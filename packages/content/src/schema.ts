@@ -61,6 +61,8 @@ export const techniqueSchema = z.strictObject({
   state: stateId.nullable(),
   /** N trainer, S scroll or library, O carrier (boss or enemy), Q quest line. */
   src: z.enum(['N', 'S', 'O', 'Q']),
+  /** For trainer techniques: the home Academy or any other mentor. `null` for other sources. */
+  mentor: z.enum(['academy', 'other']).nullable(),
   /** Ordered ids of seals needed to cast the technique. */
   sealSeq: z.array(coreId),
   sealsCanon: z.boolean(),
@@ -365,6 +367,10 @@ export const balanceParamsSchema = z.object({
   cellExplores: z.array(z.number()),
   cellLevelStep: z.number(),
   clone: z.object({ pool: z.number(), link: z.number() }),
+  academyCap: z.number().int(),
+  academySlow: z.number(),
+  offlineCapHours: z.number(),
+  masteryCap: z.number().int(),
 });
 
 /** The balance parameter object, referred to as `K` in the formulas. */

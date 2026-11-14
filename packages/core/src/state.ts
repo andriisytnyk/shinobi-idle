@@ -1,13 +1,24 @@
 import type { ContentDb, NatureId, SkillId } from '@shinobi/content';
+import type { GameEvent } from './events.ts';
 import { createStreams, type RngStreams } from './rng.ts';
+import { refreshUnlocks } from './unlocks.ts';
 
 export type Rank = 'student' | 'genin' | 'chunin';
 
+export type JsonValue =
+  string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
+/** A slot at full speed. Shares are whole thousandths so all time maths stays exact. */
+export const SHARE_FULL = 1000;
+
 export interface ActionSlot {
   action: { kind: string; id: string } | null;
+  /** Work done on the current cycle, in ms x SHARE_FULL units (a whole number). */
   progress: number;
-  /** Share of the player's speed this slot gets. */
+  /** Speed of this slot in thousandths of full speed (whole number, 0..SHARE_FULL). */
   share: number;
+  /** State private to the running action kind; plain JSON, saved with the slot. */
+  data: JsonValue;
 }
 
 /**
@@ -31,9 +42,12 @@ export interface GameState {
   known: Record<string, true>;
   slots: ActionSlot[];
   flags: Record<string, true | number>;
+  stats: { /** Action cycles completed over the whole game. */ completed: number };
+  /** One-off notices for the UI, newest last. The UI drains it; it is never saved. */
+  events: GameEvent[];
 }
 
-export const STATE_VERSION = 1;
+export const STATE_VERSION = 3;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
@@ -43,7 +57,7 @@ export function createState(seed: number, content: ContentDb): GameState {
     skills[skill.id] = { xp: 0 };
     pools[skill.id] = { xp: 0 };
   }
-  return {
+  const state: GameState = {
     v: STATE_VERSION,
     now: 0,
     rng: createStreams(seed),
@@ -54,7 +68,11 @@ export function createState(seed: number, content: ContentDb): GameState {
     bank: {},
     currencies: { ryo: 0, rep: 0, intel: 0 },
     known: {},
-    slots: [{ action: null, progress: 0, share: 1 }],
+    slots: [{ action: null, progress: 0, share: SHARE_FULL, data: null }],
     flags: {},
+    stats: { completed: 0 },
+    events: [],
   };
+  refreshUnlocks(state, content, true);
+  return state;
 }
