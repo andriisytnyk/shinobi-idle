@@ -1,0 +1,2837 @@
+{
+ "params": {
+  "cap": 50,
+  "rateBase": 4800,
+  "rateGrowth": 1.08,
+  "nativeXp": 1.25,
+  "craftXpMult": 4,
+  "masteryPerHour": 10500,
+  "poolShare": 0.25,
+  "poolCapPerItem": 1500,
+  "practiceRecovery": 1.2,
+  "practiceMin": 2,
+  "drill": 3,
+  "meditate": 3,
+  "obstacle": 2.5,
+  "gather": 2.5,
+  "craft": 2.5,
+  "explore": 5,
+  "castBase": 0.4,
+  "castPerSeal": 0.15,
+  "masteryCast": 0.5,
+  "castFloor": 0.4,
+  "nonNativeCast": 0.3,
+  "power": {
+   "E": 10,
+   "D": 10,
+   "C": 17,
+   "B": 27,
+   "A": 42,
+   "S": 65
+  },
+  "tierMult": {
+   "0": 1,
+   "1": 1.12,
+   "-1": 0.88
+  },
+  "role": {
+   "Снаряд": {
+    "m": 1,
+    "cd": 6,
+    "c": 1
+   },
+   "Серія": {
+    "m": 1.15,
+    "cd": 8,
+    "c": 1.1
+   },
+   "Площа": {
+    "m": 0.75,
+    "cd": 9,
+    "c": 1.2
+   },
+   "Контроль": {
+    "m": 0.3,
+    "cd": 11,
+    "c": 0.9
+   },
+   "Захист": {
+    "m": 0,
+    "cd": 12,
+    "c": 0.9
+   },
+   "Посилення": {
+    "m": 0,
+    "cd": 25,
+    "c": 1
+   },
+   "Сигнатурна": {
+    "m": 1.7,
+    "cd": 15,
+    "c": 1.3
+   },
+   "Тренування": {
+    "m": 0,
+    "cd": 0,
+    "c": 0
+   }
+  },
+  "rankCd": {
+   "E": 0.9,
+   "D": 1,
+   "C": 1.1,
+   "B": 1.25,
+   "A": 1.4,
+   "S": 1.6
+  },
+  "chakraCost": {
+   "E": 5,
+   "D": 6,
+   "C": 12,
+   "B": 22,
+   "A": 38,
+   "S": 60
+  },
+  "staminaCost": {
+   "E": 5,
+   "D": 6,
+   "C": 10,
+   "B": 16,
+   "A": 26,
+   "S": 40
+  },
+  "levelScale": 0.035,
+  "masteryDmg": 0.1,
+  "masteryCost": 0.25,
+  "burn": {
+   "share": 0.3,
+   "dur": 6
+  },
+  "wet": {
+   "slow": 0.15,
+   "dur": 8
+  },
+  "stun": {
+   "C": 1,
+   "B": 1.5,
+   "D": 0.7
+  },
+  "bind": {
+   "dur": 4
+  },
+  "poison": {
+   "pctPerSec": 0.02,
+   "dur": 8
+  },
+  "combo": {
+   "base": 0.15,
+   "perLevel": 0.004,
+   "perMastery": 0.001,
+   "cap": 0.6,
+   "fanBurn": 1.5,
+   "shockWet": 2,
+   "mudEva": 0.5,
+   "steam": 0.4
+  },
+  "wheel": 0.3,
+  "habituation": 0.15,
+  "habituationCap": 0.6,
+  "signatureHabituation": 0.5,
+  "hpBase": 90,
+  "hpPerVit": 8,
+  "chakraBase": 120,
+  "chakraPerMed": 0.005,
+  "chakraRegen": [
+   0.6,
+   0.02
+  ],
+  "staminaBase": 100,
+  "staminaPerAth": 0.01,
+  "staminaRegen": [
+   1,
+   0.02
+  ],
+  "accBase": 40,
+  "accPerLevel": 5,
+  "evaBase": 30,
+  "evaPerLevel": 5,
+  "hitMin": 0.05,
+  "hitMax": 0.95,
+  "basicInterval": 2.4,
+  "basicDmg": [
+   8,
+   0.45
+  ],
+  "dodgeStamina": 2,
+  "ccCostPerLevel": 0.0015,
+  "pillAction": 0.5,
+  "pouchStack": 4,
+  "pillAt": 0.45,
+  "food": [
+   [
+    1,
+    30
+   ],
+   [
+    5,
+    40
+   ],
+   [
+    20,
+    50
+   ],
+   [
+    30,
+    80
+   ],
+   [
+    35,
+    100
+   ],
+   [
+    45,
+    120
+   ]
+  ],
+  "toolTag": [
+   8,
+   0.4
+  ],
+  "zoneHpRegen": 0.35,
+  "opRegen": 0.25,
+  "respawn": 3,
+  "wound": {
+   "stat": 0.05,
+   "max": 4,
+   "healMin": 10,
+   "healFloorMin": 2.5
+  },
+  "eHp": [
+   20,
+   9.8
+  ],
+  "eDmg": [
+   4,
+   0.45
+  ],
+  "eInterval": 2.6,
+  "eAcc": [
+   40,
+   4.5
+  ],
+  "eEva": [
+   30,
+   4.2
+  ],
+  "boss": {
+   "hp": 3.2,
+   "dmg": 1.5
+  },
+  "pack": {
+   "n": 3,
+   "hp": 0.4,
+   "dmg": 0.4
+  },
+  "trait": {
+   "armor": 0.3,
+   "armorOff": 6,
+   "casterEvery": 12,
+   "casterCast": 3,
+   "casterMult": 3,
+   "evasive": 2,
+   "regenPct": 0.01,
+   "illusionEvery": 10,
+   "illusionDur": 6,
+   "illusionAcc": 0.25,
+   "hidden": 8,
+   "hiddenAcc": 0.4,
+   "hiddenFirst": 2,
+   "poisonChance": 0.35
+  },
+  "combatXp": {
+   "style": 0.7,
+   "vit": 0.35,
+   "eva": 0.3
+  },
+  "ryoPerMin": {
+   "D": 12,
+   "C": 22,
+   "V": 0,
+   "OP": 0
+  },
+  "repPerMission": {
+   "D": 2,
+   "C": 8,
+   "V": 4
+  },
+  "missionXpShare": 0.85,
+  "missionRateCap": {
+   "D": 25,
+   "C": 45,
+   "V": 40
+  },
+  "shinobiResPerMission": 3,
+  "scroll": {
+   "1": 250,
+   "2": 400,
+   "3": 900,
+   "4": 1600,
+   "5": 3500
+  },
+  "gearTier": [
+   300,
+   1500,
+   5000
+  ],
+  "obstacleBase": 150,
+  "goods": {
+   "water": 1,
+   "rice": 3,
+   "salt": 3,
+   "oil": 4,
+   "noodles": 4,
+   "meat": 5,
+   "saltpeter": 6,
+   "spice": 8,
+   "kunai": 2,
+   "shuriken": 2,
+   "senbon": 3,
+   "wire": 6,
+   "wiretrap": 20,
+   "tag": 30,
+   "medpouch": 2500
+  },
+  "travel": [
+   15,
+   30,
+   45
+  ],
+  "bounty": {
+   "boss_wolf": 400,
+   "boss_fighter": 900,
+   "boss_hunter": 1500,
+   "boss_twins": 2000,
+   "boss_mist": 2500
+  },
+  "bountyRepeat": 0.2,
+  "rep": {
+   "stage2": 120,
+   "exam": 300,
+   "boss": 15,
+   "questFinal": 30
+  },
+  "intel": {
+   "perCellLevel": 1,
+   "mail": 2,
+   "track": [
+    3,
+    5
+   ],
+   "caravanSkip": 1,
+   "bingoLevel": 2,
+   "writtenTestPerIntel": 0.1,
+   "writtenTestMaxIntel": 5
+  },
+  "partsPerScroll": 10,
+  "partDrop": {
+   "boss": 2,
+   "carrier": 0.12,
+   "mission": 0.15
+  },
+  "tickMin": 5,
+  "prod": 10,
+  "costBase": 20,
+  "costMult": [
+   1,
+   2.2,
+   4.8,
+   10.5,
+   23,
+   50
+  ],
+  "treasuryBase": 100,
+  "buildTicks": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   8
+  ],
+  "bureauIncome": 20,
+  "storeCap": [
+   200,
+   200
+  ],
+  "shinobiCap": [
+   30,
+   10
+  ],
+  "shinobiT6": 30,
+  "towerStageMax": [
+   3,
+   6
+  ],
+  "cellExplores": [
+   24,
+   84,
+   156,
+   240,
+   360
+  ],
+  "cellLevelStep": 10,
+  "clone": {
+   "pool": 1,
+   "link": 0.1
+  }
+ },
+ "pace": {
+  "tai": [
+   13,
+   29,
+   48,
+   72,
+   108
+  ],
+  "nin": [
+   11,
+   26,
+   46,
+   75,
+   112
+  ],
+  "cc": [
+   11,
+   26,
+   50,
+   80,
+   117
+  ],
+  "med": [
+   13,
+   33,
+   56,
+   86,
+   123
+  ],
+  "ath": [
+   13,
+   33,
+   56,
+   86,
+   123
+  ],
+  "herb": [
+   11,
+   26,
+   46,
+   69,
+   99
+  ],
+  "scout": [
+   13,
+   31,
+   53,
+   81,
+   115
+  ],
+  "prov": [
+   3,
+   7,
+   11,
+   19,
+   26
+  ],
+  "alch": [
+   3,
+   7,
+   11,
+   17,
+   25
+  ],
+  "katon": [
+   13,
+   33,
+   56,
+   80,
+   117
+  ],
+  "futon": [
+   13,
+   33,
+   56,
+   80,
+   117
+  ],
+  "raiton": [
+   13,
+   33,
+   56,
+   80,
+   134
+  ],
+  "doton": [
+   13,
+   33,
+   56,
+   80,
+   110
+  ],
+  "suiton": [
+   13,
+   33,
+   56,
+   86,
+   116
+  ]
+ },
+ "capHours": 24.1,
+ "techniques": [
+  {
+   "id": "core:leaf_whirlwind",
+   "name": "Листяний вихор",
+   "skill": "tai",
+   "role": "Серія",
+   "tags": [
+    "Переривання"
+   ],
+   "state": "",
+   "rank": "D",
+   "seals": 0,
+   "cast": 0.4,
+   "cd": 8,
+   "cost": 6.6,
+   "res": "stamina",
+   "dmg": 11.9,
+   "aoe": false,
+   "hits": 3,
+   "level": 1,
+   "dmg50": 31.7
+  },
+  {
+   "id": "core:dynamic_entry",
+   "name": "Динамічний вхід",
+   "skill": "tai",
+   "role": "Снаряд",
+   "tags": [
+    "Переривання"
+   ],
+   "state": "",
+   "rank": "D",
+   "seals": 0,
+   "cast": 0.4,
+   "cd": 6,
+   "cost": 6,
+   "res": "stamina",
+   "dmg": 13.5,
+   "aoe": false,
+   "hits": 1,
+   "level": 10,
+   "dmg50": 27.5
+  },
+  {
+   "id": "core:leaf_gale",
+   "name": "Листяний шквал",
+   "skill": "tai",
+   "role": "Серія",
+   "tags": [
+    "Переривання"
+   ],
+   "state": "",
+   "rank": "D",
+   "seals": 0,
+   "cast": 0.4,
+   "cd": 8,
+   "cost": 6.6,
+   "res": "stamina",
+   "dmg": 17.6,
+   "aoe": false,
+   "hits": 3,
+   "level": 15,
+   "dmg50": 31.7
+  },
+  {
+   "id": "core:gate_of_opening",
+   "name": "Брама відкриття",
+   "skill": "tai",
+   "role": "Посилення",
+   "tags": [],
+   "state": "",
+   "rank": "D",
+   "seals": 0,
+   "cast": 0.4,
+   "cd": 25,
+   "cost": 6,
+   "res": "stamina",
+   "dmg": 0,
+   "aoe": false,
+   "hits": 1,
+   "level": 20,
+   "dmg50": 0
+  },
+  {
+   "id": "core:gate_of_healing",
+   "name": "Брама зцілення",
+   "skill": "tai",
+   "role": "Посилення",
+   "tags": [],
+   "state": "",
+   "rank": "D",
+   "seals": 0,
+   "cast": 0.4,
+   "cd": 25,
+   "cost": 6,
+   "res": "stamina",
+   "dmg": 0,
+   "aoe": false,
+   "hits": 1,
+   "level": 25,
+   "dmg50": 0
+  },
+  {
+   "id": "core:lion_combo",
+   "name": "Левове комбо",
+   "skill": "tai",
+   "role": "Серія",
+   "tags": [],
+   "state": "",
+   "rank": "C",
+   "seals": 0,
+   "cast": 0.4,
+   "cd": 8.8,
+   "cost": 11,
+   "res": "stamina",
+   "dmg": 44.9,
+   "aoe": false,
+   "hits": 3,
+   "level": 30,
+   "dmg50": 60.3
+  },
+  {
+   "id": "core:leaf_great_whirlwind",
+   "name": "Листяний великий вихор",
+   "skill": "tai",
+   "role": "Площа",
+   "tags": [
+    "Площа"
+   ],
+   "state": "",
+   "rank": "C",
+   "seals": 0,
+   "cast": 0.4,
+   "cd": 9.9,
+   "cost": 12,
+   "res": "stamina",
+   "dmg": 28.4,
+   "aoe": true,
+   "hits": 1,
+   "level": 35,
+   "dmg50": 35.1
+  },
+  {
+   "id": "core:drunken_fist",
+   "name": "П'яний кулак",
+   "skill": "tai",
+   "role": "Серія",
+   "tags": [],
+   "state": "",
+   "rank": "C",
+   "seals": 0,
+   "cast": 0.4,
+   "cd": 8.8,
+   "cost": 11,
+   "res": "stamina",
+   "dmg": 52.6,
+   "aoe": false,
+   "hits": 3,
+   "level": 40,
+   "dmg50": 60.3
+  },
+  {
+   "id": "core:leaf_rising_wind",
+   "name": "Листяний висхідний вітер",
+   "skill": "tai",
+   "role": "Серія",
+   "tags": [],
+   "state": "",
+   "rank": "C",
+   "seals": 0,
+   "cast": 0.4,
+   "cd": 8.8,
+   "cost": 11,
+   "res": "stamina",
+   "dmg": 50.4,
+   "aoe": false,
+   "hits": 3,
+   "level": 45,
+   "dmg50": 53.8
+  },
+  {
+   "id": "core:front_lotus",
+   "name": "Передній лотос",
+   "skill": "tai",
+   "role": "Сигнатурна",
+   "tags": [],
+   "state": "",
+   "rank": "B",
+   "seals": 0,
+   "cast": 0.4,
+   "cd": 18.8,
+   "cost": 20.7,
+   "res": "stamina",
+   "dmg": 141.5,
+   "aoe": false,
+   "hits": 1,
+   "level": 50,
+   "dmg50": 141.5
+  },
+  {
+   "id": "core:clone",
+   "name": "Техніка клонування",
+   "skill": "nin",
+   "role": "Захист",
+   "tags": [],
+   "state": "",
+   "rank": "D",
+   "seals": 3,
+   "cast": 0.85,
+   "cd": 12,
+   "cost": 5.4,
+   "res": "chakra",
+   "dmg": 0,
+   "aoe": false,
+   "hits": 1,
+   "level": 1,
+   "dmg50": 0
+  },
+  {
+   "id": "core:transformation",
+   "name": "Техніка перевтілення",
+   "skill": "nin",
+   "role": "Посилення",
+   "tags": [],
+   "state": "",
+   "rank": "D",
+   "seals": 3,
+   "cast": 0.85,
+   "cd": 25,
+   "cost": 6,
+   "res": "chakra",
+   "dmg": 0,
+   "aoe": false,
+   "hits": 1,
+   "level": 1,
+   "dmg50": 0
+  },
+  {
+   "id": "core:body_replacement",
+   "name": "Техніка підміни",
+   "skill": "nin",
+   "role": "Захист",
+   "tags": [
+    "Захист"
+   ],
+   "state": "",
+   "rank": "D",
+   "seals": 5,
+   "cast": 1.15,
+   "cd": 12,
+   "cost": 5.4,
+   "res": "chakra",
+   "dmg": 0,
+   "aoe": false,
+   "hits": 1,
+   "level": 1,
+   "dmg50": 0
+  },
+  {
+   "id": "core:body_flicker",
+   "name": "Техніка мерехтіння тіла",
+   "skill": "nin",
+   "role": "Посилення",
+   "tags": [],
+   "state": "",
+   "rank": "D",
+   "seals": 1,
+   "cast": 0.55,
+   "cd": 25,
+   "cost": 6,
+   "res": "chakra",
+   "dmg": 0,
+   "aoe": false,
+   "hits": 1,
+   "level": 5,
+   "dmg50": 0
+  },
+  {
+   "id": "core:shadow_shuriken",
+   "name": "Техніка тіньового сюрікена",
+   "skill": "nin",
+   "role": "Снаряд",
+   "tags": [
+    "Переривання"
+   ],
+   "state": "",
+   "rank": "D",
+   "seals": 0,
+   "cast": 0.4,
+   "cd": 6,
+   "cost": 6,
+   "res": "chakra",
+   "dmg": 13.5,
+   "aoe": false,
+   "hits": 1,
+   "level": 10,
+   "dmg50": 27.5
+  },
+  {
+   "id": "core:enclosing",
+   "name": "Техніка запечатування",
+   "skill": "nin",
+   "role": "Контроль",
+   "tags": [],
+   "state": "",
+   "rank": "D",
+   "seals": 0,
+   "cast": 0.4,
+   "cd": 11,
+   "cost": 5.4,
+   "res": "chakra",
+   "dmg": 0,
+   "aoe": false,
+   "hits": 1,
+   "level": 15,
+   "dmg50": 0
+  },
+  {
+   "id": "core:sensing",
+   "name": "Сенсорна техніка",
+   "skill": "nin",
+   "role": "Контроль",
+   "tags": [
+    "Виявлення"
+   ],
+   "state": "",
+   "rank": "D",
+   "seals": 1,
+   "cast": 0.55,
+   "cd": 11,
+   "cost": 5.4,
+   "res": "chakra",
+   "dmg": 0,
+   "aoe": false,
+   "hits": 1,
+   "level": 20,
+   "dmg50": 0
+  },
+  {
+   "id": "core:rope_escape",
+   "name": "Техніка звільнення від мотузок",
+   "skill": "nin",
+   "role": "Захист",
+   "tags": [],
+   "state": "",
+   "rank": "D",
+   "seals": 0,
+   "cast": 0.4,
+   "cd": 12,
+   "cost": 5.4,
+   "res": "chakra",
+   "dmg": 0,
+   "aoe": false,
+   "hits": 1,
+   "level": 25,
+   "dmg50": 0
+  },
+  {
+   "id": "core:temporary_paralysis",
+   "name": "Техніка тимчасового паралічу",
+   "skill": "nin",
+   "role": "Контроль",
+   "tags": [
+    "Сковування"
+   ],
+   "state": "",
+   "rank": "D",
+   "seals": 1,
+   "cast": 0.55,
+   "cd": 11,
+   "cost": 5.4,
+   "res": "chakra",
+   "dmg": 6.2,
+   "aoe": false,
+   "hits": 1,
+   "level": 30,
+   "dmg50": 8.3
+  },
+  {
+   "id": "core:hidden_shadow_snake_hands",
+   "name": "Приховані тіньові руки-змії",
+   "skill": "nin",
+   "role": "Контроль",
+   "tags": [
+    "Сковування"
+   ],
+   "state": "",
+   "rank": "C",
+   "seals": 0,
+   "cast": 0.4,
+   "cd": 12.1,
+   "cost": 10.8,
+   "res": "chakra",
+   "dmg": 11.4,
+   "aoe": false,
+   "hits": 1,
+   "level": 35,
+   "dmg50": 14
+  },
+  {
+   "id": "core:shadow_clone",
+   "name": "Техніка тіньового клонування",
+   "skill": "nin",
+   "role": "Серія",
+   "tags": [
+    "Площа"
+   ],
+   "state": "",
+   "rank": "B",
+   "seals": 1,
+   "cast": 0.55,
+   "cd": 10,
+   "cost": 24.1,
+   "res": "chakra",
+   "dmg": 85.5,
+   "aoe": false,
+   "hits": 3,
+   "level": 50,
+   "dmg50": 85.5
+  },
+  {
+   "id": "core:running_fire",
+   "name": "Вогняна доріжка",
+   "skill": "katon",
+   "role": "Площа",
+   "tags": [
+    "Площа"
+   ],
+   "state": "Горіння",
+   "rank": "D",
+   "seals": 1,
+   "cast": 0.55,
+   "cd": 9,
+   "cost": 7.2,
+   "res": "chakra",
+   "dmg": 11.2,
+   "aoe": true,
+   "hits": 1,
+   "level": 20,
+   "dmg50": 18.2
+  },
+  {
+   "id": "core:great_fireball",
+   "name": "Техніка великої вогняної кулі",
+   "skill": "katon",
+   "role": "Снаряд",
+   "tags": [
+    "Тривала шкода"
+   ],
+   "state": "Горіння",
+   "rank": "C",
+   "seals": 6,
+   "cast": 1.3,
+   "cd": 6.6,
+   "cost": 12,
+   "res": "chakra",
+   "dmg": 34.9,
+   "aoe": false,
+   "hits": 1,
+   "level": 30,
+   "dmg50": 46.8
+  },
+  {
+   "id": "core:phoenix_sage_fire",
+   "name": "Техніка вогню фенікса-мудреця",
+   "skill": "katon",
+   "role": "Серія",
+   "tags": [
+    "Тривала шкода"
+   ],
+   "state": "Горіння",
+   "rank": "C",
+   "seals": 6,
+   "cast": 1.3,
+   "cd": 8.8,
+   "cost": 13.2,
+   "res": "chakra",
+   "dmg": 38.3,
+   "aoe": false,
+   "hits": 3,
+   "level": 35,
+   "dmg50": 47.4
+  },
+  {
+   "id": "core:dragon_fire",
+   "name": "Техніка вогню дракона",
+   "skill": "katon",
+   "role": "Снаряд",
+   "tags": [
+    "Тривала шкода"
+   ],
+   "state": "Горіння",
+   "rank": "C",
+   "seals": 4,
+   "cast": 1,
+   "cd": 6.6,
+   "cost": 12,
+   "res": "chakra",
+   "dmg": 45.7,
+   "aoe": false,
+   "hits": 1,
+   "level": 40,
+   "dmg50": 52.4
+  },
+  {
+   "id": "core:fire_dragon_flame_bullet",
+   "name": "Полум'яна куля вогняного дракона",
+   "skill": "katon",
+   "role": "Площа",
+   "tags": [
+    "Площа"
+   ],
+   "state": "Горіння",
+   "rank": "B",
+   "seals": 7,
+   "cast": 1.45,
+   "cd": 11.3,
+   "cost": 26.3,
+   "res": "chakra",
+   "dmg": 62.4,
+   "aoe": true,
+   "hits": 1,
+   "level": 50,
+   "dmg50": 62.4
+  },
+  {
+   "id": "core:gale_palm",
+   "name": "Шквальна долоня",
+   "skill": "futon",
+   "role": "Снаряд",
+   "tags": [
+    "Пробиття"
+   ],
+   "state": "",
+   "rank": "C",
+   "seals": 6,
+   "cast": 1.3,
+   "cd": 6.6,
+   "cost": 12,
+   "res": "chakra",
+   "dmg": 30.7,
+   "aoe": false,
+   "hits": 1,
+   "level": 30,
+   "dmg50": 41.2
+  },
+  {
+   "id": "core:great_breakthrough",
+   "name": "Великий прорив",
+   "skill": "futon",
+   "role": "Площа",
+   "tags": [
+    "Площа",
+    "Виявлення"
+   ],
+   "state": "",
+   "rank": "C",
+   "seals": 5,
+   "cast": 1.15,
+   "cd": 9.9,
+   "cost": 14.4,
+   "res": "chakra",
+   "dmg": 28.4,
+   "aoe": true,
+   "hits": 1,
+   "level": 35,
+   "dmg50": 35.1
+  },
+  {
+   "id": "core:sickle_weasel",
+   "name": "Техніка серповидної ласки",
+   "skill": "futon",
+   "role": "Площа",
+   "tags": [
+    "Пробиття",
+    "Виявлення"
+   ],
+   "state": "",
+   "rank": "C",
+   "seals": 3,
+   "cast": 0.85,
+   "cd": 9.9,
+   "cost": 14.4,
+   "res": "chakra",
+   "dmg": 34.3,
+   "aoe": true,
+   "hits": 1,
+   "level": 40,
+   "dmg50": 39.3
+  },
+  {
+   "id": "core:vacuum_wave",
+   "name": "Вакуумна хвиля",
+   "skill": "futon",
+   "role": "Площа",
+   "tags": [
+    "Пробиття",
+    "Площа"
+   ],
+   "state": "",
+   "rank": "B",
+   "seals": 4,
+   "cast": 1,
+   "cd": 11.3,
+   "cost": 26.3,
+   "res": "chakra",
+   "dmg": 55.7,
+   "aoe": true,
+   "hits": 1,
+   "level": 50,
+   "dmg50": 55.7
+  },
+  {
+   "id": "core:four_pillar_bind",
+   "name": "Пута чотирьох стовпів",
+   "skill": "raiton",
+   "role": "Контроль",
+   "tags": [
+    "Сковування"
+   ],
+   "state": "Оглушення",
+   "rank": "C",
+   "seals": 5,
+   "cast": 1.15,
+   "cd": 12.1,
+   "cost": 10.8,
+   "res": "chakra",
+   "dmg": 10.5,
+   "aoe": false,
+   "hits": 1,
+   "level": 30,
+   "dmg50": 14
+  },
+  {
+   "id": "core:lightning_beast_tracking_fang",
+   "name": "Ікло блискавичного звіра",
+   "skill": "raiton",
+   "role": "Снаряд",
+   "tags": [
+    "Переривання"
+   ],
+   "state": "Оглушення",
+   "rank": "C",
+   "seals": 3,
+   "cast": 0.85,
+   "cd": 6.6,
+   "cost": 12,
+   "res": "chakra",
+   "dmg": 37.9,
+   "aoe": false,
+   "hits": 1,
+   "level": 35,
+   "dmg50": 46.8
+  },
+  {
+   "id": "core:wave_of_inspiration",
+   "name": "Хвиля натхнення",
+   "skill": "raiton",
+   "role": "Снаряд",
+   "tags": [
+    "Переривання"
+   ],
+   "state": "Оглушення",
+   "rank": "C",
+   "seals": 5,
+   "cast": 1.15,
+   "cd": 6.6,
+   "cost": 12,
+   "res": "chakra",
+   "dmg": 40.8,
+   "aoe": false,
+   "hits": 1,
+   "level": 40,
+   "dmg50": 46.8
+  },
+  {
+   "id": "core:false_darkness",
+   "name": "Хибна темрява",
+   "skill": "raiton",
+   "role": "Снаряд",
+   "tags": [
+    "Пробиття",
+    "Переривання"
+   ],
+   "state": "Оглушення",
+   "rank": "B",
+   "seals": 1,
+   "cast": 0.55,
+   "cd": 7.5,
+   "cost": 21.9,
+   "res": "chakra",
+   "dmg": 83.2,
+   "aoe": false,
+   "hits": 1,
+   "level": 50,
+   "dmg50": 83.2
+  },
+  {
+   "id": "core:double_suicide_decapitation",
+   "name": "Техніка подвійного самогубчого обезглавлення",
+   "skill": "doton",
+   "role": "Контроль",
+   "tags": [
+    "Сковування"
+   ],
+   "state": "",
+   "rank": "D",
+   "seals": 0,
+   "cast": 0.4,
+   "cd": 11,
+   "cost": 5.4,
+   "res": "chakra",
+   "dmg": 4.1,
+   "aoe": false,
+   "hits": 1,
+   "level": 10,
+   "dmg50": 8.3
+  },
+  {
+   "id": "core:hiding_like_a_mole",
+   "name": "Техніка ховання як кріт",
+   "skill": "doton",
+   "role": "Контроль",
+   "tags": [],
+   "state": "",
+   "rank": "C",
+   "seals": 0,
+   "cast": 0.4,
+   "cd": 12.1,
+   "cost": 10.8,
+   "res": "chakra",
+   "dmg": 0,
+   "aoe": false,
+   "hits": 1,
+   "level": 30,
+   "dmg50": 0
+  },
+  {
+   "id": "core:tearing_earth_turning_palm",
+   "name": "Долоня, що розриває землю",
+   "skill": "doton",
+   "role": "Площа",
+   "tags": [
+    "Площа"
+   ],
+   "state": "",
+   "rank": "C",
+   "seals": 3,
+   "cast": 0.85,
+   "cd": 9.9,
+   "cost": 14.4,
+   "res": "chakra",
+   "dmg": 28.4,
+   "aoe": true,
+   "hits": 1,
+   "level": 35,
+   "dmg50": 35.1
+  },
+  {
+   "id": "core:earth_flow_river",
+   "name": "Земляна ріка",
+   "skill": "doton",
+   "role": "Контроль",
+   "tags": [
+    "Сковування"
+   ],
+   "state": "",
+   "rank": "C",
+   "seals": 1,
+   "cast": 0.55,
+   "cd": 12.1,
+   "cost": 10.8,
+   "res": "chakra",
+   "dmg": 12.3,
+   "aoe": false,
+   "hits": 1,
+   "level": 40,
+   "dmg50": 14
+  },
+  {
+   "id": "core:earth_dragon_bullet",
+   "name": "Куля земляного дракона",
+   "skill": "doton",
+   "role": "Снаряд",
+   "tags": [],
+   "state": "",
+   "rank": "C",
+   "seals": 3,
+   "cast": 0.85,
+   "cd": 6.6,
+   "cost": 12,
+   "res": "chakra",
+   "dmg": 49.1,
+   "aoe": false,
+   "hits": 1,
+   "level": 45,
+   "dmg50": 52.4
+  },
+  {
+   "id": "core:earth_style_wall",
+   "name": "Стіна земляного стилю",
+   "skill": "doton",
+   "role": "Захист",
+   "tags": [
+    "Захист"
+   ],
+   "state": "",
+   "rank": "B",
+   "seals": 4,
+   "cast": 1,
+   "cd": 15,
+   "cost": 19.8,
+   "res": "chakra",
+   "dmg": 0,
+   "aoe": false,
+   "hits": 1,
+   "level": 50,
+   "dmg50": 0
+  },
+  {
+   "id": "core:hiding_in_mist",
+   "name": "Техніка ховання в тумані",
+   "skill": "suiton",
+   "role": "Захист",
+   "tags": [],
+   "state": "",
+   "rank": "D",
+   "seals": 3,
+   "cast": 0.85,
+   "cd": 12,
+   "cost": 5.4,
+   "res": "chakra",
+   "dmg": 0,
+   "aoe": false,
+   "hits": 1,
+   "level": 10,
+   "dmg50": 0
+  },
+  {
+   "id": "core:water_clone",
+   "name": "Техніка водяного клону",
+   "skill": "suiton",
+   "role": "Захист",
+   "tags": [],
+   "state": "",
+   "rank": "C",
+   "seals": 1,
+   "cast": 0.55,
+   "cd": 13.2,
+   "cost": 10.8,
+   "res": "chakra",
+   "dmg": 0,
+   "aoe": false,
+   "hits": 1,
+   "level": 30,
+   "dmg50": 0
+  },
+  {
+   "id": "core:wild_water_wave",
+   "name": "Буйна водяна хвиля",
+   "skill": "suiton",
+   "role": "Снаряд",
+   "tags": [],
+   "state": "Мокрий",
+   "rank": "C",
+   "seals": 3,
+   "cast": 0.85,
+   "cd": 6.6,
+   "cost": 12,
+   "res": "chakra",
+   "dmg": 30.7,
+   "aoe": false,
+   "hits": 1,
+   "level": 30,
+   "dmg50": 41.2
+  },
+  {
+   "id": "core:water_prison",
+   "name": "Техніка водяної в'язниці",
+   "skill": "suiton",
+   "role": "Контроль",
+   "tags": [
+    "Сковування"
+   ],
+   "state": "Мокрий",
+   "rank": "C",
+   "seals": 8,
+   "cast": 1.6,
+   "cd": 12.1,
+   "cost": 10.8,
+   "res": "chakra",
+   "dmg": 11.4,
+   "aoe": false,
+   "hits": 1,
+   "level": 35,
+   "dmg50": 14
+  },
+  {
+   "id": "core:gunshot",
+   "name": "Постріл",
+   "skill": "suiton",
+   "role": "Площа",
+   "tags": [
+    "Площа"
+   ],
+   "state": "Мокрий",
+   "rank": "C",
+   "seals": 1,
+   "cast": 0.55,
+   "cd": 9.9,
+   "cost": 14.4,
+   "res": "chakra",
+   "dmg": 30.6,
+   "aoe": true,
+   "hits": 1,
+   "level": 40,
+   "dmg50": 35.1
+  },
+  {
+   "id": "core:starch_syrup_capturing_field",
+   "name": "Поле липкого сиропу",
+   "skill": "suiton",
+   "role": "Контроль",
+   "tags": [
+    "Сковування"
+   ],
+   "state": "Мокрий",
+   "rank": "C",
+   "seals": 2,
+   "cast": 0.7,
+   "cd": 12.1,
+   "cost": 10.8,
+   "res": "chakra",
+   "dmg": 13.1,
+   "aoe": false,
+   "hits": 1,
+   "level": 45,
+   "dmg50": 14
+  },
+  {
+   "id": "core:water_formation_wall",
+   "name": "Стіна водяного табору",
+   "skill": "suiton",
+   "role": "Захист",
+   "tags": [
+    "Захист"
+   ],
+   "state": "Мокрий",
+   "rank": "B",
+   "seals": 5,
+   "cast": 1.15,
+   "cd": 15,
+   "cost": 19.8,
+   "res": "chakra",
+   "dmg": 0,
+   "aoe": false,
+   "hits": 1,
+   "level": 50,
+   "dmg50": 0
+  }
+ ],
+ "enemies": [
+  {
+   "id": "dummy",
+   "cl": 2,
+   "hp": 40,
+   "dmg": 4.9
+  },
+  {
+   "id": "bandit",
+   "cl": 6,
+   "hp": 79,
+   "dmg": 6.7
+  },
+  {
+   "id": "arsonist",
+   "cl": 9,
+   "hp": 108,
+   "dmg": 8.1
+  },
+  {
+   "id": "wolf",
+   "cl": 10,
+   "hp": 118,
+   "dmg": 8.5
+  },
+  {
+   "id": "wolfmask",
+   "cl": 13,
+   "hp": 147,
+   "dmg": 9.9
+  },
+  {
+   "id": "centipede",
+   "cl": 15,
+   "hp": 167,
+   "dmg": 10.8
+  },
+  {
+   "id": "tiger",
+   "cl": 20,
+   "hp": 216,
+   "dmg": 13
+  },
+  {
+   "id": "thief",
+   "cl": 16,
+   "hp": 177,
+   "dmg": 11.2
+  },
+  {
+   "id": "merc_pack",
+   "cl": 19,
+   "hp": 206,
+   "dmg": 12.6
+  },
+  {
+   "id": "heavy",
+   "cl": 24,
+   "hp": 255,
+   "dmg": 14.8
+  },
+  {
+   "id": "marauder",
+   "cl": 22,
+   "hp": 236,
+   "dmg": 13.9
+  },
+  {
+   "id": "poisoner",
+   "cl": 24,
+   "hp": 255,
+   "dmg": 14.8
+  },
+  {
+   "id": "kumo",
+   "cl": 28,
+   "hp": 294,
+   "dmg": 16.6
+  },
+  {
+   "id": "suna",
+   "cl": 26,
+   "hp": 275,
+   "dmg": 15.7
+  },
+  {
+   "id": "hunter",
+   "cl": 30,
+   "hp": 314,
+   "dmg": 17.5
+  },
+  {
+   "id": "hunter_caster",
+   "cl": 32,
+   "hp": 334,
+   "dmg": 18.4
+  },
+  {
+   "id": "kiri_hunter",
+   "cl": 34,
+   "hp": 353,
+   "dmg": 19.3
+  },
+  {
+   "id": "guard_pack",
+   "cl": 33,
+   "hp": 343,
+   "dmg": 18.9
+  },
+  {
+   "id": "veteran",
+   "cl": 36,
+   "hp": 373,
+   "dmg": 20.2
+  },
+  {
+   "id": "oro_aide",
+   "cl": 36,
+   "hp": 373,
+   "dmg": 20.2
+  },
+  {
+   "id": "serpent",
+   "cl": 38,
+   "hp": 392,
+   "dmg": 21.1
+  },
+  {
+   "id": "leech",
+   "cl": 36,
+   "hp": 373,
+   "dmg": 20.2
+  },
+  {
+   "id": "fake_genin",
+   "cl": 39,
+   "hp": 402,
+   "dmg": 21.6
+  },
+  {
+   "id": "foreign_genin",
+   "cl": 40,
+   "hp": 412,
+   "dmg": 22
+  },
+  {
+   "id": "boss_wolf",
+   "cl": 22,
+   "hp": 754,
+   "dmg": 20.9,
+   "boss": true
+  },
+  {
+   "id": "boss_ren1",
+   "cl": 26,
+   "hp": 879,
+   "dmg": 23.6,
+   "boss": true
+  },
+  {
+   "id": "boss_fighter",
+   "cl": 32,
+   "hp": 1068,
+   "dmg": 27.6,
+   "boss": true
+  },
+  {
+   "id": "boss_hunter",
+   "cl": 36,
+   "hp": 1193,
+   "dmg": 30.3,
+   "boss": true
+  },
+  {
+   "id": "boss_twins",
+   "cl": 38,
+   "hp": 1256,
+   "dmg": 31.7,
+   "boss": true
+  },
+  {
+   "id": "boss_mist",
+   "cl": 40,
+   "hp": 1318,
+   "dmg": 33,
+   "boss": true
+  },
+  {
+   "id": "boss_nameless",
+   "cl": 44,
+   "hp": 1444,
+   "dmg": 35.7,
+   "boss": true
+  },
+  {
+   "id": "boss_ren2",
+   "cl": 42,
+   "hp": 1381,
+   "dmg": 34.4,
+   "boss": true
+  }
+ ],
+ "sim": [
+  {
+   "label": "Звичайний ворог свого рівня (10)",
+   "nature": "katon",
+   "win": 100,
+   "ttk": 32,
+   "hpLost": 34,
+   "load": [
+    "Листяний вихор"
+   ]
+  },
+  {
+   "label": "Звичайний ворог свого рівня (10)",
+   "nature": "doton",
+   "win": 100,
+   "ttk": 26,
+   "hpLost": 27,
+   "load": [
+    "Листяний вихор",
+    "Техніка подвійного самогубчого обезглавлення"
+   ]
+  },
+  {
+   "label": "Звичайний ворог свого рівня (10)",
+   "nature": "suiton",
+   "win": 100,
+   "ttk": 32,
+   "hpLost": 34,
+   "load": [
+    "Листяний вихор"
+   ]
+  },
+  {
+   "label": "Звичайний ворог свого рівня (20)",
+   "nature": "katon",
+   "win": 100,
+   "ttk": 26,
+   "hpLost": 29,
+   "load": [
+    "Динамічний вхід",
+    "Техніка тіньового сюрікена",
+    "Листяний вихор",
+    "Листяний шквал"
+   ]
+  },
+  {
+   "label": "Звичайний ворог свого рівня (20)",
+   "nature": "doton",
+   "win": 100,
+   "ttk": 26,
+   "hpLost": 29,
+   "load": [
+    "Динамічний вхід",
+    "Техніка тіньового сюрікена",
+    "Листяний вихор",
+    "Листяний шквал"
+   ]
+  },
+  {
+   "label": "Звичайний ворог свого рівня (20)",
+   "nature": "suiton",
+   "win": 100,
+   "ttk": 26,
+   "hpLost": 29,
+   "load": [
+    "Динамічний вхід",
+    "Техніка тіньового сюрікена",
+    "Листяний вихор",
+    "Листяний шквал"
+   ]
+  },
+  {
+   "label": "Звичайний ворог свого рівня (30)",
+   "nature": "katon",
+   "win": 100,
+   "ttk": 24,
+   "hpLost": 27,
+   "load": [
+    "Левове комбо",
+    "Техніка великої вогняної кулі",
+    "Динамічний вхід",
+    "Техніка тіньового сюрікена"
+   ]
+  },
+  {
+   "label": "Звичайний ворог свого рівня (30)",
+   "nature": "doton",
+   "win": 100,
+   "ttk": 25,
+   "hpLost": 29,
+   "load": [
+    "Левове комбо",
+    "Динамічний вхід",
+    "Техніка тіньового сюрікена",
+    "Листяний вихор"
+   ]
+  },
+  {
+   "label": "Звичайний ворог свого рівня (30)",
+   "nature": "suiton",
+   "win": 100,
+   "ttk": 25,
+   "hpLost": 25,
+   "load": [
+    "Левове комбо",
+    "Буйна водяна хвиля",
+    "Динамічний вхід",
+    "Техніка тіньового сюрікена"
+   ]
+  },
+  {
+   "label": "Звичайний ворог свого рівня (40)",
+   "nature": "katon",
+   "win": 100,
+   "ttk": 21,
+   "hpLost": 24,
+   "load": [
+    "Техніка вогню дракона",
+    "Левове комбо",
+    "П'яний кулак",
+    "Техніка великої вогняної кулі"
+   ]
+  },
+  {
+   "label": "Звичайний ворог свого рівня (40)",
+   "nature": "doton",
+   "win": 100,
+   "ttk": 23,
+   "hpLost": 27,
+   "load": [
+    "Куля земляного дракона",
+    "Левове комбо",
+    "П'яний кулак",
+    "Динамічний вхід"
+   ]
+  },
+  {
+   "label": "Звичайний ворог свого рівня (40)",
+   "nature": "suiton",
+   "win": 100,
+   "ttk": 24,
+   "hpLost": 26,
+   "load": [
+    "Левове комбо",
+    "П'яний кулак",
+    "Буйна водяна хвиля",
+    "Динамічний вхід"
+   ]
+  },
+  {
+   "label": "Ворог на 5 рівнів сильніший (20 проти 25)",
+   "nature": "katon",
+   "win": 99,
+   "ttk": 40,
+   "hpLost": 59,
+   "load": [
+    "Динамічний вхід",
+    "Техніка тіньового сюрікена",
+    "Листяний вихор",
+    "Листяний шквал"
+   ]
+  },
+  {
+   "label": "Ворог на 5 рівнів сильніший (35 проти 40)",
+   "nature": "katon",
+   "win": 100,
+   "ttk": 29,
+   "hpLost": 40,
+   "load": [
+    "Левове комбо",
+    "Техніка великої вогняної кулі",
+    "Техніка вогню фенікса-мудреця",
+    "Динамічний вхід"
+   ]
+  },
+  {
+   "trait": "Броня",
+   "nature": "futon",
+   "with": {
+    "win": 100,
+    "ttk": 28,
+    "hpLost": 32,
+    "load": [
+     "Шквальна долоня",
+     "Левове комбо",
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена"
+    ]
+   },
+   "without": {
+    "win": 100,
+    "ttk": 43,
+    "hpLost": 52,
+    "load": [
+     "Левове комбо",
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена",
+     "Листяний вихор"
+    ]
+   }
+  },
+  {
+   "trait": "Броня",
+   "nature": "katon",
+   "with": {
+    "win": 100,
+    "ttk": 33,
+    "hpLost": 38,
+    "load": [
+     "Левове комбо",
+     "Техніка великої вогняної кулі",
+     "Техніка вогню фенікса-мудреця",
+     "Динамічний вхід"
+    ]
+   },
+   "without": {
+    "win": 100,
+    "ttk": 33,
+    "hpLost": 38,
+    "load": [
+     "Левове комбо",
+     "Техніка великої вогняної кулі",
+     "Техніка вогню фенікса-мудреця",
+     "Динамічний вхід"
+    ]
+   }
+  },
+  {
+   "trait": "Кастер",
+   "nature": "raiton",
+   "with": {
+    "win": 100,
+    "ttk": 26,
+    "hpLost": 28,
+    "load": [
+     "Ікло блискавичного звіра",
+     "Левове комбо",
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена"
+    ]
+   },
+   "without": {
+    "win": 99,
+    "ttk": 33,
+    "hpLost": 64,
+    "load": [
+     "Левове комбо",
+     "Пута чотирьох стовпів",
+     "Техніка тимчасового паралічу"
+    ]
+   }
+  },
+  {
+   "trait": "Кастер",
+   "nature": "doton",
+   "with": {
+    "win": 100,
+    "ttk": 28,
+    "hpLost": 32,
+    "load": [
+     "Листяний вихор",
+     "Левове комбо",
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена"
+    ]
+   },
+   "without": {
+    "win": 100,
+    "ttk": 29,
+    "hpLost": 56,
+    "load": [
+     "Левове комбо",
+     "Долоня, що розриває землю",
+     "Техніка подвійного самогубчого обезглавлення",
+     "Техніка тимчасового паралічу"
+    ]
+   }
+  },
+  {
+   "trait": "Зграя",
+   "nature": "katon",
+   "with": {
+    "win": 100,
+    "ttk": 29,
+    "hpLost": 25,
+    "load": [
+     "Вогняна доріжка",
+     "Левове комбо",
+     "Техніка великої вогняної кулі",
+     "Техніка вогню фенікса-мудреця"
+    ]
+   },
+   "without": {
+    "win": 100,
+    "ttk": 31,
+    "hpLost": 26,
+    "load": [
+     "Левове комбо",
+     "Техніка великої вогняної кулі",
+     "Техніка вогню фенікса-мудреця",
+     "Динамічний вхід"
+    ]
+   }
+  },
+  {
+   "trait": "Зграя",
+   "nature": "suiton",
+   "with": {
+    "win": 100,
+    "ttk": 22,
+    "hpLost": 18,
+    "load": [
+     "Левове комбо",
+     "Буйна водяна хвиля",
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена"
+    ]
+   },
+   "without": {
+    "win": 100,
+    "ttk": 36,
+    "hpLost": 30,
+    "load": [
+     "Левове комбо",
+     "Буйна водяна хвиля",
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена"
+    ]
+   }
+  },
+  {
+   "trait": "Ухильний",
+   "nature": "doton",
+   "with": {
+    "win": 100,
+    "ttk": 36,
+    "hpLost": 41,
+    "load": [
+     "Техніка подвійного самогубчого обезглавлення",
+     "Левове комбо",
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена"
+    ]
+   },
+   "without": {
+    "win": 92,
+    "ttk": 60,
+    "hpLost": 70,
+    "load": [
+     "Левове комбо",
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена",
+     "Листяний вихор"
+    ]
+   }
+  },
+  {
+   "trait": "Ухильний",
+   "nature": "katon",
+   "with": {
+    "win": 100,
+    "ttk": 22,
+    "hpLost": 24,
+    "load": [
+     "Техніка тимчасового паралічу",
+     "Левове комбо",
+     "Техніка великої вогняної кулі",
+     "Техніка вогню фенікса-мудреця"
+    ]
+   },
+   "without": {
+    "win": 98,
+    "ttk": 49,
+    "hpLost": 56,
+    "load": [
+     "Левове комбо",
+     "Техніка великої вогняної кулі",
+     "Техніка вогню фенікса-мудреця",
+     "Динамічний вхід"
+    ]
+   }
+  },
+  {
+   "trait": "Регенерація",
+   "nature": "katon",
+   "with": {
+    "win": 100,
+    "ttk": 25,
+    "hpLost": 28,
+    "load": [
+     "Техніка вогню фенікса-мудреця",
+     "Левове комбо",
+     "Техніка великої вогняної кулі",
+     "Динамічний вхід"
+    ]
+   },
+   "without": {
+    "win": 99,
+    "ttk": 42,
+    "hpLost": 49,
+    "load": [
+     "Левове комбо",
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена",
+     "Листяний вихор"
+    ]
+   }
+  },
+  {
+   "trait": "Регенерація",
+   "nature": "futon",
+   "with": {
+    "win": 100,
+    "ttk": 21,
+    "hpLost": 23,
+    "load": [
+     "Левове комбо",
+     "Шквальна долоня",
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена"
+    ]
+   },
+   "without": {
+    "win": 99,
+    "ttk": 42,
+    "hpLost": 49,
+    "load": [
+     "Левове комбо",
+     "Шквальна долоня",
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена"
+    ]
+   }
+  },
+  {
+   "trait": "Ілюзіоніст",
+   "nature": "katon",
+   "with": {
+    "win": 100,
+    "ttk": 25,
+    "hpLost": 28,
+    "load": [
+     "Левове комбо",
+     "Техніка великої вогняної кулі",
+     "Техніка вогню фенікса-мудреця",
+     "Динамічний вхід"
+    ]
+   },
+   "without": {
+    "win": 100,
+    "ttk": 33,
+    "hpLost": 38,
+    "load": [
+     "Левове комбо",
+     "Техніка великої вогняної кулі",
+     "Техніка вогню фенікса-мудреця",
+     "Динамічний вхід"
+    ]
+   }
+  },
+  {
+   "trait": "Прихований",
+   "nature": "futon",
+   "with": {
+    "win": 100,
+    "ttk": 29,
+    "hpLost": 33,
+    "load": [
+     "Великий прорив",
+     "Левове комбо",
+     "Шквальна долоня",
+     "Динамічний вхід"
+    ]
+   },
+   "without": {
+    "win": 100,
+    "ttk": 34,
+    "hpLost": 46,
+    "load": [
+     "Левове комбо",
+     "Шквальна долоня",
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена"
+    ]
+   }
+  },
+  {
+   "trait": "Отруйник",
+   "nature": "katon",
+   "with": {
+    "win": 100,
+    "ttk": 23,
+    "hpLost": 26,
+    "load": [
+     "Левове комбо",
+     "Техніка великої вогняної кулі",
+     "Техніка вогню фенікса-мудреця",
+     "Динамічний вхід"
+    ]
+   },
+   "without": {
+    "win": 100,
+    "ttk": 23,
+    "hpLost": 42,
+    "load": [
+     "Левове комбо",
+     "Техніка великої вогняної кулі",
+     "Техніка вогню фенікса-мудреця",
+     "Динамічний вхід"
+    ]
+   }
+  },
+  {
+   "boss": "boss_wolf",
+   "pcl": 22,
+   "nature": "katon",
+   "prepared": {
+    "win": 100,
+    "ttk": 68,
+    "hpLost": 98,
+    "load": [
+     "Вогняна доріжка",
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена",
+     "Листяний вихор"
+    ]
+   },
+   "noFood": {
+    "win": 59,
+    "ttk": 67,
+    "hpLost": 89,
+    "load": [
+     "Вогняна доріжка",
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена",
+     "Листяний вихор"
+    ]
+   },
+   "unprepared": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена",
+     "Листяний вихор",
+     "Листяний шквал"
+    ]
+   }
+  },
+  {
+   "boss": "boss_wolf",
+   "pcl": 22,
+   "nature": "raiton",
+   "prepared": {
+    "win": 100,
+    "ttk": 74,
+    "hpLost": 104,
+    "load": [
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена",
+     "Листяний вихор",
+     "Листяний шквал"
+    ]
+   },
+   "noFood": {
+    "win": 49,
+    "ttk": 72,
+    "hpLost": 90,
+    "load": [
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена",
+     "Листяний вихор",
+     "Листяний шквал"
+    ]
+   },
+   "unprepared": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена",
+     "Листяний вихор",
+     "Листяний шквал"
+    ]
+   }
+  },
+  {
+   "boss": "boss_wolf",
+   "pcl": 22,
+   "nature": "suiton",
+   "prepared": {
+    "win": 100,
+    "ttk": 74,
+    "hpLost": 104,
+    "load": [
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена",
+     "Листяний вихор",
+     "Листяний шквал"
+    ]
+   },
+   "noFood": {
+    "win": 49,
+    "ttk": 72,
+    "hpLost": 90,
+    "load": [
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена",
+     "Листяний вихор",
+     "Листяний шквал"
+    ]
+   },
+   "unprepared": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена",
+     "Листяний вихор",
+     "Листяний шквал"
+    ]
+   }
+  },
+  {
+   "boss": "boss_fighter",
+   "pcl": 32,
+   "nature": "doton",
+   "prepared": {
+    "win": 74,
+    "ttk": 100,
+    "hpLost": 168,
+    "load": [
+     "Техніка подвійного самогубчого обезглавлення",
+     "Левове комбо",
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена"
+    ]
+   },
+   "noFood": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Техніка подвійного самогубчого обезглавлення",
+     "Левове комбо",
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена"
+    ]
+   },
+   "unprepared": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Левове комбо",
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена",
+     "Листяний вихор"
+    ]
+   }
+  },
+  {
+   "boss": "boss_fighter",
+   "pcl": 32,
+   "nature": "katon",
+   "prepared": {
+    "win": 83,
+    "ttk": 92,
+    "hpLost": 159,
+    "load": [
+     "Техніка тимчасового паралічу",
+     "Левове комбо",
+     "Техніка великої вогняної кулі",
+     "Техніка вогню фенікса-мудреця"
+    ]
+   },
+   "noFood": {
+    "win": 1,
+    "ttk": 86,
+    "hpLost": 97,
+    "load": [
+     "Техніка тимчасового паралічу",
+     "Левове комбо",
+     "Техніка великої вогняної кулі",
+     "Техніка вогню фенікса-мудреця"
+    ]
+   },
+   "unprepared": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Левове комбо",
+     "Техніка великої вогняної кулі",
+     "Техніка вогню фенікса-мудреця",
+     "Динамічний вхід"
+    ]
+   }
+  },
+  {
+   "boss": "boss_hunter",
+   "pcl": 36,
+   "nature": "futon",
+   "prepared": {
+    "win": 91,
+    "ttk": 99,
+    "hpLost": 168,
+    "load": [
+     "Листяний вихор",
+     "Техніка тимчасового паралічу",
+     "Левове комбо",
+     "Шквальна долоня"
+    ]
+   },
+   "noFood": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Листяний вихор",
+     "Техніка тимчасового паралічу",
+     "Левове комбо",
+     "Шквальна долоня"
+    ]
+   },
+   "unprepared": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Левове комбо",
+     "Шквальна долоня",
+     "Техніка серповидної ласки",
+     "Великий прорив"
+    ]
+   }
+  },
+  {
+   "boss": "boss_hunter",
+   "pcl": 36,
+   "nature": "doton",
+   "prepared": {
+    "win": 67,
+    "ttk": 113,
+    "hpLost": 184,
+    "load": [
+     "Листяний вихор",
+     "Земляна ріка",
+     "Левове комбо",
+     "Динамічний вхід"
+    ]
+   },
+   "noFood": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Листяний вихор",
+     "Земляна ріка",
+     "Левове комбо",
+     "Динамічний вхід"
+    ]
+   },
+   "unprepared": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Левове комбо",
+     "Долоня, що розриває землю",
+     "Листяний великий вихор"
+    ]
+   }
+  },
+  {
+   "boss": "boss_twins",
+   "pcl": 38,
+   "nature": "futon",
+   "prepared": {
+    "win": 40,
+    "ttk": 114,
+    "hpLost": 186,
+    "load": [
+     "Техніка серповидної ласки",
+     "Левове комбо",
+     "Шквальна долоня",
+     "Динамічний вхід"
+    ]
+   },
+   "noFood": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Техніка серповидної ласки",
+     "Левове комбо",
+     "Шквальна долоня",
+     "Динамічний вхід"
+    ]
+   },
+   "unprepared": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Левове комбо",
+     "Шквальна долоня",
+     "Динамічний вхід",
+     "Техніка тіньового сюрікена"
+    ]
+   }
+  },
+  {
+   "boss": "boss_twins",
+   "pcl": 38,
+   "nature": "katon",
+   "prepared": {
+    "win": 71,
+    "ttk": 103,
+    "hpLost": 177,
+    "load": [
+     "Сенсорна техніка",
+     "Техніка вогню дракона",
+     "Левове комбо",
+     "Техніка великої вогняної кулі"
+    ]
+   },
+   "noFood": {
+    "win": 0,
+    "ttk": 101,
+    "hpLost": 98,
+    "load": [
+     "Сенсорна техніка",
+     "Техніка вогню дракона",
+     "Левове комбо",
+     "Техніка великої вогняної кулі"
+    ]
+   },
+   "unprepared": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Техніка вогню дракона",
+     "Левове комбо",
+     "Техніка великої вогняної кулі",
+     "Техніка вогню фенікса-мудреця"
+    ]
+   }
+  },
+  {
+   "boss": "boss_mist",
+   "pcl": 40,
+   "nature": "doton",
+   "prepared": {
+    "win": 80,
+    "ttk": 100,
+    "hpLost": 171,
+    "load": [
+     "Сенсорна техніка",
+     "Куля земляного дракона",
+     "Левове комбо",
+     "П'яний кулак"
+    ]
+   },
+   "noFood": {
+    "win": 1,
+    "ttk": 85,
+    "hpLost": 98,
+    "load": [
+     "Сенсорна техніка",
+     "Куля земляного дракона",
+     "Левове комбо",
+     "П'яний кулак"
+    ]
+   },
+   "unprepared": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Куля земляного дракона",
+     "Левове комбо",
+     "П'яний кулак",
+     "Динамічний вхід"
+    ]
+   }
+  },
+  {
+   "boss": "boss_mist",
+   "pcl": 40,
+   "nature": "katon",
+   "prepared": {
+    "win": 61,
+    "ttk": 109,
+    "hpLost": 180,
+    "load": [
+     "Сенсорна техніка",
+     "Техніка вогню дракона",
+     "Левове комбо",
+     "П'яний кулак"
+    ]
+   },
+   "noFood": {
+    "win": 0,
+    "ttk": 95,
+    "hpLost": 71,
+    "load": [
+     "Сенсорна техніка",
+     "Техніка вогню дракона",
+     "Левове комбо",
+     "П'яний кулак"
+    ]
+   },
+   "unprepared": {
+    "win": 0,
+    "ttk": 94,
+    "hpLost": 98,
+    "load": [
+     "Техніка вогню дракона",
+     "Левове комбо",
+     "П'яний кулак",
+     "Техніка великої вогняної кулі"
+    ]
+   }
+  },
+  {
+   "boss": "boss_nameless",
+   "pcl": 44,
+   "nature": "suiton",
+   "prepared": {
+    "win": 73,
+    "ttk": 107,
+    "hpLost": 165,
+    "load": [
+     "Левове комбо",
+     "П'яний кулак",
+     "Листяний висхідний вітер",
+     "Буйна водяна хвиля"
+    ]
+   },
+   "noFood": {
+    "win": 1,
+    "ttk": 105,
+    "hpLost": 89,
+    "load": [
+     "Левове комбо",
+     "П'яний кулак",
+     "Листяний висхідний вітер",
+     "Буйна водяна хвиля"
+    ]
+   },
+   "unprepared": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Левове комбо",
+     "П'яний кулак",
+     "Листяний висхідний вітер",
+     "Буйна водяна хвиля"
+    ]
+   }
+  },
+  {
+   "boss": "boss_nameless",
+   "pcl": 44,
+   "nature": "futon",
+   "prepared": {
+    "win": 31,
+    "ttk": 116,
+    "hpLost": 178,
+    "load": [
+     "Левове комбо",
+     "П'яний кулак",
+     "Листяний висхідний вітер",
+     "Шквальна долоня"
+    ]
+   },
+   "noFood": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Левове комбо",
+     "П'яний кулак",
+     "Листяний висхідний вітер",
+     "Шквальна долоня"
+    ]
+   },
+   "unprepared": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Левове комбо",
+     "П'яний кулак",
+     "Листяний висхідний вітер",
+     "Шквальна долоня"
+    ]
+   }
+  },
+  {
+   "boss": "boss_nameless",
+   "pcl": 40,
+   "nature": "suiton",
+   "prepared": {
+    "win": 16,
+    "ttk": 119,
+    "hpLost": 185,
+    "load": [
+     "Левове комбо",
+     "П'яний кулак",
+     "Буйна водяна хвиля",
+     "Динамічний вхід"
+    ]
+   },
+   "noFood": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Левове комбо",
+     "П'яний кулак",
+     "Буйна водяна хвиля",
+     "Динамічний вхід"
+    ]
+   },
+   "unprepared": {
+    "win": 0,
+    "ttk": null,
+    "hpLost": null,
+    "load": [
+     "Левове комбо",
+     "П'яний кулак",
+     "Буйна водяна хвиля",
+     "Динамічний вхід"
+    ]
+   }
+  }
+ ],
+ "missions": [
+  {
+   "id": "cat",
+   "min": 3,
+   "ryo": 40,
+   "rep": 2
+  },
+  {
+   "id": "weed",
+   "min": 2,
+   "ryo": 20,
+   "rep": 0
+  },
+  {
+   "id": "fire",
+   "min": 6,
+   "ryo": 70,
+   "rep": 2
+  },
+  {
+   "id": "drought",
+   "min": 5,
+   "ryo": 60,
+   "rep": 0
+  },
+  {
+   "id": "courier",
+   "min": 4,
+   "ryo": 50,
+   "rep": 0
+  },
+  {
+   "id": "rockfall",
+   "min": 6,
+   "ryo": 70,
+   "rep": 0
+  },
+  {
+   "id": "thief",
+   "min": 8,
+   "ryo": 100,
+   "rep": 0
+  },
+  {
+   "id": "caravan",
+   "min": 25,
+   "ryo": 550,
+   "rep": 8
+  },
+  {
+   "id": "sealed",
+   "min": 18,
+   "ryo": 400,
+   "rep": 0
+  },
+  {
+   "id": "mail",
+   "min": 20,
+   "ryo": 440,
+   "rep": 0
+  },
+  {
+   "id": "well",
+   "min": 22,
+   "ryo": 480,
+   "rep": 8
+  },
+  {
+   "id": "dig",
+   "min": 28,
+   "ryo": 620,
+   "rep": 8
+  },
+  {
+   "id": "v_spar",
+   "min": 4,
+   "ryo": 0,
+   "rep": 4
+  },
+  {
+   "id": "v_walls",
+   "min": 10,
+   "ryo": 0,
+   "rep": 4
+  },
+  {
+   "id": "v_fence",
+   "min": 8,
+   "ryo": 0,
+   "rep": 4
+  },
+  {
+   "id": "v_clear",
+   "min": 8,
+   "ryo": 0,
+   "rep": 4
+  },
+  {
+   "id": "v_water",
+   "min": 8,
+   "ryo": 0,
+   "rep": 4
+  },
+  {
+   "id": "v_sanit",
+   "min": 8,
+   "ryo": 0,
+   "rep": 4
+  },
+  {
+   "id": "v_rubble",
+   "min": 8,
+   "ryo": 0,
+   "rep": 4
+  },
+  {
+   "id": "v_clones",
+   "min": 10,
+   "ryo": 0,
+   "rep": 4
+  },
+  {
+   "id": "v_seal",
+   "min": 6,
+   "ryo": 0,
+   "rep": 4
+  },
+  {
+   "id": "op_hideout",
+   "min": 0,
+   "ryo": 0,
+   "rep": 0
+  }
+ ],
+ "sinks": 40200,
+ "milestones": {
+  "genin": 1,
+  "clones": 5.1,
+  "chunin": 14.3,
+  "cap": 24.1
+ }
+}

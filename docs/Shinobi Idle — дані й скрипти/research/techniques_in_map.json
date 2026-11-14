@@ -1,0 +1,1178 @@
+[
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 1,
+  "uk": "Листяний вихор",
+  "en": "Leaf Whirlwind"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 5,
+  "uk": "Листяний висхідний вітер",
+  "en": "Leaf Rising Wind"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 10,
+  "uk": "Динамічний вхід",
+  "en": "Dynamic Entry"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 15,
+  "uk": "Листяний шквал",
+  "en": "Leaf Gale"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 20,
+  "uk": "Листяний ураган",
+  "en": "Leaf Hurricane"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 25,
+  "uk": "Брама відкриття",
+  "en": "Gate of Opening"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 30,
+  "uk": "Передній лотос",
+  "en": "Front Lotus"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 35,
+  "uk": "Левове комбо",
+  "en": "Lion Combo"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 40,
+  "uk": "Брама зцілення",
+  "en": "Gate of Healing"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 45,
+  "uk": "Удар вишневого цвіту",
+  "en": "Cherry Blossom Impact"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 50,
+  "uk": "Брама життя",
+  "en": "Gate of Life"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 55,
+  "uk": "Ступня небесного болю",
+  "en": "Heavenly Foot of Pain"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 60,
+  "uk": "Брама болю",
+  "en": "Gate of Pain"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 65,
+  "uk": "П'яний кулак",
+  "en": "Drunken Fist"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 70,
+  "uk": "Брама межі",
+  "en": "Gate of Limit"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 75,
+  "uk": "Зворотний лотос",
+  "en": "Reverse Lotus"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 80,
+  "uk": "Брама погляду",
+  "en": "Gate of View"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 85,
+  "uk": "Ранковий павич",
+  "en": "Morning Peacock"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 90,
+  "uk": "Брама дива",
+  "en": "Gate of Wonder"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 95,
+  "uk": "Денний тигр",
+  "en": "Daytime Tiger"
+ },
+ {
+  "skill": "Тайдзюцу",
+  "skill_id": "tai",
+  "level": 99,
+  "uk": "Брама смерті: Вечірній слон і Нічний Гай",
+  "en": "Gate of Death: Evening Elephant, Night Guy"
+ },
+ {
+  "skill": "Ляльководство",
+  "skill_id": "pup",
+  "level": 1,
+  "uk": "Тренувальна лялька",
+  "en": "Удар лезом"
+ },
+ {
+  "skill": "Ляльководство",
+  "skill_id": "pup",
+  "level": 5,
+  "uk": "Лялька-метальник",
+  "en": "Залп кунаїв (витрачає кунаї)"
+ },
+ {
+  "skill": "Ляльководство",
+  "skill_id": "pup",
+  "level": 10,
+  "uk": "Ворон",
+  "en": "Crow · леза з отрутою, розпад на частини"
+ },
+ {
+  "skill": "Ляльководство",
+  "skill_id": "pup",
+  "level": 15,
+  "uk": "Лялька-приманка",
+  "en": "Відволікання"
+ },
+ {
+  "skill": "Ляльководство",
+  "skill_id": "pup",
+  "level": 20,
+  "uk": "Чорний мураха",
+  "en": "Black Ant · захоплення в тулуб"
+ },
+ {
+  "skill": "Ляльководство",
+  "skill_id": "pup",
+  "level": 25,
+  "uk": "Саламандра",
+  "en": "Salamander · щит"
+ },
+ {
+  "skill": "Ляльководство",
+  "skill_id": "pup",
+  "level": 30,
+  "uk": "Лялька-скорпіон",
+  "en": "Хвіст з отрутою, кігті"
+ },
+ {
+  "skill": "Ляльководство",
+  "skill_id": "pup",
+  "level": 40,
+  "uk": "Хіруко",
+  "en": "Hiruko · броня-лялька, отруйний хвіст, сенбони"
+ },
+ {
+  "skill": "Ляльководство",
+  "skill_id": "pup",
+  "level": 50,
+  "uk": "Мати й Батько",
+  "en": "Mother and Father · дві ляльки в одному слоті"
+ },
+ {
+  "skill": "Ляльководство",
+  "skill_id": "pup",
+  "level": 60,
+  "uk": "Третій Казекаґе",
+  "en": "Third Kazekage · Iron Sand: Drizzle, Iron Sand: Gathering Assault"
+ },
+ {
+  "skill": "Ляльководство",
+  "skill_id": "pup",
+  "level": 70,
+  "uk": "Лялька-павук",
+  "en": "Сітки з ниток"
+ },
+ {
+  "skill": "Ляльководство",
+  "skill_id": "pup",
+  "level": 80,
+  "uk": "Десять ляльок Чікамацу",
+  "en": "White Secret Technique: Chikamatsu's Collection of Ten Puppets"
+ },
+ {
+  "skill": "Ляльководство",
+  "skill_id": "pup",
+  "level": 95,
+  "uk": "Сто ляльок",
+  "en": "Red Secret Technique: Performance of a Hundred Puppets"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 1,
+  "uk": "Техніка клонування",
+  "en": "Clone Technique"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 1,
+  "uk": "Техніка перевтілення",
+  "en": "Transformation Technique"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 1,
+  "uk": "Техніка підміни",
+  "en": "Body Replacement Technique"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 5,
+  "uk": "Техніка мерехтіння тіла",
+  "en": "Body Flicker Technique"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 10,
+  "uk": "Техніка тіньового сюрікена",
+  "en": "Shadow Shuriken Technique"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 15,
+  "uk": "Техніка камуфляжного ховання",
+  "en": "Hiding with Camouflage Technique"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 20,
+  "uk": "Техніка призову",
+  "en": "Summoning Technique"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 25,
+  "uk": "Сенсорна техніка",
+  "en": "Sensor Technique"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 30,
+  "uk": "Техніка тіньового клонування",
+  "en": "Shadow Clone Technique"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 35,
+  "uk": "Техніка запечатування",
+  "en": "Sealing Technique"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 40,
+  "uk": "Техніка тіньового клонування сюрікенів",
+  "en": "Shuriken Shadow Clone Technique"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 50,
+  "uk": "Печатка п'яти елементів",
+  "en": "Five Elements Seal"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 55,
+  "uk": "Вибух тіньового клону",
+  "en": "Shadow Clone Explosion"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 60,
+  "uk": "Техніка множинного тіньового клонування",
+  "en": "Multiple Shadow Clone Technique"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 65,
+  "uk": "Техніка телескопа",
+  "en": "Telescope Technique"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 70,
+  "uk": "Расенґан",
+  "en": "Rasengan"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 75,
+  "uk": "Техніка прозорої втечі",
+  "en": "Transparent Escape Technique"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 80,
+  "uk": "Приховані тіньові руки-змії",
+  "en": "Hidden Shadow Snake Hands"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 90,
+  "uk": "Голковий Дзідзо",
+  "en": "Needle Jizō"
+ },
+ {
+  "skill": "Ніндзюцу",
+  "skill_id": "nin",
+  "level": 95,
+  "uk": "Техніка летючого бога грому",
+  "en": "Flying Thunder God Technique"
+ },
+ {
+  "skill": "Катон",
+  "skill_id": "katon",
+  "level": 1,
+  "uk": "Техніка вогню фенікса-мудреця",
+  "en": "Phoenix Sage Fire Technique"
+ },
+ {
+  "skill": "Катон",
+  "skill_id": "katon",
+  "level": 5,
+  "uk": "Техніка великої вогняної кулі",
+  "en": "Great Fireball Technique"
+ },
+ {
+  "skill": "Катон",
+  "skill_id": "katon",
+  "level": 10,
+  "uk": "Техніка вогню дракона",
+  "en": "Dragon Fire Technique"
+ },
+ {
+  "skill": "Катон",
+  "skill_id": "katon",
+  "level": 20,
+  "uk": "Техніка ховання в попелі",
+  "en": "Hiding in Ash Technique"
+ },
+ {
+  "skill": "Катон",
+  "skill_id": "katon",
+  "level": 30,
+  "uk": "Вогняна доріжка",
+  "en": "Running Fire"
+ },
+ {
+  "skill": "Катон",
+  "skill_id": "katon",
+  "level": 40,
+  "uk": "Полум'яна куля вогняного дракона",
+  "en": "Fire Dragon Flame Bullet"
+ },
+ {
+  "skill": "Катон",
+  "skill_id": "katon",
+  "level": 50,
+  "uk": "Спалення купою попелу",
+  "en": "Ash Pile Burning"
+ },
+ {
+  "skill": "Катон",
+  "skill_id": "katon",
+  "level": 60,
+  "uk": "Техніка великого вогню дракона",
+  "en": "Great Dragon Fire Technique"
+ },
+ {
+  "skill": "Катон",
+  "skill_id": "katon",
+  "level": 70,
+  "uk": "Велике вогняне руйнування",
+  "en": "Great Fire Destruction"
+ },
+ {
+  "skill": "Катон",
+  "skill_id": "katon",
+  "level": 80,
+  "uk": "Велика полум'яна квітка",
+  "en": "Great Flame Flower"
+ },
+ {
+  "skill": "Катон",
+  "skill_id": "katon",
+  "level": 90,
+  "uk": "Величне руйнівне полум'я",
+  "en": "Majestic Destroyer Flame"
+ },
+ {
+  "skill": "Футон",
+  "skill_id": "futon",
+  "level": 1,
+  "uk": "Шквальна долоня",
+  "en": "Gale Palm"
+ },
+ {
+  "skill": "Футон",
+  "skill_id": "futon",
+  "level": 10,
+  "uk": "Великий прорив",
+  "en": "Great Breakthrough"
+ },
+ {
+  "skill": "Футон",
+  "skill_id": "futon",
+  "level": 20,
+  "uk": "Лезо вітру",
+  "en": "Blade of Wind"
+ },
+ {
+  "skill": "Футон",
+  "skill_id": "futon",
+  "level": 25,
+  "uk": "Вакуумна хвиля",
+  "en": "Vacuum Wave"
+ },
+ {
+  "skill": "Футон",
+  "skill_id": "futon",
+  "level": 30,
+  "uk": "Техніка серповидної ласки",
+  "en": "Sickle Weasel Technique"
+ },
+ {
+  "skill": "Футон",
+  "skill_id": "futon",
+  "level": 40,
+  "uk": "Вакуумна сфера",
+  "en": "Vacuum Sphere"
+ },
+ {
+  "skill": "Футон",
+  "skill_id": "futon",
+  "level": 50,
+  "uk": "Шкода тиску",
+  "en": "Pressure Damage"
+ },
+ {
+  "skill": "Футон",
+  "skill_id": "futon",
+  "level": 60,
+  "uk": "Вакуумне лезо",
+  "en": "Vacuum Blade"
+ },
+ {
+  "skill": "Футон",
+  "skill_id": "futon",
+  "level": 70,
+  "uk": "Велика серповидна ласка",
+  "en": "Great Sickle Weasel Technique"
+ },
+ {
+  "skill": "Футон",
+  "skill_id": "futon",
+  "level": 80,
+  "uk": "Велика вакуумна сфера",
+  "en": "Vacuum Great Sphere"
+ },
+ {
+  "skill": "Футон",
+  "skill_id": "futon",
+  "level": 90,
+  "uk": "Расенсюрікен",
+  "en": "Rasenshuriken"
+ },
+ {
+  "skill": "Райтон",
+  "skill_id": "raiton",
+  "level": 1,
+  "uk": "Лазерний цирк",
+  "en": "Laser Circus"
+ },
+ {
+  "skill": "Райтон",
+  "skill_id": "raiton",
+  "level": 10,
+  "uk": "Пута чотирьох стовпів",
+  "en": "Four Pillar Bind"
+ },
+ {
+  "skill": "Райтон",
+  "skill_id": "raiton",
+  "level": 20,
+  "uk": "Хибна темрява",
+  "en": "False Darkness"
+ },
+ {
+  "skill": "Райтон",
+  "skill_id": "raiton",
+  "level": 30,
+  "uk": "Чорна пантера",
+  "en": "Black Panther"
+ },
+ {
+  "skill": "Райтон",
+  "skill_id": "raiton",
+  "level": 40,
+  "uk": "Чідорі",
+  "en": "Chidori"
+ },
+ {
+  "skill": "Райтон",
+  "skill_id": "raiton",
+  "level": 50,
+  "uk": "Райкірі",
+  "en": "Lightning Blade"
+ },
+ {
+  "skill": "Райтон",
+  "skill_id": "raiton",
+  "level": 55,
+  "uk": "Ласо блискавки",
+  "en": "Lightning Release: Lariat"
+ },
+ {
+  "skill": "Райтон",
+  "skill_id": "raiton",
+  "level": 60,
+  "uk": "Ікло блискавичного звіра",
+  "en": "Lightning Beast Tracking Fang"
+ },
+ {
+  "skill": "Райтон",
+  "skill_id": "raiton",
+  "level": 70,
+  "uk": "Фіолетова блискавка",
+  "en": "Purple Lightning"
+ },
+ {
+  "skill": "Райтон",
+  "skill_id": "raiton",
+  "level": 80,
+  "uk": "Броня блискавки",
+  "en": "Lightning Release Armour"
+ },
+ {
+  "skill": "Райтон",
+  "skill_id": "raiton",
+  "level": 90,
+  "uk": "Кірін",
+  "en": "Kirin"
+ },
+ {
+  "skill": "Дотон",
+  "skill_id": "doton",
+  "level": 1,
+  "uk": "Техніка ховання як кріт",
+  "en": "Hiding like a Mole Technique"
+ },
+ {
+  "skill": "Дотон",
+  "skill_id": "doton",
+  "level": 10,
+  "uk": "Техніка мисливця за головами",
+  "en": "Headhunter Jutsu"
+ },
+ {
+  "skill": "Дотон",
+  "skill_id": "doton",
+  "level": 20,
+  "uk": "Стіна земляного стилю",
+  "en": "Earth Style Wall"
+ },
+ {
+  "skill": "Дотон",
+  "skill_id": "doton",
+  "level": 30,
+  "uk": "Земляний спис",
+  "en": "Earth Spear"
+ },
+ {
+  "skill": "Дотон",
+  "skill_id": "doton",
+  "level": 40,
+  "uk": "Грязьова ріка",
+  "en": "Mud River"
+ },
+ {
+  "skill": "Дотон",
+  "skill_id": "doton",
+  "level": 50,
+  "uk": "Куля земляного дракона",
+  "en": "Earth Dragon Bullet"
+ },
+ {
+  "skill": "Дотон",
+  "skill_id": "doton",
+  "level": 60,
+  "uk": "Вал земляного потоку",
+  "en": "Earth Flow Rampart"
+ },
+ {
+  "skill": "Дотон",
+  "skill_id": "doton",
+  "level": 70,
+  "uk": "В'язниця-купол землі",
+  "en": "Earth Dome Prison"
+ },
+ {
+  "skill": "Дотон",
+  "skill_id": "doton",
+  "level": 80,
+  "uk": "Техніка легкої скелі",
+  "en": "Light Weight Rock Technique"
+ },
+ {
+  "skill": "Дотон",
+  "skill_id": "doton",
+  "level": 90,
+  "uk": "Техніка обтяженої скелі",
+  "en": "Added Weight Rock Technique"
+ },
+ {
+  "skill": "Суйтон",
+  "skill_id": "suiton",
+  "level": 1,
+  "uk": "Техніка водяного клону",
+  "en": "Water Clone Technique"
+ },
+ {
+  "skill": "Суйтон",
+  "skill_id": "suiton",
+  "level": 5,
+  "uk": "Постріл",
+  "en": "Gunshot"
+ },
+ {
+  "skill": "Суйтон",
+  "skill_id": "suiton",
+  "level": 10,
+  "uk": "Техніка прихованого туману",
+  "en": "Hidden Mist Technique"
+ },
+ {
+  "skill": "Суйтон",
+  "skill_id": "suiton",
+  "level": 20,
+  "uk": "Стіна водяного табору",
+  "en": "Water Encampment Wall"
+ },
+ {
+  "skill": "Суйтон",
+  "skill_id": "suiton",
+  "level": 30,
+  "uk": "Техніка водяної в'язниці",
+  "en": "Water Prison Technique"
+ },
+ {
+  "skill": "Суйтон",
+  "skill_id": "suiton",
+  "level": 40,
+  "uk": "Куля водяного дракона",
+  "en": "Water Dragon Bullet"
+ },
+ {
+  "skill": "Суйтон",
+  "skill_id": "suiton",
+  "level": 50,
+  "uk": "Куля водяної акули",
+  "en": "Water Shark Bullet"
+ },
+ {
+  "skill": "Суйтон",
+  "skill_id": "suiton",
+  "level": 60,
+  "uk": "Хвиля, що розсікає воду",
+  "en": "Water Severing Wave"
+ },
+ {
+  "skill": "Суйтон",
+  "skill_id": "suiton",
+  "level": 70,
+  "uk": "Хвилі вибухової води",
+  "en": "Bursting Water Collision Waves"
+ },
+ {
+  "skill": "Суйтон",
+  "skill_id": "suiton",
+  "level": 80,
+  "uk": "Велика куля акули",
+  "en": "Great Shark Bullet"
+ },
+ {
+  "skill": "Суйтон",
+  "skill_id": "suiton",
+  "level": 90,
+  "uk": "Тисяча ненажерливих акул",
+  "en": "Thousand Feeding Sharks"
+ },
+ {
+  "skill": "Гендзюцу",
+  "skill_id": "gen",
+  "level": 1,
+  "uk": "Розсіювання",
+  "en": "Release"
+ },
+ {
+  "skill": "Гендзюцу",
+  "skill_id": "gen",
+  "level": 10,
+  "uk": "Техніка лукавого впливу на розум",
+  "en": "Sly Mind Affect Technique"
+ },
+ {
+  "skill": "Гендзюцу",
+  "skill_id": "gen",
+  "level": 15,
+  "uk": "Техніка видіння пекла",
+  "en": "Hell Viewing Technique"
+ },
+ {
+  "skill": "Гендзюцу",
+  "skill_id": "gen",
+  "level": 20,
+  "uk": "Техніка слуги туману",
+  "en": "Mist Servant Technique"
+ },
+ {
+  "skill": "Гендзюцу",
+  "skill_id": "gen",
+  "level": 30,
+  "uk": "Техніка темряви",
+  "en": "Bringer-of-Darkness Technique"
+ },
+ {
+  "skill": "Гендзюцу",
+  "skill_id": "gen",
+  "level": 40,
+  "uk": "Техніка храму нірвани",
+  "en": "Temple of Nirvana Technique"
+ },
+ {
+  "skill": "Гендзюцу",
+  "skill_id": "gen",
+  "level": 50,
+  "uk": "Смерть у путах дерева",
+  "en": "Tree Binding Death"
+ },
+ {
+  "skill": "Гендзюцу",
+  "skill_id": "gen",
+  "level": 60,
+  "uk": "Демонічна флейта: ланцюги примарного звуку",
+  "en": "Demonic Flute: Phantom Sound Chains"
+ },
+ {
+  "skill": "Гендзюцу",
+  "skill_id": "gen",
+  "level": 70,
+  "uk": "Дзеркальна зміна неба й землі",
+  "en": "Mirror Heaven and Earth Change"
+ },
+ {
+  "skill": "Гендзюцу",
+  "skill_id": "gen",
+  "level": 95,
+  "uk": "Жаб'ячий спів",
+  "en": "Toad Confrontation Chant"
+ },
+ {
+  "skill": "Букідзюцу",
+  "skill_id": "buki",
+  "level": 1,
+  "uk": "Кидок куная",
+  "en": ""
+ },
+ {
+  "skill": "Букідзюцу",
+  "skill_id": "buki",
+  "level": 5,
+  "uk": "Техніка керованого сюрікена",
+  "en": "Manipulated Shuriken Technique"
+ },
+ {
+  "skill": "Букідзюцу",
+  "skill_id": "buki",
+  "level": 10,
+  "uk": "Вітряк тіней",
+  "en": "Demon Wind Shuriken: Windmill of Shadows"
+ },
+ {
+  "skill": "Букідзюцу",
+  "skill_id": "buki",
+  "level": 20,
+  "uk": "Потрійна атака вітряка",
+  "en": "Windmill Triple Attack"
+ },
+ {
+  "skill": "Букідзюцу",
+  "skill_id": "buki",
+  "level": 30,
+  "uk": "Здвоєні висхідні дракони",
+  "en": "Rising Twin Dragons"
+ },
+ {
+  "skill": "Букідзюцу",
+  "skill_id": "buki",
+  "level": 35,
+  "uk": "Кидок кусаріґами",
+  "en": ""
+ },
+ {
+  "skill": "Букідзюцу",
+  "skill_id": "buki",
+  "level": 40,
+  "uk": "Отруйні сенбони",
+  "en": ""
+ },
+ {
+  "skill": "Букідзюцу",
+  "skill_id": "buki",
+  "level": 45,
+  "uk": "Вибухові кунаї",
+  "en": ""
+ },
+ {
+  "skill": "Букідзюцу",
+  "skill_id": "buki",
+  "level": 55,
+  "uk": "Танець півмісяця",
+  "en": "Crescent Moon Dance"
+ },
+ {
+  "skill": "Букідзюцу",
+  "skill_id": "buki",
+  "level": 60,
+  "uk": "Летюча ластівка",
+  "en": "Flying Swallow"
+ },
+ {
+  "skill": "Букідзюцу",
+  "skill_id": "buki",
+  "level": 65,
+  "uk": "Техніка безшумного вбивства",
+  "en": "Silent Killing Technique"
+ },
+ {
+  "skill": "Букідзюцу",
+  "skill_id": "buki",
+  "level": 70,
+  "uk": "Кусанаґі: катана Чідорі",
+  "en": "Kusanagi Sword: Chidori Katana"
+ },
+ {
+  "skill": "Медичне ніндзюцу",
+  "skill_id": "mednin",
+  "level": 1,
+  "uk": "Техніка долоні, що лікує",
+  "en": "Mystical Palm Technique"
+ },
+ {
+  "skill": "Медичне ніндзюцу",
+  "skill_id": "mednin",
+  "level": 10,
+  "uk": "Техніка витягування хвороби",
+  "en": "Delicate Illness Extraction Technique"
+ },
+ {
+  "skill": "Медичне ніндзюцу",
+  "skill_id": "mednin",
+  "level": 20,
+  "uk": "Чакровий скальпель",
+  "en": "Chakra Scalpel"
+ },
+ {
+  "skill": "Медичне ніндзюцу",
+  "skill_id": "mednin",
+  "level": 25,
+  "uk": "Отруйний туман",
+  "en": "Poison Mist"
+ },
+ {
+  "skill": "Медичне ніндзюцу",
+  "skill_id": "mednin",
+  "level": 30,
+  "uk": "Техніка передачі чакри",
+  "en": "Chakra Transfer Technique"
+ },
+ {
+  "skill": "Медичне ніндзюцу",
+  "skill_id": "mednin",
+  "level": 40,
+  "uk": "Техніка розладу шляхів тіла",
+  "en": "Body Pathway Derangement"
+ },
+ {
+  "skill": "Медичне ніндзюцу",
+  "skill_id": "mednin",
+  "level": 50,
+  "uk": "Сортування поранених",
+  "en": ""
+ },
+ {
+  "skill": "Медичне ніндзюцу",
+  "skill_id": "mednin",
+  "level": 55,
+  "uk": "Техніка лікувального відновлення й регенерації",
+  "en": "Healing Resuscitation Regeneration Technique"
+ },
+ {
+  "skill": "Медичне ніндзюцу",
+  "skill_id": "mednin",
+  "level": 65,
+  "uk": "Нейтралізація отрути",
+  "en": ""
+ },
+ {
+  "skill": "Медичне ніндзюцу",
+  "skill_id": "mednin",
+  "level": 70,
+  "uk": "Печатка сили ста",
+  "en": "Strength of a Hundred Seal"
+ },
+ {
+  "skill": "Медичне ніндзюцу",
+  "skill_id": "mednin",
+  "level": 80,
+  "uk": "Регенерація тканин",
+  "en": ""
+ },
+ {
+  "skill": "Медичне ніндзюцу",
+  "skill_id": "mednin",
+  "level": 85,
+  "uk": "Відродження творіння",
+  "en": "Creation Rebirth"
+ },
+ {
+  "skill": "Медичне ніндзюцу",
+  "skill_id": "mednin",
+  "level": 95,
+  "uk": "Реінкарнація власного життя",
+  "en": "One's Own Life Reincarnation"
+ },
+ {
+  "skill": "Сендзюцу",
+  "skill_id": "sage",
+  "level": 1,
+  "uk": "Збирання природної енергії",
+  "en": ""
+ },
+ {
+  "skill": "Сендзюцу",
+  "skill_id": "sage",
+  "level": 5,
+  "uk": "Відчуття природи",
+  "en": ""
+ },
+ {
+  "skill": "Сендзюцу",
+  "skill_id": "sage",
+  "level": 10,
+  "uk": "Режим мудреця (жаби)",
+  "en": "Sage Mode"
+ },
+ {
+  "skill": "Сендзюцу",
+  "skill_id": "sage",
+  "level": 10,
+  "uk": "Режим мудреця (змії)",
+  "en": "Sage Mode"
+ },
+ {
+  "skill": "Сендзюцу",
+  "skill_id": "sage",
+  "level": 10,
+  "uk": "Режим мудреця (слимаки)",
+  "en": "Sage Mode"
+ },
+ {
+  "skill": "Сендзюцу",
+  "skill_id": "sage",
+  "level": 20,
+  "uk": "Ката жаби",
+  "en": "Frog Kata"
+ },
+ {
+  "skill": "Сендзюцу",
+  "skill_id": "sage",
+  "level": 30,
+  "uk": "Жаб'ячий крик",
+  "en": "Frog Call"
+ },
+ {
+  "skill": "Сендзюцу",
+  "skill_id": "sage",
+  "level": 40,
+  "uk": "Мистецтво мудреця: Ґоемон",
+  "en": "Sage Art: Goemon"
+ },
+ {
+  "skill": "Сендзюцу",
+  "skill_id": "sage",
+  "level": 50,
+  "uk": "Мистецтво мудреця: Ґамаю Ендан",
+  "en": "Sage Art: Gamayu Endan"
+ },
+ {
+  "skill": "Сендзюцу",
+  "skill_id": "sage",
+  "level": 55,
+  "uk": "Мистецтво мудреця: масивний Расенґан",
+  "en": "Sage Art: Massive Rasengan"
+ },
+ {
+  "skill": "Сендзюцу",
+  "skill_id": "sage",
+  "level": 60,
+  "uk": "Мистецтво мудреця: неорганічна анімація",
+  "en": "Sage Art: Inorganic Animation"
+ },
+ {
+  "skill": "Сендзюцу",
+  "skill_id": "sage",
+  "level": 70,
+  "uk": "Мистецтво мудреця: білий гнів",
+  "en": "Sage Art: White Rage"
+ },
+ {
+  "skill": "Сендзюцу",
+  "skill_id": "sage",
+  "level": 75,
+  "uk": "Мистецтво мудреця: Расенсюрікен",
+  "en": "Sage Art: Rasenshuriken"
+ },
+ {
+  "skill": "Сендзюцу",
+  "skill_id": "sage",
+  "level": 80,
+  "uk": "Досконалий режим мудреця",
+  "en": "Perfect Sage Mode"
+ },
+ {
+  "skill": "Сендзюцу",
+  "skill_id": "sage",
+  "level": 95,
+  "uk": "Мистецтво мудреця: справжні кілька тисяч рук",
+  "en": "Wood Release: Sage Art: True Several Thousand Hands"
+ },
+ {
+  "skill": "Злиття природ",
+  "skill_id": "fusion",
+  "level": 1,
+  "uk": "Деревний клон",
+  "en": "Wood Clone Technique"
+ },
+ {
+  "skill": "Злиття природ",
+  "skill_id": "fusion",
+  "level": 10,
+  "uk": "Стіна деревного замка",
+  "en": "Wood Locking Wall"
+ },
+ {
+  "skill": "Злиття природ",
+  "skill_id": "fusion",
+  "level": 20,
+  "uk": "Техніка будинку чотирьох стовпів",
+  "en": "Four Pillar House Technique"
+ },
+ {
+  "skill": "Злиття природ",
+  "skill_id": "fusion",
+  "level": 30,
+  "uk": "В'язниця чотирьох стовпів",
+  "en": "Four Pillar Prison Technique"
+ },
+ {
+  "skill": "Злиття природ",
+  "skill_id": "fusion",
+  "level": 40,
+  "uk": "Техніка великого лісу",
+  "en": "Great Forest Technique"
+ },
+ {
+  "skill": "Злиття природ",
+  "skill_id": "fusion",
+  "level": 50,
+  "uk": "Техніка деревного дракона",
+  "en": "Wood Dragon Technique"
+ },
+ {
+  "skill": "Злиття природ",
+  "skill_id": "fusion",
+  "level": 60,
+  "uk": "Техніка деревної людини",
+  "en": "Wood Human Technique"
+ },
+ {
+  "skill": "Злиття природ",
+  "skill_id": "fusion",
+  "level": 70,
+  "uk": "Поява глибокого лісу",
+  "en": "Deep Forest Emergence"
+ },
+ {
+  "skill": "Злиття природ",
+  "skill_id": "fusion",
+  "level": 80,
+  "uk": "Народження світу дерев",
+  "en": "Nativity of a World of Trees"
+ },
+ {
+  "skill": "Злиття природ",
+  "skill_id": "fusion",
+  "level": 95,
+  "uk": "Деревний голем",
+  "en": "Wood Golem Technique"
+ }
+]

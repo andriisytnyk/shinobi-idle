@@ -1,0 +1,4246 @@
+{
+ "seals": {
+  "rat": {
+   "uk": "Щур",
+   "jp": "Ne",
+   "glyph": "子",
+   "kind": "zodiac"
+  },
+  "ox": {
+   "uk": "Бик",
+   "jp": "Ushi",
+   "glyph": "丑",
+   "kind": "zodiac"
+  },
+  "tiger": {
+   "uk": "Тигр",
+   "jp": "Tora",
+   "glyph": "寅",
+   "kind": "zodiac"
+  },
+  "hare": {
+   "uk": "Заєць",
+   "jp": "U",
+   "glyph": "卯",
+   "kind": "zodiac"
+  },
+  "dragon": {
+   "uk": "Дракон",
+   "jp": "Tatsu",
+   "glyph": "辰",
+   "kind": "zodiac"
+  },
+  "snake": {
+   "uk": "Змія",
+   "jp": "Mi",
+   "glyph": "巳",
+   "kind": "zodiac"
+  },
+  "horse": {
+   "uk": "Кінь",
+   "jp": "Uma",
+   "glyph": "午",
+   "kind": "zodiac"
+  },
+  "ram": {
+   "uk": "Баран",
+   "jp": "Hitsuji",
+   "glyph": "未",
+   "kind": "zodiac"
+  },
+  "monkey": {
+   "uk": "Мавпа",
+   "jp": "Saru",
+   "glyph": "申",
+   "kind": "zodiac"
+  },
+  "bird": {
+   "uk": "Птах",
+   "jp": "Tori",
+   "glyph": "酉",
+   "kind": "zodiac"
+  },
+  "dog": {
+   "uk": "Пес",
+   "jp": "Inu",
+   "glyph": "戌",
+   "kind": "zodiac"
+  },
+  "boar": {
+   "uk": "Кабан",
+   "jp": "I",
+   "glyph": "亥",
+   "kind": "zodiac"
+  },
+  "clone": {
+   "uk": "Печатка клона",
+   "jp": "Bunshin no In",
+   "glyph": "十",
+   "kind": "special"
+  },
+  "clap": {
+   "uk": "Сплеск долонь",
+   "jp": "Gasshō",
+   "glyph": "合",
+   "kind": "special"
+  },
+  "confront": {
+   "uk": "Печатка протистояння",
+   "jp": "Tairitsu no In",
+   "glyph": "対",
+   "kind": "special"
+  },
+  "palms": {
+   "uk": "Долоні вперед",
+   "jp": "—",
+   "glyph": "掌",
+   "kind": "special"
+  },
+  "unique": {
+   "uk": "Власна печатка техніки",
+   "jp": "—",
+   "glyph": "印",
+   "kind": "special"
+  }
+ },
+ "meta": {
+  "built": "2026-11-14",
+  "cap": 50,
+  "skills": [
+   "tai",
+   "nin",
+   "katon",
+   "futon",
+   "raiton",
+   "doton",
+   "suiton",
+   "cc",
+   "med",
+   "ath",
+   "herb",
+   "scout",
+   "prov",
+   "alch",
+   "vit",
+   "eva"
+  ],
+  "wheel": {
+   "katon": "futon",
+   "futon": "raiton",
+   "raiton": "doton",
+   "doton": "suiton",
+   "suiton": "katon"
+  }
+ },
+ "techniques": [
+  {
+   "skill": "tai",
+   "level": 1,
+   "uk": "Листяний вихор",
+   "en": "Leaf Whirlwind",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Серія",
+   "tags": [
+    "Переривання"
+   ],
+   "state": "",
+   "src": "N",
+   "home": "Академія",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "",
+   "id": "core:leaf_whirlwind",
+   "sealSeq": [],
+   "seals": 0,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "tai",
+   "level": 10,
+   "uk": "Динамічний вхід",
+   "en": "Dynamic Entry",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Снаряд",
+   "tags": [
+    "Переривання"
+   ],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "Місія села «Спаринг в Академії»",
+   "patched": "",
+   "id": "core:dynamic_entry",
+   "sealSeq": [],
+   "seals": 0,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "tai",
+   "level": 15,
+   "uk": "Листяний шквал",
+   "en": "Leaf Gale",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Серія",
+   "tags": [
+    "Переривання"
+   ],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "",
+   "id": "core:leaf_gale",
+   "sealSeq": [],
+   "seals": 0,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "tai",
+   "level": 20,
+   "uk": "Брама відкриття",
+   "en": "Gate of Opening",
+   "rank": "D",
+   "rankCanon": false,
+   "role": "Посилення",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей тайдзюцу",
+   "home2": "",
+   "req": "",
+   "note": "Стан: +3% шкоди тайдзюцу",
+   "patched": "",
+   "id": "core:gate_of_opening",
+   "sealSeq": [],
+   "seals": 0,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "tai",
+   "level": 25,
+   "uk": "Брама зцілення",
+   "en": "Gate of Healing",
+   "rank": "D",
+   "rankCanon": false,
+   "role": "Посилення",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей тайдзюцу",
+   "home2": "",
+   "req": "",
+   "note": "Стан: +5% шкоди тайдзюцу, +відновлення витривалості",
+   "patched": "",
+   "id": "core:gate_of_healing",
+   "sealSeq": [],
+   "seals": 0,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "tai",
+   "level": 30,
+   "uk": "Левове комбо",
+   "en": "Lion Combo",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Серія",
+   "tags": [],
+   "state": "",
+   "src": "S",
+   "home": "Бібліотека села, рівень 3",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "",
+   "id": "core:lion_combo",
+   "sealSeq": [],
+   "seals": 0,
+   "sealsCanon": true,
+   "tier": 1,
+   "noDamage": false
+  },
+  {
+   "skill": "tai",
+   "level": 35,
+   "uk": "Листяний великий вихор",
+   "en": "Leaf Great Whirlwind",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Площа",
+   "tags": [
+    "Площа"
+   ],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей тайдзюцу",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "",
+   "id": "core:leaf_great_whirlwind",
+   "sealSeq": [],
+   "seals": 0,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "tai",
+   "level": 40,
+   "uk": "П'яний кулак",
+   "en": "Drunken Fist",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Серія",
+   "tags": [],
+   "state": "",
+   "src": "O",
+   "home": "Носій: мандрівні бійці Країни Чаю",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "",
+   "id": "core:drunken_fist",
+   "sealSeq": [],
+   "seals": 0,
+   "sealsCanon": true,
+   "tier": 1,
+   "noDamage": false
+  },
+  {
+   "skill": "tai",
+   "level": 45,
+   "uk": "Листяний висхідний вітер",
+   "en": "Leaf Rising Wind",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Серія",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей тайдзюцу",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "Канонічний ранг C (Narutopedia) — у смузі D стояв помилково; закриває розрив Тайдзюцу 35→50",
+   "id": "core:leaf_rising_wind",
+   "sealSeq": [],
+   "seals": 0,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "tai",
+   "level": 50,
+   "uk": "Передній лотос",
+   "en": "Front Lotus",
+   "rank": "B",
+   "rankCanon": true,
+   "role": "Сигнатурна",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей тайдзюцу",
+   "home2": "",
+   "req": "",
+   "note": "Атака; потребує відкритої 1-ї брами",
+   "patched": "",
+   "id": "core:front_lotus",
+   "sealSeq": [],
+   "seals": 0,
+   "sealsCanon": true,
+   "tier": 1,
+   "noDamage": false
+  },
+  {
+   "skill": "nin",
+   "level": 1,
+   "uk": "Техніка клонування",
+   "en": "Clone Technique",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Захист",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Академія",
+   "home2": "",
+   "req": "",
+   "note": "Іспит на Геніна (академічна трійка)",
+   "patched": "",
+   "id": "core:clone",
+   "sealSeq": [
+    "ram",
+    "snake",
+    "tiger"
+   ],
+   "seals": 3,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "nin",
+   "level": 1,
+   "uk": "Техніка перевтілення",
+   "en": "Transformation Technique",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Посилення",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Академія",
+   "home2": "",
+   "req": "",
+   "note": "Іспит на Геніна; ключ: відкриває Інфільтрацію, Майстерність — до +10 Прикриття",
+   "patched": "",
+   "id": "core:transformation",
+   "sealSeq": [
+    "dog",
+    "boar",
+    "ram"
+   ],
+   "seals": 3,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "nin",
+   "level": 1,
+   "uk": "Техніка підміни",
+   "en": "Body Replacement Technique",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Захист",
+   "tags": [
+    "Захист"
+   ],
+   "state": "",
+   "src": "N",
+   "home": "Академія",
+   "home2": "",
+   "req": "",
+   "note": "Іспит на Геніна; поза слотами набору",
+   "patched": "",
+   "id": "core:body_replacement",
+   "sealSeq": [
+    "tiger",
+    "boar",
+    "ox",
+    "dog",
+    "snake"
+   ],
+   "seals": 5,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "nin",
+   "level": 5,
+   "uk": "Техніка мерехтіння тіла",
+   "en": "Body Flicker Technique",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Посилення",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "Місія «Термінова доставка»; ключ: кур'єрські місії",
+   "patched": "",
+   "id": "core:body_flicker",
+   "sealSeq": [
+    "tiger"
+   ],
+   "seals": 1,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "nin",
+   "level": 10,
+   "uk": "Техніка тіньового сюрікена",
+   "en": "Shadow Shuriken Technique",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Снаряд",
+   "tags": [
+    "Переривання"
+   ],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "",
+   "id": "core:shadow_shuriken",
+   "sealSeq": [],
+   "seals": 0,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "nin",
+   "level": 15,
+   "uk": "Техніка запечатування",
+   "en": "Enclosing Technique",
+   "rank": "D",
+   "rankCanon": false,
+   "role": "Контроль",
+   "tags": [],
+   "state": "",
+   "src": "S",
+   "home": "Бібліотека села, рівень 1",
+   "home2": "",
+   "req": "",
+   "note": "Місії «Запечатаний вантаж» і «Запечатування запасів»; ключ: сувої-сховища, +1 місце в банку за 10 рівнів Майстерності",
+   "patched": "",
+   "id": "core:enclosing",
+   "sealSeq": [],
+   "seals": 0,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": true
+  },
+  {
+   "skill": "nin",
+   "level": 20,
+   "uk": "Сенсорна техніка",
+   "en": "Sensing Technique",
+   "rank": "D",
+   "rankCanon": false,
+   "role": "Контроль",
+   "tags": [
+    "Виявлення"
+   ],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "Ключ: +10% успіху сенсорного пошуку в Розвідці",
+   "patched": "",
+   "id": "core:sensing",
+   "sealSeq": [
+    "ram"
+   ],
+   "seals": 1,
+   "sealsCanon": false,
+   "tier": 0,
+   "noDamage": true
+  },
+  {
+   "skill": "nin",
+   "level": 25,
+   "uk": "Техніка звільнення від мотузок",
+   "en": "Rope Escape Technique",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Захист",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Академія",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "",
+   "id": "core:rope_escape",
+   "sealSeq": [],
+   "seals": 0,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "nin",
+   "level": 30,
+   "uk": "Техніка тимчасового паралічу",
+   "en": "Temporary Paralysis Technique",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Контроль",
+   "tags": [
+    "Сковування"
+   ],
+   "state": "",
+   "src": "S",
+   "home": "Бібліотека села, рівень 2",
+   "home2": "",
+   "req": "",
+   "note": "Канон (D): техніка АНБУ, що сковує рухи. Нестихійна відповідь на Ухильного",
+   "patched": "Додано в зріз",
+   "id": "core:temporary_paralysis",
+   "sealSeq": [
+    "rat"
+   ],
+   "seals": 1,
+   "sealsCanon": false,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "nin",
+   "level": 35,
+   "uk": "Приховані тіньові руки-змії",
+   "en": "Hidden Shadow Snake Hands",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Контроль",
+   "tags": [
+    "Сковування"
+   ],
+   "state": "",
+   "src": "O",
+   "home": "Носій: колишні помічники Орочімару (сховок у Долині, Ліс смерті)",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "Носій з'являється вже в акті 3",
+   "id": "core:hidden_shadow_snake_hands",
+   "sealSeq": [],
+   "seals": 0,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "nin",
+   "level": 40,
+   "uk": "Вправа: поділ чакри",
+   "en": "Chakra halving drill",
+   "rank": "—",
+   "rankCanon": false,
+   "role": "Тренування",
+   "tags": [],
+   "state": "",
+   "src": "Q",
+   "home": "Сенсей команди (лінія «Тіньові клони», після кроку 1)",
+   "home2": "",
+   "req": "",
+   "note": "Лорно: тіньовий клон ділить чакру порівну, тож перед технікою вчаться тримати половину запасу. Тренувальна майстерність, як вправи стихій",
+   "patched": "Додано в зріз",
+   "id": "core:chakra_halving_drill",
+   "sealSeq": [
+    "clone"
+   ],
+   "seals": 1,
+   "sealsCanon": false,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "nin",
+   "level": 50,
+   "uk": "Техніка тіньового клонування",
+   "en": "Shadow Clone Technique",
+   "rank": "B",
+   "rankCanon": true,
+   "role": "Серія",
+   "tags": [
+    "Площа"
+   ],
+   "state": "",
+   "src": "Q",
+   "home": "Лінія доручень «Тіньові клони»",
+   "home2": "",
+   "req": "Медитація 40; лінія доручень «Тіньові клони»",
+   "note": "1 клон; Місія села «Клони на будівництві»",
+   "patched": "Без змін: Ніндзюцу 50, Медитація 40, лінія «Тіньові клони»",
+   "id": "core:shadow_clone",
+   "sealSeq": [
+    "clone"
+   ],
+   "seals": 1,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "katon",
+   "level": 1,
+   "uk": "Вправа: спалити листок",
+   "en": "Nature transformation: burn a leaf",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Тренування",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "Канонічна вправа перетворення природи",
+   "patched": "",
+   "id": "core:nature_transformation_burn_a_leaf",
+   "sealSeq": [
+    "tiger"
+   ],
+   "seals": 1,
+   "sealsCanon": false,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "katon",
+   "level": 10,
+   "uk": "Вправа: полум'я з подиху",
+   "en": "Fire breath control drill",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Тренування",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "Тренування контролю вогню",
+   "patched": "",
+   "id": "core:fire_breath_control_drill",
+   "sealSeq": [
+    "tiger"
+   ],
+   "seals": 1,
+   "sealsCanon": false,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "katon",
+   "level": 20,
+   "uk": "Вогняна доріжка",
+   "en": "Fire Release: Running Fire",
+   "rank": "D",
+   "rankCanon": false,
+   "role": "Площа",
+   "tags": [
+    "Площа"
+   ],
+   "state": "Горіння",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "Не з манґи. Ключ: зарості в Розвідці; Місія села «Розчищення ділянок»",
+   "patched": "",
+   "id": "core:running_fire",
+   "sealSeq": [
+    "tiger"
+   ],
+   "seals": 1,
+   "sealsCanon": true,
+   "tier": -1,
+   "noDamage": false
+  },
+  {
+   "skill": "katon",
+   "level": 30,
+   "uk": "Техніка великої вогняної кулі",
+   "en": "Fire Release: Great Fireball Technique",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Снаряд",
+   "tags": [
+    "Тривала шкода"
+   ],
+   "state": "Горіння",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "Печатки: Змія, Баран, Мавпа, Кабан, Кінь, Тигр. Місія села «Санітарна варта»",
+   "patched": "",
+   "id": "core:great_fireball",
+   "sealSeq": [
+    "snake",
+    "ram",
+    "monkey",
+    "boar",
+    "horse",
+    "tiger"
+   ],
+   "seals": 6,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "katon",
+   "level": 35,
+   "uk": "Техніка вогню фенікса-мудреця",
+   "en": "Fire Release: Phoenix Sage Fire Technique",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Серія",
+   "tags": [
+    "Тривала шкода"
+   ],
+   "state": "Горіння",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "",
+   "id": "core:phoenix_sage_fire",
+   "sealSeq": [
+    "rat",
+    "tiger",
+    "dog",
+    "ox",
+    "hare",
+    "tiger"
+   ],
+   "seals": 6,
+   "sealsCanon": true,
+   "tier": -1,
+   "noDamage": false
+  },
+  {
+   "skill": "katon",
+   "level": 40,
+   "uk": "Техніка вогню дракона",
+   "en": "Fire Release: Dragon Fire Technique",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Снаряд",
+   "tags": [
+    "Тривала шкода"
+   ],
+   "state": "Горіння",
+   "src": "S",
+   "home": "Бібліотека села, рівень 3",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "",
+   "id": "core:dragon_fire",
+   "sealSeq": [
+    "snake",
+    "dragon",
+    "hare",
+    "tiger"
+   ],
+   "seals": 4,
+   "sealsCanon": true,
+   "tier": 1,
+   "noDamage": false
+  },
+  {
+   "skill": "katon",
+   "level": 50,
+   "uk": "Полум'яна куля вогняного дракона",
+   "en": "Fire Release: Fire Dragon Flame Bullet",
+   "rank": "B",
+   "rankCanon": true,
+   "role": "Площа",
+   "tags": [
+    "Площа"
+   ],
+   "state": "Горіння",
+   "src": "S",
+   "home": "Руїни прикордонної фортеці, Країна Вогню",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "",
+   "id": "core:fire_dragon_flame_bullet",
+   "sealSeq": [
+    "ram",
+    "horse",
+    "snake",
+    "dragon",
+    "rat",
+    "ox",
+    "tiger"
+   ],
+   "seals": 7,
+   "sealsCanon": true,
+   "tier": 1,
+   "noDamage": false
+  },
+  {
+   "skill": "futon",
+   "level": 1,
+   "uk": "Вправа: розрізати листок",
+   "en": "Nature transformation: cut a leaf",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Тренування",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "Канонічна вправа (Асума й Наруто)",
+   "patched": "",
+   "id": "core:nature_transformation_cut_a_leaf",
+   "sealSeq": [
+    "bird"
+   ],
+   "seals": 1,
+   "sealsCanon": false,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "futon",
+   "level": 10,
+   "uk": "Вправа: розсікти водоспад",
+   "en": "Nature transformation: split a waterfall",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Тренування",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "Канонічна вправа",
+   "patched": "",
+   "id": "core:nature_transformation_split_a_waterfall",
+   "sealSeq": [
+    "bird"
+   ],
+   "seals": 1,
+   "sealsCanon": false,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "futon",
+   "level": 20,
+   "uk": "Вправа: потік вітру в клинок",
+   "en": "Wind chakra flow drill",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Тренування",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей стихії",
+   "home2": "",
+   "req": "",
+   "note": "Канонічний потік чакри (клинки Асуми)",
+   "patched": "",
+   "id": "core:wind_chakra_flow_drill",
+   "sealSeq": [
+    "bird"
+   ],
+   "seals": 1,
+   "sealsCanon": false,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "futon",
+   "level": 30,
+   "uk": "Шквальна долоня",
+   "en": "Wind Release: Gale Palm",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Снаряд",
+   "tags": [
+    "Пробиття"
+   ],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "",
+   "id": "core:gale_palm",
+   "sealSeq": [
+    "snake",
+    "ram",
+    "boar",
+    "horse",
+    "bird",
+    "clap"
+   ],
+   "seals": 6,
+   "sealsCanon": true,
+   "tier": -1,
+   "noDamage": false
+  },
+  {
+   "skill": "futon",
+   "level": 35,
+   "uk": "Великий прорив",
+   "en": "Wind Release: Great Breakthrough",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Площа",
+   "tags": [
+    "Площа",
+    "Виявлення"
+   ],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "Здуває туман. Місія «Піщана буря над оазою»",
+   "patched": "",
+   "id": "core:great_breakthrough",
+   "sealSeq": [
+    "tiger",
+    "ox",
+    "dog",
+    "hare",
+    "snake"
+   ],
+   "seals": 5,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "futon",
+   "level": 40,
+   "uk": "Техніка серповидної ласки",
+   "en": "Wind Release: Sickle Weasel Technique",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Площа",
+   "tags": [
+    "Пробиття",
+    "Виявлення"
+   ],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей стихії",
+   "home2": "",
+   "req": "",
+   "note": "Ключ: туман і зарості в Розвідці",
+   "patched": "",
+   "id": "core:sickle_weasel",
+   "sealSeq": [
+    "snake",
+    "dragon",
+    "bird"
+   ],
+   "seals": 3,
+   "sealsCanon": true,
+   "tier": 1,
+   "noDamage": false
+  },
+  {
+   "skill": "futon",
+   "level": 50,
+   "uk": "Вакуумна хвиля",
+   "en": "Wind Release: Vacuum Wave",
+   "rank": "B",
+   "rankCanon": true,
+   "role": "Площа",
+   "tags": [
+    "Пробиття",
+    "Площа"
+   ],
+   "state": "",
+   "src": "S",
+   "home": "Бібліотека села, рівень 5",
+   "home2": "",
+   "req": "",
+   "note": "Місія села «Розчищення ділянок»",
+   "patched": "",
+   "id": "core:vacuum_wave",
+   "sealSeq": [
+    "rat",
+    "snake",
+    "horse",
+    "dog"
+   ],
+   "seals": 4,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "raiton",
+   "level": 1,
+   "uk": "Вправа: зім'яти листок",
+   "en": "Nature transformation: crumple a leaf",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Тренування",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "Канонічна вправа перетворення природи",
+   "patched": "",
+   "id": "core:nature_transformation_crumple_a_leaf",
+   "sealSeq": [
+    "monkey"
+   ],
+   "seals": 1,
+   "sealsCanon": false,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "raiton",
+   "level": 10,
+   "uk": "Вправа: розряд між пальцями",
+   "en": "Lightning discharge drill",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Тренування",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "Тренування контролю блискавки",
+   "patched": "",
+   "id": "core:lightning_discharge_drill",
+   "sealSeq": [
+    "monkey"
+   ],
+   "seals": 1,
+   "sealsCanon": false,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "raiton",
+   "level": 20,
+   "uk": "Вправа: потік блискавки в кунай",
+   "en": "Lightning chakra flow drill",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Тренування",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей стихії",
+   "home2": "",
+   "req": "",
+   "note": "Канонічний потік чакри (Даруй, Саске)",
+   "patched": "",
+   "id": "core:lightning_chakra_flow_drill",
+   "sealSeq": [
+    "monkey"
+   ],
+   "seals": 1,
+   "sealsCanon": false,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "raiton",
+   "level": 30,
+   "uk": "Пута чотирьох стовпів",
+   "en": "Lightning Release: Four Pillar Bind",
+   "rank": "C",
+   "rankCanon": false,
+   "role": "Контроль",
+   "tags": [
+    "Сковування"
+   ],
+   "state": "Оглушення",
+   "src": "N",
+   "home": "Сенсей стихії",
+   "home2": "",
+   "req": "",
+   "note": "Місія села «Заряджені загородження»",
+   "patched": "",
+   "id": "core:four_pillar_bind",
+   "sealSeq": [
+    "ram",
+    "boar",
+    "dog",
+    "bird",
+    "hare"
+   ],
+   "seals": 5,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "raiton",
+   "level": 35,
+   "uk": "Ікло блискавичного звіра",
+   "en": "Lightning Release: Lightning Beast Tracking Fang",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Снаряд",
+   "tags": [
+    "Переривання"
+   ],
+   "state": "Оглушення",
+   "src": "N",
+   "home": "Сенсей стихії",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "",
+   "id": "core:lightning_beast_tracking_fang",
+   "sealSeq": [
+    "ox",
+    "hare",
+    "monkey"
+   ],
+   "seals": 3,
+   "sealsCanon": false,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "raiton",
+   "level": 40,
+   "uk": "Хвиля натхнення",
+   "en": "Lightning Release: Wave of Inspiration",
+   "rank": "C",
+   "rankCanon": false,
+   "role": "Снаряд",
+   "tags": [
+    "Переривання"
+   ],
+   "state": "Оглушення",
+   "src": "O",
+   "home": "Носій: найманець — дезертир Хмари (Південні рівнини)",
+   "home2": "",
+   "req": "",
+   "note": "Канон (манґа, техніка Даруя; ранг не вказано): блискавка, пущена по воді. Комбо «Райтон по Мокрому» спрацьовує завжди",
+   "patched": "Додано в зріз",
+   "id": "core:wave_of_inspiration",
+   "sealSeq": [
+    "hare",
+    "dog",
+    "boar",
+    "ram",
+    "rat"
+   ],
+   "seals": 5,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "raiton",
+   "level": 50,
+   "uk": "Хибна темрява",
+   "en": "Lightning Release: False Darkness",
+   "rank": "B",
+   "rankCanon": true,
+   "role": "Снаряд",
+   "tags": [
+    "Пробиття",
+    "Переривання"
+   ],
+   "state": "Оглушення",
+   "src": "O",
+   "home": "Носій: нукенін-мисливець за головами",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "",
+   "id": "core:false_darkness",
+   "sealSeq": [
+    "snake"
+   ],
+   "seals": 1,
+   "sealsCanon": true,
+   "tier": 1,
+   "noDamage": false
+  },
+  {
+   "skill": "doton",
+   "level": 1,
+   "uk": "Вправа: розтерти листок на порох",
+   "en": "Nature transformation: crumble a leaf",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Тренування",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "Канонічна вправа перетворення природи",
+   "patched": "",
+   "id": "core:nature_transformation_crumble_a_leaf",
+   "sealSeq": [
+    "snake"
+   ],
+   "seals": 1,
+   "sealsCanon": false,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "doton",
+   "level": 10,
+   "uk": "Техніка подвійного самогубчого обезглавлення",
+   "en": "Earth Release: Double Suicide Decapitation Technique",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Контроль",
+   "tags": [
+    "Сковування"
+   ],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "",
+   "id": "core:double_suicide_decapitation",
+   "sealSeq": [],
+   "seals": 0,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "doton",
+   "level": 20,
+   "uk": "Вправа: розм'якшити ґрунт",
+   "en": "Earth softening drill",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Тренування",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей стихії",
+   "home2": "",
+   "req": "",
+   "note": "Тренування контролю землі",
+   "patched": "",
+   "id": "core:earth_softening_drill",
+   "sealSeq": [
+    "snake"
+   ],
+   "seals": 1,
+   "sealsCanon": false,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "doton",
+   "level": 30,
+   "uk": "Техніка ховання як кріт",
+   "en": "Earth Release: Hiding like a Mole Technique",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Контроль",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей стихії",
+   "home2": "",
+   "req": "",
+   "note": "Ключ: завали на входах до руїн",
+   "patched": "",
+   "id": "core:hiding_like_a_mole",
+   "sealSeq": [],
+   "seals": 0,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": true
+  },
+  {
+   "skill": "doton",
+   "level": 35,
+   "uk": "Долоня, що розриває землю",
+   "en": "Earth Release: Tearing Earth Turning Palm",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Площа",
+   "tags": [
+    "Площа"
+   ],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей стихії",
+   "home2": "",
+   "req": "",
+   "note": "Канон (C): земля розходиться під ворогами",
+   "patched": "Додано в зріз",
+   "id": "core:tearing_earth_turning_palm",
+   "sealSeq": [
+    "boar",
+    "ox",
+    "unique"
+   ],
+   "seals": 3,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "doton",
+   "level": 40,
+   "uk": "Земляна ріка",
+   "en": "Earth Release: Earth Flow River",
+   "rank": "C",
+   "rankCanon": false,
+   "role": "Контроль",
+   "tags": [
+    "Сковування"
+   ],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей стихії",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "",
+   "id": "core:earth_flow_river",
+   "sealSeq": [
+    "tiger"
+   ],
+   "seals": 1,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "doton",
+   "level": 45,
+   "uk": "Куля земляного дракона",
+   "en": "Earth Release: Earth Dragon Bullet",
+   "rank": "C",
+   "rankCanon": false,
+   "role": "Снаряд",
+   "tags": [],
+   "state": "",
+   "src": "S",
+   "home": "Бібліотека села, рівень 4",
+   "home2": "",
+   "req": "",
+   "note": "Аніме",
+   "patched": "",
+   "id": "core:earth_dragon_bullet",
+   "sealSeq": [
+    "ram",
+    "horse",
+    "dragon"
+   ],
+   "seals": 3,
+   "sealsCanon": true,
+   "tier": 1,
+   "noDamage": false
+  },
+  {
+   "skill": "doton",
+   "level": 50,
+   "uk": "Стіна земляного стилю",
+   "en": "Earth Release: Earth-Style Wall",
+   "rank": "B",
+   "rankCanon": true,
+   "role": "Захист",
+   "tags": [
+    "Захист"
+   ],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей стихії",
+   "home2": "",
+   "req": "",
+   "note": "Місія села «Зведення стін»",
+   "patched": "",
+   "id": "core:earth_style_wall",
+   "sealSeq": [
+    "tiger",
+    "hare",
+    "boar",
+    "dog"
+   ],
+   "seals": 4,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "suiton",
+   "level": 1,
+   "uk": "Вправа: змочити листок",
+   "en": "Nature transformation: dampen a leaf",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Тренування",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "Канонічна вправа перетворення природи",
+   "patched": "",
+   "id": "core:nature_transformation_dampen_a_leaf",
+   "sealSeq": [
+    "dragon"
+   ],
+   "seals": 1,
+   "sealsCanon": false,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "suiton",
+   "level": 10,
+   "uk": "Техніка ховання в тумані",
+   "en": "Hiding in Mist Technique",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Захист",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей команди",
+   "home2": "",
+   "req": "",
+   "note": "Ключ: +2 Прикриття в Інфільтрації",
+   "patched": "",
+   "id": "core:hiding_in_mist",
+   "sealSeq": [
+    "ox",
+    "snake",
+    "ram"
+   ],
+   "seals": 3,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "suiton",
+   "level": 20,
+   "uk": "Вправа: вести воду з річки",
+   "en": "River water guiding drill",
+   "rank": "D",
+   "rankCanon": true,
+   "role": "Тренування",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей стихії",
+   "home2": "",
+   "req": "",
+   "note": "Місії «Посуха на полях» і «Зрошення полів села» (з рівня 70 — Хвилями вибухової води, більше)",
+   "patched": "",
+   "id": "core:river_water_guiding_drill",
+   "sealSeq": [
+    "dragon"
+   ],
+   "seals": 1,
+   "sealsCanon": false,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "suiton",
+   "level": 30,
+   "uk": "Техніка водяного клону",
+   "en": "Water Release: Water Clone Technique",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Захист",
+   "tags": [],
+   "state": "",
+   "src": "N",
+   "home": "Сенсей стихії",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "",
+   "id": "core:water_clone",
+   "sealSeq": [
+    "tiger"
+   ],
+   "seals": 1,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "suiton",
+   "level": 30,
+   "uk": "Буйна водяна хвиля",
+   "en": "Water Release: Wild Water Wave",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Снаряд",
+   "tags": [],
+   "state": "Мокрий",
+   "src": "N",
+   "home": "Сенсей стихії",
+   "home2": "",
+   "req": "",
+   "note": "Канон (C): струмінь води з рота. Перша атака Суйтону й раннє джерело Мокрого",
+   "patched": "Додано в зріз",
+   "id": "core:wild_water_wave",
+   "sealSeq": [
+    "dragon",
+    "tiger",
+    "hare"
+   ],
+   "seals": 3,
+   "sealsCanon": true,
+   "tier": -1,
+   "noDamage": false
+  },
+  {
+   "skill": "suiton",
+   "level": 35,
+   "uk": "Техніка водяної в'язниці",
+   "en": "Water Release: Water Prison Technique",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Контроль",
+   "tags": [
+    "Сковування"
+   ],
+   "state": "Мокрий",
+   "src": "O",
+   "home": "Носій: нукенін Туману (Бінґо-книга)",
+   "home2": "",
+   "req": "",
+   "note": "",
+   "patched": "",
+   "id": "core:water_prison",
+   "sealSeq": [
+    "snake",
+    "ram",
+    "horse",
+    "hare",
+    "ram",
+    "horse",
+    "hare",
+    "palms"
+   ],
+   "seals": 8,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "suiton",
+   "level": 40,
+   "uk": "Постріл",
+   "en": "Water Release: Gunshot",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Площа",
+   "tags": [
+    "Площа"
+   ],
+   "state": "Мокрий",
+   "src": "S",
+   "home": "Бібліотека села, рівень 3",
+   "home2": "Призовний рід: жаби (поза зрізом)",
+   "req": "",
+   "note": "Спільна техніка з жабою",
+   "patched": "Друга домівка в зрізі: Суйтон отримує атаку по площі",
+   "id": "core:gunshot",
+   "sealSeq": [
+    "tiger"
+   ],
+   "seals": 1,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "suiton",
+   "level": 45,
+   "uk": "Поле липкого сиропу",
+   "en": "Water Release: Starch Syrup Capturing Field",
+   "rank": "C",
+   "rankCanon": true,
+   "role": "Контроль",
+   "tags": [
+    "Сковування"
+   ],
+   "state": "Мокрий",
+   "src": "S",
+   "home": "Бібліотека села, рівень 4",
+   "home2": "",
+   "req": "",
+   "note": "Канон (C): липка вода сковує ноги. Сковування Суйтоном без боса",
+   "patched": "Додано в зріз",
+   "id": "core:starch_syrup_capturing_field",
+   "sealSeq": [
+    "ram",
+    "tiger"
+   ],
+   "seals": 2,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  },
+  {
+   "skill": "suiton",
+   "level": 50,
+   "uk": "Стіна водяного табору",
+   "en": "Water Release: Water Formation Wall",
+   "rank": "B",
+   "rankCanon": true,
+   "role": "Захист",
+   "tags": [
+    "Захист"
+   ],
+   "state": "Мокрий",
+   "src": "N",
+   "home": "Сенсей стихії",
+   "home2": "",
+   "req": "",
+   "note": "Місія «Пожежа на рисовому складі»",
+   "patched": "",
+   "id": "core:water_formation_wall",
+   "sealSeq": [
+    "tiger",
+    "snake",
+    "rat",
+    "snake",
+    "tiger"
+   ],
+   "seals": 5,
+   "sealsCanon": true,
+   "tier": 0,
+   "noDamage": false
+  }
+ ],
+ "exercises": [
+  {
+   "level": 1,
+   "uk": "Листок на лобі",
+   "req": "",
+   "note": ""
+  },
+  {
+   "level": 5,
+   "uk": "Кунай на долоні",
+   "req": "",
+   "note": ""
+  },
+  {
+   "level": 10,
+   "uk": "Чакра в стопах",
+   "req": "",
+   "note": ""
+  },
+  {
+   "level": 15,
+   "uk": "Ходіння по дереву",
+   "req": "",
+   "note": "Верхівки дерев у Розвідці; скельні трави"
+  },
+  {
+   "level": 20,
+   "uk": "Підйом скелею без рук",
+   "req": "",
+   "note": ""
+  },
+  {
+   "level": 30,
+   "uk": "Ходіння по воді",
+   "req": "",
+   "note": "Водні клітинки в Розвідці; водяні трави"
+  },
+  {
+   "level": 40,
+   "uk": "Лопання водяної кулі",
+   "req": "",
+   "note": ""
+  },
+  {
+   "level": 50,
+   "uk": "Лопання гумової кулі",
+   "req": "",
+   "note": ""
+  }
+ ],
+ "practices": [
+  {
+   "level": 1,
+   "uk": "Тиха кімната",
+   "pair": "Контроль чакри + Ніндзюцу",
+   "insight": [
+    "+8% досвіду Контролю чакри",
+    "+8% досвіду Ніндзюцу",
+    "−8% часу вправ Контролю чакри"
+   ],
+   "enlight": [
+    "−5% вартості чакри нестихійних технік",
+    "+5% до спільного пулу тіньових клонів",
+    "+5% досвіду Майстерності технік Ніндзюцу"
+   ]
+  },
+  {
+   "level": 10,
+   "uk": "Медитація в русі",
+   "pair": "Тайдзюцу + Ухилення",
+   "insight": [
+    "+8% досвіду Тайдзюцу",
+    "+8% досвіду Ухилення",
+    "+8% пулу витривалості"
+   ],
+   "enlight": [
+    "+2,5% шансу ухилитися",
+    "−5% витрат витривалості на тайдзюцу",
+    "−10% часу загоєння Ран від брам"
+   ]
+  },
+  {
+   "level": 20,
+   "uk": "Лісове святилище",
+   "pair": "Травництво + Алхімія",
+   "insight": [
+    "+8% досвіду Травництва",
+    "+8% досвіду Алхімії",
+    "+8 до запасу всіх кущів"
+   ],
+   "enlight": [
+    "+5% шансу подвійного збору",
+    "+5% до відновлення HP від мазей і страв",
+    "+5% шансу зберегти трави при варінні"
+   ]
+  },
+  {
+   "level": 30,
+   "uk": "Біля вогнища",
+   "pair": "Катон + Провіант",
+   "insight": [
+    "+8% досвіду Катону",
+    "+8% досвіду Провіанту",
+    "−8% часу активної станції"
+   ],
+   "enlight": [
+    "+2,5% шансу ідеального приготування",
+    "+10% тривалості Горіння",
+    "+10% зарядів тоніків"
+   ]
+  },
+  {
+   "level": 40,
+   "uk": "Під водоспадом",
+   "pair": "Суйтон + Атлетика",
+   "insight": [
+    "+8% досвіду Суйтону",
+    "+8% досвіду Атлетики",
+    "−8% вартості будівництва перешкод"
+   ],
+   "enlight": [
+    "+10% тривалості Мокрого",
+    "+2,5% до плюсів смуги",
+    "−5% тривалості місій"
+   ]
+  },
+  {
+   "level": 50,
+   "uk": "Сад каменів",
+   "pair": "Дотон + Живучість",
+   "insight": [
+    "+8% досвіду Дотону",
+    "+8% досвіду Живучості",
+    "+8% запасу HP"
+   ],
+   "enlight": [
+    "+10% міцності щитів",
+    "−10% часу загоєння Ран",
+    "+5% захисту"
+   ]
+  }
+ ],
+ "obstacles": [
+  {
+   "level": 1,
+   "uk": "Слот 1: Стрибки по дахах",
+   "req": "",
+   "note": "+2% досвіду Атлетики / −1% швидкості Травництва"
+  },
+  {
+   "level": 1,
+   "uk": "Слот 1: Біг навколо села",
+   "req": "",
+   "note": "−2% тривалості місій / −1% досвіду Медитації"
+  },
+  {
+   "level": 10,
+   "uk": "Слот 2: Обтяжувачі",
+   "req": "",
+   "note": "+3% досвіду Тайдзюцу / −2% швидкості Атлетики"
+  },
+  {
+   "level": 10,
+   "uk": "Слот 2: Віджимання на пальцях",
+   "req": "",
+   "note": "+2% пулу витривалості / −1% швидкості Алхімії"
+  },
+  {
+   "level": 20,
+   "uk": "Слот 3: Колода над прірвою",
+   "req": "",
+   "note": "+2% ухилення в бою / −2% досвіду Атлетики"
+  },
+  {
+   "level": 20,
+   "uk": "Слот 3: Ухилення від кунаїв",
+   "req": "",
+   "note": "+3% досвіду Ухилення / −1% точності"
+  },
+  {
+   "level": 30,
+   "uk": "Слот 4: Біг по деревах",
+   "req": "Контроль чакри 15",
+   "note": "−3% часу дослідження клітинок / −1% досвіду Тайдзюцу"
+  },
+  {
+   "level": 30,
+   "uk": "Слот 4: Лазіння по скелі",
+   "req": "",
+   "note": "+3% досвіду Атлетики / −2% швидкості Провіанту"
+  },
+  {
+   "level": 40,
+   "uk": "Слот 5: Перегони з суперником",
+   "req": "",
+   "note": "+3% досвіду Тайдзюцу / −2% досвіду Медитації"
+  },
+  {
+   "level": 40,
+   "uk": "Слот 5: Стрибки через стовпи",
+   "req": "",
+   "note": "+2% швидкості дій Атлетики / −1% пулу чакри"
+  },
+  {
+   "level": 50,
+   "uk": "Слот 6: Біг по воді",
+   "req": "Контроль чакри 30",
+   "note": "+3% досвіду Контролю чакри / −2% пулу витривалості"
+  },
+  {
+   "level": 50,
+   "uk": "Слот 6: Плавання проти течії",
+   "req": "",
+   "note": "+3% пулу витривалості / −2% швидкості Травництва"
+  }
+ ],
+ "herbs": [
+  {
+   "level": 1,
+   "uk": "Цілюща м'ята",
+   "req": "",
+   "note": "",
+   "id": "mint"
+  },
+  {
+   "level": 5,
+   "uk": "Кропива",
+   "req": "",
+   "note": "",
+   "id": "nettle"
+  },
+  {
+   "level": 10,
+   "uk": "Отруйний борщівник",
+   "req": "",
+   "note": "",
+   "id": "hogweed"
+  },
+  {
+   "level": 15,
+   "uk": "Кровотрав",
+   "req": "",
+   "note": "",
+   "id": "bloodgrass"
+  },
+  {
+   "level": 20,
+   "uk": "Сонний мак",
+   "req": "",
+   "note": "",
+   "id": "poppy"
+  },
+  {
+   "level": 25,
+   "uk": "Залізний корінь",
+   "req": "",
+   "note": "",
+   "id": "ironroot"
+  },
+  {
+   "level": 30,
+   "uk": "Сріблястий мох",
+   "req": "",
+   "note": "",
+   "id": "silvermoss"
+  },
+  {
+   "level": 35,
+   "uk": "Гірський едельвейс",
+   "req": "Контроль чакри 15 (скелі)",
+   "note": "Бонусний вид",
+   "id": "edelweiss"
+  },
+  {
+   "level": 40,
+   "uk": "Вогняна квітка",
+   "req": "",
+   "note": "",
+   "id": "fireflower"
+  },
+  {
+   "level": 45,
+   "uk": "Водяний лотос",
+   "req": "Контроль чакри 30 (вода)",
+   "note": "Бонусний вид",
+   "id": "lotus"
+  },
+  {
+   "level": 50,
+   "uk": "Тіньовий гриб",
+   "req": "",
+   "note": "",
+   "id": "shadowshroom"
+  }
+ ],
+ "recipes": [
+  {
+   "skill": "alch",
+   "level": 1,
+   "uk": "Протиотрута",
+   "act": "Бій: знімає отруєння",
+   "ing": [
+    [
+     "mint",
+     2
+    ],
+    [
+     "water",
+     1
+    ]
+   ],
+   "out": 2,
+   "tags": [
+    "Очищення"
+   ],
+   "patched": ""
+  },
+  {
+   "skill": "alch",
+   "level": 5,
+   "uk": "Цілюща мазь",
+   "act": "Бій: +40 HP миттєво",
+   "ing": [
+    [
+     "nettle",
+     2
+    ],
+    [
+     "oil",
+     1
+    ]
+   ],
+   "out": 2,
+   "tags": [],
+   "patched": ""
+  },
+  {
+   "skill": "alch",
+   "level": 10,
+   "uk": "Паралітична отрута",
+   "act": "Отрута на зброю: сповільнення, 15 ударів",
+   "ing": [
+    [
+     "hogweed",
+     2
+    ],
+    [
+     "mint",
+     1
+    ]
+   ],
+   "out": 1,
+   "tags": [
+    "Сковування"
+   ],
+   "patched": ""
+  },
+  {
+   "skill": "alch",
+   "level": 15,
+   "uk": "Димова бомба",
+   "act": "Бій: +20% ухилення на 3 с",
+   "ing": [
+    [
+     "saltpeter",
+     1
+    ],
+    [
+     "nettle",
+     2
+    ]
+   ],
+   "out": 3,
+   "tags": [
+    "Захист"
+   ],
+   "patched": ""
+  },
+  {
+   "skill": "alch",
+   "level": 20,
+   "uk": "Сонний порошок",
+   "act": "Бій: шанс приспати слабшого ворога",
+   "ing": [
+    [
+     "poppy",
+     3
+    ]
+   ],
+   "out": 2,
+   "tags": [
+    "Сковування"
+   ],
+   "patched": ""
+  },
+  {
+   "skill": "alch",
+   "level": 25,
+   "uk": "Кровоспинна мазь",
+   "act": "Після бою: −1 хв загоєння одного стаку Ран (не нижче мінімуму)",
+   "ing": [
+    [
+     "bloodgrass",
+     2
+    ],
+    [
+     "oil",
+     1
+    ]
+   ],
+   "out": 2,
+   "tags": [],
+   "patched": ""
+  },
+  {
+   "skill": "alch",
+   "level": 30,
+   "uk": "Сльозогінна бомба",
+   "act": "Бій: −15% точності ворога на 5 с",
+   "ing": [
+    [
+     "silvermoss",
+     2
+    ],
+    [
+     "saltpeter",
+     1
+    ]
+   ],
+   "out": 3,
+   "tags": [
+    "Переривання"
+   ],
+   "patched": ""
+  },
+  {
+   "skill": "alch",
+   "level": 35,
+   "uk": "Гірська мазь",
+   "act": "Бій: +100 HP миттєво",
+   "ing": [
+    [
+     "edelweiss",
+     2
+    ],
+    [
+     "oil",
+     1
+    ]
+   ],
+   "out": 2,
+   "tags": [],
+   "patched": ""
+  },
+  {
+   "skill": "alch",
+   "level": 40,
+   "uk": "Нервова отрута",
+   "act": "Отрута на зброю: шкода з часом, 15 ударів",
+   "ing": [
+    [
+     "hogweed",
+     2
+    ],
+    [
+     "poppy",
+     2
+    ]
+   ],
+   "out": 1,
+   "tags": [
+    "Тривала шкода"
+   ],
+   "patched": ""
+  },
+  {
+   "skill": "alch",
+   "level": 45,
+   "uk": "Нюхальна сіль",
+   "act": "Інструмент підсумка: знімає ворожу ілюзію (Розсіювання)",
+   "ing": [
+    [
+     "mint",
+     2
+    ],
+    [
+     "salt",
+     1
+    ],
+    [
+     "water",
+     1
+    ]
+   ],
+   "out": 3,
+   "tags": [
+    "Розсіювання"
+   ],
+   "patched": ""
+  },
+  {
+   "skill": "alch",
+   "level": 50,
+   "uk": "Мазь від опіків",
+   "act": "Бій: знімає Горіння, +опір Катону на 30 с",
+   "ing": [
+    [
+     "fireflower",
+     2
+    ],
+    [
+     "oil",
+     1
+    ]
+   ],
+   "out": 2,
+   "tags": [],
+   "patched": ""
+  },
+  {
+   "skill": "prov",
+   "level": 1,
+   "uk": "Онігірі",
+   "act": "Казан · бій: +30 HP миттєво",
+   "ing": [
+    [
+     "rice",
+     2
+    ],
+    [
+     "salt",
+     1
+    ]
+   ],
+   "out": 3,
+   "tags": [],
+   "patched": ""
+  },
+  {
+   "skill": "prov",
+   "level": 5,
+   "uk": "Тонік ясного розуму",
+   "act": "Ступка · +5% досвіду Медитації, 40 зарядів",
+   "ing": [
+    [
+     "mint",
+     2
+    ],
+    [
+     "water",
+     1
+    ]
+   ],
+   "out": 1,
+   "tags": [],
+   "patched": ""
+  },
+  {
+   "skill": "prov",
+   "level": 10,
+   "uk": "Пілюля військового пайка",
+   "act": "Котел · Military Ration Pill · бій: +40 чакри й +40 витривалості миттєво",
+   "ing": [
+    [
+     "nettle",
+     2
+    ],
+    [
+     "rice",
+     2
+    ]
+   ],
+   "out": 2,
+   "tags": [],
+   "patched": ""
+  },
+  {
+   "skill": "prov",
+   "level": 15,
+   "uk": "Сушений пайок",
+   "act": "Казан · −5% тривалості однієї місії; пайки для загонів села додають Силу шинобі",
+   "ing": [
+    [
+     "meat",
+     2
+    ],
+    [
+     "salt",
+     2
+    ]
+   ],
+   "out": 2,
+   "tags": [],
+   "patched": ""
+  },
+  {
+   "skill": "prov",
+   "level": 20,
+   "uk": "Кровотворна пілюля",
+   "act": "Котел · Blood Increasing Pill · бій: +50 HP миттєво; після бою −1 хв загоєння одного стаку Ран",
+   "ing": [
+    [
+     "bloodgrass",
+     2
+    ],
+    [
+     "meat",
+     1
+    ]
+   ],
+   "out": 2,
+   "tags": [],
+   "patched": ""
+  },
+  {
+   "skill": "prov",
+   "level": 25,
+   "uk": "Тонік концентрації",
+   "act": "Ступка · +5% досвіду Контролю чакри, 40 зарядів",
+   "ing": [
+    [
+     "ironroot",
+     2
+    ],
+    [
+     "water",
+     1
+    ]
+   ],
+   "out": 1,
+   "tags": [],
+   "patched": ""
+  },
+  {
+   "skill": "prov",
+   "level": 30,
+   "uk": "Бульйон рамену",
+   "act": "Казан · бій: +80 HP миттєво",
+   "ing": [
+    [
+     "noodles",
+     2
+    ],
+    [
+     "meat",
+     1
+    ],
+    [
+     "salt",
+     1
+    ],
+    [
+     "spice",
+     1
+    ]
+   ],
+   "out": 2,
+   "tags": [],
+   "patched": "Споживач спецій"
+  },
+  {
+   "skill": "prov",
+   "level": 40,
+   "uk": "Чай бадьорості",
+   "act": "Ступка · +5% досвіду Атлетики, 40 зарядів",
+   "ing": [
+    [
+     "ironroot",
+     2
+    ],
+    [
+     "silvermoss",
+     1
+    ]
+   ],
+   "out": 1,
+   "tags": [],
+   "patched": ""
+  },
+  {
+   "skill": "prov",
+   "level": 45,
+   "uk": "Якіторі шинобі",
+   "act": "Казан · бій: +120 HP миттєво",
+   "ing": [
+    [
+     "meat",
+     3
+    ],
+    [
+     "oil",
+     1
+    ],
+    [
+     "salt",
+     1
+    ],
+    [
+     "spice",
+     1
+    ]
+   ],
+   "out": 2,
+   "tags": [],
+   "patched": "Споживач спецій"
+  },
+  {
+   "skill": "prov",
+   "level": 50,
+   "uk": "Тонік стихій",
+   "act": "Ступка · +5% досвіду всіх стихій, 40 зарядів",
+   "ing": [
+    [
+     "lotus",
+     2
+    ],
+    [
+     "fireflower",
+     1
+    ]
+   ],
+   "out": 1,
+   "tags": [],
+   "patched": ""
+  },
+  {
+   "skill": "prov",
+   "level": 50,
+   "uk": "Пілюля відновлення чакри",
+   "act": "Котел · бій: +120 чакри миттєво",
+   "ing": [
+    [
+     "shadowshroom",
+     2
+    ],
+    [
+     "rice",
+     1
+    ]
+   ],
+   "out": 2,
+   "tags": [],
+   "patched": "Споживач Тіньового гриба в зрізі; пілюля чакри потрібна в Лісі смерті"
+  }
+ ],
+ "coat": [
+  {
+   "poison": "Нервова отрута",
+   "base": "senbon",
+   "n": 15,
+   "out": "Отруєні сенбон",
+   "tags": [
+    "Тривала шкода"
+   ]
+  },
+  {
+   "poison": "Паралітична отрута",
+   "base": "senbon",
+   "n": 15,
+   "out": "Паралітичні сенбон",
+   "tags": [
+    "Сковування"
+   ]
+  }
+ ],
+ "pools": {
+  "tai": [
+   {
+    "pct": 10,
+    "text": "−5% витрат витривалості на тайдзюцу",
+    "patched": false
+   },
+   {
+    "pct": 25,
+    "text": "+5% шансу перервати ворожі печатки",
+    "patched": false
+   },
+   {
+    "pct": 50,
+    "text": "+5% шкоди проти ворогів ближнього бою",
+    "patched": false
+   },
+   {
+    "pct": 95,
+    "text": "+5% досвіду Атлетики й Живучості",
+    "patched": false
+   }
+  ],
+  "nin": [
+   {
+    "pct": 10,
+    "text": "−5% тривалості етапів місій, які виконує техніка Ніндзюцу",
+    "patched": true
+   },
+   {
+    "pct": 25,
+    "text": "−5% перезарядки Підміни",
+    "patched": false
+   },
+   {
+    "pct": 50,
+    "text": "+5% до спільного пулу клонів",
+    "patched": false
+   },
+   {
+    "pct": 95,
+    "text": "+5% досвіду Інфільтрації: перевтілення й підміна",
+    "patched": false
+   }
+  ],
+  "katon": [
+   {
+    "pct": 10,
+    "text": "+5% тривалості Горіння",
+    "patched": false
+   },
+   {
+    "pct": 25,
+    "text": "−5% вартості технік Катону",
+    "patched": false
+   },
+   {
+    "pct": 50,
+    "text": "+5% шкоди Горіння",
+    "patched": false
+   },
+   {
+    "pct": 95,
+    "text": "+5% досвіду Майстерності Райтону: хмари для Кіріна",
+    "patched": false
+   }
+  ],
+  "futon": [
+   {
+    "pct": 10,
+    "text": "+5% пробивання захисту",
+    "patched": false
+   },
+   {
+    "pct": 25,
+    "text": "−5% часу касту технік Футону",
+    "patched": false
+   },
+   {
+    "pct": 50,
+    "text": "+5% шкоди по ворогах із рисою «Броня»",
+    "patched": true
+   },
+   {
+    "pct": 95,
+    "text": "+5% досвіду Майстерності Катону: вітер роздмухує вогонь",
+    "patched": false
+   }
+  ],
+  "raiton": [
+   {
+    "pct": 10,
+    "text": "+5% тривалості оглушення",
+    "patched": false
+   },
+   {
+    "pct": 25,
+    "text": "+5% шансу перервати печатки",
+    "patched": false
+   },
+   {
+    "pct": 50,
+    "text": "−5% перезарядки технік Райтону",
+    "patched": false
+   },
+   {
+    "pct": 95,
+    "text": "+5% досвіду Тайдзюцу: броня блискавки",
+    "patched": false
+   }
+  ],
+  "doton": [
+   {
+    "pct": 10,
+    "text": "+5% міцності щитів",
+    "patched": false
+   },
+   {
+    "pct": 25,
+    "text": "+5% тривалості сковування",
+    "patched": false
+   },
+   {
+    "pct": 50,
+    "text": "−5% вартості захисних технік Дотону",
+    "patched": false
+   },
+   {
+    "pct": 95,
+    "text": "+5% досвіду Майстерності Суйтону: земля й вода — основа Мокутону",
+    "patched": false
+   }
+  ],
+  "suiton": [
+   {
+    "pct": 10,
+    "text": "+5% тривалості Мокрого",
+    "patched": false
+   },
+   {
+    "pct": 25,
+    "text": "+5% сили сповільнення",
+    "patched": false
+   },
+   {
+    "pct": 50,
+    "text": "−5% вартості технік Суйтону",
+    "patched": false
+   },
+   {
+    "pct": 95,
+    "text": "+5% досвіду Майстерності Дотону: земля й вода — основа Мокутону",
+    "patched": false
+   }
+  ],
+  "cc": [
+   {
+    "pct": 10,
+    "text": "+5% досвіду Контролю чакри",
+    "patched": false
+   },
+   {
+    "pct": 25,
+    "text": "−2% бойової вартості технік",
+    "patched": false
+   },
+   {
+    "pct": 50,
+    "text": "+2% швидкості тренування технік",
+    "patched": false
+   },
+   {
+    "pct": 95,
+    "text": "−5% вартості чакри всіх технік",
+    "patched": false
+   }
+  ],
+  "med": [
+   {
+    "pct": 10,
+    "text": "+5% досвіду Майстерності практик",
+    "patched": false
+   },
+   {
+    "pct": 25,
+    "text": "+5% до шансу Прозріння (5% → 10%)",
+    "patched": false
+   },
+   {
+    "pct": 50,
+    "text": "+10% відновлення чакри в бою",
+    "patched": false
+   },
+   {
+    "pct": 95,
+    "text": "+5% досвіду Майстерності в усіх навичках",
+    "patched": false
+   }
+  ],
+  "ath": [
+   {
+    "pct": 10,
+    "text": "−5% вартості будівництва перешкод",
+    "patched": false
+   },
+   {
+    "pct": 25,
+    "text": "+2% до всіх плюсів смуги",
+    "patched": false
+   },
+   {
+    "pct": 50,
+    "text": "−25% до всіх мінусів смуги",
+    "patched": false
+   },
+   {
+    "pct": 95,
+    "text": "−5% тривалості всіх місій",
+    "patched": false
+   }
+  ],
+  "herb": [
+   {
+    "pct": 10,
+    "text": "+5 до запасу всіх кущів",
+    "patched": false
+   },
+   {
+    "pct": 25,
+    "text": "−10% часу відростання",
+    "patched": false
+   },
+   {
+    "pct": 50,
+    "text": "+5% шансу подвійного збору",
+    "patched": false
+   },
+   {
+    "pct": 95,
+    "text": "+5% досвіду Алхімії й Провіанту",
+    "patched": false
+   }
+  ],
+  "prov": [
+   {
+    "pct": 10,
+    "text": "+5% швидкості активної станції",
+    "patched": true
+   },
+   {
+    "pct": 25,
+    "text": "+3% шансу ідеального приготування",
+    "patched": false
+   },
+   {
+    "pct": 50,
+    "text": "Тоніки мають на 25% більше зарядів",
+    "patched": false
+   },
+   {
+    "pct": 95,
+    "text": "Тоніки мають удвічі більше зарядів",
+    "patched": false
+   }
+  ],
+  "alch": [
+   {
+    "pct": 10,
+    "text": "−5% часу варіння",
+    "patched": false
+   },
+   {
+    "pct": 25,
+    "text": "+5% шансу зберегти будь-які інгредієнти",
+    "patched": false
+   },
+   {
+    "pct": 50,
+    "text": "+5% шансу подвійного виробу",
+    "patched": false
+   },
+   {
+    "pct": 95,
+    "text": "+5% досвіду Медичного ніндзюцу",
+    "patched": false
+   }
+  ]
+ },
+ "tools": {
+  "kunai": [
+   "Кунаї",
+   "Кузня 1; Ринок",
+   "Підсумок: кидок у паузах",
+   [
+    "Переривання"
+   ]
+  ],
+  "shuriken": [
+   "Сюрікени",
+   "Кузня 1; Ринок",
+   "Підсумок: кидок у паузах",
+   [
+    "Переривання"
+   ]
+  ],
+  "senbon": [
+   "Сенбон",
+   "Кузня 2",
+   "Підсумок; основа для отруєних сенбон",
+   []
+  ],
+  "wire": [
+   "Дріт",
+   "Кузня 2",
+   "Місія «Заряджені загородження» (10); дротяна пастка",
+   []
+  ],
+  "wiretrap": [
+   "Дротяна пастка",
+   "Кузня 3 (2 дроти)",
+   "Підсумок",
+   [
+    "Сковування"
+   ]
+  ],
+  "tag": [
+   "Вибухова мітка (базова)",
+   "Ринок 2",
+   "Підсумок",
+   [
+    "Площа"
+   ]
+  ],
+  "psenbon": [
+   "Отруєні сенбон",
+   "Нервова отрута + сенбон",
+   "Підсумок",
+   [
+    "Тривала шкода"
+   ]
+  ],
+  "parsenbon": [
+   "Паралітичні сенбон",
+   "Паралітична отрута + сенбон",
+   "Підсумок",
+   [
+    "Сковування"
+   ]
+  ],
+  "medpouch": [
+   "Підсумок медика I",
+   "Ринок 3",
+   "Автовживання однієї пілюлі на порозі",
+   []
+  ]
+ },
+ "misc": {
+  "crate": [
+   "Ящик торговця",
+   "«Супровід каравану»",
+   "Відкрити: олія, сіль, спеції, зрідка коштовність"
+  ],
+  "gem": [
+   "Коштовність",
+   "Ящик торговця; сховки",
+   "Продаж"
+  ],
+  "band": [
+   "Сіра пов'язка",
+   "Найманці «Сірих пов'язок»",
+   "Продаж у Бюро місій (нагорода)"
+  ],
+  "pelt": [
+   "Вовча шкура",
+   "Вовки",
+   "Продаж"
+  ],
+  "coin": [
+   "Старовинна монета",
+   "Руїни, сховки",
+   "Продаж"
+  ],
+  "fang": [
+   "Ікло звіра Лісу смерті",
+   "Звірі Лісу смерті",
+   "Продаж"
+  ],
+  "note": [
+   "Відомості",
+   "«Вистежити злодія», Розвідка",
+   "Рівень знань у Бінґо-книзі"
+  ],
+  "scrollpart": [
+   "Частина сувою",
+   "Носії, руїни, місії",
+   "10 частин → сувій"
+  ],
+  "notes": [
+   "Нотатки",
+   "Дублікат сувою; сховки",
+   "Досвід Майстерності техніки"
+  ]
+ },
+ "market": [
+  [
+   "water",
+   "—",
+   1
+  ],
+  [
+   "rice",
+   "Ферми",
+   1
+  ],
+  [
+   "salt",
+   "Шахта",
+   1
+  ],
+  [
+   "oil",
+   "Ферми",
+   1
+  ],
+  [
+   "noodles",
+   "Ферми",
+   2
+  ],
+  [
+   "meat",
+   "Угіддя",
+   1
+  ],
+  [
+   "saltpeter",
+   "Шахта",
+   2
+  ],
+  [
+   "spice",
+   "—",
+   3
+  ]
+ ],
+ "missions": [
+  {
+   "id": "cat",
+   "rk": "D",
+   "name": "Знайти кота",
+   "client": "Дружина даймьо",
+   "team": true,
+   "min": 3,
+   "stages": [
+    {
+     "t": "skill",
+     "s": "scout",
+     "min": 1,
+     "label": "Пошук слідів"
+    },
+    {
+     "t": "skill",
+     "s": "ath",
+     "min": 5,
+     "label": "Погоня"
+    }
+   ],
+   "pay": []
+  },
+  {
+   "id": "weed",
+   "rk": "D",
+   "name": "Прополоти поле",
+   "client": "Селяни околиць",
+   "team": false,
+   "min": 2,
+   "stages": [
+    {
+     "t": "skill",
+     "s": "herb",
+     "min": 1,
+     "label": "Відрізнити бур'ян від трав"
+    }
+   ],
+   "pay": [
+    "rice"
+   ]
+  },
+  {
+   "id": "fire",
+   "rk": "D",
+   "name": "Пожежа на рисовому складі",
+   "client": "Купці околиць",
+   "team": true,
+   "min": 6,
+   "stages": [
+    {
+     "t": "skill",
+     "s": "ath",
+     "min": 10,
+     "label": "Дорога"
+    },
+    {
+     "t": "tech",
+     "any": [
+      [
+       "suiton",
+       20
+      ],
+      [
+       "ath",
+       25
+      ]
+     ],
+     "label": "Гасіння: Суйтон 20+ або ланцюг відер (Атлетика 25+, удвічі довше)"
+    },
+    {
+     "t": "tech",
+     "any": [
+      [
+       "doton",
+       30
+      ],
+      [
+       "tai",
+       20
+      ]
+     ],
+     "label": "Завал"
+    }
+   ],
+   "pay": [
+    "rice"
+   ]
+  },
+  {
+   "id": "drought",
+   "rk": "D",
+   "name": "Посуха на полях",
+   "client": "Селяни околиць",
+   "team": false,
+   "min": 5,
+   "stages": [
+    {
+     "t": "tech",
+     "any": [
+      [
+       "suiton",
+       20
+      ],
+      [
+       "ath",
+       20
+      ]
+     ],
+     "label": "Полив: Суйтон 20+ або носити воду (Атлетика 20+, удвічі довше)"
+    }
+   ],
+   "pay": [
+    "rice",
+    "spice"
+   ]
+  },
+  {
+   "id": "courier",
+   "rk": "D",
+   "name": "Термінова доставка",
+   "client": "Гільдія купців",
+   "team": false,
+   "min": 4,
+   "stages": [
+    {
+     "t": "tech",
+     "any": [
+      [
+       "nin",
+       5
+      ],
+      [
+       "ath",
+       30
+      ]
+     ],
+     "label": "Техніка мерехтіння тіла або Атлетика 30+"
+    }
+   ],
+   "pay": []
+  },
+  {
+   "id": "rockfall",
+   "rk": "D",
+   "name": "Обвал на перевалі",
+   "client": "Солевари",
+   "team": false,
+   "min": 6,
+   "stages": [
+    {
+     "t": "tech",
+     "any": [
+      [
+       "doton",
+       30
+      ],
+      [
+       "tai",
+       30
+      ]
+     ],
+     "label": "Дотон 30+ або Тайдзюцу 30+"
+    }
+   ],
+   "pay": [
+    "salt"
+   ]
+  },
+  {
+   "id": "thief",
+   "rk": "D",
+   "name": "Вистежити злодія",
+   "client": "Містечко",
+   "team": false,
+   "min": 8,
+   "stages": [
+    {
+     "t": "skill",
+     "s": "scout",
+     "min": 20,
+     "label": "Сліди"
+    },
+    {
+     "t": "combat",
+     "enemy": "thief"
+    }
+   ],
+   "pay": [
+    "note"
+   ]
+  },
+  {
+   "id": "caravan",
+   "rk": "C",
+   "name": "Супровід каравану",
+   "client": "Гільдія купців",
+   "team": true,
+   "min": 25,
+   "stages": [
+    {
+     "t": "skill",
+     "s": "scout",
+     "min": 20,
+     "label": "Засідки (або 1 Intel)"
+    },
+    {
+     "t": "combat",
+     "enemy": "merc_pack"
+    },
+    {
+     "t": "skill",
+     "s": "tai",
+     "min": 25,
+     "label": "Варта"
+    }
+   ],
+   "pay": [
+    "crate"
+   ]
+  },
+  {
+   "id": "sealed",
+   "rk": "C",
+   "name": "Запечатаний вантаж",
+   "client": "Гільдія купців",
+   "team": false,
+   "min": 18,
+   "stages": [
+    {
+     "t": "named",
+     "tech": "Техніка запечатування",
+     "alts": []
+    },
+    {
+     "t": "skill",
+     "s": "ath",
+     "min": 20,
+     "label": "Дорога"
+    }
+   ],
+   "pay": []
+  },
+  {
+   "id": "mail",
+   "rk": "C",
+   "name": "Таємна пошта",
+   "client": "Вежа Каґе",
+   "team": false,
+   "min": 20,
+   "stages": [
+    {
+     "t": "skill",
+     "s": "ath",
+     "min": 40,
+     "label": "Гінець"
+    }
+   ],
+   "pay": [
+    "intel"
+   ]
+  },
+  {
+   "id": "well",
+   "rk": "C",
+   "name": "Отруєна криниця",
+   "client": "Містечко на Південних рівнинах",
+   "team": true,
+   "min": 22,
+   "stages": [
+    {
+     "t": "skill",
+     "s": "scout",
+     "min": 15,
+     "label": "Пошук"
+    },
+    {
+     "t": "items",
+     "item": "antidote",
+     "n": 5
+    },
+    {
+     "t": "combat",
+     "enemy": "poisoner"
+    }
+   ],
+   "pay": [
+    "spice"
+   ]
+  },
+  {
+   "id": "dig",
+   "rk": "C",
+   "name": "Охорона розкопок",
+   "client": "Храм Вогню",
+   "team": true,
+   "min": 28,
+   "stages": [
+    {
+     "t": "skill",
+     "s": "ath",
+     "min": 25,
+     "label": "Дорога"
+    },
+    {
+     "t": "tech",
+     "any": [
+      [
+       "doton",
+       30
+      ],
+      [
+       "tai",
+       30
+      ]
+     ],
+     "label": "Завал"
+    },
+    {
+     "t": "combat",
+     "enemy": "marauder"
+    }
+   ],
+   "pay": [
+    "scrollpart:Полум'яна куля вогняного дракона"
+   ]
+  },
+  {
+   "id": "v_spar",
+   "rk": "V",
+   "name": "Спаринг в Академії",
+   "team": true,
+   "min": 4,
+   "stages": [
+    {
+     "t": "skill",
+     "s": "tai",
+     "min": 10,
+     "label": ""
+    }
+   ],
+   "res": "Сила шинобі"
+  },
+  {
+   "id": "v_walls",
+   "rk": "V",
+   "name": "Зведення стін",
+   "team": true,
+   "min": 10,
+   "stages": [
+    {
+     "t": "named",
+     "tech": "Стіна земляного стилю",
+     "alts": []
+    }
+   ],
+   "res": "Охорона"
+  },
+  {
+   "id": "v_fence",
+   "rk": "V",
+   "name": "Заряджені загородження",
+   "team": true,
+   "min": 8,
+   "stages": [
+    {
+     "t": "named",
+     "tech": "Пута чотирьох стовпів",
+     "alts": []
+    },
+    {
+     "t": "items",
+     "item": "wire",
+     "n": 10
+    }
+   ],
+   "res": "Охорона"
+  },
+  {
+   "id": "v_clear",
+   "rk": "V",
+   "name": "Розчищення ділянок",
+   "team": true,
+   "min": 8,
+   "stages": [
+    {
+     "t": "named",
+     "tech": "Вогняна доріжка",
+     "alts": [
+      "Вакуумна хвиля",
+      "Долоня, що розриває землю"
+     ]
+    }
+   ],
+   "res": "Ділянки"
+  },
+  {
+   "id": "v_water",
+   "rk": "V",
+   "name": "Зрошення полів села",
+   "team": true,
+   "min": 8,
+   "stages": [
+    {
+     "t": "tech",
+     "any": [
+      [
+       "suiton",
+       20
+      ]
+     ],
+     "label": ""
+    }
+   ],
+   "res": "Зрошення"
+  },
+  {
+   "id": "v_sanit",
+   "rk": "V",
+   "name": "Санітарна варта",
+   "team": true,
+   "min": 8,
+   "stages": [
+    {
+     "t": "named",
+     "tech": "Техніка великої вогняної кулі",
+     "alts": []
+    }
+   ],
+   "res": "Здоров'я"
+  },
+  {
+   "id": "v_rubble",
+   "rk": "V",
+   "name": "Розбір завалів",
+   "team": true,
+   "min": 8,
+   "stages": [
+    {
+     "t": "tech",
+     "any": [
+      [
+       "doton",
+       30
+      ],
+      [
+       "tai",
+       40
+      ]
+     ],
+     "label": ""
+    }
+   ],
+   "res": "Кладка"
+  },
+  {
+   "id": "v_clones",
+   "rk": "V",
+   "name": "Клони на будівництві",
+   "team": true,
+   "min": 10,
+   "stages": [
+    {
+     "t": "named",
+     "tech": "Техніка тіньового клонування",
+     "alts": []
+    }
+   ],
+   "res": "Робоча сила"
+  },
+  {
+   "id": "v_seal",
+   "rk": "V",
+   "name": "Запечатування запасів",
+   "team": true,
+   "min": 6,
+   "stages": [
+    {
+     "t": "named",
+     "tech": "Техніка запечатування",
+     "alts": []
+    }
+   ],
+   "res": "Місткість"
+  },
+  {
+   "id": "op_hideout",
+   "rk": "OP",
+   "name": "Операція «Сховок у Долині»",
+   "team": true,
+   "min": 0,
+   "stages": [
+    {
+     "t": "skill",
+     "s": "scout",
+     "min": 20,
+     "label": "Підхід"
+    },
+    {
+     "t": "combat",
+     "enemy": "guard_pack"
+    },
+    {
+     "t": "combat",
+     "enemy": "boss_twins"
+    },
+    {
+     "t": "combat",
+     "enemy": "boss_mist"
+    }
+   ],
+   "pay": [
+    "scrollpart:Техніка водяної в'язниці"
+   ]
+  }
+ ],
+ "regions": [
+  {
+   "id": "forest",
+   "name": "Ліси Країни Вогню",
+   "scout": 1,
+   "cells": [
+    [
+     "Околиці села",
+     null,
+     "Застава"
+    ],
+    [
+     "Рисові поля",
+     null,
+     null
+    ],
+    [
+     "Згарище складу",
+     null,
+     "Сюжет: сіра пов'язка"
+    ],
+    [
+     "Узлісся",
+     null,
+     "Зона: розбійники, підпалювачі"
+    ],
+    [
+     "Полігон №44 «Ліс смерті»",
+     null,
+     "Місце тренування: +10% досвіду Травництва; зона: звірі"
+    ],
+    [
+     "Прикордонний ліс: околиця",
+     null,
+     "Зона: вовки"
+    ],
+    [
+     "Прикордонний ліс: хащі",
+     null,
+     "Зона: банда у вовчих масках"
+    ],
+    [
+     "Прикордонний ліс: брід",
+     null,
+     "Сюжет: напад на караван"
+    ],
+    [
+     "Скеля над водоспадом",
+     "rock",
+     "Сюжет: табір банди, бос Сірий Вовк"
+    ],
+    [
+     "Тернові зарості",
+     "brush",
+     "Родовище: стара діброва (Лісопилка +1); сховок розбійників"
+    ],
+    [
+     "Лісове озеро",
+     "water",
+     "Родовище: рибні ями (Угіддя +1)"
+    ],
+    [
+     "Старий тракт",
+     null,
+     null
+    ]
+   ]
+  },
+  {
+   "id": "plains",
+   "name": "Південні рівнини Вогню",
+   "scout": 10,
+   "cells": [
+    [
+     "Південний тракт",
+     null,
+     "Застава"
+    ],
+    [
+     "Містечко на рівнинах",
+     null,
+     "Місія «Отруєна криниця»"
+    ],
+    [
+     "Храм Вогню",
+     null,
+     "Місце тренування: +10% досвіду Катону"
+    ],
+    [
+     "Караванний шлях",
+     null,
+     "Зона: найманці «Сірих пов'язок»"
+    ],
+    [
+     "Табір найманців",
+     null,
+     "Зона: важкі найманці, дезертир Хмари (носій Хвилі натхнення)"
+    ],
+    [
+     "Сухе річище",
+     null,
+     "Зона: отруйники"
+    ],
+    [
+     "Руїни прикордонної фортеці",
+     null,
+     "Сюжет: розкопки, бос Мандрівний боєць"
+    ],
+    [
+     "Сховище фортеці",
+     "rubble",
+     "Цілий сувій Полум'яної кулі вогняного дракона"
+    ],
+    [
+     "Соляні копальні",
+     null,
+     "Родовище: сіль (Шахта +1)"
+    ],
+    [
+     "Степові зарості",
+     "brush",
+     "Сховок мародерів: трофеї, Нотатки"
+    ],
+    [
+     "Кам'яні пагорби",
+     "rock",
+     "Родовище: каменярня (Шахта +1)"
+    ],
+    [
+     "Покинутий хутір",
+     null,
+     "Зона: мародери"
+    ]
+   ]
+  },
+  {
+   "id": "valley",
+   "name": "Долина Завершення",
+   "scout": 20,
+   "cells": [
+    [
+     "Північний тракт",
+     null,
+     "Застава"
+    ],
+    [
+     "Статуї засновників",
+     null,
+     "Місце тренування: +10% досвіду Тайдзюцу"
+    ],
+    [
+     "Берег ріки",
+     null,
+     "Зона: мисливці за головами"
+    ],
+    [
+     "Стежка мисливця",
+     null,
+     "Сюжет: бос Мисливець за головами"
+    ],
+    [
+     "Сховок під водоспадом",
+     null,
+     "Сюжет: операція «Сховок у Долині» (відкриває карта мисливця)"
+    ],
+    [
+     "Святе місце біля водоспаду",
+     "water",
+     "Місце тренування: +10% досвіду Медитації"
+    ],
+    [
+     "Туманний яр",
+     "mist",
+     "Зона: мисливці-нін Туману; трофеї"
+    ],
+    [
+     "Кам'яні уступи",
+     "rock",
+     "Родовище: залізна жила (Шахта +1)"
+    ],
+    [
+     "Завалена печера",
+     "rubble",
+     "Сховок старого шинобі: Нотатки, рьо"
+    ],
+    [
+     "Старе поле бою",
+     null,
+     "Старовинні монети"
+    ],
+    [
+     "Прикордонна застава",
+     null,
+     "Застава"
+    ],
+    [
+     "Верхів'я ріки",
+     null,
+     "Зона: вартові сховку"
+    ]
+   ]
+  }
+ ],
+ "enemies": [
+  [
+   "dummy",
+   "Тренувальний манекен",
+   "academy",
+   2,
+   [],
+   null,
+   null
+  ],
+  [
+   "bandit",
+   "Розбійник",
+   "forest",
+   6,
+   [],
+   null,
+   null
+  ],
+  [
+   "arsonist",
+   "Підпалювач",
+   "forest",
+   9,
+   [],
+   "katon",
+   null
+  ],
+  [
+   "wolf",
+   "Вовки",
+   "forest",
+   10,
+   [
+    "Зграя"
+   ],
+   null,
+   null
+  ],
+  [
+   "wolfmask",
+   "Розбійник у вовчій масці",
+   "forest",
+   13,
+   [],
+   null,
+   null
+  ],
+  [
+   "centipede",
+   "Гігантська багатоніжка",
+   "forest",
+   15,
+   [
+    "Регенерація"
+   ],
+   null,
+   null
+  ],
+  [
+   "tiger",
+   "Тигр Лісу смерті",
+   "forest",
+   20,
+   [
+    "Регенерація"
+   ],
+   null,
+   null
+  ],
+  [
+   "thief",
+   "Злодій",
+   "mission",
+   16,
+   [
+    "Ухильний"
+   ],
+   null,
+   null
+  ],
+  [
+   "merc_pack",
+   "Найманці «Сірих пов'язок»",
+   "plains",
+   19,
+   [
+    "Зграя"
+   ],
+   null,
+   null
+  ],
+  [
+   "heavy",
+   "Важкий найманець — дезертир Каменю",
+   "plains",
+   24,
+   [
+    "Броня"
+   ],
+   "doton",
+   null
+  ],
+  [
+   "marauder",
+   "Мародер",
+   "plains",
+   22,
+   [
+    "Ухильний"
+   ],
+   null,
+   null
+  ],
+  [
+   "poisoner",
+   "Отруйник",
+   "plains",
+   24,
+   [
+    "Отруйник"
+   ],
+   null,
+   null
+  ],
+  [
+   "kumo",
+   "Найманець — дезертир Хмари",
+   "plains",
+   28,
+   [
+    "Кастер"
+   ],
+   "raiton",
+   "Хвиля натхнення"
+  ],
+  [
+   "suna",
+   "Найманець — дезертир Піску",
+   "plains",
+   26,
+   [],
+   "futon",
+   null
+  ],
+  [
+   "hunter",
+   "Мисливець за головами",
+   "valley",
+   30,
+   [
+    "Ухильний"
+   ],
+   null,
+   null
+  ],
+  [
+   "hunter_caster",
+   "Мисливець-підпалювач",
+   "valley",
+   32,
+   [
+    "Кастер"
+   ],
+   "katon",
+   null
+  ],
+  [
+   "kiri_hunter",
+   "Мисливець-нін Туману",
+   "valley",
+   34,
+   [
+    "Прихований"
+   ],
+   "suiton",
+   null
+  ],
+  [
+   "guard_pack",
+   "Вартові сховку",
+   "valley",
+   33,
+   [
+    "Зграя",
+    "Броня"
+   ],
+   null,
+   null
+  ],
+  [
+   "veteran",
+   "Ветеран «Сірих пов'язок»",
+   "valley",
+   36,
+   [
+    "Броня"
+   ],
+   "doton",
+   null
+  ],
+  [
+   "oro_aide",
+   "Колишній помічник Орочімару",
+   "valley",
+   36,
+   [
+    "Отруйник"
+   ],
+   null,
+   "Приховані тіньові руки-змії"
+  ],
+  [
+   "serpent",
+   "Велетенський змій",
+   "exam",
+   38,
+   [
+    "Регенерація"
+   ],
+   null,
+   null
+  ],
+  [
+   "leech",
+   "Зграя літаючих п'явок",
+   "exam",
+   36,
+   [
+    "Зграя",
+    "Отруйник"
+   ],
+   null,
+   null
+  ],
+  [
+   "fake_genin",
+   "Найманець під виглядом іноземного геніна",
+   "exam",
+   39,
+   [
+    "Ілюзіоніст"
+   ],
+   null,
+   null
+  ],
+  [
+   "foreign_genin",
+   "Іноземний генін (турнір)",
+   "exam",
+   40,
+   [],
+   "wheel",
+   null
+  ]
+ ],
+ "bosses": [
+  [
+   "boss_wolf",
+   "Сірий Вовк",
+   "Скеля над водоспадом, акт 2",
+   22,
+   [
+    "Зграя"
+   ],
+   "doton",
+   null,
+   "Зграя вовків: 4 вовки, що повертаються кожні 20 с, доки ватажок живий"
+  ],
+  [
+   "boss_ren1",
+   "Хіраґі Рен (дуель)",
+   "Полігони, акт 2",
+   26,
+   [],
+   "wheel",
+   null,
+   "Природа б'є першу природу гравця; коронна техніка"
+  ],
+  [
+   "boss_fighter",
+   "Мандрівний боєць із Країни Чаю",
+   "Руїни фортеці, акт 3",
+   32,
+   [
+    "Ухильний"
+   ],
+   null,
+   "П'яний кулак",
+   "П'яний кулак: що менше HP, то вище ухилення (до ×3)"
+  ],
+  [
+   "boss_hunter",
+   "Мисливець за головами",
+   "Стежка мисливця, акт 3",
+   36,
+   [
+    "Кастер",
+    "Ухильний"
+   ],
+   "raiton",
+   "Хибна темрява",
+   "Хибна темрява: кожні 15 с каст 2,5 с, шкода ×4 і оглушення"
+  ],
+  [
+   "boss_twins",
+   "Близнюки Кусакабе",
+   "Сховок у Долині, акт 3",
+   38,
+   [
+    "Прихований",
+    "Отруйник"
+   ],
+   null,
+   null,
+   "Двоє ворогів; Отруйний туман: отрута по площі, поки обоє живі"
+  ],
+  [
+   "boss_mist",
+   "Втікач із Кривавого Туману",
+   "Сховок у Долині, акт 3",
+   40,
+   [
+    "Прихований"
+   ],
+   "suiton",
+   "Техніка водяної в'язниці",
+   "Туман: Прихований поновлюється кожні 25 с; Водяна в'язниця сковує гравця на 4 с"
+  ],
+  [
+   "boss_nameless",
+   "Безіменний (Ендо Кейджі)",
+   "Ліс смерті, день 5, акт 4",
+   44,
+   [
+    "Ілюзіоніст"
+   ],
+   "katon",
+   null,
+   "Ілюзія кожні 8 с; на 30% HP тікає — бій виграно"
+  ],
+  [
+   "boss_ren2",
+   "Хіраґі Рен (турнір)",
+   "Арена, акт 4",
+   42,
+   [],
+   "wheel",
+   null,
+   "Дві техніки своєї природи й коронна; звикає до повторів гравця вдвічі швидше"
+  ]
+ ],
+ "buildings": [
+  [
+   "tower",
+   "Вежа Каґе",
+   "Ліміт рівня будівель за етапом (етап 1 — 3, етап 2 — 6); офлайн 12 год",
+   false,
+   null
+  ],
+  [
+   "bureau",
+   "Бюро місій",
+   "+1% рьо з місій за рівень; дохід казни",
+   false,
+   null
+  ],
+  [
+   "grounds",
+   "Полігони",
+   "+1% досвіду Тайдзюцу й Атлетики за рівень; рівень 6: Сила шинобі зі спарингів ×2",
+   true,
+   {
+    "Ділянки": 30,
+    "Кладка": 30
+   }
+  ],
+  [
+   "shrine",
+   "Святилище",
+   "+1% досвіду Медитації й Контролю чакри за рівень",
+   true,
+   {
+    "Ділянки": 30
+   }
+  ],
+  [
+   "academy",
+   "Академія",
+   "+1% досвіду стихій і Ніндзюцу за рівень",
+   false,
+   null
+  ],
+  [
+   "library",
+   "Бібліотека",
+   "Сувої: рівень 1 — Запечатування; 2 — Тимчасовий параліч; 3 — Левове комбо, Вогонь дракона, Постріл; 4 — Куля земляного дракона, Поле липкого сиропу; 5 — Вакуумна хвиля",
+   false,
+   null
+  ],
+  [
+   "hospital",
+   "Госпіталь",
+   "−5% часу загоєння Ран за рівень",
+   true,
+   {
+    "Здоров'я": 30
+   }
+  ],
+  [
+   "forge",
+   "Кузня",
+   "1 — кунаї, сюрікени; 2 — сенбон, дріт; 3 — дротяна пастка; 4 — манекени III; станції Провіанту II",
+   false,
+   null
+  ],
+  [
+   "lab",
+   "Лабораторія",
+   "+1% швидкості ремесел і +1% шансу зберегти інгредієнти за рівень",
+   false,
+   null
+  ],
+  [
+   "market",
+   "Ринок",
+   "1 — вода, рис, сіль, олія, м'ясо; 2 — локшина, селітра, вибухові мітки; 3 — спеції, Підсумок медика I; −2% цін за рівень",
+   false,
+   null
+  ],
+  [
+   "store",
+   "Склад",
+   "Місткість цивільних ресурсів і ресурсів шинобі",
+   true,
+   {
+    "Місткість": 30
+   }
+  ],
+  [
+   "barrier",
+   "Бар'єр",
+   "Оборона під час нападу «Сірих пов'язок»",
+   true,
+   {
+    "Охорона": 30
+   }
+  ],
+  [
+   "farms",
+   "Ферми",
+   "Їжа; товари: рис, олія, локшина",
+   true,
+   {
+    "Зрошення": 30
+   }
+  ],
+  [
+   "hunt",
+   "Угіддя",
+   "Їжа; товар: м'ясо",
+   false,
+   null
+  ],
+  [
+   "mine",
+   "Шахта",
+   "Камінь, залізо; товари: сіль, селітра",
+   false,
+   null
+  ],
+  [
+   "sawmill",
+   "Лісопилка",
+   "Деревина",
+   false,
+   null
+  ]
+ ],
+ "gear": [
+  [
+   "Тренувальні манекени",
+   "tai",
+   [
+    [
+     "I",
+     10,
+     null
+    ],
+    [
+     "II",
+     30,
+     null
+    ],
+    [
+     "III",
+     50,
+     "Кузня 4"
+    ]
+   ],
+   "+3% досвіду за тир"
+  ],
+  [
+   "Серп і рукавиці травника",
+   "herb",
+   [
+    [
+     "I",
+     1,
+     null
+    ],
+    [
+     "II",
+     30,
+     null
+    ]
+   ],
+   "−5% часу збору за тир"
+  ],
+  [
+   "Перегінний куб",
+   "alch",
+   [
+    [
+     "I",
+     20,
+     null
+    ],
+    [
+     "II",
+     50,
+     "Лабораторія 3"
+    ]
+   ],
+   "+3% шансу зберегти інгредієнти за тир"
+  ],
+  [
+   "Станції Провіанту",
+   "prov",
+   [
+    [
+     "I",
+     1,
+     null
+    ],
+    [
+     "II",
+     30,
+     "Кузня 4"
+    ]
+   ],
+   "+5% швидкості станції за тир"
+  ],
+  [
+   "Карти й компас",
+   "scout",
+   [
+    [
+     "I",
+     10,
+     null
+    ],
+    [
+     "II",
+     40,
+     null
+    ]
+   ],
+   "−3% часу дослідження за тир"
+  ]
+ ]
+}
