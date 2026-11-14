@@ -1,0 +1,36 @@
+/**
+ * Icons the app shell uses directly, outside the entity mapping. `pnpm icons:build` bundles them
+ * together with the mapped entity icons, so every name here must exist in its collection.
+ */
+
+/** General UI icons from Lucide (ISC). Referenced as `lucide:<name>`. */
+export const UI_ICON_NAMES = [
+  'arrow-left',
+  'book-open',
+  'check',
+  'chevron-down',
+  'chevron-right',
+  'circle-help',
+  'ellipsis',
+  'external-link',
+  'info',
+  'lock',
+  'menu',
+  'minus',
+  'panel-right',
+  'plus',
+  'search',
+  'settings',
+  'x',
+] as const;
+
+/** game-icons names the shell uses by name (tab bar, rank mark) rather than through an entity. */
+export const SHELL_GAME_ICONS = [
+  'crossed-swords',
+  'fist',
+  'huts-village',
+  'rank-3',
+  'tied-scroll',
+] as const;
+
+export type UiIconName = (typeof UI_ICON_NAMES)[number];

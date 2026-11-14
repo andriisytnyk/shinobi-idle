@@ -5,3 +5,4 @@ pnpm-lock.yaml
 packages/content/src/data/generated
 packages/content/src/locales
 *.md
+apps/web/src/lib/icons.generated.ts

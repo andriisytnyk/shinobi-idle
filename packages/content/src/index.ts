@@ -52,5 +52,6 @@ export const ukLocale: Readonly<Record<string, string>> = { ...generatedUk, ...u
 export const enLocale: Readonly<Record<string, string>> = enGenerated;
 
 export * from './constants.ts';
+export * from './icons.ts';
 export * from './keys.ts';
 export * from './schema.ts';

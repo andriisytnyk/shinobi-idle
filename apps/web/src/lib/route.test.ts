@@ -15,6 +15,7 @@ describe('router', () => {
     expect(parseHash('#/')).toEqual({ page: 'home' });
     expect(parseHash('#/skills')).toEqual({ page: 'skills' });
     expect(parseHash('#/missions')).toEqual({ page: 'tab', tab: 'missions' });
+    expect(parseHash('#/credits')).toEqual({ page: 'credits' });
   });
 
   it('reports unknown routes', () => {

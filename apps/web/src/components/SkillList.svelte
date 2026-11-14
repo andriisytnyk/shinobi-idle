@@ -1,28 +1,10 @@
 <script lang="ts">
-  import {
-    content,
-    localeKey,
-    SKILL_GROUPS,
-    type SkillGroup,
-    type SkillId,
-  } from '@shinobi/content';
+  import { content, localeKey, SKILL_GROUPS, type SkillGroup } from '@shinobi/content';
   import { skillProgress } from '../lib/game.ts';
   import { t } from '../lib/i18n.ts';
   import { currentRoute } from '../lib/router.svelte.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
-
-  const ICON_BY_SKILL: Partial<Record<SkillId, string>> = {
-    tai: 'fist',
-    nin: 'scroll',
-    katon: 'flame',
-    futon: 'wind',
-    raiton: 'bolt',
-    doton: 'mountain',
-    suiton: 'drop',
-    cc: 'eye',
-    scout: 'eye',
-  };
 
   const NATURE_SKILLS: readonly string[] = ['katon', 'futon', 'raiton', 'doton', 'suiton'];
 
@@ -54,7 +36,7 @@
         onclick={() => toggle(group.id)}
       >
         <span class="chevron" class:open={!collapsed[group.id]}
-          ><Icon name="chevron" size={14} /></span
+          ><Icon name="lucide:chevron-right" size={14} /></span
         >
         {t(localeKey('group', group.id, 'name'))}
       </button>
@@ -71,7 +53,7 @@
                 : 'var(--steel)'}
             >
               <span class="skill-icon"
-                ><Icon name={ICON_BY_SKILL[skill.id] ?? 'leaf'} size={18} /></span
+                ><Icon entity={{ kind: 'skill', id: skill.id }} size={18} /></span
               >
               <span class="skill-name"><EntityLink kind="skill" id={skill.id} /></span>
               <span class="skill-level">{t('level.short', { n: progress.level })}</span>
