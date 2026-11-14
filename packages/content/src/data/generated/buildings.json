@@ -1,0 +1,79 @@
+[
+  {
+    "id": "core:tower",
+    "tier6": null
+  },
+  {
+    "id": "core:bureau",
+    "tier6": null
+  },
+  {
+    "id": "core:grounds",
+    "tier6": {
+      "dilianky": 30,
+      "kladka": 30
+    }
+  },
+  {
+    "id": "core:shrine",
+    "tier6": {
+      "dilianky": 30
+    }
+  },
+  {
+    "id": "core:academy",
+    "tier6": null
+  },
+  {
+    "id": "core:library",
+    "tier6": null
+  },
+  {
+    "id": "core:hospital",
+    "tier6": {
+      "zdorovia": 30
+    }
+  },
+  {
+    "id": "core:forge",
+    "tier6": null
+  },
+  {
+    "id": "core:lab",
+    "tier6": null
+  },
+  {
+    "id": "core:market",
+    "tier6": null
+  },
+  {
+    "id": "core:store",
+    "tier6": {
+      "mistkist": 30
+    }
+  },
+  {
+    "id": "core:barrier",
+    "tier6": {
+      "okhorona": 30
+    }
+  },
+  {
+    "id": "core:farms",
+    "tier6": {
+      "zroshennia": 30
+    }
+  },
+  {
+    "id": "core:hunt",
+    "tier6": null
+  },
+  {
+    "id": "core:mine",
+    "tier6": null
+  },
+  {
+    "id": "core:sawmill",
+    "tier6": null
+  }
+]

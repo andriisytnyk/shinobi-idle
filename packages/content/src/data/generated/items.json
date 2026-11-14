@@ -1,0 +1,480 @@
+[
+  {
+    "id": "core:mint",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:nettle",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:hogweed",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:bloodgrass",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:poppy",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:ironroot",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:silvermoss",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:edelweiss",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:fireflower",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:lotus",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:shadowshroom",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:water",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:rice",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:salt",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [
+      "crate"
+    ],
+    "madeFrom": []
+  },
+  {
+    "id": "core:oil",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [
+      "crate"
+    ],
+    "madeFrom": []
+  },
+  {
+    "id": "core:noodles",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:meat",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:saltpeter",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:spice",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [
+      "crate"
+    ],
+    "madeFrom": []
+  },
+  {
+    "id": "core:kunai",
+    "kind": "tool",
+    "tags": [
+      "interrupt"
+    ],
+    "extraSources": [
+      "forge"
+    ],
+    "madeFrom": []
+  },
+  {
+    "id": "core:shuriken",
+    "kind": "tool",
+    "tags": [
+      "interrupt"
+    ],
+    "extraSources": [
+      "forge"
+    ],
+    "madeFrom": []
+  },
+  {
+    "id": "core:senbon",
+    "kind": "tool",
+    "tags": [],
+    "extraSources": [
+      "forge"
+    ],
+    "madeFrom": []
+  },
+  {
+    "id": "core:wire",
+    "kind": "tool",
+    "tags": [],
+    "extraSources": [
+      "forge"
+    ],
+    "madeFrom": []
+  },
+  {
+    "id": "core:wiretrap",
+    "kind": "tool",
+    "tags": [
+      "bind"
+    ],
+    "extraSources": [
+      "forge"
+    ],
+    "madeFrom": [
+      {
+        "item": "core:wire",
+        "n": 2
+      }
+    ]
+  },
+  {
+    "id": "core:tag",
+    "kind": "tool",
+    "tags": [
+      "area"
+    ],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:psenbon",
+    "kind": "tool",
+    "tags": [
+      "dot"
+    ],
+    "extraSources": [],
+    "madeFrom": [
+      {
+        "item": "core:senbon",
+        "n": 15
+      },
+      {
+        "item": "core:nervova_otruta",
+        "n": 1
+      }
+    ]
+  },
+  {
+    "id": "core:parsenbon",
+    "kind": "tool",
+    "tags": [
+      "bind"
+    ],
+    "extraSources": [],
+    "madeFrom": [
+      {
+        "item": "core:senbon",
+        "n": 15
+      },
+      {
+        "item": "core:paralitychna_otruta",
+        "n": 1
+      }
+    ]
+  },
+  {
+    "id": "core:medpouch",
+    "kind": "tool",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:crate",
+    "kind": "misc",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:gem",
+    "kind": "misc",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:band",
+    "kind": "misc",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:pelt",
+    "kind": "misc",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:coin",
+    "kind": "misc",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:fang",
+    "kind": "misc",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:note",
+    "kind": "misc",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:scrollpart",
+    "kind": "misc",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:notes",
+    "kind": "misc",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:antidote",
+    "kind": "consumable",
+    "tags": [
+      "cleanse"
+    ],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:tsiliushcha_maz",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:paralitychna_otruta",
+    "kind": "consumable",
+    "tags": [
+      "bind"
+    ],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:dymova_bomba",
+    "kind": "consumable",
+    "tags": [
+      "guard"
+    ],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:sonnyi_poroshok",
+    "kind": "consumable",
+    "tags": [
+      "bind"
+    ],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:krovospynna_maz",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:slozohinna_bomba",
+    "kind": "consumable",
+    "tags": [
+      "interrupt"
+    ],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:hirska_maz",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:nervova_otruta",
+    "kind": "consumable",
+    "tags": [
+      "dot"
+    ],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:niukhalna_sil",
+    "kind": "consumable",
+    "tags": [
+      "dispel"
+    ],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:maz_vid_opikiv",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:onihiri",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:tonik_iasnoho_rozumu",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:piliulia_viiskovoho_paika",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:sushenyi_paiok",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:krovotvorna_piliulia",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:tonik_kontsentratsii",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:bulion_ramenu",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:chai_badorosti",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:iakitori_shynobi",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:tonik_stykhii",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:piliulia_vidnovlennia_chakry",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  }
+]
