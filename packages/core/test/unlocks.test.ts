@@ -1,6 +1,14 @@
 import { content } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
-import { advance, createState, dispatch, gainXp, refreshUnlocks, xpAt } from '../src/index.ts';
+import {
+  advance,
+  createState,
+  defaultRules,
+  dispatch,
+  gainXp,
+  refreshUnlocks,
+  xpAt,
+} from '../src/index.ts';
 
 describe('A12: technique unlocks', () => {
   it('a fresh state knows exactly the Academy techniques available at level 1', () => {
@@ -38,7 +46,7 @@ describe('A12: technique unlocks', () => {
     const state = createState(1, content);
     state.skills.nin.xp = xpAt(24);
     // A student at level 24 is slowed to a quarter, so feed four times the gap.
-    gainXp(state, 'nin', (xpAt(25) - xpAt(24)) * 4, content);
+    gainXp(state, 'nin', (xpAt(25) - xpAt(24)) * 4, content, defaultRules);
     expect(state.known['core:rope_escape']).toBe(true);
     expect(state.events.some((e) => e.type === 'techniqueLearned')).toBe(true);
   });

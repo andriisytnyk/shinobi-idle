@@ -35,7 +35,7 @@ export interface ActionStoppedEvent extends EventBase {
   slot: number;
   kind: string;
   id: string;
-  reason: 'manual' | 'requirements';
+  reason: 'manual' | 'requirements' | 'replaced' | 'missing' | 'finished';
 }
 
 export type GameEvent =

@@ -1,0 +1,32 @@
+import {
+  actionSystem,
+  drillKind,
+  meditateKind,
+  obstacleKind,
+  practiceKind,
+  type ActionKind,
+} from './actions.ts';
+import type { ModifierProvider } from './modifiers.ts';
+import type { System } from './system.ts';
+
+/**
+ * Everything that defines how a game behaves, as one explicit value. The order of `systems` is
+ * the order they run when events coincide. Nothing registers itself: later stages add their
+ * system, kinds and providers to `defaultRules` below, in this one place.
+ */
+export interface Rules {
+  systems: readonly System[];
+  actionKinds: Readonly<Record<string, ActionKind>>;
+  modifierProviders: readonly ModifierProvider[];
+}
+
+export const defaultRules: Rules = {
+  systems: [actionSystem],
+  actionKinds: {
+    practice: practiceKind,
+    drill: drillKind,
+    meditate: meditateKind,
+    obstacle: obstacleKind,
+  },
+  modifierProviders: [],
+};

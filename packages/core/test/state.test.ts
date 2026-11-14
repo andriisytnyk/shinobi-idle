@@ -9,7 +9,7 @@ describe('createState', () => {
     expect(Object.keys(state.skills).sort()).toEqual([...SKILL_IDS].sort());
     expect(SKILL_IDS.length).toBe(16);
     for (const id of SKILL_IDS) expect(state.skills[id]).toEqual({ xp: 0 });
-    expect(state.slots).toEqual([{ action: null, progress: 0, share: 1 }]);
+    expect(state.slots).toEqual([{ action: null, progress: 0, share: 1000, data: null }]);
   });
 
   it('starts with an empty event queue and no completed cycles', () => {

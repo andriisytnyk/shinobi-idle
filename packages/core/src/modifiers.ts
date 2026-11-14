@@ -22,22 +22,17 @@ export interface ModResult {
   parts: Modifier[];
 }
 
-const providers: ModifierProvider[] = [];
-
-/** Registers a source of modifiers (character perks, buildings, gear). Returns an unregister function. */
-export function registerModifierProvider(provider: ModifierProvider): () => void {
-  providers.push(provider);
-  return () => {
-    const at = providers.indexOf(provider);
-    if (at >= 0) providers.splice(at, 1);
-  };
-}
-
 /**
- * Collects the modifiers for `key`. Inside a group, `add` values are summed (factor 1 + sum) and
- * `mul` values multiplied in; the groups are then multiplied together.
+ * Collects the modifiers for `key` from the given providers. Inside a group, `add` values are
+ * summed (factor 1 + sum) and `mul` values multiplied in; the groups are then multiplied together.
+ * Public callers use `getMod`, which supplies the default providers.
  */
-export function getMod(state: GameState, key: string, content: ContentDb): ModResult {
+export function computeMod(
+  providers: readonly ModifierProvider[],
+  state: GameState,
+  key: string,
+  content: ContentDb,
+): ModResult {
   const parts: Modifier[] = [];
   for (const provider of providers) {
     for (const m of provider(state, content)) if (m.key === key) parts.push(m);

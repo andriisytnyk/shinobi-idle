@@ -52,6 +52,23 @@ describe('A10: save', () => {
     expect(MIGRATIONS.length).toBe(STATE_VERSION - 1);
   });
 
+  it('migrates a version 2 save: fractional slot numbers become whole units', () => {
+    const old = JSON.parse(serialize(played(), 5));
+    old.v = 2;
+    old.state.v = 2;
+    old.state.slots = [
+      { action: { kind: 'practice', id: 'core:leaf_whirlwind' }, progress: 0.5, share: 0.5 },
+    ];
+    const state = deserialize(JSON.stringify(old), content);
+    expect(state.v).toBe(STATE_VERSION);
+    expect(state.slots[0]).toEqual({
+      action: { kind: 'practice', id: 'core:leaf_whirlwind' },
+      progress: 500,
+      share: 1000,
+      data: null,
+    });
+  });
+
   it('migrates a version 1 save to the current version', () => {
     const old = JSON.parse(serialize(played(), 5));
     old.v = 1;
@@ -95,8 +112,8 @@ describe('A10: save', () => {
     expect(state.player.natures).toEqual(['katon']);
     expect(state.rng.combat).toEqual(createState(0, content).rng.combat);
     expect(state.slots).toEqual([
-      { action: null, progress: 0, share: 1 },
-      { action: null, progress: 0, share: 1 },
+      { action: null, progress: 0, share: 1000, data: null },
+      { action: null, progress: 0, share: 0, data: null },
     ]);
   });
 
@@ -128,6 +145,8 @@ describe('advanceOffline', () => {
     expect(summary.levelsGained.tai).toBeGreaterThan(10);
     expect(summary.masteryLevelsGained['core:leaf_whirlwind']).toBeGreaterThan(20);
     expect(Object.keys(summary.skillXp)).toEqual(['tai']);
+    expect(summary.techniquesLearned).toContain('core:dynamic_entry');
+    expect(summary.actionsStopped).toEqual([]);
     expect(state.events.length).toBe(queued);
   });
 

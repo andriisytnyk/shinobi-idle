@@ -1,10 +1,19 @@
 import { NATURE_IDS, type ContentDb, type NatureId, type SkillId } from '@shinobi/content';
-import { getActionKind } from './actions.ts';
+import { rebalanceShares } from './actions.ts';
+import { emit } from './events.ts';
 import { poolCapacity } from './formulas.ts';
 import { indexOf } from './lookup.ts';
 import { RANK_ORDER } from './requirements.ts';
 import { STREAM_NAMES } from './rng.ts';
-import { createState, STATE_VERSION, type ActionSlot, type GameState } from './state.ts';
+import { defaultRules, type Rules } from './rules.ts';
+import {
+  createState,
+  SHARE_FULL,
+  STATE_VERSION,
+  type ActionSlot,
+  type GameState,
+  type JsonValue,
+} from './state.ts';
 import { refreshUnlocks } from './unlocks.ts';
 import { xpAt } from './xp.ts';
 
@@ -16,6 +25,22 @@ export type Migration = (state: Raw) => Raw;
 export const MIGRATIONS: readonly Migration[] = [
   // v1 -> v2: the completed-cycles counter.
   (state) => ({ ...state, stats: { completed: 0 } }),
+  // v2 -> v3: slot share and progress become whole numbers (thousandths, ms x 1000); slots get `data`.
+  (state) => ({
+    ...state,
+    slots: Array.isArray(state.slots)
+      ? state.slots.map((s: unknown) =>
+          isRecord(s)
+            ? {
+                ...s,
+                share: Math.round(nonNegative(s.share) * SHARE_FULL),
+                progress: Math.round(nonNegative(s.progress) * SHARE_FULL),
+                data: null,
+              }
+            : s,
+        )
+      : state.slots,
+  }),
 ];
 
 const isRecord = (x: unknown): x is Raw => typeof x === 'object' && x !== null && !Array.isArray(x);
@@ -64,27 +89,37 @@ function pick<T>(
   return out;
 }
 
-function sanitizeSlot(raw: unknown, content: ContentDb): ActionSlot {
-  const slot: ActionSlot = { action: null, progress: 0, share: 1 };
-  if (!isRecord(raw)) return slot;
+/** Cleans one saved slot. `lost` names an action that the rule set or content no longer has. */
+function sanitizeSlot(
+  raw: unknown,
+  content: ContentDb,
+  rules: Rules,
+): { slot: ActionSlot; lost: { kind: string; id: string } | null } {
+  const slot: ActionSlot = { action: null, progress: 0, share: 0, data: null };
+  let lost: { kind: string; id: string } | null = null;
+  if (!isRecord(raw)) return { slot, lost };
   const action = raw.action;
   if (isRecord(action) && typeof action.kind === 'string' && typeof action.id === 'string') {
-    if (getActionKind(action.kind)?.has(action.id, content)) {
+    if (rules.actionKinds[action.kind]?.has(action.id, content)) {
       slot.action = { kind: action.kind, id: action.id };
-      slot.progress = nonNegative(raw.progress);
+      slot.progress = Math.floor(nonNegative(raw.progress));
+      slot.data = (raw.data ?? null) as JsonValue;
+    } else {
+      lost = { kind: action.kind, id: action.id };
     }
   }
-  if (typeof raw.share === 'number' && raw.share > 0 && Number.isFinite(raw.share)) {
-    slot.share = raw.share;
-  }
-  return slot;
+  return { slot, lost };
 }
 
 /**
  * Reads a save text, migrating old versions. Ids that the content no longer knows are dropped
  * and numbers are clamped to what the rules allow; only a text that is not a save at all throws.
  */
-export function deserialize(text: string, content: ContentDb): GameState {
+export function deserialize(
+  text: string,
+  content: ContentDb,
+  rules: Rules = defaultRules,
+): GameState {
   const envelope = parseEnvelope(text);
   let raw = envelope.state;
   for (let v = envelope.v; v < STATE_VERSION; v++) {
@@ -147,7 +182,12 @@ export function deserialize(text: string, content: ContentDb): GameState {
     index.techniques.has(key) || index.recipeIds.has(key) ? (true as const) : undefined,
   );
   if (Array.isArray(raw.slots) && raw.slots.length > 0) {
-    state.slots = raw.slots.map((s) => sanitizeSlot(s, content));
+    state.slots = [];
+    raw.slots.forEach((s: unknown, i) => {
+      const { slot, lost } = sanitizeSlot(s, content, rules);
+      state.slots.push(slot);
+      if (lost) emit(state, { type: 'actionStopped', slot: i, ...lost, reason: 'missing' });
+    });
   }
   state.flags = pick(raw.flags, (_key, v) =>
     v === true || (typeof v === 'number' && Number.isFinite(v)) ? v : undefined,
@@ -155,5 +195,17 @@ export function deserialize(text: string, content: ContentDb): GameState {
   if (isRecord(raw.stats)) state.stats.completed = Math.floor(nonNegative(raw.stats.completed));
 
   refreshUnlocks(state, content, true);
+  // Shares are derived from which slots run, so they are recomputed rather than trusted; a
+  // saved progress beyond one cycle is cut so a doctored save cannot make the loop spin.
+  rebalanceShares(state);
+  for (const slot of state.slots) {
+    const kind = slot.action && rules.actionKinds[slot.action.kind];
+    if (slot.action && kind) {
+      slot.progress = Math.min(
+        slot.progress,
+        kind.intervalMs(state, slot.action.id, content, rules) * SHARE_FULL,
+      );
+    }
+  }
   return state;
 }

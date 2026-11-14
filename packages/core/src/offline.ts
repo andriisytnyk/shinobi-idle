@@ -1,6 +1,8 @@
 import type { ContentDb, SkillId } from '@shinobi/content';
 import { advance } from './engine.ts';
+import type { ActionStoppedEvent } from './events.ts';
 import { MS_PER_HOUR, masteryLevel } from './formulas.ts';
+import { defaultRules, type Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 import { levelAt } from './xp.ts';
 
@@ -14,6 +16,9 @@ export interface OfflineSummary {
   levelsGained: Partial<Record<SkillId, number>>;
   /** Mastery levels gained per mastery key. */
   masteryLevelsGained: Record<string, number>;
+  /** Techniques learned and actions stopped while away, so the UI can explain what changed. */
+  techniquesLearned: string[];
+  actionsStopped: ActionStoppedEvent[];
 }
 
 /**
@@ -24,6 +29,7 @@ export function advanceOffline(
   state: GameState,
   elapsedMs: number,
   content: ContentDb,
+  rules: Rules = defaultRules,
 ): OfflineSummary {
   const K = content.balance.K;
   const requestedMs = Math.max(0, Math.floor(elapsedMs));
@@ -38,7 +44,8 @@ export function advanceOffline(
 
   const queued = state.events;
   state.events = [];
-  advance(state, simulatedMs, content);
+  advance(state, simulatedMs, content, rules);
+  const away = state.events;
   state.events = queued;
 
   const summary: OfflineSummary = {
@@ -48,7 +55,13 @@ export function advanceOffline(
     skillXp: {},
     levelsGained: {},
     masteryLevelsGained: {},
+    techniquesLearned: [],
+    actionsStopped: [],
   };
+  for (const e of away) {
+    if (e.type === 'techniqueLearned') summary.techniquesLearned.push(e.id);
+    else if (e.type === 'actionStopped') summary.actionsStopped.push(e);
+  }
   for (const skill of skills) {
     const xp = state.skills[skill].xp - (xpBefore.get(skill) ?? 0);
     if (xp > 0) summary.skillXp[skill] = xp;
