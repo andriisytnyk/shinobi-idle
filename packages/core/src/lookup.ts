@@ -1,9 +1,13 @@
 import type {
   ContentDb,
+  Enemy,
+  Exam,
   Exercise,
+  Item,
   Obstacle,
   PoolCheckpoint,
   Practice,
+  Quest,
   Technique,
 } from '@shinobi/content';
 
@@ -13,6 +17,10 @@ export interface ContentIndex {
   exercises: Map<string, Exercise>;
   practices: Map<string, Practice>;
   obstacles: Map<string, Obstacle>;
+  enemies: Map<string, Enemy>;
+  items: Map<string, Item>;
+  quests: Map<string, Quest>;
+  exams: Map<string, Exam>;
   itemIds: Set<string>;
   recipeIds: Set<string>;
   /** Every id that can own a mastery record. */
@@ -55,6 +63,10 @@ function build(content: ContentDb): ContentIndex {
     poolCheckpoints.set(p.skill, list);
   }
   return {
+    enemies: byId(content.enemies),
+    items: byId(content.items),
+    quests: byId(content.quests),
+    exams: byId(content.exams),
     techniques,
     exercises,
     practices,

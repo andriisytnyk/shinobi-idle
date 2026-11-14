@@ -1,4 +1,5 @@
 import type { ContentDb, SkillId } from '@shinobi/content';
+import { actionsKey, bump } from './counters.ts';
 import { emit, type ActionStoppedEvent } from './events.ts';
 import {
   MS_PER_SECOND,
@@ -215,6 +216,7 @@ export const actionSystem: System = {
         slot.progress -= need;
         const result = kind.complete(state, id, content, rules);
         state.stats.completed++;
+        bump(state, actionsKey(name));
         if (result === 'stop') return stopSlot(state, index, 'finished', content, rules);
         const req = kind.requirements(state, id, content, rules);
         if (req && !evalReq(state, req, content).met) {

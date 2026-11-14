@@ -17,6 +17,9 @@ import regions from './data/generated/regions.json' with { type: 'json' };
 import seals from './data/generated/seals.json' with { type: 'json' };
 import skills from './data/generated/skills.json' with { type: 'json' };
 import techniques from './data/generated/techniques.json' with { type: 'json' };
+import handExams from './data/hand/exams.json' with { type: 'json' };
+import handItems from './data/hand/items.json' with { type: 'json' };
+import handQuests from './data/hand/quests.json' with { type: 'json' };
 import generatedUk from './locales/uk.json' with { type: 'json' };
 import enGenerated from './locales/en.json' with { type: 'json' };
 import uiUk from './locales/ui.uk.json' with { type: 'json' };
@@ -32,7 +35,7 @@ export const content: ContentDb = contentDbSchema.parse({
   obstacles,
   herbs,
   pools,
-  items,
+  items: [...items, ...handItems],
   market,
   recipes,
   missions,
@@ -43,6 +46,8 @@ export const content: ContentDb = contentDbSchema.parse({
   buildings,
   gear,
   balance,
+  quests: handQuests,
+  exams: handExams,
 });
 
 /** Ukrainian strings: generated entity names and descriptions plus hand-written UI strings. */

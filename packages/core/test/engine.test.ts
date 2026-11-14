@@ -116,7 +116,7 @@ describe('advance', () => {
     expect(fired).toBe(1);
     advance(state, 10_000, content, rules);
     expect(fired).toBe(1);
-    expect(defaultRules.systems).toHaveLength(1);
+    expect(defaultRules.systems).toHaveLength(3);
   });
 
   it('throws instead of hanging when a system never lets time move', () => {

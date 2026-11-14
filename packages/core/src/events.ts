@@ -35,11 +35,60 @@ export interface ActionStoppedEvent extends EventBase {
   slot: number;
   kind: string;
   id: string;
-  reason: 'manual' | 'requirements' | 'replaced' | 'missing' | 'finished';
+  reason: 'manual' | 'requirements' | 'replaced' | 'missing' | 'finished' | 'defeated';
+}
+export interface EnemyDefeatedEvent extends EventBase {
+  type: 'enemyDefeated';
+  enemy: string;
+}
+export interface PlayerDefeatedEvent extends EventBase {
+  type: 'playerDefeated';
+  enemy: string;
+}
+export interface QuestStepEvent extends EventBase {
+  type: 'questStep';
+  quest: string;
+  /** Number of steps finished, 1-based. */
+  step: number;
+}
+export interface QuestDoneEvent extends EventBase {
+  type: 'questDone';
+  quest: string;
+}
+export interface RankUpEvent extends EventBase {
+  type: 'rankUp';
+  rank: string;
+}
+export interface ItemGainedEvent extends EventBase {
+  type: 'itemGained';
+  id: string;
+  n: number;
+}
+export interface ItemUsedEvent extends EventBase {
+  type: 'itemUsed';
+  id: string;
+  target: string;
+}
+export interface GoalSetEvent extends EventBase {
+  type: 'goalSet';
+  kind: string;
+  id: string;
 }
 
 export type GameEvent =
-  LevelUpEvent | MasteryUpEvent | PoolCheckpointEvent | TechniqueLearnedEvent | ActionStoppedEvent;
+  | LevelUpEvent
+  | MasteryUpEvent
+  | PoolCheckpointEvent
+  | TechniqueLearnedEvent
+  | ActionStoppedEvent
+  | EnemyDefeatedEvent
+  | PlayerDefeatedEvent
+  | QuestStepEvent
+  | QuestDoneEvent
+  | RankUpEvent
+  | ItemGainedEvent
+  | ItemUsedEvent
+  | GoalSetEvent;
 
 type WithoutAt<T> = T extends unknown ? Omit<T, 'at'> : never;
 

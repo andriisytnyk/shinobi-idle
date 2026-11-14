@@ -1,5 +1,6 @@
 import type { ContentDb, NatureId, SkillId } from '@shinobi/content';
 import type { EntityRef } from './entity.ts';
+import { indexOf } from './lookup.ts';
 import type { GameState, Rank } from './state.ts';
 import { levelAt, levelCap } from './xp.ts';
 
@@ -9,9 +10,9 @@ export type Req =
   | { t: 'rank'; rank: Rank }
   | { t: 'nature'; nature: NatureId }
   | { t: 'item'; id: string; n: number }
-  | { t: 'quest'; id: string; step?: number }
+  | { t: 'quest'; id: string; step?: number | undefined }
   | { t: 'building'; id: string; level: number }
-  | { t: 'flag'; id: string; n?: number }
+  | { t: 'flag'; id: string; n?: number | undefined }
   | { t: 'all'; of: Req[] }
   | { t: 'any'; of: Req[] };
 
@@ -37,8 +38,7 @@ const flagValue = (state: GameState, id: string): number => {
   return v === undefined ? 0 : v === true ? 1 : v;
 };
 
-// Quests and buildings get their own state branches in later stages; until then they read flags.
-const questStep = (state: GameState, id: string) => flagValue(state, `quest.${id}`);
+// Buildings get their own state branch in a later stage; until then they read flags.
 const buildingLevel = (state: GameState, id: string) => flagValue(state, `building.${id}`);
 
 function leaf(req: Req, current: number, target: number, ref: EntityRef | null): ReqResult {
@@ -64,8 +64,13 @@ export function evalReq(state: GameState, req: Req, content: ContentDb): ReqResu
       });
     case 'item':
       return leaf(req, state.bank[req.id] ?? 0, req.n, { kind: 'item', id: req.id });
-    case 'quest':
-      return leaf(req, questStep(state, req.id), req.step ?? 1, { kind: 'quest', id: req.id });
+    case 'quest': {
+      // Steps finished against steps asked for; without `step` the whole chain must be done.
+      const total = indexOf(content).quests.get(req.id)?.steps.length ?? 1;
+      const progress = state.quests[req.id];
+      const current = progress ? (progress.done ? total : progress.step) : 0;
+      return leaf(req, current, req.step ?? total, { kind: 'quest', id: req.id });
+    }
     case 'building':
       return leaf(req, buildingLevel(state, req.id), req.level, {
         kind: 'building',

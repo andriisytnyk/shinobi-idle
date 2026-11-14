@@ -386,6 +386,11 @@
     },
     "academyCap": 10,
     "academySlow": 0.25,
+    "senseiTest": {
+      "base": 300,
+      "perLevel": 0.01,
+      "floor": 120
+    },
     "offlineCapHours": 12,
     "masteryCap": 99
   },

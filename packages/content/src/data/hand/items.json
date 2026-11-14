@@ -1,0 +1,10 @@
+[
+  {
+    "id": "core:graduate_scroll",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": [],
+    "use": { "t": "masteryHour", "mentor": "academy" }
+  }
+]
