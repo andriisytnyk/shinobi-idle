@@ -28,6 +28,10 @@ jobs:
         run: |
           pnpm content:import
           git diff --exit-code
+      - name: Generated icons must match the icon mapping
+        run: |
+          pnpm icons:build
+          git diff --exit-code
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test

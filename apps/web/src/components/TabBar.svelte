@@ -5,16 +5,17 @@
 
   const tabs = [
     { id: 'skills', icon: 'fist', label: 'nav.skills', href: '#/skills' },
-    { id: 'missions', icon: 'scroll', label: 'nav.missions', href: '#/missions' },
-    { id: 'combat', icon: 'swords', label: 'nav.combat', href: '#/combat' },
-    { id: 'village', icon: 'home', label: 'nav.village', href: '#/village' },
-    { id: 'more', icon: 'dots', label: 'nav.more', href: '#/more' },
+    { id: 'missions', icon: 'tied-scroll', label: 'nav.missions', href: '#/missions' },
+    { id: 'combat', icon: 'crossed-swords', label: 'nav.combat', href: '#/combat' },
+    { id: 'village', icon: 'huts-village', label: 'nav.village', href: '#/village' },
+    { id: 'more', icon: 'lucide:ellipsis', label: 'nav.more', href: '#/more' },
   ] as const;
 
   const route = $derived(currentRoute());
   const activeTab = $derived.by(() => {
     if (route.page === 'skills') return 'skills';
     if (route.page === 'tab') return route.tab;
+    if (route.page === 'credits') return 'more';
     if (route.page === 'entity' && route.ref.kind === 'skill') return 'skills';
     return null;
   });

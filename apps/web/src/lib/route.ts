@@ -25,6 +25,7 @@ export type Route =
   | { page: 'skills' }
   | { page: 'entity'; ref: EntityRef }
   | { page: 'tab'; tab: string }
+  | { page: 'credits' }
   | { page: 'notFound'; hash: string };
 
 const TABS = ['missions', 'combat', 'village', 'more'];
@@ -37,6 +38,7 @@ export function parseHash(hash: string): Route {
   if (path === '') return { page: 'home' };
   const [first = '', ...rest] = path.split('/');
   if (first === 'skills' && rest.length === 0) return { page: 'skills' };
+  if (first === 'credits' && rest.length === 0) return { page: 'credits' };
   if (TABS.includes(first) && rest.length === 0) return { page: 'tab', tab: first };
   const id = rest.join('/');
   if (isKind(first) && id !== '') {

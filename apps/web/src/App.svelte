@@ -6,7 +6,9 @@
   import TopBar from './components/TopBar.svelte';
   import { t } from './lib/i18n.ts';
   import { currentRoute } from './lib/router.svelte.ts';
+  import CreditsPage from './pages/CreditsPage.svelte';
   import EntityPage from './pages/EntityPage.svelte';
+  import MorePage from './pages/MorePage.svelte';
   import SimplePage from './pages/SimplePage.svelte';
   import SkillPage from './pages/SkillPage.svelte';
 
@@ -34,6 +36,10 @@
         <div class="mobile-skills"><SkillList /></div>
         <p class="hint desktop-only">{t('home.hint')}</p>
       </SimplePage>
+    {:else if route.page === 'credits'}
+      <CreditsPage />
+    {:else if route.page === 'tab' && route.tab === 'more'}
+      <MorePage />
     {:else if route.page === 'tab'}
       <SimplePage title={t(`nav.${route.tab}`)}>
         <p class="hint">{t('entity.placeholder')}</p>

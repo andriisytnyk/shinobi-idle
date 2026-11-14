@@ -24,6 +24,7 @@ export default defineConfig(
     '**/coverage/**',
     'docs/**',
     'packages/content/src/data/generated/**',
+    'apps/web/src/lib/icons.generated.ts',
   ]),
   js.configs.recommended,
   tseslint.configs.recommended,

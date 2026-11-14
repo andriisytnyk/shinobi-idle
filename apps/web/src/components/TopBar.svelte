@@ -18,19 +18,31 @@
 
   <dl class="stats">
     <div class="stat">
-      <dt><Icon name="coin" size={16} /><span class="label">{t('topbar.ryo')}</span></dt>
+      <dt>
+        <Icon entity={{ kind: 'currency', id: 'ryo' }} size={16} /><span class="label"
+          >{t('topbar.ryo')}</span
+        >
+      </dt>
       <dd>{numbers.format(state.currencies.ryo)}</dd>
     </div>
     <div class="stat">
-      <dt><Icon name="star" size={16} /><span class="label">{t('topbar.rep')}</span></dt>
+      <dt>
+        <Icon entity={{ kind: 'currency', id: 'rep' }} size={16} /><span class="label"
+          >{t('topbar.rep')}</span
+        >
+      </dt>
       <dd>{numbers.format(state.currencies.rep)}</dd>
     </div>
     <div class="stat intel">
-      <dt><Icon name="eye" size={16} /><span class="label">{t('topbar.intel')}</span></dt>
+      <dt>
+        <Icon entity={{ kind: 'currency', id: 'intel' }} size={16} /><span class="label"
+          >{t('topbar.intel')}</span
+        >
+      </dt>
       <dd>{numbers.format(state.currencies.intel)}</dd>
     </div>
     <div class="stat rank">
-      <dt><Icon name="shield" size={16} /><span class="label">{t('topbar.rank')}</span></dt>
+      <dt><Icon name="rank-3" size={16} /><span class="label">{t('topbar.rank')}</span></dt>
       <dd>{t(`rank.${state.player.rank}`)}</dd>
     </div>
   </dl>
@@ -42,6 +54,10 @@
         <option>{t('lang.uk')}</option>
       </select>
     </label>
+    <a class="meta-toggle more-link" href="#/more">
+      <Icon name="lucide:settings" size={18} />
+      <span class="more-label">{t('nav.more')}</span>
+    </a>
     <button
       type="button"
       class="meta-toggle"
@@ -49,7 +65,7 @@
       aria-controls="meta-panel"
       onclick={onToggleMeta}
     >
-      <Icon name="scroll" size={18} />
+      <Icon name="lucide:panel-right" size={18} />
       <span>{t('nav.meta')}</span>
     </button>
   </div>
@@ -142,6 +158,10 @@
     cursor: pointer;
   }
 
+  .more-link {
+    text-decoration: none;
+  }
+
   .meta-toggle[aria-expanded='true'] {
     border-color: var(--accent);
   }
@@ -164,7 +184,8 @@
       margin-left: auto;
     }
 
-    .lang {
+    .lang,
+    .more-link {
       display: none;
     }
 

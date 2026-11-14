@@ -1,8 +1,9 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte';
   import { entityDesc, entityName } from '../lib/entities.ts';
   import { skillProgress } from '../lib/game.ts';
   import { t } from '../lib/i18n.ts';
-  import { content, localeKey, type SkillId } from '@shinobi/content';
+  import { content, localeKey, NATURE_IDS, type SkillId } from '@shinobi/content';
 
   interface Props {
     id: string;
@@ -20,7 +21,15 @@
 {#if skill && progress}
   <article class="skill-page">
     <header class="plate">
-      <h1>{entityName(ref)}</h1>
+      <h1>
+        <span
+          class="plate-icon"
+          style:color={(NATURE_IDS as readonly string[]).includes(id)
+            ? `var(--nature-${id})`
+            : 'var(--steel)'}><Icon entity={ref} size={32} /></span
+        >
+        {entityName(ref)}
+      </h1>
       <span class="level">{t('level.short', { n: progress.level })}</span>
     </header>
     {#if desc}<p class="lore">{desc}</p>{/if}
@@ -44,11 +53,18 @@
   }
 
   h1 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
     margin: 0;
     color: var(--heading);
     font-family: var(--font-heading);
     font-size: 1.6rem;
     font-weight: 400;
+  }
+
+  .plate-icon {
+    display: inline-flex;
   }
 
   .level {
