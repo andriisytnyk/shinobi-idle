@@ -47,7 +47,7 @@ export const sealSchema = z.object({
   kind: z.enum(['zodiac', 'special']),
 });
 
-export const techniqueSchema = z.object({
+export const techniqueSchema = z.strictObject({
   id: coreId,
   skill: techSkillId,
   level,
@@ -61,8 +61,6 @@ export const techniqueSchema = z.object({
   state: stateId.nullable(),
   /** N trainer, S scroll or library, O carrier (boss or enemy), Q quest line. */
   src: z.enum(['N', 'S', 'O', 'Q']),
-  /** Canonical English name; not a display string. */
-  enName: z.string(),
   /** Ordered ids of seals needed to cast the technique. */
   sealSeq: z.array(coreId),
   sealsCanon: z.boolean(),
@@ -72,7 +70,7 @@ export const techniqueSchema = z.object({
 
 export const exerciseSchema = z.object({ id: coreId, level });
 
-export const practiceSchema = z.object({
+export const practiceSchema = z.strictObject({
   id: coreId,
   level,
   /** The two skills the practice trains together. */
@@ -96,7 +94,7 @@ export const poolCheckpointSchema = z.object({
 
 export const ingredientRef = z.object({ item: coreId, n: z.number().int().min(1) });
 
-export const itemSchema = z.object({
+export const itemSchema = z.strictObject({
   id: coreId,
   kind: z.enum(['ingredient', 'tool', 'misc', 'consumable']),
   /** Tags the item carries (tools answer enemy traits). */
@@ -147,7 +145,7 @@ export const missionPaySchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('scrollPart'), technique: coreId }),
 ]);
 
-export const missionSchema = z.object({
+export const missionSchema = z.strictObject({
   id: coreId,
   rank: z.enum(MISSION_RANKS),
   team: z.boolean(),
@@ -179,7 +177,7 @@ export const regionSchema = z.object({
   cells: z.array(coreId),
 });
 
-export const enemySchema = z.object({
+export const enemySchema = z.strictObject({
   id: coreId,
   region: z.enum(ENEMY_REGIONS),
   cl: z.number().int(),

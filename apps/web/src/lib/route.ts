@@ -39,8 +39,14 @@ export function parseHash(hash: string): Route {
   if (first === 'skills' && rest.length === 0) return { page: 'skills' };
   if (TABS.includes(first) && rest.length === 0) return { page: 'tab', tab: first };
   const id = rest.join('/');
-  if (isKind(first) && id !== '')
-    return { page: 'entity', ref: { kind: first, id: decodeURIComponent(id) } };
+  if (isKind(first) && id !== '') {
+    try {
+      return { page: 'entity', ref: { kind: first, id: decodeURIComponent(id) } };
+    } catch {
+      // Malformed percent escape: treat the hash as an unknown route.
+      return { page: 'notFound', hash };
+    }
+  }
   return { page: 'notFound', hash };
 }
 

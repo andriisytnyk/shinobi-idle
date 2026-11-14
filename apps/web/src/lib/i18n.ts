@@ -76,7 +76,7 @@ function format(template: string, params: Params, messages: Messages): string {
 /** Builds a translator over a message table. Unknown keys come back as the key itself. */
 export function createTranslator(messages: Messages) {
   return (key: string, params: Params = {}): string => {
-    const template = messages[key];
+    const template = Object.hasOwn(messages, key) ? messages[key] : undefined;
     if (template === undefined) return key;
     return format(template, params, messages);
   };
@@ -86,4 +86,4 @@ export function createTranslator(messages: Messages) {
 export const t = createTranslator(ukLocale);
 
 /** Whether a key has a translation. */
-export const hasKey = (key: string): boolean => key in ukLocale;
+export const hasKey = (key: string): boolean => Object.hasOwn(ukLocale, key);

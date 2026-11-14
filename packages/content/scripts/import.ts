@@ -4,7 +4,7 @@
  *   src/locales/uk.json         every display string, keyed `<kind>.<id>.<field>`
  * The import is idempotent: running it twice leaves the files byte-identical.
  */
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -47,7 +47,7 @@ import {
   type Technique,
 } from '../src/schema.ts';
 import { rawBalance, rawMap, rawSlice } from './raw.ts';
-import { SlugRegistry } from './translit.ts';
+import { IdRegistry, type IdTable } from './translit.ts';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
@@ -57,10 +57,18 @@ const mapPath = join(docs, 'Shinobi Idle — дані й скрипти', 'conce
 const outData = join(root, 'src', 'data', 'generated');
 const outLocale = join(root, 'src', 'locales', 'uk.json');
 
+const registryPath = join(root, 'src', 'data', 'id-registry.json');
+const assignIds = process.argv.includes('--assign-ids');
+
 const readJson = (path: string): unknown => JSON.parse(readFileSync(path, 'utf8'));
 const slice = rawSlice.parse(readJson(join(sliceDir, 'slice.json')));
 const bal = rawBalance.parse(readJson(join(sliceDir, 'balance.json')));
 const map = rawMap.parse(readJson(mapPath));
+
+const ids = new IdRegistry(
+  existsSync(registryPath) ? (readJson(registryPath) as IdTable) : {},
+  assignIds,
+);
 
 // ---------- helpers ----------
 
@@ -163,10 +171,12 @@ const seals: Seal[] = Object.entries(slice.seals).map(([key, s]) => {
   return { id, glyph: s.glyph, romaji: s.jp, kind: s.kind as Seal['kind'] };
 });
 
+const english: Record<string, string> = {};
 const techByUk = new Map<string, string>();
 const techniques: Technique[] = slice.techniques.map((t) => {
   techByUk.set(t.uk, t.id);
   text('technique', t.id, 'name', t.uk);
+  english[localeKey('technique', t.id, 'name')] = t.en;
   text('technique', t.id, 'home', t.home);
   text('technique', t.id, 'home2', t.home2);
   text('technique', t.id, 'req', t.req);
@@ -181,7 +191,6 @@ const techniques: Technique[] = slice.techniques.map((t) => {
     tags: t.tags.map(tag),
     state: t.state === '' ? null : need(STATE_BY_UK[t.state], `unknown state "${t.state}"`),
     src: t.src as Technique['src'],
-    enName: t.en,
     sealSeq: t.sealSeq.map(core),
     sealsCanon: t.sealsCanon,
     tier: t.tier as Technique['tier'],
@@ -192,7 +201,7 @@ const techId = (uk: string) => need(techByUk.get(uk), `technique "${uk}" is not 
 
 // ---------- masteries ----------
 
-const exerciseSlugs = new SlugRegistry();
+const exerciseSlugs = { take: (k: string) => ids.take('exercise', k) };
 const exercises: Exercise[] = slice.exercises.map((e) => {
   const id = core(exerciseSlugs.take(e.uk));
   text('exercise', id, 'name', e.uk);
@@ -200,7 +209,7 @@ const exercises: Exercise[] = slice.exercises.map((e) => {
   return { id, level: e.level };
 });
 
-const obstacleSlugs = new SlugRegistry();
+const obstacleSlugs = { take: (k: string) => ids.take('obstacle', k) };
 const obstacles: Obstacle[] = slice.obstacles.map((o) => {
   const m = /^Слот (\d+): (.+)$/.exec(o.uk);
   if (!m) throw new Error(`Import: obstacle "${o.uk}" has no slot number`);
@@ -213,7 +222,7 @@ const obstacles: Obstacle[] = slice.obstacles.map((o) => {
 const skillByName = new Map(
   skills.map((s) => [need(locale[localeKey('skill', s.id, 'name')], s.id), s.id]),
 );
-const practiceSlugs = new SlugRegistry();
+const practiceSlugs = { take: (k: string) => ids.take('practice', k) };
 const practices: Practice[] = slice.practices.map((p) => {
   const id = core(practiceSlugs.take(p.uk));
   const pair = p.pair.split(' + ').map((n) => need(skillByName.get(n), `practice skill "${n}"`));
@@ -254,7 +263,7 @@ const itemDesc = (id: string) => need(map.ITEMS[id], `item ${id} missing in map 
 const herbs: Herb[] = slice.herbs.map((h) => ({ id: core(h.id), level: h.level }));
 
 // Recipe ids come from the Ukrainian name; the antidote keeps a readable id because missions use it.
-const recipeSlugs = new SlugRegistry();
+const recipeSlugs = { take: (k: string, forced?: string) => ids.take('recipe', k, forced) };
 const recipes: Recipe[] = slice.recipes.map((r) => {
   const slug = recipeSlugs.take(r.uk, r.uk === 'Протиотрута' ? 'antidote' : undefined);
   const id = core(slug);
@@ -337,7 +346,7 @@ for (const r of recipes) {
 // ---------- buildings, market, gear ----------
 
 const buildingByName = new Map<string, string>();
-const resSlugs = new SlugRegistry();
+const resSlugs = { take: (k: string) => ids.take('resource', k) };
 const resByName = new Map<string, string>();
 const resource = (uk: string): string => {
   let slug = resByName.get(uk);
@@ -364,7 +373,7 @@ const market: MarketEntry[] = slice.market.map(([raw, supplier, lvl]) => ({
   marketLevel: lvl,
 }));
 
-const gearSlugs = new SlugRegistry();
+const gearSlugs = { take: (k: string) => ids.take('gear', k) };
 const gear: Gear[] = slice.gear.map(([name, skill, tiers, effect]) => {
   const id = core(gearSlugs.take(name));
   text('gear', id, 'name', name);
@@ -476,7 +485,7 @@ const missions: Mission[] = slice.missions.map((m) => {
 
 // ---------- regions and cells ----------
 
-const cellSlugs = new SlugRegistry();
+const cellSlugs = { take: (k: string) => ids.take('cell', k) };
 const cells: Cell[] = [];
 const regions: Region[] = slice.regions.map((r) => {
   const id = core(r.id);
@@ -535,6 +544,7 @@ const db: ContentDb = contentDbSchema.parse({
 });
 
 const json = (value: unknown) => `${JSON.stringify(value, null, 2)}\n`;
+if (ids.dirty) writeFileSync(registryPath, json(ids.table));
 mkdirSync(outData, { recursive: true });
 mkdirSync(dirname(outLocale), { recursive: true });
 for (const [name, value] of Object.entries(db))
@@ -543,6 +553,12 @@ const sorted = Object.fromEntries(
   Object.entries(locale).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)),
 );
 writeFileSync(outLocale, json(sorted));
+writeFileSync(
+  join(dirname(outLocale), 'en.json'),
+  json(
+    Object.fromEntries(Object.entries(english).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))),
+  ),
+);
 
 console.log(
   `Imported ${Object.keys(db).length} data files and ${Object.keys(sorted).length} locale strings.`,

@@ -22,6 +22,11 @@ describe('router', () => {
     expect(parseHash('#/skill').page).toBe('notFound');
   });
 
+  it('does not throw on malformed percent escapes', () => {
+    expect(parseHash('#/skill/%E0%A4%A').page).toBe('notFound');
+    expect(parseHash('#/technique/%').page).toBe('notFound');
+  });
+
   it('builds hashes that parse back', () => {
     const ref = { kind: 'item', id: 'core:mint' } as const;
     expect(hrefFor(ref)).toBe('#/item/core:mint');

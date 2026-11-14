@@ -24,6 +24,10 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+      - name: Generated content must match the docs data
+        run: |
+          pnpm content:import
+          git diff --exit-code
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test

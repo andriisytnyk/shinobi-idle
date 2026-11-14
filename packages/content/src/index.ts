@@ -18,6 +18,7 @@ import seals from './data/generated/seals.json' with { type: 'json' };
 import skills from './data/generated/skills.json' with { type: 'json' };
 import techniques from './data/generated/techniques.json' with { type: 'json' };
 import generatedUk from './locales/uk.json' with { type: 'json' };
+import enGenerated from './locales/en.json' with { type: 'json' };
 import uiUk from './locales/ui.uk.json' with { type: 'json' };
 import { contentDbSchema, type ContentDb } from './schema.ts';
 
@@ -46,6 +47,9 @@ export const content: ContentDb = contentDbSchema.parse({
 
 /** Ukrainian strings: generated entity names and descriptions plus hand-written UI strings. */
 export const ukLocale: Readonly<Record<string, string>> = { ...generatedUk, ...uiUk };
+
+/** English technique names (canonical). Not used by the UI, which reads Ukrainian only. */
+export const enLocale: Readonly<Record<string, string>> = enGenerated;
 
 export * from './constants.ts';
 export * from './keys.ts';

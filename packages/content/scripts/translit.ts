@@ -46,17 +46,39 @@ export function slugify(name: string): string {
   return out.replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
 }
 
-/** Hands out unique slugs within one namespace; a collision gets a numeric suffix. */
-export class SlugRegistry {
-  private readonly used = new Set<string>();
+export type IdTable = Record<string, Record<string, string>>;
 
-  take(name: string, forced?: string): string {
-    const base = forced ?? slugify(name);
-    if (base === '') throw new Error(`Cannot derive a slug from "${name}"`);
+/**
+ * Explicit, committed id registry: entity kind -> source key (Ukrainian name) -> slug.
+ * The importer takes every transliterated id from here, so a copy-edit of a name can never
+ * rename an id silently. New entities need `--assign-ids`, which appends transliterated slugs.
+ */
+export class IdRegistry {
+  dirty = false;
+
+  constructor(
+    readonly table: IdTable,
+    private readonly assign: boolean,
+  ) {}
+
+  take(kind: string, key: string, forced?: string): string {
+    const entries = (this.table[kind] ??= {});
+    const existing = entries[key];
+    if (existing !== undefined) return existing;
+    if (!this.assign) {
+      throw new Error(
+        `Import: no id registered for ${kind} "${key}". ` +
+          `Add it to src/data/id-registry.json or run the import with --assign-ids.`,
+      );
+    }
+    const base = forced ?? slugify(key);
+    if (base === '') throw new Error(`Cannot derive an id from "${key}"`);
+    const used = new Set(Object.values(entries));
     let slug = base;
     let n = 2;
-    while (this.used.has(slug)) slug = `${base}_${n++}`;
-    this.used.add(slug);
+    while (used.has(slug)) slug = `${base}_${n++}`;
+    entries[key] = slug;
+    this.dirty = true;
     return slug;
   }
 }

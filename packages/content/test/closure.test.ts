@@ -2,7 +2,9 @@
  * Closure validator: every rule from build_slice.mjs (the "audit"), as tests over the content database.
  * A failing test names the offending entity so a content change is easy to fix.
  */
+import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import idRegistry from '../src/data/id-registry.json' with { type: 'json' };
 import {
   content,
   KEY_NATURES,
@@ -110,13 +112,15 @@ describe('items: source and consumer', () => {
   const hasConsumer = (id: string) =>
     recipeIngredients.has(id) || stageItems.has(id) || madeFromIds.has(id);
 
-  const mustHaveSource = new Set([
+  // Same set as the original audit: every item that has a source or a consumer in the slice
+  // (herbs, market goods, ingredient payments, recipe ingredients, mission item stages).
+  const audited = new Set([
     ...content.items.filter((i) => i.kind === 'ingredient').map((i) => i.id),
     ...recipeIngredients,
     ...stageItems,
-    ...payItems,
   ]);
-  const mustHaveConsumer = content.items.filter((i) => i.kind === 'ingredient').map((i) => i.id);
+  // The antidote is crafted for a mission stage and has no other consumer by design.
+  const NO_CONSUMER_REQUIRED = new Set(['core:antidote']);
 
   it('every referenced item exists', () => {
     for (const id of [...recipeIngredients, ...stageItems, ...payItems, ...madeFromIds]) {
@@ -124,14 +128,21 @@ describe('items: source and consumer', () => {
     }
   });
 
-  it('every ingredient and payment item has a source', () => {
-    for (const id of mustHaveSource)
-      expect(hasSource(id), `${name('item', id)}: no source`).toBe(true);
+  it('every audited item has a source', () => {
+    for (const id of audited) expect(hasSource(id), `${name('item', id)}: no source`).toBe(true);
   });
 
-  it('every ingredient has a consumer', () => {
-    for (const id of mustHaveConsumer)
+  it('every audited item has a consumer', () => {
+    for (const id of audited) {
+      if (NO_CONSUMER_REQUIRED.has(id)) continue;
       expect(hasConsumer(id), `${name('item', id)}: no consumer`).toBe(true);
+    }
+  });
+
+  it('every ingredient payment item has a source', () => {
+    for (const id of payItems) {
+      if (byId.get(id)?.kind === 'ingredient') expect(hasSource(id), id).toBe(true);
+    }
   });
 
   it('every herb and market good is an ingredient item', () => {
@@ -349,10 +360,57 @@ describe('identity and localization', () => {
   });
 
   it('data files hold no display text', () => {
-    // Names, notes and labels live only in the locale; spot-check that entities carry no strings that look like prose.
-    for (const t of content.techniques) {
-      expect(Object.keys(t)).not.toContain('uk');
-      expect(Object.keys(t)).not.toContain('home');
+    // Schemas are strict, and the raw JSON is checked too: no text-bearing keys anywhere.
+    const banned = new Set([
+      'uk',
+      'en',
+      'name',
+      'desc',
+      'home',
+      'home2',
+      'note',
+      'label',
+      'client',
+      'place',
+      'text',
+    ]);
+    const visit = (value: unknown, where: string): void => {
+      if (Array.isArray(value)) value.forEach((v, i) => visit(v, `${where}[${i}]`));
+      else if (value && typeof value === 'object') {
+        for (const [k, v] of Object.entries(value)) {
+          expect(
+            banned.has(k) && typeof v === 'string',
+            `${where}.${k} looks like display text`,
+          ).toBe(false);
+          visit(v, `${where}.${k}`);
+        }
+      }
+    };
+    const dir = new URL('../src/data/generated/', import.meta.url);
+    for (const file of readdirSync(dir)) {
+      visit(JSON.parse(readFileSync(new URL(file, dir), 'utf8')), file);
     }
+  });
+
+  it('every id is in the id registry and ids are unique per kind', () => {
+    const registered = Object.fromEntries(
+      Object.entries(idRegistry).map(([kind, m]) => [kind, Object.values(m)]),
+    );
+    for (const [kind, slugs] of Object.entries(registered)) {
+      expect(new Set(slugs).size, `registry kind ${kind} has duplicate ids`).toBe(slugs.length);
+    }
+    const has = (kind: string, id: string) =>
+      (registered[kind] ?? []).includes(id.replace('core:', ''));
+    for (const e of content.exercises) expect(has('exercise', e.id), e.id).toBe(true);
+    for (const e of content.obstacles) expect(has('obstacle', e.id), e.id).toBe(true);
+    for (const e of content.practices) expect(has('practice', e.id), e.id).toBe(true);
+    for (const e of content.recipes) expect(has('recipe', e.id), e.id).toBe(true);
+    for (const e of content.gear) expect(has('gear', e.id), e.id).toBe(true);
+    for (const e of content.cells) expect(has('cell', e.id), e.id).toBe(true);
+    const resources = new Set([
+      ...content.buildings.flatMap((b) => Object.keys(b.tier6 ?? {})),
+      ...content.missions.flatMap((m) => (m.resource ? [m.resource] : [])),
+    ]);
+    for (const r of resources) expect(has('resource', r), r).toBe(true);
   });
 });
