@@ -1,0 +1,262 @@
+[
+  {
+    "id": "core:pool_tai_10",
+    "skill": "tai",
+    "pct": 10
+  },
+  {
+    "id": "core:pool_tai_25",
+    "skill": "tai",
+    "pct": 25
+  },
+  {
+    "id": "core:pool_tai_50",
+    "skill": "tai",
+    "pct": 50
+  },
+  {
+    "id": "core:pool_tai_95",
+    "skill": "tai",
+    "pct": 95
+  },
+  {
+    "id": "core:pool_nin_10",
+    "skill": "nin",
+    "pct": 10
+  },
+  {
+    "id": "core:pool_nin_25",
+    "skill": "nin",
+    "pct": 25
+  },
+  {
+    "id": "core:pool_nin_50",
+    "skill": "nin",
+    "pct": 50
+  },
+  {
+    "id": "core:pool_nin_95",
+    "skill": "nin",
+    "pct": 95
+  },
+  {
+    "id": "core:pool_katon_10",
+    "skill": "katon",
+    "pct": 10
+  },
+  {
+    "id": "core:pool_katon_25",
+    "skill": "katon",
+    "pct": 25
+  },
+  {
+    "id": "core:pool_katon_50",
+    "skill": "katon",
+    "pct": 50
+  },
+  {
+    "id": "core:pool_katon_95",
+    "skill": "katon",
+    "pct": 95
+  },
+  {
+    "id": "core:pool_futon_10",
+    "skill": "futon",
+    "pct": 10
+  },
+  {
+    "id": "core:pool_futon_25",
+    "skill": "futon",
+    "pct": 25
+  },
+  {
+    "id": "core:pool_futon_50",
+    "skill": "futon",
+    "pct": 50
+  },
+  {
+    "id": "core:pool_futon_95",
+    "skill": "futon",
+    "pct": 95
+  },
+  {
+    "id": "core:pool_raiton_10",
+    "skill": "raiton",
+    "pct": 10
+  },
+  {
+    "id": "core:pool_raiton_25",
+    "skill": "raiton",
+    "pct": 25
+  },
+  {
+    "id": "core:pool_raiton_50",
+    "skill": "raiton",
+    "pct": 50
+  },
+  {
+    "id": "core:pool_raiton_95",
+    "skill": "raiton",
+    "pct": 95
+  },
+  {
+    "id": "core:pool_doton_10",
+    "skill": "doton",
+    "pct": 10
+  },
+  {
+    "id": "core:pool_doton_25",
+    "skill": "doton",
+    "pct": 25
+  },
+  {
+    "id": "core:pool_doton_50",
+    "skill": "doton",
+    "pct": 50
+  },
+  {
+    "id": "core:pool_doton_95",
+    "skill": "doton",
+    "pct": 95
+  },
+  {
+    "id": "core:pool_suiton_10",
+    "skill": "suiton",
+    "pct": 10
+  },
+  {
+    "id": "core:pool_suiton_25",
+    "skill": "suiton",
+    "pct": 25
+  },
+  {
+    "id": "core:pool_suiton_50",
+    "skill": "suiton",
+    "pct": 50
+  },
+  {
+    "id": "core:pool_suiton_95",
+    "skill": "suiton",
+    "pct": 95
+  },
+  {
+    "id": "core:pool_cc_10",
+    "skill": "cc",
+    "pct": 10
+  },
+  {
+    "id": "core:pool_cc_25",
+    "skill": "cc",
+    "pct": 25
+  },
+  {
+    "id": "core:pool_cc_50",
+    "skill": "cc",
+    "pct": 50
+  },
+  {
+    "id": "core:pool_cc_95",
+    "skill": "cc",
+    "pct": 95
+  },
+  {
+    "id": "core:pool_med_10",
+    "skill": "med",
+    "pct": 10
+  },
+  {
+    "id": "core:pool_med_25",
+    "skill": "med",
+    "pct": 25
+  },
+  {
+    "id": "core:pool_med_50",
+    "skill": "med",
+    "pct": 50
+  },
+  {
+    "id": "core:pool_med_95",
+    "skill": "med",
+    "pct": 95
+  },
+  {
+    "id": "core:pool_ath_10",
+    "skill": "ath",
+    "pct": 10
+  },
+  {
+    "id": "core:pool_ath_25",
+    "skill": "ath",
+    "pct": 25
+  },
+  {
+    "id": "core:pool_ath_50",
+    "skill": "ath",
+    "pct": 50
+  },
+  {
+    "id": "core:pool_ath_95",
+    "skill": "ath",
+    "pct": 95
+  },
+  {
+    "id": "core:pool_herb_10",
+    "skill": "herb",
+    "pct": 10
+  },
+  {
+    "id": "core:pool_herb_25",
+    "skill": "herb",
+    "pct": 25
+  },
+  {
+    "id": "core:pool_herb_50",
+    "skill": "herb",
+    "pct": 50
+  },
+  {
+    "id": "core:pool_herb_95",
+    "skill": "herb",
+    "pct": 95
+  },
+  {
+    "id": "core:pool_prov_10",
+    "skill": "prov",
+    "pct": 10
+  },
+  {
+    "id": "core:pool_prov_25",
+    "skill": "prov",
+    "pct": 25
+  },
+  {
+    "id": "core:pool_prov_50",
+    "skill": "prov",
+    "pct": 50
+  },
+  {
+    "id": "core:pool_prov_95",
+    "skill": "prov",
+    "pct": 95
+  },
+  {
+    "id": "core:pool_alch_10",
+    "skill": "alch",
+    "pct": 10
+  },
+  {
+    "id": "core:pool_alch_25",
+    "skill": "alch",
+    "pct": 25
+  },
+  {
+    "id": "core:pool_alch_50",
+    "skill": "alch",
+    "pct": 50
+  },
+  {
+    "id": "core:pool_alch_95",
+    "skill": "alch",
+    "pct": 95
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "core:strybky_po_dakhakh",
+    "level": 1,
+    "slot": 1
+  },
+  {
+    "id": "core:bih_navkolo_sela",
+    "level": 1,
+    "slot": 1
+  },
+  {
+    "id": "core:obtiazhuvachi",
+    "level": 10,
+    "slot": 2
+  },
+  {
+    "id": "core:vidzhymannia_na_paltsiakh",
+    "level": 10,
+    "slot": 2
+  },
+  {
+    "id": "core:koloda_nad_prirvoiu",
+    "level": 20,
+    "slot": 3
+  },
+  {
+    "id": "core:ukhylennia_vid_kunaiv",
+    "level": 20,
+    "slot": 3
+  },
+  {
+    "id": "core:bih_po_derevakh",
+    "level": 30,
+    "slot": 4
+  },
+  {
+    "id": "core:lazinnia_po_skeli",
+    "level": 30,
+    "slot": 4
+  },
+  {
+    "id": "core:perehony_z_supernykom",
+    "level": 40,
+    "slot": 5
+  },
+  {
+    "id": "core:strybky_cherez_stovpy",
+    "level": 40,
+    "slot": 5
+  },
+  {
+    "id": "core:bih_po_vodi",
+    "level": 50,
+    "slot": 6
+  },
+  {
+    "id": "core:plavannia_proty_techii",
+    "level": 50,
+    "slot": 6
+  }
+]

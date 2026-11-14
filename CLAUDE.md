@@ -117,3 +117,22 @@ ID і назва
 ## Дискусія з автором
 
 Не погоджуватися автоматично. Якщо є суттєві аргументи — заперечити й запропонувати своє. По одному питанню не більше трьох обмінів аргументами в кожен бік; далі діє версія автора. Якщо автор каже, що рішення принципове, — не сперечатися. Якщо позиція автора сильніша — визнати одразу.
+
+## Команди
+
+Усі команди запускаються з кореня репозиторію через `pnpm` (npm і yarn не використовувати). Потрібні Node 24 і pnpm 10.
+
+| Команда | Що робить |
+| --- | --- |
+| `pnpm install` | Ставить залежності всіх пакетів |
+| `pnpm dev` | Запускає застосунок `apps/web` на `http://localhost:5173` |
+| `pnpm build` | Збирає застосунок у `apps/web/dist` |
+| `pnpm test` | Запускає Vitest у кожному пакеті, зокрема валідатор замкненості контенту |
+| `pnpm lint` | ESLint для всього репозиторію; у `packages/core/src` забороняє `Date`, `Math.random`, `performance`, `window`, `document`, `setTimeout`, `setInterval` |
+| `pnpm typecheck` | `tsc` для пакетів і `svelte-check` для застосунку |
+| `pnpm format` | Prettier переписує файли |
+| `pnpm content:import` | Читає `slice.json`, `balance.json` з `docs/` і перегенеровує `packages/content/src/data/generated/` та `packages/content/src/locales/uk.json`; повторний запуск нічого не змінює |
+| `pnpm content:check` | Друкує кількість сутностей і запускає тести замкненості контенту |
+| `pnpm sim` | CLI пакета `sim`: поки що друкує кількість сутностей і `xpAt(50)` |
+
+Назви й описи сутностей лежать лише в `packages/content/src/locales/uk.json` (генерується імпортом). Рядки інтерфейсу пишуться вручну в `packages/content/src/locales/ui.uk.json`.

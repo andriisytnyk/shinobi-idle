@@ -1,0 +1,1130 @@
+[
+  {
+    "id": "core:leaf_whirlwind",
+    "skill": "tai",
+    "level": 1,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "series",
+    "tags": [
+      "interrupt"
+    ],
+    "state": null,
+    "src": "N",
+    "sealSeq": [],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:dynamic_entry",
+    "skill": "tai",
+    "level": 10,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "projectile",
+    "tags": [
+      "interrupt"
+    ],
+    "state": null,
+    "src": "N",
+    "sealSeq": [],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:leaf_gale",
+    "skill": "tai",
+    "level": 15,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "series",
+    "tags": [
+      "interrupt"
+    ],
+    "state": null,
+    "src": "N",
+    "sealSeq": [],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:gate_of_opening",
+    "skill": "tai",
+    "level": 20,
+    "rank": "D",
+    "rankCanon": false,
+    "role": "buff",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:gate_of_healing",
+    "skill": "tai",
+    "level": 25,
+    "rank": "D",
+    "rankCanon": false,
+    "role": "buff",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:lion_combo",
+    "skill": "tai",
+    "level": 30,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "series",
+    "tags": [],
+    "state": null,
+    "src": "S",
+    "sealSeq": [],
+    "sealsCanon": true,
+    "tier": 1,
+    "noDamage": false
+  },
+  {
+    "id": "core:leaf_great_whirlwind",
+    "skill": "tai",
+    "level": 35,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "area",
+    "tags": [
+      "area"
+    ],
+    "state": null,
+    "src": "N",
+    "sealSeq": [],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:drunken_fist",
+    "skill": "tai",
+    "level": 40,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "series",
+    "tags": [],
+    "state": null,
+    "src": "O",
+    "sealSeq": [],
+    "sealsCanon": true,
+    "tier": 1,
+    "noDamage": false
+  },
+  {
+    "id": "core:leaf_rising_wind",
+    "skill": "tai",
+    "level": 45,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "series",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:front_lotus",
+    "skill": "tai",
+    "level": 50,
+    "rank": "B",
+    "rankCanon": true,
+    "role": "signature",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [],
+    "sealsCanon": true,
+    "tier": 1,
+    "noDamage": false
+  },
+  {
+    "id": "core:clone",
+    "skill": "nin",
+    "level": 1,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "defense",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:ram",
+      "core:snake",
+      "core:tiger"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:transformation",
+    "skill": "nin",
+    "level": 1,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "buff",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:dog",
+      "core:boar",
+      "core:ram"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:body_replacement",
+    "skill": "nin",
+    "level": 1,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "defense",
+    "tags": [
+      "guard"
+    ],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:tiger",
+      "core:boar",
+      "core:ox",
+      "core:dog",
+      "core:snake"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:body_flicker",
+    "skill": "nin",
+    "level": 5,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "buff",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:tiger"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:shadow_shuriken",
+    "skill": "nin",
+    "level": 10,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "projectile",
+    "tags": [
+      "interrupt"
+    ],
+    "state": null,
+    "src": "N",
+    "sealSeq": [],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:enclosing",
+    "skill": "nin",
+    "level": 15,
+    "rank": "D",
+    "rankCanon": false,
+    "role": "control",
+    "tags": [],
+    "state": null,
+    "src": "S",
+    "sealSeq": [],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": true
+  },
+  {
+    "id": "core:sensing",
+    "skill": "nin",
+    "level": 20,
+    "rank": "D",
+    "rankCanon": false,
+    "role": "control",
+    "tags": [
+      "reveal"
+    ],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:ram"
+    ],
+    "sealsCanon": false,
+    "tier": 0,
+    "noDamage": true
+  },
+  {
+    "id": "core:rope_escape",
+    "skill": "nin",
+    "level": 25,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "defense",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:temporary_paralysis",
+    "skill": "nin",
+    "level": 30,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "control",
+    "tags": [
+      "bind"
+    ],
+    "state": null,
+    "src": "S",
+    "sealSeq": [
+      "core:rat"
+    ],
+    "sealsCanon": false,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:hidden_shadow_snake_hands",
+    "skill": "nin",
+    "level": 35,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "control",
+    "tags": [
+      "bind"
+    ],
+    "state": null,
+    "src": "O",
+    "sealSeq": [],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:chakra_halving_drill",
+    "skill": "nin",
+    "level": 40,
+    "rank": null,
+    "rankCanon": false,
+    "role": "drill",
+    "tags": [],
+    "state": null,
+    "src": "Q",
+    "sealSeq": [
+      "core:clone"
+    ],
+    "sealsCanon": false,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:shadow_clone",
+    "skill": "nin",
+    "level": 50,
+    "rank": "B",
+    "rankCanon": true,
+    "role": "series",
+    "tags": [
+      "area"
+    ],
+    "state": null,
+    "src": "Q",
+    "sealSeq": [
+      "core:clone"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:nature_transformation_burn_a_leaf",
+    "skill": "katon",
+    "level": 1,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "drill",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:tiger"
+    ],
+    "sealsCanon": false,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:fire_breath_control_drill",
+    "skill": "katon",
+    "level": 10,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "drill",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:tiger"
+    ],
+    "sealsCanon": false,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:running_fire",
+    "skill": "katon",
+    "level": 20,
+    "rank": "D",
+    "rankCanon": false,
+    "role": "area",
+    "tags": [
+      "area"
+    ],
+    "state": "burn",
+    "src": "N",
+    "sealSeq": [
+      "core:tiger"
+    ],
+    "sealsCanon": true,
+    "tier": -1,
+    "noDamage": false
+  },
+  {
+    "id": "core:great_fireball",
+    "skill": "katon",
+    "level": 30,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "projectile",
+    "tags": [
+      "dot"
+    ],
+    "state": "burn",
+    "src": "N",
+    "sealSeq": [
+      "core:snake",
+      "core:ram",
+      "core:monkey",
+      "core:boar",
+      "core:horse",
+      "core:tiger"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:phoenix_sage_fire",
+    "skill": "katon",
+    "level": 35,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "series",
+    "tags": [
+      "dot"
+    ],
+    "state": "burn",
+    "src": "N",
+    "sealSeq": [
+      "core:rat",
+      "core:tiger",
+      "core:dog",
+      "core:ox",
+      "core:hare",
+      "core:tiger"
+    ],
+    "sealsCanon": true,
+    "tier": -1,
+    "noDamage": false
+  },
+  {
+    "id": "core:dragon_fire",
+    "skill": "katon",
+    "level": 40,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "projectile",
+    "tags": [
+      "dot"
+    ],
+    "state": "burn",
+    "src": "S",
+    "sealSeq": [
+      "core:snake",
+      "core:dragon",
+      "core:hare",
+      "core:tiger"
+    ],
+    "sealsCanon": true,
+    "tier": 1,
+    "noDamage": false
+  },
+  {
+    "id": "core:fire_dragon_flame_bullet",
+    "skill": "katon",
+    "level": 50,
+    "rank": "B",
+    "rankCanon": true,
+    "role": "area",
+    "tags": [
+      "area"
+    ],
+    "state": "burn",
+    "src": "S",
+    "sealSeq": [
+      "core:ram",
+      "core:horse",
+      "core:snake",
+      "core:dragon",
+      "core:rat",
+      "core:ox",
+      "core:tiger"
+    ],
+    "sealsCanon": true,
+    "tier": 1,
+    "noDamage": false
+  },
+  {
+    "id": "core:nature_transformation_cut_a_leaf",
+    "skill": "futon",
+    "level": 1,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "drill",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:bird"
+    ],
+    "sealsCanon": false,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:nature_transformation_split_a_waterfall",
+    "skill": "futon",
+    "level": 10,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "drill",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:bird"
+    ],
+    "sealsCanon": false,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:wind_chakra_flow_drill",
+    "skill": "futon",
+    "level": 20,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "drill",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:bird"
+    ],
+    "sealsCanon": false,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:gale_palm",
+    "skill": "futon",
+    "level": 30,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "projectile",
+    "tags": [
+      "pierce"
+    ],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:snake",
+      "core:ram",
+      "core:boar",
+      "core:horse",
+      "core:bird",
+      "core:clap"
+    ],
+    "sealsCanon": true,
+    "tier": -1,
+    "noDamage": false
+  },
+  {
+    "id": "core:great_breakthrough",
+    "skill": "futon",
+    "level": 35,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "area",
+    "tags": [
+      "area",
+      "reveal"
+    ],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:tiger",
+      "core:ox",
+      "core:dog",
+      "core:hare",
+      "core:snake"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:sickle_weasel",
+    "skill": "futon",
+    "level": 40,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "area",
+    "tags": [
+      "pierce",
+      "reveal"
+    ],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:snake",
+      "core:dragon",
+      "core:bird"
+    ],
+    "sealsCanon": true,
+    "tier": 1,
+    "noDamage": false
+  },
+  {
+    "id": "core:vacuum_wave",
+    "skill": "futon",
+    "level": 50,
+    "rank": "B",
+    "rankCanon": true,
+    "role": "area",
+    "tags": [
+      "pierce",
+      "area"
+    ],
+    "state": null,
+    "src": "S",
+    "sealSeq": [
+      "core:rat",
+      "core:snake",
+      "core:horse",
+      "core:dog"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:nature_transformation_crumple_a_leaf",
+    "skill": "raiton",
+    "level": 1,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "drill",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:monkey"
+    ],
+    "sealsCanon": false,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:lightning_discharge_drill",
+    "skill": "raiton",
+    "level": 10,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "drill",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:monkey"
+    ],
+    "sealsCanon": false,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:lightning_chakra_flow_drill",
+    "skill": "raiton",
+    "level": 20,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "drill",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:monkey"
+    ],
+    "sealsCanon": false,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:four_pillar_bind",
+    "skill": "raiton",
+    "level": 30,
+    "rank": "C",
+    "rankCanon": false,
+    "role": "control",
+    "tags": [
+      "bind"
+    ],
+    "state": "stun",
+    "src": "N",
+    "sealSeq": [
+      "core:ram",
+      "core:boar",
+      "core:dog",
+      "core:bird",
+      "core:hare"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:lightning_beast_tracking_fang",
+    "skill": "raiton",
+    "level": 35,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "projectile",
+    "tags": [
+      "interrupt"
+    ],
+    "state": "stun",
+    "src": "N",
+    "sealSeq": [
+      "core:ox",
+      "core:hare",
+      "core:monkey"
+    ],
+    "sealsCanon": false,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:wave_of_inspiration",
+    "skill": "raiton",
+    "level": 40,
+    "rank": "C",
+    "rankCanon": false,
+    "role": "projectile",
+    "tags": [
+      "interrupt"
+    ],
+    "state": "stun",
+    "src": "O",
+    "sealSeq": [
+      "core:hare",
+      "core:dog",
+      "core:boar",
+      "core:ram",
+      "core:rat"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:false_darkness",
+    "skill": "raiton",
+    "level": 50,
+    "rank": "B",
+    "rankCanon": true,
+    "role": "projectile",
+    "tags": [
+      "pierce",
+      "interrupt"
+    ],
+    "state": "stun",
+    "src": "O",
+    "sealSeq": [
+      "core:snake"
+    ],
+    "sealsCanon": true,
+    "tier": 1,
+    "noDamage": false
+  },
+  {
+    "id": "core:nature_transformation_crumble_a_leaf",
+    "skill": "doton",
+    "level": 1,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "drill",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:snake"
+    ],
+    "sealsCanon": false,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:double_suicide_decapitation",
+    "skill": "doton",
+    "level": 10,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "control",
+    "tags": [
+      "bind"
+    ],
+    "state": null,
+    "src": "N",
+    "sealSeq": [],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:earth_softening_drill",
+    "skill": "doton",
+    "level": 20,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "drill",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:snake"
+    ],
+    "sealsCanon": false,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:hiding_like_a_mole",
+    "skill": "doton",
+    "level": 30,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "control",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": true
+  },
+  {
+    "id": "core:tearing_earth_turning_palm",
+    "skill": "doton",
+    "level": 35,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "area",
+    "tags": [
+      "area"
+    ],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:boar",
+      "core:ox",
+      "core:unique"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:earth_flow_river",
+    "skill": "doton",
+    "level": 40,
+    "rank": "C",
+    "rankCanon": false,
+    "role": "control",
+    "tags": [
+      "bind"
+    ],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:tiger"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:earth_dragon_bullet",
+    "skill": "doton",
+    "level": 45,
+    "rank": "C",
+    "rankCanon": false,
+    "role": "projectile",
+    "tags": [],
+    "state": null,
+    "src": "S",
+    "sealSeq": [
+      "core:ram",
+      "core:horse",
+      "core:dragon"
+    ],
+    "sealsCanon": true,
+    "tier": 1,
+    "noDamage": false
+  },
+  {
+    "id": "core:earth_style_wall",
+    "skill": "doton",
+    "level": 50,
+    "rank": "B",
+    "rankCanon": true,
+    "role": "defense",
+    "tags": [
+      "guard"
+    ],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:tiger",
+      "core:hare",
+      "core:boar",
+      "core:dog"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:nature_transformation_dampen_a_leaf",
+    "skill": "suiton",
+    "level": 1,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "drill",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:dragon"
+    ],
+    "sealsCanon": false,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:hiding_in_mist",
+    "skill": "suiton",
+    "level": 10,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "defense",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:ox",
+      "core:snake",
+      "core:ram"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:river_water_guiding_drill",
+    "skill": "suiton",
+    "level": 20,
+    "rank": "D",
+    "rankCanon": true,
+    "role": "drill",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:dragon"
+    ],
+    "sealsCanon": false,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:water_clone",
+    "skill": "suiton",
+    "level": 30,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "defense",
+    "tags": [],
+    "state": null,
+    "src": "N",
+    "sealSeq": [
+      "core:tiger"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:wild_water_wave",
+    "skill": "suiton",
+    "level": 30,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "projectile",
+    "tags": [],
+    "state": "wet",
+    "src": "N",
+    "sealSeq": [
+      "core:dragon",
+      "core:tiger",
+      "core:hare"
+    ],
+    "sealsCanon": true,
+    "tier": -1,
+    "noDamage": false
+  },
+  {
+    "id": "core:water_prison",
+    "skill": "suiton",
+    "level": 35,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "control",
+    "tags": [
+      "bind"
+    ],
+    "state": "wet",
+    "src": "O",
+    "sealSeq": [
+      "core:snake",
+      "core:ram",
+      "core:horse",
+      "core:hare",
+      "core:ram",
+      "core:horse",
+      "core:hare",
+      "core:palms"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:gunshot",
+    "skill": "suiton",
+    "level": 40,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "area",
+    "tags": [
+      "area"
+    ],
+    "state": "wet",
+    "src": "S",
+    "sealSeq": [
+      "core:tiger"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:starch_syrup_capturing_field",
+    "skill": "suiton",
+    "level": 45,
+    "rank": "C",
+    "rankCanon": true,
+    "role": "control",
+    "tags": [
+      "bind"
+    ],
+    "state": "wet",
+    "src": "S",
+    "sealSeq": [
+      "core:ram",
+      "core:tiger"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  },
+  {
+    "id": "core:water_formation_wall",
+    "skill": "suiton",
+    "level": 50,
+    "rank": "B",
+    "rankCanon": true,
+    "role": "defense",
+    "tags": [
+      "guard"
+    ],
+    "state": "wet",
+    "src": "N",
+    "sealSeq": [
+      "core:tiger",
+      "core:snake",
+      "core:rat",
+      "core:snake",
+      "core:tiger"
+    ],
+    "sealsCanon": true,
+    "tier": 0,
+    "noDamage": false
+  }
+]

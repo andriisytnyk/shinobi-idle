@@ -1,0 +1,104 @@
+[
+  {
+    "id": "core:rat",
+    "glyph": "子",
+    "romaji": "Ne",
+    "kind": "zodiac"
+  },
+  {
+    "id": "core:ox",
+    "glyph": "丑",
+    "romaji": "Ushi",
+    "kind": "zodiac"
+  },
+  {
+    "id": "core:tiger",
+    "glyph": "寅",
+    "romaji": "Tora",
+    "kind": "zodiac"
+  },
+  {
+    "id": "core:hare",
+    "glyph": "卯",
+    "romaji": "U",
+    "kind": "zodiac"
+  },
+  {
+    "id": "core:dragon",
+    "glyph": "辰",
+    "romaji": "Tatsu",
+    "kind": "zodiac"
+  },
+  {
+    "id": "core:snake",
+    "glyph": "巳",
+    "romaji": "Mi",
+    "kind": "zodiac"
+  },
+  {
+    "id": "core:horse",
+    "glyph": "午",
+    "romaji": "Uma",
+    "kind": "zodiac"
+  },
+  {
+    "id": "core:ram",
+    "glyph": "未",
+    "romaji": "Hitsuji",
+    "kind": "zodiac"
+  },
+  {
+    "id": "core:monkey",
+    "glyph": "申",
+    "romaji": "Saru",
+    "kind": "zodiac"
+  },
+  {
+    "id": "core:bird",
+    "glyph": "酉",
+    "romaji": "Tori",
+    "kind": "zodiac"
+  },
+  {
+    "id": "core:dog",
+    "glyph": "戌",
+    "romaji": "Inu",
+    "kind": "zodiac"
+  },
+  {
+    "id": "core:boar",
+    "glyph": "亥",
+    "romaji": "I",
+    "kind": "zodiac"
+  },
+  {
+    "id": "core:clone",
+    "glyph": "十",
+    "romaji": "Bunshin no In",
+    "kind": "special"
+  },
+  {
+    "id": "core:clap",
+    "glyph": "合",
+    "romaji": "Gasshō",
+    "kind": "special"
+  },
+  {
+    "id": "core:confront",
+    "glyph": "対",
+    "romaji": "Tairitsu no In",
+    "kind": "special"
+  },
+  {
+    "id": "core:palms",
+    "glyph": "掌",
+    "romaji": "—",
+    "kind": "special"
+  },
+  {
+    "id": "core:unique",
+    "glyph": "印",
+    "romaji": "—",
+    "kind": "special"
+  }
+]
