@@ -40,10 +40,33 @@ interface GameState {
   flags: Record<string, true | number>;
   // далі додають етапи: combat, loadouts, pouch, wounds, bingo, missions, world, village, quests, goal, stats
 }
-interface ActionSlot { action: { kind: string; id: string } | null; progress: number; share: number }
+interface ActionSlot {
+  action: { kind: string; id: string } | null;
+  progress: number;   // цілі одиниці роботи: мс × share
+  share: number;      // ціла вага в тисячних; 1000 — повна швидкість; сума активних слотів — 1000
+  data: JsonValue;    // дані виду дії, серіалізуються
+}
 ```
 
 Кожен етап додає свої гілки стану й підвищує `v` із міграцією.
+
+## Правила
+
+Системи, види дій і постачальники модифікаторів зібрані в один явний упорядкований набір `defaultRules` у `rules.ts`. Глобальних реєстрів і реєстрації під час імпорту немає. `advance`, `dispatch`, `deserialize`, `getMod`, `advanceOffline` приймають `rules` останнім параметром; тести й боти можуть передати власний набір.
+
+```ts
+interface System { nextEventIn(state, content, rules): number | null; elapse?(state, dt, content, rules): void; run(state, content, rules): void }
+interface ActionKind {
+  has(id, content): boolean;
+  requirements(state, id, content, rules): Req | null;   // перевіряється на старті й після кожного завершення
+  intervalMs(state, id, content, rules): number;
+  complete(state, id, content, rules): 'continue' | 'stop' | void;
+  start?(state, slot, id, content, rules): void;
+  stop?(state, slot, id, content, rules, reason): void;
+}
+```
+
+Увесь облік часу й прогресу — цілими числами; жодних дробів у прогресі й у пошуку найближчої події.
 
 ## Команди й події
 
