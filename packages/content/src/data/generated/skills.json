@@ -1,0 +1,82 @@
+[
+  {
+    "id": "tai",
+    "group": "train",
+    "activity": "tech"
+  },
+  {
+    "id": "nin",
+    "group": "nin",
+    "activity": "tech"
+  },
+  {
+    "id": "katon",
+    "group": "nin",
+    "activity": "tech"
+  },
+  {
+    "id": "futon",
+    "group": "nin",
+    "activity": "tech"
+  },
+  {
+    "id": "raiton",
+    "group": "nin",
+    "activity": "tech"
+  },
+  {
+    "id": "doton",
+    "group": "nin",
+    "activity": "tech"
+  },
+  {
+    "id": "suiton",
+    "group": "nin",
+    "activity": "tech"
+  },
+  {
+    "id": "cc",
+    "group": "train",
+    "activity": "drill"
+  },
+  {
+    "id": "med",
+    "group": "train",
+    "activity": "insight"
+  },
+  {
+    "id": "ath",
+    "group": "train",
+    "activity": "course"
+  },
+  {
+    "id": "herb",
+    "group": "field",
+    "activity": "patch"
+  },
+  {
+    "id": "scout",
+    "group": "field",
+    "activity": "map"
+  },
+  {
+    "id": "prov",
+    "group": "craft",
+    "activity": "station"
+  },
+  {
+    "id": "alch",
+    "group": "craft",
+    "activity": "recipe"
+  },
+  {
+    "id": "vit",
+    "group": "combat",
+    "activity": "none"
+  },
+  {
+    "id": "eva",
+    "group": "combat",
+    "activity": "none"
+  }
+]

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "core:forest",
+    "scout": 1,
+    "cells": [
+      "core:okolytsi_sela",
+      "core:rysovi_polia",
+      "core:zharyshche_skladu",
+      "core:uzlissia",
+      "core:polihon_44_lis_smerti",
+      "core:prykordonnyi_lis_okolytsia",
+      "core:prykordonnyi_lis_khashchi",
+      "core:prykordonnyi_lis_brid",
+      "core:skelia_nad_vodospadom",
+      "core:ternovi_zarosti",
+      "core:lisove_ozero",
+      "core:staryi_trakt"
+    ]
+  },
+  {
+    "id": "core:plains",
+    "scout": 10,
+    "cells": [
+      "core:pivdennyi_trakt",
+      "core:mistechko_na_rivnynakh",
+      "core:khram_vohniu",
+      "core:karavannyi_shliakh",
+      "core:tabir_naimantsiv",
+      "core:sukhe_richyshche",
+      "core:ruiny_prykordonnoi_fortetsi",
+      "core:skhovyshche_fortetsi",
+      "core:soliani_kopalni",
+      "core:stepovi_zarosti",
+      "core:kamiani_pahorby",
+      "core:pokynutyi_khutir"
+    ]
+  },
+  {
+    "id": "core:valley",
+    "scout": 20,
+    "cells": [
+      "core:pivnichnyi_trakt",
+      "core:statui_zasnovnykiv",
+      "core:bereh_riky",
+      "core:stezhka_myslyvtsia",
+      "core:skhovok_pid_vodospadom",
+      "core:sviate_mistse_bilia_vodospadu",
+      "core:tumannyi_iar",
+      "core:kamiani_ustupy",
+      "core:zavalena_pechera",
+      "core:stare_pole_boiu",
+      "core:prykordonna_zastava",
+      "core:verkhivia_riky"
+    ]
+  }
+]

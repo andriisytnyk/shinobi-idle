@@ -1,0 +1,96 @@
+[
+  {
+    "id": "core:trenuvalni_manekeny",
+    "skill": "tai",
+    "tiers": [
+      {
+        "tier": "I",
+        "level": 10,
+        "building": null
+      },
+      {
+        "tier": "II",
+        "level": 30,
+        "building": null
+      },
+      {
+        "tier": "III",
+        "level": 50,
+        "building": {
+          "id": "core:forge",
+          "level": 4
+        }
+      }
+    ]
+  },
+  {
+    "id": "core:serp_i_rukavytsi_travnyka",
+    "skill": "herb",
+    "tiers": [
+      {
+        "tier": "I",
+        "level": 1,
+        "building": null
+      },
+      {
+        "tier": "II",
+        "level": 30,
+        "building": null
+      }
+    ]
+  },
+  {
+    "id": "core:perehinnyi_kub",
+    "skill": "alch",
+    "tiers": [
+      {
+        "tier": "I",
+        "level": 20,
+        "building": null
+      },
+      {
+        "tier": "II",
+        "level": 50,
+        "building": {
+          "id": "core:lab",
+          "level": 3
+        }
+      }
+    ]
+  },
+  {
+    "id": "core:stantsii_proviantu",
+    "skill": "prov",
+    "tiers": [
+      {
+        "tier": "I",
+        "level": 1,
+        "building": null
+      },
+      {
+        "tier": "II",
+        "level": 30,
+        "building": {
+          "id": "core:forge",
+          "level": 4
+        }
+      }
+    ]
+  },
+  {
+    "id": "core:karty_i_kompas",
+    "skill": "scout",
+    "tiers": [
+      {
+        "tier": "I",
+        "level": 10,
+        "building": null
+      },
+      {
+        "tier": "II",
+        "level": 40,
+        "building": null
+      }
+    ]
+  }
+]
