@@ -1,10 +1,13 @@
 import type { ContentDb, NatureId, SkillId } from '@shinobi/content';
+import type { GameEvent } from './events.ts';
 import { createStreams, type RngStreams } from './rng.ts';
+import { refreshUnlocks } from './unlocks.ts';
 
 export type Rank = 'student' | 'genin' | 'chunin';
 
 export interface ActionSlot {
   action: { kind: string; id: string } | null;
+  /** Ms of full-speed work done on the current cycle. */
   progress: number;
   /** Share of the player's speed this slot gets. */
   share: number;
@@ -31,9 +34,12 @@ export interface GameState {
   known: Record<string, true>;
   slots: ActionSlot[];
   flags: Record<string, true | number>;
+  stats: { /** Action cycles completed over the whole game. */ completed: number };
+  /** One-off notices for the UI, newest last. The UI drains it; it is never saved. */
+  events: GameEvent[];
 }
 
-export const STATE_VERSION = 1;
+export const STATE_VERSION = 2;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
@@ -43,7 +49,7 @@ export function createState(seed: number, content: ContentDb): GameState {
     skills[skill.id] = { xp: 0 };
     pools[skill.id] = { xp: 0 };
   }
-  return {
+  const state: GameState = {
     v: STATE_VERSION,
     now: 0,
     rng: createStreams(seed),
@@ -56,5 +62,9 @@ export function createState(seed: number, content: ContentDb): GameState {
     known: {},
     slots: [{ action: null, progress: 0, share: 1 }],
     flags: {},
+    stats: { completed: 0 },
+    events: [],
   };
+  refreshUnlocks(state, content, true);
+  return state;
 }

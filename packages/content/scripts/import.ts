@@ -20,6 +20,7 @@ import {
   type TagId,
   type TraitId,
 } from '../src/constants.ts';
+import { BALANCE_EXT } from '../src/balance-ext.ts';
 import { localeKey, type LocaleKind } from '../src/keys.ts';
 import {
   balanceParamsSchema,
@@ -191,6 +192,7 @@ const techniques: Technique[] = slice.techniques.map((t) => {
     tags: t.tags.map(tag),
     state: t.state === '' ? null : need(STATE_BY_UK[t.state], `unknown state "${t.state}"`),
     src: t.src as Technique['src'],
+    mentor: t.src === 'N' ? (t.home === 'Академія' ? 'academy' : 'other') : null,
     sealSeq: t.sealSeq.map(core),
     sealsCanon: t.sealsCanon,
     tier: t.tier as Technique['tier'],
@@ -512,6 +514,7 @@ const roleKeys = new Map(Object.entries(ROLE_BY_UK));
 const rawParams = bal.params;
 const rawRole = rawParams.role as Record<string, unknown>;
 const params = balanceParamsSchema.parse({
+  ...BALANCE_EXT,
   ...rawParams,
   role: Object.fromEntries(
     Object.entries(rawRole).map(([uk, v]) => [need(roleKeys.get(uk), `balance role "${uk}"`), v]),

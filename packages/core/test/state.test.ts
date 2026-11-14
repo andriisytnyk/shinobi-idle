@@ -1,6 +1,6 @@
 import { content, SKILL_IDS } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
-import { advance, createState, dispatch } from '../src/index.ts';
+import { createState } from '../src/index.ts';
 
 describe('createState', () => {
   const state = createState(123, content);
@@ -12,6 +12,11 @@ describe('createState', () => {
     expect(state.slots).toEqual([{ action: null, progress: 0, share: 1 }]);
   });
 
+  it('starts with an empty event queue and no completed cycles', () => {
+    expect(state.events).toEqual([]);
+    expect(state.stats).toEqual({ completed: 0 });
+  });
+
   it('survives a JSON round trip unchanged', () => {
     expect(JSON.parse(JSON.stringify(state))).toEqual(state);
   });
@@ -19,29 +24,5 @@ describe('createState', () => {
   it('is deterministic for a seed', () => {
     expect(createState(123, content)).toEqual(state);
     expect(createState(124, content)).not.toEqual(state);
-  });
-});
-
-describe('engine stubs', () => {
-  it('advance moves only the clock', () => {
-    const state = createState(1, content);
-    const before = JSON.parse(JSON.stringify(state));
-    advance(state, 1500, content);
-    expect(state.now).toBe(1500);
-    expect({ ...state, now: 0 }).toEqual(before);
-  });
-
-  it('advance rejects fractional or negative time', () => {
-    const state = createState(1, content);
-    expect(() => advance(state, -1, content)).toThrow(RangeError);
-    expect(() => advance(state, 0.5, content)).toThrow(RangeError);
-  });
-
-  it('dispatch rejects every command as unknown', () => {
-    const state = createState(1, content);
-    expect(dispatch(state, { type: 'action.start' }, content)).toEqual({
-      ok: false,
-      reason: 'error.unknownCommand',
-    });
   });
 });

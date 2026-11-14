@@ -1,6 +1,11 @@
 {
   "app.title": "Shinobi Idle",
   "error.unknownCommand": "Невідома команда.",
+  "error.invalidSlot": "Такого слота дій немає.",
+  "error.unknownActionKind": "Невідомий вид дії.",
+  "error.unknownAction": "Такої дії немає.",
+  "error.requirementsNotMet": "Вимоги до цієї дії не виконано.",
+  "error.noAction": "У слоті немає дії.",
   "nav.skills": "Навички",
   "nav.missions": "Місії",
   "nav.combat": "Бій",

@@ -383,7 +383,11 @@
     "clone": {
       "pool": 1,
       "link": 0.1
-    }
+    },
+    "academyCap": 10,
+    "academySlow": 0.25,
+    "offlineCapHours": 12,
+    "masteryCap": 99
   },
   "pace": {
     "tai": [
