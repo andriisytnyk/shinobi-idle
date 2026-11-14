@@ -1,0 +1,7 @@
+node_modules
+dist
+docs
+pnpm-lock.yaml
+packages/content/src/data/generated
+packages/content/src/locales
+*.md
