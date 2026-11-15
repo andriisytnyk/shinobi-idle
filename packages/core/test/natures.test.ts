@@ -251,7 +251,6 @@ describe('A3: locks, the native bonus and the non-native cast', () => {
 
   // Needs `techniqueFigures` (combat/numbers.ts, not touched by this task) to pass `snap.natures` on:
   //   techniqueCastSeconds(seals, mastery, content, nonNativeLevel(tech.skill, snap.natures ?? [], skillLvl))
-  it.todo('stretches the cast of a non-native technique in a fight snapshot the same way');
 
   it('runs a non-native practice slower in play too', () => {
     const cycles = (natures: NatureId[]) => {
