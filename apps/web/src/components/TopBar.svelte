@@ -101,6 +101,10 @@
         <option>{t('lang.uk')}</option>
       </select>
     </label>
+    <a class="meta-toggle shop-link" href="#/bank" data-bank-link>
+      <Icon name="lucide:package" size={18} />
+      <span>{t('nav.bank')}</span>
+    </a>
     <a class="meta-toggle shop-link" href="#/shop" data-shop-link>
       <Icon name="lucide:store" size={18} />
       <span>{t('nav.shop')}</span>
@@ -285,6 +289,21 @@
     .lang,
     .more-link {
       display: none;
+    }
+
+    /* The shop and bank links keep only their icons, so the brand and the tools share one row. */
+    .shop-link {
+      justify-content: center;
+      min-width: 2.75rem;
+    }
+
+    .shop-link span {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
 
     /* Icons stay, labels remain available to screen readers. */

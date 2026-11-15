@@ -16,6 +16,11 @@ describe('router', () => {
     expect(parseHash('#/skills')).toEqual({ page: 'skills' });
     expect(parseHash('#/missions')).toEqual({ page: 'tab', tab: 'missions' });
     expect(parseHash('#/credits')).toEqual({ page: 'credits' });
+    expect(parseHash('#/world')).toEqual({ page: 'world' });
+    expect(parseHash('#/poi/core:poi_x')).toEqual({
+      page: 'entity',
+      ref: { kind: 'poi', id: 'core:poi_x' },
+    });
     expect(parseHash('#/settings')).toEqual({ page: 'settings' });
     expect(parseHash('#/exercise/core:x')).toEqual({
       page: 'entity',
