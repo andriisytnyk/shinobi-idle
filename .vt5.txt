@@ -96,3 +96,36 @@
 [90mstdout[2m | test/ui-testmod-app.test.ts[2m > [22m[2mthe observer costs little (A13)[2m > [22m[2mthe observer adds at most 20% to 200 store updates on the skill page
 [22m[39mobserver: 2030.6 ms without, 2112.2 ms with
 
+[90mstdout[2m | test/ui-testmod-app.test.ts[2m > [22m[2mthe observer costs little (A13)[2m > [22m[2mthe whole fixture, with its own computing, stays within +50% (it recounts XP rates on every update)
+[22m[39mfixture: 2059.5 ms without, 2633.3 ms with
+
+ [32m✓[39m test/ui-testmod-app.test.ts [2m([22m[2m24 tests[22m[2m)[22m[33m 112457[2mms[22m[39m
+   [33m[2m✓[22m[39m the testmod pack: widgets, page, nav, link, setting (A3)[2m > [22mshows the three figures on the skill page and they follow the game [33m 484[2mms[22m[39m
+   [33m[2m✓[22m[39m injection by selector (D12)[2m > [22mruns the cleanups when the elements go away: no nodes, subscriptions or observers left [33m 333[2mms[22m[39m
+   [33m[2m✓[22m[39m the observer costs little (A13)[2m > [22mthe observer adds at most 20% to 200 store updates on the skill page [33m 52999[2mms[22m[39m
+   [33m[2m✓[22m[39m the observer costs little (A13)[2m > [22mthe whole fixture, with its own computing, stays within +50% (it recounts XP rates on every update) [33m 56852[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m test/missions.test.ts[2m > [22mthe mission page[2m > [22mshows the totals of the forecast and the length of each stage
+[31m[1mAssertionError[22m: expected NaN to be close to 1493.9493772599435, received difference is NaN, but expected 5e-7[39m
+[36m [2m❯[22m test/missions.test.ts:[2m382:60[22m[39m
+    [90m380| [39m      [34m10[39m[33m,[39m
+    [90m381| [39m    )[33m;[39m
+    [90m382| [39m    expect(Number(q('[data-total="ryo"]')?.dataset.value)).toBeCloseTo…
+    [90m   | [39m                                                           [31m^[39m
+    [90m383| [39m    expect(Number(q('[data-total="rep"]')?.dataset.value)).toBeCloseTo…
+    [90m384| [39m    [35mfor[39m ([35mconst[39m stage [35mof[39m forecast[33m.[39mstages) {
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m36 passed[39m[22m[90m (37)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1372 passed[39m[22m[90m (1373)[39m
+[2m   Start at [22m 20:40:03
+[2m   Duration [22m 119.23s[2m (transform 12.14s, setup 0ms, collect 111.45s, tests 173.84s, environment 15.38s, prepare 5.02s)[22m
+
+D:\Work\ShinobiIdle\.claude\worktrees\agent-a6d79eba375081c89\apps\web:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @shinobi/web@0.0.0 test: `vitest run`
+Exit status 1
+finished
