@@ -586,9 +586,11 @@ export function stageViews(
           result,
           techMet,
           met:
-            alt.intel > 0 ? state.currencies.intel >= alt.intel : (result?.met ?? false) && techMet,
+            alt.intel > 0
+              ? (state.currencies.intel ?? 0) >= alt.intel
+              : (result?.met ?? false) && techMet,
           used: i === used,
-          have: alt.intel > 0 ? state.currencies.intel : 0,
+          have: alt.intel > 0 ? (state.currencies.intel ?? 0) : 0,
         };
       }),
       takes: stageTakes(state, mission, stage.index),
@@ -658,7 +660,7 @@ export function pinTarget(blocker: ReqResult | null): CoreEntityRef | null {
  * bought item), not on a timer. Slots are not in it: whether a slot is free is read live.
  */
 export function inputsSignature(state: GameState, content: ContentDb): string {
-  const parts: (string | number)[] = [state.player.rank, state.currencies.intel];
+  const parts: (string | number)[] = [state.player.rank, state.currencies.intel ?? 0];
   for (const skill of content.skills) parts.push(skillLevel(state, skill.id, content));
   for (const id of Object.keys(state.known)) parts.push(masteryLevel(state, id, content));
   parts.push(state.player.natures.join(','), JSON.stringify(state.team));

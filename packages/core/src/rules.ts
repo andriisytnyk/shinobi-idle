@@ -3,8 +3,9 @@ import { guardAi, guardKind, guardProvider, tagOrigin } from './guard.ts';
 import { actionSystem, drillKind, practiceKind, type ActionKind } from './actions.ts';
 import { COURSE_KIND, courseKind, obstacleProvider } from './athletics.ts';
 import { defaultCombatAi } from './combat/fight-ai.ts';
-import { defaultFightHooks } from './combat/fight-hooks.ts';
-import type { CombatAi, FightRules } from './combat/fight-types.ts';
+import { engineFightHooks, validateHooks } from './combat/fight-hooks.ts';
+import type { CombatAi, FightHook, FightRules } from './combat/fight-types.ts';
+import { coreFightHooks } from './corepack/fight-hooks.ts';
 import { tonicProvider } from './buffs.ts';
 import { checkpointProvider } from './checkpoints.ts';
 import { fightKind, operationKind } from './combat/kind.ts';
@@ -34,6 +35,9 @@ export interface Rules extends FightRules {
   /** Decides what the player does whenever the fight needs a choice. */
   combatAi: CombatAi;
 }
+
+/** The fight hooks of the engine and of the pack `core`; another pack adds its own to a copy of the rules. */
+export const defaultFightHooks: readonly FightHook[] = [...engineFightHooks, ...coreFightHooks];
 
 /** A system under a name, so that a pack can wrap it. */
 const named = (id: string, system: System): System => ({ ...system, id });
@@ -187,7 +191,7 @@ export function composeRules(
         `the rules of the pack "${manifest.id}" failed: ${why}`,
       );
     }
-    if (!isRules(next)) {
+    if (!isRules(next) || !Array.isArray((next as Rules).fightHooks)) {
       throw new PackRulesError(
         manifest.id,
         `the rules of the pack "${manifest.id}" are not a rule set`,
@@ -195,6 +199,9 @@ export function composeRules(
     }
     rules = adopt(rules, next, manifest.id);
   }
+  // An entity that names a fight hook no pack registers is an error that names the pack of the entity.
+  const missing = validateHooks(content, rules)[0];
+  if (missing) throw new PackRulesError(missing.pack, missing.message);
   return rules;
 }
 
@@ -210,7 +217,54 @@ export class PackRulesError extends PackError {
  * What a pack's function made of the rules: every entry that is new or replaced is recorded as the
  * pack's and guarded (see `guard.ts`), so nothing a pack adds can stop or corrupt `advance`.
  */
+const isFn = (x: unknown): boolean => typeof x === 'function';
+const isObj = (x: unknown): x is Record<string, unknown> =>
+  typeof x === 'object' && x !== null && !Array.isArray(x);
+
+/**
+ * Checks the shape of everything a pack's function returned, family by family, and fails with the
+ * pack's name before anything of it is used: a wrong entry is the pack's mistake, never a crash.
+ */
+function checkShape(before: Rules, after: Rules, pack: string): void {
+  const bad = (what: string): never => {
+    throw new PackRulesError(pack, `the rules of the pack "${pack}" are not a rule set: ${what}`);
+  };
+  if (!Array.isArray(after.systems)) bad('systems is not a list');
+  after.systems.forEach((s, i) => {
+    const ok =
+      isObj(s) && isFn(s.nextEventIn) && isFn(s.run) && (s.elapse === undefined || isFn(s.elapse));
+    if (!ok) bad(`systems[${i}] is not a system`);
+  });
+  if (!isObj(after.actionKinds)) bad('actionKinds is not a record');
+  for (const [key, kind] of Object.entries(after.actionKinds)) {
+    const k = kind as unknown;
+    if (!isObj(k) || !['has', 'requirements', 'intervalMs', 'complete'].every((m) => isFn(k[m])))
+      bad(`actionKinds.${key} is not an action kind`);
+  }
+  if (!Array.isArray(after.modifierProviders)) bad('modifierProviders is not a list');
+  after.modifierProviders.forEach((p, i) => {
+    if (!isFn(p)) bad(`modifierProviders[${i}] is not a function`);
+  });
+  if (!isFn(after.combatAi)) bad('combatAi is not a function');
+  if (!Array.isArray(after.fightHooks)) bad('fightHooks is not a list');
+  const owners = new Map<string, unknown>();
+  for (const h of before.fightHooks) owners.set(h.id, h);
+  after.fightHooks.forEach((h, i) => {
+    const hook = h as unknown;
+    if (!isObj(hook) || typeof hook.id !== 'string' || hook.id === '')
+      return bad(`fightHooks[${i}] is not a fight hook`);
+    for (const [name, value] of Object.entries(hook)) {
+      if (name !== 'id' && !isFn(value)) bad(`fightHooks[${i}].${name} is not a function`);
+    }
+    // A pack may not register a hook under an id that another entry owns.
+    const have = owners.get(hook.id);
+    if (have !== undefined && have !== h) bad(`the fight hook "${hook.id}" is registered twice`);
+    owners.set(hook.id, h);
+  });
+}
+
 function adopt(before: Rules, after: Rules, pack: string): Rules {
+  checkShape(before, after, pack);
   const systems = after.systems.map((s) => (before.systems.includes(s) ? s : tagOrigin(s, pack)));
   const actionKinds: Record<string, ActionKind> = {};
   for (const [key, kind] of Object.entries(after.actionKinds)) {
@@ -225,5 +279,9 @@ function adopt(before: Rules, after: Rules, pack: string): Rules {
     after.combatAi === before.combatAi
       ? after.combatAi
       : guardAi(after.combatAi, pack, before.combatAi);
-  return { ...after, systems, actionKinds, modifierProviders, combatAi };
+  // A fight hook of a pack is recorded as the pack's: its failures are contained and name the pack (see `combat/fight-guard.ts`).
+  const fightHooks = after.fightHooks.map((h) =>
+    before.fightHooks.includes(h) ? h : tagOrigin(h, pack),
+  );
+  return { ...after, systems, actionKinds, modifierProviders, combatAi, fightHooks };
 }

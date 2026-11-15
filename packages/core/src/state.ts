@@ -49,13 +49,6 @@ export interface MeditationEntry {
   bought: Record<string, number>;
 }
 
-/** @deprecated The built-in currencies by name, for the fight code; read `currencyOf(content, role)` instead. */
-export interface LegacyCurrencies {
-  ryo: number;
-  rep: number;
-  intel: number;
-}
-
 /** A content pack that the game was played with: its id and the version of its manifest. */
 export interface PackRef {
   id: string;
@@ -103,7 +96,7 @@ export interface GameState {
    * the built-in pack are named in the type only so that the fight code, which still reads them by
    * name, compiles; the pack `core` is always present, so they are always there.
    */
-  currencies: Record<string, number> & LegacyCurrencies;
+  currencies: Record<string, number>;
   /** Unlocked techniques, recipes and so on. */
   known: Record<string, true>;
   slots: ActionSlot[];
@@ -161,8 +154,6 @@ export function createState(seed: number, content: ContentDb): GameState {
   }
   const currencies: Record<string, number> = {};
   for (const currency of content.currencies) currencies[currency.id] = 0;
-  // The pack core is always composed, so its currencies exist; see `LegacyCurrencies`.
-  const bridged = currencies as Record<string, number> & LegacyCurrencies;
   const state: GameState = {
     v: STATE_VERSION,
     packs: content.packs.map((p) => ({ id: p.id, version: p.version, since: 0 })),
@@ -175,7 +166,7 @@ export function createState(seed: number, content: ContentDb): GameState {
     mastery: {},
     pools,
     bank: {},
-    currencies: bridged,
+    currencies,
     known: {},
     slots: [{ action: null, progress: 0, share: SHARE_FULL, data: null }],
     flags: {},

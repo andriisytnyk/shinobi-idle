@@ -24,6 +24,7 @@ export function entryOf(content: ContentDb, id: string): Enemy | Boss | undefine
  * which `zoneBlocked` checks.
  */
 export function zoneRequirement(zone: Zone): Req | null {
+  // The content names a rank by an open string; the core's requirement still types it by its own list of ranks.
   return zone.unlock;
 }
 

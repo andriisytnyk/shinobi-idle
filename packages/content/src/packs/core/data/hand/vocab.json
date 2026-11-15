@@ -1,10 +1,20 @@
 {
   "skillGroups": [
-    { "id": "train" },
-    { "id": "nin" },
-    { "id": "field" },
-    { "id": "craft" },
-    { "id": "combat" }
+    {
+      "id": "train"
+    },
+    {
+      "id": "nin"
+    },
+    {
+      "id": "field"
+    },
+    {
+      "id": "craft"
+    },
+    {
+      "id": "combat"
+    }
   ],
   "natures": [
     {
@@ -44,96 +54,371 @@
     }
   ],
   "playerRanks": [
-    { "id": "student", "tier": 0, "academy": true },
-    { "id": "genin", "tier": 1 },
-    { "id": "chunin", "tier": 2 }
+    {
+      "id": "student",
+      "tier": 0,
+      "academy": true
+    },
+    {
+      "id": "genin",
+      "tier": 1
+    },
+    {
+      "id": "chunin",
+      "tier": 2
+    }
   ],
   "techRanks": [
-    { "id": "E" },
-    { "id": "D" },
-    { "id": "C" },
-    { "id": "B" },
-    { "id": "A" },
-    { "id": "S" }
+    {
+      "id": "E"
+    },
+    {
+      "id": "D"
+    },
+    {
+      "id": "C"
+    },
+    {
+      "id": "B"
+    },
+    {
+      "id": "A"
+    },
+    {
+      "id": "S"
+    }
   ],
-  "missionRanks": [{ "id": "D" }, { "id": "C" }, { "id": "V" }, { "id": "OP" }],
+  "missionRanks": [
+    {
+      "id": "D"
+    },
+    {
+      "id": "C"
+    },
+    {
+      "id": "V"
+    },
+    {
+      "id": "OP"
+    }
+  ],
   "villageStages": [
-    { "id": "stage1", "rep": null },
-    { "id": "stage2", "rep": "stage2" }
+    {
+      "id": "stage1",
+      "rep": null
+    },
+    {
+      "id": "stage2",
+      "rep": "stage2"
+    }
   ],
-  "states": [{ "id": "burn" }, { "id": "stun" }, { "id": "wet" }],
+  "states": [
+    {
+      "id": "burn"
+    },
+    {
+      "id": "stun"
+    },
+    {
+      "id": "wet"
+    }
+  ],
   "tags": [
-    { "id": "interrupt" },
-    { "id": "area" },
-    { "id": "guard" },
-    { "id": "reveal" },
-    { "id": "bind" },
-    { "id": "dot" },
-    { "id": "pierce" },
-    { "id": "cleanse" },
-    { "id": "dispel" }
+    {
+      "id": "interrupt",
+      "onHit": [
+        {
+          "op": "cancelCast"
+        }
+      ]
+    },
+    {
+      "id": "area",
+      "hitsAll": true,
+      "pouch": "sweep"
+    },
+    {
+      "id": "guard",
+      "guard": true
+    },
+    {
+      "id": "reveal",
+      "removes": ["hidden"]
+    },
+    {
+      "id": "bind",
+      "onHit": [
+        {
+          "op": "status",
+          "status": "bind",
+          "value": "bindEva"
+        }
+      ],
+      "onUse": [
+        {
+          "op": "status",
+          "status": "bind",
+          "value": "bindEva"
+        }
+      ],
+      "pouch": "snare"
+    },
+    {
+      "id": "dot",
+      "onUse": [
+        {
+          "op": "effect",
+          "id": "toolPoison",
+          "effects": [
+            {
+              "kind": "periodic",
+              "from": "maxHp",
+              "amount": "toolFx.dot.pct"
+            }
+          ],
+          "duration": "toolFx.dot.durS",
+          "suppresses": "regen",
+          "tally": false
+        }
+      ],
+      "pouch": "venom"
+    },
+    {
+      "id": "pierce",
+      "onHit": [
+        {
+          "op": "effect",
+          "id": "armorOff",
+          "effects": [
+            {
+              "kind": "modifier",
+              "stat": "damageTaken",
+              "op": "mul",
+              "value": 1
+            }
+          ],
+          "duration": "trait.armorOff",
+          "suppresses": "armor",
+          "tally": {
+            "as": "armorBreak",
+            "whenSuppressing": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "cleanse",
+      "removes": ["poison"]
+    },
+    {
+      "id": "dispel",
+      "removes": ["illusion"]
+    }
   ],
   "roles": [
-    { "id": "projectile" },
-    { "id": "series" },
-    { "id": "area" },
-    { "id": "control" },
-    { "id": "defense" },
-    { "id": "buff" },
-    { "id": "signature" },
-    { "id": "drill" }
+    {
+      "id": "projectile"
+    },
+    {
+      "id": "series"
+    },
+    {
+      "id": "area",
+      "hitsAll": true
+    },
+    {
+      "id": "control"
+    },
+    {
+      "id": "defense"
+    },
+    {
+      "id": "buff"
+    },
+    {
+      "id": "signature"
+    },
+    {
+      "id": "drill"
+    }
   ],
-  "attackStyles": [{ "id": "melee" }, { "id": "ranged" }],
+  "attackStyles": [
+    {
+      "id": "melee"
+    },
+    {
+      "id": "ranged"
+    }
+  ],
   "fightRegions": [
-    { "id": "academy" },
-    { "id": "forest" },
-    { "id": "plains" },
-    { "id": "valley" },
-    { "id": "exam" },
-    { "id": "mission" },
-    { "id": "boss" }
+    {
+      "id": "academy"
+    },
+    {
+      "id": "forest"
+    },
+    {
+      "id": "plains"
+    },
+    {
+      "id": "valley"
+    },
+    {
+      "id": "exam"
+    },
+    {
+      "id": "mission"
+    },
+    {
+      "id": "boss"
+    }
   ],
-  "itemKinds": [{ "id": "ingredient" }, { "id": "tool" }, { "id": "misc" }, { "id": "consumable" }],
+  "itemKinds": [
+    {
+      "id": "ingredient"
+    },
+    {
+      "id": "tool"
+    },
+    {
+      "id": "misc"
+    },
+    {
+      "id": "consumable"
+    }
+  ],
   "currencies": [
-    { "id": "ryo", "role": "money" },
-    { "id": "rep", "role": "renown" },
-    { "id": "intel", "role": "study" }
+    {
+      "id": "ryo",
+      "role": "money"
+    },
+    {
+      "id": "rep",
+      "role": "renown"
+    },
+    {
+      "id": "intel",
+      "role": "study"
+    }
   ],
   "entityKinds": [
-    { "id": "skill", "list": "skills" },
-    { "id": "technique", "list": "techniques" },
-    { "id": "item", "list": "items" },
-    { "id": "recipe", "list": "recipes" },
-    { "id": "mission", "list": "missions" },
-    { "id": "enemy", "list": "enemies" },
-    { "id": "boss", "list": "bosses" },
-    { "id": "region", "list": "regions" },
-    { "id": "building", "list": "buildings" },
-    { "id": "gear", "list": "gear" },
-    { "id": "seal", "list": "seals" },
-    { "id": "exercise", "list": "exercises" },
-    { "id": "practice", "list": "practices" },
-    { "id": "obstacle", "list": "obstacles" },
-    { "id": "status", "list": "statuses" },
-    { "id": "trait", "list": "traits" },
-    { "id": "quest", "list": "quests" },
-    { "id": "exam", "list": "exams" },
-    { "id": "cell", "list": "cells" },
-    { "id": "poi", "list": null },
-    { "id": "combo", "list": "combos" }
+    {
+      "id": "skill",
+      "list": "skills"
+    },
+    {
+      "id": "technique",
+      "list": "techniques"
+    },
+    {
+      "id": "item",
+      "list": "items"
+    },
+    {
+      "id": "recipe",
+      "list": "recipes"
+    },
+    {
+      "id": "mission",
+      "list": "missions"
+    },
+    {
+      "id": "enemy",
+      "list": "enemies"
+    },
+    {
+      "id": "boss",
+      "list": "bosses"
+    },
+    {
+      "id": "region",
+      "list": "regions"
+    },
+    {
+      "id": "building",
+      "list": "buildings"
+    },
+    {
+      "id": "gear",
+      "list": "gear"
+    },
+    {
+      "id": "seal",
+      "list": "seals"
+    },
+    {
+      "id": "exercise",
+      "list": "exercises"
+    },
+    {
+      "id": "practice",
+      "list": "practices"
+    },
+    {
+      "id": "obstacle",
+      "list": "obstacles"
+    },
+    {
+      "id": "status",
+      "list": "statuses"
+    },
+    {
+      "id": "trait",
+      "list": "traits"
+    },
+    {
+      "id": "quest",
+      "list": "quests"
+    },
+    {
+      "id": "exam",
+      "list": "exams"
+    },
+    {
+      "id": "cell",
+      "list": "cells"
+    },
+    {
+      "id": "poi",
+      "list": null
+    },
+    {
+      "id": "combo",
+      "list": "combos"
+    }
   ],
   "trophies": [
-    { "id": "band" },
-    { "id": "pelt" },
-    { "id": "fang" },
-    { "id": "coin" },
-    { "id": "gem" }
+    {
+      "id": "band"
+    },
+    {
+      "id": "pelt"
+    },
+    {
+      "id": "fang"
+    },
+    {
+      "id": "coin"
+    },
+    {
+      "id": "gem"
+    }
   ],
   "gearFx": [
-    { "id": "mannequin" },
-    { "id": "sickle" },
-    { "id": "alembic" },
-    { "id": "stations" },
-    { "id": "maps" }
+    {
+      "id": "mannequin"
+    },
+    {
+      "id": "sickle"
+    },
+    {
+      "id": "alembic"
+    },
+    {
+      "id": "stations"
+    },
+    {
+      "id": "maps"
+    }
   ]
 }

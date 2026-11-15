@@ -1,5 +1,6 @@
 import type { Boss, ContentDb, Enemy } from '@shinobi/content';
 import { hasCurrency, removeCurrency } from '../bank.ts';
+import { currencyFor } from './currency.ts';
 import type { CommandResult } from '../engine.ts';
 import { emit } from '../events.ts';
 import { indexOf } from '../lookup.ts';
@@ -186,7 +187,8 @@ export function studyEnemy(state: GameState, id: string, content: ContentDb): Co
     return { ok: false, reason: 'error.notDiscovered' };
   }
   const cost = studyCost(content);
-  if (!hasCurrency(state, 'intel', cost) || !removeCurrency(state, 'intel', cost)) {
+  const intel = currencyFor(content, 'study');
+  if (!hasCurrency(state, intel, cost) || !removeCurrency(state, intel, cost)) {
     return { ok: false, reason: 'error.notEnoughIntel' };
   }
   const b = entryFor(state, id);
@@ -237,7 +239,7 @@ export function bingoView(state: GameState, id: string, content: ContentDb): Bin
     canStudy:
       level < BINGO_MAX &&
       level !== BOUGHT_GAP &&
-      state.currencies.intel >= cost &&
+      hasCurrency(state, currencyFor(content, 'study'), cost) &&
       (level > 0 || canScout(state, id, content)),
     traits: reveal.traits ? entry.traits.filter((t) => visible.includes(t)) : [],
     hiddenTraits: reveal.hiddenTraits ? entry.traits.filter((t) => !visible.includes(t)) : null,

@@ -1,4 +1,5 @@
-import type { ContentDb } from '@shinobi/content';
+import { FIRST_FIGHT_FLAG, type ContentDb } from '@shinobi/content';
+import { fightData } from './fight-data.ts';
 import type { ActionKind } from '../actions.ts';
 import { MS_PER_HOUR, rate } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
@@ -16,9 +17,11 @@ function payTick(state: GameState, fallback: string, content: ContentDb, rules: 
   if (!entry) return;
   const K = content.balance.K;
   const perTick = (rate(entry.cl, content) * K.combat.xpTickMs) / MS_PER_HOUR;
-  gainXp(state, state.combat?.style ?? 'tai', K.combatXp.style * perTick, content, rules);
-  gainXp(state, 'vit', K.combatXp.vit * perTick, content, rules);
-  gainXp(state, 'eva', K.combatXp.eva * perTick, content, rules);
+  // `style` is the skill of the technique last used (a basic attack's style before any); every other key is a skill.
+  for (const [key, mult] of Object.entries(K.combatXp)) {
+    const skill = key === 'style' ? (state.combat?.style ?? fightData(content).basicSkill) : key;
+    if (skill) gainXp(state, skill, mult * perTick, content, rules);
+  }
 }
 
 /**
@@ -54,7 +57,7 @@ export const fightKind: ActionKind = {
     refillPouch(state, content);
     state.combat = newCombat(state, target.enemy, content, rules, slot);
     // The first fight opens Vitality and Evasion, whose skills train only in combat.
-    state.flags.firstFight = true;
+    state.flags[FIRST_FIGHT_FLAG] = true;
   },
 
   stop(state, slot) {
@@ -85,7 +88,7 @@ export const operationKind: ActionKind = {
     ensurePouch(state, content);
     refillPouch(state, content);
     state.combat = newOperation(state, op, content, rules, slot);
-    state.flags.firstFight = true;
+    state.flags[FIRST_FIGHT_FLAG] = true;
   },
 
   stop(state, slot) {

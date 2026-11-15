@@ -32,7 +32,7 @@
         next: next ? { tier: next.tier } : null,
         price: nextTierPrice(gs, line, content),
         req: req ? evalReq(gs, req, content) : null,
-        ryo: gs.currencies.ryo,
+        ryo: gs.currencies.ryo ?? 0,
       };
     }),
   );

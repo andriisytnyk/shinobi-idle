@@ -19,7 +19,7 @@
 
   let { section }: Props = $props();
 
-  const ryo = $derived(game.read((gs) => gs.currencies.ryo));
+  const ryo = $derived(game.read((gs) => gs.currencies.ryo ?? 0));
   const goods = $derived(
     game.read((gs) =>
       shopEntries(content).flatMap((entry) => {

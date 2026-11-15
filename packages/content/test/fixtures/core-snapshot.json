@@ -43,20 +43,20 @@
       "wet": "defd047fd6a2"
     },
     "tags": {
-      "interrupt": "5e30f660ecaf",
-      "area": "1b44eae0eac1",
-      "guard": "5c9c7f50ca27",
-      "reveal": "b52e505608fc",
-      "bind": "5ad1ff581b0a",
-      "dot": "31b787083211",
-      "pierce": "b558e0fe517d",
-      "cleanse": "19d9ec7f9aa8",
-      "dispel": "32d810cad56f"
+      "interrupt": "608146ec7a1c",
+      "area": "af3755e51300",
+      "guard": "d19ecf02dc46",
+      "reveal": "6af2b77eb699",
+      "bind": "753e9230c8d3",
+      "dot": "8cdf78a1d5a4",
+      "pierce": "b61dcef5d9a9",
+      "cleanse": "6463fa80887c",
+      "dispel": "550f09ba1a20"
     },
     "roles": {
       "projectile": "de66d1e406c4",
       "series": "d0dbb2e80e50",
-      "area": "1b44eae0eac1",
+      "area": "a89f76b0b4d7",
       "control": "37515f2d68e1",
       "defense": "77e6c433fd86",
       "buff": "0f136a112097",
@@ -125,7 +125,7 @@
       "maps": "3d5d6de0a0ae"
     },
     "skills": {
-      "tai": "f3ab5bee5030",
+      "tai": "d6b7882abcda",
       "nin": "60e2c8aabb75",
       "katon": "6c8c64db4e0c",
       "futon": "aaa06d5b3ba3",
@@ -364,7 +364,7 @@
       "core:tsiliushcha_maz": "3b31c5d23a2e",
       "core:paralitychna_otruta": "2c068518a91c",
       "core:dymova_bomba": "4a12162d6180",
-      "core:sonnyi_poroshok": "80f5f04f1e10",
+      "core:sonnyi_poroshok": "e4ae0853a8e4",
       "core:krovospynna_maz": "ce4604c43784",
       "core:slozohinna_bomba": "bafb0c95db2b",
       "core:hirska_maz": "cf1168661d01",
@@ -564,14 +564,14 @@
       "core:foreign_genin": "e9aebbfaaaca"
     },
     "bosses": {
-      "core:boss_wolf": "78e97034e421",
-      "core:boss_ren1": "85d36f9daf05",
-      "core:boss_fighter": "1f29f1698dd4",
-      "core:boss_hunter": "7d4310f6fc22",
-      "core:boss_twins": "c12077b1615d",
-      "core:boss_mist": "ac2b182cd048",
-      "core:boss_nameless": "6d7435e733b0",
-      "core:boss_ren2": "9c2a54794abb"
+      "core:boss_wolf": "e277790f5b3e",
+      "core:boss_ren1": "0c8684a461c7",
+      "core:boss_fighter": "b9e4ed17349f",
+      "core:boss_hunter": "7ad1dcfe2c3d",
+      "core:boss_twins": "0f8d3fbef7d9",
+      "core:boss_mist": "c9a062dbb728",
+      "core:boss_nameless": "00ee5672c182",
+      "core:boss_ren2": "4fdf3eb38a57"
     },
     "buildings": {
       "core:tower": "a09f68debf19",
@@ -657,27 +657,27 @@
       "core:op_forest_of_death": "9781d1996b59"
     },
     "statuses": {
-      "burn": "fc4bc580c0b7",
-      "wet": "defd047fd6a2",
-      "stun": "c3ca1fc7f4ad",
-      "bind": "5ad1ff581b0a",
-      "poison": "b84b47dee016"
+      "burn": "50e04d0420d7",
+      "wet": "7c7effd3721c",
+      "stun": "d03e1b736068",
+      "bind": "ffd6aa55e99a",
+      "poison": "12772fb0ef6b"
     },
     "traits": {
-      "armor": "d817c335f8c8",
-      "caster": "0ac5db6328fb",
-      "pack": "4ab301005f83",
-      "evasive": "f8a3c629e46b",
-      "regen": "2cad22ef7be9",
-      "illusionist": "94333683e2f9",
-      "hidden": "74e85ea294eb",
-      "poisoner": "50e62a963e7e"
+      "armor": "3c9833026e2f",
+      "caster": "f183e0f5a949",
+      "pack": "8c8a46d4f892",
+      "evasive": "4d3c7b7023c0",
+      "regen": "6c2913672578",
+      "illusionist": "86898e01a6e4",
+      "hidden": "61c7019b8206",
+      "poisoner": "1cbee3d52558"
     },
     "combos": {
-      "fanBurn": "430a09ec2a90",
-      "shockWet": "6a4b8305316d",
-      "mudEva": "64330afd1e84",
-      "steam": "3952b787e6cc"
+      "fanBurn": "75a90c5d6cd3",
+      "shockWet": "93da2b7b0716",
+      "mudEva": "b03d24af663f",
+      "steam": "0094cbf559e3"
     },
     "ai": {
       "ai": "0d0acb16d9aa"
@@ -835,7 +835,10 @@
     "K.bossFx.illusion.fleeAtHp": 0.3,
     "K.bossFx.illusion.hp": 1.25,
     "K.bossFx.illusion.dmg": 1.25,
-    "K.ryoDrop": [5, 8],
+    "K.ryoDrop": [
+      5,
+      8
+    ],
     "K.dropChance.band": 0.25,
     "K.dropChance.pelt": 0.4,
     "K.dropChance.fang": 0.3,
@@ -854,10 +857,16 @@
     "K.hpPerVit": 8,
     "K.chakraBase": 120,
     "K.chakraPerMed": 0.005,
-    "K.chakraRegen": [0.6, 0.02],
+    "K.chakraRegen": [
+      0.6,
+      0.02
+    ],
     "K.staminaBase": 100,
     "K.staminaPerAth": 0.01,
-    "K.staminaRegen": [1, 0.02],
+    "K.staminaRegen": [
+      1,
+      0.02
+    ],
     "K.accBase": 40,
     "K.accPerLevel": 5,
     "K.evaBase": 30,
@@ -865,21 +874,45 @@
     "K.hitMin": 0.05,
     "K.hitMax": 0.95,
     "K.basicInterval": 2.4,
-    "K.basicDmg": [8, 0.45],
+    "K.basicDmg": [
+      8,
+      0.45
+    ],
     "K.dodgeStamina": 2,
     "K.ccCostPerLevel": 0.0015,
     "K.pillAction": 0.5,
     "K.pouchStack": 4,
     "K.pillAt": 0.45,
     "K.food": [
-      [1, 30],
-      [5, 40],
-      [20, 50],
-      [30, 80],
-      [35, 100],
-      [45, 120]
+      [
+        1,
+        30
+      ],
+      [
+        5,
+        40
+      ],
+      [
+        20,
+        50
+      ],
+      [
+        30,
+        80
+      ],
+      [
+        35,
+        100
+      ],
+      [
+        45,
+        120
+      ]
     ],
-    "K.toolTag": [8, 0.4],
+    "K.toolTag": [
+      8,
+      0.4
+    ],
     "K.zoneHpRegen": 0.8,
     "K.opRegen": 0.25,
     "K.respawn": 3,
@@ -887,11 +920,23 @@
     "K.wound.max": 4,
     "K.wound.healMin": 10,
     "K.wound.healFloorMin": 2.5,
-    "K.eHp": [20, 9.8],
-    "K.eDmg": [4, 0.45],
+    "K.eHp": [
+      20,
+      9.8
+    ],
+    "K.eDmg": [
+      4,
+      0.45
+    ],
     "K.eInterval": 2.6,
-    "K.eAcc": [40, 4.5],
-    "K.eEva": [30, 4.2],
+    "K.eAcc": [
+      40,
+      4.5
+    ],
+    "K.eEva": [
+      30,
+      4.2
+    ],
     "K.boss.hp": 3.2,
     "K.boss.dmg": 1.5,
     "K.pack.n": 3,
@@ -931,7 +976,11 @@
     "K.scroll.3": 900,
     "K.scroll.4": 1600,
     "K.scroll.5": 3500,
-    "K.gearTier": [300, 1500, 5000],
+    "K.gearTier": [
+      300,
+      1500,
+      5000
+    ],
     "K.obstacleBase": 150,
     "K.goods.water": 1,
     "K.goods.rice": 3,
@@ -948,7 +997,11 @@
     "K.goods.wiretrap": 20,
     "K.goods.tag": 30,
     "K.goods.medpouch": 2500,
-    "K.travel": [15, 30, 45],
+    "K.travel": [
+      15,
+      30,
+      45
+    ],
     "K.bounty.boss_wolf": 400,
     "K.bounty.boss_fighter": 900,
     "K.bounty.boss_hunter": 1500,
@@ -961,7 +1014,10 @@
     "K.rep.questFinal": 30,
     "K.intel.perCellLevel": 1,
     "K.intel.mail": 2,
-    "K.intel.track": [3, 5],
+    "K.intel.track": [
+      3,
+      5
+    ],
     "K.intel.caravanSkip": 1,
     "K.intel.bingoLevel": 2,
     "K.intel.writtenTestPerIntel": 0.1,
@@ -986,15 +1042,44 @@
     "K.village.lateShare": 0.5,
     "K.prod": 20,
     "K.costBase": 20,
-    "K.costMult": [1, 2.2, 4.8, 10.5, 23, 50],
+    "K.costMult": [
+      1,
+      2.2,
+      4.8,
+      10.5,
+      23,
+      50
+    ],
     "K.treasuryBase": 25,
-    "K.buildTicks": [1, 2, 3, 4, 5, 8],
+    "K.buildTicks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      8
+    ],
     "K.bureauIncome": 20,
-    "K.storeCap": [200, 200],
-    "K.shinobiCap": [30, 10],
+    "K.storeCap": [
+      200,
+      200
+    ],
+    "K.shinobiCap": [
+      30,
+      10
+    ],
     "K.shinobiT6": 30,
-    "K.towerStageMax": [3, 6],
-    "K.cellExplores": [24, 84, 156, 240, 360],
+    "K.towerStageMax": [
+      3,
+      6
+    ],
+    "K.cellExplores": [
+      24,
+      84,
+      156,
+      240,
+      360
+    ],
     "K.cellLevelStep": 10,
     "K.clone.pool": 1,
     "K.clone.link": 0.1,
@@ -1002,7 +1087,12 @@
     "K.academySlow": 0.25,
     "K.field.stockBase": 5,
     "K.field.regrowMs": 5000,
-    "K.craftRules.masteryTiers": [1, 20, 50, 90],
+    "K.craftRules.masteryTiers": [
+      1,
+      20,
+      50,
+      90
+    ],
     "K.craftRules.bonusPerTier": 0.25,
     "K.tonic.capMult": 2,
     "K.shop.craftSellFactor": 0.35,
@@ -1019,6 +1109,10 @@
     "K.combat.hitEven": 0.5,
     "K.combat.fightCapMs": 240000,
     "K.combat.maxEnemies": 8,
+    "K.combat.timerFires": 1000,
+    "K.combat.timerMinMs": 100,
+    "K.combat.hookEventsPerSec": 500,
+    "K.combat.hookStatMax": 10,
     "K.bindEva": 0.3,
     "K.loadout.slots.genin": 4,
     "K.loadout.slots.chunin": 5,
@@ -1035,80 +1129,6 @@
     "K.ai.geninReactionMs": 1000,
     "K.ai.guardBelow": 0.6,
     "K.woundHp": 0.1,
-    "K.operation.approachMs": 30000,
-    "K.operation.approachShort": 0.5,
-    "K.mission.perLevel": 0.01,
-    "K.mission.floor": 0.5,
-    "K.mission.masteryTime": 0.003,
-    "K.mission.slowAlt": 2,
-    "K.mission.minFactor": 0.2,
-    "K.mission.maxDefeats": 3,
-    "K.mission.defaultStyle": "tai",
-    "K.mission.fightSkills": ["vit", "eva"],
-    "K.mission.success.base": 0.9,
-    "K.mission.success.perLevel": 0.01,
-    "K.mission.success.perMastery": 0.002,
-    "K.mission.success.cap": 0.99,
-    "K.team.levelShare": 0.8,
-    "K.team.mastery": 10,
-    "K.team.support.everyMs": 9000,
-    "K.team.support.damage": 0.6,
-    "K.team.states.katon": "burn",
-    "K.team.states.suiton": "wet",
-    "K.team.states.raiton": "stun",
-    "K.team.states.futon": null,
-    "K.team.states.doton": null,
-    "K.crate.goods.core:oil": [2, 4],
-    "K.crate.goods.core:salt": [2, 4],
-    "K.crate.goods.core:spice": [1, 2],
-    "K.crate.gem.item": "core:gem",
-    "K.crate.gem.chance": 0.05,
-    "K.toolFx.dot.pct": 0.012,
-    "K.toolFx.dot.durS": 10,
-    "K.toolFx.resist": 0.6,
-    "K.illusionResist": 0.005,
-    "K.senseiTest.base": 300,
-    "K.senseiTest.perLevel": 0.01,
-    "K.senseiTest.floor": 120,
-    "K.natures.second": 20,
-    "K.natures.third": 40,
-    "K.natures.max": 3,
-    "K.natures.penaltyEnd": 50,
-    "K.offlineCapHours": 12,
-    "K.scouting.plainMaxLevel": 3,
-    "K.scouting.walkWithinMin": 10,
-    "K.scouting.walkBetweenMin": 30,
-    "K.scouting.athPerLevel": 0.001,
-    "K.scouting.athCap": 0.1,
-    "K.masteryCap": 99,
-    "K.meditation.insightChance": 0.05,
-    "K.meditation.enlightChance": 0.02,
-    "K.meditation.insightLevels": 8,
-    "K.meditation.enlightLevels": 5,
-    "K.meditation.insightGates": [1, 40, 80],
-    "K.meditation.enlightGates": [20, 60, 99],
-    "K.athletics.freeSlot": 1,
-    "K.athletics.pillarCount": 5,
-    "K.athletics.pillarXp": 0.05,
-    "pace.tai": [13, 29, 48, 72, 108],
-    "pace.nin": [11, 26, 46, 75, 112],
-    "pace.cc": [11, 26, 50, 80, 117],
-    "pace.med": [13, 33, 56, 86, 123],
-    "pace.ath": [13, 33, 56, 86, 123],
-    "pace.herb": [11, 26, 46, 69, 99],
-    "pace.scout": [13, 31, 53, 81, 115],
-    "pace.prov": [3, 7, 11, 19, 26],
-    "pace.alch": [3, 7, 11, 17, 25],
-    "pace.katon": [13, 33, 56, 80, 117],
-    "pace.futon": [13, 33, 56, 80, 117],
-    "pace.raiton": [13, 33, 56, 80, 134],
-    "pace.doton": [13, 33, 56, 80, 110],
-    "pace.suiton": [13, 33, 56, 86, 116],
-    "capHours": 24.1,
-    "milestones.genin": 1,
-    "milestones.clones": 5.1,
-    "milestones.chunin": 14.3,
-    "milestones.cap": 24.1,
     "K.bingo.studiedWins.enemy": 25,
     "K.bingo.studiedWins.boss": 3,
     "K.bingo.rareBelow": 0.05,
@@ -1133,22 +1153,274 @@
     "K.analysis.verdict.hopelessBelow": 0.1,
     "K.analysis.verdict.stableMedian": 0.8,
     "K.analysis.verdict.stableCollapse": 0.15,
-    "K.report.defeats": 5
+    "K.report.defeats": 5,
+    "K.operation.approachMs": 30000,
+    "K.operation.approachShort": 0.5,
+    "K.mission.perLevel": 0.01,
+    "K.mission.floor": 0.5,
+    "K.mission.masteryTime": 0.003,
+    "K.mission.slowAlt": 2,
+    "K.mission.minFactor": 0.2,
+    "K.mission.maxDefeats": 3,
+    "K.mission.defaultStyle": "tai",
+    "K.mission.fightSkills": [
+      "vit",
+      "eva"
+    ],
+    "K.mission.success.base": 0.9,
+    "K.mission.success.perLevel": 0.01,
+    "K.mission.success.perMastery": 0.002,
+    "K.mission.success.cap": 0.99,
+    "K.team.levelShare": 0.8,
+    "K.team.mastery": 10,
+    "K.team.support.everyMs": 9000,
+    "K.team.support.damage": 0.6,
+    "K.team.states.katon": "burn",
+    "K.team.states.suiton": "wet",
+    "K.team.states.raiton": "stun",
+    "K.team.states.futon": null,
+    "K.team.states.doton": null,
+    "K.crate.goods.core:oil": [
+      2,
+      4
+    ],
+    "K.crate.goods.core:salt": [
+      2,
+      4
+    ],
+    "K.crate.goods.core:spice": [
+      1,
+      2
+    ],
+    "K.crate.gem.item": "core:gem",
+    "K.crate.gem.chance": 0.05,
+    "K.toolFx.dot.pct": 0.012,
+    "K.toolFx.dot.durS": 10,
+    "K.toolFx.resist": 0.6,
+    "K.illusionResist": 0.005,
+    "K.senseiTest.base": 300,
+    "K.senseiTest.perLevel": 0.01,
+    "K.senseiTest.floor": 120,
+    "K.natures.second": 20,
+    "K.natures.third": 40,
+    "K.natures.max": 3,
+    "K.natures.penaltyEnd": 50,
+    "K.offlineCapHours": 12,
+    "K.scouting.plainMaxLevel": 3,
+    "K.scouting.walkWithinMin": 10,
+    "K.scouting.walkBetweenMin": 30,
+    "K.scouting.athPerLevel": 0.001,
+    "K.scouting.athCap": 0.1,
+    "K.masteryCap": 99,
+    "K.meditation.insightChance": 0.05,
+    "K.meditation.enlightChance": 0.02,
+    "K.meditation.insightLevels": 8,
+    "K.meditation.enlightLevels": 5,
+    "K.meditation.insightGates": [
+      1,
+      40,
+      80
+    ],
+    "K.meditation.enlightGates": [
+      20,
+      60,
+      99
+    ],
+    "K.athletics.freeSlot": 1,
+    "K.athletics.pillarCount": 5,
+    "K.athletics.pillarXp": 0.05,
+    "pace.tai": [
+      13,
+      29,
+      48,
+      72,
+      108
+    ],
+    "pace.nin": [
+      11,
+      26,
+      46,
+      75,
+      112
+    ],
+    "pace.cc": [
+      11,
+      26,
+      50,
+      80,
+      117
+    ],
+    "pace.med": [
+      13,
+      33,
+      56,
+      86,
+      123
+    ],
+    "pace.ath": [
+      13,
+      33,
+      56,
+      86,
+      123
+    ],
+    "pace.herb": [
+      11,
+      26,
+      46,
+      69,
+      99
+    ],
+    "pace.scout": [
+      13,
+      31,
+      53,
+      81,
+      115
+    ],
+    "pace.prov": [
+      3,
+      7,
+      11,
+      19,
+      26
+    ],
+    "pace.alch": [
+      3,
+      7,
+      11,
+      17,
+      25
+    ],
+    "pace.katon": [
+      13,
+      33,
+      56,
+      80,
+      117
+    ],
+    "pace.futon": [
+      13,
+      33,
+      56,
+      80,
+      117
+    ],
+    "pace.raiton": [
+      13,
+      33,
+      56,
+      80,
+      134
+    ],
+    "pace.doton": [
+      13,
+      33,
+      56,
+      80,
+      110
+    ],
+    "pace.suiton": [
+      13,
+      33,
+      56,
+      86,
+      116
+    ],
+    "capHours": 24.1,
+    "milestones.genin": 1,
+    "milestones.clones": 5.1,
+    "milestones.chunin": 14.3,
+    "milestones.cap": 24.1
   },
   "order": {
-    "skillGroups": ["train", "nin", "field", "craft", "combat"],
-    "natures": ["katon", "futon", "raiton", "doton", "suiton"],
-    "playerRanks": ["student", "genin", "chunin"],
-    "techRanks": ["E", "D", "C", "B", "A", "S"],
-    "missionRanks": ["D", "C", "V", "OP"],
-    "villageStages": ["stage1", "stage2"],
-    "states": ["burn", "stun", "wet"],
-    "tags": ["interrupt", "area", "guard", "reveal", "bind", "dot", "pierce", "cleanse", "dispel"],
-    "roles": ["projectile", "series", "area", "control", "defense", "buff", "signature", "drill"],
-    "attackStyles": ["melee", "ranged"],
-    "fightRegions": ["academy", "forest", "plains", "valley", "exam", "mission", "boss"],
-    "itemKinds": ["ingredient", "tool", "misc", "consumable"],
-    "currencies": ["ryo", "rep", "intel"],
+    "skillGroups": [
+      "train",
+      "nin",
+      "field",
+      "craft",
+      "combat"
+    ],
+    "natures": [
+      "katon",
+      "futon",
+      "raiton",
+      "doton",
+      "suiton"
+    ],
+    "playerRanks": [
+      "student",
+      "genin",
+      "chunin"
+    ],
+    "techRanks": [
+      "E",
+      "D",
+      "C",
+      "B",
+      "A",
+      "S"
+    ],
+    "missionRanks": [
+      "D",
+      "C",
+      "V",
+      "OP"
+    ],
+    "villageStages": [
+      "stage1",
+      "stage2"
+    ],
+    "states": [
+      "burn",
+      "stun",
+      "wet"
+    ],
+    "tags": [
+      "interrupt",
+      "area",
+      "guard",
+      "reveal",
+      "bind",
+      "dot",
+      "pierce",
+      "cleanse",
+      "dispel"
+    ],
+    "roles": [
+      "projectile",
+      "series",
+      "area",
+      "control",
+      "defense",
+      "buff",
+      "signature",
+      "drill"
+    ],
+    "attackStyles": [
+      "melee",
+      "ranged"
+    ],
+    "fightRegions": [
+      "academy",
+      "forest",
+      "plains",
+      "valley",
+      "exam",
+      "mission",
+      "boss"
+    ],
+    "itemKinds": [
+      "ingredient",
+      "tool",
+      "misc",
+      "consumable"
+    ],
+    "currencies": [
+      "ryo",
+      "rep",
+      "intel"
+    ],
     "entityKinds": [
       "skill",
       "technique",
@@ -1172,8 +1444,20 @@
       "poi",
       "combo"
     ],
-    "trophies": ["band", "pelt", "fang", "coin", "gem"],
-    "gearFx": ["mannequin", "sickle", "alembic", "stations", "maps"],
+    "trophies": [
+      "band",
+      "pelt",
+      "fang",
+      "coin",
+      "gem"
+    ],
+    "gearFx": [
+      "mannequin",
+      "sickle",
+      "alembic",
+      "stations",
+      "maps"
+    ],
     "skills": [
       "tai",
       "nin",
@@ -1481,7 +1765,10 @@
       "core:wiretrap",
       "core:tag"
     ],
-    "coat": ["core:nervova_otruta", "core:paralitychna_otruta"],
+    "coat": [
+      "core:nervova_otruta",
+      "core:paralitychna_otruta"
+    ],
     "recipes": [
       "core:antidote",
       "core:tsiliushcha_maz",
@@ -1530,8 +1817,15 @@
       "core:v_seal",
       "core:op_hideout"
     ],
-    "team": ["core:ren", "core:aya"],
-    "regions": ["core:forest", "core:plains", "core:valley"],
+    "team": [
+      "core:ren",
+      "core:aya"
+    ],
+    "regions": [
+      "core:forest",
+      "core:plains",
+      "core:valley"
+    ],
     "cells": [
       "core:okolytsi_sela",
       "core:rysovi_polia",
@@ -1570,7 +1864,13 @@
       "core:prykordonna_zastava",
       "core:verkhivia_riky"
     ],
-    "cellKeys": ["rock", "brush", "water", "mist", "rubble"],
+    "cellKeys": [
+      "rock",
+      "brush",
+      "water",
+      "mist",
+      "rubble"
+    ],
     "enemies": [
       "core:dummy",
       "core:bandit",
@@ -1646,8 +1946,13 @@
       "core:stantsii_proviantu",
       "core:karty_i_kompas"
     ],
-    "quests": ["core:graduation", "core:mission_board"],
-    "exams": ["core:genin_exam"],
+    "quests": [
+      "core:graduation",
+      "core:mission_board"
+    ],
+    "exams": [
+      "core:genin_exam"
+    ],
     "zones": [
       "core:zone_dummy",
       "core:zone_bandit",
@@ -1681,11 +1986,36 @@
       "core:zone_boss_nameless",
       "core:zone_boss_ren2"
     ],
-    "operations": ["core:op_hideout", "core:op_forest_of_death"],
-    "statuses": ["burn", "wet", "stun", "bind", "poison"],
-    "traits": ["armor", "caster", "pack", "evasive", "regen", "illusionist", "hidden", "poisoner"],
-    "combos": ["fanBurn", "shockWet", "mudEva", "steam"],
-    "ai": ["ai"]
+    "operations": [
+      "core:op_hideout",
+      "core:op_forest_of_death"
+    ],
+    "statuses": [
+      "burn",
+      "wet",
+      "stun",
+      "bind",
+      "poison"
+    ],
+    "traits": [
+      "armor",
+      "caster",
+      "pack",
+      "evasive",
+      "regen",
+      "illusionist",
+      "hidden",
+      "poisoner"
+    ],
+    "combos": [
+      "fanBurn",
+      "shockWet",
+      "mudEva",
+      "steam"
+    ],
+    "ai": [
+      "ai"
+    ]
   },
   "locales": {
     "uk": {
@@ -2845,6 +3175,20 @@
       "modal.close": "1455299dece6",
       "now.progress": "b6f7e9ea4d27",
       "now.more": "f1c589848463",
+      "now.phase.focus": "a9b7967a808a",
+      "now.phase.seal": "c21da65ba0df",
+      "now.phase.release": "2559e901abcb",
+      "now.doing.gather": "26b0d0a36851",
+      "now.doing.craft": "568312f1c8a9",
+      "now.doing.drill": "3e58ac0d0a6f",
+      "now.doing.meditate": "623cc7866d70",
+      "now.doing.course": "1f3eb1ba6bab",
+      "now.doing.explore": "81cd86c531d9",
+      "now.doing.walk": "f3e67912a710",
+      "now.doing.fight": "94d0402a7324",
+      "now.doing.mission": "aafff6f249d0",
+      "now.doing.exam": "d51ad1894982",
+      "now.phases": "50e37e374c37",
       "tile.level": "93cdc87ab57f",
       "tile.interval": "9f9f096b73c2",
       "tile.xph": "e09f86bbe91d",
@@ -3732,21 +4076,7 @@
       "mission.stage.fightXpWhere": "cd06d30c03ea",
       "mission.fightXpHour": "d6c314495d44",
       "mission.chain.perMission": "b4dc7f4b7c30",
-      "mission.chain.runs": "9c5dd52f161e",
-      "now.phase.focus": "a9b7967a808a",
-      "now.phase.seal": "c21da65ba0df",
-      "now.phase.release": "2559e901abcb",
-      "now.doing.gather": "26b0d0a36851",
-      "now.doing.craft": "568312f1c8a9",
-      "now.doing.drill": "3e58ac0d0a6f",
-      "now.doing.meditate": "623cc7866d70",
-      "now.doing.course": "1f3eb1ba6bab",
-      "now.doing.explore": "81cd86c531d9",
-      "now.doing.walk": "f3e67912a710",
-      "now.doing.fight": "94d0402a7324",
-      "now.doing.mission": "aafff6f249d0",
-      "now.doing.exam": "d51ad1894982",
-      "now.phases": "50e37e374c37"
+      "mission.chain.runs": "9c5dd52f161e"
     },
     "en": {
       "technique.core:body_flicker.name": "026242b01872",
@@ -3975,6 +4305,62 @@
       "core:tonik_stykhii": "potion-ball",
       "core:piliulia_vidnovlennia_chakry": "pill-drop"
     },
+    "exercise": {
+      "core:lystok_na_lobi": "maple-leaf",
+      "core:kunai_na_doloni": "plain-dagger",
+      "core:chakra_v_stopakh": "wingfoot",
+      "core:khodinnia_po_derevu": "tree-growth",
+      "core:pidiom_skeleiu_bez_ruk": "mountain-climbing",
+      "core:khodinnia_po_vodi": "echo-ripples",
+      "core:lopannia_vodianoi_kuli": "bubbles",
+      "core:lopannia_humovoi_kuli": "balloons"
+    },
+    "practice": {
+      "core:tykha_kimnata": "silence",
+      "core:medytatsiia_v_rusi": "footsteps",
+      "core:lisove_sviatylyshche": "temple-gate",
+      "core:bilia_vohnyshcha": "campfire",
+      "core:pid_vodospadom": "waterfall",
+      "core:sad_kameniv": "stone-stack"
+    },
+    "obstacle": {
+      "core:strybky_po_dakhakh": "jump-across",
+      "core:bih_navkolo_sela": "sprint",
+      "core:obtiazhuvachi": "weight",
+      "core:vidzhymannia_na_paltsiakh": "muscle-up",
+      "core:koloda_nad_prirvoiu": "cliff-crossing",
+      "core:ukhylennia_vid_kunaiv": "dodge",
+      "core:bih_po_derevakh": "tree-branch",
+      "core:lazinnia_po_skeli": "mountaintop",
+      "core:perehony_z_supernykom": "duel",
+      "core:strybky_cherez_stovpy": "ancient-columns",
+      "core:bih_po_vodi": "splashy-stream",
+      "core:plavannia_proty_techii": "swimfins"
+    },
+    "recipe": {
+      "core:antidote": "pestle-mortar",
+      "core:tsiliushcha_maz": "heart-bottle",
+      "core:paralitychna_otruta": "round-potion",
+      "core:dymova_bomba": "smoke-bomb",
+      "core:sonnyi_poroshok": "powder",
+      "core:krovospynna_maz": "bandage-roll",
+      "core:slozohinna_bomba": "stun-grenade",
+      "core:hirska_maz": "honey-jar",
+      "core:nervova_otruta": "potion-of-madness",
+      "core:niukhalna_sil": "spray",
+      "core:maz_vid_opikiv": "medicines",
+      "core:onihiri": "sushis",
+      "core:tonik_iasnoho_rozumu": "magic-potion",
+      "core:piliulia_viiskovoho_paika": "pill",
+      "core:sushenyi_paiok": "ham-shank",
+      "core:krovotvorna_piliulia": "medicine-pills",
+      "core:tonik_kontsentratsii": "standing-potion",
+      "core:bulion_ramenu": "bowl-spiral",
+      "core:chai_badorosti": "teapot",
+      "core:iakitori_shynobi": "steak",
+      "core:tonik_stykhii": "potion-ball",
+      "core:piliulia_vidnovlennia_chakry": "pill-drop"
+    },
     "status": {
       "burn": "burn",
       "wet": "splash",
@@ -4070,62 +4456,6 @@
       "core:perehinnyi_kub": "spiral-bottle",
       "core:stantsii_proviantu": "camp-cooking-pot",
       "core:karty_i_kompas": "compass"
-    },
-    "exercise": {
-      "core:lystok_na_lobi": "maple-leaf",
-      "core:kunai_na_doloni": "plain-dagger",
-      "core:chakra_v_stopakh": "wingfoot",
-      "core:khodinnia_po_derevu": "tree-growth",
-      "core:pidiom_skeleiu_bez_ruk": "mountain-climbing",
-      "core:khodinnia_po_vodi": "echo-ripples",
-      "core:lopannia_vodianoi_kuli": "bubbles",
-      "core:lopannia_humovoi_kuli": "balloons"
-    },
-    "practice": {
-      "core:tykha_kimnata": "silence",
-      "core:medytatsiia_v_rusi": "footsteps",
-      "core:lisove_sviatylyshche": "temple-gate",
-      "core:bilia_vohnyshcha": "campfire",
-      "core:pid_vodospadom": "waterfall",
-      "core:sad_kameniv": "stone-stack"
-    },
-    "obstacle": {
-      "core:strybky_po_dakhakh": "jump-across",
-      "core:bih_navkolo_sela": "sprint",
-      "core:obtiazhuvachi": "weight",
-      "core:vidzhymannia_na_paltsiakh": "muscle-up",
-      "core:koloda_nad_prirvoiu": "cliff-crossing",
-      "core:ukhylennia_vid_kunaiv": "dodge",
-      "core:bih_po_derevakh": "tree-branch",
-      "core:lazinnia_po_skeli": "mountaintop",
-      "core:perehony_z_supernykom": "duel",
-      "core:strybky_cherez_stovpy": "ancient-columns",
-      "core:bih_po_vodi": "splashy-stream",
-      "core:plavannia_proty_techii": "swimfins"
-    },
-    "recipe": {
-      "core:antidote": "pestle-mortar",
-      "core:tsiliushcha_maz": "heart-bottle",
-      "core:paralitychna_otruta": "round-potion",
-      "core:dymova_bomba": "smoke-bomb",
-      "core:sonnyi_poroshok": "powder",
-      "core:krovospynna_maz": "bandage-roll",
-      "core:slozohinna_bomba": "stun-grenade",
-      "core:hirska_maz": "honey-jar",
-      "core:nervova_otruta": "potion-of-madness",
-      "core:niukhalna_sil": "spray",
-      "core:maz_vid_opikiv": "medicines",
-      "core:onihiri": "sushis",
-      "core:tonik_iasnoho_rozumu": "magic-potion",
-      "core:piliulia_viiskovoho_paika": "pill",
-      "core:sushenyi_paiok": "ham-shank",
-      "core:krovotvorna_piliulia": "medicine-pills",
-      "core:tonik_kontsentratsii": "standing-potion",
-      "core:bulion_ramenu": "bowl-spiral",
-      "core:chai_badorosti": "teapot",
-      "core:iakitori_shynobi": "steak",
-      "core:tonik_stykhii": "potion-ball",
-      "core:piliulia_vidnovlennia_chakry": "pill-drop"
     }
   },
   "modifierKeys": {
@@ -4270,7 +4600,12 @@
     "meditation.enlightChance": "d937f7f0ecc5"
   },
   "balanceOrder": {
-    "(root)": ["K", "pace", "capHours", "milestones"],
+    "(root)": [
+      "K",
+      "pace",
+      "capHours",
+      "milestones"
+    ],
     "K": [
       "cap",
       "rateBase",
@@ -4417,26 +4752,123 @@
       "meditation",
       "athletics"
     ],
-    "K.power": ["E", "D", "C", "B", "A", "S"],
-    "K.tierMult": ["0", "1", "-1"],
-    "K.role": ["projectile", "series", "area", "control", "defense", "buff", "signature", "drill"],
-    "K.role.projectile": ["m", "cd", "c"],
-    "K.role.series": ["m", "cd", "c"],
-    "K.role.area": ["m", "cd", "c"],
-    "K.role.control": ["m", "cd", "c"],
-    "K.role.defense": ["m", "cd", "c"],
-    "K.role.buff": ["m", "cd", "c"],
-    "K.role.signature": ["m", "cd", "c"],
-    "K.role.drill": ["m", "cd", "c"],
-    "K.rankCd": ["E", "D", "C", "B", "A", "S"],
-    "K.chakraCost": ["E", "D", "C", "B", "A", "S"],
-    "K.staminaCost": ["E", "D", "C", "B", "A", "S"],
-    "K.burn": ["share", "dur"],
-    "K.wet": ["slow", "dur"],
-    "K.stun": ["C", "B", "D"],
-    "K.bind": ["dur"],
-    "K.poison": ["pctPerSec", "dur"],
-    "K.combo": ["base", "perLevel", "perMastery", "cap", "fanBurn", "shockWet", "mudEva", "steam"],
+    "K.power": [
+      "E",
+      "D",
+      "C",
+      "B",
+      "A",
+      "S"
+    ],
+    "K.tierMult": [
+      "0",
+      "1",
+      "-1"
+    ],
+    "K.role": [
+      "projectile",
+      "series",
+      "area",
+      "control",
+      "defense",
+      "buff",
+      "signature",
+      "drill"
+    ],
+    "K.role.projectile": [
+      "m",
+      "cd",
+      "c"
+    ],
+    "K.role.series": [
+      "m",
+      "cd",
+      "c"
+    ],
+    "K.role.area": [
+      "m",
+      "cd",
+      "c"
+    ],
+    "K.role.control": [
+      "m",
+      "cd",
+      "c"
+    ],
+    "K.role.defense": [
+      "m",
+      "cd",
+      "c"
+    ],
+    "K.role.buff": [
+      "m",
+      "cd",
+      "c"
+    ],
+    "K.role.signature": [
+      "m",
+      "cd",
+      "c"
+    ],
+    "K.role.drill": [
+      "m",
+      "cd",
+      "c"
+    ],
+    "K.rankCd": [
+      "E",
+      "D",
+      "C",
+      "B",
+      "A",
+      "S"
+    ],
+    "K.chakraCost": [
+      "E",
+      "D",
+      "C",
+      "B",
+      "A",
+      "S"
+    ],
+    "K.staminaCost": [
+      "E",
+      "D",
+      "C",
+      "B",
+      "A",
+      "S"
+    ],
+    "K.burn": [
+      "share",
+      "dur"
+    ],
+    "K.wet": [
+      "slow",
+      "dur"
+    ],
+    "K.stun": [
+      "C",
+      "B",
+      "D"
+    ],
+    "K.bind": [
+      "dur"
+    ],
+    "K.poison": [
+      "pctPerSec",
+      "dur"
+    ],
+    "K.combo": [
+      "base",
+      "perLevel",
+      "perMastery",
+      "cap",
+      "fanBurn",
+      "shockWet",
+      "mudEva",
+      "steam"
+    ],
     "K.techFx": [
       "shield",
       "decoy",
@@ -4447,14 +4879,37 @@
       "nextCast",
       "reveal"
     ],
-    "K.techFx.shield": ["mult", "durationMs"],
-    "K.techFx.decoy": ["charges", "durationMs"],
-    "K.techFx.evasionBuff": ["mult", "durationMs"],
-    "K.techFx.passiveNegate": ["everyMs"],
-    "K.techFx.gateOpening": ["taiDamage", "staminaPerSec", "woundsAfter"],
-    "K.techFx.gateHealing": ["taiDamage", "staminaPerSec", "woundsAfter"],
-    "K.techFx.nextCast": ["castMult"],
-    "K.techFx.reveal": ["durationMs"],
+    "K.techFx.shield": [
+      "mult",
+      "durationMs"
+    ],
+    "K.techFx.decoy": [
+      "charges",
+      "durationMs"
+    ],
+    "K.techFx.evasionBuff": [
+      "mult",
+      "durationMs"
+    ],
+    "K.techFx.passiveNegate": [
+      "everyMs"
+    ],
+    "K.techFx.gateOpening": [
+      "taiDamage",
+      "staminaPerSec",
+      "woundsAfter"
+    ],
+    "K.techFx.gateHealing": [
+      "taiDamage",
+      "staminaPerSec",
+      "woundsAfter"
+    ],
+    "K.techFx.nextCast": [
+      "castMult"
+    ],
+    "K.techFx.reveal": [
+      "durationMs"
+    ],
     "K.bossFx": [
       "wolfPack",
       "rivalDuel",
@@ -4465,7 +4920,14 @@
       "mistRehide",
       "illusion"
     ],
-    "K.bossFx.wolfPack": ["count", "everyMs", "hp", "dmg", "leaderHp", "leaderDmg"],
+    "K.bossFx.wolfPack": [
+      "count",
+      "everyMs",
+      "hp",
+      "dmg",
+      "leaderHp",
+      "leaderDmg"
+    ],
     "K.bossFx.rivalDuel": [
       "techniques",
       "everyMs",
@@ -4487,16 +4949,65 @@
       "dmg",
       "habituationMult"
     ],
-    "K.bossFx.drunkenEvasion": ["maxMult", "hp", "dmg"],
-    "K.bossFx.heavyCast": ["everyMs", "castMs", "damageMult", "stunMs", "hp", "dmg"],
-    "K.bossFx.twins": ["count", "hpEach", "dmgEach", "mistMult"],
-    "K.bossFx.mistRehide": ["everyMs", "hp", "dmg"],
-    "K.bossFx.illusion": ["everyMs", "fleeAtHp", "hp", "dmg"],
-    "K.dropChance": ["band", "pelt", "fang", "coin", "gem"],
-    "K.sell": ["band", "pelt", "fang", "coin", "gem"],
-    "K.wound": ["stat", "max", "healMin", "healFloorMin"],
-    "K.boss": ["hp", "dmg"],
-    "K.pack": ["n", "hp", "dmg"],
+    "K.bossFx.drunkenEvasion": [
+      "maxMult",
+      "hp",
+      "dmg"
+    ],
+    "K.bossFx.heavyCast": [
+      "everyMs",
+      "castMs",
+      "damageMult",
+      "stunMs",
+      "hp",
+      "dmg"
+    ],
+    "K.bossFx.twins": [
+      "count",
+      "hpEach",
+      "dmgEach",
+      "mistMult"
+    ],
+    "K.bossFx.mistRehide": [
+      "everyMs",
+      "hp",
+      "dmg"
+    ],
+    "K.bossFx.illusion": [
+      "everyMs",
+      "fleeAtHp",
+      "hp",
+      "dmg"
+    ],
+    "K.dropChance": [
+      "band",
+      "pelt",
+      "fang",
+      "coin",
+      "gem"
+    ],
+    "K.sell": [
+      "band",
+      "pelt",
+      "fang",
+      "coin",
+      "gem"
+    ],
+    "K.wound": [
+      "stat",
+      "max",
+      "healMin",
+      "healFloorMin"
+    ],
+    "K.boss": [
+      "hp",
+      "dmg"
+    ],
+    "K.pack": [
+      "n",
+      "hp",
+      "dmg"
+    ],
     "K.trait": [
       "armor",
       "armorOff",
@@ -4513,11 +5024,34 @@
       "hiddenFirst",
       "poisonChance"
     ],
-    "K.combatXp": ["style", "vit", "eva"],
-    "K.ryoPerMin": ["D", "C", "V", "OP"],
-    "K.repPerMission": ["D", "C", "V"],
-    "K.missionRateCap": ["D", "C", "V"],
-    "K.scroll": ["1", "2", "3", "4", "5"],
+    "K.combatXp": [
+      "style",
+      "vit",
+      "eva"
+    ],
+    "K.ryoPerMin": [
+      "D",
+      "C",
+      "V",
+      "OP"
+    ],
+    "K.repPerMission": [
+      "D",
+      "C",
+      "V"
+    ],
+    "K.missionRateCap": [
+      "D",
+      "C",
+      "V"
+    ],
+    "K.scroll": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
     "K.goods": [
       "water",
       "rice",
@@ -4535,8 +5069,19 @@
       "tag",
       "medpouch"
     ],
-    "K.bounty": ["boss_wolf", "boss_fighter", "boss_hunter", "boss_twins", "boss_mist"],
-    "K.rep": ["stage2", "exam", "boss", "questFinal"],
+    "K.bounty": [
+      "boss_wolf",
+      "boss_fighter",
+      "boss_hunter",
+      "boss_twins",
+      "boss_mist"
+    ],
+    "K.rep": [
+      "stage2",
+      "exam",
+      "boss",
+      "questFinal"
+    ],
     "K.intel": [
       "perCellLevel",
       "mail",
@@ -4546,8 +5091,22 @@
       "writtenTestPerIntel",
       "writtenTestMaxIntel"
     ],
-    "K.partDrop": ["boss", "carrier", "mission"],
-    "K.village": ["start", "lateFromLevel", "lateShare"],
+    "K.partDrop": [
+      "boss",
+      "carrier",
+      "mission"
+    ],
+    "K.engine": [
+      "packEventsPerHour",
+      "minActionMs",
+      "modMin",
+      "modMax"
+    ],
+    "K.village": [
+      "start",
+      "lateFromLevel",
+      "lateShare"
+    ],
     "K.village.start": [
       "core:tower",
       "core:bureau",
@@ -4557,23 +5116,86 @@
       "core:farms",
       "core:market"
     ],
-    "K.clone": ["pool", "link"],
-    "K.field": ["stockBase", "regrowMs"],
-    "K.craftRules": ["masteryTiers", "bonusPerTier"],
-    "K.tonic": ["capMult"],
-    "K.shop": ["craftSellFactor", "herbBase", "herbPerLevel"],
-    "K.gearFx": ["mannequin", "sickle", "alembic", "stations", "maps"],
-    "K.itemFx": ["sleep"],
-    "K.itemFx.sleep": ["chance"],
-    "K.combat": ["xpTickMs", "regenMs", "hitEven", "fightCapMs", "maxEnemies"],
-    "K.loadout": ["slots", "natures", "saved", "nameMax", "areaBodies"],
-    "K.loadout.slots": ["genin", "chunin"],
-    "K.loadout.natures": ["genin", "chunin"],
-    "K.signature": ["minMastery", "xpBonus"],
-    "K.pouch": ["slots", "vest", "vestRank"],
-    "K.ai": ["geninReactionMs", "guardBelow"],
-    "K.bingo": ["studiedWins", "rareBelow"],
-    "K.bingo.studiedWins": ["enemy", "boss"],
+    "K.clone": [
+      "pool",
+      "link"
+    ],
+    "K.field": [
+      "stockBase",
+      "regrowMs"
+    ],
+    "K.craftRules": [
+      "masteryTiers",
+      "bonusPerTier"
+    ],
+    "K.tonic": [
+      "capMult"
+    ],
+    "K.shop": [
+      "craftSellFactor",
+      "herbBase",
+      "herbPerLevel"
+    ],
+    "K.gearFx": [
+      "mannequin",
+      "sickle",
+      "alembic",
+      "stations",
+      "maps"
+    ],
+    "K.itemFx": [
+      "sleep"
+    ],
+    "K.itemFx.sleep": [
+      "chance"
+    ],
+    "K.combat": [
+      "xpTickMs",
+      "regenMs",
+      "hitEven",
+      "fightCapMs",
+      "maxEnemies",
+      "timerFires",
+      "timerMinMs",
+      "hookEventsPerSec",
+      "hookStatMax"
+    ],
+    "K.loadout": [
+      "slots",
+      "natures",
+      "saved",
+      "nameMax",
+      "areaBodies"
+    ],
+    "K.loadout.slots": [
+      "genin",
+      "chunin"
+    ],
+    "K.loadout.natures": [
+      "genin",
+      "chunin"
+    ],
+    "K.signature": [
+      "minMastery",
+      "xpBonus"
+    ],
+    "K.pouch": [
+      "slots",
+      "vest",
+      "vestRank"
+    ],
+    "K.ai": [
+      "geninReactionMs",
+      "guardBelow"
+    ],
+    "K.bingo": [
+      "studiedWins",
+      "rareBelow"
+    ],
+    "K.bingo.studiedWins": [
+      "enemy",
+      "boss"
+    ],
     "K.analysis": [
       "samples",
       "opSamples",
@@ -4589,12 +5211,33 @@
       "batch",
       "verdict"
     ],
-    "K.analysis.sessionMinutes": ["zone", "boss", "operation"],
-    "K.analysis.sessionHours": ["zone", "boss", "operation"],
-    "K.analysis.batch": ["zone", "operation"],
-    "K.analysis.verdict": ["collapseBelow", "hopelessBelow", "stableMedian", "stableCollapse"],
-    "K.report": ["defeats"],
-    "K.operation": ["approachMs", "approachShort"],
+    "K.analysis.sessionMinutes": [
+      "zone",
+      "boss",
+      "operation"
+    ],
+    "K.analysis.sessionHours": [
+      "zone",
+      "boss",
+      "operation"
+    ],
+    "K.analysis.batch": [
+      "zone",
+      "operation"
+    ],
+    "K.analysis.verdict": [
+      "collapseBelow",
+      "hopelessBelow",
+      "stableMedian",
+      "stableCollapse"
+    ],
+    "K.report": [
+      "defeats"
+    ],
+    "K.operation": [
+      "approachMs",
+      "approachShort"
+    ],
     "K.mission": [
       "perLevel",
       "floor",
@@ -4606,18 +5249,68 @@
       "fightSkills",
       "success"
     ],
-    "K.mission.success": ["base", "perLevel", "perMastery", "cap"],
-    "K.team": ["levelShare", "mastery", "support", "states"],
-    "K.team.support": ["everyMs", "damage"],
-    "K.team.states": ["katon", "suiton", "raiton", "futon", "doton"],
-    "K.crate": ["goods", "gem"],
-    "K.crate.goods": ["core:oil", "core:salt", "core:spice"],
-    "K.crate.gem": ["item", "chance"],
-    "K.toolFx": ["dot", "resist"],
-    "K.toolFx.dot": ["pct", "durS"],
-    "K.senseiTest": ["base", "perLevel", "floor"],
-    "K.natures": ["second", "third", "max", "penaltyEnd"],
-    "K.scouting": ["plainMaxLevel", "walkWithinMin", "walkBetweenMin", "athPerLevel", "athCap"],
+    "K.mission.success": [
+      "base",
+      "perLevel",
+      "perMastery",
+      "cap"
+    ],
+    "K.team": [
+      "levelShare",
+      "mastery",
+      "support",
+      "states"
+    ],
+    "K.team.support": [
+      "everyMs",
+      "damage"
+    ],
+    "K.team.states": [
+      "katon",
+      "suiton",
+      "raiton",
+      "futon",
+      "doton"
+    ],
+    "K.crate": [
+      "goods",
+      "gem"
+    ],
+    "K.crate.goods": [
+      "core:oil",
+      "core:salt",
+      "core:spice"
+    ],
+    "K.crate.gem": [
+      "item",
+      "chance"
+    ],
+    "K.toolFx": [
+      "dot",
+      "resist"
+    ],
+    "K.toolFx.dot": [
+      "pct",
+      "durS"
+    ],
+    "K.senseiTest": [
+      "base",
+      "perLevel",
+      "floor"
+    ],
+    "K.natures": [
+      "second",
+      "third",
+      "max",
+      "penaltyEnd"
+    ],
+    "K.scouting": [
+      "plainMaxLevel",
+      "walkWithinMin",
+      "walkBetweenMin",
+      "athPerLevel",
+      "athCap"
+    ],
     "K.meditation": [
       "insightChance",
       "enlightChance",
@@ -4626,7 +5319,11 @@
       "insightGates",
       "enlightGates"
     ],
-    "K.athletics": ["freeSlot", "pillarCount", "pillarXp"],
+    "K.athletics": [
+      "freeSlot",
+      "pillarCount",
+      "pillarXp"
+    ],
     "pace": [
       "tai",
       "nin",
@@ -4643,7 +5340,11 @@
       "doton",
       "suiton"
     ],
-    "milestones": ["genin", "clones", "chunin", "cap"],
-    "K.engine": ["packEventsPerHour", "minActionMs", "modMin", "modMax"]
+    "milestones": [
+      "genin",
+      "clones",
+      "chunin",
+      "cap"
+    ]
   }
 }

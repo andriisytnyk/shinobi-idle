@@ -20,7 +20,10 @@
   },
   "core:sonnyi_poroshok": {
     "kind": "sleep",
-    "fx": "sleep"
+    "fx": "sleep",
+    "status": "stun",
+    "rank": "C",
+    "refresh": "replace"
   },
   "core:krovospynna_maz": {
     "kind": "woundHeal",

@@ -1,14 +1,14 @@
-import type { NatureId } from '@shinobi/content';
-import { alive, cancelCasts, count, dealDamage, secWork, wheelFactor } from './fight.ts';
-import { addEffect } from './fight-effects.ts';
+import { alive, dealDamage, wheelFactor } from './fight.ts';
+import { fightData } from './fight-data.ts';
+import { applyStatus } from './fight-status.ts';
 import type { Combatant, FightCtx, FightHook, TeamSupport } from './fight-types.ts';
 import { TEAM_HOOK } from './fight-team-id.ts';
-import { needOf, TICK_MS, workOf } from './units.ts';
+import { needOf } from './units.ts';
 
 /*
  * Team support in a team mission's fight, as a hook of the player's own: every `everyMs` each
  * teammate hits the first living enemy with an attack of their nature, and the nature's state is
- * put on the enemy (burn, wet, stun) under the same effect ids the player's techniques use, so the
+ * put on the enemy under the same effect ids the player's techniques use, so the
  * player's techniques find them and the status combos can fire. The hit always lands. The
  * encounter carries the supports; the numbers come from `K.team`.
  */
@@ -23,52 +23,13 @@ function applyState(
   base: number,
   src: string,
 ): void {
-  const { fight, content } = ctx;
-  const K = content.balance.K;
-  const now = fight.t;
-  if (state === 'burn') {
-    const amount = (K.burn.share * base) / K.burn.dur;
-    addEffect(target, {
-      kind: 'periodic',
-      id: 'burn',
-      src,
-      until: now + secWork(K.burn.dur),
-      suppresses: 'regen',
-      mode: 'damage',
-      amount,
-      base: amount,
-      every: workOf(TICK_MS),
-      next: now + workOf(TICK_MS),
-    });
-    count(fight.tally.statuses, 'burn');
-  } else if (state === 'wet') {
-    addEffect(target, {
-      kind: 'modifier',
-      id: 'wet',
-      src,
-      until: now + secWork(K.wet.dur),
-      stat: 'speed',
-      op: 'mul',
-      value: 1 - K.wet.slow,
-    });
-    count(fight.tally.statuses, 'wet');
-  } else if (state === 'stun') {
-    addEffect(target, {
-      kind: 'modifier',
-      id: 'stun',
-      src,
-      until: now + secWork(K.stun.D),
-      stat: 'speed',
-      op: 'mul',
-      value: 0,
-    });
-    cancelCasts(ctx, target);
-    count(fight.tally.statuses, 'stun');
-  }
+  const def = state ? fightData(ctx.content).byState.get(state) : undefined;
+  // A teammate's hit has no technique rank: a duration that depends on it takes the lowest the data gives.
+  if (def) applyStatus(ctx, target, def, src, { base, rank: null });
 }
 
 /** The state a nature's teammate attack applies, from the balance extension. */
-export const supportState = (ctx: FightCtx, nature: NatureId): string | null =>
+export const supportState = (ctx: FightCtx, nature: string): string | null =>
   ctx.content.balance.K.team.states[nature] ?? null;
 
 export const teamSupportHook: FightHook = {

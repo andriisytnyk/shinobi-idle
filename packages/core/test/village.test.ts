@@ -243,7 +243,7 @@ describe('A3: building', () => {
     const s = genin();
     s.currencies.ryo = 500;
     ok(s, { type: 'village.donate', ryo: 200 });
-    expect(s.currencies.ryo).toBe(300);
+    expect(s.currencies.ryo!).toBe(300);
     expect(v(s).treasury).toBe(200);
     refused(s, { type: 'village.donate', ryo: 301 }, 'error.notEnoughRyo');
   });
@@ -362,7 +362,7 @@ describe('A6: shop gating', () => {
       refused(s, { type: 'shop.buy', item: item.id, n: 1 }, 'error.requirementsNotMet');
       withBuildings(s, { 'core:library': src.level });
       ok(s, { type: 'shop.buy', item: item.id, n: 1 });
-      expect(s.currencies.ryo).toBe(1e6 - (K.scroll[String(src.level)] ?? 0));
+      expect(s.currencies.ryo!).toBe(1e6 - (K.scroll[String(src.level)] ?? 0));
     }
   });
 
@@ -429,7 +429,7 @@ describe('review fixes', () => {
     s.currencies.ryo = 1000;
     ok(s, { type: 'shop.buy', item: 'core:water', n: 100 });
     // 100 water at 1 ryo and -10%: 90, not 100.
-    expect(s.currencies.ryo).toBe(1000 - 90);
+    expect(s.currencies.ryo!).toBe(1000 - 90);
   });
 
   it('does not create a village for a command that is refused', () => {
@@ -503,7 +503,7 @@ describe('A9: pace report', () => {
     for (let minute = K.tickMin; minute <= 12 * 60; minute += K.tickMin) {
       if (variant && minute === 4 * 60) s.currencies.rep = K.rep.stage2!;
       if (variant && minute >= 2 * 60 && minute % 60 === 0) {
-        s.currencies.ryo += 300;
+        s.currencies.ryo = (s.currencies.ryo ?? 0) + 300;
         dispatch(s, { type: 'village.donate', ryo: 300 }, content);
       }
       policy();

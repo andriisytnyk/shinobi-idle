@@ -8,6 +8,7 @@
  */
 import { testmodPack as data } from '@shinobi/content/testmod';
 import type { ContentPack } from '@shinobi/content';
+import type { FightHook } from '../combat/fight-types.ts';
 import { addRule, wrapRule, type Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 import type { System } from '../system.ts';
@@ -56,9 +57,30 @@ const tokenSystem: System = {
   },
 };
 
+/**
+ * The hook of the test boss: every third basic attack of the body is a heavy one (its damage times
+ * `K.bossFx['testmod:third'].mult`). It is registered with the other fight hooks and the pack is
+ * recorded as its owner, so a failure of it is contained and names the pack.
+ */
+const thirdStrike: FightHook = {
+  id: 'testmod:thirdStrike',
+  onAttack(ctx, c, plan) {
+    const n = (c.data['testmod.attacks'] ?? 0) + 1;
+    c.data['testmod.attacks'] = n;
+    if (n % 3 === 0)
+      plan.damage *=
+        (ctx.content.balance.K.bossFx as Record<string, Record<string, number> | undefined>)[
+          'testmod:third'
+        ]?.mult ?? 1;
+  },
+};
+
 /** The rules function of the pack: one added system and one wrapped action kind of the core pack. */
 export function testmodRules(base: Rules): Rules {
-  const withSystem = addRule(base, 'systems', tokenSystem);
+  const withSystem: Rules = {
+    ...addRule(base, 'systems', tokenSystem),
+    fightHooks: [...base.fightHooks, thirdStrike],
+  };
   return wrapRule(withSystem, 'actionKinds', 'drill', (drill) => ({
     ...drill,
     intervalMs: (state, id, content, rules, slot) =>

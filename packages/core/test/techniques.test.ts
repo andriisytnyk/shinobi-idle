@@ -23,6 +23,7 @@ import {
   runUntil,
   scripted,
   sec,
+  fig,
   tech,
   withAi,
 } from './fight-helpers.ts';
@@ -51,14 +52,14 @@ describe('shield: a ward that absorbs damage for a while', () => {
     const t = tech(fight, wall);
     expect(t.fx.kind).toBe('shield');
     expect(t.fx.amount).toBeCloseTo(
-      K.power[t.rank] * K.techFx.shield!.mult * (1 + K.levelScale * 40),
+      fig(`power.${t.rank}`) * fig('techFx.shield.mult') * (1 + K.levelScale * 40),
       9,
     );
     runUntil(fight, cast(wall), ai);
     expect(fight.player.ward).toBeCloseTo(t.fx.amount, 9);
-    expect(fight.player.wardUntil).toBe(fight.t + sec(K.techFx.shield!.durationMs / 1000));
+    expect(fight.player.wardUntil).toBe(fight.t + sec(fig('techFx.shield.durationMs') / 1000));
     runUntil(fight, (f) => f.player.ward === 0, ai);
-    expect(fight.t).toBeGreaterThanOrEqual(sec(K.techFx.shield!.durationMs / 1000));
+    expect(fight.t).toBeGreaterThanOrEqual(sec(fig('techFx.shield.durationMs') / 1000));
     expect(fight.player.wardUntil).toBeNull();
   });
 });
@@ -69,7 +70,7 @@ describe('decoy: the next hits miss', () => {
   it('turns the next hit into a miss, then lapses', () => {
     const { fight, ai } = scene([clone]);
     runUntil(fight, cast(clone), ai);
-    expect(fight.player.decoys).toBe(K.techFx.decoy!.charges);
+    expect(fight.player.decoys).toBe(fig('techFx.decoy.charges'));
     expect(rollHit(ctxOf(fight), fight.player, null)).toBe(false);
     expect(fight.player.decoys).toBe(0);
     expect(rollHit(ctxOf(fight), fight.player, null)).toBe(true);
@@ -78,7 +79,7 @@ describe('decoy: the next hits miss', () => {
     runUntil(other.fight, cast(clone), other.ai);
     const at = other.fight.t;
     runUntil(other.fight, (f) => f.player.decoys === 0, other.ai);
-    expect(other.fight.t - at).toBe(sec(K.techFx.decoy!.durationMs / 1000));
+    expect(other.fight.t - at).toBe(sec(fig('techFx.decoy.durationMs') / 1000));
   });
 });
 
@@ -88,7 +89,10 @@ describe('evasion buff', () => {
     const { fight, ai } = scene([mist]);
     expect(statOf(fight.player, 'evasion', 100)).toBe(100);
     runUntil(fight, cast(mist), ai);
-    expect(statOf(fight.player, 'evasion', 100)).toBeCloseTo(100 * K.techFx.evasionBuff!.mult, 9);
+    expect(statOf(fight.player, 'evasion', 100)).toBeCloseTo(
+      100 * fig('techFx.evasionBuff.mult'),
+      9,
+    );
     runUntil(fight, (f) => !findEffect(f.player, 'evasionBuff'), ai);
     expect(statOf(fight.player, 'evasion', 100)).toBe(100);
   });
@@ -132,7 +136,7 @@ describe('next-cast modifier', () => {
     // The player starts the next cast the moment the flicker ends, and that cast is the short one.
     runUntil(fight, (f) => f.player.phase === 'cast' && f.player.cast === next, ai);
     expect(fight.player.timer.need).toBe(
-      needOf(Math.round(tech(fight, next).castMs * K.techFx.nextCast!.castMult)),
+      needOf(Math.round(tech(fight, next).castMs * fig('techFx.nextCast.castMult'))),
     );
     expect(fight.player.data.hasten).toBe(0);
   });
@@ -146,7 +150,8 @@ describe('reveal', () => {
     runUntil(fight, cast(sensing), ai);
     expect(findEffect(fight.player, 'hidden')).toBeUndefined();
     const revealed = fight.enemies.every(
-      (e) => findEffect(e, 'revealed')?.until === fight.t + sec(K.techFx.reveal!.durationMs / 1000),
+      (e) =>
+        findEffect(e, 'revealed')?.until === fight.t + sec(fig('techFx.reveal.durationMs') / 1000),
     );
     expect(revealed).toBe(true);
   });
@@ -163,12 +168,12 @@ describe('passive negate (Body Replacement)', () => {
     expect(fight.player.decoys).toBe(0);
     const ai = withAi(() => ({ type: 'wait' }));
     runUntil(fight, (f) => f.player.decoys === 1, ai);
-    expect(fight.t).toBe(sec(K.techFx.passiveNegate!.everyMs / 1000));
+    expect(fight.t).toBe(sec(fig('techFx.passiveNegate.everyMs') / 1000));
     expect(rollHit(ctxOf(fight), fight.player, null)).toBe(false);
     // The charge comes back at the next period, not before.
     expect(fight.player.decoys).toBe(0);
     runUntil(fight, (f) => f.player.decoys === 1, ai);
-    expect(fight.t).toBe(2 * sec(K.techFx.passiveNegate!.everyMs / 1000));
+    expect(fight.t).toBe(2 * sec(fig('techFx.passiveNegate.everyMs') / 1000));
   });
 });
 
@@ -182,19 +187,22 @@ describe('stances', () => {
     const fx = tech(fight, opening).fx;
     expect(fx).toMatchObject({
       kind: 'stance',
-      mult: K.techFx.gateOpening!.taiDamage,
-      drain: K.techFx.gateOpening!.staminaPerSec,
+      mult: fig('techFx.gateOpening.taiDamage'),
+      drain: fig('techFx.gateOpening.staminaPerSec'),
     });
     runUntil(fight, cast(opening), ai);
     expect(statOf(fight.player, 'taiDamage', 1)).toBeCloseTo(
-      1 + K.techFx.gateOpening!.taiDamage,
+      1 + fig('techFx.gateOpening.taiDamage'),
       9,
     );
     const start = fight.player.stamina;
     const at = fight.t;
     runUntil(fight, (f) => f.t >= at + sec(5), ai);
-    expect(start - fight.player.stamina).toBeCloseTo(5 * K.techFx.gateOpening!.staminaPerSec, 6);
-    fight.player.stamina = K.techFx.gateOpening!.staminaPerSec;
+    expect(start - fight.player.stamina).toBeCloseTo(
+      5 * fig('techFx.gateOpening.staminaPerSec'),
+      6,
+    );
+    fight.player.stamina = fig('techFx.gateOpening.staminaPerSec');
     runUntil(fight, (f) => !findEffect(f.player, 'stance'), ai);
     expect(fight.player.stamina).toBe(0);
     expect(findEffect(fight.player, 'stanceDrain')).toBeUndefined();
@@ -210,11 +218,11 @@ describe('stances', () => {
     expect(stances).toHaveLength(1);
     expect(stances[0]?.src).toBe(healing);
     expect(statOf(fight.player, 'taiDamage', 1)).toBeCloseTo(
-      1 + K.techFx.gateHealing!.taiDamage,
+      1 + fig('techFx.gateHealing.taiDamage'),
       9,
     );
     expect(fight.tally.wounds).toBe(
-      K.techFx.gateOpening!.woundsAfter + K.techFx.gateHealing!.woundsAfter,
+      fig('techFx.gateOpening.woundsAfter') + fig('techFx.gateHealing.woundsAfter'),
     );
   });
 
@@ -223,7 +231,7 @@ describe('stances', () => {
     const ai = withAi(castSeq(opening));
     runUntil(fight, (f) => (f.tally.uses[opening] ?? 0) >= 3, ai, content, sec(120));
     expect(fight.tally.uses[opening]).toBeGreaterThanOrEqual(3);
-    expect(fight.tally.wounds).toBe(K.techFx.gateOpening!.woundsAfter);
+    expect(fight.tally.wounds).toBe(fig('techFx.gateOpening.woundsAfter'));
   });
 
   it('are needed by Front Lotus, which is refused without one', () => {

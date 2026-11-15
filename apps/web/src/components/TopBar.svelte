@@ -40,7 +40,7 @@
           >{t('topbar.ryo')}</span
         >
       </dt>
-      <dd>{numbers.format(game.state.currencies.ryo)}</dd>
+      <dd>{numbers.format(game.state.currencies.ryo ?? 0)}</dd>
     </div>
     <div class="stat" data-ui="topbar-currency" data-entity="currency:rep">
       <dt>
@@ -48,7 +48,7 @@
           >{t('topbar.rep')}</span
         >
       </dt>
-      <dd>{numbers.format(game.state.currencies.rep)}</dd>
+      <dd>{numbers.format(game.state.currencies.rep ?? 0)}</dd>
     </div>
     <div class="stat intel" data-ui="topbar-currency" data-entity="currency:intel">
       <dt>
@@ -56,7 +56,7 @@
           >{t('topbar.intel')}</span
         >
       </dt>
-      <dd>{numbers.format(game.state.currencies.intel)}</dd>
+      <dd>{numbers.format(game.state.currencies.intel ?? 0)}</dd>
     </div>
     <div class="stat rank">
       <dt><Icon name="rank-3" size={16} /><span class="label">{t('topbar.rank')}</span></dt>

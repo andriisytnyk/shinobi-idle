@@ -134,6 +134,8 @@ describe('boss specials', () => {
     expect(special('core:boss_ren1')).toEqual({
       kind: 'rival',
       fx: 'rivalDuel',
+      hook: 'special:rival.duel',
+      numbers: ['techniques', 'everyMs', 'sigEveryMs', 'sigOpenMs', 'sigMult', 'mult'],
       signature: true,
       nature: 'beatsPlayerFirst',
     });

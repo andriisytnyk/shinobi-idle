@@ -138,6 +138,9 @@ describe('A8: team support', () => {
     expect(again?.encounter.support).toEqual(fight.encounter.support);
     const broken = JSON.parse(JSON.stringify(fight)) as { encounter: { support: unknown } };
     broken.encounter.support = [{ nature: 'nope', everyMs: 1, damage: 1 }];
+    // A teammate whose nature the content does not have gives no support; the fight still loads.
+    expect(parseFight(broken, content)?.encounter.support).toEqual([]);
+    broken.encounter.support = [{ nature: 'katon', everyMs: 0, damage: 1 }];
     expect(parseFight(broken, content)).toBeNull();
   });
 

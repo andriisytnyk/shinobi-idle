@@ -27,6 +27,7 @@ import {
   withAi,
   withTechniques,
   runUntil,
+  fig,
 } from './fight-helpers.ts';
 
 const LEVEL = 34;
@@ -129,9 +130,9 @@ describe('Stun', () => {
   const c = withTechniques([stunD]);
 
   it.each([
-    [fang, K.stun.C],
-    [dark, K.stun.B],
-    [stunD.id, K.stun.D],
+    [fang, fig('stun.C')],
+    [dark, fig('stun.B')],
+    [stunD.id, fig('stun.D')],
   ])('%s stops the target for the time of its rank, and cancels its cast', (id, seconds) => {
     const caster = enemyAt(LEVEL, ['caster']);
     const { fight } = castAndHit(
@@ -144,7 +145,7 @@ describe('Stun', () => {
           pacify(f);
           const e = only(f);
           e.data['caster.cast'] = 1;
-          e.timers.caster = { progress: 1, need: needOf(K.trait.casterCast * 1000) };
+          e.timers.caster = { progress: 1, need: needOf(fig('trait.casterCast') * 1000) };
         },
       },
       id,
@@ -299,7 +300,10 @@ describe('Combos', () => {
         const { hits, fired, chance } = trials(combo.tech, combo.prime, combo.key);
         const skill = content.techniques.find((t) => t.id === combo.tech)?.skill ?? 'tai';
         expect(chance).toBeCloseTo(
-          Math.min(K.combo.cap, K.combo.base + K.combo.perLevel * 40 + K.combo.perMastery * 20),
+          Math.min(
+            fig('combo.cap'),
+            fig('combo.base') + fig('combo.perLevel') * 40 + fig('combo.perMastery') * 20,
+          ),
           9,
         );
         expect(skill).not.toBe('tai');
@@ -340,7 +344,7 @@ describe('Combos', () => {
     if (!combo) throw new Error('no combo');
     const { fight } = castAndHit(scene(combo), combo.tech);
     const burn = findEffect(only(fight), 'burn');
-    expect(burn?.kind === 'periodic' && burn.amount).toBe(10 * K.combo.fanBurn);
+    expect(burn?.kind === 'periodic' && burn.amount).toBe(10 * fig('combo.fanBurn'));
     expect(burn?.until).toBe(fight.t + sec(K.burn.dur));
   });
 
@@ -348,7 +352,9 @@ describe('Combos', () => {
     const combo = combos[1];
     if (!combo) throw new Error('no combo');
     const { fight } = castAndHit(scene(combo), combo.tech);
-    expect(findEffect(only(fight), 'stun')?.until).toBe(fight.t + sec(K.stun.C) * K.combo.shockWet);
+    expect(findEffect(only(fight), 'stun')?.until).toBe(
+      fight.t + sec(fig('stun.C')) * fig('combo.shockWet'),
+    );
   });
 
   it('Doton on Wet binds with the mud evasion multiplier', () => {
@@ -357,7 +363,7 @@ describe('Combos', () => {
     const { fight } = castAndHit(scene(combo), combo.tech);
     const e = only(fight);
     expect(findEffect(e, 'bind')?.until).toBe(fight.t + sec(K.bind.dur));
-    expect(statOf(e, 'evasion', 100)).toBeCloseTo(100 * K.combo.mudEva, 9);
+    expect(statOf(e, 'evasion', 100)).toBeCloseTo(100 * fig('combo.mudEva'), 9);
   });
 
   it('Katon on Wet removes Wet and adds a share of the technique damage', () => {
@@ -366,7 +372,7 @@ describe('Combos', () => {
     const { fight } = castAndHit(scene(combo), combo.tech);
     expect(findEffect(only(fight), 'wet')).toBeUndefined();
     expect(fight.tally.damage[combo.tech]).toBeCloseTo(
-      tech(fight, combo.tech).damage * (1 + K.combo.steam),
+      tech(fight, combo.tech).damage * (1 + fig('combo.steam')),
       5,
     );
   });

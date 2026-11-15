@@ -32,7 +32,9 @@ import {
   withAi,
   withTechniques,
   runUntil,
+  fig,
 } from './fight-helpers.ts';
+import { aiVocab, viewTechnique } from './view-helpers.ts';
 
 const chunin = content.ai.tiers.find((t) => t.id === 'chunin');
 if (!chunin) throw new Error('no chunin AI tier');
@@ -51,7 +53,10 @@ describe('Armor (answer: pierce)', () => {
       { known: [dyn], enemy: enemyAt(LEVEL, ['armor']), ai: () => castOnce(dyn) },
       dyn,
     );
-    expect(fight.tally.damage[dyn]).toBeCloseTo(tech(fight, dyn).damage * (1 - K.trait.armor), 8);
+    expect(fight.tally.damage[dyn]).toBeCloseTo(
+      tech(fight, dyn).damage * (1 - fig('trait.armor')),
+      8,
+    );
   });
 
   it('is ignored by a pierce hit, which switches it off for the configured time', () => {
@@ -63,30 +68,35 @@ describe('Armor (answer: pierce)', () => {
     if (!enemy) throw new Error('no enemy');
     expect(fight.tally.damage[palm]).toBeCloseTo(tech(fight, palm).damage, 8);
     const off = findEffect(enemy, 'armorOff');
-    expect(off?.until).toBe(fight.t + sec(K.trait.armorOff));
+    expect(off?.until).toBe(fight.t + sec(fig('trait.armorOff')));
     expect(stat(ctxOf(fight), enemy, 'damageTaken', 1)).toBe(1);
     expect(fight.tally.statuses.armorBreak).toBe(1);
     // After the window the armour is back.
     fightAdvance(
       fight,
-      sec(K.trait.armorOff),
+      sec(fig('trait.armorOff')),
       content,
       withAi(() => ({ type: 'basic' })),
     );
     expect(findEffect(enemy, 'armorOff')).toBeUndefined();
-    expect(stat(ctxOf(fight), enemy, 'damageTaken', 1)).toBeCloseTo(1 - K.trait.armor, 12);
+    expect(stat(ctxOf(fight), enemy, 'damageTaken', 1)).toBeCloseTo(1 - fig('trait.armor'), 12);
   });
 });
 
 describe('Caster (answer: interrupt)', () => {
   const dyn = 'core:dynamic_entry';
-  const heavy = enemyDamage * K.trait.casterMult;
+  const heavy = enemyDamage * fig('trait.casterMult');
   /** Plays to just after the first heavy attack would land; ordinary enemy attacks are off. */
   const play = (known: string[], seed: number): FightState => {
     const fight = quiet(
       pacify(createFight(scripted(known), enemyAt(LEVEL, ['caster']), seed, content, rules)),
     );
-    fightAdvance(fight, sec(K.trait.casterEvery + K.trait.casterCast + 1), content, rules);
+    fightAdvance(
+      fight,
+      sec(fig('trait.casterEvery') + fig('trait.casterCast') + 1),
+      content,
+      rules,
+    );
     return fight;
   };
 
@@ -162,7 +172,7 @@ describe('Evasive (answer: bind)', () => {
     if (!enemy) throw new Error('no enemy');
     expect(enemy.evasion).toBeCloseTo(enemyEvasion, 9);
     expect(stat(ctxOf(fight), enemy, 'evasion', enemy.evasion)).toBeCloseTo(
-      enemyEvasion * K.trait.evasive,
+      enemyEvasion * fig('trait.evasive'),
       9,
     );
 
@@ -186,14 +196,14 @@ describe('Evasive (answer: bind)', () => {
     );
     expect(findEffect(target, 'bind')).toBeUndefined();
     expect(stat(ctxOf(bound), target, 'evasion', target.evasion)).toBeCloseTo(
-      enemyEvasion * K.trait.evasive,
+      enemyEvasion * fig('trait.evasive'),
       9,
     );
   });
 });
 
 describe('Regeneration (answer: damage over time)', () => {
-  const amount = K.trait.regenPct * enemyHp;
+  const amount = fig('trait.regenPct') * enemyHp;
 
   function regenFight(): FightState {
     const fight = quiet(
@@ -290,11 +300,11 @@ describe('Illusionist (answer: dispel)', () => {
 
   it('cuts the player accuracy by the configured factor for the configured time', () => {
     const fight = illusionFight(0, 1);
-    fightAdvance(fight, sec(K.trait.illusionEvery), content, rules);
+    fightAdvance(fight, sec(fig('trait.illusionEvery')), content, rules);
     const effect = findEffect(fight.player, 'illusion');
-    expect(effect?.until).toBe(fight.t + sec(K.trait.illusionDur));
-    expect(statOf(fight.player, 'accuracy', 100)).toBeCloseTo(100 * K.trait.illusionAcc, 9);
-    fightAdvance(fight, sec(K.trait.illusionDur), content, rules);
+    expect(effect?.until).toBe(fight.t + sec(fig('trait.illusionDur')));
+    expect(statOf(fight.player, 'accuracy', 100)).toBeCloseTo(100 * fig('trait.illusionAcc'), 9);
+    fightAdvance(fight, sec(fig('trait.illusionDur')), content, rules);
     expect(findEffect(fight.player, 'illusion')).toBeUndefined();
     expect(statOf(fight.player, 'accuracy', 100)).toBe(100);
   });
@@ -305,7 +315,7 @@ describe('Illusionist (answer: dispel)', () => {
       const n = 2000;
       for (let seed = 1; seed <= n; seed++) {
         const fight = illusionFight(med, seed);
-        fightAdvance(fight, sec(K.trait.illusionEvery), content, rules);
+        fightAdvance(fight, sec(fig('trait.illusionEvery')), content, rules);
         if (!findEffect(fight.player, 'illusion')) resisted++;
       }
       expect(Math.abs(resisted / n - med * K.illusionResist)).toBeLessThan(0.03);
@@ -319,7 +329,7 @@ describe('Illusionist (answer: dispel)', () => {
     runUntil(fight, (f) => (f.tally.uses[dispel] ?? 0) > 0, rules, c);
     expect(fight.tally.uses[dispel]).toBe(1);
     // It was cast in answer to the illusion, not before it.
-    expect(fight.tally.lastUseAt).toBeGreaterThanOrEqual(sec(K.trait.illusionEvery));
+    expect(fight.tally.lastUseAt).toBeGreaterThanOrEqual(sec(fig('trait.illusionEvery')));
     expect(findEffect(fight.player, 'illusion')).toBeUndefined();
   });
 });
@@ -339,12 +349,12 @@ describe('Hidden (answer: reveal)', () => {
 
   it('cuts the player accuracy for the first seconds, then lets go', () => {
     const fight = hiddenFight(1, []);
-    expect(statOf(fight.player, 'accuracy', 100)).toBeCloseTo(100 * K.trait.hiddenAcc, 9);
-    expect(findEffect(fight.player, 'hidden')?.until).toBe(sec(K.trait.hidden));
+    expect(statOf(fight.player, 'accuracy', 100)).toBeCloseTo(100 * fig('trait.hiddenAcc'), 9);
+    expect(findEffect(fight.player, 'hidden')?.until).toBe(sec(fig('trait.hidden')));
     quiet(pacify(fight));
     fightAdvance(
       fight,
-      sec(K.trait.hidden),
+      sec(fig('trait.hidden')),
       content,
       withAi(() => ({ type: 'basic' })),
     );
@@ -353,7 +363,7 @@ describe('Hidden (answer: reveal)', () => {
 
   it('strikes first with a multiplied blow while still hidden', () => {
     const blow = firstBlow([]);
-    expect(blow?.taken).toBeCloseTo(enemyDamage * K.trait.hiddenFirst, 8);
+    expect(blow?.taken).toBeCloseTo(enemyDamage * fig('trait.hiddenFirst'), 8);
   });
 
   it('loses both edges once a reveal technique is used', () => {
@@ -379,7 +389,7 @@ describe('Poisoner (answer: cleanse)', () => {
       if ((fight.tally.statuses.poison ?? 0) > 0) poisoned++;
     }
     expect(hits).toBeGreaterThan(1000);
-    expect(Math.abs(poisoned / hits - K.trait.poisonChance)).toBeLessThan(0.04);
+    expect(Math.abs(poisoned / hits - fig('trait.poisonChance'))).toBeLessThan(0.04);
   });
 
   it('then takes a share of maximum health every second for the configured time', () => {
@@ -516,16 +526,7 @@ describe('the default AI decision rules, on hand-made views', () => {
     requiresStance: false,
     ...extra,
   });
-  const vt = (tech: KitTechnique): ViewTechnique => ({
-    tech,
-    cooldownLeft: 0,
-    affordable: true,
-    ready: true,
-    uses: 0,
-    expected: tech.damage,
-    power: tech.damage,
-    stanceOk: true,
-  });
+  const vt = (tech: KitTechnique): ViewTechnique => viewTechnique(tech);
   const enemyView = (o: Partial<ViewEnemy> = {}): ViewEnemy => ({
     id: 'e#0',
     hp: 100,
@@ -562,6 +563,7 @@ describe('the default AI decision rules, on hand-made views', () => {
     habituation: {},
     ai: chunin,
     visibleTraits: content.ai.visibleTraits,
+    vocab: aiVocab,
     pouch: [],
     medic: null,
     stance: null,

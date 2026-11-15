@@ -1,4 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
+import { fightData } from './fight-data.ts';
 import { indexOf } from '../lookup.ts';
 import { entryOf } from './zones.ts';
 import type { GameState } from '../state.ts';
@@ -236,7 +237,8 @@ export function parseReport(raw: unknown, content: ContentDb): TargetReport | nu
   const index = indexOf(content);
   const technique = (key: string): boolean => index.techniques.has(key);
   const item = (key: string): boolean => index.itemIds.has(key);
-  const status = (key: string): boolean => content.statuses.some((x) => x.id === key);
+  const tallies = fightData(content).tallyNames;
+  const status = (key: string): boolean => tallies.has(key);
   const combo = (key: string): boolean => content.combos.some((x) => x.id === key);
   // Damage is also kept for the basic attack, which no technique id names: the fight's own key.
   const damage = (key: string): boolean =>
