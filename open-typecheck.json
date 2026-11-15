@@ -9,13 +9,7 @@
       "path": "packages/core/test",
       "exclude": [
         "ai-tiers.test.ts",
-        "analysis-helpers.ts",
-        "analysis-horizon.test.ts",
-        "analysis.test.ts",
-        "bingo.test.ts",
         "boss-specials.test.ts",
-        "determinism.test.ts",
-        "fight-engine.test.ts",
         "fight-extend.test.ts",
         "fight-helpers.ts",
         "fight-status.test.ts",
@@ -25,7 +19,6 @@
         "missions-team.test.ts",
         "pouch.test.ts",
         "prep-helpers.ts",
-        "prep-state.ts",
         "techniques.test.ts",
         "wounds.test.ts"
       ]
