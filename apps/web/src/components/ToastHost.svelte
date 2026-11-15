@@ -53,6 +53,7 @@
       role={toast.persistent ? 'alert' : undefined}
     >
       <span>
+        {#if toast.subject}<EntityLink kind={toast.subject.kind} id={toast.subject.id} />{/if}
         {t(toast.key, toast.params)}
         {#if toast.ref}<EntityLink kind={toast.ref.kind} id={toast.ref.id} />{/if}
         {#if toast.gains}
@@ -60,6 +61,12 @@
             {#if toast.gains.ryo > 0}<span>{t('toast.gainRyo', { n: toast.gains.ryo })}</span>{/if}
             {#each toast.gains.items as item (item.id)}
               <span><EntityLink kind="item" id={item.id} /> ×{item.n}</span>
+            {/each}
+            {#each toast.gains.missed ?? [] as item (item.id)}
+              <span data-missed>
+                {t('toast.mission.missed')}
+                <EntityLink kind="item" id={item.id} /> ×{item.n}
+              </span>
             {/each}
           </span>
         {/if}

@@ -10,6 +10,7 @@
   import { game } from '../lib/store.ts';
   import Slot from '../lib/ext/Slot.svelte';
   import EntityLink from './EntityLink.svelte';
+  import GoalMissions from './GoalMissions.svelte';
   import Hint from './Hint.svelte';
   import NatureOffer from './NatureOffer.svelte';
   import NextStepCard from './NextStepCard.svelte';
@@ -65,6 +66,7 @@
         </p>
       {/if}
     </div>
+    {#if goal.kind === 'item'}<GoalMissions item={goal.id} />{/if}
     {#if result?.met}<p class="done">{t('meta.done')}</p>{/if}
     <button type="button" class="unpin" onclick={() => game.dispatch({ type: 'goal.clear' })}>
       {t('meta.unpin')}

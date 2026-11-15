@@ -502,10 +502,12 @@ describe('waiting for the sensei test', () => {
 });
 
 describe('navigation and the log', () => {
-  it('has five tabs and no sections that do not exist yet', () => {
+  it('has five tabs, and the missions only in the sidebar', () => {
     const body = inApp(TabBar);
     expect(body.match(/data-tab=/g)).toHaveLength(5);
-    for (const text of [body, inApp(MainNav)]) expect(text).not.toContain('#/missions');
+    // The missions are a section of the journal on a phone, a menu item beside the quests elsewhere.
+    expect(body).not.toContain('#/missions');
+    expect(inApp(MainNav)).toContain('#/missions');
     // The village is a page of its own: in the sidebar menu, inside «Ще» on a phone, never a tab.
     expect(body).not.toContain('#/village');
     expect(inApp(MainNav)).toContain('#/village');

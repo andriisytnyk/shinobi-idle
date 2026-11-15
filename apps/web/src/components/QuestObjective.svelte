@@ -4,7 +4,12 @@
   import { evalReq } from '@shinobi/core';
   import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
-  import { counterEnemy, counterProgress, withoutRankRows } from '../lib/next-step.ts';
+  import {
+    counterEnemy,
+    counterMission,
+    counterProgress,
+    withoutRankRows,
+  } from '../lib/next-step.ts';
   import { game } from '../lib/store.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
@@ -30,6 +35,7 @@
     ),
   );
   const enemy = $derived(objective?.t === 'counter' ? counterEnemy(objective.counter) : null);
+  const mission = $derived(objective?.t === 'counter' ? counterMission(objective.counter) : null);
   const fraction = $derived(counted && counted.of > 0 ? counted.n / counted.of : 0);
   const met = $derived(counted !== null && counted.n >= counted.of);
 </script>
@@ -42,6 +48,8 @@
     <span class="label">
       {#if enemy}
         <span class="detail">{t('quests.kill')}</span> <EntityLink kind="enemy" id={enemy} />
+      {:else if mission}
+        <span class="detail">{t('quests.mission')}</span> <EntityLink kind="mission" id={mission} />
       {:else}
         <span class="detail">{t('quests.counter')}</span>
       {/if}
