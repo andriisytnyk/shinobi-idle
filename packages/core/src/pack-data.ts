@@ -1,5 +1,6 @@
 import type { ContentDb } from '@shinobi/content';
 import type { DormantPack, JsonValue } from './state.ts';
+import { PLACES, type Place } from './dormant-places.ts';
 import { isNature, packOfId, rankIndex } from './vocab.ts';
 
 /*
@@ -14,24 +15,8 @@ type Raw = Record<string, unknown>;
 
 const isRecord = (x: unknown): x is Raw => typeof x === 'object' && x !== null && !Array.isArray(x);
 
-/** The keyed branches of the state whose entries can belong to a pack, by the pack named in the key. */
-export const DORMANT_FIELDS = [
-  'skills',
-  'pools',
-  'mastery',
-  'bank',
-  'currencies',
-  'known',
-  'flags',
-  'counters',
-  'quests',
-  'gear',
-  'bushes',
-  'meditation',
-  'buffs',
-  'bingo',
-  'report',
-] as const;
+/** The fields of a dormant bucket: the dotted paths of the places of the state (`dormant-places.ts`). */
+export const DORMANT_FIELDS: readonly string[] = PLACES.map((p) => p.path);
 
 /** Most packs, most entries per branch and longest text a bucket keeps; the rest of a tampered save is dropped. */
 const MAX_PACKS = 32;
@@ -160,10 +145,132 @@ function bucket(
   return (dormant[pack] = { version: saved.get(pack) ?? '', rank: null, natures: [], data: {} });
 }
 
+// ---------- moving the entries of a missing pack ----------
+
+const asRecord = (x: unknown): Raw | undefined => (isRecord(x) ? x : undefined);
+
+/** The value at a dotted path of `raw`, or undefined. */
+function getAt(raw: Raw, path: string): unknown {
+  let at: unknown = raw;
+  for (const part of path.split('.')) {
+    if (!isRecord(at) || !Object.hasOwn(at, part)) return undefined;
+    at = at[part];
+  }
+  return at;
+}
+
+/** A copy of `raw` with the value at the path replaced; the branches on the way are copied, never changed in place. */
+function setAt(raw: Raw, path: string, value: unknown): Raw {
+  const [head, ...rest] = path.split('.');
+  if (head === undefined) return raw;
+  if (rest.length === 0) return { ...raw, [head]: value };
+  const inner = asRecord(raw[head]);
+  if (inner === undefined) return raw;
+  return { ...raw, [head]: setAt(inner, rest.join('.'), value) };
+}
+
+/** Whether an id names only the pack `pack` (at least once): what a returning pack may restore. */
+const ownId = (pack: string, id: unknown): boolean => {
+  if (typeof id !== 'string') return false;
+  const packs = packsInKey(id);
+  return packs.length > 0 && packs.every((p) => p === pack);
+};
+
+/** The pack of an id when it is not loaded, else undefined. */
+const awayPack = (loaded: ReadonlySet<string>, id: unknown): string | undefined =>
+  typeof id === 'string' ? packsInKey(id).find((p) => !loaded.has(p)) : undefined;
+
+type Stash = (pack: string, path: string, key: string, value: unknown) => void;
+
+/** Moves the entries of one place that belong to a missing pack to the dormant bucket; returns the cleaned state. */
+function stashPlace(raw: Raw, place: Place, loaded: ReadonlySet<string>, stash: Stash): Raw {
+  const at = getAt(raw, place.path);
+  const { path } = place;
+  switch (place.rule) {
+    case 'keys': {
+      if (!isRecord(at)) return raw;
+      const kept: Raw = {};
+      for (const [key, value] of Object.entries(at)) {
+        if (!safeKey(key)) continue;
+        const away = awayPack(loaded, key);
+        if (away === undefined) kept[key] = value;
+        else stash(away, path, key, value);
+      }
+      return setAt(raw, path, kept);
+    }
+    case 'values': {
+      if (!isRecord(at)) return raw;
+      const kept: Raw = {};
+      for (const [key, value] of Object.entries(at)) {
+        if (!safeKey(key)) continue;
+        const away = awayPack(loaded, value);
+        if (away === undefined) kept[key] = value;
+        else stash(away, path, key, value);
+      }
+      return setAt(raw, path, kept);
+    }
+    case 'list': {
+      if (!Array.isArray(at)) return raw;
+      const kept: unknown[] = [];
+      at.forEach((id: unknown, index) => {
+        const away = awayPack(loaded, id);
+        if (away === undefined) kept.push(id);
+        else stash(away, path, String(index), id);
+      });
+      return setAt(raw, path, kept);
+    }
+    case 'single': {
+      const away = awayPack(loaded, at);
+      if (away === undefined) return raw;
+      stash(away, path, '0', at);
+      return setAt(raw, path, null);
+    }
+    case 'saved': {
+      if (!isRecord(at)) return raw;
+      const kept: Raw = {};
+      for (const [name, entry] of Object.entries(at)) {
+        if (!safeKey(name)) continue;
+        if (!isRecord(entry) || !Array.isArray(entry.techniques)) {
+          kept[name] = entry;
+          continue;
+        }
+        const cut: Raw = {};
+        const techniques: unknown[] = [];
+        entry.techniques.forEach((id: unknown, index) => {
+          if (awayPack(loaded, id) === undefined) techniques.push(id);
+          else cut[String(index)] = id;
+        });
+        const away = Object.values(cut).map((id) => awayPack(loaded, id))[0];
+        if (away !== undefined) stash(away, path, name, cut);
+        kept[name] = { ...entry, techniques };
+      }
+      return setAt(raw, path, kept);
+    }
+    case 'pouch': {
+      if (!isRecord(at) || !Array.isArray(at.slots)) return raw;
+      const slots = at.slots.map((slot: unknown, index: number) => {
+        const id = isRecord(slot) ? slot.id : undefined;
+        const away = awayPack(loaded, id);
+        if (away === undefined) return slot;
+        stash(away, path, String(index), slot);
+        return { id: '', n: 0 };
+      });
+      return setAt(raw, path, { ...at, slots });
+    }
+    case 'goal': {
+      const id = isRecord(at) ? at.id : undefined;
+      const away = awayPack(loaded, id);
+      if (away === undefined) return raw;
+      stash(away, path, '0', at);
+      return setAt(raw, path, null);
+    }
+  }
+}
+
 /**
- * Moves the entries of `raw` that belong to a pack the content does not have into `dormant`, and
- * returns a copy of `raw` without them. The entries are found by the pack named in their key. The
- * rank and the natures of such a pack are settled separately (`settlePlayer`).
+ * Moves every entry of `raw` that belongs to a pack the content does not have into `dormant`, and
+ * returns a copy of `raw` without them. The places and how each is read are the table `PLACES`.
+ * The rank and the natures of such a pack are settled separately (`settlePlayer`).
  */
 export function stashMissing(
   raw: Raw,
@@ -172,52 +279,145 @@ export function stashMissing(
   saved: ReadonlyMap<string, string>,
 ): Raw {
   const loaded = new Set(content.packs.map((p) => p.id));
-  const out: Raw = { ...raw };
-  for (const field of DORMANT_FIELDS) {
-    const source = raw[field];
-    if (!isRecord(source)) continue;
-    const kept: Raw = {};
-    for (const [key, value] of Object.entries(source)) {
-      if (!safeKey(key)) continue;
-      const away = packsInKey(key).find((p) => !loaded.has(p));
-      if (away === undefined) {
-        kept[key] = value;
-        continue;
-      }
-      const target = bucket(dormant, away, saved);
-      const clean = cleanJson(value);
-      if (!target || clean === undefined || key.length > MAX_TEXT) continue;
-      const branch = (target.data[field] ??= {});
-      if (Object.keys(branch).length < MAX_ENTRIES) branch[key] = clean;
-    }
-    out[field] = kept;
-  }
+  const stash: Stash = (pack, path, key, value) => {
+    const target = bucket(dormant, pack, saved);
+    const clean = cleanJson(value);
+    if (!target || clean === undefined || key.length > MAX_TEXT) return;
+    const branch = (target.data[path] ??= {});
+    if (Object.keys(branch).length < MAX_ENTRIES) branch[key] = clean;
+  };
+  let out: Raw = { ...raw };
+  for (const place of PLACES) out = stashPlace(out, place, loaded, stash);
   return out;
 }
 
+/** Puts the entries of a bucket that are the pack's own back into one place; returns the new state. */
+function restorePlace(
+  raw: Raw,
+  place: Place,
+  pack: string,
+  entries: Record<string, JsonValue>,
+): Raw {
+  const at = getAt(raw, place.path);
+  const { path } = place;
+  const mine = (id: unknown): boolean => ownId(pack, id);
+  switch (place.rule) {
+    case 'keys': {
+      const now = isRecord(at) ? at : undefined;
+      if (
+        now === undefined &&
+        path.includes('.') &&
+        getAt(raw, path.slice(0, path.lastIndexOf('.'))) === undefined
+      ) {
+        return raw;
+      }
+      const merged: Raw = { ...(now ?? {}) };
+      for (const [key, value] of Object.entries(entries)) {
+        if (mine(key) && !Object.hasOwn(merged, key)) merged[key] = value;
+      }
+      return setAt(raw, path, merged);
+    }
+    case 'values': {
+      const merged: Raw = { ...(isRecord(at) ? at : {}) };
+      for (const [slot, id] of Object.entries(entries)) {
+        if (mine(id) && !Object.hasOwn(merged, slot)) merged[slot] = id;
+      }
+      return setAt(raw, path, merged);
+    }
+    case 'list': {
+      if (!Array.isArray(at)) return raw;
+      const list = [...at];
+      const back = Object.entries(entries)
+        .map(([index, id]) => [Number(index), id] as const)
+        .filter(([index, id]) => Number.isInteger(index) && index >= 0 && mine(id))
+        .sort((x, y) => x[0] - y[0]);
+      for (const [index, id] of back) {
+        if (!list.includes(id)) list.splice(Math.min(index, list.length), 0, id);
+      }
+      return setAt(raw, path, list);
+    }
+    case 'single': {
+      const id = entries['0'];
+      return (at === null || at === undefined) && mine(id) ? setAt(raw, path, id) : raw;
+    }
+    case 'saved': {
+      const saved = asRecord(at);
+      if (!saved) return raw;
+      const out: Raw = { ...saved };
+      for (const [name, cut] of Object.entries(entries)) {
+        const entry = asRecord(out[name]);
+        if (!entry || !Array.isArray(entry.techniques) || !isRecord(cut)) continue;
+        const techniques = [...entry.techniques];
+        const back = Object.entries(cut)
+          .map(([index, id]) => [Number(index), id] as const)
+          .filter(([index, id]) => Number.isInteger(index) && index >= 0 && mine(id))
+          .sort((x, y) => x[0] - y[0]);
+        for (const [index, id] of back) {
+          if (!techniques.includes(id))
+            techniques.splice(Math.min(index, techniques.length), 0, id);
+        }
+        out[name] = { ...entry, techniques };
+      }
+      return setAt(raw, path, out);
+    }
+    case 'pouch': {
+      const pouch = asRecord(at);
+      if (!pouch || !Array.isArray(pouch.slots)) return raw;
+      const slots = [...pouch.slots];
+      let next = raw;
+      for (const [index, slot] of Object.entries(entries)) {
+        if (!isRecord(slot) || !mine(slot.id)) continue;
+        const at2 = Number(index);
+        const have = slots[at2];
+        const free =
+          at2 < slots.length && isRecord(have) && (have.id === '' || have.id === undefined);
+        if (free) {
+          slots[at2] = { id: slot.id, n: slot.n };
+        } else {
+          // The slot is taken or gone: the units go back to the bank.
+          const bank = asRecord(getAt(next, 'bank')) ?? {};
+          const id = slot.id as string;
+          const had = typeof bank[id] === 'number' ? (bank[id] as number) : 0;
+          next = setAt(next, 'bank', {
+            ...bank,
+            [id]: had + (typeof slot.n === 'number' ? slot.n : 0),
+          });
+        }
+      }
+      return setAt(next, path, { ...(asRecord(getAt(next, path)) ?? pouch), slots });
+    }
+    case 'goal': {
+      const goal = entries['0'];
+      return (at === null || at === undefined) && isRecord(goal) && mine(goal.id)
+        ? setAt(raw, path, goal)
+        : raw;
+    }
+  }
+}
+
 /**
- * Returns the dormant entries of packs that are present now to the branches of `raw` and drops
- * their buckets. An entry that `raw` already has wins.
+ * Returns the dormant entries of packs that are present now to the places they came from and drops
+ * their buckets. A pack gets back only ids of its own namespace, and an entry that the state already
+ * has wins, so a tampered bucket cannot overwrite progress of the game or of another pack.
  */
+/** A bucket that came back, with the id of its pack. */
+export type RestoredPack = DormantPack & { packId: string };
+
 export function restoreDormant(
   raw: Raw,
   content: ContentDb,
   dormant: Record<string, DormantPack>,
-): { raw: Raw; restored: DormantPack[] } {
-  const out: Raw = { ...raw };
-  const restored: DormantPack[] = [];
+): { raw: Raw; restored: RestoredPack[] } {
+  let out: Raw = { ...raw };
+  const restored: RestoredPack[] = [];
   for (const pack of content.packs) {
     const held = dormant[pack.id];
     if (!held) continue;
-    restored.push(held);
+    restored.push({ ...held, packId: pack.id });
     delete dormant[pack.id];
-    for (const [field, entries] of Object.entries(held.data)) {
-      const now = isRecord(out[field]) ? (out[field] as Raw) : {};
-      const merged: Raw = { ...now };
-      for (const [key, value] of Object.entries(entries)) {
-        if (!Object.hasOwn(merged, key)) merged[key] = value;
-      }
-      out[field] = merged;
+    for (const place of PLACES) {
+      const entries = held.data[place.path];
+      if (entries) out = restorePlace(out, place, pack.id, entries);
     }
   }
   return { raw: out, restored };
@@ -233,7 +433,7 @@ export function settlePlayer(
   player: Raw,
   content: ContentDb,
   savedOrder: readonly string[],
-  restored: readonly DormantPack[],
+  restored: readonly RestoredPack[],
   dormant: Record<string, DormantPack>,
   saved: ReadonlyMap<string, string>,
 ): { rank: string | null; natures: string[] } {
@@ -258,7 +458,11 @@ export function settlePlayer(
   }
   // A returning pack gives its rank back when it is higher than the one held.
   for (const held of restored) {
-    if (held.rank !== null && rankIndex(content, held.rank) > rankIndex(content, rank)) {
+    if (
+      held.rank !== null &&
+      packOfId(held.rank) === held.packId &&
+      rankIndex(content, held.rank) > rankIndex(content, rank)
+    ) {
       rank = held.rank;
     }
   }
@@ -276,8 +480,12 @@ export function settlePlayer(
   }
   for (const held of restored) {
     if (held.natures.length === 0) continue;
-    const back = held.natures.filter((n) => isNature(content, n));
-    natures = [...back, ...natures.filter((n) => !back.includes(n))];
+    // The saved order is kept: the natures the player still has and the pack's own come back in it.
+    const now = natures;
+    const kept = held.natures.filter(
+      (n) => now.includes(n) || (isNature(content, n) && packOfId(n) === held.packId),
+    );
+    natures = [...kept, ...now.filter((n) => !kept.includes(n))];
   }
   return { rank: rank === '' ? null : rank, natures: [...new Set(natures)] };
 }
