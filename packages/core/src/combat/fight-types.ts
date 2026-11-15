@@ -237,12 +237,21 @@ export interface Spawn {
   specials: string[];
 }
 
+/** A teammate's support in a fight: every `everyMs` a hit of `damage` x the player's basic damage, with the state of the nature. */
+export interface TeamSupport {
+  nature: NatureId;
+  everyMs: number;
+  damage: number;
+}
+
 /** What a fight is against: a list of spawns plus special hooks every body of the fight carries. */
 export interface Encounter {
   /** Content id of the entry the encounter was built from. */
   id: string;
   spawns: Spawn[];
   specials: string[];
+  /** The teammates who support the player (a team mission); absent for none. */
+  support?: TeamSupport[];
 }
 
 export type FightResult = 'ongoing' | 'victory' | 'defeat' | 'fled' | 'timeout';

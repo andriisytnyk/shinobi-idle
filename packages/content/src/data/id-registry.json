@@ -138,7 +138,8 @@
     "Сувій: Техніка водяної в'язниці": "scroll_water_prison",
     "Частина сувою: Техніка водяної в'язниці": "scrollpart_water_prison",
     "Сувій: Постріл": "scroll_gunshot",
-    "Сувій: Поле липкого сиропу": "scroll_starch_syrup_capturing_field"
+    "Сувій: Поле липкого сиропу": "scroll_starch_syrup_capturing_field",
+    "Частина сувою: Полум'яна куля вогняного дракона": "scrollpart_fire_dragon_flame_bullet"
   },
   "zone": {
     "core:dummy": "zone_dummy",

@@ -11,6 +11,7 @@ import type { GameState } from '../state.ts';
 import type { System } from '../system.ts';
 import { encounterFor } from './fight-encounter.ts';
 import { bossNature } from '../natures.ts';
+import type { TeamSupport } from './fight-types.ts';
 import { createFight, fightAdvance, fightNextEventIn, fightOutcome } from './fight.ts';
 import { secMs } from './numbers.ts';
 import { refillPouch, syncPouch } from './pouch.ts';
@@ -28,12 +29,19 @@ export const OPERATION_KIND = 'operation';
 export const isCombatKind = (kind: string): boolean =>
   kind === FIGHT_KIND || kind === OPERATION_KIND;
 
+/** The action kind of a mission; its slot holds a fight only while one of its combat stages runs. */
+export const MISSION_KIND = 'mission';
+
 /** The slot's work units for `ms` of game time. Fights run on work units, like action progress. */
 export const combatUnits = (ms: number): number => workOf(ms);
 
 /** Index of the slot running a fight or an operation, or -1. */
 export function fightSlotIndex(state: GameState): number {
-  return state.slots.findIndex((s) => s.action !== null && isCombatKind(s.action.kind));
+  return state.slots.findIndex(
+    (s) =>
+      s.action !== null &&
+      (isCombatKind(s.action.kind) || (s.action.kind === MISSION_KIND && state.combat !== null)),
+  );
 }
 
 type Pools = { hp: number; chakra: number; stamina: number };
@@ -49,13 +57,14 @@ function startFight(
   content: ContentDb,
   rules: Rules,
   pools?: Pools,
+  support: readonly TeamSupport[] = [],
 ): CombatState['fight'] {
   state.seen[entry.id] = true;
   const snapshot = snapshotPlayer(state, content, rules, pools, [entry.id]);
   // The fight gets its own seed from the game's combat stream and runs on a stream of its own.
   return createFight(
     snapshot,
-    encounterFor(entry, content, [], 'special' in entry ? bossNature(state, entry) : null),
+    encounterFor(entry, content, [], 'special' in entry ? bossNature(state, entry) : null, support),
     nextSeed(state.rng, 'combat'),
     content,
     rules,
@@ -88,6 +97,18 @@ export function newCombat(
   rules: Rules,
 ): CombatState {
   return blank(entry, startFight(state, entry, content, rules), null);
+}
+
+/** A fight of a mission's combat stage: full pools, the current loadout and pouch (no refill), and the teammates' support. */
+export function newMissionCombat(
+  state: GameState,
+  entry: Enemy | Boss,
+  support: readonly TeamSupport[],
+  content: ContentDb,
+  rules: Rules,
+): CombatState {
+  state.flags.firstFight = true;
+  return blank(entry, startFight(state, entry, content, rules, undefined, support), null);
 }
 
 /** The enemy of an operation step; a step that draws from a pool draws on the combat stream. */
@@ -272,13 +293,36 @@ export const combatSystem: System = {
         bump(state, studiedKey(c.enemy));
         c.carry += c.fight.t - c.fight.tally.lastUseAt;
         const p = c.fight.player;
-        c.fight = startFight(state, entry, content, rules, {
-          hp: p.hp,
-          chakra: p.chakra,
-          stamina: p.stamina,
-        });
+        c.fight = startFight(
+          state,
+          entry,
+          content,
+          rules,
+          { hp: p.hp, chakra: p.chakra, stamina: p.stamina },
+          c.fight.encounter.support,
+        );
         c.paid = {};
         continue;
+      }
+      const owner = rules.actionKinds[state.slots[index]?.action?.kind ?? ''];
+      if (owner?.combatEnded) {
+        // The action that started the fight decides what follows (a mission's combat stage).
+        if (result === 'defeat') {
+          emit(state, { type: 'playerDefeated', enemy: c.enemy });
+          bump(state, defeatsKey(c.enemy));
+          woundsAfter(state, c, content, true);
+        } else {
+          bump(state, killsKey(c.enemy));
+          emit(state, { type: 'enemyDefeated', enemy: c.enemy });
+          woundsAfter(state, c, content, false);
+        }
+        return owner.combatEnded(
+          state,
+          index,
+          result === 'defeat' ? 'defeat' : 'victory',
+          content,
+          rules,
+        );
       }
       if (result === 'defeat') {
         emit(state, { type: 'playerDefeated', enemy: c.enemy });

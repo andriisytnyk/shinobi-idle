@@ -8,6 +8,8 @@ import {
 import { rebalanceShares } from './actions.ts';
 import { COURSE_ID, COURSE_KIND } from './athletics.ts';
 import { tonicCharges } from './buffs.ts';
+import { RATION_BUFF } from './missions/ration.ts';
+import { repairMissions } from './missions/run.ts';
 import { parseFight } from './combat/fight-parse.ts';
 import { secMs } from './combat/numbers.ts';
 import { pouchUse } from './combat/fight-items.ts';
@@ -16,6 +18,7 @@ import { ensurePouch } from './combat/pouch.ts';
 import {
   FIGHT_KIND,
   OPERATION_KIND,
+  MISSION_KIND,
   isCombatKind,
   newCombat,
   newOperation,
@@ -123,6 +126,8 @@ export const MIGRATIONS: readonly Migration[] = [
       seen: {},
     };
   },
+  // v10 -> v11: missions. Village resource units earned by missions wait for a village to take them.
+  (state) => ({ ...state, missions: { pending: {} } }),
 ];
 
 /** Deepest nesting a slot's data may have. */
@@ -527,6 +532,10 @@ export function deserialize(
   });
   state.buffs = pick(raw.buffs, (key, v) => {
     const fx = index.items.get(key)?.fx;
+    if (fx?.kind === 'ration' && isRecord(v)) {
+      const charges = Math.min(Math.floor(nonNegative(v.charges)), fx.missions);
+      return charges >= 1 ? { skill: RATION_BUFF, charges } : undefined;
+    }
     if (fx?.kind !== 'tonic' || !isRecord(v)) return undefined;
     const cap = tonicCharges(state, fx.charges, content, rules) * content.balance.K.tonic.capMult;
     const charges = Math.min(Math.floor(nonNegative(v.charges)), cap);
@@ -549,6 +558,14 @@ export function deserialize(
     return { stock, size, carry };
   });
   state.world = sanitizeWorld(raw.world, content);
+  const pending = isRecord(raw.missions) ? raw.missions.pending : undefined;
+  state.missions = {
+    pending: pick(pending, (key, n) =>
+      /^[a-z0-9_]+$/.test(key) && typeof n === 'number' && Number.isInteger(n) && n > 0
+        ? n
+        : undefined,
+    ),
+  };
   const goal = raw.goal;
   state.goal =
     isRecord(goal) && typeof goal.kind === 'string' && typeof goal.id === 'string'
@@ -583,6 +600,16 @@ export function deserialize(
       const op = indexOf(content).operations.get(action.id);
       if (op) state.combat = newOperation(state, op, content, rules);
     }
+  }
+  // A mission's combat stage keeps its fight in the same place; the mission checks it against its run.
+  const missionSlot = state.slots.find((s) => s.action?.kind === MISSION_KIND);
+  if (missionSlot?.action) {
+    state.combat = sanitizeCombat(
+      raw.combat,
+      { kind: FIGHT_KIND, id: missionSlot.action.id },
+      content,
+    );
+    repairMissions(state, content, rules);
   }
   updateQuests(state, content);
   return state;

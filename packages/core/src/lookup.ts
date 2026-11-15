@@ -8,6 +8,7 @@ import type {
   Gear,
   Herb,
   Item,
+  Mission,
   Obstacle,
   Operation,
   Poi,
@@ -36,6 +37,7 @@ export interface ContentIndex {
   medicItems: { id: string; tier: number }[];
   operations: Map<string, Operation>;
   items: Map<string, Item>;
+  missions: Map<string, Mission>;
   herbs: Map<string, Herb>;
   recipes: Map<string, Recipe>;
   /** Recipe by the item it makes. */
@@ -115,6 +117,7 @@ function build(content: ContentDb): ContentIndex {
     zoneByEnemy: new Map(content.zones.map((z) => [z.enemy, z])),
     operations: byId(content.operations),
     items: byId(content.items),
+    missions: byId(content.missions),
     herbs: byId(content.herbs),
     recipes: byId(content.recipes),
     recipeByOutput: new Map(content.recipes.map((r) => [r.output.item, r])),

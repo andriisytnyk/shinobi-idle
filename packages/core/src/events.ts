@@ -152,6 +152,21 @@ export interface TravelledEvent extends EventBase {
   cell: string;
 }
 
+/** One attempt at a mission stage ended; `ok` is false when it must be repeated. */
+export interface MissionStageEvent extends EventBase {
+  type: 'missionStage';
+  mission: string;
+  stage: number;
+  ok: boolean;
+}
+/** A mission was finished and paid. */
+export interface MissionDoneEvent extends EventBase {
+  type: 'missionDone';
+  mission: string;
+  ryo: number;
+  rep: number;
+}
+
 export type GameEvent =
   | LevelUpEvent
   | MasteryUpEvent
@@ -176,7 +191,9 @@ export type GameEvent =
   | CellLevelUpEvent
   | PoiFoundEvent
   | PoiClaimedEvent
-  | TravelledEvent;
+  | TravelledEvent
+  | MissionStageEvent
+  | MissionDoneEvent;
 
 type WithoutAt<T> = T extends unknown ? Omit<T, 'at'> : never;
 

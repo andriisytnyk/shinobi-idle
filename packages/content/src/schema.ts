@@ -259,6 +259,10 @@ export const itemFxSchema = z.discriminatedUnion('kind', [
   }),
   /** A weapon poison; the tag is what the coated senbon answer. */
   z.strictObject({ kind: z.literal('poison'), tag: tagId }),
+  /** A merchant crate: opening it rolls the table `K.crate`. */
+  z.strictObject({ kind: z.literal('crate') }),
+  /** Notes about an enemy: they raise the Bingo level of a chosen enemy by `levels` once the Bingo book exists; until then the item carries data only. */
+  z.strictObject({ kind: z.literal('bingoNote'), levels: z.number().int().min(1) }),
 ]);
 
 export const itemSchema = z.strictObject({
@@ -344,24 +348,63 @@ export const missionStageSchema = z.discriminatedUnion('t', [
   z.object({ t: z.literal('items'), item: coreId, n: z.number().int().min(1) }),
 ]);
 
-export const missionPaySchema = z.discriminatedUnion('kind', [
+/** What the generated data says about one payment in kind: the item, Intel or a scroll part. */
+export const missionBasePaySchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('item'), item: coreId }),
   z.object({ kind: z.literal('intel') }),
   z.object({ kind: z.literal('scrollPart'), technique: coreId }),
 ]);
 
-export const missionSchema = z.strictObject({
+/** A payment in kind with its amount; a scroll part is a chance (`K.partDrop.mission`) of one part. */
+export const missionPaySchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('item'), item: coreId, n: z.number().int().min(1) }),
+  z.object({ kind: z.literal('intel'), n: z.number().int().min(1) }),
+  z.object({ kind: z.literal('scrollPart'), technique: coreId }),
+]);
+
+/** The mission as the importer generates it. */
+export const missionBaseSchema = z.strictObject({
   id: coreId,
   rank: z.enum(MISSION_RANKS),
   team: z.boolean(),
   /** Duration in minutes. */
   minutes: z.number().int().min(0),
   stages: z.array(missionStageSchema).min(1),
-  pay: z.array(missionPaySchema),
+  pay: z.array(missionBasePaySchema),
   /** Village resource gained, for village missions. */
   resource: resSlug.nullable(),
   ryo: z.number(),
   rep: z.number(),
+});
+
+/** The hand-written part of a mission: what opens it, how its minutes split between stages, how much of each payment. */
+export const missionExtraSchema = z.strictObject({
+  unlock: z.lazy(() => reqSchema).nullable(),
+  /** Relative weight of each stage in the mission's minutes. */
+  shares: z.array(z.number().int().min(1)).min(1),
+  /** Amount of each payment of the base mission, in order; a scroll part has 1. */
+  pay: z.array(z.number().int().min(1)),
+  /** For each stage, the indices of its alternatives that are slower fallbacks (they take twice the time). */
+  slow: z.array(z.array(z.number().int().min(0))),
+});
+
+export const missionSchema = missionBaseSchema.extend({
+  pay: z.array(missionPaySchema),
+  unlock: z.lazy(() => reqSchema).nullable(),
+  shares: z.array(z.number().int().min(1)).min(1),
+  slow: z.array(z.array(z.number().int().min(0))),
+});
+
+/**
+ * A teammate: which of the rival's and Aya's natures is his or hers, the skills the role is good at,
+ * and the level formula (shares of the player's own levels) lives in `K.team`.
+ */
+export const teammateSchema = z.strictObject({
+  id: coreId,
+  /** Whose nature from the team selector this teammate has. */
+  natureOf: z.enum(['rival', 'aya']),
+  /** Skills the teammate is strong in (a stage that checks one of them can be done by the teammate). */
+  skills: z.array(skillId).min(1),
 });
 
 // ---------- world ----------
@@ -989,6 +1032,41 @@ export const balanceParamsSchema = z.object({
     regions: z.array(z.string()),
   }),
   operation: z.object({ approachMs: z.number().int(), approachShort: z.number() }),
+  /**
+   * Missions: the time a level above a stage's requirement saves (per level, never below the floor
+   * share), what a mastery level of the technique used saves, the factor of a slower fallback, and
+   * the chance of a stage attempt (base at the requirement, plus per level and per mastery level, up to the cap).
+   */
+  mission: z.object({
+    perLevel: z.number(),
+    floor: z.number(),
+    masteryTime: z.number(),
+    slowAlt: z.number(),
+    success: z.object({
+      base: z.number(),
+      perLevel: z.number(),
+      perMastery: z.number(),
+      cap: z.number(),
+    }),
+  }),
+  /**
+   * The team: a teammate's level is this share of the player's own level (of the role skill, or of
+   * the player's best nature skill for the teammate's nature), at least 1; the mastery a teammate
+   * has with the technique he or she performs; and the support in a fight: a hit every `everyMs`
+   * (the second teammate starts half a period later) of `damage` x the player's basic damage, which
+   * applies the state its nature makes (`states`, null: none).
+   */
+  team: z.object({
+    levelShare: z.number(),
+    mastery: z.number().int(),
+    support: z.object({ everyMs: z.number().int(), damage: z.number() }),
+    states: z.record(z.string(), z.string().nullable()),
+  }),
+  /** A merchant crate's contents: units of each good (min, max), and the chance of a gem. */
+  crate: z.object({
+    goods: z.record(z.string(), z.tuple([z.number().int(), z.number().int()])),
+    gem: z.object({ item: z.string(), chance: z.number() }),
+  }),
   toolFx: z.object({ dot: z.object({ pct: z.number(), durS: z.number() }), resist: z.number() }),
   illusionResist: z.number(),
   senseiTest: z.object({ base: z.number(), perLevel: z.number(), floor: z.number() }),
@@ -1063,6 +1141,7 @@ export const contentDbSchema = z.object({
   coat: z.array(coatSchema),
   recipes: z.array(recipeSchema),
   missions: z.array(missionSchema),
+  team: z.array(teammateSchema),
   regions: z.array(regionSchema),
   cells: z.array(cellSchema),
   /** What each kind of key cell needs. */
@@ -1099,8 +1178,10 @@ export const generatedDbSchema = contentDbSchema
     traits: true,
     combos: true,
     ai: true,
+    team: true,
   })
   .extend({
+    missions: z.array(missionBaseSchema),
     cells: z.array(cellBaseSchema),
     techniques: z.array(techniqueBaseSchema),
     enemies: z.array(enemyBaseSchema),
@@ -1138,6 +1219,10 @@ export type MarketEntry = z.infer<typeof marketEntrySchema>;
 export type Recipe = z.infer<typeof recipeSchema>;
 export type MissionStage = z.infer<typeof missionStageSchema>;
 export type MissionPay = z.infer<typeof missionPaySchema>;
+export type MissionBasePay = z.infer<typeof missionBasePaySchema>;
+export type MissionBase = z.infer<typeof missionBaseSchema>;
+export type MissionExtra = z.infer<typeof missionExtraSchema>;
+export type Teammate = z.infer<typeof teammateSchema>;
 export type Mission = z.infer<typeof missionSchema>;
 export type Cell = z.infer<typeof cellSchema>;
 export type Region = z.infer<typeof regionSchema>;

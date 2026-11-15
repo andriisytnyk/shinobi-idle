@@ -50,6 +50,18 @@ export interface ActionKind {
   missing?(state: GameState, id: string, content: ContentDb, rules: Rules): string | null;
   /** The skill the action trains, when it trains one; a locked skill refuses its actions. */
   skill?(id: string, content: ContentDb): SkillId | null;
+  /**
+   * The fight the action started (it put `state.combat` there) has ended in `result`; the combat
+   * system has counted the Wounds and the kill. The kind decides what follows: it may leave the
+   * slot, clear or replace `state.combat`, and so on. Kinds without it are the fight kinds.
+   */
+  combatEnded?(
+    state: GameState,
+    slot: number,
+    result: 'victory' | 'defeat',
+    content: ContentDb,
+    rules: Rules,
+  ): void;
   /** Called after the action is put in slot `slot` (its `data` is null). */
   start?(state: GameState, slot: number, id: string, content: ContentDb, rules: Rules): void;
   /** Called just before the action leaves slot `slot`, for any reason. */

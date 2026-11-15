@@ -184,6 +184,7 @@ export const ICON_MAP: Readonly<Record<IconKind, Readonly<Record<string, string>
     'core:scroll_earth_dragon_bullet': 'tied-scroll',
     'core:scroll_water_prison': 'tied-scroll',
     'core:scrollpart_water_prison': 'scroll-unfurled',
+    'core:scrollpart_fire_dragon_flame_bullet': 'scroll-unfurled',
     'core:scroll_gunshot': 'tied-scroll',
     'core:scroll_starch_syrup_capturing_field': 'tied-scroll',
     // Consumables (recipe outputs)

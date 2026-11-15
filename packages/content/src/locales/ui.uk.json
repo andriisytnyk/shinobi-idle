@@ -257,6 +257,7 @@
   "error.invalidName": "Ім'я має містити від 1 до 24 символів.",
   "error.missingIngredient": "Бракує інгредієнтів.",
   "error.tonicFull": "Дія цього тоніка вже на межі зарядів.",
+  "error.rationArmed": "Пайок уже чекає на наступну місію.",
   "error.invalidCoat": "Цією отрутою ці предмети не змастити.",
   "error.invalidAmount": "Кількість має бути цілим числом від 1.",
   "error.notForSale": "Цього товару тут не продають.",

@@ -39,8 +39,8 @@ import {
   type HerbBase,
   type Item,
   type MarketEntry,
-  type Mission,
-  type MissionPay,
+  type MissionBase,
+  type MissionBasePay,
   type MissionStage,
   type ObstacleBase,
   type PoolCheckpointBase,
@@ -451,7 +451,7 @@ const bosses: BossBase[] = slice.bosses.map((row) => {
 
 const enemyIds = new Set([...enemies, ...bosses].map((e) => e.id));
 const balMission = new Map(bal.missions.map((m) => [m.id, m]));
-const missions: Mission[] = slice.missions.map((m) => {
+const missions: MissionBase[] = slice.missions.map((m) => {
   const id = core(m.id);
   const b = need(balMission.get(m.id), `balance entry for mission ${m.id}`);
   text('mission', id, 'name', m.name);
@@ -480,7 +480,7 @@ const missions: Mission[] = slice.missions.map((m) => {
         return { t: 'items', item: core(s.item), n: s.n };
     }
   });
-  const pay: MissionPay[] = (m.pay ?? []).map((p) => {
+  const pay: MissionBasePay[] = (m.pay ?? []).map((p) => {
     if (p === 'intel') return { kind: 'intel' };
     if (p.startsWith('scrollpart:'))
       return { kind: 'scrollPart', technique: techId(p.slice('scrollpart:'.length)) };
@@ -488,7 +488,7 @@ const missions: Mission[] = slice.missions.map((m) => {
   });
   return {
     id,
-    rank: m.rk as Mission['rank'],
+    rank: m.rk as MissionBase['rank'],
     team: m.team,
     minutes: m.min,
     stages,

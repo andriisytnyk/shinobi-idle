@@ -7,13 +7,23 @@ import type { Req } from '../requirements.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 import { ensurePouch, refillPouch } from './pouch.ts';
-import { isCombatKind, newCombat, newOperation } from './system.ts';
+import { MISSION_KIND, isCombatKind, newCombat, newOperation } from './system.ts';
 import { entryOf, fightTarget, zoneRequirement } from './zones.ts';
 
 /** One fight gives way to another: a fight or run already going in another slot stops. */
-function clearOthers(state: GameState, slot: number, content: ContentDb, rules: Rules): void {
+export function clearOthers(
+  state: GameState,
+  slot: number,
+  content: ContentDb,
+  rules: Rules,
+): void {
   state.slots.forEach((other, index) => {
-    if (index !== slot && other.action && isCombatKind(other.action.kind)) {
+    // A mission in the middle of a combat stage holds the fight as well.
+    const fighting =
+      other.action !== null &&
+      (isCombatKind(other.action.kind) ||
+        (other.action.kind === MISSION_KIND && state.combat !== null));
+    if (index !== slot && fighting) {
       stopSlot(state, index, 'replaced', content, rules);
     }
   });
