@@ -11,6 +11,7 @@ export * from './events.ts';
 export * from './exam.ts';
 export * from './buffs.ts';
 export * from './field.ts';
+export * from './flags.ts';
 export * from './gate.ts';
 export * from './gear.ts';
 export * from './shop.ts';

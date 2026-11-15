@@ -1,0 +1,41 @@
+{
+  "visibleTraits": ["armor", "pack"],
+  "tiers": [
+    {
+      "id": "genin",
+      "minTier": 0,
+      "rules": [
+        "heal",
+        "interrupt",
+        "defend",
+        "answer",
+        "maintain",
+        "signature",
+        "best",
+        "filler",
+        "basic"
+      ],
+      "defends": "known",
+      "tactical": false,
+      "reaction": true
+    },
+    {
+      "id": "chunin",
+      "minTier": 2,
+      "rules": [
+        "heal",
+        "interrupt",
+        "defend",
+        "answer",
+        "maintain",
+        "signature",
+        "best",
+        "filler",
+        "basic"
+      ],
+      "defends": "all",
+      "tactical": true,
+      "reaction": false
+    }
+  ]
+}

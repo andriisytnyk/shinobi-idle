@@ -1,4 +1,5 @@
 import type {
+  Boss,
   ContentDb,
   Cell,
   Enemy,
@@ -8,6 +9,7 @@ import type {
   Herb,
   Item,
   Obstacle,
+  Operation,
   Poi,
   PoolCheckpoint,
   Practice,
@@ -16,6 +18,7 @@ import type {
   Recipe,
   ShopEntry,
   Technique,
+  Zone,
 } from '@shinobi/content';
 
 /** Id lookups over a content database, built once per database. */
@@ -25,6 +28,13 @@ export interface ContentIndex {
   practices: Map<string, Practice>;
   obstacles: Map<string, Obstacle>;
   enemies: Map<string, Enemy>;
+  bosses: Map<string, Boss>;
+  zones: Map<string, Zone>;
+  /** The zone that holds each enemy; an enemy of no zone (a mission enemy) has none. */
+  zoneByEnemy: Map<string, Zone>;
+  /** The items that are a medic pouch upgrade, with their tier. */
+  medicItems: { id: string; tier: number }[];
+  operations: Map<string, Operation>;
   items: Map<string, Item>;
   herbs: Map<string, Herb>;
   recipes: Map<string, Recipe>;
@@ -97,6 +107,13 @@ function build(content: ContentDb): ContentIndex {
     pois,
     zoneCell,
     enemies: byId(content.enemies),
+    bosses: byId(content.bosses),
+    zones: byId(content.zones),
+    medicItems: content.items.flatMap((i) =>
+      i.medic === undefined ? [] : [{ id: i.id, tier: i.medic }],
+    ),
+    zoneByEnemy: new Map(content.zones.map((z) => [z.enemy, z])),
+    operations: byId(content.operations),
     items: byId(content.items),
     herbs: byId(content.herbs),
     recipes: byId(content.recipes),

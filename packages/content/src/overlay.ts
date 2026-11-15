@@ -52,7 +52,7 @@ export const bossSpecialMapSchema = z.record(coreId, bossSpecialSchema);
 /** The economy fields of an item that the generated data does not know. */
 export const itemEconMapSchema = z.record(
   coreId,
-  itemSchema.pick({ buy: true, sell: true, pouch: true }),
+  itemSchema.pick({ buy: true, sell: true, pouch: true, medic: true }),
 );
 
 type TechniqueBase = z.infer<typeof techniqueBaseSchema>;
