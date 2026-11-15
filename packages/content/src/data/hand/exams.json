@@ -1,0 +1,22 @@
+[
+  {
+    "id": "core:genin_exam",
+    "rank": "genin",
+    "checklist": {
+      "t": "all",
+      "of": [
+        { "t": "skill", "skill": "tai", "level": 10 },
+        { "t": "skill", "skill": "nin", "level": 10 },
+        { "t": "skill", "skill": "cc", "level": 10 },
+        { "t": "technique", "id": "core:clone" },
+        { "t": "technique", "id": "core:transformation" },
+        { "t": "technique", "id": "core:body_replacement" }
+      ]
+    },
+    "reduceBy": ["tai", "nin", "cc"],
+    "rewards": {
+      "items": [{ "item": "core:graduate_scroll", "n": 1 }],
+      "goal": { "kind": "technique", "id": "core:shadow_clone" }
+    }
+  }
+]

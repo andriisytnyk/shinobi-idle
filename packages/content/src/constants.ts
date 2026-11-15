@@ -28,6 +28,9 @@ export const SKILL_GROUPS = ['train', 'nin', 'field', 'craft', 'combat'] as cons
 
 export const RANKS = ['E', 'D', 'C', 'B', 'A', 'S'] as const;
 
+/** Ranks the player holds, lowest first. */
+export const PLAYER_RANK_IDS = ['student', 'genin', 'chunin'] as const;
+
 /** Technique roles (Ukrainian role names are only localization strings). */
 export const ROLE_IDS = [
   'projectile',
@@ -94,14 +97,41 @@ export const KEY_NATURES: Record<(typeof CELL_KEYS)[number], readonly string[]> 
   rubble: ['doton'],
 };
 
+/** Skills that are open from the first day. */
+export const OPEN_SKILL_IDS = ['tai', 'nin', 'cc', 'med', 'ath'] as const;
+
+/** Skills that open with the first fight; every other skill opens at the Genin rank. */
+export const FIGHT_SKILL_IDS = ['vit', 'eva'] as const;
+
+/** The flag the combat stage raises on the first fight. */
+export const FIRST_FIGHT_FLAG = 'firstFight';
+
 export type SkillId = (typeof SKILL_IDS)[number];
 export type NatureId = (typeof NATURE_IDS)[number];
 export type TechSkillId = (typeof TECH_SKILL_IDS)[number];
 export type SkillGroup = (typeof SKILL_GROUPS)[number];
 export type Rank = (typeof RANKS)[number];
+export type PlayerRank = (typeof PLAYER_RANK_IDS)[number];
 export type RoleId = (typeof ROLE_IDS)[number];
 export type TagId = (typeof TAG_IDS)[number];
 export type TraitId = (typeof TRAIT_IDS)[number];
 export type StateId = (typeof STATE_IDS)[number];
 export type MissionRank = (typeof MISSION_RANKS)[number];
 export type CellKey = (typeof CELL_KEYS)[number];
+
+/** Statuses a fighter can carry. Burn, stun and wet are technique states; bind and poison come from other effects. */
+export const STATUS_IDS = ['burn', 'wet', 'stun', 'bind', 'poison'] as const;
+
+/** Combos of states: a nature hitting a fighter that already carries a state. */
+export const COMBO_IDS = ['fanBurn', 'shockWet', 'mudEva', 'steam'] as const;
+
+/** How an enemy attacks. */
+export const ATTACK_STYLES = ['melee', 'ranged'] as const;
+
+/** Where a fightable zone lies: a region of the map, the Academy yard, the exam forest or a boss. */
+export const ZONE_REGIONS = ['academy', 'forest', 'plains', 'valley', 'exam', 'boss'] as const;
+
+export type StatusId = (typeof STATUS_IDS)[number];
+export type ComboId = (typeof COMBO_IDS)[number];
+export type AttackStyle = (typeof ATTACK_STYLES)[number];
+export type ZoneRegion = (typeof ZONE_REGIONS)[number];

@@ -1,6 +1,9 @@
 <script lang="ts">
-  import { state } from '../lib/game.ts';
+  import { game } from '../lib/store.ts';
+  import { content } from '@shinobi/content';
   import { t } from '../lib/i18n.ts';
+  import { markerOf } from '../lib/nav.ts';
+  import { nextStep } from '../lib/next-step.ts';
   import Icon from './Icon.svelte';
 
   interface Props {
@@ -11,6 +14,9 @@
   let { metaOpen, onToggleMeta }: Props = $props();
 
   const numbers = new Intl.NumberFormat('uk');
+  const rankMarked = $derived(
+    markerOf(nextStep(game.state, content)?.target ?? null).nav === 'rank',
+  );
 </script>
 
 <header class="topbar">
@@ -18,20 +24,45 @@
 
   <dl class="stats">
     <div class="stat">
-      <dt><Icon name="coin" size={16} /><span class="label">{t('topbar.ryo')}</span></dt>
-      <dd>{numbers.format(state.currencies.ryo)}</dd>
+      <dt>
+        <Icon entity={{ kind: 'currency', id: 'ryo' }} size={16} /><span class="label"
+          >{t('topbar.ryo')}</span
+        >
+      </dt>
+      <dd>{numbers.format(game.state.currencies.ryo)}</dd>
     </div>
     <div class="stat">
-      <dt><Icon name="star" size={16} /><span class="label">{t('topbar.rep')}</span></dt>
-      <dd>{numbers.format(state.currencies.rep)}</dd>
+      <dt>
+        <Icon entity={{ kind: 'currency', id: 'rep' }} size={16} /><span class="label"
+          >{t('topbar.rep')}</span
+        >
+      </dt>
+      <dd>{numbers.format(game.state.currencies.rep)}</dd>
     </div>
     <div class="stat intel">
-      <dt><Icon name="eye" size={16} /><span class="label">{t('topbar.intel')}</span></dt>
-      <dd>{numbers.format(state.currencies.intel)}</dd>
+      <dt>
+        <Icon entity={{ kind: 'currency', id: 'intel' }} size={16} /><span class="label"
+          >{t('topbar.intel')}</span
+        >
+      </dt>
+      <dd>{numbers.format(game.state.currencies.intel)}</dd>
     </div>
     <div class="stat rank">
-      <dt><Icon name="shield" size={16} /><span class="label">{t('topbar.rank')}</span></dt>
-      <dd>{t(`rank.${state.player.rank}`)}</dd>
+      <dt><Icon name="rank-3" size={16} /><span class="label">{t('topbar.rank')}</span></dt>
+      <dd>
+        <a class="rank-link" href="#/rank" data-rank-plate
+          >{t(`rank.${game.state.player.rank}`)}{#if rankMarked}<span
+              class="marker"
+              data-marker
+              role="img"
+              aria-label={t('nav.next')}
+            ></span>{/if}</a
+        >
+      </dd>
+    </div>
+    <div class="stat save" data-save={game.saveStatus}>
+      <dt class="label">{t('topbar.save')}</dt>
+      <dd>{t(`topbar.save.${game.saveStatus}`)}</dd>
     </div>
   </dl>
 
@@ -42,6 +73,10 @@
         <option>{t('lang.uk')}</option>
       </select>
     </label>
+    <a class="meta-toggle more-link" href="#/more">
+      <Icon name="lucide:settings" size={18} />
+      <span class="more-label">{t('nav.more')}</span>
+    </a>
     <button
       type="button"
       class="meta-toggle"
@@ -49,7 +84,7 @@
       aria-controls="meta-panel"
       onclick={onToggleMeta}
     >
-      <Icon name="scroll" size={18} />
+      <Icon name="lucide:panel-right" size={18} />
       <span>{t('nav.meta')}</span>
     </button>
   </div>
@@ -105,11 +140,36 @@
   }
 
   .stat.rank dd {
-    padding: 0 var(--space-2);
     border-radius: var(--radius-sm);
     background: var(--steel);
     color: var(--ink-900);
     font-weight: 600;
+  }
+
+  .rank-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 0 var(--space-2);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .marker {
+    width: 0.6rem;
+    height: 0.6rem;
+    border: 2px solid var(--ink-900);
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .stat.save {
+    color: var(--fg-dim);
+    font-size: 0.85rem;
+  }
+
+  .stat.save[data-save='error'] dd {
+    color: var(--danger);
   }
 
   .tools {
@@ -142,6 +202,10 @@
     cursor: pointer;
   }
 
+  .more-link {
+    text-decoration: none;
+  }
+
   .meta-toggle[aria-expanded='true'] {
     border-color: var(--accent);
   }
@@ -164,7 +228,20 @@
       margin-left: auto;
     }
 
-    .lang {
+    /* Whole-tap targets of at least 44 px on a phone. */
+    .meta-toggle,
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.75rem;
+    }
+
+    .rank-link {
+      min-height: 2.75rem;
+    }
+
+    .lang,
+    .more-link {
       display: none;
     }
 

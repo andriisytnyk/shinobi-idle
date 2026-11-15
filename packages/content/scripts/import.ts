@@ -8,7 +8,10 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  FIGHT_SKILL_IDS,
+  FIRST_FIGHT_FLAG,
   NATURE_IDS,
+  OPEN_SKILL_IDS,
   ROLE_IDS,
   SKILL_GROUPS,
   SKILL_IDS,
@@ -20,15 +23,16 @@ import {
   type TagId,
   type TraitId,
 } from '../src/constants.ts';
+import { BALANCE_EXT } from '../src/balance-ext.ts';
 import { localeKey, type LocaleKind } from '../src/keys.ts';
 import {
   balanceParamsSchema,
-  contentDbSchema,
-  type Boss,
+  generatedDbSchema,
+  type BossBase,
   type Building,
   type Cell,
-  type ContentDb,
-  type Enemy,
+  type GeneratedDb,
+  type EnemyBase,
   type Exercise,
   type Gear,
   type Herb,
@@ -44,7 +48,7 @@ import {
   type Region,
   type Seal,
   type Skill,
-  type Technique,
+  type TechniqueBase,
 } from '../src/schema.ts';
 import { rawBalance, rawMap, rawSlice } from './raw.ts';
 import { IdRegistry, type IdTable } from './translit.ts';
@@ -155,7 +159,14 @@ const skills: Skill[] = SKILL_IDS.map((id) => {
   text('skill', id, 'name', n.name);
   text('skill', id, 'desc', n.lore);
   text('skill', id, 'unlock', n.unlock);
-  return { id, group, activity: n.mt ?? 'none' };
+  const open = (OPEN_SKILL_IDS as readonly string[]).includes(id);
+  const fight = (FIGHT_SKILL_IDS as readonly string[]).includes(id);
+  const unlockReq: Skill['unlockReq'] = open
+    ? null
+    : fight
+      ? { t: 'flag', id: FIRST_FIGHT_FLAG }
+      : { t: 'rank', rank: 'genin' };
+  return { id, group, activity: n.mt ?? 'none', unlockReq };
 });
 for (const nat of NATURE_IDS)
   need(
@@ -173,7 +184,7 @@ const seals: Seal[] = Object.entries(slice.seals).map(([key, s]) => {
 
 const english: Record<string, string> = {};
 const techByUk = new Map<string, string>();
-const techniques: Technique[] = slice.techniques.map((t) => {
+const techniques: TechniqueBase[] = slice.techniques.map((t) => {
   techByUk.set(t.uk, t.id);
   text('technique', t.id, 'name', t.uk);
   english[localeKey('technique', t.id, 'name')] = t.en;
@@ -183,17 +194,18 @@ const techniques: Technique[] = slice.techniques.map((t) => {
   text('technique', t.id, 'note', t.note);
   return {
     id: t.id,
-    skill: t.skill as Technique['skill'],
+    skill: t.skill as TechniqueBase['skill'],
     level: t.level,
-    rank: t.rank === '—' ? null : (t.rank as Technique['rank']),
+    rank: t.rank === '—' ? null : (t.rank as TechniqueBase['rank']),
     rankCanon: t.rankCanon,
     role: need(ROLE_BY_UK[t.role], `unknown role "${t.role}"`),
     tags: t.tags.map(tag),
     state: t.state === '' ? null : need(STATE_BY_UK[t.state], `unknown state "${t.state}"`),
-    src: t.src as Technique['src'],
+    src: t.src as TechniqueBase['src'],
+    mentor: t.src === 'N' ? (t.home === 'Академія' ? 'academy' : 'other') : null,
     sealSeq: t.sealSeq.map(core),
     sealsCanon: t.sealsCanon,
-    tier: t.tier as Technique['tier'],
+    tier: t.tier as TechniqueBase['tier'],
     noDamage: t.noDamage,
   };
 });
@@ -399,9 +411,10 @@ const gear: Gear[] = slice.gear.map(([name, skill, tiers, effect]) => {
 // ---------- enemies, bosses ----------
 
 const balEnemy = new Map(bal.enemies.map((e) => [e.id, e]));
-const nature = (v: string | null): Enemy['nature'] => {
+const nature = (v: string | null): EnemyBase['nature'] => {
   if (v === null) return null;
-  if (v === 'wheel' || (NATURE_IDS as readonly string[]).includes(v)) return v as Enemy['nature'];
+  if (v === 'wheel' || (NATURE_IDS as readonly string[]).includes(v))
+    return v as EnemyBase['nature'];
   throw new Error(`Import: enemy nature "${v}"`);
 };
 type EnemyRow = [string, string, string, number, string[], string | null, string | null];
@@ -420,11 +433,11 @@ const enemyBase = (kind: 'enemy' | 'boss', [raw, name, , cl, traits, nat, carrie
     dmg: b.dmg,
   };
 };
-const enemies: Enemy[] = slice.enemies.map((row) => ({
+const enemies: EnemyBase[] = slice.enemies.map((row) => ({
   ...enemyBase('enemy', row),
-  region: row[2] as Enemy['region'],
+  region: row[2] as EnemyBase['region'],
 }));
-const bosses: Boss[] = slice.bosses.map((row) => {
+const bosses: BossBase[] = slice.bosses.map((row) => {
   const base = enemyBase('boss', [row[0], row[1], row[2], row[3], row[4], row[5], row[6]]);
   text('boss', base.id, 'place', row[2]);
   text('boss', base.id, 'desc', row[7]);
@@ -512,6 +525,7 @@ const roleKeys = new Map(Object.entries(ROLE_BY_UK));
 const rawParams = bal.params;
 const rawRole = rawParams.role as Record<string, unknown>;
 const params = balanceParamsSchema.parse({
+  ...BALANCE_EXT,
   ...rawParams,
   role: Object.fromEntries(
     Object.entries(rawRole).map(([uk, v]) => [need(roleKeys.get(uk), `balance role "${uk}"`), v]),
@@ -521,7 +535,7 @@ const balance = { K: params, pace: bal.pace, capHours: bal.capHours, milestones:
 
 // ---------- assemble, validate, write ----------
 
-const db: ContentDb = contentDbSchema.parse({
+const db: GeneratedDb = generatedDbSchema.parse({
   skills,
   seals,
   techniques,

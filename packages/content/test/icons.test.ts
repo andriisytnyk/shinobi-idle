@@ -1,0 +1,78 @@
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { describe, expect, it } from 'vitest';
+import {
+  content,
+  CURRENCY_IDS,
+  ICON_KINDS,
+  ICON_MAP,
+  iconFor,
+  NATURE_IDS,
+  SKILL_IDS,
+  STATUS_IDS,
+  TECH_SKILL_IDS,
+  TRAIT_IDS,
+  type IconKind,
+} from '../src/index.ts';
+
+const require = createRequire(import.meta.url);
+const collection = JSON.parse(
+  readFileSync(require.resolve('@iconify-json/game-icons/icons.json'), 'utf8'),
+) as { icons: Record<string, unknown>; aliases?: Record<string, unknown> };
+
+const exists = (name: string) =>
+  Object.hasOwn(collection.icons, name) || Object.hasOwn(collection.aliases ?? {}, name);
+
+/** Every entity id of each kind that must carry an icon. */
+const required: Record<IconKind, string[]> = {
+  skill: [...SKILL_IDS],
+  technique: content.techniques.map((t) => t.id),
+  item: content.items.map((i) => i.id),
+  status: [...STATUS_IDS],
+  trait: [...TRAIT_IDS, 'shield'],
+  nature: [...NATURE_IDS],
+  currency: [...CURRENCY_IDS],
+  enemy: content.enemies.map((e) => e.id),
+  boss: content.bosses.map((b) => b.id),
+  building: content.buildings.map((b) => b.id),
+  region: content.regions.map((r) => r.id),
+  gear: content.gear.map((g) => g.id),
+};
+
+describe('icon registry', () => {
+  it('covers the expected number of entities', () => {
+    expect(required.skill).toHaveLength(16);
+    expect(required.technique).toHaveLength(60);
+    expect(required.status).toHaveLength(5);
+    expect(required.trait).toHaveLength(9);
+    expect(required.nature).toHaveLength(5);
+    expect(required.currency).toHaveLength(3);
+  });
+
+  for (const kind of ICON_KINDS) {
+    it(`maps every ${kind} to an icon that exists in game-icons`, () => {
+      const missing = required[kind].filter((id) => iconFor(kind, id) === undefined);
+      expect(missing, `${kind} entities without an icon`).toEqual([]);
+      const unknown = required[kind].filter((id) => !exists(iconFor(kind, id) ?? ''));
+      expect(unknown, `${kind} entities whose icon is not in the collection`).toEqual([]);
+    });
+
+    it(`has no stale ${kind} entries`, () => {
+      const stale = Object.keys(ICON_MAP[kind]).filter((id) => !required[kind].includes(id));
+      expect(stale).toEqual([]);
+    });
+  }
+
+  it('gives each of the 16 skills a different icon', () => {
+    const icons = SKILL_IDS.map((id) => iconFor('skill', id));
+    expect(new Set(icons).size).toBe(SKILL_IDS.length);
+  });
+
+  for (const skill of TECH_SKILL_IDS) {
+    it(`gives at least 70% of ${skill} techniques distinct icons`, () => {
+      const own = content.techniques.filter((t) => t.skill === skill);
+      const distinct = new Set(own.map((t) => iconFor('technique', t.id)));
+      expect(distinct.size / own.length).toBeGreaterThanOrEqual(0.7);
+    });
+  }
+});
