@@ -14,55 +14,57 @@
   /** Enemies of the Academy yard are open to everyone; the other regions arrive with missions. */
   const enemies = $derived(content.enemies.filter((e) => e.region === 'academy'));
 
-  const fight = $derived.by(() => {
-    const state = game.state;
-    const combat = state.combat;
-    const slot = fightSlotIndex(state);
-    if (!combat || slot < 0) return null;
-    const enemy = content.enemies.find((e) => e.id === combat.enemy);
-    if (!enemy) return null;
-    const f = combat.fight;
-    const p = f.player;
-    // The fight is advanced at events; work the slot has received since then still counts.
-    const fraction = (timer: { progress: number; need: number }): number =>
-      timer.need > 0
-        ? Math.min(1, Math.max(0, (timer.progress + combat.work * RATE_FULL) / timer.need))
-        : 1;
+  const fight = $derived.by(() =>
+    game.read((gs) => {
+      const state = gs;
+      const combat = state.combat;
+      const slot = fightSlotIndex(state);
+      if (!combat || slot < 0) return null;
+      const enemy = content.enemies.find((e) => e.id === combat.enemy);
+      if (!enemy) return null;
+      const f = combat.fight;
+      const p = f.player;
+      // The fight is advanced at events; work the slot has received since then still counts.
+      const fraction = (timer: { progress: number; need: number }): number =>
+        timer.need > 0
+          ? Math.min(1, Math.max(0, (timer.progress + combat.work * RATE_FULL) / timer.need))
+          : 1;
 
-    let playerDoing: { key: string; tech: string | null; progress: number };
-    if (p.phase === 'cast' && p.cast) {
-      playerDoing = { key: 'combat.doing.cast', tech: p.cast, progress: fraction(p.timer) };
-    } else if (p.phase === 'recover') {
-      playerDoing = { key: 'combat.doing.recover', tech: null, progress: 0 };
-    } else {
-      playerDoing = { key: 'combat.doing.ready', tech: null, progress: 0 };
-    }
+      let playerDoing: { key: string; tech: string | null; progress: number };
+      if (p.phase === 'cast' && p.cast) {
+        playerDoing = { key: 'combat.doing.cast', tech: p.cast, progress: fraction(p.timer) };
+      } else if (p.phase === 'recover') {
+        playerDoing = { key: 'combat.doing.recover', tech: null, progress: 0 };
+      } else {
+        playerDoing = { key: 'combat.doing.ready', tech: null, progress: 0 };
+      }
 
-    const front = f.enemies.find((e) => e.hp > 0) ?? f.enemies[0];
-    const enemyDoing =
-      combat.phase === 'respawn' || !front
-        ? { key: 'combat.doing.respawn', progress: 0 }
-        : { key: 'combat.doing.attack', progress: fraction(front.timer) };
+      const front = f.enemies.find((e) => e.hp > 0) ?? f.enemies[0];
+      const enemyDoing =
+        combat.phase === 'respawn' || !front
+          ? { key: 'combat.doing.respawn', progress: 0 }
+          : { key: 'combat.doing.attack', progress: fraction(front.timer) };
 
-    return {
-      slot,
-      enemy,
-      c: {
-        hp: p.hp,
-        chakra: p.chakra,
-        stamina: p.stamina,
-        enemyHp: f.enemies.reduce((sum, e) => sum + e.hp, 0),
-        phase: combat.phase,
-      },
-      maxHp: p.maxHp,
-      maxChakra: p.maxChakra,
-      maxStamina: p.maxStamina,
-      enemyMaxHp: f.enemies.reduce((sum, e) => sum + e.maxHp, 0),
-      kills: counterValue(state, killsKey(enemy.id)),
-      playerDoing,
-      enemyDoing,
-    };
-  });
+      return {
+        slot,
+        enemy,
+        c: {
+          hp: p.hp,
+          chakra: p.chakra,
+          stamina: p.stamina,
+          enemyHp: f.enemies.reduce((sum, e) => sum + e.hp, 0),
+          phase: combat.phase,
+        },
+        maxHp: p.maxHp,
+        maxChakra: p.maxChakra,
+        maxStamina: p.maxStamina,
+        enemyMaxHp: f.enemies.reduce((sum, e) => sum + e.maxHp, 0),
+        kills: counterValue(state, killsKey(enemy.id)),
+        playerDoing,
+        enemyDoing,
+      };
+    }),
+  );
 
   const start = (id: string) =>
     void game.dispatch({ type: 'action.start', slot: 0, kind: 'fight', id });

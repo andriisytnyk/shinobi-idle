@@ -23,22 +23,30 @@
   const ref = $derived({ kind: 'skill', id } as const);
   const desc = $derived(entityDesc(ref));
   const unlockKey = $derived(localeKey('skill', id, 'unlock'));
-  const progress = $derived(skill ? skillProgress(game.state, skill.id as SkillId) : null);
-  const lock = $derived(skill ? skillUnlockStatus(game.state, skill.id, content) : null);
+  const progress = $derived(
+    game.read((gs) => (skill ? skillProgress(gs, skill.id as SkillId) : null)),
+  );
+  const lock = $derived(
+    game.read((gs) => (skill ? skillUnlockStatus(gs, skill.id, content) : null)),
+  );
   /** For a nature skill the player owns: whether it is the native one, and the cast penalty still to work off. */
-  const natureLine = $derived.by(() => {
-    const natures = game.state.player.natures;
-    if (!(NATURE_IDS as readonly string[]).includes(id) || !natures.includes(id as never)) {
-      return null;
-    }
-    const K = content.balance.K;
-    if (natures[0] === id)
-      return { text: 'nature.skillNative', pct: Math.round((K.nativeXp - 1) * 100) };
-    const mult = nonNativeCastMult(progress?.level ?? 1, content);
-    return { text: 'nature.skillForeign', pct: Math.round((mult - 1) * 100) };
-  });
+  const natureLine = $derived.by(() =>
+    game.read((gs) => {
+      const natures = gs.player.natures;
+      if (!(NATURE_IDS as readonly string[]).includes(id) || !natures.includes(id as never)) {
+        return null;
+      }
+      const K = content.balance.K;
+      if (natures[0] === id)
+        return { text: 'nature.skillNative', pct: Math.round((K.nativeXp - 1) * 100) };
+      const mult = nonNativeCastMult(progress?.level ?? 1, content);
+      return { text: 'nature.skillForeign', pct: Math.round((mult - 1) * 100) };
+    }),
+  );
   const actions = $derived(
-    skill ? listSkillActions(game.state, skill.id as SkillId, content, game.rules) : [],
+    game.read((gs) =>
+      skill ? listSkillActions(gs, skill.id as SkillId, content, game.rules) : [],
+    ),
   );
 </script>
 

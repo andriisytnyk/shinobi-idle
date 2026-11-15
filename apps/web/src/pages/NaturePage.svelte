@@ -16,9 +16,9 @@
   let result = $state<{ nature: NatureId; first: boolean } | null>(null);
   let error = $state<string | null>(null);
 
-  const status = $derived(natureStatus(game.state, content));
-  const owned = $derived(game.state.player.natures);
-  const team = $derived(game.state.team);
+  const status = $derived(game.read((gs) => natureStatus(gs, content)));
+  const owned = $derived(game.read((gs) => gs.player.natures));
+  const team = $derived(game.read((gs) => gs.team));
   const first = $derived(status.stage === 'test');
   /** Which natures can be chosen right now. */
   const choosable = $derived(
@@ -32,14 +32,16 @@
   );
   const summary = $derived(owned.length > 0 ? natureSetSummary(owned, content) : null);
   const cards = $derived(
-    NATURE_IDS.map((nature) => ({
-      nature,
-      cons: natureConsequences(nature, game.state, content),
-      together:
-        owned.length > 0 && !owned.includes(nature)
-          ? natureSetSummary([...owned, nature], content)
-          : null,
-    })),
+    game.read((gs) =>
+      NATURE_IDS.map((nature) => ({
+        nature,
+        cons: natureConsequences(nature, gs, content),
+        together:
+          owned.length > 0 && !owned.includes(nature)
+            ? natureSetSummary([...owned, nature], content)
+            : null,
+      })),
+    ),
   );
 
   const pendingName = $derived(

@@ -11,9 +11,9 @@
   import SimplePage from './SimplePage.svelte';
 
   /** Chains that have started: those under way first, finished ones after. */
-  const started = $derived(content.quests.filter((q) => game.state.quests[q.id]));
-  const active = $derived(started.filter((q) => !game.state.quests[q.id]?.done));
-  const finished = $derived(started.filter((q) => game.state.quests[q.id]?.done));
+  const started = $derived(game.read((gs) => content.quests.filter((q) => gs.quests[q.id])));
+  const active = $derived(game.read((gs) => started.filter((q) => !gs.quests[q.id]?.done)));
+  const finished = $derived(game.read((gs) => started.filter((q) => gs.quests[q.id]?.done)));
 </script>
 
 {#snippet chain(quest: (typeof content.quests)[number], done: boolean)}

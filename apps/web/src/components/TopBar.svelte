@@ -16,12 +16,12 @@
   let { metaOpen, onToggleMeta }: Props = $props();
 
   const numbers = new Intl.NumberFormat('uk');
-  const nature = $derived(natureStatus(game.state, content));
-  const natures = $derived(game.state.player.natures);
+  const nature = $derived(game.read((gs) => natureStatus(gs, content)));
+  const natures = $derived(game.read((gs) => gs.player.natures));
   /** A nature is waiting to be chosen: the test, or an extra one. */
   const natureDue = $derived(nature.canChoose);
   const rankMarked = $derived(
-    markerOf(nextStep(game.state, content)?.target ?? null).nav === 'rank',
+    game.read((gs) => markerOf(nextStep(gs, content)?.target ?? null).nav === 'rank'),
   );
 </script>
 

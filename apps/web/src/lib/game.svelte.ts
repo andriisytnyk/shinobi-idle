@@ -28,12 +28,27 @@ import {
   type Clock,
   type KeyValue,
 } from './persistence.ts';
+import { detach as detachData } from './read.ts';
 import { requestPersistentStorage } from './platform.ts';
 import type { TabLock } from './tab-lock.ts';
 import { toastFor, toasts as defaultToasts } from './toasts.svelte.ts';
 
 /** How often the game loop runs. */
 export const TICK_MS = 100;
+/** Commands after which the game is saved at once: what a reload must not undo. */
+const SAVE_NOW: ReadonlySet<string> = new Set([
+  'nature.choose',
+  'nature.add',
+  'exam.genin.start',
+  'item.use',
+  'item.coat',
+  'shop.buy',
+  'shop.sell',
+  'gear.buy',
+  'athletics.build',
+  'meditation.buy',
+]);
+
 /** How often the save is written. */
 export const SAVE_EVERY_MS = 10_000;
 /** A gap longer than this between two ticks means the tab slept: catch up through the offline path. */
@@ -111,7 +126,10 @@ export function createGame(deps: GameDeps = {}) {
     if (events.length === 0) return;
     state.events = [];
     const lines: LogEntry[] = [];
+    let urgent = false;
     for (const event of events) {
+      // Changes the player must not lose to a reload are saved at once, not on the next timer.
+      if (event.type === 'rankUp' || event.type === 'natureGained') urgent = true;
       if (
         event.type === 'combatLog' ||
         event.type === 'enemyDefeated' ||
@@ -125,6 +143,7 @@ export function createGame(deps: GameDeps = {}) {
       if (spec) toasts.push(spec);
     }
     if (lines.length > 0) log = [...log, ...lines].slice(-LOG_LIMIT);
+    if (urgent) void save();
   }
 
   /** One pass of the loop: move the game to the wall clock, through the offline path after a sleep. */
@@ -260,6 +279,15 @@ export function createGame(deps: GameDeps = {}) {
       void version;
       return state;
     },
+    /**
+     * Reads from the game state through the update counter and returns a copy of what `fn`
+     * returns. Components use it inside `$derived`: the core changes its state in place, so a
+     * derived value that handed back the same array or object would never reach its readers.
+     */
+    read<T>(fn: (state: GameState) => T): T {
+      void version;
+      return detachData(fn(state));
+    },
     get version(): number {
       return version;
     },
@@ -301,6 +329,7 @@ export function createGame(deps: GameDeps = {}) {
       if (result.ok && command.type === 'action.start' && command.kind === 'fight') log = [];
       drainEvents();
       touch();
+      if (result.ok && SAVE_NOW.has(command.type)) void save();
       return result;
     },
     dismissGraduation(): void {

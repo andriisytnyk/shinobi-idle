@@ -199,11 +199,11 @@ describe('A3: locks, the native bonus and the non-native cast', () => {
       advance(s, 60_000, content);
       return s.skills.katon.xp;
     };
-    // Same cycles for a native and a foreign katon only if the cast did not differ; compare per cycle.
+    // Same technique, same cast, same cycles: only the native bonus differs.
     const native = run(['katon']);
-    expect(native).toBeGreaterThan(0);
     const foreign = run(['futon', 'katon']);
     expect(foreign).toBeGreaterThan(0);
+    expect(native / foreign).toBeCloseTo(K.nativeXp, 9);
   });
 
   it('stretches the cast of a non-native technique 1.30 at level 1, 1.15 at 25 and 1.00 at 50', () => {
@@ -394,6 +394,7 @@ describe('natureConsequences', () => {
 
 describe('A8: save and determinism', () => {
   it('migrates a version 7 save: no nature means no team, a nature gets the team', () => {
+    expect(STATE_VERSION).toBe(8);
     expect(MIGRATIONS).toHaveLength(STATE_VERSION - 1);
     const s = genin(3);
     const text = JSON.parse(serialize(s, 9));
@@ -421,15 +422,17 @@ describe('A8: save and determinism', () => {
     expect(back.player.natures).toEqual(['futon']);
   });
 
-  it('drops a doctored team and a fourth nature', () => {
+  it('recomputes a missing or doctored team from the native nature, and drops a fourth nature', () => {
     const s = genin(4);
     choose(s, 'futon');
     const parsed = JSON.parse(serialize(s, 1));
     parsed.state.team = { rival: 'nope', aya: 3 };
     parsed.state.player.natures = ['katon', 'futon', 'raiton', 'doton', 'suiton'];
     const back = deserialize(JSON.stringify(parsed), content);
-    expect(back.team).toBeNull();
+    expect(back.team).toEqual({ rival: 'suiton', aya: 'raiton' });
     expect(back.player.natures).toEqual(['katon', 'futon', 'raiton']);
+    delete parsed.state.team;
+    expect(deserialize(JSON.stringify(parsed), content).team).toEqual(back.team);
   });
 
   it('is deterministic with a random nature choice, however time is chunked', () => {

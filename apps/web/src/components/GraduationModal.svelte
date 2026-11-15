@@ -19,9 +19,9 @@
   const unlocked = $derived(
     content.skills.filter((s) => s.unlockReq?.t === 'rank' && s.unlockReq.rank === 'genin'),
   );
-  const goal = $derived(webRef(game.state.goal));
+  const goal = $derived(game.read((gs) => webRef(gs.goal)));
   /** The chakra paper test is the first thing a new genin does: until a nature is chosen the screen is offered. */
-  const needsTest = $derived(game.state.player.natures.length === 0);
+  const needsTest = $derived(game.read((gs) => gs.player.natures.length === 0));
   const reward = $derived(exam?.rewards.items ?? []);
 
   function toNature(): void {

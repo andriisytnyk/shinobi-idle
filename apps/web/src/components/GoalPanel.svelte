@@ -20,16 +20,18 @@
 
   let { onClose }: Props = $props();
 
-  const wait = $derived(senseiTestInfo(game.state, game.rules, content));
-  const goal = $derived(game.state.goal);
+  const wait = $derived(game.read((gs) => senseiTestInfo(gs, game.rules, content)));
+  const goal = $derived(game.read((gs) => gs.goal));
   const goalRef = $derived(webRef(goal));
   const req = $derived(goal ? goalReq(goal, content) : null);
-  const result = $derived(req ? evalReq(game.state, req, content) : null);
-  const quest = $derived(goal ? null : nextStep(game.state, content));
+  const result = $derived(game.read((gs) => (req ? evalReq(gs, req, content) : null)));
+  const quest = $derived(game.read((gs) => (goal ? null : nextStep(gs, content))));
   /** With nothing pinned and no quest under way, the nearest technique is suggested. */
-  const suggestion = $derived(goal || quest ? null : suggestGoal(game.state, content));
+  const suggestion = $derived(game.read((gs) => (goal || quest ? null : suggestGoal(gs, content))));
   /** The quest card already leads to the nature test, so the test is offered separately only when it does not. */
-  const offerNature = $derived(!(quest && natureStatus(game.state, content).stage === 'test'));
+  const offerNature = $derived(
+    game.read((gs) => !(quest && natureStatus(gs, content).stage === 'test')),
+  );
 
   function pinSuggestion(): void {
     if (suggestion) game.dispatch({ type: 'goal.set', ref: { kind: 'technique', id: suggestion } });

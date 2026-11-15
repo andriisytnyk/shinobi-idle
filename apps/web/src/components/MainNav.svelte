@@ -11,7 +11,7 @@
 
   const route = $derived(currentRoute());
   const active = $derived(activeNav(route));
-  const marker = $derived(markerOf(nextStep(game.state, content)?.target ?? null).nav);
+  const marker = $derived(game.read((gs) => markerOf(nextStep(gs, content)?.target ?? null).nav));
 </script>
 
 <nav class="main-nav" aria-label={t('nav.pages')}>

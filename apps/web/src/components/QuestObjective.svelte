@@ -20,10 +20,14 @@
 
   const objective = $derived(quest.steps[index]?.objective);
   const result = $derived(
-    objective?.t === 'req' ? withoutRankRows(evalReq(game.state, objective.req, content)) : null,
+    game.read((gs) =>
+      objective?.t === 'req' ? withoutRankRows(evalReq(gs, objective.req, content)) : null,
+    ),
   );
   const counted = $derived(
-    objective?.t === 'counter' ? counterProgress(game.state, quest, index, objective) : null,
+    game.read((gs) =>
+      objective?.t === 'counter' ? counterProgress(gs, quest, index, objective) : null,
+    ),
   );
   const enemy = $derived(objective?.t === 'counter' ? counterEnemy(objective.counter) : null);
   const fraction = $derived(counted && counted.of > 0 ? counted.n / counted.of : 0);

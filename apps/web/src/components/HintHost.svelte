@@ -6,7 +6,9 @@
   import Hint from './Hint.svelte';
 
   /** The hint whose moment has come (first level, first Mastery, exam ready, graduation), one at a time. */
-  const hint = $derived(nextStateHint(game.state, content, (id) => settings.hintVisible(id)));
+  const hint = $derived(
+    game.read((gs) => nextStateHint(gs, content, (id) => settings.hintVisible(id))),
+  );
 </script>
 
 {#if hint}

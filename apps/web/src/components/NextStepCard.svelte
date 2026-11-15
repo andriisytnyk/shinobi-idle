@@ -7,7 +7,7 @@
   import NatureOffer from './NatureOffer.svelte';
   import QuestObjective from './QuestObjective.svelte';
 
-  const step = $derived(nextStep(game.state, content));
+  const step = $derived(game.read((gs) => nextStep(gs, content)));
 </script>
 
 {#if step}

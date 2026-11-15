@@ -202,8 +202,6 @@ function sanitizeCombat(raw: unknown, content: ContentDb): CombatState | null {
   };
 }
 
-const isNatureId = (x: unknown): x is NatureId => (NATURE_IDS as readonly unknown[]).includes(x);
-
 const SKILL_ID_SET: ReadonlySet<string> = new Set(SKILL_IDS);
 
 /**
@@ -249,11 +247,9 @@ export function deserialize(
         (NATURE_IDS as readonly unknown[]).includes(n) && natures.indexOf(n) === i,
     );
     state.player.natures = state.player.natures.slice(0, content.balance.K.natures.max);
-    const team = isRecord(raw.team) ? raw.team : null;
-    state.team =
-      team && isNatureId(team.rival) && isNatureId(team.aya)
-        ? { rival: team.rival, aya: team.aya }
-        : null;
+    // The team's natures follow from the native nature alone, so they are recomputed, never trusted.
+    const native = state.player.natures[0];
+    state.team = native ? teamFor(native) : null;
   }
 
   const skillXp = isRecord(raw.skills) ? raw.skills : {};

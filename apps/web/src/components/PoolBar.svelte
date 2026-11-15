@@ -17,7 +17,7 @@
   const checkpoints = $derived(
     content.pools.filter((p) => p.skill === skill).sort((a, b) => a.pct - b.pct),
   );
-  const xp = $derived(game.state.pools[skill].xp);
+  const xp = $derived(game.read((gs) => gs.pools[skill].xp));
   const fraction = $derived(capacity > 0 ? Math.min(1, xp / capacity) : 0);
 </script>
 

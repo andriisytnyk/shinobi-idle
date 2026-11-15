@@ -22,15 +22,17 @@
   const tech = $derived(content.techniques.find((x) => x.id === id));
   const ref = $derived({ kind: 'technique', id } as const);
   const relations = $derived(techniqueRelations(id, content));
-  const known = $derived(game.state.known[id] === true);
+  const known = $derived(game.read((gs) => gs.known[id] === true));
 
   /** What it takes to learn the technique: its skill level, plus the rank for a mentor away from the Academy. */
-  const requirements = $derived.by(() => {
-    if (!tech) return null;
-    const of: Req[] = [{ t: 'skill', skill: tech.skill, level: tech.level }];
-    if (tech.src === 'N' && tech.mentor === 'other') of.push({ t: 'rank', rank: 'genin' });
-    return evalReq(game.state, { t: 'all', of }, content);
-  });
+  const requirements = $derived.by(() =>
+    game.read((gs) => {
+      if (!tech) return null;
+      const of: Req[] = [{ t: 'skill', skill: tech.skill, level: tech.level }];
+      if (tech.src === 'N' && tech.mentor === 'other') of.push({ t: 'rank', rank: 'genin' });
+      return evalReq(gs, { t: 'all', of }, content);
+    }),
+  );
 
   /** Tags answer enemy traits; show which trait each tag counters. */
   const answers = $derived(
@@ -43,11 +45,13 @@
   );
 
   const info = $derived(
-    tech ? actionInfo(game.state, { kind: 'practice', id }, content, game.rules) : null,
+    game.read((gs) =>
+      tech ? actionInfo(gs, { kind: 'practice', id }, content, game.rules) : null,
+    ),
   );
 
   const goal = $derived(techniqueGoal(id, content));
-  const pinned = $derived(game.state.goal?.kind === 'technique' && game.state.goal.id === id);
+  const pinned = $derived(game.read((gs) => gs.goal?.kind === 'technique' && gs.goal.id === id));
 
   function togglePin(): void {
     if (pinned) game.dispatch({ type: 'goal.clear' });

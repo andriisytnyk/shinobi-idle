@@ -4,7 +4,7 @@
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
 
-  const status = $derived(natureStatus(game.state, content));
+  const status = $derived(game.read((gs) => natureStatus(gs, content)));
   /** The nature test, or an extra nature once Chakra Control allows it. */
   const offer = $derived(status.canChoose);
   const ordinal = $derived(

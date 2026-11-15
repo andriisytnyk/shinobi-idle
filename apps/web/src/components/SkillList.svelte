@@ -17,25 +17,29 @@
   let collapsed = $state<Partial<Record<SkillGroup, boolean>>>({});
 
   const route = $derived(currentRoute());
-  const native = $derived(game.state.player.natures[0] ?? null);
-  const markedSkill = $derived(markerOf(nextStep(game.state, content)?.target ?? null).skill);
+  const native = $derived(game.read((gs) => gs.player.natures[0] ?? null));
+  const markedSkill = $derived(
+    game.read((gs) => markerOf(nextStep(gs, content)?.target ?? null).skill),
+  );
   const activeSkill = $derived(
     route.page === 'entity' && route.ref.kind === 'skill' ? route.ref.id : null,
   );
 
   /** Groups come from the content, in the order the style document lists them. */
   const groups = $derived(
-    SKILL_GROUPS.map((id) => ({
-      id,
-      skills: content.skills
-        .filter((s) => s.group === id)
-        .map((skill) => ({
-          skill,
-          lock: skillUnlockStatus(game.state, skill.id, content),
-          progress: skillProgress(game.state, skill.id),
-        }))
-        .filter((row) => !(settings.hideLocked && row.lock && !row.lock.met)),
-    })).filter((g) => g.skills.length > 0),
+    game.read((gs) =>
+      SKILL_GROUPS.map((id) => ({
+        id,
+        skills: content.skills
+          .filter((s) => s.group === id)
+          .map((skill) => ({
+            skill,
+            lock: skillUnlockStatus(gs, skill.id, content),
+            progress: skillProgress(gs, skill.id),
+          }))
+          .filter((row) => !(settings.hideLocked && row.lock && !row.lock.met)),
+      })).filter((g) => g.skills.length > 0),
+    ),
   );
 
   const toggle = (id: SkillGroup) => {

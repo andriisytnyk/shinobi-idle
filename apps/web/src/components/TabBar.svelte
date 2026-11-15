@@ -15,7 +15,7 @@
     const id = activeNav(route);
     return id === 'help' || id === 'rank' ? 'more' : id;
   });
-  const marker = $derived(markerOf(nextStep(game.state, content)?.target ?? null).nav);
+  const marker = $derived(game.read((gs) => markerOf(nextStep(gs, content)?.target ?? null).nav));
 </script>
 
 <nav class="tabbar" aria-label={t('nav.main')}>
