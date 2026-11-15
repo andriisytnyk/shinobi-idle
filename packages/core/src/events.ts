@@ -1,7 +1,7 @@
 import type { SkillId } from '@shinobi/content';
 import type { GameState } from './state.ts';
 
-/** The queue keeps the newest events only; the UI drains it long before this matters. */
+/** The queue keeps the newest events only (battle log lines first to go); the UI drains it long before this matters. */
 export const EVENT_CAP = 200;
 
 interface EventBase {
@@ -45,6 +45,19 @@ export interface PlayerDefeatedEvent extends EventBase {
   type: 'playerDefeated';
   enemy: string;
 }
+/** One line of the battle log: who did what, with which technique, for how much damage. */
+export interface CombatLogEvent extends EventBase {
+  type: 'combatLog';
+  side: 'player' | 'enemy';
+  /** `cast`: the player began a technique; `hit` and `miss`: an attack landed or not. */
+  act: 'cast' | 'hit' | 'miss';
+  /** Technique id; null for a basic attack and for every enemy attack. */
+  tech: string | null;
+  /** Content id of the enemy in the fight. */
+  enemy: string;
+  /** Damage dealt by a hit; 0 otherwise. */
+  dmg: number;
+}
 export interface QuestStepEvent extends EventBase {
   type: 'questStep';
   quest: string;
@@ -83,6 +96,7 @@ export type GameEvent =
   | ActionStoppedEvent
   | EnemyDefeatedEvent
   | PlayerDefeatedEvent
+  | CombatLogEvent
   | QuestStepEvent
   | QuestDoneEvent
   | RankUpEvent
@@ -95,5 +109,10 @@ type WithoutAt<T> = T extends unknown ? Omit<T, 'at'> : never;
 /** Appends an event stamped with the current game time, dropping the oldest beyond the cap. */
 export function emit(state: GameState, event: WithoutAt<GameEvent>): void {
   state.events.push({ ...event, at: state.now } as GameEvent);
-  if (state.events.length > EVENT_CAP) state.events.splice(0, state.events.length - EVENT_CAP);
+  // Battle log lines are the cheapest to lose: they go first so a long fight cannot push out a
+  // level, a learned technique or a stopped action that an offline report still needs.
+  while (state.events.length > EVENT_CAP) {
+    const log = state.events.findIndex((e) => e.type === 'combatLog');
+    state.events.splice(log === -1 ? 0 : log, 1);
+  }
 }

@@ -34,6 +34,8 @@ export const fightKind: ActionKind = {
       }
     });
     state.combat = newCombat(state, enemy, content);
+    // The first fight opens Vitality and Evasion, whose skills train only in combat.
+    state.flags.firstFight = true;
   },
 
   stop(state) {

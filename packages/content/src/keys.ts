@@ -21,7 +21,9 @@ export type LocaleKind =
   | 'tag'
   | 'role'
   | 'state'
-  | 'group';
+  | 'group'
+  | 'quest'
+  | 'exam';
 
 /** Localization key of an entity string, e.g. `technique.core:great_fireball.name`. */
 export function localeKey(kind: LocaleKind, id: string, field: string): string {
