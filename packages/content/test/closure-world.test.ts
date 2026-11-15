@@ -1,6 +1,6 @@
 /** The map: structured points of interest, key definitions and their closure. */
 import { describe, expect, it } from 'vitest';
-import idRegistry from '../src/data/id-registry.json' with { type: 'json' };
+import idRegistry from '../src/packs/core/id-registry.json' with { type: 'json' };
 import { CELL_KEYS, KEY_NATURES, content, ukLocale, type PoiKind, type Req } from '../src/index.ts';
 
 const pois = content.cells.flatMap((c) => c.pois.map((p) => ({ cell: c, poi: p })));

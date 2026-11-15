@@ -4,7 +4,7 @@
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import idRegistry from '../src/data/id-registry.json' with { type: 'json' };
+import idRegistry from '../src/packs/core/id-registry.json' with { type: 'json' };
 import {
   content,
   KEY_NATURES,
@@ -387,7 +387,7 @@ describe('identity and localization', () => {
       }
     };
     for (const folder of ['generated', 'hand']) {
-      const dir = new URL(`../src/data/${folder}/`, import.meta.url);
+      const dir = new URL(`../src/packs/core/data/${folder}/`, import.meta.url);
       for (const file of readdirSync(dir)) {
         visit(JSON.parse(readFileSync(new URL(file, dir), 'utf8')), `${folder}/${file}`);
       }

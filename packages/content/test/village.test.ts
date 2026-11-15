@@ -1,6 +1,6 @@
 /** Village data: buildings with roles and effects, resources, starting levels, level-6 needs. */
 import { describe, expect, it } from 'vitest';
-import generatedUk from '../src/locales/uk.json' with { type: 'json' };
+import generatedUk from '../src/packs/core/locales/uk.json' with { type: 'json' };
 import { content, ukLocale } from '../src/index.ts';
 
 const K = content.balance.K;

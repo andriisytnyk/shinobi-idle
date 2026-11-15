@@ -3,11 +3,11 @@
  * scrolls, statuses, traits and combos. A failing test names the offending entity.
  */
 import { describe, expect, it } from 'vitest';
-import handBossSpecials from '../src/data/hand/boss-specials.json' with { type: 'json' };
-import handEnemyCombat from '../src/data/hand/enemy-combat.json' with { type: 'json' };
-import handItemEcon from '../src/data/hand/item-econ.json' with { type: 'json' };
-import handTechniqueCombat from '../src/data/hand/technique-combat.json' with { type: 'json' };
-import idRegistry from '../src/data/id-registry.json' with { type: 'json' };
+import handBossSpecials from '../src/packs/core/data/hand/boss-specials.json' with { type: 'json' };
+import handEnemyCombat from '../src/packs/core/data/hand/enemy-combat.json' with { type: 'json' };
+import handItemEcon from '../src/packs/core/data/hand/item-econ.json' with { type: 'json' };
+import handTechniqueCombat from '../src/packs/core/data/hand/technique-combat.json' with { type: 'json' };
+import idRegistry from '../src/packs/core/id-registry.json' with { type: 'json' };
 import {
   COMBO_IDS,
   content,
@@ -372,7 +372,8 @@ describe('statuses, traits and combos', () => {
     expect(content.traits.map((t) => t.id)).toEqual([...TRAIT_IDS]);
     for (const t of content.traits) {
       expect(t.answer, t.id).toBe(TRAIT_ANSWER[t.id]);
-      const source = K[t.numbers.from] as Record<string, unknown>;
+      const source =
+        (K as unknown as Record<string, Record<string, unknown>>)[t.numbers.from] ?? {};
       for (const key of t.numbers.keys) expect(source, `${t.id}: ${key}`).toHaveProperty(key);
     }
   });

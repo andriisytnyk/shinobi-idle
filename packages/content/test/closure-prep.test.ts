@@ -1,6 +1,6 @@
 /** Closure of the combat preparation data: the AI tiers, the loadout and pouch numbers, the medic pouch, the operations' clear flags. */
 import { describe, expect, it } from 'vitest';
-import { BALANCE_OVERRIDE, withOverrides } from '../src/balance-ext.ts';
+import { BALANCE_OVERRIDE, withOverrides } from '../src/packs/core/balance-ext.ts';
 import { AI_RULE_IDS, content, TRAIT_IDS } from '../src/index.ts';
 
 const K = content.balance.K;

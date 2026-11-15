@@ -23,7 +23,7 @@ export default defineConfig(
     '**/dist/**',
     '**/coverage/**',
     'docs/**',
-    'packages/content/src/data/generated/**',
+    'packages/content/src/packs/core/data/generated/**',
     'apps/web/src/lib/icons.generated.ts',
   ]),
   js.configs.recommended,

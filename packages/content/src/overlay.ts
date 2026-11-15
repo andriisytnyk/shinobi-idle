@@ -89,10 +89,11 @@ type CombatMap = z.infer<typeof techniqueCombatMapSchema>;
 type EnemyMap = z.infer<typeof enemyCombatMapSchema>;
 type SpecialMap = z.infer<typeof bossSpecialMapSchema>;
 
-const slug = (id: string): string => id.replace(/^core:/, '');
+const slug = (id: string): string => id.slice(id.indexOf(':') + 1);
 
 /** The scroll-part item of a technique carried by an enemy or boss. */
-export const scrollPartId = (technique: string): string => `core:scrollpart_${slug(technique)}`;
+export const scrollPartId = (technique: string): string =>
+  `${technique.slice(0, technique.indexOf(':'))}:scrollpart_${slug(technique)}`;
 
 /** Adds `combat` to each technique; training drills have none. */
 export function layerTechniques(base: TechniqueBase[], combat: CombatMap) {

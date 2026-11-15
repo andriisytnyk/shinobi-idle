@@ -1,0 +1,307 @@
+/**
+ * `testmod`: the test pack. It adds one entity of every kind the card names, as data, to prove that
+ * a second pack can extend the game without a line of code. Every id is `testmod:<slug>` and every
+ * text says that it is a test. It is exported only through `@shinobi/content/testmod`: the app
+ * bundle never imports it.
+ */
+import type { ContentPack, PackData } from '../../pack.ts';
+
+const data = {
+  // ----- vocabularies -----
+  natures: [
+    {
+      id: 'testmod:aether',
+      /** The wheel: this nature beats a nature of the core pack. */
+      strongAgainst: ['katon'],
+      color: '--nature-testmod-aether',
+      opens: [],
+      ayaNature: 'raiton',
+    },
+  ],
+  playerRanks: [{ id: 'testmod:adept', tier: 3 }],
+  missionRanks: [{ id: 'testmod:trial' }],
+  currencies: [{ id: 'testmod:token' }],
+  villageStages: [{ id: 'testmod:stage3', rep: 'testmod:stage3' }],
+  states: [{ id: 'testmod:chilled' }],
+  statuses: [{ id: 'testmod:chill' }],
+  combos: [{ id: 'testmod:frostburn', nature: 'testmod:aether', onState: 'testmod:chilled' }],
+  tags: [{ id: 'testmod:crack' }],
+  roles: [{ id: 'testmod:sapper' }],
+  traits: [
+    {
+      id: 'testmod:shelled',
+      answer: 'testmod:crack',
+      numbers: { from: 'ext.testmod', keys: ['shellArmor'] },
+    },
+  ],
+
+  // ----- skill, technique, seal -----
+  skills: [
+    {
+      id: 'testmod:forge',
+      group: 'craft',
+      /** `recipe` is an activity that the existing crafting action runs. */
+      activity: 'recipe',
+      unlockReq: { t: 'rank', rank: 'genin' },
+    },
+  ],
+  seals: [{ id: 'testmod:glyph', glyph: 'Т', romaji: 'Test', kind: 'special' }],
+  techniques: [
+    {
+      id: 'testmod:ember_pulse',
+      skill: 'katon',
+      level: 3,
+      rank: 'D',
+      rankCanon: false,
+      role: 'testmod:sapper',
+      tags: ['testmod:crack'],
+      state: 'testmod:chilled',
+      src: 'N',
+      mentor: 'other',
+      sealSeq: ['testmod:glyph'],
+      sealsCanon: false,
+      tier: 0,
+      noDamage: false,
+      combat: { effect: { kind: 'damage' } },
+    },
+  ],
+
+  // ----- items, recipe, gear -----
+  items: [
+    { id: 'testmod:pellet', kind: 'ingredient', tags: [], extraSources: [], madeFrom: [] },
+    {
+      id: 'testmod:charm',
+      kind: 'tool',
+      tags: ['testmod:crack'],
+      extraSources: [],
+      madeFrom: [{ item: 'testmod:pellet', n: 2 }],
+    },
+    {
+      id: 'testmod:elixir',
+      kind: 'consumable',
+      tags: [],
+      extraSources: [],
+      madeFrom: [],
+      fx: { kind: 'heal', hp: 30 },
+    },
+  ],
+  recipes: [
+    {
+      id: 'testmod:elixir_brew',
+      skill: 'testmod:forge',
+      level: 1,
+      ingredients: [{ item: 'testmod:pellet', n: 2 }],
+      output: { item: 'testmod:elixir', n: 1 },
+      tags: [],
+    },
+  ],
+  gear: [
+    {
+      id: 'testmod:anvil',
+      skill: 'testmod:forge',
+      tiers: [{ tier: 'I', level: 5, building: null }],
+      fx: { key: 'xp.skill.testmod:forge', perTier: 'sickle', effect: 'bonus' },
+    },
+  ],
+
+  // ----- enemy, boss -----
+  enemies: [
+    {
+      id: 'testmod:shellback',
+      region: 'forest',
+      cl: 5,
+      traits: ['testmod:shelled'],
+      nature: 'testmod:aether',
+      carries: null,
+      hp: 100,
+      dmg: 5,
+      style: 'melee',
+      drops: [{ item: 'testmod:pellet', chance: 0.2 }],
+      ryo: [20, 30],
+      bounty: null,
+      scrollPart: null,
+    },
+  ],
+  bosses: [
+    {
+      id: 'testmod:boss_shell',
+      cl: 8,
+      traits: ['testmod:shelled'],
+      nature: 'testmod:aether',
+      carries: null,
+      hp: 300,
+      dmg: 9,
+      style: 'melee',
+      drops: [{ item: 'testmod:elixir', chance: 0.5 }],
+      ryo: [60, 90],
+      bounty: { first: 100, repeatShare: 0.2 },
+      scrollPart: null,
+      special: { kind: 'heavyCast', fx: 'testmod:heavy', stun: false },
+    },
+  ],
+
+  // ----- world -----
+  regions: [{ id: 'testmod:grove', scout: 1, cells: ['testmod:grove_edge'] }],
+  cells: [
+    {
+      id: 'testmod:grove_edge',
+      region: 'testmod:grove',
+      index: 0,
+      key: null,
+      story: false,
+      pois: [{ id: 'testmod:poi_grove_edge_outpost', kind: 'outpost' }],
+    },
+  ],
+  buildings: [
+    {
+      id: 'testmod:hut',
+      tier6: null,
+      role: 'bonus',
+      effects: [{ key: 'testmod:forge.bonus', op: 'add', value: 0.01 }],
+      capstone: [],
+      produces: [],
+    },
+  ],
+
+  // ----- missions and quests -----
+  missions: [
+    {
+      id: 'testmod:test_run',
+      rank: 'testmod:trial',
+      team: false,
+      minutes: 2,
+      stages: [{ t: 'skill', skill: 'testmod:forge', min: 1, label: true }],
+      pay: [],
+      resource: null,
+      ryo: 10,
+      rep: 0,
+      unlock: null,
+      shares: [1],
+      slow: [[]],
+      skip: [0],
+      resourceMod: null,
+      board: true,
+      rateCap: 20,
+    },
+  ],
+  quests: [
+    {
+      id: 'testmod:test_chain',
+      chain: 'testmod:test_chain',
+      unlock: null,
+      steps: [
+        {
+          textKey: 'quest.testmod:test_chain.step.1',
+          objective: { t: 'req', req: { t: 'skill', skill: 'testmod:forge', level: 2 } },
+        },
+      ],
+      rewards: { items: [{ item: 'testmod:pellet', n: 1 }], ryo: 0, rep: 0, flags: [], rank: null },
+    },
+  ],
+} satisfies Record<string, unknown>;
+
+export const testmodPack: ContentPack = {
+  manifest: { id: 'testmod', version: '0.1.0', dependsOn: ['core'], loadAfter: [] },
+  data: data as unknown as PackData,
+  balance: {
+    K: {
+      ryoPerMin: { 'testmod:trial': 5 },
+      repPerMission: { 'testmod:trial': 0 },
+      missionRateCap: { 'testmod:trial': 20 },
+      role: { 'testmod:sapper': { m: 0.5, cd: 8, c: 1 } },
+      combo: { 'testmod:frostburn': 0.3 },
+      bossFx: {
+        'testmod:heavy': {
+          everyMs: 25000,
+          castMs: 3000,
+          damageMult: 1.5,
+          stunMs: 0,
+          hp: 1,
+          dmg: 1,
+        },
+      },
+      rep: { 'testmod:stage3': 500 },
+      ext: { testmod: { shellArmor: 0.2 } },
+    },
+    pace: { 'testmod:forge': [3, 7, 11, 17, 25] },
+  },
+  locales: {
+    uk: {
+      'skill.testmod:forge.name': 'Тестова кузня',
+      'skill.testmod:forge.desc':
+        'Тестова навичка пакета перевірки: вона лише доводить, що мод додає навички даними.',
+      'nature.testmod:aether.name': 'Тестовий ефір',
+      'rank.testmod:adept': 'Тестовий адепт',
+      'currency.testmod:token': 'Тестовий жетон',
+      'state.testmod:chilled.name': 'Тестове охолодження',
+      'status.testmod:chill.name': 'Тестовий холод',
+      'status.testmod:chill.desc': 'Тестовий стан, що показує: мод додає власні стани бою.',
+      'combo.testmod:frostburn.name': 'Тестовий морозний опік',
+      'combo.testmod:frostburn.desc':
+        'Тестове поєднання, яке мод додає даними без жодного рядка коду.',
+      'tag.testmod:crack.name': 'Тестова тріщина',
+      'role.testmod:sapper.name': 'Тестовий сапер',
+      'trait.testmod:shelled.name': 'Тестовий панцир',
+      'trait.testmod:shelled.desc':
+        'Тестова риса ворога, відповідь на яку дає тестова мітка тріщини.',
+      'seal.testmod:glyph.name': 'Тестовий знак',
+      'seal.testmod:glyph.desc': 'Тестова печатка, що доводить: мод додає й печатки для технік.',
+      'technique.testmod:ember_pulse.name': 'Тестовий імпульс жару',
+      'technique.testmod:ember_pulse.desc':
+        'Тестова техніка мода, яку можна вивчити, як і будь-яку іншу.',
+      'technique.testmod:ember_pulse.home': 'Тестовий пакет',
+      'technique.testmod:ember_pulse.note': 'Лише для перевірки модів.',
+      'item.testmod:pellet.name': 'Тестова кулька',
+      'item.testmod:pellet.desc': 'Тестовий інгредієнт, який мод додає разом із власним рецептом.',
+      'item.testmod:charm.name': 'Тестовий оберіг',
+      'item.testmod:charm.desc': 'Тестове знаряддя, що відповідає на тестову рису панцира ворога.',
+      'item.testmod:elixir.name': 'Тестовий еліксир',
+      'item.testmod:elixir.desc':
+        'Тестовий витратний предмет, який трохи лікує того, хто його випив.',
+      'recipe.testmod:elixir_brew.name': 'Тестове варіння еліксиру',
+      'recipe.testmod:elixir_brew.desc':
+        'Тестовий рецепт нової навички мода: з кульок виходить еліксир.',
+      'gear.testmod:anvil.name': 'Тестова ковадла',
+      'gear.testmod:anvil.desc':
+        'Тестове спорядження нової навички: воно трохи прискорює її розвиток.',
+      'enemy.testmod:shellback.name': 'Тестовий панцирник',
+      'enemy.testmod:shellback.desc': 'Тестовий ворог мода з тестовою рисою та тестовою природою.',
+      'boss.testmod:boss_shell.name': 'Тестовий вартовий',
+      'boss.testmod:boss_shell.desc':
+        'Тестовий бос мода зі своїм особливим ударом і власними числами.',
+      'boss.testmod:boss_shell.place': 'Тестовий гай',
+      'region.testmod:grove.name': 'Тестовий гай',
+      'region.testmod:grove.desc': 'Тестовий регіон мода з однією клітинкою, до якої можна дійти.',
+      'cell.testmod:grove_edge.name': 'Край тестового гаю',
+      'cell.testmod:grove_edge.note': 'Єдина клітинка тестового регіону.',
+      'poi.testmod:poi_grove_edge_outpost.name': 'Тестова застава',
+      'poi.testmod:poi_grove_edge_outpost.desc':
+        'Тестова точка інтересу відомого виду: вільна ціль подорожі.',
+      'building.testmod:hut.name': 'Тестова хатина',
+      'building.testmod:hut.desc': 'Тестова будівля мода з одним власним модифікатором за рівень.',
+      'mission.testmod:test_run.name': 'Тестове доручення',
+      'mission.testmod:test_run.desc':
+        'Тестове доручення нового рангу, яке виконує нова навичка мода.',
+      'mission.testmod:test_run.client': 'Тестовий замовник',
+      'mission.testmod:test_run.stage.0.label': 'Тестова робота',
+      'quest.testmod:test_chain.name': 'Тестовий ланцюжок',
+      'quest.testmod:test_chain.step.1': 'Досягни другого рівня тестової кузні.',
+    },
+  },
+  icons: { skill: { 'testmod:forge': 'anvil' } },
+  modifierKeys: {
+    'testmod:forge.bonus': {
+      desc: 'A test bonus that only the test pack declares',
+      flat: false,
+      wired: false,
+    },
+  },
+  patches: [
+    {
+      /** A new drop row on a core enemy: the pack changes another pack's entity explicitly. */
+      target: { kind: 'enemies', id: 'core:wolf' },
+      append: { drops: [{ item: 'testmod:pellet', chance: 0.05 }] },
+    },
+  ],
+  ui: 'testmod',
+};
