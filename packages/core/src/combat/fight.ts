@@ -966,7 +966,8 @@ function buildView(ctx: FightCtx): FightView {
       nextCastIn,
       leader: bindings.some(
         (b) =>
-          b.trait === null && guard(ctx, b.hook, () => b.hook.leader?.(ctx, e) ?? false, false, BOOLEAN) === true,
+          b.trait === null &&
+          guard(ctx, b.hook, () => b.hook.leader?.(ctx, e) ?? false, false, BOOLEAN) === true,
       ),
     };
   });

@@ -245,7 +245,11 @@ export function guard<T>(
       owners.set(name, hook);
     }
     if (!sanitizeBody(ctx, body, limits)) {
-      fault(ctx, hook, 'the hook left a timer, a number or an effect in a shape the engine cannot run');
+      fault(
+        ctx,
+        hook,
+        'the hook left a timer, a number or an effect in a shape the engine cannot run',
+      );
       return fallback;
     }
   }
