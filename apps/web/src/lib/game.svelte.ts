@@ -7,6 +7,7 @@ import {
   dispatch as coreDispatch,
   type Command,
   type CommandResult,
+  type GameEvent,
   type GameState,
   type Rules,
 } from '@shinobi/core';
@@ -37,6 +38,19 @@ export const TICK_MS = 100;
 export const SAVE_EVERY_MS = 10_000;
 /** A gap longer than this between two ticks means the tab slept: catch up through the offline path. */
 export const SLEEP_GAP_MS = 5_000;
+
+/** A line of the battle log the page keeps: events of the fight, numbered for keyed lists. */
+export type LogEvent = Extract<
+  GameEvent,
+  { type: 'combatLog' | 'enemyDefeated' | 'playerDefeated' }
+>;
+export interface LogEntry {
+  id: number;
+  event: LogEvent;
+}
+
+/** Lines the battle log keeps. */
+export const LOG_LIMIT = 60;
 
 export type SaveStatus = 'idle' | 'saved' | 'error';
 
@@ -76,6 +90,10 @@ export function createGame(deps: GameDeps = {}) {
   let saveStatus = $state<SaveStatus>('idle');
   let loadError = $state.raw<{ message: string; raw: string | null } | null>(null);
   let hasBackup = $state(false);
+  let log = $state.raw<LogEntry[]>([]);
+  let logId = 0;
+  /** Set when the player has just graduated; the graduation modal clears it. */
+  let graduation = $state(false);
 
   /** Revision of the save this tab last read or wrote; a stored revision above it means a newer save exists. */
   let rev = 0;
@@ -92,10 +110,21 @@ export function createGame(deps: GameDeps = {}) {
     const events = state.events;
     if (events.length === 0) return;
     state.events = [];
+    const lines: LogEntry[] = [];
     for (const event of events) {
+      if (
+        event.type === 'combatLog' ||
+        event.type === 'enemyDefeated' ||
+        event.type === 'playerDefeated'
+      ) {
+        lines.push({ id: ++logId, event });
+      } else if (event.type === 'rankUp' && event.rank === 'genin') {
+        graduation = true;
+      }
       const spec = toastFor(event);
       if (spec) toasts.push(spec);
     }
+    if (lines.length > 0) log = [...log, ...lines].slice(-LOG_LIMIT);
   }
 
   /** One pass of the loop: move the game to the wall clock, through the offline path after a sleep. */
@@ -174,6 +203,8 @@ export function createGame(deps: GameDeps = {}) {
 
   function replaceState(next: GameState): void {
     state = next;
+    log = [];
+    graduation = false;
     lastWall = clock.now();
     touch();
   }
@@ -235,6 +266,15 @@ export function createGame(deps: GameDeps = {}) {
     get report(): AnbuReport | null {
       return report;
     },
+    /** The newest lines of the battle log, oldest first. */
+    get combatLog(): LogEntry[] {
+      void version;
+      return log;
+    },
+    /** Whether the graduation modal is due. */
+    get graduation(): boolean {
+      return graduation;
+    },
     get phase(): Phase {
       return phase;
     },
@@ -258,9 +298,19 @@ export function createGame(deps: GameDeps = {}) {
     /** Sends a command to the core and refreshes the views. */
     dispatch(command: Command): CommandResult {
       const result = coreDispatch(state, command, content, rules);
+      if (result.ok && command.type === 'action.start' && command.kind === 'fight') log = [];
       drainEvents();
       touch();
       return result;
+    },
+    dismissGraduation(): void {
+      graduation = false;
+    },
+    /** Developer tool: moves game time forward through `advance`, like waiting would. */
+    devAdvance(ms: number): void {
+      advance(state, ms, content, rules);
+      drainEvents();
+      touch();
     },
     dismissReport(): void {
       report = null;

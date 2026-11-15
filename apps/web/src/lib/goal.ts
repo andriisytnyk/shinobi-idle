@@ -32,3 +32,24 @@ export function suggestGoal(state: GameState, content: ContentDb): string | null
   }
   return best?.id ?? null;
 }
+
+/** The requirement tree behind a pinned goal; null for a goal that is only a link, with no tree. */
+export function goalReq(ref: { kind: string; id: string }, content: ContentDb): Req | null {
+  if (ref.kind === 'technique') return techniqueGoal(ref.id, content);
+  if (ref.kind === 'item') return { t: 'item', id: ref.id, n: 1 };
+  return null;
+}
+
+/** The technique a goal pinned by an older version of the app pointed at: its first technique row. */
+export function legacyGoalTechnique(raw: unknown): string | null {
+  if (typeof raw !== 'object' || raw === null) return null;
+  const node = raw as { t?: unknown; id?: unknown; of?: unknown };
+  if (node.t === 'technique' && typeof node.id === 'string') return node.id;
+  if (Array.isArray(node.of)) {
+    for (const child of node.of) {
+      const found = legacyGoalTechnique(child);
+      if (found) return found;
+    }
+  }
+  return null;
+}

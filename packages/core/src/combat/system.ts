@@ -68,6 +68,18 @@ export function newCombat(state: GameState, enemy: Enemy, content: ContentDb): C
   };
 }
 
+/** Adds a line to the battle log; it reads the fight and never changes it. */
+function log(
+  state: GameState,
+  c: CombatState,
+  side: 'player' | 'enemy',
+  act: 'cast' | 'hit' | 'miss',
+  tech: string | null,
+  dmg: number,
+): void {
+  emit(state, { type: 'combatLog', side, act, tech, enemy: c.enemy, dmg });
+}
+
 function roll(state: GameState, chance: number): boolean {
   return nextFloat(state.rng, STREAM) < chance;
 }
@@ -115,6 +127,7 @@ function playerAct(
     c.lastActionAt = c.clock;
     const amount = (content.balance.K.masteryPerHour * gapMs) / MS_PER_HOUR;
     grantMastery(state, tech.id, tech.skill, amount, content);
+    log(state, c, 'player', 'cast', tech.id, 0);
     return;
   }
   const basic = basicAttack(state, content);
@@ -122,7 +135,10 @@ function playerAct(
   c.pPhase = 'recover';
   c.pAt = c.clock + combatUnits(basic.intervalMs);
   const stats = enemyStats(enemy, content);
-  if (roll(state, hitChance(basic.accuracy, stats.evasion, content))) c.enemyHp -= basic.damage;
+  if (roll(state, hitChance(basic.accuracy, stats.evasion, content))) {
+    c.enemyHp -= basic.damage;
+    log(state, c, 'player', 'hit', null, basic.damage);
+  } else log(state, c, 'player', 'miss', null, 0);
 }
 
 function resolveCast(
@@ -140,14 +156,20 @@ function resolveCast(
   c.cd[tech.id] = c.clock + combatUnits(n.cooldownMs);
   const stats = enemyStats(enemy, content);
   const chance = hitChance(playerAccuracy(state, tech.skill, content), stats.evasion, content);
-  if (roll(state, chance)) c.enemyHp -= n.damage;
+  if (roll(state, chance)) {
+    c.enemyHp -= n.damage;
+    log(state, c, 'player', 'hit', tech.id, n.damage);
+  } else log(state, c, 'player', 'miss', tech.id, 0);
 }
 
 function enemyAttack(state: GameState, c: CombatState, enemy: Enemy, content: ContentDb) {
   const stats = enemyStats(enemy, content);
   c.eAt = c.clock + combatUnits(stats.intervalMs);
   const chance = hitChance(stats.accuracy, playerEvasion(state, content), content);
-  if (roll(state, chance)) c.hp -= stats.damage;
+  if (roll(state, chance)) {
+    c.hp -= stats.damage;
+    log(state, c, 'enemy', 'hit', null, stats.damage);
+  } else log(state, c, 'enemy', 'miss', null, 0);
 }
 
 /** An enemy fell: count it, let the player recover, and start the pause before the next. */

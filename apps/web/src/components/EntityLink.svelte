@@ -20,6 +20,15 @@
     text-decoration: none;
   }
 
+  /* A whole-tap target on a phone: padding grows the hit area, the text stays the same size. */
+  @media (max-width: 768px) {
+    .entity-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.75rem;
+    }
+  }
+
   .entity-link:hover {
     color: var(--accent);
     text-decoration: underline;

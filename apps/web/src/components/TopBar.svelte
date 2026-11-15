@@ -1,6 +1,9 @@
 <script lang="ts">
   import { game } from '../lib/store.ts';
+  import { content } from '@shinobi/content';
   import { t } from '../lib/i18n.ts';
+  import { markerOf } from '../lib/nav.ts';
+  import { nextStep } from '../lib/next-step.ts';
   import Icon from './Icon.svelte';
 
   interface Props {
@@ -11,6 +14,9 @@
   let { metaOpen, onToggleMeta }: Props = $props();
 
   const numbers = new Intl.NumberFormat('uk');
+  const rankMarked = $derived(
+    markerOf(nextStep(game.state, content)?.target ?? null).nav === 'rank',
+  );
 </script>
 
 <header class="topbar">
@@ -43,7 +49,16 @@
     </div>
     <div class="stat rank">
       <dt><Icon name="rank-3" size={16} /><span class="label">{t('topbar.rank')}</span></dt>
-      <dd>{t(`rank.${game.state.player.rank}`)}</dd>
+      <dd>
+        <a class="rank-link" href="#/rank" data-rank-plate
+          >{t(`rank.${game.state.player.rank}`)}{#if rankMarked}<span
+              class="marker"
+              data-marker
+              role="img"
+              aria-label={t('nav.next')}
+            ></span>{/if}</a
+        >
+      </dd>
     </div>
     <div class="stat save" data-save={game.saveStatus}>
       <dt class="label">{t('topbar.save')}</dt>
@@ -125,11 +140,27 @@
   }
 
   .stat.rank dd {
-    padding: 0 var(--space-2);
     border-radius: var(--radius-sm);
     background: var(--steel);
     color: var(--ink-900);
     font-weight: 600;
+  }
+
+  .rank-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 0 var(--space-2);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .marker {
+    width: 0.6rem;
+    height: 0.6rem;
+    border: 2px solid var(--ink-900);
+    border-radius: 50%;
+    background: var(--accent);
   }
 
   .stat.save {
@@ -202,6 +233,10 @@
     .brand {
       display: inline-flex;
       align-items: center;
+      min-height: 2.75rem;
+    }
+
+    .rank-link {
       min-height: 2.75rem;
     }
 

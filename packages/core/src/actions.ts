@@ -35,6 +35,8 @@ export interface ActionKind {
     content: ContentDb,
     rules: Rules,
   ): 'continue' | 'stop' | void;
+  /** The skill the action trains, when it trains one; a locked skill refuses its actions. */
+  skill?(id: string, content: ContentDb): SkillId | null;
   /** Called after the action is put in slot `slot` (its `data` is null). */
   start?(state: GameState, slot: number, id: string, content: ContentDb, rules: Rules): void;
   /** Called just before the action leaves slot `slot`, for any reason. */
@@ -67,6 +69,7 @@ function skillAction(resolve: Resolver): ActionKind {
   const baseMs = (def: SkillActionDef) => Math.round(def.baseSeconds * MS_PER_SECOND);
   return {
     has: (id, content) => resolve(null, id, content) !== null,
+    skill: (id, content) => resolve(null, id, content)?.skill ?? null,
     requirements(state, id, content) {
       const def = resolve(state, id, content);
       if (!def) return null;

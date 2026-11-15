@@ -2,6 +2,8 @@
   import { content, localeKey, SKILL_GROUPS, type SkillGroup } from '@shinobi/content';
   import { skillUnlockStatus } from '@shinobi/core';
   import { t } from '../lib/i18n.ts';
+  import { markerOf } from '../lib/nav.ts';
+  import { nextStep } from '../lib/next-step.ts';
   import { skillProgress } from '../lib/progress.ts';
   import { currentRoute } from '../lib/router.svelte.ts';
   import { settings } from '../lib/settings.svelte.ts';
@@ -15,6 +17,7 @@
   let collapsed = $state<Partial<Record<SkillGroup, boolean>>>({});
 
   const route = $derived(currentRoute());
+  const markedSkill = $derived(markerOf(nextStep(game.state, content)?.target ?? null).skill);
   const activeSkill = $derived(
     route.page === 'entity' && route.ref.kind === 'skill' ? route.ref.id : null,
   );
@@ -69,7 +72,14 @@
               <span class="skill-icon"
                 ><Icon entity={{ kind: 'skill', id: skill.id }} size={18} /></span
               >
-              <span class="skill-name"><EntityLink kind="skill" id={skill.id} /></span>
+              <span class="skill-name"
+                ><EntityLink kind="skill" id={skill.id} />{#if markedSkill === skill.id}<span
+                    class="marker"
+                    data-marker
+                    role="img"
+                    aria-label={t('nav.next')}
+                  ></span>{/if}</span
+              >
               {#if locked}
                 <span class="skill-level" role="img" aria-label={t('skill.locked')}
                   ><Icon name="lucide:lock" size={14} /></span
@@ -206,6 +216,14 @@
   .xp-fill {
     display: block;
     height: 100%;
+    background: var(--accent);
+  }
+  .marker {
+    display: inline-block;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin-left: var(--space-2);
+    border-radius: 50%;
     background: var(--accent);
   }
 </style>

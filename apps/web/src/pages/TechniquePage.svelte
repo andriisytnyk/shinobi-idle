@@ -10,7 +10,6 @@
   import { t } from '../lib/i18n.ts';
   import { techniqueGoal } from '../lib/goal.ts';
   import { techniqueRelations } from '../lib/technique-links.ts';
-  import { settings } from '../lib/settings.svelte.ts';
   import { game } from '../lib/store.ts';
   import { entityName } from '../lib/entities.ts';
 
@@ -48,11 +47,11 @@
   );
 
   const goal = $derived(techniqueGoal(id, content));
-  const pinned = $derived(goal !== null && JSON.stringify(settings.goal) === JSON.stringify(goal));
+  const pinned = $derived(game.state.goal?.kind === 'technique' && game.state.goal.id === id);
 
   function togglePin(): void {
-    if (pinned) settings.unpinGoal();
-    else if (goal) settings.pinGoal(goal);
+    if (pinned) game.dispatch({ type: 'goal.clear' });
+    else if (goal) game.dispatch({ type: 'goal.set', ref: { kind: 'technique', id } });
   }
 </script>
 

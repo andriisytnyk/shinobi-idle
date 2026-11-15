@@ -1,5 +1,3 @@
-import type { Req } from '@shinobi/core';
-
 export interface SettingsData {
   /** Hide the skills that are still shut from the sidebar. */
   hideLocked: boolean;
@@ -7,11 +5,6 @@ export interface SettingsData {
   hints: boolean;
   /** Ids of hints the player has dismissed. */
   dismissedHints: string[];
-  /**
-   * The pinned goal. The core has no goal command yet, so it lives here, in the web settings,
-   * until `state.goal` and a pin command exist.
-   */
-  goal: Req | null;
 }
 
 export const SETTINGS_KEY = 'shinobi.settings';
@@ -20,7 +13,6 @@ const defaults = (): SettingsData => ({
   hideLocked: false,
   hints: true,
   dismissedHints: [],
-  goal: null,
 });
 
 /** The slice of `localStorage` the settings use. */
@@ -31,26 +23,6 @@ export interface TextStorage {
 
 const isRecord = (x: unknown): x is Record<string, unknown> =>
   typeof x === 'object' && x !== null && !Array.isArray(x);
-
-const REQ_TYPES = [
-  'skill',
-  'technique',
-  'rank',
-  'nature',
-  'item',
-  'quest',
-  'building',
-  'flag',
-  'all',
-  'any',
-];
-
-/** Cheap shape check for a stored goal; a bad one is dropped rather than rendered. */
-export function isReq(x: unknown): x is Req {
-  if (!isRecord(x) || typeof x.t !== 'string' || !REQ_TYPES.includes(x.t)) return false;
-  if (x.t === 'all' || x.t === 'any') return Array.isArray(x.of) && x.of.every(isReq);
-  return true;
-}
 
 /** Reads stored settings, keeping every field that is valid and defaulting the rest. */
 export function parseSettings(text: string | null): SettingsData {
@@ -64,14 +36,13 @@ export function parseSettings(text: string | null): SettingsData {
     if (Array.isArray(raw.dismissedHints)) {
       out.dismissedHints = raw.dismissedHints.filter((h): h is string => typeof h === 'string');
     }
-    if (isReq(raw.goal)) out.goal = raw.goal;
   } catch {
     // A damaged settings blob falls back to the defaults.
   }
   return out;
 }
 
-function browserStorage(): TextStorage | null {
+export function browserStorage(): TextStorage | null {
   try {
     return typeof localStorage === 'undefined' ? null : localStorage;
   } catch {
@@ -114,17 +85,6 @@ export function createSettings(storage: TextStorage | null = browserStorage()) {
     },
     set hints(value: boolean) {
       data.hints = value;
-      persist();
-    },
-    get goal() {
-      return data.goal;
-    },
-    pinGoal(req: Req) {
-      data.goal = req;
-      persist();
-    },
-    unpinGoal() {
-      data.goal = null;
       persist();
     },
     /** Whether a hint with this id should still be shown. */

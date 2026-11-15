@@ -63,7 +63,6 @@ function fresh(rank: GameState['player']['rank'] = 'genin'): GameState {
 
 beforeEach(() => {
   game.replaceState(fresh());
-  settings.unpinGoal();
   settings.hideLocked = false;
   settings.hints = true;
   settings.resetHints();
@@ -253,9 +252,8 @@ describe('generic entity page', () => {
 
 describe('A5: goal panel', () => {
   it('renders the pinned goal as a tree of links', () => {
-    const req = techniqueGoal('core:great_fireball', content);
-    if (!req) throw new Error('no goal');
-    settings.pinGoal(req);
+    expect(techniqueGoal('core:great_fireball', content)).not.toBeNull();
+    game.dispatch({ type: 'goal.set', ref: { kind: 'technique', id: 'core:great_fireball' } });
     const body = html(GoalPanel, { onClose: () => {} });
     expect(body).toMatch(anchor({ kind: 'technique', id: 'core:great_fireball' }));
     expect(body).toMatch(anchor({ kind: 'skill', id: 'katon' }));
@@ -263,7 +261,18 @@ describe('A5: goal panel', () => {
     expect(body).toContain('data-hint="goalPanel"');
   });
 
-  it('suggests the nearest technique gated only by level when nothing is pinned', () => {
+  it('suggests the current quest step, with a way to where it is done, when nothing is pinned', () => {
+    const body = html(GoalPanel, { onClose: () => {} });
+    expect(body).toContain('data-suggestion="quest"');
+    expect(body).toMatch(anchor({ kind: 'quest', id: 'core:graduation' }));
+    expect(body).toMatch(anchor({ kind: 'skill', id: 'tai' }));
+    expect(body).toMatch(/<a [^>]*href="#\/skill\/tai"[^>]*data-go/);
+  });
+
+  it('suggests the nearest technique gated only by level once every chain is done', () => {
+    const done = fresh();
+    done.quests['core:graduation'] = { step: 5, base: 0, done: true };
+    game.replaceState(done);
     const body = html(GoalPanel, { onClose: () => {} });
     expect(body).toContain('Закріпленої мети ще немає');
     const match = /data-suggestion[\s\S]*?href="#\/technique\/([^"]+)"/.exec(body);
@@ -326,11 +335,11 @@ describe('real state in the views', () => {
 
 describe('hints', () => {
   it('are shown once and not again after dismissal, and not at all when switched off', () => {
-    expect(html(Hint, { id: 'x', text: 'hint.goal' })).toContain('data-hint="x"');
-    settings.dismissHint('x');
-    expect(html(Hint, { id: 'x', text: 'hint.goal' })).not.toContain('data-hint');
+    expect(html(Hint, { id: 'combat' })).toContain('data-hint="combat"');
+    settings.dismissHint('combat');
+    expect(html(Hint, { id: 'combat' })).not.toContain('data-hint');
     settings.resetHints();
     settings.hints = false;
-    expect(html(Hint, { id: 'x', text: 'hint.goal' })).not.toContain('data-hint');
+    expect(html(Hint, { id: 'combat' })).not.toContain('data-hint');
   });
 });

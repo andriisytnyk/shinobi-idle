@@ -2,7 +2,8 @@
   import { content } from '@shinobi/content';
   import { actionInfo, SHARE_FULL } from '@shinobi/core';
   import { actionRef } from '../lib/entities.ts';
-  import { formatXp } from '../lib/format.ts';
+  import { senseiTestInfo } from '../lib/exam-test.ts';
+  import { formatDuration, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import EntityLink from './EntityLink.svelte';
@@ -12,7 +13,8 @@
     slot: number;
     ref: ReturnType<typeof actionRef>;
     fraction: number;
-    xpPerHour: number;
+    /** Skill XP per hour; null for actions that pay none by the hour (fights, exams). */
+    xpPerHour: number | null;
   }
 
   const rows = $derived.by((): Row[] => {
@@ -21,12 +23,16 @@
     state.slots.forEach((slot, index) => {
       if (!slot.action) return;
       const info = actionInfo(state, slot.action, content, game.rules);
-      if (!info) return;
+      // Fights and exams are not skill tiles, so their cycle comes straight from their kind.
+      const kind = game.rules.actionKinds[slot.action.kind];
+      const intervalMs =
+        info?.intervalMs ?? kind?.intervalMs(state, slot.action.id, content, game.rules);
+      if (intervalMs === undefined) return;
       out.push({
         slot: index,
         ref: actionRef(slot.action),
-        fraction: Math.min(1, slot.progress / (info.intervalMs * SHARE_FULL)),
-        xpPerHour: (info.xpPerHour * slot.share) / SHARE_FULL,
+        fraction: Math.min(1, slot.progress / (intervalMs * SHARE_FULL)),
+        xpPerHour: info ? (info.xpPerHour * slot.share) / SHARE_FULL : null,
       });
     });
     return out;
@@ -35,6 +41,8 @@
   /** On a phone the bar is one line; the toggle opens the other slots. */
   let expanded = $state(false);
   const shown = $derived(expanded ? rows : rows.slice(0, 1));
+
+  const wait = $derived(senseiTestInfo(game.state, game.rules, content));
 
   const stop = (slot: number) => void game.dispatch({ type: 'action.stop', slot });
 </script>
@@ -58,7 +66,16 @@
           >
             <span class="fill" style:width="{row.fraction * 100}%"></span>
           </span>
-          <span class="xph">{t('tile.xphValue', { n: formatXp(row.xpPerHour) })}</span>
+          <span class="xph"
+            >{#if row.xpPerHour !== null}{t('tile.xphValue', {
+                n: formatXp(row.xpPerHour),
+              })}{/if}</span
+          >
+          {#if wait && wait.slot === row.slot}
+            <span class="wait" data-exam-wait
+              >{t('rank.testLeft', { time: formatDuration(wait.left) })}</span
+            >
+          {/if}
           <button type="button" class="stop" onclick={() => stop(row.slot)}>{t('now.stop')}</button>
         </li>
       {/each}
@@ -144,6 +161,14 @@
     display: block;
     height: 100%;
     background: var(--accent);
+  }
+
+  .wait {
+    flex: none;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
   }
 
   .xph {

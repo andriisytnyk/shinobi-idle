@@ -1,10 +1,14 @@
 import type { ContentDb } from '@shinobi/content';
 import { rebalanceShares, stopSlot } from './actions.ts';
+import type { EntityRef } from './entity.ts';
+import { emit } from './events.ts';
 import { examFor, SENSEI_TEST_KIND } from './exam.ts';
 import { useItem } from './items.ts';
+import { indexOf } from './lookup.ts';
 import { updateQuests } from './quests.ts';
 import { evalReq, RANK_ORDER } from './requirements.ts';
 import { defaultRules, type Rules } from './rules.ts';
+import { isSkillUnlocked } from './selectors.ts';
 import type { GameState } from './state.ts';
 
 /** A player or bot command. Concrete command types arrive with the stages that need them. */
@@ -14,7 +18,15 @@ export type Command =
   /** Starts the Genin exam's sensei test; the checklist must be met. `slot` defaults to 0. */
   | { type: 'exam.genin.start'; slot?: number }
   /** Uses a bank item on a target (for the graduate scroll, an academy technique id). */
-  | { type: 'item.use'; id: string; target: string };
+  | { type: 'item.use'; id: string; target: string }
+  /** Pins a goal for the meta panel; the entity must exist and be a kind that can be a goal. */
+  | { type: 'goal.set'; ref: EntityRef }
+  | { type: 'goal.clear' }
+  /** Names the player: 1 to 24 characters once trimmed. */
+  | { type: 'player.setName'; name: string };
+
+/** Longest player name. */
+export const PLAYER_NAME_MAX = 24;
 
 export type CommandResult = { ok: true } | { ok: false; reason: string };
 
@@ -74,6 +86,11 @@ function startAction(
   const kind = rules.actionKinds[kindName];
   if (!kind) return { ok: false, reason: 'error.unknownActionKind' };
   if (!kind.has(id, content)) return { ok: false, reason: 'error.unknownAction' };
+  // A skill that is still shut refuses every action it would train, whatever else holds.
+  const skill = kind.skill?.(id, content);
+  if (skill && !isSkillUnlocked(state, skill, content)) {
+    return { ok: false, reason: 'error.skillLocked' };
+  }
   const req = kind.requirements(state, id, content, rules);
   if (req && !evalReq(state, req, content).met) {
     return { ok: false, reason: 'error.requirementsNotMet' };
@@ -85,6 +102,26 @@ function startAction(
   rebalanceShares(state);
   kind.start?.(state, slotIndex, id, content, rules);
   return { ok: true };
+}
+
+/** Whether a goal reference names an entity the content has, of a kind that can be pinned. */
+function goalExists(ref: EntityRef, content: ContentDb): boolean {
+  if (typeof ref !== 'object' || ref === null || typeof ref.id !== 'string') return false;
+  const index = indexOf(content);
+  switch (ref.kind) {
+    case 'technique':
+      return index.techniques.has(ref.id);
+    case 'skill':
+      return content.skills.some((s) => s.id === ref.id);
+    case 'item':
+      return index.items.has(ref.id);
+    case 'enemy':
+      return index.enemies.has(ref.id);
+    case 'quest':
+      return index.quests.has(ref.id);
+    default:
+      return false;
+  }
 }
 
 /** Applies a command to the state. Failures carry a localization key. */
@@ -125,6 +162,24 @@ function apply(
     }
     case 'item.use':
       return useItem(state, command.id, command.target, content);
+    case 'goal.set': {
+      if (!goalExists(command.ref, content)) return { ok: false, reason: 'error.invalidGoal' };
+      state.goal = { kind: command.ref.kind, id: command.ref.id };
+      emit(state, { type: 'goalSet', kind: command.ref.kind, id: command.ref.id });
+      return { ok: true };
+    }
+    case 'goal.clear':
+      state.goal = null;
+      return { ok: true };
+    case 'player.setName': {
+      const name = typeof command.name === 'string' ? command.name.trim() : '';
+      // No control characters: a name is one line of plain text.
+      if (name.length < 1 || name.length > PLAYER_NAME_MAX || /\p{Cc}/u.test(name)) {
+        return { ok: false, reason: 'error.invalidName' };
+      }
+      state.player.name = name;
+      return { ok: true };
+    }
     default:
       return { ok: false, reason: 'error.unknownCommand' };
   }

@@ -46,7 +46,7 @@
     {#if desc}<p class="lore">{desc}</p>{/if}
     {#if hasKey(unlockKey)}<p class="unlock">{t(unlockKey)}</p>{/if}
 
-    <Hint id="skillPage" text="hint.skillPage" />
+    <Hint id="skillPage" />
 
     {#if lock && !lock.met}
       <section class="locked" data-locked>

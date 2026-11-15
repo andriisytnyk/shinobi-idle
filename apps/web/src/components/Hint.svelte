@@ -1,22 +1,26 @@
 <script lang="ts">
+  import { hintTextKey, hintTitleKey } from '../lib/hints.ts';
   import { t } from '../lib/i18n.ts';
   import { settings } from '../lib/settings.svelte.ts';
   import Icon from './Icon.svelte';
 
   interface Props {
-    /** Stable id; once dismissed the hint never comes back (unless the player resets hints). */
+    /** Stable id from the hint registry; once dismissed the hint never comes back (unless reset). */
     id: string;
-    /** Localization key of the hint text. */
-    text: string;
+    /** Localization key of the text; by default `hint.<id>`. */
+    text?: string;
   }
 
-  let { id, text }: Props = $props();
+  let { id, text = hintTextKey(id) }: Props = $props();
 </script>
 
 {#if settings.hintVisible(id)}
   <aside class="hint" data-hint={id}>
     <span class="mark"><Icon name="lucide:info" size={18} /></span>
-    <p>{t(text)}</p>
+    <div class="body">
+      <p class="title">{t(hintTitleKey(id))}</p>
+      <p>{t(text)}</p>
+    </div>
     <button type="button" onclick={() => settings.dismissHint(id)}>{t('hint.dismiss')}</button>
   </aside>
 {/if}
@@ -25,6 +29,7 @@
   .hint {
     display: flex;
     align-items: flex-start;
+    flex-wrap: wrap;
     gap: var(--space-3);
     margin: var(--space-3) 0;
     padding: var(--space-3);
@@ -39,9 +44,18 @@
     color: var(--chakra);
   }
 
+  .body {
+    flex: 1 1 12rem;
+    min-width: 0;
+  }
+
   p {
-    flex: 1;
     margin: 0;
+  }
+
+  .title {
+    color: var(--heading);
+    font-weight: 600;
   }
 
   button {
