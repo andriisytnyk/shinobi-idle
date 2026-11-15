@@ -18,6 +18,9 @@ import {
   meditationChances,
   poolCapacity,
   poolGain,
+  shopPrice,
+  woundHealMs,
+  woundIntervalMs,
   regrowMs,
   techniqueNumbers,
   useTonic,
@@ -26,7 +29,7 @@ import {
   type Modifier,
   type Rules,
 } from '../src/index.ts';
-import { genin, HOUR, plainRules, setLevel, start } from './helpers.ts';
+import { genin, HOUR, plainRules, setLevel, start, withBuildings } from './helpers.ts';
 
 const K = content.balance.K;
 const MINT = 'core:mint';
@@ -110,7 +113,9 @@ describe('A5: pool checkpoints switch on exactly at their share', () => {
       Object.keys(MODIFIER_KEYS)
         // The Athletics cut of explore and walk time is not a checkpoint.
         .filter((key) => key !== 'interval.explore' && key !== 'interval.walk')
-        .flatMap((key) => getMod(state, key, content).parts),
+        .flatMap((key) => getMod(state, key, content).parts)
+        // Village bonuses come from buildings, not from checkpoints.
+        .filter((p) => typeof p.source !== 'object' || p.source.kind !== 'building'),
     );
     // Every part comes from a 10 / 25 / 50% checkpoint: at most one part per such checkpoint.
     expect(sources.size).toBeLessThanOrEqual(39);
@@ -306,6 +311,20 @@ describe('A4: each wired key changes its mechanic by exactly the modifier', () =
       expect(walkMs(s, cell, content, withProvider())).toBe(base);
       const faster = withProvider(test('interval.walk', -0.1));
       expect(walkMs(s, cell, content, faster)).toBe(Math.round(base * 0.9));
+    },
+    'shop.price': () => {
+      // Each Market level takes 2% off the price of a good.
+      const s = withBuildings(genin(), { 'core:market': 0 });
+      expect(shopPrice(s, 'core:meat', content)).toBe(K.goods.meat);
+      withBuildings(s, { 'core:market': 3 });
+      expect(shopPrice(s, 'core:meat', content)).toBe(Math.round((K.goods.meat ?? 0) * 0.94));
+    },
+    'wound.heal': () => {
+      // Each Hospital level shortens the healing of a stack by 5%.
+      const s = withBuildings(genin(), { 'core:hospital': 2 });
+      expect(woundHealMs(s, content, defaultRules)).toBe(
+        Math.round(woundIntervalMs(content) * 0.9),
+      );
     },
     'obstacle.penalty': () => {
       const s = genin();

@@ -2,6 +2,7 @@ import type { ContentDb, NatureId, SkillId } from '@shinobi/content';
 import type { EntityRef } from './entity.ts';
 import { indexOf } from './lookup.ts';
 import type { GameState, Rank } from './state.ts';
+import { buildingLevel } from './village-state.ts';
 import { levelAt, levelCap } from './xp.ts';
 
 export type Req =
@@ -37,9 +38,6 @@ const flagValue = (state: GameState, id: string): number => {
   const v = state.flags[id];
   return v === undefined ? 0 : v === true ? 1 : v;
 };
-
-// Buildings get their own state branch in a later stage; until then they read flags.
-const buildingLevel = (state: GameState, id: string) => flagValue(state, `building.${id}`);
 
 function leaf(req: Req, current: number, target: number, ref: EntityRef | null): ReqResult {
   return { req, met: current >= target, current, target, ref, children: [] };

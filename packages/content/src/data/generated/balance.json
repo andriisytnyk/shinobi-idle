@@ -451,6 +451,19 @@
       "mission": 0.15
     },
     "tickMin": 5,
+    "village": {
+      "start": {
+        "core:tower": 1,
+        "core:bureau": 1,
+        "core:store": 1,
+        "core:sawmill": 1,
+        "core:mine": 1,
+        "core:farms": 1,
+        "core:market": 1
+      },
+      "lateFromLevel": 4,
+      "lateShare": 0.5
+    },
     "prod": 20,
     "costBase": 20,
     "costMult": [

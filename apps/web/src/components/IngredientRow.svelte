@@ -1,8 +1,11 @@
 <script lang="ts">
   import { content } from '@shinobi/content';
-  import { itemSource } from '../lib/crafts.ts';
+  import { evalReq, shopEntries } from '@shinobi/core';
+  import { blockOf, itemSource } from '../lib/crafts.ts';
   import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
+  import { game } from '../lib/store.ts';
+  import BuildingNeed from './BuildingNeed.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
 
@@ -16,6 +19,14 @@
 
   const missing = $derived(have < need);
   const source = $derived(itemSource(item, content));
+  /** A shop good that the village has not yet opened says which building it waits for. */
+  const locked = $derived(
+    game.read((gs) => {
+      const entry = shopEntries(content).find((s) => s.item === item);
+      const block = entry ? blockOf(evalReq(gs, entry.req, content)) : null;
+      return block?.kind === 'building' ? block : null;
+    }),
+  );
 </script>
 
 <li class="input" class:missing data-input={item} data-missing={missing}>
@@ -26,6 +37,9 @@
   >
   {#if missing}
     <a class="source" href={source.href} data-source={source.kind}>{t(source.labelKey)}</a>
+    {#if locked}<span class="locked" data-input-locked
+        ><BuildingNeed id={locked.id} level={locked.n} /></span
+      >{/if}
   {/if}
 </li>
 
