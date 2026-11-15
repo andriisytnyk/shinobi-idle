@@ -187,7 +187,8 @@ describe('technique page', () => {
   it('A8: shows the seal strip with glyphs and Ukrainian names in order', () => {
     const body = html(TechniquePage, { id });
     const glyphs = [...body.matchAll(/class="glyph[^"]*" lang="ja">([^<]+)</g)].map((m) => m[1]);
-    expect(glyphs).toEqual(['巳', '未', '申', '亥', '午', '寅']);
+    // The strip of the page comes first; the tile below it repeats the seals in compact form.
+    expect(glyphs.slice(0, 6)).toEqual(['巳', '未', '申', '亥', '午', '寅']);
     const names = ['Змія', 'Баран', 'Мавпа', 'Кабан', 'Кінь', 'Тигр'];
     const seals = content.techniques.find((t) => t.id === id)?.sealSeq ?? [];
     expect(seals).toHaveLength(6);
@@ -292,7 +293,8 @@ describe('now bar', () => {
     const body = html(NowBar, {});
     expect(body).toMatch(anchor({ kind: 'technique', id: info.id }));
     expect(body).toContain('Зупинити');
-    expect(body).toContain('role="progressbar"');
+    expect(body).not.toContain('role="progressbar"');
+    expect(body).toContain('data-now-phase');
   });
 });
 

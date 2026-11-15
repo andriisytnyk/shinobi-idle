@@ -14,6 +14,7 @@
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import { toasts } from '../lib/toasts.svelte.ts';
+  import ActionEmblem from './ActionEmblem.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
@@ -128,6 +129,7 @@
             {@const missing = needs(slot, option.id)}
             <li class="option" class:built={option.built} data-obstacle={option.id}>
               <p class="name">
+                <ActionEmblem kind="obstacle" id={option.id} skill="ath" size="sm" />
                 <EntityLink kind="obstacle" id={option.id} />
                 {#if option.built}
                   <span class="mark"
