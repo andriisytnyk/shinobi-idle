@@ -5,11 +5,13 @@
   import { senseiTestInfo } from '../lib/exam-test.ts';
   import { formatDuration, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
+  import { missionNow, type MissionNow } from '../lib/missions.ts';
   import { game } from '../lib/store.ts';
   import BuffStrip from './BuffStrip.svelte';
   import EntityLink from './EntityLink.svelte';
   import Slot from '../lib/ext/Slot.svelte';
   import Icon from './Icon.svelte';
+  import NowMission from './NowMission.svelte';
 
   interface Row {
     slot: number;
@@ -19,6 +21,8 @@
     xpPerHour: number | null;
     /** What the slot does when it is a move on the map: its label key and the time left. */
     move: { key: string; left: number } | null;
+    /** The stage, performer and failures of a mission in the slot. */
+    mission: MissionNow | null;
   }
 
   const rows = $derived.by((): Row[] =>
@@ -46,6 +50,7 @@
           ref: actionRef(slot.action),
           fraction: Math.min(1, slot.progress / (intervalMs * SHARE_FULL)),
           xpPerHour,
+          mission: missionNow(state, index, game.content),
           move:
             isExplore || isWalk
               ? {
@@ -116,6 +121,7 @@
           data-ui="now-slot"
           data-slot-index={row.slot}
           data-entity="{row.ref.kind}:{row.ref.id}"
+          class:with-mission={row.mission}
         >
           <span class="name"
             >{#if row.move}<span class="verb">{t(row.move.key)}</span>
@@ -147,6 +153,7 @@
             >
           {/if}
           <button type="button" class="stop" onclick={() => stop(row.slot)}>{t('now.stop')}</button>
+          {#if row.mission}<NowMission now={row.mission} />{/if}
           <Slot name="now.bar" ctx={{ slot: row.slot }} />
         </li>
       {/each}
@@ -246,6 +253,11 @@
     align-items: center;
     gap: var(--space-3);
     min-width: 0;
+  }
+
+  /* A mission shows its stage on a line of its own under the bar. */
+  .slot.with-mission {
+    flex-wrap: wrap;
   }
 
   .name {

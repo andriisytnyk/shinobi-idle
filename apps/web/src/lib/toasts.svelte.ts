@@ -2,6 +2,7 @@ import { content } from '@shinobi/content';
 import type { GameEvent } from '@shinobi/core';
 import { actionRef, masteryRef } from './entities.ts';
 import { t, type Params } from './i18n.ts';
+import { missionToast } from './mission-toasts.ts';
 import type { EntityRef } from './route.ts';
 
 export interface Toast {
@@ -25,6 +26,9 @@ export type ToastSpec = Omit<Toast, 'id'>;
 
 /** Maps a core event to the toast that announces it, or null for events that stay silent. */
 export function toastFor(event: GameEvent): ToastSpec | null {
+  // Missions have their own words for a stage, a finished run and a stop.
+  const mission = missionToast(event, content);
+  if (mission !== undefined) return mission;
   switch (event.type) {
     case 'levelUp':
       return {

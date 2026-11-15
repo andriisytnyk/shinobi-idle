@@ -41,6 +41,12 @@ export const UI_PARTS = [
   'world-cell',
   /** A point-of-interest row of the cell panel. */
   'poi-row',
+  /** A mission's card on the board; carries `data-entity="mission:<id>"`. */
+  'mission-card',
+  /** One stage of a mission on its page; `data-stage` is its index. */
+  'mission-stage',
+  /** One thing a mission pays: a currency, an item, a village resource. */
+  'mission-reward',
   /** A currency figure of the top bar. */
   'topbar-currency',
   'modal',
@@ -71,5 +77,8 @@ export const ENTITY_PARTS: readonly UiPart[] = [
   'building-card',
   'world-cell',
   'poi-row',
+  'mission-card',
+  'mission-stage',
+  'mission-reward',
   'topbar-currency',
 ];
