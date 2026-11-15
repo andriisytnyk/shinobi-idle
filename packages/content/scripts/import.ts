@@ -8,7 +8,10 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  FIGHT_SKILL_IDS,
+  FIRST_FIGHT_FLAG,
   NATURE_IDS,
+  OPEN_SKILL_IDS,
   ROLE_IDS,
   SKILL_GROUPS,
   SKILL_IDS,
@@ -156,7 +159,14 @@ const skills: Skill[] = SKILL_IDS.map((id) => {
   text('skill', id, 'name', n.name);
   text('skill', id, 'desc', n.lore);
   text('skill', id, 'unlock', n.unlock);
-  return { id, group, activity: n.mt ?? 'none' };
+  const open = (OPEN_SKILL_IDS as readonly string[]).includes(id);
+  const fight = (FIGHT_SKILL_IDS as readonly string[]).includes(id);
+  const unlockReq: Skill['unlockReq'] = open
+    ? null
+    : fight
+      ? { t: 'flag', id: FIRST_FIGHT_FLAG }
+      : { t: 'rank', rank: 'genin' };
+  return { id, group, activity: n.mt ?? 'none', unlockReq };
 });
 for (const nat of NATURE_IDS)
   need(

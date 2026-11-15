@@ -1,4 +1,4 @@
-/** Entity kinds that have a page. `boss` entities are shown under the enemy-style route kind `boss`. */
+/** Entity kinds that have a page. Exercises, practices and obstacles are the action entities of the training skills. */
 export const ENTITY_KINDS = [
   'skill',
   'technique',
@@ -11,6 +11,11 @@ export const ENTITY_KINDS = [
   'building',
   'gear',
   'seal',
+  'exercise',
+  'practice',
+  'obstacle',
+  'status',
+  'trait',
 ] as const;
 
 export type EntityKind = (typeof ENTITY_KINDS)[number];
@@ -26,6 +31,7 @@ export type Route =
   | { page: 'entity'; ref: EntityRef }
   | { page: 'tab'; tab: string }
   | { page: 'credits' }
+  | { page: 'settings' }
   | { page: 'notFound'; hash: string };
 
 const TABS = ['missions', 'combat', 'village', 'more'];
@@ -39,6 +45,7 @@ export function parseHash(hash: string): Route {
   const [first = '', ...rest] = path.split('/');
   if (first === 'skills' && rest.length === 0) return { page: 'skills' };
   if (first === 'credits' && rest.length === 0) return { page: 'credits' };
+  if (first === 'settings' && rest.length === 0) return { page: 'settings' };
   if (TABS.includes(first) && rest.length === 0) return { page: 'tab', tab: first };
   const id = rest.join('/');
   if (isKind(first) && id !== '') {

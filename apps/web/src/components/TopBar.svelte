@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { state } from '../lib/game.ts';
+  import { game } from '../lib/store.ts';
   import { t } from '../lib/i18n.ts';
   import Icon from './Icon.svelte';
 
@@ -23,7 +23,7 @@
           >{t('topbar.ryo')}</span
         >
       </dt>
-      <dd>{numbers.format(state.currencies.ryo)}</dd>
+      <dd>{numbers.format(game.state.currencies.ryo)}</dd>
     </div>
     <div class="stat">
       <dt>
@@ -31,7 +31,7 @@
           >{t('topbar.rep')}</span
         >
       </dt>
-      <dd>{numbers.format(state.currencies.rep)}</dd>
+      <dd>{numbers.format(game.state.currencies.rep)}</dd>
     </div>
     <div class="stat intel">
       <dt>
@@ -39,11 +39,15 @@
           >{t('topbar.intel')}</span
         >
       </dt>
-      <dd>{numbers.format(state.currencies.intel)}</dd>
+      <dd>{numbers.format(game.state.currencies.intel)}</dd>
     </div>
     <div class="stat rank">
       <dt><Icon name="rank-3" size={16} /><span class="label">{t('topbar.rank')}</span></dt>
-      <dd>{t(`rank.${state.player.rank}`)}</dd>
+      <dd>{t(`rank.${game.state.player.rank}`)}</dd>
+    </div>
+    <div class="stat save" data-save={game.saveStatus}>
+      <dt class="label">{t('topbar.save')}</dt>
+      <dd>{t(`topbar.save.${game.saveStatus}`)}</dd>
     </div>
   </dl>
 
@@ -128,6 +132,15 @@
     font-weight: 600;
   }
 
+  .stat.save {
+    color: var(--fg-dim);
+    font-size: 0.85rem;
+  }
+
+  .stat.save[data-save='error'] dd {
+    color: var(--danger);
+  }
+
   .tools {
     display: flex;
     align-items: center;
@@ -182,6 +195,14 @@
 
     .tools {
       margin-left: auto;
+    }
+
+    /* Whole-tap targets of at least 44 px on a phone. */
+    .meta-toggle,
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.75rem;
     }
 
     .lang,

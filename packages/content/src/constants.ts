@@ -97,6 +97,15 @@ export const KEY_NATURES: Record<(typeof CELL_KEYS)[number], readonly string[]> 
   rubble: ['doton'],
 };
 
+/** Skills that are open from the first day. */
+export const OPEN_SKILL_IDS = ['tai', 'nin', 'cc', 'med', 'ath'] as const;
+
+/** Skills that open with the first fight; every other skill opens at the Genin rank. */
+export const FIGHT_SKILL_IDS = ['vit', 'eva'] as const;
+
+/** The flag the combat stage raises on the first fight. */
+export const FIRST_FIGHT_FLAG = 'firstFight';
+
 export type SkillId = (typeof SKILL_IDS)[number];
 export type NatureId = (typeof NATURE_IDS)[number];
 export type TechSkillId = (typeof TECH_SKILL_IDS)[number];

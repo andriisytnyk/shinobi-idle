@@ -1,24 +1,37 @@
 <script lang="ts">
   import { content, localeKey, SKILL_GROUPS, type SkillGroup } from '@shinobi/content';
-  import { skillProgress } from '../lib/game.ts';
+  import { skillUnlockStatus } from '@shinobi/core';
   import { t } from '../lib/i18n.ts';
+  import { skillProgress } from '../lib/progress.ts';
   import { currentRoute } from '../lib/router.svelte.ts';
+  import { settings } from '../lib/settings.svelte.ts';
+  import { game } from '../lib/store.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
+  import ReqTree from './ReqTree.svelte';
 
   const NATURE_SKILLS: readonly string[] = ['katon', 'futon', 'raiton', 'doton', 'suiton'];
-
-  // Groups come from the content, in the order the style document lists them.
-  const groups = SKILL_GROUPS.map((id) => ({
-    id,
-    skills: content.skills.filter((s) => s.group === id),
-  })).filter((g) => g.skills.length > 0);
 
   let collapsed = $state<Partial<Record<SkillGroup, boolean>>>({});
 
   const route = $derived(currentRoute());
   const activeSkill = $derived(
     route.page === 'entity' && route.ref.kind === 'skill' ? route.ref.id : null,
+  );
+
+  /** Groups come from the content, in the order the style document lists them. */
+  const groups = $derived(
+    SKILL_GROUPS.map((id) => ({
+      id,
+      skills: content.skills
+        .filter((s) => s.group === id)
+        .map((skill) => ({
+          skill,
+          lock: skillUnlockStatus(game.state, skill.id, content),
+          progress: skillProgress(game.state, skill.id),
+        }))
+        .filter((row) => !(settings.hideLocked && row.lock && !row.lock.met)),
+    })).filter((g) => g.skills.length > 0),
   );
 
   const toggle = (id: SkillGroup) => {
@@ -42,12 +55,13 @@
       </button>
       {#if !collapsed[group.id]}
         <ul>
-          {#each group.skills as skill (skill.id)}
-            {@const progress = skillProgress(skill.id)}
+          {#each group.skills as { skill, lock, progress } (skill.id)}
+            {@const locked = lock !== null && !lock.met}
             <li
               class="skill"
               class:active={activeSkill === skill.id}
-              class:nature={NATURE_SKILLS.includes(skill.id)}
+              class:locked
+              data-skill={skill.id}
               style:--skill-color={NATURE_SKILLS.includes(skill.id)
                 ? `var(--nature-${skill.id})`
                 : 'var(--steel)'}
@@ -56,10 +70,19 @@
                 ><Icon entity={{ kind: 'skill', id: skill.id }} size={18} /></span
               >
               <span class="skill-name"><EntityLink kind="skill" id={skill.id} /></span>
-              <span class="skill-level">{t('level.short', { n: progress.level })}</span>
-              <span class="xp-bar" aria-hidden="true">
-                <span class="xp-fill" style:width="{progress.fraction * 100}%"></span>
-              </span>
+              {#if locked}
+                <span class="skill-level" role="img" aria-label={t('skill.locked')}
+                  ><Icon name="lucide:lock" size={14} /></span
+                >
+                <span class="condition" data-lock>
+                  {#if lock}<ReqTree node={lock} />{/if}
+                </span>
+              {:else}
+                <span class="skill-level">{t('level.short', { n: progress.level })}</span>
+                <span class="xp-bar" aria-hidden="true">
+                  <span class="xp-fill" style:width="{progress.fraction * 100}%"></span>
+                </span>
+              {/if}
             </li>
           {/each}
         </ul>
@@ -80,6 +103,7 @@
     align-items: center;
     gap: var(--space-2);
     width: 100%;
+    min-height: 2.75rem;
     padding: var(--space-1) var(--space-2);
     border: 0;
     background: none;
@@ -115,6 +139,7 @@
       'bar bar bar';
     align-items: center;
     column-gap: var(--space-2);
+    min-height: 2.75rem;
     padding: var(--space-2);
     border-left: 3px solid transparent;
     border-radius: var(--radius-sm);
@@ -129,10 +154,18 @@
     background: var(--surface-raised);
   }
 
+  .skill.locked {
+    color: var(--fg-dim);
+  }
+
   .skill-icon {
     grid-area: icon;
     display: inline-flex;
     color: var(--skill-color);
+  }
+
+  .locked .skill-icon {
+    opacity: 0.5;
   }
 
   .skill-name {
@@ -140,7 +173,7 @@
   }
 
   /* The whole row is the click target of the entity link. */
-  .skill :global(a)::after {
+  .skill :global(> .skill-name a)::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -148,9 +181,17 @@
 
   .skill-level {
     grid-area: level;
+    display: inline-flex;
     color: var(--fg-dim);
     font-size: 0.8rem;
     font-variant-numeric: tabular-nums;
+  }
+
+  .condition {
+    grid-area: bar;
+    position: relative;
+    z-index: 1;
+    font-size: 0.8rem;
   }
 
   .xp-bar {

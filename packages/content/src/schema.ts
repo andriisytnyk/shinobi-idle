@@ -38,11 +38,13 @@ const resSlug = z.string().regex(/^[a-z0-9_]+$/);
 
 // ---------- skills and techniques ----------
 
-export const skillSchema = z.object({
+export const skillSchema = z.strictObject({
   id: skillId,
   group: z.enum(SKILL_GROUPS),
   /** How the skill is trained: tech, course, drill, insight, patch, map, recipe, station, none. */
   activity: z.string(),
+  /** What opens the skill for training; `null` when it is open from the first day. */
+  unlockReq: z.lazy(() => reqSchema).nullable(),
 });
 
 export const sealSchema = z.object({
