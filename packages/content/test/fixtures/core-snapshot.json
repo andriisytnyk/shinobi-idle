@@ -347,7 +347,7 @@
       "core:sealed": "0cedc81ab79a",
       "core:mail": "0d42cca497ce",
       "core:well": "45f9e2f5473d",
-      "core:dig": "9eddc8d8c8cd",
+      "core:dig": "c219b2c1930b",
       "core:v_spar": "69974b08c824",
       "core:v_walls": "853d8492a40a",
       "core:v_fence": "0b20bfa4f4a4",
@@ -357,7 +357,7 @@
       "core:v_rubble": "b548688eeba2",
       "core:v_clones": "4937c6d9144b",
       "core:v_seal": "26339286ebfe",
-      "core:op_hideout": "8d153b42566f"
+      "core:op_hideout": "8e2760265320"
     },
     "team": {
       "core:ren": "8d870f3b8115",
