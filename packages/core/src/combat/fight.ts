@@ -736,6 +736,9 @@ function buildView(ctx: FightCtx): FightView {
   const living = fight.enemies.filter(alive);
   const primary = lowestHp(living);
   const stance = activeStance(fight);
+  // Per view, not per technique: the same for every technique.
+  const taiMult = stat(ctx, player, 'taiDamage', 1);
+  const habScale = habituationScale(ctx, primary);
   const techniques: ViewTechnique[] = fight.kit.techniques.map((tech) => {
     const cooldownLeft = Math.max(0, (player.cd[tech.id] ?? 0) - fight.t);
     const affordable = (tech.pool === 'chakra' ? player.chakra : player.stamina) >= tech.cost;
@@ -743,19 +746,14 @@ function buildView(ctx: FightCtx): FightView {
     const wheel = wheelFactor(tech.skill, primary?.nature ?? null, content);
     const targets = tech.hitsAll ? living.length : 1;
     const stanceOk = !tech.requiresStance || stance !== null;
-    const hab = habituation(uses, tech.habituationMult * habituationScale(ctx, primary), content);
+    const hab = habituation(uses, tech.habituationMult * habScale, content);
     return {
       tech: viewOf(tech),
       cooldownLeft,
       affordable,
       ready: cooldownLeft === 0 && affordable && stanceOk,
       uses,
-      expected:
-        tech.damage *
-        hab *
-        wheel *
-        targets *
-        (tech.skill === 'tai' ? stat(ctx, player, 'taiDamage', 1) : 1),
+      expected: tech.damage * hab * wheel * targets * (tech.skill === 'tai' ? taiMult : 1),
       power: tech.damage,
       stanceOk,
     };

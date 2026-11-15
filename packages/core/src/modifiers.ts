@@ -33,7 +33,11 @@ export function computeMod(
   key: string,
   content: ContentDb,
 ): ModResult {
-  return computeMods(providers, state, [key], content)[0] ?? { total: 1, parts: [] };
+  const parts: Modifier[] = [];
+  for (const provider of providers) {
+    for (const m of provider(state, content)) if (m.key === key) parts.push(m);
+  }
+  return combine(parts);
 }
 
 /** The totals of several keys, asking each provider once: what a fight start needs for its cost modifiers. */

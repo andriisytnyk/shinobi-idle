@@ -36,7 +36,7 @@ export function fightTarget(
   }
   // An enemy that belongs to no zone (a mission enemy) is fought through its mission or operation only.
   const enemy = index.enemies.get(id);
-  return enemy && content.zones.some((z) => z.enemy === id) ? { enemy, zone: null } : null;
+  return enemy && index.zoneByEnemy.has(id) ? { enemy, zone: null } : null;
 }
 
 /** One step of an operation once its stages are laid out: the approach, a fight with a named enemy, or one drawn from a pool. */

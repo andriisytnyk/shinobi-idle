@@ -26,9 +26,8 @@ export function pouchSlotCount(state: GameState, content: ContentDb): number {
 /** The highest medic pouch upgrade in the bank, 0 when none. */
 export function medicTier(state: GameState, content: ContentDb): number {
   let tier = 0;
-  for (const item of content.items) {
-    if (item.medic !== undefined && (state.bank[item.id] ?? 0) > 0)
-      tier = Math.max(tier, item.medic);
+  for (const item of indexOf(content).medicItems) {
+    if ((state.bank[item.id] ?? 0) > 0) tier = Math.max(tier, item.tier);
   }
   return tier;
 }

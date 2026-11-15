@@ -39,7 +39,7 @@ export const fightKind: ActionKind = {
   has: (id, content) => fightTarget(content, id) !== null,
   requirements(_state, id, content): Req | null {
     // An enemy id is gated like the zone that holds the enemy.
-    const zone = indexOf(content).zones.get(id) ?? content.zones.find((z) => z.enemy === id);
+    const zone = indexOf(content).zones.get(id) ?? indexOf(content).zoneByEnemy.get(id);
     return zone ? zoneRequirement(zone, content) : null;
   },
   intervalMs: (_state, _id, content) => content.balance.K.combat.xpTickMs,

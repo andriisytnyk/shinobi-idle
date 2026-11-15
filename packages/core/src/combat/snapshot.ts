@@ -106,7 +106,8 @@ export function snapshotPlayer(
   }
   snapshot.pouch = state.pouch.slots.map((s) => ({ id: s.id, n: s.n }));
   // The medic pouch works only while it is owned.
-  snapshot.medic = medicTier(state, content) >= 1 ? state.pouch.medic : null;
+  snapshot.medic =
+    state.pouch.medic !== null && medicTier(state, content) >= 1 ? state.pouch.medic : null;
   if (pools) Object.assign(snapshot, pools);
   return snapshot;
 }

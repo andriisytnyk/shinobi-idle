@@ -30,6 +30,10 @@ export interface ContentIndex {
   enemies: Map<string, Enemy>;
   bosses: Map<string, Boss>;
   zones: Map<string, Zone>;
+  /** The zone that holds each enemy; an enemy of no zone (a mission enemy) has none. */
+  zoneByEnemy: Map<string, Zone>;
+  /** The items that are a medic pouch upgrade, with their tier. */
+  medicItems: { id: string; tier: number }[];
   operations: Map<string, Operation>;
   items: Map<string, Item>;
   herbs: Map<string, Herb>;
@@ -105,6 +109,10 @@ function build(content: ContentDb): ContentIndex {
     enemies: byId(content.enemies),
     bosses: byId(content.bosses),
     zones: byId(content.zones),
+    medicItems: content.items.flatMap((i) =>
+      i.medic === undefined ? [] : [{ id: i.id, tier: i.medic }],
+    ),
+    zoneByEnemy: new Map(content.zones.map((z) => [z.enemy, z])),
     operations: byId(content.operations),
     items: byId(content.items),
     herbs: byId(content.herbs),
