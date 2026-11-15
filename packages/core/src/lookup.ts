@@ -9,6 +9,9 @@ import type {
   Herb,
   Item,
   Mission,
+  Nature,
+  PlayerRankData,
+  Skill,
   Obstacle,
   Operation,
   Poi,
@@ -21,6 +24,7 @@ import type {
   Technique,
   Zone,
 } from '@shinobi/content';
+import type { Req } from './requirements.ts';
 
 /** Id lookups over a content database, built once per database. */
 export interface ContentIndex {
@@ -59,6 +63,24 @@ export interface ContentIndex {
   pois: Map<string, { poi: Poi; cell: Cell }>;
   /** The cell whose point of interest opens a fight zone. */
   zoneCell: Map<string, Cell>;
+  skills: Map<string, Skill>;
+  natures: Map<string, Nature>;
+  /** Nature ids in list order. */
+  natureIds: string[];
+  /** The natures that open each kind of key cell, by cell key. */
+  keyNatures: Map<string, string[]>;
+  /** The player ranks in order, lowest first. */
+  ranks: PlayerRankData[];
+  rankIndex: Map<string, number>;
+  /** The first rank that is not an Academy rank (the graduation), if any. */
+  graduateRank: string | null;
+  /** The currency that has each role (`money`, `renown`, `study`). */
+  currencyByRole: Map<string, string>;
+  currencyIds: Set<string>;
+  /** The first skill of each activity (`drill`, `insight`, `course`, `patch`, `map`): the skill that the action kind of that activity trains. */
+  activitySkill: Map<string, string>;
+  /** The skills that train techniques (`tech`). */
+  techSkills: Set<string>;
 }
 
 const cache = new WeakMap<ContentDb, ContentIndex>();
@@ -77,21 +99,29 @@ export function shopEntries(content: ContentDb): ShopEntry[] {
   for (const item of content.items) {
     const source = item.scroll?.source;
     if (!library || source?.t !== 'library') continue;
-    scrolls.push({
-      item: item.id,
-      req: {
-        t: 'all',
-        of: [
-          { t: 'rank', rank: 'genin' },
-          { t: 'building', id: library.id, level: source.level },
-        ],
-      },
-    });
+    // The cast goes with the legacy id mapping: the content type of a requirement names narrow ids.
+    const req = {
+      t: 'all',
+      of: [graduateReq(content), { t: 'building', id: library.id, level: source.level }],
+    } as ShopEntry['req'];
+    scrolls.push({ item: item.id, req });
   }
   return [...content.shop, ...scrolls];
 }
 
+/** The requirement of having graduated: the first rank that is not an Academy rank. */
+export function graduateReq(content: ContentDb): Req {
+  const rank = content.playerRanks.find((r) => r.academy !== true) ?? content.playerRanks[0];
+  // A game with no rank can never meet it: `any` of nothing does not hold.
+  return rank ? { t: 'rank', rank: rank.id } : { t: 'any', of: [] };
+}
+
 function build(content: ContentDb): ContentIndex {
+  const activitySkill = new Map<string, string>();
+  for (const skill of content.skills) {
+    if (!activitySkill.has(skill.activity)) activitySkill.set(skill.activity, skill.id);
+  }
+  const trainer = (activity: string): string => activitySkill.get(activity) ?? '';
   const techniques = byId(content.techniques);
   const exercises = byId(content.exercises);
   const practices = byId(content.practices);
@@ -108,10 +138,10 @@ function build(content: ContentDb): ContentIndex {
   const count = (skill: string, n: number) =>
     masteryCount.set(skill, (masteryCount.get(skill) ?? 0) + n);
   for (const t of content.techniques) count(t.skill, 1);
-  count('cc', content.exercises.length);
-  count('med', content.practices.length);
-  count('ath', content.obstacles.length);
-  count('herb', content.herbs.length);
+  for (const e of content.exercises) count(e.skill ?? trainer('drill'), 1);
+  for (const p of content.practices) count(p.skill ?? trainer('insight'), 1);
+  count(trainer('course'), content.obstacles.length);
+  for (const h of content.herbs) count(h.skill ?? trainer('patch'), 1);
   for (const r of content.recipes) count(r.skill, 1);
   const poolCheckpoints = new Map<string, PoolCheckpoint[]>();
   for (const p of content.pools) {
@@ -149,6 +179,24 @@ function build(content: ContentDb): ContentIndex {
     shop: new Map(shopEntries(content).map((s) => [s.item, s])),
     quests: byId(content.quests),
     exams: byId(content.exams),
+    skills: byId(content.skills),
+    natures: byId(content.natures),
+    natureIds: content.natures.map((n) => n.id),
+    keyNatures: new Map(
+      Object.keys(content.cellKeys).map((key) => [
+        key,
+        content.natures.filter((n) => n.opens.includes(key)).map((n) => n.id),
+      ]),
+    ),
+    ranks: [...content.playerRanks],
+    rankIndex: new Map(content.playerRanks.map((r, i) => [r.id, i])),
+    graduateRank: content.playerRanks.find((r) => r.academy !== true)?.id ?? null,
+    currencyByRole: new Map(
+      content.currencies.flatMap((c) => (c.role === undefined ? [] : [[c.role, c.id] as const])),
+    ),
+    currencyIds: new Set(content.currencies.map((c) => c.id)),
+    activitySkill,
+    techSkills: new Set(content.skills.filter((s) => s.activity === 'tech').map((s) => s.id)),
     techniques,
     exercises,
     practices,

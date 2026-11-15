@@ -16,7 +16,7 @@
   import { t } from '../lib/i18n.ts';
   import { held, moneyOf } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
-  import { toasts } from '../lib/toasts.svelte.ts';
+  import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import { perHour, resourceIcon, resourceName, ROLE_ORDER } from '../lib/village.ts';
   import SimplePage from './SimplePage.svelte';
 
@@ -56,17 +56,17 @@
   function donate(): void {
     if (donateOff) return;
     const result = game.dispatch({ type: 'village.donate', ryo: donation });
-    if (!result.ok) toasts.push({ key: result.reason, params: {} });
+    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 
   function cancel(): void {
     const result = game.dispatch({ type: 'village.cancel' });
-    if (!result.ok) toasts.push({ key: result.reason, params: {} });
+    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 
   function useWorkforce(): void {
     const result = game.dispatch({ type: 'village.workforce' });
-    if (!result.ok) toasts.push({ key: result.reason, params: {} });
+    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 
   // The card the route points at comes into view.

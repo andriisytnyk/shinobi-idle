@@ -37,7 +37,7 @@ export function computeMod(
   for (const provider of providers) {
     for (const m of provider(state, content)) if (m.key === key) parts.push(m);
   }
-  return combine(parts);
+  return combine(parts, content);
 }
 
 /** The totals of several keys, asking each provider once: what a fight start needs for its cost modifiers. */
@@ -49,10 +49,15 @@ export function computeMods(
 ): ModResult[] {
   const all: Modifier[] = [];
   for (const provider of providers) for (const m of provider(state, content)) all.push(m);
-  return keys.map((key) => combine(all.filter((m) => m.key === key)));
+  return keys.map((key) =>
+    combine(
+      all.filter((m) => m.key === key),
+      content,
+    ),
+  );
 }
 
-function combine(parts: Modifier[]): ModResult {
+function combine(parts: Modifier[], content: ContentDb): ModResult {
   if (parts.length === 0) return { total: 1, parts };
   const groups = new Map<ModifierGroup, { add: number; mul: number }>();
   for (const m of parts) {
@@ -63,6 +68,9 @@ function combine(parts: Modifier[]): ModResult {
   }
   let total = 1;
   for (const g of groups.values()) total *= (1 + g.add) * g.mul;
+  // A total that is not a number, or outside the bounds of the balance, is brought inside them.
+  const { modMin, modMax } = content.balance.K.engine;
+  total = Number.isFinite(total) ? Math.min(modMax, Math.max(modMin, total)) : 1;
   return { total, parts };
 }
 

@@ -38,7 +38,7 @@ const code = (text: string): string =>
     .replace(/\bclass="[^"]*"/g, '');
 
 /** Value imports from `@shinobi/content` that are allowed anywhere: pure helpers that take their data as arguments. */
-const PURE_HELPERS = new Set(['localeKey', 'iconFor']);
+const PURE_HELPERS = new Set(['localeKey', 'iconFor', 'scrollPartId']);
 
 const CONTENT_IMPORT = /import\s+(type\s+)?\{([^}]*)\}\s*from\s*'@shinobi\/content'/g;
 
@@ -104,13 +104,13 @@ const CORE_IDS = coreEntityIds();
  * a core id is a failure: such a name is data and belongs in the content.
  */
 const ALLOWED: Record<string, { ids: string[]; why: string }> = {
+  'lib/missions.ts': {
+    ids: ['intel'],
+    why: 'The pay kind of a mission stage (the engine schema of mission pay is closed): a kind of payment, not the currency of that id.',
+  },
   'lib/crafts.ts': {
     ids: ['herb'],
     why: 'The source kind of an item that grows in a patch (ItemSource.kind and the craft.src.herb text): a kind of source, not the skill of that id.',
-  },
-  'lib/vocab.ts': {
-    ids: ['intel'],
-    why: 'The map rules pay the currency named by the balance key K.intel; the core names it in state and balance, not in data, so the interface follows the core in this one constant.',
   },
 };
 

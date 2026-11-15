@@ -12,7 +12,8 @@ import HomePage from '../../pages/HomePage.svelte';
 import ItemPage from '../../pages/ItemPage.svelte';
 import MorePage from '../../pages/MorePage.svelte';
 import NaturePage from '../../pages/NaturePage.svelte';
-import PlaceholderPage from '../../pages/PlaceholderPage.svelte';
+import MissionPage from '../../pages/MissionPage.svelte';
+import MissionsPage from '../../pages/MissionsPage.svelte';
 import QuestsPage from '../../pages/QuestsPage.svelte';
 import RankPage from '../../pages/RankPage.svelte';
 import RecipePage from '../../pages/RecipePage.svelte';
@@ -142,7 +143,7 @@ export const coreUi: UiPack = {
       route: '#/missions',
       title: 'nav.missions',
       nav: 'missions',
-      mount: { svelte: PlaceholderPage, props: () => ({ title: 'nav.missions' }) },
+      mount: { svelte: MissionsPage },
     });
     ui.addPage({
       id: 'village',
@@ -177,6 +178,7 @@ export const coreUi: UiPack = {
         mount,
       });
     entity('quest', { svelte: QuestsPage }, 'quests');
+    entity('mission', byId(MissionPage), 'missions');
     entity('exam', { svelte: RankPage }, 'rank');
     entity('skill', byId(SkillPage), 'skills');
     entity('technique', byId(TechniquePage));
@@ -235,6 +237,17 @@ export const coreUi: UiPack = {
       route: '#/quests',
       order: 10,
       tabOrder: 40,
+    });
+    ui.addNavItem({
+      id: 'missions',
+      group: 'main',
+      title: 'nav.missions',
+      icon: 'tied-scroll',
+      route: '#/missions',
+      order: 15,
+      // The phone bar keeps five tabs: missions are the second section of the journal there.
+      tabOrder: 45,
+      tab: 'quests',
     });
     ui.addNavItem({
       id: 'combat',

@@ -37,7 +37,7 @@
   let error = $state<string | null>(null);
 
   function take(): void {
-    const result = game.dispatch({ type: 'exam.genin.start' });
+    const result = game.dispatch({ type: 'exam.start', rank: exam?.rank ?? '' });
     error = result.ok ? null : result.reason;
   }
 

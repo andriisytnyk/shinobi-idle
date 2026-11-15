@@ -86,8 +86,8 @@ describe('listSkillActions', () => {
     advance(state, HOUR, content);
     // Whole cycles only, so allow one cycle of slack.
     const perCycle = (info.xpPerHour * info.intervalMs) / HOUR;
-    expect(state.skills.tai.xp).toBeGreaterThan(info.xpPerHour - perCycle - 1);
-    expect(state.skills.tai.xp).toBeLessThanOrEqual(info.xpPerHour + 1);
+    expect(state.skills.tai!.xp).toBeGreaterThan(info.xpPerHour - perCycle - 1);
+    expect(state.skills.tai!.xp).toBeLessThanOrEqual(info.xpPerHour + 1);
   });
 
   it('marks an action unavailable with its requirement tree when the level is too low', () => {

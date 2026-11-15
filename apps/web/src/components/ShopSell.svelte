@@ -4,7 +4,7 @@
   import { t } from '../lib/i18n.ts';
   import { moneyName } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
-  import { toasts } from '../lib/toasts.svelte.ts';
+  import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import Stepper from './Stepper.svelte';
@@ -27,7 +27,7 @@
   function sell(): void {
     if (off) return;
     const result = game.dispatch({ type: 'shop.sell', item, n: qty });
-    if (!result.ok) toasts.push({ key: result.reason, params: {} });
+    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 </script>
 

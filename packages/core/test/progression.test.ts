@@ -71,9 +71,9 @@ describe('A4: XP per hour follows the rate formula', () => {
       setLevel(state, t.skill, level);
       state.known[id] = true;
       expect(dispatch(state, start(kind, id), content).ok).toBe(true);
-      const before = state.skills[t.skill].xp;
+      const before = state.skills[t.skill]!.xp;
       advance(state, HOUR, content);
-      const perHour = state.skills[t.skill].xp - before;
+      const perHour = state.skills[t.skill]!.xp - before;
       const expected = K.rateBase * K.rateGrowth ** level;
       expect(Math.abs(perHour / expected - 1)).toBeLessThan(0.02);
     });
@@ -90,9 +90,9 @@ describe('A4: XP per hour follows the rate formula', () => {
       setLevel(state, skill, level);
       if (kind === 'course') state.course = { '2': masteryKey };
       expect(dispatch(state, start(kind, id), content, plainRules)).toEqual({ ok: true });
-      const before = state.skills[skill].xp;
+      const before = state.skills[skill]!.xp;
       advance(state, HOUR, content, plainRules);
-      const perHour = state.skills[skill].xp - before;
+      const perHour = state.skills[skill]!.xp - before;
       expect(Math.abs(perHour / rate(level, content) - 1)).toBeLessThan(0.02);
       expect(state.mastery[masteryKey]?.xp).toBeGreaterThan(0);
     }
@@ -126,11 +126,11 @@ describe('A5: Academy slowdown', () => {
       const g = genin();
       setLevel(student, 'tai', level);
       setLevel(g, 'tai', level);
-      const a = student.skills.tai.xp;
+      const a = student.skills.tai!.xp;
       gainXp(student, 'tai', 100, content, defaultRules);
       gainXp(g, 'tai', 100, content, defaultRules);
-      const studentGain = student.skills.tai.xp - a;
-      const geninGain = g.skills.tai.xp - a;
+      const studentGain = student.skills.tai!.xp - a;
+      const geninGain = g.skills.tai!.xp - a;
       expect(geninGain).toBe(100);
       expect(studentGain).toBe(level >= K.academyCap ? 100 * slow : 100);
     }
@@ -143,9 +143,9 @@ describe('A5: a grant that crosses the Academy cap is split there', () => {
   it('student at level 9 with a big grant: full below the cap, slowed above', () => {
     const state = createState(1, content);
     setLevel(state, 'tai', 9);
-    const room = gate - state.skills.tai.xp;
+    const room = gate - state.skills.tai!.xp;
     gainXp(state, 'tai', room + 1000, content, defaultRules);
-    expect(state.skills.tai.xp).toBeCloseTo(gate + 1000 * K.academySlow, 6);
+    expect(state.skills.tai!.xp).toBeCloseTo(gate + 1000 * K.academySlow, 6);
   });
 
   it('gives the same XP in one grant as in two', () => {
@@ -156,22 +156,22 @@ describe('A5: a grant that crosses the Academy cap is split there', () => {
     gainXp(one, 'tai', 5000, content, defaultRules);
     gainXp(two, 'tai', 2000, content, defaultRules);
     gainXp(two, 'tai', 3000, content, defaultRules);
-    expect(two.skills.tai.xp).toBeCloseTo(one.skills.tai.xp, 6);
+    expect(two.skills.tai!.xp).toBeCloseTo(one.skills.tai!.xp, 6);
   });
 
   it('a grant crossing both the Academy cap and the level cap ends exactly at the cap', () => {
     const state = createState(1, content);
     setLevel(state, 'tai', 9);
     gainXp(state, 'tai', 1e12, content, defaultRules);
-    expect(state.skills.tai.xp).toBe(xpAt(K.cap));
-    expect(levelAt(state.skills.tai.xp, K.cap)).toBe(K.cap);
+    expect(state.skills.tai!.xp).toBe(xpAt(K.cap));
+    expect(levelAt(state.skills.tai!.xp, K.cap)).toBe(K.cap);
   });
 
   it('a genin keeps the whole grant', () => {
     const state = genin();
     setLevel(state, 'tai', 9);
     gainXp(state, 'tai', 5000, content, defaultRules);
-    expect(state.skills.tai.xp).toBe(xpAt(9) + 5000);
+    expect(state.skills.tai!.xp).toBe(xpAt(9) + 5000);
   });
 });
 
@@ -186,16 +186,16 @@ describe('A6: the level cap', () => {
     const state = genin();
     gainXp(state, 'tai', 1e12, content, defaultRules);
     gainXp(state, 'tai', 5, content, defaultRules);
-    expect(state.skills.tai.xp).toBe(xpAt(K.cap));
-    expect(levelAt(state.skills.tai.xp, K.cap)).toBe(K.cap);
+    expect(state.skills.tai!.xp).toBe(xpAt(K.cap));
+    expect(levelAt(state.skills.tai!.xp, K.cap)).toBe(K.cap);
   });
 
   it('a long run at the cap stays clamped', () => {
     const state = genin();
-    state.skills.tai.xp = xpAt(K.cap) - 10;
+    state.skills.tai!.xp = xpAt(K.cap) - 10;
     dispatch(state, start('practice', 'core:leaf_whirlwind'), content);
     advance(state, 2 * HOUR, content);
-    expect(state.skills.tai.xp).toBe(xpAt(K.cap));
+    expect(state.skills.tai!.xp).toBe(xpAt(K.cap));
   });
 
   it('emits one levelUp per level gained', () => {
@@ -252,7 +252,7 @@ describe('mastery and pool events', () => {
     const pcts = state.events.flatMap((e) => (e.type === 'poolCheckpoint' ? [e.pct] : []));
     expect(pcts).toEqual([10, 25, 50]);
     gainPoolXp(state, 'nin', cap * 10, content);
-    expect(state.pools.nin.xp).toBe(cap);
+    expect(state.pools.nin!.xp).toBe(cap);
     expect(state.events.filter((e) => e.type === 'poolCheckpoint').length).toBe(4);
   });
 
@@ -261,17 +261,17 @@ describe('mastery and pool events', () => {
     dispatch(state, start('practice', 'core:leaf_whirlwind'), content);
     advance(state, HOUR, content);
     const mastery = state.mastery['core:leaf_whirlwind']!.xp;
-    expect(state.pools.tai.xp).toBeCloseTo(mastery * K.poolShare, 3);
+    expect(state.pools.tai!.xp).toBeCloseTo(mastery * K.poolShare, 3);
   });
 
   it('ignores skills without masteries and non-positive gains', () => {
     const state = genin();
     gainPoolXp(state, 'vit', 100, content);
-    expect(state.pools.vit.xp).toBe(0);
+    expect(state.pools.vit!.xp).toBe(0);
     gainXp(state, 'tai', -5, content, defaultRules);
     gainXp(state, 'tai', 0, content, defaultRules);
     gainMasteryXp(state, 'core:clone', 0, content);
-    expect(state.skills.tai.xp).toBe(0);
+    expect(state.skills.tai!.xp).toBe(0);
     expect(state.mastery).toEqual({});
   });
 });

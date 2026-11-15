@@ -234,8 +234,8 @@ describe('what each tool does, and what it costs', () => {
       fightAdvance(fight, workOf(200), content, r);
       if (fight.enemies[0] && findEffect(fight.enemies[0], 'stun')) slept++;
     }
-    expect(slept / tries).toBeGreaterThan(K.itemFx.sleep.chance - 0.15);
-    expect(slept / tries).toBeLessThan(K.itemFx.sleep.chance + 0.15);
+    expect(slept / tries).toBeGreaterThan(K.itemFx.sleep!.chance! - 0.15);
+    expect(slept / tries).toBeLessThan(K.itemFx.sleep!.chance! + 0.15);
   });
 
   it('pills heal, and restore chakra', () => {

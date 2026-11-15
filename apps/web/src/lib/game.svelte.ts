@@ -35,7 +35,7 @@ import { deepFreeze } from './freeze.ts';
 import { detach as detachData } from './read.ts';
 import { requestPersistentStorage } from './platform.ts';
 import type { TabLock } from './tab-lock.ts';
-import { toastFor, toasts as defaultToasts } from './toasts.svelte.ts';
+import { packsToasts, toastFor, toasts as defaultToasts } from './toasts.svelte.ts';
 
 /** How often the game loop runs. */
 export const TICK_MS = 100;
@@ -43,7 +43,7 @@ export const TICK_MS = 100;
 const SAVE_NOW: ReadonlySet<string> = new Set([
   'nature.choose',
   'nature.add',
-  'exam.genin.start',
+  'exam.start',
   'item.use',
   'item.coat',
   'shop.buy',
@@ -63,6 +63,12 @@ export type LogEvent = Extract<
   GameEvent,
   { type: 'combatLog' | 'enemyDefeated' | 'playerDefeated' }
 >;
+/** A rule a pack added that failed and was switched off for the session. */
+export interface RuleNotice {
+  pack: string;
+  rule: string;
+  reason: string;
+}
 export interface LogEntry {
   id: number;
   event: LogEvent;
@@ -92,6 +98,8 @@ export interface GameDeps {
   rules?: Rules;
   /** The manifests of the packs the content was composed from. */
   packs?: readonly PackManifest[];
+  /** The packs the core left out because they failed to compose. */
+  failed?: readonly { pack: string; error: string }[];
   clock?: Clock;
   kv?: KeyValue;
   lock?: TabLock | null;
@@ -109,6 +117,7 @@ export function createGame(deps: GameDeps = {}) {
   const content = deepFreeze(deps.content ?? base?.content ?? composeBoot().content);
   const rules = deps.rules ?? base?.rules ?? defaultRules;
   const packs = deps.packs ?? content.packs;
+  const failed = deps.failed ?? [];
   setActiveContent(content);
   const clock = deps.clock ?? { now: () => 0 };
   const kv = deps.kv ?? null;
@@ -142,6 +151,14 @@ export function createGame(deps: GameDeps = {}) {
     version++;
   };
 
+  /** A rule of a pack that the core switched off: listed for the session, told once. */
+  let ruleNotices = $state.raw<RuleNotice[]>([]);
+  function noteRule(pack: string, rule: string, reason: string): boolean {
+    if (ruleNotices.some((n) => n.pack === pack && n.rule === rule)) return false;
+    ruleNotices = [...ruleNotices, { pack, rule, reason }];
+    return true;
+  }
+
   /** Turns the events the core queued into toasts and empties the queue. */
   function drainEvents(): void {
     const events = state.events;
@@ -168,6 +185,9 @@ export function createGame(deps: GameDeps = {}) {
       } else if (event.type === 'rankUp' && content.exams.some((e) => e.rank === event.rank)) {
         graduation = true;
       }
+      if (event.type === 'ruleDisabled' && !noteRule(event.pack, event.rule, event.reason))
+        continue;
+      if (event.type === 'packsChanged') for (const p of packsToasts(event)) toasts.push(p);
       const spec = toastFor(event, content);
       if (spec) toasts.push(spec);
     }
@@ -188,6 +208,7 @@ export function createGame(deps: GameDeps = {}) {
     lastWall += delta;
     if (delta > SLEEP_GAP_MS) {
       const summary = advanceOffline(state, delta, content, rules);
+      for (const r of summary.rulesDisabled ?? []) noteRule(r.pack, r.rule, r.reason);
       const next = buildReport(summary);
       if (next) report = next;
     } else {
@@ -368,6 +389,12 @@ export function createGame(deps: GameDeps = {}) {
     rules,
     /** The manifests of the packs this game was composed from, in load order. */
     packs,
+    /** The packs the core left out, with the reason. */
+    failed,
+    /** Rules of packs switched off during this session. */
+    get ruleNotices(): readonly RuleNotice[] {
+      return ruleNotices;
+    },
 
     /** Sends a command to the core and refreshes the views. */
     dispatch(original: Command): CommandResult {

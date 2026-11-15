@@ -1,4 +1,4 @@
-import { isModifierKey, type ContentDb, type Mission, type MissionPay } from '@shinobi/content';
+import type { ContentDb, Mission, MissionPay } from '@shinobi/content';
 import { effectiveLoadout } from '../combat/loadout.ts';
 import { MS_PER_HOUR } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
@@ -133,7 +133,11 @@ export function missionForecast(
   for (const stage of stages) {
     const skill = stage.path?.tech ? stage.path.skill : '';
     const key = `mission.duration.${skill}`;
-    if (skill !== '' && isModifierKey(key) && !Object.hasOwn(durationBySkill, skill)) {
+    if (
+      skill !== '' &&
+      Object.hasOwn(content.modifierKeys, key) &&
+      !Object.hasOwn(durationBySkill, skill)
+    ) {
       durationBySkill[skill] = computeMod(mods, state, key, content).parts;
     }
   }

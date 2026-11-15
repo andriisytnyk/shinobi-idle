@@ -21,7 +21,7 @@ const data = {
   playerRanks: [{ id: 'testmod:adept', tier: 3 }],
   missionRanks: [{ id: 'testmod:trial' }],
   currencies: [{ id: 'testmod:token' }],
-  villageStages: [{ id: 'testmod:stage3', rep: 'testmod:stage3' }],
+  villageStages: [{ id: 'testmod:stage3', rep: 'testmod:stage3', cap: 6 }],
   states: [{ id: 'testmod:chilled' }],
   statuses: [{ id: 'testmod:chill' }],
   combos: [{ id: 'testmod:frostburn', nature: 'testmod:aether', onState: 'testmod:chilled' }],
@@ -44,6 +44,13 @@ const data = {
       activity: 'recipe',
       unlockReq: { t: 'rank', rank: 'genin' },
     },
+    {
+      /** The skill of the test nature: a nature trains through the skill that has its id. */
+      id: 'testmod:aether',
+      group: 'nin',
+      activity: 'tech',
+      unlockReq: { t: 'nature', nature: 'testmod:aether' },
+    },
   ],
   seals: [{ id: 'testmod:glyph', glyph: 'Т', romaji: 'Test', kind: 'special' }],
   techniques: [
@@ -65,6 +72,24 @@ const data = {
       noDamage: false,
       combat: { effect: { kind: 'damage' } },
     },
+    {
+      /** A trainer technique of the test nature: the player practises it to train the skill. */
+      id: 'testmod:aether_touch',
+      skill: 'testmod:aether',
+      level: 1,
+      rank: 'E',
+      rankCanon: false,
+      role: 'testmod:sapper',
+      tags: [],
+      state: null,
+      src: 'N',
+      mentor: 'academy',
+      sealSeq: ['testmod:glyph'],
+      sealsCanon: false,
+      tier: 0,
+      noDamage: false,
+      combat: { effect: { kind: 'damage' } },
+    },
   ],
 
   // ----- items, recipe, gear -----
@@ -76,6 +101,8 @@ const data = {
       tags: ['testmod:crack'],
       extraSources: [],
       madeFrom: [{ item: 'testmod:pellet', n: 2 }],
+      /** Sold for tokens: the price is `K.goods['testmod:charm']`. */
+      buy: 'testmod:charm',
     },
     {
       id: 'testmod:scrollpart_ember_pulse',
@@ -167,7 +194,17 @@ const data = {
       index: 0,
       key: null,
       story: false,
-      pois: [{ id: 'testmod:poi_grove_edge_outpost', kind: 'outpost' }],
+      pois: [
+        { id: 'testmod:poi_grove_edge_outpost', kind: 'outpost' },
+        {
+          id: 'testmod:poi_grove_cache',
+          kind: 'cache',
+          items: [],
+          ryo: 0,
+          /** A cache that pays tokens. */
+          currencies: { 'testmod:token': 3 },
+        },
+      ],
     },
   ],
   buildings: [
@@ -178,6 +215,8 @@ const data = {
       effects: [{ key: 'testmod:forge.bonus', op: 'add', value: 0.01 }],
       capstone: [],
       produces: [],
+      /** Can be built only from the village stage of the pack. */
+      stage: 'testmod:stage3',
     },
   ],
 
@@ -189,7 +228,7 @@ const data = {
       team: false,
       minutes: 2,
       stages: [{ t: 'skill', skill: 'testmod:forge', min: 1, label: true }],
-      pay: [],
+      pay: [{ kind: 'currency', currency: 'testmod:token', n: 2 }],
       resource: null,
       ryo: 10,
       rep: 0,
@@ -203,6 +242,29 @@ const data = {
       rateCap: 20,
     },
   ],
+  shop: [
+    {
+      /** Opens at the rank of the pack and is paid in the currency of the pack. */
+      item: 'testmod:charm',
+      req: { t: 'rank', rank: 'testmod:adept' },
+      currency: 'testmod:token',
+    },
+  ],
+  exams: [
+    {
+      id: 'testmod:adept_exam',
+      rank: 'testmod:adept',
+      checklist: {
+        t: 'all',
+        of: [
+          { t: 'rank', rank: 'chunin' },
+          { t: 'skill', skill: 'testmod:forge', level: 2 },
+        ],
+      },
+      reduceBy: ['testmod:forge'],
+      rewards: { items: [{ item: 'testmod:pellet', n: 5 }], goal: null },
+    },
+  ],
   quests: [
     {
       id: 'testmod:test_chain',
@@ -214,7 +276,14 @@ const data = {
           objective: { t: 'req', req: { t: 'skill', skill: 'testmod:forge', level: 2 } },
         },
       ],
-      rewards: { items: [{ item: 'testmod:pellet', n: 1 }], ryo: 0, rep: 0, flags: [], rank: null },
+      rewards: {
+        items: [{ item: 'testmod:pellet', n: 1 }],
+        ryo: 0,
+        rep: 0,
+        currencies: { 'testmod:token': 3 },
+        flags: [],
+        rank: null,
+      },
     },
   ],
 } satisfies Record<string, unknown>;
@@ -240,9 +309,13 @@ export const testmodPack: ContentPack = {
         },
       },
       rep: { 'testmod:stage3': 500 },
+      goods: { 'testmod:charm': 10 },
       ext: { testmod: { shellArmor: 0.2 } },
     },
-    pace: { 'testmod:forge': [3, 7, 11, 17, 25] },
+    pace: {
+      'testmod:forge': [3, 7, 11, 17, 25],
+      'testmod:aether': [3, 7, 11, 17, 25],
+    },
   },
   locales: {
     uk: {
@@ -250,6 +323,14 @@ export const testmodPack: ContentPack = {
       'skill.testmod:forge.desc':
         'Тестова навичка пакета перевірки: вона лише доводить, що мод додає навички даними.',
       'nature.testmod:aether.name': 'Тестовий ефір',
+      'skill.testmod:aether.name': 'Тестовий ефір (навичка)',
+      'skill.testmod:aether.desc':
+        'Навичка тестової природи: доводить, що природу мода тренує власна навичка.',
+      'technique.testmod:aether_touch.name': 'Тестовий дотик ефіру',
+      'technique.testmod:aether_touch.desc':
+        'Тестова техніка наставника: її тренування розвиває тестову навичку ефіру.',
+      'exam.testmod:adept_exam.name': 'Тестовий іспит адепта',
+      'exam.testmod:adept_exam.desc': 'Тестовий іспит пакета: він дає тестовий ранг адепта.',
       'rank.testmod:adept': 'Тестовий адепт',
       'currency.testmod:token': 'Тестовий жетон',
       'state.testmod:chilled.name': 'Тестове охолодження',
@@ -295,6 +376,8 @@ export const testmodPack: ContentPack = {
       'region.testmod:grove.desc': 'Тестовий регіон мода з однією клітинкою, до якої можна дійти.',
       'cell.testmod:grove_edge.name': 'Край тестового гаю',
       'cell.testmod:grove_edge.note': 'Єдина клітинка тестового регіону.',
+      'poi.testmod:poi_grove_cache.name': 'Тестовий тайник',
+      'poi.testmod:poi_grove_cache.desc': 'Тестова схованка, що платить тестовими жетонами.',
       'poi.testmod:poi_grove_edge_outpost.name': 'Тестова застава',
       'poi.testmod:poi_grove_edge_outpost.desc':
         'Тестова точка інтересу відомого виду: вільна ціль подорожі.',

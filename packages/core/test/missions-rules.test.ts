@@ -59,7 +59,7 @@ const TRIOS: Record<string, number> = {
 /** Everything but the natures is in place: levels high, the scroll techniques known, the items in the bank. */
 function maxed(natures: NatureId[], team: boolean): GameState {
   const state = ableFor(mission('core:weed'), natures);
-  for (const n of NATURE_IDS) state.skills[n].xp = xpAt(natures.includes(n) ? 50 : 1);
+  for (const n of NATURE_IDS) state.skills[n]!.xp = xpAt(natures.includes(n) ? 50 : 1);
   // The scroll technique of Futon is known to whoever has the nature.
   if (natures.includes('futon')) state.known['core:vacuum_wave'] = true;
   if (!team) state.team = null;
@@ -261,7 +261,7 @@ describe('A5: rewards', () => {
     for (let i = 0; i < n; i++) payMission(state, dig, [], content, defaultRules);
     const parts = state.bank['core:scrollpart_fire_dragon_flame_bullet'] ?? 0;
     const p = K.partDrop.mission;
-    expect(Math.abs(parts - n * p)).toBeLessThanOrEqual(3 * Math.sqrt(n * p * (1 - p)));
+    expect(Math.abs(parts - n * p!)).toBeLessThanOrEqual(3 * Math.sqrt(n * p! * (1 - p!)));
   });
 
   it('opens a merchant crate into oil, salt, spices and now and then a gem', () => {
@@ -327,11 +327,11 @@ describe('A6: experience', () => {
       const state = ableFor(m, [natureFor(m)], 1, 40);
       state.team = null;
       startMission(state, m.id);
-      const cap = K.missionRateCap[m.rank as 'D' | 'C' | 'V'];
+      const cap = K.missionRateCap[m.rank as 'D' | 'C' | 'V']!;
       const shares: number[] = [];
       let seen = 0;
       let startedAt = 0;
-      const total = () => content.skills.reduce((sum, s) => sum + state.skills[s.id].xp, 0);
+      const total = () => content.skills.reduce((sum, s) => sum + state.skills[s.id]!.xp, 0);
       let before = total();
       let guard = 0;
       while (shares.length < m.stages.length && guard++ < 100_000) {
@@ -385,7 +385,7 @@ describe('A6: experience', () => {
     startMission(state, 'core:rockfall');
     runUntilDone(state, 'core:rockfall', 30 * MIN, 1);
     expect(state.mastery[tech]?.xp ?? 0).toBeGreaterThan(0);
-    expect(state.skills.doton.xp).toBeGreaterThan(xpAt(30));
+    expect(state.skills.doton!.xp).toBeGreaterThan(xpAt(30));
   });
 });
 

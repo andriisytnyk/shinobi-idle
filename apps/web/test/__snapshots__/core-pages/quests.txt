@@ -3,6 +3,11 @@
     <article class="simple-page">
       <h1>
         Журнал доручень
+      <nav aria-label="Розділи журналу" class="journal" data-journal-tabs="">
+        <a aria-current="page" class="active" data-journal="quests" href="#/quests">
+          Доручення
+        <a data-journal="missions" href="#/missions">
+          Місії
       <section>
         <h2>
           Поточні

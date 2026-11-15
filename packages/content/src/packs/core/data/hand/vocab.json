@@ -44,7 +44,7 @@
     }
   ],
   "playerRanks": [
-    { "id": "student", "tier": 0 },
+    { "id": "student", "tier": 0, "academy": true },
     { "id": "genin", "tier": 1 },
     { "id": "chunin", "tier": 2 }
   ],
@@ -94,7 +94,11 @@
     { "id": "boss" }
   ],
   "itemKinds": [{ "id": "ingredient" }, { "id": "tool" }, { "id": "misc" }, { "id": "consumable" }],
-  "currencies": [{ "id": "ryo" }, { "id": "rep" }, { "id": "intel" }],
+  "currencies": [
+    { "id": "ryo", "role": "money" },
+    { "id": "rep", "role": "renown" },
+    { "id": "intel", "role": "study" }
+  ],
   "entityKinds": [
     { "id": "skill", "list": "skills" },
     { "id": "technique", "list": "techniques" },

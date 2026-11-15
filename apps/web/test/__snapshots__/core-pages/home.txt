@@ -104,6 +104,12 @@
           <span class="label">
             Журнал
       <li>
+        <a data-nav="missions" data-ui="nav-item" href="#/missions">
+          <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+            <path d="#2473-iia64e" fill="currentColor">
+          <span class="label">
+            Місії
+      <li>
         <a data-nav="combat" data-ui="nav-item" href="#/combat">
           <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
             <path d="#1122-4vrbkl" fill="currentColor">

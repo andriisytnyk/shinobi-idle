@@ -10,7 +10,7 @@
   import { goalItemIds } from '../lib/goal.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
-  import { toasts } from '../lib/toasts.svelte.ts';
+  import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import SimplePage from './SimplePage.svelte';
 
   const content = game.content;
@@ -97,7 +97,7 @@
 
   function drink(id: string): void {
     const result = game.dispatch({ type: 'item.use', id });
-    if (!result.ok) toasts.push({ key: result.reason, params: {} });
+    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 
   function coat(poison: string, base: string): void {

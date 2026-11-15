@@ -300,6 +300,9 @@ describe('the public lists', () => {
       'topbar',
       'settings',
       'village.header',
+      'missions.header',
+      'mission.header',
+      'mission.footer',
       'page.footer',
     ]);
     expect(SLOT_NAMES.every(isSlotName)).toBe(true);

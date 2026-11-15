@@ -79,6 +79,7 @@ const PAGES: Record<string, string> = {
   'enemy-wolf': '#/enemy/core:wolf',
   'recipe-first': '#/recipe/core:antidote',
   more: '#/more',
+  missions: '#/missions',
 };
 
 let booted: BootedApp | null = null;

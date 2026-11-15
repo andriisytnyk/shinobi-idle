@@ -8,6 +8,7 @@ const make = (boot: Boot): Game =>
     content: boot.content,
     rules: boot.rules,
     packs: boot.packs.map((p) => p.manifest),
+    failed: boot.failed,
     clock: wallClock,
     kv: indexedDbStore,
     lock: createTabLock(),

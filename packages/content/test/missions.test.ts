@@ -70,7 +70,8 @@ describe('missions: data', () => {
     expect(pay('core:well')).toEqual([{ kind: 'item', item: 'core:spice', n: 2 }]);
     expect(pay('core:mail')).toEqual([{ kind: 'intel', n: K.intel.mail }]);
     expect(pay('core:dig')).toEqual([
-      { kind: 'scrollPart', technique: 'core:fire_dragon_flame_bullet' },
+      // The chance of the part is the `K.partDrop` entry that the payment names.
+      { kind: 'scrollPart', technique: 'core:fire_dragon_flame_bullet', chance: 'mission' },
     ]);
     expect(K.partDrop.mission).toBe(0.15);
   });

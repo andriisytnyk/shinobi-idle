@@ -1,5 +1,5 @@
-import { composeContent, corePack, type ContentDb, type ContentPack } from '@shinobi/content';
-import { defaultRules, type Rules } from '@shinobi/core';
+import { corePack, type ContentDb, type ContentPack } from '@shinobi/content';
+import { composeGame, type FailedPack, type Rules } from '@shinobi/core';
 import type { UiPack } from './ext/types.ts';
 
 /*
@@ -14,14 +14,18 @@ export interface Boot {
   packs: readonly ContentPack[];
   content: ContentDb;
   rules: Rules;
+  /** Packs the core left out because they failed to compose, with the reason. */
+  failed: readonly FailedPack[];
 }
 
 /** Composes the content of `core` and these packs, and the rules that go with them. */
 export function composeBoot(extra: readonly ContentPack[] = []): Boot {
   if (extra.length === 0 && coreOnly) return coreOnly;
-  const packs = [corePack, ...extra];
-  // TODO(M2a): build the rules with `composeRules(defaultRules, packs)` once the core provides it.
-  const boot: Boot = { packs, content: composeContent(packs), rules: defaultRules };
+  const game = composeGame([corePack, ...extra]);
+  // A pack the core left out is not part of this boot.
+  const left = new Set(game.failed.map((f) => f.pack));
+  const packs = [corePack, ...extra].filter((p) => !left.has(p.manifest.id));
+  const boot: Boot = { packs, content: game.content, rules: game.rules, failed: game.failed };
   if (extra.length === 0) coreOnly = boot;
   return boot;
 }

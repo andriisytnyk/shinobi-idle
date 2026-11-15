@@ -8,7 +8,7 @@
   import { blockOf, shopSection, type ShopSection } from '../lib/crafts.ts';
   import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
-  import { held, moneyName, moneyOf } from '../lib/vocab.ts';
+  import { currencyName, held, moneyOf } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
 
@@ -22,7 +22,17 @@
   let { section }: Props = $props();
 
   const money = moneyOf(content);
-  const ryo = $derived(game.read((gs) => held(gs, money)));
+  /** What the player holds of each currency the shop takes: the money first, then the others, in order of appearance. */
+  const purses = $derived(
+    game.read((gs) => {
+      const ids = [money];
+      for (const entry of shopEntries(content)) {
+        const id = entry.currency ?? money;
+        if (!ids.includes(id)) ids.push(id);
+      }
+      return ids.map((id) => ({ id, n: held(gs, id) }));
+    }),
+  );
   const goods = $derived(
     game.read((gs) =>
       shopEntries(content).flatMap((entry) => {
@@ -32,6 +42,7 @@
           {
             item: entry.item,
             price,
+            currency: entry.currency ?? money,
             section: shopSection(entry),
             owned: gs.bank[entry.item] ?? 0,
             req: evalReq(gs, entry.req, content),
@@ -65,9 +76,11 @@
 
 <SimplePage title={t('shop.title')}>
   <Hint id="shop" />
-  <p class="purse" data-purse>
-    {t('shop.purse', { n: formatInt(ryo), currency: moneyName(content) })}
-  </p>
+  {#each purses as purse (purse.id)}
+    <p class="purse" data-purse data-purse-currency={purse.id === money ? undefined : purse.id}>
+      {t('shop.purse', { n: formatInt(purse.n), currency: currencyName(purse.id).toLowerCase() })}
+    </p>
+  {/each}
   {#if shut}
     <p class="ct-why" id="shop-locked" data-shop-locked data-why="rank">{t('shop.shut')}</p>
   {/if}
@@ -80,6 +93,7 @@
           <ShopGood
             item={good.item}
             price={good.price}
+            currency={good.currency}
             owned={good.owned}
             req={good.req}
             quiet={shut}

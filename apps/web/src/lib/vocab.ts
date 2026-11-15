@@ -1,5 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
-import type { GameState, Rank } from '@shinobi/core';
+import { graduateRank, moneyOf, type GameState, type Rank } from '@shinobi/core';
 import { localeKey } from '@shinobi/content';
 import { hasKey, t, textOf } from './i18n.ts';
 
@@ -45,10 +45,6 @@ export const natureIconRef = (
 ): { kind: 'skill' | 'nature'; id: string } =>
   content.skills.some((s) => s.id === id) ? { kind: 'skill', id } : { kind: 'nature', id };
 
-/** Whether `id` is a nature of the content (a skill of the same id is the nature's skill). */
-export const isNature = (content: ContentDb, id: string): boolean =>
-  content.natures.some((n) => n.id === id);
-
 /**
  * A rank id as the core types it. The core types ranks as a closed union while it is migrated to
  * open ids; the cast keeps this code valid under both the legacy and the truthful types.
@@ -79,24 +75,14 @@ export const startRank = (content: ContentDb): string => content.playerRanks[0]?
  * Academy, the pouch and the natures wait for it (the core rule: «not the starting rank»).
  */
 export const promotedRank = (content: ContentDb): string =>
-  content.playerRanks[1]?.id ?? startRank(content);
+  graduateRank(content) ?? content.playerRanks[1]?.id ?? startRank(content);
 
-/** The currency that shops, the village and gear are priced in: the first of the list. */
-export const moneyOf = (content: ContentDb): string => content.currencies[0]?.id ?? '';
+/** What the core says about the currency roles, natures and activities: the interface asks it. */
+export { activitySkill as skillByActivity, currencyOf, isNature, moneyOf } from '@shinobi/core';
 
 /** The name of the money currency in running text (lower case): «рьо» in «У тебе 5 рьо». */
 export const moneyName = (content: ContentDb): string =>
   currencyName(moneyOf(content)).toLowerCase();
-
-/**
- * The currency the map rules pay for exploring. The core names it in its state and balance
- * (`K.intel`) but not in data yet, so the interface follows the core here: this is the one place.
- */
-export const INTEL = 'intel';
-
-/** The first skill that trains by this activity (`skill.activity`): the skill whose page holds that kind of action. */
-export const skillByActivity = (content: ContentDb, activity: string): string | null =>
-  content.skills.find((s) => s.activity === activity)?.id ?? null;
 
 /** How much of a currency the player holds; a currency the save does not know holds none. */
 export const held = (state: GameState, id: string): number =>

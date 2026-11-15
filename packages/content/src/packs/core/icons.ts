@@ -179,6 +179,70 @@ export const CORE_ICONS: Readonly<Record<string, Readonly<Record<string, string>
     'core:piliulia_vidnovlennia_chakry': 'pill-drop',
   },
 
+  // Drills of Chakra Control
+  exercise: {
+    'core:lystok_na_lobi': 'maple-leaf',
+    'core:kunai_na_doloni': 'plain-dagger',
+    'core:chakra_v_stopakh': 'wingfoot',
+    'core:khodinnia_po_derevu': 'tree-growth',
+    'core:pidiom_skeleiu_bez_ruk': 'mountain-climbing',
+    'core:khodinnia_po_vodi': 'echo-ripples',
+    'core:lopannia_vodianoi_kuli': 'bubbles',
+    'core:lopannia_humovoi_kuli': 'balloons',
+  },
+
+  // Meditation practices
+  practice: {
+    'core:tykha_kimnata': 'silence',
+    'core:medytatsiia_v_rusi': 'footsteps',
+    'core:lisove_sviatylyshche': 'temple-gate',
+    'core:bilia_vohnyshcha': 'campfire',
+    'core:pid_vodospadom': 'waterfall',
+    'core:sad_kameniv': 'stone-stack',
+  },
+
+  // Athletics obstacles
+  obstacle: {
+    'core:strybky_po_dakhakh': 'jump-across',
+    'core:bih_navkolo_sela': 'sprint',
+    'core:obtiazhuvachi': 'weight',
+    'core:vidzhymannia_na_paltsiakh': 'muscle-up',
+    'core:koloda_nad_prirvoiu': 'cliff-crossing',
+    'core:ukhylennia_vid_kunaiv': 'dodge',
+    'core:bih_po_derevakh': 'tree-branch',
+    'core:lazinnia_po_skeli': 'mountaintop',
+    'core:perehony_z_supernykom': 'duel',
+    'core:strybky_cherez_stovpy': 'ancient-columns',
+    'core:bih_po_vodi': 'splashy-stream',
+    'core:plavannia_proty_techii': 'swimfins',
+  },
+
+  // Alchemy and provisions recipes; the picture matches the item the recipe makes (the antidote takes a mortar)
+  recipe: {
+    'core:antidote': 'pestle-mortar',
+    'core:tsiliushcha_maz': 'heart-bottle',
+    'core:paralitychna_otruta': 'round-potion',
+    'core:dymova_bomba': 'smoke-bomb',
+    'core:sonnyi_poroshok': 'powder',
+    'core:krovospynna_maz': 'bandage-roll',
+    'core:slozohinna_bomba': 'stun-grenade',
+    'core:hirska_maz': 'honey-jar',
+    'core:nervova_otruta': 'potion-of-madness',
+    'core:niukhalna_sil': 'spray',
+    'core:maz_vid_opikiv': 'medicines',
+    'core:onihiri': 'sushis',
+    'core:tonik_iasnoho_rozumu': 'magic-potion',
+    'core:piliulia_viiskovoho_paika': 'pill',
+    'core:sushenyi_paiok': 'ham-shank',
+    'core:krovotvorna_piliulia': 'medicine-pills',
+    'core:tonik_kontsentratsii': 'standing-potion',
+    'core:bulion_ramenu': 'bowl-spiral',
+    'core:chai_badorosti': 'teapot',
+    'core:iakitori_shynobi': 'steak',
+    'core:tonik_stykhii': 'potion-ball',
+    'core:piliulia_vidnovlennia_chakry': 'pill-drop',
+  },
+
   status: {
     burn: 'burn',
     wet: 'splash',

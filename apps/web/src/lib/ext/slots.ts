@@ -30,6 +30,12 @@ export interface SlotContexts {
   settings: Record<string, never>;
   /** At the top of the village page. */
   'village.header': Record<string, never>;
+  /** At the top of the mission board. */
+  'missions.header': Record<string, never>;
+  /** Under the title of a mission page; `mission` is the mission's id. */
+  'mission.header': { mission: string };
+  /** At the end of a mission page. */
+  'mission.footer': { mission: string };
   /** At the end of every page; `route` is the location hash. */
   'page.footer': { route: string };
 }
@@ -48,6 +54,9 @@ const SLOT_TABLE: Record<SlotName, true> = {
   topbar: true,
   settings: true,
   'village.header': true,
+  'missions.header': true,
+  'mission.header': true,
+  'mission.footer': true,
   'page.footer': true,
 };
 

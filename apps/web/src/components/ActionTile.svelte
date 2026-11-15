@@ -1,15 +1,19 @@
 <script lang="ts">
-  import { SHARE_FULL, type ActionInfo } from '@shinobi/core';
+  import type { ActionInfo } from '@shinobi/core';
   import { actionRef } from '../lib/entities.ts';
   import { formatSeconds, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
-  import { toasts } from '../lib/toasts.svelte.ts';
+  import { practiceView, slotTiming } from '../lib/timing.ts';
+  import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
+  import ActionEmblem from './ActionEmblem.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import MasteryRing from './MasteryRing.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
   import ReqTree from './ReqTree.svelte';
+  import SealStrip from './SealStrip.svelte';
+  import TimeBar from './TimeBar.svelte';
   import Slot from '../lib/ext/Slot.svelte';
 
   interface Props {
@@ -18,6 +22,7 @@
 
   let { info }: Props = $props();
 
+  const content = game.content;
   const ref = $derived(actionRef(info));
   const slotIndex = $derived(
     game.read((gs) =>
@@ -25,20 +30,27 @@
     ),
   );
   const running = $derived(slotIndex >= 0);
-  /** How far through the current cycle the running action is, 0..1. */
-  const cycle = $derived.by(() =>
-    game.read((gs) => {
-      const slot = gs.slots[slotIndex];
-      if (!slot) return 0;
-      return Math.min(1, slot.progress / (info.intervalMs * SHARE_FULL));
-    }),
+  const timing = $derived(game.read((gs) => slotTiming(gs, slotIndex, info.intervalMs)));
+  const technique = $derived(
+    info.kind === 'practice' ? content.techniques.find((x) => x.id === info.id) : undefined,
+  );
+  /** The phases of the practice while it runs, and how many seals the technique has. */
+  const view = $derived(
+    technique && running
+      ? game.read((gs) => practiceView(gs, slotIndex, content, info.intervalMs))
+      : null,
+  );
+  /** The strip also shows on a tile that is idle, so the player sees what the technique asks for. */
+  const stripSeals = $derived(technique?.sealSeq ?? []);
+  const flash = $derived(
+    view ? { timing: view.timing, from: view.phases.sealsEnd, to: view.phases.releaseEnd } : null,
   );
 
   function toggle(): void {
     const result = running
       ? game.dispatch({ type: 'action.stop', slot: slotIndex })
       : game.dispatch({ type: 'action.start', slot: 0, kind: info.kind, id: info.id });
-    if (!result.ok) toasts.push({ key: result.reason, params: {} });
+    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 </script>
 
@@ -50,9 +62,23 @@
   data-ui="action-tile"
   data-entity="{ref.kind}:{ref.id}"
 >
-  <div class="head">
-    <h3 class="name"><EntityLink kind={ref.kind} id={ref.id} /></h3>
-    <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
+  <div class="top">
+    <ActionEmblem
+      kind={ref.kind}
+      id={ref.id}
+      skill={info.skill}
+      rank={technique?.rank ?? null}
+      {flash}
+    />
+    <div class="main">
+      <div class="head">
+        <h3 class="name"><EntityLink kind={ref.kind} id={ref.id} /></h3>
+        <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
+      </div>
+      {#if stripSeals.length > 0}
+        <SealStrip seals={stripSeals} {view} compact />
+      {/if}
+    </div>
   </div>
 
   <dl class="facts">
@@ -77,9 +103,7 @@
 
   {#if info.available}
     {#if running}
-      <span class="cycle" data-ui="action-progress" aria-hidden="true"
-        ><span class="fill" style:width="{cycle * 100}%"></span></span
-      >
+      <TimeBar {timing} part="action-progress" />
     {/if}
     <button type="button" class="action" class:stop={running} onclick={toggle}>
       {t(running ? 'tile.stop' : 'tile.start')}
@@ -107,6 +131,21 @@
 
   .tile.running {
     border-color: var(--accent);
+  }
+
+  /* The emblem sits left of the title; the numbers go under both. */
+  .top {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
   }
 
   .head {
@@ -142,19 +181,6 @@
   dd {
     margin: 0;
     font-variant-numeric: tabular-nums;
-  }
-
-  .cycle {
-    height: var(--bar-thin);
-    border-radius: var(--radius-xs);
-    background: var(--line);
-    overflow: hidden;
-  }
-
-  .fill {
-    display: block;
-    height: 100%;
-    background: var(--accent);
   }
 
   .action {

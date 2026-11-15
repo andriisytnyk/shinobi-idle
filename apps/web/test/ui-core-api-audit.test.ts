@@ -109,7 +109,7 @@ describe('api.core allowlist: nothing writes into a frozen state or content (#53
     natureSetSummary: () => core.natureSetSummary(['katon'] as never, frozenContent),
     nextTierPrice: () =>
       core.nextTierPrice(frozenState, frozenContent.gear[0] as never, frozenContent),
-    nextTierReq: () => core.nextTierReq(frozenState, frozenContent.gear[0] as never),
+    nextTierReq: () => core.nextTierReq(frozenState, frozenContent.gear[0] as never, frozenContent),
     analyzeFight: () =>
       core.analyzeFight(
         frozenState,

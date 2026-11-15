@@ -57,8 +57,8 @@ describe('academy bot', () => {
 
   it('starts from a provided mid-game state without touching it', () => {
     const start = createState(7, content);
-    start.skills.tai.xp = xpAt(5);
-    start.skills.ath.xp = xpAt(5);
+    start.skills.tai!.xp = xpAt(5);
+    start.skills.ath!.xp = xpAt(5);
     const before = serialize(start, 0);
     const run = runBot(academyBot, { seed: 7, initialState: start, limitMs: 240 * MINUTE });
     expect(serialize(start, 0)).toBe(before);

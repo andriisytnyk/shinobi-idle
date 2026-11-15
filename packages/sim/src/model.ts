@@ -1,6 +1,12 @@
-import { NATURE_IDS, type Boss, type ContentDb, type Enemy, type NatureId } from '@shinobi/content';
-import { encounterFor, loadoutLimits, planningSnapshot, type GameState } from '@shinobi/core';
-import { BASIC_SKILLS } from './constants.ts';
+import type { Boss, ContentDb, Enemy, NatureId } from '@shinobi/content';
+import {
+  encounterFor,
+  isNature,
+  loadoutLimits,
+  planningSnapshot,
+  type GameState,
+} from '@shinobi/core';
+import { basicSkills } from './constants.ts';
 
 /** What the simplified balance model (docs: «модель балансу», `balance.mjs`) expects of one fight. */
 export interface ModelExpectation {
@@ -62,36 +68,36 @@ export function modelExpectation(
   const eDmg = (cl: number) => K.eDmg[0] + K.eDmg[1] * cl;
   const hpTotal = encounter.spawns.reduce((sum, s) => sum + s.count * eHp(s.cl) * s.hpMult, 0);
   const levels = snap.levels;
-  const style = Math.max(...BASIC_SKILLS.map((s) => levels[s]));
+  const style = Math.max(...basicSkills(content).map((s) => levels[s] ?? 1));
 
   const acc = K.accBase + K.accPerLevel * style;
-  const eva = K.evaBase + K.evaPerLevel * levels.eva;
+  const eva = K.evaBase + K.evaPerLevel * (levels.eva ?? 1);
   const known = new Set(snap.known);
   const figures = content.techniques
     .filter((t) => t.rank !== null && !t.noDamage && known.has(t.id))
     .map((t) => {
       const role = K.role[t.role];
       const rank = t.rank as keyof typeof K.power;
+      const power = K.power[rank];
+      if (!role || power === undefined) return { nature: null, cast: 0, cycle: 1, value: 0 };
       const m = (snap.mastery[t.id] ?? 1) / K.masteryCap;
       const seals = Math.max(
         Math.round(t.sealSeq.length * (1 - K.masteryCast * m)),
         t.sealSeq.length > 0 ? 1 : 0,
       );
       const cast = Math.max(K.castFloor, K.castBase + K.castPerSeal * seals);
-      const cycle = cast + role.cd * K.rankCd[rank];
+      const cycle = cast + role.cd * (K.rankCd[rank] ?? 0);
       const reach = t.role === 'area' ? Math.min(bodies, K.loadout.areaBodies) : 1;
-      const nature = (NATURE_IDS as readonly string[]).includes(t.skill)
-        ? (t.skill as NatureId)
-        : null;
+      const nature = isNature(content, t.skill) ? (t.skill as NatureId) : null;
       return {
         nature,
         cast,
         cycle,
         value:
-          K.power[rank] *
+          power *
           role.m *
           K.tierMult[`${t.tier}`] *
-          (1 + K.levelScale * levels[t.skill]) *
+          (1 + K.levelScale * (levels[t.skill] ?? 1)) *
           (1 + K.masteryDmg * m) *
           reach,
       };
@@ -100,7 +106,9 @@ export function modelExpectation(
 
   // The rank's limits: a student takes everything, a Genin or a Chunin a number of slots and natures.
   const limits = loadoutLimits(snap.tier ?? 0, content);
-  const natures = NATURE_IDS.filter((n) => figures.some((f) => f.nature === n));
+  const natures = content.natures
+    .map((n) => n.id as NatureId)
+    .filter((n) => figures.some((f) => f.nature === n));
   const choices = limits ? subsets(natures, limits.natures) : [natures];
   let best: typeof figures = [];
   let bestScore = -1;
@@ -130,6 +138,6 @@ export function modelExpectation(
     (sum, s) => sum + (s.count * eDmg(s.cl) * s.dmgMult * enemyHit(s.cl)) / K.eInterval,
     0,
   );
-  const playerHp = K.hpBase + K.hpPerVit * levels.vit;
+  const playerHp = K.hpBase + K.hpPerVit * (levels.vit ?? 1);
   return { ttkSec, hpLossShare: (enemyDps * ttkSec) / playerHp, playerDps };
 }

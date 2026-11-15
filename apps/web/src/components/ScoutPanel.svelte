@@ -5,7 +5,7 @@
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { skillProgress } from '../lib/progress.ts';
-  import { held, INTEL } from '../lib/vocab.ts';
+  import { currencyOf, held } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
@@ -19,6 +19,8 @@
   }
 
   let { skill }: Props = $props();
+  /** The currency exploring pays: the one with the role study. */
+  const study = currencyOf(content, 'study') ?? '';
 
   /** The Scouting page: its currency, what it is doing now, the time of an exploration and a way to the map. */
   const data = $derived(
@@ -33,7 +35,7 @@
       return {
         xp: gs.skills[skill as SkillId]?.xp ?? 0,
         fraction: skillProgress(gs, skill as SkillId).fraction,
-        intel: held(gs, INTEL),
+        intel: held(gs, study),
         action,
         exploreMs: exploreIntervalMs(gs, content, game.rules),
         walkMs: first ? walkMs(gs, first, content, game.rules) : 0,
@@ -48,7 +50,7 @@
   <p class="intro">{t('scout.intro')}</p>
   <dl class="facts">
     <div>
-      <dt><Icon entity={{ kind: 'currency', id: INTEL }} size={16} /> {t('scout.intel')}</dt>
+      <dt><Icon entity={{ kind: 'currency', id: study }} size={16} /> {t('scout.intel')}</dt>
       <dd data-intel>{formatInt(data.intel)}</dd>
     </div>
     <div>

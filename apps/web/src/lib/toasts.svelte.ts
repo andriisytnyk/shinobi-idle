@@ -2,6 +2,8 @@ import type { ContentDb } from '@shinobi/content';
 import type { GameEvent } from '@shinobi/core';
 import { actionRef, masteryRef } from './entities.ts';
 import { t, type Params } from './i18n.ts';
+import { missionToast } from './mission-toasts.ts';
+import { currencyName } from './vocab.ts';
 import type { EntityRef } from './route.ts';
 
 export interface Toast {
@@ -9,9 +11,15 @@ export interface Toast {
   /** Message key; the text ends where the entity link begins. */
   key: string;
   params: Params;
+  /** An entity the toast is about, as a link before the text (the sentence goes on after the name). */
+  subject?: EntityRef;
   ref?: EntityRef;
-  /** What a claimed cache or vault gave: ryo and items, the items as links. */
-  gains?: { ryo: number; items: { id: string; n: number }[] };
+  /** What a claimed cache or vault gave: ryo and items, the items as links; `missed` is what was due but not received. */
+  gains?: {
+    ryo: number;
+    items: { id: string; n: number }[];
+    missed?: { id: string; n: number }[];
+  };
   /**
    * A button on the toast; pressing it runs `run` and closes the toast, unless `run` returns (or
    * resolves to) `false`: then the toast stays so the player can try again.
@@ -25,6 +33,9 @@ export type ToastSpec = Omit<Toast, 'id'>;
 
 /** Maps a core event to the toast that announces it, or null for events that stay silent. */
 export function toastFor(event: GameEvent, content: ContentDb): ToastSpec | null {
+  // Missions have their own words for a stage, a finished run and a stop.
+  const mission = missionToast(event, content);
+  if (mission !== undefined) return mission;
   switch (event.type) {
     case 'levelUp':
       return {
@@ -109,11 +120,41 @@ export function toastFor(event: GameEvent, content: ContentDb): ToastSpec | null
       };
     case 'villageStage':
       return { key: 'toast.villageStage', params: {} };
+    case 'packsChanged':
+      // Told by the store, which may have several notices for one event.
+      return null;
+    case 'ruleDisabled':
+      return {
+        key: 'toast.ruleDisabled',
+        params: { pack: event.pack },
+        persistent: true,
+      };
     case 'storageFull':
       return { key: 'toast.storageFull', params: { name: t(`resource.${event.resource}.name`) } };
     default:
       return null;
   }
+}
+
+/** The params of a refusal for its text: a currency it names is shown by its name, not its id. */
+export function refusalParams(result: { params?: Params }): Params {
+  const params = { ...(result.params ?? {}) };
+  if (typeof params.currency === 'string') params.currency = currencyName(params.currency);
+  return params;
+}
+
+/** The notices for a save made with other packs than the game has now: one per kind of change. */
+export function packsToasts(event: Extract<GameEvent, { type: 'packsChanged' }>): ToastSpec[] {
+  const one = (key: string, list: string[]): ToastSpec[] =>
+    list.length === 0 ? [] : [{ key, params: { packs: list.join(', ') }, persistent: true }];
+  return [
+    ...one('toast.packsRemoved', event.removed),
+    ...one('toast.packsAdded', event.added),
+    ...one(
+      'toast.packsUpdated',
+      event.updated.map((u) => `${u.id} ${u.from} → ${u.to}`),
+    ),
+  ];
 }
 
 /** What claiming a cache or a vault gives. */

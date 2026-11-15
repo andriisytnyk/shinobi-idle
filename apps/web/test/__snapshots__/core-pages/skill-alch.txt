@@ -18,19 +18,20 @@
           Дії
         <ul class="tiles">
           <li class="ct-tile" data-action="core:antidote" data-entity="recipe:core:antidote" data-recipe="core:antidote" data-ui="action-tile">
-            <div class="ct-head">
-              <h3 class="ct-name">
-                <span class="ct-icon">
-                  <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
-                    <path d="#2152-14fqxmf" fill="currentColor">
-                <a class="entity-link" href="#/recipe/core:antidote">
-                  Протиотрута
-              <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                  <circle class="track" cx="22" cy="22" r="18">
-                  <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                <span class="level">
-                  1
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="pestle-mortar" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#1092-7cd30b" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:antidote">
+                    Протиотрута
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -102,19 +103,20 @@
             <p class="ct-why" data-why="missing" id="why-core:antidote">
               Бракує інгредієнтів.
           <li class="ct-tile" data-action="core:tsiliushcha_maz" data-entity="recipe:core:tsiliushcha_maz" data-recipe="core:tsiliushcha_maz" data-ui="action-tile">
-            <div class="ct-head">
-              <h3 class="ct-name">
-                <span class="ct-icon">
-                  <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
-                    <path d="#1245-i1pns4" fill="currentColor">
-                <a class="entity-link" href="#/recipe/core:tsiliushcha_maz">
-                  Цілюща мазь
-              <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                  <circle class="track" cx="22" cy="22" r="18">
-                  <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                <span class="level">
-                  1
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="heart-bottle" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#1245-i1pns4" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:tsiliushcha_maz">
+                    Цілюща мазь
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -234,19 +236,20 @@
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
           <li class="ct-tile" data-action="core:paralitychna_otruta" data-entity="recipe:core:paralitychna_otruta" data-recipe="core:paralitychna_otruta" data-ui="action-tile">
-            <div class="ct-head">
-              <h3 class="ct-name">
-                <span class="ct-icon">
-                  <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
-                    <path d="#804-1w00djv" fill="currentColor">
-                <a class="entity-link" href="#/recipe/core:paralitychna_otruta">
-                  Паралітична отрута
-              <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                  <circle class="track" cx="22" cy="22" r="18">
-                  <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                <span class="level">
-                  1
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="round-potion" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#804-1w00djv" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:paralitychna_otruta">
+                    Паралітична отрута
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -360,19 +363,20 @@
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
           <li class="ct-tile" data-action="core:dymova_bomba" data-entity="recipe:core:dymova_bomba" data-recipe="core:dymova_bomba" data-ui="action-tile">
-            <div class="ct-head">
-              <h3 class="ct-name">
-                <span class="ct-icon">
-                  <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
-                    <path d="#4321-10f8c8b" fill="currentColor">
-                <a class="entity-link" href="#/recipe/core:dymova_bomba">
-                  Димова бомба
-              <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                  <circle class="track" cx="22" cy="22" r="18">
-                  <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                <span class="level">
-                  1
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="smoke-bomb" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#4321-10f8c8b" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:dymova_bomba">
+                    Димова бомба
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -492,19 +496,20 @@
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
           <li class="ct-tile" data-action="core:sonnyi_poroshok" data-entity="recipe:core:sonnyi_poroshok" data-recipe="core:sonnyi_poroshok" data-ui="action-tile">
-            <div class="ct-head">
-              <h3 class="ct-name">
-                <span class="ct-icon">
-                  <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
-                    <path d="#2795-1aheut1" fill="currentColor">
-                <a class="entity-link" href="#/recipe/core:sonnyi_poroshok">
-                  Сонний порошок
-              <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                  <circle class="track" cx="22" cy="22" r="18">
-                  <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                <span class="level">
-                  1
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="powder" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#2795-1aheut1" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:sonnyi_poroshok">
+                    Сонний порошок
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -596,19 +601,20 @@
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
           <li class="ct-tile" data-action="core:krovospynna_maz" data-entity="recipe:core:krovospynna_maz" data-recipe="core:krovospynna_maz" data-ui="action-tile">
-            <div class="ct-head">
-              <h3 class="ct-name">
-                <span class="ct-icon">
-                  <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
-                    <path d="#2043-nrdkti" fill="currentColor">
-                <a class="entity-link" href="#/recipe/core:krovospynna_maz">
-                  Кровоспинна мазь
-              <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                  <circle class="track" cx="22" cy="22" r="18">
-                  <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                <span class="level">
-                  1
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="bandage-roll" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#2043-nrdkti" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:krovospynna_maz">
+                    Кровоспинна мазь
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -728,19 +734,20 @@
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
           <li class="ct-tile" data-action="core:slozohinna_bomba" data-entity="recipe:core:slozohinna_bomba" data-recipe="core:slozohinna_bomba" data-ui="action-tile">
-            <div class="ct-head">
-              <h3 class="ct-name">
-                <span class="ct-icon">
-                  <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
-                    <path d="#996-2czncp" fill="currentColor">
-                <a class="entity-link" href="#/recipe/core:slozohinna_bomba">
-                  Сльозогінна бомба
-              <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                  <circle class="track" cx="22" cy="22" r="18">
-                  <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                <span class="level">
-                  1
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="stun-grenade" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#996-2czncp" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:slozohinna_bomba">
+                    Сльозогінна бомба
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -860,19 +867,20 @@
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
           <li class="ct-tile" data-action="core:hirska_maz" data-entity="recipe:core:hirska_maz" data-recipe="core:hirska_maz" data-ui="action-tile">
-            <div class="ct-head">
-              <h3 class="ct-name">
-                <span class="ct-icon">
-                  <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
-                    <path d="#2138-1fy6hr3" fill="currentColor">
-                <a class="entity-link" href="#/recipe/core:hirska_maz">
-                  Гірська мазь
-              <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                  <circle class="track" cx="22" cy="22" r="18">
-                  <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                <span class="level">
-                  1
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="honey-jar" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#2138-1fy6hr3" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:hirska_maz">
+                    Гірська мазь
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -992,19 +1000,20 @@
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
           <li class="ct-tile" data-action="core:nervova_otruta" data-entity="recipe:core:nervova_otruta" data-recipe="core:nervova_otruta" data-ui="action-tile">
-            <div class="ct-head">
-              <h3 class="ct-name">
-                <span class="ct-icon">
-                  <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
-                    <path d="#1642-1t5nrp" fill="currentColor">
-                <a class="entity-link" href="#/recipe/core:nervova_otruta">
-                  Нервова отрута
-              <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                  <circle class="track" cx="22" cy="22" r="18">
-                  <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                <span class="level">
-                  1
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="potion-of-madness" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#1642-1t5nrp" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:nervova_otruta">
+                    Нервова отрута
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -1118,19 +1127,20 @@
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
           <li class="ct-tile" data-action="core:niukhalna_sil" data-entity="recipe:core:niukhalna_sil" data-recipe="core:niukhalna_sil" data-ui="action-tile">
-            <div class="ct-head">
-              <h3 class="ct-name">
-                <span class="ct-icon">
-                  <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
-                    <path d="#2304-rb3lw" fill="currentColor">
-                <a class="entity-link" href="#/recipe/core:niukhalna_sil">
-                  Нюхальна сіль
-              <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                  <circle class="track" cx="22" cy="22" r="18">
-                  <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                <span class="level">
-                  1
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="spray" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#2304-rb3lw" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:niukhalna_sil">
+                    Нюхальна сіль
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -1278,19 +1288,20 @@
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
           <li class="ct-tile" data-action="core:maz_vid_opikiv" data-entity="recipe:core:maz_vid_opikiv" data-recipe="core:maz_vid_opikiv" data-ui="action-tile">
-            <div class="ct-head">
-              <h3 class="ct-name">
-                <span class="ct-icon">
-                  <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
-                    <path d="#728-1v8zlty" fill="currentColor">
-                <a class="entity-link" href="#/recipe/core:maz_vid_opikiv">
-                  Мазь від опіків
-              <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                  <circle class="track" cx="22" cy="22" r="18">
-                  <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                <span class="level">
-                  1
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="medicines" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#728-1v8zlty" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:maz_vid_opikiv">
+                    Мазь від опіків
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <dl class="ct-facts">
               <div>
                 <dt>

@@ -46,8 +46,26 @@ export function isInFolder(file: string, folder: string): boolean {
   return d !== '' && (f === d || f.startsWith(`${d}/`));
 }
 
-export function isInMigrated(file: string, migrated: readonly string[]): boolean {
-  return migrated.some((folder) => isInFolder(file, folder));
+/**
+ * An entry of `open-typecheck.json`: a repo-relative folder or file, or a folder with parts of it
+ * left out (`exclude`: folders or files relative to it, which another task migrates later).
+ */
+export type MigratedEntry = string | { path: string; exclude?: readonly string[] };
+
+/** The repo-relative folder or file an entry names. */
+export const entryPath = (entry: MigratedEntry): string =>
+  typeof entry === 'string' ? entry : entry.path;
+
+/** Whether `file` is covered by the entry: inside its path and in none of its excluded parts. */
+export function isInEntry(file: string, entry: MigratedEntry): boolean {
+  const path = entryPath(entry);
+  if (!isInFolder(file, path)) return false;
+  const exclude = typeof entry === 'string' ? [] : (entry.exclude ?? []);
+  return !exclude.some((part) => isInFolder(file, `${normalizePath(path)}/${normalizePath(part)}`));
+}
+
+export function isInMigrated(file: string, migrated: readonly MigratedEntry[]): boolean {
+  return migrated.some((entry) => isInEntry(file, entry));
 }
 
 /** The folder a file lives in: the directory of the file, repo-relative. */
@@ -126,14 +144,20 @@ export interface Verdict {
  */
 export function judge(
   errors: readonly Diagnostic[],
-  migrated: readonly string[],
+  migrated: readonly MigratedEntry[],
   mappingExists: boolean,
   folderExists: (folder: string) => boolean = () => true,
 ): Verdict {
   const messages: string[] = [];
-  for (const folder of migrated)
-    if (!folderExists(folder))
-      messages.push(`open-typecheck.json lists "${folder}", which does not exist`);
+  for (const entry of migrated) {
+    const path = entryPath(entry);
+    if (!folderExists(path))
+      messages.push(`open-typecheck.json lists "${path}", which does not exist`);
+    else if (typeof entry !== 'string')
+      for (const part of entry.exclude ?? [])
+        if (!folderExists(`${normalizePath(path)}/${normalizePath(part)}`))
+          messages.push(`open-typecheck.json excludes "${path}/${part}", which does not exist`);
+  }
   const inside = errors.filter((e) => isInMigrated(e.file, migrated));
   if (inside.length > 0)
     messages.push(

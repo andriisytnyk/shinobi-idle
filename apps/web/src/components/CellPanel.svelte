@@ -12,12 +12,14 @@
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import { keyIcon, keyNameKey, uniqueReq } from '../lib/world.ts';
+  import { IDLE_TIMING, slotTiming } from '../lib/timing.ts';
   import PoiRow from './PoiRow.svelte';
   import RegionEntry from './RegionEntry.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
   import ReqTree from './ReqTree.svelte';
+  import TimeBar from './TimeBar.svelte';
 
   const content = game.content;
 
@@ -53,6 +55,15 @@
           true,
         walkMs: walkMs(gs, target, content, game.rules),
       };
+    }),
+  );
+
+  /** The cycle of the exploring or the walk that is busy with this cell. */
+  const cycle = $derived(
+    game.read((gs) => {
+      if (busy.explore >= 0 && info) return slotTiming(gs, busy.explore, info.intervalMs);
+      if (busy.walk >= 0 && travel) return slotTiming(gs, busy.walk, travel.walkMs, false);
+      return IDLE_TIMING;
     }),
   );
 
@@ -173,6 +184,7 @@
         </p>
 
         {#if busy.explore >= 0}<p class="small dim">{t('world.explore.running')}</p>{/if}
+        {#if cycle.running}<TimeBar timing={cycle} part="action-progress" />{/if}
       </section>
 
       {#if explored}

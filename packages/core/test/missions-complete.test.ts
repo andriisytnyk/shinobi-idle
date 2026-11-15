@@ -174,7 +174,7 @@ describe('each alternative of a stage is exercised', () => {
     runUntilDone(state, 'core:fire', 3 * 60 * MIN);
     expect(state.counters['missions.done.core:fire']).toBe(1);
     // A teammate's stage pays the player no XP in the skill.
-    expect(state.skills.suiton.xp).toBe(0);
+    expect(state.skills.suiton!.xp).toBe(0);
   });
 
   it('Aya scouts and Ren fights with their levels, the best of the team counts', () => {

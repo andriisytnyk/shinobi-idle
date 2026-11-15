@@ -13,7 +13,8 @@
   import { formatInt, formatSeconds, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
-  import { toasts } from '../lib/toasts.svelte.ts';
+  import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
+  import ActionEmblem from './ActionEmblem.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
@@ -57,8 +58,13 @@
     return tree.met ? null : tree;
   }
 
-  function report(result: { ok: boolean; reason?: string }): void {
-    if (!result.ok && result.reason) toasts.push({ key: result.reason, params: {} });
+  function report(result: {
+    ok: boolean;
+    reason?: string;
+    params?: Record<string, string | number>;
+  }): void {
+    if (!result.ok && result.reason)
+      toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 
   const build = (slot: number, obstacle: string) =>
@@ -137,6 +143,7 @@
             {@const missing = needs(slot, option.id)}
             <li class="option" class:built={option.built} data-obstacle={option.id}>
               <p class="name">
+                <ActionEmblem kind="obstacle" id={option.id} {skill} size="sm" />
                 <EntityLink kind="obstacle" id={option.id} />
                 {#if option.built}
                   <span class="mark"

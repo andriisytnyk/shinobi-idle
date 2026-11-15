@@ -116,6 +116,32 @@
     </ul>
   </section>
 
+  {#if game.failed.length > 0}
+    <section data-ui="failed-packs">
+      <h2>{t('settings.failedPacks')}</h2>
+      {#each game.failed as pack (pack.pack)}
+        <p class="message bad" role="status">
+          {t('settings.packFailed', { pack: pack.pack, error: pack.error })}
+        </p>
+      {/each}
+    </section>
+  {/if}
+
+  {#if game.ruleNotices.length > 0}
+    <section data-ui="disabled-rules">
+      <h2>{t('settings.rulesDisabled')}</h2>
+      {#each game.ruleNotices as notice (notice.pack + notice.rule)}
+        <p class="message bad" role="status">
+          {t('settings.ruleDisabled', {
+            pack: notice.pack,
+            rule: notice.rule,
+            reason: notice.reason,
+          })}
+        </p>
+      {/each}
+    </section>
+  {/if}
+
   {#if disabledPacks.length > 0}
     <section data-ui="disabled-packs">
       <h2>{t('settings.disabledPacks')}</h2>

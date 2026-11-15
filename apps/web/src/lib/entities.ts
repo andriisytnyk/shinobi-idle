@@ -52,6 +52,7 @@ const ACTION_ENTITY: Readonly<Record<string, string>> = {
   gather: 'item',
   craft: 'recipe',
   fight: 'enemy',
+  mission: 'mission',
   senseiTest: 'exam',
   explore: 'cell',
   walk: 'cell',

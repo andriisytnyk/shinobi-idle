@@ -11,19 +11,20 @@
         Бій: знімає отруєння
       <ul class="ct-tiles single">
         <li class="ct-tile" data-action="core:antidote" data-entity="recipe:core:antidote" data-recipe="core:antidote" data-ui="action-tile">
-          <div class="ct-head">
-            <h3 class="ct-name">
-              <span class="ct-icon">
-                <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
-                  <path d="#2152-14fqxmf" fill="currentColor">
-              <a class="entity-link" href="#/recipe/core:antidote">
-                Протиотрута
-            <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-              <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                <circle class="track" cx="22" cy="22" r="18">
-                <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-              <span class="level">
-                1
+          <div class="ct-top">
+            <span class="emblem md" data-emblem-icon="pestle-mortar" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+              <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                <path d="#1092-7cd30b" fill="currentColor">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <a class="entity-link" href="#/recipe/core:antidote">
+                  Протиотрута
+              <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                  <circle class="track" cx="22" cy="22" r="18">
+                  <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                <span class="level">
+                  1
           <dl class="ct-facts">
             <div>
               <dt>

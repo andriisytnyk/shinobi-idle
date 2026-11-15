@@ -160,7 +160,46 @@ describe('the app booted with core and testmod (T1)', () => {
   it('shows the requirement of the rank by its name on the mission page', async () => {
     booted = await boot('#/mission/testmod:test_run');
     expect(text('[data-ui="entity-page"] h1')).toContain('Тестове доручення');
-    expect(text('[data-entity-req]')).toContain('Тестовий адепт');
+    expect(texts().some((x) => x.includes('Тестовий адепт'))).toBe(true);
+    expect(texts().some((x) => x.includes('Тестовий жетон'))).toBe(true);
+    expect(rawTexts()).toEqual([]);
+  });
+
+  it('shows the exam of the rank on the rank page with its requirement tree', async () => {
+    booted = await boot('#/rank');
+    const exam = q('[data-exam="testmod:adept_exam"]');
+    expect(exam).not.toBeNull();
+    const list = exam?.querySelector('[data-checklist]')?.textContent ?? '';
+    expect(list).toContain('Тестова кузня');
+    expect(exam?.querySelector('button.take')).not.toBeNull();
+    expect(rawTexts()).toEqual([]);
+  });
+
+  it('shows the wheel of the nature: whom it beats', async () => {
+    booted = await boot('#/nature');
+    const row = q('[data-nature="testmod:aether"] [data-row="wheel"]');
+    expect(row?.textContent).toContain('Катон');
+    expect(rawTexts()).toEqual([]);
+  });
+
+  it('prices a shop good in the currency of the pack and shows how much of it the player holds', async () => {
+    const gs = state();
+    gs.player.rank = 'testmod:adept';
+    booted = await boot('#/shop', gs);
+    const good = q('[data-good="testmod:charm"]');
+    expect(good?.querySelector('[data-price]')?.textContent).toContain('жетон');
+    expect(q('[data-purse-currency="testmod:token"]')?.textContent).toMatch(/7.*жетон/);
+    expect(rawTexts()).toEqual([]);
+  });
+
+  it('opens the page of a pack skill with a list activity and shows its action tile', async () => {
+    const gs = state();
+    gs.player.natures = ['testmod:aether'] as never;
+    booted = await boot('#/skill/testmod:aether', gs);
+    expect(q('[data-ui="entity-page"][data-entity="skill:testmod:aether"]')).not.toBeNull();
+    expect(
+      q('[data-ui="action-tile"][data-entity="technique:testmod:aether_touch"]'),
+    ).not.toBeNull();
     expect(rawTexts()).toEqual([]);
   });
 

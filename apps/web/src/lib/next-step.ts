@@ -1,5 +1,12 @@
 import type { ContentDb, Quest, QuestObjective } from '@shinobi/content';
-import { counterValue, evalReq, examFor, type GameState, type ReqResult } from '@shinobi/core';
+import {
+  counterValue,
+  evalReq,
+  examFor,
+  missionDoneKey,
+  type GameState,
+  type ReqResult,
+} from '@shinobi/core';
 import { itemPlace } from './crafts.ts';
 import { hrefFor } from './route.ts';
 
@@ -8,6 +15,12 @@ export type StepStatus = 'done' | 'current' | 'pending';
 /** The enemy a `kills.<enemy>` counter counts, or null for any other counter. */
 export function counterEnemy(counter: string): string | null {
   return counter.startsWith('kills.') ? counter.slice('kills.'.length) : null;
+}
+
+/** The mission a `missions.done.<mission>` counter counts, or null for any other counter. */
+export function counterMission(counter: string): string | null {
+  const prefix = missionDoneKey('');
+  return counter.startsWith(prefix) ? counter.slice(prefix.length) : null;
 }
 
 /** Where a step stands: finished steps, the active one, and those still to come. */
@@ -101,6 +114,10 @@ export function objectiveTarget(
 ): string {
   if (objective.t === 'counter') {
     if (counterEnemy(objective.counter) !== null) return '#/combat';
+    const mission = counterMission(objective.counter);
+    if (mission !== null) return hrefFor({ kind: 'mission', id: mission });
+    // The other mission counters (by rank, in total) are worked on the board.
+    if (objective.counter.startsWith('missions.')) return '#/missions';
     // Cells of a region explored: the world page on that region.
     if (objective.counter.startsWith('explored.')) {
       return hrefFor({ kind: 'region', id: objective.counter.slice('explored.'.length) });

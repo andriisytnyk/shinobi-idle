@@ -1,10 +1,4 @@
-import {
-  NATURE_IDS,
-  scrollPartId,
-  type ContentDb,
-  type Mission,
-  type SkillId,
-} from '@shinobi/content';
+import { scrollPartId, type ContentDb, type Mission } from '@shinobi/content';
 import { stopSlot, type ActionKind } from '../actions.ts';
 import { addCurrency, addItem, hasItem, removeCurrency, removeItem } from '../bank.ts';
 import { actionsKey, bump } from '../counters.ts';
@@ -17,6 +11,7 @@ import { skillLevel, type Req } from '../requirements.ts';
 import { nextFloat } from '../rng.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState, JsonValue } from '../state.ts';
+import { currencyOf, isNature } from '../vocab.ts';
 import { entryOf } from '../combat/zones.ts';
 import { drainPendingResources } from '../village.ts';
 import { MISSION_KIND, fightBusy, fightBusyReason, newMissionCombat } from '../combat/system.ts';
@@ -179,7 +174,10 @@ function beginStage(
   const entry = stage.t === 'combat' ? entryOf(content, stage.enemy) : undefined;
   if (stage.t === 'combat' && !entry) return false;
   if (stage.t === 'items') removeItem(state, stage.item, stage.n);
-  if (plan.intel > 0 && !reuse) removeCurrency(state, 'intel', plan.intel);
+  const intelCurrency = currencyOf(content, 'study');
+  if (plan.intel > 0 && !reuse && intelCurrency !== null) {
+    removeCurrency(state, intelCurrency, plan.intel);
+  }
   const next: MissionRun = { ...run, s: index, p: plan, w: 0, q: 0, f: 0, st: '' };
   if (entry) {
     if (fightBusy(state, at)) next.q = 1;
@@ -226,8 +224,8 @@ function beginRun(
 
 /** What one attempt of a stage the player did earns: XP by skill, and the Mastery XP of the technique used. */
 export interface StageXp {
-  xp: [SkillId, number][];
-  mastery: { id: string; skill: SkillId; amount: number } | null;
+  xp: [string, number][];
+  mastery: { id: string; skill: string; amount: number } | null;
 }
 
 /** The skill a fight's style XP goes to: that of the technique last used, or the balance's default. */
@@ -253,7 +251,7 @@ export function stageXp(
   const K = content.balance.K;
   const hours = plan.ms / MS_PER_SECOND / SECONDS_PER_HOUR;
   if (plan.skill !== '') {
-    const skill = plan.skill as SkillId;
+    const skill = plan.skill;
     const level = Math.min(skillLevel(state, skill, content), mission.rateCap);
     const tech = indexOf(content).techniques.get(plan.tech);
     return {
@@ -273,8 +271,8 @@ export function stageXp(
   const pool = K.missionXpShare * rate(Math.min(entry.cl, mission.rateCap), content) * hours;
   return {
     xp: [
-      [style as SkillId, (pool * K.combatXp.style) / total],
-      ...others.map((s): [SkillId, number] => [s, (pool * (weights[s] ?? 0)) / total]),
+      [style, (pool * K.combatXp.style) / total],
+      ...others.map((s): [string, number] => [s, (pool * (weights[s] ?? 0)) / total]),
     ],
     mastery: null,
   };
@@ -330,19 +328,24 @@ export function payMission(
   const rep = mission.team
     ? Math.round(mission.rep * computeMod(mods, state, 'mission.rep', content).total)
     : 0;
-  addCurrency(state, 'ryo', ryo);
-  addCurrency(state, 'rep', rep);
+  const money = currencyOf(content, 'money');
+  const reputation = currencyOf(content, 'renown');
+  const intel = currencyOf(content, 'study');
+  if (money !== null) addCurrency(state, money, ryo);
+  if (reputation !== null) addCurrency(state, reputation, rep);
   const items = indexOf(content).items;
   for (const pay of mission.pay) {
     if (pay.kind === 'item') {
       if (addItem(state, pay.item, pay.n)) {
         emit(state, { type: 'itemGained', id: pay.item, n: pay.n });
       }
+    } else if (pay.kind === 'currency') {
+      addCurrency(state, pay.currency, pay.n);
     } else if (pay.kind === 'intel') {
-      addCurrency(state, 'intel', pay.n);
+      if (intel !== null) addCurrency(state, intel, pay.n);
     } else {
       const part = scrollPartId(pay.technique);
-      if (items.has(part) && nextFloat(state.rng, 'loot') < K.partDrop.mission) {
+      if (items.has(part) && nextFloat(state.rng, 'loot') < (K.partDrop[pay.chance] ?? 0)) {
         addItem(state, part, 1);
         emit(state, { type: 'itemGained', id: part, n: 1 });
       }
@@ -363,7 +366,7 @@ export function payMission(
   bump(state, missionRankKey(mission.rank));
   const skills = [...new Set(performed)];
   for (const skill of skills) bump(state, missionTechKey(skill));
-  if (skills.some((s) => (NATURE_IDS as readonly string[]).includes(s))) {
+  if (skills.some((s) => isNature(content, s))) {
     bump(state, MISSIONS_ELEMENTAL);
     bump(state, missionElementalKey(mission.rank));
   }

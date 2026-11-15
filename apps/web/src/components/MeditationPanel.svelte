@@ -3,7 +3,7 @@
   import { listMeditationMods, type MeditationModInfo } from '@shinobi/core';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
-  import { toasts } from '../lib/toasts.svelte.ts';
+  import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import EntityLink from './EntityLink.svelte';
   import NatureLink from './NatureLink.svelte';
   import Icon from './Icon.svelte';
@@ -14,7 +14,7 @@
 
   function buy(practice: string, ref: string): void {
     const result = game.dispatch({ type: 'meditation.buy', practice, mod: ref });
-    if (!result.ok) toasts.push({ key: result.reason, params: {} });
+    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 
   /** Why the modifier does not work or cannot be bought, as a key; null when nothing is wrong. */

@@ -47,8 +47,8 @@ describe('bush memory: stop and start does not skip the regrow', () => {
     const herbs = (s: GameState) => s.bank[MINT] ?? 0;
     expect(herbs(cheat) / herbs(honest)).toBeGreaterThan(0.995);
     expect(herbs(cheat) / herbs(honest)).toBeLessThan(1.005);
-    expect(cheat.skills.herb.xp / honest.skills.herb.xp).toBeGreaterThan(0.995);
-    expect(cheat.skills.herb.xp / honest.skills.herb.xp).toBeLessThan(1.005);
+    expect(cheat.skills.herb!.xp / honest.skills.herb!.xp).toBeGreaterThan(0.995);
+    expect(cheat.skills.herb!.xp / honest.skills.herb!.xp).toBeLessThan(1.005);
   });
 
   it('resumes an empty bush where it was left, and regrows only while gathering', () => {
@@ -108,7 +108,7 @@ describe('a craft that cannot be made is not a completion', () => {
     expect(s.stats.completed).toBe(0);
     expect(s.counters['actions.craft']).toBeUndefined();
     expect(s.buffs['core:tonik_kontsentratsii']?.charges).toBe(40);
-    expect(s.skills.alch.xp).toBe(0);
+    expect(s.skills.alch!.xp).toBe(0);
     expect(s.slots[0]?.action).toBeNull();
     expect(s.events).toContainEqual(
       expect.objectContaining({ type: 'actionStopped', reason: 'requirements', missing: MINT }),
@@ -193,7 +193,7 @@ describe('selectors cover gather and craft', () => {
     const info = actionInfo(s, { kind: 'gather', id: MINT }, content);
     ok(s, start('gather', MINT));
     advance(s, HOUR, content);
-    expect(s.skills.herb.xp / (info?.xpPerHour ?? 1)).toBeGreaterThan(0.98);
-    expect(s.skills.herb.xp / (info?.xpPerHour ?? 1)).toBeLessThan(1.02);
+    expect(s.skills.herb!.xp / (info?.xpPerHour ?? 1)).toBeGreaterThan(0.98);
+    expect(s.skills.herb!.xp / (info?.xpPerHour ?? 1)).toBeLessThan(1.02);
   });
 });

@@ -37,6 +37,10 @@ const required: Record<IconKind, string[]> = {
   building: content.buildings.map((b) => b.id),
   region: content.regions.map((r) => r.id),
   gear: content.gear.map((g) => g.id),
+  exercise: content.exercises.map((e) => e.id),
+  practice: content.practices.map((p) => p.id),
+  obstacle: content.obstacles.map((o) => o.id),
+  recipe: content.recipes.map((r) => r.id),
 };
 
 describe('icon registry', () => {
@@ -76,4 +80,25 @@ describe('icon registry', () => {
       expect(distinct.size / own.length).toBeGreaterThanOrEqual(0.7);
     });
   }
+
+  it('uses one pictogram for at most two actions of a skill', () => {
+    const bySkill = new Map<string, string[]>();
+    const add = (skill: string, kind: IconKind, id: string) => {
+      const list = bySkill.get(skill) ?? [];
+      list.push(iconFor(kind, id) ?? '');
+      bySkill.set(skill, list);
+    };
+    for (const t of content.techniques) add(t.skill, 'technique', t.id);
+    for (const e of content.exercises) add('cc', 'exercise', e.id);
+    for (const p of content.practices) add('med', 'practice', p.id);
+    for (const o of content.obstacles) add('ath', 'obstacle', o.id);
+    for (const h of content.herbs) add('herb', 'item', h.id);
+    for (const r of content.recipes) add(r.skill, 'recipe', r.id);
+    for (const [skill, names] of bySkill) {
+      const counts = new Map<string, number>();
+      for (const n of names) counts.set(n, (counts.get(n) ?? 0) + 1);
+      const over = [...counts].filter(([, c]) => c > 2).map(([n]) => n);
+      expect(over, `skill ${skill}`).toEqual([]);
+    }
+  });
 });

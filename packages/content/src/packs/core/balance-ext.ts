@@ -28,6 +28,8 @@ export function withOverrides<T extends object>(
  * the documented values, so a parameter added to balance.json later wins automatically.
  */
 export const BALANCE_EXT = {
+  /** Engine limits against rules and modifiers of packs (see `balanceParamsSchema`). */
+  engine: { packEventsPerHour: 3600, minActionMs: 1000, modMin: 0.01, modMax: 100 },
   /** While a student, XP gained at a skill level at or above this is slowed. */
   academyCap: 10,
   /** Multiplier applied to that XP. */

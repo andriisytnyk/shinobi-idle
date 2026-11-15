@@ -1,4 +1,4 @@
-import { NATURE_IDS, type ContentDb } from '@shinobi/content';
+import type { ContentDb } from '@shinobi/content';
 import { removeItem } from './bank.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
@@ -8,8 +8,8 @@ import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 
 /** The skills a tonic's `skill` field covers. */
-function coveredSkills(skill: string): readonly string[] {
-  return skill === 'allNatures' ? NATURE_IDS : [skill];
+function coveredSkills(skill: string, content: ContentDb): readonly string[] {
+  return skill === 'allNatures' ? indexOf(content).natureIds : [skill];
 }
 
 /**
@@ -22,7 +22,7 @@ export const tonicProvider: ModifierProvider = (state, content) => {
   for (const [id, buff] of Object.entries(state.buffs)) {
     const fx = items.get(id)?.fx;
     if (fx?.kind !== 'tonic' || buff.charges < 1) continue;
-    for (const skill of coveredSkills(buff.skill)) {
+    for (const skill of coveredSkills(buff.skill, content)) {
       out.push({
         key: `xp.skill.${skill}`,
         op: 'add',
@@ -36,9 +36,9 @@ export const tonicProvider: ModifierProvider = (state, content) => {
 };
 
 /** Takes one charge from every tonic that covers `skill`; a tonic with none left is removed. */
-export function spendTonicCharges(state: GameState, skill: string): void {
+export function spendTonicCharges(state: GameState, skill: string, content: ContentDb): void {
   for (const [id, buff] of Object.entries(state.buffs)) {
-    if (!coveredSkills(buff.skill).includes(skill)) continue;
+    if (!coveredSkills(buff.skill, content).includes(skill)) continue;
     buff.charges -= 1;
     if (buff.charges < 1) delete state.buffs[id];
   }

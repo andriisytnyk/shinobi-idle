@@ -2,9 +2,12 @@
   <div class="ui-page" data-page="core:entity.technique" data-ui="page">
     <article class="technique" data-entity="technique:core:great_fireball" data-technique="core:great_fireball" data-ui="entity-page">
       <header class="scroll" data-ui="entity-header">
-        <span class="icon">
-          <svg aria-hidden="true" class="icon" height="40" style="color: var(--nature-katon);" viewBox="0 0 512 512" width="40">
+        <span class="emblem lg" data-emblem-icon="fireball" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--nature-katon, var(--steel));">
+          <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
             <path d="#4415-1puwv3d" fill="currentColor">
+          <span class="rank">
+            <span aria-label="Ранг техніки C" class="stamp xs" role="img" style="--stamp: var(--rank-c);">
+              C
         <div class="title">
           <p class="kind">
             Техніка ·
@@ -12,8 +15,6 @@
               Катон
           <h1>
             Техніка великої вогняної кулі
-        <span aria-label="Ранг техніки C" class="stamp" role="img" style="--stamp: var(--rank-c);">
-          C
       <dl class="facts">
         <div>
           <dt>
@@ -47,43 +48,44 @@
       <section data-ui="entity-section">
         <h2>
           Печатки
-        <ol class="strip">
-          <li class="seal">
-            <span class="glyph" lang="ja">
-              巳
-            <span class="name">
-              <a class="entity-link" href="#/seal/core:snake">
-                Змія
-          <li class="seal">
-            <span class="glyph" lang="ja">
-              未
-            <span class="name">
-              <a class="entity-link" href="#/seal/core:ram">
-                Баран
-          <li class="seal">
-            <span class="glyph" lang="ja">
-              申
-            <span class="name">
-              <a class="entity-link" href="#/seal/core:monkey">
-                Мавпа
-          <li class="seal">
-            <span class="glyph" lang="ja">
-              亥
-            <span class="name">
-              <a class="entity-link" href="#/seal/core:boar">
-                Кабан
-          <li class="seal">
-            <span class="glyph" lang="ja">
-              午
-            <span class="name">
-              <a class="entity-link" href="#/seal/core:horse">
-                Кінь
-          <li class="seal">
-            <span class="glyph" lang="ja">
-              寅
-            <span class="name">
-              <a class="entity-link" href="#/seal/core:tiger">
-                Тигр
+        <div class="live" data-fraction="0.000" data-mode="still" data-seal-strip="" style="--tp: 0;">
+          <ol aria-label="Печатки" class="strip">
+            <li class="seal" data-seal-index="0" style="--_k: 1000;">
+              <span class="glyph" lang="ja">
+                巳
+              <span class="name">
+                <a class="entity-link" href="#/seal/core:snake">
+                  Змія
+            <li class="seal" data-seal-index="1" style="--_k: 1000;">
+              <span class="glyph" lang="ja">
+                未
+              <span class="name">
+                <a class="entity-link" href="#/seal/core:ram">
+                  Баран
+            <li class="seal" data-seal-index="2" style="--_k: 1000;">
+              <span class="glyph" lang="ja">
+                申
+              <span class="name">
+                <a class="entity-link" href="#/seal/core:monkey">
+                  Мавпа
+            <li class="seal" data-seal-index="3" style="--_k: 1000;">
+              <span class="glyph" lang="ja">
+                亥
+              <span class="name">
+                <a class="entity-link" href="#/seal/core:boar">
+                  Кабан
+            <li class="seal" data-seal-index="4" style="--_k: 1000;">
+              <span class="glyph" lang="ja">
+                午
+              <span class="name">
+                <a class="entity-link" href="#/seal/core:horse">
+                  Кінь
+            <li class="seal" data-seal-index="5" style="--_k: 1000;">
+              <span class="glyph" lang="ja">
+                寅
+              <span class="name">
+                <a class="entity-link" href="#/seal/core:tiger">
+                  Тигр
       <section data-ui="entity-section">
         <h2>
           Звідки береться
@@ -128,16 +130,44 @@
           Тренування й Майстерність
         <ul class="tile-host">
           <li class="tile locked" data-action="core:great_fireball" data-entity="technique:core:great_fireball" data-ui="action-tile">
-            <div class="head">
-              <h3 class="name">
-                <a class="entity-link" href="#/technique/core:great_fireball">
-                  Техніка великої вогняної кулі
-              <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                  <circle class="track" cx="22" cy="22" r="18">
-                  <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                <span class="level">
-                  1
+            <div class="top">
+              <span class="emblem md" data-emblem-icon="fireball" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--nature-katon, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#4415-1puwv3d" fill="currentColor">
+                <span class="rank">
+                  <span aria-label="Ранг техніки C" class="stamp xs" role="img" style="--stamp: var(--rank-c);">
+                    C
+              <div class="main">
+                <div class="head">
+                  <h3 class="name">
+                    <a class="entity-link" href="#/technique/core:great_fireball">
+                      Техніка великої вогняної кулі
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+                <div class="live compact" data-fraction="0.000" data-mode="still" data-seal-strip="" style="--tp: 0;">
+                  <ol aria-label="Печатки" class="strip">
+                    <li class="seal" data-seal-index="0" style="--_k: 1000;" title="Змія">
+                      <span class="glyph" lang="ja">
+                        巳
+                    <li class="seal" data-seal-index="1" style="--_k: 1000;" title="Баран">
+                      <span class="glyph" lang="ja">
+                        未
+                    <li class="seal" data-seal-index="2" style="--_k: 1000;" title="Мавпа">
+                      <span class="glyph" lang="ja">
+                        申
+                    <li class="seal" data-seal-index="3" style="--_k: 1000;" title="Кабан">
+                      <span class="glyph" lang="ja">
+                        亥
+                    <li class="seal" data-seal-index="4" style="--_k: 1000;" title="Кінь">
+                      <span class="glyph" lang="ja">
+                        午
+                    <li class="seal" data-seal-index="5" style="--_k: 1000;" title="Тигр">
+                      <span class="glyph" lang="ja">
+                        寅
             <dl class="facts">
               <div>
                 <dt>

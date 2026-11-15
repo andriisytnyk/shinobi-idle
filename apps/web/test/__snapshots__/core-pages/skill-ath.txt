@@ -54,6 +54,9 @@
             <ul class="options">
               <li class="option" data-obstacle="core:strybky_po_dakhakh">
                 <p class="name">
+                  <span class="emblem sm" data-emblem-icon="jump-across" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#945-1swkgw1" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:strybky_po_dakhakh">
                     Стрибки по дахах
                 <p class="bonus">
@@ -70,6 +73,9 @@
                   Збудувати
               <li class="option" data-obstacle="core:bih_navkolo_sela">
                 <p class="name">
+                  <span class="emblem sm" data-emblem-icon="sprint" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#401-ttijlg" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:bih_navkolo_sela">
                     Біг навколо села
                 <p class="bonus">
@@ -92,6 +98,9 @@
             <ul class="options">
               <li class="option" data-obstacle="core:obtiazhuvachi">
                 <p class="name">
+                  <span class="emblem sm" data-emblem-icon="weight" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#959-1owm4r9" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:obtiazhuvachi">
                     Обтяжувачі
                 <p class="bonus">
@@ -131,6 +140,9 @@
                   Збудувати
               <li class="option" data-obstacle="core:vidzhymannia_na_paltsiakh">
                 <p class="name">
+                  <span class="emblem sm" data-emblem-icon="muscle-up" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#917-1lnknq0" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:vidzhymannia_na_paltsiakh">
                     Віджимання на пальцях
                 <p class="bonus">
@@ -176,6 +188,9 @@
             <ul class="options">
               <li class="option" data-obstacle="core:koloda_nad_prirvoiu">
                 <p class="name">
+                  <span class="emblem sm" data-emblem-icon="cliff-crossing" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#416-wwolv0" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:koloda_nad_prirvoiu">
                     Колода над прірвою
                 <p class="bonus">
@@ -215,6 +230,9 @@
                   Збудувати
               <li class="option" data-obstacle="core:ukhylennia_vid_kunaiv">
                 <p class="name">
+                  <span class="emblem sm" data-emblem-icon="dodge" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#198-2btmks" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:ukhylennia_vid_kunaiv">
                     Ухилення від кунаїв
                 <p class="bonus">
@@ -260,6 +278,9 @@
             <ul class="options">
               <li class="option" data-obstacle="core:bih_po_derevakh">
                 <p class="name">
+                  <span class="emblem sm" data-emblem-icon="tree-branch" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#1634-nfcbh9" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:bih_po_derevakh">
                     Біг по деревах
                 <p class="bonus">
@@ -313,6 +334,9 @@
                   Збудувати
               <li class="option" data-obstacle="core:lazinnia_po_skeli">
                 <p class="name">
+                  <span class="emblem sm" data-emblem-icon="mountaintop" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#710-jbb9n8" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:lazinnia_po_skeli">
                     Лазіння по скелі
                 <p class="bonus">
@@ -358,6 +382,9 @@
             <ul class="options">
               <li class="option" data-obstacle="core:perehony_z_supernykom">
                 <p class="name">
+                  <span class="emblem sm" data-emblem-icon="duel" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#595-77s7ic" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:perehony_z_supernykom">
                     Перегони з суперником
                 <p class="bonus">
@@ -397,6 +424,9 @@
                   Збудувати
               <li class="option" data-obstacle="core:strybky_cherez_stovpy">
                 <p class="name">
+                  <span class="emblem sm" data-emblem-icon="ancient-columns" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#179-1stpbnq" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:strybky_cherez_stovpy">
                     Стрибки через стовпи
                 <p class="bonus">
@@ -442,6 +472,9 @@
             <ul class="options">
               <li class="option" data-obstacle="core:bih_po_vodi">
                 <p class="name">
+                  <span class="emblem sm" data-emblem-icon="splashy-stream" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#1271-4rwhzz" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:bih_po_vodi">
                     Біг по воді
                 <p class="bonus">
@@ -495,6 +528,9 @@
                   Збудувати
               <li class="option" data-obstacle="core:plavannia_proty_techii">
                 <p class="name">
+                  <span class="emblem sm" data-emblem-icon="swimfins" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#4396-1xcybq6" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:plavannia_proty_techii">
                     Плавання проти течії
                 <p class="bonus">
