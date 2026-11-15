@@ -593,11 +593,11 @@
       "hintOptions": 3,
       "sessionMinutes": 120,
       "sessionHours": {
-        "zone": 8,
+        "zone": 6,
         "boss": 30,
         "operation": 30
       },
-      "minSessions": 4,
+      "minSessions": 3,
       "agree": 0.05,
       "stopFresh": 0.03,
       "batch": {
