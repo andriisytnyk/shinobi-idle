@@ -5,6 +5,7 @@ import {
   craftBonusChance,
   craftTier,
   regrowMs,
+  shopEntries,
   type GameState,
   type Req,
   type ReqResult,
@@ -30,7 +31,7 @@ export function itemSource(id: string, content: ContentDb): ItemSource {
       labelKey: 'craft.src.herb',
     };
   }
-  if (content.shop.some((s) => s.item === id)) {
+  if (shopEntries(content).some((s) => s.item === id)) {
     return { kind: 'shop', href: '#/shop', labelKey: 'craft.src.shop' };
   }
   const recipe = content.recipes.find((r) => r.output.item === id);
@@ -50,7 +51,7 @@ export function itemSource(id: string, content: ContentDb): ItemSource {
  */
 export function itemPlace(id: string, content: ContentDb): string | null {
   if (content.herbs.some((h) => h.id === id)) return hrefFor({ kind: 'skill', id: 'herb' });
-  if (content.shop.some((s) => s.item === id)) return '#/shop';
+  if (shopEntries(content).some((s) => s.item === id)) return '#/shop';
   const recipe = content.recipes.find((r) => r.output.item === id);
   return recipe ? hrefFor({ kind: 'skill', id: recipe.skill }) : null;
 }
@@ -112,6 +113,7 @@ export function bankTab(item: Item): Exclude<BankTab, 'all'> {
 export type Block =
   | { kind: 'level'; n: number }
   | { kind: 'rank'; rank: string }
+  | { kind: 'building'; id: string; n: number }
   | { kind: 'locked' }
   | { kind: 'missing' };
 
@@ -131,6 +133,10 @@ export function blockOf(req: ReqResult | null): Block | null {
   if (rank && rank.req.t === 'rank') return { kind: 'rank', rank: rank.req.rank };
   const level = leaves.find((l) => l.req.t === 'skill');
   if (level && level.req.t === 'skill') return { kind: 'level', n: level.req.level };
+  const building = leaves.find((l) => l.req.t === 'building');
+  if (building && building.req.t === 'building') {
+    return { kind: 'building', id: building.req.id, n: building.req.level };
+  }
   const other = leaves.find((l) => l.req.t !== 'item');
   if (other) return { kind: 'locked' };
   return { kind: 'missing' };

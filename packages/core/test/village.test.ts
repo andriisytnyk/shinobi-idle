@@ -210,7 +210,7 @@ describe('A3: building', () => {
     refused(r, { type: 'village.build', building: id('grounds') }, 'error.notEnoughShinobi');
     v(r).shinobi.dilianky = 30;
     v(r).shinobi.kladka = 30;
-    const snapshot = structuredClone(v(r));
+    const snapshot = { ...structuredClone(v(r)), stage: 2 as const };
     ok(r, { type: 'village.build', building: id('grounds') });
     expect(v(r).shinobi.dilianky).toBe(0);
     expect(v(r).shinobi.kladka).toBe(0);
@@ -411,6 +411,33 @@ describe('A7: deposits', () => {
   });
 });
 
+describe('review fixes', () => {
+  it('lets a deposit raise a built producer only: an unbuilt one stays idle', () => {
+    const s = genin();
+    s.flags['deposit.core:hunt'] = 1;
+    advance(s, TICK, content);
+    expect(v(s).res.food).toBe(K.prod);
+    withBuildings(s, { 'core:hunt': 1 });
+    advance(s, TICK, content);
+    expect(v(s).res.food).toBe(K.prod + K.prod + 2 * K.prod);
+  });
+
+  it('applies the Market discount to the stack total, so cheap goods get it too', () => {
+    const s = withBuildings(genin(), { 'core:market': 5 });
+    s.currencies.ryo = 1000;
+    ok(s, { type: 'shop.buy', item: 'core:water', n: 100 });
+    // 100 water at 1 ryo and -10%: 90, not 100.
+    expect(s.currencies.ryo).toBe(1000 - 90);
+  });
+
+  it('does not create a village for a command that is refused', () => {
+    const s = createState(1, content);
+    s.player.rank = 'genin';
+    refused(s, { type: 'village.cancel' }, 'error.noVillage');
+    expect(s.village).toBeNull();
+  });
+});
+
 describe('A8: shinobi resources', () => {
   it('respects caps, workforce charges and Shinobi Power', () => {
     const s = genin();
@@ -444,11 +471,17 @@ describe('A8: shinobi resources', () => {
 
 describe('A9: pace report', () => {
   type Group = string[];
+  interface Played {
+    report: string[];
+    library3: number;
+    library5: number;
+    firstFive: number;
+  }
   const slugs = (list: string[]): Group => list.map(id);
   const PRODUCERS = slugs(['sawmill', 'mine', 'farms', 'hunt']);
 
   /** Plays 12 game hours with `dispatch` and `advance` only: always the cheapest affordable upgrade of the first group that has one. The variant lifts Reputation to the stage-2 threshold at hour 4 and donates 300 ryo an hour from hour 2; otherwise nothing is donated. */
-  function play(groups: Group[], variant = false): string[] {
+  function play(groups: Group[], variant = false): Played {
     const s = genin();
     const when: Record<string, number> = {};
     const policy = (): void => {
@@ -488,11 +521,22 @@ describe('A9: pace report', () => {
         );
       }
     }
-    const fives = Object.entries(when).filter(([k]) => k.endsWith(':5'));
+    const fives = Object.entries(when)
+      .filter(([k]) => k.endsWith(':5'))
+      .map(([, h]) => h);
+    const library3 = when['core:library:3'] ?? Infinity;
+    const library5 = when['core:library:5'] ?? Infinity;
+    const firstFive = fives.length ? Math.min(...fives) : Infinity;
     report.push(
-      `  library 3 at ${when['core:library:3'] ?? 'never'}h; library 5 at ${when['core:library:5'] ?? 'never'}h; first level-5 building at ${fives.length ? Math.min(...fives.map(([, h]) => h)) : 'never'}h`,
+      '  library 3 at ' +
+        library3 +
+        'h; library 5 at ' +
+        library5 +
+        'h; first level-5 building at ' +
+        firstFive +
+        'h',
     );
-    return report;
+    return { report, library3, library5, firstFive };
   }
 
   it('prints levels and resources after 2, 4, 8 and 12 hours for two builder policies', () => {
@@ -537,16 +581,24 @@ describe('A9: pace report', () => {
     console.log(
       [
         'Policy as specified (producers first):',
-        ...spec,
+        ...spec.report,
         'Variant (Reputation at 4 h, 300 ryo donated per hour from 2 h):',
-        ...variant,
+        ...variant.report,
         'Library first, no donations:',
-        ...libraryFirst,
+        ...libraryFirst.report,
         'Library first with the variant (Reputation at 4 h, donations):',
-        ...libraryFirstVariant,
+        ...libraryFirstVariant.report,
       ].join('\n'),
     );
-    expect(spec.length).toBe(5);
+    // Library 3 by hour 4 with the Library first or with the variant; the first level-5 building
+    // between hours 6 and 12 in the variant; Library 5 by hour 12 with the Library first and the variant.
+    expect(libraryFirst.library3).toBeLessThanOrEqual(4);
+    expect(variant.library3).toBeLessThanOrEqual(4);
+    expect(variant.firstFive).toBeGreaterThanOrEqual(6);
+    expect(variant.firstFive).toBeLessThanOrEqual(12);
+    expect(libraryFirstVariant.library5).toBeLessThanOrEqual(12);
+    // Without Reputation nothing passes the stage-1 cap of level 3.
+    expect(spec.firstFive).toBe(Infinity);
   });
 });
 

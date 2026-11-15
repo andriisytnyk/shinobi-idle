@@ -400,7 +400,8 @@ describe('the quantity field', () => {
       ?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
     flushSync();
     expect(game.state.bank[OIL]).toBe(17);
-    expect(game.state.currencies.ryo).toBe(100 - 17 * 4);
+    // The Market's 2% comes off the whole stack: 68 ryo become 67.
+    expect(game.state.currencies.ryo).toBe(100 - Math.round(17 * 4 * 0.98));
   });
 
   it('arrow keys step the amount', () => {

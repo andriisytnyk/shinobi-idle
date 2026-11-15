@@ -54,12 +54,12 @@ export function depositsOf(state: GameState, buildingId: string): number {
   return typeof found === 'number' ? found : 0;
 }
 
-/** A producer works as if it were one level higher for each deposit found for it. */
+/** A built producer works as if it were one level higher for each deposit found for it; an unbuilt one does not work at all. */
 export function effectiveLevel(state: GameState, building: Building): number {
   const village = state.village;
   if (!village) return 0;
   const level = levelOf(village, building.id);
-  return building.produces.length > 0 ? level + depositsOf(state, building.id) : level;
+  return building.produces.length > 0 && level > 0 ? level + depositsOf(state, building.id) : level;
 }
 
 /** Highest level a building can reach: the last row of the cost table only for buildings that name level-6 resources. */
@@ -68,9 +68,15 @@ export function maxBuildingLevel(building: Building, content: ContentDb): number
   return building.tier6 ? rows : rows - 1;
 }
 
+/** The stage now: stage 2 as soon as Reputation reaches the threshold, even before the next village sync. */
+export function currentStage(state: GameState, content: ContentDb): 1 | 2 {
+  const stage = state.village?.stage ?? 1;
+  return stage === 2 || state.currencies.rep >= content.balance.K.rep.stage2 ? 2 : 1;
+}
+
 /** Highest building level the stage allows. */
-export function stageCap(village: VillageState, content: ContentDb): number {
-  return content.balance.K.towerStageMax[village.stage - 1] ?? 0;
+export function stageCap(state: GameState, content: ContentDb): number {
+  return content.balance.K.towerStageMax[currentStage(state, content) - 1] ?? 0;
 }
 
 /** What building `level` costs: civil resources, treasury ryo and, for the last level, the shinobi resources. */
@@ -185,7 +191,7 @@ export function buildCheck(
       reason: level >= top && !building.tier6 ? 'error.noLevelSix' : 'error.maxLevel',
     };
   }
-  if (level > stageCap(village, content)) {
+  if (level > stageCap(state, content)) {
     return { ok: false, reason: level >= top ? 'error.stageNotReached' : 'error.stageCap' };
   }
   const cost = villageBuildCost(building, level, content);

@@ -436,7 +436,8 @@ describe('A8: shops', () => {
     const s = genin();
     s.currencies.ryo = 500;
     ok(s, { type: 'shop.buy', item: 'core:rice', n: 10 });
-    expect(s.currencies.ryo).toBe(500 - 10 * (K.goods.rice ?? 0));
+    // The Market's 2% comes off the whole stack: 30 ryo of rice cost 29.
+    expect(s.currencies.ryo).toBe(500 - Math.round(10 * (K.goods.rice ?? 0) * 0.98));
     expect(s.bank['core:rice']).toBe(10);
     withBuildings(s, { 'core:forge': 2 });
     ok(s, { type: 'shop.buy', item: 'core:senbon', n: 15 });

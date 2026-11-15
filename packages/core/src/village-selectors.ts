@@ -6,6 +6,7 @@ import {
   buildCheck,
   villageBuildCost,
   civilCap,
+  currentStage,
   depositsOf,
   effectiveLevel,
   maxBuildingLevel,
@@ -119,7 +120,7 @@ export function buildingUnlocks(
 }
 
 /** The modifiers of one building at `level`. */
-function effectsAt(building: Building, level: number): BuildingEffect[] {
+export function buildingEffectsAt(building: Building, level: number): BuildingEffect[] {
   if (level < 1) return [];
   return building.effects.map((e) => ({ key: e.key, op: e.op, value: e.value * level }));
 }
@@ -145,9 +146,9 @@ export function villageBuildings(state: GameState, content: ContentDb): Building
       needs.push({
         kind: 'stage',
         id: null,
-        current: stageCap(village, content),
+        current: stageCap(state, content),
         target: next,
-        met: stageCap(village, content) >= next,
+        met: stageCap(state, content) >= next,
       });
       for (const [id, n] of Object.entries(cost.res)) {
         const have = village.res[id] ?? 0;
@@ -180,8 +181,8 @@ export function villageBuildings(state: GameState, content: ContentDb): Building
       cost,
       needs,
       build: check.ok ? { ok: true } : { ok: false, reason: check.reason },
-      effectsNow: effectsAt(b, level),
-      effectsNext: next === null ? [] : effectsAt(b, next),
+      effectsNow: buildingEffectsAt(b, level),
+      effectsNext: next === null ? [] : buildingEffectsAt(b, next),
       perTick,
       unlocks: buildingUnlocks(state, b.id, content),
       building: village?.job?.building === b.id,
@@ -288,11 +289,11 @@ export interface StageInfo {
 
 export function villageStage(state: GameState, content: ContentDb): StageInfo {
   const village = state.village;
-  const stage = village?.stage ?? 1;
+  const stage = currentStage(state, content);
   const needed = content.balance.K.rep.stage2;
   return {
     stage,
-    levelCap: village ? stageCap(village, content) : (content.balance.K.towerStageMax[0] ?? 0),
+    levelCap: village ? stageCap(state, content) : (content.balance.K.towerStageMax[0] ?? 0),
     rep: state.currencies.rep,
     repNeeded: needed,
     reached: stage >= 2,

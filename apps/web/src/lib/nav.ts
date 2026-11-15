@@ -50,6 +50,14 @@ export const NAV: readonly NavItem[] = [
     tab: false,
     side: true,
   },
+  {
+    id: 'village',
+    href: '#/village',
+    label: 'nav.village',
+    icon: 'lucide:landmark',
+    tab: false,
+    side: true,
+  },
   { id: 'rank', href: '#/rank', label: 'nav.rank', icon: 'rank-3', tab: false, side: true },
   {
     id: 'help',
@@ -70,7 +78,7 @@ export const NAV: readonly NavItem[] = [
 ];
 
 /** Nav items that have no tab of their own on a phone: they are reached from «Ще» and keep that tab lit. */
-export const MORE_PAGES: readonly string[] = ['help', 'rank', 'shop', 'bank'];
+export const MORE_PAGES: readonly string[] = ['help', 'rank', 'shop', 'bank', 'village'];
 
 /** Order of the phone tabs. */
 export const TAB_ORDER: readonly string[] = ['skills', 'world', 'combat', 'quests', 'more'];
@@ -107,6 +115,7 @@ export function activeNav(route: Route): string | null {
       if (route.ref.kind === 'exam') return 'rank';
       if (route.ref.kind === 'recipe') return 'skills';
       if (route.ref.kind === 'gear') return 'shop';
+      if (route.ref.kind === 'building') return 'village';
       if (['cell', 'region', 'poi'].includes(route.ref.kind)) return 'world';
       return null;
     default:

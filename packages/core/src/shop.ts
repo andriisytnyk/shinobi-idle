@@ -23,18 +23,30 @@ export function buyPrice(itemId: string, content: ContentDb): number | null {
   return key === undefined ? null : (content.balance.K.goods[key] ?? null);
 }
 
-/** What one unit costs the player now: the base price with the shop-price modifiers (the Market) applied, at least 1. */
-export function shopPrice(
+/**
+ * What n units cost the player now: the base price times n with the shop-price modifiers (the
+ * Market) applied to the whole stack, so a small discount is not lost to rounding on a cheap good; at least 1.
+ */
+export function shopTotal(
   state: GameState,
   itemId: string,
+  n: number,
   content: ContentDb,
   rules: Rules = defaultRules,
 ): number | null {
   const base = buyPrice(itemId, content);
   if (base === null) return null;
   const mod = computeMod(rules.modifierProviders, state, 'shop.price', content).total;
-  return Math.max(1, Math.round(base * mod));
+  return Math.max(1, Math.round(base * n * mod));
 }
+
+/** What one unit costs the player now (the total of a stack of one). */
+export const shopPrice = (
+  state: GameState,
+  itemId: string,
+  content: ContentDb,
+  rules: Rules = defaultRules,
+): number | null => shopTotal(state, itemId, 1, content, rules);
 
 /** What one unit of an item is worth for the sell formula: a herb by its level, a good by its price, else nothing. */
 function unitValue(itemId: string, content: ContentDb): number {
@@ -71,12 +83,11 @@ export function shopBuy(
 ): CommandResult {
   if (!isCount(n)) return { ok: false, reason: 'error.invalidAmount' };
   const entry = indexOf(content).shop.get(itemId);
-  const price = shopPrice(state, itemId, content, rules);
-  if (!entry || price === null) return { ok: false, reason: 'error.notForSale' };
+  const total = shopTotal(state, itemId, n, content, rules);
+  if (!entry || total === null) return { ok: false, reason: 'error.notForSale' };
   if (!evalReq(state, entry.req, content).met) {
     return { ok: false, reason: 'error.requirementsNotMet' };
   }
-  const total = price * n;
   if (!Number.isSafeInteger(total) || !removeCurrency(state, 'ryo', total)) {
     return { ok: false, reason: 'error.notEnoughRyo' };
   }

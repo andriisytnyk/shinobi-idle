@@ -25,13 +25,7 @@ import { evalReq, RANK_ORDER } from './requirements.ts';
 import { defaultRules, type Rules } from './rules.ts';
 import { isSkillUnlocked } from './selectors.ts';
 import type { GameState } from './state.ts';
-import {
-  cancelBuild,
-  donateToTreasury,
-  spendWorkforce,
-  startBuild,
-  syncVillage,
-} from './village.ts';
+import { cancelBuild, donateToTreasury, spendWorkforce, startBuild } from './village.ts';
 import { claimPoi, travelInstant, WALK_KIND } from './world.ts';
 
 /** A player or bot command. Concrete command types arrive with the stages that need them. */
@@ -203,8 +197,6 @@ export function dispatch(
   content: ContentDb,
   rules: Rules = defaultRules,
 ): CommandResult {
-  // A Genin whose rank was set from outside still gets the village before any command reads it.
-  syncVillage(state, content);
   const result = apply(state, command, content, rules);
   if (result.ok) updateQuests(state, content);
   return result;

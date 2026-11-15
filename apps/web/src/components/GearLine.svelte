@@ -7,6 +7,7 @@
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import { toasts } from '../lib/toasts.svelte.ts';
+  import BuildingNeed from './BuildingNeed.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ReqTree from './ReqTree.svelte';
@@ -73,7 +74,12 @@
         {t('shop.buy')}
       </button>
       {#if block}
-        <p class="ct-why" id="why-gear-{line.id}" data-why={block.kind}>{blockText(block)}</p>
+        <p class="ct-why" id="why-gear-{line.id}" data-why={block.kind}>
+          {#if block.kind === 'building'}<BuildingNeed
+              id={block.id}
+              level={block.n}
+            />{:else}{blockText(block)}{/if}
+        </p>
       {:else if poor}
         <p class="ct-why" id="why-gear-{line.id}" data-why="ryo">
           {t('shop.reason.ryo', { need: formatInt(view.price), have: formatInt(view.ryo) })}
