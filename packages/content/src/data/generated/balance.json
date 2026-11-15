@@ -451,7 +451,7 @@
       "mission": 0.15
     },
     "tickMin": 5,
-    "prod": 10,
+    "prod": 20,
     "costBase": 20,
     "costMult": [
       1,
