@@ -12,7 +12,7 @@ export interface ResolvedIcon {
 /** Prefix that selects the Lucide (general UI) namespace; bare names are game-icons. */
 export const UI_PREFIX = 'lucide:';
 
-const FALLBACK = 'circle-help';
+const FALLBACK = 'circle-dot';
 
 /** The icon of an entity or a raw icon name; unknown input yields the fallback glyph, never a hole. */
 export function resolveIcon(input: IconRef | string): ResolvedIcon {

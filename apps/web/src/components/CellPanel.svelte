@@ -11,6 +11,7 @@
   import { formatDuration, formatInt, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
+  import { currencyName, moneyOf, skillByActivity } from '../lib/vocab.ts';
   import { keyIcon, keyNameKey, uniqueReq } from '../lib/world.ts';
   import { IDLE_TIMING, slotTiming } from '../lib/timing.ts';
   import PoiRow from './PoiRow.svelte';
@@ -30,6 +31,8 @@
 
   let { id, onClose }: Props = $props();
 
+  /** The skill that explores: the one whose activity is the map. */
+  const scoutSkill = skillByActivity(content, 'map') ?? '';
   const cell = $derived(content.cells.find((c) => c.id === id));
   const info = $derived(game.read((gs): CellInfo | null => cellInfo(gs, id, content, game.rules)));
 
@@ -173,7 +176,7 @@
             <dt>{t('world.panel.xp')}</dt>
             <dd>
               <ModBreakdown
-                keys={['xp.all', 'xp.skill.scout']}
+                keys={['xp.all', `xp.skill.${scoutSkill}`]}
                 display={t('tile.xphValue', { n: formatXp(info.xpPerHour) })}
               />
             </dd>
@@ -238,7 +241,10 @@
             {t('world.travel.instantShort')} ·
             {travel.cost === 0
               ? t('world.travel.free')
-              : t('world.travel.cost', { n: formatInt(travel.cost) })}
+              : t('world.travel.cost', {
+                  n: formatInt(travel.cost),
+                  currency: currencyName(moneyOf(content)),
+                })}
           </button>
           {#if busy.walk >= 0}
             <button

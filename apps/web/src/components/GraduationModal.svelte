@@ -2,6 +2,8 @@
   import { examFor } from '@shinobi/core';
   import { webRef } from '../lib/entities.ts';
   import { t } from '../lib/i18n.ts';
+  import { isAcademyRank } from '@shinobi/core';
+  import { rankEntries } from '../lib/rank-ladder.ts';
   import { rankName } from '../lib/vocab.ts';
   import { navigate } from '../lib/router.svelte.ts';
   import { game } from '../lib/store.ts';
@@ -19,13 +21,20 @@
   /** The rank the player has just reached and the exam that led to it. */
   const reached = $derived(game.read((gs) => gs.player.rank));
   const exam = $derived(examFor(content, reached));
+  /** The rank before it: the Academy's graduation is told in the Academy's words, any other promotion in general ones. */
+  const previous = $derived(
+    content.playerRanks[content.playerRanks.findIndex((r) => r.id === reached) - 1]?.id ?? '',
+  );
+  const fromAcademy = $derived(isAcademyRank(content, previous));
+  /** What the new rank opens, from the data: skills and missions whose requirement names it. */
+  const opens = $derived(rankEntries(content, reached).find((e) => e.id === reached)?.opens ?? []);
   /** Skills that opened with the rank. */
   const unlocked = $derived(
     content.skills.filter((s) => s.unlockReq?.t === 'rank' && s.unlockReq.rank === reached),
   );
   const goal = $derived(game.read((gs) => webRef(gs.goal)));
   /** The chakra paper test is the first thing a new genin does: until a nature is chosen the screen is offered. */
-  const needsTest = $derived(game.read((gs) => gs.player.natures.length === 0));
+  const needsTest = $derived(fromAcademy && game.read((gs) => gs.player.natures.length === 0));
   const reward = $derived(exam?.rewards.items ?? []);
 
   function toNature(): void {
@@ -39,7 +48,7 @@
   }
 </script>
 
-<Modal title={t('graduation.title')} {onClose}>
+<Modal title={t(fromAcademy ? 'graduation.title' : 'graduation.promoted.title')} {onClose}>
   <!-- A link inside the dialog leaves the page, so the dialog closes with it. -->
   <div
     data-graduation
@@ -48,7 +57,7 @@
       if (e.target instanceof Element && e.target.closest('a')) onClose();
     }}
   >
-    <p>{t('graduation.body')}</p>
+    <p>{t(fromAcademy ? 'graduation.body' : 'graduation.promoted.body')}</p>
 
     <h3>{t('graduation.rank')}</h3>
     <p class="rank">{rankName(reached)}</p>
@@ -60,7 +69,14 @@
       </section>
     {/if}
 
-    {#if unlocked.length > 0}
+    {#if !fromAcademy && opens.length > 0}
+      <h3>{t('graduation.unlocked')}</h3>
+      <ul data-opens>
+        {#each opens as ref (ref.kind + ref.id)}
+          <li><EntityLink kind={ref.kind} id={ref.id} /></li>
+        {/each}
+      </ul>
+    {:else if unlocked.length > 0}
       <h3>{t('graduation.unlocked')}</h3>
       <ul>
         {#each unlocked as skill (skill.id)}

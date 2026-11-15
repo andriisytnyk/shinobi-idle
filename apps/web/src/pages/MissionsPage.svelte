@@ -6,8 +6,8 @@
   import MissionRankStamp from '../components/MissionRankStamp.svelte';
   import ReqTree from '../components/ReqTree.svelte';
   import Slot from '../lib/ext/Slot.svelte';
-  import { hasKey, t } from '../lib/i18n.ts';
-  import { missionRankName } from '../lib/vocab.ts';
+  import { t } from '../lib/i18n.ts';
+  import { missionRankDesc, missionRankName } from '../lib/vocab.ts';
   import { availableOf, followCommands, gatesOf, viewOf } from '../lib/mission-feed.svelte.ts';
   import {
     isMissionSort,
@@ -82,7 +82,7 @@
   {#each shown as group (group.rank)}
     {@const gate = gateOf(group.rank)}
     {@const open = gate?.open ?? true}
-    {@const descKey = `mission.rank.${group.rank}.desc`}
+    {@const rankDesc = missionRankDesc(group.rank)}
     <section class="group" data-rank={group.rank} data-open={open}>
       <header class="group-head">
         <MissionRankStamp rank={group.rank} />
@@ -90,7 +90,7 @@
           <h2>
             {missionRankName(group.rank)}
           </h2>
-          {#if hasKey(descKey)}<p class="ct-note">{t(descKey)}</p>{/if}
+          {#if rankDesc}<p class="ct-note">{rankDesc}</p>{/if}
         </div>
       </header>
       {#if !open && gate?.result}

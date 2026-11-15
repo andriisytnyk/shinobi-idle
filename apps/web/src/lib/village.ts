@@ -1,7 +1,7 @@
 import type { BuildingEffect, BuildingInfo } from '@shinobi/core';
 import { entityName } from './entities.ts';
 import { formatInt } from './format.ts';
-import { fallbackText, hasKey, t } from './i18n.ts';
+import { hasKey, t } from './i18n.ts';
 import { game } from './store.ts';
 
 /** The order the roles are listed in on the village page. */
@@ -10,7 +10,8 @@ export const ROLE_ORDER = ['producer', 'storage', 'shop', 'bonus', 'admin', 'def
 /** The icon of a resource: the one its data names (Shinobi Power and the unnamed ones share a generic one). */
 export const resourceIcon = (id: string): string =>
   game.content.resources.find((r) => r.id === id)?.icon ?? 'lucide:users';
-export const resourceName = (id: string): string => t(`resource.${id}.name`);
+import { currencyName, modifierName, moneyOf, resourceName } from './vocab.ts';
+export { resourceName };
 
 /** Village ticks in one hour. */
 export const ticksPerHour = (): number => 60 / game.content.balance.K.tickMin;
@@ -47,7 +48,7 @@ export function effectLines(effects: readonly BuildingEffect[]): string[] {
     const known = `village.fx.${l.family}`;
     // A modifier that no text names shows its readable name rather than nothing.
     if (!hasKey(known)) {
-      return t('village.fx.other', { key: fallbackText(`x.${l.key}`), value: l.value });
+      return t('village.fx.other', { key: modifierName(l.key), value: l.value });
     }
     return l.family === 'xp' || l.family === 'speed'
       ? t(known, { skills: l.skills.join(', '), value: l.value })
@@ -93,7 +94,11 @@ export function whyOff(
       return {
         reason,
         shinobi: null,
-        text: t('village.why.treasury', { have: formatInt(n.current), need: formatInt(n.target) }),
+        text: t('village.why.treasury', {
+          have: formatInt(n.current),
+          need: formatInt(n.target),
+          currency: currencyName(moneyOf(game.content)),
+        }),
       };
     }
   }

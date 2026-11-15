@@ -13,6 +13,7 @@
   import { formatInt, formatSeconds, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
+  import { currencyName, moneyOf } from '../lib/vocab.ts';
   import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import ActionEmblem from './ActionEmblem.svelte';
   import EntityLink from './EntityLink.svelte';
@@ -166,7 +167,10 @@
                 <p class="price">
                   {option.cost === 0
                     ? t('course.free')
-                    : t('course.price', { n: formatInt(option.cost) })}
+                    : t('course.price', {
+                        n: formatInt(option.cost),
+                        currency: currencyName(moneyOf(content)),
+                      })}
                 </p>
                 <button
                   type="button"

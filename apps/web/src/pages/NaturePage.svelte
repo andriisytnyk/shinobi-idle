@@ -5,7 +5,7 @@
   import Modal from '../components/Modal.svelte';
   import NatureCard from '../components/NatureCard.svelte';
   import NatureLink from '../components/NatureLink.svelte';
-  import { natureName } from '../lib/vocab.ts';
+  import { natureCharacter, natureName } from '../lib/vocab.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
@@ -185,7 +185,7 @@
   >
     <div data-result={done.nature}>
       <p class="chosen"><NatureLink id={done.nature} /></p>
-      <p>{t(`nature.character.${done.nature}`)}</p>
+      <p>{natureCharacter(done.nature) ?? ''}</p>
       <p>{t('nature.result.skill')} <NatureLink id={done.nature} /></p>
       {#if done.first && team}
         <h3>{t('nature.result.team')}</h3>

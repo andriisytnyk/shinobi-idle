@@ -9,7 +9,7 @@
   import { senseiTestInfo } from '../lib/exam-test.ts';
   import { rankEntries } from '../lib/rank-ladder.ts';
   import { t } from '../lib/i18n.ts';
-  import { asRank, nextExamRank, rankIndex, rankName } from '../lib/vocab.ts';
+  import { nextExamRank, rankIndex, rankName } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
 
@@ -19,13 +19,15 @@
   /** The exam to show: the next one the player has to take, else the last one they passed. */
   const exam = $derived.by(() => {
     const pending = nextExamRank(content, rank);
-    if (pending !== null) return examFor(content, asRank(pending));
+    if (pending !== null) return examFor(content, pending);
     const taken = content.exams.filter(
       (e) => rankIndex(content, e.rank) <= rankIndex(content, rank),
     );
     return taken.sort((a, b) => rankIndex(content, a.rank) - rankIndex(content, b.rank)).at(-1);
   });
   const passed = $derived(exam ? rankIndex(content, exam.rank) <= rankIndex(content, rank) : false);
+  /** Links shown at once in a rank's «Відкриває» list; the rest are behind «ще N». */
+  const OPENS_SHOWN = 5;
   const ladder = $derived(rankEntries(content, rank));
   const checklist = $derived(
     game.read((gs) => (exam ? evalReq(gs, exam.checklist, content) : null)),
@@ -113,11 +115,24 @@
           <span class="state">{t(`rank.state.${entry.state}`)}</span>
           {#if entry.exam}<span class="opens"><EntityLink kind="exam" id={entry.exam} /></span>{/if}
           {#if entry.opens.length > 0}
-            <span class="opens"
-              >{t('rank.opens')}
-              {#each entry.opens as ref, i (ref.kind + ref.id)}{#if i > 0},
-                {/if}<EntityLink kind={ref.kind} id={ref.id} />{/each}</span
-            >
+            <div class="opens" data-opens>
+              <span>{t('rank.opens')}</span>
+              <ul class="chips">
+                {#each entry.opens.slice(0, OPENS_SHOWN) as ref (ref.kind + ref.id)}
+                  <li><EntityLink kind={ref.kind} id={ref.id} /></li>
+                {/each}
+              </ul>
+              {#if entry.opens.length > OPENS_SHOWN}
+                <details class="more-opens">
+                  <summary>{t('rank.opensMore', { n: entry.opens.length - OPENS_SHOWN })}</summary>
+                  <ul class="chips">
+                    {#each entry.opens.slice(OPENS_SHOWN) as ref (ref.kind + ref.id)}
+                      <li><EntityLink kind={ref.kind} id={ref.id} /></li>
+                    {/each}
+                  </ul>
+                </details>
+              {/if}
+            </div>
           {/if}
         </li>
       {/each}
@@ -173,6 +188,27 @@
 
   .ladder li[data-state='current'] {
     border-color: var(--accent);
+  }
+
+  .chips {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ladder .opens {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-2);
+    flex-basis: 100%;
+  }
+
+  .more-opens summary {
+    cursor: pointer;
   }
 
   .ladder .name {

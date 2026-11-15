@@ -13,7 +13,7 @@
         Розвідка відкриває нові місця на мапі й допомагає в місіях.
       <p class="unlock">
         Генін.
-      <section class="scout" data-scout-panel="">
+      <section class="explore-panel" data-scout-panel="">
         <p class="intro">
           Розвідка відкриває мапу: чим вищий її рівень, тим глибше ти вивчаєш клітинки й тим більше регіонів стає тобі доступно.
         <dl class="facts">
@@ -77,7 +77,7 @@
           <p class="effect">
             −3% часу дослідження за тир
           <p class="next" data-next="">
-            Наступний рівень I: 300 рьо.
+            Наступний рівень I. Ціна — Рьо: 300.
           <div class="req">
             <div class="group" data-met="false">
               <ul class="rows">

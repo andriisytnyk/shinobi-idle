@@ -1,5 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
-import { graduateRank, moneyOf, type GameState, type Rank } from '@shinobi/core';
+import { moneyOf, rankIndex, type GameState } from '@shinobi/core';
 import { localeKey } from '@shinobi/content';
 import { humanId } from './entities.ts';
 import { hasKey, t, textOf } from './i18n.ts';
@@ -21,7 +21,31 @@ export const natureName = (id: string): string => textOf([`nature.${id}.name`, `
 
 /** The name of a mission rank: its own text, or its readable id. */
 export const missionRankName = (id: string): string =>
-  hasKey(`mission.rank.${id}.name`) ? t(`mission.rank.${id}.name`) : humanId(id);
+  textOf([`mission.rank.${id}.name`, `missionRank.${id}.name`], {}, humanId(id));
+
+/** The description of a mission rank, when its pack wrote one (a pack's key is `missionRank.<id>.desc`). */
+export const missionRankDesc = (id: string): string | null => {
+  const key = [`mission.rank.${id}.desc`, `missionRank.${id}.desc`].find(hasKey);
+  return key ? t(key) : null;
+};
+
+/** The text of `key`, or the readable id when no locale has it: a pack entity never shows a raw key. */
+const textOrId = (key: string, id: string): string => (hasKey(key) ? t(key) : humanId(id));
+
+/** The name of a village resource. */
+export const resourceName = (id: string): string => textOrId(`resource.${id}.name`, id);
+
+/** The name of a teammate. */
+export const teammateName = (id: string): string => textOrId(`teammate.${id}.name`, id);
+
+/** The name of an item kind (`ingredient`, a pack's own). */
+export const itemKindName = (id: string): string => textOrId(`item.kind.${id}`, id);
+
+/** The heading of a shop section: the building's slug, with the core's own words for the old ones. */
+export const shopSectionName = (id: string): string => textOrId(`shop.section.${id}`, id);
+
+/** The name of a modifier key a pack declares: `modifier.<key>` in its locale, else the readable key. */
+export const modifierName = (key: string): string => textOrId(`modifier.${key}`, key);
 
 /** The name of a skill group. */
 export const groupName = (id: string): string => t(localeKey('group', id, 'name'));
@@ -50,19 +74,6 @@ export const natureIconRef = (
 ): { kind: 'skill' | 'nature'; id: string } =>
   content.skills.some((s) => s.id === id) ? { kind: 'skill', id } : { kind: 'nature', id };
 
-/**
- * A rank id as the core types it. The core types ranks as a closed union while it is migrated to
- * open ids; the cast keeps this code valid under both the legacy and the truthful types.
- */
-export const asRank = (id: string): Rank => id as Rank;
-
-/** The ranks in order, as ids. */
-export const rankIds = (content: ContentDb): string[] => content.playerRanks.map((r) => r.id);
-
-/** Position of a rank in the list; -1 for one that is not in it. */
-export const rankIndex = (content: ContentDb, id: string): number =>
-  content.playerRanks.findIndex((r) => r.id === id);
-
 /** The rank after `id` that has an exam to take, or null when none is left. */
 export function nextExamRank(content: ContentDb, id: string): string | null {
   const from = rankIndex(content, id);
@@ -72,23 +83,31 @@ export function nextExamRank(content: ContentDb, id: string): string | null {
   return null;
 }
 
-/** The first rank: where a new player starts. */
-export const startRank = (content: ContentDb): string => content.playerRanks[0]?.id ?? '';
-
-/**
- * The rank a player reaches by the first promotion. Trainer techniques of mentors away from the
- * Academy, the pouch and the natures wait for it (the core rule: «not the starting rank»).
- */
-export const promotedRank = (content: ContentDb): string =>
-  graduateRank(content) ?? content.playerRanks[1]?.id ?? startRank(content);
-
 /** What the core says about the currency roles, natures and activities: the interface asks it. */
-export { activitySkill as skillByActivity, currencyOf, isNature, moneyOf } from '@shinobi/core';
+export {
+  activitySkill as skillByActivity,
+  currencyOf,
+  graduateRank,
+  isAcademyRank,
+  isNature,
+  moneyOf,
+  rankIndex,
+} from '@shinobi/core';
 
-/** The name of the money currency in running text (lower case): «рьо» in «У тебе 5 рьо». */
-export const moneyName = (content: ContentDb): string =>
-  currencyName(moneyOf(content)).toLowerCase();
+/** The name of the money currency, in the nominative: «Рьо» in «Рьо у тебе: 5». */
+export const moneyName = (content: ContentDb): string => currencyName(moneyOf(content));
 
 /** How much of a currency the player holds; a currency the save does not know holds none. */
 export const held = (state: GameState, id: string): number =>
   (state.currencies as Record<string, number | undefined>)[id] ?? 0;
+
+/**
+ * A short Ukrainian phrase for why a rule of a pack was switched off, for the reasons that are
+ * known; the technical text stays in the detail.
+ */
+export function ruleReasonText(reason: string): string {
+  if (/cannot read|undefined|is not a function|is not iterable|null/i.test(reason))
+    return t('settings.why.data');
+  if (/stack|stuck|loop|too many|timeout/i.test(reason)) return t('settings.why.stuck');
+  return t('settings.why.other');
+}

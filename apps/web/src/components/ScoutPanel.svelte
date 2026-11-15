@@ -46,7 +46,7 @@
   const current = $derived(data.action);
 </script>
 
-<section class="scout" data-scout-panel>
+<section class="explore-panel" data-scout-panel>
   <p class="intro">{t('scout.intro')}</p>
   <dl class="facts">
     <div>
@@ -93,7 +93,7 @@
 </section>
 
 <style>
-  .scout {
+  .explore-panel {
     margin: var(--space-3) 0;
   }
 

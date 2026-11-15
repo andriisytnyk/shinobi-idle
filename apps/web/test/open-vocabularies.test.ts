@@ -34,8 +34,25 @@ const code = (text: string): string =>
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/^\s*\/\/.*$/gm, '')
-    // A CSS class name is not an id: class="scout".
-    .replace(/\bclass="[^"]*"/g, '');
+    // An import names a module, not an id.
+    .replace(/^\s*import [^\n]*$/gm, '');
+
+/**
+ * The parts of a source where an id can be a value rather than the name of a property: string
+ * and template literals (a composite key such as `xp.skill.ath`, a data-* value, an attribute value),
+ * `class:` directives and the selectors of a style block. A property or an attribute name is not.
+ */
+const valuesOf = (text: string): string => {
+  const parts: string[] = [];
+  for (const m of text.matchAll(/'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"|`(?:[^`\\]|\\.)*`/g))
+    // The name of a locale string (`world.panel.intel`) is a text key, not an id.
+    if (!(m[0].slice(1, -1) in content.locales.uk)) parts.push(m[0].replace(/\$\{[^}]*\}/g, ''));
+  for (const m of text.matchAll(/\bclass:([A-Za-z0-9_-]+)/g)) parts.push(m[1] ?? '');
+  for (const style of text.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)) {
+    for (const sel of (style[1] ?? '').matchAll(/([^{}]+)\{/g)) parts.push(sel[1] ?? '');
+  }
+  return parts.join('\n');
+};
 
 /** Value imports from `@shinobi/content` that are allowed anywhere: pure helpers that take their data as arguments. */
 const PURE_HELPERS = new Set(['localeKey', 'iconFor', 'scrollPartId']);
@@ -114,9 +131,9 @@ const ALLOWED: Record<string, { ids: string[]; why: string }> = {
   },
 };
 
-/** The quoted forms in which an id stands in source: 'id', "id" and `id`. */
+/** An id as a whole token: bare in code, inside a composite string (xp.skill.ath), a class, a CSS selector or a data value. */
 const quoted = (id: string): RegExp =>
-  new RegExp(`(['"\`])${id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\1`);
+  new RegExp(`(?<![A-Za-z0-9_-])${id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![A-Za-z0-9_-])`);
 
 describe('the interface names no core vocabulary or entity (D3, D5, D6)', () => {
   it('lists the vocabulary it checks', () => {
@@ -127,15 +144,21 @@ describe('the interface names no core vocabulary or entity (D3, D5, D6)', () => 
   for (const file of files) {
     it(`${file.name} names no skill, nature, rank, currency or core entity`, () => {
       const allowed = ALLOWED[file.name]?.ids ?? [];
-      const text = code(file.text);
+      const text = valuesOf(code(file.text));
       const found: string[] = [];
       for (const { kind, ids } of vocabulary) {
         for (const id of ids) {
-          if (!allowed.includes(id) && quoted(id).test(text)) found.push(`${kind} ${id}`);
+          if (!allowed.includes(id) && quoted(id).test(text)) {
+            const line = text.split('\n').find((l) => quoted(id).test(l)) ?? '';
+            found.push(`${kind} ${id}: ${line.trim().slice(0, 90)}`);
+          }
         }
       }
       for (const id of CORE_IDS) {
-        if (!allowed.includes(id) && text.includes(id)) found.push(`entity ${id}`);
+        if (!allowed.includes(id) && text.includes(id)) {
+          const line = text.split('\n').find((l) => l.includes(id));
+          found.push(`entity ${id}: ${line?.trim().slice(0, 80)}`);
+        }
       }
       expect(found).toEqual([]);
     });
@@ -146,8 +169,33 @@ describe('the interface names no core vocabulary or entity (D3, D5, D6)', () => 
       const file = files.find((f) => f.name === name);
       expect(file, name).toBeDefined();
       for (const id of entry.ids)
-        expect(quoted(id).test(file?.text ?? ''), `${name} ${id}`).toBe(true);
+        expect(quoted(id).test(valuesOf(code(file?.text ?? ''))), `${name} ${id}`).toBe(true);
       expect(entry.why.length).toBeGreaterThan(20);
     }
+  });
+});
+
+describe('the scan itself', () => {
+  const hit = (source: string, id: string): boolean => quoted(id).test(valuesOf(code(source)));
+
+  it('finds an id inside a composite string, a template, a class directive and a selector', () => {
+    expect(hit("const k = 'xp.skill.ath';", 'ath')).toBe(true);
+    expect(hit('const k = `interval.skill.${x}.ath`;', 'ath')).toBe(true);
+    expect(hit('<li class:intel={x}>', 'intel')).toBe(true);
+    expect(
+      hit(
+        "<style>\n  [data-entity='currency:intel'] dt {\n    color: red;\n  }\n</style>",
+        'intel',
+      ),
+    ).toBe(true);
+    expect(hit('<div data-total="ryo">', 'ryo')).toBe(true);
+    expect(hit("const r = 'student';", 'student')).toBe(true);
+  });
+
+  it('does not take a property, an attribute name, a longer word or a text key for an id', () => {
+    expect(hit('const n = cost.ryo + poi.ryo;', 'ryo')).toBe(false);
+    expect(hit('<div data-herb={x}>', 'herb')).toBe(false);
+    expect(hit("const k = 'herbalism';", 'herb')).toBe(false);
+    expect(hit("t('world.panel.intel')", 'intel')).toBe(false);
   });
 });

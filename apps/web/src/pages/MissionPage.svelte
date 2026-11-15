@@ -10,7 +10,8 @@
   import ModParts from '../components/ModParts.svelte';
   import ReqTree from '../components/ReqTree.svelte';
   import Slot from '../lib/ext/Slot.svelte';
-  import { entityDesc } from '../lib/entities.ts';
+  import { entityDesc, entityName } from '../lib/entities.ts';
+  import { resourceName } from '../lib/vocab.ts';
   import { formatDuration, formatInt, formatXp } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
   import { cardState, followCommands, stagesOf, viewOf } from '../lib/mission-feed.svelte.ts';
@@ -132,7 +133,7 @@
     <p class="kind">{t('entity.kind.mission')}</p>
     <h1 data-ui="entity-header">
       <MissionRankStamp rank={mission.rank} />
-      {t(`mission.${mission.id}.name`)}
+      {entityName({ kind: 'mission', id: mission.id })}
     </h1>
     <Hint id="missionPage" />
     <Slot name="mission.header" ctx={{ mission: mission.id }} />
@@ -268,7 +269,7 @@
               <ModParts
                 display={t('mission.resourceValue', {
                   n: forecast.resource.units,
-                  name: t(`resource.${forecast.resource.slug}.name`),
+                  name: resourceName(forecast.resource.slug),
                 })}
                 parts={forecast.mods.resource}
               />

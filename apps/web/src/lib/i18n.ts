@@ -131,7 +131,8 @@ export function t(key: string, params: Params = {}): string {
 export const hasKey = (key: string): boolean => Object.hasOwn(messages(), key);
 
 /** The text of the first of these keys that has one; with none, the stand-in for the first key. */
-export function textOf(keys: readonly string[], params: Params = {}): string {
-  const key = keys.find(hasKey) ?? keys[0] ?? '';
-  return t(key, params);
+export function textOf(keys: readonly string[], params: Params = {}, fallback?: string): string {
+  const key = keys.find(hasKey);
+  if (key === undefined && fallback !== undefined) return fallback;
+  return t(key ?? keys[0] ?? '', params);
 }

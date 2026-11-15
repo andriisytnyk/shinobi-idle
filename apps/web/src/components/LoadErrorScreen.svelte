@@ -10,7 +10,13 @@
 <main class="gate" data-gate="error">
   <h1>{t('gate.error.title')}</h1>
   <p>{t('gate.error.body')}</p>
-  {#if error}<pre class="message">{error.message}</pre>{/if}
+  {#if error}
+    <p data-reason={error.reason}>{t(`gate.error.reason.${error.reason}`)}</p>
+    <details>
+      <summary>{t('gate.error.details')}</summary>
+      <pre class="message">{error.message}</pre>
+    </details>
+  {/if}
 
   <div class="row">
     <button type="button" class="primary" onclick={() => void game.retry()}>

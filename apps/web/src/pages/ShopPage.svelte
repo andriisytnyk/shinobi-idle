@@ -8,7 +8,7 @@
   import { blockOf, shopSection, type ShopSection } from '../lib/crafts.ts';
   import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
-  import { currencyName, held, moneyOf } from '../lib/vocab.ts';
+  import { currencyName, held, moneyOf, shopSectionName } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
 
@@ -78,7 +78,7 @@
   <Hint id="shop" />
   {#each purses as purse (purse.id)}
     <p class="purse" data-purse data-purse-currency={purse.id === money ? undefined : purse.id}>
-      {t('shop.purse', { n: formatInt(purse.n), currency: currencyName(purse.id).toLowerCase() })}
+      {t('shop.purse', { n: formatInt(purse.n), currency: currencyName(purse.id) })}
     </p>
   {/each}
   {#if shut}
@@ -87,7 +87,7 @@
 
   {#each SECTIONS as id (id)}
     <section class="ct-section" data-section={id}>
-      <h2>{t(`shop.section.${id}`)}</h2>
+      <h2>{shopSectionName(id)}</h2>
       <ul class="list">
         {#each goods.filter((g) => g.section === id) as good (good.item)}
           <ShopGood

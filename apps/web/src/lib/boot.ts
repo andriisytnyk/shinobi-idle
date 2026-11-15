@@ -58,6 +58,8 @@ export function uiPacksFor(
 export interface DevPacks {
   packs: ContentPack[];
   ui: UiPack[];
+  /** The UI packs that were loaded, by id: what `uiPacksFor` pairs the packs of a boot with. */
+  available: Record<string, UiPack>;
 }
 
 /** The ids asked for with `?packs=a,b` (repeated parameters add up). */
@@ -74,12 +76,13 @@ export function requestedPacks(search: string): string[] {
  * build this is always empty and the code that loads them is not in the bundle.
  */
 export async function devPacks(search: string): Promise<DevPacks> {
-  const none: DevPacks = { packs: [], ui: [] };
+  const none: DevPacks = { packs: [], ui: [], available: {} };
   if (!import.meta.env.DEV) return none;
   if (!requestedPacks(search).includes('testmod')) return none;
   const [{ testmodPack }, { testmodUi }] = await Promise.all([
     import('@shinobi/content/testmod'),
     import('../../dev-packs/testmod-ui.ts'),
   ]);
-  return { packs: [testmodPack], ui: uiPacksFor([testmodPack], { testmod: testmodUi }) };
+  const available = { testmod: testmodUi };
+  return { packs: [testmodPack], ui: uiPacksFor([testmodPack], available), available };
 }

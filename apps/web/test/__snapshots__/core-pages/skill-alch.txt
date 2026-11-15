@@ -1435,7 +1435,7 @@
           <p class="effect">
             +3% шансу зберегти інгредієнти за тир
           <p class="next" data-next="">
-            Наступний рівень I: 300 рьо.
+            Наступний рівень I. Ціна — Рьо: 300.
           <div class="req">
             <div class="group" data-met="false">
               <ul class="rows">

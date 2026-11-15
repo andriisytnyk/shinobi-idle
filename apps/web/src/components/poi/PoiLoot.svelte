@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { Poi } from '@shinobi/content';
   import { cellInfo } from '@shinobi/core';
-  import { formatInt } from '../../lib/format.ts';
   import { t } from '../../lib/i18n.ts';
   import { game } from '../../lib/store.ts';
   import EntityLink from '../EntityLink.svelte';
+  import RewardList from '../RewardList.svelte';
 
   const content = game.content;
 
@@ -25,10 +25,11 @@
 <p class="small">
   {t(poi.kind === 'cache' ? 'world.poi.lootCache' : 'world.poi.lootVault')}
   {#if poi.kind === 'cache'}
-    {#if poi.ryo > 0}<span>{t('world.poi.ryo', { n: formatInt(poi.ryo) })}</span>{/if}
-    {#each poi.items as item (item.item)}
-      <span><EntityLink kind="item" id={item.item} /> ×{item.n}</span>
-    {/each}
+    <RewardList
+      money={poi.ryo}
+      currencies={poi.currencies ?? {}}
+      items={poi.items.map((i) => ({ id: i.item, n: i.n }))}
+    />
   {:else}
     <EntityLink kind="item" id={poi.item} />
   {/if}

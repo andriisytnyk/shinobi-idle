@@ -4,6 +4,7 @@
   import { tryUi } from '../lib/ext/runtime.svelte.ts';
   import Slot from '../lib/ext/Slot.svelte';
   import { t } from '../lib/i18n.ts';
+  import { ruleReasonText } from '../lib/vocab.ts';
   import { settings } from '../lib/settings.svelte.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
@@ -120,9 +121,13 @@
     <section data-ui="failed-packs">
       <h2>{t('settings.failedPacks')}</h2>
       {#each game.failed as pack (pack.pack)}
-        <p class="message bad" role="status">
-          {t('settings.packFailed', { pack: pack.pack, error: pack.error })}
-        </p>
+        <div class="message bad" role="status" data-pack-failed={pack.pack}>
+          <p>{t('settings.packFailed', { pack: pack.pack })}</p>
+          <details>
+            <summary>{t('settings.details')}</summary>
+            <pre>{pack.error}</pre>
+          </details>
+        </div>
       {/each}
     </section>
   {/if}
@@ -131,13 +136,15 @@
     <section data-ui="disabled-rules">
       <h2>{t('settings.rulesDisabled')}</h2>
       {#each game.ruleNotices as notice (notice.pack + notice.rule)}
-        <p class="message bad" role="status">
-          {t('settings.ruleDisabled', {
-            pack: notice.pack,
-            rule: notice.rule,
-            reason: notice.reason,
-          })}
-        </p>
+        <div class="message bad" role="status" data-rule-disabled={notice.pack}>
+          <p>
+            {t('settings.ruleDisabled', { pack: notice.pack, why: ruleReasonText(notice.reason) })}
+          </p>
+          <details>
+            <summary>{t('settings.details')}</summary>
+            <pre>{notice.rule}: {notice.reason}</pre>
+          </details>
+        </div>
       {/each}
     </section>
   {/if}
@@ -146,9 +153,13 @@
     <section data-ui="disabled-packs">
       <h2>{t('settings.disabledPacks')}</h2>
       {#each disabledPacks as pack (pack.packId)}
-        <p class="message bad" role="status">
-          {t('settings.packDisabled', { pack: pack.packId, error: pack.message })}
-        </p>
+        <div class="message bad" role="status" data-pack-disabled={pack.packId}>
+          <p>{t('settings.packDisabled', { pack: pack.packId })}</p>
+          <details>
+            <summary>{t('settings.details')}</summary>
+            <pre>{pack.message}</pre>
+          </details>
+        </div>
       {/each}
     </section>
   {/if}
@@ -259,6 +270,14 @@
 {/if}
 
 <style>
+  details pre {
+    margin: var(--space-1) 0 0;
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
   .packs {
     margin: 0;
     padding: 0;

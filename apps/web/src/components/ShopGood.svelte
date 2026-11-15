@@ -33,7 +33,7 @@
 
   let qty = $state(1);
   const money = $derived(currency ?? moneyOf(content));
-  const unit = $derived(currencyName(money).toLowerCase());
+  const unit = $derived(currencyName(money));
   const ryo = $derived(game.read((gs) => held(gs, money)));
   /** What the stack costs now: the Market's discount comes off the whole stack. */
   const total = $derived(

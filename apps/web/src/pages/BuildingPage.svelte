@@ -6,7 +6,7 @@
     type BuildingInfo,
   } from '@shinobi/core';
   import BuildingCard from '../components/BuildingCard.svelte';
-  import { entityDesc } from '../lib/entities.ts';
+  import { entityDesc, entityName } from '../lib/entities.ts';
   import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
@@ -46,7 +46,7 @@
   );
 </script>
 
-<SimplePage title={t(`building.${id}.name`)}>
+<SimplePage title={entityName({ kind: 'building', id })}>
   <div
     class="building-page"
     data-building-page={id}

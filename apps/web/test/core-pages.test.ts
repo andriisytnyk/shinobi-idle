@@ -80,6 +80,10 @@ const PAGES: Record<string, string> = {
   'recipe-first': '#/recipe/core:antidote',
   more: '#/more',
   missions: '#/missions',
+  'boss-wolf': '#/boss/core:boss_wolf',
+  'status-burn': '#/status/burn',
+  'combo-fanburn': '#/combo/fanBurn',
+  'practice-first': '#/practice/core:tykha_kimnata',
 };
 
 let booted: BootedApp | null = null;

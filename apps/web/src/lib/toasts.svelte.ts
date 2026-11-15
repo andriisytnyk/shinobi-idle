@@ -1,9 +1,9 @@
 import type { ContentDb } from '@shinobi/content';
 import type { GameEvent } from '@shinobi/core';
 import { actionRef, masteryRef } from './entities.ts';
-import { t, type Params } from './i18n.ts';
+import type { Params } from './i18n.ts';
 import { missionToast } from './mission-toasts.ts';
-import { currencyName } from './vocab.ts';
+import { currencyName, resourceName } from './vocab.ts';
 import type { EntityRef } from './route.ts';
 
 export interface Toast {
@@ -17,6 +17,8 @@ export interface Toast {
   /** What a claimed cache or vault gave: ryo and items, the items as links; `missed` is what was due but not received. */
   gains?: {
     ryo: number;
+    /** Other currencies, by id. */
+    currencies?: Record<string, number>;
     items: { id: string; n: number }[];
     missed?: { id: string; n: number }[];
   };
@@ -130,7 +132,7 @@ export function toastFor(event: GameEvent, content: ContentDb): ToastSpec | null
         persistent: true,
       };
     case 'storageFull':
-      return { key: 'toast.storageFull', params: { name: t(`resource.${event.resource}.name`) } };
+      return { key: 'toast.storageFull', params: { name: resourceName(event.resource) } };
     default:
       return null;
   }
@@ -158,15 +160,16 @@ export function packsToasts(event: Extract<GameEvent, { type: 'packsChanged' }>)
 }
 
 /** What claiming a cache or a vault gives. */
-function claimGains(
-  poiId: string,
-  content: ContentDb,
-): { ryo: number; items: { id: string; n: number }[] } {
+function claimGains(poiId: string, content: ContentDb): NonNullable<Toast['gains']> {
   for (const cell of content.cells) {
     for (const poi of cell.pois) {
       if (poi.id !== poiId) continue;
       if (poi.kind === 'cache') {
-        return { ryo: poi.ryo, items: poi.items.map((i) => ({ id: i.item, n: i.n })) };
+        return {
+          ryo: poi.ryo,
+          currencies: poi.currencies ?? {},
+          items: poi.items.map((i) => ({ id: i.item, n: i.n })),
+        };
       }
       if (poi.kind === 'vault') return { ryo: 0, items: [{ id: poi.item, n: 1 }] };
     }

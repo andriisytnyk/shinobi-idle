@@ -27,6 +27,7 @@ import {
   type AnbuReport,
   type Clock,
   type KeyValue,
+  type LoadReason,
 } from './persistence.ts';
 import type { Signals } from './hints.ts';
 import { setActiveContent } from './active.ts';
@@ -129,7 +130,9 @@ export function createGame(deps: GameDeps = {}) {
   let report = $state.raw<AnbuReport | null>(null);
   let phase = $state<Phase>('loading');
   let saveStatus = $state<SaveStatus>('idle');
-  let loadError = $state.raw<{ message: string; raw: string | null } | null>(null);
+  let loadError = $state.raw<{ message: string; raw: string | null; reason: LoadReason } | null>(
+    null,
+  );
   let hasBackup = $state(false);
   let log = $state.raw<LogEntry[]>([]);
   let logId = 0;
@@ -314,8 +317,12 @@ export function createGame(deps: GameDeps = {}) {
       halt();
       loadError =
         error instanceof LoadError
-          ? { message: error.message, raw: error.raw }
-          : { message: error instanceof Error ? error.message : String(error), raw: null };
+          ? { message: error.message, raw: error.raw, reason: error.reason }
+          : {
+              message: error instanceof Error ? error.message : String(error),
+              raw: null,
+              reason: 'core' as const,
+            };
       phase = 'error';
     }
   }

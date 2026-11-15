@@ -40,67 +40,74 @@
             <span class="opens">
               <a class="entity-link" href="#/exam/core:genin_exam">
                 Іспит на Геніна
-            <span class="opens">
-              Відкриває:
-              <a class="entity-link" href="#/skill/herb">
-                Травництво
-              ,
-              <a class="entity-link" href="#/skill/scout">
-                Розвідка
-              ,
-              <a class="entity-link" href="#/skill/prov">
-                Провіант
-              ,
-              <a class="entity-link" href="#/skill/alch">
-                Алхімія
-              ,
-              <a class="entity-link" href="#/mission/core:cat">
-                Знайти кота
-              ,
-              <a class="entity-link" href="#/mission/core:weed">
-                Прополоти поле
-              ,
-              <a class="entity-link" href="#/mission/core:fire">
-                Пожежа на рисовому складі
-              ,
-              <a class="entity-link" href="#/mission/core:drought">
-                Посуха на полях
-              ,
-              <a class="entity-link" href="#/mission/core:courier">
-                Термінова доставка
-              ,
-              <a class="entity-link" href="#/mission/core:rockfall">
-                Обвал на перевалі
-              ,
-              <a class="entity-link" href="#/mission/core:thief">
-                Вистежити злодія
-              ,
-              <a class="entity-link" href="#/mission/core:v_spar">
-                Спаринг в Академії
-              ,
-              <a class="entity-link" href="#/mission/core:v_walls">
-                Зведення стін
-              ,
-              <a class="entity-link" href="#/mission/core:v_fence">
-                Заряджені загородження
-              ,
-              <a class="entity-link" href="#/mission/core:v_clear">
-                Розчищення ділянок
-              ,
-              <a class="entity-link" href="#/mission/core:v_water">
-                Зрошення полів села
-              ,
-              <a class="entity-link" href="#/mission/core:v_sanit">
-                Санітарна варта
-              ,
-              <a class="entity-link" href="#/mission/core:v_rubble">
-                Розбір завалів
-              ,
-              <a class="entity-link" href="#/mission/core:v_clones">
-                Клони на будівництві
-              ,
-              <a class="entity-link" href="#/mission/core:v_seal">
-                Запечатування запасів
+            <div class="opens" data-opens="">
+              <span>
+                Відкриває:
+              <ul class="chips">
+                <li>
+                  <a class="entity-link" href="#/skill/herb">
+                    Травництво
+                <li>
+                  <a class="entity-link" href="#/skill/scout">
+                    Розвідка
+                <li>
+                  <a class="entity-link" href="#/skill/prov">
+                    Провіант
+                <li>
+                  <a class="entity-link" href="#/skill/alch">
+                    Алхімія
+                <li>
+                  <a class="entity-link" href="#/mission/core:cat">
+                    Знайти кота
+              <details class="more-opens">
+                <summary>
+                  ще 15
+                <ul class="chips">
+                  <li>
+                    <a class="entity-link" href="#/mission/core:weed">
+                      Прополоти поле
+                  <li>
+                    <a class="entity-link" href="#/mission/core:fire">
+                      Пожежа на рисовому складі
+                  <li>
+                    <a class="entity-link" href="#/mission/core:drought">
+                      Посуха на полях
+                  <li>
+                    <a class="entity-link" href="#/mission/core:courier">
+                      Термінова доставка
+                  <li>
+                    <a class="entity-link" href="#/mission/core:rockfall">
+                      Обвал на перевалі
+                  <li>
+                    <a class="entity-link" href="#/mission/core:thief">
+                      Вистежити злодія
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_spar">
+                      Спаринг в Академії
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_walls">
+                      Зведення стін
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_fence">
+                      Заряджені загородження
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_clear">
+                      Розчищення ділянок
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_water">
+                      Зрошення полів села
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_sanit">
+                      Санітарна варта
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_rubble">
+                      Розбір завалів
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_clones">
+                      Клони на будівництві
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_seal">
+                      Запечатування запасів
           <li data-rank-row="chunin" data-state="ahead">
             <span class="name">
               Чунін

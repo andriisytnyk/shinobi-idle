@@ -134,9 +134,9 @@ describe('loading a save', () => {
     expect(kv.data.get(SAVE_KEY)).toBe('not json');
   });
 
-  it('throws a LoadError for a well-formed envelope with an empty state', async () => {
+  it('throws a LoadError for an envelope without a state', async () => {
     const kv = memoryStore();
-    kv.data.set(SAVE_KEY, encodeStored(3, JSON.stringify({ v: 4, savedAt: 1, state: {} })));
+    kv.data.set(SAVE_KEY, encodeStored(3, JSON.stringify({ v: 4, savedAt: 1 })));
     await expect(loadGame(kv, fakeClock(T0), content)).rejects.toBeInstanceOf(LoadError);
   });
 
@@ -254,12 +254,12 @@ describe('export and import', () => {
     expect(serialize(restored, T0)).toBe(before);
   });
 
-  it('rejects an envelope with an empty or alien state', () => {
-    const empty = btoa(JSON.stringify({ v: 4, savedAt: 1, state: {} }));
+  it('rejects an envelope without a state, and accepts one that lacks a skill (the core fills it in)', () => {
+    const empty = btoa(JSON.stringify({ v: 4, savedAt: 1 }));
     expect(() => importSave(empty, content)).toThrow();
     const partial = JSON.parse(serialize(practising(), T0));
     delete partial.state.skills.tai;
-    expect(() => importSave(btoa(JSON.stringify(partial)), content)).toThrow();
+    expect(importSave(btoa(JSON.stringify(partial)), content).skills.tai).toBeDefined();
   });
 
   it('rejects text that is not a save', () => {

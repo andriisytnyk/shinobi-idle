@@ -897,7 +897,7 @@
           <p class="effect">
             −5% часу збору за тир
           <p class="next" data-next="">
-            Наступний рівень I: 300 рьо.
+            Наступний рівень I. Ціна — Рьо: 300.
           <a class="shop-link ct-link" data-shop-link="" href="#/shop">
             До крамниці
       <section aria-label="Пул Майстерності" class="pool" data-entity="skill:herb" data-ui="pool-bar">

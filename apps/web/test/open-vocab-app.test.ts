@@ -188,7 +188,7 @@ describe('the app booted with core and testmod (T1)', () => {
     booted = await boot('#/shop', gs);
     const good = q('[data-good="testmod:charm"]');
     expect(good?.querySelector('[data-price]')?.textContent).toContain('жетон');
-    expect(q('[data-purse-currency="testmod:token"]')?.textContent).toMatch(/7.*жетон/);
+    expect(q('[data-purse-currency="testmod:token"]')?.textContent).toMatch(/Тестовий жетон.*7/);
     expect(rawTexts()).toEqual([]);
   });
 
@@ -303,5 +303,58 @@ describe('the app booted with core and testmod (T1)', () => {
     // Every missing text got a readable stand-in: nothing on the screen looks like the key it lacks.
     for (const key of missingKeys()) expect(texts().includes(key), key).toBe(false);
     settings.hints = false;
+  });
+});
+
+describe('what a player sees with a mod (fix iteration)', () => {
+  it('lists the currency a cache pays', async () => {
+    const gs = state();
+    gs.world.explores[CELL] = game.content.balance.K.cellExplores[0] ?? 1;
+    gs.world.pois['testmod:poi_grove_cache'] = true;
+    booted = await boot(`#/cell/${CELL}`, gs);
+    const row = q('[data-poi="testmod:poi_grove_cache"]');
+    expect(row?.textContent).toContain('Тестовий жетон: 3');
+    expect(rawTexts()).toEqual([]);
+  });
+
+  it('shows the state of a technique by its own name, not as a status that does not exist', async () => {
+    booted = await boot('#/technique/testmod:ember_pulse');
+    expect(q('a[href="#/status/testmod:chilled"]')).toBeNull();
+    expect(texts().some((s) => s.includes('Тестове охолодження'))).toBe(true);
+  });
+
+  it('opens the nature page without a text standing in for a missing one', async () => {
+    booted = await boot('#/nature');
+    expect(missingKeys().filter((k) => k.startsWith('nature.character'))).toEqual([]);
+  });
+
+  it('tells a promotion that is not the Academy graduation in general words', async () => {
+    const gs = state();
+    gs.player.rank = 'testmod:adept';
+    booted = await boot('#/', gs);
+    game.state.events.push({ type: 'rankUp', rank: 'testmod:adept', at: 0 } as never);
+    game.devAdvance(0);
+    flushSync();
+    const box = q('[data-graduation]');
+    expect(box).not.toBeNull();
+    expect(box?.textContent).toContain('Тестовий адепт');
+    expect(box?.textContent).not.toContain('Академії');
+    expect(box?.textContent).not.toContain('Ви');
+    expect(document.body.textContent).toContain('Нове звання');
+  });
+
+  it('never shows English from the pack: every entity of the pack has a Ukrainian name', () => {
+    const lists = game.content as unknown as Record<string, readonly { id: string }[] | undefined>;
+    const missing: string[] = [];
+    for (const kind of game.content.entityKinds) {
+      for (const e of (kind.list ? lists[kind.list] : undefined) ?? []) {
+        if (!e.id.startsWith('testmod:')) continue;
+        const key = `${kind.id}.${e.id}.name`;
+        if (!(key in game.content.locales.uk) && kind.id !== 'cell' && kind.id !== 'poi') {
+          missing.push(key);
+        }
+      }
+    }
+    expect(missing.filter((k) => !k.startsWith('boss.') || true)).toEqual([]);
   });
 });

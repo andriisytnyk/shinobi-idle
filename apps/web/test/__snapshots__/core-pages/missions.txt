@@ -73,13 +73,13 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#957-1xqth0s" fill="currentColor">
                   <span>
-                    +40 Рьо
+                    Рьо: 40
               <li>
                 <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    +2 Репутація
+                    Репутація: 2
             <div class="why" data-why="error.requirementsNotMet" id="why-core:cat">
               <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
                 <span class="mark">
@@ -135,7 +135,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#957-1xqth0s" fill="currentColor">
                   <span>
-                    +20 Рьо
+                    Рьо: 20
               <li>
                 <span class="reward" data-entity="item:core:rice" data-reward="item" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
@@ -187,13 +187,13 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#957-1xqth0s" fill="currentColor">
                   <span>
-                    +70 Рьо
+                    Рьо: 70
               <li>
                 <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    +2 Репутація
+                    Репутація: 2
               <li>
                 <span class="reward" data-entity="item:core:rice" data-reward="item" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
@@ -257,7 +257,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#957-1xqth0s" fill="currentColor">
                   <span>
-                    +60 Рьо
+                    Рьо: 60
               <li>
                 <span class="reward" data-entity="item:core:rice" data-reward="item" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
@@ -329,7 +329,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#957-1xqth0s" fill="currentColor">
                   <span>
-                    +50 Рьо
+                    Рьо: 50
             <div class="why" data-why="error.requirementsNotMet" id="why-core:courier">
               <div class="row" data-entity="skill:nin" data-met="false" data-ui="req-row">
                 <span class="mark">
@@ -385,7 +385,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#957-1xqth0s" fill="currentColor">
                   <span>
-                    +70 Рьо
+                    Рьо: 70
               <li>
                 <span class="reward" data-entity="item:core:salt" data-reward="item" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
@@ -449,7 +449,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#957-1xqth0s" fill="currentColor">
                   <span>
-                    +100 Рьо
+                    Рьо: 100
               <li>
                 <span class="reward" data-entity="item:core:note" data-reward="item" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
@@ -539,13 +539,13 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#957-1xqth0s" fill="currentColor">
                   <span>
-                    +550 Рьо
+                    Рьо: 550
               <li>
                 <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    +8 Репутація
+                    Репутація: 8
               <li>
                 <span class="reward" data-entity="item:core:crate" data-reward="item" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
@@ -601,7 +601,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#957-1xqth0s" fill="currentColor">
                   <span>
-                    +400 Рьо
+                    Рьо: 400
             <div class="why" data-why="error.requirementsNotMet" id="why-core:sealed">
               <div class="row" data-met="false" data-ui="req-row">
                 <span class="mark">
@@ -650,13 +650,13 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#957-1xqth0s" fill="currentColor">
                   <span>
-                    +440 Рьо
+                    Рьо: 440
               <li>
                 <span class="reward" data-entity="currency:intel" data-reward="currency" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3653-17qd3ut" fill="currentColor">
                   <span>
-                    +2 Intel
+                    Intel: 2
             <div class="why" data-why="error.requirementsNotMet" id="why-core:mail">
               <div class="row" data-met="false" data-ui="req-row">
                 <span class="mark">
@@ -709,13 +709,13 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#957-1xqth0s" fill="currentColor">
                   <span>
-                    +480 Рьо
+                    Рьо: 480
               <li>
                 <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    +8 Репутація
+                    Репутація: 8
               <li>
                 <span class="reward" data-entity="item:core:spice" data-reward="item" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
@@ -776,13 +776,13 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#957-1xqth0s" fill="currentColor">
                   <span>
-                    +620 Рьо
+                    Рьо: 620
               <li>
                 <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    +8 Репутація
+                    Репутація: 8
               <li>
                 <span class="reward" data-entity="item:core:scrollpart_fire_dragon_flame_bullet" data-reward="item" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
@@ -854,7 +854,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    +4 Репутація
+                    Репутація: 4
               <li>
                 <span class="reward" data-entity="resource:syla_shynobi" data-reward="resource" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -862,7 +862,7 @@
                       <path d="#94-lwm9pk">
                       <circle cx="9" cy="7" r="4">
                   <a href="#/village">
-                    +3 Сила шинобі
+                    Сила шинобі: +3
             <div class="why" data-why="error.requirementsNotMet" id="why-core:v_spar">
               <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
                 <span class="mark">
@@ -922,7 +922,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    +4 Репутація
+                    Репутація: 4
               <li>
                 <span class="reward" data-entity="resource:okhorona" data-reward="resource" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -930,7 +930,7 @@
                       <path d="#94-lwm9pk">
                       <circle cx="9" cy="7" r="4">
                   <a href="#/village">
-                    +3 Охорона
+                    Охорона: +3
             <div class="why" data-why="error.requirementsNotMet" id="why-core:v_walls">
               <div class="row" data-entity="technique:core:earth_style_wall" data-met="false" data-ui="req-row">
                 <span class="mark">
@@ -986,7 +986,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    +4 Репутація
+                    Репутація: 4
               <li>
                 <span class="reward" data-entity="resource:okhorona" data-reward="resource" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -994,7 +994,7 @@
                       <path d="#94-lwm9pk">
                       <circle cx="9" cy="7" r="4">
                   <a href="#/village">
-                    +3 Охорона
+                    Охорона: +3
             <div class="why" data-why="error.missingIngredient" id="why-core:v_fence">
               <div class="row" data-entity="technique:core:four_pillar_bind" data-met="false" data-ui="req-row">
                 <span class="mark">
@@ -1050,7 +1050,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    +4 Репутація
+                    Репутація: 4
               <li>
                 <span class="reward" data-entity="resource:dilianky" data-reward="resource" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -1058,7 +1058,7 @@
                       <path d="#94-lwm9pk">
                       <circle cx="9" cy="7" r="4">
                   <a href="#/village">
-                    +3 Ділянки
+                    Ділянки: +3
             <div class="why" data-why="error.requirementsNotMet" id="why-core:v_clear">
               <div class="row" data-entity="technique:core:running_fire" data-met="false" data-ui="req-row">
                 <span class="mark">
@@ -1114,7 +1114,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    +4 Репутація
+                    Репутація: 4
               <li>
                 <span class="reward" data-entity="resource:zroshennia" data-reward="resource" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -1122,7 +1122,7 @@
                       <path d="#94-lwm9pk">
                       <circle cx="9" cy="7" r="4">
                   <a href="#/village">
-                    +3 Зрошення
+                    Зрошення: +3
             <div class="why" data-why="error.requirementsNotMet" id="why-core:v_water">
               <div class="row" data-entity="skill:suiton" data-met="false" data-ui="req-row">
                 <span class="mark">
@@ -1182,7 +1182,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    +4 Репутація
+                    Репутація: 4
               <li>
                 <span class="reward" data-entity="resource:zdorovia" data-reward="resource" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -1190,7 +1190,7 @@
                       <path d="#94-lwm9pk">
                       <circle cx="9" cy="7" r="4">
                   <a href="#/village">
-                    +3 Здоров'я
+                    Здоров'я: +3
             <div class="why" data-why="error.requirementsNotMet" id="why-core:v_sanit">
               <div class="row" data-entity="technique:core:great_fireball" data-met="false" data-ui="req-row">
                 <span class="mark">
@@ -1246,7 +1246,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    +4 Репутація
+                    Репутація: 4
               <li>
                 <span class="reward" data-entity="resource:kladka" data-reward="resource" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -1254,7 +1254,7 @@
                       <path d="#94-lwm9pk">
                       <circle cx="9" cy="7" r="4">
                   <a href="#/village">
-                    +3 Кладка
+                    Кладка: +3
             <div class="why" data-why="error.requirementsNotMet" id="why-core:v_rubble">
               <div class="row" data-entity="skill:doton" data-met="false" data-ui="req-row">
                 <span class="mark">
@@ -1314,7 +1314,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    +4 Репутація
+                    Репутація: 4
               <li>
                 <span class="reward" data-entity="resource:robocha_syla" data-reward="resource" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -1322,7 +1322,7 @@
                       <path d="#94-lwm9pk">
                       <circle cx="9" cy="7" r="4">
                   <a href="#/village">
-                    +3 Робоча сила
+                    Робоча сила: +3
             <div class="why" data-why="error.requirementsNotMet" id="why-core:v_clones">
               <div class="row" data-entity="technique:core:shadow_clone" data-met="false" data-ui="req-row">
                 <span class="mark">
@@ -1378,7 +1378,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    +4 Репутація
+                    Репутація: 4
               <li>
                 <span class="reward" data-entity="resource:mistkist" data-reward="resource" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -1386,7 +1386,7 @@
                       <path d="#94-lwm9pk">
                       <circle cx="9" cy="7" r="4">
                   <a href="#/village">
-                    +3 Місткість
+                    Місткість: +3
             <div class="why" data-why="error.requirementsNotMet" id="why-core:v_seal">
               <div class="row" data-entity="technique:core:enclosing" data-met="false" data-ui="req-row">
                 <span class="mark">

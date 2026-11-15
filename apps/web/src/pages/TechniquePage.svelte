@@ -7,13 +7,13 @@
   import Icon from '../components/Icon.svelte';
   import ReqTree from '../components/ReqTree.svelte';
   import SealStrip from '../components/SealStrip.svelte';
-  import { t } from '../lib/i18n.ts';
+  import { t, textOf } from '../lib/i18n.ts';
   import { techniqueGoal } from '../lib/goal.ts';
   import { techniqueRelations } from '../lib/technique-links.ts';
   import { game } from '../lib/store.ts';
   import { practiceView } from '../lib/timing.ts';
   import { entityName } from '../lib/entities.ts';
-  import { asRank, promotedRank } from '../lib/vocab.ts';
+  import { graduateRank } from '../lib/vocab.ts';
 
   const content = game.content;
 
@@ -34,7 +34,7 @@
       if (!tech) return null;
       const of: Req[] = [{ t: 'skill', skill: tech.skill, level: tech.level }];
       if (tech.src === 'N' && tech.mentor === 'other')
-        of.push({ t: 'rank', rank: asRank(promotedRank(content)) });
+        of.push({ t: 'rank', rank: graduateRank(content) ?? '' });
       return evalReq(gs, { t: 'all', of }, content);
     }),
   );
@@ -98,7 +98,13 @@
       {#if tech.state}
         <div>
           <dt>{t('technique.effect')}</dt>
-          <dd><EntityLink kind="status" id={tech.state} /></dd>
+          <dd>
+            <!-- A state is not a status; the status page exists only where the content has a status of the same id. -->
+            {#if content.statuses.some((x) => x.id === tech.state)}<EntityLink
+                kind="status"
+                id={tech.state}
+              />{:else}{textOf([`state.${tech.state}.name`])}{/if}
+          </dd>
         </div>
       {/if}
       {#if answers.length > 0}

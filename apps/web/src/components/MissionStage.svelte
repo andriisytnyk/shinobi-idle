@@ -2,7 +2,7 @@
   import { formatBonus, formatDuration, formatInt, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
-  import { currencyOf } from '../lib/vocab.ts';
+  import { currencyOf, teammateName } from '../lib/vocab.ts';
   import type { StageView } from '../lib/missions.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
@@ -106,7 +106,7 @@
                 </div>
               {/if}
             {:else}
-              <span class="intel">
+              <span class="study">
                 <Icon entity={{ kind: 'currency', id: study }} size={16} />
                 {t('mission.stage.intel', { n: way.alt.intel })}
                 <span class="dim"
@@ -154,7 +154,7 @@
             {t('mission.who.self')}
           {:else}
             <span data-entity="teammate:{path.who}">
-              {t('mission.who.mate', { name: t(`teammate.${path.who}.name`) })}
+              {t('mission.who.mate', { name: teammateName(path.who) })}
             </span>
             <span class="dim" data-who-reason>{t('mission.who.reason')}</span>
           {/if}
@@ -347,7 +347,7 @@
     font-weight: 600;
   }
 
-  .intel {
+  .study {
     display: inline-flex;
     flex-wrap: wrap;
     align-items: center;

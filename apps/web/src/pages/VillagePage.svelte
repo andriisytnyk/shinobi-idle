@@ -14,7 +14,7 @@
   import Stepper from '../components/Stepper.svelte';
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
-  import { held, moneyOf } from '../lib/vocab.ts';
+  import { currencyName, held, moneyOf } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
   import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import { perHour, resourceIcon, resourceName, ROLE_ORDER } from '../lib/village.ts';
@@ -36,6 +36,7 @@
   const queue = $derived(game.read((gs) => villageQueue(gs, content)));
   const stage = $derived(game.read((gs) => villageStage(gs, content)));
   const workforce = $derived(game.read((gs) => gs.village?.workforce ?? 0));
+  const moneyLabel = currencyName(moneyOf(content));
   const ryo = $derived(game.read((gs) => held(gs, moneyOf(content))));
 
   const civil = $derived(resources.filter((r) => r.kind === 'civil'));
@@ -105,13 +106,16 @@
         <h2><Icon name="lucide:coins" size={18} /> {t('village.treasury')}</h2>
         <p class="big" data-treasury-amount>{formatInt(treasury.amount)}</p>
         <p class="ct-muted">
-          {t('village.treasury.income', { n: formatInt(perHour(treasury.perTick)) })}
+          {t('village.treasury.income', {
+            n: formatInt(perHour(treasury.perTick)),
+            currency: moneyLabel,
+          })}
         </p>
         <div class="donate">
           <Stepper
             bind:value={donation}
             max={ryo}
-            label={t('village.donate.label')}
+            label={t('village.donate.label', { currency: moneyLabel })}
             onSubmit={donate}
           />
           <button
@@ -129,7 +133,7 @@
           <p class="ct-why" id="why-donate" data-why="qty">{t('village.donate.invalid')}</p>
         {:else if donateTooMany}
           <p class="ct-why" id="why-donate" data-why="money">
-            {t('village.donate.tooMany', { n: formatInt(ryo) })}
+            {t('village.donate.tooMany', { n: formatInt(ryo), currency: moneyLabel })}
           </p>
         {/if}
       </section>
@@ -182,7 +186,10 @@
               <span class="name">{resourceName(power.id)}</span>
               <span class="num" data-stock>{formatInt(power.amount)}</span>
               <span class="ct-muted"
-                >{t('village.power.income', { n: formatInt(perHour(power.amount)) })}</span
+                >{t('village.power.income', {
+                  n: formatInt(perHour(power.amount)),
+                  currency: moneyLabel,
+                })}</span
               >
             </li>
           {/if}
