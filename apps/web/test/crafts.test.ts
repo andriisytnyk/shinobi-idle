@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { content, localeKey, ukLocale } from '@shinobi/content';
-import { actionInfo, createState, xpAt, type GameState } from '@shinobi/core';
+import { actionInfo, createState, syncVillage, xpAt, type GameState } from '@shinobi/core';
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import BuffStrip from '../src/components/BuffStrip.svelte';
@@ -48,6 +48,7 @@ function bare(ref: EntityRef): number {
 function genin(): GameState {
   const state = createState(1, content);
   state.player.rank = 'genin';
+  syncVillage(state, content);
   state.player.name = 'Тест';
   state.skills.herb.xp = xpAt(10);
   state.skills.alch.xp = xpAt(10);

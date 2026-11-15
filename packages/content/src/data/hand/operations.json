@@ -5,6 +5,7 @@
       "t": "flag",
       "id": "op.hideout.unlocked"
     },
+    "clearFlag": "op.hideout.cleared",
     "regen": "opRegen",
     "stages": [
       {
@@ -35,6 +36,7 @@
       "t": "flag",
       "id": "op.forest_of_death.unlocked"
     },
+    "clearFlag": "op.forest_of_death.cleared",
     "regen": "opRegen",
     "stages": [
       {

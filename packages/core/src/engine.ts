@@ -1,5 +1,15 @@
 import type { ContentDb } from '@shinobi/content';
 import { rebalanceShares, stopSlot } from './actions.ts';
+import {
+  deleteSavedLoadout,
+  loadSavedLoadout,
+  prepareLoadout,
+  saveLoadout,
+  setAutoLoadout,
+  setLoadout,
+  setSignature,
+} from './combat/loadout.ts';
+import { setMedicSlot, setPouchSlot, usePouchSlot } from './combat/pouch.ts';
 import { buildObstacle } from './athletics.ts';
 import type { EntityRef } from './entity.ts';
 import { emit } from './events.ts';
@@ -49,6 +59,23 @@ export type Command =
   | { type: 'goal.clear' }
   /** Names the player: 1 to 24 characters once trimmed. */
   | { type: 'player.setName'; name: string }
+  /** Sets the loadout by hand (this switches the automatic loadout off). */
+  | { type: 'loadout.set'; techniques: string[] }
+  /** Switches the automatic loadout on or off; on rebuilds it at once. */
+  | { type: 'loadout.auto'; on: boolean }
+  | { type: 'loadout.save'; name: string }
+  | { type: 'loadout.load'; name: string }
+  | { type: 'loadout.delete'; name: string }
+  /** Marks a technique of the loadout (mastery 25 or more) as the signature, or clears it. */
+  | { type: 'loadout.signature'; technique: string | null }
+  /** Builds the best loadout and pouch for a zone, enemy or boss id. */
+  | { type: 'loadout.prepare'; encounter: string }
+  /** Puts an item (or nothing) in a pouch slot and packs it from the bank. */
+  | { type: 'pouch.set'; slot: number; item: string | null }
+  /** Uses a healing or restoring slot by hand during a fight. */
+  | { type: 'pouch.use'; slot: number }
+  /** Chooses the slot the medic pouch uses on its own (null: none). */
+  | { type: 'pouch.medic'; slot: number | null }
   /** The chakra paper test: sets the native nature, once, as a genin. `random` draws on the world stream. */
   | { type: 'nature.choose'; nature: NatureChoice }
   /** Adds a second nature (Chakra Control 20) or a third (40); only natures not owned. */
@@ -124,7 +151,7 @@ function startAction(
 ): CommandResult {
   const slot = state.slots[slotIndex];
   if (!slot) return { ok: false, reason: 'error.invalidSlot' };
-  const kind = rules.actionKinds[kindName];
+  const kind = Object.hasOwn(rules.actionKinds, kindName) ? rules.actionKinds[kindName] : undefined;
   if (!kind) return { ok: false, reason: 'error.unknownActionKind' };
   if (!kind.has(id, content)) return { ok: false, reason: 'error.unknownAction' };
   // A skill that is still shut refuses every action it would train, whatever else holds.
@@ -239,6 +266,26 @@ function apply(
       state.player.name = name;
       return { ok: true };
     }
+    case 'loadout.set':
+      return setLoadout(state, command.techniques, content);
+    case 'loadout.auto':
+      return setAutoLoadout(state, command.on, content);
+    case 'loadout.save':
+      return saveLoadout(state, command.name, content);
+    case 'loadout.load':
+      return loadSavedLoadout(state, command.name, content);
+    case 'loadout.delete':
+      return deleteSavedLoadout(state, command.name);
+    case 'loadout.signature':
+      return setSignature(state, command.technique, content);
+    case 'loadout.prepare':
+      return prepareLoadout(state, command.encounter, content);
+    case 'pouch.set':
+      return setPouchSlot(state, command.slot, command.item, content);
+    case 'pouch.use':
+      return usePouchSlot(state, command.slot, content, rules);
+    case 'pouch.medic':
+      return setMedicSlot(state, command.slot, content);
     case 'nature.choose':
       return chooseNature(state, command.nature);
     case 'nature.add':

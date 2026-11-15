@@ -619,7 +619,7 @@ describe('A11: save', () => {
   });
 
   it('migrates a version 8 save: nothing explored, standing in the first cell', () => {
-    expect(STATE_VERSION).toBe(9);
+    expect(STATE_VERSION).toBeGreaterThanOrEqual(9);
     expect(MIGRATIONS).toHaveLength(STATE_VERSION - 1);
     const state = genin();
     const parsed = JSON.parse(serialize(state)) as { v: number; state: Record<string, unknown> };

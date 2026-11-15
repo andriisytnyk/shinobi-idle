@@ -18,7 +18,7 @@ import {
   type Command,
   type GameState,
 } from '../src/index.ts';
-import { genin, HOUR, plainRules, setLevel, start, withNatures } from './helpers.ts';
+import { genin, HOUR, plainRules, setLevel, start, withBuildings, withNatures } from './helpers.ts';
 
 const K = content.balance.K;
 const MINT = 'core:mint';
@@ -438,6 +438,7 @@ describe('A8: shops', () => {
     ok(s, { type: 'shop.buy', item: 'core:rice', n: 10 });
     expect(s.currencies.ryo).toBe(500 - 10 * (K.goods.rice ?? 0));
     expect(s.bank['core:rice']).toBe(10);
+    withBuildings(s, { 'core:forge': 2 });
     ok(s, { type: 'shop.buy', item: 'core:senbon', n: 15 });
     expect(s.bank['core:senbon']).toBe(15);
   });
@@ -513,14 +514,17 @@ describe('A9: training gear', () => {
     refused(s, { type: 'gear.buy', line: SICKLE }, 'error.gearMaxed');
   });
 
-  it('refuses without ryo and treats building requirements as met until buildings exist', () => {
+  it('refuses without ryo and holds a tier back until its building stands', () => {
     const s = genin();
     setLevel(s, 'tai', 50);
     s.currencies.ryo = 299;
     refused(s, { type: 'gear.buy', line: 'core:trenuvalni_manekeny' }, 'error.notEnoughRyo');
     s.currencies.ryo = 10_000;
-    for (let i = 0; i < 3; i++) ok(s, { type: 'gear.buy', line: 'core:trenuvalni_manekeny' });
-    // Tier III names the Forge, level 4; no building exists, and it still opens.
+    for (let i = 0; i < 2; i++) ok(s, { type: 'gear.buy', line: 'core:trenuvalni_manekeny' });
+    // Tier III names the Forge, level 4: it stays shut until the building stands.
+    refused(s, { type: 'gear.buy', line: 'core:trenuvalni_manekeny' }, 'error.requirementsNotMet');
+    withBuildings(s, { 'core:forge': 4 });
+    ok(s, { type: 'gear.buy', line: 'core:trenuvalni_manekeny' });
     expect(s.gear['core:trenuvalni_manekeny']).toBe(3);
     expect(
       content.gear.find((g) => g.id === 'core:trenuvalni_manekeny')?.tiers[2]?.building,

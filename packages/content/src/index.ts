@@ -17,6 +17,7 @@ import regions from './data/generated/regions.json' with { type: 'json' };
 import seals from './data/generated/seals.json' with { type: 'json' };
 import skills from './data/generated/skills.json' with { type: 'json' };
 import techniques from './data/generated/techniques.json' with { type: 'json' };
+import handAi from './data/hand/ai.json' with { type: 'json' };
 import handBossSpecials from './data/hand/boss-specials.json' with { type: 'json' };
 import handBuildings from './data/hand/buildings.json' with { type: 'json' };
 import handCellKeys from './data/hand/cell-keys.json' with { type: 'json' };
@@ -154,6 +155,7 @@ export const content: ContentDb = contentDbSchema.parse({
   statuses: handStatuses,
   traits: handTraits,
   combos: handCombos,
+  ai: handAi,
 });
 
 /** Ukrainian strings: generated entity names and descriptions plus hand-written content descriptions and UI strings. Hand-written content texts win over generated ones. */

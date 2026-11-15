@@ -1,5 +1,6 @@
 import type { ContentDb, Enemy, NatureId, SkillId, Technique } from '@shinobi/content';
 import { MS_PER_SECOND, techniqueCastSeconds } from '../formulas.ts';
+import { nonNativeLevel } from '../natures.ts';
 
 /**
  * Everything a fight needs to know about the player, as plain JSON. It is built from the game
@@ -27,6 +28,11 @@ export interface PlayerSnapshot {
   tier?: number;
   /** The signature technique, which habituates more slowly. */
   signature?: string;
+  /** The pouch, slot by slot (an empty slot has an empty id), and the slot the medic pouch empties on its own. */
+  pouch?: { id: string; n: number }[];
+  medic?: number | null;
+  /** Wound stacks; each one cuts the combat stats. */
+  wounds?: number;
 }
 
 export type Levels = PlayerSnapshot['levels'];
@@ -130,7 +136,7 @@ export interface TechniqueNumbers {
 
 /** Everything a technique does in a fight, from the balance formulas. */
 export function techniqueFigures(
-  snap: Pick<PlayerSnapshot, 'levels' | 'mastery' | 'costMod'>,
+  snap: Pick<PlayerSnapshot, 'levels' | 'mastery' | 'costMod'> & { natures?: readonly NatureId[] },
   tech: Technique,
   content: ContentDb,
 ): TechniqueNumbers {
@@ -149,7 +155,15 @@ export function techniqueFigures(
       K.tierMult[`${tech.tier}`] *
       (1 + K.levelScale * skillLvl) *
       (1 + K.masteryDmg * masteryShare);
-  const cast = Math.max(K.castFloor, techniqueCastSeconds(tech.sealSeq.length, mastery, content));
+  const cast = Math.max(
+    K.castFloor,
+    techniqueCastSeconds(
+      tech.sealSeq.length,
+      mastery,
+      content,
+      nonNativeLevel(tech.skill, snap.natures ?? [], skillLvl),
+    ),
+  );
   const base = (pool === 'stamina' ? K.staminaCost[rank] : K.chakraCost[rank]) * role.c;
   const reduction =
     (1 - K.masteryCost * masteryShare) *

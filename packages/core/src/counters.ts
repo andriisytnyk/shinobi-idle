@@ -3,6 +3,12 @@ import type { GameState } from './state.ts';
 /** Counter key for defeats of one enemy. */
 export const killsKey = (enemy: string): string => `kills.${enemy}`;
 
+/** Counter key for the times an enemy defeated the player. */
+export const defeatsKey = (enemy: string): string => `defeats.${enemy}`;
+
+/** Counter key for the fights with an enemy that ran to the time cap: the player watched it for the whole fight. */
+export const studiedKey = (enemy: string): string => `studied.${enemy}`;
+
 /** Counter key for finished cycles of one action kind. */
 export const actionsKey = (kind: string): string => `actions.${kind}`;
 

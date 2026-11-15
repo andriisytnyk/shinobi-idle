@@ -1,4 +1,6 @@
 export * from './fight-ai.ts';
+export * from './fight-boss.ts';
+export * from './fight-items.ts';
 export * from './fight-encounter.ts';
 export * from './fight-hooks.ts';
 export * from './fight-parse.ts';
@@ -7,6 +9,10 @@ export * from './fight-sim.ts';
 export * from './fight-types.ts';
 export * from './fight.ts';
 export * from './kind.ts';
+export * from './loadout.ts';
+export * from './pouch.ts';
+export * from './wounds.ts';
+export * from './zones.ts';
 export * from './numbers.ts';
 export * from './snapshot.ts';
 export * from './stats.ts';

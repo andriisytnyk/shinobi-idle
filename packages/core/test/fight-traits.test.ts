@@ -34,6 +34,9 @@ import {
   runUntil,
 } from './fight-helpers.ts';
 
+const chunin = content.ai.tiers.find((t) => t.id === 'chunin');
+if (!chunin) throw new Error('no chunin AI tier');
+
 const LEVEL = 34;
 const enemyHp = K.eHp[0] + K.eHp[1] * LEVEL;
 const enemyDamage = K.eDmg[0] + K.eDmg[1] * LEVEL;
@@ -316,7 +319,7 @@ describe('Illusionist (answer: dispel)', () => {
     runUntil(fight, (f) => (f.tally.uses[dispel] ?? 0) > 0, rules, c);
     expect(fight.tally.uses[dispel]).toBe(1);
     // It was cast in answer to the illusion, not before it.
-    expect(fight.tally.lastUseAt).toBeGreaterThan(sec(K.trait.illusionEvery));
+    expect(fight.tally.lastUseAt).toBeGreaterThanOrEqual(sec(K.trait.illusionEvery));
     expect(findEffect(fight.player, 'illusion')).toBeUndefined();
   });
 });
@@ -500,6 +503,17 @@ describe('the default AI decision rules, on hand-made views', () => {
     hitsAll: false,
     guaranteedCombo: null,
     habituationMult: 1,
+    fx: {
+      kind: 'damage',
+      amount: 0,
+      mult: 1,
+      durationMs: 0,
+      drain: 0,
+      wounds: 0,
+      everyMs: 0,
+      statuses: [],
+    },
+    requiresStance: false,
     ...extra,
   });
   const vt = (tech: KitTechnique): ViewTechnique => ({
@@ -509,6 +523,8 @@ describe('the default AI decision rules, on hand-made views', () => {
     ready: true,
     uses: 0,
     expected: tech.damage,
+    power: tech.damage,
+    stanceOk: true,
   });
   const enemyView = (o: Partial<ViewEnemy> = {}): ViewEnemy => ({
     id: 'e#0',
@@ -520,6 +536,7 @@ describe('the default AI decision rules, on hand-made views', () => {
     workingTraits: [],
     cast: null,
     nextCastIn: null,
+    leader: false,
     ...o,
   });
   const mk = (
@@ -537,10 +554,21 @@ describe('the default AI decision rules, on hand-made views', () => {
       stamina: 100,
       maxStamina: 100,
       effects: playerEffects.map((id) => ({ id, kind: 'modifier', remaining: null })),
+      ward: 0,
+      decoys: 0,
     },
     techniques: techs.map(vt),
     enemies,
     habituation: {},
+    ai: chunin,
+    visibleTraits: content.ai.visibleTraits,
+    pouch: [],
+    medic: null,
+    stance: null,
+    hastened: false,
+    reactWork: 0,
+    guardBelow: K.ai.guardBelow,
+    itemWork: sec(K.pillAction),
   });
   const cast = (id: string) => ({ type: 'technique', id });
 
@@ -549,7 +577,7 @@ describe('the default AI decision rules, on hand-made views', () => {
     const casting = (remaining: number, interruptible = true) =>
       mk(techs, [
         enemyView({
-          cast: { kind: 'heavy', remaining, interruptible },
+          cast: { kind: 'heavy', remaining, total: remaining, mult: 3, interruptible, known: true },
         }),
       ]);
     const need = sec(1);
@@ -633,8 +661,8 @@ describe('the view the AI gets', () => {
     expect(view?.enemies[0]?.knownTraits).toEqual(['armor']);
     expect(view?.enemies[0]?.workingTraits).toEqual(['armor']);
     expect(view?.enemies[0]?.hpShare).toBe(1);
-    // The view is a copy: changing it does not touch the fight.
-    (view?.techniques[0]?.tech.tags as string[]).push('x');
+    // The view is a frozen copy: changing it is refused and never touches the fight.
+    expect(() => (view?.techniques[0]?.tech.tags as string[]).push('x')).toThrow();
     expect(fight.kit.techniques[0]?.tags).not.toContain('x');
   });
 

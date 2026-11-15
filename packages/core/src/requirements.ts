@@ -39,7 +39,6 @@ const flagValue = (state: GameState, id: string): number => {
   return v === undefined ? 0 : v === true ? 1 : v;
 };
 
-
 function leaf(req: Req, current: number, target: number, ref: EntityRef | null): ReqResult {
   return { req, met: current >= target, current, target, ref, children: [] };
 }

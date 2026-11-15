@@ -74,7 +74,7 @@ add('evasion.chance', 'Chance to dodge a hit');
 add('accuracy', 'Accuracy rating');
 add('defense', 'Defense rating against enemy hits');
 add('heal.food', 'HP restored by salves and food');
-add('wound.heal', 'Time to heal Wounds');
+add('wound.heal', 'Time to heal Wounds (-0.05 is 5% shorter)', { wired: true });
 add('wound.heal.gates', 'Time to heal Wounds taken from the Gates');
 add('pool.hp', 'Size of the HP pool');
 add('pool.chakra', 'Size of the chakra pool');
@@ -85,7 +85,9 @@ add('clone.pool', 'The shared pool of shadow clones');
 add('mission.duration', 'Duration of every mission');
 add('mission.ryo', 'Ryo paid by missions (0.01 is 1% more)');
 add('mission.duration.nin', 'Duration of the mission stages a Ninjutsu technique performs');
-add('shop.price', 'Prices of the shop goods, tools and scrolls (-0.02 is 2% cheaper)', { wired: true });
+add('shop.price', 'Prices of the shop goods, tools and scrolls (-0.02 is 2% cheaper)', {
+  wired: true,
+});
 add('interval.explore', 'Time to explore a cell (-0.05 is 5% shorter)', { wired: true });
 add('interval.walk', 'Time of a walk to another cell (-0.05 is 5% shorter)', { wired: true });
 

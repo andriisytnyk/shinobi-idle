@@ -23,9 +23,11 @@ import type {
   FightResult,
   FightState,
   FightTally,
+  KitEffect,
   KitTechnique,
   ModStat,
   PlayerKit,
+  PouchSlot,
   Spawn,
   Timer,
 } from './fight-types.ts';
@@ -49,7 +51,26 @@ const share = (x: unknown): x is number => isNum(x) && x >= 0 && x <= 1;
 const oneOf = <T extends string>(list: readonly T[], x: unknown): x is T =>
   typeof x === 'string' && (list as readonly string[]).includes(x);
 
-const MOD_STATS: readonly ModStat[] = ['accuracy', 'evasion', 'speed', 'damageTaken'];
+const MOD_STATS: readonly ModStat[] = [
+  'accuracy',
+  'evasion',
+  'speed',
+  'damageTaken',
+  'taiDamage',
+  'resist',
+];
+const KIT_EFFECTS: readonly KitEffect['kind'][] = [
+  'damage',
+  'none',
+  'shield',
+  'decoy',
+  'evasionBuff',
+  'cleanse',
+  'passiveNegate',
+  'stance',
+  'nextCast',
+  'reveal',
+];
 const RESULTS: readonly FightResult[] = ['ongoing', 'victory', 'defeat', 'fled', 'timeout'];
 /** The largest multiplier an effect may carry; more would make a timer fill in no time. */
 const MOD_LIMIT = 10;
@@ -80,10 +101,18 @@ function parseEffect(raw: unknown, t: number): Effect | null {
     if (!oneOf(MOD_STATS, raw.stat) || !isNum(raw.value)) return null;
     if (raw.op !== 'mul' && raw.op !== 'add') return null;
     if (raw.value < 0 || raw.value > MOD_LIMIT) return null;
-    return { ...base, kind: 'modifier', stat: raw.stat, op: raw.op, value: raw.value };
+    if (raw.nature !== undefined && !oneOf(NATURE_IDS, raw.nature)) return null;
+    return {
+      ...base,
+      kind: 'modifier',
+      stat: raw.stat,
+      op: raw.op,
+      value: raw.value,
+      ...(raw.nature === undefined ? {} : { nature: raw.nature }),
+    };
   }
   if (raw.kind === 'periodic') {
-    if (raw.mode !== 'damage' && raw.mode !== 'heal') return null;
+    if (raw.mode !== 'damage' && raw.mode !== 'heal' && raw.mode !== 'stamina') return null;
     // A tick is at least a millisecond apart, or time could never pass.
     if (!nonNeg(raw.amount) || !isInt(raw.every) || raw.every < WORK_PER_MS || !isInt(raw.next)) {
       return null;
@@ -152,6 +181,7 @@ function parseCombatant(raw: unknown, side: Combatant['side'], t: number): Comba
   }
   if (raw.wardUntil !== null && !isInt(raw.wardUntil)) return null;
   if (!isInt(raw.decoys) || raw.decoys < 0) return null;
+  if (raw.decoyUntil !== null && !isInt(raw.decoyUntil)) return null;
   if (raw.fleeAt !== null && !share(raw.fleeAt)) return null;
   if (typeof raw.fled !== 'boolean') return null;
   const max = (x: unknown, m: number) => Math.min(m, x as number);
@@ -185,14 +215,34 @@ function parseCombatant(raw: unknown, side: Combatant['side'], t: number): Comba
     ward: raw.ward as number,
     wardUntil: raw.wardUntil === null ? null : Math.max(raw.wardUntil as number, t),
     decoys: raw.decoys,
+    decoyUntil: raw.decoyUntil === null ? null : Math.max(raw.decoyUntil as number, t),
     fleeAt: raw.fleeAt,
     fled: raw.fled,
+  };
+}
+
+function parseKitEffect(raw: unknown): KitEffect | null {
+  if (!isRecord(raw) || !oneOf(KIT_EFFECTS, raw.kind)) return null;
+  const figures = [raw.amount, raw.mult, raw.drain, raw.wounds];
+  if (!figures.every(nonNeg) || !isInt(raw.durationMs) || raw.durationMs < 0) return null;
+  if (!isInt(raw.everyMs) || raw.everyMs < 0) return null;
+  if (!Array.isArray(raw.statuses) || !raw.statuses.every(isStr)) return null;
+  return {
+    kind: raw.kind,
+    amount: raw.amount as number,
+    mult: raw.mult as number,
+    durationMs: raw.durationMs,
+    drain: raw.drain as number,
+    wounds: raw.wounds as number,
+    everyMs: raw.everyMs,
+    statuses: raw.statuses as string[],
   };
 }
 
 function parseKit(raw: unknown, content: ContentDb): PlayerKit | null {
   if (!isRecord(raw) || !Array.isArray(raw.techniques)) return null;
   if (!nonNeg(raw.med) || !nonNeg(raw.chakraRegen) || !nonNeg(raw.staminaRegen)) return null;
+  if (!nonNeg(raw.toolDamage)) return null;
   const known = new Set(content.techniques.map((t) => t.id));
   const techniques: KitTechnique[] = [];
   for (const t of raw.techniques) {
@@ -209,6 +259,8 @@ function parseKit(raw: unknown, content: ContentDb): PlayerKit | null {
     const figures = [t.damage, t.cost, t.accuracy, t.habituationMult];
     if (!figures.every(nonNeg) || typeof t.hitsAll !== 'boolean') return null;
     if (t.guaranteedCombo !== null && !oneOf(COMBO_IDS, t.guaranteedCombo)) return null;
+    const fx = parseKitEffect(t.fx);
+    if (!fx || typeof t.requiresStance !== 'boolean') return null;
     techniques.push({
       id: t.id,
       skill: t.skill,
@@ -226,9 +278,17 @@ function parseKit(raw: unknown, content: ContentDb): PlayerKit | null {
       hitsAll: t.hitsAll,
       guaranteedCombo: t.guaranteedCombo as ComboId | null,
       habituationMult: t.habituationMult as number,
+      fx,
+      requiresStance: t.requiresStance,
     });
   }
-  return { techniques, med: raw.med, chakraRegen: raw.chakraRegen, staminaRegen: raw.staminaRegen };
+  return {
+    techniques,
+    toolDamage: raw.toolDamage,
+    med: raw.med,
+    chakraRegen: raw.chakraRegen,
+    staminaRegen: raw.staminaRegen,
+  };
 }
 
 function parseTally(raw: unknown): FightTally | null {
@@ -239,7 +299,16 @@ function parseTally(raw: unknown): FightTally | null {
   const combos = numberRecord(raw.combos);
   const masteryWork = numberRecord(raw.masteryWork);
   if (!damage || !uses || !statuses || !combos || !masteryWork) return null;
-  const scalars = [raw.basic, raw.interrupts, raw.kills, raw.taken, raw.time, raw.lastUseAt];
+  const scalars = [
+    raw.basic,
+    raw.interrupts,
+    raw.kills,
+    raw.taken,
+    raw.time,
+    raw.lastUseAt,
+    raw.wounds,
+    raw.woundMin,
+  ];
   if (!scalars.every(nonNeg)) return null;
   return {
     damage,
@@ -254,6 +323,8 @@ function parseTally(raw: unknown): FightTally | null {
     style: raw.style as SkillId,
     lastUseAt: raw.lastUseAt as number,
     masteryWork,
+    wounds: raw.wounds as number,
+    woundMin: raw.woundMin as number,
   };
 }
 
@@ -309,6 +380,19 @@ function parseKnowledge(raw: unknown): Record<string, string[]> | null {
   return out;
 }
 
+function parsePouch(raw: unknown, content: ContentDb): PouchSlot[] | null {
+  const most = content.balance.K.pouch.slots + content.balance.K.pouch.vest;
+  if (!Array.isArray(raw) || raw.length > most) return null;
+  const items = new Set(content.items.map((i) => i.id));
+  const slots: PouchSlot[] = [];
+  for (const s of raw) {
+    if (!isRecord(s) || !isStr(s.id) || !isInt(s.n) || s.n < 0) return null;
+    if (s.id !== '' && !items.has(s.id)) return null;
+    slots.push({ id: s.id, n: s.n });
+  }
+  return slots;
+}
+
 /** A saved fight, checked field by field; null when it is not a usable fight. */
 export function parseFight(raw: unknown, content: ContentDb): FightState | null {
   if (!isRecord(raw) || !isStr(raw.enemy) || !isInt(raw.t) || raw.t < 0) return null;
@@ -335,7 +419,11 @@ export function parseFight(raw: unknown, content: ContentDb): FightState | null 
   const uses = numberRecord(raw.uses);
   const tally = parseTally(raw.tally);
   const knowledge = parseKnowledge(raw.knowledge);
-  if (!kit || !uses || !tally || !knowledge) return null;
+  const pouch = parsePouch(raw.pouch, content);
+  if (!kit || !uses || !tally || !knowledge || !pouch) return null;
+  if (raw.medic !== null && (!isInt(raw.medic) || raw.medic < 0 || raw.medic >= pouch.length)) {
+    return null;
+  }
   if (!Array.isArray(raw.natures) || !raw.natures.every((n) => oneOf(NATURE_IDS, n))) return null;
   if (raw.target !== null && !isStr(raw.target)) return null;
   // A player who is casting casts a technique of the kit.
@@ -358,6 +446,8 @@ export function parseFight(raw: unknown, content: ContentDb): FightState | null 
     natures: raw.natures as NatureId[],
     target: raw.target,
     knowledge,
+    pouch,
+    medic: raw.medic as number | null,
     uses,
     // The next regeneration is within one step of the clock.
     poolAt: Math.min(Math.max(raw.poolAt, t), t + workOf(K.combat.regenMs)),

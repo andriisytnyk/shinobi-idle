@@ -5,8 +5,9 @@ import { defaultFightHooks } from './combat/fight-hooks.ts';
 import type { CombatAi, FightRules } from './combat/fight-types.ts';
 import { tonicProvider } from './buffs.ts';
 import { checkpointProvider } from './checkpoints.ts';
-import { fightKind } from './combat/kind.ts';
+import { fightKind, operationKind } from './combat/kind.ts';
 import { combatSystem } from './combat/system.ts';
+import { woundSystem } from './combat/wounds.ts';
 import { senseiTestKind } from './exam.ts';
 import { craftKind, gatherKind } from './field.ts';
 import { gearProvider } from './gear.ts';
@@ -32,13 +33,14 @@ export interface Rules extends FightRules {
 }
 
 export const defaultRules: Rules = {
-  systems: [actionSystem, combatSystem, villageSystem, questSystem],
+  systems: [actionSystem, combatSystem, woundSystem, villageSystem, questSystem],
   actionKinds: {
     practice: practiceKind,
     drill: drillKind,
     meditate: meditateKind,
     [COURSE_KIND]: courseKind,
     fight: fightKind,
+    operation: operationKind,
     gather: gatherKind,
     craft: craftKind,
     senseiTest: senseiTestKind,

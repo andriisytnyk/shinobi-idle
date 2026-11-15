@@ -278,6 +278,8 @@ export const itemSchema = z.strictObject({
   sell: z.enum(TROPHY_KEYS).optional(),
   /** A tool that rides in the pouch; a pouch slot holds `K.pouchStack` of them. */
   pouch: z.boolean().optional(),
+  /** A medic pouch upgrade: owning it (tier 1 to 3) lets the pouch use a healing slot on its own. */
+  medic: z.number().int().min(1).max(3).optional(),
   /** A scroll that teaches the technique; the price of a library scroll is `K.scroll[level]`. */
   scroll: z
     .strictObject({
@@ -677,9 +679,47 @@ export const operationStageSchema = z.discriminatedUnion('t', [
 export const operationSchema = z.strictObject({
   id: coreId,
   unlock: reqSchema.nullable(),
+  /** The flag raised the first time the operation is finished. */
+  clearFlag: z.string().min(1),
   /** Key of the recovery share between fights in the balance object. */
   regen: z.literal('opRegen'),
   stages: z.array(operationStageSchema).min(1),
+});
+
+/** Rules the player AI can run, in the order a tier lists them (see `fight-ai.ts`). */
+export const AI_RULE_IDS = [
+  'heal',
+  'interrupt',
+  'defend',
+  'answer',
+  'maintain',
+  'signature',
+  'best',
+  'filler',
+  'basic',
+] as const;
+
+/**
+ * One tier of the player AI. `rules` is the ordered priority list; the other fields say how the
+ * rules behave at this tier. The numbers a tier needs live in `K.ai[id]`.
+ */
+export const aiTierSchema = z.strictObject({
+  id: z.enum(['genin', 'chunin']),
+  /** The lowest player tier (0 student, 1 genin, 2 chunin) that runs this tier. */
+  minTier: z.number().int().min(0),
+  rules: z.array(z.enum(AI_RULE_IDS)).min(1),
+  /** `known`: defends against the casts it knows to be heavy; `all`: every cast. */
+  defends: z.enum(['known', 'all']),
+  /** Whether it needs the reaction delay before it answers a cast. */
+  reaction: z.boolean(),
+  /** Whether the best attack counts the nature wheel and habituation, or only raw strength. */
+  tactical: z.boolean(),
+});
+
+export const aiSchema = z.strictObject({
+  /** Traits that show from the first sight of an enemy; the others need a victory over it. */
+  visibleTraits: z.array(traitId),
+  tiers: z.array(aiTierSchema).min(1),
 });
 
 /** A status; its numbers live in the balance object under the status id. */
@@ -702,6 +742,17 @@ export const comboSchema = z.strictObject({ id: comboId, nature: natureId, onSta
 // ---------- balance ----------
 
 const pair = z.tuple([z.number(), z.number()]);
+/** The numbers every rival special shares: technique count, cadence and strength of the techniques and of the signature. */
+const rivalNumbers = z.object({
+  techniques: z.number().int(),
+  everyMs: z.number().int(),
+  mult: z.number(),
+  sigEveryMs: z.number().int(),
+  sigMult: z.number(),
+  sigOpenMs: z.number().int(),
+  hp: z.number(),
+  dmg: z.number(),
+});
 const byRank = z.record(rankId, z.number());
 
 export const balanceParamsSchema = z.object({
@@ -769,18 +820,38 @@ export const balanceParamsSchema = z.object({
     reveal: z.object({ durationMs: z.number().int() }),
   }),
   bossFx: z.object({
-    wolfPack: z.object({ count: z.number().int(), everyMs: z.number().int() }),
-    rivalDuel: z.object({ techniques: z.number().int() }),
-    rivalTournament: z.object({ techniques: z.number().int(), habituationMult: z.number() }),
-    drunkenEvasion: z.object({ maxMult: z.number() }),
+    wolfPack: z.object({
+      count: z.number().int(),
+      everyMs: z.number().int(),
+      hp: z.number(),
+      dmg: z.number(),
+      leaderHp: z.number(),
+      leaderDmg: z.number(),
+    }),
+    rivalDuel: rivalNumbers,
+    rivalTournament: rivalNumbers.extend({ habituationMult: z.number() }),
+    drunkenEvasion: z.object({ maxMult: z.number(), hp: z.number(), dmg: z.number() }),
     heavyCast: z.object({
       everyMs: z.number().int(),
       castMs: z.number().int(),
       damageMult: z.number(),
+      stunMs: z.number().int(),
+      hp: z.number(),
+      dmg: z.number(),
     }),
-    twins: z.object({ count: z.number().int() }),
-    mistRehide: z.object({ everyMs: z.number().int() }),
-    illusion: z.object({ everyMs: z.number().int(), fleeAtHp: z.number() }),
+    twins: z.object({
+      count: z.number().int(),
+      hpEach: z.number(),
+      dmgEach: z.number(),
+      mistMult: z.number(),
+    }),
+    mistRehide: z.object({ everyMs: z.number().int(), hp: z.number(), dmg: z.number() }),
+    illusion: z.object({
+      everyMs: z.number().int(),
+      fleeAtHp: z.number(),
+      hp: z.number(),
+      dmg: z.number(),
+    }),
   }),
   ryoDrop: pair,
   dropChance: z.object({
@@ -938,6 +1009,23 @@ export const balanceParamsSchema = z.object({
     maxEnemies: z.number().int(),
   }),
   bindEva: z.number(),
+  loadout: z.object({
+    slots: z.object({ genin: z.number().int(), chunin: z.number().int() }),
+    natures: z.object({ genin: z.number().int(), chunin: z.number().int() }),
+    saved: z.number().int(),
+    nameMax: z.number().int(),
+    areaBodies: z.number(),
+  }),
+  signature: z.object({ minMastery: z.number().int(), xpBonus: z.number() }),
+  pouch: z.object({ slots: z.number().int(), vest: z.number().int(), vestRank: playerRankId }),
+  ai: z.object({ geninReactionMs: z.number().int(), guardBelow: z.number() }),
+  woundHp: z.number(),
+  regionZones: z.object({
+    openFromRank: z.union([playerRankId, z.literal('off')]),
+    regions: z.array(z.string()),
+  }),
+  operation: z.object({ approachMs: z.number().int(), approachShort: z.number() }),
+  toolFx: z.object({ dot: z.object({ pct: z.number(), durS: z.number() }), resist: z.number() }),
   illusionResist: z.number(),
   senseiTest: z.object({ base: z.number(), perLevel: z.number(), floor: z.number() }),
   natures: z.object({
@@ -1028,6 +1116,7 @@ export const contentDbSchema = z.object({
   statuses: z.array(statusSchema),
   traits: z.array(traitSchema),
   combos: z.array(comboSchema),
+  ai: aiSchema,
 });
 
 /**
@@ -1047,6 +1136,7 @@ export const generatedDbSchema = contentDbSchema
     statuses: true,
     traits: true,
     combos: true,
+    ai: true,
   })
   .extend({
     buildings: z.array(buildingBaseSchema),
@@ -1109,6 +1199,9 @@ export type OperationStage = z.infer<typeof operationStageSchema>;
 export type Status = z.infer<typeof statusSchema>;
 export type TraitEntity = z.infer<typeof traitSchema>;
 export type Combo = z.infer<typeof comboSchema>;
+export type AiTier = z.infer<typeof aiTierSchema>;
+export type AiData = z.infer<typeof aiSchema>;
+export type AiRuleId = (typeof AI_RULE_IDS)[number];
 export type TechniqueCombat = z.infer<typeof techniqueCombatSchema>;
 export type TechniqueEffect = z.infer<typeof techniqueEffectSchema>;
 export type BossSpecial = z.infer<typeof bossSpecialSchema>;

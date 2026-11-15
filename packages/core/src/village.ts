@@ -18,7 +18,10 @@ const isCount = (n: unknown): n is number =>
   typeof n === 'number' && Number.isSafeInteger(n) && n >= 1;
 
 /** The building that performs a duty of the village rules (the store, the Bureau, the Library), if the content has one. */
-export function dutyBuilding(content: ContentDb, duty: NonNullable<Building['duty']>): Building | null {
+export function dutyBuilding(
+  content: ContentDb,
+  duty: NonNullable<Building['duty']>,
+): Building | null {
   return content.buildings.find((b) => b.duty === duty) ?? null;
 }
 
@@ -71,7 +74,11 @@ export function stageCap(village: VillageState, content: ContentDb): number {
 }
 
 /** What building `level` costs: civil resources, treasury ryo and, for the last level, the shinobi resources. */
-export function villageBuildCost(building: Building, level: number, content: ContentDb): VillageCost {
+export function villageBuildCost(
+  building: Building,
+  level: number,
+  content: ContentDb,
+): VillageCost {
   const K = content.balance.K;
   const mult = K.costMult[level - 1] ?? 0;
   const base = Math.round(K.costBase * mult);
@@ -173,7 +180,10 @@ export function buildCheck(
   const level = levelOf(village, building.id) + 1;
   const top = K.costMult.length;
   if (level > maxBuildingLevel(building, content)) {
-    return { ok: false, reason: level >= top && !building.tier6 ? 'error.noLevelSix' : 'error.maxLevel' };
+    return {
+      ok: false,
+      reason: level >= top && !building.tier6 ? 'error.noLevelSix' : 'error.maxLevel',
+    };
   }
   if (level > stageCap(village, content)) {
     return { ok: false, reason: level >= top ? 'error.stageNotReached' : 'error.stageCap' };
@@ -190,11 +200,17 @@ export function buildCheck(
 }
 
 /** Starts the next level of a building: the costs are taken now and the job waits for its ticks. */
-export function startBuild(state: GameState, buildingId: string, content: ContentDb): CommandResult {
+export function startBuild(
+  state: GameState,
+  buildingId: string,
+  content: ContentDb,
+): CommandResult {
   const check = buildCheck(state, buildingId, content);
   const village = state.village;
-  if (!check.ok || !village) return { ok: false, reason: check.ok ? 'error.noVillage' : check.reason };
-  for (const [id, n] of Object.entries(check.cost.res)) village.res[id] = (village.res[id] ?? 0) - n;
+  if (!check.ok || !village)
+    return { ok: false, reason: check.ok ? 'error.noVillage' : check.reason };
+  for (const [id, n] of Object.entries(check.cost.res))
+    village.res[id] = (village.res[id] ?? 0) - n;
   for (const [id, n] of Object.entries(check.cost.shinobi)) {
     village.shinobi[id] = (village.shinobi[id] ?? 0) - n;
   }
@@ -299,5 +315,7 @@ export function treasuryIncome(state: GameState, content: ContentDb): number {
   const village = state.village;
   if (!village) return 0;
   const bureau = dutyBuilding(content, 'treasury');
-  return content.balance.K.bureauIncome * (bureau ? levelOf(village, bureau.id) : 0) + village.power;
+  return (
+    content.balance.K.bureauIncome * (bureau ? levelOf(village, bureau.id) : 0) + village.power
+  );
 }
