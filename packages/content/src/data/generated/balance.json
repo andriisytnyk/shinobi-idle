@@ -320,7 +320,7 @@
       "casterEvery": 12,
       "casterCast": 3,
       "casterMult": 3,
-      "evasive": 2,
+      "evasive": 1.6,
       "regenPct": 0.01,
       "illusionEvery": 10,
       "illusionDur": 6,
