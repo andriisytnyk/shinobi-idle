@@ -191,6 +191,16 @@ describe('every route of every core entity (R1, T2)', () => {
   }, 300_000);
 });
 
+describe('a name-only page still says what opens the entity', () => {
+  it('shows the requirement of a mission the rank does not allow yet, and no description', async () => {
+    booted = await bootApp([coreUi], freshState(), '#/mission/core:cat');
+    const page = booted.target.querySelector('[data-name-only]');
+    expect(page).not.toBeNull();
+    expect(page?.querySelector('[data-entity-req]')).not.toBeNull();
+    expect(page?.textContent).not.toContain(textsOf({ kind: 'mission', id: 'core:cat' }).desc);
+  });
+});
+
 describe('what the app prints during a run (R1, T3)', () => {
   it('never prints the name of an entity that is still hidden', async () => {
     const state = freshState();

@@ -6,6 +6,7 @@ import { indexOf, shopEntries } from './lookup.ts';
 import { evalReq, type Req } from './requirements.ts';
 import { defaultRules, type Rules } from './rules.ts';
 import { buyPrice } from './shop.ts';
+import { addShown } from './shown.ts';
 import type { GameState } from './state.ts';
 import { cellLevel } from './world.ts';
 
@@ -465,6 +466,6 @@ export function markSeen(state: GameState, refs: unknown, content: ContentDb): C
   const room = seenLimit(content) - Object.keys(state.shown).length;
   const unique = [...new Set(fresh)];
   if (unique.length > room) return { ok: false, reason: 'error.revealRefused' };
-  for (const id of unique) state.shown[id] = true;
+  for (const id of unique) addShown(state, id, seenLimit(content));
   return { ok: true };
 }

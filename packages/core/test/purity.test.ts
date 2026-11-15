@@ -38,8 +38,9 @@ describe('A9: core source hygiene', () => {
       'combat/loadout.ts': [24], // longest name of a saved loadout
       'save.ts': [4, 6], // four words of an rng stream; nesting depth of slot data
       'combat/report.ts': [1000, 100, 64], // three decimals of a multiplier, percent of a pool, longest id read from a save
-      'state.ts': [1000, 4, 16], // share scale, rng words, save version
-      'reveal.ts': [6, 64], // how deep the data of an entity is searched for the ids it names; most refs one mark carries
+      'state.ts': [1000, 4, 15], // share scale, rng words, save version
+      'reveal.ts': [6, 64],
+      'shown.ts': [4000], // ceiling of the shown set for writes that do not know the content, // how deep the data of an entity is searched for the ids it names; most refs one mark carries
       'guard.ts': [16, 64], // deepest requirement tree and widest node a pack's callback may return
       'pack-data.ts': [6, 16, 32, 64, 256, 4000], // limits on what a hostile save may make the loader keep: nesting depth, natures, packs, version text, text length, entries
       'xp.ts': [4, 7, 300], // the fixed Melvor level curve

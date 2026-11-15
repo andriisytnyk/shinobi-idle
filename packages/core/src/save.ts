@@ -197,10 +197,7 @@ export const MIGRATIONS: readonly Migration[] = [
       dormant: {},
     };
   },
-  // v14 -> v15: reserved for the Evasion-skill removal of branch feat/fight-loop-v2, which takes
-  // this version; its migration replaces this empty step when the two branches meet.
-  (state) => state,
-  // v15 -> v16: the set of entities the interface has shown (the reveal rule's `seen`), empty at first.
+  // v14 -> v15: the set of entities the interface has shown (the reveal rule), empty at first.
   (state) => ({ ...state, shown: {} }),
 ];
 

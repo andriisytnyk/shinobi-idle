@@ -295,7 +295,7 @@ describe('the command reveal.mark', () => {
   it('migrates an older save with an empty set', () => {
     const state = createState(1, content);
     const raw = JSON.parse(serialize(state)) as { v: number; state: Record<string, unknown> };
-    raw.v = 15;
+    raw.v = 14;
     delete raw.state.shown;
     expect(deserialize(JSON.stringify(raw), content).shown).toEqual({});
   });

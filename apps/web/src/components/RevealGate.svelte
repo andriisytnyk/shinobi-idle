@@ -1,11 +1,14 @@
 <script lang="ts">
   import type { IconKind } from '@shinobi/content';
+  import { evalReq } from '@shinobi/core';
   import { entityName } from '../lib/entities.ts';
+  import { findEntity, reqOf } from '../lib/entity-data.ts';
   import { t } from '../lib/i18n.ts';
   import { revealHintKey } from '../lib/reveal.ts';
   import type { EntityRef } from '../lib/route.ts';
   import { game } from '../lib/store.ts';
   import Icon from './Icon.svelte';
+  import ReqTree from './ReqTree.svelte';
 
   interface Props {
     entity: EntityRef;
@@ -16,6 +19,14 @@
   let { entity, level }: Props = $props();
 
   const hint = $derived(revealHintKey(entity));
+  /** What opens the entity is not a secret (the board and the lists show it): a name-only page still says it. */
+  const gate = $derived(
+    game.read((gs) => {
+      const data = findEntity(game.content, entity);
+      const req = data ? reqOf(data) : null;
+      return req ? evalReq(gs, req, game.content) : null;
+    }),
+  );
   const hasIcon = $derived(Object.hasOwn(game.content.icons, entity.kind));
 </script>
 
@@ -38,6 +49,12 @@
       {entityName(entity)}
     </h1>
     <p>{t('reveal.name.body')}</p>
+    {#if gate}
+      <section data-entity-req data-ui="entity-section">
+        <h2>{t('entity.requirements')}</h2>
+        <ReqTree node={gate} />
+      </section>
+    {/if}
     {#if hint}<p class="hint" data-reveal-hint>{t('reveal.howTo')} {t(hint)}.</p>{/if}
   </article>
 {/if}

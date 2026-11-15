@@ -1,3 +1,4 @@
+import { addShown, SHOWN_CEILING } from './shown.ts';
 import type { GameState } from './state.ts';
 
 /** A currency id of the content. */
@@ -15,7 +16,7 @@ export function addItem(state: GameState, id: string, n: number): boolean {
   if (n > 0) {
     state.bank[id] = (state.bank[id] ?? 0) + n;
     // Having held an item is remembered for the reveal rule: it stays shown after the last one is used up.
-    state.shown[id] = true;
+    addShown(state, id, SHOWN_CEILING);
   }
   return true;
 }
