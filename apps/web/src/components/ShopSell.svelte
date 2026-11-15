@@ -33,7 +33,7 @@
 
 <li class="ct-row" data-sell={item} data-owned={owned}>
   <span class="ct-icon"><Icon entity={{ kind: 'item', id: item }} size={28} /></span>
-  <span class="grow"><EntityLink kind="item" id={item} /></span>
+  <span class="grow"><EntityLink kind="item" id={item} offered /></span>
   <span class="ct-muted" data-sell-price
     >{t('shop.sellPrice', { n: formatInt(price), currency: moneyName(game.content) })}</span
   >

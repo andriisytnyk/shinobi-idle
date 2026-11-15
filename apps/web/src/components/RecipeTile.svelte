@@ -52,7 +52,7 @@
   <div class="ct-top">
     <ActionEmblem kind="recipe" id={info.id} skill={info.skill} />
     <div class="ct-head">
-      <h3 class="ct-name"><EntityLink kind="recipe" id={info.id} /></h3>
+      <h3 class="ct-name"><EntityLink kind="recipe" id={info.id} offered /></h3>
       <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
     </div>
   </div>
@@ -99,7 +99,7 @@
         <li class="output" data-output={out.item}>
           <Icon entity={{ kind: 'item', id: out.item }} size={18} />
           <span class="qty">&times;{formatInt(out.n)}</span>
-          <EntityLink kind="item" id={out.item} />
+          <EntityLink kind="item" id={out.item} offered />
           <span class="ct-muted"
             >{t('craft.owned', { n: formatInt(game.read((gs) => gs.bank[out.item] ?? 0)) })}</span
           >

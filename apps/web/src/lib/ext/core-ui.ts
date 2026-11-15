@@ -169,6 +169,7 @@ export const coreUi: UiPack = {
       kind: string,
       mount: Parameters<typeof ui.addPage>[0]['mount'],
       nav?: string,
+      reveal?: 'self',
     ): void =>
       ui.addPage({
         id: `entity.${kind}`,
@@ -176,6 +177,7 @@ export const coreUi: UiPack = {
         title: `entity.kind.${kind}`,
         nav,
         mount,
+        ...(reveal ? { reveal } : {}),
       });
     entity('quest', { svelte: QuestsPage }, 'quests');
     entity('mission', byId(MissionPage), 'missions');
@@ -190,7 +192,8 @@ export const coreUi: UiPack = {
       svelte: WorldPage,
       props: ({ hash }: { hash: string }) => ({ focus: worldFocus(parseHash(hash)) }),
     };
-    for (const kind of ['cell', 'region', 'poi']) entity(kind, world, 'world');
+    // The map shows a place by name before it is explored: its panel keeps the description back itself.
+    for (const kind of ['cell', 'region', 'poi']) entity(kind, world, 'world', 'self');
     ui.addPage({
       id: 'entity',
       route: '#/:kind/*id',

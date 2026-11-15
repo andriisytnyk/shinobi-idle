@@ -7,6 +7,7 @@
   import { entityDesc } from '../lib/entities.ts';
   import { hasKey, t } from '../lib/i18n.ts';
   import { stepStatus } from '../lib/next-step.ts';
+  import { MASK } from '../lib/reveal.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
 
@@ -58,8 +59,13 @@
               )}</span
             >
           </div>
-          <p class="text">{t(step.textKey)}</p>
-          <div class="objective"><QuestObjective {quest} index={i} /></div>
+          {#if status === 'pending'}
+            <!-- The steps a chain has not reached stay unread: the story is not spoiled. -->
+            <p class="text" data-step-hidden>{MASK}</p>
+          {:else}
+            <p class="text">{t(step.textKey)}</p>
+            <div class="objective"><QuestObjective {quest} index={i} /></div>
+          {/if}
         </li>
       {/each}
     </ol>

@@ -53,6 +53,7 @@ import {
 } from './state.ts';
 import { updateQuests } from './quests.ts';
 import { refreshRegions, regionFlag } from './regions.ts';
+import { isEntityId, seenLimit } from './reveal.ts';
 import { refreshUnlocks } from './unlocks.ts';
 import {
   villageBuildCost,
@@ -196,6 +197,11 @@ export const MIGRATIONS: readonly Migration[] = [
       dormant: {},
     };
   },
+  // v14 -> v15: reserved for the Evasion-skill removal of branch feat/fight-loop-v2, which takes
+  // this version; its migration replaces this empty step when the two branches meet.
+  (state) => state,
+  // v15 -> v16: the set of entities the interface has shown (the reveal rule's `seen`), empty at first.
+  (state) => ({ ...state, shown: {} }),
 ];
 
 /** Deepest nesting a slot's data may have. */
@@ -637,6 +643,12 @@ export function deserialize(
       bounty: Math.min(ceiling, n(v.bounty)),
     };
   });
+  // The set of shown entities is trusted only as far as the ids go: each must be an entity of the content, and the set is bounded.
+  state.shown = Object.fromEntries(
+    Object.keys(pick(raw.shown, (key) => (isEntityId(content, key) ? (true as const) : undefined)))
+      .slice(0, seenLimit(content))
+      .map((key) => [key, true as const]),
+  );
   state.report = pick(raw.report, (key, v) =>
     entryOf(content, key) || Object.values(rules.actionKinds).some((kind) => kind.has(key, content))
       ? (parseReport(v, content) ?? undefined)

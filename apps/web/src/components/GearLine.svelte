@@ -52,7 +52,7 @@
 <section class="gear" data-gear={line.id} data-owned={view.owned}>
   <h3 class="name">
     <span class="icon"><Icon entity={ref} size={24} /></span>
-    <EntityLink kind="gear" id={line.id} />
+    <EntityLink kind="gear" id={line.id} offered />
     <span class="tiers" data-tiers>{t('gear.tiers', { n: view.owned, of: line.tiers.length })}</span
     >
   </h3>

@@ -58,7 +58,7 @@
   <div class="ct-top">
     <ActionEmblem kind="item" id={info.id} skill={info.skill} />
     <div class="ct-head">
-      <h3 class="ct-name"><EntityLink kind="item" id={info.id} /></h3>
+      <h3 class="ct-name"><EntityLink kind="item" id={info.id} offered /></h3>
       <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
     </div>
   </div>

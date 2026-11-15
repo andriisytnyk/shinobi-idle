@@ -60,7 +60,7 @@
   data-entity="item:{item}"
 >
   <span class="ct-icon"><Icon entity={{ kind: 'item', id: item }} size={28} /></span>
-  <span class="grow"><EntityLink kind="item" id={item} /></span>
+  <span class="grow"><EntityLink kind="item" id={item} offered /></span>
   <span class="ct-muted" data-price>{t('shop.price', { n: formatInt(price), currency: unit })}</span
   >
   <span class="ct-muted" data-have>{t('shop.owned', { n: formatInt(owned) })}</span>

@@ -5,6 +5,8 @@
   import EntityLink from '../components/EntityLink.svelte';
   import Icon from '../components/Icon.svelte';
   import ReqTree from '../components/ReqTree.svelte';
+  import RevealGate from '../components/RevealGate.svelte';
+  import { revealLevel } from '../lib/reveal.ts';
   import ZoneWhere from '../components/ZoneWhere.svelte';
   import { entityDesc, entityName } from '../lib/entities.ts';
   import { entityRefsIn, findEntity, reqOf } from '../lib/entity-data.ts';
@@ -19,6 +21,9 @@
 
   let { entity }: Props = $props();
 
+  /** How much the player may see; the app gate already holds back what is not shown, this keeps a page mounted by hand honest. */
+  const revealed = $derived(revealLevel(entity));
+  const level = $derived(revealed === 'hidden' ? 'hidden' : revealed === 'name' ? 'name' : 'full');
   const desc = $derived(entityDesc(entity));
   /** The fight zones where an enemy is met, each tied to a map cell. */
   const zones = $derived(
@@ -38,7 +43,9 @@
   const links = $derived(data ? entityRefsIn(data, content, entity) : []);
 </script>
 
-{#if !data}
+{#if level !== 'full'}
+  <RevealGate {entity} {level} />
+{:else if !data}
   <article
     class="entity-page"
     data-ui="entity-page"

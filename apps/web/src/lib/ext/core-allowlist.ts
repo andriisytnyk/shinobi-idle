@@ -95,6 +95,8 @@ export const CORE_API = {
     'techniqueNumbers',
     'techniqueFigures',
     'enemyStats',
+    'revealOf',
+    'revealHint',
   ],
   world: [
     'villageBuildings',

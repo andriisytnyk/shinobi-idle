@@ -30,7 +30,7 @@
   {:else if reward.t === 'item'}
     <Icon entity={{ kind: 'item', id: reward.id }} size={16} />
     <span>
-      <EntityLink kind="item" id={reward.id} />
+      <EntityLink kind="item" id={reward.id} offered />
       {#if reward.n > 1}×{formatInt(reward.n)}{/if}
       {#if percent < 100}<span class="chance">{t('mission.chance', { pct: percent })}</span>{/if}
     </span>

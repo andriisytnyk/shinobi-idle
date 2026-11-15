@@ -312,27 +312,51 @@
     },
     {
       "id": "item",
-      "list": "items"
+      "list": "items",
+      "reveal": {
+        "name": ["named"],
+        "full": ["owned", "known", "seen"]
+      }
     },
     {
       "id": "recipe",
-      "list": "recipes"
+      "list": "recipes",
+      "reveal": {
+        "name": ["named"],
+        "full": ["known", "seen"]
+      }
     },
     {
       "id": "mission",
-      "list": "missions"
+      "list": "missions",
+      "reveal": {
+        "name": ["named"],
+        "full": ["unlocked"]
+      }
     },
     {
       "id": "enemy",
-      "list": "enemies"
+      "list": "enemies",
+      "reveal": {
+        "name": ["seen", "named"],
+        "full": ["encountered"]
+      }
     },
     {
       "id": "boss",
-      "list": "bosses"
+      "list": "bosses",
+      "reveal": {
+        "name": ["seen", "named"],
+        "full": ["encountered"]
+      }
     },
     {
       "id": "region",
-      "list": "regions"
+      "list": "regions",
+      "reveal": {
+        "name": ["adjacent", "named", "seen"],
+        "full": ["explored"]
+      }
     },
     {
       "id": "building",
@@ -340,7 +364,11 @@
     },
     {
       "id": "gear",
-      "list": "gear"
+      "list": "gear",
+      "reveal": {
+        "name": ["named"],
+        "full": ["owned", "seen"]
+      }
     },
     {
       "id": "seal",
@@ -368,7 +396,11 @@
     },
     {
       "id": "quest",
-      "list": "quests"
+      "list": "quests",
+      "reveal": {
+        "name": ["unlocked"],
+        "full": ["questStarted"]
+      }
     },
     {
       "id": "exam",
@@ -376,11 +408,18 @@
     },
     {
       "id": "cell",
-      "list": "cells"
+      "list": "cells",
+      "reveal": {
+        "name": ["parent", "seen"],
+        "full": ["explored"]
+      }
     },
     {
       "id": "poi",
-      "list": null
+      "list": null,
+      "reveal": {
+        "full": ["explored"]
+      }
     },
     {
       "id": "combo",

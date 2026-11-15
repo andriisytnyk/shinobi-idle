@@ -4,7 +4,7 @@
  * exist in the balance object, and every modifier key must be a key of the composed database.
  * Each problem names the pack that owns the entity holding the dangling reference.
  */
-import type { ContentDb, Req } from './schema.ts';
+import type { ContentDb, Req, RevealRule, RevealTerm } from './schema.ts';
 import type { EntityListKey } from './pack.ts';
 
 /** The effects the engine and the core hooks put on a body under their own ids (not statuses): a tag or a trait may name them. */
@@ -604,6 +604,85 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
           at(list, e.id);
           problem('locale', `missing locale key ${key}`);
         }
+      }
+    }
+  }
+  // ----- reveal rules: terms that fit the kind, requirement trees that close -----
+  const revealTermApplies = (term: RevealTerm, list: string | null, kind: string): boolean => {
+    if (typeof term !== 'string') return true;
+    switch (term) {
+      case 'encountered':
+        return list === 'enemies' || list === 'bosses';
+      case 'questStarted':
+        return list === 'quests';
+      case 'explored':
+        return list === 'cells' || list === 'regions' || kind === 'poi';
+      case 'adjacent':
+        return list === 'regions';
+      case 'parent':
+        return list === 'cells' || kind === 'poi';
+      default:
+        return true;
+    }
+  };
+  const checkReveal = (
+    field: string,
+    rule: RevealRule,
+    list: string | null,
+    kind: string,
+  ): void => {
+    for (const part of ['name', 'full'] as const) {
+      (rule[part] ?? []).forEach((term, i) => {
+        if (typeof term !== 'string') req(`${field}.${part}[${i}].req`, term.req);
+        else if (!revealTermApplies(term, list, kind))
+          problem(
+            `${field}.${part}[${i}]`,
+            `the term "${term}" does not apply to the kind "${kind}"`,
+          );
+      });
+    }
+  };
+  for (const k of db.entityKinds) {
+    if (k.reveal) {
+      at('entityKinds', k.id);
+      checkReveal('reveal', k.reveal, k.list, k.id);
+    }
+    const entities =
+      k.list === null
+        ? []
+        : ((db as unknown as Plain)[k.list] as { id: string; reveal?: RevealRule }[]);
+    for (const e of entities) {
+      if (!e.reveal) continue;
+      at(k.list as string, e.id);
+      checkReveal('reveal', e.reveal, k.list, k.id);
+    }
+    if (k.id === 'poi') {
+      for (const cell of db.cells) {
+        for (const poi of cell.pois) {
+          if (!poi.reveal) continue;
+          at('cells', cell.id);
+          checkReveal('reveal', poi.reveal, null, 'poi');
+        }
+      }
+    }
+  }
+  for (const manifest of db.packs) {
+    for (const [kindId, rule] of Object.entries(manifest.reveal ?? {})) {
+      const k = db.entityKinds.find((x) => x.id === kindId);
+      if (!k) {
+        problems.push({
+          pack: manifest.id,
+          message: `manifest reveal: "${kindId}" is not a known entity kind`,
+        });
+        continue;
+      }
+      at('entityKinds', k.id);
+      const before = problems.length;
+      checkReveal(`manifest reveal.${kindId}`, rule, k.list, k.id);
+      // The problem belongs to the pack whose manifest holds the rule, not to the owner of the kind.
+      for (let i = before; i < problems.length; i++) {
+        const p = problems[i];
+        if (p) p.pack = manifest.id;
       }
     }
   }

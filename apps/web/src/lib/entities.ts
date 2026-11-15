@@ -1,5 +1,6 @@
 import type { ContentDb } from '@shinobi/content';
 import { fallbackText, hasKey, reportMissing, t } from './i18n.ts';
+import { MASK, revealLevel } from './reveal.ts';
 import { isEntityKind, type EntityRef } from './route.ts';
 
 export { isEntityKind };
@@ -23,16 +24,21 @@ export function humanId(id: string): string {
   return fallbackText(`x.${id.slice(id.lastIndexOf(':') + 1)}`);
 }
 
-/** Localized display name of an entity; a missing text shows the humanised id (and is reported once in dev), never a key. */
+/**
+ * Localized display name of an entity; a missing text shows the humanised id (and is reported once
+ * in dev), never a key. An entity the player has not discovered reads «???» (the reveal rule).
+ */
 export function entityName(ref: EntityRef): string {
+  if (revealLevel(ref) === 'hidden') return MASK;
   const key = textKey(ref, 'name');
   if (key) return t(key);
   reportMissing(`${localeKinds(ref.kind)[0] ?? ref.kind}.${ref.id}.name`);
   return humanId(ref.id);
 }
 
-/** Localized description, or `null` when the entity has none. */
+/** Localized description, or `null` when the entity has none or the player may not read it yet. */
 export function entityDesc(ref: EntityRef): string | null {
+  if (revealLevel(ref) !== 'full') return null;
   // A map cell carries a short note instead of a description.
   const key = textKey(ref, ref.kind === 'cell' ? 'note' : 'desc');
   return key ? t(key) : null;

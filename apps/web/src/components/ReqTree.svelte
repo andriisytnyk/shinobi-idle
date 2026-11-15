@@ -4,6 +4,7 @@
   import { rankName } from '../lib/vocab.ts';
   import { formatInt } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
+  import { nameShown } from '../lib/reveal.ts';
   import { flagEntity } from '../lib/world.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
@@ -21,6 +22,8 @@
 
   const req = $derived(node.req);
   const ref = $derived(webRef(node.ref));
+  /** A row about an entity the player has not discovered keeps its place (the player sees that something is asked) but not the id. */
+  const shown = $derived(ref !== null && nameShown(ref));
   const isGroup = $derived(req.t === 'all' || req.t === 'any');
   /** Rows with a count to reach show it with a thin bar. */
   const counted = $derived(
@@ -61,31 +64,31 @@
     class:met={node.met}
     data-met={node.met}
     data-ui={part}
-    data-entity={ref ? `${ref.kind}:${ref.id}` : undefined}
+    data-entity={ref && shown ? `${ref.kind}:${ref.id}` : undefined}
   >
     <span class="mark"><Icon name={node.met ? 'lucide:check' : 'lucide:minus'} size={14} /></span>
     <span class="label">
       {#if req.t === 'skill'}
-        {#if ref}<EntityLink kind={ref.kind} id={ref.id} />{/if}
+        {#if ref}<EntityLink kind={ref.kind} id={ref.id} offered />{/if}
         <span class="detail">{t('req.level', { n: req.level })}</span>
       {:else if req.t === 'technique'}
-        {#if ref}<EntityLink kind={ref.kind} id={ref.id} />{/if}
+        {#if ref}<EntityLink kind={ref.kind} id={ref.id} offered />{/if}
         <span class="detail">{t(node.met ? 'req.known' : 'req.unknown')}</span>
       {:else if req.t === 'nature'}
         <span class="detail">{t('req.nature')}</span>
-        {#if ref}<EntityLink kind={ref.kind} id={ref.id} />{/if}
+        {#if ref}<EntityLink kind={ref.kind} id={ref.id} offered />{/if}
         {#if !node.met}<a class="detail-link" href="#/nature">{t('req.natureLink')}</a>{/if}
       {:else if req.t === 'item'}
-        {#if ref}<EntityLink kind={ref.kind} id={ref.id} />{/if}
+        {#if ref}<EntityLink kind={ref.kind} id={ref.id} offered />{/if}
       {:else if req.t === 'rank'}
         {t('req.rank', { rank: rankName(req.rank) })}
       {:else if req.t === 'flag' && flagRef}
-        <EntityLink kind={flagRef.kind} id={flagRef.id} />
+        <EntityLink kind={flagRef.kind} id={flagRef.id} offered />
         <span class="detail">{t(flagRef.kind === 'poi' ? 'req.poiFound' : 'req.regionOpen')}</span>
       {:else if req.t === 'flag'}
         {flagText}
       {:else if ref}
-        <EntityLink kind={ref.kind} id={ref.id} />
+        <EntityLink kind={ref.kind} id={ref.id} offered />
       {:else}
         {t(`req.type.${req.t}`)}
       {/if}

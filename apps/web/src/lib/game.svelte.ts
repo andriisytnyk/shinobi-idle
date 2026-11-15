@@ -5,6 +5,8 @@ import {
   createState,
   defaultRules,
   dispatch as coreDispatch,
+  revealHint,
+  revealOf,
   type Command,
   type CommandResult,
   type GameEvent,
@@ -35,6 +37,7 @@ import { composeBoot } from './boot.ts';
 import { deepFreeze } from './freeze.ts';
 import { detach as detachData } from './read.ts';
 import { requestPersistentStorage } from './platform.ts';
+import { setRevealReader } from './reveal.ts';
 import type { TabLock } from './tab-lock.ts';
 import { packsToasts, toastFor, toasts as defaultToasts } from './toasts.svelte.ts';
 
@@ -140,6 +143,29 @@ export function createGame(deps: GameDeps = {}) {
   let graduation = $state(false);
   /** One-off happenings of this session that hints wait for (a craft that ran out of ingredients). */
   let signals = $state.raw<Signals>({});
+
+  // The reveal rule for the components: reading through `version` makes whatever uses it follow the game.
+  setRevealReader({
+    level(ref) {
+      void version;
+      return revealOf(state, ref, content, rules);
+    },
+    hint(ref) {
+      void version;
+      return revealHint(state, ref, content, rules);
+    },
+    mark(refs) {
+      let changed = false;
+      for (const ref of refs) {
+        if (state.shown[ref.id] === true || revealOf(state, ref, content, rules) === 'full')
+          continue;
+        // Straight to the core, past the hooks of the packs: the mark is bookkeeping, not a player's command.
+        if (coreDispatch(state, { type: 'reveal.mark', refs: [ref] }, content, rules).ok)
+          changed = true;
+      }
+      if (changed) touch();
+    },
+  });
 
   /** Revision of the save this tab last read or wrote; a stored revision above it means a newer save exists. */
   let rev = 0;

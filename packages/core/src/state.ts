@@ -136,13 +136,15 @@ export interface GameState {
   bingo: Record<string, BingoEntry>;
   /** Battle reports by target (zone, enemy or operation id): what the fights against it added up to. */
   report: Record<string, TargetReport>;
+  /** Entities the interface showed legitimately and `reveal.mark` recorded, by id (the reveal rule's `seen` term). Written only by that command. */
+  shown: Record<string, true>;
   /** Missions: village resource units earned that no village has taken yet, by resource slug (the village stage consumes them). */
   missions: { pending: Record<string, number> };
   /** One-off notices for the UI, newest last. The UI drains it; it is never saved. */
   events: GameEvent[];
 }
 
-export const STATE_VERSION = 14;
+export const STATE_VERSION = 16;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
@@ -182,6 +184,7 @@ export function createState(seed: number, content: ContentDb): GameState {
     wounds: { stacks: 0, left: 0 },
     bingo: {},
     report: {},
+    shown: {},
     meditation: {},
     course: {},
     team: null,

@@ -1,0 +1,43 @@
+import type { RevealLevel } from '@shinobi/core';
+import type { EntityRef } from './route.ts';
+
+/*
+ * The reveal rule as the interface uses it. The core decides (`revealOf`); this module is the one
+ * door the components and the name helpers go through, so nothing prints the name of an entity the
+ * player has not discovered. `createGame` installs the reader that is tied to the running game and
+ * its update counter, so a value read inside `$derived` follows the game; before a game exists
+ * (and in tests that mount a component alone) everything counts as shown.
+ */
+
+/** What the interface prints in place of a name it may not show. */
+export const MASK = '???';
+
+export interface RevealReader {
+  /** How much of the entity may be shown; reactive through the game's update counter. */
+  level(ref: EntityRef): RevealLevel;
+  /** The text key that says how to learn more, or null. */
+  hint(ref: EntityRef): string | null;
+  /** Tells the core that these entities were shown legitimately; the core refuses what it does not allow. */
+  mark(refs: readonly EntityRef[]): void;
+}
+
+let reader: RevealReader | null = null;
+
+/** Called by `createGame`. */
+export function setRevealReader(next: RevealReader | null): void {
+  reader = next;
+}
+
+/** How much of an entity may be shown now. */
+export const revealLevel = (ref: EntityRef): RevealLevel => reader?.level(ref) ?? 'full';
+
+/** The hint text key for an entity that is not fully shown, or null. */
+export const revealHintKey = (ref: EntityRef): string | null => reader?.hint(ref) ?? null;
+
+/** Whether the name of the entity may be printed. */
+export const nameShown = (ref: EntityRef): boolean => revealLevel(ref) !== 'hidden';
+
+/** Records that the entities were shown legitimately (a shop row, a recipe list, a reward on a mission the player may take). */
+export function markShown(refs: readonly EntityRef[]): void {
+  if (refs.length > 0) reader?.mark(refs);
+}

@@ -39,7 +39,7 @@
   data-entity="item:{item}"
 >
   <Icon entity={{ kind: 'item', id: item }} size={18} />
-  <span class="name"><EntityLink kind="item" id={item} /></span>
+  <span class="name"><EntityLink kind="item" id={item} offered /></span>
   <span class="count" aria-label={t('craft.haveNeed', { have, need })}
     >{formatInt(have)}/{formatInt(need)}</span
   >
