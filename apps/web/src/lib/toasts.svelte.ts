@@ -12,6 +12,10 @@ export interface Toast {
   ref?: EntityRef;
   /** What a claimed cache or vault gave: ryo and items, the items as links. */
   gains?: { ryo: number; items: { id: string; n: number }[] };
+  /** A button on the toast; pressing it runs `run` and closes the toast. */
+  action?: { labelKey: string; run: () => void };
+  /** Stays until the player closes it or presses the action; never pushed out by newer toasts. */
+  persistent?: boolean;
 }
 
 export type ToastSpec = Omit<Toast, 'id'>;
@@ -135,10 +139,18 @@ export function createToasts() {
     get list() {
       return list;
     },
-    push(spec: ToastSpec) {
+    push(spec: ToastSpec): void {
       const id = next++;
-      list = [...list, { ...spec, id }].slice(-MAX_TOASTS);
-      if (typeof window !== 'undefined') window.setTimeout(() => dismiss(id), LIFETIME_MS);
+      list = [...list, { ...spec, id }];
+      // Over the limit the oldest ordinary toasts make way; persistent ones stay.
+      while (list.length > MAX_TOASTS) {
+        const victim = list.findIndex((item) => !item.persistent);
+        if (victim === -1) break;
+        list = list.filter((_, i) => i !== victim);
+      }
+      if (!spec.persistent && typeof window !== 'undefined') {
+        window.setTimeout(() => dismiss(id), LIFETIME_MS);
+      }
     },
     dismiss,
     clear() {

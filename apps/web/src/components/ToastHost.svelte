@@ -16,7 +16,13 @@
     return () => query.removeEventListener('change', update);
   });
   const cap = $derived(phone ? 3 : 6);
-  const shown = $derived(toasts.list.slice(-cap));
+  // Persistent toasts (an update waiting) are always shown; the newest ordinary ones fill the rest.
+  const shown = $derived.by(() => {
+    const ordinary = toasts.list.filter((toast) => !toast.persistent);
+    const room = Math.max(0, cap - (toasts.list.length - ordinary.length));
+    const keep = new Set(ordinary.slice(Math.max(0, ordinary.length - room)).map((x) => x.id));
+    return toasts.list.filter((toast) => toast.persistent || keep.has(toast.id));
+  });
   const hidden = $derived(toasts.list.length - shown.length);
 </script>
 
@@ -36,6 +42,20 @@
           </span>
         {/if}
       </span>
+      {#if toast.action}
+        {@const action = toast.action}
+        <button
+          type="button"
+          class="action"
+          data-toast-action
+          onclick={() => {
+            action.run();
+            toasts.dismiss(toast.id);
+          }}
+        >
+          {t(action.labelKey)}
+        </button>
+      {/if}
       <button type="button" aria-label={t('modal.close')} onclick={() => toasts.dismiss(toast.id)}>
         <Icon name="lucide:x" size={14} />
       </button>
@@ -91,6 +111,25 @@
   .toast :global(a) {
     color: var(--accent);
     font-weight: 600;
+  }
+
+  button.action {
+    flex: none;
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  button.action:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
 
   button {
