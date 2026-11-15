@@ -1,16 +1,6 @@
 <script lang="ts">
   import { content } from '@shinobi/content';
-  import {
-    combatUnits,
-    counterValue,
-    enemyStats,
-    fightSlotIndex,
-    killsKey,
-    playerMaxChakra,
-    playerMaxHp,
-    playerMaxStamina,
-    techniqueNumbers,
-  } from '@shinobi/core';
+  import { counterValue, enemyStats, fightSlotIndex, killsKey, RATE_FULL } from '@shinobi/core';
   import CombatLog from '../components/CombatLog.svelte';
   import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
@@ -26,46 +16,48 @@
 
   const fight = $derived.by(() => {
     const state = game.state;
-    const c = state.combat;
+    const combat = state.combat;
     const slot = fightSlotIndex(state);
-    if (!c || slot < 0) return null;
-    const enemy = content.enemies.find((e) => e.id === c.enemy);
+    if (!combat || slot < 0) return null;
+    const enemy = content.enemies.find((e) => e.id === combat.enemy);
     if (!enemy) return null;
-    const stats = enemyStats(enemy, content);
-    const fraction = (left: number, span: number): number =>
-      span > 0 ? Math.min(1, Math.max(0, 1 - left / span)) : 1;
+    const f = combat.fight;
+    const p = f.player;
+    // The fight is advanced at events; work the slot has received since then still counts.
+    const fraction = (timer: { progress: number; need: number }): number =>
+      timer.need > 0
+        ? Math.min(1, Math.max(0, (timer.progress + combat.work * RATE_FULL) / timer.need))
+        : 1;
 
     let playerDoing: { key: string; tech: string | null; progress: number };
-    if (c.pPhase === 'cast' && c.cast) {
-      const tech = content.techniques.find((x) => x.id === c.cast);
-      const castMs = tech ? techniqueNumbers(state, tech, content, game.rules).castMs : 0;
-      playerDoing = {
-        key: 'combat.doing.cast',
-        tech: c.cast,
-        progress: fraction(c.pAt - c.clock, combatUnits(castMs)),
-      };
-    } else if (c.pPhase === 'recover') {
+    if (p.phase === 'cast' && p.cast) {
+      playerDoing = { key: 'combat.doing.cast', tech: p.cast, progress: fraction(p.timer) };
+    } else if (p.phase === 'recover') {
       playerDoing = { key: 'combat.doing.recover', tech: null, progress: 0 };
     } else {
       playerDoing = { key: 'combat.doing.ready', tech: null, progress: 0 };
     }
 
+    const front = f.enemies.find((e) => e.hp > 0) ?? f.enemies[0];
     const enemyDoing =
-      c.phase === 'respawn'
+      combat.phase === 'respawn' || !front
         ? { key: 'combat.doing.respawn', progress: 0 }
-        : {
-            key: 'combat.doing.attack',
-            progress: fraction(c.eAt - c.clock, combatUnits(stats.intervalMs)),
-          };
+        : { key: 'combat.doing.attack', progress: fraction(front.timer) };
 
     return {
       slot,
       enemy,
-      c,
-      maxHp: playerMaxHp(state, content),
-      maxChakra: playerMaxChakra(state, content),
-      maxStamina: playerMaxStamina(state, content),
-      enemyMaxHp: stats.maxHp,
+      c: {
+        hp: p.hp,
+        chakra: p.chakra,
+        stamina: p.stamina,
+        enemyHp: f.enemies.reduce((sum, e) => sum + e.hp, 0),
+        phase: combat.phase,
+      },
+      maxHp: p.maxHp,
+      maxChakra: p.maxChakra,
+      maxStamina: p.maxStamina,
+      enemyMaxHp: f.enemies.reduce((sum, e) => sum + e.maxHp, 0),
       kills: counterValue(state, killsKey(enemy.id)),
       playerDoing,
       enemyDoing,

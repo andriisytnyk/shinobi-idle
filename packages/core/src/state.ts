@@ -71,7 +71,7 @@ export interface GameState {
   events: GameEvent[];
 }
 
-export const STATE_VERSION = 5;
+export const STATE_VERSION = 6;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {

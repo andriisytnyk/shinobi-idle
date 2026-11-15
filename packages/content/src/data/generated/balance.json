@@ -504,8 +504,12 @@
     "combat": {
       "xpTickMs": 1000,
       "regenMs": 1000,
-      "hitEven": 0.5
+      "hitEven": 0.5,
+      "fightCapMs": 240000,
+      "maxEnemies": 8
     },
+    "bindEva": 0.3,
+    "illusionResist": 0.005,
     "senseiTest": {
       "base": 300,
       "perLevel": 0.01,

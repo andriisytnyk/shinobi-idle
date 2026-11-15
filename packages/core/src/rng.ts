@@ -66,3 +66,15 @@ export function nextFloat(streams: RngStreams, name: string): number {
 export function nextInt(streams: RngStreams, name: string, n: number): number {
   return Math.floor(nextFloat(streams, name) * n);
 }
+
+/** Next float in [0, 1) from a bare stream state, for engines that keep one stream of their own. */
+export function nextFloatFrom(state: RngState): number {
+  return nextUint32(state) / 4294967296;
+}
+
+/** Next unsigned 32-bit integer from the named stream, for seeding something else. */
+export function nextSeed(streams: RngStreams, name: string): number {
+  const state = streams[name];
+  if (!state) throw new Error(`Unknown rng stream "${name}"`);
+  return nextUint32(state);
+}
