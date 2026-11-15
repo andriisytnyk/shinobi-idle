@@ -3934,7 +3934,18 @@
       "error.fightBusy": "42f7d954f0eb",
       "mission.consumed.note": "b532cd7bb1d9",
       "error.missionTooHard": "db8f55716ee7",
-      "error.missionRunning": "d88bcd2e31d1"
+      "error.missionRunning": "d88bcd2e31d1",
+      "settings.theme": "16b83ae48b41",
+      "settings.packs": "e33e35fb8805",
+      "settings.disabledPacks": "c1c6a07f6b48",
+      "settings.packDisabled": "397493f5fe8f",
+      "theme.base": "a1e95087bd09",
+      "route.entity": "9863a0af0bbc",
+      "toast.mod": "2427e7a839f9",
+      "error.cancelledByMod": "df6af2635279",
+      "credits.appIcon.heading": "eeea3ce190e2",
+      "credits.appIcon.body": "491f650bd715",
+      "credits.appIcon.link": "841d6a417ea6"
     },
     "en": {
       "technique.core:body_flicker.name": "026242b01872",

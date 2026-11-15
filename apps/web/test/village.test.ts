@@ -5,6 +5,7 @@ import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { nextStateHint } from '../src/lib/hints.ts';
 import { activeNav } from '../src/lib/nav.ts';
+import { coreRegistry } from './helpers/core-registry.ts';
 import { objectiveTarget } from '../src/lib/next-step.ts';
 import { parseHash } from '../src/lib/route.ts';
 import { settings } from '../src/lib/settings.svelte.ts';
@@ -254,8 +255,8 @@ describe('routes, toasts and hints', () => {
       tab: 'village',
       focus: 'core:forge',
     });
-    expect(activeNav(parseHash('#/village/core:forge'))).toBe('village');
-    expect(activeNav(parseHash('#/building/core:forge'))).toBe('village');
+    expect(activeNav('#/village/core:forge', coreRegistry)).toBe('village');
+    expect(activeNav('#/building/core:forge', coreRegistry)).toBe('village');
   });
 
   it('leads a building requirement to the village page focused on that building', () => {

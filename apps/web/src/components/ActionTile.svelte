@@ -10,6 +10,7 @@
   import MasteryRing from './MasteryRing.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
   import ReqTree from './ReqTree.svelte';
+  import Slot from '../lib/ext/Slot.svelte';
 
   interface Props {
     info: ActionInfo;
@@ -41,7 +42,14 @@
   }
 </script>
 
-<li class="tile" class:locked={!info.available} class:running data-action={info.id}>
+<li
+  class="tile"
+  class:locked={!info.available}
+  class:running
+  data-action={info.id}
+  data-ui="action-tile"
+  data-entity="{ref.kind}:{ref.id}"
+>
   <div class="head">
     <h3 class="name"><EntityLink kind={ref.kind} id={ref.id} /></h3>
     <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
@@ -52,11 +60,11 @@
       <dt>{t('tile.level')}</dt>
       <dd>{info.level}</dd>
     </div>
-    <div>
+    <div data-ui="action-interval">
       <dt>{t('tile.interval')}</dt>
       <dd>{formatSeconds(info.intervalMs)}</dd>
     </div>
-    <div>
+    <div data-ui="action-xp">
       <dt>{t('tile.xph')}</dt>
       <dd>
         <ModBreakdown
@@ -69,7 +77,7 @@
 
   {#if info.available}
     {#if running}
-      <span class="cycle" aria-hidden="true"
+      <span class="cycle" data-ui="action-progress" aria-hidden="true"
         ><span class="fill" style:width="{cycle * 100}%"></span></span
       >
     {/if}
@@ -82,6 +90,7 @@
       <ReqTree node={info.req} />
     </div>
   {/if}
+  <Slot name="action.tile" ctx={{ action: { kind: info.kind, id: info.id } }} />
 </li>
 
 <style>
@@ -90,8 +99,8 @@
     flex-direction: column;
     gap: var(--space-3);
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface-raised);
     list-style: none;
   }
@@ -109,7 +118,7 @@
 
   .name {
     margin: 0;
-    font-size: 1rem;
+    font-size: var(--text-sm);
     font-weight: 600;
   }
 
@@ -127,7 +136,7 @@
 
   dt {
     color: var(--fg-dim);
-    font-size: 0.75rem;
+    font-size: var(--text-2xs);
   }
 
   dd {
@@ -136,8 +145,8 @@
   }
 
   .cycle {
-    height: 4px;
-    border-radius: 2px;
+    height: var(--bar-thin);
+    border-radius: var(--radius-xs);
     background: var(--line);
     overflow: hidden;
   }
@@ -149,9 +158,9 @@
   }
 
   .action {
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     padding: var(--space-2) var(--space-4);
-    border: 1px solid var(--accent);
+    border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-sm);
     background: var(--accent);
     color: var(--ink-900);
@@ -171,10 +180,10 @@
     gap: var(--space-1);
     margin: 0 0 var(--space-1);
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
   }
 
   .req {
-    font-size: 0.9rem;
+    font-size: var(--text-xs);
   }
 </style>

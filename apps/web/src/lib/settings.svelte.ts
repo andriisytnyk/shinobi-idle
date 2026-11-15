@@ -5,6 +5,10 @@ export interface SettingsData {
   hints: boolean;
   /** Ids of hints the player has dismissed. */
   dismissedHints: string[];
+  /** Id of the chosen interface theme (`<packId>:<id>`); an unknown id means the base theme. */
+  theme: string;
+  /** Values of the settings that UI packs registered, by `<packId>:<id>`. */
+  ext: Record<string, boolean | string>;
 }
 
 export const SETTINGS_KEY = 'shinobi.settings';
@@ -13,6 +17,8 @@ const defaults = (): SettingsData => ({
   hideLocked: false,
   hints: true,
   dismissedHints: [],
+  theme: 'core:base',
+  ext: {},
 });
 
 /** The slice of `localStorage` the settings use. */
@@ -35,6 +41,12 @@ export function parseSettings(text: string | null): SettingsData {
     if (typeof raw.hints === 'boolean') out.hints = raw.hints;
     if (Array.isArray(raw.dismissedHints)) {
       out.dismissedHints = raw.dismissedHints.filter((h): h is string => typeof h === 'string');
+    }
+    if (typeof raw.theme === 'string') out.theme = raw.theme;
+    if (isRecord(raw.ext)) {
+      for (const [key, value] of Object.entries(raw.ext)) {
+        if (typeof value === 'boolean' || typeof value === 'string') out.ext[key] = value;
+      }
     }
   } catch {
     // A damaged settings blob falls back to the defaults.
@@ -72,6 +84,9 @@ export function createSettings(storage: TextStorage | null = browserStorage()) {
     }
   };
 
+  /** Bumped by every change of the theme or of a pack setting. */
+  let revision = $state(0);
+
   return {
     get hideLocked() {
       return data.hideLocked;
@@ -93,6 +108,28 @@ export function createSettings(storage: TextStorage | null = browserStorage()) {
     },
     dismissHint(id: string) {
       if (!data.dismissedHints.includes(id)) data.dismissedHints = [...data.dismissedHints, id];
+      persist();
+    },
+    /** The chosen theme id. */
+    get theme() {
+      return data.theme;
+    },
+    set theme(value: string) {
+      data.theme = value;
+      revision++;
+      persist();
+    },
+    /** Changes whenever the theme or a pack setting does; effects read it to follow them. */
+    get revision(): number {
+      return revision;
+    },
+    /** The stored value of a pack setting, or `undefined` when it was never changed. */
+    ext(key: string): boolean | string | undefined {
+      return data.ext[key];
+    },
+    setExt(key: string, value: boolean | string) {
+      data.ext = { ...data.ext, [key]: value };
+      revision++;
       persist();
     },
     /** Shows every hint again. */

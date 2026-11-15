@@ -36,17 +36,22 @@
 {/snippet}
 
 {#if recipe && info}
-  <article class="recipe-page" data-recipe-page={id}>
+  <article
+    class="recipe-page"
+    data-recipe-page={id}
+    data-ui="entity-page"
+    data-entity="recipe:{id}"
+  >
     <Hint id="crafting" />
     <p class="kind">
       {t('entity.kind.recipe')} · <EntityLink kind="skill" id={recipe.skill} />
     </p>
-    <h1>{entityName(ref)}</h1>
+    <h1 data-ui="entity-header">{entityName(ref)}</h1>
     {#if desc}<p>{desc}</p>{/if}
 
     <ul class="ct-tiles single"><RecipeTile {info} /></ul>
 
-    <section>
+    <section data-ui="entity-section">
       <h2>{t('item.usedIn')}</h2>
       {#if usedIn.length > 0}
         <ul>
@@ -65,14 +70,14 @@
   .kind {
     margin: 0;
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
   }
 
   h1 {
     margin: var(--space-1) 0 var(--space-3);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.6rem;
+    font-size: var(--text-2xl);
     font-weight: 400;
   }
 
@@ -80,12 +85,12 @@
     margin: var(--space-4) 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--text-md);
     font-weight: 400;
   }
 
   .single {
-    max-width: 24rem;
+    max-width: var(--measure);
   }
 
   ul {

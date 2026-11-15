@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import BlockedScreen from './components/BlockedScreen.svelte';
   import LoadErrorScreen from './components/LoadErrorScreen.svelte';
   import DevTools from './components/DevTools.svelte';
@@ -6,7 +7,6 @@
   import GraduationModal from './components/GraduationModal.svelte';
   import HintHost from './components/HintHost.svelte';
   import MainNav from './components/MainNav.svelte';
-  import NextStepCard from './components/NextStepCard.svelte';
   import NowBar from './components/NowBar.svelte';
   import ReportModal from './components/ReportModal.svelte';
   import SkillList from './components/SkillList.svelte';
@@ -15,34 +15,81 @@
   import TopBar from './components/TopBar.svelte';
   import WelcomeModal from './components/WelcomeModal.svelte';
   import { isDevMode } from './lib/dev.ts';
-  import { game } from './lib/store.ts';
+  import { coreUi } from './lib/ext/core-ui.ts';
+  import EntityExtras from './lib/ext/EntityExtras.svelte';
+  import PageHost from './lib/ext/PageHost.svelte';
+  import { createUi, provideUi, type Ui } from './lib/ext/runtime.svelte.ts';
+  import Slot from './lib/ext/Slot.svelte';
+  import { createStyleInjector, createThemeApplier } from './lib/ext/theme.ts';
+  import type { UiPack } from './lib/ext/types.ts';
   import { t } from './lib/i18n.ts';
-  import { currentRoute } from './lib/router.svelte.ts';
-  import { isWorldRoute, worldFocus } from './lib/world.ts';
-  import BankPage from './pages/BankPage.svelte';
-  import CombatPage from './pages/CombatPage.svelte';
-  import CreditsPage from './pages/CreditsPage.svelte';
-  import EntityPage from './pages/EntityPage.svelte';
-  import GearPage from './pages/GearPage.svelte';
-  import HelpPage from './pages/HelpPage.svelte';
-  import MorePage from './pages/MorePage.svelte';
-  import NaturePage from './pages/NaturePage.svelte';
-  import QuestsPage from './pages/QuestsPage.svelte';
-  import RankPage from './pages/RankPage.svelte';
-  import RecipePage from './pages/RecipePage.svelte';
-  import ShopPage from './pages/ShopPage.svelte';
-  import SimplePage from './pages/SimplePage.svelte';
-  import ItemPage from './pages/ItemPage.svelte';
-  import SettingsPage from './pages/SettingsPage.svelte';
-  import SkillPage from './pages/SkillPage.svelte';
-  import TechniquePage from './pages/TechniquePage.svelte';
-  import BuildingPage from './pages/BuildingPage.svelte';
-  import VillagePage from './pages/VillagePage.svelte';
-  import WorldPage from './pages/WorldPage.svelte';
+  import { currentHash, currentRoute, setBeforeRoute } from './lib/router.svelte.ts';
+  import { settings } from './lib/settings.svelte.ts';
+  import { game } from './lib/store.ts';
+
+  interface Props {
+    /** The UI packs of this boot, the built-in game first. Tests pass more. */
+    uiPacks?: readonly UiPack[];
+    /** Gives tests the registries of this boot. */
+    onUi?: (ui: Ui) => void;
+  }
+
+  let { uiPacks = [coreUi], onUi }: Props = $props();
+
+  // The registries belong to this boot of the app; nothing outlives it.
+  const ui = createUi(
+    untrack(() => uiPacks),
+    { game, settings },
+  );
+  provideUi(ui);
+  untrack(() => onUi?.(ui));
+
+  // The chosen theme sits on the root element; switching or closing the app removes it completely.
+  const themes = createThemeApplier(document.documentElement);
+  $effect(() => themes.apply(ui.activeTheme()));
+  $effect(() => () => themes.dispose());
+  // Stylesheets that packs ship are in the page for as long as the app is.
+  $effect(() => {
+    const styles = createStyleInjector(document);
+    styles.apply(ui.registry.stylesheets);
+    return () => styles.apply([]);
+  });
+
+  // The observers watch the app root; the packs themselves were started when the registries were made.
+  let appEl = $state<HTMLElement>();
+  $effect(() => {
+    if (appEl) return ui.hub.attach(appEl);
+  });
+  $effect(() => () => ui.dispose());
 
   // The meta panel starts open beside the page on wide screens and closed on phones, where it is an overlay.
   let metaOpen = $state(window.matchMedia('(min-width: 769px)').matches);
+  const hash = $derived(currentHash());
   const route = $derived(currentRoute());
+
+  // Hooks for the packs: the route (the hash changed / the page is drawn) and the state (after every update).
+  let lastHash = untrack(() => hash);
+  $effect(() => {
+    const to = hash;
+    untrack(() => {
+      const from = lastHash;
+      lastHash = to;
+      if (from !== to) ui.emit('route', { phase: 'after', from, to });
+    });
+  });
+  // «before» is asked by the router itself, synchronously, while the old page is still on screen.
+  $effect(() => {
+    setBeforeRoute((from, to) => {
+      const verdicts = ui.emit('route', { phase: 'before', from, to });
+      if (verdicts.includes(false)) return false;
+      return verdicts.findLast((v) => typeof v === 'string') as string | undefined;
+    });
+    return () => setBeforeRoute(null);
+  });
+  $effect(() => {
+    void game.version;
+    untrack(() => ui.emit('state'));
+  });
   /** Room at the foot of the page for the developer panel, so it never hides the last controls. */
   const dev = isDevMode();
 </script>
@@ -54,7 +101,7 @@
 {:else if !game.ready}
   <div class="boot" role="status">{t('app.loading')}</div>
 {:else}
-  <div class="app" class:meta-open={metaOpen}>
+  <div class="app" class:meta-open={metaOpen} bind:this={appEl}>
     <div class="top">
       <TopBar {metaOpen} onToggleMeta={() => (metaOpen = !metaOpen)} />
     </div>
@@ -66,66 +113,9 @@
 
     <main class="main" class:dev>
       <HintHost />
-      {#if route.page === 'home'}
-        <SimplePage title={t('home.title')}>
-          <p class="hello">{t('welcome.hello', { name: game.state.player.name })}</p>
-          <NextStepCard />
-          <p class="hint">{t('home.hint')}</p>
-        </SimplePage>
-      {:else if route.page === 'skills'}
-        <SimplePage title={t('nav.skills')}>
-          <div class="mobile-skills"><NextStepCard /><SkillList /></div>
-          <p class="hint desktop-only">{t('home.hint')}</p>
-        </SimplePage>
-      {:else if route.page === 'settings'}
-        <SettingsPage />
-      {:else if route.page === 'quests'}
-        <QuestsPage />
-      {:else if route.page === 'rank'}
-        <RankPage />
-      {:else if route.page === 'combat'}
-        <CombatPage />
-      {:else if route.page === 'bank'}
-        <BankPage />
-      {:else if route.page === 'shop'}
-        <ShopPage section={'section' in route ? route.section : undefined} />
-      {:else if isWorldRoute(route)}
-        <WorldPage focus={worldFocus(route)} />
-      {:else if route.page === 'nature'}
-        <NaturePage />
-      {:else if route.page === 'help'}
-        <HelpPage />
-      {:else if route.page === 'credits'}
-        <CreditsPage />
-      {:else if route.page === 'tab' && route.tab === 'more'}
-        <MorePage />
-      {:else if route.page === 'tab' && route.tab === 'village'}
-        <VillagePage focus={route.focus ?? null} />
-      {:else if route.page === 'tab'}
-        <SimplePage title={t(`nav.${route.tab}`)}>
-          <p class="hint">{t('entity.placeholder')}</p>
-        </SimplePage>
-      {:else if route.page === 'entity' && route.ref.kind === 'quest'}
-        <QuestsPage />
-      {:else if route.page === 'entity' && route.ref.kind === 'exam'}
-        <RankPage />
-      {:else if route.page === 'entity' && route.ref.kind === 'skill'}
-        <SkillPage id={route.ref.id} />
-      {:else if route.page === 'entity' && route.ref.kind === 'technique'}
-        <TechniquePage id={route.ref.id} />
-      {:else if route.page === 'entity' && route.ref.kind === 'recipe'}
-        <RecipePage id={route.ref.id} />
-      {:else if route.page === 'entity' && route.ref.kind === 'gear'}
-        <GearPage id={route.ref.id} />
-      {:else if route.page === 'entity' && route.ref.kind === 'building'}
-        <BuildingPage id={route.ref.id} />
-      {:else if route.page === 'entity' && route.ref.kind === 'item'}
-        <ItemPage id={route.ref.id} />
-      {:else if route.page === 'entity'}
-        <EntityPage entity={route.ref} />
-      {:else}
-        <SimplePage title={t('route.notFound')} />
-      {/if}
+      <PageHost {hash} />
+      {#if route.page === 'entity'}<EntityExtras entity={route.ref} />{/if}
+      <Slot name="page.footer" ctx={{ route: hash }} />
     </main>
 
     {#if metaOpen}
@@ -182,7 +172,7 @@
   .side {
     grid-area: side;
     padding: var(--space-3);
-    border-right: 1px solid var(--line);
+    border-right: var(--border-thin) solid var(--line);
     background: var(--surface);
     overflow-y: auto;
   }
@@ -194,14 +184,15 @@
   }
 
   .main.dev {
-    padding-bottom: 5rem;
+    --_padding-bottom: 5rem;
+    padding-bottom: var(--_padding-bottom);
   }
 
   .meta {
     grid-area: meta;
     display: flex;
     flex-direction: column;
-    border-left: 1px solid var(--line);
+    border-left: var(--border-thin) solid var(--line);
     overflow: hidden;
   }
 
@@ -211,19 +202,6 @@
 
   .tabs {
     grid-area: tabs;
-  }
-
-  .hello {
-    margin: 0 0 var(--space-3);
-    font-weight: 600;
-  }
-
-  .hint {
-    color: var(--fg-dim);
-  }
-
-  .mobile-skills {
-    display: none;
   }
 
   @media (max-width: 768px) {
@@ -246,19 +224,11 @@
       padding: var(--space-4);
     }
 
-    .mobile-skills {
-      display: block;
-    }
-
-    .desktop-only {
-      display: none;
-    }
-
     /* On a phone the meta panel is an overlay opened from the top bar. */
     .meta {
       position: fixed;
       inset: 0 0 var(--tabbar-height) 0;
-      z-index: 10;
+      z-index: var(--z-overlay);
       border-left: 0;
       background: var(--surface);
     }

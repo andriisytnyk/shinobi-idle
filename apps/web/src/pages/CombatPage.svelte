@@ -233,7 +233,7 @@
     margin: var(--space-4) 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--text-md);
     font-weight: 400;
   }
 
@@ -243,7 +243,7 @@
 
   .arena {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(var(--tile-min), 1fr));
     gap: var(--space-4);
   }
 
@@ -252,8 +252,8 @@
     flex-direction: column;
     gap: var(--space-2);
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface);
   }
 
@@ -275,8 +275,8 @@
   }
 
   .cast {
-    height: 6px;
-    border-radius: 3px;
+    height: var(--bar-md);
+    border-radius: var(--radius-xs);
     background: var(--line);
     overflow: hidden;
   }
@@ -299,7 +299,7 @@
   .why {
     margin: 0;
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
   }
 
   .start:disabled {
@@ -311,9 +311,9 @@
 
   .stop,
   .start {
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-4);
-    border: 1px solid var(--accent);
+    border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-sm);
     background: var(--accent);
     color: var(--ink-900);
@@ -341,8 +341,8 @@
     gap: var(--space-3);
     margin-bottom: var(--space-2);
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface);
   }
 
@@ -366,7 +366,7 @@
     h2 :global(a) {
       display: inline-flex;
       align-items: center;
-      min-height: 2.75rem;
+      min-height: var(--control-md);
     }
   }
 
@@ -375,7 +375,7 @@
   .empty {
     margin: 0;
     color: var(--fg-dim);
-    font-size: 0.9rem;
+    font-size: var(--text-xs);
   }
 
   .idle {

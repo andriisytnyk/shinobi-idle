@@ -1,6 +1,7 @@
 <script lang="ts">
   import Icon from '../components/Icon.svelte';
   import {
+    APP_ICON_CREDIT,
     GAME_ICONS_AUTHORS,
     GAME_ICONS_LICENSE_URL,
     GAME_ICONS_URL,
@@ -21,6 +22,19 @@
       </a>
       <a href={GAME_ICONS_LICENSE_URL} target="_blank" rel="noopener noreferrer">
         {t('credits.icons.license')}
+        <Icon name="lucide:external-link" size={14} />
+      </a>
+    </p>
+  </section>
+
+  <section data-app-icon-credit>
+    <h2>{t('credits.appIcon.heading')}</h2>
+    <p>
+      {t('credits.appIcon.body', { icon: APP_ICON_CREDIT.icon, author: APP_ICON_CREDIT.author })}
+    </p>
+    <p class="links">
+      <a href={APP_ICON_CREDIT.url} target="_blank" rel="noopener noreferrer">
+        {t('credits.appIcon.link')}
         <Icon name="lucide:external-link" size={14} />
       </a>
     </p>
@@ -57,7 +71,7 @@
     margin: 0 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--text-md);
     font-weight: 400;
   }
 
@@ -89,7 +103,7 @@
 
   .authors li {
     padding: var(--space-1) var(--space-2);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
   }

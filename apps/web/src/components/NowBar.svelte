@@ -8,6 +8,7 @@
   import { game } from '../lib/store.ts';
   import BuffStrip from './BuffStrip.svelte';
   import EntityLink from './EntityLink.svelte';
+  import Slot from '../lib/ext/Slot.svelte';
   import Icon from './Icon.svelte';
 
   interface Row {
@@ -109,7 +110,13 @@
   {:else}
     <ul class="slots">
       {#each shown as row (row.slot)}
-        <li class="slot" data-slot={row.slot}>
+        <li
+          class="slot"
+          data-slot={row.slot}
+          data-ui="now-slot"
+          data-slot-index={row.slot}
+          data-entity="{row.ref.kind}:{row.ref.id}"
+        >
           <span class="name"
             >{#if row.move}<span class="verb">{t(row.move.key)}</span>
             {/if}<EntityLink kind={row.ref.kind} id={row.ref.id} /></span
@@ -140,6 +147,7 @@
             >
           {/if}
           <button type="button" class="stop" onclick={() => stop(row.slot)}>{t('now.stop')}</button>
+          <Slot name="now.bar" ctx={{ slot: row.slot }} />
         </li>
       {/each}
     </ul>
@@ -165,14 +173,14 @@
     gap: var(--space-4);
     min-height: var(--now-height);
     padding: var(--space-2) var(--space-4);
-    border-top: 1px solid var(--line);
+    border-top: var(--border-thin) solid var(--line);
     background: var(--surface);
   }
 
   .title {
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
   }
 
   /* The wrapper adds no box: the buff chips are items of the bar itself. */
@@ -186,9 +194,9 @@
     align-items: center;
     flex-wrap: wrap;
     gap: var(--space-1) var(--space-2);
-    max-width: 24rem;
+    max-width: var(--measure);
     min-width: 0;
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
   }
 
   .place-label,
@@ -207,10 +215,10 @@
 
   .chip {
     padding: 0 var(--space-2);
-    border: 1px solid var(--accent);
-    border-radius: 999px;
+    border: var(--border-thin) solid var(--accent);
+    border-radius: var(--radius-pill);
     color: var(--accent);
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
   }
 
   .chip :global(a) {
@@ -241,8 +249,9 @@
   }
 
   .name {
+    --_max-width: 14rem;
     flex: none;
-    max-width: 14rem;
+    max-width: var(--_max-width);
     overflow: hidden;
     font-weight: 600;
     text-overflow: ellipsis;
@@ -254,10 +263,11 @@
   }
 
   .bar {
+    --_min-width: 3rem;
     flex: 1;
-    height: 6px;
-    min-width: 3rem;
-    border-radius: 3px;
+    height: var(--bar-md);
+    min-width: var(--_min-width);
+    border-radius: var(--radius-xs);
     background: var(--line);
     overflow: hidden;
   }
@@ -271,7 +281,7 @@
   .wait {
     flex: none;
     color: var(--accent);
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
     font-weight: 600;
     white-space: nowrap;
   }
@@ -279,15 +289,15 @@
   .xph {
     flex: none;
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
     white-space: nowrap;
   }
 
   .stop,
   .more {
-    min-height: 2rem;
+    min-height: var(--control-xs);
     padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);
@@ -306,7 +316,7 @@
       flex-wrap: wrap;
       gap: var(--space-2);
       padding: var(--space-1) var(--space-3);
-      font-size: 0.85rem;
+      font-size: var(--text-xs);
     }
 
     /* On a phone the buffs take a line of their own under the running action. */
@@ -322,12 +332,14 @@
     }
 
     .place {
-      max-width: 11rem;
+      --_max-width: 11rem;
+      max-width: var(--_max-width);
     }
 
     /* The actions take a line of their own when the place and the action do not fit side by side. */
     .slots {
-      flex: 1 1 15rem;
+      --_flex: 15rem;
+      flex: 1 1 var(--_flex);
     }
 
     .chip {
@@ -335,14 +347,15 @@
     }
 
     .name {
-      max-width: 9rem;
+      --_max-width: 9rem;
+      max-width: var(--_max-width);
     }
 
     /* Whole-tap targets of at least 44 px on a phone. */
     .stop,
     .more {
-      min-width: 2.75rem;
-      min-height: 2.75rem;
+      min-width: var(--control-md);
+      min-height: var(--control-md);
     }
   }
 </style>

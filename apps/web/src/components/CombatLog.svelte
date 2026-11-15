@@ -64,10 +64,11 @@
 
 <style>
   .log {
-    max-height: 16rem;
+    --_max-height: 16rem;
+    max-height: var(--_max-height);
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface);
     overflow-y: auto;
   }
@@ -79,12 +80,13 @@
   }
 
   li {
+    --_padding: 2px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0 var(--space-1);
-    padding: 2px 0;
-    font-size: 0.9rem;
+    padding: var(--_padding) 0;
+    font-size: var(--text-xs);
     overflow-wrap: anywhere;
   }
 

@@ -22,6 +22,8 @@ export default defineConfig(
     '**/node_modules/**',
     '**/dist/**',
     '**/coverage/**',
+    // Local working copies of automation agents; never part of the project.
+    '.claude/**',
     'docs/**',
     'packages/content/src/packs/core/data/generated/**',
     'apps/web/src/lib/icons.generated.ts',

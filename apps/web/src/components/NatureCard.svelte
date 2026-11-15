@@ -129,9 +129,9 @@
     gap: var(--space-3);
     min-width: 0;
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-top: 4px solid var(--nature-color);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-top: var(--border-heavy) solid var(--nature-color);
+    border-radius: var(--radius-md);
     background: var(--surface);
     list-style: none;
   }
@@ -160,7 +160,7 @@
     margin: 0;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.15rem;
+    font-size: var(--text-md);
     font-weight: 400;
   }
 
@@ -175,9 +175,9 @@
 
   .badge {
     padding: 0 var(--space-2);
-    border: 1px solid var(--nature-color);
+    border: var(--border-thin) solid var(--nature-color);
     border-radius: var(--radius-sm);
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
   }
 
   dl {
@@ -193,7 +193,7 @@
 
   dt {
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
   }
 
   dd {
@@ -224,14 +224,14 @@
     padding: var(--space-2);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
-    font-size: 0.9rem;
+    font-size: var(--text-xs);
   }
 
   .pick {
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     margin-top: auto;
     padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--nature-color);
+    border: var(--border-thin) solid var(--nature-color);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);

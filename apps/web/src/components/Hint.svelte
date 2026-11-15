@@ -64,8 +64,8 @@
     gap: var(--space-3);
     margin: var(--space-3) 0;
     padding: var(--space-3);
-    border: 1px solid var(--chakra);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--chakra);
+    border-radius: var(--radius-md);
     background: var(--surface);
   }
 
@@ -77,13 +77,14 @@
   }
 
   .mark {
+    --_padding-top: 2px;
     display: inline-flex;
-    padding-top: 2px;
+    padding-top: var(--_padding-top);
     color: var(--chakra);
   }
 
   .body {
-    flex: 1 1 12rem;
+    flex: 1 1 var(--card-min);
     min-width: 0;
   }
 
@@ -119,9 +120,9 @@
   }
 
   button {
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);
@@ -133,7 +134,7 @@
   @media (max-width: 768px) {
     .collapsed button {
       padding-inline: var(--space-2);
-      font-size: 0.8rem;
+      font-size: var(--text-xs);
     }
   }
 </style>

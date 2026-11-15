@@ -77,13 +77,13 @@
     margin: 0 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--text-md);
     font-weight: 400;
   }
 
   h3 {
     margin: 0;
-    font-size: 1rem;
+    font-size: var(--text-sm);
   }
 
   ul {
@@ -100,8 +100,8 @@
 
   .practice {
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface-raised);
   }
 
@@ -113,8 +113,9 @@
   }
 
   .mods {
+    --_grid-template-columns: 15rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(var(--_grid-template-columns), 1fr));
     gap: var(--space-2);
   }
 
@@ -123,7 +124,7 @@
     flex-direction: column;
     gap: var(--space-1);
     padding: var(--space-2);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
   }
 
@@ -141,7 +142,7 @@
 
   .kind {
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
   }
 
   .meta {
@@ -149,7 +150,7 @@
     flex-wrap: wrap;
     gap: var(--space-3);
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
   }
 
   .unmet {
@@ -161,7 +162,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-1);
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
   }
 
   .locked {
@@ -173,9 +174,9 @@
   }
 
   button {
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--accent);
+    border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-sm);
     background: var(--accent);
     color: var(--ink-900);

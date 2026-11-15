@@ -29,7 +29,14 @@
   );
 </script>
 
-<li class="input" class:missing data-input={item} data-missing={missing}>
+<li
+  class="input"
+  class:missing
+  data-input={item}
+  data-missing={missing}
+  data-ui="ingredient-row"
+  data-entity="item:{item}"
+>
   <Icon entity={{ kind: 'item', id: item }} size={18} />
   <span class="name"><EntityLink kind="item" id={item} /></span>
   <span class="count" aria-label={t('craft.haveNeed', { have, need })}
@@ -72,8 +79,8 @@
   .source {
     display: inline-flex;
     align-items: center;
-    min-height: 2.75rem;
-    font-size: 0.85rem;
+    min-height: var(--control-md);
+    font-size: var(--text-xs);
   }
 
   @media (min-width: 769px) {
