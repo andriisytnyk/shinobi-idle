@@ -7,6 +7,7 @@
   import ReqTree from '../components/ReqTree.svelte';
   import Slot from '../lib/ext/Slot.svelte';
   import { hasKey, t } from '../lib/i18n.ts';
+  import { missionRankName } from '../lib/vocab.ts';
   import { availableOf, followCommands, gatesOf, viewOf } from '../lib/mission-feed.svelte.ts';
   import {
     isMissionSort,
@@ -87,9 +88,7 @@
         <MissionRankStamp rank={group.rank} />
         <div class="titles">
           <h2>
-            {hasKey(`mission.rank.${group.rank}.name`)
-              ? t(`mission.rank.${group.rank}.name`)
-              : group.rank}
+            {missionRankName(group.rank)}
           </h2>
           {#if hasKey(descKey)}<p class="ct-note">{t(descKey)}</p>{/if}
         </div>

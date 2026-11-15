@@ -1,6 +1,7 @@
 import type { ContentDb } from '@shinobi/content';
 import { graduateRank, moneyOf, type GameState, type Rank } from '@shinobi/core';
 import { localeKey } from '@shinobi/content';
+import { humanId } from './entities.ts';
 import { hasKey, t, textOf } from './i18n.ts';
 
 /*
@@ -17,6 +18,10 @@ export const currencyName = (id: string): string => textOf([`currency.${id}`]);
 
 /** The name of a nature: its own text, or the text of the skill that carries the nature's name. */
 export const natureName = (id: string): string => textOf([`nature.${id}.name`, `skill.${id}.name`]);
+
+/** The name of a mission rank: its own text, or its readable id. */
+export const missionRankName = (id: string): string =>
+  hasKey(`mission.rank.${id}.name`) ? t(`mission.rank.${id}.name`) : humanId(id);
 
 /** The name of a skill group. */
 export const groupName = (id: string): string => t(localeKey('group', id, 'name'));
