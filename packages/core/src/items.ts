@@ -6,6 +6,8 @@ import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
 import { indexOf } from './lookup.ts';
 import { grantMastery } from './progression.ts';
+import { openCrate } from './missions/crate.ts';
+import { useRation } from './missions/ration.ts';
 import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 
@@ -26,6 +28,9 @@ export function useItem(
   if ((state.bank[id] ?? 0) < 1) return { ok: false, reason: 'error.noItem' };
   // A tonic needs no target: it starts a buff on its own skill.
   if (item.fx?.kind === 'tonic') return useTonic(state, id, content, rules);
+  // A ration is armed for the next mission; a crate is opened.
+  if (item.fx?.kind === 'ration') return useRation(state, id, content);
+  if (item.fx?.kind === 'crate') return openCrate(state, id, content);
   // An ointment or a blood-making pill shortens the healing of the current Wound stack.
   const fx = item.fx;
   const woundMin =

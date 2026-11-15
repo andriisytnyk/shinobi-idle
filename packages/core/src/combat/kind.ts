@@ -1,5 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
-import { stopSlot, type ActionKind } from '../actions.ts';
+import type { ActionKind } from '../actions.ts';
 import { MS_PER_HOUR, rate } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
 import { gainXp } from '../progression.ts';
@@ -7,17 +7,8 @@ import type { Req } from '../requirements.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 import { ensurePouch, refillPouch } from './pouch.ts';
-import { isCombatKind, newCombat, newOperation } from './system.ts';
+import { fightBusyReason, newCombat, newOperation } from './system.ts';
 import { entryOf, fightTarget, zoneRequirement } from './zones.ts';
-
-/** One fight gives way to another: a fight or run already going in another slot stops. */
-function clearOthers(state: GameState, slot: number, content: ContentDb, rules: Rules): void {
-  state.slots.forEach((other, index) => {
-    if (index !== slot && other.action && isCombatKind(other.action.kind)) {
-      stopSlot(state, index, 'replaced', content, rules);
-    }
-  });
-}
 
 /** Combat XP of one tick against the enemy being fought. Combat XP is paid by time, so it follows the slot share like all combat time. */
 function payTick(state: GameState, fallback: string, content: ContentDb, rules: Rules): void {
@@ -42,6 +33,7 @@ export const fightKind: ActionKind = {
     const zone = indexOf(content).zones.get(id) ?? indexOf(content).zoneByEnemy.get(id);
     return zone ? zoneRequirement(zone, content) : null;
   },
+  blocked: (state, _id, content, _rules, slot) => fightBusyReason(state, slot, content),
   intervalMs: (_state, _id, content) => content.balance.K.combat.xpTickMs,
 
   complete(state, id, content, rules) {
@@ -51,17 +43,17 @@ export const fightKind: ActionKind = {
   start(state, slot, id, content, rules) {
     const target = fightTarget(content, id);
     if (!target) return;
-    clearOthers(state, slot, content, rules);
     // The pouch is topped up from the bank on the way out.
     ensurePouch(state, content);
     refillPouch(state, content);
-    state.combat = newCombat(state, target.enemy, content, rules);
+    state.combat = newCombat(state, target.enemy, content, rules, slot);
     // The first fight opens Vitality and Evasion, whose skills train only in combat.
     state.flags.firstFight = true;
   },
 
-  stop(state) {
-    state.combat = null;
+  stop(state, slot) {
+    // Only the slot that owns the fight ends it.
+    if (state.combat?.owner === slot) state.combat = null;
   },
 };
 
@@ -73,6 +65,7 @@ export const operationKind: ActionKind = {
   has: (id, content) => indexOf(content).operations.has(id),
   requirements: (_state, id, content): Req | null =>
     indexOf(content).operations.get(id)?.unlock ?? null,
+  blocked: (state, _id, content, _rules, slot) => fightBusyReason(state, slot, content),
   intervalMs: (_state, _id, content) => content.balance.K.combat.xpTickMs,
 
   complete(state, id, content, rules) {
@@ -82,15 +75,15 @@ export const operationKind: ActionKind = {
   start(state, slot, id, content, rules) {
     const op = indexOf(content).operations.get(id);
     if (!op) return;
-    clearOthers(state, slot, content, rules);
     // The pouch is packed once, for the whole run.
     ensurePouch(state, content);
     refillPouch(state, content);
-    state.combat = newOperation(state, op, content, rules);
+    state.combat = newOperation(state, op, content, rules, slot);
     state.flags.firstFight = true;
   },
 
-  stop(state) {
-    state.combat = null;
+  stop(state, slot) {
+    // Only the slot that owns the fight ends it.
+    if (state.combat?.owner === slot) state.combat = null;
   },
 };

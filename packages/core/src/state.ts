@@ -96,11 +96,13 @@ export interface GameState {
   wounds: WoundState;
   /** Enemy and boss entries the player has met: what is known of them is derived from this and the kill counters. */
   seen: Record<string, true>;
+  /** Missions: village resource units earned that no village has taken yet, by resource slug (the village stage consumes them). */
+  missions: { pending: Record<string, number> };
   /** One-off notices for the UI, newest last. The UI drains it; it is never saved. */
   events: GameEvent[];
 }
 
-export const STATE_VERSION = 11;
+export const STATE_VERSION = 12;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
@@ -140,6 +142,7 @@ export function createState(seed: number, content: ContentDb): GameState {
     world: createWorld(content),
     village: null,
     goal: null,
+    missions: { pending: {} },
     events: [],
   };
   ensurePouch(state, content);

@@ -37,6 +37,8 @@ import handModsPractices from './data/hand/mods-practices.json' with { type: 'js
 import handObstacleReqs from './data/hand/obstacle-reqs.json' with { type: 'json' };
 import handResources from './data/hand/resources.json' with { type: 'json' };
 import handShopTools from './data/hand/shop-tools.json' with { type: 'json' };
+import handMissions from './data/hand/missions.json' with { type: 'json' };
+import handTeam from './data/hand/team.json' with { type: 'json' };
 import handOperations from './data/hand/operations.json' with { type: 'json' };
 import handQuests from './data/hand/quests.json' with { type: 'json' };
 import handStatuses from './data/hand/statuses.json' with { type: 'json' };
@@ -76,6 +78,7 @@ import {
   shopToolsSchema,
   techniqueCombatMapSchema,
 } from './overlay.ts';
+import { layerMissions, missionExtraMapSchema } from './overlay-missions.ts';
 import {
   balanceSchema,
   bossBaseSchema,
@@ -89,6 +92,7 @@ import {
   practiceBaseSchema,
   herbBaseSchema,
   marketEntrySchema,
+  missionBaseSchema,
   techniqueBaseSchema,
   type ContentDb,
 } from './schema.ts';
@@ -130,7 +134,12 @@ export const content: ContentDb = contentDbSchema.parse({
   shop: layerShop(z.array(marketEntrySchema).parse(market), shopToolsSchema.parse(handShopTools)),
   coat: coatListSchema.parse(handCoat),
   recipes,
-  missions,
+  missions: layerMissions(
+    z.array(missionBaseSchema).parse(missions),
+    missionExtraMapSchema.parse(handMissions),
+    bal.K.missionRateCap,
+  ),
+  team: handTeam,
   regions,
   cells: layerCells(z.array(cellBaseSchema).parse(cells), cellPoiMapSchema.parse(handCellPois)),
   cellKeys: handCellKeys,
@@ -169,4 +178,5 @@ export * from './icons.ts';
 export * from './keys.ts';
 export * from './modifiers.ts';
 export * from './overlay.ts';
+export * from './overlay-missions.ts';
 export * from './schema.ts';

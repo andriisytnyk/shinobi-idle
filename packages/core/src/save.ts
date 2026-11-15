@@ -8,6 +8,8 @@ import {
 import { rebalanceShares } from './actions.ts';
 import { COURSE_ID, COURSE_KIND } from './athletics.ts';
 import { tonicCharges } from './buffs.ts';
+import { RATION_BUFF } from './missions/ration.ts';
+import { repairMissions } from './missions/run.ts';
 import { parseFight } from './combat/fight-parse.ts';
 import { secMs } from './combat/numbers.ts';
 import { pouchUse } from './combat/fight-items.ts';
@@ -16,6 +18,7 @@ import { ensurePouch } from './combat/pouch.ts';
 import {
   FIGHT_KIND,
   OPERATION_KIND,
+  MISSION_KIND,
   isCombatKind,
   newCombat,
   newOperation,
@@ -131,6 +134,8 @@ export const MIGRATIONS: readonly Migration[] = [
     const village = rank === 'genin' || rank === 'chunin' ? createVillage(content) : null;
     return { ...state, village };
   },
+  // v11 -> v12: missions. Village resource units earned by missions wait here until a village takes them.
+  (state) => ({ ...state, missions: { pending: {} } }),
 ];
 
 /** Deepest nesting a slot's data may have. */
@@ -239,6 +244,7 @@ function stepAllows(run: RunState, enemy: string, content: ContentDb): boolean {
 function sanitizeCombat(
   raw: unknown,
   action: { kind: string; id: string },
+  owner: number,
   content: ContentDb,
 ): CombatState | null {
   if (!isRecord(raw) || typeof raw.enemy !== 'string') return null;
@@ -281,6 +287,7 @@ function sanitizeCombat(
     paid,
     carry: Math.min(horizon, Math.floor(nonNegative(raw.carry))),
     style: SKILL_ID_SET.has(String(raw.style)) ? (raw.style as SkillId) : style,
+    owner,
     run,
   };
 }
@@ -582,6 +589,10 @@ export function deserialize(
   });
   state.buffs = pick(raw.buffs, (key, v) => {
     const fx = index.items.get(key)?.fx;
+    if (fx?.kind === 'ration' && isRecord(v)) {
+      const charges = Math.min(Math.floor(nonNegative(v.charges)), fx.missions);
+      return charges >= 1 ? { skill: RATION_BUFF, charges } : undefined;
+    }
     if (fx?.kind !== 'tonic' || !isRecord(v)) return undefined;
     const cap = tonicCharges(state, fx.charges, content, rules) * content.balance.K.tonic.capMult;
     const charges = Math.min(Math.floor(nonNegative(v.charges)), cap);
@@ -604,6 +615,17 @@ export function deserialize(
     return { stock, size, carry };
   });
   state.world = sanitizeWorld(raw.world, content);
+  const pending = isRecord(raw.missions) ? raw.missions.pending : undefined;
+  state.missions = {
+    pending: pick(pending, (key, n) =>
+      content.resources.some((r) => r.id === key) &&
+      typeof n === 'number' &&
+      Number.isInteger(n) &&
+      n > 0
+        ? n
+        : undefined,
+    ),
+  };
   state.village = sanitizeVillage(raw.village, state, content);
   const goal = raw.goal;
   state.goal =
@@ -627,19 +649,41 @@ export function deserialize(
   }
   ensurePouch(state, content);
   syncLoadout(state, content);
-  // A fight needs both its slot and its state; either one alone is dropped or rebuilt.
-  const slot = state.slots.find((s) => s.action !== null && isCombatKind(s.action.kind));
-  const action = slot?.action ?? null;
-  state.combat = action ? sanitizeCombat(raw.combat, action, content) : null;
-  if (action && !state.combat) {
-    if (action.kind === FIGHT_KIND) {
+  // A fight needs both its slot and its state: it belongs to the slot its `owner` names, and only if that
+  // slot still runs an action that can hold a fight. Either one alone is dropped or rebuilt.
+  const holds = (i: number): boolean => {
+    const kind = state.slots[i]?.action?.kind;
+    return kind !== undefined && (isCombatKind(kind) || kind === MISSION_KIND);
+  };
+  const savedOwner = isRecord(raw.combat) ? raw.combat.owner : undefined;
+  const firstFight = state.slots.findIndex((s) => s.action !== null && isCombatKind(s.action.kind));
+  const owner =
+    typeof savedOwner === 'number' && Number.isInteger(savedOwner) && holds(savedOwner)
+      ? savedOwner
+      : firstFight;
+  /** A new fight for a slot that runs a plain fight or an operation. */
+  const rebuild = (i: number): CombatState | null => {
+    const action = state.slots[i]?.action;
+    if (action?.kind === FIGHT_KIND) {
       const target = fightTarget(content, action.id);
-      if (target) state.combat = newCombat(state, target.enemy, content, rules);
-    } else if (action.kind === OPERATION_KIND) {
-      const op = indexOf(content).operations.get(action.id);
-      if (op) state.combat = newOperation(state, op, content, rules);
+      return target ? newCombat(state, target.enemy, content, rules, i) : null;
     }
+    if (action?.kind === OPERATION_KIND) {
+      const op = indexOf(content).operations.get(action.id);
+      return op ? newOperation(state, op, content, rules, i) : null;
+    }
+    return null;
+  };
+  const action = state.slots[owner]?.action ?? null;
+  state.combat = null;
+  if (action && owner >= 0) {
+    // A mission keeps its fight in the same place; the mission checks it against its run below.
+    const stand = action.kind === MISSION_KIND ? { kind: FIGHT_KIND, id: action.id } : action;
+    state.combat = sanitizeCombat(raw.combat, stand, owner, content) ?? rebuild(owner);
   }
+  repairMissions(state, content, rules);
+  // A mission that took the fight in a tampered save gave it up again: a plain fight gets its own back.
+  if (!state.combat && firstFight >= 0) state.combat = rebuild(firstFight);
   updateQuests(state, content);
   return state;
 }

@@ -1,6 +1,7 @@
 import { applyPoison, alive, heavyBlow, roll, secWork, speed } from './fight.ts';
 import { bossFightHooks, hide } from './fight-boss.ts';
 import { addEffect, findEffect, isSuppressed } from './fight-effects.ts';
+import { teamSupportHook } from './fight-team.ts';
 import type { Combatant, FightCtx, FightHook } from './fight-types.ts';
 import { secMs } from './numbers.ts';
 import { needOf, TICK_MS, workOf } from './units.ts';
@@ -184,5 +185,6 @@ export const defaultFightHooks: readonly FightHook[] = [
   illusionist,
   hidden,
   poisoner,
+  teamSupportHook,
   ...bossFightHooks,
 ];

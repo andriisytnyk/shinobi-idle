@@ -1,5 +1,5 @@
 import type { Boss, ContentDb, Enemy, NatureId } from '@shinobi/content';
-import type { Encounter, Spawn } from './fight-types.ts';
+import type { Encounter, Spawn, TeamSupport } from './fight-types.ts';
 
 /** The hook ids of the boss specials, by the special's kind (and, for the rival, its numbers key). */
 export function specialHookIds(special: Boss['special']): string[] {
@@ -32,6 +32,7 @@ export function encounterFor(
   content: ContentDb,
   specials: readonly string[] = [],
   rivalNature: NatureId | null = null,
+  support: readonly TeamSupport[] = [],
 ): Encounter {
   const K = content.balance.K;
   const boss = !('region' in entry);
@@ -48,6 +49,7 @@ export function encounterFor(
     specials: [],
   };
   const encounter: Encounter = { id: entry.id, specials: [...specials], spawns: [base] };
+  if (support.length > 0) encounter.support = support.map((s) => ({ ...s }));
   if (!('special' in entry)) return encounter;
 
   const own = specialHookIds(entry.special);

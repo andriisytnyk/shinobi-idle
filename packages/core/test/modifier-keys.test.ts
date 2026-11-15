@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest';
 import {
   advance,
   bushSize,
+  missionForecast,
+  payMission,
   craftBonusChance,
   craftKeepChance,
   defaultRules,
@@ -53,6 +55,12 @@ const test = (key: string, value: number, op: 'add' | 'mul' = 'add'): Modifier =
   group: 'items',
   source: 'test',
 });
+
+const missionById = (id: string) => {
+  const found = content.missions.find((x) => x.id === id);
+  if (!found) throw new Error(`no mission ${id}`);
+  return found;
+};
 
 /** The modifiers of the checkpoint with this skill and share. */
 function checkpoint(skill: string, pct: number) {
@@ -337,6 +345,58 @@ describe('A4: each wired key changes its mechanic by exactly the modifier', () =
       expect(meditationChances(s, content, defaultRules).insight).toBeCloseTo(0.05, 12);
       reach(s, 'med', 25);
       expect(meditationChances(s, content, defaultRules).insight).toBeCloseTo(0.1, 12);
+    },
+    'mission.duration': () => {
+      const s = genin();
+      const weed = missionById('core:weed');
+      const base = missionForecast(s, weed, content, withProvider()).stages[0]?.ms ?? 0;
+      const faster = missionForecast(
+        s,
+        weed,
+        content,
+        withProvider(test('mission.duration', -0.1)),
+      );
+      expect(Math.abs((faster.stages[0]?.ms ?? 0) - base * 0.9)).toBeLessThanOrEqual(1);
+    },
+    'mission.duration.nin': () => {
+      // The stage of the courier's Ninjutsu alternative is the only one Ninjutsu performs.
+      const s = genin();
+      setLevel(s, 'nin', 10);
+      s.known['core:body_flicker'] = true;
+      const courier = missionById('core:courier');
+      const base = missionForecast(s, courier, content, withProvider()).stages[0]?.ms ?? 0;
+      const faster = missionForecast(
+        s,
+        courier,
+        content,
+        withProvider(test('mission.duration.nin', -0.2)),
+      );
+      expect(Math.abs((faster.stages[0]?.ms ?? 0) - base * 0.8)).toBeLessThanOrEqual(1);
+      const other = missionForecast(
+        s,
+        missionById('core:weed'),
+        content,
+        withProvider(test('mission.duration.nin', -0.2)),
+      );
+      expect(other.stages[0]?.ms).toBe(
+        missionForecast(s, missionById('core:weed'), content, withProvider()).stages[0]?.ms,
+      );
+    },
+    'mission.ryo': () => {
+      const s = genin();
+      payMission(s, missionById('core:cat'), [], content, withProvider(test('mission.ryo', 0.1)));
+      expect(s.currencies.ryo).toBe(Math.round(missionById('core:cat').ryo * 1.1));
+    },
+    'power.sparring': () => {
+      const s = genin();
+      const spar = missionById('core:v_spar');
+      payMission(s, spar, [], content, withProvider(test('power.sparring', 1)));
+      expect(s.village?.power).toBe(content.balance.K.shinobiResPerMission * 2);
+    },
+    'mission.rep': () => {
+      const s = genin();
+      payMission(s, missionById('core:cat'), [], content, withProvider(test('mission.rep', 0.5)));
+      expect(s.currencies.rep).toBe(Math.round(missionById('core:cat').rep * 1.5));
     },
     'meditation.enlightChance': () => {
       const s = genin();
