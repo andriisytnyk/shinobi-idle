@@ -238,7 +238,7 @@
                 <p class="bonus">
                   <span class="tag">
                     Плюс
-                  +3% досвіду Ухилення
+                  +3% ухилення в бою
                 <p class="penalty">
                   <span class="tag">
                     Мінус

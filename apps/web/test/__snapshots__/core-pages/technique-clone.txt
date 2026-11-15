@@ -123,7 +123,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2 с
+                  2,4 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід
