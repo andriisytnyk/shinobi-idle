@@ -19,6 +19,14 @@ export interface PlayerSnapshot {
   hp?: number;
   chakra?: number;
   stamina?: number;
+  /** Techniques taken into the fight; absent means every known technique. */
+  loadout?: string[];
+  /** Trait ids the player knows, per enemy id; an enemy without an entry is fully known. */
+  knowledge?: Record<string, string[]>;
+  /** The player's rank tier (0 student, 1 genin, ...); absent means 0. */
+  tier?: number;
+  /** The signature technique, which habituates more slowly. */
+  signature?: string;
 }
 
 export type Levels = PlayerSnapshot['levels'];
@@ -98,7 +106,7 @@ export interface EnemyStats {
 }
 
 /** An enemy's numbers from its combat level. */
-export function enemyStats(enemy: Enemy, content: ContentDb): EnemyStats {
+export function enemyStats(enemy: Pick<Enemy, 'cl'>, content: ContentDb): EnemyStats {
   const K = content.balance.K;
   const cl = enemy.cl;
   return {

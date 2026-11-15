@@ -730,6 +730,7 @@ export const balanceParamsSchema = z.object({
     regenMs: z.number().int(),
     hitEven: z.number(),
     fightCapMs: z.number().int(),
+    maxEnemies: z.number().int(),
   }),
   bindEva: z.number(),
   illusionResist: z.number(),

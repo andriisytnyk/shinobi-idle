@@ -1,5 +1,6 @@
 import type {
   ComboId,
+  ContentDb,
   NatureId,
   Rank,
   RoleId,
@@ -40,6 +41,8 @@ export interface PeriodicEffect extends EffectBase {
   every: number;
   /** Fight clock time of the next tick. */
   next: number;
+  /** The amount before any combo boosted it, so a boost never compounds. */
+  base?: number;
 }
 
 export type Effect = ModifierEffect | PeriodicEffect;
@@ -50,15 +53,12 @@ export interface Timer {
   need: number;
 }
 
-/** What an enemy's heavy attack is doing: waiting for its turn or winding up the cast. */
-export interface HeavyTimer extends Timer {
-  phase: 'wait' | 'cast';
-}
-
 /** One fighter. The player and every enemy have this shape. */
 export interface Combatant {
   id: string;
   side: 'player' | 'enemy';
+  /** Content id of the enemy entry this body came from; empty for the player. */
+  entry: string;
   hp: number;
   maxHp: number;
   chakra: number;
@@ -71,7 +71,10 @@ export interface Combatant {
   damage: number;
   intervalMs: number;
   nature: NatureId | null;
+  /** Traits, as content ids; the fight hooks give them their behaviour. */
   traits: TraitId[];
+  /** Further hook ids (boss specials and the like). */
+  specials: string[];
   effects: Effect[];
   /** Fight clock time at which each technique is ready again. */
   cd: Record<string, number>;
@@ -83,12 +86,18 @@ export interface Combatant {
   /** Technique being cast, while `phase` is `cast`. */
   cast: string | null;
   timer: Timer;
-  /** Caster trait: the periodic heavy attack. */
-  heavy: HeavyTimer | null;
-  /** Illusionist trait: countdown to the next illusion. */
-  illusion: Timer | null;
-  /** Hidden trait: the enemy's first blow is still to come. */
-  opening: boolean;
+  /** Timers owned by fight hooks, by name; they fill at the combatant's speed. */
+  timers: Record<string, Timer>;
+  /** Numbers owned by fight hooks, by name. */
+  data: Record<string, number>;
+  /** Damage absorbed before health, and the fight clock time it lapses (null: never). */
+  ward: number;
+  wardUntil: number | null;
+  /** Hits left that turn into a miss. */
+  decoys: number;
+  /** The enemy leaves the fight when its health share falls to this; null never. */
+  fleeAt: number | null;
+  fled: boolean;
 }
 
 /** A technique as the fight uses it: its content facts and its numbers for this player. */
@@ -111,10 +120,13 @@ export interface KitTechnique {
   hitsAll: boolean;
   /** The combo that fires whenever its rule is met, without a roll. */
   guaranteedCombo: ComboId | null;
+  /** Scale of the habituation step: 1, or the signature's slower step. */
+  habituationMult: number;
 }
 
 /** What the player brings into the fight. */
 export interface PlayerKit {
+  /** The techniques of the loadout. */
   techniques: KitTechnique[];
   /** Meditation level: it resists illusions. */
   med: number;
@@ -159,17 +171,52 @@ export interface FightLogLine {
   dmg: number;
 }
 
+/** One kind of enemy body an encounter puts into the fight. */
+export interface Spawn {
+  /** Content id of the enemy or boss entry. */
+  enemy: string;
+  cl: number;
+  traits: TraitId[];
+  nature: NatureId | 'wheel' | null;
+  /** How many bodies of this kind. */
+  count: number;
+  /** Scaling of health and damage against the level formulas. */
+  hpMult: number;
+  dmgMult: number;
+  /** The body leaves when its health share falls to this; null never. */
+  fleeAt: number | null;
+}
+
+/** What a fight is against: a list of spawns plus special hooks every body carries. */
+export interface Encounter {
+  /** Content id of the entry the encounter was built from. */
+  id: string;
+  spawns: Spawn[];
+  specials: string[];
+}
+
+export type FightResult = 'ongoing' | 'victory' | 'defeat' | 'fled' | 'timeout';
+
 export interface FightState {
   /** The fight clock in work units. */
   t: number;
+  /** The fight ends as a timeout at this clock time. */
+  cap: number;
   /** The fight's own random stream. */
   rng: RngState;
-  result: 'ongoing' | 'victory' | 'defeat';
-  /** Content id of the enemy entry. */
+  result: FightResult;
+  /** Content id of the entry fought. */
   enemy: string;
+  encounter: Encounter;
+  /** Bodies spawned so far, for naming. */
+  spawned: number;
   player: Combatant;
   enemies: Combatant[];
   kit: PlayerKit;
+  /** Rank tier of the player. */
+  tier: number;
+  /** Trait ids the player knows per enemy entry id; an entry without a record is fully known. */
+  knowledge: Record<string, string[]>;
   /** Times each technique has finished casting against this enemy, for habituation. */
   uses: Record<string, number>;
   /** Fight clock time of the next pool regeneration. */
@@ -179,42 +226,123 @@ export interface FightState {
   log: FightLogLine[] | null;
 }
 
-export type Decision = { kind: 'technique'; id: string } | { kind: 'basic' };
+// ---------- the player's decisions ----------
 
-export interface ReadyTechnique {
-  tech: KitTechnique;
+export type Decision =
+  | { type: 'technique'; id: string; target?: string }
+  | { type: 'basic'; target?: string }
+  | { type: 'item'; id: string; target?: string }
+  | { type: 'wait' };
+
+export interface ViewEffect {
+  id: string;
+  kind: 'modifier' | 'periodic';
+  /** Work units left; null for an effect that lasts the whole fight. */
+  remaining: number | null;
+}
+
+export interface ViewTechnique {
+  tech: Readonly<KitTechnique>;
+  /** Work units until it is off cooldown; 0 when ready. */
+  cooldownLeft: number;
+  affordable: boolean;
+  /** Off cooldown and affordable. */
+  ready: boolean;
+  /** Times it has been cast in this fight. */
+  uses: number;
   /** Damage it is expected to do now, after habituation, the nature wheel and the number of targets. */
   expected: number;
 }
 
-/** What the player AI sees when it must choose; nothing in it is live state to mutate. */
+export interface ViewEnemy {
+  id: string;
+  hp: number;
+  hpShare: number;
+  nature: NatureId | null;
+  effects: readonly ViewEffect[];
+  /** Traits of this enemy the player knows. */
+  knownTraits: readonly TraitId[];
+  /** Known traits that are working at the moment (not switched off). */
+  workingTraits: readonly TraitId[];
+  /** A cast under way: its kind and the work units until it ends. */
+  cast: { kind: string; remaining: number } | null;
+  /** Work units until a waiting caster of this body starts its cast; null when none. */
+  nextCastIn: number | null;
+}
+
+/** What the player AI sees when it must choose. Everything in it is a copy. */
 export interface FightView {
   t: number;
-  player: Readonly<Combatant>;
+  tier: number;
+  player: {
+    hp: number;
+    maxHp: number;
+    chakra: number;
+    maxChakra: number;
+    stamina: number;
+    maxStamina: number;
+    effects: readonly ViewEffect[];
+  };
+  /** Every technique of the loadout. */
+  techniques: readonly ViewTechnique[];
   /** Living enemies. */
-  enemies: readonly Readonly<Combatant>[];
-  /** Techniques that are off cooldown and affordable. */
-  ready: readonly ReadyTechnique[];
-  /** Work units until the soonest cast of a living caster ends; null when none is casting. */
-  castEndsIn: number | null;
-  /** Work units until the soonest living caster that is waiting starts its cast; null when none. */
-  nextCastIn: number | null;
-  casterAlive: boolean;
-  /** The player's accuracy is cut by a hidden enemy. */
-  hidden: boolean;
-  illusion: boolean;
-  poisoned: boolean;
-  /** A living enemy's Evasive is working. */
-  evasive: boolean;
-  /** A living enemy's armour is up. */
-  armored: boolean;
-  /** A living enemy's Regeneration is working. */
-  regenUnchecked: boolean;
+  enemies: readonly ViewEnemy[];
+  /** Casts per technique so far (habituation counts). */
+  habituation: Readonly<Record<string, number>>;
 }
 
 export type CombatAi = (view: FightView) => Decision;
 
+// ---------- fight hooks ----------
+
+/** What a hook gets to work with. */
+export interface FightCtx {
+  fight: FightState;
+  content: ContentDb;
+  rules: FightRules;
+}
+
+/** An enemy's basic attack about to be made; a hook may change it. */
+export interface AttackPlan {
+  chance: number;
+  damage: number;
+}
+
+/**
+ * Behaviour attached to a trait or special id. A combatant carries a hook for each id in its
+ * `traits` and `specials`. A hook keeps its state in the combatant's `timers`, `data` and
+ * `effects`, so it is part of the plain-JSON fight, and wakes through the normal event search.
+ */
+export interface FightHook {
+  id: string;
+  /** A body has appeared: add effects, timers and data. */
+  init?(ctx: FightCtx, c: Combatant): void;
+  /** A multiplier on one of the combatant's stats, computed from its current state; 1 for none. */
+  stat?(ctx: FightCtx, c: Combatant, stat: ModStat): number;
+  /** Whether the trait is doing anything now (the view shows it); defaults to not being switched off. */
+  working?(ctx: FightCtx, c: Combatant): boolean;
+  /** One of this hook's timers (`timers[name]`) has filled and has been emptied by its size. */
+  onTimer?(ctx: FightCtx, c: Combatant, name: string): void;
+  /** A cast of this hook is being interrupted or stunned away. */
+  onCancel?(ctx: FightCtx, c: Combatant): void;
+  /** Whether a cast of this hook is under way, and the work units until it ends or starts. */
+  castInfo?(
+    ctx: FightCtx,
+    c: Combatant,
+  ): { kind: string; casting: boolean; inWork: number | null } | null;
+  /** The combatant is about to make its basic attack. */
+  onAttack?(ctx: FightCtx, c: Combatant, plan: AttackPlan): void;
+  /** The combatant's attack hit `target` for `dealt`. */
+  onAttackHit?(ctx: FightCtx, c: Combatant, target: Combatant, dealt: number): void;
+  /** The combatant lost health. */
+  onDamaged?(ctx: FightCtx, c: Combatant, dealt: number, src: string): void;
+  /** The combatant fell. */
+  onDeath?(ctx: FightCtx, c: Combatant): void;
+}
+
 /** The part of the rule set a fight reads. */
 export interface FightRules {
   combatAi: CombatAi;
+  /** Handlers by trait or special id, in the order they are consulted. */
+  fightHooks: readonly FightHook[];
 }
