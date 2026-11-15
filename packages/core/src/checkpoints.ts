@@ -60,11 +60,12 @@ const NONE: Modifier[] = [];
  */
 export const checkpointProvider: ModifierProvider = (state, content) => {
   const table = tableOf(content);
+  const pools: Record<string, { xp: number }> = state.pools;
   let out: Modifier[] | null = null;
   for (let i = 0; i < table.length; i++) {
     const group = table[i];
     if (!group) continue;
-    const xp = poolEntry(state, group.skill)?.xp ?? 0;
+    const xp = pools[group.skill]?.xp ?? 0;
     // Most pools have not reached even their first checkpoint.
     if (xp < (group.thresholds[0] ?? Infinity)) continue;
     for (let j = 0; j < group.thresholds.length; j++) {
