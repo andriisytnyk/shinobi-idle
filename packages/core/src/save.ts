@@ -11,7 +11,7 @@ import { tonicCharges } from './buffs.ts';
 import { parseFight } from './combat/fight-parse.ts';
 import { secMs } from './combat/numbers.ts';
 import { pouchUse } from './combat/fight-items.ts';
-import { LOADOUT_NAME_MAX, syncLoadout } from './combat/loadout.ts';
+import { loadoutLimits, syncLoadout } from './combat/loadout.ts';
 import { ensurePouch } from './combat/pouch.ts';
 import {
   FIGHT_KIND,
@@ -102,14 +102,22 @@ export const MIGRATIONS: readonly Migration[] = [
   },
   // v8 -> v9: loadouts, the pouch, Wounds and what the player has seen. The fight carries a pouch,
   // technique effects and boss hooks now, so a fight in progress restarts; the loadout rebuilds itself.
-  (state) => ({
-    ...state,
-    combat: null,
-    loadouts: { active: [], auto: true, signature: null, basis: '', saved: {} },
-    pouch: { slots: [], medic: null },
-    wounds: { stacks: 0, left: 0 },
-    seen: {},
-  }),
+  // A genin of an older save gets the medic pouch the graduation now gives.
+  (state, content) => {
+    const rank = isRecord(state.player) ? state.player.rank : 'student';
+    const bank = isRecord(state.bank) ? { ...state.bank } : {};
+    const medic = content.items.find((i) => i.medic !== undefined);
+    if (medic && rank !== 'student' && typeof bank[medic.id] !== 'number') bank[medic.id] = 1;
+    return {
+      ...state,
+      bank,
+      combat: null,
+      loadouts: { active: [], auto: true, signature: null, basis: '', saved: {} },
+      pouch: { slots: [], medic: null },
+      wounds: { stacks: 0, left: 0 },
+      seen: {},
+    };
+  },
 ];
 
 /** Deepest nesting a slot's data may have. */
@@ -269,23 +277,45 @@ function sanitizeLoadouts(raw: unknown, state: GameState, content: ContentDb): L
   const out: LoadoutState = { active: [], auto: true, signature: null, basis: '', saved: {} };
   if (!isRecord(raw)) return out;
   const index = indexOf(content);
-  const ids = (list: unknown): string[] =>
-    Array.isArray(list)
-      ? [...new Set(list.filter((x): x is string => typeof x === 'string'))].filter(
-          (id) =>
-            state.known[id] === true &&
-            index.techniques.get(id)?.rank !== null &&
-            index.techniques.has(id),
-        )
-      : [];
+  const limits = loadoutLimits(RANK_ORDER.indexOf(state.player.rank), content);
+  const natureOf = (id: string): string | null => {
+    const skill = index.techniques.get(id)?.skill ?? '';
+    return (NATURE_IDS as readonly string[]).includes(skill) ? skill : null;
+  };
+  /** The techniques the player knows, none out of the loadout, as many as the rank's slots and natures allow. */
+  const ids = (list: unknown): string[] => {
+    if (!Array.isArray(list)) return [];
+    const out: string[] = [];
+    const natures = new Set<string>();
+    for (const id of new Set(list.filter((x): x is string => typeof x === 'string'))) {
+      const tech = index.techniques.get(id);
+      if (!tech || tech.rank === null || tech.combat?.outOfLoadout || state.known[id] !== true) {
+        continue;
+      }
+      const nature = natureOf(id);
+      if (limits) {
+        if (out.length >= limits.slots) break;
+        if (nature && !natures.has(nature) && natures.size >= limits.natures) continue;
+      }
+      if (nature) natures.add(nature);
+      out.push(id);
+    }
+    return out.slice(0, content.balance.K.loadout.slots.chunin);
+  };
   out.auto = raw.auto !== false;
-  out.active = ids(raw.active).slice(0, content.balance.K.loadout.slots.chunin);
+  out.active = ids(raw.active);
   out.signature =
     typeof raw.signature === 'string' && out.active.includes(raw.signature) ? raw.signature : null;
   out.basis = typeof raw.basis === 'string' ? raw.basis : '';
   if (isRecord(raw.saved)) {
     for (const [name, entry] of Object.entries(raw.saved)) {
-      if (name.length < 1 || name.length > LOADOUT_NAME_MAX || !isRecord(entry)) continue;
+      if (
+        name.length < 1 ||
+        name.length > content.balance.K.loadout.nameMax ||
+        name in Object.prototype ||
+        !isRecord(entry)
+      )
+        continue;
       if (Object.keys(out.saved).length >= content.balance.K.loadout.saved) break;
       const techniques = ids(entry.techniques);
       const sig =

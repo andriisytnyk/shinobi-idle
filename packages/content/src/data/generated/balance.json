@@ -181,6 +181,7 @@
         "mult": 0.05,
         "sigEveryMs": 16000,
         "sigMult": 0.3,
+        "sigOpenMs": 2000,
         "hp": 0.92,
         "dmg": 0.92
       },
@@ -190,6 +191,7 @@
         "mult": 0.05,
         "sigEveryMs": 16000,
         "sigMult": 0.3,
+        "sigOpenMs": 2000,
         "hp": 1,
         "dmg": 1,
         "habituationMult": 2
@@ -204,8 +206,8 @@
         "castMs": 2500,
         "damageMult": 2,
         "stunMs": 500,
-        "hp": 0.95,
-        "dmg": 0.93
+        "hp": 0.85,
+        "dmg": 1.05
       },
       "twins": {
         "count": 2,
@@ -307,7 +309,7 @@
       8,
       0.4
     ],
-    "zoneHpRegen": 0.35,
+    "zoneHpRegen": 0.8,
     "opRegen": 0.25,
     "respawn": 3,
     "wound": {
@@ -546,7 +548,9 @@
         "genin": 1,
         "chunin": 2
       },
-      "saved": 5
+      "saved": 5,
+      "nameMax": 24,
+      "areaBodies": 2
     },
     "signature": {
       "minMastery": 25,

@@ -1,4 +1,12 @@
 /**
+ * Values that win over the documented ones until the documents are updated.
+ */
+export const BALANCE_OVERRIDE: Partial<Record<string, number>> = {
+  /** HP regained between the fights of a zone: with no healing item at all, grinding an enemy of the player's level for two hours needs this much (see sustained.test.ts). */
+  zoneHpRegen: 0.8,
+};
+
+/**
  * Balance parameters that the design documents do not carry yet. The importer merges them under
  * the documented values, so a parameter added to balance.json later wins automatically.
  */
@@ -86,6 +94,7 @@ export const BALANCE_EXT = {
       mult: 0.05,
       sigEveryMs: 16000,
       sigMult: 0.3,
+      sigOpenMs: 2000,
       hp: 0.92,
       dmg: 0.92,
     },
@@ -96,19 +105,27 @@ export const BALANCE_EXT = {
       mult: 0.05,
       sigEveryMs: 16000,
       sigMult: 0.3,
+      sigOpenMs: 2000,
       hp: 1,
       dmg: 1,
     },
     drunkenEvasion: { maxMult: 2, hp: 1, dmg: 1 },
     /** A heavy cast: `castMs` wind-up every `everyMs`, `damageMult` x damage, stuns the player for `stunMs` when it lands. */
-    heavyCast: { everyMs: 20000, castMs: 2500, damageMult: 2, stunMs: 500, hp: 0.95, dmg: 0.93 },
+    heavyCast: { everyMs: 20000, castMs: 2500, damageMult: 2, stunMs: 500, hp: 0.85, dmg: 1.05 },
     /** Two bodies: each has `hpEach` of the boss health and `dmgEach` of its damage; while both live the mist poisons the player for `mistMult` x the poison strength. */
     twins: { count: 2, hpEach: 0.5, dmgEach: 0.5, mistMult: 0.3 },
     mistRehide: { everyMs: 25000, hp: 0.97, dmg: 0.95 },
     illusion: { everyMs: 8000, fleeAtHp: 0.3, hp: 1.25, dmg: 1.25 },
   },
   /** Loadout: slots and distinct natures by rank (a student has no limit), and the number of saved loadouts. */
-  loadout: { slots: { genin: 4, chunin: 5 }, natures: { genin: 1, chunin: 2 }, saved: 5 },
+  loadout: {
+    slots: { genin: 4, chunin: 5 },
+    natures: { genin: 1, chunin: 2 },
+    saved: 5,
+    nameMax: 24,
+    /** An area technique counts as hitting this many bodies when loadouts are scored. */
+    areaBodies: 2,
+  },
   /** The signature technique: the mastery it needs and its extra mastery XP share. */
   signature: { minMastery: 25, xpBonus: 0.1 },
   /** Pouch slots: the base count and the extra slots the chunin vest gives. */

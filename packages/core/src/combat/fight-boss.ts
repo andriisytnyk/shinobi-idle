@@ -9,7 +9,6 @@ import {
 } from './fight.ts';
 import { addEffect, findEffect, removeEffect } from './fight-effects.ts';
 import type { Combatant, FightCtx, FightHook } from './fight-types.ts';
-import { secMs } from './numbers.ts';
 import { needOf, TICK_MS, workOf } from './units.ts';
 
 /*
@@ -76,7 +75,7 @@ function rival(id: string, key: 'rivalDuel' | 'rivalTournament'): FightHook {
         c.timers[`rival.${i}`] = timer;
       }
       const sig = timerOf(fx.sigEveryMs);
-      sig.progress = Math.max(0, sig.need - needOf(secMs(2)));
+      sig.progress = Math.max(0, sig.need - needOf(fx.sigOpenMs));
       c.timers['rival.sig'] = sig;
     },
     onTimer(ctx, c, name) {

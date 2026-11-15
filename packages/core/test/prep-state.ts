@@ -21,6 +21,8 @@ export function fighter(seed = 1, level = 36, nature: NatureId = 'katon'): GameS
   for (const skill of skills) setLevel(state, skill, level);
   // The state a played game would be in: the team follows the native nature, the quests have noticed the levels.
   state.team = teamFor(nature);
+  // The graduation gave the medic pouch.
+  state.bank['core:medpouch'] = 1;
   refreshUnlocks(state, content, true);
   updateQuests(state, content);
   state.events = [];

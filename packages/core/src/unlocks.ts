@@ -1,5 +1,6 @@
 import type { ContentDb } from '@shinobi/content';
 import { syncLoadout } from './combat/loadout.ts';
+import { ensurePouch } from './combat/pouch.ts';
 import { emit } from './events.ts';
 import { skillLevel } from './requirements.ts';
 import type { GameState } from './state.ts';
@@ -21,5 +22,6 @@ export function refreshUnlocks(state: GameState, content: ContentDb, silent = fa
   }
   // The automatic loadout follows what the player knows and the rank.
   syncLoadout(state, content);
+  ensurePouch(state, content);
   return learned;
 }

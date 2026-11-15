@@ -113,7 +113,7 @@ describe('zones', () => {
     const p = c?.fight.player;
     expect(p?.chakra).toBe(p?.maxChakra);
     expect(p?.stamina).toBe(p?.maxStamina);
-    expect(p?.hp).toBeGreaterThan((p?.maxHp ?? 0) * (0.3 + K.zoneHpRegen) - 20);
+    expect(p?.hp).toBeGreaterThan((p?.maxHp ?? 0) * Math.min(1, 0.3 + K.zoneHpRegen) - 20);
     advance(state, 60_000, content);
     expect(state.combat?.enemy).toBe('core:dummy');
     expect(state.counters['kills.core:dummy']).toBeGreaterThan(1);

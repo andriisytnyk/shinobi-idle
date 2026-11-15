@@ -35,7 +35,7 @@ describe('the AI tiers', () => {
 
 describe('the preparation numbers', () => {
   it('gives the loadout 4 and 5 slots, 1 and 2 natures, 5 saved sets and a Mastery 25 signature', () => {
-    expect(K.loadout).toEqual({
+    expect(K.loadout).toMatchObject({
       slots: { genin: 4, chunin: 5 },
       natures: { genin: 1, chunin: 2 },
       saved: 5,
@@ -57,7 +57,10 @@ describe('the preparation numbers', () => {
   it('has a medic pouch among the shop tools', () => {
     const medic = content.items.filter((i) => i.medic !== undefined);
     expect(medic.map((i) => i.id)).toEqual(['core:medpouch']);
-    expect(content.shop.some((s) => s.item === 'core:medpouch')).toBe(true);
+    // It comes with the rank of Genin, not from a shop.
+    expect(content.shop.some((s) => s.item === 'core:medpouch')).toBe(false);
+    const exam = content.exams.find((e) => e.rank === 'genin');
+    expect(exam?.rewards.items.some((i) => i.item === 'core:medpouch')).toBe(true);
   });
 
   it('gives each operation its own first-clear flag', () => {

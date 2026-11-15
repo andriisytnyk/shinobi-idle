@@ -900,7 +900,13 @@ function basicAttack(ctx: FightCtx, targetId: string | undefined): void {
       const left = (player.cd[id] ?? 0) - fight.t;
       if (left > 0 && left < wait) wait = left;
     }
-    wait = Math.min(wait, fight.poolAt - fight.t > 0 ? fight.poolAt - fight.t : wait);
+    // A technique short of chakra or stamina can come within reach at the next regeneration step.
+    const short = fight.kit.techniques.some(
+      (t) =>
+        (player.cd[t.id] ?? 0) <= fight.t &&
+        (t.pool === 'chakra' ? player.chakra : player.stamina) < t.cost,
+    );
+    if (short && fight.poolAt > fight.t) wait = Math.min(wait, fight.poolAt - fight.t);
     player.phase = 'recover';
     player.timer.need = Math.max(1, wait) * RATE_FULL;
     return;

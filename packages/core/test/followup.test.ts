@@ -3,8 +3,13 @@ import { content, type NatureId } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
   createFight,
+  createState,
   defaultCombatAi,
+  deserialize,
   dispatch,
+  refreshUnlocks,
+  serialize,
+  xpAt,
   fightAdvance,
   findEffect,
   nonNativeLevel,
@@ -13,6 +18,7 @@ import {
   type PlayerSnapshot,
 } from '../src/index.ts';
 import { K, enemyAt, quiet, rules, scripted, sec, withAi } from './fight-helpers.ts';
+import { setLevel } from './helpers.ts';
 import { fighter, ids, startFight, unlock } from './prep-state.ts';
 
 describe('fighting by a raw enemy id respects the gating of its zone', () => {
@@ -179,5 +185,147 @@ describe('the basic attack is an auto-attack on its own timer', () => {
     for (const gap of spacing) expect(gap).toBeGreaterThanOrEqual(sec(K.basicInterval));
     expect(fight.tally.basic).toBeGreaterThanOrEqual(Math.floor(100 / K.basicInterval) - 8);
     expect(fight.tally.basic).toBeLessThanOrEqual(Math.ceil(100 / K.basicInterval));
+  });
+});
+
+describe('the auto-loadout and the signature', () => {
+  it('never drops the signature, even when another nature is far stronger', () => {
+    const state = fighter(3, 40, 'katon');
+    setLevel(state, 'futon', 50);
+    setLevel(state, 'katon', 31);
+    refreshUnlocks(state, content, true);
+    const sig = 'core:great_fireball';
+    state.mastery[sig] = { xp: xpAt(K.signature.minMastery) };
+    state.loadouts.auto = false;
+    state.loadouts.active = [sig, 'core:leaf_whirlwind'];
+    state.loadouts.signature = sig;
+    dispatch(state, { type: 'loadout.auto', on: true }, content);
+    expect(state.loadouts.active).toContain(sig);
+    expect(state.loadouts.signature).toBe(sig);
+    // The one nature of the loadout is the signature's.
+    const natures = state.loadouts.active
+      .map((id) => content.techniques.find((t) => t.id === id)?.skill)
+      .filter((s) => s === 'katon' || s === 'futon');
+    expect(new Set(natures)).toEqual(new Set(['katon']));
+  });
+
+  it('never takes a stance or a technique that needs one, however high Taijutsu stands', () => {
+    const state = fighter(4, 50, 'katon');
+    state.known['core:front_lotus'] = true;
+    state.loadouts.basis = '';
+    dispatch(state, { type: 'loadout.auto', on: true }, content);
+    for (const id of state.loadouts.active) {
+      const t = content.techniques.find((x) => x.id === id);
+      expect(t?.combat?.effect.kind, id).not.toBe('stance');
+      expect(t?.combat?.requiresStance ?? false, id).toBe(false);
+    }
+    // A hand-made loadout may still take them.
+    expect(
+      dispatch(
+        state,
+        { type: 'loadout.set', techniques: ['core:gate_of_opening', 'core:front_lotus'] },
+        content,
+      ).ok,
+    ).toBe(true);
+  });
+});
+
+describe('the medic pouch and the pouch of a student', () => {
+  it('comes with the graduation and is not for sale', () => {
+    const exam = content.exams.find((e) => e.rank === 'genin');
+    expect(exam?.rewards.items.some((i) => i.item === ids.medpouch)).toBe(true);
+    expect(content.shop.some((s) => s.item === ids.medpouch)).toBe(false);
+  });
+
+  it('is given to the genin of an older save by the migration, and a student has no pouch', () => {
+    const state = fighter(5, 20);
+    const raw = JSON.parse(serialize(state, 0)) as { v: number; state: Record<string, unknown> };
+    raw.v = 8;
+    raw.state.v = 8;
+    raw.state.bank = {};
+    for (const key of ['loadouts', 'pouch', 'wounds', 'seen']) delete raw.state[key];
+    const loaded = deserialize(JSON.stringify(raw), content);
+    expect(loaded.bank[ids.medpouch]).toBe(1);
+    expect(loaded.pouch.slots).toHaveLength(K.pouch.slots);
+    const student = createState(1, content);
+    expect(student.pouch.slots).toHaveLength(0);
+    expect(dispatch(student, { type: 'pouch.set', slot: 0, item: ids.kunai }, content).ok).toBe(
+      false,
+    );
+  });
+});
+
+describe('names and loaded state are checked', () => {
+  it('rejects names that are properties of every object', () => {
+    const state = fighter(6, 20);
+    for (const name of ['__proto__', 'constructor', 'toString']) {
+      expect(dispatch(state, { type: 'loadout.save', name }, content)).toEqual({
+        ok: false,
+        reason: 'error.invalidName',
+      });
+    }
+    expect(
+      dispatch(state, { type: 'loadout.save', name: 'x'.repeat(K.loadout.nameMax + 1) }, content)
+        .ok,
+    ).toBe(false);
+  });
+
+  it('cuts a loaded loadout to the slots and natures of the rank and keeps out-of-loadout techniques out', () => {
+    const state = fighter(7, 40, 'katon');
+    setLevel(state, 'futon', 40);
+    refreshUnlocks(state, content, true);
+    const raw = JSON.parse(serialize(state, 0)) as { state: { loadouts: unknown } };
+    raw.state.loadouts = {
+      active: [
+        'core:body_replacement',
+        'core:leaf_whirlwind',
+        'core:dynamic_entry',
+        'core:leaf_gale',
+        'core:great_fireball',
+        'core:gale_palm',
+        'core:shadow_shuriken',
+      ],
+      auto: false,
+      signature: null,
+      basis: '',
+      saved: { __proto__x: { techniques: [], signature: null } },
+    };
+    const loaded = deserialize(JSON.stringify(raw), content);
+    expect(loaded.loadouts.active).not.toContain('core:body_replacement');
+    expect(loaded.loadouts.active.length).toBeLessThanOrEqual(K.loadout.slots.genin);
+    const natures = loaded.loadouts.active
+      .map((id) => content.techniques.find((t) => t.id === id)?.skill)
+      .filter((s) => s === 'katon' || s === 'futon');
+    expect(new Set(natures).size).toBeLessThanOrEqual(K.loadout.natures.genin);
+  });
+});
+
+describe('a student and a genin against a locked zone', () => {
+  it('refuses a student the zones of the world by their raw enemy ids', () => {
+    for (const id of ['core:foreign_genin', 'core:tiger']) {
+      const student = fighter(8, 10);
+      student.player.rank = 'student';
+      expect(startFight(student, id), id).toEqual({
+        ok: false,
+        reason: 'error.requirementsNotMet',
+      });
+    }
+  });
+
+  it('refuses a genin a zone whose flag is not raised, by zone id and by enemy id', () => {
+    const off = {
+      ...content,
+      balance: { ...content.balance, K: { ...K, regionZones: { openFromRank: 'off' as const } } },
+    };
+    const state = fighter(9, 20);
+    for (const id of ['core:zone_foreign_genin', 'core:foreign_genin', 'core:zone_boss_wolf']) {
+      expect(
+        dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id }, off),
+        id,
+      ).toEqual({
+        ok: false,
+        reason: 'error.requirementsNotMet',
+      });
+    }
   });
 });

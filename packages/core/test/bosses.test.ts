@@ -108,4 +108,19 @@ describe('A9: bosses against a prepared player', () => {
     expect(nameless).toBeLessThanOrEqual(by('core:boss_mist'));
     for (const r of rows) expect(nameless, r.boss.id).toBeLessThanOrEqual(r.full);
   });
+
+  it('lets the favourable nature beat the unfavourable one by a margin, where the wheel names them', () => {
+    // Exempt, and why: the wolf (level 22: neither nature has a technique yet, the wheel has nothing to
+    // act on); the hunter and the mist fugitive (their unfavourable natures, Doton and Katon, have more
+    // techniques at the level than the favourable Futon and Doton, which outweighs a 30% wheel factor).
+    const exempt = ['core:boss_wolf', 'core:boss_hunter', 'core:boss_mist'];
+    for (const r of rows.filter((x) => x.boss.nature !== null && x.boss.nature !== 'wheel')) {
+      if (exempt.includes(r.boss.id)) {
+        // Still not far behind.
+        expect(r.full, r.boss.id).toBeGreaterThanOrEqual(r.unfavourable - 0.15);
+      } else {
+        expect(r.full - r.unfavourable, r.boss.id).toBeGreaterThanOrEqual(0.2);
+      }
+    }
+  });
 });

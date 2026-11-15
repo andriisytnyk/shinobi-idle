@@ -684,6 +684,7 @@ const rivalNumbers = z.object({
   mult: z.number(),
   sigEveryMs: z.number().int(),
   sigMult: z.number(),
+  sigOpenMs: z.number().int(),
   hp: z.number(),
   dmg: z.number(),
 });
@@ -941,6 +942,8 @@ export const balanceParamsSchema = z.object({
     slots: z.object({ genin: z.number().int(), chunin: z.number().int() }),
     natures: z.object({ genin: z.number().int(), chunin: z.number().int() }),
     saved: z.number().int(),
+    nameMax: z.number().int(),
+    areaBodies: z.number(),
   }),
   signature: z.object({ minMastery: z.number().int(), xpBonus: z.number() }),
   pouch: z.object({ slots: z.number().int(), vest: z.number().int() }),

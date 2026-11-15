@@ -35,9 +35,6 @@ export interface LoadoutLimits {
   natures: number;
 }
 
-/** The longest name a saved loadout can have. */
-export const LOADOUT_NAME_MAX = 24;
-
 export function loadoutLimits(tier: number, content: ContentDb): LoadoutLimits | null {
   const L = content.balance.K.loadout;
   if (tier >= RANK_ORDER.indexOf('chunin'))
@@ -78,8 +75,11 @@ function scoreOf(
   const K = content.balance.K;
   const n = techniqueFigures(snap, tech, content);
   if (!(n.damage > 0)) return 0;
-  // An area technique counts as hitting two bodies; burning adds its share on top.
-  const bodies = tech.role === 'area' || tech.tags.includes('area') || tech.combat?.hitsAll ? 2 : 1;
+  // An area technique counts as hitting several bodies; burning adds its share on top.
+  const bodies =
+    tech.role === 'area' || tech.tags.includes('area') || tech.combat?.hitsAll
+      ? K.loadout.areaBodies
+      : 1;
   const burn = tech.state === 'burn' ? 1 + K.burn.share : 1;
   const seconds = (n.castMs + n.cooldownMs) / MS_PER_SECOND;
   return (
@@ -131,24 +131,26 @@ export function planLoadout(
   const cands: Cand[] = [];
   for (const id of snap.known) {
     const tech = index.techniques.get(id);
+    // Stances cost Wounds: they, and the techniques that need one, are for the player to take by hand.
     if (!tech || tech.rank === null || tech.combat?.outOfLoadout) continue;
+    if (isStance(tech) || tech.combat?.requiresStance) continue;
     cands.push({ tech, nature: natureOf(tech), score: scoreOf(snap, tech, enemy, content) });
   }
   if (!limits) return cands.map((c) => c.tech.id).sort();
 
   const natures = NATURE_IDS.filter((n) => cands.some((c) => c.nature === n));
-  const choices = subsets(natures, limits.natures);
+  // The signature stays: only the nature sets that include its nature are considered.
+  const keepNature = options.keep
+    ? (cands.find((c) => c.tech.id === options.keep)?.nature ?? null)
+    : null;
+  const choices = subsets(natures, limits.natures).filter(
+    (s) => keepNature === null || s.includes(keepNature),
+  );
   const byScore = (a: Cand, b: Cand) => b.score - a.score || (a.tech.id < b.tech.id ? -1 : 1);
   let bestPlan: { ids: string[]; total: number; size: number } | null = null;
 
   for (const choice of choices) {
     const pool = cands.filter((c) => c.nature === null || choice.includes(c.nature));
-    const stance = pool
-      .filter((c) => isStance(c.tech))
-      .sort((a, b) => {
-        const fx = (c: Cand) => (c.tech.combat?.effect.kind === 'stance' ? c.tech.level : 0);
-        return fx(b) - fx(a);
-      })[0];
     const chosen: Cand[] = [];
     const add = (c: Cand | undefined): void => {
       if (c && !chosen.includes(c) && chosen.length < limits.slots) chosen.push(c);
@@ -172,14 +174,9 @@ export function planLoadout(
       add(pick);
       covered++;
     }
-    for (const c of [...pool].filter((x) => x.score > 0 && !isStance(x.tech)).sort(byScore)) {
+    for (const c of [...pool].filter((x) => x.score > 0).sort(byScore)) {
       if (chosen.length >= limits.slots) break;
-      if (c.tech.combat?.requiresStance) {
-        // A technique that needs a stance brings the stance with it, or stays out.
-        if (!stance || chosen.length + 2 > limits.slots) continue;
-        add(c);
-        add(stance);
-      } else add(c);
+      add(c);
     }
     for (const c of [...pool].filter((x) => isGuard(x.tech)).sort(byScore)) add(c);
     const top = pool.reduce((m, c) => Math.max(m, c.score), 0);
@@ -442,7 +439,13 @@ export function setSignature(
 export function saveLoadout(state: GameState, name: string, content: ContentDb): CommandResult {
   const l = state.loadouts;
   const clean = typeof name === 'string' ? name.trim() : '';
-  if (clean.length < 1 || clean.length > LOADOUT_NAME_MAX || /\p{Cc}/u.test(clean)) {
+  // A name is a key of an object: nothing that is already a property of every object.
+  if (
+    clean.length < 1 ||
+    clean.length > content.balance.K.loadout.nameMax ||
+    /\p{Cc}/u.test(clean) ||
+    clean in Object.prototype
+  ) {
     return { ok: false, reason: 'error.invalidName' };
   }
   if (tierOf(state) < 1) return { ok: false, reason: 'error.noLoadoutYet' };

@@ -15,7 +15,10 @@
     },
     "reduceBy": ["tai", "nin", "cc"],
     "rewards": {
-      "items": [{ "item": "core:graduate_scroll", "n": 1 }],
+      "items": [
+        { "item": "core:graduate_scroll", "n": 1 },
+        { "item": "core:medpouch", "n": 1 }
+      ],
       "goal": { "kind": "technique", "id": "core:shadow_clone" }
     }
   }

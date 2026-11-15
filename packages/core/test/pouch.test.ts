@@ -291,6 +291,7 @@ describe('use by hand', () => {
 
   it('is not done by the game itself: without the medic pouch nothing heals on its own', () => {
     const state = fighter(6, 20);
+    delete state.bank[ids.medpouch];
     stock(state, { [ids.heal]: 4 });
     run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
     expect(snapshotPlayer(state, content, defaultRules).medic).toBeNull();
