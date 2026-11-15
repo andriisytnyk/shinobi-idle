@@ -1,6 +1,6 @@
 import type { Boss, ContentDb, Enemy, Operation } from '@shinobi/content';
 import { stopSlot } from '../actions.ts';
-import { bump, killsKey } from '../counters.ts';
+import { bump, defeatsKey, killsKey } from '../counters.ts';
 import { emit } from '../events.ts';
 import { MS_PER_HOUR } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
@@ -10,6 +10,7 @@ import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 import type { System } from '../system.ts';
 import { encounterFor } from './fight-encounter.ts';
+import { bossNature } from '../natures.ts';
 import { createFight, fightAdvance, fightNextEventIn, fightOutcome } from './fight.ts';
 import { secMs } from './numbers.ts';
 import { refillPouch, syncPouch } from './pouch.ts';
@@ -54,7 +55,7 @@ function startFight(
   // The fight gets its own seed from the game's combat stream and runs on a stream of its own.
   return createFight(
     snapshot,
-    encounterFor(entry, content),
+    encounterFor(entry, content, [], 'special' in entry ? bossNature(state, entry) : null),
     nextSeed(state.rng, 'combat'),
     content,
     rules,
@@ -279,6 +280,7 @@ export const combatSystem: System = {
       }
       if (result === 'defeat') {
         emit(state, { type: 'playerDefeated', enemy: c.enemy });
+        bump(state, defeatsKey(c.enemy));
         woundsAfter(state, c, content, true);
         // A defeat ends an operation run with the action: nothing of it is kept.
         return stopSlot(state, index, 'defeated', content, rules);

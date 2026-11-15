@@ -70,8 +70,6 @@ function rival(id: string, key: 'rivalDuel' | 'rivalTournament'): FightHook {
     init(ctx, c) {
       const K = ctx.content.balance.K;
       const fx = K.bossFx[key];
-      // Until the player has a nature the rival fights with fire.
-      c.nature ??= 'katon';
       for (let i = 0; i < fx.techniques; i++) {
         const timer = timerOf(fx.everyMs);
         timer.progress = Math.floor((timer.need * (i + 1)) / (fx.techniques + 1));

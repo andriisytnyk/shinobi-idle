@@ -1,5 +1,5 @@
 import type { ContentDb, SkillId } from '@shinobi/content';
-import { killsKey } from '../counters.ts';
+import { defeatsKey, killsKey } from '../counters.ts';
 import { masteryLevel } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
 import { computeMod } from '../modifiers.ts';
@@ -33,7 +33,8 @@ export function knowledgeOf(
   for (const id of entries) {
     const entry = index.enemies.get(id) ?? index.bosses.get(id);
     if (!entry) continue;
-    const beaten = (state.counters[killsKey(id)] ?? 0) > 0;
+    // Losing to an enemy teaches as much as beating it: the player has seen it all.
+    const beaten = (state.counters[killsKey(id)] ?? 0) + (state.counters[defeatsKey(id)] ?? 0) > 0;
     if (beaten) out[id] = [...entry.traits, 'special'];
     else if (state.seen[id]) out[id] = entry.traits.filter((t) => visible.includes(t));
     else out[id] = [];

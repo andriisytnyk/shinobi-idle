@@ -168,7 +168,7 @@ describe('A11: speed', () => {
   it('simulates 1000 fights against an at-level regular enemy in under 2000 ms', () => {
     const enemy = content.enemies.find((e) => e.id === 'core:hunter');
     if (!enemy) throw new Error('no enemy');
-    const snap = playerFor(enemy, 'katon', { prep: 'auto', tier: 1, knowsAll: false });
+    const snap = playerFor(enemy, 'katon', { prep: 'auto', tier: 1, knowledge: 'none' });
     const t0 = performance.now();
     const r = simulateFights(snap, encounterFor(enemy, content), 1000, 5, content, defaultRules);
     const ms = performance.now() - t0;

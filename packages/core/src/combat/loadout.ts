@@ -290,7 +290,6 @@ export function planTarget(
   if (entry.nature === 'wheel') {
     nature = first ? (NATURE_IDS.find((n) => NATURE_WHEEL[n] === first) ?? null) : null;
   } else nature = entry.nature;
-  if (entry.nature === 'wheel' && nature === null && 'special' in entry) nature = 'katon';
   return { traits, nature };
 }
 

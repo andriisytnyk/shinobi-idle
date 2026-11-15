@@ -53,7 +53,9 @@ describe('A3: the fight engine does not know the game', () => {
   it('keeps the shared number files free of game state too', () => {
     for (const file of ['numbers.ts', 'units.ts']) {
       for (const from of importsOf(readFileSync(dir + file, 'utf8'))) {
-        expect(from, `${file} imports ${from}`).toMatch(/^(@shinobi\/content|\.\.\/formulas\.ts)$/);
+        expect(from, `${file} imports ${from}`).toMatch(
+          /^(@shinobi\/content|\.\.\/formulas\.ts|\.\.\/natures\.ts)$/,
+        );
       }
     }
   });
@@ -420,6 +422,8 @@ describe('the fight action wraps the fight engine', () => {
 
   it('stops with a defeat when the player falls', () => {
     const state = createState(7, content);
+    // The strongest enemy is in a gated zone: the player is a genin.
+    state.player.rank = 'genin';
     const boss = content.enemies.reduce((a, b) => (a.cl > b.cl ? a : b));
     start(state, boss.id);
     advance(state, 10 * 60_000, content);

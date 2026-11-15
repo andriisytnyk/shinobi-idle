@@ -51,7 +51,14 @@ const share = (x: unknown): x is number => isNum(x) && x >= 0 && x <= 1;
 const oneOf = <T extends string>(list: readonly T[], x: unknown): x is T =>
   typeof x === 'string' && (list as readonly string[]).includes(x);
 
-const MOD_STATS: readonly ModStat[] = ['accuracy', 'evasion', 'speed', 'damageTaken', 'taiDamage'];
+const MOD_STATS: readonly ModStat[] = [
+  'accuracy',
+  'evasion',
+  'speed',
+  'damageTaken',
+  'taiDamage',
+  'resist',
+];
 const KIT_EFFECTS: readonly KitEffect['kind'][] = [
   'damage',
   'none',
@@ -94,7 +101,15 @@ function parseEffect(raw: unknown, t: number): Effect | null {
     if (!oneOf(MOD_STATS, raw.stat) || !isNum(raw.value)) return null;
     if (raw.op !== 'mul' && raw.op !== 'add') return null;
     if (raw.value < 0 || raw.value > MOD_LIMIT) return null;
-    return { ...base, kind: 'modifier', stat: raw.stat, op: raw.op, value: raw.value };
+    if (raw.nature !== undefined && !oneOf(NATURE_IDS, raw.nature)) return null;
+    return {
+      ...base,
+      kind: 'modifier',
+      stat: raw.stat,
+      op: raw.op,
+      value: raw.value,
+      ...(raw.nature === undefined ? {} : { nature: raw.nature }),
+    };
   }
   if (raw.kind === 'periodic') {
     if (raw.mode !== 'damage' && raw.mode !== 'heal' && raw.mode !== 'stamina') return null;

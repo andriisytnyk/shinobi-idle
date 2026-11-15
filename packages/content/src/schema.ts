@@ -643,10 +643,10 @@ export const aiTierSchema = z.strictObject({
   /** The lowest player tier (0 student, 1 genin, 2 chunin) that runs this tier. */
   minTier: z.number().int().min(0),
   rules: z.array(z.enum(AI_RULE_IDS)).min(1),
-  /** `visible`: answers only openly visible traits; `known`: every trait the player knows. */
-  answers: z.enum(['visible', 'known']),
-  /** `strongest`: defends only against the strongest casts, after a reaction delay; `all`: every heavy cast. */
-  defends: z.enum(['strongest', 'all']),
+  /** `known`: defends against the casts it knows to be heavy; `all`: every cast. */
+  defends: z.enum(['known', 'all']),
+  /** Whether it needs the reaction delay before it answers a cast. */
+  reaction: z.boolean(),
   /** Whether the best attack counts the nature wheel and habituation, or only raw strength. */
   tactical: z.boolean(),
 });
@@ -684,6 +684,8 @@ const rivalNumbers = z.object({
   mult: z.number(),
   sigEveryMs: z.number().int(),
   sigMult: z.number(),
+  hp: z.number(),
+  dmg: z.number(),
 });
 const byRank = z.record(rankId, z.number());
 
@@ -757,15 +759,19 @@ export const balanceParamsSchema = z.object({
       everyMs: z.number().int(),
       hp: z.number(),
       dmg: z.number(),
+      leaderHp: z.number(),
+      leaderDmg: z.number(),
     }),
     rivalDuel: rivalNumbers,
     rivalTournament: rivalNumbers.extend({ habituationMult: z.number() }),
-    drunkenEvasion: z.object({ maxMult: z.number() }),
+    drunkenEvasion: z.object({ maxMult: z.number(), hp: z.number(), dmg: z.number() }),
     heavyCast: z.object({
       everyMs: z.number().int(),
       castMs: z.number().int(),
       damageMult: z.number(),
       stunMs: z.number().int(),
+      hp: z.number(),
+      dmg: z.number(),
     }),
     twins: z.object({
       count: z.number().int(),
@@ -773,8 +779,13 @@ export const balanceParamsSchema = z.object({
       dmgEach: z.number(),
       mistMult: z.number(),
     }),
-    mistRehide: z.object({ everyMs: z.number().int() }),
-    illusion: z.object({ everyMs: z.number().int(), fleeAtHp: z.number() }),
+    mistRehide: z.object({ everyMs: z.number().int(), hp: z.number(), dmg: z.number() }),
+    illusion: z.object({
+      everyMs: z.number().int(),
+      fleeAtHp: z.number(),
+      hp: z.number(),
+      dmg: z.number(),
+    }),
   }),
   ryoDrop: pair,
   dropChance: z.object({
@@ -933,15 +944,11 @@ export const balanceParamsSchema = z.object({
   }),
   signature: z.object({ minMastery: z.number().int(), xpBonus: z.number() }),
   pouch: z.object({ slots: z.number().int(), vest: z.number().int() }),
-  ai: z.object({
-    genin: z.object({ strongMult: z.number(), reactMs: z.number().int() }),
-    chunin: z.object({ strongMult: z.number(), reactMs: z.number().int() }),
-    guardBelow: z.number(),
-  }),
+  ai: z.object({ geninReactionMs: z.number().int(), guardBelow: z.number() }),
   woundHp: z.number(),
   regionZones: z.object({ openFromRank: z.union([playerRankId, z.literal('off')]) }),
   operation: z.object({ approachMs: z.number().int(), approachShort: z.number() }),
-  toolFx: z.object({ dot: z.object({ pct: z.number(), durS: z.number() }) }),
+  toolFx: z.object({ dot: z.object({ pct: z.number(), durS: z.number() }), resist: z.number() }),
   illusionResist: z.number(),
   senseiTest: z.object({ base: z.number(), perLevel: z.number(), floor: z.number() }),
   natures: z.object({

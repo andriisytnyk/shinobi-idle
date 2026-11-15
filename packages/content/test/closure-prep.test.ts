@@ -8,7 +8,6 @@ describe('the AI tiers', () => {
   it('has a genin and a chunin tier, each with numbers in the balance object', () => {
     expect(content.ai.tiers.map((t) => t.id).sort()).toEqual(['chunin', 'genin']);
     for (const tier of content.ai.tiers) {
-      expect(K.ai, tier.id).toHaveProperty(tier.id);
       expect(
         tier.rules.every((r) => AI_RULE_IDS.includes(r)),
         tier.id,
@@ -18,13 +17,14 @@ describe('the AI tiers', () => {
     }
   });
 
-  it('starts at the lowest player tier and leaves the interrupt to the chunin', () => {
+  it('starts at the lowest player tier; only the genin needs a reaction delay', () => {
     const genin = content.ai.tiers.find((t) => t.id === 'genin');
     const chunin = content.ai.tiers.find((t) => t.id === 'chunin');
     expect(genin?.minTier).toBe(0);
     expect(chunin?.minTier).toBe(2);
-    expect(genin?.rules).not.toContain('interrupt');
-    expect(chunin?.rules).toContain('interrupt');
+    expect(genin?.reaction).toBe(true);
+    expect(chunin?.reaction).toBe(false);
+    expect(K.ai.geninReactionMs).toBeGreaterThan(0);
   });
 
   it('names only real traits as visible', () => {

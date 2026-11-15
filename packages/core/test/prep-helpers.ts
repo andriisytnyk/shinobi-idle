@@ -62,8 +62,8 @@ export interface PlayerOptions {
   /** The AI tier: 1 plays as a Genin, 2 as a Chunin. */
   tier?: number;
   mastery?: number;
-  /** Whether the player knows every trait and the mechanic of the enemy. */
-  knowsAll?: boolean;
+  /** `full`: every trait and the mechanic of the enemy is known; `none`: a first attempt, only what shows on sight. */
+  knowledge?: 'full' | 'none';
   /** Whether the pouch is used on its own (the medic pouch). */
   medic?: boolean;
 }
@@ -75,6 +75,7 @@ export function playerFor(entry: Entry, nature: NatureId, opts: PlayerOptions): 
   const mastery: Record<string, number> = {};
   for (const id of known) mastery[id] = opts.mastery ?? 20;
   const tier = opts.tier ?? 1;
+  if (opts.knowledge === undefined && opts.prep === 'auto') opts = { ...opts, knowledge: 'none' };
   const snap: PlayerSnapshot = {
     levels,
     mastery,
@@ -84,7 +85,11 @@ export function playerFor(entry: Entry, nature: NatureId, opts: PlayerOptions): 
     tier,
   };
   const limits = loadoutLimits(tier, content);
-  const everything = opts.knowsAll !== false ? [...entry.traits, 'special'] : [];
+  const visible: readonly string[] = content.ai.visibleTraits;
+  const everything =
+    opts.knowledge === 'none'
+      ? entry.traits.filter((t) => visible.includes(t))
+      : [...entry.traits, 'special'];
   snap.knowledge = { [entry.id]: everything };
   if (opts.prep === 'auto') {
     snap.loadout = autoLoadout(snap, limits, null, content);
@@ -106,7 +111,11 @@ export function playerFor(entry: Entry, nature: NatureId, opts: PlayerOptions): 
 }
 
 export function simulate(entry: Entry, snap: PlayerSnapshot, n = 400, seed = 1): FightSummary {
-  return simulateFights(snap, encounterFor(entry, content), n, seed, content, rules);
+  // The rival's nature is the one the team gives: the one that beats the player's first.
+  const first = snap.natures[0];
+  const rival =
+    'special' in entry && entry.special.kind === 'rival' && first ? beater(first) : null;
+  return simulateFights(snap, encounterFor(entry, content, [], rival), n, seed, content, rules);
 }
 
 export const pct = (x: number): string => `${(x * 100).toFixed(0)}%`;

@@ -74,4 +74,5 @@ export const ids = {
   ointment: 'core:krovospynna_maz',
   bloodPill: 'core:krovotvorna_piliulia',
   chakraPill: 'core:piliulia_vidnovlennia_chakry',
+  burnOintment: 'core:maz_vid_opikiv',
 };

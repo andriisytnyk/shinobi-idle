@@ -22,7 +22,7 @@ describe('A10: regular enemies at the level of the player', () => {
       nature,
       r: simulate(
         enemy,
-        playerFor(enemy, nature, { prep: 'auto', tier: 1, knowsAll: false }),
+        playerFor(enemy, nature, { prep: 'auto', tier: 1, knowledge: 'none' }),
         N,
         1,
       ),

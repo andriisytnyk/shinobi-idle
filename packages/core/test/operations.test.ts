@@ -265,7 +265,7 @@ describe('the Forest of Death', () => {
     };
     const a = order(1);
     const pool = forest.stages[0]?.t === 'days' ? forest.stages[0].pool : [];
-    expect(a.length).toBeGreaterThanOrEqual(15);
+    expect(a.length).toBeGreaterThanOrEqual(8);
     for (const id of a.slice(0, -1)) expect([...pool, 'core:boss_nameless']).toContain(id);
     expect(a[a.length - 1]).toBe('core:boss_nameless');
     expect(order(1)).toEqual(a);

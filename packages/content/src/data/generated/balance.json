@@ -171,14 +171,18 @@
         "count": 4,
         "everyMs": 20000,
         "hp": 0.12,
-        "dmg": 0.05
+        "dmg": 0.05,
+        "leaderHp": 0.97,
+        "leaderDmg": 0.97
       },
       "rivalDuel": {
         "techniques": 1,
         "everyMs": 9000,
         "mult": 0.05,
         "sigEveryMs": 16000,
-        "sigMult": 0.3
+        "sigMult": 0.3,
+        "hp": 0.92,
+        "dmg": 0.92
       },
       "rivalTournament": {
         "techniques": 2,
@@ -186,16 +190,22 @@
         "mult": 0.05,
         "sigEveryMs": 16000,
         "sigMult": 0.3,
+        "hp": 1,
+        "dmg": 1,
         "habituationMult": 2
       },
       "drunkenEvasion": {
-        "maxMult": 2
+        "maxMult": 2,
+        "hp": 1,
+        "dmg": 1
       },
       "heavyCast": {
         "everyMs": 20000,
         "castMs": 2500,
         "damageMult": 2,
-        "stunMs": 500
+        "stunMs": 500,
+        "hp": 0.95,
+        "dmg": 0.93
       },
       "twins": {
         "count": 2,
@@ -204,11 +214,15 @@
         "mistMult": 0.3
       },
       "mistRehide": {
-        "everyMs": 25000
+        "everyMs": 25000,
+        "hp": 0.97,
+        "dmg": 0.95
       },
       "illusion": {
         "everyMs": 8000,
-        "fleeAtHp": 0.3
+        "fleeAtHp": 0.3,
+        "hp": 1.25,
+        "dmg": 1.25
       }
     },
     "ryoDrop": [
@@ -543,14 +557,7 @@
       "vest": 1
     },
     "ai": {
-      "genin": {
-        "strongMult": 3.5,
-        "reactMs": 1000
-      },
-      "chunin": {
-        "strongMult": 0,
-        "reactMs": 0
-      },
+      "geninReactionMs": 1000,
       "guardBelow": 0.6
     },
     "woundHp": 0.1,
@@ -565,7 +572,8 @@
       "dot": {
         "pct": 0.012,
         "durS": 10
-      }
+      },
+      "resist": 0.6
     },
     "illusionResist": 0.005,
     "senseiTest": {

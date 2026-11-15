@@ -568,7 +568,6 @@ describe('the default AI decision rules, on hand-made views', () => {
     hastened: false,
     reactWork: 0,
     guardBelow: K.ai.guardBelow,
-    strongMult: 0,
     itemWork: sec(K.pillAction),
   });
   const cast = (id: string) => ({ type: 'technique', id });
@@ -578,7 +577,7 @@ describe('the default AI decision rules, on hand-made views', () => {
     const casting = (remaining: number, interruptible = true) =>
       mk(techs, [
         enemyView({
-          cast: { kind: 'heavy', remaining, total: remaining, mult: 3, interruptible },
+          cast: { kind: 'heavy', remaining, total: remaining, mult: 3, interruptible, known: true },
         }),
       ]);
     const need = sec(1);

@@ -145,6 +145,7 @@ describe('fight action', () => {
 
   it('stops with a defeated event when the player falls', () => {
     const state = createState(4, content);
+    state.player.rank = 'genin';
     const boss = content.enemies.reduce((a, b) => (a.cl > b.cl ? a : b));
     dispatch(state, fight(boss.id), content);
     advance(state, 10 * 60 * 1000, content);

@@ -12,6 +12,8 @@ import {
   type FightState,
   type PlayerSnapshot,
 } from '../src/index.ts';
+import { bossNature } from '../src/index.ts';
+import { fighter, startFight, unlock } from './prep-state.ts';
 import { K, ctxOf, quiet, rules, scripted, sec, withAi } from './fight-helpers.ts';
 
 const boss = (id: string): Boss => {
@@ -42,7 +44,10 @@ describe('the pack respawn of the wolf leader', () => {
     const [lead, ...pack] = f.enemies;
     expect(lead?.specials).toContain('special:packRespawn');
     expect(pack).toHaveLength(K.bossFx.wolfPack.count);
-    expect(lead?.maxHp).toBeCloseTo((K.eHp[0] + K.eHp[1] * 22) * K.boss.hp, 6);
+    expect(lead?.maxHp).toBeCloseTo(
+      (K.eHp[0] + K.eHp[1] * 22) * K.boss.hp * K.bossFx.wolfPack.leaderHp,
+      6,
+    );
     expect(pack[0]?.maxHp).toBeCloseTo((K.eHp[0] + K.eHp[1] * 22) * K.bossFx.wolfPack.hp, 6);
   });
 
@@ -79,13 +84,19 @@ describe('the pack respawn of the wolf leader', () => {
 });
 
 describe('the rival', () => {
-  it('fights with the nature that beats the first nature of the player, and with fire when the player has none', () => {
-    const f = watched('core:boss_ren1', { ...scripted([]), natures: ['katon'] });
+  it('fights with the nature the team selector gives him: the one that beats the first nature of the player', () => {
+    const state = fighter(1, 20, 'katon');
     // Suiton beats Katon.
-    expect(f.enemies[0]?.nature).toBe('suiton');
-    expect(watched('core:boss_ren1', { ...scripted([]), natures: [] }).enemies[0]?.nature).toBe(
-      'katon',
-    );
+    expect(bossNature(state, boss('core:boss_ren1'))).toBe('suiton');
+    expect(state.team?.rival).toBe('suiton');
+    startBoss(state);
+    expect(state.combat?.fight.enemies[0]?.nature).toBe('suiton');
+    // A player with no nature has no rival nature yet, and no placeholder stands in for it.
+    const none = fighter(2, 20, 'katon');
+    none.player.natures = [];
+    none.team = null;
+    startBoss(none);
+    expect(none.combat?.fight.enemies[0]?.nature).toBeNull();
   });
 
   it('keeps a timer for each of its techniques and one for the signature that opens the fight', () => {
@@ -319,3 +330,8 @@ describe('the Nameless', () => {
     expect(f.result).toBe('fled');
   });
 });
+
+function startBoss(state: Parameters<typeof startFight>[0]): void {
+  unlock(state, 'boss.ren1.unlocked');
+  startFight(state, 'core:zone_boss_ren1');
+}

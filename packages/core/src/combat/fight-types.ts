@@ -13,7 +13,7 @@ import type {
 import type { RngState } from '../rng.ts';
 
 /** Stats an effect can change. Multipliers combine by product, additions as `1 + sum`. */
-export type ModStat = 'accuracy' | 'evasion' | 'speed' | 'damageTaken' | 'taiDamage';
+export type ModStat = 'accuracy' | 'evasion' | 'speed' | 'damageTaken' | 'taiDamage' | 'resist';
 
 interface EffectBase {
   /** One effect per id on a combatant: applying it again refreshes it, it never stacks. */
@@ -34,6 +34,8 @@ export interface ModifierEffect extends EffectBase {
   stat: ModStat;
   op: 'mul' | 'add';
   value: number;
+  /** For `resist`: the nature of the attackers whose damage is multiplied by `value`. */
+  nature?: NatureId;
 }
 
 /** Hurts or heals its holder `amount` every `every` work units until it ends; `stamina` drains the stamina pool instead. */
@@ -340,6 +342,8 @@ export interface ViewEnemy {
     total: number;
     mult: number;
     interruptible: boolean;
+    /** Whether the player knows this cast to be a heavy one (its trait or boss mechanic is known). */
+    known: boolean;
   } | null;
   /** Work units until a waiting caster of this body starts its cast; null when none. */
   nextCastIn: number | null;
@@ -383,8 +387,6 @@ export interface FightView {
   /** The reaction delay of this tier in work units, and the share of health below which a spare buff is cast. */
   reactWork: number;
   guardBelow: number;
-  /** The strongest-cast threshold of this tier (x damage). */
-  strongMult: number;
   /** Work units a tool or pill takes to use. */
   itemWork: number;
 }

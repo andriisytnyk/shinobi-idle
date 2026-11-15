@@ -114,7 +114,22 @@ export function applyItem(ctx: FightCtx, id: string): boolean {
       }
       return true;
     case 'cleanse':
-      if (fx?.kind === 'cleanse') for (const status of fx.statuses) removeEffect(player, status);
+      if (fx?.kind === 'cleanse') {
+        for (const status of fx.statuses) removeEffect(player, status);
+        // An ointment against burns also hardens the skin against that nature for a while.
+        if (fx.resist) {
+          addEffect(player, {
+            kind: 'modifier',
+            id: 'resist',
+            src: id,
+            until: fight.t + workOf(fx.resist.durationMs),
+            stat: 'resist',
+            op: 'mul',
+            value: K.toolFx.resist,
+            nature: fx.resist.nature,
+          });
+        }
+      }
       return true;
     case 'dispel':
       removeEffect(player, 'illusion');

@@ -1,4 +1,4 @@
-import type { Boss, ContentDb, Enemy } from '@shinobi/content';
+import type { Boss, ContentDb, Enemy, NatureId } from '@shinobi/content';
 import type { Encounter, Spawn } from './fight-types.ts';
 
 /** The hook ids of the boss specials, by the special's kind (and, for the rival, its numbers key). */
@@ -31,6 +31,7 @@ export function encounterFor(
   entry: Enemy | Boss,
   content: ContentDb,
   specials: readonly string[] = [],
+  rivalNature: NatureId | null = null,
 ): Encounter {
   const K = content.balance.K;
   const boss = !('region' in entry);
@@ -50,9 +51,16 @@ export function encounterFor(
   if (!('special' in entry)) return encounter;
 
   const own = specialHookIds(entry.special);
+  // Each special carries the scale of the boss body it fights with.
+  const fx = K.bossFx[entry.special.fx] as {
+    hp?: number;
+    dmg?: number;
+    leaderHp?: number;
+    leaderDmg?: number;
+  };
   base.count = 1;
-  base.hpMult = K.boss.hp;
-  base.dmgMult = K.boss.dmg;
+  base.hpMult = K.boss.hp * (fx.leaderHp ?? fx.hp ?? 1);
+  base.dmgMult = K.boss.dmg * (fx.leaderDmg ?? fx.dmg ?? 1);
   base.specials = own;
   switch (entry.special.kind) {
     case 'packRespawn':
@@ -64,6 +72,10 @@ export function encounterFor(
         dmgMult: K.bossFx.wolfPack.dmg,
         specials: ['special:packMember'],
       });
+      break;
+    case 'rival':
+      // The rival fights with the nature the team gives him; a player with no nature gets none.
+      base.nature = rivalNature;
       break;
     case 'twins': {
       const fx = K.bossFx.twins;

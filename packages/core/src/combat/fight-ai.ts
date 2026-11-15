@@ -38,21 +38,33 @@ function item(view: FightView, test: (p: ViewPouch) => boolean): Decision | null
 const status = (view: FightView, id: string): boolean =>
   view.player.effects.some((e) => e.id === id);
 
-/** Whether the tier answers the trait: the player must know it, and a plain tier needs it in plain sight. */
+/** Whether the tier answers the trait: the player must know it (visible traits are known on sight). */
 const answers = (view: FightView, trait: TraitId): boolean =>
-  view.enemies.some((e) => e.knownTraits.includes(trait)) &&
-  (view.ai.answers === 'known' || view.visibleTraits.includes(trait));
+  view.enemies.some((e) => e.knownTraits.includes(trait));
 
 const works = (view: FightView, trait: TraitId): boolean =>
   view.enemies.some((e) => e.workingTraits.includes(trait));
 
-/** Soonest end of an interruptible cast under way, or null. */
+/**
+ * The casts under way that the tier answers: those it knows to be heavy (or every cast, at the
+ * tier that sees them all), once the reaction delay since the cast began has passed.
+ */
+function noticed(view: FightView): { remaining: number; total: number; interruptible: boolean }[] {
+  const out: { remaining: number; total: number; interruptible: boolean }[] = [];
+  for (const e of view.enemies) {
+    const c = e.cast;
+    if (!c || (view.ai.defends !== 'all' && !c.known)) continue;
+    if (c.total - c.remaining < view.reactWork) continue;
+    out.push(c);
+  }
+  return out;
+}
+
+/** Soonest end of an interruptible cast that the tier has noticed, or null. */
 function interruptibleCast(view: FightView): number | null {
-  return view.enemies.reduce<number | null>(
-    (soonest, e) =>
-      e.cast?.interruptible && (soonest === null || e.cast.remaining < soonest)
-        ? e.cast.remaining
-        : soonest,
+  return noticed(view).reduce<number | null>(
+    (soonest, c) =>
+      c.interruptible && (soonest === null || c.remaining < soonest) ? c.remaining : soonest,
     null,
   );
 }
@@ -90,16 +102,8 @@ const DEFENSES = ['shield', 'decoy', 'evasionBuff'] as const;
 const defend: Rule = (view) => {
   // The strongest cast under way that this tier cares about.
   let threat: { remaining: number; total: number } | null = null;
-  for (const e of view.enemies) {
-    const c = e.cast;
-    if (!c || c.mult < view.strongMult) continue;
-    if (!threat || c.remaining < threat.remaining) threat = c;
-  }
+  for (const c of noticed(view)) if (!threat || c.remaining < threat.remaining) threat = c;
   if (!threat) return null;
-  // A plain tier notices a cast only after its reaction delay.
-  if (view.ai.defends === 'strongest' && threat.total - threat.remaining < view.reactWork) {
-    return null;
-  }
   const left = threat.remaining;
   const covered = view.player.ward > 0 || view.player.decoys > 0;
   if (!covered) {
@@ -113,8 +117,7 @@ const defend: Rule = (view) => {
 };
 
 const answer: Rule = (view) => {
-  const known = view.ai.answers === 'known';
-  if (known) {
+  {
     if (status(view, 'illusion')) {
       const decision = use(best(view, tagged('dispel'))) ?? item(view, (p) => p.use === 'dispel');
       if (decision) return decision;

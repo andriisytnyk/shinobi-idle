@@ -762,6 +762,9 @@ function buildView(ctx: FightCtx): FightView {
           total: info.total,
           mult: info.mult,
           interruptible: info.interruptible,
+          known: e.traits.includes(hook.id as never)
+            ? knownTraits.includes(hook.id as never)
+            : mechanicKnown,
         };
       } else if (
         e.traits.includes(hook.id as never) ? knownTraits.includes(hook.id as never) : mechanicKnown
@@ -811,9 +814,8 @@ function buildView(ctx: FightCtx): FightView {
         : null,
     stance,
     hastened: (player.data.hasten ?? 0) > 0,
-    reactWork: workOf(K.ai[tier.id].reactMs),
+    reactWork: tier.reaction ? workOf(K.ai.geninReactionMs) : 0,
     guardBelow: K.ai.guardBelow,
-    strongMult: K.ai[tier.id].strongMult,
     itemWork: secWork(K.pillAction),
   };
 }
@@ -1150,6 +1152,10 @@ function enemyAttack(ctx: FightCtx, enemy: Combatant): void {
   };
   const hooks = hooksOf(ctx, enemy);
   for (const hook of hooks) hook.onAttack?.(ctx, enemy, plan);
+  const resist = findEffect(player, 'resist');
+  if (resist?.kind === 'modifier' && enemy.nature !== null && resist.nature === enemy.nature) {
+    plan.damage *= resist.value;
+  }
   if (!rollHit(ctx, player, plan.chance)) {
     note(fight, 'enemy', 'miss', null, 0);
     return;

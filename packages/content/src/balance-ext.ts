@@ -73,14 +73,22 @@ export const BALANCE_EXT = {
     reveal: { durationMs: 20000 },
   },
   /**
-   * Numbers of boss specials. Bind duration of the mist fugitive is `bind.dur`, and the hit
+   * Numbers of boss specials; `hp` and `dmg` scale the boss's own health and damage for its fight. Bind duration of the mist fugitive is `bind.dur`, and the hit
    * counters of the rival are the generic `habituation` ones.
    */
   bossFx: {
     /** The leader of the wolves calls `count` wolves back every `everyMs` while he lives; a wolf has `hp` and `dmg` of an ordinary enemy of the leader's level. */
-    wolfPack: { count: 4, everyMs: 20000, hp: 0.12, dmg: 0.05 },
+    wolfPack: { count: 4, everyMs: 20000, hp: 0.12, dmg: 0.05, leaderHp: 0.97, leaderDmg: 0.97 },
     /** The rival casts `techniques` techniques of the nature that beats the player's, one every `everyMs` (each hits for `mult` x his damage), and a signature every `sigEveryMs` for `sigMult` x. */
-    rivalDuel: { techniques: 1, everyMs: 9000, mult: 0.05, sigEveryMs: 16000, sigMult: 0.3 },
+    rivalDuel: {
+      techniques: 1,
+      everyMs: 9000,
+      mult: 0.05,
+      sigEveryMs: 16000,
+      sigMult: 0.3,
+      hp: 0.92,
+      dmg: 0.92,
+    },
     rivalTournament: {
       techniques: 2,
       habituationMult: 2,
@@ -88,14 +96,16 @@ export const BALANCE_EXT = {
       mult: 0.05,
       sigEveryMs: 16000,
       sigMult: 0.3,
+      hp: 1,
+      dmg: 1,
     },
-    drunkenEvasion: { maxMult: 2 },
+    drunkenEvasion: { maxMult: 2, hp: 1, dmg: 1 },
     /** A heavy cast: `castMs` wind-up every `everyMs`, `damageMult` x damage, stuns the player for `stunMs` when it lands. */
-    heavyCast: { everyMs: 20000, castMs: 2500, damageMult: 2, stunMs: 500 },
+    heavyCast: { everyMs: 20000, castMs: 2500, damageMult: 2, stunMs: 500, hp: 0.95, dmg: 0.93 },
     /** Two bodies: each has `hpEach` of the boss health and `dmgEach` of its damage; while both live the mist poisons the player for `mistMult` x the poison strength. */
     twins: { count: 2, hpEach: 0.5, dmgEach: 0.5, mistMult: 0.3 },
-    mistRehide: { everyMs: 25000 },
-    illusion: { everyMs: 8000, fleeAtHp: 0.3 },
+    mistRehide: { everyMs: 25000, hp: 0.97, dmg: 0.95 },
+    illusion: { everyMs: 8000, fleeAtHp: 0.3, hp: 1.25, dmg: 1.25 },
   },
   /** Loadout: slots and distinct natures by rank (a student has no limit), and the number of saved loadouts. */
   loadout: { slots: { genin: 4, chunin: 5 }, natures: { genin: 1, chunin: 2 }, saved: 5 },
@@ -103,20 +113,16 @@ export const BALANCE_EXT = {
   signature: { minMastery: 25, xpBonus: 0.1 },
   /** Pouch slots: the base count and the extra slots the chunin vest gives. */
   pouch: { slots: 3, vest: 1 },
-  /** The player's AI by tier: how strong an enemy cast must be for the tier to defend against it, the reaction delay (ms) after the cast begins, and the health share below which a spare buff is cast. */
-  ai: {
-    genin: { strongMult: 3.5, reactMs: 1000 },
-    chunin: { strongMult: 0, reactMs: 0 },
-    guardBelow: 0.6,
-  },
+  /** The player's AI: the reaction delay (ms) of the genin tier to a cast it has to answer, and the health share below which a spare buff is cast. */
+  ai: { geninReactionMs: 1000, guardBelow: 0.6 },
   /** Health share below which a won fight still costs a Wound. */
   woundHp: 0.1,
   /** Until exploration gives real flags, every region zone is open from this rank. */
   regionZones: { openFromRank: 'genin' },
   /** Operations: ms of the approach stage, and its share when the shortening requirement holds. */
   operation: { approachMs: 30000, approachShort: 0.5 },
-  /** Numbers of tools that the item data does not carry: the poisoned senbon's damage over time (share of maximum health per second, seconds). */
-  toolFx: { dot: { pct: 0.012, durS: 10 } },
+  /** Numbers of tools that the item data does not carry: the poisoned senbon's damage over time (share of maximum health per second, seconds), and the damage multiplier of a burn ointment against the nature it names. */
+  toolFx: { dot: { pct: 0.012, durS: 10 }, resist: 0.6 },
   /** Ryo dropped by an enemy per combat level: range of the multiplier. */
   ryoDrop: [5, 8],
   /** Chance of a trophy drop per kill. */

@@ -38,7 +38,8 @@ function payTick(state: GameState, fallback: string, content: ContentDb, rules: 
 export const fightKind: ActionKind = {
   has: (id, content) => fightTarget(content, id) !== null,
   requirements(_state, id, content): Req | null {
-    const zone = indexOf(content).zones.get(id);
+    // An enemy id is gated like the zone that holds the enemy.
+    const zone = indexOf(content).zones.get(id) ?? content.zones.find((z) => z.enemy === id);
     return zone ? zoneRequirement(zone, content) : null;
   },
   intervalMs: (_state, _id, content) => content.balance.K.combat.xpTickMs,

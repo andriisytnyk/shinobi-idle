@@ -121,25 +121,34 @@ function view(id: 'genin' | 'chunin', techs: KitTechnique[], enemies: ViewEnemy[
     medic: null,
     stance: null,
     hastened: false,
-    reactWork: workOf(K.ai[id].reactMs),
+    reactWork: ai.reaction ? workOf(K.ai.geninReactionMs) : 0,
     guardBelow: K.ai.guardBelow,
-    strongMult: K.ai[id].strongMult,
     itemWork: sec(K.pillAction),
   };
 }
 const cast = (id: string) => ({ type: 'technique', id });
 
+/** A heavy cast under way: `elapsed` work units into a wind-up of `total`; `known` when its trait or mechanic is. */
+const cast_ = (elapsed: number, known: boolean, total = sec(3)) =>
+  enemyView({
+    cast: { kind: 'heavy', remaining: total - elapsed, total, mult: 3, interruptible: true, known },
+  });
+
 describe('the two tiers are data', () => {
-  it('lists an ordered rule set per tier, with the genin tier plainer than the chunin one', () => {
+  it('lists an ordered rule set per tier: rank decides what the tactics can do', () => {
     const genin = tierOf('genin');
     const chunin = tierOf('chunin');
-    expect(genin.rules).not.toContain('interrupt');
+    // Both interrupt and answer; the genin needs a reaction delay and does not reserve an interrupt.
+    expect(genin.rules).toContain('interrupt');
     expect(chunin.rules).toContain('interrupt');
-    expect(genin.answers).toBe('visible');
-    expect(chunin.answers).toBe('known');
-    expect(genin.defends).toBe('strongest');
+    expect(genin.reaction).toBe(true);
+    expect(chunin.reaction).toBe(false);
+    expect(genin.defends).toBe('known');
     expect(chunin.defends).toBe('all');
+    expect(genin.tactical).toBe(false);
+    expect(chunin.tactical).toBe(true);
     expect(content.ai.visibleTraits).toEqual(['armor', 'pack']);
+    expect(K.ai.geninReactionMs).toBeGreaterThan(0);
   });
 
   it('plays a student and a genin with the genin tier and a chunin with the other', () => {
@@ -158,20 +167,34 @@ describe('the two tiers are data', () => {
   });
 });
 
-describe('a genin does not interrupt, a chunin does', () => {
+describe('interrupts: a genin reacts after a delay to a cast it knows, a chunin at once to any', () => {
   const techs = [kt('int', ['interrupt'], 1), kt('big', [], 50)];
-  const casting = [
-    enemyView({
-      cast: { kind: 'heavy', remaining: sec(2), total: sec(3), mult: 3, interruptible: true },
-    }),
-  ];
+  const react = workOf(K.ai.geninReactionMs);
 
-  it('on the same view', () => {
-    expect(defaultCombatAi(view('genin', techs, casting))).toEqual(cast('big'));
-    expect(defaultCombatAi(view('chunin', techs, casting))).toEqual(cast('int'));
+  it('does not interrupt before the genin reaction delay has passed, and does after', () => {
+    expect(defaultCombatAi(view('genin', techs, [cast_(0, true)]))).toEqual(cast('big'));
+    expect(defaultCombatAi(view('genin', techs, [cast_(react + 1, true)]))).toEqual(cast('int'));
   });
 
-  it('in a real fight against a caster', () => {
+  it('does not interrupt a cast it does not know to be heavy, while a chunin does at once', () => {
+    expect(defaultCombatAi(view('genin', techs, [cast_(react + 1, false)]))).toEqual(cast('big'));
+    expect(defaultCombatAi(view('chunin', techs, [cast_(0, false)]))).toEqual(cast('int'));
+  });
+
+  it('does not reserve an interrupt for a known caster, as a chunin does', () => {
+    const waiting = (t: 'genin' | 'chunin') =>
+      defaultCombatAi(
+        view(
+          t,
+          [kt('int', ['interrupt'], 30), kt('plain', [], 10)],
+          [enemyView({ knownTraits: ['caster'], workingTraits: ['caster'], nextCastIn: sec(2) })],
+        ),
+      );
+    expect(waiting('genin')).toEqual(cast('int'));
+    expect(waiting('chunin')).toEqual(cast('plain'));
+  });
+
+  it('in a real fight against a caster the player knows, both interrupt', () => {
     const interrupts = (tier: number): number => {
       let sum = 0;
       for (let seed = 1; seed <= 30; seed++) {
@@ -183,87 +206,67 @@ describe('a genin does not interrupt, a chunin does', () => {
       }
       return sum;
     };
-    expect(interrupts(2)).toBeGreaterThan(interrupts(1));
+    expect(interrupts(1)).toBeGreaterThan(0);
+    expect(interrupts(2)).toBeGreaterThan(0);
   });
 });
 
-describe('answers: only known traits, and a genin only the visible ones', () => {
-  const answer = (trait: TraitId, tag: string) => {
-    const techs = [kt('answer', [tag], 1), kt('big', [], 50)];
-    const known = (t: 'genin' | 'chunin', traits: TraitId[], working: TraitId[] = traits) =>
-      defaultCombatAi(view(t, techs, [enemyView({ knownTraits: traits, workingTraits: working })]));
-    return { known };
-  };
+describe('answers: every known trait, at either tier, and nothing else', () => {
+  const known = (t: 'genin' | 'chunin', tag: string, traits: TraitId[]) =>
+    defaultCombatAi(
+      view(
+        t,
+        [kt('answer', [tag], 1), kt('big', [], 50)],
+        [enemyView({ knownTraits: traits, workingTraits: traits })],
+      ),
+    );
+  const pairs = [
+    ['hidden', 'reveal'],
+    ['armor', 'pierce'],
+    ['evasive', 'bind'],
+    ['regen', 'dot'],
+  ] as const;
 
-  it('does not answer a trait the player does not know, at either tier', () => {
-    for (const [trait, tag] of [
-      ['hidden', 'reveal'],
-      ['armor', 'pierce'],
-      ['evasive', 'bind'],
-      ['regen', 'dot'],
-    ] as const) {
-      const { known } = answer(trait, tag);
-      expect(known('genin', []), trait).toEqual(cast('big'));
-      expect(known('chunin', []), trait).toEqual(cast('big'));
+  it('does not answer a trait the player does not know', () => {
+    for (const [trait, tag] of pairs) {
+      expect(known('genin', tag, []), trait).toEqual(cast('big'));
+      expect(known('chunin', tag, []), trait).toEqual(cast('big'));
     }
   });
 
-  it('answers a visible known trait at genin, and a hidden known one only at chunin', () => {
-    const visible = answer('armor', 'pierce').known;
-    expect(visible('genin', ['armor'])).toEqual(cast('answer'));
-    expect(visible('chunin', ['armor'])).toEqual(cast('answer'));
-    for (const [trait, tag] of [
-      ['hidden', 'reveal'],
-      ['evasive', 'bind'],
-      ['regen', 'dot'],
-    ] as const) {
-      const { known } = answer(trait, tag);
-      expect(known('genin', [trait]), `genin ${trait}`).toEqual(cast('big'));
-      expect(known('chunin', [trait]), `chunin ${trait}`).toEqual(cast('answer'));
+  it('answers a known trait, hidden ones included, as a genin and as a chunin', () => {
+    for (const [trait, tag] of pairs) {
+      expect(known('genin', tag, [trait]), `genin ${trait}`).toEqual(cast('answer'));
+      expect(known('chunin', tag, [trait]), `chunin ${trait}`).toEqual(cast('answer'));
     }
   });
 
-  it('answers a status on the player only at the chunin tier', () => {
+  it('answers a status on the player at both tiers', () => {
     const techs = [kt('dispel', ['dispel'], 1), kt('big', [], 50)];
-    const withStatus = (t: 'genin' | 'chunin'): FightView => {
+    for (const t of ['genin', 'chunin'] as const) {
       const v = view(t, techs, [enemyView()]);
-      return {
+      const withStatus: FightView = {
         ...v,
         player: { ...v.player, effects: [{ id: 'illusion', kind: 'modifier', remaining: null }] },
       };
-    };
-    expect(defaultCombatAi(withStatus('genin'))).toEqual(cast('big'));
-    expect(defaultCombatAi(withStatus('chunin'))).toEqual(cast('dispel'));
+      expect(defaultCombatAi(withStatus)).toEqual(cast('dispel'));
+    }
   });
 });
 
 describe('defence', () => {
   const techs = [shield('guard'), kt('big', [], 50)];
-  const heavy = (mult: number, left: number, total = sec(3)) => [
-    enemyView({ cast: { kind: 'heavy', remaining: left, total, mult, interruptible: true } }),
-  ];
+  const react = workOf(K.ai.geninReactionMs);
 
-  it('a chunin guards against every heavy cast, a genin only against the strongest', () => {
-    const plain = heavy(K.trait.casterMult, sec(2));
-    expect(defaultCombatAi(view('chunin', techs, plain))).toEqual(cast('guard'));
-    expect(defaultCombatAi(view('genin', techs, plain))).toEqual(cast('big'));
+  it('a chunin guards against every heavy cast, a genin only against the ones it knows to be heavy', () => {
+    expect(defaultCombatAi(view('chunin', techs, [cast_(0, false)]))).toEqual(cast('guard'));
+    expect(defaultCombatAi(view('genin', techs, [cast_(react + 1, false)]))).toEqual(cast('big'));
+    expect(defaultCombatAi(view('genin', techs, [cast_(react + 1, true)]))).toEqual(cast('guard'));
   });
 
-  it('a genin reacts to the strongest cast only after the reaction delay', () => {
-    const strong = K.bossFx.heavyCast.damageMult + K.ai.genin.strongMult;
-    const total = sec(3);
-    const fresh = view('genin', techs, heavy(strong, total, total));
-    expect(defaultCombatAi(fresh)).toEqual(cast('big'));
-    const noticed = view(
-      'genin',
-      techs,
-      heavy(strong, total - workOf(K.ai.genin.reactMs) - 1, total),
-    );
-    expect(defaultCombatAi(noticed)).toEqual(cast('guard'));
-    // The chunin needs no delay.
-    expect(defaultCombatAi(view('chunin', techs, heavy(strong, total, total)))).toEqual(
-      cast('guard'),
-    );
+  it('a genin guards only after the reaction delay', () => {
+    expect(defaultCombatAi(view('genin', techs, [cast_(0, true)]))).toEqual(cast('big'));
+    expect(defaultCombatAi(view('genin', techs, [cast_(react + 1, true)]))).toEqual(cast('guard'));
   });
 });
 
@@ -273,11 +276,7 @@ describe('the rule list decides', () => {
     ai: { ...content.ai, tiers: content.ai.tiers.map((t) => ({ ...t, rules: rules(t.id) })) },
   });
   const techs = [kt('int', ['interrupt'], 1), kt('big', [], 50)];
-  const casting = [
-    enemyView({
-      cast: { kind: 'heavy', remaining: sec(2), total: sec(3), mult: 3, interruptible: true },
-    }),
-  ];
+  const casting = [cast_(sec(1.5), true)];
   /** The view a player of the tier gets in a fight run on `c`: the tier comes from its data. */
   const viewIn = (c: ContentDb, id: 'genin' | 'chunin'): FightView => {
     const tier = c.ai.tiers.find((t) => t.id === id);
@@ -285,25 +284,12 @@ describe('the rule list decides', () => {
     return { ...view(id, techs, casting), ai: tier };
   };
 
-  it('gives the genin tier an interrupt by listing the rule, and takes it from the chunin by removing it', () => {
-    expect(defaultCombatAi(viewIn(content, 'genin'))).toEqual(cast('big'));
-    expect(
-      defaultCombatAi(
-        viewIn(
-          swapped(() => ['interrupt', 'best', 'basic']),
-          'genin',
-        ),
-      ),
-    ).toEqual(cast('int'));
+  it('takes the interrupt from a tier by removing the rule, and the other way round', () => {
+    const none = swapped(() => ['best', 'basic']);
+    expect(defaultCombatAi(viewIn(content, 'genin'))).toEqual(cast('int'));
+    expect(defaultCombatAi(viewIn(none, 'genin'))).toEqual(cast('big'));
     expect(defaultCombatAi(viewIn(content, 'chunin'))).toEqual(cast('int'));
-    expect(
-      defaultCombatAi(
-        viewIn(
-          swapped(() => ['best', 'basic']),
-          'chunin',
-        ),
-      ),
-    ).toEqual(cast('big'));
+    expect(defaultCombatAi(viewIn(none, 'chunin'))).toEqual(cast('big'));
   });
 
   it('follows the order of the list: the first rule with a decision wins', () => {
@@ -350,6 +336,10 @@ describe('what the player knows of an enemy', () => {
     state.counters[`kills.${hidden}`] = 1;
     expect(knowledgeOf(state, content, [hidden])[hidden]).toEqual(['hidden', 'special']);
     advance(state, 1000, content);
+    // Losing to an enemy teaches as much as beating it.
+    const lost = 'core:fake_genin';
+    state.counters[`defeats.${lost}`] = 1;
+    expect(knowledgeOf(state, content, [lost])[lost]).toContain('illusionist');
   });
 
   it('puts the knowledge of the enemy into the fight', () => {
