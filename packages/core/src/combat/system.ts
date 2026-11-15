@@ -69,7 +69,7 @@ export function newCombat(
 }
 
 /** Pays mastery XP for the technique time the fight has tallied since the last payment. */
-function settle(state: GameState, c: CombatState, content: ContentDb): void {
+function settle(state: GameState, c: CombatState, content: ContentDb, rules: Rules): void {
   const K = content.balance.K;
   const tally = c.fight.tally;
   c.style = tally.style;
@@ -86,6 +86,7 @@ function settle(state: GameState, c: CombatState, content: ContentDb): void {
       tech.skill,
       (K.masteryPerHour * paying) / WORK_PER_MS / MS_PER_HOUR,
       content,
+      rules,
     );
   }
 }
@@ -161,7 +162,7 @@ export const combatSystem: System = {
         c.phase = 'fight';
       }
       c.work = fightAdvance(c.fight, c.work, content, rules);
-      settle(state, c, content);
+      settle(state, c, content, rules);
       report(state, c);
       const result = fightOutcome(c.fight);
       if (result === 'ongoing') return;
