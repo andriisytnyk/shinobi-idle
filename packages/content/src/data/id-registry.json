@@ -109,5 +109,14 @@
     "Старе поле бою": "stare_pole_boiu",
     "Прикордонна застава": "prykordonna_zastava",
     "Верхів'я ріки": "verkhivia_riky"
+  },
+  "quest": {
+    "Випуск": "graduation"
+  },
+  "exam": {
+    "Іспит на Геніна": "genin_exam"
+  },
+  "item": {
+    "Сувій випускника": "graduate_scroll"
   }
 }

@@ -167,6 +167,7 @@ export const ICON_MAP: Readonly<Record<IconKind, Readonly<Record<string, string>
     'core:note': 'folded-paper',
     'core:scrollpart': 'scroll-unfurled',
     'core:notes': 'notebook',
+    'core:graduate_scroll': 'tied-scroll',
     // Consumables (recipe outputs)
     'core:antidote': 'fizzing-flask',
     'core:tsiliushcha_maz': 'heart-bottle',

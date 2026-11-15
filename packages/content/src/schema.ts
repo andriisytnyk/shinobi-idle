@@ -4,6 +4,7 @@ import {
   ENEMY_REGIONS,
   MISSION_RANKS,
   NATURE_IDS,
+  PLAYER_RANK_IDS,
   RANKS,
   ROLE_IDS,
   SKILL_GROUPS,
@@ -12,6 +13,9 @@ import {
   TAG_IDS,
   TECH_SKILL_IDS,
   TRAIT_IDS,
+  type NatureId,
+  type PlayerRank,
+  type SkillId,
 } from './constants.ts';
 
 // ---------- identifiers ----------
@@ -22,6 +26,7 @@ export const skillId = z.enum(SKILL_IDS);
 export const natureId = z.enum(NATURE_IDS);
 export const techSkillId = z.enum(TECH_SKILL_IDS);
 export const rankId = z.enum(RANKS);
+export const playerRankId = z.enum(PLAYER_RANK_IDS);
 export const roleId = z.enum(ROLE_IDS);
 export const tagId = z.enum(TAG_IDS);
 export const traitId = z.enum(TRAIT_IDS);
@@ -96,6 +101,12 @@ export const poolCheckpointSchema = z.object({
 
 export const ingredientRef = z.object({ item: coreId, n: z.number().int().min(1) });
 
+/** One hour of practice for a chosen technique of the given mentor. */
+export const itemUseSchema = z.strictObject({
+  t: z.literal('masteryHour'),
+  mentor: z.enum(['academy', 'other']),
+});
+
 export const itemSchema = z.strictObject({
   id: coreId,
   kind: z.enum(['ingredient', 'tool', 'misc', 'consumable']),
@@ -105,6 +116,8 @@ export const itemSchema = z.strictObject({
   extraSources: z.array(z.enum(['crate', 'forge'])),
   /** What a crafted tool is made from. */
   madeFrom: z.array(ingredientRef),
+  /** What using the item from the bank does, if it can be used. */
+  use: itemUseSchema.optional(),
 });
 
 export const marketEntrySchema = z.object({
@@ -211,6 +224,102 @@ export const gearSchema = z.object({
   id: coreId,
   skill: skillId,
   tiers: z.array(gearTierSchema).min(1),
+});
+
+// ---------- requirements, quests, exams ----------
+
+/** The condition tree shared by unlocks, checklists, quest objectives and goals. */
+export type Req =
+  | { t: 'skill'; skill: SkillId; level: number }
+  | { t: 'technique'; id: string }
+  | { t: 'rank'; rank: PlayerRank }
+  | { t: 'nature'; nature: NatureId }
+  | { t: 'item'; id: string; n: number }
+  | { t: 'quest'; id: string; step?: number | undefined }
+  | { t: 'building'; id: string; level: number }
+  | { t: 'flag'; id: string; n?: number | undefined }
+  | { t: 'all'; of: Req[] }
+  | { t: 'any'; of: Req[] };
+
+export const reqSchema: z.ZodType<Req> = z.lazy(() =>
+  z.union([
+    z.strictObject({ t: z.literal('skill'), skill: skillId, level: z.number().int().min(1) }),
+    z.strictObject({ t: z.literal('technique'), id: coreId }),
+    z.strictObject({ t: z.literal('rank'), rank: playerRankId }),
+    z.strictObject({ t: z.literal('nature'), nature: natureId }),
+    z.strictObject({ t: z.literal('item'), id: coreId, n: z.number().int().min(1) }),
+    z.strictObject({ t: z.literal('quest'), id: coreId, step: z.number().int().min(1).optional() }),
+    z.strictObject({ t: z.literal('building'), id: coreId, level: z.number().int().min(1) }),
+    z.strictObject({ t: z.literal('flag'), id: z.string(), n: z.number().int().optional() }),
+    z.strictObject({ t: z.literal('all'), of: z.array(reqSchema).min(1) }),
+    z.strictObject({ t: z.literal('any'), of: z.array(reqSchema).min(1) }),
+  ]),
+);
+
+export const entityRefSchema = z.strictObject({
+  kind: z.enum([
+    'skill',
+    'technique',
+    'item',
+    'recipe',
+    'mission',
+    'enemy',
+    'region',
+    'building',
+    'quest',
+    'gear',
+    'seal',
+  ]),
+  id: z.string(),
+});
+
+/** A quest step is done when a requirement holds or a state counter grew by `n` since the step began. */
+export const questObjectiveSchema = z.discriminatedUnion('t', [
+  z.strictObject({ t: z.literal('req'), req: reqSchema }),
+  z.strictObject({
+    t: z.literal('counter'),
+    counter: z.string().min(1),
+    n: z.number().int().min(1),
+  }),
+]);
+
+export const questStepSchema = z.strictObject({
+  /** Localization key of the step's one-line text. */
+  textKey: z.string().min(1),
+  objective: questObjectiveSchema,
+});
+
+export const questRewardsSchema = z.strictObject({
+  items: z.array(ingredientRef),
+  ryo: z.number().int().min(0),
+  rep: z.number().int().min(0),
+  flags: z.array(z.string().min(1)),
+  rank: playerRankId.nullable(),
+});
+
+export const questSchema = z.strictObject({
+  id: coreId,
+  /** Chain this quest belongs to; the chain id is the quest id in this slice. */
+  chain: coreId,
+  /** When the chain starts; `null` means from the first moment. */
+  unlock: reqSchema.nullable(),
+  steps: z.array(questStepSchema).min(1),
+  rewards: questRewardsSchema,
+});
+
+/** A rank exam: a checklist plus a timed test that grants the rank. */
+export const examSchema = z.strictObject({
+  id: coreId,
+  /** Rank the player holds after passing. */
+  rank: playerRankId,
+  checklist: reqSchema,
+  /** Skills whose levels shorten the test. */
+  reduceBy: z.array(skillId).min(1),
+  rewards: z.strictObject({
+    items: z.array(ingredientRef),
+    /** The pinned goal set on passing. */
+    goal: entityRefSchema.nullable(),
+  }),
 });
 
 // ---------- balance ----------
@@ -369,6 +478,9 @@ export const balanceParamsSchema = z.object({
   clone: z.object({ pool: z.number(), link: z.number() }),
   academyCap: z.number().int(),
   academySlow: z.number(),
+  /** The sensei test: base seconds, shortening per level of the exam's skills, floor in seconds. */
+  combat: z.object({ xpTickMs: z.number().int(), regenMs: z.number().int(), hitEven: z.number() }),
+  senseiTest: z.object({ base: z.number(), perLevel: z.number(), floor: z.number() }),
   offlineCapHours: z.number(),
   masteryCap: z.number().int(),
 });
@@ -406,7 +518,13 @@ export const contentDbSchema = z.object({
   buildings: z.array(buildingSchema),
   gear: z.array(gearSchema),
   balance: balanceSchema,
+  quests: z.array(questSchema),
+  exams: z.array(examSchema),
 });
+
+/** The part of the database the importer generates; quests and exams are hand-written. */
+export const generatedDbSchema = contentDbSchema.omit({ quests: true, exams: true });
+export type GeneratedDb = z.infer<typeof generatedDbSchema>;
 
 export type Skill = z.infer<typeof skillSchema>;
 export type Seal = z.infer<typeof sealSchema>;
@@ -429,5 +547,12 @@ export type Boss = z.infer<typeof bossSchema>;
 export type Building = z.infer<typeof buildingSchema>;
 export type GearTier = z.infer<typeof gearTierSchema>;
 export type Gear = z.infer<typeof gearSchema>;
+export type Quest = z.infer<typeof questSchema>;
+export type QuestStep = z.infer<typeof questStepSchema>;
+export type QuestObjective = z.infer<typeof questObjectiveSchema>;
+export type QuestRewards = z.infer<typeof questRewardsSchema>;
+export type Exam = z.infer<typeof examSchema>;
+export type ItemUse = z.infer<typeof itemUseSchema>;
+export type EntityRefData = z.infer<typeof entityRefSchema>;
 export type Balance = z.infer<typeof balanceSchema>;
 export type ContentDb = z.infer<typeof contentDbSchema>;

@@ -25,7 +25,8 @@ describe('A8: evalReq', () => {
   state.bank['core:mint'] = 3;
   state.flags['gate'] = true;
   state.flags['count'] = 4;
-  state.flags['quest.core:q1'] = 2;
+  state.quests['core:q1'] = { step: 2, base: 0, done: false };
+  state.quests['core:q3'] = { step: 0, base: 0, done: true };
   state.flags['building.core:academy'] = 3;
   const check = (req: Req) => evalReq(state, req, content);
 
@@ -97,6 +98,10 @@ describe('A8: evalReq', () => {
     });
     expect(check({ t: 'quest', id: 'core:q1', step: 3 }).met).toBe(false);
     expect(shape(check({ t: 'quest', id: 'core:q2' }))).toMatchObject({ met: false, target: 1 });
+    // Without a step the whole chain must be done; an unknown chain counts as one step.
+    expect(check({ t: 'quest', id: 'core:q3' }).met).toBe(true);
+    const graduation = check({ t: 'quest', id: 'core:graduation' });
+    expect(graduation).toMatchObject({ met: false, target: 5 });
   });
 
   it('building', () => {
