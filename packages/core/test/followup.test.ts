@@ -5,8 +5,10 @@ import {
   createFight,
   createState,
   defaultCombatAi,
+  advance,
   deserialize,
   dispatch,
+  knowledgeOf,
   refreshUnlocks,
   serialize,
   xpAt,
@@ -19,7 +21,7 @@ import {
 } from '../src/index.ts';
 import { K, enemyAt, quiet, rules, scripted, sec, withAi } from './fight-helpers.ts';
 import { setLevel } from './helpers.ts';
-import { fighter, ids, startFight, unlock } from './prep-state.ts';
+import { fighter, ids, startFight, stock, unlock } from './prep-state.ts';
 
 describe('fighting by a raw enemy id respects the gating of its zone', () => {
   it('refuses a student the enemies of the forest, and a boss needs its flag', () => {
@@ -45,13 +47,16 @@ describe('fighting by a raw enemy id respects the gating of its zone', () => {
   it('follows the switch of the balance extension that turns the region zones back to their flags', () => {
     const off = {
       ...content,
-      balance: { ...content.balance, K: { ...K, regionZones: { openFromRank: 'off' as const } } },
+      balance: {
+        ...content.balance,
+        K: { ...K, regionZones: { ...K.regionZones, openFromRank: 'off' as const } },
+      },
     };
     const state = fighter(2, 10);
     const open = () =>
-      dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: 'core:bandit' }, off);
+      dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: 'core:marauder' }, off);
     expect(open()).toEqual({ ok: false, reason: 'error.requirementsNotMet' });
-    unlock(state, 'region.forest.unlocked');
+    unlock(state, 'region.plains.unlocked');
     expect(open()).toEqual({ ok: true });
   });
 });
@@ -240,8 +245,8 @@ describe('the medic pouch and the pouch of a student', () => {
   it('is given to the genin of an older save by the migration, and a student has no pouch', () => {
     const state = fighter(5, 20);
     const raw = JSON.parse(serialize(state, 0)) as { v: number; state: Record<string, unknown> };
-    raw.v = 8;
-    raw.state.v = 8;
+    raw.v = 9;
+    raw.state.v = 9;
     raw.state.bank = {};
     for (const key of ['loadouts', 'pouch', 'wounds', 'seen']) delete raw.state[key];
     const loaded = deserialize(JSON.stringify(raw), content);
@@ -315,7 +320,10 @@ describe('a student and a genin against a locked zone', () => {
   it('refuses a genin a zone whose flag is not raised, by zone id and by enemy id', () => {
     const off = {
       ...content,
-      balance: { ...content.balance, K: { ...K, regionZones: { openFromRank: 'off' as const } } },
+      balance: {
+        ...content.balance,
+        K: { ...K, regionZones: { ...K.regionZones, openFromRank: 'off' as const } },
+      },
     };
     const state = fighter(9, 20);
     for (const id of ['core:zone_foreign_genin', 'core:foreign_genin', 'core:zone_boss_wolf']) {
@@ -327,5 +335,132 @@ describe('a student and a genin against a locked zone', () => {
         reason: 'error.requirementsNotMet',
       });
     }
+  });
+});
+
+describe('a stance-dependent signature', () => {
+  const lotus = 'core:front_lotus';
+  function withLotus() {
+    const state = fighter(11, 50, 'katon');
+    state.known[lotus] = true;
+    state.mastery[lotus] = { xp: xpAt(K.signature.minMastery) };
+    return state;
+  }
+
+  it('may be any known technique with Mastery 25, and the auto-loadout keeps it with the best stance', () => {
+    const state = withLotus();
+    expect(state.loadouts.auto).toBe(true);
+    expect(dispatch(state, { type: 'loadout.signature', technique: lotus }, content)).toEqual({
+      ok: true,
+    });
+    expect(state.loadouts.signature).toBe(lotus);
+    expect(state.loadouts.active).toContain(lotus);
+    expect(state.loadouts.active).toContain('core:gate_of_healing');
+    expect(state.loadouts.active.length).toBeLessThanOrEqual(K.loadout.slots.genin);
+    // Turning the auto-loadout off and on again changes nothing about it.
+    dispatch(state, { type: 'loadout.auto', on: false }, content);
+    dispatch(state, { type: 'loadout.auto', on: true }, content);
+    expect(state.loadouts.active).toContain(lotus);
+    // Learning something new rebuilds around it too.
+    state.loadouts.basis = '';
+    refreshUnlocks(state, content, true);
+    expect(state.loadouts.active).toContain(lotus);
+  });
+
+  it('keeps the invariant after every change: a signature that is set is in the loadout', () => {
+    const state = withLotus();
+    const holds = () => {
+      const l = state.loadouts;
+      if (l.signature !== null) expect(l.active).toContain(l.signature);
+    };
+    dispatch(state, { type: 'loadout.signature', technique: lotus }, content);
+    holds();
+    dispatch(state, { type: 'loadout.set', techniques: ['core:leaf_whirlwind'] }, content);
+    holds();
+    expect(state.loadouts.signature).toBeNull();
+    // A manual loadout must hold the technique before it can be the signature.
+    expect(dispatch(state, { type: 'loadout.signature', technique: lotus }, content)).toEqual({
+      ok: false,
+      reason: 'error.notInLoadout',
+    });
+    dispatch(state, { type: 'loadout.set', techniques: [lotus, 'core:gate_of_healing'] }, content);
+    dispatch(state, { type: 'loadout.signature', technique: lotus }, content);
+    holds();
+    dispatch(state, { type: 'loadout.save', name: 'lotus' }, content);
+    dispatch(state, { type: 'loadout.set', techniques: ['core:leaf_whirlwind'] }, content);
+    dispatch(state, { type: 'loadout.load', name: 'lotus' }, content);
+    holds();
+    dispatch(state, { type: 'loadout.auto', on: true }, content);
+    holds();
+    const loaded = deserialize(serialize(state, 0), content);
+    if (loaded.loadouts.signature !== null) {
+      expect(loaded.loadouts.active).toContain(loaded.loadouts.signature);
+    }
+  });
+
+  it('is not what the auto-loadout takes without it', () => {
+    const state = withLotus();
+    expect(state.loadouts.active).not.toContain(lotus);
+    expect(state.loadouts.active).not.toContain('core:gate_of_healing');
+  });
+});
+
+describe('junk commands never throw', () => {
+  it('refuse a null-prototype name, a prototype kind and a string slot with a reason', () => {
+    const state = fighter(12, 20);
+    stock(state, { [ids.heal]: 4 });
+    dispatch(state, { type: 'pouch.set', slot: 0, item: ids.heal }, content);
+    const bare = Object.create(null) as string;
+    const results = [
+      dispatch(state, { type: 'loadout.load', name: bare }, content),
+      dispatch(state, { type: 'loadout.delete', name: bare }, content),
+      dispatch(state, { type: 'loadout.load', name: '__proto__' }, content),
+      dispatch(state, { type: 'action.start', slot: 0, kind: '__proto__', id: 'x' }, content),
+      dispatch(state, { type: 'action.start', slot: 0, kind: 'constructor', id: 'x' }, content),
+      dispatch(state, { type: 'pouch.medic', slot: '0' as unknown as number }, content),
+    ];
+    for (const r of results) {
+      expect(r.ok).toBe(false);
+      expect(typeof (r.ok ? '' : r.reason)).toBe('string');
+    }
+    expect(state.pouch.medic).toBeNull();
+  });
+
+  it('refuse a raw enemy id that belongs to no zone: a mission enemy is fought in its mission', () => {
+    const state = fighter(13, 40);
+    expect(startFight(state, 'core:thief')).toEqual({ ok: false, reason: 'error.unknownAction' });
+  });
+});
+
+describe('what a fight to the time cap teaches', () => {
+  /** Starts a fight with an enemy that cannot be beaten or hurt and watches it for `ms`. */
+  function watched(ms: number) {
+    const state = fighter(14, 36);
+    startFight(state, 'core:zone_kiri_hunter');
+    const fight = state.combat?.fight;
+    if (!fight) throw new Error('no fight');
+    for (const e of fight.enemies) {
+      e.hp = e.maxHp = 1e12;
+      e.timer.need = 1e18;
+    }
+    fight.player.hp = fight.player.maxHp = 1e12;
+    advance(state, ms, content);
+    return state;
+  }
+
+  it('shows the hidden traits and the mechanic once the fight ran out of time', () => {
+    const state = watched(K.combat.fightCapMs + 5000);
+    expect(state.counters['studied.core:kiri_hunter']).toBeGreaterThanOrEqual(1);
+    expect(knowledgeOf(state, content, ['core:kiri_hunter'])['core:kiri_hunter']).toEqual([
+      'hidden',
+      'special',
+    ]);
+  });
+
+  it('teaches nothing new when the player stops within the first seconds', () => {
+    const state = watched(5000);
+    dispatch(state, { type: 'action.stop', slot: 0 }, content);
+    expect(state.counters['studied.core:kiri_hunter']).toBeUndefined();
+    expect(knowledgeOf(state, content, ['core:kiri_hunter'])['core:kiri_hunter']).toEqual([]);
   });
 });

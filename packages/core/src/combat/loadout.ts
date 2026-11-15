@@ -131,10 +131,28 @@ export function planLoadout(
   const cands: Cand[] = [];
   for (const id of snap.known) {
     const tech = index.techniques.get(id);
-    // Stances cost Wounds: they, and the techniques that need one, are for the player to take by hand.
     if (!tech || tech.rank === null || tech.combat?.outOfLoadout) continue;
-    if (isStance(tech) || tech.combat?.requiresStance) continue;
+    // Stances cost Wounds: they, and the techniques that need one, are for the player to take by
+    // hand, or as the signature (the player has opted in to the price).
+    if ((isStance(tech) || tech.combat?.requiresStance) && tech.id !== options.keep) continue;
     cands.push({ tech, nature: natureOf(tech), score: scoreOf(snap, tech, enemy, content) });
+  }
+  // A signature that needs a stance brings the best stance the player knows.
+  let stance: Cand | undefined;
+  const signature = cands.find((c) => c.tech.id === options.keep);
+  if (signature?.tech.combat?.requiresStance) {
+    for (const id of snap.known) {
+      const tech = index.techniques.get(id);
+      if (
+        tech &&
+        isStance(tech) &&
+        tech.rank !== null &&
+        (!stance || tech.level > stance.tech.level)
+      ) {
+        stance = { tech, nature: natureOf(tech), score: 0 };
+      }
+    }
+    if (stance) cands.push(stance);
   }
   if (!limits) return cands.map((c) => c.tech.id).sort();
 
@@ -156,6 +174,7 @@ export function planLoadout(
       if (c && !chosen.includes(c) && chosen.length < limits.slots) chosen.push(c);
     };
     if (options.keep) add(pool.find((c) => c.tech.id === options.keep));
+    if (stance) add(pool.find((c) => c.tech === stance?.tech));
     let covered = 0;
     for (const trait of traits) {
       if (chosen.some((c) => answersTrait(c.tech, trait))) {
@@ -371,6 +390,12 @@ function buildAuto(state: GameState, content: ContentDb): string[] {
     : [];
 }
 
+/** The invariant: a signature that is set is in the active loadout. */
+export function ensureSignature(state: GameState): void {
+  const l = state.loadouts;
+  if (l.signature !== null && !l.active.includes(l.signature)) l.signature = null;
+}
+
 /** Rebuilds the automatic loadout when the rank or the known techniques changed since it was built. */
 export function syncLoadout(state: GameState, content: ContentDb): void {
   const l = state.loadouts;
@@ -378,6 +403,7 @@ export function syncLoadout(state: GameState, content: ContentDb): void {
   if (!l.auto || l.basis === basis) return;
   l.basis = basis;
   l.active = buildAuto(state, content);
+  ensureSignature(state);
 }
 
 /**
@@ -427,12 +453,25 @@ export function setSignature(
     l.signature = null;
     return { ok: true };
   }
-  if (!l.active.includes(technique)) return { ok: false, reason: 'error.notInLoadout' };
+  if (typeof technique !== 'string') return { ok: false, reason: 'error.unknownTechnique' };
+  // Any known technique may be the signature, a stance or one that needs a stance included: the
+  // player takes the Wound price on. The signature is always in a slot, so a manual loadout
+  // must hold it already, and an automatic one is rebuilt around it.
+  const tech = indexOf(content).techniques.get(technique);
+  if (!tech || tech.rank === null || tech.combat?.outOfLoadout || !state.known[technique]) {
+    return { ok: false, reason: 'error.unknownTechnique' };
+  }
+  if (!l.auto && !l.active.includes(technique)) return { ok: false, reason: 'error.notInLoadout' };
   const mastery = planningSnapshot(state, content).mastery[technique] ?? 1;
   if (mastery < content.balance.K.signature.minMastery) {
     return { ok: false, reason: 'error.masteryTooLow' };
   }
   l.signature = technique;
+  if (l.auto) {
+    l.basis = '';
+    syncLoadout(state, content);
+  }
+  ensureSignature(state);
   return { ok: true };
 }
 
@@ -456,12 +495,20 @@ export function saveLoadout(state: GameState, name: string, content: ContentDb):
   return { ok: true };
 }
 
+/** A saved loadout of this very name: never a property every object has. */
+function savedOf(
+  state: GameState,
+  name: string,
+): GameState['loadouts']['saved'][string] | undefined {
+  return Object.hasOwn(state.loadouts.saved, name) ? state.loadouts.saved[name] : undefined;
+}
+
 export function loadSavedLoadout(
   state: GameState,
   name: string,
   content: ContentDb,
 ): CommandResult {
-  const saved = state.loadouts.saved[name];
+  const saved = typeof name === 'string' ? savedOf(state, name) : undefined;
   if (!saved) return { ok: false, reason: 'error.noSuchLoadout' };
   const result = setLoadout(state, saved.techniques, content);
   if (!result.ok) return result;
@@ -471,7 +518,9 @@ export function loadSavedLoadout(
 }
 
 export function deleteSavedLoadout(state: GameState, name: string): CommandResult {
-  if (!(name in state.loadouts.saved)) return { ok: false, reason: 'error.noSuchLoadout' };
+  if (typeof name !== 'string' || !savedOf(state, name)) {
+    return { ok: false, reason: 'error.noSuchLoadout' };
+  }
   delete state.loadouts.saved[name];
   return { ok: true };
 }

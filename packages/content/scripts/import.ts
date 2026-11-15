@@ -24,14 +24,14 @@ import {
   type TagId,
   type TraitId,
 } from '../src/constants.ts';
-import { BALANCE_EXT, BALANCE_OVERRIDE } from '../src/balance-ext.ts';
+import { BALANCE_EXT, BALANCE_OVERRIDE, withOverrides } from '../src/balance-ext.ts';
 import { localeKey, type LocaleKind } from '../src/keys.ts';
 import {
   balanceParamsSchema,
   generatedDbSchema,
   type BossBase,
   type Building,
-  type Cell,
+  type CellBase,
   type GeneratedDb,
   type EnemyBase,
   type Exercise,
@@ -502,7 +502,7 @@ const missions: Mission[] = slice.missions.map((m) => {
 // ---------- regions and cells ----------
 
 const cellSlugs = { take: (k: string) => ids.take('cell', k) };
-const cells: Cell[] = [];
+const cells: CellBase[] = [];
 const regions: Region[] = slice.regions.map((r) => {
   const id = core(r.id);
   text('region', id, 'name', r.name);
@@ -514,7 +514,7 @@ const regions: Region[] = slice.regions.map((r) => {
       id: cid,
       region: id,
       index,
-      key: key as Cell['key'],
+      key: key as CellBase['key'],
       story: /^Сюжет/.test(note ?? ''),
     });
     return cid;
@@ -528,9 +528,7 @@ const roleKeys = new Map(Object.entries(ROLE_BY_UK));
 const rawParams = bal.params;
 const rawRole = rawParams.role as Record<string, unknown>;
 const params = balanceParamsSchema.parse({
-  ...BALANCE_EXT,
-  ...rawParams,
-  ...BALANCE_OVERRIDE,
+  ...withOverrides({ ...BALANCE_EXT, ...rawParams }, BALANCE_OVERRIDE),
   role: Object.fromEntries(
     Object.entries(rawRole).map(([uk, v]) => [need(roleKeys.get(uk), `balance role "${uk}"`), v]),
   ),

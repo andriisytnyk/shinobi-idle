@@ -7,6 +7,7 @@
  */
 import { content, NATURE_IDS, type Boss, type NatureId } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
+import { techniqueFigures, wheelFactor } from '../src/index.ts';
 import { beaten, beater, pct, playerFor, simulate } from './prep-helpers.ts';
 
 const N = 400;
@@ -109,17 +110,48 @@ describe('A9: bosses against a prepared player', () => {
     for (const r of rows) expect(nameless, r.boss.id).toBeLessThanOrEqual(r.full);
   });
 
-  it('lets the favourable nature beat the unfavourable one by a margin, where the wheel names them', () => {
-    // Exempt, and why: the wolf (level 22: neither nature has a technique yet, the wheel has nothing to
-    // act on); the hunter and the mist fugitive (their unfavourable natures, Doton and Katon, have more
-    // techniques at the level than the favourable Futon and Doton, which outweighs a 30% wheel factor).
-    const exempt = ['core:boss_wolf', 'core:boss_hunter', 'core:boss_mist'];
+  it('lets the favourable nature beat the unfavourable one by a margin, or states a verified reason', () => {
+    /** Damage per second of a prepared loadout against the boss, the wheel factor counted. */
+    const power = (boss: Boss, nature: NatureId): number => {
+      const snap = playerFor(boss, nature, { prep: 'prepared', tier: TIER });
+      let sum = 0;
+      for (const id of snap.loadout ?? []) {
+        const tech = content.techniques.find((t) => t.id === id);
+        if (!tech) continue;
+        const n = techniqueFigures(snap, tech, content);
+        sum +=
+          (n.damage *
+            (tech.state === 'burn' ? 1 + content.balance.K.burn.share : 1) *
+            wheelFactor(tech.skill, boss.nature === 'wheel' ? null : boss.nature, content)) /
+          ((n.castMs + n.cooldownMs) / 1000);
+      }
+      return sum;
+    };
+    const elemental = (boss: Boss, nature: NatureId) =>
+      (playerFor(boss, nature, { prep: 'prepared', tier: TIER }).loadout ?? []).filter((id) =>
+        NATURE_IDS.includes(content.techniques.find((t) => t.id === id)?.skill as NatureId),
+      );
     for (const r of rows.filter((x) => x.boss.nature !== null && x.boss.nature !== 'wheel')) {
-      if (exempt.includes(r.boss.id)) {
-        // Still not far behind.
-        expect(r.full, r.boss.id).toBeGreaterThanOrEqual(r.unfavourable - 0.15);
+      const id = r.boss.id;
+      if (id === 'core:boss_wolf') {
+        // Exempt: at level 22 neither nature has a technique yet, so the wheel has nothing to act on.
+        expect(elemental(r.boss, r.fav), id).toEqual([]);
+        expect(elemental(r.boss, r.unfav), id).toEqual([]);
+      } else if (id === 'core:boss_hunter') {
+        // Exempt: the unfavourable nature brings the stronger loadout at that level, wheel factor included.
+        expect(power(r.boss, r.unfav), id).toBeGreaterThan(power(r.boss, r.fav));
+      } else if (id === 'core:boss_mist') {
+        // Exempt: the unfavourable Katon loadout carries a burning technique (damage over time) that
+        // the favourable Doton one lacks, which is worth more than the wheel here.
+        const dot = (nature: NatureId) =>
+          (playerFor(r.boss, nature, { prep: 'prepared', tier: TIER }).loadout ?? []).filter(
+            (tid) => content.techniques.find((t) => t.id === tid)?.tags.includes('dot'),
+          );
+        expect(dot(r.unfav).length, id).toBeGreaterThan(0);
+        expect(dot(r.fav), id).toEqual([]);
+        expect(r.full, id).toBeGreaterThanOrEqual(r.unfavourable - 0.15);
       } else {
-        expect(r.full - r.unfavourable, r.boss.id).toBeGreaterThanOrEqual(0.2);
+        expect(r.full - r.unfavourable, id).toBeGreaterThanOrEqual(0.2);
       }
     }
   });

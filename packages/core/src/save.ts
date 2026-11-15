@@ -43,7 +43,10 @@ import {
   type JsonValue,
 } from './state.ts';
 import { updateQuests } from './quests.ts';
+import { refreshRegions, regionFlag } from './regions.ts';
 import { refreshUnlocks } from './unlocks.ts';
+import { cellMaxExplores, levelForExplores } from './world.ts';
+import { createWorld } from './world-state.ts';
 import { xpAt } from './xp.ts';
 
 type Raw = Record<string, unknown>;
@@ -100,7 +103,9 @@ export const MIGRATIONS: readonly Migration[] = [
     const native = NATURE_IDS.find((n) => n === natures[0]);
     return { ...state, team: native ? teamFor(native) : null };
   },
-  // v8 -> v9: loadouts, the pouch, Wounds and what the player has seen. The fight carries a pouch,
+  // v8 -> v9: exploration. Nothing explored yet; the player stands in the first cell of the world.
+  (state, content) => ({ ...state, world: createWorld(content) }),
+  // v9 -> v10: loadouts, the pouch, Wounds and what the player has seen. The fight carries a pouch,
   // technique effects and boss hooks now, so a fight in progress restarts; the loadout rebuilds itself.
   // A genin of an older save gets the medic pouch the graduation now gives.
   (state, content) => {
@@ -348,6 +353,36 @@ function sanitizePouch(raw: unknown, content: ContentDb): PouchState {
   return out;
 }
 
+/**
+ * A saved world. Explorations are clamped to what the cell can hold; found points follow from
+ * them, so they are recomputed, never trusted; loot counts as taken only when it can be.
+ */
+function sanitizeWorld(raw: unknown, content: ContentDb): GameState['world'] {
+  const world = createWorld(content);
+  if (!isRecord(raw)) return world;
+  const index = indexOf(content);
+  if (typeof raw.location === 'string' && index.cells.has(raw.location)) {
+    world.location = raw.location;
+  }
+  world.explores = pick(raw.explores, (key, v) => {
+    const cell = index.cells.get(key);
+    if (!cell || typeof v !== 'number') return undefined;
+    const count = Math.min(Math.floor(nonNegative(v)), cellMaxExplores(cell, content));
+    return count >= 1 ? count : undefined;
+  });
+  for (const cell of content.cells) {
+    if (levelForExplores(world.explores[cell.id] ?? 0, content) < 1) continue;
+    for (const poi of cell.pois) world.pois[poi.id] = true;
+  }
+  world.claimed = pick(raw.claimed, (key, v) => {
+    const kind = index.pois.get(key)?.poi.kind;
+    return v === true && world.pois[key] && (kind === 'cache' || kind === 'vault')
+      ? (true as const)
+      : undefined;
+  });
+  return world;
+}
+
 const SKILL_ID_SET: ReadonlySet<string> = new Set(SKILL_IDS);
 
 /**
@@ -456,6 +491,8 @@ export function deserialize(
   state.flags = pick(raw.flags, (_key, v) =>
     v === true || (typeof v === 'number' && Number.isFinite(v)) ? v : undefined,
   );
+  // Region flags follow from rank and Scouting, so they are recomputed below, never trusted.
+  for (const region of content.regions) delete state.flags[regionFlag(region.id)];
   if (isRecord(raw.stats)) state.stats.completed = Math.floor(nonNegative(raw.stats.completed));
   state.counters = pick(raw.counters, (_key, v) =>
     typeof v === 'number' && Number.isInteger(v) && v >= 0 ? v : undefined,
@@ -511,6 +548,7 @@ export function deserialize(
     const carry = stock === 0 ? Math.min(Math.floor(nonNegative(v.carry)), room) : 0;
     return { stock, size, carry };
   });
+  state.world = sanitizeWorld(raw.world, content);
   const goal = raw.goal;
   state.goal =
     isRecord(goal) && typeof goal.kind === 'string' && typeof goal.id === 'string'
@@ -518,6 +556,7 @@ export function deserialize(
       : null;
 
   refreshUnlocks(state, content, true);
+  refreshRegions(state, content, true);
   // Shares are derived from which slots run, so they are recomputed rather than trusted; a
   // saved progress beyond one cycle is cut so a doctored save cannot make the loop spin.
   rebalanceShares(state);

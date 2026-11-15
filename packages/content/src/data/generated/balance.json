@@ -558,7 +558,8 @@
     },
     "pouch": {
       "slots": 3,
-      "vest": 1
+      "vest": 1,
+      "vestRank": "chunin"
     },
     "ai": {
       "geninReactionMs": 1000,
@@ -566,7 +567,13 @@
     },
     "woundHp": 0.1,
     "regionZones": {
-      "openFromRank": "genin"
+      "openFromRank": "genin",
+      "regions": [
+        "forest",
+        "plains",
+        "valley",
+        "exam"
+      ]
     },
     "operation": {
       "approachMs": 30000,
@@ -592,6 +599,13 @@
       "penaltyEnd": 50
     },
     "offlineCapHours": 12,
+    "scouting": {
+      "plainMaxLevel": 3,
+      "walkWithinMin": 10,
+      "walkBetweenMin": 30,
+      "athPerLevel": 0.001,
+      "athCap": 0.1
+    },
     "masteryCap": 99,
     "meditation": {
       "insightChance": 0.05,

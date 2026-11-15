@@ -15,14 +15,12 @@ import type { FightState } from './fight-types.ts';
  * the counts and the game copies them back after every step, so the state is always current.
  */
 
-const RANK_VEST = 'chunin';
-
 /** Slots of the pouch: the base count, and the extra the chunin vest gives. */
 export function pouchSlotCount(state: GameState, content: ContentDb): number {
   // A student carries no pouch; it comes with the rank of Genin, the vest adds a slot.
   if (state.player.rank === 'student') return 0;
   const p = content.balance.K.pouch;
-  return p.slots + (state.player.rank === RANK_VEST ? p.vest : 0);
+  return p.slots + (state.player.rank === p.vestRank ? p.vest : 0);
 }
 
 /** The highest medic pouch upgrade in the bank, 0 when none. */
@@ -108,6 +106,9 @@ export function setMedicSlot(
   if (slot === null) {
     state.pouch.medic = null;
     return { ok: true };
+  }
+  if (typeof slot !== 'number' || !Number.isInteger(slot)) {
+    return { ok: false, reason: 'error.invalidSlot' };
   }
   if (medicTier(state, content) < 1) return { ok: false, reason: 'error.noMedicPouch' };
   const held = state.pouch.slots[slot];

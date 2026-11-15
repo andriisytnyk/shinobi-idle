@@ -9,17 +9,17 @@ export function entryOf(content: ContentDb, id: string): Enemy | Boss | undefine
   return index.enemies.get(id) ?? index.bosses.get(id);
 }
 
-/** Zones of these regions open with their region flag; until exploration gives one, the balance extension opens them by rank. */
-const REGION_ZONES: readonly string[] = ['forest', 'plains', 'valley', 'exam'];
-
 /**
  * What must hold to fight in a zone. A region zone is open from the rank the balance extension
  * names (until exploration supplies the region flags); the Academy yard is always open, and a
  * boss zone opens with its flag.
  */
 export function zoneRequirement(zone: Zone, content: ContentDb): Req | null {
-  const open = content.balance.K.regionZones.openFromRank;
-  if (open !== 'off' && REGION_ZONES.includes(zone.region)) return { t: 'rank', rank: open };
+  const open = content.balance.K.regionZones;
+  // The regions that open with their flag are named in the balance extension.
+  if (open.openFromRank !== 'off' && open.regions.includes(zone.region)) {
+    return { t: 'rank', rank: open.openFromRank };
+  }
   return zone.unlock;
 }
 
@@ -34,8 +34,9 @@ export function fightTarget(
     const enemy = entryOf(content, zone.enemy);
     return enemy ? { enemy, zone } : null;
   }
+  // An enemy that belongs to no zone (a mission enemy) is fought through its mission or operation only.
   const enemy = index.enemies.get(id);
-  return enemy ? { enemy, zone: null } : null;
+  return enemy && content.zones.some((z) => z.enemy === id) ? { enemy, zone: null } : null;
 }
 
 /** One step of an operation once its stages are laid out: the approach, a fight with a named enemy, or one drawn from a pool. */

@@ -1,0 +1,223 @@
+/* Shared look of the herb and recipe tiles, the shop rows and the gear lines. */
+
+.ct-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+}
+
+.ct-tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  list-style: none;
+}
+
+.ct-tile.running {
+  border-color: var(--accent);
+}
+
+.ct-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.ct-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.ct-name a {
+  color: var(--heading);
+}
+
+.ct-icon {
+  display: inline-flex;
+  color: var(--steel);
+}
+
+.ct-facts {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.ct-facts dt {
+  color: var(--fg-dim);
+  font-size: 0.75rem;
+}
+
+.ct-facts dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.ct-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ct-caption {
+  margin: 0 0 var(--space-1);
+  color: var(--fg-dim);
+  font-size: 0.75rem;
+}
+
+.ct-note {
+  margin: 0;
+  color: var(--fg-dim);
+  font-size: 0.85rem;
+}
+
+.ct-bar {
+  display: block;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.ct-fill {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+.ct-fill.stock {
+  background: var(--success);
+}
+
+.ct-action {
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--ink-900);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ct-action.stop {
+  background: none;
+  color: var(--accent);
+}
+
+.ct-action:disabled {
+  border-color: var(--line);
+  background: var(--surface);
+  color: var(--fg-dim);
+  cursor: not-allowed;
+}
+
+/* The sentence that says why a control is off. */
+.ct-why {
+  margin: 0;
+  color: var(--fg-dim);
+  font-size: 0.85rem;
+}
+
+.ct-why::before {
+  content: '! ';
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.ct-locked {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0 0 var(--space-1);
+  color: var(--fg-dim);
+  font-size: 0.85rem;
+}
+
+.ct-section {
+  margin-top: var(--space-6);
+}
+
+.ct-section > h2 {
+  margin: 0 0 var(--space-2);
+  color: var(--heading);
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
+.ct-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  list-style: none;
+}
+
+.ct-row .grow {
+  flex: 1 1 8rem;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.ct-row .grow a {
+  color: var(--fg);
+}
+
+.ct-muted {
+  color: var(--fg-dim);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.ct-button {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--fg);
+  font: inherit;
+  cursor: pointer;
+}
+
+.ct-button:disabled {
+  border-color: var(--line);
+  color: var(--fg-dim);
+  cursor: not-allowed;
+}
+
+.ct-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+}
+
+@media (min-width: 769px) {
+  .ct-link {
+    min-height: 0;
+  }
+}

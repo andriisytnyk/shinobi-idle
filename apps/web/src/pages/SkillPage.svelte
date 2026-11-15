@@ -3,10 +3,13 @@
   import { listSkillActions, nonNativeCastMult, skillUnlockStatus } from '@shinobi/core';
   import ActionTile from '../components/ActionTile.svelte';
   import CoursePanel from '../components/CoursePanel.svelte';
+  import GearLine from '../components/GearLine.svelte';
+  import HerbTile from '../components/HerbTile.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
   import MeditationPanel from '../components/MeditationPanel.svelte';
   import PoolBar from '../components/PoolBar.svelte';
+  import RecipeTile from '../components/RecipeTile.svelte';
   import ReqTree from '../components/ReqTree.svelte';
   import { entityDesc, entityName } from '../lib/entities.ts';
   import { hasKey, t } from '../lib/i18n.ts';
@@ -43,6 +46,7 @@
       return { text: 'nature.skillForeign', pct: Math.round((mult - 1) * 100) };
     }),
   );
+  const gear = $derived(content.gear.filter((g) => g.skill === id));
   const actions = $derived(
     game.read((gs) =>
       skill ? listSkillActions(gs, skill.id as SkillId, content, game.rules) : [],
@@ -73,7 +77,13 @@
       </p>
     {/if}
 
-    <Hint id="skillPage" />
+    {#if id === 'herb'}
+      <Hint id="herbalism" />
+    {:else if id === 'alch' || id === 'prov'}
+      <Hint id="crafting" />
+    {:else}
+      <Hint id="skillPage" />
+    {/if}
 
     {#if lock && !lock.met}
       <section class="locked" data-locked>
@@ -92,7 +102,13 @@
         <h2>{t('skill.actions')}</h2>
         <ul class="tiles">
           {#each actions as info (info.kind + info.id)}
-            <ActionTile {info} />
+            {#if info.kind === 'gather'}
+              <HerbTile {info} />
+            {:else if info.kind === 'craft'}
+              <RecipeTile {info} />
+            {:else}
+              <ActionTile {info} />
+            {/if}
           {/each}
         </ul>
       </section>
@@ -102,6 +118,15 @@
 
     {#if id === 'med'}
       <MeditationPanel />
+    {/if}
+
+    {#if gear.length > 0}
+      <section data-gear-section>
+        <h2>{t('skill.gear')}</h2>
+        {#each gear as line (line.id)}
+          <GearLine {line} compact />
+        {/each}
+      </section>
     {/if}
 
     <PoolBar skill={skill.id} />

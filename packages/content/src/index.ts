@@ -19,6 +19,8 @@ import skills from './data/generated/skills.json' with { type: 'json' };
 import techniques from './data/generated/techniques.json' with { type: 'json' };
 import handAi from './data/hand/ai.json' with { type: 'json' };
 import handBossSpecials from './data/hand/boss-specials.json' with { type: 'json' };
+import handCellKeys from './data/hand/cell-keys.json' with { type: 'json' };
+import handCellPois from './data/hand/cell-pois.json' with { type: 'json' };
 import handCombos from './data/hand/combos.json' with { type: 'json' };
 import handEnemyCombat from './data/hand/enemy-combat.json' with { type: 'json' };
 import handCoat from './data/hand/coat.json' with { type: 'json' };
@@ -46,6 +48,7 @@ import uiUk from './locales/ui.uk.json' with { type: 'json' };
 import { z } from 'zod';
 import {
   bossSpecialMapSchema,
+  cellPoiMapSchema,
   coatListSchema,
   enemyCombatMapSchema,
   gearFxMapSchema,
@@ -57,6 +60,7 @@ import {
   poolModMapSchema,
   practiceModMapSchema,
   layerBosses,
+  layerCells,
   layerEnemies,
   layerGear,
   layerObstacles,
@@ -71,6 +75,7 @@ import {
 import {
   balanceSchema,
   bossBaseSchema,
+  cellBaseSchema,
   contentDbSchema,
   enemyBaseSchema,
   gearBaseSchema,
@@ -122,7 +127,8 @@ export const content: ContentDb = contentDbSchema.parse({
   recipes,
   missions,
   regions,
-  cells,
+  cells: layerCells(z.array(cellBaseSchema).parse(cells), cellPoiMapSchema.parse(handCellPois)),
+  cellKeys: handCellKeys,
   enemies: layerEnemies(z.array(enemyBaseSchema).parse(enemies), enemyCombat, bal.K),
   bosses: layerBosses(
     z.array(bossBaseSchema).parse(bosses),

@@ -1,5 +1,6 @@
 /** Closure of the combat preparation data: the AI tiers, the loadout and pouch numbers, the medic pouch, the operations' clear flags. */
 import { describe, expect, it } from 'vitest';
+import { BALANCE_OVERRIDE, withOverrides } from '../src/balance-ext.ts';
 import { AI_RULE_IDS, content, TRAIT_IDS } from '../src/index.ts';
 
 const K = content.balance.K;
@@ -45,7 +46,7 @@ describe('the preparation numbers', () => {
   });
 
   it('gives the pouch 3 slots and one more with the vest, and the stack its cap', () => {
-    expect(K.pouch).toEqual({ slots: 3, vest: 1 });
+    expect(K.pouch).toMatchObject({ slots: 3, vest: 1 });
     expect(K.pouchStack).toBe(4);
   });
 
@@ -73,5 +74,21 @@ describe('the preparation numbers', () => {
     for (const boss of content.bosses) expect(K.bossFx).toHaveProperty(boss.special.fx);
     expect(K.bossFx.wolfPack.count).toBe(4);
     expect(K.bossFx.illusion.fleeAtHp).toBe(0.3);
+  });
+});
+
+describe('the balance overrides', () => {
+  it('win over the imported value, and are the values the content carries', () => {
+    expect(Object.keys(BALANCE_OVERRIDE)).toEqual(['zoneHpRegen']);
+    for (const [key, value] of Object.entries(BALANCE_OVERRIDE)) {
+      expect((K as unknown as Record<string, unknown>)[key], key).toBe(value);
+    }
+    // The documented value is lower: the override is what makes the difference.
+    expect(withOverrides({ zoneHpRegen: 0.35 }, BALANCE_OVERRIDE).zoneHpRegen).toBe(0.8);
+  });
+
+  it('fail for a key that is not a parameter, so a typo cannot shadow nothing', () => {
+    expect(() => withOverrides({ zoneHpRegen: 0.35 }, { zoneHpRegn: 1 })).toThrow(/zoneHpRegn/);
+    for (const key of Object.keys(BALANCE_OVERRIDE)) expect(Object.hasOwn(K, key)).toBe(true);
   });
 });

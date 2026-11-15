@@ -1,6 +1,6 @@
 import type { Boss, ContentDb, Enemy, Operation } from '@shinobi/content';
 import { stopSlot } from '../actions.ts';
-import { bump, defeatsKey, killsKey } from '../counters.ts';
+import { bump, defeatsKey, killsKey, studiedKey } from '../counters.ts';
 import { emit } from '../events.ts';
 import { MS_PER_HOUR } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
@@ -268,6 +268,8 @@ export const combatSystem: System = {
       if (result === 'ongoing') return;
       if (result === 'timeout') {
         // A fight that ran out of time pays nothing and costs nothing: a new one starts at once.
+        // The player watched the whole fight, so the enemy is known now.
+        bump(state, studiedKey(c.enemy));
         c.carry += c.fight.t - c.fight.tally.lastUseAt;
         const p = c.fight.player;
         c.fight = startFight(state, entry, content, rules, {

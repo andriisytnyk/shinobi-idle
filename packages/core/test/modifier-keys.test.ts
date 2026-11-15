@@ -8,6 +8,7 @@ import {
   craftKeepChance,
   defaultRules,
   dispatch,
+  exploreIntervalMs,
   gainPoolXp,
   gainXp,
   gatherKind,
@@ -20,6 +21,7 @@ import {
   regrowMs,
   techniqueNumbers,
   useTonic,
+  walkMs,
   type GameState,
   type Modifier,
   type Rules,
@@ -105,7 +107,10 @@ describe('A5: pool checkpoints switch on exactly at their share', () => {
       state.pools[skill].xp = poolCapacity(skill, content);
     }
     const sources = new Set(
-      Object.keys(MODIFIER_KEYS).flatMap((key) => getMod(state, key, content).parts),
+      Object.keys(MODIFIER_KEYS)
+        // The Athletics cut of explore and walk time is not a checkpoint.
+        .filter((key) => key !== 'interval.explore' && key !== 'interval.walk')
+        .flatMap((key) => getMod(state, key, content).parts),
     );
     // Every part comes from a 10 / 25 / 50% checkpoint: at most one part per such checkpoint.
     expect(sources.size).toBeLessThanOrEqual(39);
@@ -286,6 +291,21 @@ describe('A4: each wired key changes its mechanic by exactly the modifier', () =
       const s = genin();
       reach(s, 'ath', 25);
       expect(getMod(s, 'obstacle.bonus', content).total).toBeCloseTo(1.02, 12);
+    },
+    'interval.explore': () => {
+      const s = genin();
+      expect(exploreIntervalMs(s, content, withProvider())).toBe(K.explore * 1000);
+      const faster = withProvider(test('interval.explore', -0.1));
+      expect(exploreIntervalMs(s, content, faster)).toBe(Math.round(K.explore * 1000 * 0.9));
+    },
+    'interval.walk': () => {
+      const s = genin();
+      const cell = content.cells[1];
+      if (!cell) throw new Error('no cell');
+      const base = K.scouting.walkWithinMin * 60_000;
+      expect(walkMs(s, cell, content, withProvider())).toBe(base);
+      const faster = withProvider(test('interval.walk', -0.1));
+      expect(walkMs(s, cell, content, faster)).toBe(Math.round(base * 0.9));
     },
     'obstacle.penalty': () => {
       const s = genin();

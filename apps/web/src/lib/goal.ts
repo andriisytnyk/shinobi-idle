@@ -1,5 +1,7 @@
 import type { ContentDb } from '@shinobi/content';
 import { isSkillUnlocked, skillLevel, type GameState, type Req } from '@shinobi/core';
+import { reqItemIds } from './crafts.ts';
+import { nextStep } from './next-step.ts';
 
 /** The requirement tree of the goal "learn this technique": the technique, its level and its rank. */
 export function techniqueGoal(id: string, content: ContentDb): Req | null {
@@ -38,6 +40,23 @@ export function goalReq(ref: { kind: string; id: string }, content: ContentDb): 
   if (ref.kind === 'technique') return techniqueGoal(ref.id, content);
   if (ref.kind === 'item') return { t: 'item', id: ref.id, n: 1 };
   return null;
+}
+
+/**
+ * The requirement tree the goal panel shows now: the pinned goal's tree; with nothing pinned, the
+ * objective of the quest step under way; with no quest, the suggested technique. Null when none.
+ */
+export function shownGoalReq(state: GameState, content: ContentDb): Req | null {
+  if (state.goal) return goalReq(state.goal, content);
+  const step = nextStep(state, content);
+  if (step) return step.objective.t === 'req' ? step.objective.req : null;
+  const suggestion = suggestGoal(state, content);
+  return suggestion ? techniqueGoal(suggestion, content) : null;
+}
+
+/** Ids of the items the shown goal's requirement tree asks for. */
+export function goalItemIds(state: GameState, content: ContentDb): string[] {
+  return reqItemIds(shownGoalReq(state, content));
 }
 
 /** The technique a goal pinned by an older version of the app pointed at: its first technique row. */

@@ -70,17 +70,20 @@ describe('zones', () => {
   it('go back to their region flags when the switch is turned off', () => {
     const off = {
       ...content,
-      balance: { ...content.balance, K: { ...K, regionZones: { openFromRank: 'off' as const } } },
+      balance: {
+        ...content.balance,
+        K: { ...K, regionZones: { ...K.regionZones, openFromRank: 'off' as const } },
+      },
     };
     const state = fighter(1, 10);
     const open = () =>
       dispatch(
         state,
-        { type: 'action.start', slot: 0, kind: 'fight', id: 'core:zone_bandit' },
+        { type: 'action.start', slot: 0, kind: 'fight', id: 'core:zone_marauder' },
         off,
       );
     expect(open()).toEqual({ ok: false, reason: 'error.requirementsNotMet' });
-    setFlag(state, 'region.forest.unlocked');
+    setFlag(state, 'region.plains.unlocked');
     expect(open()).toEqual({ ok: true });
   });
 

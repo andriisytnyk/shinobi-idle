@@ -7,6 +7,23 @@ export const BALANCE_OVERRIDE: Partial<Record<string, number>> = {
 };
 
 /**
+ * Puts the overrides over `base`. A key that `base` does not have is a typo, not a new
+ * parameter: it throws, so an override can never silently shadow nothing.
+ */
+export function withOverrides<T extends object>(
+  base: T,
+  overrides: Readonly<Record<string, number | undefined>>,
+): T {
+  const out: Record<string, unknown> = { ...(base as Record<string, unknown>) };
+  for (const [key, value] of Object.entries(overrides)) {
+    if (value === undefined) continue;
+    if (!Object.hasOwn(out, key)) throw new Error(`Balance override "${key}" names no parameter`);
+    out[key] = value;
+  }
+  return out as T;
+}
+
+/**
  * Balance parameters that the design documents do not carry yet. The importer merges them under
  * the documented values, so a parameter added to balance.json later wins automatically.
  */
@@ -42,6 +59,18 @@ export const BALANCE_EXT = {
    * slice allows, and the skill level at which the non-native cast penalty (K.nonNativeCast) is gone.
    */
   natures: { second: 20, third: 40, max: 3, penaltyEnd: 50 },
+  /**
+   * Exploration: a cell with no point of interest stops at this level in the slice; a walk takes
+   * 10 minutes within a region and 30 between regions; Athletics shortens explore and walk time by
+   * 0.1% per level, never by more than 10%.
+   */
+  scouting: {
+    plainMaxLevel: 3,
+    walkWithinMin: 10,
+    walkBetweenMin: 30,
+    athPerLevel: 0.001,
+    athCap: 0.1,
+  },
   /** Mastery levels stop here. */
   masteryCap: 99,
   /**
@@ -129,13 +158,13 @@ export const BALANCE_EXT = {
   /** The signature technique: the mastery it needs and its extra mastery XP share. */
   signature: { minMastery: 25, xpBonus: 0.1 },
   /** Pouch slots: the base count and the extra slots the chunin vest gives. */
-  pouch: { slots: 3, vest: 1 },
+  pouch: { slots: 3, vest: 1, vestRank: 'chunin' },
   /** The player's AI: the reaction delay (ms) of the genin tier to a cast it has to answer, and the health share below which a spare buff is cast. */
   ai: { geninReactionMs: 1000, guardBelow: 0.6 },
   /** Health share below which a won fight still costs a Wound. */
   woundHp: 0.1,
   /** Until exploration gives real flags, every region zone is open from this rank. */
-  regionZones: { openFromRank: 'genin' },
+  regionZones: { openFromRank: 'genin', regions: ['forest', 'plains', 'valley', 'exam'] },
   /** Operations: ms of the approach stage, and its share when the shortening requirement holds. */
   operation: { approachMs: 30000, approachShort: 0.5 },
   /** Numbers of tools that the item data does not carry: the poisoned senbon's damage over time (share of maximum health per second, seconds), and the damage multiplier of a burn ointment against the nature it names. */

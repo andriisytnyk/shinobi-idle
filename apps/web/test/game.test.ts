@@ -153,6 +153,31 @@ describe('start, error and tab handling', () => {
 
   afterEach(() => vi.unstubAllGlobals());
 
+  it('rapid significant commands do not look like another tab and lose no save', async () => {
+    browserStubs();
+    const s = setup();
+    // A store whose writes take a few turns of the event loop, like IndexedDB.
+    const update = s.kv.update;
+    s.kv.update = async (key, fn) => {
+      for (let i = 0; i < 3; i++) await Promise.resolve();
+      await update(key, fn);
+    };
+    await s.game.start();
+    expect(s.game.phase).toBe('playing');
+    s.game.state.player.rank = 'genin';
+    s.game.state.currencies.ryo = 100;
+    s.game.state.bank['core:pelt'] = 1;
+    for (let i = 0; i < 4; i++) {
+      expect(s.game.dispatch({ type: 'shop.buy', item: 'core:oil', n: 1 }).ok).toBe(true);
+    }
+    expect(s.game.dispatch({ type: 'shop.sell', item: 'core:pelt', n: 1 }).ok).toBe(true);
+    await s.game.save();
+    expect(s.game.phase).toBe('playing');
+    const stored = decodeStored(s.data.get(SAVE_KEY) ?? '');
+    const saved = JSON.parse(stored.text) as { state: { bank: Record<string, number> } };
+    expect(saved.state.bank['core:oil']).toBe(4);
+  });
+
   it('a corrupted save shows the error, starts no loop and never writes', async () => {
     const intervals = browserStubs();
     const s = setup();

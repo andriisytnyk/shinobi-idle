@@ -123,6 +123,35 @@ export interface NatureGainedEvent extends EventBase {
   first: boolean;
 }
 
+/** The region is open: Scouting and rank allow exploring it. */
+export interface RegionOpenedEvent extends EventBase {
+  type: 'regionOpened';
+  region: string;
+}
+/** A cell reached a new level; `max` marks the last level it can have. */
+export interface CellLevelUpEvent extends EventBase {
+  type: 'cellLevelUp';
+  cell: string;
+  level: number;
+  max: boolean;
+}
+/** A point of interest was found by exploring its cell to level 1. */
+export interface PoiFoundEvent extends EventBase {
+  type: 'poiFound';
+  cell: string;
+  poi: string;
+}
+/** The one-time loot of a cache or a vault was collected. */
+export interface PoiClaimedEvent extends EventBase {
+  type: 'poiClaimed';
+  poi: string;
+}
+/** The player now stands in a new cell after a walk or an instant trip. */
+export interface TravelledEvent extends EventBase {
+  type: 'travelled';
+  cell: string;
+}
+
 export type GameEvent =
   | LevelUpEvent
   | MasteryUpEvent
@@ -142,7 +171,12 @@ export type GameEvent =
   | MeditationGainEvent
   | MeditationBoughtEvent
   | ObstacleBuiltEvent
-  | NatureGainedEvent;
+  | NatureGainedEvent
+  | RegionOpenedEvent
+  | CellLevelUpEvent
+  | PoiFoundEvent
+  | PoiClaimedEvent
+  | TravelledEvent;
 
 type WithoutAt<T> = T extends unknown ? Omit<T, 'at'> : never;
 

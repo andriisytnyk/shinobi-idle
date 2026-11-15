@@ -134,6 +134,7 @@
     .figure {
       display: inline-flex;
       align-items: center;
+      min-width: 2.75rem;
       min-height: 2.75rem;
     }
   }

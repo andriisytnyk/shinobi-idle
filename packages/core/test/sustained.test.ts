@@ -17,7 +17,10 @@ import { levelsFor } from './fight-helpers.ts';
 import { setLevel } from './helpers.ts';
 
 const HOURS = 2;
-const regular = content.enemies.filter((e) => e.id !== 'core:dummy');
+// The thief is a mission enemy: no zone, fought only through its mission, so not here.
+const regular = content.enemies.filter(
+  (e) => e.id !== 'core:dummy' && content.zones.some((z) => z.enemy === e.id),
+);
 
 function grind(
   enemyId: string,
@@ -75,7 +78,7 @@ describe('two hours of continuous zone fighting without healing items', () => {
     console.log(
       `Sustained (${HOURS} h, genin, auto loadout, no items): defeats / peak wounds / kills\n| enemy | level | traits | Katon | Doton |\n| --- | --- | --- | --- | --- |\n${lines.join('\n')}`,
     );
-    expect(lines).toHaveLength(23);
+    expect(lines).toHaveLength(22);
   });
 
   for (const { enemy, results } of rows) {

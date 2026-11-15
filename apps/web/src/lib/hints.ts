@@ -8,8 +8,11 @@ export interface HintDef {
    * Hints without `when` belong to a page and are shown by that page when it opens. The others
    * are shown by the hint host the moment their condition first holds.
    */
-  when?: (state: GameState, content: ContentDb) => boolean;
+  when?: (state: GameState, content: ContentDb, signals: Signals) => boolean;
 }
+
+/** One-off things that happened this session and that no state shows afterwards, by name. */
+export type Signals = Readonly<Record<string, true | undefined>>;
 
 /** Every hint, in the order the help page lists them. */
 export const HINTS: readonly HintDef[] = [
@@ -20,6 +23,11 @@ export const HINTS: readonly HintDef[] = [
   { id: 'rank' },
   { id: 'bank' },
   { id: 'nature' },
+  { id: 'herbalism' },
+  { id: 'crafting' },
+  { id: 'shop' },
+  { id: 'craftStopped', when: (_state, _content, signals) => signals.craftStopped === true },
+  { id: 'tonicUsed', when: (state) => Object.keys(state.buffs).length > 0 },
   {
     id: 'levelUp',
     when: (state, content) =>
@@ -52,9 +60,10 @@ export function nextStateHint(
   state: GameState,
   content: ContentDb,
   visible: (id: string) => boolean,
+  signals: Signals = {},
 ): HintDef | null {
   for (const hint of HINTS) {
-    if (hint.when && visible(hint.id) && hint.when(state, content)) return hint;
+    if (hint.when && visible(hint.id) && hint.when(state, content, signals)) return hint;
   }
   return null;
 }
