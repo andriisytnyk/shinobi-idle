@@ -135,6 +135,7 @@ describe('boss specials', () => {
       kind: 'rival',
       fx: 'rivalDuel',
       hook: 'special:rival.duel',
+      numbers: ['techniques', 'everyMs', 'sigEveryMs', 'sigOpenMs', 'sigMult', 'mult'],
       signature: true,
       nature: 'beatsPlayerFirst',
     });

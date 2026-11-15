@@ -232,7 +232,12 @@ const data = {
         count: 2,
       },
       /** Every third attack is a heavy one: a hook the pack's `rules` registers. */
-      special: { kind: 'testmod:thirdStrike', fx: 'testmod:third', hook: 'testmod:thirdStrike' },
+      special: {
+        kind: 'testmod:thirdStrike',
+        fx: 'testmod:third',
+        hook: 'testmod:thirdStrike',
+        numbers: ['mult'],
+      },
     },
   ],
 

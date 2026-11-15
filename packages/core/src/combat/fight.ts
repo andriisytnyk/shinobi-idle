@@ -3,7 +3,18 @@ import { createStream, nextFloatFrom } from '../rng.ts';
 import { addEffect, findEffect, isSuppressed, removeEffect, statOf } from './fight-effects.ts';
 import { figure, need } from './need.ts';
 import { answersTraitData, balanceOf, beatenBy, fightData, type TraitMod } from './fight-data.ts';
-import { fault, guard, isDisabled, disabledCount, trusted } from './fight-guard.ts';
+import {
+  disabledCount,
+  fault,
+  guard,
+  isBoolean,
+  isDisabled,
+  isFactor,
+  timerOwner,
+  trusted,
+  validCastInfo,
+  type GuardOptions,
+} from './fight-guard.ts';
 import { PASSIVE_NEGATE_HOOK } from './fight-hooks.ts';
 import { applyItem, itemView } from './fight-items.ts';
 import {
@@ -167,6 +178,17 @@ export function boundOf(ctx: FightCtx, c: Combatant): Bound {
   return made;
 }
 
+/** What a guarded call of a hook of a body may change: the body and the player. */
+const bodiesOf = (ctx: FightCtx, c: Combatant, event: boolean): GuardOptions<void | undefined> => ({
+  bodies: c === ctx.fight.player ? [c] : [c, ctx.fight.player],
+  event,
+});
+const FACTOR: GuardOptions<number> = { check: isFactor };
+const BOOLEAN: GuardOptions<boolean> = { check: isBoolean };
+const CAST_INFO: GuardOptions<ReturnType<NonNullable<FightHook['castInfo']>>> = {
+  check: validCastInfo,
+};
+
 const sameIds = (a: readonly string[], b: readonly string[]): boolean =>
   a.length === b.length && a.every((x, i) => x === b[i]);
 
@@ -188,7 +210,7 @@ export function stat(ctx: FightCtx, c: Combatant, which: ModStat, base: number):
   }
   for (const hook of b.hooks) {
     const f = hook.stat;
-    if (f) value *= guard(ctx, hook, () => f.call(hook, ctx, c, which), 1);
+    if (f) value *= guard(ctx, hook, () => f.call(hook, ctx, c, which), 1, FACTOR);
   }
   return value;
 }
@@ -424,7 +446,9 @@ function addBodies(ctx: FightCtx, spawn: Spawn, n: number, staggered: boolean): 
     fight.enemies.push(c);
     added.push(c);
     initTraits(ctx, c);
-    for (const hook of hooksOf(ctx, c)) guard(ctx, hook, () => hook.init?.(ctx, c), undefined);
+    for (const hook of hooksOf(ctx, c)) {
+      guard(ctx, hook, () => hook.init?.(ctx, c), undefined, bodiesOf(ctx, c, true));
+    }
   }
   return added;
 }
@@ -511,7 +535,7 @@ export function createFight(
   // Teammates of a team mission support the player through a hook of the player's own.
   if (fight.encounter.support?.length) player.specials.push(TEAM_HOOK);
   for (const hook of hooksOf(ctx, player)) {
-    guard(ctx, hook, () => hook.init?.(ctx, player), undefined);
+    guard(ctx, hook, () => hook.init?.(ctx, player), undefined, bodiesOf(ctx, player, true));
   }
   for (const spawn of fight.encounter.spawns) addBodies(ctx, spawn, spawn.count, spawn.count > 1);
   return fight;
@@ -606,9 +630,12 @@ export function fightAdvance(
     stalled = next === 0 ? stalled + 1 : 0;
     if (stalled > STALL_LIMIT) {
       // An event that repeats at once is a hook of another pack that never lets time pass, or a bug.
-      const culprit = [fight.player, ...fight.enemies]
-        .flatMap((c) => hooksOf(ctx, c))
-        .find((h) => !trusted(h));
+      const bodies = [fight.player, ...fight.enemies];
+      const culprit =
+        bodies
+          .flatMap((c) => Object.keys(c.timers).map((name) => timerOwner(c, name)))
+          .find((h) => h !== undefined && !trusted(h)) ??
+        bodies.flatMap((c) => hooksOf(ctx, c)).find((h) => !trusted(h));
       if (!culprit) throw new Error('fight made no progress: an event repeats at once');
       fault(ctx, culprit, 'an event repeated without time passing');
       return left;
@@ -667,12 +694,18 @@ export function hurt(ctx: FightCtx, target: Combatant, amount: number, src: stri
     if (target.hp <= target.maxHp * ctx.content.balance.K.woundHp) target.data.low = 1;
   }
   for (const hook of hooksOf(ctx, target)) {
-    guard(ctx, hook, () => hook.onDamaged?.(ctx, target, applied, src), undefined);
+    guard(
+      ctx,
+      hook,
+      () => hook.onDamaged?.(ctx, target, applied, src),
+      undefined,
+      bodiesOf(ctx, target, true),
+    );
   }
   if (!alive(target)) {
     if (target.side === 'enemy') fight.tally.kills++;
     for (const hook of hooksOf(ctx, target)) {
-      guard(ctx, hook, () => hook.onDeath?.(ctx, target), undefined);
+      guard(ctx, hook, () => hook.onDeath?.(ctx, target), undefined, bodiesOf(ctx, target, true));
     }
     leave(ctx, target);
     // A fallen body keeps no effects: its ticks would never be handled, and a save would not read them back.
@@ -687,7 +720,9 @@ export function hurt(ctx: FightCtx, target: Combatant, amount: number, src: stri
 
 /** A body is gone, by death or flight: tell its hooks and end every effect that lasts while it lives. */
 function leave(ctx: FightCtx, c: Combatant): void {
-  for (const hook of hooksOf(ctx, c)) guard(ctx, hook, () => hook.onLeave?.(ctx, c), undefined);
+  for (const hook of hooksOf(ctx, c)) {
+    guard(ctx, hook, () => hook.onLeave?.(ctx, c), undefined, bodiesOf(ctx, c, true));
+  }
   for (const holder of [ctx.fight.player, ...ctx.fight.enemies]) {
     if (holder.effects.some((e) => e.whileAlive === c.id)) {
       holder.effects = holder.effects.filter((e) => e.whileAlive !== c.id);
@@ -746,9 +781,9 @@ export function addDecoys(c: Combatant, n: number): void {
 export function cancelCasts(ctx: FightCtx, target: Combatant, interruptible = false): boolean {
   let any = false;
   for (const hook of hooksOf(ctx, target)) {
-    const info = guard(ctx, hook, () => hook.castInfo?.(ctx, target), null);
+    const info = guard(ctx, hook, () => hook.castInfo?.(ctx, target) ?? null, null, CAST_INFO);
     if (info?.casting && (!interruptible || info.interruptible)) {
-      guard(ctx, hook, () => hook.onCancel?.(ctx, target), undefined);
+      guard(ctx, hook, () => hook.onCancel?.(ctx, target), undefined, bodiesOf(ctx, target, true));
       any = true;
     }
   }
@@ -779,7 +814,7 @@ function habituationScale(ctx: FightCtx, target: Combatant | undefined): number 
   if (!target) return 1;
   let scale = 1;
   for (const hook of hooksOf(ctx, target)) {
-    scale *= guard(ctx, hook, () => hook.habituation?.(ctx, target) ?? 1, 1);
+    scale *= guard(ctx, hook, () => hook.habituation?.(ctx, target) ?? 1, 1, FACTOR);
   }
   return scale;
 }
@@ -896,13 +931,13 @@ function buildView(ctx: FightCtx): FightView {
       const hook = bindings.find((b) => b.trait === trait)?.hook;
       const w = hook?.working;
       return hook && w
-        ? guard(ctx, hook, () => w.call(hook, ctx, e), true)
+        ? guard(ctx, hook, () => w.call(hook, ctx, e), true, BOOLEAN)
         : !isSuppressed(e, trait);
     });
     let cast: ViewEnemy['cast'] = null;
     let nextCastIn: number | null = null;
     for (const { hook, trait } of bindings) {
-      const info = guard(ctx, hook, () => hook.castInfo?.(ctx, e), null);
+      const info = guard(ctx, hook, () => hook.castInfo?.(ctx, e) ?? null, null, CAST_INFO);
       if (!info || info.inWork === null) continue;
       // A cast under way can be seen; when the next one comes is known only for a known trait.
       const seen = trait !== null ? knownTraits.includes(trait) : mechanicKnown;
@@ -931,7 +966,7 @@ function buildView(ctx: FightCtx): FightView {
       nextCastIn,
       leader: bindings.some(
         (b) =>
-          b.trait === null && guard(ctx, b.hook, () => b.hook.leader?.(ctx, e), false) === true,
+          b.trait === null && guard(ctx, b.hook, () => b.hook.leader?.(ctx, e) ?? false, false, BOOLEAN) === true,
       ),
     };
   });
@@ -1257,7 +1292,17 @@ function enemyAttack(ctx: FightCtx, enemy: Combatant): void {
     damage: enemy.damage,
   };
   const hooks = hooksOf(ctx, enemy);
-  for (const hook of hooks) guard(ctx, hook, () => hook.onAttack?.(ctx, enemy, plan), undefined);
+  for (const hook of hooks) {
+    guard(ctx, hook, () => hook.onAttack?.(ctx, enemy, plan), undefined, {
+      ...bodiesOf(ctx, enemy, true),
+      after: () =>
+        Number.isFinite(plan.damage) &&
+        plan.damage >= 0 &&
+        Number.isFinite(plan.chance) &&
+        plan.chance >= 0 &&
+        plan.chance <= 1,
+    });
+  }
   const resist = findEffect(player, 'resist');
   if (resist?.kind === 'modifier' && enemy.nature !== null && resist.nature === enemy.nature) {
     plan.damage *= resist.value;
@@ -1269,7 +1314,13 @@ function enemyAttack(ctx: FightCtx, enemy: Combatant): void {
   const dealt = dealDamage(ctx, player, plan.damage, enemy.id);
   note(fight, 'enemy', 'hit', null, dealt);
   for (const hook of hooks) {
-    guard(ctx, hook, () => hook.onAttackHit?.(ctx, enemy, player, dealt), undefined);
+    guard(
+      ctx,
+      hook,
+      () => hook.onAttackHit?.(ctx, enemy, player, dealt),
+      undefined,
+      bodiesOf(ctx, enemy, true),
+    );
   }
 }
 
@@ -1344,7 +1395,7 @@ function runTimers(ctx: FightCtx, c: Combatant): void {
       timer.progress -= timer.need;
       const hooks = hooksOf(ctx, c);
       for (const hook of hooks) {
-        guard(ctx, hook, () => hook.onTimer?.(ctx, c, name), undefined);
+        guard(ctx, hook, () => hook.onTimer?.(ctx, c, name), undefined, bodiesOf(ctx, c, true));
       }
       const after = c.timers[name];
       // A timer that no longer has a size, or that fires without end within one moment, is a failure of
@@ -1352,6 +1403,7 @@ function runTimers(ctx: FightCtx, c: Combatant): void {
       const broken = after !== undefined && !(Number.isFinite(after.need) && after.need >= 1);
       if (broken || ++fires > cap) {
         const culprit =
+          timerOwner(c, name) ??
           hooks.find((h) => !trusted(h) && h.onTimer !== undefined) ??
           hooks.find((h) => !trusted(h));
         if (culprit) {

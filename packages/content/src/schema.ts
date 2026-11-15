@@ -620,6 +620,8 @@ export const bossSpecialSchema = z.strictObject({
   companions: z.strictObject({ fx: z.string().min(1), hook: z.string().min(1) }).optional(),
   bodies: z.boolean().optional(),
   fleeAt: z.string().min(1).optional(),
+  /** The keys of `K.bossFx[fx]` the hook reads: the closure proves they exist, so the hook never falls back to a default. */
+  numbers: z.array(z.string().min(1)).optional(),
   /** What the mechanic does, as the design table lists it; no rule reads these. */
   signature: z.boolean().optional(),
   stun: z.boolean().optional(),
@@ -1221,6 +1223,9 @@ export const balanceParamsSchema = z.object({
     fightCapMs: z.number().int(),
     maxEnemies: z.number().int(),
     timerFires: z.number().int(),
+    timerMinMs: z.number().int(),
+    hookEventsPerSec: z.number().int(),
+    hookStatMax: z.number(),
   }),
   bindEva: z.number(),
   loadout: z.object({

@@ -108,6 +108,48 @@ function items() {
   );
 }
 
+/** The powder thrown at enemies that are already stunned for far longer: what a second stun does to a longer one. */
+function stacked() {
+  const out: Record<string, unknown[]> = {};
+  for (const entry of content.enemies) {
+    const rows: unknown[] = [];
+    for (let seed = 1; seed <= 4; seed++) {
+      const snap: PlayerSnapshot = {
+        ...yardstick(
+          Math.max(1, Math.min(K.cap, entry.cl)),
+          NATURES[seed % NATURES.length] ?? 'katon',
+        ),
+        pouch: bank([POWDER]),
+      };
+      const rules = { ...defaultRules, combatAi: powderAi() };
+      const fight = createFight(snap, encounterFor(entry, content), seed, content, rules);
+      for (const e of fight.enemies) {
+        e.effects.push({
+          kind: 'modifier',
+          id: 'stun',
+          src: 'earlier',
+          until: fight.t + workOf(120_000),
+          stat: 'speed',
+          op: 'mul',
+          value: 0,
+        });
+      }
+      const untils: unknown[] = [];
+      for (let at = 0; at < 30; at += 3) {
+        fightAdvance(fight, workOf(3000), content, rules);
+        untils.push(
+          fight.enemies.map((e) =>
+            e.effects.filter((x) => x.id === 'stun').map((x) => [x.src, x.until]),
+          ),
+        );
+      }
+      rows.push([untils, fight.pouch.map((p) => p.n)]);
+    }
+    out[entry.id] = rows;
+  }
+  return out;
+}
+
 /** The burn ointment before the antidote, against the poisoners. */
 const poison = () =>
   record(bank(['core:bulion_ramenu', 'core:maz_vid_opikiv', 'core:antidote']), poisoners, false);
@@ -117,11 +159,11 @@ describe('the golden record of items and enemy-applied effects', () => {
     'stays byte-identical, and the poison answer is the intended one',
     { timeout: 300_000 },
     () => {
-      const now = { items: items(), poison: poison() };
+      const now = { items: items(), poison: poison(), stacked: stacked() };
       if (process.env.UPDATE_GOLDEN === '1') {
         // Recorded on dev: both poison records are what dev did.
         const text = JSON.stringify(
-          { items: now.items, dev: now.poison, poison: now.poison },
+          { items: now.items, dev: now.poison, poison: now.poison, stacked: now.stacked },
           null,
           1,
         );
@@ -138,9 +180,11 @@ describe('the golden record of items and enemy-applied effects', () => {
         items: unknown;
         dev: unknown;
         poison: unknown;
+        stacked: unknown;
       };
       expect(JSON.stringify(now.items)).toBe(JSON.stringify(fixture.items));
       expect(JSON.stringify(now.poison)).toBe(JSON.stringify(fixture.poison));
+      expect(JSON.stringify(now.stacked)).toBe(JSON.stringify(fixture.stacked));
     },
   );
 });

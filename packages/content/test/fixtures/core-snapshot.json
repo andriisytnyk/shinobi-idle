@@ -564,14 +564,14 @@
       "core:foreign_genin": "e9aebbfaaaca"
     },
     "bosses": {
-      "core:boss_wolf": "4118facdaf8a",
-      "core:boss_ren1": "e1c9e0709256",
-      "core:boss_fighter": "19b525df2272",
-      "core:boss_hunter": "24ff39b2a56e",
-      "core:boss_twins": "b24c8cf4e172",
-      "core:boss_mist": "5f502669dbdc",
-      "core:boss_nameless": "14d16e023e5d",
-      "core:boss_ren2": "4b4f27d3fb50"
+      "core:boss_wolf": "e277790f5b3e",
+      "core:boss_ren1": "0c8684a461c7",
+      "core:boss_fighter": "b9e4ed17349f",
+      "core:boss_hunter": "7ad1dcfe2c3d",
+      "core:boss_twins": "0f8d3fbef7d9",
+      "core:boss_mist": "c9a062dbb728",
+      "core:boss_nameless": "00ee5672c182",
+      "core:boss_ren2": "4fdf3eb38a57"
     },
     "buildings": {
       "core:tower": "a09f68debf19",
@@ -1110,6 +1110,9 @@
     "K.combat.fightCapMs": 240000,
     "K.combat.maxEnemies": 8,
     "K.combat.timerFires": 1000,
+    "K.combat.timerMinMs": 100,
+    "K.combat.hookEventsPerSec": 500,
+    "K.combat.hookStatMax": 10,
     "K.bindEva": 0.3,
     "K.loadout.slots.genin": 4,
     "K.loadout.slots.chunin": 5,
@@ -5152,7 +5155,10 @@
       "hitEven",
       "fightCapMs",
       "maxEnemies",
-      "timerFires"
+      "timerFires",
+      "timerMinMs",
+      "hookEventsPerSec",
+      "hookStatMax"
     ],
     "K.loadout": [
       "slots",

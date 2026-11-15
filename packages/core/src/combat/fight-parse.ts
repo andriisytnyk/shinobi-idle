@@ -49,6 +49,8 @@ interface Vocab {
   /** The hook ids the content names, and the ones of the engine. */
   specials: ReadonlySet<string>;
   basicSkill: SkillId | null;
+  /** The smallest size of a hook timer. */
+  timerMin: number;
 }
 
 const vocabs = new WeakMap<ContentDb, Vocab>();
@@ -88,6 +90,7 @@ function vocabOf(content: ContentDb): Vocab {
       effects,
       specials,
       basicSkill: fightData(content).basicSkill,
+      timerMin: needOf(content.balance.K.combat.timerMinMs),
     };
     vocabs.set(content, v);
   }
@@ -252,7 +255,7 @@ function parseCombatant(
   if (!cd || !data || !timer || !isRecord(raw.timers)) return null;
   const timers: Record<string, Timer> = {};
   for (const [name, value] of Object.entries(raw.timers)) {
-    const parsed = parseTimer(value, needOf(1));
+    const parsed = parseTimer(value, v.timerMin);
     if (!parsed) return null;
     timers[name] = parsed;
   }

@@ -20,6 +20,7 @@ import { scrollOf } from '../scrolls.ts';
 import { buyPrice } from '../shop.ts';
 import type { GameState } from '../state.ts';
 import { bingoLevel, dropShown, isFirstWin, revealAt } from './bingo.ts';
+import { voidCount } from './fight-guard.ts';
 import { figure, need } from './need.ts';
 import { createFight, fightAdvance, fightTimeMs } from './fight.ts';
 import { encounterFor } from './fight-encounter.ts';
@@ -213,6 +214,8 @@ export interface Once {
 }
 
 export interface Analysis {
+  /** Present when a hook of a pack failed during the analysis: that many fights were cut short (counted as neither a defeat nor a Wound) and the forecast is unreliable. */
+  voided?: number;
   target: AnalysisTarget;
   fresh: Fresh;
   /** For each trait the player knows, what answers it; the others are only counted. */
@@ -581,6 +584,8 @@ interface FreshTotals {
  * result does not depend on how the slices were cut.
  */
 export interface AnalysisJob {
+  /** Fights a failing hook of a pack cut short while the job ran; the figures are unreliable when there are any. */
+  voided?: number;
   target: AnalysisTarget;
   seed: number;
   samples: number;
@@ -958,7 +963,27 @@ function suppliesOf(job: AnalysisJob): Supply[] {
 }
 
 /** Runs one unit of work: a batch of the first-fight run, a session, or a session of the after-supplies forecast. Returns false when there is nothing left. */
-function unit(job: AnalysisJob, found: Resolved, content: ContentDb, rules: Rules): boolean {
+/**
+ * The rules an analysis plays with: a copy whose fight hooks have a disabled set of their own, so a hook
+ * that fails here is not switched off for the live game and the game is told nothing. One per job.
+ */
+const detached = new WeakMap<AnalysisJob, Rules>();
+function ownRules(job: AnalysisJob, live: Rules): Rules {
+  let own = detached.get(job);
+  if (!own) detached.set(job, (own = { ...live, fightHooks: [...live.fightHooks] }));
+  return own;
+}
+
+function unit(job: AnalysisJob, found: Resolved, content: ContentDb, live: Rules): boolean {
+  const rules = ownRules(job, live);
+  try {
+    return step(job, found, content, rules);
+  } finally {
+    job.voided = voidCount(rules.fightHooks);
+  }
+}
+
+function step(job: AnalysisJob, found: Resolved, content: ContentDb, rules: Rules): boolean {
   const f = job.fresh;
   const A = content.balance.K.analysis;
   if (f.done < f.batches) {
@@ -1045,6 +1070,7 @@ function assemble(job: AnalysisJob, found: Resolved, content: ContentDb): Analys
     session: played ? sessionOf(job, found, content) : null,
     sessionBlocked: job.blockedReason,
     once: job.once,
+    ...(job.voided ? { voided: job.voided } : {}),
   };
 }
 

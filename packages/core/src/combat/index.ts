@@ -6,6 +6,7 @@ export * from './fight-hooks.ts';
 export * from './fight-parse.ts';
 export * from './fight-data.ts';
 export * from './fight-effects.ts';
+export { disabledCount, voidCount } from './fight-guard.ts';
 export * from './fight-status.ts';
 export * from './fight-sim.ts';
 export * from './fight-team.ts';

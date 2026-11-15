@@ -30,6 +30,14 @@ import { needOf, TICK_MS, workOf } from '../combat/units.ts';
 const trait = (K: { trait: Readonly<Record<string, number>> }, key: string): number =>
   figure(K.trait, key, 'trait');
 
+/** A number of a row of `K.bossFx`; a number the data does not have is an error, not a zero. */
+const bf = (ctx: FightCtx, row: string, key: string): number =>
+  figure(
+    (ctx.content.balance.K.bossFx as Record<string, Record<string, number> | undefined>)[row],
+    key,
+    `bossFx.${row}`,
+  );
+
 const timerOf = (ms: number) => ({ progress: 0, need: needOf(ms) });
 
 // ---------- capabilities: numbers a special publishes for the trait it strengthens ----------
@@ -55,12 +63,10 @@ const ILLUSION_EVERY = 'illusionist.everyMs';
 const heavyCast: FightHook = {
   id: 'special:heavyCast',
   publish(ctx, c) {
-    const fx = ctx.content.balance.K.bossFx.heavyCast;
-    if (!fx) return;
-    put(c, CAST.every, fx.everyMs ?? 0);
-    put(c, CAST.cast, fx.castMs ?? 0);
-    put(c, CAST.mult, fx.damageMult ?? 1);
-    put(c, CAST.stun, fx.stunMs ?? 0);
+    put(c, CAST.every, bf(ctx, 'heavyCast', 'everyMs'));
+    put(c, CAST.cast, bf(ctx, 'heavyCast', 'castMs'));
+    put(c, CAST.mult, bf(ctx, 'heavyCast', 'damageMult'));
+    put(c, CAST.stun, bf(ctx, 'heavyCast', 'stunMs'));
   },
 };
 
@@ -68,8 +74,7 @@ const heavyCast: FightHook = {
 const evasionByMissingHp: FightHook = {
   id: 'special:evasionByMissingHp',
   publish(ctx, c) {
-    const fx = ctx.content.balance.K.bossFx.drunkenEvasion;
-    if (fx) put(c, RAMP, fx.maxMult ?? 1);
+    put(c, RAMP, bf(ctx, 'drunkenEvasion', 'maxMult'));
   },
 };
 
@@ -77,8 +82,7 @@ const evasionByMissingHp: FightHook = {
 const illusion: FightHook = {
   id: 'special:illusion',
   publish(ctx, c) {
-    const fx = ctx.content.balance.K.bossFx.illusion;
-    if (fx) put(c, ILLUSION_EVERY, fx.everyMs ?? 0);
+    put(c, ILLUSION_EVERY, bf(ctx, 'illusion', 'everyMs'));
   },
 };
 
@@ -259,7 +263,7 @@ const packRespawn: FightHook = {
   id: 'special:packRespawn',
   leader: () => true,
   init(ctx, c) {
-    c.timers.pack = timerOf(ctx.content.balance.K.bossFx.wolfPack?.everyMs ?? 0);
+    c.timers.pack = timerOf(bf(ctx, 'wolfPack', 'everyMs'));
   },
   onTimer(ctx, c, name) {
     if (name !== 'pack' || !alive(c)) return;
@@ -271,7 +275,7 @@ const packRespawn: FightHook = {
     const living = fight.enemies.filter(
       (e) => alive(e) && e.specials.includes('special:packMember'),
     );
-    const missing = (content.balance.K.bossFx.wolfPack?.count ?? 0) - living.length;
+    const missing = bf(ctx, 'wolfPack', 'count') - living.length;
     if (missing > 0) spawnEnemies(fight, index, content, rules, missing);
   },
 };
@@ -281,28 +285,22 @@ function rival(id: string, key: 'rivalDuel' | 'rivalTournament'): FightHook {
   return {
     id,
     init(ctx, c) {
-      const fx = ctx.content.balance.K.bossFx[key];
-      if (!fx) return;
-      const techniques = fx.techniques ?? 0;
+      const techniques = bf(ctx, key, 'techniques');
       for (let i = 0; i < techniques; i++) {
-        const timer = timerOf(fx.everyMs ?? 0);
+        const timer = timerOf(bf(ctx, key, 'everyMs'));
         timer.progress = Math.floor((timer.need * (i + 1)) / (techniques + 1));
         c.timers[`rival.${i}`] = timer;
       }
-      const sig = timerOf(fx.sigEveryMs ?? 0);
-      sig.progress = Math.max(0, sig.need - needOf(fx.sigOpenMs ?? 0));
+      const sig = timerOf(bf(ctx, key, 'sigEveryMs'));
+      sig.progress = Math.max(0, sig.need - needOf(bf(ctx, key, 'sigOpenMs')));
       c.timers['rival.sig'] = sig;
     },
     onTimer(ctx, c, name) {
-      const fx = ctx.content.balance.K.bossFx[key];
-      if (!fx) return;
-      if (name === 'rival.sig') strike(ctx, c, c.damage * (fx.sigMult ?? 1));
-      else if (name.startsWith('rival.')) strike(ctx, c, c.damage * (fx.mult ?? 1));
+      if (name === 'rival.sig') strike(ctx, c, c.damage * bf(ctx, key, 'sigMult'));
+      else if (name.startsWith('rival.')) strike(ctx, c, c.damage * bf(ctx, key, 'mult'));
     },
     habituation: (ctx) =>
-      key === 'rivalTournament'
-        ? (ctx.content.balance.K.bossFx.rivalTournament?.habituationMult ?? 1)
-        : 1,
+      key === 'rivalTournament' ? bf(ctx, 'rivalTournament', 'habituationMult') : 1,
   };
 }
 
@@ -312,17 +310,15 @@ const twins: FightHook = {
   init(ctx, c) {
     const { fight, content } = ctx;
     const K = content.balance.K;
-    const fx = K.bossFx.twins;
-    if (!fx) return;
     const bodies = fight.enemies.filter((e) => e.specials.includes('special:twins'));
-    if (bodies.length < (fx.count ?? 0) || findEffect(fight.player, 'twinMist')) return;
+    if (bodies.length < bf(ctx, 'twins', 'count') || findEffect(fight.player, 'twinMist')) return;
     addEffect(fight.player, {
       kind: 'periodic',
       id: 'twinMist',
       src: c.id,
       until: null,
       mode: 'damage',
-      amount: K.poison.pctPerSec * fight.player.maxHp * (fx.mistMult ?? 1),
+      amount: K.poison.pctPerSec * fight.player.maxHp * bf(ctx, 'twins', 'mistMult'),
       every: workOf(TICK_MS),
       next: fight.t + workOf(TICK_MS),
     });
@@ -336,7 +332,7 @@ const twins: FightHook = {
 const rehide: FightHook = {
   id: 'special:rehide',
   init(ctx, c) {
-    c.timers.rehide = timerOf(ctx.content.balance.K.bossFx.mistRehide?.everyMs ?? 0);
+    c.timers.rehide = timerOf(bf(ctx, 'mistRehide', 'everyMs'));
   },
   onTimer(ctx, c, name) {
     if (name !== 'rehide') return;

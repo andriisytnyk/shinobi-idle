@@ -7,6 +7,17 @@
 import type { ContentDb, Req } from './schema.ts';
 import type { EntityListKey } from './pack.ts';
 
+/** The effects the engine and the core hooks put on a body under their own ids (not statuses): a tag or a trait may name them. */
+const ENGINE_EFFECTS: ReadonlySet<string> = new Set([
+  'illusion',
+  'revealed',
+  'twinMist',
+  'stance',
+  'stanceDrain',
+  'evasionBuff',
+  'resist',
+]);
+
 export interface ClosureProblem {
   pack: string;
   message: string;
@@ -260,7 +271,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
       if (op.op === 'effect') effectIds.add(op.id);
   /** A reference of fight data to an effect or trait: one of another pack must exist; the engine's and the core's own effects are bare. */
   const effectRef = (field: string, value: string): void => {
-    if (value.includes(':') && !effectIds.has(value))
+    if (!effectIds.has(value) && !ENGINE_EFFECTS.has(value))
       problem(field, `"${value}" names no status, effect or trait`);
   };
   for (const st of db.statuses) {
@@ -472,6 +483,8 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
   for (const b of db.bosses) {
     at('bosses', b.id);
     needNumber('special.fx', `bossFx.${b.special.fx}`);
+    for (const key of b.special.numbers ?? [])
+      needNumber('special.numbers', `bossFx.${b.special.fx}.${key}`);
     if (b.special.companions)
       needNumber('special.companions.fx', `bossFx.${b.special.companions.fx}`);
     refs('special.adds', b.special.adds ?? [], 'traits');
