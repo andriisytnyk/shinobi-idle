@@ -31,6 +31,8 @@ export const UI_PARTS = [
   'now-slot',
   'goal-panel',
   'goal-row',
+  /** The pin that makes an entity the goal: on a tile's corner, as a caption under a requirement tree, or as a button of an entity page; carries `data-entity` and `data-pinned`. */
+  'pin-goal',
   /** The root of an entity page. */
   'entity-page',
   'entity-header',
@@ -88,5 +90,6 @@ export const ENTITY_PARTS: readonly UiPart[] = [
   'mission-card',
   'mission-stage',
   'mission-reward',
+  'pin-goal',
   'topbar-currency',
 ];

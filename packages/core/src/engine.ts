@@ -275,6 +275,10 @@ const PINNABLE: ReadonlySet<string> = new Set([
   'items',
   'enemies',
   'quests',
+  'recipes',
+  'exercises',
+  'practices',
+  'obstacles',
 ]);
 
 /** Starts the sensei test of the exam that grants `rank`. */
