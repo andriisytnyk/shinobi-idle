@@ -1,53 +1,32 @@
 import type { SkillId } from '@shinobi/content';
-import type { JsonValue } from '../state.ts';
+import type { FightState } from './fight-types.ts';
 
 /**
- * A timed effect on one combatant (burn, stun, a tool's bonus and so on). Stage 3 adds the kinds;
- * for now the lists stay empty. An effect names the moment it ends so it needs no per-tick upkeep,
- * and the combat system will fold `until` into its next-event time.
- */
-export interface CombatEffect {
-  kind: string;
-  /** Combat clock time at which the effect ends. */
-  until: number;
-  data: JsonValue;
-}
-
-/** Where the player is in the technique lifecycle: free, casting, or recovering from a swing. */
-export type PlayerPhase = 'ready' | 'cast' | 'recover';
-
-/**
- * The running fight, as plain JSON. Combat has its own clock in work units (ms x the fight slot's
- * share, like action progress) and every deadline below is a time on that clock, so combat of any
- * speed share is exact in whole numbers and any chunking of `advance` gives identical saves.
+ * The running fight as the game keeps it, plain JSON. The fight itself is a self-contained
+ * `FightState` with its own clock; this wraps it with what the game needs around it: the work
+ * the slot has fed in, the pause between enemies, and what has already been paid out.
  */
 export interface CombatState {
   /** Content id of the enemy being fought. */
   enemy: string;
-  /** `fight`: an enemy is alive. `respawn`: the pause before the next one appears. */
+  /** `fight`: the fight runs. `respawn`: the pause before the next enemy appears. */
   phase: 'fight' | 'respawn';
-  /** Combat time in work units; advances by the slot share per ms. */
-  clock: number;
-  enemyHp: number;
-  hp: number;
-  chakra: number;
-  stamina: number;
-  pPhase: PlayerPhase;
-  /** When the player's current phase ends (cast resolves, recovery ends). */
-  pAt: number;
-  /** Technique being cast, if `pPhase` is `cast`. */
-  cast: string | null;
-  /** When the enemy next attacks. */
-  eAt: number;
-  /** When the next enemy appears, during `respawn`. */
-  respawnAt: number;
-  /** When pools next regenerate (once per second of game time). */
-  regenAt: number;
-  /** Cooldown end per technique id; absent or in the past means ready. */
-  cd: Record<string, number>;
+  /**
+   * The current fight, or the one just won while `phase` is `respawn`; the player's pools there
+   * are the ones carried into the next fight.
+   */
+  fight: FightState;
+  /** Work units (ms x share) received since the fight or the pause was last advanced. */
+  work: number;
+  /** Work units left of the pause between enemies, during `respawn`. */
+  pause: number;
+  /** Mastery work of this fight, per technique, that has already been paid out. */
+  paid: Record<string, number>;
+  /**
+   * Work units since the last technique use that earlier fights and pauses left unpaid; the next
+   * technique use is paid for them, so mastery follows combat time across enemies.
+   */
+  carry: number;
   /** Skill that earns combat style XP: that of the technique last used; basic attacks are Taijutsu. */
   style: SkillId;
-  /** Clock time of the player's previous technique use, or the fight's start. */
-  lastActionAt: number;
-  fx: { player: CombatEffect[]; enemy: CombatEffect[] };
 }

@@ -137,7 +137,7 @@ describe('combat runs at the slot share', () => {
       };
       const whole = run(120_000);
       for (const chunk of [1, 7, 999, 3600]) expect(run(chunk)).toBe(whole);
-      expect(deserialize(whole, content).combat?.clock).toBeGreaterThan(0);
+      expect(deserialize(whole, content).combat?.fight.t).toBeGreaterThan(0);
     });
   }
 });

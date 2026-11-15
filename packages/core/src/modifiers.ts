@@ -37,6 +37,7 @@ export function computeMod(
   for (const provider of providers) {
     for (const m of provider(state, content)) if (m.key === key) parts.push(m);
   }
+  if (parts.length === 0) return { total: 1, parts };
   const groups = new Map<ModifierGroup, { add: number; mul: number }>();
   for (const m of parts) {
     const g = groups.get(m.group) ?? { add: 0, mul: 1 };

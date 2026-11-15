@@ -331,28 +331,37 @@ describe('A8: saves', () => {
     expect(loaded.quests[QUEST]).toEqual({ step: 0, base: 0, done: false });
   });
 
-  it('repairs a damaged fight instead of trusting it', () => {
+  it('restarts a damaged fight instead of trusting it', () => {
     const a = busy();
-    const parsed = JSON.parse(serialize(a, 0)) as {
+    type Doc = {
       v: number;
-      state: { combat: Record<string, unknown> };
+      state: { combat: { fight: Record<string, unknown> } & Record<string, unknown> };
     };
-    Object.assign(parsed.state.combat, {
-      hp: -5,
-      regenAt: 0,
-      pAt: 1e15,
-      enemy: DUMMY,
-      cast: 'core:nope',
-      stamina: 'x',
-    });
-    const b = deserialize(JSON.stringify(parsed), content);
-    expect(b.combat?.hp).toBeGreaterThan(0);
-    expect(b.combat?.regenAt).toBeGreaterThanOrEqual(b.combat?.clock ?? Infinity);
-    expect(b.combat?.pAt).toBeLessThanOrEqual((b.combat?.clock ?? 0) + 3_600_000 * 1000);
-    expect(b.combat?.cast).toBeNull();
+    const damage = (edit: (doc: Doc) => void): ReturnType<typeof deserialize> => {
+      const parsed = JSON.parse(serialize(a, 0)) as Doc;
+      edit(parsed);
+      return deserialize(JSON.stringify(parsed), content);
+    };
+    const fresh = (b: ReturnType<typeof deserialize>) => {
+      expect(b.combat?.enemy).toBe(DUMMY);
+      expect(b.combat?.fight.t).toBe(0);
+      expect(b.combat?.fight.result).toBe('ongoing');
+      advance(b, 10_000, content);
+    };
+    fresh(damage((d) => ((d.state.combat.fight.player as Record<string, unknown>).hp = 'x')));
+    fresh(damage((d) => ((d.state.combat.fight.player as Record<string, unknown>).intervalMs = 0)));
+    fresh(damage((d) => (d.state.combat.fight.t = -4)));
+    fresh(damage((d) => (d.state.combat.fight.result = 'defeat')));
+    fresh(damage((d) => (d.state.combat.fight.rng = [1, 2])));
+    fresh(damage((d) => delete (d.state.combat as Record<string, unknown>).fight));
+    // Numbers around the fight are clamped, not trusted.
+    const b = damage((d) => Object.assign(d.state.combat, { work: 1e18, pause: -4, carry: 1e18 }));
+    expect(b.combat?.work).toBeLessThanOrEqual(3_600_000 * 1000);
+    expect(b.combat?.pause).toBe(0);
     advance(b, 10_000, content);
     // A save without a combat block but with a fight slot gets a fresh fight.
-    delete (parsed.state as Record<string, unknown>).combat;
+    const parsed = JSON.parse(serialize(a, 0)) as { state: Record<string, unknown> };
+    delete parsed.state.combat;
     expect(deserialize(JSON.stringify(parsed), content).combat?.enemy).toBe(DUMMY);
     // A combat block without a fight slot is dropped.
     const idle = JSON.parse(serialize(a, 0)) as { state: { slots: { action: unknown }[] } };

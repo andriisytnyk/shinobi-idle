@@ -11,8 +11,12 @@ export const BALANCE_EXT = {
   offlineCapHours: 12,
   /** The sensei test: 300 s, 1% shorter per level of the exam's skills, never under 120 s. */
   senseiTest: { base: 300, perLevel: 0.01, floor: 120 },
-  /** Combat timing: ms per combat XP tick, ms per pool regeneration step, hit share at equal ratings. */
-  combat: { xpTickMs: 1000, regenMs: 1000, hitEven: 0.5 },
+  /** Combat timing: ms per combat XP tick, ms per pool regeneration step, hit share at equal ratings, the longest fight (ms) before it ends as a timeout, and the most enemies one fight holds. */
+  combat: { xpTickMs: 1000, regenMs: 1000, hitEven: 0.5, fightCapMs: 240000, maxEnemies: 8 },
+  /** Evasion multiplier of a bound enemy (the balance tables: Сковування, ухилення ×0.3). */
+  bindEva: 0.3,
+  /** Chance to resist an Illusionist's illusion per Meditation level (Медитація ÷ 200). */
+  illusionResist: 0.005,
   /** Herb bushes: stock is stockBase plus the herb's mastery level; an empty bush regrows for regrowMs. */
   field: { stockBase: 5, regrowMs: 5000 },
   /** Crafting mastery tiers (mastery levels 1 / 20 / 50 / 90): each tier above the first adds this chance of one bonus unit. */

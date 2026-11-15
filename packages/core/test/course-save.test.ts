@@ -1,4 +1,4 @@
-/** A8: determinism and split-invariance with the course and Meditation running; A9: the save migration to version 6. */
+/** A8: determinism and split-invariance with the course and Meditation running; A9: the save migration to version 7. */
 import { content } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
@@ -84,37 +84,53 @@ describe('A8: determinism and split-invariance', () => {
   });
 });
 
-/** A save as version 5 wrote it: no meditation, no course, and the plain obstacle action. */
-function v5Save(patch: (state: Record<string, unknown>) => void): string {
+/** A save as the version before this one wrote it: no meditation, no course, and the plain obstacle action. */
+function v6Save(patch: (state: Record<string, unknown>) => void, version = 6): string {
   const s = createState(1, content);
   s.player.rank = 'genin';
   const parsed = JSON.parse(serialize(s)) as { v: number; state: Record<string, unknown> };
-  parsed.v = 5;
-  parsed.state.v = 5;
+  parsed.v = version;
+  parsed.state.v = version;
   delete parsed.state.meditation;
   delete parsed.state.course;
   patch(parsed.state);
   return JSON.stringify(parsed);
 }
 
-describe('A9: save migration to version 6', () => {
-  it('is the sixth step', () => {
-    expect(STATE_VERSION).toBe(6);
+describe('A9: save migration to version 7', () => {
+  it('is the seventh step', () => {
+    expect(STATE_VERSION).toBe(7);
     expect(MIGRATIONS).toHaveLength(STATE_VERSION - 1);
   });
 
-  it('loads a version 5 save with empty Meditation and course', () => {
+  it('loads a version 6 save with empty Meditation and course', () => {
     const state = deserialize(
-      v5Save(() => {}),
+      v6Save(() => {}),
       content,
     );
-    expect(state.v).toBe(6);
+    expect(state.v).toBe(7);
     expect(state.meditation).toEqual({});
     expect(state.course).toEqual({});
   });
 
+  it('also carries a version 5 save through both steps', () => {
+    const text = v6Save((state) => {
+      state.slots = [
+        {
+          action: { kind: 'obstacle', id: 'core:bih_navkolo_sela' },
+          progress: 0,
+          share: 1000,
+          data: null,
+        },
+      ];
+    }, 5);
+    const state = deserialize(text, content);
+    expect(state.v).toBe(STATE_VERSION);
+    expect(state.course).toEqual({ '1': 'core:bih_navkolo_sela' });
+  });
+
   it('turns a running obstacle of slot 1 into a course lap with that obstacle built', () => {
-    const text = v5Save((state) => {
+    const text = v6Save((state) => {
       state.skills = { ...(state.skills as object), ath: { xp: 400 } };
       state.slots = [
         {
@@ -136,7 +152,7 @@ describe('A9: save migration to version 6', () => {
   });
 
   it('builds the obstacle where it stood when it was in a later slot', () => {
-    const text = v5Save((state) => {
+    const text = v6Save((state) => {
       state.slots = [
         {
           action: { kind: 'obstacle', id: 'core:obtiazhuvachi' },
@@ -152,7 +168,7 @@ describe('A9: save migration to version 6', () => {
   });
 
   it('drops a running obstacle the content does not know', () => {
-    const text = v5Save((state) => {
+    const text = v6Save((state) => {
       state.slots = [
         { action: { kind: 'obstacle', id: 'core:gone' }, progress: 5, share: 1000, data: null },
       ];

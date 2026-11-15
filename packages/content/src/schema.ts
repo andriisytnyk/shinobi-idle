@@ -859,7 +859,15 @@ export const balanceParamsSchema = z.object({
   /** Numbers of item effects that name them by key. */
   itemFx: z.object({ sleep: z.object({ chance: z.number() }) }),
   /** The sensei test: base seconds, shortening per level of the exam's skills, floor in seconds. */
-  combat: z.object({ xpTickMs: z.number().int(), regenMs: z.number().int(), hitEven: z.number() }),
+  combat: z.object({
+    xpTickMs: z.number().int(),
+    regenMs: z.number().int(),
+    hitEven: z.number(),
+    fightCapMs: z.number().int(),
+    maxEnemies: z.number().int(),
+  }),
+  bindEva: z.number(),
+  illusionResist: z.number(),
   senseiTest: z.object({ base: z.number(), perLevel: z.number(), floor: z.number() }),
   offlineCapHours: z.number(),
   masteryCap: z.number().int(),

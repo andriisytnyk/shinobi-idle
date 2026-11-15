@@ -20,6 +20,15 @@ export const SKILL_IDS = [
 
 export const NATURE_IDS = ['katon', 'futon', 'raiton', 'doton', 'suiton'] as const;
 
+/** The nature wheel: each nature beats the one it maps to and loses to the one that maps to it. */
+export const NATURE_WHEEL: Record<(typeof NATURE_IDS)[number], (typeof NATURE_IDS)[number]> = {
+  katon: 'futon',
+  futon: 'raiton',
+  raiton: 'doton',
+  doton: 'suiton',
+  suiton: 'katon',
+};
+
 /** Skills that own techniques. */
 export const TECH_SKILL_IDS = ['tai', 'nin', ...NATURE_IDS] as const;
 
