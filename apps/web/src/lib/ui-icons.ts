@@ -17,6 +17,7 @@ export const UI_ICON_NAMES = [
   'lock',
   'menu',
   'minus',
+  'package',
   'panel-right',
   'plus',
   'search',

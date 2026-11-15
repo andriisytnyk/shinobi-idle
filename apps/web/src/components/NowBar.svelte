@@ -12,7 +12,8 @@
     slot: number;
     ref: ReturnType<typeof actionRef>;
     fraction: number;
-    xpPerHour: number;
+    /** Skill XP per hour; null for actions that pay none by the hour (fights, exams). */
+    xpPerHour: number | null;
   }
 
   const rows = $derived.by((): Row[] => {
@@ -21,12 +22,16 @@
     state.slots.forEach((slot, index) => {
       if (!slot.action) return;
       const info = actionInfo(state, slot.action, content, game.rules);
-      if (!info) return;
+      // Fights and exams are not skill tiles, so their cycle comes straight from their kind.
+      const kind = game.rules.actionKinds[slot.action.kind];
+      const intervalMs =
+        info?.intervalMs ?? kind?.intervalMs(state, slot.action.id, content, game.rules);
+      if (intervalMs === undefined) return;
       out.push({
         slot: index,
         ref: actionRef(slot.action),
-        fraction: Math.min(1, slot.progress / (info.intervalMs * SHARE_FULL)),
-        xpPerHour: (info.xpPerHour * slot.share) / SHARE_FULL,
+        fraction: Math.min(1, slot.progress / (intervalMs * SHARE_FULL)),
+        xpPerHour: info ? (info.xpPerHour * slot.share) / SHARE_FULL : null,
       });
     });
     return out;
@@ -58,7 +63,11 @@
           >
             <span class="fill" style:width="{row.fraction * 100}%"></span>
           </span>
-          <span class="xph">{t('tile.xphValue', { n: formatXp(row.xpPerHour) })}</span>
+          <span class="xph"
+            >{#if row.xpPerHour !== null}{t('tile.xphValue', {
+                n: formatXp(row.xpPerHour),
+              })}{/if}</span
+          >
           <button type="button" class="stop" onclick={() => stop(row.slot)}>{t('now.stop')}</button>
         </li>
       {/each}

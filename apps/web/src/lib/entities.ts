@@ -24,7 +24,7 @@ export function isEntityKind(kind: string): kind is EntityKind {
   return (ENTITY_KINDS as readonly string[]).includes(kind);
 }
 
-/** A core entity reference as a web one, or null when the kind has no page here (for example quests). */
+/** A core entity reference as a web one, or null when the kind has no page here (for example a region before its page exists). */
 export function webRef(ref: { kind: string; id: string } | null): EntityRef | null {
   return ref && isEntityKind(ref.kind) ? { kind: ref.kind, id: ref.id } : null;
 }
@@ -35,6 +35,8 @@ const ACTION_ENTITY: Readonly<Record<string, EntityKind>> = {
   drill: 'exercise',
   meditate: 'practice',
   obstacle: 'obstacle',
+  fight: 'enemy',
+  senseiTest: 'exam',
 };
 
 export function actionRef(action: { kind: string; id: string }): EntityRef {

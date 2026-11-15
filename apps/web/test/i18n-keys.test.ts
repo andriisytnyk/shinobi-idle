@@ -3,6 +3,7 @@ import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { content, SKILL_IDS, ukLocale } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
+import { HINTS } from '../src/lib/hints.ts';
 
 const src = fileURLToPath(new URL('../src', import.meta.url));
 
@@ -45,6 +46,11 @@ describe('interface strings', () => {
       'toast.stopped.': ['requirements', 'missing', 'finished', 'defeated'],
       'req.type.': ['quest', 'building'],
       'req.flag.': ['firstFight'],
+      'quests.step': ['Done', 'Current', 'Pending'],
+      'hint.': HINTS.map((h) => h.id),
+      'hint.title.': HINTS.map((h) => h.id),
+      'log.': ['cast', 'hit', 'miss', 'basicHit', 'basicMiss', 'enemyHit', 'enemyMiss'],
+      'combat.doing.': ['ready', 'cast', 'recover', 'attack', 'respawn'],
       'entity.kind.': [
         'skill',
         'technique',
@@ -67,6 +73,17 @@ describe('interface strings', () => {
     const missing: string[] = [];
     for (const [prefix, ids] of Object.entries(families)) {
       for (const id of ids) if (!(`${prefix}${id}` in ukLocale)) missing.push(`${prefix}${id}`);
+    }
+    expect(missing).toEqual([]);
+  });
+
+  it('has a text for every reason the core can refuse a command with', () => {
+    const core = fileURLToPath(new URL('../../../packages/core/src', import.meta.url));
+    const missing: string[] = [];
+    for (const file of walk(core).filter((f) => f.endsWith('.ts'))) {
+      for (const m of readFileSync(file, 'utf8').matchAll(/'(error\.[a-zA-Z]+)'/g)) {
+        if (m[1] !== undefined && !(m[1] in ukLocale)) missing.push(m[1]);
+      }
     }
     expect(missing).toEqual([]);
   });

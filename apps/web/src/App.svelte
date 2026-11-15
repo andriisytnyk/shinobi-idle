@@ -1,19 +1,31 @@
 <script lang="ts">
   import BlockedScreen from './components/BlockedScreen.svelte';
   import LoadErrorScreen from './components/LoadErrorScreen.svelte';
+  import DevTools from './components/DevTools.svelte';
   import GoalPanel from './components/GoalPanel.svelte';
+  import GraduationModal from './components/GraduationModal.svelte';
+  import HintHost from './components/HintHost.svelte';
+  import MainNav from './components/MainNav.svelte';
+  import NextStepCard from './components/NextStepCard.svelte';
   import NowBar from './components/NowBar.svelte';
   import ReportModal from './components/ReportModal.svelte';
   import SkillList from './components/SkillList.svelte';
   import TabBar from './components/TabBar.svelte';
   import ToastHost from './components/ToastHost.svelte';
   import TopBar from './components/TopBar.svelte';
+  import WelcomeModal from './components/WelcomeModal.svelte';
+  import { isDevMode } from './lib/dev.ts';
   import { game } from './lib/store.ts';
   import { t } from './lib/i18n.ts';
   import { currentRoute } from './lib/router.svelte.ts';
+  import BankPage from './pages/BankPage.svelte';
+  import CombatPage from './pages/CombatPage.svelte';
   import CreditsPage from './pages/CreditsPage.svelte';
   import EntityPage from './pages/EntityPage.svelte';
+  import HelpPage from './pages/HelpPage.svelte';
   import MorePage from './pages/MorePage.svelte';
+  import QuestsPage from './pages/QuestsPage.svelte';
+  import RankPage from './pages/RankPage.svelte';
   import SimplePage from './pages/SimplePage.svelte';
   import ItemPage from './pages/ItemPage.svelte';
   import SettingsPage from './pages/SettingsPage.svelte';
@@ -23,6 +35,8 @@
   // The meta panel starts open beside the page on wide screens and closed on phones, where it is an overlay.
   let metaOpen = $state(window.matchMedia('(min-width: 769px)').matches);
   const route = $derived(currentRoute());
+  /** Room at the foot of the page for the developer panel, so it never hides the last controls. */
+  const dev = isDevMode();
 </script>
 
 {#if game.phase === 'blocked'}
@@ -37,22 +51,35 @@
       <TopBar {metaOpen} onToggleMeta={() => (metaOpen = !metaOpen)} />
     </div>
 
-    <nav class="side" aria-label={t('nav.skills')}>
-      <SkillList />
-    </nav>
+    <div class="side">
+      <MainNav />
+      <nav aria-label={t('nav.skills')}><SkillList /></nav>
+    </div>
 
-    <main class="main">
+    <main class="main" class:dev>
+      <HintHost />
       {#if route.page === 'home'}
         <SimplePage title={t('home.title')}>
+          <NextStepCard />
           <p class="hint">{t('home.hint')}</p>
         </SimplePage>
       {:else if route.page === 'skills'}
         <SimplePage title={t('nav.skills')}>
-          <div class="mobile-skills"><SkillList /></div>
+          <div class="mobile-skills"><NextStepCard /><SkillList /></div>
           <p class="hint desktop-only">{t('home.hint')}</p>
         </SimplePage>
       {:else if route.page === 'settings'}
         <SettingsPage />
+      {:else if route.page === 'quests'}
+        <QuestsPage />
+      {:else if route.page === 'rank'}
+        <RankPage />
+      {:else if route.page === 'combat'}
+        <CombatPage />
+      {:else if route.page === 'bank'}
+        <BankPage />
+      {:else if route.page === 'help'}
+        <HelpPage />
       {:else if route.page === 'credits'}
         <CreditsPage />
       {:else if route.page === 'tab' && route.tab === 'more'}
@@ -61,6 +88,10 @@
         <SimplePage title={t(`nav.${route.tab}`)}>
           <p class="hint">{t('entity.placeholder')}</p>
         </SimplePage>
+      {:else if route.page === 'entity' && route.ref.kind === 'quest'}
+        <QuestsPage />
+      {:else if route.page === 'entity' && route.ref.kind === 'exam'}
+        <RankPage />
       {:else if route.page === 'entity' && route.ref.kind === 'skill'}
         <SkillPage id={route.ref.id} />
       {:else if route.page === 'entity' && route.ref.kind === 'technique'}
@@ -80,6 +111,12 @@
 
     <div class="now"><NowBar /></div>
     <ToastHost />
+    <DevTools />
+    {#if game.state.player.name === ''}
+      <WelcomeModal />
+    {:else if game.graduation}
+      <GraduationModal onClose={() => game.dismissGraduation()} />
+    {/if}
     {#if game.report}
       <ReportModal report={game.report} onClose={() => game.dismissReport()} />
     {/if}
@@ -131,6 +168,10 @@
     grid-area: main;
     padding: var(--space-6);
     overflow-y: auto;
+  }
+
+  .main.dev {
+    padding-bottom: 5rem;
   }
 
   .meta {
