@@ -1,9 +1,11 @@
 <script lang="ts">
   import { content, localeKey, NATURE_IDS, type SkillId } from '@shinobi/content';
-  import { listSkillActions, skillUnlockStatus } from '@shinobi/core';
+  import { listSkillActions, nonNativeCastMult, skillUnlockStatus } from '@shinobi/core';
   import ActionTile from '../components/ActionTile.svelte';
+  import CoursePanel from '../components/CoursePanel.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
+  import MeditationPanel from '../components/MeditationPanel.svelte';
   import PoolBar from '../components/PoolBar.svelte';
   import ReqTree from '../components/ReqTree.svelte';
   import { entityDesc, entityName } from '../lib/entities.ts';
@@ -21,10 +23,30 @@
   const ref = $derived({ kind: 'skill', id } as const);
   const desc = $derived(entityDesc(ref));
   const unlockKey = $derived(localeKey('skill', id, 'unlock'));
-  const progress = $derived(skill ? skillProgress(game.state, skill.id as SkillId) : null);
-  const lock = $derived(skill ? skillUnlockStatus(game.state, skill.id, content) : null);
+  const progress = $derived(
+    game.read((gs) => (skill ? skillProgress(gs, skill.id as SkillId) : null)),
+  );
+  const lock = $derived(
+    game.read((gs) => (skill ? skillUnlockStatus(gs, skill.id, content) : null)),
+  );
+  /** For a nature skill the player owns: whether it is the native one, and the cast penalty still to work off. */
+  const natureLine = $derived.by(() =>
+    game.read((gs) => {
+      const natures = gs.player.natures;
+      if (!(NATURE_IDS as readonly string[]).includes(id) || !natures.includes(id as never)) {
+        return null;
+      }
+      const K = content.balance.K;
+      if (natures[0] === id)
+        return { text: 'nature.skillNative', pct: Math.round((K.nativeXp - 1) * 100) };
+      const mult = nonNativeCastMult(progress?.level ?? 1, content);
+      return { text: 'nature.skillForeign', pct: Math.round((mult - 1) * 100) };
+    }),
+  );
   const actions = $derived(
-    skill ? listSkillActions(game.state, skill.id as SkillId, content, game.rules) : [],
+    game.read((gs) =>
+      skill ? listSkillActions(gs, skill.id as SkillId, content, game.rules) : [],
+    ),
   );
 </script>
 
@@ -45,6 +67,11 @@
 
     {#if desc}<p class="lore">{desc}</p>{/if}
     {#if hasKey(unlockKey)}<p class="unlock">{t(unlockKey)}</p>{/if}
+    {#if natureLine}
+      <p class="nature-line" data-nature-line>
+        {t(natureLine.text, { pct: natureLine.pct, end: content.balance.K.natures.penaltyEnd })}
+      </p>
+    {/if}
 
     <Hint id="skillPage" />
 
@@ -52,10 +79,15 @@
       <section class="locked" data-locked>
         <h2><Icon name="lucide:lock" size={18} /> {t('skill.locked')}</h2>
         <ReqTree node={lock} />
+        {#if (NATURE_IDS as readonly string[]).includes(id)}
+          <p><a class="nature-go" href="#/nature">{t('nature.skillOpen')}</a></p>
+        {/if}
       </section>
     {/if}
 
-    {#if actions.length > 0}
+    {#if id === 'ath'}
+      <CoursePanel />
+    {:else if actions.length > 0}
       <section>
         <h2>{t('skill.actions')}</h2>
         <ul class="tiles">
@@ -66,6 +98,10 @@
       </section>
     {:else}
       <p class="placeholder">{t('skill.page.empty')}</p>
+    {/if}
+
+    {#if id === 'med'}
+      <MeditationPanel />
     {/if}
 
     <PoolBar skill={skill.id} />
@@ -119,6 +155,14 @@
 
   .lore {
     font-style: italic;
+  }
+
+  .nature-line {
+    font-weight: 600;
+  }
+
+  .nature-go {
+    color: var(--accent);
   }
 
   .unlock,

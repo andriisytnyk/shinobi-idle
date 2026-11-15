@@ -5,6 +5,8 @@ import {
   dispatch,
   refreshUnlocks,
   setFlag,
+  teamFor,
+  updateQuests,
   type Command,
   type GameState,
 } from '../src/index.ts';
@@ -17,7 +19,11 @@ export function fighter(seed = 1, level = 36, nature: NatureId = 'katon'): GameS
   state.player.natures = [nature];
   const skills: SkillId[] = ['tai', 'nin', nature, 'vit', 'eva', 'med', 'ath', 'cc'];
   for (const skill of skills) setLevel(state, skill, level);
+  // The state a played game would be in: the team follows the native nature, the quests have noticed the levels.
+  state.team = teamFor(nature);
   refreshUnlocks(state, content, true);
+  updateQuests(state, content);
+  state.events = [];
   return state;
 }
 

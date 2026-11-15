@@ -6,6 +6,7 @@ import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
 import { indexOf } from './lookup.ts';
 import { grantMastery } from './progression.ts';
+import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 
 /**
@@ -17,13 +18,14 @@ export function useItem(
   id: string,
   target: string | undefined,
   content: ContentDb,
+  rules: Rules,
 ): CommandResult {
   const index = indexOf(content);
   const item = index.items.get(id);
   if (!item) return { ok: false, reason: 'error.unknownItem' };
   if ((state.bank[id] ?? 0) < 1) return { ok: false, reason: 'error.noItem' };
   // A tonic needs no target: it starts a buff on its own skill.
-  if (item.fx?.kind === 'tonic') return useTonic(state, id, content);
+  if (item.fx?.kind === 'tonic') return useTonic(state, id, content, rules);
   // An ointment or a blood-making pill shortens the healing of the current Wound stack.
   const fx = item.fx;
   const woundMin =
@@ -43,7 +45,14 @@ export function useItem(
   }
   removeItem(state, id, 1);
   // One hour of practice, as the balance defines it.
-  grantMastery(state, technique.id, technique.skill, content.balance.K.masteryPerHour, content);
+  grantMastery(
+    state,
+    technique.id,
+    technique.skill,
+    content.balance.K.masteryPerHour,
+    content,
+    rules,
+  );
   emit(state, { type: 'itemUsed', id, target: technique.id });
   return { ok: true };
 }

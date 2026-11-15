@@ -573,8 +573,35 @@
       "perLevel": 0.01,
       "floor": 120
     },
+    "natures": {
+      "second": 20,
+      "third": 40,
+      "max": 3,
+      "penaltyEnd": 50
+    },
     "offlineCapHours": 12,
-    "masteryCap": 99
+    "masteryCap": 99,
+    "meditation": {
+      "insightChance": 0.05,
+      "enlightChance": 0.02,
+      "insightLevels": 8,
+      "enlightLevels": 5,
+      "insightGates": [
+        1,
+        40,
+        80
+      ],
+      "enlightGates": [
+        20,
+        60,
+        99
+      ]
+    },
+    "athletics": {
+      "freeSlot": 1,
+      "pillarCount": 5,
+      "pillarXp": 0.05
+    }
   },
   "pace": {
     "tai": [

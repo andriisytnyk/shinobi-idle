@@ -29,8 +29,27 @@ export const BALANCE_EXT = {
   gearFx: { mannequin: 0.03, sickle: 0.05, alembic: 0.03, stations: 0.05, maps: 0.03 },
   /** Numbers of item effects that name them by key (the recipe text gives no number for the sleeping powder). */
   itemFx: { sleep: { chance: 0.5 } },
+  /**
+   * Chakra natures: Chakra Control needed for the second and the third nature, the most natures the
+   * slice allows, and the skill level at which the non-native cast penalty (K.nonNativeCast) is gone.
+   */
+  natures: { second: 20, third: 40, max: 3, penaltyEnd: 50 },
   /** Mastery levels stop here. */
   masteryCap: 99,
+  /**
+   * Meditation: 5% Insight and 2% Enlightenment per finished cycle; an Insight modifier has up to
+   * 8 levels and an Enlightenment one up to 5; the three of each kind open at these practice masteries.
+   */
+  meditation: {
+    insightChance: 0.05,
+    enlightChance: 0.02,
+    insightLevels: 8,
+    enlightLevels: 5,
+    insightGates: [1, 40, 80],
+    enlightGates: [20, 60, 99],
+  },
+  /** Athletics course: slot 1 is free the first time; five built obstacles raise the pillar, +5% Athletics XP. */
+  athletics: { freeSlot: 1, pillarCount: 5, pillarXp: 0.05 },
   /**
    * Numbers of non-damaging technique effects (balance_tables.md, section 3, «Особливі ефекти»,
    * and the slice amendments). Technique data names an entry by key; it never carries the number.

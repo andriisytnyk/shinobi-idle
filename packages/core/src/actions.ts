@@ -11,10 +11,11 @@ import {
   techniqueCastSeconds,
 } from './formulas.ts';
 import { indexOf } from './lookup.ts';
-import { computeMod } from './modifiers.ts';
+import { nonNativeLevel } from './natures.ts';
+import { cycleFactor } from './modifiers.ts';
 import { spendTonicCharges } from './buffs.ts';
 import { gainXp, grantMastery } from './progression.ts';
-import { evalReq, type Req } from './requirements.ts';
+import { evalReq, skillLevel, type Req } from './requirements.ts';
 import type { Rules } from './rules.ts';
 import { SHARE_FULL, type GameState } from './state.ts';
 import type { System } from './system.ts';
@@ -43,6 +44,8 @@ export interface ActionKind {
     rules: Rules,
     slot?: number,
   ): 'continue' | 'stop' | 'abort' | void;
+  /** A reason (localization key) the action cannot start for a cause that is not a requirement, or null. */
+  blocked?(state: GameState, id: string, content: ContentDb, rules: Rules): string | null;
   /** The item the action lacks for its next cycle, if any; names the cause when it stops or is refused. */
   missing?(state: GameState, id: string, content: ContentDb, rules: Rules): string | null;
   /** The skill the action trains, when it trains one; a locked skill refuses its actions. */
@@ -61,7 +64,7 @@ export interface ActionKind {
 }
 
 /** The facts a skill-training action is built from. */
-interface SkillActionDef {
+export interface SkillActionDef {
   skill: SkillId;
   /** Level at which the action unlocks; sets its XP rate. */
   level: number;
@@ -70,12 +73,18 @@ interface SkillActionDef {
   baseSeconds: number;
   /** Requirements beyond the skill level. */
   extra: Req[];
+  /** A speed modifier key besides the skill's own, for example `speed.practice`. */
+  extraSpeed?: string;
 }
 
 /** Looks an action up in the content. `state` is null when only existence is being checked. */
-type Resolver = (state: GameState | null, id: string, content: ContentDb) => SkillActionDef | null;
+export type Resolver = (
+  state: GameState | null,
+  id: string,
+  content: ContentDb,
+) => SkillActionDef | null;
 
-function skillAction(resolve: Resolver): ActionKind {
+export function skillAction(resolve: Resolver): ActionKind {
   const baseMs = (def: SkillActionDef) => Math.round(def.baseSeconds * MS_PER_SECOND);
   return {
     has: (id, content) => resolve(null, id, content) !== null,
@@ -88,12 +97,7 @@ function skillAction(resolve: Resolver): ActionKind {
     intervalMs(state, id, content, rules) {
       const def = resolve(state, id, content);
       if (!def) return 1;
-      const mod = computeMod(
-        rules.modifierProviders,
-        state,
-        `interval.skill.${def.skill}`,
-        content,
-      ).total;
+      const mod = cycleFactor(rules.modifierProviders, state, def.skill, content, def.extraSpeed);
       return Math.max(1, Math.round(baseMs(def) * mod));
     },
     complete(state, id, content, rules) {
@@ -104,7 +108,7 @@ function skillAction(resolve: Resolver): ActionKind {
       const xp = (rate(def.level, content) * seconds) / SECONDS_PER_HOUR;
       gainXp(state, def.skill, xp, content, rules);
       const mastery = masteryXpPerAction(seconds, content);
-      grantMastery(state, def.masteryKey, def.skill, mastery, content);
+      grantMastery(state, def.masteryKey, def.skill, mastery, content, rules);
     },
   };
 }
@@ -113,13 +117,17 @@ export const practiceKind = skillAction((state, id, content) => {
   const t = indexOf(content).techniques.get(id);
   if (!t) return null;
   const mastery = state ? masteryLevel(state, id, content) : 1;
-  const cast = techniqueCastSeconds(t.sealSeq.length, mastery, content);
+  const foreign = state
+    ? nonNativeLevel(t.skill, state.player.natures, skillLevel(state, t.skill, content))
+    : undefined;
+  const cast = techniqueCastSeconds(t.sealSeq.length, mastery, content, foreign);
   return {
     skill: t.skill,
     level: t.level,
     masteryKey: id,
     baseSeconds: practiceIntervalSeconds(cast, content),
     extra: [{ t: 'technique', id }],
+    extraSpeed: 'speed.practice',
   };
 });
 
@@ -131,30 +139,6 @@ export const drillKind = skillAction((_state, id, content) => {
     level: e.level,
     masteryKey: id,
     baseSeconds: content.balance.K.drill,
-    extra: [],
-  };
-});
-
-export const meditateKind = skillAction((_state, id, content) => {
-  const p = indexOf(content).practices.get(id);
-  if (!p) return null;
-  return {
-    skill: 'med',
-    level: p.level,
-    masteryKey: id,
-    baseSeconds: content.balance.K.meditate,
-    extra: [],
-  };
-});
-
-export const obstacleKind = skillAction((_state, id, content) => {
-  const o = indexOf(content).obstacles.get(id);
-  if (!o) return null;
-  return {
-    skill: 'ath',
-    level: o.level,
-    masteryKey: id,
-    baseSeconds: content.balance.K.obstacle,
     extra: [],
   };
 });

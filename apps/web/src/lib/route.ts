@@ -18,6 +18,8 @@ export const ENTITY_KINDS = [
   'trait',
   'quest',
   'exam',
+  'cell',
+  'combo',
 ] as const;
 
 export type EntityKind = (typeof ENTITY_KINDS)[number];
@@ -27,8 +29,8 @@ export interface EntityRef {
   id: string;
 }
 
-/** Pages with a route of their own and no id: `#/quests`, `#/rank`, `#/combat`, `#/bank`, `#/help`. */
-export const PAGES = ['quests', 'rank', 'combat', 'bank', 'help'] as const;
+/** Pages with a route of their own and no id: `#/quests`, `#/rank`, `#/combat`, `#/bank`, `#/help`, `#/nature`. */
+export const PAGES = ['quests', 'rank', 'combat', 'bank', 'help', 'nature'] as const;
 export type PageName = (typeof PAGES)[number];
 
 export type Route =

@@ -10,12 +10,15 @@ import {
   setSignature,
 } from './combat/loadout.ts';
 import { setMedicSlot, setPouchSlot, usePouchSlot } from './combat/pouch.ts';
+import { buildObstacle } from './athletics.ts';
 import type { EntityRef } from './entity.ts';
 import { emit } from './events.ts';
 import { examFor, SENSEI_TEST_KIND } from './exam.ts';
 import { buyGear } from './gear.ts';
 import { coatItem, useItem } from './items.ts';
 import { indexOf } from './lookup.ts';
+import { buyMeditationLevel } from './meditation.ts';
+import { addNature, chooseNature, type NatureChoice } from './natures.ts';
 import { shopBuy, shopSell } from './shop.ts';
 import { updateQuests } from './quests.ts';
 import { evalReq, RANK_ORDER } from './requirements.ts';
@@ -39,6 +42,10 @@ export type Command =
   | { type: 'shop.sell'; item: string; n: number }
   /** Buys the next tier of a training-gear line. */
   | { type: 'gear.buy'; line: string }
+  /** Builds one of the two obstacles of an Athletics course slot, replacing what stands there. */
+  | { type: 'athletics.build'; slot: number; obstacle: string }
+  /** Spends Insights or Enlightenments of a practice on one level of its modifier (`insight.0` .. `enlight.2`). */
+  | { type: 'meditation.buy'; practice: string; mod: string }
   /** Pins a goal for the meta panel; the entity must exist and be a kind that can be a goal. */
   | { type: 'goal.set'; ref: EntityRef }
   | { type: 'goal.clear' }
@@ -60,7 +67,11 @@ export type Command =
   /** Uses a healing or restoring slot by hand during a fight. */
   | { type: 'pouch.use'; slot: number }
   /** Chooses the slot the medic pouch uses on its own (null: none). */
-  | { type: 'pouch.medic'; slot: number | null };
+  | { type: 'pouch.medic'; slot: number | null }
+  /** The chakra paper test: sets the native nature, once, as a genin. `random` draws on the world stream. */
+  | { type: 'nature.choose'; nature: NatureChoice }
+  /** Adds a second nature (Chakra Control 20) or a third (40); only natures not owned. */
+  | { type: 'nature.add'; nature: NatureChoice };
 
 /** Longest player name. */
 export const PLAYER_NAME_MAX = 24;
@@ -128,6 +139,8 @@ function startAction(
   if (skill && !isSkillUnlocked(state, skill, content)) {
     return { ok: false, reason: 'error.skillLocked' };
   }
+  const blocked = kind.blocked?.(state, id, content, rules);
+  if (blocked) return { ok: false, reason: blocked };
   const req = kind.requirements(state, id, content, rules);
   if (req && !evalReq(state, req, content).met) {
     // An action that lacks an ingredient says so; anything else is a plain unmet requirement.
@@ -200,7 +213,7 @@ function apply(
       return startAction(state, command.slot ?? 0, SENSEI_TEST_KIND, exam.id, content, rules);
     }
     case 'item.use':
-      return useItem(state, command.id, command.target, content);
+      return useItem(state, command.id, command.target, content, rules);
     case 'item.coat':
       return coatItem(state, command.poison, command.base, content);
     case 'shop.buy':
@@ -209,6 +222,10 @@ function apply(
       return shopSell(state, command.item, command.n, content);
     case 'gear.buy':
       return buyGear(state, command.line, content);
+    case 'athletics.build':
+      return buildObstacle(state, command.slot, command.obstacle, content, rules);
+    case 'meditation.buy':
+      return buyMeditationLevel(state, command.practice, command.mod, content);
     case 'goal.set': {
       if (!goalExists(command.ref, content)) return { ok: false, reason: 'error.invalidGoal' };
       state.goal = { kind: command.ref.kind, id: command.ref.id };
@@ -247,6 +264,10 @@ function apply(
       return usePouchSlot(state, command.slot, content, rules);
     case 'pouch.medic':
       return setMedicSlot(state, command.slot, content);
+    case 'nature.choose':
+      return chooseNature(state, command.nature);
+    case 'nature.add':
+      return addNature(state, command.nature, content);
     default:
       return { ok: false, reason: 'error.unknownCommand' };
   }

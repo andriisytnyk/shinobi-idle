@@ -1,15 +1,18 @@
 import type { ContentDb, SkillId } from '@shinobi/content';
 import { indexOf } from './lookup.ts';
 import {
+  MS_PER_HOUR,
   MS_PER_SECOND,
   masteryLevel,
   practiceIntervalSeconds,
   rate,
   techniqueCastSeconds,
 } from './formulas.ts';
-import { bushOf, bushSize, gatherAverageSeconds } from './field.ts';
+import { builtObstacles, COURSE_ID, COURSE_KIND, lapXp } from './athletics.ts';
+import { bushOf, bushSize, gatherAverageSeconds, regrowMs } from './field.ts';
 import { getMod } from './mod.ts';
-import { evalReq, type Req, type ReqResult } from './requirements.ts';
+import { nonNativeLevel } from './natures.ts';
+import { evalReq, skillLevel, type Req, type ReqResult } from './requirements.ts';
 import { defaultRules, type Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 import { levelAt, xpAt } from './xp.ts';
@@ -47,6 +50,8 @@ export interface ActionInfo {
   level: number;
   /** Whether the action can be started now: skill open and every requirement met. */
   available: boolean;
+  /** A reason (localization key) the action cannot start besides its requirements, such as a course with no obstacle; null otherwise. */
+  blocked: string | null;
   /** The evaluated requirement tree; null when the action is available. */
   req: ReqResult | null;
   /** Length of one cycle at full speed in ms, modifiers included. */
@@ -69,6 +74,8 @@ interface Facts {
   baseMs: number;
   /** Milliseconds of work one completion is paid for, before modifiers; defaults to `baseMs`. */
   rewardMs?: number;
+  /** Skill XP one cycle pays when it is not the rate of one level (the course lap), before modifiers. */
+  rewardXp?: number;
   /** Extra ms each completion costs on average at full speed, outside the cycle (herb regrow). */
   extraMs?: number;
   inputs?: { item: string; n: number }[];
@@ -76,7 +83,13 @@ interface Facts {
 }
 
 /** The skill, unlock level and unmodified cycle of an action of a built-in kind; null otherwise. */
-function factsOf(state: GameState, kind: string, id: string, content: ContentDb): Facts | null {
+function factsOf(
+  state: GameState,
+  kind: string,
+  id: string,
+  content: ContentDb,
+  rules: Rules,
+): Facts | null {
   const index = indexOf(content);
   const K = content.balance.K;
   const ms = (seconds: number) => Math.round(seconds * MS_PER_SECOND);
@@ -88,6 +101,7 @@ function factsOf(state: GameState, kind: string, id: string, content: ContentDb)
         t.sealSeq.length,
         masteryLevel(state, id, content),
         content,
+        nonNativeLevel(t.skill, state.player.natures, skillLevel(state, t.skill, content)),
       );
       return {
         skill: t.skill,
@@ -103,21 +117,27 @@ function factsOf(state: GameState, kind: string, id: string, content: ContentDb)
       const p = index.practices.get(id);
       return p ? { skill: 'med', level: p.level, baseMs: ms(K.meditate) } : null;
     }
-    case 'obstacle': {
-      const o = index.obstacles.get(id);
-      return o ? { skill: 'ath', level: o.level, baseMs: ms(K.obstacle) } : null;
+    case COURSE_KIND: {
+      if (id !== COURSE_ID) return null;
+      const laps = Math.max(1, builtObstacles(state, content).length);
+      return {
+        skill: 'ath',
+        level: 1,
+        baseMs: laps * ms(K.obstacle),
+        rewardXp: lapXp(state, content),
+      };
     }
     case 'gather': {
       const h = index.herbs.get(id);
       if (!h) return null;
       const bush = bushOf(state, id);
-      const size = bush?.size ?? bushSize(state, id, content);
+      const size = bush?.size ?? bushSize(state, id, content, rules);
       return {
         skill: 'herb',
         level: h.level,
         baseMs: ms(K.gather),
         rewardMs: gatherAverageSeconds(size, content) * MS_PER_SECOND,
-        extraMs: K.field.regrowMs / size,
+        extraMs: regrowMs(state, content, rules) / size,
       };
     }
     case 'craft': {
@@ -155,7 +175,7 @@ export function actionInfo(
 ): ActionInfo | null {
   const kind = rules.actionKinds[action.kind];
   if (!kind || !kind.has(action.id, content)) return null;
-  const facts = factsOf(state, action.kind, action.id, content);
+  const facts = factsOf(state, action.kind, action.id, content, rules);
   if (!facts) return null;
   const { skill, level, baseMs } = facts;
   const rewardMs = facts.rewardMs ?? baseMs;
@@ -166,14 +186,18 @@ export function actionInfo(
   const own = kind.requirements(state, action.id, content, rules);
   if (own) parts.push(...(own.t === 'all' ? own.of : [own]));
   const result = evalReq(state, { t: 'all', of: parts }, content);
+  const blocked = kind.blocked?.(state, action.id, content, rules) ?? null;
 
   const K = content.balance.K;
   let intervalMs = kind.intervalMs(state, action.id, content, rules);
   // An empty bush's regrow is counted in the average (extraMs), not in the steady cycle.
   if (facts.extraMs !== undefined && bushOf(state, action.id)?.stock === 0) {
-    intervalMs -= K.field.regrowMs;
+    intervalMs -= regrowMs(state, content, rules);
   }
-  let xpPerHour = (rate(level, content) * rewardMs) / (intervalMs + (facts.extraMs ?? 0));
+  let xpPerHour =
+    facts.rewardXp === undefined
+      ? (rate(level, content) * rewardMs) / (intervalMs + (facts.extraMs ?? 0))
+      : (facts.rewardXp * MS_PER_HOUR) / intervalMs;
   xpPerHour *= getMod(state, 'xp.all', content, rules).total;
   xpPerHour *= getMod(state, `xp.skill.${skill}`, content, rules).total;
   if (state.player.rank === 'student' && state.skills[skill].xp >= xpAt(K.academyCap)) {
@@ -186,7 +210,8 @@ export function actionInfo(
     id: action.id,
     skill,
     level,
-    available: result.met,
+    available: result.met && blocked === null,
+    blocked,
     req: result.met ? null : result,
     intervalMs,
     xpPerHour,
@@ -218,7 +243,7 @@ function skillActionIds(skill: SkillId, content: ContentDb): { kind: string; id:
     case 'med':
       return by('meditate', content.practices);
     case 'ath':
-      return by('obstacle', content.obstacles);
+      return [{ kind: COURSE_KIND, id: COURSE_ID }];
     case 'herb':
       return by('gather', content.herbs);
     case 'alch':

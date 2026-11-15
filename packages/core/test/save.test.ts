@@ -12,17 +12,16 @@ import {
   STATE_VERSION,
   xpAt,
 } from '../src/index.ts';
-import { genin, HOUR, start } from './helpers.ts';
+import { genin, HOUR, start, withNatures } from './helpers.ts';
 
 function played() {
-  const state = genin(9);
+  const state = withNatures(genin(9), 'suiton', 'katon');
   dispatch(state, start('practice', 'core:leaf_whirlwind'), content);
   advance(state, 1_234_567, content);
   state.bank['core:mint'] = 2;
   state.currencies.ryo = 55;
   state.flags['gate'] = true;
   state.player.name = 'Test';
-  state.player.natures = ['suiton', 'katon'];
   return state;
 }
 

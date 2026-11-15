@@ -4,6 +4,7 @@
  * balance object is derived here, so the hand-written files hold keys and structure only.
  */
 import { z } from 'zod';
+import { modSchema, obstacleModSchema } from './modifiers.ts';
 import {
   bossBaseSchema,
   coatSchema,
@@ -21,6 +22,9 @@ import {
   type HerbBase,
   type K,
   type MarketEntry,
+  type ObstacleBase,
+  type PoolCheckpointBase,
+  type PracticeBase,
   type ShopEntry,
 } from './schema.ts';
 
@@ -141,4 +145,51 @@ export function layerShop(
     ...market.map((m) => entry(m.item, { id: MARKET, level: m.marketLevel })),
     ...tools.map((t) => entry(t.item, t.building)),
   ];
+}
+
+// ---------- structured modifiers: pool checkpoints, practices, obstacles ----------
+
+export const poolModMapSchema = z.record(coreId, z.array(modSchema));
+export const practiceModMapSchema = z.record(
+  coreId,
+  z.strictObject({
+    insight: z.array(z.array(modSchema).min(1)),
+    enlight: z.array(z.array(modSchema).min(1)),
+  }),
+);
+export const obstacleModMapSchema = z.record(coreId, z.array(obstacleModSchema).min(2));
+export const obstacleReqMapSchema = z.record(coreId, reqSchema);
+
+/** Adds the modifiers of each pool checkpoint; a checkpoint without an entry is a data error. */
+export function layerPools(base: PoolCheckpointBase[], mods: z.infer<typeof poolModMapSchema>) {
+  return base.map((p) => {
+    const own = mods[p.id];
+    if (own === undefined) throw new Error(`No modifiers for pool checkpoint ${p.id}`);
+    return { ...p, mods: own };
+  });
+}
+
+/** Adds the modifiers of each Insight and Enlightenment modifier; their counts must match the practice. */
+export function layerPractices(base: PracticeBase[], mods: z.infer<typeof practiceModMapSchema>) {
+  return base.map((p) => {
+    const own = mods[p.id];
+    if (own === undefined) throw new Error(`No modifiers for practice ${p.id}`);
+    if (own.insight.length !== p.insight || own.enlight.length !== p.enlight) {
+      throw new Error(`Modifier counts of practice ${p.id} differ from its text`);
+    }
+    return { ...p, insightMods: own.insight, enlightMods: own.enlight };
+  });
+}
+
+/** Adds the requirement and the modifiers of each obstacle. */
+export function layerObstacles(
+  base: ObstacleBase[],
+  mods: z.infer<typeof obstacleModMapSchema>,
+  reqs: z.infer<typeof obstacleReqMapSchema>,
+) {
+  return base.map((o) => {
+    const own = mods[o.id];
+    if (own === undefined) throw new Error(`No modifiers for obstacle ${o.id}`);
+    return { ...o, req: reqs[o.id] ?? null, mods: own };
+  });
 }

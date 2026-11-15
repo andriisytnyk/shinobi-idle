@@ -287,15 +287,15 @@ describe('A12: saves', () => {
     expect(loaded.combat?.phase).toBe('approach');
   });
 
-  it('migrates a version 6 save: the new branches appear, a fight in progress starts over', () => {
-    expect(STATE_VERSION).toBe(7);
+  it('migrates a version 8 save: the new branches appear, a fight in progress starts over', () => {
+    expect(STATE_VERSION).toBe(9);
     expect(MIGRATIONS).toHaveLength(STATE_VERSION - 1);
     const state = fighter(54, 36, 'katon');
     dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: 'core:bandit' }, content);
     advance(state, 4000, content);
     const raw = JSON.parse(serialize(state, 0)) as { v: number; state: Record<string, unknown> };
-    raw.v = 6;
-    raw.state.v = 6;
+    raw.v = 8;
+    raw.state.v = 8;
     for (const key of ['loadouts', 'pouch', 'wounds', 'seen']) delete raw.state[key];
     // The old fight had none of the new parts.
     raw.state.combat = {
@@ -309,7 +309,7 @@ describe('A12: saves', () => {
       style: 'tai',
     };
     const loaded = deserialize(JSON.stringify(raw), content);
-    expect(loaded.v).toBe(7);
+    expect(loaded.v).toBe(9);
     expect(loaded.wounds).toEqual({ stacks: 0, left: 0 });
     expect(loaded.pouch.slots).toHaveLength(3);
     expect(loaded.seen['core:bandit']).toBe(true);
@@ -318,7 +318,7 @@ describe('A12: saves', () => {
     expect(loaded.combat?.enemy).toBe('core:bandit');
     expect(loaded.combat?.fight.t).toBe(0);
     advance(loaded, 5000, content);
-    expect(createState(1, content).v).toBe(7);
+    expect(createState(1, content).v).toBe(9);
   });
 
   it('cleans a doctored loadout, pouch and wound state on load', () => {

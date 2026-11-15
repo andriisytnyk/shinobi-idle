@@ -18,7 +18,7 @@ import {
   type Command,
   type GameState,
 } from '../src/index.ts';
-import { genin, HOUR, setLevel, start } from './helpers.ts';
+import { genin, HOUR, plainRules, setLevel, start, withNatures } from './helpers.ts';
 
 const K = content.balance.K;
 const MINT = 'core:mint';
@@ -80,14 +80,14 @@ describe('gather', () => {
     ok(s, gather(MINT));
     const size = K.field.stockBase + 1;
     const cycle = K.gather * 1000;
-    advance(s, cycle * size - 1, content);
+    advance(s, cycle * size - 1, content, plainRules);
     expect(s.bank[MINT]).toBe(size - 1);
-    advance(s, 1, content);
+    advance(s, 1, content, plainRules);
     expect(s.bank[MINT]).toBe(size);
     // The bush is empty: the next herb comes after the regrow pause and one more cycle.
-    advance(s, K.field.regrowMs + cycle - 1, content);
+    advance(s, K.field.regrowMs + cycle - 1, content, plainRules);
     expect(s.bank[MINT]).toBe(size);
-    advance(s, 1, content);
+    advance(s, 1, content, plainRules);
     expect(s.bank[MINT]).toBe(size + 1);
   });
 
@@ -100,7 +100,7 @@ describe('gather', () => {
       if (herb.req) setLevel(s, 'cc', 30);
       const before = s.skills.herb.xp;
       ok(s, gather(herb.id));
-      advance(s, HOUR, content);
+      advance(s, HOUR, content, plainRules);
       const perHour = s.skills.herb.xp - before;
       expect(perHour / rate(level, content)).toBeGreaterThan(0.98);
       expect(perHour / rate(level, content)).toBeLessThan(1.02);
@@ -112,7 +112,7 @@ describe('gather', () => {
     withMastery(s, MINT, K.masteryCap);
     const size = K.field.stockBase + K.masteryCap;
     ok(s, gather(MINT));
-    advance(s, HOUR, content);
+    advance(s, HOUR, content, plainRules);
     const perBush = K.gather * 1000 * size + K.field.regrowMs;
     const expected = (HOUR / perBush) * size;
     expect(s.bank[MINT] ?? 0).toBeGreaterThan(expected * 0.99);
@@ -122,7 +122,7 @@ describe('gather', () => {
   it('grows the bush with mastery and earns mastery and pool XP', () => {
     const s = genin();
     ok(s, gather(MINT));
-    advance(s, 60_000, content);
+    advance(s, 60_000, content, plainRules);
     expect(s.mastery[MINT]?.xp).toBeGreaterThan(0);
     expect(s.pools.herb.xp).toBeGreaterThan(0);
     expect(s.bushes[MINT]).toMatchObject({ size: expect.any(Number), carry: 0 });
@@ -138,7 +138,7 @@ describe('gather', () => {
     ok(s, gather(MINT));
     const size = K.field.stockBase + 1;
     const cycle = Math.round(K.gather * 1000 * (1 - 2 * K.gearFx.sickle));
-    advance(s, cycle * size, content);
+    advance(s, cycle * size, content, plainRules);
     expect(s.bank[MINT]).toBe(size);
   });
 });
@@ -148,7 +148,7 @@ describe('craft', () => {
     const s = genin();
     stocked(s, { [MINT]: 5, 'core:water': 3 });
     ok(s, craft(ANTIDOTE));
-    advance(s, K.craft * 1000, content);
+    advance(s, K.craft * 1000, content, plainRules);
     expect(s.bank[MINT]).toBe(3);
     expect(s.bank['core:water']).toBe(2);
     expect(s.bank[ANTIDOTE]).toBeGreaterThanOrEqual(2);
@@ -168,7 +168,7 @@ describe('craft', () => {
       for (const i of recipe.ingredients) s.bank[i.item] = BIG;
       const before = s.skills[recipe.skill].xp;
       ok(s, craft(id));
-      advance(s, HOUR, content);
+      advance(s, HOUR, content, plainRules);
       const crafts = s.counters['actions.craft'] ?? 0;
       expect(crafts).toBe(HOUR / (K.craft * 1000));
       const perHour = s.skills[recipe.skill].xp - before;
@@ -190,7 +190,7 @@ describe('craft', () => {
     for (const i of recipe.ingredients) s.bank[i.item] = BIG;
     const crafts = 5000;
     ok(s, craft(ANTIDOTE));
-    advance(s, crafts * K.craft * 1000, content);
+    advance(s, crafts * K.craft * 1000, content, plainRules);
     expect(s.counters['actions.craft']).toBe(crafts);
     const bonus = (s.bank[recipe.output.item] ?? 0) - crafts * recipe.output.n;
     expect(bonus / crafts).toBeGreaterThan(0.5 - 0.03);
@@ -205,7 +205,7 @@ describe('craft', () => {
       s.bank[MINT] = BIG;
       s.bank['core:water'] = BIG;
       ok(s, craft(ANTIDOTE));
-      advance(s, crafts * K.craft * 1000, content);
+      advance(s, crafts * K.craft * 1000, content, plainRules);
       return ((s.bank[ANTIDOTE] ?? 0) - crafts * 2) / crafts;
     };
     expect(rateAt(null, 100)).toBe(0);
@@ -220,7 +220,7 @@ describe('craft', () => {
     s.bank['core:water'] = BIG;
     const crafts = 10_000;
     ok(s, craft(ANTIDOTE));
-    advance(s, crafts * K.craft * 1000, content);
+    advance(s, crafts * K.craft * 1000, content, plainRules);
     expect(s.counters['actions.craft']).toBe(crafts);
     const used = (BIG - (s.bank[MINT] ?? 0)) / 2;
     const kept = 1 - used / crafts;
@@ -236,7 +236,7 @@ describe('craft', () => {
     stocked(s, { 'core:rice': 20, 'core:salt': 10 });
     ok(s, craft('core:onihiri'));
     const interval = Math.round((K.craft * 1000) / (1 + K.gearFx.stations));
-    advance(s, interval, content);
+    advance(s, interval, content, plainRules);
     expect(s.counters['actions.craft']).toBe(1);
   });
 
@@ -244,7 +244,7 @@ describe('craft', () => {
     const s = genin();
     stocked(s, { [MINT]: 4, 'core:water': 5 });
     ok(s, craft(ANTIDOTE));
-    advance(s, 60_000, content);
+    advance(s, 60_000, content, plainRules);
     expect(s.counters['actions.craft']).toBe(2);
     expect(s.slots[0]?.action).toBeNull();
     expect(stops(s)).toContainEqual(
@@ -258,7 +258,7 @@ describe('craft', () => {
     const w = genin();
     stocked(w, { [MINT]: 40, 'core:water': 1 });
     ok(w, craft(ANTIDOTE));
-    advance(w, 60_000, content);
+    advance(w, 60_000, content, plainRules);
     expect(stops(w)).toContainEqual(expect.objectContaining({ missing: 'core:water' }));
   });
 
@@ -289,7 +289,7 @@ describe('A2: determinism and split-invariance', () => {
   for (const share of [1000, 500]) {
     it(`share ${share}: gather (with a regrow) and a craft that runs out`, () => {
       const whole = scenario(share);
-      advance(whole, TOTAL, content);
+      advance(whole, TOTAL, content, plainRules);
       const expected = serialize(whole);
       // The run really covered a regrow and a stop for lack of ingredients.
       expect(whole.bank[MINT] ?? 0).toBeGreaterThan(0);
@@ -297,7 +297,8 @@ describe('A2: determinism and split-invariance', () => {
       expect(serialize(scenario(share))).toBe(serialize(scenario(share)));
       for (const chunk of CHUNKS) {
         const s = scenario(share);
-        for (let left = TOTAL; left > 0; left -= chunk) advance(s, Math.min(chunk, left), content);
+        for (let left = TOTAL; left > 0; left -= chunk)
+          advance(s, Math.min(chunk, left), content, plainRules);
         expect(serialize(s)).toBe(expected);
       }
     });
@@ -305,7 +306,7 @@ describe('A2: determinism and split-invariance', () => {
 
   it('covers a bush regrow in the one-slot run', () => {
     const s = scenario(1000);
-    advance(s, TOTAL, content);
+    advance(s, TOTAL, content, plainRules);
     const herbs = s.bank[MINT] ?? 0;
     // Without any pause the 60 s run would hold 24 + 4 herbs.
     expect(herbs).toBeLessThan(4 + TOTAL / (K.gather * 1000) - 1);
@@ -330,7 +331,7 @@ describe('A6: tonics', () => {
     const gains: number[] = [];
     for (let i = 0; i < 42; i++) {
       const before = s.skills.med.xp;
-      advance(s, K.meditate * 1000, content);
+      advance(s, K.meditate * 1000, content, plainRules);
       gains.push(s.skills.med.xp - before);
     }
     for (let i = 0; i < 40; i++) expect(gains[i]).toBeCloseTo(baseXp * 1.05, 6);
@@ -359,7 +360,7 @@ describe('A6: tonics', () => {
     s.bank[CLEAR_MIND] = 1;
     ok(s, { type: 'item.use', id: CLEAR_MIND });
     ok(s, start('practice', 'core:leaf_whirlwind'));
-    advance(s, 30_000, content);
+    advance(s, 30_000, content, plainRules);
     expect(s.counters['actions.practice']).toBeGreaterThan(5);
     expect(s.buffs[CLEAR_MIND]?.charges).toBe(40);
     expect(getMod(s, 'xp.skill.tai', content).parts).toEqual([]);
@@ -367,16 +368,20 @@ describe('A6: tonics', () => {
 
   it('the elements tonic covers each of the five natures and spends a charge per action', () => {
     const s = genin();
+    withNatures(s, 'katon', 'futon', 'raiton');
     const tonic = 'core:tonik_stykhii';
     s.bank[tonic] = 1;
     ok(s, { type: 'item.use', id: tonic });
     for (const nature of ['katon', 'futon', 'raiton', 'doton', 'suiton']) {
-      expect(getMod(s, `xp.skill.${nature}`, content).parts).toHaveLength(1);
+      const fromTonic = getMod(s, `xp.skill.${nature}`, content).parts.filter(
+        (p) => typeof p.source !== 'string' && p.source.kind === 'item',
+      );
+      expect(fromTonic).toHaveLength(1);
     }
     expect(getMod(s, 'xp.skill.tai', content).parts).toHaveLength(0);
     refreshUnlocks(s, content, true);
     ok(s, start('practice', 'core:nature_transformation_burn_a_leaf'));
-    advance(s, 20_000, content);
+    advance(s, 20_000, content, plainRules);
     const done = s.counters['actions.practice'] ?? 0;
     expect(done).toBeGreaterThan(0);
     expect(s.buffs[tonic]?.charges).toBe(40 - done);
@@ -547,7 +552,7 @@ describe('A9: training gear', () => {
     geared.gear['core:trenuvalni_manekeny'] = 3;
     for (const s of [plain, geared]) {
       ok(s, start('practice', 'core:leaf_whirlwind'));
-      advance(s, 60_000, content);
+      advance(s, 60_000, content, plainRules);
     }
     expect(geared.skills.tai.xp / plain.skills.tai.xp).toBeCloseTo(1 + 3 * K.gearFx.mannequin, 6);
   });
@@ -560,7 +565,7 @@ describe('A11: a scripted run from genin with 500 ryo', () => {
     const buy = (item: string, n: number) => ok(s, { type: 'shop.buy', item, n });
     const run = (cmd: Command, ms: number) => {
       ok(s, cmd);
-      advance(s, ms, content);
+      advance(s, ms, content, plainRules);
     };
     // Herbs for everything, then the water, oil, rice and salt the herbs do not cover.
     run(gather(MINT), 15 * 60_000);
@@ -591,15 +596,15 @@ describe('A12: saving', () => {
     s.gear[SICKLE] = 1;
     ok(s, { type: 'item.use', id: CLEAR_MIND });
     ok(s, gather(MINT));
-    advance(s, 20_000, content);
+    advance(s, 20_000, content, plainRules);
     const text = serialize(s, 5);
     const back = deserialize(text, content);
     expect(serialize(back, 5)).toBe(text);
     expect(back.buffs).toEqual(s.buffs);
     expect(back.gear).toEqual({ [SICKLE]: 1 });
     expect(back.bushes).toEqual(s.bushes);
-    advance(s, 30_000, content);
-    advance(back, 30_000, content);
+    advance(s, 30_000, content, plainRules);
+    advance(back, 30_000, content, plainRules);
     expect(serialize(back)).toBe(serialize(s));
   });
 
@@ -658,7 +663,7 @@ describe('A12: saving', () => {
     ok(state, { type: 'action.stop', slot: 1 });
     ok(state, gather(MINT));
     const size = K.field.stockBase + 1;
-    advance(state, K.gather * 1000 * size, content);
+    advance(state, K.gather * 1000 * size, content, plainRules);
     expect(state.bank[MINT]).toBe(size);
   });
 

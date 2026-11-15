@@ -19,15 +19,19 @@
 
   const ref = $derived(actionRef(info));
   const slotIndex = $derived(
-    game.state.slots.findIndex((s) => s.action?.kind === info.kind && s.action.id === info.id),
+    game.read((gs) =>
+      gs.slots.findIndex((s) => s.action?.kind === info.kind && s.action.id === info.id),
+    ),
   );
   const running = $derived(slotIndex >= 0);
   /** How far through the current cycle the running action is, 0..1. */
-  const cycle = $derived.by(() => {
-    const slot = game.state.slots[slotIndex];
-    if (!slot) return 0;
-    return Math.min(1, slot.progress / (info.intervalMs * SHARE_FULL));
-  });
+  const cycle = $derived.by(() =>
+    game.read((gs) => {
+      const slot = gs.slots[slotIndex];
+      if (!slot) return 0;
+      return Math.min(1, slot.progress / (info.intervalMs * SHARE_FULL));
+    }),
+  );
 
   function toggle(): void {
     const result = running

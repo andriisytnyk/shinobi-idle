@@ -111,7 +111,8 @@
     "Верхів'я ріки": "verkhivia_riky"
   },
   "quest": {
-    "Випуск": "graduation"
+    "Випуск": "graduation",
+    "Дошка місій": "mission_board"
   },
   "exam": {
     "Іспит на Геніна": "genin_exam"

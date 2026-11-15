@@ -16,8 +16,8 @@
     "group": "nin",
     "activity": "tech",
     "unlockReq": {
-      "t": "rank",
-      "rank": "genin"
+      "t": "nature",
+      "nature": "katon"
     }
   },
   {
@@ -25,8 +25,8 @@
     "group": "nin",
     "activity": "tech",
     "unlockReq": {
-      "t": "rank",
-      "rank": "genin"
+      "t": "nature",
+      "nature": "futon"
     }
   },
   {
@@ -34,8 +34,8 @@
     "group": "nin",
     "activity": "tech",
     "unlockReq": {
-      "t": "rank",
-      "rank": "genin"
+      "t": "nature",
+      "nature": "raiton"
     }
   },
   {
@@ -43,8 +43,8 @@
     "group": "nin",
     "activity": "tech",
     "unlockReq": {
-      "t": "rank",
-      "rank": "genin"
+      "t": "nature",
+      "nature": "doton"
     }
   },
   {
@@ -52,8 +52,8 @@
     "group": "nin",
     "activity": "tech",
     "unlockReq": {
-      "t": "rank",
-      "rank": "genin"
+      "t": "nature",
+      "nature": "suiton"
     }
   },
   {

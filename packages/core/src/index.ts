@@ -1,4 +1,7 @@
 export * from './actions.ts';
+export * from './athletics.ts';
+export * from './checkpoints.ts';
+export * from './meditation.ts';
 export * from './bank.ts';
 export * from './combat/index.ts';
 export * from './counters.ts';
@@ -15,6 +18,7 @@ export * from './shop.ts';
 export * from './formulas.ts';
 export * from './items.ts';
 export * from './mod.ts';
+export * from './natures.ts';
 export * from './modifiers.ts';
 export * from './offline.ts';
 export * from './progression.ts';

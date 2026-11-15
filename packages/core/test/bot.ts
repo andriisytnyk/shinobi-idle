@@ -23,9 +23,8 @@ function candidates(state: GameState): Candidate[] {
   for (const p of content.practices) {
     out.push({ skill: 'med', kind: 'meditate', id: p.id, rate: rate(p.level, content) });
   }
-  for (const o of content.obstacles) {
-    out.push({ skill: 'ath', kind: 'obstacle', id: o.id, rate: rate(o.level, content) });
-  }
+  // The course runs whatever is built; the bot builds the free obstacle of slot 1 first.
+  out.push({ skill: 'ath', kind: 'course', id: 'ath', rate: rate(1, content) });
   return out.sort((a, b) => b.rate - a.rate);
 }
 
@@ -45,6 +44,11 @@ export interface Run {
  */
 export function greedyToGenin(state: GameState, limitMinutes = 240): Run {
   const step = 5000;
+  dispatch(
+    state,
+    { type: 'athletics.build', slot: 1, obstacle: 'core:strybky_po_dakhakh' },
+    content,
+  );
   while (state.player.rank === 'student' && state.now < limitMinutes * 60_000) {
     const quest = state.quests['core:graduation'];
     // The sensei test is the last step of the chain; the bot takes it once the first four are done.

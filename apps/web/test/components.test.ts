@@ -177,7 +177,7 @@ describe('skill page', () => {
     game.replaceState(fresh('student'));
     const body = html(SkillPage, { id: 'katon' });
     expect(body).toContain('data-locked');
-    expect(body).toContain('Ранг: Генін');
+    expect(body).toContain('Природа чакри:');
   });
 });
 
@@ -302,7 +302,7 @@ describe('A6: locked skills in the sidebar', () => {
     let body = html(SkillList, {});
     const katon = new RegExp('data-skill="katon"[\\s\\S]*?</li>').exec(body)?.[0] ?? '';
     expect(katon).toContain('Навичка закрита');
-    expect(katon).toContain('Ранг: Генін');
+    expect(katon).toContain('Природа чакри:');
     expect(body).toContain('data-skill="tai"');
 
     settings.hideLocked = true;
@@ -312,12 +312,21 @@ describe('A6: locked skills in the sidebar', () => {
     expect(body).toContain('data-skill="tai"');
   });
 
-  it('open up once the rank is reached', () => {
+  it('keep the nature skills shut at genin until the nature is owned, and mark the native one', () => {
+    const row = (body: string, skill: string) =>
+      new RegExp(`data-skill="${skill}"[\\s\\S]*?</li>`).exec(body)?.[0] ?? '';
     game.replaceState(fresh('genin'));
-    const body = html(SkillList, {});
-    expect(new RegExp('data-skill="katon"[\\s\\S]*?</li>').exec(body)?.[0]).not.toContain(
-      'data-lock',
-    );
+    let body = html(SkillList, {});
+    expect(row(body, 'katon')).toContain('data-lock');
+    expect(body).not.toContain('data-native');
+
+    const state = fresh('genin');
+    dispatch(state, { type: 'nature.choose', nature: 'katon' }, content);
+    game.replaceState(state);
+    body = html(SkillList, {});
+    expect(row(body, 'katon')).not.toContain('data-lock');
+    expect(row(body, 'katon')).toContain('data-native');
+    expect(row(body, 'futon')).toContain('data-lock');
   });
 });
 

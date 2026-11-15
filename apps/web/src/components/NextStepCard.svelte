@@ -4,9 +4,10 @@
   import { nextStep } from '../lib/next-step.ts';
   import { game } from '../lib/store.ts';
   import EntityLink from './EntityLink.svelte';
+  import NatureOffer from './NatureOffer.svelte';
   import QuestObjective from './QuestObjective.svelte';
 
-  const step = $derived(nextStep(game.state, content));
+  const step = $derived(game.read((gs) => nextStep(gs, content)));
 </script>
 
 {#if step}
@@ -17,6 +18,7 @@
     <a class="go" href={step.target} data-go>{t('next.go')}</a>
   </section>
 {:else}
+  <NatureOffer />
   <p class="empty">{t('next.done')}</p>
 {/if}
 

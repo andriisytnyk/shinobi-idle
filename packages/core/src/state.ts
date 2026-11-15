@@ -3,6 +3,7 @@ import type { CombatState, LoadoutState, PouchState, WoundState } from './combat
 import type { EntityRef } from './entity.ts';
 import type { GameEvent } from './events.ts';
 import { createStreams, type RngStreams } from './rng.ts';
+import type { TeamNatures } from './natures.ts';
 import { updateQuests } from './quests.ts';
 import { ensurePouch } from './combat/pouch.ts';
 import { refreshUnlocks } from './unlocks.ts';
@@ -36,6 +37,13 @@ export interface QuestProgress {
   done: boolean;
 }
 
+/** What one practice has earned and the player has bought: unspent Insights and Enlightenments, and levels bought by modifier (`insight.0`, `enlight.2`). */
+export interface MeditationEntry {
+  insight: number;
+  enlight: number;
+  bought: Record<string, number>;
+}
+
 export interface GameState {
   /** Save format version. */
   v: number;
@@ -66,6 +74,12 @@ export interface GameState {
   bushes: Record<string, { stock: number; size: number; carry: number }>;
   /** Training gear owned: tiers bought, by gear line id. */
   gear: Record<string, number>;
+  /** Meditation: Insights and Enlightenments earned and the levels bought, by practice id. */
+  meditation: Record<string, MeditationEntry>;
+  /** The Athletics course: the obstacle built in each slot, by slot number. */
+  course: Record<string, string>;
+  /** The rival's and Aya's natures, fixed when the native nature is chosen; null before. */
+  team: TeamNatures | null;
   /** The pinned goal shown in the meta panel. */
   goal: EntityRef | null;
   /** The techniques taken into a fight, the signature and the saved loadouts. */
@@ -80,7 +94,7 @@ export interface GameState {
   events: GameEvent[];
 }
 
-export const STATE_VERSION = 7;
+export const STATE_VERSION = 9;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
@@ -114,6 +128,9 @@ export function createState(seed: number, content: ContentDb): GameState {
     pouch: { slots: [], medic: null },
     wounds: { stacks: 0, left: 0 },
     seen: {},
+    meditation: {},
+    course: {},
+    team: null,
     goal: null,
     events: [],
   };

@@ -6,6 +6,8 @@ import {
   type SkillId,
 } from '@shinobi/content';
 import { rebalanceShares } from './actions.ts';
+import { COURSE_ID, COURSE_KIND } from './athletics.ts';
+import { tonicCharges } from './buffs.ts';
 import { parseFight } from './combat/fight-parse.ts';
 import { secMs } from './combat/numbers.ts';
 import { pouchUse } from './combat/fight-items.ts';
@@ -24,8 +26,11 @@ import { woundIntervalMs } from './combat/wounds.ts';
 import { entryOf, fightTarget, opSteps } from './combat/zones.ts';
 import type { EntityKind } from './entity.ts';
 import { emit } from './events.ts';
-import { MS_PER_HOUR, MS_PER_SECOND, masteryLevel, poolCapacity } from './formulas.ts';
+import { bushSize } from './field.ts';
+import { MS_PER_HOUR, MS_PER_SECOND, poolCapacity } from './formulas.ts';
+import { maxLevels, parseModRef } from './meditation.ts';
 import { indexOf } from './lookup.ts';
+import { teamFor } from './natures.ts';
 import { RANK_ORDER } from './requirements.ts';
 import { STREAM_NAMES } from './rng.ts';
 import { defaultRules, type Rules } from './rules.ts';
@@ -43,8 +48,8 @@ import { xpAt } from './xp.ts';
 
 type Raw = Record<string, unknown>;
 
-/** Turns a state of version `n` into version `n + 1`. `MIGRATIONS[0]` upgrades v1 to v2. */
-export type Migration = (state: Raw) => Raw;
+/** Turns a state of version `n` into version `n + 1`. `MIGRATIONS[0]` upgrades v1 to v2. Content is there for ids that moved. */
+export type Migration = (state: Raw, content: ContentDb) => Raw;
 
 export const MIGRATIONS: readonly Migration[] = [
   // v1 -> v2: the completed-cycles counter.
@@ -71,7 +76,31 @@ export const MIGRATIONS: readonly Migration[] = [
   (state) => ({ ...state, buffs: {}, gear: {}, bushes: {} }),
   // v5 -> v6: the fight became a self-contained fight state; an old fight in progress restarts.
   (state) => ({ ...state, combat: null }),
-  // v6 -> v7: loadouts, the pouch, Wounds and what the player has seen. The fight carries a pouch,
+  // v6 -> v7: Meditation insights and the Athletics course. A running obstacle becomes a course
+  // lap with that obstacle built where it stands (grandfathered, no price).
+  (state, content) => {
+    const obstacles = indexOf(content).obstacles;
+    const course: Record<string, string> = {};
+    const slots = Array.isArray(state.slots)
+      ? state.slots.map((s: unknown) => {
+          if (!isRecord(s) || !isRecord(s.action) || s.action.kind !== 'obstacle') return s;
+          const obstacle = typeof s.action.id === 'string' ? obstacles.get(s.action.id) : undefined;
+          if (!obstacle) return { ...s, action: null, progress: 0, data: null };
+          course[`${obstacle.slot}`] = obstacle.id;
+          return { ...s, action: { kind: COURSE_KIND, id: COURSE_ID } };
+        })
+      : state.slots;
+    return { ...state, slots, meditation: {}, course };
+  },
+  // v7 -> v8: the team's natures follow from the native nature; a save that has one gets them,
+  // every other genin has none yet and is led to the nature test.
+  (state) => {
+    const natures =
+      isRecord(state.player) && Array.isArray(state.player.natures) ? state.player.natures : [];
+    const native = NATURE_IDS.find((n) => n === natures[0]);
+    return { ...state, team: native ? teamFor(native) : null };
+  },
+  // v8 -> v9: loadouts, the pouch, Wounds and what the player has seen. The fight carries a pouch,
   // technique effects and boss hooks now, so a fight in progress restarts; the loadout rebuilds itself.
   (state) => ({
     ...state,
@@ -305,7 +334,7 @@ export function deserialize(
   for (let v = envelope.v; v < STATE_VERSION; v++) {
     const migrate = MIGRATIONS[v - 1];
     if (!migrate) throw new Error(`No migration from version ${v}`);
-    raw = migrate(raw);
+    raw = migrate(raw, content);
   }
 
   const state = createState(0, content);
@@ -333,6 +362,10 @@ export function deserialize(
       (n, i): n is NatureId =>
         (NATURE_IDS as readonly unknown[]).includes(n) && natures.indexOf(n) === i,
     );
+    state.player.natures = state.player.natures.slice(0, content.balance.K.natures.max);
+    // The team's natures follow from the native nature alone, so they are recomputed, never trusted.
+    const native = state.player.natures[0];
+    state.team = native ? teamFor(native) : null;
   }
 
   const skillXp = isRecord(raw.skills) ? raw.skills : {};
@@ -403,10 +436,32 @@ export function deserialize(
     const step = Math.min(Math.floor(nonNegative(v.step)), quest.steps.length);
     return { step, base: Math.floor(nonNegative(v.base)), done: step >= quest.steps.length };
   });
+  // The Athletics course and Meditation feed modifiers, so they load before what the modifiers bound.
+  state.course = pick(raw.course, (slot, v) => {
+    const obstacle = typeof v === 'string' ? index.obstacles.get(v) : undefined;
+    return obstacle && `${obstacle.slot}` === slot ? obstacle.id : undefined;
+  });
+  state.meditation = pick(raw.meditation, (key, v) => {
+    const practice = index.practices.get(key);
+    if (!practice || !isRecord(v)) return undefined;
+    const bought = pick(v.bought, (ref, levels) => {
+      const parsed = parseModRef(ref);
+      const list =
+        parsed && (parsed.kind === 'insight' ? practice.insightMods : practice.enlightMods);
+      if (!parsed || !list?.[parsed.index] || typeof levels !== 'number') return undefined;
+      const n = Math.min(Math.floor(nonNegative(levels)), maxLevels(parsed.kind, content));
+      return n >= 1 ? n : undefined;
+    });
+    return {
+      insight: Math.floor(nonNegative(v.insight)),
+      enlight: Math.floor(nonNegative(v.enlight)),
+      bought,
+    };
+  });
   state.buffs = pick(raw.buffs, (key, v) => {
     const fx = index.items.get(key)?.fx;
     if (fx?.kind !== 'tonic' || !isRecord(v)) return undefined;
-    const cap = fx.charges * content.balance.K.tonic.capMult;
+    const cap = tonicCharges(state, fx.charges, content, rules) * content.balance.K.tonic.capMult;
     const charges = Math.min(Math.floor(nonNegative(v.charges)), cap);
     return charges >= 1 ? { skill: fx.skill, charges } : undefined;
   });
@@ -420,7 +475,7 @@ export function deserialize(
     if (!index.herbs.has(key) || !isRecord(v)) return undefined;
     const K = content.balance.K;
     const size = Math.floor(nonNegative(v.size));
-    if (size < 1 || size > K.field.stockBase + masteryLevel(state, key, content)) return undefined;
+    if (size < 1 || size > bushSize(state, key, content, rules)) return undefined;
     const stock = Math.min(Math.floor(nonNegative(v.stock)), size);
     const room = (K.field.regrowMs + K.gather * MS_PER_SECOND) * SHARE_FULL;
     const carry = stock === 0 ? Math.min(Math.floor(nonNegative(v.carry)), room) : 0;

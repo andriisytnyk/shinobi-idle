@@ -15,7 +15,8 @@ export function entityName(ref: EntityRef): string {
 
 /** Localized description, or `null` when the entity has none yet. */
 export function entityDesc(ref: EntityRef): string | null {
-  const key = localeKey(localeKind(ref.kind), ref.id, 'desc');
+  // A map cell carries a short note instead of a description.
+  const key = localeKey(localeKind(ref.kind), ref.id, ref.kind === 'cell' ? 'note' : 'desc');
   return hasKey(key) ? t(key) : null;
 }
 
@@ -34,7 +35,7 @@ const ACTION_ENTITY: Readonly<Record<string, EntityKind>> = {
   practice: 'technique',
   drill: 'exercise',
   meditate: 'practice',
-  obstacle: 'obstacle',
+  course: 'skill',
   fight: 'enemy',
   senseiTest: 'exam',
 };

@@ -13,12 +13,14 @@
   import SimplePage from './SimplePage.svelte';
 
   const exam = $derived(examFor(content, 'genin'));
-  const rank = $derived(game.state.player.rank);
+  const rank = $derived(game.read((gs) => gs.player.rank));
   const passed = $derived(rank !== 'student');
-  const checklist = $derived(exam ? evalReq(game.state, exam.checklist, content) : null);
+  const checklist = $derived(
+    game.read((gs) => (exam ? evalReq(gs, exam.checklist, content) : null)),
+  );
 
   /** The sensei test, while it runs, as a progress action. */
-  const test = $derived(senseiTestInfo(game.state, game.rules, content));
+  const test = $derived(game.read((gs) => senseiTestInfo(gs, game.rules, content)));
 
   let error = $state<string | null>(null);
 
