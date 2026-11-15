@@ -101,7 +101,7 @@ export function fightRow(entry: Enemy | Boss, o: FightReportOptions): FightRow {
   const requestedLevel = o.level ?? entry.cl;
   const level = Math.min(K.cap, Math.max(1, requestedLevel));
   const rank = o.rank ?? rankForLevel(level, content);
-  const natures = [...(o.natures ?? [defaultNature()])];
+  const natures = [...(o.natures ?? [defaultNature(content)])];
   const pouch = o.pouch ?? 'none';
   const food = o.food ?? (boss ? 'model' : 'none');
 

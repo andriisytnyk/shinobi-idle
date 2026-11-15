@@ -81,7 +81,7 @@ describe('pnpm sim fight', () => {
       seed: 3,
       level: entry.cl,
       rank: 'genin',
-      natures: [defaultNature()],
+      natures: [defaultNature(content)],
     });
     equipFor(state, entry.id, content, defaultRules, { pouch: 'shop', food: 'none' }, entry.cl);
     expect(state.loadouts.active.length).toBeGreaterThan(0);
@@ -104,7 +104,7 @@ describe('pnpm sim fight', () => {
   it('stocks the shop pouch through the engine even with village gating, and none when asked', () => {
     const entry = content.enemies[6];
     if (!entry) throw new Error('no enemies in content');
-    const base = { seed: 1, level: 25, rank: 'genin' as const, natures: [defaultNature()] };
+    const base = { seed: 1, level: 25, rank: 'genin' as const, natures: [defaultNature(content)] };
     const shop = buildCharacter(content, base);
     equipFor(shop, entry.id, content, defaultRules, { pouch: 'shop', food: 'none' }, 25);
     expect(shop.pouch.slots.some((s) => s.id !== '' && s.n > 0)).toBe(true);
@@ -200,7 +200,7 @@ describe('pnpm sim crafts', () => {
 });
 
 describe('fighter bot', () => {
-  const start = (seed: number) => buildGeninStart(content, seed, 500, [defaultNature()]);
+  const start = (seed: number) => buildGeninStart(content, seed, 500, [defaultNature(content)]);
 
   it('gains combat XP every hour over three game hours and never gets stuck', () => {
     const result = runHourly(createFighterBot(), { seed: 1, hours: 3, initialState: start(1) });

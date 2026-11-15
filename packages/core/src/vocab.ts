@@ -18,6 +18,11 @@ export function isAcademyRank(content: ContentDb, rank: string): boolean {
   return content.playerRanks[rankIndex(content, rank)]?.academy === true;
 }
 
+/** The first rank that is not an Academy rank (the graduation), or null when every rank is one. */
+export function graduateRank(content: ContentDb): string | null {
+  return indexOf(content).graduateRank;
+}
+
 /** The currency that has the role (`money`, `reputation`, `intel`), or null when none has it. */
 export function currencyOf(content: ContentDb, role: string): string | null {
   return indexOf(content).currencyByRole.get(role) ?? null;

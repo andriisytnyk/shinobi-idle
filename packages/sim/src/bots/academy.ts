@@ -1,8 +1,10 @@
 import {
-  COURSE_ID,
   COURSE_KIND,
+  courseSkill,
   evalReq,
   examFor,
+  graduateRank,
+  isAcademyRank,
   listSkillActions,
   type ActionInfo,
   type Command,
@@ -21,7 +23,10 @@ const leaves = (r: ReqResult): ReqResult[] =>
 export const academyBot: Bot = {
   name: 'academy',
   description: 'Академія: від нового збереження до Геніна за квестом «Випуск».',
-  goal: { label: 'Генін', reached: (state) => state.player.rank !== 'student' },
+  goal: {
+    label: 'Генін',
+    reached: (state, content) => !isAcademyRank(content, state.player.rank),
+  },
 
   decide({ state, content, rules }: BotContext): Command[] | null {
     const quest = content.quests.find((q) => {
@@ -50,12 +55,17 @@ export const academyBot: Bot = {
       const target = skills.reduce((a, b) => (b.current < a.current ? b : a));
       if (target.req.t !== 'skill') return null;
       // Athletics runs the course: the first time, the free obstacle of slot 1 has to be built.
-      if (target.req.skill === 'ath' && Object.keys(state.course).length === 0) {
+      const course = courseSkill(content);
+      if (
+        course !== null &&
+        target.req.skill === course &&
+        Object.keys(state.course).length === 0
+      ) {
         const free = content.obstacles.find((o) => o.slot === content.balance.K.athletics.freeSlot);
         if (!free) return null;
         return [
           { type: 'athletics.build', slot: free.slot, obstacle: free.id },
-          ...(start(COURSE_KIND, COURSE_ID) ?? []),
+          ...(start(COURSE_KIND, course) ?? []),
         ];
       }
       let best: ActionInfo | null = null;
@@ -67,9 +77,15 @@ export const academyBot: Bot = {
 
     const rank = unmet.find((r) => r.req.t === 'rank')?.req;
     if (rank?.t === 'rank' && running?.kind !== 'senseiTest') {
-      const exam = examFor(content, 'genin');
-      if (rank.rank === 'genin' && exam && evalReq(state, exam.checklist, content).met) {
-        return [{ type: 'exam.genin.start' }];
+      const graduation = graduateRank(content);
+      const exam = graduation === null ? undefined : examFor(content, graduation);
+      if (
+        graduation !== null &&
+        rank.rank === graduation &&
+        exam &&
+        evalReq(state, exam.checklist, content).met
+      ) {
+        return [{ type: 'exam.start', rank: graduation }];
       }
     }
     return null;

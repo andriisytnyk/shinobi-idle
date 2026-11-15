@@ -1,8 +1,8 @@
-import { ukLocale } from '@shinobi/content';
 import { runBench } from './bench.ts';
 import type { Bot } from './bot.ts';
 import { bots } from './bots/index.ts';
 import { runCraftsCli, runFightCli, runFighterCli } from './cliSim.ts';
+import { buildEnvironment, parsePacks, type Environment } from './env.ts';
 import { buildReport, type Report } from './report.ts';
 import type { Milestone } from './runner.ts';
 
@@ -16,8 +16,6 @@ export interface CliResult {
   err: string[];
 }
 
-const t = (key: string): string => ukLocale[key] ?? key;
-
 const clock = (ms: number): string => {
   const total = Math.round(ms / 1000);
   const m = Math.floor(total / 60);
@@ -26,7 +24,7 @@ const clock = (ms: number): string => {
 
 const minutes = (n: number): string => `${n.toFixed(1)} хв`;
 
-function describe(m: Milestone): string {
+function describe(m: Milestone, t: (key: string) => string): string {
   switch (m.type) {
     case 'skill':
       return `${t(`skill.${m.id}.name`)} ${m.level}`;
@@ -39,7 +37,7 @@ function describe(m: Milestone): string {
   }
 }
 
-function formatReport(report: Report): string[] {
+function formatReport(report: Report, t: (key: string) => string): string[] {
   const out = [`Бот: ${report.bot}, сіди: ${report.seeds.join(', ')}`];
   if (report.minutes) {
     const { min, median, max } = report.minutes;
@@ -51,7 +49,7 @@ function formatReport(report: Report): string[] {
   }
   const run = report.median;
   out.push(`\nХронологія медіанного прогону (сід ${run.seed}):`);
-  for (const m of run.timeline) out.push(`  ${clock(m.at)}  ${describe(m)}`);
+  for (const m of run.timeline) out.push(`  ${clock(m.at)}  ${describe(m, t)}`);
   out.push('\nXP за годину за навичками:');
   const rows = Object.entries(run.xpPerHour).sort((a, b) => b[1] - a[1]);
   for (const [skill, perHour] of rows) {
@@ -78,7 +76,14 @@ function wholeOption(args: string[], name: string, fallback: number): number | n
 }
 
 /** Runs one CLI invocation and returns what it would print and its exit code. */
-export function runCli(args: string[], registry: Readonly<Record<string, Bot>> = bots): CliResult {
+export function runCli(argv: string[], registry: Readonly<Record<string, Bot>> = bots): CliResult {
+  // `--packs core,testmod` picks the packs the run is played on; every command takes it.
+  const at = argv.indexOf('--packs');
+  const args = at < 0 ? argv : [...argv.slice(0, at), ...argv.slice(at + 2)];
+  const parsed = parsePacks(at < 0 ? undefined : argv[at + 1]);
+  if (typeof parsed === 'string') return { code: 1, out: [], err: [parsed] };
+  const env = buildEnvironment(parsed);
+  const t = (key: string): string => env.content.locales.uk[key] ?? key;
   const [command] = args;
   if (!command) {
     return {
@@ -94,14 +99,14 @@ export function runCli(args: string[], registry: Readonly<Record<string, Bot>> =
       ],
     };
   }
-  if (command === 'fight') return runFightCli(args.slice(1));
-  if (command === 'fighter') return runFighterCli(args.slice(1));
-  if (command === 'crafts') return runCraftsCli(args.slice(1));
+  if (command === 'fight') return runFightCli(args.slice(1), env);
+  if (command === 'fighter') return runFighterCli(args.slice(1), env);
+  if (command === 'crafts') return runCraftsCli(args.slice(1), env);
   if (command === 'bench') {
     return {
       code: 0,
       err: [],
-      out: runBench().map(
+      out: runBench(env).map(
         (r) =>
           `${r.label}: ${r.gameHours} ігрових годин за ${r.ms.toFixed(0)} мс ` +
           `(${r.hoursPerSecond.toFixed(0)} ігрових годин/с)`,
@@ -121,8 +126,14 @@ export function runCli(args: string[], registry: Readonly<Record<string, Bot>> =
   if (seed === null || runs === null) {
     return { code: 1, out: [], err: ['--seed і --runs мають бути цілими числами від 1.'] };
   }
-  const report = buildReport(bot, { seed, runs, limitMs: LIMIT_MS });
-  const out = args.includes('--json') ? [JSON.stringify(report, null, 2)] : formatReport(report);
+  const report = buildReport(bot, {
+    seed,
+    runs,
+    limitMs: LIMIT_MS,
+    content: env.content,
+    rules: env.rules,
+  });
+  const out = args.includes('--json') ? [JSON.stringify(report, null, 2)] : formatReport(report, t);
   const err = report.failed
     ? [
         `Збій: бот надсилав відхилені команди (перша причина: ${report.runs.find((r) => r.ended === 'failed')?.firstRejection ?? '?'}).`,

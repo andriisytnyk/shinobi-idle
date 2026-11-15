@@ -1,16 +1,13 @@
-import {
-  NATURE_IDS,
-  type ContentDb,
-  type NatureId,
-  type Req,
-  type SkillId,
-} from '@shinobi/content';
+import { type ContentDb, type NatureId, type Req, type SkillId } from '@shinobi/content';
 import {
   addItem,
   createState,
   dispatch,
   examFor,
+  isAcademyRank,
+  isNature,
   killsKey,
+  moneyOf,
   pouchUse,
   refreshUnlocks,
   syncVillage,
@@ -20,7 +17,7 @@ import {
   type Rank,
   type Rules,
 } from '@shinobi/core';
-import { CHUNIN_FROM_LEVEL, RANK_CHUNIN, RANK_GENIN, RANK_STUDENT } from './constants.ts';
+import { CHUNIN_FROM_LEVEL, chuninRank, geninRank, studentRank } from './constants.ts';
 
 /** Mastery level of every known technique of a yardstick character (the balance model uses 20). */
 export const TYPICAL_MASTERY = 20;
@@ -40,11 +37,9 @@ export interface CharacterOptions {
 
 /** Rank a yardstick character of this level holds: a student up to the Academy cap, a Chunin from `CHUNIN_FROM_LEVEL`. */
 export function rankForLevel(level: number, content: ContentDb): Rank {
-  if (level <= content.balance.K.academyCap) return RANK_STUDENT;
-  return level >= CHUNIN_FROM_LEVEL ? RANK_CHUNIN : RANK_GENIN;
+  if (level <= content.balance.K.academyCap) return studentRank(content);
+  return level >= CHUNIN_FROM_LEVEL ? chuninRank(content) : geninRank(content);
 }
-
-const isNature = (id: string): boolean => (NATURE_IDS as readonly string[]).includes(id);
 
 /** The village buildings the shop's requirements name, with the level each needs. */
 function shopBuildingLevels(req: Req, out: Record<string, number>): void {
@@ -83,7 +78,7 @@ export function buildCharacter(content: ContentDb, o: CharacterOptions): GameSta
   if (native) state.team = teamFor(content, native);
   const level = Math.min(K.cap, Math.max(1, o.level));
   for (const skill of content.skills) {
-    if (isNature(skill.id) && !o.natures.includes(skill.id as NatureId)) continue;
+    if (isNature(content, skill.id) && !o.natures.includes(skill.id as NatureId)) continue;
     state.skills[skill.id] = { xp: xpAt(level) };
   }
   refreshUnlocks(state, content, true);
@@ -92,7 +87,7 @@ export function buildCharacter(content: ContentDb, o: CharacterOptions): GameSta
   for (const tech of content.techniques) {
     if (state.known[tech.id] && tech.rank !== null) state.mastery[tech.id] = { xp: xpAt(mastery) };
   }
-  state.currencies.ryo = o.ryo ?? 0;
+  state.currencies[moneyOf(content)] = o.ryo ?? 0;
   state.events = [];
   return state;
 }
@@ -114,10 +109,10 @@ export function buildGeninStart(
   ryo: number,
   natures: readonly NatureId[] = [],
 ): GameState {
-  const exam = examFor(content, RANK_GENIN);
+  const exam = examFor(content, geninRank(content));
   const needs = exam ? examSkillLevels(exam.checklist) : {};
   const state = createState(seed, content);
-  state.player.rank = RANK_GENIN;
+  state.player.rank = geninRank(content);
   state.player.natures = [...natures];
   const native = natures[0];
   if (native) state.team = teamFor(content, native);
@@ -126,7 +121,7 @@ export function buildGeninStart(
   }
   refreshUnlocks(state, content, true);
   grantShopBuildings(state, content);
-  state.currencies.ryo = ryo;
+  state.currencies[moneyOf(content)] = ryo;
   state.events = [];
   return state;
 }
@@ -137,8 +132,9 @@ export function buildGeninStart(
  * requirement does not hold is simply refused.
  */
 export function stockFromShop(state: GameState, content: ContentDb, rules: Rules): void {
-  const kept = state.currencies.ryo;
-  state.currencies.ryo = SHOPPING_RYO;
+  const money = moneyOf(content);
+  const kept = state.currencies[money] ?? 0;
+  state.currencies[money] = SHOPPING_RYO;
   const stack = content.balance.K.pouchStack;
   for (const entry of content.shop) {
     const item = content.items.find((i) => i.id === entry.item);
@@ -146,7 +142,7 @@ export function stockFromShop(state: GameState, content: ContentDb, rules: Rules
     const n = item.medic === undefined ? stack : 1;
     dispatch(state, { type: 'shop.buy', item: entry.item, n }, content, rules);
   }
-  state.currencies.ryo = kept;
+  state.currencies[money] = kept;
 }
 
 export type PouchMode = 'none' | 'shop';
@@ -200,7 +196,7 @@ export function equipFor(
     bounty: 0,
   });
   book.wins++;
-  if (state.player.rank === RANK_STUDENT) return;
+  if (isAcademyRank(content, state.player.rank)) return;
   if (equip.pouch === 'shop') stockFromShop(state, content, rules);
   if (equip.food === 'model') {
     const food = modelFood(level, content);
