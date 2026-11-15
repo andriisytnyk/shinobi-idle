@@ -661,8 +661,8 @@ describe('the view the AI gets', () => {
     expect(view?.enemies[0]?.knownTraits).toEqual(['armor']);
     expect(view?.enemies[0]?.workingTraits).toEqual(['armor']);
     expect(view?.enemies[0]?.hpShare).toBe(1);
-    // The view is a copy: changing it does not touch the fight.
-    (view?.techniques[0]?.tech.tags as string[]).push('x');
+    // The view is a frozen copy: changing it is refused and never touches the fight.
+    expect(() => (view?.techniques[0]?.tech.tags as string[]).push('x')).toThrow();
     expect(fight.kit.techniques[0]?.tags).not.toContain('x');
   });
 
