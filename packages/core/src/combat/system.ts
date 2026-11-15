@@ -379,6 +379,27 @@ export const combatSystem: System = {
       report(state, c);
       const result = fightOutcome(c.fight);
       if (result === 'ongoing') return;
+      if (result === 'void') {
+        // A hook of a pack failed: no win, no loss, no loot, no Wound. A new fight starts at once, without the hook.
+        emit(state, {
+          type: 'fightVoided',
+          enemy: c.enemy,
+          pack: c.fight.fault?.pack ?? '',
+          hook: c.fight.fault?.hook ?? '',
+        });
+        c.carry += c.fight.t - c.fight.tally.lastUseAt;
+        const p = c.fight.player;
+        c.fight = startFight(
+          state,
+          entry,
+          content,
+          rules,
+          { hp: p.hp, chakra: p.chakra, stamina: p.stamina },
+          c.fight.encounter.support,
+        );
+        c.paid = {};
+        continue;
+      }
       if (result === 'timeout') {
         // A fight that ran out of time pays nothing and costs nothing: a new one starts at once.
         noteFight(state, c.enemy, 'timeout', content);

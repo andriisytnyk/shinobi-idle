@@ -34,6 +34,11 @@ const timerOf = (ms: number) => ({ progress: 0, need: needOf(ms) });
 
 // ---------- capabilities: numbers a special publishes for the trait it strengthens ----------
 
+/** Publishes a number once: a body that already has it (a fresh start, a load) keeps it. */
+const put = (c: Combatant, key: string, value: number): void => {
+  if (c.data[key] === undefined) c.data[key] = value;
+};
+
 /** The caster's numbers a heavy-cast boss publishes (ms and a multiplier), read by the Caster trait. */
 const CAST = {
   every: 'caster.everyMs',
@@ -49,31 +54,34 @@ const ILLUSION_EVERY = 'illusionist.everyMs';
 /** A boss whose special is a heavy cast: the Caster trait uses the stronger numbers of the boss. */
 const heavyCast: FightHook = {
   id: 'special:heavyCast',
-  init(ctx, c) {
+  pack: 'core',
+  publish(ctx, c) {
     const fx = ctx.content.balance.K.bossFx.heavyCast;
     if (!fx) return;
-    c.data[CAST.every] = fx.everyMs ?? 0;
-    c.data[CAST.cast] = fx.castMs ?? 0;
-    c.data[CAST.mult] = fx.damageMult ?? 1;
-    c.data[CAST.stun] = fx.stunMs ?? 0;
+    put(c, CAST.every, fx.everyMs ?? 0);
+    put(c, CAST.cast, fx.castMs ?? 0);
+    put(c, CAST.mult, fx.damageMult ?? 1);
+    put(c, CAST.stun, fx.stunMs ?? 0);
   },
 };
 
 /** A boss whose evasion grows as its health falls: the Evasive trait ramps to the boss's number. */
 const evasionByMissingHp: FightHook = {
   id: 'special:evasionByMissingHp',
-  init(ctx, c) {
+  pack: 'core',
+  publish(ctx, c) {
     const fx = ctx.content.balance.K.bossFx.drunkenEvasion;
-    if (fx) c.data[RAMP] = fx.maxMult ?? 1;
+    if (fx) put(c, RAMP, fx.maxMult ?? 1);
   },
 };
 
 /** The Nameless casts illusions faster than an ordinary illusionist. */
 const illusion: FightHook = {
   id: 'special:illusion',
-  init(ctx, c) {
+  pack: 'core',
+  publish(ctx, c) {
     const fx = ctx.content.balance.K.bossFx.illusion;
-    if (fx) c.data[ILLUSION_EVERY] = fx.everyMs ?? 0;
+    if (fx) put(c, ILLUSION_EVERY, fx.everyMs ?? 0);
   },
 };
 
@@ -82,6 +90,7 @@ const illusion: FightHook = {
 /** Evasive: evasion is multiplied, unless the body is bound; a ramping boss replaces the flat factor. */
 const evasive: FightHook = {
   id: 'trait:evasive',
+  pack: 'core',
   stat(ctx, c, stat) {
     if (stat !== 'evasion' || isSuppressed(c, 'evasive')) return 1;
     const flat = trait(ctx.content.balance.K, 'evasive');
@@ -123,6 +132,7 @@ const casterTimer = (ctx: FightCtx, c: Combatant) => {
 /** Caster: every so often winds up a heavy blow; an interrupt or a stun cancels the wind-up. */
 const caster: FightHook = {
   id: 'trait:caster',
+  pack: 'core',
   init(ctx, c) {
     casterTimer(ctx, c);
     c.data['caster.cast'] = 0;
@@ -140,14 +150,11 @@ const caster: FightHook = {
       timer.need = needOf(n.every);
       // A heavy cast of a boss stuns whoever it lands on.
       if (landed && n.stun > 0) {
-        addEffect(ctx.fight.player, {
-          kind: 'modifier',
-          id: 'stun',
-          src: 'special:heavyCast',
-          until: ctx.fight.t + workOf(n.stun),
-          stat: 'speed',
-          op: 'mul',
-          value: 0,
+        // The stun is the stun of the data, for the boss's own time, without the report or a cancelled cast.
+        applyStatusById(ctx, ctx.fight.player, 'stun', 'special:heavyCast', {
+          durationMs: n.stun,
+          refresh: 'replace',
+          silent: true,
         });
       }
     }
@@ -175,6 +182,7 @@ const caster: FightHook = {
 /** Illusionist: every so often tries to cut the player's accuracy; Meditation resists. */
 const illusionist: FightHook = {
   id: 'trait:illusionist',
+  pack: 'core',
   init(ctx, c) {
     const K = ctx.content.balance.K;
     // The Nameless casts faster than an ordinary illusionist.
@@ -217,6 +225,7 @@ function hide(ctx: FightCtx, c: Combatant, src = 'trait:hidden'): void {
 /** Hidden: the player's accuracy is cut for a while and the enemy's first blow is stronger. */
 const hidden: FightHook = {
   id: 'trait:hidden',
+  pack: 'core',
   init(ctx, c) {
     hide(ctx, c);
   },
@@ -236,6 +245,7 @@ const hidden: FightHook = {
 /** Poisoner: a hit may poison the player. */
 const poisoner: FightHook = {
   id: 'trait:poisoner',
+  pack: 'core',
   onAttackHit(ctx, _c, target) {
     if (alive(target) && roll(ctx.fight, trait(ctx.content.balance.K, 'poisonChance'))) {
       applyStatusById(ctx, target, 'poison', 'trait:poisoner');
@@ -255,6 +265,7 @@ function strike(ctx: FightCtx, c: Combatant, damage: number): void {
 /** Wolves: the leader calls the pack back at intervals while he lives. */
 const packRespawn: FightHook = {
   id: 'special:packRespawn',
+  pack: 'core',
   leader: () => true,
   init(ctx, c) {
     c.timers.pack = timerOf(ctx.content.balance.K.bossFx.wolfPack?.everyMs ?? 0);
@@ -278,6 +289,7 @@ const packRespawn: FightHook = {
 function rival(id: string, key: 'rivalDuel' | 'rivalTournament'): FightHook {
   return {
     id,
+    pack: 'core',
     init(ctx, c) {
       const fx = ctx.content.balance.K.bossFx[key];
       if (!fx) return;
@@ -307,6 +319,7 @@ function rival(id: string, key: 'rivalDuel' | 'rivalTournament'): FightHook {
 /** The twins: while both fight, a poison mist hangs over the player. */
 const twins: FightHook = {
   id: 'special:twins',
+  pack: 'core',
   init(ctx, c) {
     const { fight, content } = ctx;
     const K = content.balance.K;
@@ -333,6 +346,7 @@ const twins: FightHook = {
 /** The mist fugitive: hides again at intervals and binds the player in a water prison. */
 const rehide: FightHook = {
   id: 'special:rehide',
+  pack: 'core',
   init(ctx, c) {
     c.timers.rehide = timerOf(ctx.content.balance.K.bossFx.mistRehide?.everyMs ?? 0);
   },

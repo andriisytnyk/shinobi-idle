@@ -137,7 +137,7 @@ const KIT_EFFECTS: readonly KitEffect['kind'][] = [
   'nextCast',
   'reveal',
 ];
-const RESULTS: readonly FightResult[] = ['ongoing', 'victory', 'defeat', 'fled', 'timeout'];
+const RESULTS: readonly FightResult[] = ['ongoing', 'victory', 'defeat', 'fled', 'timeout', 'void'];
 /** The largest multiplier an effect may carry; more would make a timer fill in no time. */
 const MOD_LIMIT = 10;
 
@@ -394,6 +394,9 @@ function parseTally(raw: unknown, v: Vocab): FightTally | null {
     raw.woundMin,
   ];
   if (!scalars.every(nonNeg)) return null;
+  // A style of a skill that is not loaded falls back to the style of basic attacks; with none, there is no fight to read.
+  const style = v.skills.has(raw.style) ? raw.style : v.basicSkill;
+  if (style === null) return null;
   return {
     damage,
     uses,
@@ -405,7 +408,7 @@ function parseTally(raw: unknown, v: Vocab): FightTally | null {
     taken: raw.taken as number,
     time: raw.time as number,
     // A style of a skill that is not loaded falls back to the style of basic attacks.
-    style: (v.skills.has(raw.style) ? raw.style : (v.basicSkill ?? raw.style)) as SkillId,
+    style: style as SkillId,
     lastUseAt: raw.lastUseAt as number,
     masteryWork,
     wounds: raw.wounds as number,
@@ -535,11 +538,16 @@ export function parseFight(raw: unknown, content: ContentDb): FightState | null 
   if (player.phase !== 'cast' && player.cast !== null) return null;
   const w = rng as number[];
   const state: RngState = [w[0] ?? 0, w[1] ?? 0, w[2] ?? 0, w[3] ?? 0];
+  const fault =
+    isRecord(raw.fault) && isStr(raw.fault.pack) && isStr(raw.fault.hook)
+      ? { pack: raw.fault.pack, hook: raw.fault.hook }
+      : undefined;
   return {
     t,
     cap: raw.cap,
     rng: state,
     result: raw.result,
+    ...(fault ? { fault } : {}),
     enemy: raw.enemy,
     encounter,
     spawned: raw.spawned,

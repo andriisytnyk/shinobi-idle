@@ -246,7 +246,8 @@ export interface Encounter {
   support?: TeamSupport[];
 }
 
-export type FightResult = 'ongoing' | 'victory' | 'defeat' | 'fled' | 'timeout';
+/** `void`: a hook of another pack failed and the fight was cut short; it pays and costs nothing. */
+export type FightResult = 'ongoing' | 'victory' | 'defeat' | 'fled' | 'timeout' | 'void';
 
 export interface FightState {
   /** The fight clock in work units. */
@@ -256,6 +257,8 @@ export interface FightState {
   /** The fight's own random stream. */
   rng: RngState;
   result: FightResult;
+  /** The pack and the hook that ended the fight as void. */
+  fault?: { pack: string; hook: string };
   /** Content id of the entry fought. */
   enemy: string;
   encounter: Encounter;
@@ -264,7 +267,7 @@ export interface FightState {
   player: Combatant;
   enemies: Combatant[];
   kit: PlayerKit;
-  /** string tier of the player. */
+  /** Rank tier of the player. */
   tier: number;
   /** The player's natures, first one first (a `wheel` enemy counters the first). */
   natures: string[];
@@ -436,6 +439,15 @@ export interface AttackPlan {
  */
 export interface FightHook {
   id: string;
+  /** The pack that registered it; `core` marks the hooks that may fail loudly, any other is contained (see `fight-guard.ts`). Absent: the prefix of the id. */
+  pack?: string;
+  /**
+   * Numbers this hook derives for its body from data and publishes as `c.data` keys for other hooks
+   * to read. Runs for every hook of the body, before any `init`, whenever the body is first read: for
+   * a fresh body and for one loaded from a save. Must be idempotent (write a key only when it is
+   * missing) and must not touch the fight otherwise.
+   */
+  publish?(ctx: FightCtx, c: Combatant): void;
   /** A body has appeared: add effects, timers and data. */
   init?(ctx: FightCtx, c: Combatant): void;
   /** A multiplier on one of the combatant's stats, computed from its current state; 1 for none. */

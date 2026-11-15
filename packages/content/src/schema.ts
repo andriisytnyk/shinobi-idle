@@ -291,6 +291,8 @@ export const itemFxSchema = z.discriminatedUnion('kind', [
     /** The status it puts on the body, and the rank whose duration (the status's `byRank` row) it lasts. */
     status: statusId.optional(),
     rank: rankId.optional(),
+    /** What the powder does to a stun already there: the rule belongs to the source of the application. */
+    refresh: z.enum(['replace', 'longest', 'strongest']).optional(),
   }),
   /** Raises the XP of a skill (or of the five natures) for a number of completed actions. */
   z.strictObject({
@@ -1168,6 +1170,7 @@ export const balanceParamsSchema = z.object({
     hitEven: z.number(),
     fightCapMs: z.number().int(),
     maxEnemies: z.number().int(),
+    timerFires: z.number().int(),
   }),
   bindEva: z.number(),
   loadout: z.object({

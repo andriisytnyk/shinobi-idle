@@ -239,7 +239,7 @@ export function bingoView(state: GameState, id: string, content: ContentDb): Bin
     canStudy:
       level < BINGO_MAX &&
       level !== BOUGHT_GAP &&
-      state.currencies.intel >= cost &&
+      hasCurrency(state, currencyFor(content, 'study'), cost) &&
       (level > 0 || canScout(state, id, content)),
     traits: reveal.traits ? entry.traits.filter((t) => visible.includes(t)) : [],
     hiddenTraits: reveal.hiddenTraits ? entry.traits.filter((t) => !visible.includes(t)) : null,

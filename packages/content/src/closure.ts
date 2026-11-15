@@ -239,8 +239,25 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     if (st.state !== undefined) ref('state', st.state, 'states');
     body('', st);
   }
+  /** Every id an effect goes by in a fight and that data can name: statuses, effects a tag defines, traits. */
+  const effectIds = new Set<string>([...set.statuses, ...set.traits]);
+  for (const tag of db.tags)
+    for (const op of [...(tag.onHit ?? []), ...(tag.onUse ?? [])])
+      if (op.op === 'effect') effectIds.add(op.id);
+  /** A reference of fight data to an effect or trait: one of another pack must exist; the engine's and the core's own effects are bare. */
+  const effectRef = (field: string, value: string): void => {
+    if (value.includes(':') && !effectIds.has(value))
+      problem(field, `"${value}" names no status, effect or trait`);
+  };
+  for (const st of db.statuses) {
+    at('statuses', st.id);
+    if (st.suppresses !== undefined) effectRef('suppresses', st.suppresses);
+  }
   for (const tag of db.tags) {
     at('tags', tag.id);
+    for (const id of tag.removes ?? []) effectRef('removes', id);
+    for (const op of [...(tag.onHit ?? []), ...(tag.onUse ?? [])])
+      if (op.op === 'effect' && op.suppresses !== undefined) effectRef('suppresses', op.suppresses);
     tagOps('onHit', tag.onHit);
     tagOps('onUse', tag.onUse);
   }
@@ -261,6 +278,9 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     ref('answer', t.answer, 'tags');
     for (const key of t.numbers.keys) needNumber('numbers', `${t.numbers.from}.${key}`);
     (t.mods ?? []).forEach((m, i) => numRef(`mods[${i}].value`, m.value));
+    for (const id of t.inflicts ?? []) effectRef('inflicts', id);
+    if (t.swarm !== undefined)
+      for (const key of ['n', 'hp', 'dmg']) needNumber('swarm', `${t.swarm}.${key}`);
     if (t.regen !== undefined) numRef('regen', t.regen);
   }
   for (const tier of db.ai.tiers) {
@@ -440,6 +460,17 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     if (b.special.companions)
       needNumber('special.companions.fx', `bossFx.${b.special.companions.fx}`);
     refs('special.adds', b.special.adds ?? [], 'traits');
+    if (b.special.fleeAt !== undefined) {
+      const row = (db.balance.K.bossFx as Record<string, Record<string, number> | undefined>)[
+        b.special.fx
+      ];
+      const share = row?.[b.special.fleeAt];
+      if (typeof share !== 'number' || share < 0 || share > 1)
+        problem(
+          'special.fleeAt',
+          `bossFx.${b.special.fx}.${b.special.fleeAt} must be a share from 0 to 1`,
+        );
+    }
   }
   for (const b of db.buildings) {
     at('buildings', b.id);

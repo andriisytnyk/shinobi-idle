@@ -22,7 +22,8 @@
     "kind": "sleep",
     "fx": "sleep",
     "status": "stun",
-    "rank": "C"
+    "rank": "C",
+    "refresh": "replace"
   },
   "core:krovospynna_maz": {
     "kind": "woundHeal",

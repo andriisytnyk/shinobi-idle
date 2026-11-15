@@ -192,7 +192,10 @@ export function applyItem(ctx: FightCtx, id: string): boolean {
         const chance = (K.itemFx[fx.fx] as { chance?: number } | undefined)?.chance ?? 0;
         const status = fx.status === undefined ? undefined : data.statuses.get(fx.status);
         if (roll(fight, chance) && status) {
-          applyStatus(ctx, first, status, id, { rank: fx.rank ?? null });
+          applyStatus(ctx, first, status, id, {
+            rank: fx.rank ?? null,
+            ...(fx.refresh === undefined ? {} : { refresh: fx.refresh }),
+          });
         }
       }
       return true;

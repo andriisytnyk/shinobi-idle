@@ -549,7 +549,8 @@
       "regenMs": 1000,
       "hitEven": 0.5,
       "fightCapMs": 240000,
-      "maxEnemies": 8
+      "maxEnemies": 8,
+      "timerFires": 1000
     },
     "bindEva": 0.3,
     "loadout": {

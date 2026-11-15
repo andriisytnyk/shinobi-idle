@@ -49,6 +49,13 @@ export interface PlayerDefeatedEvent extends EventBase {
   type: 'playerDefeated';
   enemy: string;
 }
+/** A hook of a pack failed: the fight was cut short and paid and cost nothing; the hook is off until the next load. */
+export interface FightVoidedEvent extends EventBase {
+  type: 'fightVoided';
+  enemy: string;
+  pack: string;
+  hook: string;
+}
 /** One line of the battle log: who did what, with which technique, for how much damage. */
 export interface CombatLogEvent extends EventBase {
   type: 'combatLog';
@@ -215,6 +222,7 @@ export type GameEvent =
   | TechniqueLearnedEvent
   | ActionStoppedEvent
   | EnemyDefeatedEvent
+  | FightVoidedEvent
   | PlayerDefeatedEvent
   | CombatLogEvent
   | OperationClearedEvent

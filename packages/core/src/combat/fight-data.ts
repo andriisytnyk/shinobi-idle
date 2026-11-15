@@ -141,8 +141,7 @@ export interface FightData {
 
 type Body = Omit<Status, 'id' | 'state'>;
 
-function defOf(id: string, body: Body, ranks: readonly string[]): StatusDef {
-  void ranks;
+function defOf(id: string, body: Body): StatusDef {
   const d = body.duration;
   const byRank = d !== undefined && typeof d === 'object' && 'byRank' in d ? d.byRank : null;
   return {
@@ -177,7 +176,7 @@ function build(content: ContentDb): FightData {
   const statuses = new Map<string, StatusDef>();
   const byState = new Map<string, StatusDef>();
   for (const s of content.statuses) {
-    const def = defOf(s.id, s, ranks);
+    const def = defOf(s.id, s);
     statuses.set(s.id, def);
     if (s.state !== undefined && !byState.has(s.state)) byState.set(s.state, def);
   }
@@ -196,7 +195,7 @@ function build(content: ContentDb): FightData {
       } else {
         const { op: _op, id, ...body } = o;
         void _op;
-        out.push({ op: 'status', def: defOf(id, body, ranks), value: null });
+        out.push({ op: 'status', def: defOf(id, body), value: null });
       }
     }
     return out;

@@ -50,7 +50,21 @@ for (const list of Object.keys(db).filter((k) => !META.has(k))) {
   order[list] = list === 'ai' ? ['ai'] : keysOf(value);
 }
 
+const flat: Record<string, unknown> = {};
+const keyOrder: Record<string, string[]> = {};
+const walk = (p: string, v: unknown) => {
+  if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
+    keyOrder[p || '(root)'] = Object.keys(v);
+    for (const [k, x] of Object.entries(v)) walk(p ? `${p}.${k}` : k, x);
+  } else flat[p] = v;
+};
+walk('', (db as { balance: unknown }).balance);
+
 const changes: string[] = [];
+for (const path of new Set([...Object.keys(old.balance as object), ...Object.keys(flat)])) {
+  if (JSON.stringify((old.balance as Record<string, unknown>)[path]) !== JSON.stringify(flat[path]))
+    changes.push(`balance ${path}`);
+}
 for (const [list, now] of Object.entries(entities)) {
   const before = old.entities[list] ?? {};
   for (const id of new Set([...Object.keys(before), ...Object.keys(now)])) {
@@ -64,4 +78,7 @@ for (const [list, now] of Object.entries(entities)) {
     changes.push(`${list}: order`);
 }
 console.log(changes.join('\n') || 'nothing changed');
-writeFileSync(FILE, `${JSON.stringify({ ...old, entities, order }, null, 2)}\n`);
+writeFileSync(
+  FILE,
+  `${JSON.stringify({ ...old, entities, order, balance: flat, balanceOrder: keyOrder }, null, 2)}\n`,
+);

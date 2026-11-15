@@ -24,42 +24,14 @@ import {
   type PlayerSnapshot,
 } from '../src/index.ts';
 import { HOUR, setLevel } from './helpers.ts';
+import { NATURES, yardstick } from './combat-golden-lib.ts';
 import { fighter, ids, know, run, startFight, stock, unlock } from './prep-state.ts';
 
 const FIXTURE = new URL('./fixtures/combat-golden.json', import.meta.url);
 const K = content.balance.K;
-const NATURES = ['katon', 'futon', 'raiton', 'doton', 'suiton'] as const;
 const RESULTS: Record<string, number> = { victory: 1, defeat: 2, fled: 3, timeout: 4, ongoing: 5 };
 
 const sha = (s: string): string => createHash('sha256').update(s).digest('hex').slice(0, 24);
-
-/** The yardstick player: a typical build for combat level `c`, full tactics, no pouch. */
-function yardstick(c: number, nature: string): PlayerSnapshot {
-  const style = Math.min(K.cap, Math.round(c * 1.12));
-  const d = Math.min(K.cap, Math.max(1, Math.round((c - style / 2) * 2)));
-  const levels = {} as PlayerSnapshot['levels'];
-  for (const skill of content.skills) levels[skill.id] = 1;
-  levels.tai = Math.max(1, style - 4);
-  levels.nin = Math.max(1, style - 6);
-  for (const n of NATURES) levels[n] = style;
-  levels.vit = d;
-  levels.eva = d;
-  levels.med = d;
-  levels.ath = Math.min(K.cap, d);
-  levels.cc = Math.min(K.cap, d);
-  const skills: string[] = ['tai', 'nin', ...NATURES];
-  const known = content.techniques
-    .filter((t) => skills.includes(t.skill) && t.rank !== null && t.level <= (levels[t.skill] ?? 0))
-    .map((t) => t.id);
-  return {
-    levels,
-    mastery: Object.fromEntries(known.map((id) => [id, 20])),
-    known,
-    natures: [nature] as PlayerSnapshot['natures'],
-    costMod: { chakra: 1, stamina: 1 },
-    tier: 2,
-  };
-}
 
 function fights(): Record<string, unknown[]> {
   const out: Record<string, unknown[]> = {};

@@ -22,6 +22,12 @@ export interface ApplyOptions {
   rank?: string | null;
   /** Multiplies the duration (a combo that stretches the status). */
   scale?: number;
+  /** A duration of the source in ms, in place of the status's own (a boss cast that stuns for its own time). */
+  durationMs?: number;
+  /** What a second application does to the first, when the source says (a tool replaces); else the status's own rule. */
+  refresh?: 'replace' | 'longest' | 'strongest';
+  /** Apply the effects only: no cast is cancelled and the report does not count it. */
+  silent?: boolean;
 }
 
 /** Puts the status of the content with this id on a combatant, if there is one. */
@@ -53,10 +59,6 @@ export function removeStatus(c: Combatant, id: string): boolean {
   return c.effects.length !== before;
 }
 
-/** The effect a status put on a combatant under its own id, if it is there. */
-export const statusEffect = (c: Combatant, def: StatusDef): Effect | undefined =>
-  findEffect(c, def.id);
-
 /**
  * Puts a status on a combatant. A second application refreshes the first (or adds a stack, up to
  * the status's limit); a periodic effect keeps its tick schedule. The effect is credited to `src`.
@@ -76,7 +78,11 @@ export function applyStatus(
   if (def.durationByRank !== null) {
     length = secWork(secondsByRank(content, def.durationByRank, options.rank ?? null));
   } else if (def.duration) length = secWork(def.duration(K));
+  if (options.durationMs !== undefined) length = workOf(options.durationMs);
   if (options.scale !== undefined) length *= options.scale;
+  // Every time of a fight is a whole number of work units: a duration made from data is rounded once, here, to the nearest.
+  length = Math.round(length);
+  const refresh = options.refresh ?? def.refresh;
   for (const [n, spec] of def.effects.entries()) {
     const id = effectId(def, n);
     const old = findEffect(target, id);
@@ -85,10 +91,10 @@ export function applyStatus(
     if (spec.kind === 'modifier') {
       const unit = n === 0 && options.value !== undefined ? options.value : spec.value(K);
       // The stronger of two modifiers stays: a weaker bind never replaces a stronger one.
-      const stronger = def.refresh === 'strongest' && old?.kind === 'modifier' && old.value < unit;
+      const stronger = refresh === 'strongest' && old?.kind === 'modifier' && old.value < unit;
       const value = stronger ? old.value : stacks > 1 ? stackedValue(spec.op, unit, stacks) : unit;
       const until =
-        def.refresh === 'longest'
+        refresh === 'longest'
           ? Math.max(now + length, old?.until ?? 0)
           : stronger
             ? old.until
@@ -128,6 +134,7 @@ export function applyStatus(
       });
     }
   }
+  if (options.silent) return;
   if (def.interrupts) cancelCasts(ctx, target);
   const tally = def.tally;
   if (
@@ -148,7 +155,7 @@ function periodicOf(c: Combatant, id: string): Extract<Effect, { kind: 'periodic
   return e?.kind === 'periodic' ? e : undefined;
 }
 
-/** Runs the operations of a tag on a body: statuses applied, casts stopped. Returns whether any ran. */
+/** Runs the operations of a tag on a body: statuses applied, casts stopped. */
 export function runTagOps(
   ctx: FightCtx,
   target: Combatant,
