@@ -41,6 +41,7 @@ import handMissions from './data/hand/missions.json' with { type: 'json' };
 import handTeam from './data/hand/team.json' with { type: 'json' };
 import handOperations from './data/hand/operations.json' with { type: 'json' };
 import handQuests from './data/hand/quests.json' with { type: 'json' };
+import handSkillFight from './data/hand/skill-fight.json' with { type: 'json' };
 import handStatuses from './data/hand/statuses.json' with { type: 'json' };
 import handTechniqueCombat from './data/hand/technique-combat.json' with { type: 'json' };
 import handTraits from './data/hand/traits.json' with { type: 'json' };
@@ -111,7 +112,10 @@ const itemFx = itemFxMapSchema.parse(handItemFx);
  */
 const data: Record<string, unknown> = {
   ...vocab,
-  skills,
+  skills: skills.map((skill) => {
+    const fight = (handSkillFight as Record<string, object>)[skill.id];
+    return fight ? { ...skill, fight } : skill;
+  }),
   seals,
   techniques: layerTechniques(
     z.array(techniqueBaseSchema).parse(techniques),

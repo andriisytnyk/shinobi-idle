@@ -1,17 +1,75 @@
 [
   {
-    "id": "burn"
+    "id": "burn",
+    "state": "burn",
+    "effects": [
+      {
+        "kind": "periodic",
+        "from": "hit",
+        "amount": "burn.share",
+        "over": "burn.dur"
+      }
+    ],
+    "duration": "burn.dur",
+    "suppresses": "regen"
   },
   {
-    "id": "wet"
+    "id": "wet",
+    "state": "wet",
+    "effects": [
+      {
+        "kind": "modifier",
+        "stat": "speed",
+        "op": "mul",
+        "value": {
+          "path": "wet.slow",
+          "oneMinus": true
+        }
+      }
+    ],
+    "duration": "wet.dur"
   },
   {
-    "id": "stun"
+    "id": "stun",
+    "state": "stun",
+    "effects": [
+      {
+        "kind": "modifier",
+        "stat": "speed",
+        "op": "mul",
+        "value": 0
+      }
+    ],
+    "duration": {
+      "byRank": "stun"
+    },
+    "refresh": "longest",
+    "interrupts": true
   },
   {
-    "id": "bind"
+    "id": "bind",
+    "effects": [
+      {
+        "kind": "modifier",
+        "stat": "evasion",
+        "op": "mul",
+        "value": "bindEva"
+      }
+    ],
+    "duration": "bind.dur",
+    "suppresses": "evasive",
+    "refresh": "strongest"
   },
   {
-    "id": "poison"
+    "id": "poison",
+    "effects": [
+      {
+        "kind": "periodic",
+        "from": "maxHp",
+        "amount": "poison.pctPerSec"
+      }
+    ],
+    "duration": "poison.dur",
+    "suppresses": "regen"
   }
 ]

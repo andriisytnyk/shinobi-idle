@@ -1,8 +1,9 @@
 import { actionSystem, drillKind, practiceKind, type ActionKind } from './actions.ts';
 import { COURSE_KIND, courseKind, obstacleProvider } from './athletics.ts';
 import { defaultCombatAi } from './combat/fight-ai.ts';
-import { defaultFightHooks } from './combat/fight-hooks.ts';
-import type { CombatAi, FightRules } from './combat/fight-types.ts';
+import { engineFightHooks } from './combat/fight-hooks.ts';
+import type { CombatAi, FightHook, FightRules } from './combat/fight-types.ts';
+import { coreFightHooks } from './corepack/fight-hooks.ts';
 import { tonicProvider } from './buffs.ts';
 import { checkpointProvider } from './checkpoints.ts';
 import { fightKind, operationKind } from './combat/kind.ts';
@@ -32,6 +33,9 @@ export interface Rules extends FightRules {
   /** Decides what the player does whenever the fight needs a choice. */
   combatAi: CombatAi;
 }
+
+/** The fight hooks of the engine and of the pack `core`; another pack adds its own to a copy of the rules. */
+export const defaultFightHooks: readonly FightHook[] = [...engineFightHooks, ...coreFightHooks];
 
 export const defaultRules: Rules = {
   systems: [actionSystem, combatSystem, woundSystem, villageSystem, questSystem],

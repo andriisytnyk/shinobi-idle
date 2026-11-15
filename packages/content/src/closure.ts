@@ -193,16 +193,74 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     at('gearFx', g.id);
     needNumber('gearFx', `gearFx.${g.id}`);
   }
+  /** A number reference of fight data: a path of the balance object, or one minus a path; a literal needs no check. */
+  const numRef = (field: string, r: unknown): void => {
+    if (typeof r === 'string') needNumber(field, r);
+    else if (r !== null && typeof r === 'object') needNumber(field, (r as { path: string }).path);
+  };
+  const tagOps = (
+    field: string,
+    ops: readonly { op: string; status?: string; value?: unknown }[] | undefined,
+  ) =>
+    (ops ?? []).forEach((o, i) => {
+      if (o.op === 'effect') body(`${field}[${i}].`, o as Parameters<typeof body>[1]);
+      if (o.op !== 'status') return;
+      ref(`${field}[${i}].status`, o.status, 'statuses');
+      if (o.value !== undefined) numRef(`${field}[${i}].value`, o.value);
+    });
+  const body = (
+    field: string,
+    st: {
+      effects?: readonly (
+        { kind: 'modifier'; value: unknown } | { kind: 'periodic'; amount: unknown; over?: unknown }
+      )[];
+      duration?: unknown;
+    },
+  ): void => {
+    for (const [n, e] of (st.effects ?? []).entries()) {
+      if (e.kind === 'modifier') numRef(`${field}effects[${n}].value`, e.value);
+      else {
+        numRef(`${field}effects[${n}].amount`, e.amount);
+        if (e.over !== undefined) numRef(`${field}effects[${n}].over`, e.over);
+      }
+    }
+    const d = st.duration;
+    if (d !== undefined) {
+      if (typeof d === 'object' && d !== null && 'byRank' in d)
+        needNumber(`${field}duration.byRank`, (d as { byRank: string }).byRank);
+      else numRef(`${field}duration`, d);
+    }
+    if (st.effects !== undefined && d === undefined)
+      problem(`${field}duration`, 'a status with effects needs a duration');
+  };
+  for (const st of db.statuses) {
+    at('statuses', st.id);
+    if (st.state !== undefined) ref('state', st.state, 'states');
+    body('', st);
+  }
+  for (const tag of db.tags) {
+    at('tags', tag.id);
+    tagOps('onHit', tag.onHit);
+    tagOps('onUse', tag.onUse);
+  }
   for (const c of db.combos) {
     at('combos', c.id);
-    ref('nature', c.nature, 'natures');
+    if (c.nature !== undefined) ref('nature', c.nature, 'natures');
+    if (c.tag !== undefined) ref('tag', c.tag, 'tags');
+    if (c.nature === undefined && c.tag === undefined)
+      problem('nature', 'a combo needs a nature or a tag to be triggered by');
     ref('onState', c.onState, 'states');
+    if (c.effect.status !== undefined) ref('effect.status', c.effect.status, 'statuses');
+    if (c.effect.kind === 'status' && c.effect.status === undefined)
+      problem('effect.status', 'a status combo names its status');
     needNumber('combo', `combo.${c.id}`);
   }
   for (const t of db.traits) {
     at('traits', t.id);
     ref('answer', t.answer, 'tags');
     for (const key of t.numbers.keys) needNumber('numbers', `${t.numbers.from}.${key}`);
+    (t.mods ?? []).forEach((m, i) => numRef(`mods[${i}].value`, m.value));
+    if (t.regen !== undefined) numRef('regen', t.regen);
   }
   for (const tier of db.ai.tiers) {
     at('ai', tier.id);
@@ -364,6 +422,9 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
   for (const b of db.bosses) {
     at('bosses', b.id);
     needNumber('special.fx', `bossFx.${b.special.fx}`);
+    if (b.special.companions)
+      needNumber('special.companions.fx', `bossFx.${b.special.companions.fx}`);
+    refs('special.adds', b.special.adds ?? [], 'traits');
   }
   for (const b of db.buildings) {
     at('buildings', b.id);

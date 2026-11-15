@@ -1,4 +1,4 @@
-import { TRAIT_ANSWER, type AiRuleId, type TagId, type TraitId } from '@shinobi/content';
+import type { AiRuleId } from '@shinobi/content';
 import type { CombatAi, Decision, FightView, ViewPouch, ViewTechnique } from './fight-types.ts';
 import { workOf } from './units.ts';
 
@@ -24,8 +24,6 @@ function best(
   return top;
 }
 
-const tagged = (tag: TagId) => (r: ViewTechnique) => r.tech.tags.includes(tag);
-
 const use = (r: ViewTechnique | undefined): Decision | null =>
   r ? { type: 'technique', id: r.tech.id } : null;
 
@@ -39,11 +37,14 @@ const status = (view: FightView, id: string): boolean =>
   view.player.effects.some((e) => e.id === id);
 
 /** Whether the tier answers the trait: the player must know it (visible traits are known on sight). */
-const answers = (view: FightView, trait: TraitId): boolean =>
+const answers = (view: FightView, trait: string): boolean =>
   view.enemies.some((e) => e.knownTraits.includes(trait));
 
-const works = (view: FightView, trait: TraitId): boolean =>
+const works = (view: FightView, trait: string): boolean =>
   view.enemies.some((e) => e.workingTraits.includes(trait));
+
+/** The effect id a status put on a body: the effects after the first are `<id>#<n>`. */
+const statusOf = (effect: string): string => effect.split('#')[0] ?? effect;
 
 /**
  * The casts under way that the tier answers: those it knows to be heavy (or every cast, at the
@@ -85,15 +86,12 @@ const heal: Rule = (view) => {
 const interrupt: Rule = (view) => {
   const left = interruptibleCast(view);
   if (left === null) return null;
-  const tech = use(best(view, (r) => tagged('interrupt')(r) && workOf(r.tech.castMs) < left));
+  const tech = use(best(view, (r) => r.interrupts && workOf(r.tech.castMs) < left));
   if (tech) return tech;
   // A tool is quicker than any cast, but takes its own action time.
   return item(
     view,
-    (p) =>
-      p.tags.includes('interrupt') &&
-      (p.use === 'throw' || p.use === 'bomb') &&
-      view.itemWork < left,
+    (p) => p.interrupts && (p.use === 'throw' || p.use === 'bomb') && view.itemWork < left,
   );
 };
 
@@ -111,47 +109,38 @@ const defend: Rule = (view) => {
       const tech = use(best(view, (r) => r.tech.fx.kind === kind && workOf(r.tech.castMs) < left));
       if (tech) return tech;
     }
-    return item(view, (p) => p.use === 'bomb' && p.tags.includes('guard') && view.itemWork < left);
+    return item(view, (p) => p.use === 'bomb' && p.guard && view.itemWork < left);
   }
   return null;
 };
 
+/** The effects the traits of the content put on the player are answered with the trait's answer, then the rest by the techniques that take them off. */
 const answer: Rule = (view) => {
-  {
-    if (status(view, 'illusion')) {
-      const decision = use(best(view, tagged('dispel'))) ?? item(view, (p) => p.use === 'dispel');
-      if (decision) return decision;
-    }
-    if (status(view, 'poison')) {
-      const decision = use(best(view, tagged('cleanse'))) ?? item(view, (p) => p.use === 'cleanse');
-      if (decision) return decision;
-    }
-    if (status(view, 'bind')) {
-      const decision = use(best(view, (r) => r.tech.fx.statuses.includes('bind')));
-      if (decision) return decision;
-    }
+  for (const { trait, effects } of view.vocab.inflicted) {
+    if (!effects.some((effect) => status(view, effect))) continue;
+    const decision =
+      use(best(view, (r) => r.answers.includes(trait))) ?? item(view, (p) => p.answers.includes(trait));
+    if (decision) return decision;
   }
-  const byTrait: [TraitId, (r: ViewTechnique) => boolean, (p: ViewPouch) => boolean][] = [
-    ['hidden', tagged(TRAIT_ANSWER.hidden), () => false],
-    // A bind tool pays only when there is something ready to strike the bound body with.
-    [
-      'evasive',
-      tagged(TRAIT_ANSWER.evasive),
-      (p) => p.use === 'bind' && view.techniques.some((r) => r.ready && r.expected > 0),
-    ],
-    ['regen', (r) => tagged('dot')(r) || r.tech.state === 'burn', (p) => p.use === 'dot'],
-    ['armor', tagged(TRAIT_ANSWER.armor), () => false],
-  ];
-  for (const [trait, test, tool] of byTrait) {
+  for (const effect of view.player.effects) {
+    const id = statusOf(effect.id);
+    const decision = use(best(view, (r) => r.tech.fx.statuses.includes(id)));
+    if (decision) return decision;
+  }
+  const attackReady = view.techniques.some((r) => r.ready && r.expected > 0);
+  for (const trait of view.vocab.answered) {
     if (!answers(view, trait) || !works(view, trait)) continue;
-    const decision = use(best(view, test)) ?? item(view, tool);
+    // A tool that snares pays only when there is something ready to strike the snared body with.
+    const decision =
+      use(best(view, (r) => r.answers.includes(trait))) ??
+      item(view, (p) => p.answers.includes(trait) && (p.use !== 'snare' || attackReady));
     if (decision) return decision;
   }
   // Several bodies are in plain sight: that needs no knowledge.
   if (view.enemies.length > 1) {
     const decision =
       use(best(view, (r) => r.tech.hitsAll && r.expected > 0)) ??
-      item(view, (p) => p.use === 'area');
+      item(view, (p) => p.use === 'sweep');
     if (decision) return decision;
   }
   return null;
@@ -211,7 +200,7 @@ const bestAttack: Rule = (view) => {
   const reserved = (r: ViewTechnique): boolean =>
     tactical &&
     soonest !== null &&
-    tagged('interrupt')(r) &&
+    r.interrupts &&
     soonest < workOf(r.tech.cooldownMs + r.tech.castMs);
   const score = (r: ViewTechnique) =>
     tactical ? r.expected : r.power * (r.tech.hitsAll ? view.enemies.length : 1);
@@ -224,9 +213,12 @@ const bestAttack: Rule = (view) => {
  */
 const filler: Rule = (view) => {
   const casts = view.enemies.some(
-    (e) => e.knownTraits.includes('caster') || e.nextCastIn !== null || e.cast !== null,
+    (e) =>
+      e.knownTraits.some((t) => view.vocab.casters.includes(t)) ||
+      e.nextCastIn !== null ||
+      e.cast !== null,
   );
-  return item(view, (p) => p.use === 'throw' && !(casts && p.tags.includes('interrupt')));
+  return item(view, (p) => p.use === 'throw' && !(casts && p.interrupts));
 };
 
 const basic: Rule = () => ({ type: 'basic' });

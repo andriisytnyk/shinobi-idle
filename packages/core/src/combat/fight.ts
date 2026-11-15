@@ -1,8 +1,17 @@
-import { NATURE_IDS, NATURE_WHEEL, TECH_SKILL_IDS } from '@shinobi/content';
-import type { ComboId, ContentDb, NatureId, Rank, SkillId, Technique } from '@shinobi/content';
+import type { ContentDb, Technique } from '@shinobi/content';
 import { createStream, nextFloatFrom } from '../rng.ts';
 import { addEffect, findEffect, isSuppressed, removeEffect, statOf } from './fight-effects.ts';
+import { answersTraitData, balanceOf, beatenBy, fightData, type TraitMod } from './fight-data.ts';
+import { PASSIVE_NEGATE_HOOK } from './fight-hooks.ts';
 import { applyItem, itemView } from './fight-items.ts';
+import {
+  applyStatus,
+  comboPriors,
+  comboScale,
+  removeTagged,
+  runCombos,
+  runTagOps,
+} from './fight-status.ts';
 import { TEAM_HOOK } from './fight-team-id.ts';
 import type {
   Combatant,
@@ -83,19 +92,88 @@ export const makeCtx = (fight: FightState, content: ContentDb, rules: FightRules
   rules,
 });
 
-/** The hooks a combatant carries, in the order of the rule set. */
-export function hooksOf(ctx: FightCtx, c: Combatant): FightHook[] {
-  const out: FightHook[] = [];
-  for (const hook of ctx.rules.fightHooks) {
-    if (c.traits.includes(hook.id as never) || c.specials.includes(hook.id)) out.push(hook);
-  }
-  return out;
+/** A hook a combatant carries and the trait it comes from (null: it is one of the body's own specials). */
+export interface Binding {
+  hook: FightHook;
+  trait: string | null;
 }
 
-/** A stat after effects and hooks. */
+interface Bound {
+  rules: readonly FightHook[];
+  content: ContentDb;
+  traits: number;
+  specials: number;
+  /** The hooks in the order of the rule set, with the trait each comes from. */
+  list: Binding[];
+  hooks: FightHook[];
+  /** The stat modifiers its traits declare in data, with the trait they stop with. */
+  mods: { trait: string; mod: TraitMod }[];
+}
+
+const bound = new WeakMap<Combatant, Bound>();
+
+/**
+ * What a combatant carries: the hook of each of its traits (named by the trait's data), the hooks
+ * its specials name, and the stat modifiers its traits declare. Found once per body, in the order
+ * of the rule set; an id nothing registered (a pack that is not loaded) is ignored.
+ */
+export function boundOf(ctx: FightCtx, c: Combatant): Bound {
+  const rules = ctx.rules.fightHooks;
+  const have = bound.get(c);
+  if (
+    have &&
+    have.rules === rules &&
+    have.content === ctx.content &&
+    have.traits === c.traits.length &&
+    have.specials === c.specials.length
+  ) {
+    return have;
+  }
+  const data = fightData(ctx.content);
+  const ids = new Map<string, string | null>();
+  const mods: Bound['mods'] = [];
+  for (const trait of c.traits) {
+    const def = data.traits.get(trait);
+    if (!def) continue;
+    if (def.hook !== null && !ids.has(def.hook)) ids.set(def.hook, trait);
+    for (const mod of def.mods) mods.push({ trait, mod });
+  }
+  for (const special of c.specials) if (!ids.has(special)) ids.set(special, null);
+  const list: Binding[] = [];
+  for (const hook of rules) {
+    const trait = ids.get(hook.id);
+    if (trait !== undefined) list.push({ hook, trait });
+  }
+  const made: Bound = {
+    rules,
+    content: ctx.content,
+    traits: c.traits.length,
+    specials: c.specials.length,
+    list,
+    hooks: list.map((b) => b.hook),
+    mods,
+  };
+  bound.set(c, made);
+  return made;
+}
+
+/** The hooks a combatant carries, in the order of the rule set. */
+export function hooksOf(ctx: FightCtx, c: Combatant): FightHook[] {
+  return boundOf(ctx, c).hooks;
+}
+
+/** A stat after effects, the modifiers its traits declare and hooks. */
 export function stat(ctx: FightCtx, c: Combatant, which: ModStat, base: number): number {
   let value = statOf(c, which, base);
-  for (const hook of hooksOf(ctx, c)) if (hook.stat) value *= hook.stat(ctx, c, which);
+  const b = boundOf(ctx, c);
+  if (b.mods.length > 0) {
+    const K = balanceOf(ctx.content);
+    for (const { trait, mod } of b.mods) {
+      if (mod.stat !== which || isSuppressed(c, trait)) continue;
+      value *= mod.op === 'mul' ? mod.value(K) : 1 + mod.value(K);
+    }
+  }
+  for (const hook of b.hooks) if (hook.stat) value *= hook.stat(ctx, c, which);
   return value;
 }
 
@@ -134,7 +212,9 @@ function kitEffect(tech: Technique, snap: PlayerSnapshot, content: ContentDb): K
   switch (effect.kind) {
     case 'shield':
       fx.amount =
-        K.power[tech.rank] * K.techFx.shield.mult * (1 + K.levelScale * snap.levels[tech.skill]);
+        (K.power[tech.rank] ?? 0) *
+        (K.techFx.shield?.mult ?? 0) *
+        (1 + K.levelScale * (snap.levels[tech.skill] ?? 0));
       fx.durationMs = K.techFx.shield.durationMs;
       break;
     case 'decoy':
@@ -177,7 +257,8 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
   const wound = woundFactor(snap.wounds ?? 0, content);
   const techniques: KitTechnique[] = [];
   let style = 0;
-  for (const skill of TECH_SKILL_IDS) style = Math.max(style, snap.levels[skill]);
+  const data = fightData(content);
+  for (const skill of data.techSkills) style = Math.max(style, snap.levels[skill] ?? 0);
   for (const tech of content.techniques) {
     if (!known.has(tech.id) || tech.rank === null) continue;
     if (loadout && !loadout.has(tech.id) && !tech.combat?.outOfLoadout) continue;
@@ -198,9 +279,12 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
       accuracy: accuracyOf(snap.levels, tech.skill, content) * wound,
       comboChance: Math.min(
         K.combo.cap,
-        K.combo.base + K.combo.perLevel * snap.levels[tech.skill] + K.combo.perMastery * mastery,
+        K.combo.base + K.combo.perLevel * (snap.levels[tech.skill] ?? 0) + K.combo.perMastery * mastery,
       ),
-      hitsAll: tech.role === 'area' || tech.tags.includes('area') || tech.combat?.hitsAll === true,
+      hitsAll:
+        data.wideRoles.has(tech.role) ||
+        tech.tags.some((tag) => data.tags.get(tag)?.hitsAll === true) ||
+        tech.combat?.hitsAll === true,
       guaranteedCombo: tech.combat?.guaranteedCombo ?? null,
       habituationMult: snap.signature === tech.id ? K.signatureHabituation : 1,
       fx: kitEffect(tech, snap, content),
@@ -217,11 +301,11 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
 }
 
 /** The nature an enemy fights with; `wheel` is the one that beats the player's first nature. */
-function natureOf(spawn: Spawn, natures: readonly NatureId[]): NatureId | null {
+function natureOf(spawn: Spawn, natures: readonly string[], content: ContentDb): string | null {
   if (spawn.nature !== 'wheel') return spawn.nature;
   const first = natures[0];
   if (!first) return null;
-  return NATURE_IDS.find((n) => NATURE_WHEEL[n] === first) ?? null;
+  return beatenBy(content, first);
 }
 
 const idleTimer = (): Timer => ({ progress: 0, need: 0 });
@@ -240,6 +324,26 @@ export function spawnEnemies(
   const spawn = fight.encounter.spawns[spawnIndex];
   if (!spawn) return [];
   return addBodies(makeCtx(fight, content, rules), spawn, n, false);
+}
+
+/** The effects a body's traits give it from data: a trait that heals a share of health every second. */
+function initTraits(ctx: FightCtx, c: Combatant): void {
+  const data = fightData(ctx.content);
+  const K = balanceOf(ctx.content);
+  for (const trait of c.traits) {
+    const def = data.traits.get(trait);
+    if (!def?.regen) continue;
+    addEffect(c, {
+      kind: 'periodic',
+      id: trait,
+      src: `trait:${trait}`,
+      until: null,
+      mode: 'heal',
+      amount: def.regen(K) * c.maxHp,
+      every: workOf(TICK_MS),
+      next: ctx.fight.t + workOf(TICK_MS),
+    });
+  }
 }
 
 function addBodies(ctx: FightCtx, spawn: Spawn, n: number, staggered: boolean): Combatant[] {
@@ -266,7 +370,7 @@ function addBodies(ctx: FightCtx, spawn: Spawn, n: number, staggered: boolean): 
       evasion: stats.evasion,
       damage: stats.damage * spawn.dmgMult,
       intervalMs: stats.intervalMs,
-      nature: natureOf(spawn, fight.natures),
+      nature: natureOf(spawn, fight.natures, content),
       traits: [...spawn.traits],
       specials: [...fight.encounter.specials, ...spawn.specials],
       effects: [],
@@ -291,6 +395,7 @@ function addBodies(ctx: FightCtx, spawn: Spawn, n: number, staggered: boolean): 
     };
     fight.enemies.push(c);
     added.push(c);
+    initTraits(ctx, c);
     for (const hook of hooksOf(ctx, c)) hook.init?.(ctx, c);
   }
   return added;
@@ -370,8 +475,8 @@ export function createFight(
   const ctx = makeCtx(fight, content, rules);
   // Passive techniques out of the loadout work through a hook of the player's own.
   for (const tech of fight.kit.techniques) {
-    if (tech.fx.kind === 'passiveNegate' && !player.specials.includes('passiveNegate')) {
-      player.specials.push('passiveNegate');
+    if (tech.fx.kind === 'passiveNegate' && !player.specials.includes(PASSIVE_NEGATE_HOOK)) {
+      player.specials.push(PASSIVE_NEGATE_HOOK);
     }
   }
   // Teammates of a team mission support the player through a hook of the player's own.
@@ -485,13 +590,6 @@ export function fightOutcome(fight: FightState): FightState['result'] {
 export const fightTimeMs = (fight: FightState): number => Math.floor(fight.t / WORK_PER_MS);
 
 // ---------- damage and effects ----------
-
-/** Whether a combo whose rule is met fires: always for its guaranteed technique, else by chance. Counts it. */
-function combo(fight: FightState, tech: KitTechnique, id: ComboId): boolean {
-  const fires = tech.guaranteedCombo === id || roll(fight, tech.comboChance);
-  if (fires) count(fight.tally.combos, id);
-  return fires;
-}
 
 /** The player's fall wins over the last enemy's in the same moment; a leaving enemy ends the fight as `fled`. */
 function checkResult(fight: FightState): boolean {
@@ -614,57 +712,16 @@ export function cancelCasts(ctx: FightCtx, target: Combatant, interruptible = fa
   return any;
 }
 
-/** Bind lowers evasion and switches Evasive off; a weaker bind never replaces a stronger one. */
-export function applyBind(ctx: FightCtx, target: Combatant, evasion: number, src: string): void {
-  const fight = ctx.fight;
-  const until = fight.t + secWork(ctx.content.balance.K.bind.dur);
-  const old = findEffect(target, 'bind');
-  const stronger = old?.kind === 'modifier' && old.value < evasion;
-  addEffect(target, {
-    kind: 'modifier',
-    id: 'bind',
-    src: stronger ? old.src : src,
-    // A weaker bind leaves the stronger one as it is.
-    until: stronger ? old.until : until,
-    suppresses: 'evasive',
-    stat: 'evasion',
-    op: 'mul',
-    value: stronger ? old.value : evasion,
-  });
-  count(fight.tally.statuses, 'bind');
-}
-
-/** Poisons a combatant: a share of its maximum health every second for the configured time. */
-export function applyPoison(ctx: FightCtx, target: Combatant, src: string): void {
-  const K = ctx.content.balance.K;
-  const fight = ctx.fight;
-  addEffect(target, {
-    kind: 'periodic',
-    id: 'poison',
-    src,
-    until: fight.t + secWork(K.poison.dur),
-    suppresses: 'regen',
-    mode: 'damage',
-    amount: K.poison.pctPerSec * target.maxHp,
-    every: workOf(TICK_MS),
-    next: fight.t + workOf(TICK_MS),
-  });
-  count(fight.tally.statuses, 'poison');
-}
-
-function stunSeconds(rank: Rank, content: ContentDb): number {
-  const stun = content.balance.K.stun;
-  if (rank === 'E' || rank === 'D') return stun.D;
-  return rank === 'C' ? stun.C : stun.B;
-}
-
 /** The nature wheel: +wheel against a nature the technique beats, -wheel against one that beats it. */
-export function wheelFactor(skill: SkillId, nature: NatureId | null, content: ContentDb): number {
-  if (nature === null || !(NATURE_IDS as readonly string[]).includes(skill)) return 1;
+export function wheelFactor(skill: string, nature: string | null, content: ContentDb): number {
+  if (nature === null) return 1;
+  const strong = fightData(content).strong;
+  const own = strong.get(skill);
+  // Only the skills that are natures have a place in the wheel.
+  if (!own) return 1;
   const wheel = content.balance.K.wheel;
-  const own = skill as NatureId;
-  if (NATURE_WHEEL[own] === nature) return 1 + wheel;
-  if (NATURE_WHEEL[nature] === own) return 1 - wheel;
+  if (own.has(nature)) return 1 + wheel;
+  if (strong.get(nature)?.has(skill)) return 1 - wheel;
   return 1;
 }
 
@@ -689,6 +746,23 @@ function activeStance(fight: FightState): string | null {
 }
 
 const techViews = new WeakMap<KitTechnique, KitTechnique>();
+const techFactsOf = new WeakMap<KitTechnique, { answers: string[]; interrupts: boolean }>();
+
+/** What a technique answers and whether it interrupts, from the data; the same for the whole fight. */
+function techFacts(content: ContentDb, tech: KitTechnique): { answers: string[]; interrupts: boolean } {
+  let facts = techFactsOf.get(tech);
+  if (!facts) {
+    const data = fightData(content);
+    facts = {
+      answers: [...data.traits.values()]
+        .filter((trait) => answersTraitData(data, tech.tags, tech.state, trait))
+        .map((trait) => trait.id),
+      interrupts: tech.tags.some((tag) => data.tags.get(tag)?.interrupts === true),
+    };
+    techFactsOf.set(tech, facts);
+  }
+  return facts;
+}
 
 /**
  * A frozen copy of a kit technique for the view, made once per technique: the AI reads it, never
@@ -742,6 +816,7 @@ function buildView(ctx: FightCtx): FightView {
   // Per view, not per technique: the same for every technique.
   const taiMult = stat(ctx, player, 'taiDamage', 1);
   const habScale = habituationScale(ctx, primary);
+  const physical = fightData(content).physical;
   const techniques: ViewTechnique[] = fight.kit.techniques.map((tech) => {
     const cooldownLeft = Math.max(0, (player.cd[tech.id] ?? 0) - fight.t);
     const affordable = (tech.pool === 'chakra' ? player.chakra : player.stamina) >= tech.cost;
@@ -750,31 +825,36 @@ function buildView(ctx: FightCtx): FightView {
     const targets = tech.hitsAll ? living.length : 1;
     const stanceOk = !tech.requiresStance || stance !== null;
     const hab = habituation(uses, tech.habituationMult * habScale, content);
+    const facts = techFacts(content, tech);
     return {
       tech: viewOf(tech),
       cooldownLeft,
       affordable,
       ready: cooldownLeft === 0 && affordable && stanceOk,
       uses,
-      expected: tech.damage * hab * wheel * targets * (tech.skill === 'tai' ? taiMult : 1),
+      expected: tech.damage * hab * wheel * targets * (physical.has(tech.skill) ? taiMult : 1),
       power: tech.damage,
       stanceOk,
+      answers: facts.answers,
+      interrupts: facts.interrupts,
     };
   });
   const enemies: ViewEnemy[] = living.map((e) => {
     const known = fight.knowledge[e.entry];
     const knownTraits = known ? e.traits.filter((t) => known.includes(t)) : [...e.traits];
     const mechanicKnown = !known || known.includes('special');
+    const bindings = boundOf(ctx, e).list;
     const workingTraits = knownTraits.filter((trait) => {
-      const hook = ctx.rules.fightHooks.find((h) => h.id === trait);
+      const hook = bindings.find((b) => b.trait === trait)?.hook;
       return hook?.working ? hook.working(ctx, e) : !isSuppressed(e, trait);
     });
     let cast: ViewEnemy['cast'] = null;
     let nextCastIn: number | null = null;
-    for (const hook of hooksOf(ctx, e)) {
+    for (const { hook, trait } of bindings) {
       const info = hook.castInfo?.(ctx, e);
       if (!info || info.inWork === null) continue;
       // A cast under way can be seen; when the next one comes is known only for a known trait.
+      const seen = trait !== null ? knownTraits.includes(trait) : mechanicKnown;
       if (info.casting) {
         cast = {
           kind: info.kind,
@@ -782,13 +862,9 @@ function buildView(ctx: FightCtx): FightView {
           total: info.total,
           mult: info.mult,
           interruptible: info.interruptible,
-          known: e.traits.includes(hook.id as never)
-            ? knownTraits.includes(hook.id as never)
-            : mechanicKnown,
+          known: seen,
         };
-      } else if (
-        e.traits.includes(hook.id as never) ? knownTraits.includes(hook.id as never) : mechanicKnown
-      ) {
+      } else if (seen) {
         nextCastIn = info.inWork;
       }
     }
@@ -802,9 +878,7 @@ function buildView(ctx: FightCtx): FightView {
       workingTraits,
       cast,
       nextCastIn,
-      leader: ctx.rules.fightHooks.some(
-        (h) => h.leader !== undefined && e.specials.includes(h.id) && h.leader(ctx, e),
-      ),
+      leader: bindings.some((b) => b.trait === null && b.hook.leader?.(ctx, e) === true),
     };
   });
   return {
@@ -826,9 +900,23 @@ function buildView(ctx: FightCtx): FightView {
     habituation: { ...fight.uses },
     ai: tier,
     visibleTraits: content.ai.visibleTraits,
+    vocab: fightData(content).ai,
     pouch: fight.pouch.flatMap((slot, i) => {
       const view = slot.n > 0 ? itemView(content, slot.id) : null;
-      return view ? [{ slot: i, id: slot.id, n: slot.n, tags: view.tags, use: view.use }] : [];
+      return view
+        ? [
+            {
+              slot: i,
+              id: slot.id,
+              n: slot.n,
+              tags: view.tags,
+              use: view.use,
+              answers: view.answers,
+              interrupts: view.interrupts,
+              guard: view.guard,
+            },
+          ]
+        : [];
     }),
     medic:
       fight.medic !== null && (fight.pouch[fight.medic]?.n ?? 0) > 0
@@ -934,7 +1022,7 @@ function basicAttack(ctx: FightCtx, targetId: string | undefined): void {
     return;
   }
   player.data.basicAt = fight.t + workOf(player.intervalMs);
-  fight.tally.style = 'tai';
+  fight.tally.style = fightData(ctx.content).basicSkill ?? fight.tally.style;
   fight.tally.basic++;
   const target = pickTarget(fight, targetId);
   if (!target) return;
@@ -960,16 +1048,16 @@ function resolveCast(ctx: FightCtx): void {
   fight.uses[tech.id] = previous + 1;
   count(fight.tally.uses, tech.id);
   // Tags that work on the player rather than on an enemy act when the cast ends.
-  if (tech.tags.includes('reveal')) removeEffect(player, 'hidden');
-  if (tech.tags.includes('dispel')) removeEffect(player, 'illusion');
-  if (tech.tags.includes('cleanse')) removeEffect(player, 'poison');
+  const tags = fightData(content).tags;
+  for (const tag of tech.tags) {
+    const def = tags.get(tag);
+    if (def) removeTagged(player, def.removes);
+  }
   applyTechniqueEffect(ctx, tech);
   const hurtsEnemy =
     tech.damage > 0 ||
     tech.state !== null ||
-    tech.tags.includes('bind') ||
-    tech.tags.includes('interrupt') ||
-    tech.tags.includes('pierce');
+    tech.tags.some((tag) => (tags.get(tag)?.onHit.length ?? 0) > 0);
   if (!hurtsEnemy) return;
   const aimed = pickTarget(fight, fight.target);
   fight.target = null;
@@ -1073,94 +1161,30 @@ function applyTechniqueEffect(ctx: FightCtx, tech: KitTechnique): void {
 /** What one technique does to one enemy it hit: tags, damage, status, then combos. Returns the direct damage dealt. */
 function applyHit(ctx: FightCtx, tech: KitTechnique, target: Combatant, hab: number): number {
   const { fight, content } = ctx;
-  const K = content.balance.K;
-  const now = fight.t;
-  const wetBefore = findEffect(target, 'wet') !== undefined;
-  const burnBefore = findEffect(target, 'burn');
-  if (tech.tags.includes('pierce')) {
-    addEffect(target, {
-      kind: 'modifier',
-      id: 'armorOff',
-      src: tech.id,
-      until: now + secWork(K.trait.armorOff),
-      suppresses: 'armor',
-      stat: 'damageTaken',
-      op: 'mul',
-      value: 1,
-    });
-    if (target.traits.includes('armor')) count(fight.tally.statuses, 'armorBreak');
-  }
-  if (tech.tags.includes('bind')) applyBind(ctx, target, K.bindEva, tech.id);
-  if (tech.tags.includes('interrupt') && cancelCasts(ctx, target, true)) {
-    fight.tally.interrupts++;
+  const data = fightData(content);
+  // What the combos need of the body is read before the hit changes it.
+  const priors = comboPriors(ctx, tech, target);
+  for (const tag of tech.tags) {
+    const def = data.tags.get(tag);
+    if (def) runTagOps(ctx, target, def.onHit, tech.id, tech.rank);
   }
   const base =
     tech.damage *
     hab *
     wheelFactor(tech.skill, target.nature, content) *
-    (tech.skill === 'tai' ? stat(ctx, fight.player, 'taiDamage', 1) : 1);
+    (data.physical.has(tech.skill) ? stat(ctx, fight.player, 'taiDamage', 1) : 1);
   const dealt = dealDamage(ctx, target, base, tech.id);
   if (!alive(target)) return dealt;
 
-  if (tech.state === 'burn') {
-    const amount = (K.burn.share * base) / K.burn.dur;
-    addEffect(target, {
-      kind: 'periodic',
-      id: 'burn',
-      src: tech.id,
-      until: now + secWork(K.burn.dur),
-      suppresses: 'regen',
-      mode: 'damage',
-      amount,
-      base: amount,
-      every: workOf(TICK_MS),
-      next: now + workOf(TICK_MS),
+  const status = tech.state === null ? undefined : data.byState.get(tech.state);
+  if (status) {
+    applyStatus(ctx, target, status, tech.id, {
+      base,
+      rank: tech.rank,
+      scale: comboScale(ctx, tech, priors),
     });
-    count(fight.tally.statuses, 'burn');
   }
-  if (tech.state === 'wet') {
-    addEffect(target, {
-      kind: 'modifier',
-      id: 'wet',
-      src: tech.id,
-      until: now + secWork(K.wet.dur),
-      stat: 'speed',
-      op: 'mul',
-      value: 1 - K.wet.slow,
-    });
-    count(fight.tally.statuses, 'wet');
-  }
-  if (tech.state === 'stun') {
-    const shock = tech.skill === 'raiton' && wetBefore && combo(fight, tech, 'shockWet');
-    const length = secWork(stunSeconds(tech.rank, content)) * (shock ? K.combo.shockWet : 1);
-    const old = findEffect(target, 'stun');
-    addEffect(target, {
-      kind: 'modifier',
-      id: 'stun',
-      src: tech.id,
-      until: Math.max(now + length, old?.until ?? 0),
-      stat: 'speed',
-      op: 'mul',
-      value: 0,
-    });
-    cancelCasts(ctx, target);
-    count(fight.tally.statuses, 'stun');
-  }
-
-  if (tech.skill === 'futon' && burnBefore?.kind === 'periodic' && combo(fight, tech, 'fanBurn')) {
-    // The boost is applied to the burn's own strength, once, however many times it fires.
-    const own = burnBefore.base ?? burnBefore.amount;
-    burnBefore.base = own;
-    burnBefore.amount = own * K.combo.fanBurn;
-    burnBefore.until = now + secWork(K.burn.dur);
-  }
-  if (tech.skill === 'doton' && wetBefore && combo(fight, tech, 'mudEva')) {
-    applyBind(ctx, target, K.combo.mudEva, tech.id);
-  }
-  if (tech.skill === 'katon' && wetBefore && combo(fight, tech, 'steam')) {
-    removeEffect(target, 'wet');
-    dealDamage(ctx, target, K.combo.steam * base, tech.id);
-  }
+  runCombos(ctx, tech, target, priors, base);
   return dealt;
 }
 

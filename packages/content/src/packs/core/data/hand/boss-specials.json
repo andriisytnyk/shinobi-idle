@@ -1,41 +1,56 @@
 {
   "core:boss_wolf": {
     "kind": "packRespawn",
-    "fx": "wolfPack"
+    "fx": "wolfPack",
+    "hook": "special:packRespawn",
+    "companions": {
+      "fx": "wolfPack",
+      "hook": "special:packMember"
+    }
   },
   "core:boss_ren1": {
     "kind": "rival",
     "fx": "rivalDuel",
-    "signature": true,
-    "nature": "beatsPlayerFirst"
+    "hook": "special:rival.duel",
+    "nature": "beatsPlayerFirst",
+    "signature": true
   },
   "core:boss_fighter": {
     "kind": "evasionByMissingHp",
-    "fx": "drunkenEvasion"
+    "fx": "drunkenEvasion",
+    "hook": "special:evasionByMissingHp"
   },
   "core:boss_hunter": {
     "kind": "heavyCast",
     "fx": "heavyCast",
+    "hook": "special:heavyCast",
+    "adds": ["caster"],
     "stun": true
   },
   "core:boss_twins": {
     "kind": "twins",
     "fx": "twins",
+    "hook": "special:twins",
+    "bodies": true,
     "poisonMist": true
   },
   "core:boss_mist": {
     "kind": "rehide",
     "fx": "mistRehide",
+    "hook": "special:rehide",
     "bindPlayer": true
   },
   "core:boss_nameless": {
     "kind": "illusion",
-    "fx": "illusion"
+    "fx": "illusion",
+    "hook": "special:illusion",
+    "fleeAt": "fleeAtHp"
   },
   "core:boss_ren2": {
     "kind": "rival",
     "fx": "rivalTournament",
-    "signature": true,
-    "nature": "beatsPlayerFirst"
+    "hook": "special:rival.tournament",
+    "nature": "beatsPlayerFirst",
+    "signature": true
   }
 }

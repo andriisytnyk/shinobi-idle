@@ -7,7 +7,6 @@ import {
   type Operation,
   type SkillId,
   type Technique,
-  type TraitId,
 } from '@shinobi/content';
 import { rebalanceShares } from '../actions.ts';
 import { advance, dispatch } from '../engine.ts';
@@ -23,10 +22,10 @@ import type { GameState } from '../state.ts';
 import { bingoLevel, dropShown, isFirstWin, revealAt } from './bingo.ts';
 import { createFight, fightAdvance, fightTimeMs } from './fight.ts';
 import { encounterFor } from './fight-encounter.ts';
-import { pouchUse } from './fight-items.ts';
 import { simulateFights } from './fight-sim.ts';
 import type { Encounter, FightState } from './fight-types.ts';
-import { answersTrait, itemAnswers, planTarget } from './loadout.ts';
+import { itemAnswers } from './fight-items.ts';
+import { answersTrait, planTarget } from './loadout.ts';
 import { secMs, type PlayerSnapshot } from './numbers.ts';
 import { snapshotPlayer } from './snapshot.ts';
 import { FIGHT_KIND, OPERATION_KIND, isCombatKind } from './system.ts';
@@ -59,7 +58,7 @@ export const UNKNOWN: Unknown = 'unknown';
 export interface TraitCoverage {
   /** The enemy entry the trait belongs to (an operation has several). */
   enemy: string;
-  trait: TraitId;
+  trait: string;
   answered: boolean;
   by: { kind: 'technique' | 'item'; id: string }[];
 }
@@ -87,7 +86,7 @@ export type HintOption =
 
 export interface Hint {
   enemy: string;
-  trait: TraitId;
+  trait: string;
   /** The cheapest first. */
   options: HintOption[];
 }
@@ -445,15 +444,15 @@ function coverageOf(
   });
   for (const entry of entries) {
     const known = snap.knowledge?.[entry.id] ?? [];
-    const { traits } = planTarget(entry, known, first);
+    const { traits } = planTarget(entry, known, first, content);
     hidden += entry.traits.filter((t) => !known.includes(t)).length;
     for (const trait of traits) {
       const by: TraitCoverage['by'] = [
         ...carried
-          .filter((t) => answersTrait(t, trait))
+          .filter((t) => answersTrait(t, trait, content))
           .map((t) => ({ kind: 'technique' as const, id: t.id })),
         ...packed
-          .filter((i) => itemAnswers(i, trait))
+          .filter((i) => itemAnswers(i, trait, content))
           .map((i) => ({ kind: 'item' as const, id: i.id })),
       ];
       coverage.push({ enemy: entry.id, trait, answered: by.length > 0, by });
@@ -523,12 +522,12 @@ function hintsFor(
     done.add(`${c.enemy}.${c.trait}`);
     const options: HintOption[] = [];
     for (const tech of content.techniques) {
-      if (tech.rank === null || state.known[tech.id] || !answersTrait(tech, c.trait)) continue;
+      if (tech.rank === null || state.known[tech.id] || !answersTrait(tech, c.trait, content)) continue;
       const o = techniqueOption(tech, state, content);
       if (o) options.push(o);
     }
     for (const item of content.items) {
-      if (!itemAnswers(item, c.trait) || pouchUse(item) === 'sleep') continue;
+      if (!itemAnswers(item, c.trait, content)) continue;
       const o = toolOption(state, item, content);
       if (o) options.push(o);
     }

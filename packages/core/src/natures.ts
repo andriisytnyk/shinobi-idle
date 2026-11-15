@@ -82,7 +82,9 @@ export function resolveBossNature(
 
 /** The nature a boss fights with for this player, resolving the rival's rule through the state. */
 export function bossNature(state: GameState, boss: Boss): NatureId | null {
-  if (boss.special.kind === 'rival') return resolveBossNature(state, boss.special.nature);
+  if (boss.special.kind === 'rival' && boss.special.nature) {
+    return resolveBossNature(state, boss.special.nature);
+  }
   if (boss.nature === 'wheel') return resolveBossNature(state, 'wheel');
   return boss.nature;
 }
