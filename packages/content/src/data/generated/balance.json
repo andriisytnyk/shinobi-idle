@@ -485,9 +485,9 @@
       "capMult": 2
     },
     "shop": {
-      "craftSellFactor": 0.4,
+      "craftSellFactor": 0.35,
       "herbBase": 2,
-      "herbPerLevel": 0.4
+      "herbPerLevel": 0
     },
     "gearFx": {
       "mannequin": 0.03,

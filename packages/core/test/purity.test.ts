@@ -32,7 +32,7 @@ describe('A9: core source hygiene', () => {
       'events.ts': [200],
       'formulas.ts': [1000, 3600],
       'progression.ts': [100],
-      'save.ts': [4], // four words of an rng stream
+      'save.ts': [4, 6], // four words of an rng stream; nesting depth of slot data
       'state.ts': [1000, 4, 5], // share scale, rng words, save version
       'xp.ts': [4, 7, 300], // the fixed Melvor level curve
     };

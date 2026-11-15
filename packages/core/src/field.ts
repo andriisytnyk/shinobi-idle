@@ -16,22 +16,17 @@ import { nextFloat } from './rng.ts';
 import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 
-/** The bush a gather slot works: herbs left on it and how many it held when it last filled. */
-interface Bush {
+/** One herb's bush: herbs left, how many it held when it last filled, and work kept while it regrows. */
+export interface Bush {
   stock: number;
   size: number;
+  /** Work done on the regrow cycle when gathering stopped; only an empty bush keeps any. */
+  carry: number;
 }
 
-/** Reads the bush out of the slot data; null when the slot holds none (or something unusable). */
-function readBush(state: GameState, slot: number | undefined, content: ContentDb): Bush | null {
-  const data = slot === undefined ? null : state.slots[slot]?.data;
-  if (typeof data !== 'object' || data === null || Array.isArray(data)) return null;
-  const { stock, size } = data;
-  if (typeof stock !== 'number' || typeof size !== 'number') return null;
-  const K = content.balance.K;
-  const most = K.field.stockBase + K.masteryCap;
-  if (!Number.isInteger(stock) || !Number.isInteger(size) || size < 1 || size > most) return null;
-  return { stock: Math.min(Math.max(stock, 0), size), size };
+/** The bush of a herb as the player left it; a herb never gathered has none. */
+export function bushOf(state: GameState, herb: string): Bush | null {
+  return state.bushes[herb] ?? null;
 }
 
 /** How many herbs a bush yields before it must regrow: the base stock plus the herb's mastery level. */
@@ -58,27 +53,36 @@ export const gatherKind: ActionKind = {
     const extra: Req[] = herb.req ? [herb.req] : [];
     return { t: 'all', of: [...extra, { t: 'skill', skill: 'herb', level: herb.level }] };
   },
-  intervalMs(state, _id, content, rules, slot) {
+  intervalMs(state, id, content, rules) {
     const K = content.balance.K;
     const mod = computeMod(rules.modifierProviders, state, 'interval.skill.herb', content).total;
     const cycle = Math.max(1, Math.round(K.gather * MS_PER_SECOND * mod));
     // An empty bush regrows before the next herb: the pause is part of that cycle.
-    return readBush(state, slot, content)?.stock === 0 ? cycle + K.field.regrowMs : cycle;
+    return bushOf(state, id)?.stock === 0 ? cycle + K.field.regrowMs : cycle;
   },
   start(state, slot, id, content) {
     const target = state.slots[slot];
-    const size = bushSize(state, id, content);
-    if (target) target.data = { stock: size, size };
+    const bush = bushOf(state, id);
+    if (!bush) {
+      const size = bushSize(state, id, content);
+      state.bushes[id] = { stock: size, size, carry: 0 };
+    } else if (target && bush.stock === 0) {
+      // Regrowing only moves while the herb is gathered: resume where it was left.
+      target.progress = bush.carry;
+    }
   },
-  complete(state, id, content, rules, slot) {
+  stop(state, slot, id) {
+    const bush = bushOf(state, id);
+    if (bush) bush.carry = bush.stock === 0 ? (state.slots[slot]?.progress ?? 0) : 0;
+  },
+  complete(state, id, content, rules) {
     const herb = indexOf(content).herbs.get(id);
     if (!herb) return;
-    const held = readBush(state, slot, content);
+    const held = bushOf(state, id);
     // A bush found empty has regrown by now and is full again, to the size its mastery gives now.
     const fresh = bushSize(state, id, content);
-    const bush: Bush = held && held.stock > 0 ? held : { stock: fresh, size: fresh };
-    const target = slot === undefined ? undefined : state.slots[slot];
-    if (target) target.data = { stock: bush.stock - 1, size: bush.size };
+    const bush: Bush = held && held.stock > 0 ? held : { stock: fresh, size: fresh, carry: 0 };
+    state.bushes[id] = { stock: bush.stock - 1, size: bush.size, carry: 0 };
     addItem(state, id, 1);
     const seconds = gatherAverageSeconds(bush.size, content);
     gainXp(state, 'herb', (rate(herb.level, content) * seconds) / SECONDS_PER_HOUR, content, rules);
@@ -150,7 +154,7 @@ export const craftKind: ActionKind = {
     const recipe = indexOf(content).recipes.get(id);
     if (!recipe) return;
     // Ingredients may have left the bank since the cycle began.
-    if (firstMissing(state, id, content) !== null) return 'stop';
+    if (firstMissing(state, id, content) !== null) return 'abort';
     const K = content.balance.K;
     const bonusChance = craftBonusChance(state, id, content);
     const bonus = bonusChance > 0 && nextFloat(state.rng, 'action') < bonusChance;

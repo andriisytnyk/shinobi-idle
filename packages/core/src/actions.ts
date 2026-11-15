@@ -32,14 +32,17 @@ export interface ActionKind {
    * that runs the action, when the caller knows it; kinds that keep state in the slot read it.
    */
   intervalMs(state: GameState, id: string, content: ContentDb, rules: Rules, slot?: number): number;
-  /** Pays out one finished cycle. Returning 'stop' ends the action (one-shot actions). */
+  /**
+   * Pays out one finished cycle. Returning 'stop' ends the action (one-shot actions); 'abort'
+   * ends it too but means nothing was done, so the cycle is not counted.
+   */
   complete(
     state: GameState,
     id: string,
     content: ContentDb,
     rules: Rules,
     slot?: number,
-  ): 'continue' | 'stop' | void;
+  ): 'continue' | 'stop' | 'abort' | void;
   /** The item the action lacks for its next cycle, if any; names the cause when it stops or is refused. */
   missing?(state: GameState, id: string, content: ContentDb, rules: Rules): string | null;
   /** The skill the action trains, when it trains one; a locked skill refuses its actions. */
@@ -232,6 +235,10 @@ export const actionSystem: System = {
         if (slot.progress < need) return;
         slot.progress -= need;
         const result = kind.complete(state, id, content, rules, index);
+        if (result === 'abort') {
+          const lacking = kind.missing?.(state, id, content, rules);
+          return stopSlot(state, index, lacking ? 'requirements' : 'finished', content, rules);
+        }
         const trained = kind.skill?.(id, content);
         if (trained) spendTonicCharges(state, trained);
         state.stats.completed++;

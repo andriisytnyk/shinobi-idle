@@ -13,13 +13,16 @@ export function ownedTiers(state: GameState, line: string): number {
 }
 
 /**
- * What the next tier of a line needs: the tier's skill level, and its building level when it has
+ * What the next tier of a line needs: the rank of Genin, the tier's skill level, and its building level when it has
  * one. Building levels count as met until the village stage exists (see `waiveBuildings`).
  */
 export function nextTierReq(state: GameState, gear: Gear): Req | null {
   const tier = gear.tiers[ownedTiers(state, gear.id)];
   if (!tier) return null;
-  const parts: Req[] = [{ t: 'skill', skill: gear.skill, level: tier.level }];
+  const parts: Req[] = [
+    { t: 'rank', rank: 'genin' },
+    { t: 'skill', skill: gear.skill, level: tier.level },
+  ];
   if (tier.building)
     parts.push({ t: 'building', id: tier.building.id, level: tier.building.level });
   return waiveBuildings({ t: 'all', of: parts });

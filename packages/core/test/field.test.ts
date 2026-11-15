@@ -10,6 +10,9 @@ import {
   rate,
   refreshUnlocks,
   sellPrice,
+  buyPrice,
+  actionInfo,
+  listSkillActions,
   serialize,
   MIGRATIONS,
   STATE_VERSION,
@@ -124,7 +127,7 @@ describe('gather', () => {
     advance(s, 60_000, content);
     expect(s.mastery[MINT]?.xp).toBeGreaterThan(0);
     expect(s.pools.herb.xp).toBeGreaterThan(0);
-    expect(s.slots[0]?.data).toMatchObject({ size: expect.any(Number) });
+    expect(s.bushes[MINT]).toMatchObject({ size: expect.any(Number), carry: 0 });
   });
 
   it('is sped up by the sickle without changing the regrow pause', () => {
@@ -468,11 +471,26 @@ describe('A8: shops', () => {
     expect(s.bank['core:kunai']).toBe(2);
   });
 
-  it('never pays more for a product than its ingredients cost', () => {
+  it('never pays more for a purchase-only product than its ingredients cost, bonus units included', () => {
+    const herbs = new Set(content.herbs.map((h) => h.id));
+    const bonus = (K.craftRules.masteryTiers.length - 1) * K.craftRules.bonusPerTier;
+    let checked = 0;
     for (const r of content.recipes) {
-      const price = sellPrice(r.output.item, content);
+      if (r.ingredients.some((i) => herbs.has(i.item))) continue;
+      const cost = r.ingredients.reduce(
+        (sum, i) => sum + (buyPrice(i.item, content) ?? 0) * i.n,
+        0,
+      );
+      const price = sellPrice(r.output.item, content) ?? 0;
       expect(price, r.id).toBeGreaterThanOrEqual(1);
+      expect(price * (r.output.n + bonus), r.id).toBeLessThan(cost);
+      checked++;
     }
+    expect(checked).toBeGreaterThan(2);
+  });
+
+  it('does not buy herbs', () => {
+    for (const h of content.herbs) expect(sellPrice(h.id, content)).toBeNull();
   });
 });
 
@@ -581,7 +599,7 @@ describe('A12: saving', () => {
     expect(serialize(back, 5)).toBe(text);
     expect(back.buffs).toEqual(s.buffs);
     expect(back.gear).toEqual({ [SICKLE]: 1 });
-    expect(back.slots[0]?.data).toEqual(s.slots[0]?.data);
+    expect(back.bushes).toEqual(s.bushes);
     advance(s, 30_000, content);
     advance(back, 30_000, content);
     expect(serialize(back)).toBe(serialize(s));
@@ -614,12 +632,32 @@ describe('A12: saving', () => {
         action: { kind: 'gather', id: MINT },
         progress: 5,
         share: 1000,
-        data: { stock: 1e9, size: 1e9 },
+        data: { a: { b: { c: { d: { e: { f: { g: 1 } } } } } } },
+      },
+      {
+        action: { kind: 'craft', id: ANTIDOTE },
+        progress: 0,
+        share: 0,
+        data: { fine: [1, 'two', null] },
       },
     ];
+    raw.state.bushes = {
+      [MINT]: { stock: 1e9, size: 1e9, carry: 5 },
+      'core:ghost': { stock: 1, size: 2, carry: 0 },
+      [NETTLE]: { stock: 0, size: 3, carry: 1e18 },
+      'core:hogweed': { stock: 9, size: 3, carry: 4 },
+    };
     const state = deserialize(JSON.stringify(raw), content);
     expect(state.buffs).toEqual({ [CLEAR_MIND]: { skill: 'med', charges: 80 } });
     expect(state.gear).toEqual({ [SICKLE]: 2 });
+    expect(state.slots[0]?.data).toBeNull();
+    expect(state.slots[1]?.data).toEqual({ fine: [1, 'two', null] });
+    const room = (K.field.regrowMs + K.gather * 1000) * 1000;
+    expect(state.bushes).toEqual({
+      [NETTLE]: { stock: 0, size: 3, carry: room },
+      'core:hogweed': { stock: 3, size: 3, carry: 0 },
+    });
+    ok(state, { type: 'action.stop', slot: 1 });
     ok(state, gather(MINT));
     const size = K.field.stockBase + 1;
     advance(state, K.gather * 1000 * size, content);

@@ -25,6 +25,8 @@ export interface ContentIndex {
   items: Map<string, Item>;
   herbs: Map<string, Herb>;
   recipes: Map<string, Recipe>;
+  /** Recipe by the item it makes. */
+  recipeByOutput: Map<string, Recipe>;
   gear: Map<string, Gear>;
   shop: Map<string, ShopEntry>;
   quests: Map<string, Quest>;
@@ -77,6 +79,7 @@ function build(content: ContentDb): ContentIndex {
     items: byId(content.items),
     herbs: byId(content.herbs),
     recipes: byId(content.recipes),
+    recipeByOutput: new Map(content.recipes.map((r) => [r.output.item, r])),
     gear: byId(content.gear),
     shop: new Map(content.shop.map((s) => [s.item, s])),
     quests: byId(content.quests),

@@ -61,6 +61,8 @@ export interface GameState {
   combat: CombatState | null;
   /** Running tonics by item id: the skill (or `allNatures`) they raise and the charges left. */
   buffs: Record<string, { skill: string; charges: number }>;
+  /** Herb bushes as the player left them, by herb id: herbs left, size, and regrow work kept. */
+  bushes: Record<string, { stock: number; size: number; carry: number }>;
   /** Training gear owned: tiers bought, by gear line id. */
   gear: Record<string, number>;
   /** The pinned goal shown in the meta panel. */
@@ -98,6 +100,7 @@ export function createState(seed: number, content: ContentDb): GameState {
     combat: null,
     buffs: {},
     gear: {},
+    bushes: {},
     goal: null,
     events: [],
   };

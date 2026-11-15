@@ -34,7 +34,7 @@ export function sellPrice(itemId: string, content: ContentDb): number | null {
   const K = content.balance.K;
   const trophy = indexOf(content).items.get(itemId)?.sell;
   if (trophy !== undefined) return K.sell[trophy];
-  const recipe = content.recipes.find((r) => r.output.item === itemId);
+  const recipe = indexOf(content).recipeByOutput.get(itemId);
   if (!recipe) return null;
   const value = recipe.ingredients.reduce((sum, i) => sum + unitValue(i.item, content) * i.n, 0);
   return Math.max(1, Math.floor((value / recipe.output.n) * K.shop.craftSellFactor));

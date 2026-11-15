@@ -20,7 +20,7 @@ export const BALANCE_EXT = {
   /** A tonic holds at most this many times the charges of one tonic. */
   tonic: { capMult: 2 },
   /** Shop sell price of a craft product: this share of the value computed from its ingredients; herbs are worth herbBase + herbPerLevel x level. */
-  shop: { craftSellFactor: 0.4, herbBase: 2, herbPerLevel: 0.4 },
+  shop: { craftSellFactor: 0.35, herbBase: 2, herbPerLevel: 0 },
   /** Size of one owned training-gear tier: XP share, time share, keep-ingredients chance, speed share, time share. */
   gearFx: { mannequin: 0.03, sickle: 0.05, alembic: 0.03, stations: 0.05, maps: 0.03 },
   /** Numbers of item effects that name them by key (the recipe text gives no number for the sleeping powder). */
