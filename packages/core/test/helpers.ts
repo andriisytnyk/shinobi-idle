@@ -3,6 +3,7 @@ import {
   createState,
   defaultRules,
   gearProvider,
+  syncVillage,
   teamFor,
   tonicProvider,
   xpAt,
@@ -13,10 +14,18 @@ import type { NatureId, SkillId } from '@shinobi/content';
 
 export const HOUR = 3_600_000;
 
-/** A genin, so the Academy slowdown stays out of the way. */
+/** A genin with the starting village, so the Academy slowdown stays out of the way. */
 export function genin(seed = 1): GameState {
   const state = createState(seed, content);
   state.player.rank = 'genin';
+  syncVillage(state, content);
+  return state;
+}
+
+/** Sets building levels of a genin's village directly, for tests that need a shop or a bonus open. */
+export function withBuildings(state: GameState, levels: Record<string, number>): GameState {
+  if (!state.village) throw new Error('no village');
+  Object.assign(state.village.levels, levels);
   return state;
 }
 

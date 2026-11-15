@@ -36,6 +36,8 @@
   import SettingsPage from './pages/SettingsPage.svelte';
   import SkillPage from './pages/SkillPage.svelte';
   import TechniquePage from './pages/TechniquePage.svelte';
+  import BuildingPage from './pages/BuildingPage.svelte';
+  import VillagePage from './pages/VillagePage.svelte';
   import WorldPage from './pages/WorldPage.svelte';
 
   // The meta panel starts open beside the page on wide screens and closed on phones, where it is an overlay.
@@ -97,6 +99,8 @@
         <CreditsPage />
       {:else if route.page === 'tab' && route.tab === 'more'}
         <MorePage />
+      {:else if route.page === 'tab' && route.tab === 'village'}
+        <VillagePage focus={route.focus ?? null} />
       {:else if route.page === 'tab'}
         <SimplePage title={t(`nav.${route.tab}`)}>
           <p class="hint">{t('entity.placeholder')}</p>
@@ -113,6 +117,8 @@
         <RecipePage id={route.ref.id} />
       {:else if route.page === 'entity' && route.ref.kind === 'gear'}
         <GearPage id={route.ref.id} />
+      {:else if route.page === 'entity' && route.ref.kind === 'building'}
+        <BuildingPage id={route.ref.id} />
       {:else if route.page === 'entity' && route.ref.kind === 'item'}
         <ItemPage id={route.ref.id} />
       {:else if route.page === 'entity'}

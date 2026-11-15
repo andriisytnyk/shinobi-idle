@@ -5,6 +5,7 @@ import type { GameEvent } from './events.ts';
 import { createStreams, type RngStreams } from './rng.ts';
 import type { TeamNatures } from './natures.ts';
 import { updateQuests } from './quests.ts';
+import type { VillageState } from './village-state.ts';
 import { ensurePouch } from './combat/pouch.ts';
 import { createWorld, type WorldState } from './world-state.ts';
 import { refreshUnlocks } from './unlocks.ts';
@@ -83,6 +84,8 @@ export interface GameState {
   team: TeamNatures | null;
   /** Exploration: where the player stands, how often each cell was explored, the points found and the loot taken. */
   world: WorldState;
+  /** The player's district: buildings, resources, treasury, construction. Null until the player is a Genin. */
+  village: VillageState | null;
   /** The pinned goal shown in the meta panel. */
   goal: EntityRef | null;
   /** The techniques taken into a fight, the signature and the saved loadouts. */
@@ -97,7 +100,7 @@ export interface GameState {
   events: GameEvent[];
 }
 
-export const STATE_VERSION = 10;
+export const STATE_VERSION = 11;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
@@ -135,6 +138,7 @@ export function createState(seed: number, content: ContentDb): GameState {
     course: {},
     team: null,
     world: createWorld(content),
+    village: null,
     goal: null,
     events: [],
   };

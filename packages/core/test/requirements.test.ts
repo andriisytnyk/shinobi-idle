@@ -11,7 +11,7 @@ import {
   type Req,
   type ReqResult,
 } from '../src/index.ts';
-import { genin, setLevel } from './helpers.ts';
+import { genin, setLevel, withBuildings } from './helpers.ts';
 
 function shape(r: ReqResult) {
   return { met: r.met, current: r.current, target: r.target, ref: r.ref };
@@ -27,7 +27,7 @@ describe('A8: evalReq', () => {
   state.flags['count'] = 4;
   state.quests['core:q1'] = { step: 2, base: 0, done: false };
   state.quests['core:q3'] = { step: 0, base: 0, done: true };
-  state.flags['building.core:academy'] = 3;
+  withBuildings(state, { 'core:academy': 3 });
   const check = (req: Req) => evalReq(state, req, content);
 
   it('skill', () => {

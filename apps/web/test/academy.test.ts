@@ -504,10 +504,10 @@ describe('navigation and the log', () => {
   it('has five tabs and no sections that do not exist yet', () => {
     const body = html(TabBar, {});
     expect(body.match(/data-tab=/g)).toHaveLength(5);
-    for (const text of [body, html(MainNav, {})]) {
-      expect(text).not.toContain('#/missions');
-      expect(text).not.toContain('#/village');
-    }
+    for (const text of [body, html(MainNav, {})]) expect(text).not.toContain('#/missions');
+    // The village is a page of its own: in the sidebar menu, inside «Ще» on a phone, never a tab.
+    expect(body).not.toContain('#/village');
+    expect(html(MainNav, {})).toContain('#/village');
   });
 
   it('says the fight continues when the log is empty mid-fight', () => {
