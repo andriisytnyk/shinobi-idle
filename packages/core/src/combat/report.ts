@@ -1,4 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
+import { indexOf } from '../lookup.ts';
 import type { GameState } from '../state.ts';
 import { fightTimeMs, habituation } from './fight.ts';
 import type { FightState } from './fight-types.ts';
@@ -70,6 +71,9 @@ export const blankReport = (): TargetReport => ({
 });
 
 const MAX_COUNTED = 1e12;
+/** The keys the fight engine files damage under besides technique ids: the basic attack, and a trait's own damage. */
+const BASIC_KEY = 'basic';
+const TRAIT_SRC = 'trait:';
 
 /** Rounds the floating figures of a tally so a report stays a short, exact JSON. */
 const round = (x: number): number => Math.min(MAX_COUNTED, Math.round(x));
@@ -194,7 +198,7 @@ export function mergeReport(into: TargetReport, from: TargetReport, keep: number
   into.loot.bounty += from.loot.bounty;
   add(into.loot.items, from.loot.items);
   into.wounds += from.wounds;
-  into.defeats.push(...from.defeats);
+  into.defeats.push(...from.defeats.map((d) => ({ ...d })));
   if (into.defeats.length > keep) into.defeats.splice(0, into.defeats.length - keep);
 }
 
@@ -227,33 +231,43 @@ function counts(raw: unknown, allowed: (key: string) => boolean): Record<string,
 export function parseReport(raw: unknown, content: ContentDb): TargetReport | null {
   if (!isRecord(raw)) return null;
   const r = blankReport();
-  const anyKey = (key: string): boolean => key.length > 0 && key.length <= 64;
+  // Every key must name something the content has, so a forged save cannot grow a report without bound.
+  const index = indexOf(content);
+  const technique = (key: string): boolean => index.techniques.has(key);
+  const item = (key: string): boolean => index.itemIds.has(key);
+  const status = (key: string): boolean => content.statuses.some((x) => x.id === key);
+  const combo = (key: string): boolean => content.combos.some((x) => x.id === key);
+  // Damage is also kept for the basic attack, which no technique id names: the fight's own key.
+  const damage = (key: string): boolean =>
+    technique(key) ||
+    key === BASIC_KEY ||
+    (key.startsWith(TRAIT_SRC) && content.traits.some((x) => x.id === key.slice(TRAIT_SRC.length)));
   r.fights = count(raw.fights);
   r.wins = count(raw.wins);
   r.losses = count(raw.losses);
   r.timeouts = count(raw.timeouts);
   r.winMs = count(raw.winMs);
   r.allMs = count(raw.allMs);
-  r.damage = counts(raw.damage, anyKey);
-  r.uses = counts(raw.uses, anyKey);
-  r.statuses = counts(raw.statuses, anyKey);
-  r.combos = counts(raw.combos, anyKey);
+  r.damage = counts(raw.damage, damage);
+  r.uses = counts(raw.uses, technique);
+  r.statuses = counts(raw.statuses, status);
+  r.combos = counts(raw.combos, combo);
   r.basic = count(raw.basic);
   r.interrupts = count(raw.interrupts);
   r.taken = count(raw.taken);
   if (isRecord(raw.habLow)) {
     for (const [key, v] of Object.entries(raw.habLow)) {
-      if (anyKey(key) && typeof v === 'number' && Number.isFinite(v)) {
+      if (technique(key) && typeof v === 'number' && Number.isFinite(v)) {
         r.habLow[key] = Math.min(1, Math.max(0, v));
       }
     }
   }
-  r.items = counts(raw.items, anyKey);
+  r.items = counts(raw.items, item);
   if (isRecord(raw.loot)) {
     r.loot = {
       ryo: count(raw.loot.ryo),
       bounty: count(raw.loot.bounty),
-      items: counts(raw.loot.items, anyKey),
+      items: counts(raw.loot.items, item),
     };
   }
   r.wounds = count(raw.wounds);

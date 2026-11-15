@@ -11,7 +11,12 @@
       "first": {
         "ryo": 1500,
         "rep": 40,
-        "parts": []
+        "parts": [
+          {
+            "technique": "core:water_prison",
+            "chance": "mission"
+          }
+        ]
       },
       "repeat": {
         "ryo": 0,
@@ -61,7 +66,11 @@
         "t": "days",
         "days": 5,
         "fightsPerDay": 3,
-        "pool": ["core:serpent", "core:leech", "core:fake_genin"],
+        "pool": [
+          "core:serpent",
+          "core:leech",
+          "core:fake_genin"
+        ],
         "finale": "core:boss_nameless"
       }
     ]

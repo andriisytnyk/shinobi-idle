@@ -11,7 +11,7 @@ import type { GameState } from '../state.ts';
 import type { System } from '../system.ts';
 import { encounterFor } from './fight-encounter.ts';
 import { bossNature } from '../natures.ts';
-import { noteFight, noteSighting } from './bingo.ts';
+import { noteBounty, noteFight, noteSighting } from './bingo.ts';
 import { grantLoot, rollLoot } from './loot.ts';
 import { recordFight, recordItems, recordLoot, recordWounds, stampDefeat } from './report.ts';
 import { payOperation } from './rewards.ts';
@@ -225,6 +225,7 @@ function victory(state: GameState, c: CombatState, content: ContentDb, key: stri
     const loot = rollLoot(state, fallen);
     grantLoot(state, c.enemy, loot);
     recordLoot(state, key, loot);
+    noteBounty(state, c.enemy, loot.bounty);
   }
   noteFight(state, c.enemy, 'win', content);
   recordFight(state, key, c.fight, 'win', content);

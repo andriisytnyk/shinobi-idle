@@ -8,15 +8,18 @@ import type {
   Technique,
   TraitId,
 } from '@shinobi/content';
-import { MS_PER_HOUR, rate } from '../formulas.ts';
+import { advance, dispatch } from '../engine.ts';
+import { MS_PER_HOUR, MS_PER_MINUTE, MS_PER_SECOND } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
-import { getMod } from '../mod.ts';
 import { bossNature } from '../natures.ts';
-import { createStream, nextInt, nextUint32 } from '../rng.ts';
+import { createStream, createStreams, nextInt, nextUint32 } from '../rng.ts';
 import type { Rules } from '../rules.ts';
 import { buyPrice } from '../shop.ts';
+import { deserialize, serialize } from '../save.ts';
 import { scrollOf } from '../scrolls.ts';
 import type { GameState } from '../state.ts';
+import { bingoLevel, revealAt } from './bingo.ts';
+import { FIGHT_KIND, OPERATION_KIND } from './system.ts';
 import { createFight, fightAdvance, fightTimeMs } from './fight.ts';
 import { encounterFor } from './fight-encounter.ts';
 import { pouchUse } from './fight-items.ts';
@@ -25,7 +28,6 @@ import type { FightState } from './fight-types.ts';
 import { answersTrait, itemAnswers, planTarget } from './loadout.ts';
 import { secMs, type PlayerSnapshot } from './numbers.ts';
 import { snapshotPlayer } from './snapshot.ts';
-import { WORK_PER_MS } from './units.ts';
 import { approachMs, entryOf, fightTarget, opSteps } from './zones.ts';
 
 /** What a battle analysis is asked about: a fight zone, a boss (its id or its zone's), or an operation. */
@@ -41,6 +43,9 @@ export interface AnalysisOptions {
   seed?: number;
   /** A loadout to try in place of the player's (ids of techniques the player knows). */
   loadout?: readonly string[];
+  /** Minutes of a session and the number of sessions averaged; the balance defaults when absent. */
+  sessionMinutes?: number;
+  sessionRuns?: number;
 }
 
 /** One answer to a known trait: a technique of the loadout or an item of the pouch. */
@@ -90,12 +95,6 @@ export interface Analysis {
   meanMs: number;
   /** Wins (or clears) per hour of playing the target over and over. */
   winsPerHour: number;
-  /** Skill XP per hour, modifiers counted; and mastery XP per hour by technique. */
-  xpPerHour: Partial<Record<SkillId, number>>;
-  masteryPerHour: Record<string, number>;
-  /** Expected ryo per hour (bounty at the repeat share), and expected items per hour (trophies, scroll parts). */
-  ryoPerHour: number;
-  lootPerHour: Record<string, number>;
   woundsPerHour: number;
   /** Pouch units used per hour, by item id. */
   itemsPerHour: Record<string, number>;
@@ -103,6 +102,35 @@ export interface Analysis {
   coverage: TraitCoverage[];
   hiddenTraits: number;
   hints: Hint[];
+  /** The same target played as a session on a detached copy of the game; null when it cannot be started from this state. */
+  session: Session | null;
+}
+
+/**
+ * The figures of a session: the real game loop run on a copy of the state for the session length
+ * of the balance object, restarting the target after every defeat, with Wounds, the pouch, the
+ * regeneration between fights and the pauses all as in play. Averaged over several runs.
+ * Loot figures follow the Bingo knowledge level: what the book would hide is `'unknown'` or counted
+ * in `lootUnknown` without naming it.
+ */
+export interface Session {
+  minutes: number;
+  runs: number;
+  /** Wins over wins, defeats and timeouts of the session (for an operation: clears over clears and defeats). */
+  winRate: number;
+  winsPerHour: number;
+  ryoPerHour: number | 'unknown';
+  /** Items gained per hour by item id; a row the book does not show yet is counted in `lootUnknown` instead. */
+  lootPerHour: Record<string, number | 'unknown'>;
+  lootUnknown: number;
+  /** Skill XP and mastery XP per hour, as they landed. */
+  xpPerHour: Partial<Record<SkillId, number>>;
+  masteryPerHour: Record<string, number>;
+  /** Wound stacks over the session: the mean and the most reached; and Wounds earned per hour. */
+  woundStacks: { mean: number; max: number };
+  woundsPerHour: number;
+  /** Pouch units used per hour, by item id. */
+  itemsPerHour: Record<string, number>;
 }
 
 /** The difference of two analyses of one target: B minus A. */
@@ -112,9 +140,8 @@ export interface LoadoutComparison {
   winRate: number;
   meanWinMs: number;
   winsPerHour: number;
-  ryoPerHour: number;
-  woundsPerHour: number;
-  xpPerHour: Partial<Record<SkillId, number>>;
+  /** Differences of the session figures; null when either side cannot be played as a session. */
+  session: { winRate: number; winsPerHour: number; woundStacksMax: number } | null;
 }
 
 type Entry = Enemy | Boss;
@@ -316,17 +343,6 @@ function nextIntFrom(rng: ReturnType<typeof createStream>, n: number): number {
   return nextInt({ r: rng }, 'r', n);
 }
 
-/** Expected loot of one win over an entry: ryo (bounty at the repeat share) and items. */
-function lootOf(entry: Entry): { ryo: number; items: Record<string, number> } {
-  const items: Record<string, number> = {};
-  for (const d of entry.drops) items[d.item] = (items[d.item] ?? 0) + d.chance;
-  const part = entry.scrollPart;
-  if (part)
-    items[part.item] = (items[part.item] ?? 0) + ('count' in part ? part.count : part.chance);
-  const bounty = entry.bounty ? entry.bounty.first * entry.bounty.repeatShare : 0;
-  return { ryo: (entry.ryo[0] + entry.ryo[1]) / 2 + bounty, items };
-}
-
 // ---------- coverage and hints ----------
 
 function coverageOf(
@@ -482,56 +498,6 @@ export function analyzeFight(
   const perHour = cycleMs > 0 ? MS_PER_HOUR / cycleMs : 0;
   const winRate = samples === 0 ? 0 : fig.wins / samples;
 
-  // Combat XP follows slot time: every tick pays the style skill, Vitality and Evasion by the level of the enemy.
-  let ryo = 0;
-  const loot: Record<string, number> = {};
-  let defeatedTotal = 0;
-  let levelWeight = 0;
-  for (const [id, n] of Object.entries(fig.defeated)) {
-    const entry = entryOf(content, id);
-    if (!entry) continue;
-    const l = lootOf(entry);
-    ryo += l.ryo * n * perHour;
-    for (const [item, chance] of Object.entries(l.items)) {
-      loot[item] = (loot[item] ?? 0) + chance * n * perHour;
-    }
-    defeatedTotal += n;
-    levelWeight += entry.cl * n;
-  }
-  const level = defeatedTotal > 0 ? levelWeight / defeatedTotal : (found.entries[0]?.cl ?? 1);
-  if (found.op?.rewards) {
-    const pay = found.op.rewards.repeat;
-    ryo += pay.ryo * winRate * perHour;
-    for (const part of pay.parts) {
-      const id = content.items.find((i) => i.part?.technique === part.technique)?.id;
-      if (id) loot[id] = (loot[id] ?? 0) + K.partDrop[part.chance] * winRate * perHour;
-    }
-  }
-  const mod = (key: string): number => getMod(state, key, content, rules).total;
-  const xpPerHour: Partial<Record<SkillId, number>> = {};
-  const perSkill = (skill: SkillId, share: number): void => {
-    if (!(share > 0)) return;
-    xpPerHour[skill] =
-      (xpPerHour[skill] ?? 0) +
-      share * rate(level, content) * mod('xp.all') * mod(`xp.skill.${skill}`);
-  };
-  perSkill('vit', K.combatXp.vit);
-  perSkill('eva', K.combatXp.eva);
-  const index = indexOf(content);
-  const cycleWork = Math.max(1, cycleMs * WORK_PER_MS);
-  const masteryPerHour: Record<string, number> = {};
-  let styled = 0;
-  for (const [id, work] of Object.entries(fig.masteryWork)) {
-    const tech = index.techniques.get(id);
-    if (!tech) continue;
-    const share = Math.min(1, work / cycleWork);
-    const bonus = snap.signature === id ? 1 + K.signature.xpBonus : 1;
-    masteryPerHour[id] = bonus * K.masteryPerHour * share;
-    perSkill(tech.skill, K.combatXp.style * share);
-    styled += share;
-  }
-  perSkill('tai', K.combatXp.style * Math.max(0, 1 - styled));
-
   const itemsPerHour: Record<string, number> = {};
   for (const [id, n] of Object.entries(fig.items)) itemsPerHour[id] = n * perHour;
   const { coverage, hidden } = coverageOf(snap, found.entries, state, content);
@@ -542,15 +508,223 @@ export function analyzeFight(
     meanWinMs: fig.winMs,
     meanMs: fig.allMs,
     winsPerHour: winRate * perHour,
-    xpPerHour,
-    masteryPerHour,
-    ryoPerHour: ryo,
-    lootPerHour: loot,
     woundsPerHour: fig.wounds * perHour,
     itemsPerHour,
     coverage,
     hiddenTraits: hidden,
     hints: hintsFor(coverage, state, content),
+    session: sessionOf(state, target, found, opts, seed, content, rules),
+  };
+}
+
+// ---------- the session ----------
+
+interface SessionRun {
+  wins: number;
+  fights: number;
+  ryo: number;
+  xp: Partial<Record<SkillId, number>>;
+  mastery: Record<string, number>;
+  gained: Record<string, number>;
+  used: Record<string, number>;
+  wounds: number;
+  stackSum: number;
+  stackMax: number;
+  steps: number;
+}
+
+/** The id the fight action takes for a target: a boss named by its own id is fought through its zone. */
+function actionOf(target: AnalysisTarget, found: Resolved, content: ContentDb): string {
+  if (found.op) return found.op.id;
+  const index = indexOf(content);
+  return index.zones.has(target.id)
+    ? target.id
+    : (index.zoneByEnemy.get(target.id)?.id ?? target.id);
+}
+
+/** The enemy ids and the items a target can leave, from the content data, for the knowledge gate. */
+function lootSources(found: Resolved): Map<string, { enemies: string[]; part: boolean }> {
+  const sources = new Map<string, { enemies: string[]; part: boolean }>();
+  for (const e of found.entries) {
+    for (const d of e.drops) {
+      const row = sources.get(d.item) ?? { enemies: [], part: false };
+      row.enemies.push(e.id);
+      sources.set(d.item, row);
+    }
+    if (e.scrollPart) {
+      const row = sources.get(e.scrollPart.item) ?? { enemies: [], part: true };
+      row.enemies.push(e.id);
+      row.part = true;
+      sources.set(e.scrollPart.item, row);
+    }
+  }
+  return sources;
+}
+
+/** Plays one session on a detached copy of the state with a stream set of its own. */
+function playSession(
+  state: GameState,
+  target: AnalysisTarget,
+  found: Resolved,
+  minutes: number,
+  loadout: readonly string[] | undefined,
+  seed: number,
+  content: ContentDb,
+  rules: Rules,
+): SessionRun | null {
+  const clone = deserialize(serialize(state, 0), content, rules);
+  clone.rng = createStreams(seed);
+  clone.events = [];
+  clone.report = {};
+  clone.combat = null;
+  for (const slot of clone.slots) {
+    slot.action = null;
+    slot.progress = 0;
+    slot.data = null;
+  }
+  if (loadout) {
+    const known = new Set(Object.keys(clone.known));
+    clone.loadouts.active = loadout.filter((id, i, all) => known.has(id) && all.indexOf(id) === i);
+    clone.loadouts.auto = false;
+    if (clone.loadouts.signature && !clone.loadouts.active.includes(clone.loadouts.signature)) {
+      clone.loadouts.signature = null;
+    }
+  }
+  const kind = found.op ? OPERATION_KIND : FIGHT_KIND;
+  const id = actionOf(target, found, content);
+  const start = (): boolean =>
+    dispatch(clone, { type: 'action.start', slot: 0, kind, id }, content, rules).ok;
+  if (!start()) return null;
+
+  const sources = lootSources(found);
+  const skills = Object.keys(clone.skills) as SkillId[];
+  const xp0 = Object.fromEntries(skills.map((k) => [k, clone.skills[k].xp]));
+  const mastery0 = Object.fromEntries(Object.entries(clone.mastery).map(([k, v]) => [k, v.xp]));
+  const bank0 = { ...clone.bank };
+  const ryo0 = clone.currencies.ryo;
+  const run: SessionRun = {
+    wins: 0,
+    fights: 0,
+    ryo: 0,
+    xp: {},
+    mastery: {},
+    gained: {},
+    used: {},
+    wounds: 0,
+    stackSum: 0,
+    stackMax: 0,
+    steps: 0,
+  };
+  const win = found.op ? 'operationCleared' : 'enemyDefeated';
+  for (let t = 0; t < minutes * MS_PER_MINUTE; t += MS_PER_SECOND) {
+    advance(clone, MS_PER_SECOND, content, rules);
+    for (const e of clone.events) {
+      if (e.type === win) {
+        run.wins++;
+        run.fights++;
+      } else if (e.type === 'playerDefeated') run.fights++;
+    }
+    clone.events = [];
+    run.steps++;
+    run.stackSum += clone.wounds.stacks;
+    run.stackMax = Math.max(run.stackMax, clone.wounds.stacks);
+    // A defeat (or a finished operation) ends the action; the player starts it again at once.
+    if (!clone.slots[0]?.action && !start()) break;
+  }
+  const r = clone.report[id];
+  if (!found.op) run.fights += r?.timeouts ?? 0;
+  run.wounds = r?.wounds ?? 0;
+  run.used = { ...(r?.items ?? {}) };
+  run.ryo = clone.currencies.ryo - ryo0;
+  for (const k of skills) {
+    const d = clone.skills[k].xp - (xp0[k] ?? 0);
+    if (d > 0) run.xp[k] = d;
+  }
+  for (const [k, v] of Object.entries(clone.mastery)) {
+    const d = v.xp - (mastery0[k] ?? 0);
+    if (d > 0) run.mastery[k] = d;
+  }
+  for (const item of sources.keys()) {
+    const d = (clone.bank[item] ?? 0) - (bank0[item] ?? 0);
+    if (d > 0) run.gained[item] = d;
+  }
+  const partRewards = found.op?.rewards?.repeat.parts ?? [];
+  for (const part of partRewards) {
+    const item = content.items.find((i) => i.part?.technique === part.technique)?.id;
+    if (item) {
+      const d = (clone.bank[item] ?? 0) - (bank0[item] ?? 0);
+      if (d > 0) run.gained[item] = (run.gained[item] ?? 0) + d;
+    }
+  }
+  return run;
+}
+
+/** The session figures averaged over the runs the balance object names, gated by what the Bingo book shows. */
+function sessionOf(
+  state: GameState,
+  target: AnalysisTarget,
+  found: Resolved,
+  opts: AnalysisOptions,
+  seed: number,
+  content: ContentDb,
+  rules: Rules,
+): Session | null {
+  const K = content.balance.K;
+  const minutes = opts.sessionMinutes ?? K.analysis.sessionMinutes;
+  const runs = opts.sessionRuns ?? K.analysis.sessionRuns;
+  const played: SessionRun[] = [];
+  for (let i = 0; i < runs; i++) {
+    const run = playSession(state, target, found, minutes, opts.loadout, seed + i, content, rules);
+    if (!run) return null;
+    played.push(run);
+  }
+  const hours = (minutes * runs * MS_PER_MINUTE) / MS_PER_HOUR;
+  const sum = (pick: (r: SessionRun) => number): number =>
+    played.reduce((n, r) => n + pick(r), 0);
+  const merge = (pick: (r: SessionRun) => Record<string, number>): Record<string, number> => {
+    const out: Record<string, number> = {};
+    for (const r of played) {
+      for (const [k, v] of Object.entries(pick(r))) out[k] = (out[k] ?? 0) + v / hours;
+    }
+    return out;
+  };
+  const fights = sum((r) => r.fights);
+  const steps = sum((r) => r.steps);
+
+  // What the book lets the player see of the loot: the same rules as the Bingo view.
+  const levels = found.entries.map((e) => revealAt(bingoLevel(state, e.id, content)));
+  const ryoKnown = levels.every((l) => l.ryo);
+  const lootPerHour: Record<string, number | 'unknown'> = {};
+  let lootUnknown = 0;
+  const gained = merge((r) => r.gained);
+  const sources = lootSources(found);
+  for (const [item, perHour] of Object.entries(gained)) {
+    const source = sources.get(item);
+    if (!source) {
+      lootPerHour[item] = perHour;
+      continue;
+    }
+    const reveals = source.enemies.map((id) => revealAt(bingoLevel(state, id, content)));
+    const shown = reveals.every((l) => (source.part ? l.carries : l.drops));
+    if (!shown) lootUnknown++;
+    else lootPerHour[item] = reveals.every((l) => l.chances) ? perHour : 'unknown';
+  }
+  return {
+    minutes,
+    runs,
+    winRate: fights === 0 ? 0 : sum((r) => r.wins) / fights,
+    winsPerHour: sum((r) => r.wins) / hours,
+    ryoPerHour: ryoKnown ? sum((r) => r.ryo) / hours : 'unknown',
+    lootPerHour,
+    lootUnknown,
+    xpPerHour: merge((r) => r.xp as Record<string, number>) as Partial<Record<SkillId, number>>,
+    masteryPerHour: merge((r) => r.mastery),
+    woundStacks: {
+      mean: steps === 0 ? 0 : sum((r) => r.stackSum) / steps,
+      max: Math.max(0, ...played.map((r) => r.stackMax)),
+    },
+    woundsPerHour: sum((r) => r.wounds) / hours,
+    itemsPerHour: merge((r) => r.used),
   };
 }
 
@@ -573,20 +747,19 @@ export function compareLoadouts(
   const first = analyzeFight(state, target, { ...opts, loadout: a }, content, rules);
   const second = analyzeFight(state, target, { ...opts, loadout: b }, content, rules);
   if (!first || !second) return null;
-  const xp: Partial<Record<SkillId, number>> = {};
-  const skills = new Set([
-    ...Object.keys(first.xpPerHour),
-    ...Object.keys(second.xpPerHour),
-  ]) as Set<SkillId>;
-  for (const s of skills) xp[s] = (second.xpPerHour[s] ?? 0) - (first.xpPerHour[s] ?? 0);
   return {
     a: first,
     b: second,
     winRate: second.winRate - first.winRate,
     meanWinMs: second.meanWinMs - first.meanWinMs,
     winsPerHour: second.winsPerHour - first.winsPerHour,
-    ryoPerHour: second.ryoPerHour - first.ryoPerHour,
-    woundsPerHour: second.woundsPerHour - first.woundsPerHour,
-    xpPerHour: xp,
+    session:
+      first.session && second.session
+        ? {
+            winRate: second.session.winRate - first.session.winRate,
+            winsPerHour: second.session.winsPerHour - first.session.winsPerHour,
+            woundStacksMax: second.session.woundStacks.max - first.session.woundStacks.max,
+          }
+        : null,
   };
 }

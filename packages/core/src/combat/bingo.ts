@@ -25,6 +25,35 @@ export interface BingoEntry {
 
 /** Levels of knowledge: unknown, seen, defeated, studied. */
 export const BINGO_MAX = 3;
+/** The level Intel cannot buy: it is earned by a first win (or, for a boss, a first fight). */
+const BOUGHT_GAP = 1;
+
+/**
+ * What a knowledge level lets the player see of an entry's loot and traits. The Bingo view and
+ * the battle analysis both read it, so neither can show what the other hides.
+ */
+export interface Reveal {
+  /** Traits that show on sight (level 1) and the hidden ones and the mechanic (level 2). */
+  traits: boolean;
+  hiddenTraits: boolean;
+  /** The technique it carries (so the part it drops) and the ryo it pays (level 2). */
+  carries: boolean;
+  ryo: boolean;
+  /** The trophies it drops, exact chances and the bounty (level 3). */
+  drops: boolean;
+  chances: boolean;
+  bounty: boolean;
+}
+
+export const revealAt = (level: number): Reveal => ({
+  traits: level >= 1,
+  hiddenTraits: level >= 2,
+  carries: level >= 2,
+  ryo: level >= 2,
+  drops: level >= 3,
+  chances: level >= 3,
+  bounty: level >= 3,
+});
 
 export const blankBingo = (): BingoEntry => ({
   seen: 0,
@@ -92,6 +121,11 @@ export function noteFight(
   announce(state, id, before, content);
 }
 
+/** Notes bounty ryo paid for an entry. */
+export function noteBounty(state: GameState, id: string, ryo: number): void {
+  if (ryo > 0) entryFor(state, id).bounty += ryo;
+}
+
 /** Whether the entry is a first kill (no win yet recorded). */
 export const isFirstWin = (state: GameState, id: string): boolean =>
   (state.bingo[id]?.wins ?? 0) === 0;
@@ -136,6 +170,8 @@ export function studyEnemy(state: GameState, id: string, content: ContentDb): Co
   if (!entry) return { ok: false, reason: 'error.unknownEnemy' };
   const level = bingoLevel(state, id, content);
   if (level >= BINGO_MAX) return { ok: false, reason: 'error.bingoMax' };
+  // Intel gives the first sight and the last level; the level between them is earned by a fight.
+  if (level === BOUGHT_GAP) return { ok: false, reason: 'error.bingoNeedsFight' };
   if (level === 0 && !canScout(state, id, content)) {
     return { ok: false, reason: 'error.notDiscovered' };
   }
@@ -179,6 +215,7 @@ export function bingoView(state: GameState, id: string, content: ContentDb): Bin
   const b = state.bingo[id] ?? blankBingo();
   const visible: readonly string[] = content.ai.visibleTraits;
   const cost = studyCost(content);
+  const reveal = revealAt(level);
   return {
     id,
     level,
@@ -189,12 +226,13 @@ export function bingoView(state: GameState, id: string, content: ContentDb): Bin
     studyCost: cost,
     canStudy:
       level < BINGO_MAX &&
+      level !== BOUGHT_GAP &&
       state.currencies.intel >= cost &&
       (level > 0 || canScout(state, id, content)),
-    traits: level >= 1 ? entry.traits.filter((t) => visible.includes(t)) : [],
-    hiddenTraits: level >= 2 ? entry.traits.filter((t) => !visible.includes(t)) : null,
-    carries: level >= 2 ? entry.carries : null,
-    drops: level >= 3 ? entry.drops.map((d) => ({ ...d })) : null,
-    bounty: level >= 3 && entry.bounty ? { ...entry.bounty, paid: b.bounty } : null,
+    traits: reveal.traits ? entry.traits.filter((t) => visible.includes(t)) : [],
+    hiddenTraits: reveal.hiddenTraits ? entry.traits.filter((t) => !visible.includes(t)) : null,
+    carries: reveal.carries ? entry.carries : null,
+    drops: reveal.chances ? entry.drops.map((d) => ({ ...d })) : null,
+    bounty: reveal.bounty && entry.bounty ? { ...entry.bounty, paid: b.bounty } : null,
   };
 }

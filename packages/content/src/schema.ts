@@ -1013,6 +1013,9 @@ export const balanceParamsSchema = z.object({
     seed: z.number().int(),
     budgetMs: z.number().int(),
     hintOptions: z.number().int().min(1),
+    /** The session forecast: minutes of one session and how many are averaged. */
+    sessionMinutes: z.number().int().min(1),
+    sessionRuns: z.number().int().min(1),
   }),
   /** Battle report: how many of the latest defeats a report keeps. */
   report: z.object({ defeats: z.number().int().min(1) }),
