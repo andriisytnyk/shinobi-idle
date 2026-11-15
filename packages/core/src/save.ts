@@ -8,9 +8,11 @@ import {
 import { rebalanceShares } from './actions.ts';
 import { COURSE_ID, COURSE_KIND } from './athletics.ts';
 import { tonicCharges } from './buffs.ts';
+import { BINGO_MAX } from './combat/bingo.ts';
 import { RATION_BUFF } from './missions/ration.ts';
 import { repairMissions } from './missions/run.ts';
 import { parseFight } from './combat/fight-parse.ts';
+import { parseReport } from './combat/report.ts';
 import { secMs } from './combat/numbers.ts';
 import { pouchUse } from './combat/fight-items.ts';
 import { loadoutLimits, syncLoadout } from './combat/loadout.ts';
@@ -136,6 +138,34 @@ export const MIGRATIONS: readonly Migration[] = [
   },
   // v11 -> v12: missions. Village resource units earned by missions wait here until a village takes them.
   (state) => ({ ...state, missions: { pending: {} } }),
+  // v12 -> v13: the Bingo book replaces `seen`; battle reports start empty. An entry the old rule
+  // counted as beaten (a win, a defeat or a watched fight) keeps its knowledge as a bought level 2.
+  (state) => {
+    const seen = isRecord(state.seen) ? state.seen : {};
+    const counters = isRecord(state.counters) ? state.counters : {};
+    const bingo: Record<string, unknown> = {};
+    const ids = new Set<string>(Object.keys(seen));
+    for (const key of Object.keys(counters)) {
+      const m = /^(?:kills|defeats|studied)\.(.+)$/.exec(key);
+      if (m?.[1]) ids.add(m[1]);
+    }
+    for (const id of ids) {
+      const wins = nonNegative(counters[`kills.${id}`]);
+      const losses = nonNegative(counters[`defeats.${id}`]);
+      const timeouts = nonNegative(counters[`studied.${id}`]);
+      bingo[id] = {
+        seen: Math.max(1, wins + losses + timeouts),
+        wins,
+        losses,
+        timeouts,
+        bought: wins + losses + timeouts > 0 ? 2 : 0,
+        bounty: 0,
+      };
+    }
+    const { seen: _seen, ...rest } = state;
+    void _seen;
+    return { ...rest, bingo, report: {} };
+  },
 ];
 
 /** Deepest nesting a slot's data may have. */
@@ -539,8 +569,28 @@ export function deserialize(
           : 0,
     };
   }
-  state.seen = pick(raw.seen, (key, v) =>
-    v === true && entryOf(content, key) ? (true as const) : undefined,
+  state.bingo = pick(raw.bingo, (key, v) => {
+    const entry = entryOf(content, key);
+    if (!entry || !isRecord(v)) return undefined;
+    const n = (x: unknown): number => Math.floor(nonNegative(x));
+    // The bounty paid cannot exceed what the content allows for the wins: the first, then the repeat share.
+    const wins = n(v.wins);
+    const ceiling = entry.bounty
+      ? entry.bounty.first + wins * Math.round(entry.bounty.first * entry.bounty.repeatShare)
+      : 0;
+    return {
+      seen: n(v.seen),
+      wins,
+      losses: n(v.losses),
+      timeouts: n(v.timeouts),
+      bought: Math.min(BINGO_MAX, n(v.bought)),
+      bounty: Math.min(ceiling, n(v.bounty)),
+    };
+  });
+  state.report = pick(raw.report, (key, v) =>
+    entryOf(content, key) || Object.values(rules.actionKinds).some((kind) => kind.has(key, content))
+      ? (parseReport(v, content) ?? undefined)
+      : undefined,
   );
   if (Array.isArray(raw.slots) && raw.slots.length > 0) {
     state.slots = [];

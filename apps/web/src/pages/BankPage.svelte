@@ -56,8 +56,10 @@
   const targets = $derived(
     game.read((gs) =>
       pickingItem?.use
-        ? content.techniques.filter(
-            (tech) => tech.mentor === pickingItem.use?.mentor && gs.known[tech.id] === true,
+        ? content.techniques.filter((tech) =>
+            pickingItem.use?.t === 'notes'
+              ? tech.rank !== null && gs.known[tech.id] === true
+              : tech.mentor === pickingItem.use?.mentor && gs.known[tech.id] === true,
           )
         : [],
     ),

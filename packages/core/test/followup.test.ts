@@ -27,6 +27,7 @@ describe('fighting by a raw enemy id respects the gating of its zone', () => {
   it('refuses a student the enemies of the forest, and a boss needs its flag', () => {
     const student = fighter(1, 10);
     student.player.rank = 'student';
+    student.flags = {};
     expect(startFight(student, 'core:bandit')).toEqual({
       ok: false,
       reason: 'error.requirementsNotMet',
@@ -44,17 +45,10 @@ describe('fighting by a raw enemy id respects the gating of its zone', () => {
     expect(startFight(genin, 'core:zone_boss_wolf')).toEqual({ ok: true });
   });
 
-  it('follows the switch of the balance extension that turns the region zones back to their flags', () => {
-    const off = {
-      ...content,
-      balance: {
-        ...content.balance,
-        K: { ...K, regionZones: { ...K.regionZones, openFromRank: 'off' as const } },
-      },
-    };
+  it('opens a region enemy by its id only with its region flag', () => {
     const state = fighter(2, 10);
-    const open = () =>
-      dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: 'core:marauder' }, off);
+    state.flags = {};
+    const open = () => startFight(state, 'core:marauder');
     expect(open()).toEqual({ ok: false, reason: 'error.requirementsNotMet' });
     unlock(state, 'region.plains.unlocked');
     expect(open()).toEqual({ ok: true });
@@ -310,6 +304,7 @@ describe('a student and a genin against a locked zone', () => {
     for (const id of ['core:foreign_genin', 'core:tiger']) {
       const student = fighter(8, 10);
       student.player.rank = 'student';
+      student.flags = {};
       expect(startFight(student, id), id).toEqual({
         ok: false,
         reason: 'error.requirementsNotMet',
@@ -318,19 +313,10 @@ describe('a student and a genin against a locked zone', () => {
   });
 
   it('refuses a genin a zone whose flag is not raised, by zone id and by enemy id', () => {
-    const off = {
-      ...content,
-      balance: {
-        ...content.balance,
-        K: { ...K, regionZones: { ...K.regionZones, openFromRank: 'off' as const } },
-      },
-    };
     const state = fighter(9, 20);
+    state.flags = {};
     for (const id of ['core:zone_foreign_genin', 'core:foreign_genin', 'core:zone_boss_wolf']) {
-      expect(
-        dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id }, off),
-        id,
-      ).toEqual({
+      expect(startFight(state, id), id).toEqual({
         ok: false,
         reason: 'error.requirementsNotMet',
       });
@@ -448,19 +434,16 @@ describe('what a fight to the time cap teaches', () => {
     return state;
   }
 
-  it('shows the hidden traits and the mechanic once the fight ran out of time', () => {
+  it('is counted in the book, and teaches an ordinary enemy nothing without a win', () => {
     const state = watched(K.combat.fightCapMs + 5000);
-    expect(state.counters['studied.core:kiri_hunter']).toBeGreaterThanOrEqual(1);
-    expect(knowledgeOf(state, content, ['core:kiri_hunter'])['core:kiri_hunter']).toEqual([
-      'hidden',
-      'special',
-    ]);
+    expect(state.bingo['core:kiri_hunter']?.timeouts).toBeGreaterThanOrEqual(1);
+    expect(knowledgeOf(state, content, ['core:kiri_hunter'])['core:kiri_hunter']).toEqual([]);
   });
 
   it('teaches nothing new when the player stops within the first seconds', () => {
     const state = watched(5000);
     dispatch(state, { type: 'action.stop', slot: 0 }, content);
-    expect(state.counters['studied.core:kiri_hunter']).toBeUndefined();
+    expect(state.bingo['core:kiri_hunter']?.timeouts).toBe(0);
     expect(knowledgeOf(state, content, ['core:kiri_hunter'])['core:kiri_hunter']).toEqual([]);
   });
 });

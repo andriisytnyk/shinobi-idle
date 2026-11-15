@@ -579,14 +579,46 @@
       "guardBelow": 0.6
     },
     "woundHp": 0.1,
-    "regionZones": {
-      "openFromRank": "genin",
-      "regions": [
-        "forest",
-        "plains",
-        "valley",
-        "exam"
-      ]
+    "bingo": {
+      "studiedWins": {
+        "enemy": 25,
+        "boss": 3
+      },
+      "rareBelow": 0.05
+    },
+    "analysis": {
+      "samples": 400,
+      "opSamples": 200,
+      "seed": 7,
+      "budgetMs": 5000,
+      "hintOptions": 3,
+      "sessionMinutes": {
+        "zone": 15,
+        "boss": 60,
+        "operation": 60
+      },
+      "sessionHours": {
+        "zone": 5,
+        "boss": 16,
+        "operation": 16
+      },
+      "minSessions": 4,
+      "afterShare": 0.25,
+      "horizonMinutes": 240,
+      "confidenceZ": 1.64,
+      "batch": {
+        "zone": 50,
+        "operation": 20
+      },
+      "verdict": {
+        "collapseBelow": 0.5,
+        "hopelessBelow": 0.1,
+        "stableMedian": 0.8,
+        "stableCollapse": 0.15
+      }
+    },
+    "report": {
+      "defeats": 5
     },
     "operation": {
       "approachMs": 30000,

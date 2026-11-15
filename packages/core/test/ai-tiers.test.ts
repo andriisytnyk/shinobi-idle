@@ -15,7 +15,7 @@ import {
   type ViewTechnique,
 } from '../src/index.ts';
 import { K, enemyAt, scripted, sec } from './fight-helpers.ts';
-import { fighter, startFight } from './prep-state.ts';
+import { fighter, know, startFight } from './prep-state.ts';
 import { advance } from '../src/index.ts';
 
 const tierOf = (id: 'genin' | 'chunin'): AiTier => {
@@ -327,18 +327,18 @@ describe('what the player knows of an enemy', () => {
     const wolves = 'core:guard_pack';
     expect(knowledgeOf(state, content, [wolves])[wolves]).toEqual([]);
     startFight(state, 'core:zone_guard_pack');
-    expect(state.seen[wolves]).toBe(true);
+    expect(state.bingo[wolves]?.seen).toBe(1);
     const seen = knowledgeOf(state, content, [wolves])[wolves];
     expect(seen).toEqual(expect.arrayContaining(['armor', 'pack']));
     const hidden = 'core:kiri_hunter';
-    state.seen[hidden] = true;
+    state.bingo[hidden] = { seen: 1, wins: 0, losses: 0, timeouts: 0, bought: 0, bounty: 0 };
     expect(knowledgeOf(state, content, [hidden])[hidden]).toEqual([]);
-    state.counters[`kills.${hidden}`] = 1;
+    state.bingo[hidden] = { seen: 1, wins: 1, losses: 0, timeouts: 0, bought: 0, bounty: 0 };
     expect(knowledgeOf(state, content, [hidden])[hidden]).toEqual(['hidden', 'special']);
     advance(state, 1000, content);
-    // Losing to an enemy teaches as much as beating it.
-    const lost = 'core:fake_genin';
-    state.counters[`defeats.${lost}`] = 1;
+    // A boss teaches as much with a defeat as with a win.
+    const lost = 'core:boss_nameless';
+    state.bingo[lost] = { seen: 1, wins: 0, losses: 1, timeouts: 0, bought: 0, bounty: 0 };
     expect(knowledgeOf(state, content, [lost])[lost]).toContain('illusionist');
   });
 
@@ -346,7 +346,7 @@ describe('what the player knows of an enemy', () => {
     const state = fighter(2, 36);
     startFight(state, 'core:zone_kiri_hunter');
     expect(state.combat?.fight.knowledge['core:kiri_hunter']).toEqual([]);
-    state.counters['kills.core:kiri_hunter'] = 1;
+    know(state, 'core:kiri_hunter');
     state.combat = null;
     state.slots[0] = { action: null, progress: 0, share: 1000, data: null };
     startFight(state, 'core:zone_kiri_hunter');

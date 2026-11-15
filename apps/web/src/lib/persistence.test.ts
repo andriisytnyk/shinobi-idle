@@ -230,6 +230,7 @@ describe('report', () => {
         masteryLevelsGained: {},
         techniquesLearned: [],
         actionsStopped: [],
+        reports: {},
       }),
     ).toBeNull();
   });

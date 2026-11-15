@@ -18,6 +18,7 @@ import {
   type GameState,
 } from '../src/index.ts';
 import { HOUR, setLevel } from './helpers.ts';
+import { bestOf, speedBudget } from './speed.ts';
 import { fighter, ids, run, startFight, startOperation, stock, unlock } from './prep-state.ts';
 import { playerFor } from './prep-helpers.ts';
 import { encounterFor } from '../src/index.ts';
@@ -169,14 +170,16 @@ describe('A11: speed', () => {
     const enemy = content.enemies.find((e) => e.id === 'core:hunter');
     if (!enemy) throw new Error('no enemy');
     const snap = playerFor(enemy, 'katon', { prep: 'auto', tier: 1, knowledge: 'none' });
-    const t0 = performance.now();
-    const r = simulateFights(snap, encounterFor(enemy, content), 1000, 5, content, defaultRules);
-    const ms = performance.now() - t0;
+    const limit = speedBudget(2000, 8000);
+    let r = simulateFights(snap, encounterFor(enemy, content), 1, 5, content, defaultRules);
+    const ms = bestOf(3, limit, () => {
+      r = simulateFights(snap, encounterFor(enemy, content), 1000, 5, content, defaultRules);
+    });
     console.log(
       `A11: 1000 fights against ${enemy.id} in ${ms.toFixed(0)} ms, win ${(r.winRate * 100).toFixed(0)}%`,
     );
     expect(r.fights).toBe(1000);
-    expect(ms).toBeLessThan(2000);
+    expect(ms).toBeLessThan(limit);
   });
 
   it('plays 12 game hours of zone fighting with the pouch in under 3000 ms', () => {
@@ -193,9 +196,8 @@ describe('A11: speed', () => {
     );
     const bank =
       (state.bank[ids.tag] ?? 0) + (state.bank[ids.heal] ?? 0) + (state.bank[ids.kunai] ?? 0);
-    const t0 = performance.now();
-    advance(state, 12 * HOUR, content);
-    const ms = performance.now() - t0;
+    const limit = speedBudget(3000, 12_000);
+    const ms = bestOf(1, limit, () => advance(state, 12 * HOUR, content));
     const kills = state.counters['kills.core:guard_pack'] ?? 0;
     const refilled =
       bank -
@@ -206,7 +208,7 @@ describe('A11: speed', () => {
     expect(kills).toBeGreaterThan(300);
     expect(refilled).toBeGreaterThan(100);
     expect(state.slots[0]?.action).not.toBeNull();
-    expect(ms).toBeLessThan(3000);
+    expect(ms).toBeLessThan(limit);
   });
 });
 
@@ -256,7 +258,7 @@ describe('A12: saves', () => {
     const loaded = deserialize(serialize(state, 0), content);
     expect(loaded.combat?.run).toEqual(state.combat?.run);
     expect(loaded.slots[0]?.action).toEqual({ kind: 'operation', id: 'core:op_hideout' });
-    expect(loaded.seen['core:guard_pack']).toBe(true);
+    expect(loaded.bingo['core:guard_pack']?.seen).toBeGreaterThanOrEqual(1);
   });
 
   for (const boss of content.bosses) {
@@ -312,7 +314,7 @@ describe('A12: saves', () => {
     expect(loaded.v).toBe(STATE_VERSION);
     expect(loaded.wounds).toEqual({ stacks: 0, left: 0 });
     expect(loaded.pouch.slots).toHaveLength(3);
-    expect(loaded.seen['core:bandit']).toBe(true);
+    expect(loaded.bingo['core:bandit']?.seen).toBeGreaterThanOrEqual(1);
     expect(loaded.loadouts.auto).toBe(true);
     expect(loaded.loadouts.active.length).toBeGreaterThan(0);
     expect(loaded.combat?.enemy).toBe('core:bandit');

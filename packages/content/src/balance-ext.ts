@@ -181,8 +181,26 @@ export const BALANCE_EXT = {
   ai: { geninReactionMs: 1000, guardBelow: 0.6 },
   /** Health share below which a won fight still costs a Wound. */
   woundHp: 0.1,
-  /** Until exploration gives real flags, every region zone is open from this rank. */
-  regionZones: { openFromRank: 'genin', regions: ['forest', 'plains', 'valley', 'exam'] },
+  /** The Bingo book: wins that fully study an ordinary enemy and a boss. */
+  bingo: { studiedWins: { enemy: 25, boss: 3 }, rareBelow: 0.05 },
+  /** Battle analysis: fights per zone or boss run, runs per operation, the seed, the time budget (ms) of a default run, and the options a hint lists. */
+  analysis: {
+    samples: 400,
+    opSamples: 200,
+    seed: 7,
+    budgetMs: 5000,
+    hintOptions: 3,
+    sessionMinutes: { zone: 15, boss: 60, operation: 60 },
+    sessionHours: { zone: 5, boss: 16, operation: 16 },
+    minSessions: 4,
+    afterShare: 0.25,
+    horizonMinutes: 240,
+    confidenceZ: 1.64,
+    batch: { zone: 50, operation: 20 },
+    verdict: { collapseBelow: 0.5, hopelessBelow: 0.1, stableMedian: 0.8, stableCollapse: 0.15 },
+  },
+  /** Battle report: the latest defeats it keeps. */
+  report: { defeats: 5 },
   /** Operations: ms of the approach stage, and its share when the shortening requirement holds. */
   operation: { approachMs: 30000, approachShort: 0.5 },
   /** Missions: -1% time per level above a stage's requirement (never under half), -0.3% per mastery level of the technique used, a slower fallback takes twice the time; a stage attempt succeeds with 90% plus 1% per level and 0.2% per mastery level, at most 99%. */

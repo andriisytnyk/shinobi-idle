@@ -669,7 +669,7 @@ export function wheelFactor(skill: SkillId, nature: NatureId | null, content: Co
 }
 
 /** Damage multiplier of habituation after `previous` uses of a technique against this enemy. */
-function habituation(previous: number, mult: number, content: ContentDb): number {
+export function habituation(previous: number, mult: number, content: ContentDb): number {
   const K = content.balance.K;
   return 1 - Math.min(K.habituationCap, K.habituation * mult * previous);
 }

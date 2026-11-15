@@ -1,4 +1,5 @@
 import type { ContentDb, SkillId } from '@shinobi/content';
+import { mergeReports, type TargetReport } from './combat/report.ts';
 import { advance } from './engine.ts';
 import type { ActionStoppedEvent } from './events.ts';
 import { MS_PER_HOUR, masteryLevel } from './formulas.ts';
@@ -19,6 +20,8 @@ export interface OfflineSummary {
   /** Techniques learned and actions stopped while away, so the UI can explain what changed. */
   techniquesLearned: string[];
   actionsStopped: ActionStoppedEvent[];
+  /** The battle report of the time away, by target. */
+  reports: Record<string, TargetReport>;
 }
 
 /**
@@ -44,9 +47,15 @@ export function advanceOffline(
 
   const queued = state.events;
   state.events = [];
+  // The time away gets a report of its own; afterwards it is folded into the running one.
+  const before = state.report;
+  state.report = {};
   advance(state, simulatedMs, content, rules);
   const away = state.events;
   state.events = queued;
+  const reports = state.report;
+  state.report = before;
+  mergeReports(state.report, reports, content);
 
   const summary: OfflineSummary = {
     requestedMs,
@@ -57,6 +66,7 @@ export function advanceOffline(
     masteryLevelsGained: {},
     techniquesLearned: [],
     actionsStopped: [],
+    reports,
   };
   for (const e of away) {
     if (e.type === 'techniqueLearned') summary.techniquesLearned.push(e.id);

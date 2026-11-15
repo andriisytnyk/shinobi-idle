@@ -9,6 +9,7 @@ import { grantMastery } from './progression.ts';
 import { openCrate } from './missions/crate.ts';
 import { useRation } from './missions/ration.ts';
 import type { Rules } from './rules.ts';
+import { readNotes, readScroll } from './scrolls.ts';
 import type { GameState } from './state.ts';
 
 /**
@@ -42,8 +43,11 @@ export function useItem(
     emit(state, { type: 'itemUsed', id, target: 'wounds' });
     return { ok: true };
   }
+  // A scroll teaches its technique, or is read as Notes when the technique is known.
+  if (item.scroll) return readScroll(state, id, item.scroll.technique, content, rules);
   const use = item.use;
   if (!use) return { ok: false, reason: 'error.itemNotUsable' };
+  if (use.t === 'notes') return readNotes(state, id, target, content, rules);
   const technique = target === undefined ? undefined : index.techniques.get(target);
   if (!technique || technique.mentor !== use.mentor) {
     return { ok: false, reason: 'error.invalidTarget' };

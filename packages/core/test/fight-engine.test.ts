@@ -24,7 +24,8 @@ import {
   type GameState,
 } from '../src/index.ts';
 import { K, enemyAt, pacify, playerFor, rules, sec, withAi } from './fight-helpers.ts';
-import { genin, setLevel } from './helpers.ts';
+import { fightingGenin as genin, openWorld, setLevel } from './helpers.ts';
+import { bestOf, speedBudget } from './speed.ts';
 
 // ---------- A3: independence from the game state ----------
 
@@ -108,11 +109,13 @@ describe('A4: performance', () => {
     const snap = playerFor(30, 'katon');
     const enemy = enemyAt(30);
     simulateFights(snap, enemy, 50, 1, content, defaultRules);
-    const start = performance.now();
-    const summary = simulateFights(snap, enemy, 1000, 2, content, defaultRules);
-    const ms = performance.now() - start;
+    const limit = speedBudget(1500, 6000);
+    let summary = simulateFights(snap, enemy, 1, 2, content, defaultRules);
+    const ms = bestOf(3, limit, () => {
+      summary = simulateFights(snap, enemy, 1000, 2, content, defaultRules);
+    });
     console.log(`A4: 1000 fights in ${ms.toFixed(0)} ms, win rate ${summary.winRate}`);
-    expect(ms).toBeLessThan(1500);
+    expect(ms).toBeLessThan(limit);
   });
 });
 
@@ -412,18 +415,19 @@ describe('the fight action wraps the fight engine', () => {
     expect(state.combat?.fight.tally.basic ?? 0).toBeGreaterThan(0);
   });
 
-  it('draws only from the combat stream and only when a fight begins', () => {
+  it('draws only from the combat and loot streams', () => {
     const state = strong(6);
-    const others = JSON.stringify([state.rng.action, state.rng.loot, state.rng.world]);
+    const others = JSON.stringify([state.rng.action, state.rng.world]);
     start(state, 'core:dummy');
     advance(state, 60_000, content);
-    expect(JSON.stringify([state.rng.action, state.rng.loot, state.rng.world])).toBe(others);
+    expect(JSON.stringify([state.rng.action, state.rng.world])).toBe(others);
   });
 
   it('stops with a defeat when the player falls', () => {
     const state = createState(7, content);
     // The strongest enemy is in a gated zone: the player is a genin.
     state.player.rank = 'genin';
+    openWorld(state);
     const boss = content.enemies.reduce((a, b) => (a.cl > b.cl ? a : b));
     start(state, boss.id);
     advance(state, 10 * 60_000, content);

@@ -19,7 +19,7 @@ import {
 } from '../src/index.ts';
 import { K, castSeq, quiet, withAi } from './fight-helpers.ts';
 import { setLevel } from './helpers.ts';
-import { fighter, ids, run, stock } from './prep-state.ts';
+import { fighter, ids, know, run, stock } from './prep-state.ts';
 
 const tech = (id: string) => {
   const t = content.techniques.find((x) => x.id === id);
@@ -335,7 +335,7 @@ describe('loadout.prepare against a known trait', () => {
     it(`includes an answer to ${trait} against ${enemy} when the player owns one`, () => {
       const known = fighter(1, 40, 'katon');
       // The player has beaten the enemy, so its traits are known.
-      known.counters[`kills.${enemy}`] = 1;
+      know(known, enemy);
       // Technique answers: Futon pierces and reveals, Katon burns and sweeps; tools answer the rest.
       setLevel(known, 'futon', 40);
       known.player.rank = 'chunin';
@@ -362,7 +362,7 @@ describe('loadout.prepare against a known trait', () => {
       const enemy = cases.find(([t]) => t === trait)?.[1] ?? '';
       const state = fighter(1, 12, 'katon');
       state.player.rank = 'genin';
-      state.counters[`kills.${enemy}`] = 1;
+      know(state, enemy);
       // No technique of the player answers the trait.
       for (const id of Object.keys(state.known)) {
         const t = content.techniques.find((x) => x.id === id);
