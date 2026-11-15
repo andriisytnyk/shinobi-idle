@@ -102,7 +102,7 @@
           data-intel={way.kind === 'skip'}
           data-met={way.met}
         >
-          <div class="what">
+          <div class="what" class:tree={(way.result?.children.length ?? 0) > 0}>
             {#if way.kind === 'skip'}
               <span class="study">
                 <Icon entity={{ kind: 'currency', id: study }} size={16} />
@@ -330,6 +330,11 @@
   .what {
     flex: 1 1 var(--panel-min);
     min-width: 0;
+  }
+
+  /* A way with a tree of conditions takes the whole line, so that the tree is not squeezed beside its tags. */
+  .what.tree {
+    flex-basis: 100%;
   }
 
   .tags {
