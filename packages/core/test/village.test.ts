@@ -523,6 +523,17 @@ describe('A9: pace report', () => {
       slugs(['market']),
       slugs(['grounds']),
     ]);
+    const libraryFirstVariant = play(
+      [
+        slugs(['library']),
+        slugs(['store']),
+        PRODUCERS,
+        slugs(['forge']),
+        slugs(['market']),
+        slugs(['grounds']),
+      ],
+      true,
+    );
     console.log(
       [
         'Policy as specified (producers first):',
@@ -531,6 +542,8 @@ describe('A9: pace report', () => {
         ...variant,
         'Library first, no donations:',
         ...libraryFirst,
+        'Library first with the variant (Reputation at 4 h, donations):',
+        ...libraryFirstVariant,
       ].join('\n'),
     );
     expect(spec.length).toBe(5);
