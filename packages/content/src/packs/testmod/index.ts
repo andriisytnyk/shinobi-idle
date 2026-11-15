@@ -23,20 +23,71 @@ const data = {
   currencies: [{ id: 'testmod:token' }],
   villageStages: [{ id: 'testmod:stage3', rep: 'testmod:stage3' }],
   states: [{ id: 'testmod:chilled' }],
-  statuses: [{ id: 'testmod:chill' }],
-  combos: [{ id: 'testmod:frostburn', nature: 'testmod:aether', onState: 'testmod:chilled' }],
-  tags: [{ id: 'testmod:crack' }],
+  /**
+   * A status with a damage over time and a stat modifier (two effects of one status), which stacks
+   * to two: a technique whose state is `testmod:chilled` puts it on the body it hits.
+   */
+  statuses: [
+    {
+      id: 'testmod:chill',
+      state: 'testmod:chilled',
+      effects: [
+        { kind: 'periodic', from: 'maxHp', amount: 'ext.testmod.chillDot' },
+        { kind: 'modifier', stat: 'speed', op: 'mul', value: 'ext.testmod.chillSlow' },
+      ],
+      duration: 'ext.testmod.chillSecs',
+      stacks: 2,
+    },
+  ],
+  /** Its nature (skill) hitting a body that is chilled breaks the chill in a blow of `K.combo` times the hit. */
+  combos: [
+    {
+      id: 'testmod:frostburn',
+      nature: 'testmod:aether',
+      onState: 'testmod:chilled',
+      effect: { kind: 'burst' },
+    },
+  ],
+  /** A tag that cracks a shell: the body takes more damage while the crack lasts and the trait stops. */
+  tags: [
+    {
+      id: 'testmod:crack',
+      onHit: [
+        {
+          op: 'effect',
+          id: 'testmod:cracked',
+          effects: [
+            { kind: 'modifier', stat: 'damageTaken', op: 'mul', value: 'ext.testmod.crackMult' },
+          ],
+          duration: 'ext.testmod.crackSecs',
+          suppresses: 'testmod:shelled',
+          tally: { as: 'testmod:crackBreak', whenSuppressing: true },
+        },
+      ],
+    },
+  ],
   roles: [{ id: 'testmod:sapper' }],
+  /** Armour in data: it cuts damage by `K.ext.testmod.shellArmor`; a core tool tag answers it. */
   traits: [
     {
       id: 'testmod:shelled',
-      answer: 'testmod:crack',
+      answer: 'area',
       numbers: { from: 'ext.testmod', keys: ['shellArmor'] },
+      mods: [
+        {
+          stat: 'damageTaken',
+          op: 'mul',
+          value: { path: 'ext.testmod.shellArmor', oneMinus: true },
+        },
+      ],
+      priority: 5,
     },
   ],
 
   // ----- skill, technique, seal -----
   skills: [
+    /** A nature as a skill: its techniques are of the nature that the wheel and the combos see. */
+    { id: 'testmod:aether', group: 'nin', activity: 'tech', unlockReq: null },
     {
       id: 'testmod:forge',
       group: 'craft',
@@ -49,7 +100,7 @@ const data = {
   techniques: [
     {
       id: 'testmod:ember_pulse',
-      skill: 'katon',
+      skill: 'testmod:aether',
       level: 3,
       rank: 'D',
       rankCanon: false,
@@ -154,7 +205,8 @@ const data = {
         technique: 'testmod:ember_pulse',
         count: 2,
       },
-      special: { kind: 'heavyCast', fx: 'testmod:heavy', stun: false },
+      /** Every third attack is a heavy one: a hook the pack's `rules` registers. */
+      special: { kind: 'testmod:thirdStrike', fx: 'testmod:third', hook: 'testmod:thirdStrike' },
     },
   ],
 
@@ -219,7 +271,31 @@ const data = {
   ],
 } satisfies Record<string, unknown>;
 
+/**
+ * The hook of the test boss: every third basic attack of the body is a heavy one (its damage times
+ * `K.bossFx['testmod:third'].mult`). Written with the minimum of the shape of a fight hook, since
+ * the content package does not know the engine; the rules of a pack are code that lives in it.
+ */
+const thirdStrike = {
+  id: 'testmod:thirdStrike',
+  onAttack(
+    ctx: {
+      content: { balance: { K: { bossFx: Record<string, Record<string, number> | undefined> } } };
+    },
+    c: { data: Record<string, number> },
+    plan: { damage: number },
+  ): void {
+    const n = (c.data['testmod.attacks'] ?? 0) + 1;
+    c.data['testmod.attacks'] = n;
+    if (n % 3 === 0) plan.damage *= ctx.content.balance.K.bossFx['testmod:third']?.mult ?? 1;
+  },
+};
+
 export const testmodPack: ContentPack = {
+  rules: (base) => ({
+    ...base,
+    fightHooks: [...((base.fightHooks as readonly unknown[] | undefined) ?? []), thirdStrike],
+  }),
   manifest: { id: 'testmod', version: '0.1.0', dependsOn: ['core'], loadAfter: [] },
   data: data as unknown as PackData,
   balance: {
@@ -229,23 +305,29 @@ export const testmodPack: ContentPack = {
       missionRateCap: { 'testmod:trial': 20 },
       role: { 'testmod:sapper': { m: 0.5, cd: 8, c: 1 } },
       combo: { 'testmod:frostburn': 0.3 },
-      bossFx: {
-        'testmod:heavy': {
-          everyMs: 25000,
-          castMs: 3000,
-          damageMult: 1.5,
-          stunMs: 0,
-          hp: 1,
-          dmg: 1,
+      bossFx: { 'testmod:third': { mult: 2.5, hp: 1, dmg: 1 } },
+      rep: { 'testmod:stage3': 500 },
+      ext: {
+        testmod: {
+          shellArmor: 0.2,
+          chillDot: 0.01,
+          chillSlow: 0.8,
+          chillSecs: 6,
+          crackMult: 1.25,
+          crackSecs: 8,
         },
       },
-      rep: { 'testmod:stage3': 500 },
-      ext: { testmod: { shellArmor: 0.2 } },
     },
-    pace: { 'testmod:forge': [3, 7, 11, 17, 25] },
+    pace: {
+      'testmod:forge': [3, 7, 11, 17, 25],
+      'testmod:aether': [13, 33, 56, 80, 117],
+    },
   },
   locales: {
     uk: {
+      'skill.testmod:aether.name': 'Тестовий ефір (навичка)',
+      'skill.testmod:aether.desc':
+        'Тестова навичка стихії мода: її техніки мають місце в колі стихій і в комбо.',
       'skill.testmod:forge.name': 'Тестова кузня',
       'skill.testmod:forge.desc':
         'Тестова навичка пакета перевірки: вона лише доводить, що мод додає навички даними.',
@@ -318,6 +400,11 @@ export const testmodPack: ContentPack = {
     },
   },
   patches: [
+    {
+      /** The wheel both ways: a core nature beats the test nature, which beats another core one. */
+      target: { kind: 'natures', id: 'doton' },
+      append: { strongAgainst: ['testmod:aether'] },
+    },
     {
       /** A new drop row on a core enemy: the pack changes another pack's entity explicitly. */
       target: { kind: 'enemies', id: 'core:wolf' },
