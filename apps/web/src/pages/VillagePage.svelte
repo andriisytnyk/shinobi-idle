@@ -34,7 +34,7 @@
   const queue = $derived(game.read((gs) => villageQueue(gs, content)));
   const stage = $derived(game.read((gs) => villageStage(gs, content)));
   const workforce = $derived(game.read((gs) => gs.village?.workforce ?? 0));
-  const ryo = $derived(game.read((gs) => gs.currencies.ryo));
+  const ryo = $derived(game.read((gs) => gs.currencies.ryo ?? 0));
 
   const civil = $derived(resources.filter((r) => r.kind === 'civil'));
   const shinobi = $derived(resources.filter((r) => r.kind === 'shinobi'));

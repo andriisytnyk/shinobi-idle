@@ -1,4 +1,3 @@
-import type { NatureId, SkillId } from '@shinobi/content';
 import type { GameState } from './state.ts';
 
 /** The queue keeps the newest events only (battle log lines first to go); the UI drains it long before this matters. */
@@ -11,7 +10,7 @@ interface EventBase {
 
 export interface LevelUpEvent extends EventBase {
   type: 'levelUp';
-  skill: SkillId;
+  skill: string;
   level: number;
 }
 export interface MasteryUpEvent extends EventBase {
@@ -21,7 +20,7 @@ export interface MasteryUpEvent extends EventBase {
 }
 export interface PoolCheckpointEvent extends EventBase {
   type: 'poolCheckpoint';
-  skill: SkillId;
+  skill: string;
   /** Content id of the checkpoint. */
   id: string;
   pct: number;
@@ -48,13 +47,6 @@ export interface EnemyDefeatedEvent extends EventBase {
 export interface PlayerDefeatedEvent extends EventBase {
   type: 'playerDefeated';
   enemy: string;
-}
-/** A hook of a pack failed: the fight was cut short and paid and cost nothing; the hook is off until the next load. */
-export interface FightVoidedEvent extends EventBase {
-  type: 'fightVoided';
-  enemy: string;
-  pack: string;
-  hook: string;
 }
 /** One line of the battle log: who did what, with which technique, for how much damage. */
 export interface CombatLogEvent extends EventBase {
@@ -151,7 +143,7 @@ export interface ObstacleBuiltEvent extends EventBase {
 /** A chakra nature was chosen; `first` marks the native nature found by the test. */
 export interface NatureGainedEvent extends EventBase {
   type: 'natureGained';
-  nature: NatureId;
+  nature: string;
   first: boolean;
 }
 
@@ -215,6 +207,23 @@ export interface StorageFullEvent extends EventBase {
   resource: string;
 }
 
+/** A loaded save was made with other packs than the content has now: these appeared (`added`) or vanished (`removed`). */
+export interface PacksChangedEvent extends EventBase {
+  type: 'packsChanged';
+  added: string[];
+  removed: string[];
+  /** Packs present both times whose version changed. */
+  updated: { id: string; from: string; to: string }[];
+}
+
+/** A rule that a pack added failed and was switched off for this session: its pack, the rule and why. */
+export interface RuleDisabledEvent extends EventBase {
+  type: 'ruleDisabled';
+  pack: string;
+  rule: string;
+  reason: string;
+}
+
 export type GameEvent =
   | LevelUpEvent
   | MasteryUpEvent
@@ -222,7 +231,6 @@ export type GameEvent =
   | TechniqueLearnedEvent
   | ActionStoppedEvent
   | EnemyDefeatedEvent
-  | FightVoidedEvent
   | PlayerDefeatedEvent
   | CombatLogEvent
   | OperationClearedEvent
@@ -248,7 +256,9 @@ export type GameEvent =
   | MissionDoneEvent
   | BuildingBuiltEvent
   | VillageStageEvent
-  | StorageFullEvent;
+  | StorageFullEvent
+  | PacksChangedEvent
+  | RuleDisabledEvent;
 
 type WithoutAt<T> = T extends unknown ? Omit<T, 'at'> : never;
 

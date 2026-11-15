@@ -61,7 +61,8 @@ function targets(): { name: string; zone: string; level: number; boss: string | 
 function savedGame(t: { zone: string; level: number; boss: string | null }): string {
   const state: GameState = fighter(7, Math.max(2, t.level), 'katon');
   for (const n of ['futon', 'raiton', 'doton', 'suiton'] as const) {
-    state.skills[n].xp = state.skills.katon.xp;
+    const s = state.skills[n];
+    if (s) s.xp = state.skills.katon?.xp ?? 0;
   }
   stock(state, { [ids.heal]: 60, [ids.kunai]: 12, [ids.tag]: 12 });
   run(state, { type: 'pouch.set', slot: 0, item: ids.heal });

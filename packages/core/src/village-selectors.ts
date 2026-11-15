@@ -11,7 +11,9 @@ import {
   effectiveLevel,
   maxBuildingLevel,
   shinobiCap,
+  reputationOf,
   stageCap,
+  stageRep,
   tickMs,
   treasuryIncome,
 } from './village.ts';
@@ -277,25 +279,26 @@ export function villageQueue(state: GameState, content: ContentDb): QueueInfo | 
 }
 
 export interface StageInfo {
-  stage: 1 | 2;
+  /** The stage, counted from 1 in the order of `content.villageStages`. */
+  stage: number;
   /** The highest building level the stage allows. */
   levelCap: number;
-  /** Reputation the player has and what stage 2 needs. */
+  /** Reputation the player has and what the next stage needs (the last stage's own when it is reached). */
   rep: number;
   repNeeded: number;
-  /** Whether stage 2 is reached. */
+  /** Whether the last stage is reached. */
   reached: boolean;
 }
 
 export function villageStage(state: GameState, content: ContentDb): StageInfo {
   const village = state.village;
   const stage = currentStage(state, content);
-  const needed = content.balance.K.rep.stage2;
+  const last = content.villageStages.length;
   return {
     stage,
     levelCap: village ? stageCap(state, content) : (content.balance.K.towerStageMax[0] ?? 0),
-    rep: state.currencies.rep,
-    repNeeded: needed,
-    reached: stage >= 2,
+    rep: reputationOf(state, content),
+    repNeeded: stageRep(content, Math.min(stage + 1, last)),
+    reached: stage >= last,
   };
 }

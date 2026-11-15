@@ -219,7 +219,7 @@ describe('A6: graduation', () => {
     expect(state.player.rank).toBe('genin');
     for (const t of content.techniques) {
       if (t.src !== 'N') continue;
-      const reached = (state.skills[t.skill].xp >= xpAt(t.level)) as boolean;
+      const reached = (state.skills[t.skill]!.xp >= xpAt(t.level)) as boolean;
       expect(Boolean(state.known[t.id]), t.id).toBe(reached);
     }
     expect(Object.keys(state.known).length).toBeGreaterThan(4);
@@ -324,7 +324,7 @@ describe('A8: saves', () => {
     const loaded = deserialize(JSON.stringify(old), content);
     expect(loaded.v).toBe(STATE_VERSION);
     expect(loaded.slots[0]?.action).toEqual({ kind: 'practice', id: 'core:leaf_whirlwind' });
-    expect(loaded.skills.tai.xp).toBe(state.skills.tai.xp);
+    expect(loaded.skills.tai!.xp).toBe(state.skills.tai!.xp);
     expect(loaded.counters).toEqual({});
     expect(loaded.combat).toBeNull();
     expect(loaded.goal).toBeNull();

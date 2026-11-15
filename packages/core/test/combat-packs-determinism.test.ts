@@ -32,7 +32,7 @@ function game(seed: number, zone: string): GameState {
   state.player.rank = 'genin';
   state.player.natures = ['katon'];
   // The team follows the native nature, as in a played game (a load works it out).
-  state.team = teamFor('katon');
+  state.team = teamFor(mod, 'katon');
   for (const skill of mod.skills) {
     const s = state.skills[skill.id];
     if (s) s.xp = 30_000;

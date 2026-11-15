@@ -1,4 +1,4 @@
-import type { ContentDb, Mod, NatureId, Practice } from '@shinobi/content';
+import type { ContentDb, Mod, Practice } from '@shinobi/content';
 import { skillAction, type ActionKind } from './actions.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
@@ -8,6 +8,11 @@ import { bonusOf, type Modifier, type ModifierProvider } from './modifiers.ts';
 import { nextFloat } from './rng.ts';
 import type { Rules } from './rules.ts';
 import type { GameState, MeditationEntry } from './state.ts';
+import { activitySkill, entitySkill, ownsNature } from './vocab.ts';
+
+/** The skill that meditation trains: the one whose activity is `insight` (Meditation). */
+export const meditationSkill = (content: ContentDb): string | null =>
+  activitySkill(content, 'insight');
 
 export type MeditationKind = 'insight' | 'enlight';
 
@@ -63,9 +68,10 @@ export function meditationChances(
 /** Meditation: the plain training action, then a roll for an Insight and one for an Enlightenment. */
 const meditationBase = skillAction((_state, id, content) => {
   const p = indexOf(content).practices.get(id);
-  if (!p) return null;
+  const skill = p ? entitySkill(content, 'insight', p) : null;
+  if (!p || skill === null) return null;
   return {
-    skill: 'med',
+    skill,
     level: p.level,
     masteryKey: id,
     baseSeconds: content.balance.K.meditate,
@@ -125,8 +131,8 @@ export function buyMeditationLevel(
 }
 
 /** Why a bought modifier does not work: its chakra nature is not owned. */
-export const isNatureLocked = (state: GameState, nature: NatureId | undefined): boolean =>
-  nature !== undefined && !state.player.natures.includes(nature);
+export const isNatureLocked = (state: GameState, nature: string | undefined): boolean =>
+  nature !== undefined && !ownsNature(state, nature);
 
 /**
  * Bought Meditation modifiers: each level gives total / levels of the modifier's value. A modifier
@@ -175,7 +181,7 @@ export interface MeditationModInfo {
   unlockMastery: number;
   unlocked: boolean;
   /** The chakra nature the player lacks, when that keeps the bought levels from working. */
-  lockedNature: NatureId | null;
+  lockedNature: string | null;
   /** Whether the bought levels work now. */
   active: boolean;
   /** Whether one more level can be bought now. */

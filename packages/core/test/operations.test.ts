@@ -291,8 +291,8 @@ describe('the Forest of Death', () => {
     );
     const body = state.combat?.fight.enemies[0];
     if (!body) throw new Error('no body');
-    expect(body.fleeAt).toBe(K.bossFx.illusion.fleeAtHp);
-    body.hp = body.maxHp * (K.bossFx.illusion.fleeAtHp + 0.001);
+    expect(body.fleeAt).toBe(K.bossFx.illusion!.fleeAtHp);
+    body.hp = body.maxHp * (K.bossFx.illusion!.fleeAtHp! + 0.001);
     for (let i = 0; i < 600 && state.slots[0]?.action; i++) advance(state, 500, content);
     expect(state.combat).toBeNull();
     expect(state.flags[forest.clearFlag]).toBe(true);

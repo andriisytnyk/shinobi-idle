@@ -1,4 +1,5 @@
 import { content as defaultContent, type ContentDb } from '@shinobi/content';
+import { moneyOf } from '@shinobi/core';
 import {
   actionsKey,
   buyPrice,
@@ -135,7 +136,7 @@ export function runHourly(bot: Bot, o: HourlyOptions): HourlyResult {
       ),
       ryoSold: sold,
       ryoSpent: spent,
-      ryo: state.currencies.ryo,
+      ryo: state.currencies[moneyOf(content)] ?? 0,
       crafted: diff(actionsKey(KIND_CRAFT)),
       gathered: diff(actionsKey(KIND_GATHER)),
       kills: total(killsNow) - total(killsThen),

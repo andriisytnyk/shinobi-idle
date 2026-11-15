@@ -451,6 +451,12 @@
       "mission": 0.15
     },
     "tickMin": 5,
+    "engine": {
+      "packEventsPerHour": 3600,
+      "minActionMs": 1000,
+      "modMin": 0.01,
+      "modMax": 100
+    },
     "village": {
       "start": {
         "core:tower": 1,

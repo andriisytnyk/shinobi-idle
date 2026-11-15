@@ -107,7 +107,7 @@ export function runBot(bot: Bot, options: RunOptions): RunResult {
   const timeline: Milestone[] = [];
   let rejected = 0;
   let firstRejection: string | null = null;
-  let goalAt: number | null = bot.goal.reached(state) ? state.now : null;
+  let goalAt: number | null = bot.goal.reached(state, content) ? state.now : null;
   let changed = true;
   let lastDecision = -Infinity;
 
@@ -136,7 +136,7 @@ export function runBot(bot: Bot, options: RunOptions): RunResult {
         changed = true;
       }
     }
-    if (bot.goal.reached(state)) goalAt = events[events.length - 1]?.at ?? state.now;
+    if (bot.goal.reached(state, content)) goalAt = events[events.length - 1]?.at ?? state.now;
   }
 
   return {

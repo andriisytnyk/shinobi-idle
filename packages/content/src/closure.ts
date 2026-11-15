@@ -53,6 +53,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     techniques: ids(db.techniques),
     enemies: ids([...db.enemies, ...db.bosses]),
     buildings: ids(db.buildings),
+    stages: ids(db.villageStages),
     quests: ids(db.quests),
     zones: ids(db.zones),
     missions: ids(db.missions),
@@ -141,6 +142,11 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     ) {
       if (!Object.hasOwn(db.modifierKeys, o.key))
         problem(`${path}.key`, `unknown modifier key "${o.key}"`);
+      if (!Number.isFinite(o.value) || (o.op === 'mul' && o.value <= 0))
+        problem(
+          `${path}.value`,
+          `the modifier value ${String(o.value)} is not a finite number (and above 0 for a mul)`,
+        );
       if (typeof o.nature === 'string') ref(`${path}.nature`, o.nature, 'natures');
       return;
     }
@@ -153,8 +159,16 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     ref('group', s.group, 'groups');
     req('unlockReq', s.unlockReq);
   }
+  for (const role of ['money', 'renown', 'study'] as const) {
+    if (!db.currencies.some((c) => c.role === role)) {
+      at('currencies', role);
+      problem('role', `no currency has the role ${role}`);
+    }
+  }
   for (const n of db.natures) {
     at('natures', n.id);
+    // A nature trains through the skill that has its id.
+    if (!set.skills.has(n.id)) problem('id', `the nature has no skill with its id`);
     refs('strongAgainst', n.strongAgainst, 'natures');
     refs('opens', n.opens, 'cellKeys');
     ref('ayaNature', n.ayaNature, 'natures');
@@ -361,6 +375,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
   }
   for (const s of db.shop) {
     at('shop', s.item);
+    if (s.currency !== undefined) ref('currency', s.currency, 'currencies');
     ref('item', s.item, 'items');
     req('req', s.req);
   }
@@ -476,6 +491,15 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     at('buildings', b.id);
     for (const res of b.produces) ref('produces', res, 'resources');
     for (const res of Object.keys(b.tier6 ?? {})) ref('tier6', res, 'resources');
+    if (b.stage !== undefined) ref('stage', b.stage, 'stages');
+  }
+  for (const cell of db.cells) {
+    at('cells', cell.id);
+    for (const poi of cell.pois) {
+      if (poi.kind === 'cache')
+        for (const id of Object.keys(poi.currencies ?? {}))
+          ref('pois.currencies', id, 'currencies');
+    }
   }
   for (const g of db.gear) {
     at('gear', g.id);
@@ -498,6 +522,33 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     });
     q.rewards.items.forEach((x, n) => ref(`rewards.items[${n}].item`, x.item, 'items'));
     if (q.rewards.rank !== null) ref('rewards.rank', q.rewards.rank, 'ranks');
+    for (const id of Object.keys(q.rewards.currencies ?? {}))
+      ref('rewards.currencies', id, 'currencies');
+  }
+  for (const m of db.missions) {
+    at('missions', m.id);
+    m.pay.forEach((p, n) => {
+      if (p.kind === 'scrollPart') needNumber(`pay[${n}].chance`, `partDrop.${p.chance}`);
+      if (p.kind === 'currency') ref(`pay[${n}].currency`, p.currency, 'currencies');
+    });
+  }
+  for (const e of db.exercises) {
+    at('exercises', e.id);
+    if (e.skill !== undefined) ref('skill', e.skill, 'skills');
+  }
+  for (const p of db.practices) {
+    at('practices', p.id);
+    if (p.skill !== undefined) ref('skill', p.skill, 'skills');
+  }
+  for (const h of db.herbs) {
+    at('herbs', h.id);
+    if (h.skill !== undefined) ref('skill', h.skill, 'skills');
+  }
+  for (const stage of db.villageStages) {
+    at('villageStages', stage.id);
+    const top = db.balance.K.costMult.length;
+    if (stage.cap !== undefined && stage.cap > top)
+      problem('cap', `${stage.cap} is above the highest building level ${top}`);
   }
   for (const e of db.exams) {
     at('exams', e.id);

@@ -9,6 +9,7 @@ import { indexOf } from './lookup.ts';
 import { computeMod, type Modifier, type ModifierProvider } from './modifiers.ts';
 import { gainXp } from './progression.ts';
 import { regionOpenReq } from './regions.ts';
+import { actionFloor, activitySkill, currencyOf, moneyOf } from './vocab.ts';
 import { evalReq, skillLevel, type Req } from './requirements.ts';
 import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
@@ -61,13 +62,16 @@ export const levelNeed = (region: Region, k: number, content: ContentDb): number
 
 /** Whether a region is open (rank and Scouting level). */
 export function isRegionOpen(state: GameState, region: Region, content: ContentDb): boolean {
-  return evalReq(state, regionOpenReq(region), content).met;
+  return evalReq(state, regionOpenReq(region, content), content).met;
 }
 
 /** The requirement of the key of a cell, or null for a cell with no key. */
 export function keyReq(cell: Cell, content: ContentDb): Req | null {
-  return cell.key ? content.cellKeys[cell.key] : null;
+  return cell.key ? (content.cellKeys[cell.key] ?? null) : null;
 }
+
+/** The skill that exploring trains: the one whose activity is `map` (Scouting). */
+export const scoutSkill = (content: ContentDb): string | null => activitySkill(content, 'map');
 
 /** The cell the player stands in; the first cell of the world when the saved one is unknown. */
 export function locationCell(state: GameState, content: ContentDb): Cell | null {
@@ -87,10 +91,15 @@ export function exploreReq(state: GameState, cell: Cell, content: ContentDb): Re
   const region = indexOf(content).regions.get(cell.region);
   const level = cellLevel(state, cell, content);
   if (!region || level >= cellMaxLevel(cell, content)) return null;
-  const parts: Req[] = [regionOpenReq(region)];
+  const parts: Req[] = [regionOpenReq(region, content)];
   const key = keyReq(cell, content);
   if (key) parts.push(key);
-  parts.push({ t: 'skill', skill: 'scout', level: levelNeed(region, level + 1, content) });
+  const scouting = scoutSkill(content);
+  parts.push(
+    scouting === null
+      ? { t: 'any', of: [] }
+      : { t: 'skill', skill: scouting, level: levelNeed(region, level + 1, content) },
+  );
   return { t: 'all', of: parts };
 }
 
@@ -104,7 +113,10 @@ export function exploreBlocked(state: GameState, cell: Cell, content: ContentDb)
 /** Length of one exploration in ms at full speed, modifiers included; at least 1. */
 export function exploreIntervalMs(state: GameState, content: ContentDb, rules: Rules): number {
   const mod = computeMod(rules.modifierProviders, state, 'interval.explore', content).total;
-  return Math.max(1, Math.round(content.balance.K.explore * MS_PER_SECOND * mod));
+  return Math.max(
+    actionFloor(content),
+    Math.round(content.balance.K.explore * MS_PER_SECOND * mod),
+  );
 }
 
 /** Scouting XP of one exploration toward cell level `k`, before modifiers. */
@@ -139,11 +151,14 @@ function exploreOnce(state: GameState, cell: Cell, content: ContentDb, rules: Ru
   const level = levelForExplores(before, content);
   const max = cellMaxLevel(cell, content);
   if (!region || level >= max) return true;
-  gainXp(state, 'scout', exploreXp(region, level + 1, content), content, rules);
+  const scouting = scoutSkill(content);
+  if (scouting !== null)
+    gainXp(state, scouting, exploreXp(region, level + 1, content), content, rules);
   state.world.explores[cell.id] = before + 1;
   const after = levelForExplores(before + 1, content);
   if (after > level) {
-    addCurrency(state, 'intel', K.intel.perCellLevel);
+    const intel = currencyOf(content, 'study');
+    if (intel !== null) addCurrency(state, intel, K.intel.perCellLevel);
     if (after === 1) discover(state, cell);
     emit(state, { type: 'cellLevelUp', cell: cell.id, level: after, max: after >= max });
   }
@@ -152,7 +167,7 @@ function exploreOnce(state: GameState, cell: Cell, content: ContentDb, rules: Ru
 
 export const exploreKind: ActionKind = {
   has: (id, content) => indexOf(content).cells.has(id),
-  skill: () => 'scout',
+  skill: (_id, content) => scoutSkill(content),
   requirements(state, id, content) {
     const cell = indexOf(content).cells.get(id);
     return cell ? exploreReq(state, cell, content) : null;
@@ -199,7 +214,7 @@ export function walkMs(state: GameState, cell: Cell, content: ContentDb, rules: 
   const S = content.balance.K.scouting;
   const minutes = inRegionOf(state, cell, content) ? S.walkWithinMin : S.walkBetweenMin;
   const mod = computeMod(rules.modifierProviders, state, 'interval.walk', content).total;
-  return Math.max(1, Math.round(minutes * MS_PER_MINUTE * mod));
+  return Math.max(actionFloor(content), Math.round(minutes * MS_PER_MINUTE * mod));
 }
 
 /** Pays for and makes an instant trip; slots that walk or explore elsewhere stop. */
@@ -213,7 +228,7 @@ export function travelInstant(
   if (blocked) return { ok: false, reason: blocked };
   const cell = indexOf(content).cells.get(cellId);
   if (!cell) return { ok: false, reason: 'error.unknownCell' };
-  if (!removeCurrency(state, 'ryo', instantCost(cell, content))) {
+  if (!removeCurrency(state, moneyOf(content), instantCost(cell, content))) {
     return { ok: false, reason: 'error.notEnoughRyo' };
   }
   state.world.location = cell.id;
@@ -259,7 +274,11 @@ export function claimPoi(state: GameState, poiId: string, content: ContentDb): C
   for (const { item, n } of loot) {
     if (addItem(state, item, n)) emit(state, { type: 'itemGained', id: item, n });
   }
-  if (poi.kind === 'cache') addCurrency(state, 'ryo', poi.ryo);
+  if (poi.kind === 'cache') {
+    addCurrency(state, moneyOf(content), poi.ryo);
+    for (const [currency, n] of Object.entries(poi.currencies ?? {}))
+      addCurrency(state, currency, n);
+  }
   state.world.claimed[poiId] = true;
   emit(state, { type: 'poiClaimed', poi: poiId });
   return { ok: true };
@@ -281,15 +300,18 @@ function trainingHere(state: GameState, content: ContentDb): (Poi & { kind: 'tra
 export const worldProvider: ModifierProvider = (state, content) => {
   const S = content.balance.K.scouting;
   const out: Modifier[] = [];
-  const cut = Math.min(S.athCap, S.athPerLevel * skillLevel(state, 'ath', content));
-  for (const key of ['interval.explore', 'interval.walk']) {
-    out.push({
-      key,
-      op: 'add',
-      value: -cut,
-      group: 'character',
-      source: { kind: 'skill', id: 'ath' },
-    });
+  const conditioning = activitySkill(content, 'course');
+  if (conditioning !== null) {
+    const cut = Math.min(S.athCap, S.athPerLevel * skillLevel(state, conditioning, content));
+    for (const key of ['interval.explore', 'interval.walk']) {
+      out.push({
+        key,
+        op: 'add',
+        value: -cut,
+        group: 'character',
+        source: { kind: 'skill', id: conditioning },
+      });
+    }
   }
   for (const poi of trainingHere(state, content)) {
     out.push({

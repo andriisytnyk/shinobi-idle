@@ -179,14 +179,13 @@ describe('the drunken fighter: evasion grows with the health he has lost', () =>
 });
 
 describe('the heavy cast of the hunter', () => {
-  const fx = {
-    everyMs: fig('bossFx.heavyCast.everyMs'),
-    castMs: fig('bossFx.heavyCast.castMs'),
-    damageMult: fig('bossFx.heavyCast.damageMult'),
-    stunMs: fig('bossFx.heavyCast.stunMs'),
-  };
-
   it('winds up for its time, hits for the multiple and stuns the player unless interrupted', () => {
+    const fx = {
+      everyMs: fig('bossFx.heavyCast.everyMs'),
+      castMs: fig('bossFx.heavyCast.castMs'),
+      damageMult: fig('bossFx.heavyCast.damageMult'),
+      stunMs: fig('bossFx.heavyCast.stunMs'),
+    };
     const f = watched('core:boss_hunter');
     const body = f.enemies[0];
     if (!body) throw new Error('no body');

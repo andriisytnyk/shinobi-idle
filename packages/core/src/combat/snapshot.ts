@@ -1,7 +1,8 @@
 import type { ContentDb, SkillId } from '@shinobi/content';
 import { masteryLevel } from '../formulas.ts';
 import { computeMods } from '../modifiers.ts';
-import { RANK_ORDER, skillLevel } from '../requirements.ts';
+import { skillLevel } from '../requirements.ts';
+import { rankIndex } from '../vocab.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 import type { Levels, PlayerSnapshot } from './numbers.ts';
@@ -30,7 +31,7 @@ export function planningSnapshot(state: GameState, content: ContentDb): PlayerSn
     mastery,
     known,
     natures: [...state.player.natures],
-    tier: RANK_ORDER.indexOf(state.player.rank),
+    tier: rankIndex(content, state.player.rank),
     costMod: { chakra: 1, stamina: 1 },
   };
 }

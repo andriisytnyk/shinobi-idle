@@ -118,7 +118,7 @@ describe('A3: views follow the core without a reload', () => {
     flushSync();
 
     // Oil costs 4 ryo; two units.
-    expect(game.state.currencies.ryo).toBe(492);
+    expect(game.state.currencies.ryo ?? 0).toBe(492);
     expect(text(target.querySelector('[data-purse]'))).toContain('492');
     expect(owned()).toContain('2');
   });
@@ -401,7 +401,7 @@ describe('the quantity field', () => {
     flushSync();
     expect(game.state.bank[OIL]).toBe(17);
     // The Market's 2% comes off the whole stack: 68 ryo become 67.
-    expect(game.state.currencies.ryo).toBe(100 - Math.round(17 * 4 * 0.98));
+    expect(game.state.currencies.ryo ?? 0).toBe(100 - Math.round(17 * 4 * 0.98));
   });
 
   it('arrow keys step the amount', () => {

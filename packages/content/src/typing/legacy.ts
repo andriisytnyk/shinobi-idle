@@ -136,7 +136,11 @@ export interface IdTypes {
     | 'boss'
     | 'building'
     | 'region'
-    | 'gear';
+    | 'gear'
+    | 'exercise'
+    | 'practice'
+    | 'obstacle'
+    | 'recipe';
   localeKind: LegacyLocaleKind;
 }
 

@@ -8,12 +8,13 @@ import type { FightCtx, FightHook } from './fight-types.ts';
  * the rules are loaded again. The game goes on with a new fight.
  */
 
-/** The pack a hook belongs to: its own `pack`, else the prefix of its id. */
-export const packOf = (hook: FightHook): string =>
-  hook.pack ?? (hook.id.includes(':') ? hook.id.slice(0, hook.id.indexOf(':')) : 'core');
+import { originOf } from './fight-origin.ts';
 
-/** A hook that the engine trusts to fail loudly. */
-export const trusted = (hook: FightHook): boolean => hook.pack === 'core';
+/** The pack a hook was registered by (the core pack's and the engine's hooks have none). */
+export const packOf = (hook: FightHook): string => originOf(hook) ?? 'core';
+
+/** A hook that the engine trusts to fail loudly: not one a pack added. */
+export const trusted = (hook: FightHook): boolean => originOf(hook) === undefined;
 
 const disabled = new WeakMap<readonly FightHook[], Set<string>>();
 
@@ -25,7 +26,7 @@ export const disabledCount = (rules: readonly FightHook[]): number =>
   disabled.get(rules)?.size ?? 0;
 
 /** Ends the fight as a void outcome and switches the hook off. */
-export function fault(ctx: FightCtx, hook: FightHook): void {
+export function fault(ctx: FightCtx, hook: FightHook, error?: unknown): void {
   let set = disabled.get(ctx.rules.fightHooks);
   if (!set) {
     set = new Set();
@@ -35,7 +36,12 @@ export function fault(ctx: FightCtx, hook: FightHook): void {
   const fight = ctx.fight;
   if (fight.result === 'ongoing') {
     fight.result = 'void';
-    fight.fault = { pack: packOf(hook), hook: hook.id };
+    fight.fault = {
+      pack: packOf(hook),
+      hook: hook.id,
+      reason:
+        error instanceof Error ? error.message : String(error ?? 'the hook did not let time pass'),
+    };
   }
 }
 
@@ -44,8 +50,8 @@ export function guard<T>(ctx: FightCtx, hook: FightHook, call: () => T, fallback
   if (trusted(hook)) return call();
   try {
     return call();
-  } catch {
-    fault(ctx, hook);
+  } catch (error) {
+    fault(ctx, hook, error);
     return fallback;
   }
 }

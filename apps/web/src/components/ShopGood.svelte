@@ -28,7 +28,7 @@
   let { item, price, owned, req, quiet = false }: Props = $props();
 
   let qty = $state(1);
-  const ryo = $derived(game.read((gs) => gs.currencies.ryo));
+  const ryo = $derived(game.read((gs) => gs.currencies.ryo ?? 0));
   /** What the stack costs now: the Market's discount comes off the whole stack. */
   const total = $derived(
     game.read((gs) => shopTotal(gs, item, Math.max(1, qty), content, game.rules) ?? price * qty),

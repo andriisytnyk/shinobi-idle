@@ -11,6 +11,7 @@ import { z, type ZodError } from 'zod';
 import { skillFamilyKeys, type ModifierKeyInfo } from './modifiers.ts';
 import type { ContentPack, EntityListKey, Patch } from './pack.ts';
 import { validateClosure } from './closure.ts';
+import { PackError } from './pack-error.ts';
 import {
   contentDbSchema,
   packManifestSchema,
@@ -95,7 +96,7 @@ const clone = <T>(value: T): T =>
   value === undefined ? value : (JSON.parse(JSON.stringify(value)) as T);
 
 const fail = (pack: string, message: string): never => {
-  throw new Error(`Content pack "${pack}": ${message}`);
+  throw new PackError(pack, `Content pack "${pack}": ${message}`);
 };
 
 const issues = (error: ZodError | undefined): string =>
@@ -551,6 +552,17 @@ export function composeContent(packs: readonly ContentPack[]): ContentDb {
       keyOwners.set(key, pack);
     }
 
+  // The player ranks are ordered by `after` (ties by load order) and their tiers are their positions.
+  const rankList = (lists.get('playerRanks') ?? []) as {
+    id: string;
+    after?: string;
+    tier: number;
+  }[];
+  lists.set(
+    'playerRanks',
+    orderRanks(rankList, (id) => owners.get(`playerRanks:${id}`) ?? 'core', fail),
+  );
+
   const raw: Plain = {
     ...Object.fromEntries(ENTITY_LISTS.map((l) => [l, lists.get(l) ?? []])),
     market: keyed.get('market'),
@@ -601,11 +613,50 @@ export function composeContent(packs: readonly ContentPack[]): ContentDb {
     described: DESCRIBED,
   });
   if (problems.length > 0)
-    throw new Error(
+    // The first problem names the pack to blame; the others are listed for the author.
+    throw new PackError(
+      problems[0]?.pack ?? 'core',
       `Content closure failed (${problems.length} problem${problems.length === 1 ? '' : 's'}):\n${problems
         .slice(0, 20)
         .map((p) => `  - pack "${p.pack}": ${p.message}`)
         .join('\n')}`,
     );
   return db;
+}
+
+/**
+ * Orders the player ranks: a rank with `after` goes right behind that rank (behind the ones already
+ * placed there, so ties keep load order); the others keep their order. The tier of each rank is its position.
+ */
+function orderRanks<T extends { id: string; after?: string; tier: number }>(
+  list: readonly T[],
+  owner: (id: string) => string,
+  fail: (pack: string, message: string) => never,
+): T[] {
+  const placed: T[] = list.filter((r) => r.after === undefined);
+  const pending = list.filter((r) => r.after !== undefined);
+  for (let progress = true; pending.length > 0 && progress;) {
+    progress = false;
+    for (const rank of [...pending]) {
+      const anchor = placed.findIndex((r) => r.id === rank.after);
+      if (anchor < 0) continue;
+      let at = anchor + 1;
+      while (at < placed.length && placed[at]?.after === rank.after) at++;
+      placed.splice(at, 0, rank);
+      pending.splice(pending.indexOf(rank), 1);
+      progress = true;
+    }
+  }
+  const stuck = pending[0];
+  if (stuck) {
+    // An anchor that is itself waiting for a rank is a cycle (or a chain that ends in no rank).
+    const waiting = pending.some((r) => r.id === stuck.after);
+    return fail(
+      owner(stuck.id),
+      waiting
+        ? `player rank "${stuck.id}" is in a cycle of \`after\`: it comes after "${stuck.after}", which waits for a rank`
+        : `player rank "${stuck.id}" comes after "${stuck.after}", which is no rank`,
+    );
+  }
+  return placed.map((r, tier) => ({ ...r, tier }));
 }

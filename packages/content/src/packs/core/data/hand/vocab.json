@@ -56,7 +56,8 @@
   "playerRanks": [
     {
       "id": "student",
-      "tier": 0
+      "tier": 0,
+      "academy": true
     },
     {
       "id": "genin",

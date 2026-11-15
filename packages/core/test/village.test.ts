@@ -174,7 +174,7 @@ describe('A3: building', () => {
       const s2 = rich();
       v(s2).levels[id('grounds')] = level - 1;
       v(s2).stage = 2;
-      s2.currencies.rep = K.rep.stage2;
+      s2.currencies.rep = K.rep.stage2!;
       for (const r of Object.keys(v(s2).shinobi)) v(s2).shinobi[r] = 30;
       const before = structuredClone(v(s2));
       ok(s2, { type: 'village.build', building: b.id });
@@ -208,7 +208,7 @@ describe('A3: building', () => {
     refused(r, { type: 'village.build', building: id('library') }, 'error.noLevelSix');
     v(r).levels[id('grounds')] = 5;
     refused(r, { type: 'village.build', building: id('grounds') }, 'error.stageNotReached');
-    r.currencies.rep = K.rep.stage2;
+    r.currencies.rep = K.rep.stage2!;
     refused(r, { type: 'village.build', building: id('grounds') }, 'error.notEnoughShinobi');
     v(r).shinobi.dilianky = 30;
     v(r).shinobi.kladka = 30;
@@ -231,7 +231,7 @@ describe('A3: building', () => {
   it('refunds a cancel exactly', () => {
     const s = rich();
     v(s).levels[id('hospital')] = 3;
-    s.currencies.rep = K.rep.stage2;
+    s.currencies.rep = K.rep.stage2!;
     const before = structuredClone(v(s));
     ok(s, { type: 'village.build', building: id('hospital') });
     expect(v(s)).not.toEqual(before);
@@ -243,7 +243,7 @@ describe('A3: building', () => {
     const s = genin();
     s.currencies.ryo = 500;
     ok(s, { type: 'village.donate', ryo: 200 });
-    expect(s.currencies.ryo).toBe(300);
+    expect(s.currencies.ryo!).toBe(300);
     expect(v(s).treasury).toBe(200);
     refused(s, { type: 'village.donate', ryo: 301 }, 'error.notEnoughRyo');
   });
@@ -252,11 +252,11 @@ describe('A3: building', () => {
 describe('A4: the stage', () => {
   it('switches on exactly at the Reputation threshold and lifts the level cap', () => {
     const s = genin();
-    s.currencies.rep = K.rep.stage2 - 1;
+    s.currencies.rep = K.rep.stage2! - 1;
     advance(s, 1000, content);
     expect(villageStage(s, content).stage).toBe(1);
     expect(villageStage(s, content).levelCap).toBe(K.towerStageMax[0]);
-    s.currencies.rep = K.rep.stage2;
+    s.currencies.rep = K.rep.stage2!;
     advance(s, 1, content);
     expect(villageStage(s, content).stage).toBe(2);
     expect(villageStage(s, content).levelCap).toBe(K.towerStageMax[1]);
@@ -362,7 +362,7 @@ describe('A6: shop gating', () => {
       refused(s, { type: 'shop.buy', item: item.id, n: 1 }, 'error.requirementsNotMet');
       withBuildings(s, { 'core:library': src.level });
       ok(s, { type: 'shop.buy', item: item.id, n: 1 });
-      expect(s.currencies.ryo).toBe(1e6 - (K.scroll[String(src.level)] ?? 0));
+      expect(s.currencies.ryo!).toBe(1e6 - (K.scroll[String(src.level)] ?? 0));
     }
   });
 
@@ -429,7 +429,7 @@ describe('review fixes', () => {
     s.currencies.ryo = 1000;
     ok(s, { type: 'shop.buy', item: 'core:water', n: 100 });
     // 100 water at 1 ryo and -10%: 90, not 100.
-    expect(s.currencies.ryo).toBe(1000 - 90);
+    expect(s.currencies.ryo!).toBe(1000 - 90);
   });
 
   it('does not create a village for a command that is refused', () => {
@@ -501,9 +501,9 @@ describe('A9: pace report', () => {
     };
     const report: string[] = [];
     for (let minute = K.tickMin; minute <= 12 * 60; minute += K.tickMin) {
-      if (variant && minute === 4 * 60) s.currencies.rep = K.rep.stage2;
+      if (variant && minute === 4 * 60) s.currencies.rep = K.rep.stage2!;
       if (variant && minute >= 2 * 60 && minute % 60 === 0) {
-        s.currencies.ryo += 300;
+        s.currencies.ryo = (s.currencies.ryo ?? 0) + 300;
         dispatch(s, { type: 'village.donate', ryo: 300 }, content);
       }
       policy();

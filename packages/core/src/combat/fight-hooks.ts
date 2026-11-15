@@ -15,7 +15,6 @@ export const PASSIVE_NEGATE_HOOK = 'passiveNegate';
 /** The technique effect that negates one hit every so often and needs no slot: a timer of the player. */
 const passiveNegate: FightHook = {
   id: PASSIVE_NEGATE_HOOK,
-  pack: 'core',
   init(ctx, c) {
     const tech = ctx.fight.kit.techniques.find((t) => t.fx.kind === 'passiveNegate');
     if (tech) c.timers.negate = { progress: 0, need: needOf(tech.fx.everyMs) };

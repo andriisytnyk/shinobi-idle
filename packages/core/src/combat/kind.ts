@@ -1,4 +1,4 @@
-import { FIRST_FIGHT_FLAG, type ContentDb, type SkillId } from '@shinobi/content';
+import { FIRST_FIGHT_FLAG, type ContentDb } from '@shinobi/content';
 import { fightData } from './fight-data.ts';
 import type { ActionKind } from '../actions.ts';
 import { MS_PER_HOUR, rate } from '../formulas.ts';
@@ -20,7 +20,7 @@ function payTick(state: GameState, fallback: string, content: ContentDb, rules: 
   // `style` is the skill of the technique last used (a basic attack's style before any); every other key is a skill.
   for (const [key, mult] of Object.entries(K.combatXp)) {
     const skill = key === 'style' ? (state.combat?.style ?? fightData(content).basicSkill) : key;
-    if (skill) gainXp(state, skill as SkillId, mult * perTick, content, rules);
+    if (skill) gainXp(state, skill, mult * perTick, content, rules);
   }
 }
 
@@ -73,7 +73,7 @@ export const fightKind: ActionKind = {
 export const operationKind: ActionKind = {
   has: (id, content) => indexOf(content).operations.has(id),
   requirements: (_state, id, content): Req | null =>
-    (indexOf(content).operations.get(id)?.unlock ?? null) as Req | null,
+    indexOf(content).operations.get(id)?.unlock ?? null,
   blocked: (state, _id, content, _rules, slot) => fightBusyReason(state, slot, content),
   intervalMs: (_state, _id, content) => content.balance.K.combat.xpTickMs,
 

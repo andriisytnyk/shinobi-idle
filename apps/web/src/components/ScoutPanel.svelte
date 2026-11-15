@@ -23,7 +23,7 @@
       return {
         xp: gs.skills.scout.xp,
         fraction: skillProgress(gs, 'scout').fraction,
-        intel: gs.currencies.intel,
+        intel: gs.currencies.intel ?? 0,
         action,
         exploreMs: exploreIntervalMs(gs, content, game.rules),
         walkMs: first ? walkMs(gs, first, content, game.rules) : 0,

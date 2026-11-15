@@ -258,7 +258,7 @@ export interface FightState {
   rng: RngState;
   result: FightResult;
   /** The pack and the hook that ended the fight as void. */
-  fault?: { pack: string; hook: string };
+  fault?: { pack: string; hook: string; reason: string };
   /** Content id of the entry fought. */
   enemy: string;
   encounter: Encounter;
@@ -439,8 +439,6 @@ export interface AttackPlan {
  */
 export interface FightHook {
   id: string;
-  /** The pack that registered it; `core` marks the hooks that may fail loudly, any other is contained (see `fight-guard.ts`). Absent: the prefix of the id. */
-  pack?: string;
   /**
    * Numbers this hook derives for its body from data and publishes as `c.data` keys for other hooks
    * to read. Runs for every hook of the body, before any `init`, whenever the body is first read: for

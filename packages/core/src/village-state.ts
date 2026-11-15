@@ -30,7 +30,8 @@ export interface VillageState {
   power: number;
   treasury: number;
   job: VillageJob | null;
-  stage: 1 | 2;
+  /** The stage, counted from 1 in the order of `content.villageStages`. */
+  stage: number;
   /** Game time into the current village tick, in whole ms. */
   clock: number;
 }

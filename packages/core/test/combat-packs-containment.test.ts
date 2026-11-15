@@ -14,6 +14,7 @@ import {
   dispatch,
   fightAdvance,
   parseFight,
+  tagOrigin,
   serialize,
   validateHooks,
   workOf,
@@ -36,9 +37,13 @@ import {
 import { enemyAt, scripted } from './fight-helpers.ts';
 import { fighter, startFight } from './prep-state.ts';
 
+/** The core rules with hooks added the way `composeRules` adds a pack's: recorded as the pack's, from the prefix of the id. */
 const rulesWith = (...hooks: FightHook[]): Rules => ({
   ...defaultRules,
-  fightHooks: [...defaultRules.fightHooks, ...hooks],
+  fightHooks: [
+    ...defaultRules.fightHooks,
+    ...hooks.map((h) => (h.id.startsWith('core:') ? h : tagOrigin(h, h.id.split(':')[0] ?? 'x'))),
+  ],
 });
 
 /** An encounter against a bandit that carries the hook as an encounter-wide special. */
@@ -190,7 +195,6 @@ describe('a hook of another pack that fails', () => {
   it('is loud for a hook of the core pack', () => {
     const hook = evil({
       id: 'core:loud',
-      pack: 'core',
       init: () => {
         throw new Error('boom');
       },
@@ -223,7 +227,7 @@ describe('a hook of another pack that fails', () => {
     ).toBe(true);
     const wounds = state.wounds.stacks;
     expect(() => advance(state, 5 * 60_000, broken, rules)).not.toThrow();
-    const voided = state.events.filter((e) => e.type === 'fightVoided');
+    const voided = state.events.filter((e) => e.type === 'ruleDisabled');
     expect(voided.length).toBeGreaterThan(0);
     expect(voided[0]).toMatchObject({ pack: 'evil', hook: 'evil:armor' });
     expect(state.wounds.stacks).toBe(wounds);
@@ -245,7 +249,6 @@ describe('the order of the hooks', () => {
   /** A special that makes the Illusionist cast much faster: it publishes the number the trait reads. */
   const strong = (): FightHook => ({
     id: 'test:strong',
-    pack: 'core',
     publish(_ctx, c) {
       if (c.data['illusionist.everyMs'] === undefined) c.data['illusionist.everyMs'] = 1500;
     },

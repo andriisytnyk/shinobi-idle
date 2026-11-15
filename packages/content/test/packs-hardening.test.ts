@@ -140,11 +140,35 @@ describe('the closure validator catches more than references', () => {
   });
 
   it('keeps the player ranks in tier order and the AI tiers within them', () => {
-    throwsFor(
-      [corePack, tm((p) => (p.data.playerRanks![0]!.tier = 99))],
-      'testmod',
-      /playerRanks "testmod:adept" field tier: 99 must be the position 3/,
-    );
+    // The tier of a rank is its position, whatever number the pack gives.
+    const odd = composeContent([corePack, tm((p) => (p.data.playerRanks![0]!.tier = 99))]);
+    expect(odd.playerRanks.map((r) => [r.id, r.tier])).toContainEqual(['testmod:adept', 3]);
+    // Two packs that each add a rank compose; ranks go behind the rank they name, ties by load order.
+    const rankPack = (id: string, after?: string) =>
+      mod(id, { data: { playerRanks: [{ id: `${id}:r`, tier: 0, ...(after ? { after } : {}) }] } });
+    const both = composeContent([corePack, rankPack('aaa'), rankPack('bbb')]);
+    expect(both.playerRanks.map((r) => r.id)).toEqual([
+      'student',
+      'genin',
+      'chunin',
+      'aaa:r',
+      'bbb:r',
+    ]);
+    const placed = composeContent([
+      corePack,
+      rankPack('aaa'),
+      rankPack('bbb', 'genin'),
+      rankPack('ccc', 'genin'),
+    ]);
+    expect(placed.playerRanks.map((r) => [r.id, r.tier])).toEqual([
+      ['student', 0],
+      ['genin', 1],
+      ['bbb:r', 2],
+      ['ccc:r', 3],
+      ['chunin', 4],
+      ['aaa:r', 5],
+    ]);
+    throwsFor([corePack, rankPack('zzz', 'nobody')], 'zzz', /comes after "nobody"/);
     const lateAi = mod('lateai', {
       data: {
         ai: {
@@ -359,5 +383,58 @@ describe('patch rules', () => {
     const db = composeContent([corePack, wolf('app_a', 'core:pelt'), wolf('app_b', 'core:fang')]);
     const drops = db.enemies.find((e) => e.id === 'core:wolf')?.drops ?? [];
     expect(drops.slice(-2).map((d) => d.item)).toEqual(['core:pelt', 'core:fang']);
+  });
+});
+
+describe('closure of the fields packs added in the review fixes', () => {
+  it('refuses an unknown skill on an exercise, a practice and a herb', () => {
+    throwsFor(
+      [
+        corePack,
+        mod('xx', { data: { exercises: [{ id: 'xx:e', level: 1, skill: 'xx:nothing' }] } }),
+      ],
+      'xx',
+      /skill/,
+    );
+    throwsFor(
+      [
+        corePack,
+        mod('yy', { data: { herbs: [{ id: 'yy:h', level: 1, skill: 'yy:nothing', req: null }] } }),
+      ],
+      'yy',
+      /skill/,
+    );
+  });
+
+  it('refuses an unknown currency in a mission payment, a cache and a stage cap above the top level', () => {
+    const cell = (extra: Record<string, unknown>) => ({
+      regions: [{ id: 'zz:r', scout: 1, cells: ['zz:c'] }],
+      cells: [
+        {
+          id: 'zz:c',
+          region: 'zz:r',
+          index: 0,
+          key: null,
+          story: false,
+          pois: [{ id: 'zz:p', kind: 'cache', items: [], ryo: 0, ...extra }],
+        },
+      ],
+    });
+    throwsFor(
+      [corePack, mod('zz', { data: cell({ currencies: { 'zz:nothing': 1 } }) })],
+      'zz',
+      /currenc/,
+    );
+    throwsFor(
+      [corePack, mod('cap', { data: { villageStages: [{ id: 'cap:s', rep: null, cap: 99 }] } })],
+      'cap',
+      /cap/,
+    );
+  });
+
+  it('says cycle for ranks that wait for each other', () => {
+    const ranked = (id: string, after: string) =>
+      mod(id, { data: { playerRanks: [{ id: `${id}:r`, tier: 0, after }] } });
+    throwsFor([corePack, ranked('aa', 'bb:r'), ranked('bb', 'aa:r')], 'aa', /cycle/);
   });
 });

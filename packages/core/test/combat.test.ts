@@ -1,4 +1,4 @@
-import { content, type SkillId } from '@shinobi/content';
+import { content } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
   advance,
@@ -18,7 +18,6 @@ import {
   type GameState,
 } from '../src/index.ts';
 import { HOUR, genin, openWorld, setLevel } from './helpers.ts';
-import { fig } from './fight-helpers.ts';
 
 const DUMMY = 'core:dummy';
 const fight = (id = DUMMY) => ({ type: 'action.start', slot: 0, kind: 'fight', id }) as const;
@@ -83,7 +82,7 @@ describe('combat formulas', () => {
     const n = techniqueNumbers(s, entry, content, defaultRules);
     s.mastery[entry.id] = { xp: 0 };
     expect(n.damage).toBeCloseTo(
-      fig('power.D') * (1 + K.levelScale * 10) * (1 + K.masteryDmg / K.masteryCap),
+      K.power.D! * (1 + K.levelScale * 10) * (1 + K.masteryDmg / K.masteryCap),
     );
     expect(n.cooldownMs).toBe(6000);
     expect(n.pool).toBe('stamina');
@@ -200,8 +199,11 @@ describe('A4: combat XP follows the formula', () => {
     const state = genin(8);
     setLevel(state, 'vit', 40);
     setLevel(state, 'eva', 40);
-    const xp = (id: SkillId): number => state.skills[id]?.xp ?? 0;
-    const before = { tai: xp('tai'), vit: xp('vit'), eva: xp('eva') };
+    const before = {
+      tai: state.skills.tai!.xp,
+      vit: state.skills.vit!.xp,
+      eva: state.skills.eva!.xp,
+    };
     dispatch(state, fight(), content);
     advance(state, HOUR, content);
     const dummy = content.enemies.find((e) => e.id === DUMMY);
@@ -211,9 +213,9 @@ describe('A4: combat XP follows the formula', () => {
       expect(got / want).toBeLessThan(1.05);
     };
     // The dummy is beaten with Leaf Whirlwind (Taijutsu) and basic attacks (Taijutsu).
-    near(xp('tai') - before.tai, K.combatXp.style * r);
-    near(xp('vit') - before.vit, K.combatXp.vit * r);
-    near(xp('eva') - before.eva, K.combatXp.eva * r);
+    near(state.skills.tai!.xp - before.tai, K.combatXp.style * r);
+    near(state.skills.vit!.xp - before.vit, K.combatXp.vit * r);
+    near(state.skills.eva!.xp - before.eva, K.combatXp.eva * r);
   });
 
   it('pays mastery XP for time since the previous action, to techniques only', () => {
@@ -235,7 +237,7 @@ describe('A4: combat XP follows the formula', () => {
     dispatch(state, fight(), content);
     advance(state, 60_000, content);
     expect(state.combat?.style).toBeDefined();
-    expect(state.skills.katon?.xp ?? 0).toBeGreaterThan(xpAt(30));
+    expect(state.skills.katon!.xp).toBeGreaterThan(xpAt(30));
   });
 });
 

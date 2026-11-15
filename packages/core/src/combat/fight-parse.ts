@@ -539,8 +539,8 @@ export function parseFight(raw: unknown, content: ContentDb): FightState | null 
   const w = rng as number[];
   const state: RngState = [w[0] ?? 0, w[1] ?? 0, w[2] ?? 0, w[3] ?? 0];
   const fault =
-    isRecord(raw.fault) && isStr(raw.fault.pack) && isStr(raw.fault.hook)
-      ? { pack: raw.fault.pack, hook: raw.fault.hook }
+    isRecord(raw.fault) && isStr(raw.fault.pack) && isStr(raw.fault.hook) && isStr(raw.fault.reason)
+      ? { pack: raw.fault.pack, hook: raw.fault.hook, reason: raw.fault.reason }
       : undefined;
   return {
     t,

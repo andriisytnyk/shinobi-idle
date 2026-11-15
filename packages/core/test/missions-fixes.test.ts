@@ -34,7 +34,7 @@ describe('who performs a stage', () => {
       natures: ['doton'],
       levels: { doton: 30, suiton: 20, scout: 30, tai: 30 },
     });
-    state.skills.doton.xp = xpAt(50);
+    state.skills.doton!.xp = xpAt(50);
     // Aya's Suiton (80% of Doton 50) is far above the player's own Suiton 20, so she would be faster.
     expect(planStage(state, mission('core:v_water'), 0, content, defaultRules)).toMatchObject({
       who: 'self',
@@ -44,10 +44,10 @@ describe('who performs a stage', () => {
     const forecast = missionForecast(state, mission('core:v_water'), content, defaultRules);
     expect(forecast.stages[0]?.path?.who).toBe('self');
     expect(forecast.xpPerHour.suiton).toBeGreaterThan(0);
-    const before = state.skills.suiton.xp;
+    const before = state.skills.suiton!.xp;
     startMission(state, 'core:v_water');
     runUntilDone(state, 'core:v_water', 60 * MIN);
-    expect(state.skills.suiton.xp).toBeGreaterThan(before);
+    expect(state.skills.suiton!.xp).toBeGreaterThan(before);
   });
 
   it('a teammate does it when the player cannot, or when the player has only the slow fallback', () => {
@@ -61,11 +61,11 @@ describe('who performs a stage', () => {
     expect(plan).toMatchObject({ who: 'core:aya', skill: 'suiton', slow: false });
     const forecast = missionForecast(slow, mission('core:fire'), content, defaultRules);
     expect(forecast.stages[1]?.path?.who).toBe('core:aya');
-    const ath = slow.skills.ath.xp;
+    const ath = slow.skills.ath!.xp;
     startMission(slow, 'core:fire');
     runUntilDone(slow, 'core:fire', 60 * MIN);
-    expect(slow.skills.suiton.xp).toBe(0);
-    expect(slow.skills.ath.xp).toBeGreaterThan(ath);
+    expect(slow.skills.suiton!.xp).toBe(0);
+    expect(slow.skills.ath!.xp).toBeGreaterThan(ath);
   });
 });
 
@@ -73,7 +73,7 @@ describe('the forecast reads the grant', () => {
   it('shows no XP for a skill at the cap, and the Academy slowdown for a student', () => {
     const state = ableFor(mission('core:v_walls'));
     const f = missionForecast(state, mission('core:v_walls'), content, defaultRules);
-    expect(state.skills.doton.xp).toBe(xpAt(K.cap));
+    expect(state.skills.doton!.xp).toBe(xpAt(K.cap));
     expect(f.xpPerHour.doton ?? 0).toBe(0);
     const clones = missionForecast(
       ableFor(mission('core:v_clones')),

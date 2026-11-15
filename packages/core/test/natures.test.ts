@@ -173,7 +173,7 @@ describe('A3: locks, the native bonus and the non-native cast', () => {
     expect(drill).toBeDefined();
     expect(dispatch(s, start('practice', drill!.id), content)).toEqual({ ok: true });
     advance(s, 60_000, content);
-    expect(s.skills.katon.xp).toBeGreaterThan(0);
+    expect(s.skills.katon!.xp).toBeGreaterThan(0);
   });
 
   it('gives the native skill exactly x1.25 XP, with its source listed', () => {
@@ -197,7 +197,7 @@ describe('A3: locks, the native bonus and the non-native cast', () => {
       s.known['core:nature_transformation_burn_a_leaf'] = true;
       dispatch(s, start('practice', 'core:nature_transformation_burn_a_leaf'), content);
       advance(s, 60_000, content);
-      return s.skills.katon.xp;
+      return s.skills.katon!.xp;
     };
     // Same technique, same cast, same cycles: only the native bonus differs.
     const native = run(['katon']);
@@ -276,8 +276,8 @@ describe('A4: the team natures', () => {
   ];
   for (const [native, rival, aya] of rules) {
     it(`for a native ${native}: rival ${rival}, Aya ${aya}`, () => {
-      expect(rivalNatureFor(native)).toBe(rival);
-      expect(ayaNatureFor(native)).toBe(aya);
+      expect(rivalNatureFor(content, native)).toBe(rival);
+      expect(ayaNatureFor(content, native)).toBe(aya);
       const s = genin();
       expect(rivalNature(s)).toBeNull();
       expect(ayaNature(s)).toBeNull();

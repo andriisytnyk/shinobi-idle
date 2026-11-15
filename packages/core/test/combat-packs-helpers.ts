@@ -1,8 +1,8 @@
 import { composeContent, corePack, type ContentDb } from '@shinobi/content';
-import { testmodPack } from '@shinobi/content/testmod';
+import { testmodPack } from '../src/testmod/index.ts';
 import {
+  composeGame,
   createFight,
-  defaultRules,
   encounterFor,
   fightAdvance,
   fightNextEventIn,
@@ -16,13 +16,11 @@ import {
 
 /** The core pack alone, and the core pack with the test pack: what a fight is played against. */
 export const core: ContentDb = composeContent([corePack]);
-export const mod: ContentDb = composeContent([corePack, testmodPack]);
+const game = composeGame([corePack, testmodPack]);
+export const mod: ContentDb = game.content;
 
-/**
- * The rules of the core pack with the behaviour of the test pack added: the pack's `rules` function
- * applied to the base rules, the way the composed rules of a game are made.
- */
-export const modRules: Rules = (testmodPack.rules?.({ ...defaultRules }) ?? defaultRules) as Rules;
+/** The rules of the core pack with the behaviour of the test pack added, composed the way a game composes them. */
+export const modRules: Rules = game.rules;
 
 export const TECH = 'testmod:ember_pulse';
 export const sec = (s: number): number => workOf(Math.round(s * 1000));

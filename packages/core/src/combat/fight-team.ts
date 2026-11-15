@@ -34,7 +34,6 @@ export const supportState = (ctx: FightCtx, nature: string): string | null =>
 
 export const teamSupportHook: FightHook = {
   id: TEAM_HOOK,
-  pack: 'core',
   init(ctx, c) {
     const supports = ctx.fight.encounter.support ?? [];
     supports.forEach((s, i) => {

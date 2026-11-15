@@ -610,7 +610,7 @@ export function fightAdvance(
         .flatMap((c) => hooksOf(ctx, c))
         .find((h) => !trusted(h));
       if (!culprit) throw new Error('fight made no progress: an event repeats at once');
-      fault(ctx, culprit);
+      fault(ctx, culprit, 'an event repeated without time passing');
       return left;
     }
     step(ctx, next);
@@ -1355,7 +1355,7 @@ function runTimers(ctx: FightCtx, c: Combatant): void {
           hooks.find((h) => !trusted(h) && h.onTimer !== undefined) ??
           hooks.find((h) => !trusted(h));
         if (culprit) {
-          fault(ctx, culprit);
+          fault(ctx, culprit, 'a timer lost its size or fired without end');
           return;
         }
         throw new Error(`timer ${name} has no size`);

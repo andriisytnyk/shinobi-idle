@@ -21,14 +21,14 @@ describe('A12: technique unlocks', () => {
 
   it('a student at Taijutsu 10 does not learn other mentors techniques', () => {
     const state = createState(1, content);
-    state.skills.tai.xp = xpAt(10);
+    state.skills.tai!.xp = xpAt(10);
     expect(refreshUnlocks(state, content)).toEqual([]);
     expect(state.known['core:dynamic_entry']).toBeUndefined();
   });
 
   it('a genin learns them on refresh, with an event, and only once', () => {
     const state = createState(1, content);
-    state.skills.tai.xp = xpAt(10);
+    state.skills.tai!.xp = xpAt(10);
     state.player.rank = 'genin';
     const learned = refreshUnlocks(state, content);
     expect(learned).toContain('core:dynamic_entry');
@@ -44,7 +44,7 @@ describe('A12: technique unlocks', () => {
 
   it('a level-up triggers the check, and Academy techniques unlock for students', () => {
     const state = createState(1, content);
-    state.skills.nin.xp = xpAt(24);
+    state.skills.nin!.xp = xpAt(24);
     // A student at level 24 is slowed to a quarter, so feed four times the gap.
     gainXp(state, 'nin', (xpAt(25) - xpAt(24)) * 4, content, defaultRules);
     expect(state.known['core:rope_escape']).toBe(true);
@@ -55,7 +55,7 @@ describe('A12: technique unlocks', () => {
     const state = createState(1, content);
     state.player.rank = 'chunin';
     for (const skill of Object.keys(state.skills) as (keyof typeof state.skills)[]) {
-      state.skills[skill].xp = xpAt(content.balance.K.cap);
+      state.skills[skill]!.xp = xpAt(content.balance.K.cap);
     }
     refreshUnlocks(state, content, true);
     for (const t of content.techniques) {
@@ -66,7 +66,7 @@ describe('A12: technique unlocks', () => {
   it('a technique learned while practising becomes startable', () => {
     const state = createState(1, content);
     state.player.rank = 'genin';
-    state.skills.tai.xp = xpAt(10) - 1;
+    state.skills.tai!.xp = xpAt(10) - 1;
     expect(
       dispatch(
         state,

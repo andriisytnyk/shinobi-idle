@@ -1,9 +1,10 @@
-import { content, NATURE_IDS, ukLocale, type NatureId } from '@shinobi/content';
+import { content as builtIn, type NatureId } from '@shinobi/content';
 import type { Rank } from '@shinobi/core';
 import { parseArgs, wholeValue } from './args.ts';
 import type { CliResult } from './commands.ts';
 import type { FoodMode, PouchMode } from './character.ts';
-import { RANKS, REPORT } from './constants.ts';
+import { ranksOf, REPORT } from './constants.ts';
+import type { Environment } from './env.ts';
 import { craftsReport } from './craftsReport.ts';
 import { fighterReport } from './fighterReport.ts';
 import { allEntries, fightReport, rowJson, type FightRow, type Reason } from './fightReport.ts';
@@ -44,6 +45,9 @@ export const FIGHTER_HELP = [
   'Бот-боєць із стану свіжого Геніна б’ється в найвищій безпечній зоні (оцінка перемог ≥ 0,9), між боями тренується, поповнює підсумок.',
   'По годинах: зона, перемоги, поразки, досвід бою за навичками, рьо, Рани, витрати на підсумок.',
 ];
+
+/** The Ukrainian strings of the content of the command being run (the CLI runs one command at a time). */
+let ukLocale: Readonly<Record<string, string>> = builtIn.locales.uk;
 
 const nameOf = (id: string): string =>
   ukLocale[`enemy.${id}.name`] ?? ukLocale[`boss.${id}.name`] ?? id;
@@ -129,7 +133,10 @@ function fightDetail(r: FightRow): string[] {
 }
 
 /** `pnpm sim fight`: how fights against an enemy go for a yardstick character of a given level. */
-export function runFightCli(args: string[]): CliResult {
+export function runFightCli(args: string[], env: Environment): CliResult {
+  const { content } = env;
+  ukLocale = content.locales.uk;
+  const RANKS = ranksOf(content);
   const parsed = parseArgs(
     args,
     ['enemy', 'zone', 'level', 'natures', 'rank', 'runs', 'seed', 'pouch', 'food'],
@@ -155,8 +162,9 @@ export function runFightCli(args: string[]): CliResult {
     return fail('--food: model або none.');
   const natures = parsed.values.natures?.split(',').filter((n) => n !== '') as
     NatureId[] | undefined;
-  if (natures?.some((n) => !(NATURE_IDS as readonly string[]).includes(n))) {
-    return fail(`--natures: природи з ${NATURE_IDS.join(', ')}.`);
+  const natureIds = content.natures.map((n) => n.id);
+  if (natures?.some((n) => !natureIds.includes(n))) {
+    return fail(`--natures: природи з ${natureIds.join(', ')}.`);
   }
 
   const picks = [parsed.flags.has('all'), 'enemy' in parsed.values, 'zone' in parsed.values].filter(
@@ -178,6 +186,8 @@ export function runFightCli(args: string[]): CliResult {
   }
 
   const rows = fightReport({
+    content,
+    rules: env.rules,
     entries,
     runs,
     seed,
@@ -213,7 +223,8 @@ export function runFightCli(args: string[]): CliResult {
 }
 
 /** `pnpm sim crafts`: how a gathering and crafting player progresses and earns. */
-export function runCraftsCli(args: string[]): CliResult {
+export function runCraftsCli(args: string[], env: Environment): CliResult {
+  ukLocale = env.content.locales.uk;
   const parsed = parseArgs(args, ['seed', 'hours'], ['json', 'help']);
   if (parsed.flags.has('help')) return { code: 0, out: CRAFTS_HELP, err: [] };
   if (parsed.errors.length > 0) {
@@ -224,7 +235,7 @@ export function runCraftsCli(args: string[]): CliResult {
   if (seed === null || hours === null) {
     return { code: 1, out: [], err: ['--seed і --hours мають бути цілими числами від 1.'] };
   }
-  const report = craftsReport({ seed, hours });
+  const report = craftsReport({ seed, hours, content: env.content, rules: env.rules });
   if (parsed.flags.has('json')) return { code: 0, err: [], out: [JSON.stringify(report, null, 2)] };
   const out = [
     `Бот: crafts, сід ${seed}, ігрових годин ${hours}`,
@@ -245,7 +256,8 @@ export function runCraftsCli(args: string[]): CliResult {
 }
 
 /** `pnpm sim fighter`: how a fighting player progresses over game hours. */
-export function runFighterCli(args: string[]): CliResult {
+export function runFighterCli(args: string[], env: Environment): CliResult {
+  ukLocale = env.content.locales.uk;
   const parsed = parseArgs(args, ['seed', 'hours'], ['json', 'help']);
   if (parsed.flags.has('help')) return { code: 0, out: FIGHTER_HELP, err: [] };
   if (parsed.errors.length > 0) {
@@ -256,7 +268,7 @@ export function runFighterCli(args: string[]): CliResult {
   if (seed === null || hours === null) {
     return { code: 1, out: [], err: ['--seed і --hours мають бути цілими числами від 1.'] };
   }
-  const report = fighterReport({ seed, hours });
+  const report = fighterReport({ seed, hours, content: env.content, rules: env.rules });
   if (parsed.flags.has('json')) return { code: 0, err: [], out: [JSON.stringify(report, null, 2)] };
   const out = [
     `Бот: fighter, сід ${seed}, ігрових годин ${hours}`,

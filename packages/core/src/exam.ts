@@ -4,7 +4,8 @@ import { addItem } from './bank.ts';
 import { emit } from './events.ts';
 import { MS_PER_SECOND } from './formulas.ts';
 import { indexOf } from './lookup.ts';
-import { RANK_ORDER, skillLevel } from './requirements.ts';
+import { skillLevel } from './requirements.ts';
+import { rankIndex } from './vocab.ts';
 import type { GameState } from './state.ts';
 import { refreshUnlocks } from './unlocks.ts';
 
@@ -12,7 +13,7 @@ import { refreshUnlocks } from './unlocks.ts';
 export const SENSEI_TEST_KIND = 'senseiTest';
 
 /** The exam that grants `rank`, if the content has one. */
-export function examFor(content: ContentDb, rank: Exam['rank']): Exam | undefined {
+export function examFor(content: ContentDb, rank: string): Exam | undefined {
   return content.exams.find((e) => e.rank === rank);
 }
 
@@ -34,7 +35,7 @@ export const senseiTestKind: ActionKind = {
   requirements(state, id, content) {
     const exam = indexOf(content).exams.get(id);
     if (!exam) return null;
-    const held = RANK_ORDER.indexOf(state.player.rank) >= RANK_ORDER.indexOf(exam.rank);
+    const held = rankIndex(content, state.player.rank) >= rankIndex(content, exam.rank);
     return held ? { t: 'any', of: [] } : exam.checklist;
   },
 
@@ -48,7 +49,7 @@ export const senseiTestKind: ActionKind = {
     const exam = indexOf(content).exams.get(id);
     if (!exam) return 'stop';
     // Rewards come only with the rank itself, so repeating the exam can never pay twice.
-    if (RANK_ORDER.indexOf(exam.rank) <= RANK_ORDER.indexOf(state.player.rank)) return 'stop';
+    if (rankIndex(content, exam.rank) <= rankIndex(content, state.player.rank)) return 'stop';
     state.player.rank = exam.rank;
     emit(state, { type: 'rankUp', rank: exam.rank });
     refreshUnlocks(state, content);

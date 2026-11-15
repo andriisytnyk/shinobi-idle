@@ -13,12 +13,14 @@
   import { formatDuration, formatInt, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
+  import { IDLE_TIMING, slotTiming } from '../lib/timing.ts';
   import { KEY_ICON, keyNameKey, POI_ICON, poiKindKey, uniqueReq, zoneOf } from '../lib/world.ts';
   import RegionEntry from './RegionEntry.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
   import ReqTree from './ReqTree.svelte';
+  import TimeBar from './TimeBar.svelte';
 
   interface Props {
     id: string;
@@ -64,6 +66,15 @@
         ),
       ),
     ),
+  );
+
+  /** The cycle of the exploring or the walk that is busy with this cell. */
+  const cycle = $derived(
+    game.read((gs) => {
+      if (busy.explore >= 0 && info) return slotTiming(gs, busy.explore, info.intervalMs);
+      if (busy.walk >= 0 && travel) return slotTiming(gs, busy.walk, travel.walkMs, false);
+      return IDLE_TIMING;
+    }),
   );
 
   const explored = $derived((info?.level ?? 0) >= 1);
@@ -183,6 +194,7 @@
         </p>
 
         {#if busy.explore >= 0}<p class="small dim">{t('world.explore.running')}</p>{/if}
+        {#if cycle.running}<TimeBar timing={cycle} part="action-progress" />{/if}
       </section>
 
       {#if explored}

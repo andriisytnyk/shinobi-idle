@@ -1,28 +1,67 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import { actionInfo, cellInfo, locationCell, SHARE_FULL } from '@shinobi/core';
   import { actionRef } from '../lib/entities.ts';
   import { senseiTestInfo } from '../lib/exam-test.ts';
   import { formatDuration, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
+  import { missionNow, type MissionNow } from '../lib/missions.ts';
   import { game } from '../lib/store.ts';
+  import { practiceView, type PhaseName } from '../lib/timing.ts';
+  import ActionEmblem from './ActionEmblem.svelte';
   import BuffStrip from './BuffStrip.svelte';
   import EntityLink from './EntityLink.svelte';
   import Slot from '../lib/ext/Slot.svelte';
   import Icon from './Icon.svelte';
+  import NowMission from './NowMission.svelte';
+
+  /** The phrase that says what each kind of action is doing; a kind without one shows its name alone. */
+  const VERB: Readonly<Record<string, string>> = {
+    gather: 'now.doing.gather',
+    craft: 'now.doing.craft',
+    drill: 'now.doing.drill',
+    meditate: 'now.doing.meditate',
+    course: 'now.doing.course',
+    explore: 'now.doing.explore',
+    walk: 'now.doing.walk',
+    fight: 'now.doing.fight',
+    mission: 'now.doing.mission',
+    senseiTest: 'now.doing.exam',
+  };
+
+  /** The phase of a practice, by its phase name. */
+  const PHASE_KEY: Readonly<Record<PhaseName, string>> = {
+    focus: 'now.phase.focus',
+    seal: 'now.phase.seal',
+    release: 'now.phase.release',
+  };
+
+  /** The picture of an action whose entity kind has no pictogram in the content. */
+  const FALLBACK_ICON: Readonly<Record<string, string>> = {
+    cell: 'lucide:map-pin',
+    mission: 'lucide:scroll-text',
+    exam: 'lucide:clipboard-list',
+  };
 
   interface Row {
     slot: number;
+    kind: string;
     ref: ReturnType<typeof actionRef>;
-    fraction: number;
+    skill: string | undefined;
     /** Skill XP per hour; null for actions that pay none by the hour (fights, exams). */
     xpPerHour: number | null;
-    /** What the slot does when it is a move on the map: its label key and the time left. */
-    move: { key: string; left: number } | null;
+    /** Time left of a walk, in ms. */
+    walkLeft: number;
+    /** The stage, performer and failures of a mission in the slot. */
+    mission: MissionNow | null;
+    /** What a practised technique is doing right now. */
+    practice: { phase: PhaseName; seal: { id: string; glyph: string } | null } | null;
+    /** What the player does in a fight: a key of the fight page and the technique being cast. */
+    fight: { key: string; tech: string | null } | null;
   }
 
   const rows = $derived.by((): Row[] =>
     game.read((state) => {
+      const content = game.content;
       const out: Row[] = [];
       state.slots.forEach((slot, index) => {
         if (!slot.action) return;
@@ -41,23 +80,43 @@
           : mapInfo
             ? (mapInfo.xpPerHour * slot.share) / SHARE_FULL
             : null;
+
+        let practice: Row['practice'] = null;
+        if (slot.action.kind === 'practice') {
+          const view = practiceView(state, index, content, intervalMs);
+          const tech = content.techniques.find((x) => x.id === slot.action?.id);
+          if (view && tech) {
+            const id = view.phase.seal >= 0 ? tech.sealSeq[view.phase.seal] : undefined;
+            practice = {
+              phase: view.phase.name,
+              seal: id ? { id, glyph: content.seals.find((x) => x.id === id)?.glyph ?? '?' } : null,
+            };
+          }
+        }
+        let fight: Row['fight'] = null;
+        const player = state.combat?.fight.player;
+        if (slot.action.kind === 'fight' && player) {
+          fight =
+            player.phase === 'cast' && player.cast
+              ? { key: 'combat.doing.cast', tech: player.cast }
+              : {
+                  key: player.phase === 'recover' ? 'combat.doing.recover' : 'combat.doing.ready',
+                  tech: null,
+                };
+        }
+
         out.push({
           slot: index,
+          kind: slot.action.kind,
           ref: actionRef(slot.action),
-          fraction: Math.min(1, slot.progress / (intervalMs * SHARE_FULL)),
+          skill: info?.skill,
           xpPerHour,
-          move:
-            isExplore || isWalk
-              ? {
-                  key: isWalk ? 'world.walking' : 'world.exploring',
-                  left: isWalk
-                    ? Math.max(
-                        0,
-                        (intervalMs * SHARE_FULL - slot.progress) / Math.max(1, slot.share),
-                      )
-                    : 0,
-                }
-              : null,
+          mission: missionNow(state, index, game.content),
+          practice,
+          fight,
+          walkLeft: isWalk
+            ? Math.max(0, (intervalMs * SHARE_FULL - slot.progress) / Math.max(1, slot.share))
+            : 0,
         });
       });
       return out;
@@ -67,7 +126,7 @@
   /** Where the player stands, and the training-spot bonus that works there. */
   const place = $derived(
     game.read((state) => {
-      const cell = locationCell(state, content);
+      const cell = locationCell(state, game.content);
       if (!cell) return null;
       return {
         id: cell.id,
@@ -84,7 +143,7 @@
   let expanded = $state(false);
   const shown = $derived(expanded ? rows : rows.slice(0, 1));
 
-  const wait = $derived(game.read((gs) => senseiTestInfo(gs, game.rules, content)));
+  const wait = $derived(game.read((gs) => senseiTestInfo(gs, game.rules, game.content)));
 
   const stop = (slot: number) => void game.dispatch({ type: 'action.stop', slot });
 </script>
@@ -116,29 +175,43 @@
           data-ui="now-slot"
           data-slot-index={row.slot}
           data-entity="{row.ref.kind}:{row.ref.id}"
+          class:with-mission={row.mission}
         >
-          <span class="name"
-            >{#if row.move}<span class="verb">{t(row.move.key)}</span>
-            {/if}<EntityLink kind={row.ref.kind} id={row.ref.id} /></span
-          >
-          <span
-            class="bar"
-            role="progressbar"
-            aria-valuemin="0"
-            aria-valuemax="100"
-            aria-valuenow={Math.round(row.fraction * 100)}
-            aria-label={t('now.progress')}
-          >
-            <span class="fill" style:width="{row.fraction * 100}%"></span>
+          <ActionEmblem
+            size="sm"
+            kind={row.ref.kind}
+            id={row.ref.id}
+            skill={row.skill}
+            icon={FALLBACK_ICON[row.ref.kind]}
+          />
+          <span class="what" data-now-what>
+            {#if VERB[row.kind]}<span class="verb">{t(VERB[row.kind] ?? '')}</span>{/if}
+            <span class="name"><EntityLink kind={row.ref.kind} id={row.ref.id} /></span>
+            {#if row.practice}
+              <span class="phrase" data-now-phase={row.practice.phase}>
+                {#if row.practice.phase === 'seal' && row.practice.seal}
+                  <span class="lead">{t(PHASE_KEY.seal)}</span>
+                  <span class="kanji" lang="ja">{row.practice.seal.glyph}</span>
+                  <EntityLink kind="seal" id={row.practice.seal.id} />
+                {:else}
+                  {t(PHASE_KEY[row.practice.phase])}
+                {/if}
+              </span>
+            {:else if row.fight}
+              <span class="phrase" data-now-fight>
+                {t(row.fight.key)}
+                {#if row.fight.tech}<EntityLink kind="technique" id={row.fight.tech} />{/if}
+              </span>
+            {/if}
           </span>
           <span class="xph"
             >{#if row.xpPerHour !== null}{t('tile.xphValue', {
                 n: formatXp(row.xpPerHour),
               })}{/if}</span
           >
-          {#if row.move && row.move.left > 0}
+          {#if row.walkLeft > 0}
             <span class="wait" data-walk-left
-              >{t('world.walkLeft', { time: formatDuration(row.move.left) })}</span
+              >{t('world.walkLeft', { time: formatDuration(row.walkLeft) })}</span
             >
           {/if}
           {#if wait && wait.slot === row.slot}
@@ -147,6 +220,7 @@
             >
           {/if}
           <button type="button" class="stop" onclick={() => stop(row.slot)}>{t('now.stop')}</button>
+          {#if row.mission}<NowMission now={row.mission} />{/if}
           <Slot name="now.bar" ctx={{ slot: row.slot }} />
         </li>
       {/each}
@@ -248,34 +322,63 @@
     min-width: 0;
   }
 
-  .name {
-    --_max-width: 14rem;
-    flex: none;
-    max-width: var(--_max-width);
-    overflow: hidden;
-    font-weight: 600;
-    text-overflow: ellipsis;
+  /* A mission shows its stage on a line of its own under the bar. */
+  .slot.with-mission {
+    flex-wrap: wrap;
+  }
+
+  /* One line: the name gives way first, then the phrase; each is cut with an ellipsis. */
+  .what {
+    display: flex;
+    flex: 1;
+    align-items: baseline;
+    gap: var(--space-2);
+    min-width: 0;
     white-space: nowrap;
   }
 
-  .name :global(a:hover) {
+  .verb {
+    flex: none;
+  }
+
+  .name,
+  .phrase {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .name {
+    flex: 0 8 auto;
+    font-weight: 600;
+  }
+
+  .phrase {
+    flex: 0 1 auto;
+  }
+
+  .name :global(a),
+  .phrase :global(a) {
+    display: inline;
+    min-height: 0;
+  }
+
+  .name :global(a:hover),
+  .phrase :global(a:hover) {
     text-decoration: underline;
   }
 
-  .bar {
-    --_min-width: 3rem;
-    flex: 1;
-    height: var(--bar-md);
-    min-width: var(--_min-width);
-    border-radius: var(--radius-xs);
-    background: var(--line);
-    overflow: hidden;
+  .phrase {
+    color: var(--accent);
   }
 
-  .fill {
-    display: block;
-    height: 100%;
-    background: var(--accent);
+  .phrase :global(a) {
+    font-weight: 600;
+  }
+
+  .kanji {
+    font-family: var(--font-kanji);
+    font-weight: 600;
   }
 
   .wait {
@@ -325,6 +428,16 @@
       flex: 1 0 100%;
     }
 
+    /* On a phone the seal is named by its kanji and name alone. */
+    .lead {
+      display: none;
+    }
+
+    .name {
+      --_max-width: 6rem;
+      max-width: var(--_max-width);
+    }
+
     .title,
     .xph,
     .place-label {
@@ -344,11 +457,6 @@
 
     .chip {
       flex: 1 0 100%;
-    }
-
-    .name {
-      --_max-width: 9rem;
-      max-width: var(--_max-width);
     }
 
     /* Whole-tap targets of at least 44 px on a phone. */

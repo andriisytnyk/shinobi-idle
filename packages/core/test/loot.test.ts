@@ -100,7 +100,7 @@ describe('A3: what a win pays matches the content data', () => {
     expect(unlockBoss(state, 'core:boss_wolf', content)).toBe(true);
     const bounty = content.bosses.find((b) => b.id === 'core:boss_wolf')?.bounty;
     expect(startFight(state, 'core:zone_boss_wolf')).toEqual({ ok: true });
-    const ryo0 = state.currencies.intel + state.currencies.ryo;
+    const ryo0 = state.currencies.intel! + state.currencies.ryo!;
     let paid = 0;
     for (let t = 0; t < 600_000 && paid === 0; t += 500) {
       for (const e of state.combat?.fight.enemies ?? []) e.hp = Math.min(e.hp, 1);
@@ -109,7 +109,7 @@ describe('A3: what a win pays matches the content data', () => {
       if (loot?.type === 'loot') paid = loot.ryo + loot.bounty;
     }
     expect(paid).toBeGreaterThan(0);
-    expect(state.currencies.ryo).toBe(paid);
+    expect(state.currencies.ryo!).toBe(paid);
     expect(ryo0).toBe(0);
     const loot = state.events.find((e) => e.type === 'loot');
     expect(loot?.type === 'loot' && loot.bounty).toBe(bounty?.first);
@@ -125,7 +125,7 @@ describe('A3: what a win pays matches the content data', () => {
     advance(weak, 10 * 60_000, content);
     expect(weak.events.some((e) => e.type === 'playerDefeated')).toBe(true);
     expect(weak.events.some((e) => e.type === 'loot')).toBe(false);
-    expect(weak.currencies.ryo).toBe(0);
+    expect(weak.currencies.ryo!).toBe(0);
     expect(Object.keys(weak.bank).filter((id) => id !== ids.medpouch)).toEqual([]);
     // Timeout: an enemy that cannot be hurt.
     const state = fighter(5, 36, 'katon');
@@ -138,7 +138,7 @@ describe('A3: what a win pays matches the content data', () => {
     advance(state, K.combat.fightCapMs + 5000, content);
     expect(state.bingo['core:kiri_hunter']?.timeouts).toBeGreaterThanOrEqual(1);
     expect(state.events.some((e) => e.type === 'loot')).toBe(false);
-    expect(state.currencies.ryo).toBe(0);
+    expect(state.currencies.ryo!).toBe(0);
     // Fled: the Nameless leaves at a share of health, and that is a win for the loot.
     const boss = fighter(6, 50, 'katon');
     setLevel(boss, 'futon', 50);
@@ -168,7 +168,7 @@ describe('A3: what a win pays matches the content data', () => {
     const wolf = content.enemies.find((e) => e.id === 'core:wolf');
     if (!wolf) throw new Error('no wolf');
     grantLoot(state, wolf.id, { ryo: 12, bounty: 3, items: { 'core:pelt': 2 } }, content);
-    expect(state.currencies.ryo).toBe(15);
+    expect(state.currencies.ryo!).toBe(15);
     expect(state.bank['core:pelt']).toBe(2);
     expect(state.events.at(-1)).toMatchObject({ type: 'loot', enemy: wolf.id, ryo: 12, bounty: 3 });
   });
@@ -201,14 +201,14 @@ describe('operation rewards', () => {
 
   it('pays the first clear once, and the repeat share (parts only) afterwards', () => {
     const state = strong(1);
-    const ryo0 = state.currencies.ryo;
+    const ryo0 = state.currencies.ryo!;
     clear(state);
     expect(state.flags['op.hideout.cleared']).toBe(true);
     const paid = state.events.find((e) => e.type === 'operationPaid');
     expect(paid).toMatchObject({ op: 'core:op_hideout', first: true, ryo: 1500, rep: 40 });
-    expect(state.currencies.rep).toBe(40);
+    expect(state.currencies.rep!).toBe(40);
     // The fights of the run paid their own loot besides the 1500.
-    expect(state.currencies.ryo).toBeGreaterThanOrEqual(ryo0 + 1500);
+    expect(state.currencies.ryo!).toBeGreaterThanOrEqual(ryo0 + 1500);
     state.events = [];
     let parts = 0;
     for (let i = 0; i < 12; i++) {
@@ -219,7 +219,7 @@ describe('operation rewards', () => {
       parts += state.bank['core:scrollpart_water_prison'] ?? 0;
     }
     // The twins pay no part, the mist boss pays two each win: the repeat chance adds on top.
-    expect(state.currencies.rep).toBe(40);
+    expect(state.currencies.rep!).toBe(40);
     expect(parts).toBeGreaterThan(12);
   });
 
@@ -230,7 +230,7 @@ describe('operation rewards', () => {
     advance(state, 20 * 60_000, content);
     expect(state.flags['op.hideout.cleared']).toBeUndefined();
     expect(state.events.some((e) => e.type === 'operationPaid')).toBe(false);
-    expect(state.currencies.rep).toBe(0);
+    expect(state.currencies.rep!).toBe(0);
   });
 });
 
@@ -279,7 +279,7 @@ describe('A9: the chunks do not matter', () => {
             advance(state, Math.min(chunk, TOTAL - t), content);
           expect(serialize(state, 0), `chunk ${chunk}`).toBe(expected);
         }
-        expect(whole.currencies.ryo).toBeGreaterThan(0);
+        expect(whole.currencies.ryo!).toBeGreaterThan(0);
         expect(Object.keys(whole.report).length).toBeGreaterThan(0);
       });
     }

@@ -14,6 +14,8 @@ export const UI_PARTS = [
   'skill-row',
   /** The tile of one action: a technique, a herb, a recipe. */
   'action-tile',
+  /** The medallion of an action: its pictogram on a tinted disc, with the rank stamp of a technique. */
+  'action-emblem',
   /** The cycle progress bar of a running tile. */
   'action-progress',
   /** The XP-per-hour figure of a tile. */
@@ -41,6 +43,12 @@ export const UI_PARTS = [
   'world-cell',
   /** A point-of-interest row of the cell panel. */
   'poi-row',
+  /** A mission's card on the board; carries `data-entity="mission:<id>"`. */
+  'mission-card',
+  /** One stage of a mission on its page; `data-stage` is its index. */
+  'mission-stage',
+  /** One thing a mission pays: a currency, an item, a village resource. */
+  'mission-reward',
   /** A currency figure of the top bar. */
   'topbar-currency',
   'modal',
@@ -71,5 +79,8 @@ export const ENTITY_PARTS: readonly UiPart[] = [
   'building-card',
   'world-cell',
   'poi-row',
+  'mission-card',
+  'mission-stage',
+  'mission-reward',
   'topbar-currency',
 ];

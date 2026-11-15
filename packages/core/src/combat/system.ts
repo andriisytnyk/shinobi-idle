@@ -382,10 +382,10 @@ export const combatSystem: System = {
       if (result === 'void') {
         // A hook of a pack failed: no win, no loss, no loot, no Wound. A new fight starts at once, without the hook.
         emit(state, {
-          type: 'fightVoided',
-          enemy: c.enemy,
+          type: 'ruleDisabled',
           pack: c.fight.fault?.pack ?? '',
-          hook: c.fight.fault?.hook ?? '',
+          rule: `fightHook.${c.fight.fault?.hook ?? ''}`,
+          reason: c.fight.fault?.reason ?? '',
         });
         c.carry += c.fight.t - c.fight.tally.lastUseAt;
         const p = c.fight.player;

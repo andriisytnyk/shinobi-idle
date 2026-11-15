@@ -3,7 +3,7 @@ import { addItem } from '../bank.ts';
 import { MS_PER_SECOND } from '../formulas.ts';
 import type { CommandResult } from '../engine.ts';
 import { indexOf } from '../lookup.ts';
-import { RANK_ORDER } from '../requirements.ts';
+import { rankIndex } from '../vocab.ts';
 import type { GameState } from '../state.ts';
 import { wheelFactor } from './fight.ts';
 import { answersTraitData, beatenBy, dotShareOf, fightData } from './fight-data.ts';
@@ -29,17 +29,19 @@ export interface LoadoutLimits {
 
 export function loadoutLimits(tier: number, content: ContentDb): LoadoutLimits | null {
   const L = content.balance.K.loadout;
-  if (tier >= RANK_ORDER.indexOf('chunin'))
-    return {
-      slots: need(L.slots.chunin, 'loadout.slots.chunin'),
-      natures: need(L.natures.chunin, 'loadout.natures.chunin'),
-    };
-  if (tier >= RANK_ORDER.indexOf('genin'))
-    return {
-      slots: need(L.slots.genin, 'loadout.slots.genin'),
-      natures: need(L.natures.genin, 'loadout.natures.genin'),
-    };
-  return null;
+  const slots: Record<string, number | undefined> = L.slots;
+  const natures: Record<string, number | undefined> = L.natures;
+  // The limits of the highest rank the balance lists that the player's tier reaches: a rank above the last listed keeps its limits.
+  let best: { at: number; rank: string } | null = null;
+  for (const rank of Object.keys(L.slots)) {
+    const at = rankIndex(content, rank);
+    if (at >= 0 && at <= tier && (!best || at > best.at)) best = { at, rank };
+  }
+  if (!best) return null;
+  return {
+    slots: need(slots[best.rank], `loadout.slots.${best.rank}`),
+    natures: need(natures[best.rank], `loadout.natures.${best.rank}`),
+  };
 }
 
 /** The nature a technique is of: its skill, when the skill is a nature of the wheel. */
@@ -342,7 +344,8 @@ export function prepareFor(
 
 // ---------- commands ----------
 
-const tierOf = (state: GameState): number => RANK_ORDER.indexOf(state.player.rank);
+const tierOf = (state: GameState, content: ContentDb): number =>
+  rankIndex(content, state.player.rank);
 
 /** Why a list of techniques cannot be a loadout of this player, or null when it can. */
 function invalidLoadout(
@@ -350,7 +353,7 @@ function invalidLoadout(
   ids: readonly string[],
   content: ContentDb,
 ): string | null {
-  const limits = loadoutLimits(tierOf(state), content);
+  const limits = loadoutLimits(tierOf(state, content), content);
   if (!limits) return 'error.noLoadoutYet';
   const index = indexOf(content);
   if (new Set(ids).size !== ids.length) return 'error.duplicateTechnique';
@@ -370,11 +373,11 @@ function invalidLoadout(
 /** What the automatic loadout is built from: the rank and how many techniques are known. */
 function basisOf(state: GameState, content: ContentDb): string {
   const known = content.techniques.filter((t) => state.known[t.id] && t.rank !== null).length;
-  return `${tierOf(state)}:${known}`;
+  return `${tierOf(state, content)}:${known}`;
 }
 
 function buildAuto(state: GameState, content: ContentDb): string[] {
-  const limits = loadoutLimits(tierOf(state), content);
+  const limits = loadoutLimits(tierOf(state, content), content);
   return limits
     ? autoLoadout(planningSnapshot(state, content), limits, state.loadouts.signature, content)
     : [];
@@ -477,7 +480,7 @@ export function saveLoadout(state: GameState, name: string, content: ContentDb):
   ) {
     return { ok: false, reason: 'error.invalidName' };
   }
-  if (tierOf(state) < 1) return { ok: false, reason: 'error.noLoadoutYet' };
+  if (tierOf(state, content) < 1) return { ok: false, reason: 'error.noLoadoutYet' };
   if (!(clean in l.saved) && Object.keys(l.saved).length >= content.balance.K.loadout.saved) {
     return { ok: false, reason: 'error.tooManyLoadouts' };
   }
@@ -526,7 +529,7 @@ export function prepareLoadout(
   content: ContentDb,
 ): CommandResult {
   if (state.combat) return { ok: false, reason: 'error.fighting' };
-  const limits = loadoutLimits(tierOf(state), content);
+  const limits = loadoutLimits(tierOf(state, content), content);
   if (!limits) return { ok: false, reason: 'error.noLoadoutYet' };
   const entry = fightTarget(content, encounter)?.enemy ?? entryOf(content, encounter);
   const target = entry ? targetOf(state, entry.id, content) : null;

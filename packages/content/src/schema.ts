@@ -62,14 +62,30 @@ export const natureSchema = z.strictObject({
   ayaNature: vocabId,
 });
 
-/** A rank the player holds; the list order is the order of the ranks and `tier` the AI tier it runs. */
-export const playerRankSchema = z.strictObject({ id: vocabId, tier: z.number().int().min(0) });
+/**
+ * A rank the player holds; the list order is the order of the ranks and `tier` the AI tier it runs.
+ * `academy` marks a rank held while still at the Academy: such a player has no village, no pouch,
+ * no nature test and is slowed past the Academy cap; the first rank without it is the graduation.
+ */
+export const playerRankSchema = z.strictObject({
+  id: vocabId,
+  /** The AI tier the rank runs; `composeContent` sets it to the position of the rank, so a pack may give any number. */
+  tier: z.number().int().min(0),
+  academy: z.boolean().optional(),
+  /** The id of the rank this one comes right after; omitted: after the last rank of the packs loaded before. Ties go by pack load order. */
+  after: z.string().optional(),
+});
 
 /**
  * A stage of the village, in list order. `rep` is the key of `K.rep` that holds the reputation
  * needed to reach the stage (`null` for the first stage).
  */
-export const villageStageSchema = z.strictObject({ id: vocabId, rep: z.string().nullable() });
+export const villageStageSchema = z.strictObject({
+  id: vocabId,
+  rep: z.string().nullable(),
+  /** The highest building level the stage allows; omitted: the entry of `K.towerStageMax` for its position, or the last one. */
+  cap: z.number().int().min(0).optional(),
+});
 
 /** The id of an entity kind that has a page and the `ContentDb` list its entities live in (`null`: nested in another list). */
 export const entityKindSchema = z.strictObject({ id: vocabId, list: z.string().nullable() });
@@ -184,7 +200,12 @@ export const techniqueSchema = techniqueBaseSchema.extend({
   combat: techniqueCombatSchema.nullable(),
 });
 
-export const exerciseSchema = z.object({ id: coreId, level });
+export const exerciseSchema = z.object({
+  id: coreId,
+  level,
+  /** The skill the exercise trains; omitted: the first skill with the activity `drill`. */
+  skill: skillId.optional(),
+});
 
 /** The part of a practice that the importer generates; modifiers are layered on at load. */
 export const practiceBaseSchema = z.strictObject({
@@ -192,6 +213,8 @@ export const practiceBaseSchema = z.strictObject({
   level,
   /** The two skills the practice trains together. */
   pair: z.array(skillId).length(2),
+  /** The skill the practice trains; omitted: the first skill with the activity `insight`. */
+  skill: skillId.optional(),
   /** Count of insight and enlightenment modifiers (texts are locale keys by index). */
   insight: z.number().int(),
   enlight: z.number().int(),
@@ -218,7 +241,12 @@ export const obstacleSchema = obstacleBaseSchema.extend({
 });
 
 /** The part of a herb that the importer generates; the extra requirement is layered on at load. */
-export const herbBaseSchema = z.object({ id: coreId, level });
+export const herbBaseSchema = z.object({
+  id: coreId,
+  level,
+  /** The skill that gathers the herb; omitted: the first skill with the activity `patch`. */
+  skill: skillId.optional(),
+});
 
 export const herbSchema = herbBaseSchema.extend({
   /** What the herb needs besides its Herbalism level (a Chakra Control level for rare herbs); `null` for none. */
@@ -367,6 +395,8 @@ export const marketEntrySchema = z.object({
 export const shopEntrySchema = z.strictObject({
   item: coreId,
   req: z.lazy(() => reqSchema),
+  /** The currency the price is paid in (a `currencies` id); omitted: the currency with the role `money`. The `renown` currency is what Reputation is counted in: it opens the village stages. */
+  currency: vocabId.optional(),
 });
 
 /** Coating: one `poison` and a batch of `base` make a batch of `product` (counts come from the product's `madeFrom`). */
@@ -405,11 +435,13 @@ export const missionBasePaySchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('scrollPart'), technique: coreId }),
 ]);
 
-/** A payment in kind with its amount; a scroll part is a chance (`K.partDrop.mission`) of one part. */
+/** A payment in kind with its amount; a scroll part is a chance (the `K.partDrop` entry `chance` names) of one part. */
 export const missionPaySchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('item'), item: coreId, n: z.number().int().min(1) }),
   z.object({ kind: z.literal('intel'), n: z.number().int().min(1) }),
-  z.object({ kind: z.literal('scrollPart'), technique: coreId }),
+  z.object({ kind: z.literal('scrollPart'), technique: coreId, chance: idOf('partChance') }),
+  /** A payment in a currency (a `currencies` id), for the currencies of a pack. */
+  z.object({ kind: z.literal('currency'), currency: vocabId, n: z.number().int().min(1) }),
 ]);
 
 /** The mission as the importer generates it. */
@@ -494,6 +526,8 @@ export const poiSchema = z.discriminatedUnion('kind', [
     kind: z.literal('cache'),
     items: z.array(ingredientRef),
     ryo: z.number().int().min(0),
+    /** More currencies by id (a pack's own). */
+    currencies: z.record(vocabId, z.number().int().min(0)).optional(),
   }),
   z.strictObject({ id: coreId, kind: z.literal('vault'), item: coreId }),
   z.strictObject({ id: coreId, kind: z.literal('mission'), mission: coreId }),
@@ -621,6 +655,8 @@ export const buildingFxSchema = z.strictObject({
   /** Civil resources the building produces: `K.prod` x level of each, per tick. */
   produces: z.array(resSlug),
   duty: z.enum(BUILDING_DUTIES).optional(),
+  /** The village stage (a `villageStages` id) from which the building can be built; omitted: from the first stage. */
+  stage: z.string().min(1).optional(),
 });
 
 export const buildingSchema = buildingBaseSchema.extend({
@@ -629,6 +665,7 @@ export const buildingSchema = buildingBaseSchema.extend({
   capstone: z.array(modSchema),
   produces: z.array(resSlug),
   duty: z.enum(BUILDING_DUTIES).optional(),
+  stage: z.string().min(1).optional(),
 });
 
 /** Village resources: civil ones fill the store and pay for construction, shinobi ones come from village missions. */
@@ -722,6 +759,8 @@ export const questRewardsSchema = z.strictObject({
   items: z.array(ingredientRef),
   ryo: z.number().int().min(0),
   rep: z.number().int().min(0),
+  /** More currencies by id (a pack's own); `ryo` and `rep` are the `money` and `renown` ones. */
+  currencies: z.record(vocabId, z.number().int().min(0)).optional(),
   flags: z.array(z.string().min(1)),
   rank: playerRankId.nullable(),
 });
@@ -1125,6 +1164,17 @@ export const balanceParamsSchema = z.object({
   partsPerScroll: z.number(),
   partDrop: shapeOf('partDrop', z.record(z.string(), z.number())),
   tickMin: z.number(),
+  /**
+   * Limits that keep the engine running whatever a pack adds: the most events one system of a pack
+   * may ask for in an hour of game time, the shortest an action cycle can get (ms) and the bounds of a
+   * modifier total.
+   */
+  engine: z.object({
+    packEventsPerHour: z.number().int().min(1),
+    minActionMs: z.number().int().min(1),
+    modMin: z.number().gt(0),
+    modMax: z.number().gt(0),
+  }),
   /** Numbers of packs other than `core`, by pack id: nothing but that pack reads or sets them. */
   ext: z.record(z.string(), z.record(z.string(), z.number())).optional(),
   /** The village: starting building levels by building id, the level from which the `late` resource is needed and its share of the base cost. */
@@ -1440,6 +1490,11 @@ export const generatedDbSchema = contentDbSchema
 export type GeneratedDb = z.infer<typeof generatedDbSchema>;
 
 export type Skill = z.infer<typeof skillSchema>;
+export type Nature = z.infer<typeof natureSchema>;
+export type PlayerRankData = z.infer<typeof playerRankSchema>;
+export type CurrencyData = z.infer<typeof currencySchema>;
+export type VillageStageData = z.infer<typeof villageStageSchema>;
+export type EntityKindData = z.infer<typeof entityKindSchema>;
 export type Seal = z.infer<typeof sealSchema>;
 export type Technique = z.infer<typeof techniqueSchema>;
 export type TechniqueBase = z.infer<typeof techniqueBaseSchema>;
