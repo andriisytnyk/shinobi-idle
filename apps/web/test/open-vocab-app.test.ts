@@ -19,7 +19,7 @@ import { bootApp, type BootedApp } from './helpers/boot-app.ts';
 vi.mock('../src/lib/store.ts', async () => {
   const { createGame } = await import('../src/lib/game.svelte.ts');
   const { composeBoot } = await import('../src/lib/boot.ts');
-  const { testmodPack } = await import('@shinobi/content/testmod');
+  const { testmodPack } = await import('@shinobi/core/testmod');
   const boot = composeBoot([testmodPack]);
   return {
     game: createGame({
@@ -317,10 +317,11 @@ describe('what a player sees with a mod (fix iteration)', () => {
     expect(rawTexts()).toEqual([]);
   });
 
-  it('shows the state of a technique by its own name, not as a status that does not exist', async () => {
+  it('links the state of a technique to the status the content says the state puts on a body', async () => {
     booted = await boot('#/technique/testmod:ember_pulse');
+    // The state \ is not a status; the status \ names it in its data.
+    expect(q('a[href="#/status/testmod:chill"]')).not.toBeNull();
     expect(q('a[href="#/status/testmod:chilled"]')).toBeNull();
-    expect(texts().some((s) => s.includes('Тестове охолодження'))).toBe(true);
   });
 
   it('opens the nature page without a text standing in for a missing one', async () => {

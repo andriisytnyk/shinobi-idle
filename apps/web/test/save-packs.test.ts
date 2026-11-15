@@ -1,4 +1,4 @@
-import { testmodPack } from '@shinobi/content/testmod';
+import { testmodPack } from '@shinobi/core/testmod';
 import { createState, type GameState } from '@shinobi/core';
 import { describe, expect, it } from 'vitest';
 import { composeBoot } from '../src/lib/boot.ts';

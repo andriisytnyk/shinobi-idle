@@ -83,7 +83,7 @@ describe('the interface does not import the global content (D1)', () => {
 
   it('does not import the test packs either, except through the boot module', () => {
     const offenders = files.filter(
-      (f) => f.name !== BOOT && /@shinobi\/content\/testmod|dev-packs\//.test(f.text),
+      (f) => f.name !== BOOT && /@shinobi\/(content|core)\/testmod|dev-packs\//.test(f.text),
     );
     expect(offenders.map((f) => f.name)).toEqual([]);
   });

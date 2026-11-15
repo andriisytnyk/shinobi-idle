@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { corePack, type ContentPack } from '@shinobi/content';
-import { testmodPack } from '@shinobi/content/testmod';
+import { testmodPack } from '@shinobi/core/testmod';
 import { describe, expect, it, vi } from 'vitest';
 import { testmodUi } from '../dev-packs/testmod-ui.ts';
 import { composeBoot, devPacks, requestedPacks, uiPacksFor } from '../src/lib/boot.ts';

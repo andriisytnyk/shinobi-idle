@@ -80,7 +80,7 @@ export async function devPacks(search: string): Promise<DevPacks> {
   if (!import.meta.env.DEV) return none;
   if (!requestedPacks(search).includes('testmod')) return none;
   const [{ testmodPack }, { testmodUi }] = await Promise.all([
-    import('@shinobi/content/testmod'),
+    import('@shinobi/core/testmod'),
     import('../../dev-packs/testmod-ui.ts'),
   ]);
   const available = { testmod: testmodUi };

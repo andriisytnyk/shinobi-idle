@@ -16,3 +16,6 @@
           <li>
             <a class="entity-link" href="#/skill/katon">
               Катон
+          <li>
+            <a class="entity-link" href="#/trait/regen">
+              Регенерація
