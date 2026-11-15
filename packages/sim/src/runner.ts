@@ -13,6 +13,9 @@ import type { Bot } from './bot.ts';
 /** Skill levels worth a line in the timeline. */
 export const MILESTONE_LEVELS: readonly number[] = [5, 10, 20, 30, 40, 50];
 
+/** Rejected commands tolerated before a run is declared failed. */
+export const DEFAULT_REJECT_LIMIT = 100;
+
 export type Milestone =
   | { at: number; type: 'skill'; id: string; level: number }
   | { at: number; type: 'questStep'; id: string; step: number }
@@ -21,28 +24,35 @@ export type Milestone =
 
 export interface RunOptions {
   seed: number;
-  /** Hard game-time limit in ms. */
-  limitMs: number;
-  /** Game time between looks at the state, in ms. */
-  stepMs?: number;
+  /** Start from a copy of this state instead of a fresh game (`seed` is then only a label). */
+  initialState?: GameState;
   content?: ContentDb;
   rules?: Rules;
+  /** Game time between looks at the state, in ms (default 500). A finished action idles up to this long. */
+  stepMs?: number;
+  /** Hard game-time limit in ms. */
+  limitMs: number;
+  /** Rejected commands after which the run stops as failed. */
+  rejectLimit?: number;
 }
 
 export interface RunResult {
   bot: string;
   seed: number;
-  /** `done` when the bot's goal held, `limit` when the time ran out first. */
-  ended: 'done' | 'limit';
+  /** `done` when the goal held, `limit` when time ran out, `failed` after too many rejected commands. */
+  ended: 'done' | 'limit' | 'failed';
   /** Game time at the end of the run, ms. */
   endedAt: number;
+  /** Game time at which the goal held (the last event of the step it first held in), or null. */
+  goalAt: number | null;
   timeline: Milestone[];
-  /** Skill XP gained, by skill id (whole numbers). */
+  /** Skill XP gained during the run, by skill id (whole numbers). */
   xp: Record<string, number>;
   kills: Record<string, number>;
   actions: Record<string, number>;
-  /** Commands the game refused (a bot bug or a race with a defeat). */
+  /** Commands the game refused, and the reason of the first one. */
   rejected: number;
+  firstRejection: string | null;
   state: GameState;
 }
 
@@ -71,52 +81,67 @@ const withPrefix = (counters: Record<string, number>, prefix: string) =>
   );
 
 /**
- * Plays a fresh game with `bot` through `dispatch` and `advance` only. Time moves in `stepMs`
- * pieces; the bot is asked again whenever a slot is idle or a level, quest step or rank changed.
+ * Plays a game with `bot` through `dispatch` and `advance` only. Time moves in `stepMs` pieces;
+ * the bot is asked again whenever a slot is idle or a level, quest step or rank changed. The
+ * event queue is drained after every step so the core's cap cannot hide a milestone.
  */
 export function runBot(bot: Bot, options: RunOptions): RunResult {
   const content = options.content ?? defaultContent;
   const rules = options.rules ?? defaultRules;
   const stepMs = options.stepMs ?? 500;
-  const state = createState(options.seed, content);
+  const rejectLimit = options.rejectLimit ?? DEFAULT_REJECT_LIMIT;
+  const state = options.initialState
+    ? structuredClone(options.initialState)
+    : createState(options.seed, content);
+  state.events.splice(0);
+  const startXp: Record<string, number> = Object.fromEntries(
+    Object.entries(state.skills).map(([id, s]) => [id, s.xp]),
+  );
   const timeline: Milestone[] = [];
-  const seen = new WeakSet<GameEvent>();
   let rejected = 0;
+  let firstRejection: string | null = null;
+  let goalAt: number | null = bot.goal.reached(state) ? state.now : null;
   let changed = true;
 
-  while (state.now < options.limitMs && !bot.isDone(state)) {
+  while (goalAt === null && state.now < options.limitMs && rejected <= rejectLimit) {
     if (changed || state.slots.some((slot) => !slot.action)) {
       changed = false;
-      for (const command of bot.decide(state, content) ?? []) {
-        if (!dispatch(state, command, content, rules).ok) rejected++;
+      for (const command of bot.decide({ state, content, rules }) ?? []) {
+        const result = dispatch(state, command, content, rules);
+        if (!result.ok) {
+          rejected++;
+          firstRejection ??= result.reason;
+        }
       }
     }
     advance(state, Math.min(stepMs, options.limitMs - state.now), content, rules);
-    for (const event of state.events) {
-      if (seen.has(event)) continue;
-      seen.add(event);
+    const events = state.events.splice(0);
+    for (const event of events) {
       const milestone = milestoneOf(event);
       if (milestone) timeline.push(milestone);
       if (event.type === 'levelUp' || event.type === 'questStep' || event.type === 'rankUp') {
         changed = true;
       }
     }
+    if (bot.goal.reached(state)) goalAt = events[events.length - 1]?.at ?? state.now;
   }
 
   return {
     bot: bot.name,
     seed: options.seed,
-    ended: bot.isDone(state) ? 'done' : 'limit',
+    ended: goalAt !== null ? 'done' : rejected > rejectLimit ? 'failed' : 'limit',
     endedAt: state.now,
+    goalAt,
     timeline,
     xp: Object.fromEntries(
       Object.entries(state.skills)
-        .filter(([, s]) => s.xp > 0)
-        .map(([id, s]) => [id, Math.round(s.xp)]),
+        .map(([id, s]) => [id, Math.round(s.xp - (startXp[id] ?? 0))] as const)
+        .filter(([, gained]) => gained > 0),
     ),
     kills: withPrefix(state.counters, 'kills.'),
     actions: withPrefix(state.counters, 'actions.'),
     rejected,
+    firstRejection,
     state,
   };
 }

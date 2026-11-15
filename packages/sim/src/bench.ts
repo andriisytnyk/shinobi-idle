@@ -9,14 +9,21 @@ export interface BenchResult {
   gameHours: number;
   ms: number;
   hoursPerSecond: number;
+  /** Finished action cycles and the times the action had to be started again (it ended early). */
+  cycles: number;
+  restarts: number;
 }
 
 /** Wall time to advance 12 game hours with `command` kept running (restarted if it ends). */
 function measure(label: string, command: Command): BenchResult {
   const state = createState(1, content);
   let elapsed = 0;
+  let restarts = 0;
   for (let hour = 0; hour < GAME_HOURS; hour++) {
-    if (!state.slots[0]?.action) dispatch(state, command, content);
+    if (!state.slots[0]?.action) {
+      if (hour > 0) restarts++;
+      dispatch(state, command, content);
+    }
     const t0 = performance.now();
     advance(state, HOUR_MS, content);
     elapsed += performance.now() - t0;
@@ -26,6 +33,8 @@ function measure(label: string, command: Command): BenchResult {
     gameHours: GAME_HOURS,
     ms: elapsed,
     hoursPerSecond: GAME_HOURS / (elapsed / 1000),
+    cycles: state.stats.completed,
+    restarts,
   };
 }
 

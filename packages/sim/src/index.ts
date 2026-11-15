@@ -4,3 +4,4 @@ export * from './bots/academy.ts';
 export * from './bots/index.ts';
 export * from './runner.ts';
 export * from './report.ts';
+export * from './commands.ts';

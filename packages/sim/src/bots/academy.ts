@@ -1,14 +1,12 @@
-import type { ContentDb } from '@shinobi/content';
 import {
   evalReq,
   examFor,
   listSkillActions,
   type ActionInfo,
   type Command,
-  type GameState,
   type ReqResult,
 } from '@shinobi/core';
-import type { Bot } from '../bot.ts';
+import type { Bot, BotContext } from '../bot.ts';
 
 const leaves = (r: ReqResult): ReqResult[] =>
   r.children.length > 0 ? r.children.flatMap(leaves) : [r];
@@ -21,9 +19,9 @@ const leaves = (r: ReqResult): ReqResult[] =>
 export const academyBot: Bot = {
   name: 'academy',
   description: 'Академія: від нового збереження до Геніна за квестом «Випуск».',
-  isDone: (state) => state.player.rank !== 'student',
+  goal: { label: 'Генін', reached: (state) => state.player.rank !== 'student' },
 
-  decide(state: Readonly<GameState>, content: ContentDb): Command[] | null {
+  decide({ state, content, rules }: BotContext): Command[] | null {
     const quest = content.quests.find((q) => {
       const progress = state.quests[q.id];
       return progress && !progress.done;
@@ -50,7 +48,7 @@ export const academyBot: Bot = {
       const target = skills.reduce((a, b) => (b.current < a.current ? b : a));
       if (target.req.t !== 'skill') return null;
       let best: ActionInfo | null = null;
-      for (const action of listSkillActions(state, target.req.skill, content)) {
+      for (const action of listSkillActions(state, target.req.skill, content, rules)) {
         if (action.available && (!best || action.xpPerHour > best.xpPerHour)) best = action;
       }
       return best ? start(best.kind, best.id) : null;
