@@ -1,14 +1,18 @@
 import { untrack } from 'svelte';
-import type { GameState, MissionForecast, ReqResult } from '@shinobi/core';
+import {
+  missionStartSlot,
+  missionStatus,
+  type GameState,
+  type MissionForecast,
+  type MissionStatus,
+  type ReqResult,
+} from '@shinobi/core';
 import type { Mission } from '@shinobi/content';
 import {
   inputsSignature,
-  missionState,
   missionView,
   rankGroups,
-  rankUnlock,
   stageViews,
-  type MissionState,
   type MissionView,
   type StageView,
 } from './missions.ts';
@@ -71,21 +75,30 @@ export function viewOf(mission: Mission): MissionView {
   });
 }
 
-/** How a mission stands now: startable, blocked and why, or running. It follows every store update (the slot rules are cheap); the blocker comes from the view. */
-export function cardState(mission: Mission, blocker: MissionView['blocker']): MissionState {
+/**
+ * The answer `dispatch` would give to starting a mission now, from core. It follows every store
+ * update (the slot rules are cheap); the blocker is the view's, computed at the coarse rate.
+ */
+export function cardState(mission: Mission, view: MissionView): MissionStatus {
   void game.version;
-  return untrack(() => missionState(game.state, mission, blocker, game.content, game.rules));
+  return untrack(() =>
+    missionStatus(
+      game.state,
+      mission.id,
+      missionStartSlot(game.state),
+      game.content,
+      game.rules,
+      view.blocker,
+    ),
+  );
 }
 
 /** The missions of the list that can be started or are running now (what the filter «лише доступні» keeps). */
 export function availableOf(list: Mission[]): Mission[] {
   void game.version;
   return list.filter((m) => {
-    const blocker = viewOf(m).blocker;
-    return (
-      untrack(() => missionState(game.state, m, blocker, game.content, game.rules)).kind !==
-      'blocked'
-    );
+    const status = cardState(m, viewOf(m));
+    return status.runningAt >= 0 || status.startable;
   });
 }
 
@@ -94,13 +107,25 @@ export function stagesOf(mission: Mission, forecast: MissionForecast): StageView
   return untrack(() => stageViews(game.state, mission, forecast, game.content, game.rules));
 }
 
-/** What each rank asks to open, evaluated at the coarse rate like the forecasts. */
+/**
+ * What each rank asks to open, from the unlock each mission carries in the data: shown once for
+ * the rank when all its missions have the same, evaluated at the coarse rate like the forecasts.
+ * A rank whose missions differ shows no gate of its own (each card shows what blocks it).
+ */
 export function gatesOf(): { rank: string; result: ReqResult | null; open: boolean }[] {
   void forecastRevision();
   return untrack(() =>
-    rankGroups(game.content).map((g) => ({
-      rank: g.rank,
-      ...rankUnlock(game.state, g.rank, game.content),
-    })),
+    rankGroups(game.content).map((g) => {
+      const unlocks = g.missions.map((m) => viewOf(m).unlock);
+      const first = unlocks[0] ?? null;
+      const shared =
+        first !== null &&
+        unlocks.every((u) => u !== null && JSON.stringify(u.req) === JSON.stringify(first.req));
+      return {
+        rank: g.rank,
+        result: shared ? first : null,
+        open: unlocks.every((u) => u === null || u.met),
+      };
+    }),
   );
 }

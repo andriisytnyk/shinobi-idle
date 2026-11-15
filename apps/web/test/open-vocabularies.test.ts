@@ -121,10 +121,6 @@ const CORE_IDS = coreEntityIds();
  * a core id is a failure: such a name is data and belongs in the content.
  */
 const ALLOWED: Record<string, { ids: string[]; why: string }> = {
-  'lib/missions.ts': {
-    ids: ['intel'],
-    why: 'The pay kind of a mission stage (the engine schema of mission pay is closed): a kind of payment, not the currency of that id.',
-  },
   'lib/crafts.ts': {
     ids: ['herb'],
     why: 'The source kind of an item that grows in a patch (ItemSource.kind and the craft.src.herb text): a kind of source, not the skill of that id.',

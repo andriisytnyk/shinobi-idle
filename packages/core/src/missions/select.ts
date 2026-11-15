@@ -13,7 +13,14 @@ import type { GameState } from '../state.ts';
 import { currencyOf } from '../vocab.ts';
 import { planStage, planStageParts, stageReq, type DurationParts, type StagePlan } from './plan.ts';
 import { armedRation, rationItems, type RationItem } from './ration.ts';
-import { MISSION_KIND, fightXpShares, missionRequirements, resourceUnits, stageXp } from './run.ts';
+import {
+  MISSION_KIND,
+  NEEDS_TEAM,
+  fightXpShares,
+  missionRequirements,
+  resourceUnits,
+  stageXp,
+} from './run.ts';
 
 /**
  * What one attempt at a stage gives the player. `lines` are the XP by skill: a skill stage pays its
@@ -71,6 +78,8 @@ export interface MissionForecast {
   /** The mission's length with no failed attempt, and with them as expected, ms. */
   nominalMs: number;
   expectedMs: number;
+  /** The chance that one run goes with no failed attempt: the stages' chances multiplied (0 when a stage has no way). */
+  cleanChance: number;
   /** What it pays: ryo and Reputation after the modifiers, and the payments in kind. */
   ryo: number;
   rep: number;
@@ -289,6 +298,7 @@ export function missionForecast(
     stages,
     nominalMs: nominal,
     expectedMs: expected,
+    cleanChance: stages.reduce((p, s) => p * s.chance, 1),
     ryo,
     rep,
     pay: mission.pay,
@@ -443,9 +453,14 @@ export function missionStatus(
       ? startRefusal(state, slot, MISSION_KIND, missionId, content, rules, blocker?.result ?? null)
       : startRefusal(state, slot, MISSION_KIND, missionId, content, rules);
   if (!refusal) return { slot, runningAt, startable: true, refusal: null };
-  const requirement = refusal.req !== undefined;
+  // What blocks the mission by its requirements is reported with a requirement refusal and with a missing team (the team is only the first thing dispatch names); a slot rule is reported alone.
+  const requirement = refusal.req !== undefined || refusal.reason === NEEDS_TEAM;
   const found =
-    requirement && mission ? (blocker ?? missionBlocker(state, mission, content, rules)) : null;
+    requirement && mission
+      ? blocker !== undefined
+        ? blocker
+        : missionBlocker(state, mission, content, rules)
+      : null;
   return {
     slot,
     runningAt,

@@ -184,24 +184,22 @@ describe('missionStageWays', () => {
           } else {
             expect(w.result, label).toBeNull();
           }
-          if (w.kind === 'intel') expect(w.met, label).toBe(w.have >= w.intel);
-          if (w.kind === 'intel') expect(w.have, label).toBe(state.currencies[STUDY] ?? 0);
+          if (w.kind === 'skip') expect(w.met, label).toBe(w.have >= w.intel);
+          if (w.kind === 'skip') expect(w.have, label).toBe(state.currencies[STUDY] ?? 0);
           if (w.kind === 'mate') expect(w.result, label).toBeNull();
           if (w.used) {
             if (w.kind === 'mate') seen.add('mate');
-            if (w.kind === 'intel') seen.add('intel');
+            if (w.kind === 'skip') seen.add('intel');
             if (w.slow && w.kind === 'self') seen.add('slow');
             if (w.kind === 'self' && !w.slow) seen.add('self');
           }
         }
         // The tiers: a normal way of the player beats everything, a slow one or a teammate beats Intel.
-        const normal = ways.some(
-          (w) => w.met && w.kind !== 'intel' && w.kind !== 'mate' && !w.slow,
-        );
+        const normal = ways.some((w) => w.met && w.kind !== 'skip' && w.kind !== 'mate' && !w.slow);
         if (normal) expect(way.kind === 'self' || way.kind === 'free', label).toBe(true);
-        if (way.kind === 'intel') {
+        if (way.kind === 'skip') {
           expect(
-            ways.filter((w) => w.met && w.kind !== 'intel'),
+            ways.filter((w) => w.met && w.kind !== 'skip'),
             label,
           ).toEqual([]);
         }
@@ -281,7 +279,7 @@ describe('missionStageWays', () => {
         rich.currencies[STUDY] = price;
         const wayOf = (state: GameState): Way | undefined =>
           missionStageWays(state, m.id, i, content, defaultRules).ways.find(
-            (w) => w.kind === 'intel',
+            (w) => w.kind === 'skip',
           );
         expect(wayOf(poor)).toMatchObject({
           intel: price,
@@ -439,6 +437,10 @@ describe('missionStatus', () => {
         m.id,
       ).toEqual({ ok: false, reason: 'error.missionNeedsTeam' });
     }
+    // The team is only the first thing dispatch names: what else blocks the mission is reported with it.
+    const fresh = missionStatus(player({ seed: 4 }), 'core:fire', 0, content, defaultRules);
+    expect(fresh.refusal?.reason).toBe('error.missionNeedsTeam');
+    expect(fresh.refusal?.blocker?.first).not.toBeNull();
     // A mission with no team in it does not ask for one.
     const solo = BOARD.find((m) => !m.team) as Mission;
     const state = ableFor(solo);

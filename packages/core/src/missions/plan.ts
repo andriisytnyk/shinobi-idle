@@ -42,11 +42,11 @@ type Candidate = Omit<StagePlan, 'ms' | 'chance'>;
 
 /**
  * One way to do a stage, met or not: what the planner chooses from, and what the interface lists.
- * `self` is the player by a skill or a named technique, `mate` a teammate, `intel` the Intel that
+ * `self` is the player by a skill or a named technique, `mate` a teammate, `skip` the Intel that
  * stands in for the skill, `free` a stage that asks for nothing (a fight, an items stage).
  */
 export interface StageWay extends Candidate {
-  kind: 'self' | 'mate' | 'intel' | 'free';
+  kind: 'self' | 'mate' | 'skip' | 'free';
   /** Whether the way can be used now. */
   met: boolean;
   /** What the player needs for this way, with the known-technique condition of a nature; null for a teammate, Intel and a free way. */
@@ -284,7 +284,7 @@ function waysOf(state: GameState, mission: Mission, index: number, content: Cont
   if (cost > 0 && intel !== null) {
     const have = state.currencies[intel] ?? 0;
     out.push({
-      kind: 'intel',
+      kind: 'skip',
       who: SELF,
       skill: '',
       tech: '',

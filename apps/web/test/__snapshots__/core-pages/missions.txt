@@ -47,10 +47,6 @@
                 Командна місія
             <p class="ct-note client">
               Дружина даймьо
-            <p class="ct-note" data-no-team="">
-              Команда ще не зібрана: її дає вибір природи чакри.
-              <a href="#/nature">
-                Обрати природу
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -80,7 +76,7 @@
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
                     Репутація: 2
-            <div class="why" data-why="error.requirementsNotMet" id="why-core:cat">
+            <div class="why" data-why="error.missionNeedsTeam" id="why-core:cat">
               <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
                 <span class="mark">
                   <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -94,8 +90,10 @@
                   1/5
                 <span aria-hidden="true" class="bar">
                   <span class="fill" style="width: 20%;">
-              <p class="ct-why">
-                Вимоги до цієї дії не виконано.
+              <p class="ct-why" data-needs-team="">
+                Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
+                <a href="#/nature">
+                  Обрати природу
             <button aria-describedby="why-core:cat" class="ct-action" data-start="" disabled="" type="button">
               Почати
           <li class="ct-tile card" data-entity="mission:core:weed" data-mission="core:weed" data-state="startable" data-ui="mission-card">
@@ -161,10 +159,6 @@
                 Командна місія
             <p class="ct-note client">
               Купці околиць
-            <p class="ct-note" data-no-team="">
-              Команда ще не зібрана: її дає вибір природи чакри.
-              <a href="#/nature">
-                Обрати природу
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -202,7 +196,7 @@
                     <a class="entity-link" href="#/item/core:rice">
                       Рис
                     ×6
-            <div class="why" data-why="error.requirementsNotMet" id="why-core:fire">
+            <div class="why" data-why="error.missionNeedsTeam" id="why-core:fire">
               <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
                 <span class="mark">
                   <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -216,8 +210,10 @@
                   1/10
                 <span aria-hidden="true" class="bar">
                   <span class="fill" style="width: 10%;">
-              <p class="ct-why">
-                Вимоги до цієї дії не виконано.
+              <p class="ct-why" data-needs-team="">
+                Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
+                <a href="#/nature">
+                  Обрати природу
             <button aria-describedby="why-core:fire" class="ct-action" data-start="" disabled="" type="button">
               Почати
           <li class="ct-tile card" data-entity="mission:core:drought" data-mission="core:drought" data-state="blocked" data-ui="mission-card">
@@ -513,10 +509,6 @@
                 Командна місія
             <p class="ct-note client">
               Гільдія купців
-            <p class="ct-note" data-no-team="">
-              Команда ще не зібрана: її дає вибір природи чакри.
-              <a href="#/nature">
-                Обрати природу
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -553,15 +545,17 @@
                   <span>
                     <a class="entity-link" href="#/item/core:crate">
                       Ящик торговця
-            <div class="why" data-why="error.requirementsNotMet" id="why-core:caravan">
+            <div class="why" data-why="error.missionNeedsTeam" id="why-core:caravan">
               <div class="row" data-met="false" data-ui="req-row">
                 <span class="mark">
                   <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
                     <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <span class="label">
                   Дозвіл Хокаґе на місії рангу C
-              <p class="ct-why">
-                Вимоги до цієї дії не виконано.
+              <p class="ct-why" data-needs-team="">
+                Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
+                <a href="#/nature">
+                  Обрати природу
             <button aria-describedby="why-core:caravan" class="ct-action" data-start="" disabled="" type="button">
               Почати
           <li class="ct-tile card closed" data-entity="mission:core:sealed" data-mission="core:sealed" data-state="blocked" data-ui="mission-card">
@@ -683,10 +677,6 @@
                 Командна місія
             <p class="ct-note client">
               Містечко на Південних рівнинах
-            <p class="ct-note" data-no-team="">
-              Команда ще не зібрана: її дає вибір природи чакри.
-              <a href="#/nature">
-                Обрати природу
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -724,15 +714,17 @@
                     <a class="entity-link" href="#/item/core:spice">
                       Спеції
                     ×2
-            <div class="why" data-why="error.missingIngredient" id="why-core:well">
+            <div class="why" data-why="error.missionNeedsTeam" id="why-core:well">
               <div class="row" data-met="false" data-ui="req-row">
                 <span class="mark">
                   <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
                     <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <span class="label">
                   Дозвіл Хокаґе на місії рангу C
-              <p class="ct-why">
-                Бракує інгредієнтів.
+              <p class="ct-why" data-needs-team="">
+                Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
+                <a href="#/nature">
+                  Обрати природу
             <button aria-describedby="why-core:well" class="ct-action" data-start="" disabled="" type="button">
               Почати
           <li class="ct-tile card closed" data-entity="mission:core:dig" data-mission="core:dig" data-state="blocked" data-ui="mission-card">
@@ -750,10 +742,6 @@
                 Командна місія
             <p class="ct-note client">
               Храм Вогню
-            <p class="ct-note" data-no-team="">
-              Команда ще не зібрана: її дає вибір природи чакри.
-              <a href="#/nature">
-                Обрати природу
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -792,15 +780,17 @@
                       Частина сувою: Полум'яна куля вогняного дракона
                     <span class="chance">
                       шанс 15%
-            <div class="why" data-why="error.requirementsNotMet" id="why-core:dig">
+            <div class="why" data-why="error.missionNeedsTeam" id="why-core:dig">
               <div class="row" data-met="false" data-ui="req-row">
                 <span class="mark">
                   <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
                     <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <span class="label">
                   Дозвіл Хокаґе на місії рангу C
-              <p class="ct-why">
-                Вимоги до цієї дії не виконано.
+              <p class="ct-why" data-needs-team="">
+                Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
+                <a href="#/nature">
+                  Обрати природу
             <button aria-describedby="why-core:dig" class="ct-action" data-start="" disabled="" type="button">
               Почати
       <section class="group" data-open="true" data-rank="V">
@@ -828,10 +818,6 @@
                 Командна місія
             <p class="ct-note client">
               Околиці Листя
-            <p class="ct-note" data-no-team="">
-              Команда ще не зібрана: її дає вибір природи чакри.
-              <a href="#/nature">
-                Обрати природу
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -863,7 +849,7 @@
                       <circle cx="9" cy="7" r="4">
                   <a href="#/village">
                     Сила шинобі: +3
-            <div class="why" data-why="error.requirementsNotMet" id="why-core:v_spar">
+            <div class="why" data-why="error.missionNeedsTeam" id="why-core:v_spar">
               <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
                 <span class="mark">
                   <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -877,8 +863,10 @@
                   1/10
                 <span aria-hidden="true" class="bar">
                   <span class="fill" style="width: 10%;">
-              <p class="ct-why">
-                Вимоги до цієї дії не виконано.
+              <p class="ct-why" data-needs-team="">
+                Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
+                <a href="#/nature">
+                  Обрати природу
             <button aria-describedby="why-core:v_spar" class="ct-action" data-start="" disabled="" type="button">
               Почати
           <li class="ct-tile card" data-entity="mission:core:v_walls" data-mission="core:v_walls" data-state="blocked" data-ui="mission-card">
@@ -896,10 +884,6 @@
                 Командна місія
             <p class="ct-note client">
               Околиці Листя
-            <p class="ct-note" data-no-team="">
-              Команда ще не зібрана: її дає вибір природи чакри.
-              <a href="#/nature">
-                Обрати природу
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -931,7 +915,7 @@
                       <circle cx="9" cy="7" r="4">
                   <a href="#/village">
                     Охорона: +3
-            <div class="why" data-why="error.requirementsNotMet" id="why-core:v_walls">
+            <div class="why" data-why="error.missionNeedsTeam" id="why-core:v_walls">
               <div class="row" data-entity="technique:core:earth_style_wall" data-met="false" data-ui="req-row">
                 <span class="mark">
                   <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -941,8 +925,10 @@
                     Стіна земляного стилю
                   <span class="detail">
                     ще не відкрито
-              <p class="ct-why">
-                Вимоги до цієї дії не виконано.
+              <p class="ct-why" data-needs-team="">
+                Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
+                <a href="#/nature">
+                  Обрати природу
             <button aria-describedby="why-core:v_walls" class="ct-action" data-start="" disabled="" type="button">
               Почати
           <li class="ct-tile card" data-entity="mission:core:v_fence" data-mission="core:v_fence" data-state="blocked" data-ui="mission-card">
@@ -960,10 +946,6 @@
                 Командна місія
             <p class="ct-note client">
               Околиці Листя
-            <p class="ct-note" data-no-team="">
-              Команда ще не зібрана: її дає вибір природи чакри.
-              <a href="#/nature">
-                Обрати природу
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -995,7 +977,7 @@
                       <circle cx="9" cy="7" r="4">
                   <a href="#/village">
                     Охорона: +3
-            <div class="why" data-why="error.missingIngredient" id="why-core:v_fence">
+            <div class="why" data-why="error.missionNeedsTeam" id="why-core:v_fence">
               <div class="row" data-entity="technique:core:four_pillar_bind" data-met="false" data-ui="req-row">
                 <span class="mark">
                   <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -1005,8 +987,10 @@
                     Пута чотирьох стовпів
                   <span class="detail">
                     ще не відкрито
-              <p class="ct-why">
-                Бракує інгредієнтів.
+              <p class="ct-why" data-needs-team="">
+                Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
+                <a href="#/nature">
+                  Обрати природу
             <button aria-describedby="why-core:v_fence" class="ct-action" data-start="" disabled="" type="button">
               Почати
           <li class="ct-tile card" data-entity="mission:core:v_clear" data-mission="core:v_clear" data-state="blocked" data-ui="mission-card">
@@ -1024,10 +1008,6 @@
                 Командна місія
             <p class="ct-note client">
               Околиці Листя
-            <p class="ct-note" data-no-team="">
-              Команда ще не зібрана: її дає вибір природи чакри.
-              <a href="#/nature">
-                Обрати природу
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -1059,7 +1039,7 @@
                       <circle cx="9" cy="7" r="4">
                   <a href="#/village">
                     Ділянки: +3
-            <div class="why" data-why="error.requirementsNotMet" id="why-core:v_clear">
+            <div class="why" data-why="error.missionNeedsTeam" id="why-core:v_clear">
               <div class="row" data-entity="technique:core:running_fire" data-met="false" data-ui="req-row">
                 <span class="mark">
                   <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -1069,8 +1049,10 @@
                     Вогняна доріжка
                   <span class="detail">
                     ще не відкрито
-              <p class="ct-why">
-                Вимоги до цієї дії не виконано.
+              <p class="ct-why" data-needs-team="">
+                Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
+                <a href="#/nature">
+                  Обрати природу
             <button aria-describedby="why-core:v_clear" class="ct-action" data-start="" disabled="" type="button">
               Почати
           <li class="ct-tile card" data-entity="mission:core:v_water" data-mission="core:v_water" data-state="blocked" data-ui="mission-card">
@@ -1088,10 +1070,6 @@
                 Командна місія
             <p class="ct-note client">
               Околиці Листя
-            <p class="ct-note" data-no-team="">
-              Команда ще не зібрана: її дає вибір природи чакри.
-              <a href="#/nature">
-                Обрати природу
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -1123,7 +1101,7 @@
                       <circle cx="9" cy="7" r="4">
                   <a href="#/village">
                     Зрошення: +3
-            <div class="why" data-why="error.requirementsNotMet" id="why-core:v_water">
+            <div class="why" data-why="error.missionNeedsTeam" id="why-core:v_water">
               <div class="row" data-entity="skill:suiton" data-met="false" data-ui="req-row">
                 <span class="mark">
                   <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -1137,8 +1115,10 @@
                   1/20
                 <span aria-hidden="true" class="bar">
                   <span class="fill" style="width: 5%;">
-              <p class="ct-why">
-                Вимоги до цієї дії не виконано.
+              <p class="ct-why" data-needs-team="">
+                Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
+                <a href="#/nature">
+                  Обрати природу
             <button aria-describedby="why-core:v_water" class="ct-action" data-start="" disabled="" type="button">
               Почати
           <li class="ct-tile card" data-entity="mission:core:v_sanit" data-mission="core:v_sanit" data-state="blocked" data-ui="mission-card">
@@ -1156,10 +1136,6 @@
                 Командна місія
             <p class="ct-note client">
               Околиці Листя
-            <p class="ct-note" data-no-team="">
-              Команда ще не зібрана: її дає вибір природи чакри.
-              <a href="#/nature">
-                Обрати природу
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -1191,7 +1167,7 @@
                       <circle cx="9" cy="7" r="4">
                   <a href="#/village">
                     Здоров'я: +3
-            <div class="why" data-why="error.requirementsNotMet" id="why-core:v_sanit">
+            <div class="why" data-why="error.missionNeedsTeam" id="why-core:v_sanit">
               <div class="row" data-entity="technique:core:great_fireball" data-met="false" data-ui="req-row">
                 <span class="mark">
                   <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -1201,8 +1177,10 @@
                     Техніка великої вогняної кулі
                   <span class="detail">
                     ще не відкрито
-              <p class="ct-why">
-                Вимоги до цієї дії не виконано.
+              <p class="ct-why" data-needs-team="">
+                Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
+                <a href="#/nature">
+                  Обрати природу
             <button aria-describedby="why-core:v_sanit" class="ct-action" data-start="" disabled="" type="button">
               Почати
           <li class="ct-tile card" data-entity="mission:core:v_rubble" data-mission="core:v_rubble" data-state="blocked" data-ui="mission-card">
@@ -1220,10 +1198,6 @@
                 Командна місія
             <p class="ct-note client">
               Околиці Листя
-            <p class="ct-note" data-no-team="">
-              Команда ще не зібрана: її дає вибір природи чакри.
-              <a href="#/nature">
-                Обрати природу
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -1255,7 +1229,7 @@
                       <circle cx="9" cy="7" r="4">
                   <a href="#/village">
                     Кладка: +3
-            <div class="why" data-why="error.requirementsNotMet" id="why-core:v_rubble">
+            <div class="why" data-why="error.missionNeedsTeam" id="why-core:v_rubble">
               <div class="row" data-entity="skill:doton" data-met="false" data-ui="req-row">
                 <span class="mark">
                   <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -1269,8 +1243,10 @@
                   1/30
                 <span aria-hidden="true" class="bar">
                   <span class="fill" style="width: 3.3333333333333335%;">
-              <p class="ct-why">
-                Вимоги до цієї дії не виконано.
+              <p class="ct-why" data-needs-team="">
+                Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
+                <a href="#/nature">
+                  Обрати природу
             <button aria-describedby="why-core:v_rubble" class="ct-action" data-start="" disabled="" type="button">
               Почати
           <li class="ct-tile card" data-entity="mission:core:v_clones" data-mission="core:v_clones" data-state="blocked" data-ui="mission-card">
@@ -1288,10 +1264,6 @@
                 Командна місія
             <p class="ct-note client">
               Околиці Листя
-            <p class="ct-note" data-no-team="">
-              Команда ще не зібрана: її дає вибір природи чакри.
-              <a href="#/nature">
-                Обрати природу
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -1323,7 +1295,7 @@
                       <circle cx="9" cy="7" r="4">
                   <a href="#/village">
                     Робоча сила: +3
-            <div class="why" data-why="error.requirementsNotMet" id="why-core:v_clones">
+            <div class="why" data-why="error.missionNeedsTeam" id="why-core:v_clones">
               <div class="row" data-entity="technique:core:shadow_clone" data-met="false" data-ui="req-row">
                 <span class="mark">
                   <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -1333,8 +1305,10 @@
                     Техніка тіньового клонування
                   <span class="detail">
                     ще не відкрито
-              <p class="ct-why">
-                Вимоги до цієї дії не виконано.
+              <p class="ct-why" data-needs-team="">
+                Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
+                <a href="#/nature">
+                  Обрати природу
             <button aria-describedby="why-core:v_clones" class="ct-action" data-start="" disabled="" type="button">
               Почати
           <li class="ct-tile card" data-entity="mission:core:v_seal" data-mission="core:v_seal" data-state="blocked" data-ui="mission-card">
@@ -1352,10 +1326,6 @@
                 Командна місія
             <p class="ct-note client">
               Околиці Листя
-            <p class="ct-note" data-no-team="">
-              Команда ще не зібрана: її дає вибір природи чакри.
-              <a href="#/nature">
-                Обрати природу
             <dl class="ct-facts">
               <div>
                 <dt>
@@ -1387,7 +1357,7 @@
                       <circle cx="9" cy="7" r="4">
                   <a href="#/village">
                     Місткість: +3
-            <div class="why" data-why="error.requirementsNotMet" id="why-core:v_seal">
+            <div class="why" data-why="error.missionNeedsTeam" id="why-core:v_seal">
               <div class="row" data-entity="technique:core:enclosing" data-met="false" data-ui="req-row">
                 <span class="mark">
                   <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -1397,7 +1367,9 @@
                     Техніка запечатування
                   <span class="detail">
                     ще не відкрито
-              <p class="ct-why">
-                Вимоги до цієї дії не виконано.
+              <p class="ct-why" data-needs-team="">
+                Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
+                <a href="#/nature">
+                  Обрати природу
             <button aria-describedby="why-core:v_seal" class="ct-action" data-start="" disabled="" type="button">
               Почати

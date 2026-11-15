@@ -1,5 +1,12 @@
 import type { ContentDb } from '@shinobi/content';
-import { isSkillUnlocked, skillLevel, type GameState, type Req } from '@shinobi/core';
+import {
+  isSkillUnlocked,
+  missionGoalReq,
+  skillLevel,
+  type GameState,
+  type Req,
+  type Rules,
+} from '@shinobi/core';
 import { reqItemIds } from './crafts.ts';
 import { nextStep } from './next-step.ts';
 import { graduateRank, isAcademyRank } from './vocab.ts';
@@ -38,10 +45,22 @@ export function suggestGoal(state: GameState, content: ContentDb): string | null
   return best?.id ?? null;
 }
 
-/** The requirement tree behind a pinned goal; null for a goal that is only a link, with no tree. */
-export function goalReq(ref: { kind: string; id: string }, content: ContentDb): Req | null {
+/**
+ * The requirement tree behind a pinned goal; null for a goal that is only a link, with no tree. A
+ * mission's tree is core's: what opens it and the first stage that has no way yet.
+ */
+export function goalReq(
+  state: GameState,
+  ref: { kind: string; id: string },
+  content: ContentDb,
+  rules: Rules,
+): Req | null {
   if (ref.kind === 'technique') return techniqueGoal(ref.id, content);
   if (ref.kind === 'item') return { t: 'item', id: ref.id, n: 1 };
+  if (ref.kind === 'mission') {
+    const mission = content.missions.find((m) => m.id === ref.id);
+    return mission ? missionGoalReq(state, mission, content, rules) : null;
+  }
   return null;
 }
 
@@ -49,8 +68,8 @@ export function goalReq(ref: { kind: string; id: string }, content: ContentDb): 
  * The requirement tree the goal panel shows now: the pinned goal's tree; with nothing pinned, the
  * objective of the quest step under way; with no quest, the suggested technique. Null when none.
  */
-export function shownGoalReq(state: GameState, content: ContentDb): Req | null {
-  if (state.goal) return goalReq(state.goal, content);
+export function shownGoalReq(state: GameState, content: ContentDb, rules: Rules): Req | null {
+  if (state.goal) return goalReq(state, state.goal, content, rules);
   const step = nextStep(state, content);
   if (step) return step.objective.t === 'req' ? step.objective.req : null;
   const suggestion = suggestGoal(state, content);
@@ -58,8 +77,8 @@ export function shownGoalReq(state: GameState, content: ContentDb): Req | null {
 }
 
 /** Ids of the items the shown goal's requirement tree asks for. */
-export function goalItemIds(state: GameState, content: ContentDb): string[] {
-  return reqItemIds(shownGoalReq(state, content));
+export function goalItemIds(state: GameState, content: ContentDb, rules: Rules): string[] {
+  return reqItemIds(shownGoalReq(state, content, rules));
 }
 
 /** The technique a goal pinned by an older version of the app pointed at: its first technique row. */

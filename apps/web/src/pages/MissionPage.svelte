@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MISSION_KIND, type MissionForecast } from '@shinobi/core';
+  import { MISSION_KIND, NEEDS_TEAM } from '@shinobi/core';
   import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
@@ -15,14 +15,7 @@
   import { formatDuration, formatInt, formatXp } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
   import { cardState, followCommands, stagesOf, viewOf } from '../lib/mission-feed.svelte.ts';
-  import {
-    cleanRunChance,
-    hourChain,
-    missionNow,
-    pinTarget,
-    rewardsOf,
-    xpTotals,
-  } from '../lib/missions.ts';
+  import { holderRef, hourChain, missionNow, rewardRows } from '../lib/missions.ts';
   import { game } from '../lib/store.ts';
   import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import EntityPage from './EntityPage.svelte';
@@ -33,15 +26,17 @@
 
   let { id }: Props = $props();
 
-  const EMPTY = { expectedMs: 0 } as unknown as MissionForecast;
-
   $effect(() => followCommands());
 
   const mission = $derived(game.content.missions.find((m) => m.id === id));
   const view = $derived(mission ? viewOf(mission) : null);
   const forecast = $derived(view?.forecast ?? null);
   const stages = $derived(mission && forecast ? stagesOf(mission, forecast) : []);
-  const state = $derived(mission && view ? cardState(mission, view.blocker) : null);
+  /** What `dispatch` would answer to starting the mission now, from core. */
+  const status = $derived(mission && view ? cardState(mission, view) : null);
+  const running = $derived(status !== null && status.runningAt >= 0);
+  const refusal = $derived(running ? null : (status?.refusal ?? null));
+  const by = $derived(refusal?.by ? holderRef(refusal.by) : null);
   /** The stage under way when this mission runs. */
   const current = $derived(
     game.read((gs) => {
@@ -49,21 +44,22 @@
       return slot >= 0 ? (missionNow(gs, slot, game.content)?.stage ?? null) : null;
     }),
   );
-  const rewards = $derived(mission && forecast ? rewardsOf(forecast, game.content) : []);
-  const chance = $derived(forecast ? cleanRunChance(forecast) : 0);
-  const pin = $derived(pinTarget(view?.blocker?.result ?? null));
-  const pinned = $derived(
-    game.read((gs) => pin !== null && gs.goal?.kind === pin.kind && gs.goal.id === pin.id),
-  );
+  const rewards = $derived(forecast ? rewardRows(forecast.rewards) : []);
+  /** Something blocks the mission: it can be pinned as the goal, and the goal panel shows what to do. */
+  const pinnable = $derived(view !== null && view.blocker !== null);
+  const pinned = $derived(game.read((gs) => gs.goal?.kind === 'mission' && gs.goal.id === id));
   const desc = $derived(entityDesc({ kind: 'mission', id }));
   const clientKey = $derived(`mission.${id}.client`);
-  /** XP per hour of the skills the stages fix, and the fights' total: a fight's style skill is not known beforehand. */
-  const totals = $derived(xpTotals(stages, forecast ?? EMPTY));
+  /** XP per hour of the skills core is sure of, biggest first; the fights' whole XP is a line of its own (its style skill is not known beforehand). */
   const xpRows = $derived(
-    Object.entries(totals.skills)
+    Object.entries(forecast?.xpPerHour ?? {})
       .filter(([, v]) => v > 0)
       .sort((x, y) => y[1] - x[1]),
   );
+  /** The skills every fight of the mission pays besides its style skill. */
+  const fightSkills = $derived([
+    ...new Set(stages.flatMap((s) => s.forecast.xp.fight?.skills ?? [])),
+  ]);
   const ryoChain = $derived(
     mission && forecast
       ? hourChain(mission.ryo, forecast.mods.ryo, forecast.ryo, forecast.expectedMs)
@@ -74,10 +70,7 @@
       ? hourChain(mission.rep, forecast.mods.rep, forecast.rep, forecast.expectedMs)
       : null,
   );
-  const fightSkills = $derived([...game.content.balance.K.mission.fightSkills]);
   const slowK = $derived(game.content.balance.K.mission.slowAlt);
-
-  const hasTeam = $derived(game.read((gs) => gs.team !== null));
 
   const runsFormat = new Intl.NumberFormat('uk', { maximumFractionDigits: 2 });
 
@@ -101,27 +94,26 @@
   }
 
   function toggle(): void {
-    if (!state || !mission) return;
-    const result =
-      state.kind === 'running'
-        ? game.dispatch({ type: 'action.stop', slot: state.slot })
-        : game.dispatch({
-            type: 'action.start',
-            slot: state.slot,
-            kind: MISSION_KIND,
-            id: mission.id,
-          });
+    if (!status || !mission) return;
+    const result = running
+      ? game.dispatch({ type: 'action.stop', slot: status.runningAt })
+      : game.dispatch({
+          type: 'action.start',
+          slot: status.slot,
+          kind: MISSION_KIND,
+          id: mission.id,
+        });
     if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 
   function pinGoal(): void {
-    if (!pin) return;
-    const result = game.dispatch({ type: 'goal.set', ref: pin });
+    if (!mission) return;
+    const result = game.dispatch({ type: 'goal.set', ref: { kind: 'mission', id: mission.id } });
     if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 </script>
 
-{#if !mission || !forecast || !state}
+{#if !mission || !forecast || !status}
   <EntityPage entity={{ kind: 'mission', id }} />
 {:else}
   <article
@@ -145,11 +137,6 @@
     <p class="team" data-team={mission.team}>
       <Icon name="lucide:users" size={16} />
       {t(mission.team ? 'mission.team.yes' : 'mission.team.no')}
-      {#if mission.team && !hasTeam}
-        <span class="dim" data-no-team>
-          {t('mission.team.none')} <a href="#/nature">{t('req.natureLink')}</a>
-        </span>
-      {/if}
     </p>
 
     <section class="actions" data-ui="entity-section" data-mission-actions>
@@ -157,40 +144,46 @@
         <button
           type="button"
           class="ct-action"
-          class:stop={state.kind === 'running'}
-          disabled={state.kind === 'blocked'}
+          class:stop={running}
+          disabled={refusal !== null}
           data-start
-          aria-describedby={state.kind === 'blocked' ? 'why-mission' : undefined}
+          aria-describedby={refusal ? 'why-mission' : undefined}
           onclick={toggle}
         >
-          {t(state.kind === 'running' ? 'tile.stop' : 'tile.start')}
+          {t(running ? 'tile.stop' : 'tile.start')}
         </button>
-        {#if pin}
+        {#if pinnable}
           <button type="button" class="ct-button" data-pin disabled={pinned} onclick={pinGoal}>
             {t(pinned ? 'mission.pinned' : 'mission.pin')}
           </button>
         {/if}
       </div>
-      {#if state.kind === 'running'}
+      {#if running}
         <p class="ct-note" data-running>
           <Icon name="lucide:hourglass" size={14} />
-          {t('mission.running', { n: state.slot + 1 })}
+          {t('mission.running', { n: status.runningAt + 1 })}
         </p>
-      {:else if state.kind === 'blocked'}
-        <div class="why" id="why-mission" data-why={state.reason}>
-          {#if state.blocker}<ReqTree node={state.blocker} />{/if}
-          {#if state.by}
+      {:else if refusal}
+        <div class="why" id="why-mission" data-why={refusal.reason}>
+          {#if refusal.blocker}<ReqTree
+              node={refusal.blocker.first ?? refusal.blocker.result}
+            />{/if}
+          {#if by}
             <p class="ct-why" data-by>
-              {t(state.reason)}
+              {t(refusal.reason)}
               {t('mission.busyBy')}
-              {#if state.by.ref}
-                <EntityLink kind={state.by.ref.kind} id={state.by.ref.id} />
+              {#if by.ref}
+                <EntityLink kind={by.ref.kind} id={by.ref.id} />
               {:else}
                 <a href="#/combat">{t('mission.busyCombat')}</a>
               {/if}
             </p>
+          {:else if refusal.reason === NEEDS_TEAM}
+            <p class="ct-why" data-needs-team>
+              {t(refusal.reason)} <a href="#/nature">{t('req.natureLink')}</a>
+            </p>
           {:else}
-            <p class="ct-why">{t(state.reason)}</p>
+            <p class="ct-why">{t(refusal.reason)}</p>
           {/if}
         </div>
       {/if}
@@ -204,11 +197,8 @@
             missionId={mission.id}
             view={stage}
             kind={mission.stages[stage.index]?.t ?? ''}
-            ration={forecast.ration}
-            floor={forecast.durationFloor}
             current={current === stage.index}
             {slowK}
-            {fightSkills}
           />
         {/each}
       </ol>
@@ -230,9 +220,9 @@
             </span>
           </dd>
         </div>
-        <div data-total="chance" data-value={chance}>
+        <div data-total="chance" data-value={forecast.cleanChance}>
           <dt>{t('mission.chance.title')}</dt>
-          <dd>{Math.round(chance * 100)}%</dd>
+          <dd>{Math.round(forecast.cleanChance * 100)}%</dd>
         </div>
         {#if forecast.ryo > 0}
           <div data-total="money" data-value={forecast.ryoPerHour}>
@@ -287,15 +277,16 @@
                 <EntityLink kind="skill" id={skill} />
               </span>
             {:else}
-              {#if totals.fight === 0}<span class="dim">{t('mission.unknown')}</span>{/if}
+              {#if forecast.fightXpPerHour === 0}<span class="dim">{t('mission.unknown')}</span
+                >{/if}
             {/each}
           </dd>
         </div>
-        {#if totals.fight > 0}
-          <div data-total="fight-xp" data-value={totals.fight}>
+        {#if forecast.fightXpPerHour > 0}
+          <div data-total="fight-xp" data-value={forecast.fightXpPerHour}>
             <dt>{t('mission.fightXpHour')}</dt>
             <dd>
-              {t('mission.stage.fightXpValue', { n: formatXp(totals.fight) })}
+              {t('mission.stage.fightXpValue', { n: formatXp(forecast.fightXpPerHour) })}
               <span class="dim">
                 {t('mission.stage.fightXpWhere')}
                 {#each fightSkills as skill, i (skill)}<EntityLink
@@ -363,7 +354,6 @@
     color: var(--fg-dim);
   }
 
-  .team a,
   .ct-note :global(a),
   .why .ct-why :global(a) {
     color: var(--accent);

@@ -21,7 +21,7 @@
 
   /** What the bank holds and which items the shown goal asks for. */
   const view = $derived(
-    game.read((gs) => ({ owned: { ...gs.bank }, goal: goalItemIds(gs, content) })),
+    game.read((gs) => ({ owned: { ...gs.bank }, goal: goalItemIds(gs, content, game.rules) })),
   );
 
   /**

@@ -26,8 +26,12 @@
   const wait = $derived(game.read((gs) => senseiTestInfo(gs, game.rules, content)));
   const goal = $derived(game.read((gs) => gs.goal));
   const goalRef = $derived(webRef(goal));
-  const req = $derived(goal ? goalReq(goal, content) : null);
-  const result = $derived(game.read((gs) => (req ? evalReq(gs, req, content) : null)));
+  const result = $derived(
+    game.read((gs) => {
+      const req = gs.goal ? goalReq(gs, gs.goal, content, game.rules) : null;
+      return req ? evalReq(gs, req, content) : null;
+    }),
+  );
   const quest = $derived(game.read((gs) => (goal ? null : nextStep(gs, content))));
   /** With nothing pinned and no quest under way, the nearest technique is suggested. */
   const suggestion = $derived(game.read((gs) => (goal || quest ? null : suggestGoal(gs, content))));
@@ -59,6 +63,11 @@
 
   {#if goal}
     <div class="tree" data-goal>
+      {#if goal.kind === 'mission'}
+        <p class="target" data-goal-mission data-entity="mission:{goal.id}">
+          <EntityLink kind="mission" id={goal.id} />
+        </p>
+      {/if}
       {#if result}
         <ReqTree node={result} part="goal-row" />
       {:else if goalRef}
