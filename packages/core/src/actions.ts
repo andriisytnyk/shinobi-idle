@@ -11,7 +11,7 @@ import {
   techniqueCastSeconds,
 } from './formulas.ts';
 import { indexOf } from './lookup.ts';
-import { entitySkill } from './vocab.ts';
+import { actionFloor, entitySkill } from './vocab.ts';
 import { nonNativeLevel } from './natures.ts';
 import { cycleFactor } from './modifiers.ts';
 import { spendTonicCharges } from './buffs.ts';
@@ -125,7 +125,7 @@ export function skillAction(resolve: Resolver): ActionKind {
       const def = resolve(state, id, content);
       if (!def) return 1;
       const mod = cycleFactor(rules.modifierProviders, state, def.skill, content, def.extraSpeed);
-      return Math.max(1, Math.round(baseMs(def) * mod));
+      return Math.max(actionFloor(content), Math.round(baseMs(def) * mod));
     },
     complete(state, id, content, rules) {
       const def = resolve(state, id, content);

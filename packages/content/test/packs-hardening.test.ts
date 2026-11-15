@@ -385,3 +385,56 @@ describe('patch rules', () => {
     expect(drops.slice(-2).map((d) => d.item)).toEqual(['core:pelt', 'core:fang']);
   });
 });
+
+describe('closure of the fields packs added in the review fixes', () => {
+  it('refuses an unknown skill on an exercise, a practice and a herb', () => {
+    throwsFor(
+      [
+        corePack,
+        mod('xx', { data: { exercises: [{ id: 'xx:e', level: 1, skill: 'xx:nothing' }] } }),
+      ],
+      'xx',
+      /skill/,
+    );
+    throwsFor(
+      [
+        corePack,
+        mod('yy', { data: { herbs: [{ id: 'yy:h', level: 1, skill: 'yy:nothing', req: null }] } }),
+      ],
+      'yy',
+      /skill/,
+    );
+  });
+
+  it('refuses an unknown currency in a mission payment, a cache and a stage cap above the top level', () => {
+    const cell = (extra: Record<string, unknown>) => ({
+      regions: [{ id: 'zz:r', scout: 1, cells: ['zz:c'] }],
+      cells: [
+        {
+          id: 'zz:c',
+          region: 'zz:r',
+          index: 0,
+          key: null,
+          story: false,
+          pois: [{ id: 'zz:p', kind: 'cache', items: [], ryo: 0, ...extra }],
+        },
+      ],
+    });
+    throwsFor(
+      [corePack, mod('zz', { data: cell({ currencies: { 'zz:nothing': 1 } }) })],
+      'zz',
+      /currenc/,
+    );
+    throwsFor(
+      [corePack, mod('cap', { data: { villageStages: [{ id: 'cap:s', rep: null, cap: 99 }] } })],
+      'cap',
+      /cap/,
+    );
+  });
+
+  it('says cycle for ranks that wait for each other', () => {
+    const ranked = (id: string, after: string) =>
+      mod(id, { data: { playerRanks: [{ id: `${id}:r`, tier: 0, after }] } });
+    throwsFor([corePack, ranked('aa', 'bb:r'), ranked('bb', 'aa:r')], 'aa', /cycle/);
+  });
+});

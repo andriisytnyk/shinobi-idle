@@ -1,5 +1,5 @@
-import type { ContentDb, ContentPack } from '@shinobi/content';
-import { guardKind, guardProvider, tagOrigin } from './guard.ts';
+import { PackError, type ContentDb, type ContentPack } from '@shinobi/content';
+import { guardAi, guardKind, guardProvider, tagOrigin } from './guard.ts';
 import { actionSystem, drillKind, practiceKind, type ActionKind } from './actions.ts';
 import { COURSE_KIND, courseKind, obstacleProvider } from './athletics.ts';
 import { defaultCombatAi } from './combat/fight-ai.ts';
@@ -199,12 +199,10 @@ export function composeRules(
 }
 
 /** An error in the rules function of a pack (or in a rule it adds); `pack` names the pack. */
-export class PackRulesError extends Error {
-  readonly pack: string;
+export class PackRulesError extends PackError {
   constructor(pack: string, message: string) {
-    super(message);
+    super(pack, message);
     this.name = 'PackRulesError';
-    this.pack = pack;
   }
 }
 
@@ -222,5 +220,10 @@ function adopt(before: Rules, after: Rules, pack: string): Rules {
   const modifierProviders = after.modifierProviders.map((p) =>
     before.modifierProviders.includes(p) ? p : guardProvider(p, pack),
   );
-  return { ...after, systems, actionKinds, modifierProviders };
+  // A player AI that a pack set is guarded: when it fails, the AI it replaced decides.
+  const combatAi =
+    after.combatAi === before.combatAi
+      ? after.combatAi
+      : guardAi(after.combatAi, pack, before.combatAi);
+  return { ...after, systems, actionKinds, modifierProviders, combatAi };
 }

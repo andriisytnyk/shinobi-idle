@@ -25,7 +25,15 @@ import { addNature, chooseNature, type NatureChoice } from './natures.ts';
 import { shopBuy, shopSell } from './shop.ts';
 import { updateQuests } from './quests.ts';
 import { evalReq, type ReqResult } from './requirements.ts';
-import { callSystem, disableSystem, isDisabled, originOf, validWait } from './guard.ts';
+import {
+  callSystem,
+  chargeEvent,
+  disableSystem,
+  isDisabled,
+  originOf,
+  takeNotices,
+  validWait,
+} from './guard.ts';
 import { defaultRules, type Rules } from './rules.ts';
 import type { System } from './system.ts';
 import { isSkillUnlocked } from './selectors.ts';
@@ -132,6 +140,9 @@ export function advance(
   const zeros = new Map<System, number>();
   for (;;) {
     let next: number | null = null;
+    // Guarded runs only: the waits of the systems of packs, and whether a core system asked for +0 ms.
+    const packWaits = new Map<System, number>();
+    let coreZero = false;
     for (const system of rules.systems) {
       let wait: number | null;
       if (guarded) {
@@ -144,7 +155,10 @@ export function advance(
           validWait,
         );
         const pack = originOf(system);
-        if (pack !== undefined) {
+        if (pack === undefined) {
+          if (wait === 0) coreZero = true;
+        } else {
+          if (wait !== null) packWaits.set(system, wait);
           const streak = wait === 0 ? (zeros.get(system) ?? 0) + 1 : 0;
           zeros.set(system, streak);
           // A system of a pack that keeps asking for an event now, with no time passing, is switched off.
@@ -159,7 +173,20 @@ export function advance(
       if (wait !== null && (next === null || wait < next)) next = wait;
     }
     if (next === null || next > remaining) break;
-    stalled = next === 0 ? stalled + 1 : 0;
+    if (guarded) {
+      // Each event of a system of a pack is charged to it; one over its hourly budget is switched off.
+      let dropped = false;
+      const limit = content.balance.K.engine.packEventsPerHour;
+      for (const [system, wait] of packWaits) {
+        const pack = originOf(system);
+        if (wait === next && pack !== undefined && chargeEvent(state, system, pack, limit)) {
+          dropped = true;
+        }
+      }
+      if (dropped) continue;
+    }
+    // Only steps that core systems asked for at +0 ms count as a stall; a system of a pack has its own limit.
+    stalled = (guarded ? coreZero : next === 0) ? stalled + 1 : 0;
     if (stalled > STALL_LIMIT) {
       throw new Error('advance made no progress: a system keeps asking for time 0');
     }
@@ -174,6 +201,9 @@ export function advance(
     }
   }
   elapse(state, remaining, content, rules, guarded);
+  if (guarded) {
+    for (const notice of takeNotices()) emit(state, { type: 'ruleDisabled', ...notice });
+  }
 }
 
 function elapse(

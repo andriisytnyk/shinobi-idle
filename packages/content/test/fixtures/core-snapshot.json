@@ -971,6 +971,10 @@
     "K.partDrop.carrier": 0.12,
     "K.partDrop.mission": 0.15,
     "K.tickMin": 5,
+    "K.engine.packEventsPerHour": 3600,
+    "K.engine.minActionMs": 1000,
+    "K.engine.modMin": 0.01,
+    "K.engine.modMax": 100,
     "K.village.start.core:tower": 1,
     "K.village.start.core:bureau": 1,
     "K.village.start.core:store": 1,
@@ -4296,6 +4300,7 @@
       "partsPerScroll",
       "partDrop",
       "tickMin",
+      "engine",
       "village",
       "prod",
       "costBase",
@@ -4568,6 +4573,7 @@
       "doton",
       "suiton"
     ],
-    "milestones": ["genin", "clones", "chunin", "cap"]
+    "milestones": ["genin", "clones", "chunin", "cap"],
+    "K.engine": ["packEventsPerHour", "minActionMs", "modMin", "modMax"]
   }
 }

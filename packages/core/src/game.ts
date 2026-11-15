@@ -1,5 +1,5 @@
-import { composeContent, type ContentDb, type ContentPack } from '@shinobi/content';
-import { composeRules, defaultRules, PackRulesError, type Rules } from './rules.ts';
+import { composeContent, PackError, type ContentDb, type ContentPack } from '@shinobi/content';
+import { composeRules, defaultRules, type Rules } from './rules.ts';
 
 /** A pack that was left out of the game and why. */
 export interface FailedPack {
@@ -30,15 +30,6 @@ function withDependents(packs: readonly ContentPack[], gone: string): Set<string
   return out;
 }
 
-/** The pack an error of `composeContent` names: the longest-named non-core pack whose id the message quotes. */
-function packNamedIn(message: string, packs: readonly ContentPack[]): string | undefined {
-  const named = packs
-    .map((p) => p.manifest.id)
-    .filter((id) => id !== 'core' && new RegExp(`(^|[^a-z0-9_])${id}([^a-z0-9_]|$)`).test(message))
-    .sort((a, b) => b.length - a.length || (a < b ? -1 : 1));
-  return named[0];
-}
-
 /**
  * The one entry point for a host: composes the content and the rules of `packs`. When a pack other
  * than `core` fails in either step it is left out together with the packs that depend on it and the
@@ -57,7 +48,8 @@ export function composeGame(packs: readonly ContentPack[], base: Rules = default
       return { content, rules: composeRules(base, current, content), failed };
     } catch (error) {
       message = error instanceof Error ? error.message : String(error);
-      culprit = error instanceof PackRulesError ? error.pack : packNamedIn(message, current);
+      // The pack at fault is data on the error, never read from its text.
+      culprit = error instanceof PackError ? error.pack : undefined;
       if (culprit === undefined || culprit === 'core') throw error;
     }
     const gone = withDependents(current, culprit);

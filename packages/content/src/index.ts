@@ -29,6 +29,7 @@ export const isModifierKey = (key: string): boolean => Object.hasOwn(content.mod
 
 export { composeContent, ENTITY_LISTS, ownsId } from './compose.ts';
 export { validateClosure, type ClosureProblem } from './closure.ts';
+export { PackError } from './pack-error.ts';
 export { corePack } from './packs/core/index.ts';
 export type {
   ContentPack,

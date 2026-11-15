@@ -1009,6 +1009,17 @@ export const balanceParamsSchema = z.object({
   partsPerScroll: z.number(),
   partDrop: shapeOf('partDrop', z.record(z.string(), z.number())),
   tickMin: z.number(),
+  /**
+   * Limits that keep the engine running whatever a pack adds: the most events one system of a pack
+   * may ask for in an hour of game time, the shortest an action cycle can get (ms) and the bounds of a
+   * modifier total.
+   */
+  engine: z.object({
+    packEventsPerHour: z.number().int().min(1),
+    minActionMs: z.number().int().min(1),
+    modMin: z.number().gt(0),
+    modMax: z.number().gt(0),
+  }),
   /** Numbers of packs other than `core`, by pack id: nothing but that pack reads or sets them. */
   ext: z.record(z.string(), z.record(z.string(), z.number())).optional(),
   /** The village: starting building levels by building id, the level from which the `late` resource is needed and its share of the base cost. */

@@ -9,7 +9,7 @@ import { indexOf } from './lookup.ts';
 import { computeMod, type Modifier, type ModifierProvider } from './modifiers.ts';
 import { gainXp } from './progression.ts';
 import { regionOpenReq } from './regions.ts';
-import { activitySkill, currencyOf, moneyOf } from './vocab.ts';
+import { actionFloor, activitySkill, currencyOf, moneyOf } from './vocab.ts';
 import { evalReq, skillLevel, type Req } from './requirements.ts';
 import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
@@ -113,7 +113,10 @@ export function exploreBlocked(state: GameState, cell: Cell, content: ContentDb)
 /** Length of one exploration in ms at full speed, modifiers included; at least 1. */
 export function exploreIntervalMs(state: GameState, content: ContentDb, rules: Rules): number {
   const mod = computeMod(rules.modifierProviders, state, 'interval.explore', content).total;
-  return Math.max(1, Math.round(content.balance.K.explore * MS_PER_SECOND * mod));
+  return Math.max(
+    actionFloor(content),
+    Math.round(content.balance.K.explore * MS_PER_SECOND * mod),
+  );
 }
 
 /** Scouting XP of one exploration toward cell level `k`, before modifiers. */
@@ -211,7 +214,7 @@ export function walkMs(state: GameState, cell: Cell, content: ContentDb, rules: 
   const S = content.balance.K.scouting;
   const minutes = inRegionOf(state, cell, content) ? S.walkWithinMin : S.walkBetweenMin;
   const mod = computeMod(rules.modifierProviders, state, 'interval.walk', content).total;
-  return Math.max(1, Math.round(minutes * MS_PER_MINUTE * mod));
+  return Math.max(actionFloor(content), Math.round(minutes * MS_PER_MINUTE * mod));
 }
 
 /** Pays for and makes an instant trip; slots that walk or explore elsewhere stop. */

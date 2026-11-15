@@ -16,7 +16,7 @@ import {
 } from './modifiers.ts';
 import { gainXp, grantMastery } from './progression.ts';
 import { evalReq, type Req } from './requirements.ts';
-import { activitySkill, moneyOf } from './vocab.ts';
+import { actionFloor, activitySkill, moneyOf } from './vocab.ts';
 import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 
@@ -128,7 +128,7 @@ export function lapXp(state: GameState, content: ContentDb): number {
 export function lapIntervalMs(state: GameState, content: ContentDb, rules: Rules): number {
   const count = Math.max(1, builtObstacles(state, content).length);
   const factor = cycleFactor(rules.modifierProviders, state, courseSkill(content) ?? '', content);
-  return Math.max(1, Math.round(count * obstacleMs(content) * factor));
+  return Math.max(actionFloor(content), Math.round(count * obstacleMs(content) * factor));
 }
 
 export const courseKind: ActionKind = {

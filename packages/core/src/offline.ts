@@ -1,4 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
+import type { RuleDisabledEvent } from './events.ts';
 import { skillEntry } from './vocab.ts';
 import { mergeReports, type TargetReport } from './combat/report.ts';
 import { advance } from './engine.ts';
@@ -21,6 +22,8 @@ export interface OfflineSummary {
   /** Techniques learned and actions stopped while away, so the UI can explain what changed. */
   techniquesLearned: string[];
   actionsStopped: ActionStoppedEvent[];
+  /** Rules of packs that failed and were switched off during the time away. */
+  rulesDisabled?: RuleDisabledEvent[];
   /** The battle report of the time away, by target. */
   reports: Record<string, TargetReport>;
 }
@@ -69,11 +72,13 @@ export function advanceOffline(
     masteryLevelsGained: {},
     techniquesLearned: [],
     actionsStopped: [],
+    rulesDisabled: [],
     reports,
   };
   for (const e of away) {
     if (e.type === 'techniqueLearned') summary.techniquesLearned.push(e.id);
     else if (e.type === 'actionStopped') summary.actionsStopped.push(e);
+    else if (e.type === 'ruleDisabled') summary.rulesDisabled?.push(e);
   }
   for (const skill of skills) {
     const xp = (skillEntry(state, skill)?.xp ?? 0) - (xpBefore.get(skill) ?? 0);

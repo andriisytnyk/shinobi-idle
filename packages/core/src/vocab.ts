@@ -83,6 +83,9 @@ export function ownsNature(state: GameState, nature: string): boolean {
   return owned.includes(nature);
 }
 
+/** The shortest an action cycle can get, in ms (`K.engine.minActionMs`): no modifier, from any pack, goes under it. */
+export const actionFloor = (content: ContentDb): number => content.balance.K.engine.minActionMs;
+
 /** The pack that owns an id: the part before the colon, or `core` for a bare id. */
 export function packOfId(id: string): string {
   const colon = id.indexOf(':');

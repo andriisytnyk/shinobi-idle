@@ -15,7 +15,7 @@ import type { Req } from './requirements.ts';
 import { nextFloat } from './rng.ts';
 import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
-import { activitySkill, entitySkill } from './vocab.ts';
+import { actionFloor, activitySkill, entitySkill } from './vocab.ts';
 
 /** The skill that gathers herbs: the one whose activity is `patch` (Herbalism). */
 export const gatherSkill = (content: ContentDb): string | null => activitySkill(content, 'patch');
@@ -92,7 +92,7 @@ export const gatherKind: ActionKind = {
       (herb && herbSkill(content, herb)) ?? '',
       content,
     );
-    const cycle = Math.max(1, Math.round(K.gather * MS_PER_SECOND * mod));
+    const cycle = Math.max(actionFloor(content), Math.round(K.gather * MS_PER_SECOND * mod));
     // An empty bush regrows before the next herb: the pause is part of that cycle.
     return bushOf(state, id)?.stock === 0 ? cycle + regrowMs(state, content, rules) : cycle;
   },
@@ -187,7 +187,10 @@ export const craftKind: ActionKind = {
     const recipe = indexOf(content).recipes.get(id);
     if (!recipe) return 1;
     const mod = cycleFactor(rules.modifierProviders, state, recipe.skill, content);
-    return Math.max(1, Math.round(content.balance.K.craft * MS_PER_SECOND * mod));
+    return Math.max(
+      actionFloor(content),
+      Math.round(content.balance.K.craft * MS_PER_SECOND * mod),
+    );
   },
   complete(state, id, content, rules) {
     const recipe = indexOf(content).recipes.get(id);

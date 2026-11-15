@@ -142,6 +142,11 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     ) {
       if (!Object.hasOwn(db.modifierKeys, o.key))
         problem(`${path}.key`, `unknown modifier key "${o.key}"`);
+      if (!Number.isFinite(o.value) || (o.op === 'mul' && o.value <= 0))
+        problem(
+          `${path}.value`,
+          `the modifier value ${String(o.value)} is not a finite number (and above 0 for a mul)`,
+        );
       if (typeof o.nature === 'string') ref(`${path}.nature`, o.nature, 'natures');
       return;
     }
@@ -420,6 +425,24 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
       if (p.kind === 'scrollPart') needNumber(`pay[${n}].chance`, `partDrop.${p.chance}`);
       if (p.kind === 'currency') ref(`pay[${n}].currency`, p.currency, 'currencies');
     });
+  }
+  for (const e of db.exercises) {
+    at('exercises', e.id);
+    if (e.skill !== undefined) ref('skill', e.skill, 'skills');
+  }
+  for (const p of db.practices) {
+    at('practices', p.id);
+    if (p.skill !== undefined) ref('skill', p.skill, 'skills');
+  }
+  for (const h of db.herbs) {
+    at('herbs', h.id);
+    if (h.skill !== undefined) ref('skill', h.skill, 'skills');
+  }
+  for (const stage of db.villageStages) {
+    at('villageStages', stage.id);
+    const top = db.balance.K.costMult.length;
+    if (stage.cap !== undefined && stage.cap > top)
+      problem('cap', `${stage.cap} is above the highest building level ${top}`);
   }
   for (const e of db.exams) {
     at('exams', e.id);

@@ -15,8 +15,14 @@ type Raw = Record<string, unknown>;
 
 const isRecord = (x: unknown): x is Raw => typeof x === 'object' && x !== null && !Array.isArray(x);
 
+/** The suffix of the field that keeps ids of a missing pack found inside an entry that is kept (`report['core:wolf']` counting a pack's technique). */
+export const NESTED = '~';
+
 /** The fields of a dormant bucket: the dotted paths of the places of the state (`dormant-places.ts`). */
-export const DORMANT_FIELDS: readonly string[] = PLACES.map((p) => p.path);
+export const DORMANT_FIELDS: readonly string[] = PLACES.flatMap((p) => [
+  p.path,
+  `${p.path}${NESTED}`,
+]);
 
 /** Most packs, most entries per branch and longest text a bucket keeps; the rest of a tampered save is dropped. */
 const MAX_PACKS = 32;
@@ -122,7 +128,7 @@ export function sanitizePacks(raw: unknown): { id: string; version: string; sinc
     out.push({
       id: entry.id,
       version: typeof entry.version === 'string' ? entry.version.slice(0, 64) : '',
-      since: balanceOf(entry.since),
+      since: Math.floor(balanceOf(entry.since)),
     });
   }
   return out;
@@ -183,6 +189,31 @@ const awayPack = (loaded: ReadonlySet<string>, id: unknown): string | undefined 
 
 type Stash = (pack: string, path: string, key: string, value: unknown) => void;
 
+/** The ids of missing packs that the keys inside a value name (a few levels deep). */
+function awayPacksIn(loaded: ReadonlySet<string>, value: unknown, depth = 0): Set<string> {
+  const out = new Set<string>();
+  if (depth > 6 || !isRecord(value)) return out;
+  for (const [key, inner] of Object.entries(value)) {
+    for (const p of packsInKey(key)) if (!loaded.has(p)) out.add(p);
+    for (const p of awayPacksIn(loaded, inner, depth + 1)) out.add(p);
+  }
+  return out;
+}
+
+/** Adds to `live` the entries of `copy` that are the pack's own and that `live` lacks, at any depth; live entries win. */
+function mergeOwn(live: Raw, copy: Raw, pack: string, depth = 0): Raw {
+  const out: Raw = { ...live };
+  for (const [key, value] of Object.entries(copy)) {
+    if (!safeKey(key)) continue;
+    if (packsInKey(key).length > 0) {
+      if (ownId(pack, key) && !Object.hasOwn(out, key)) out[key] = value;
+    } else if (depth < 6 && isRecord(value) && isRecord(out[key])) {
+      out[key] = mergeOwn(out[key] as Raw, value, pack, depth + 1);
+    }
+  }
+  return out;
+}
+
 /** Moves the entries of one place that belong to a missing pack to the dormant bucket; returns the cleaned state. */
 function stashPlace(raw: Raw, place: Place, loaded: ReadonlySet<string>, stash: Stash): Raw {
   const at = getAt(raw, place.path);
@@ -194,8 +225,13 @@ function stashPlace(raw: Raw, place: Place, loaded: ReadonlySet<string>, stash: 
       for (const [key, value] of Object.entries(at)) {
         if (!safeKey(key)) continue;
         const away = awayPack(loaded, key);
-        if (away === undefined) kept[key] = value;
-        else stash(away, path, key, value);
+        if (away === undefined) {
+          kept[key] = value;
+          // An entry that stays may still count ids of a pack that is away (a technique in a report).
+          for (const inside of awayPacksIn(loaded, value)) {
+            stash(inside, `${path}${NESTED}`, key, value);
+          }
+        } else stash(away, path, key, value);
       }
       return setAt(raw, path, kept);
     }
@@ -235,15 +271,27 @@ function stashPlace(raw: Raw, place: Place, loaded: ReadonlySet<string>, stash: 
           kept[name] = entry;
           continue;
         }
-        const cut: Raw = {};
+        // Each missing pack keeps its own techniques of the loadout (with their positions) and the signature if it is its.
+        const cuts = new Map<string, Raw>();
+        const cutOf = (pack: string): Raw => {
+          let cut = cuts.get(pack);
+          if (!cut) cuts.set(pack, (cut = {}));
+          return cut;
+        };
         const techniques: unknown[] = [];
         entry.techniques.forEach((id: unknown, index) => {
-          if (awayPack(loaded, id) === undefined) techniques.push(id);
-          else cut[String(index)] = id;
+          const away = awayPack(loaded, id);
+          if (away === undefined) techniques.push(id);
+          else cutOf(away)[String(index)] = id;
         });
-        const away = Object.values(cut).map((id) => awayPack(loaded, id))[0];
-        if (away !== undefined) stash(away, path, name, cut);
-        kept[name] = { ...entry, techniques };
+        const sigAway = awayPack(loaded, entry.signature);
+        if (sigAway !== undefined) cutOf(sigAway)['#sig'] = entry.signature;
+        for (const [pack, cut] of cuts) stash(pack, path, name, cut);
+        kept[name] = {
+          ...entry,
+          techniques,
+          ...(sigAway === undefined ? {} : { signature: null }),
+        };
       }
       return setAt(raw, path, kept);
     }
@@ -349,7 +397,9 @@ function restorePlace(
         const entry = asRecord(out[name]);
         if (!entry || !Array.isArray(entry.techniques) || !isRecord(cut)) continue;
         const techniques = [...entry.techniques];
+        const sig = cut['#sig'];
         const back = Object.entries(cut)
+          .filter(([index]) => index !== '#sig')
           .map(([index, id]) => [Number(index), id] as const)
           .filter(([index, id]) => Number.isInteger(index) && index >= 0 && mine(id))
           .sort((x, y) => x[0] - y[0]);
@@ -357,7 +407,11 @@ function restorePlace(
           if (!techniques.includes(id))
             techniques.splice(Math.min(index, techniques.length), 0, id);
         }
-        out[name] = { ...entry, techniques };
+        out[name] = {
+          ...entry,
+          techniques,
+          ...((entry.signature ?? null) === null && mine(sig) ? { signature: sig } : {}),
+        };
       }
       return setAt(raw, path, out);
     }
@@ -419,6 +473,16 @@ export function restoreDormant(
     for (const place of PLACES) {
       const entries = held.data[place.path];
       if (entries) out = restorePlace(out, place, pack.id, entries);
+      const nested = held.data[`${place.path}${NESTED}`];
+      const live = asRecord(getAt(out, place.path));
+      if (nested && live) {
+        const merged: Raw = { ...live };
+        for (const [key, copy] of Object.entries(nested)) {
+          const at = merged[key];
+          if (isRecord(at) && isRecord(copy)) merged[key] = mergeOwn(at, copy, pack.id);
+        }
+        out = setAt(out, place.path, merged);
+      }
     }
   }
   return { raw: out, restored };
