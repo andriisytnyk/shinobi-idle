@@ -92,7 +92,9 @@
           <li><EntityLink kind="item" id={r.item} /> &times;{r.n}</li>
         {/each}
       </ul>
-      <p class="note">{t('graduation.scrollHint')}</p>
+      {#if reward.some((r) => content.items.find((i) => i.id === r.item)?.scroll)}
+        <p class="note">{t('graduation.scrollHint')}</p>
+      {/if}
     {/if}
 
     {#if goal}

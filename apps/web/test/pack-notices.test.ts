@@ -56,7 +56,7 @@ describe('ruleDisabled (D9)', () => {
     const told = toasts.push.mock.calls.filter(([c]) => c.key === 'toast.ruleDisabled');
     expect(told).toHaveLength(2);
     expect(t('toast.ruleDisabled', { pack: 'testmod' })).toBe(
-      'Правило розширення «testmod» вимкнено через помилку.',
+      'Частину розширення «testmod» вимкнено через помилку. Гра працює далі.',
     );
     expect(game.ruleNotices.map((n) => n.rule)).toEqual(['system.x', 'system.y']);
   });

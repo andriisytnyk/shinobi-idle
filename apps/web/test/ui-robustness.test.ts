@@ -54,7 +54,7 @@ describe('a pack error never stops the game (item 1)', () => {
     expect(warn.mock.calls.filter((c) => String(c[0]).includes('"bad"'))).toHaveLength(1);
     await booted.go('#/settings');
     expect(q('[data-ui="disabled-packs"]')?.textContent).toMatch(
-      /Розширення «bad» вимкнено через помилку: .*core:nope/,
+      /Інтерфейс розширення «bad» вимкнено через помилку.*core:nope/,
     );
   });
 

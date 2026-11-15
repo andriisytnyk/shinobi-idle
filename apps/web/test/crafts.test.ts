@@ -326,7 +326,7 @@ describe('A6: a disabled control says why', () => {
       'money',
     );
     expect(text(target.querySelector(`[data-good="${OIL}"] [data-why]`))).toContain(
-      'Не вистачає рьо',
+      'Не вистачає: Рьо',
     );
     everyDisabledHasReason();
   });
