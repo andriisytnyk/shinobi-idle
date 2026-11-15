@@ -30,7 +30,7 @@ import {
   balanceParamsSchema,
   generatedDbSchema,
   type BossBase,
-  type Building,
+  type BuildingBase,
   type CellBase,
   type GeneratedDb,
   type EnemyBase,
@@ -372,7 +372,7 @@ const resource = (uk: string): string => {
   }
   return slug;
 };
-const buildings: Building[] = slice.buildings.map(([raw, name, desc, hasT6, res]) => {
+const buildings: BuildingBase[] = slice.buildings.map(([raw, name, desc, hasT6, res]) => {
   const id = core(raw);
   buildingByName.set(name, id);
   text('building', id, 'name', name);

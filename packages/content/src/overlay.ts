@@ -15,12 +15,16 @@ import {
   enemyBaseSchema,
   enemyCombatDataSchema,
   bossSpecialSchema,
+  buildingFxSchema,
   gearFxSchema,
   itemFxSchema,
   itemSchema,
   reqSchema,
   techniqueBaseSchema,
   techniqueCombatSchema,
+  type Building,
+  type BuildingBase,
+  type BuildingFx,
   type GearBase,
   type HerbBase,
   type K,
@@ -46,6 +50,23 @@ export function layerCells(
       throw new Error(`Points of interest for unknown cell ${id}`);
   }
   return cells.map((c) => ({ ...c, pois: [...(pois[c.id] ?? [])] }));
+}
+
+export const buildingFxMapSchema = z.record(coreId, buildingFxSchema);
+
+/** Gives every building its role, effects and products; a building without an entry is a data error. */
+export function layerBuildings(
+  base: readonly BuildingBase[],
+  fx: Readonly<Record<string, BuildingFx>>,
+): Building[] {
+  for (const id of Object.keys(fx)) {
+    if (!base.some((b) => b.id === id)) throw new Error(`Building data for unknown building ${id}`);
+  }
+  return base.map((b) => {
+    const own = fx[b.id];
+    if (own === undefined) throw new Error(`No data for building ${b.id}`);
+    return { ...b, ...own, effects: [...own.effects], produces: [...own.produces] };
+  });
 }
 
 export const bossSpecialMapSchema = z.record(coreId, bossSpecialSchema);

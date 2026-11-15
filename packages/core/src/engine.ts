@@ -15,6 +15,13 @@ import { evalReq, RANK_ORDER } from './requirements.ts';
 import { defaultRules, type Rules } from './rules.ts';
 import { isSkillUnlocked } from './selectors.ts';
 import type { GameState } from './state.ts';
+import {
+  cancelBuild,
+  donateToTreasury,
+  spendWorkforce,
+  startBuild,
+  syncVillage,
+} from './village.ts';
 import { claimPoi, travelInstant, WALK_KIND } from './world.ts';
 
 /** A player or bot command. Concrete command types arrive with the stages that need them. */
@@ -49,7 +56,15 @@ export type Command =
   /** Goes to a cell explored to level 1, or to an outpost of an open region: `instant` pays ryo by region (free to an outpost), `walk` is free and takes time. `slot` defaults to 0. */
   | { type: 'world.travel'; cell: string; mode: 'instant' | 'walk'; slot?: number }
   /** Takes the one-time loot of a cache or vault the player has found and stands next to. */
-  | { type: 'world.claim'; poi: string };
+  | { type: 'world.claim'; poi: string }
+  /** Starts the next level of a building: costs are taken now, the job runs in village ticks. */
+  | { type: 'village.build'; building: string }
+  /** Cancels the construction job and refunds what it cost. */
+  | { type: 'village.cancel' }
+  /** Spends one workforce charge to take one tick off the construction job. */
+  | { type: 'village.workforce' }
+  /** Moves ryo from the player's purse to the village treasury. */
+  | { type: 'village.donate'; ryo: number };
 
 /** Longest player name. */
 export const PLAYER_NAME_MAX = 24;
@@ -161,6 +176,8 @@ export function dispatch(
   content: ContentDb,
   rules: Rules = defaultRules,
 ): CommandResult {
+  // A Genin whose rank was set from outside still gets the village before any command reads it.
+  syncVillage(state, content);
   const result = apply(state, command, content, rules);
   if (result.ok) updateQuests(state, content);
   return result;
@@ -195,7 +212,7 @@ function apply(
     case 'item.coat':
       return coatItem(state, command.poison, command.base, content);
     case 'shop.buy':
-      return shopBuy(state, command.item, command.n, content);
+      return shopBuy(state, command.item, command.n, content, rules);
     case 'shop.sell':
       return shopSell(state, command.item, command.n, content);
     case 'gear.buy':
@@ -232,6 +249,14 @@ function apply(
       return startAction(state, command.slot ?? 0, WALK_KIND, command.cell, content, rules);
     case 'world.claim':
       return claimPoi(state, command.poi, content);
+    case 'village.build':
+      return startBuild(state, command.building, content);
+    case 'village.cancel':
+      return cancelBuild(state);
+    case 'village.workforce':
+      return spendWorkforce(state);
+    case 'village.donate':
+      return donateToTreasury(state, command.ryo);
     default:
       return { ok: false, reason: 'error.unknownCommand' };
   }

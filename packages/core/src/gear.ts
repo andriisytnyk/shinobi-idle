@@ -1,7 +1,6 @@
 import type { ContentDb, Gear } from '@shinobi/content';
 import { removeCurrency } from './bank.ts';
 import type { CommandResult } from './engine.ts';
-import { waiveBuildings } from './gate.ts';
 import { indexOf } from './lookup.ts';
 import type { Modifier, ModifierProvider } from './modifiers.ts';
 import { evalReq, type Req } from './requirements.ts';
@@ -14,7 +13,7 @@ export function ownedTiers(state: GameState, line: string): number {
 
 /**
  * What the next tier of a line needs: the rank of Genin, the tier's skill level, and its building level when it has
- * one. Building levels count as met until the village stage exists (see `waiveBuildings`).
+ * one.
  */
 export function nextTierReq(state: GameState, gear: Gear): Req | null {
   const tier = gear.tiers[ownedTiers(state, gear.id)];
@@ -25,7 +24,7 @@ export function nextTierReq(state: GameState, gear: Gear): Req | null {
   ];
   if (tier.building)
     parts.push({ t: 'building', id: tier.building.id, level: tier.building.level });
-  return waiveBuildings({ t: 'all', of: parts });
+  return { t: 'all', of: parts };
 }
 
 /** Price of the next tier of a line, or null when every tier is owned. */

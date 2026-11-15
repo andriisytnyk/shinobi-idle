@@ -1,0 +1,64 @@
+{
+  "core:tower": { "role": "admin", "effects": [], "produces": [], "duty": "stages" },
+  "core:bureau": {
+    "role": "admin",
+    "effects": [{ "key": "mission.ryo", "op": "add", "value": 0.01 }],
+    "produces": [],
+    "duty": "treasury"
+  },
+  "core:grounds": {
+    "role": "bonus",
+    "effects": [
+      { "key": "xp.skill.tai", "op": "add", "value": 0.01 },
+      { "key": "xp.skill.ath", "op": "add", "value": 0.01 }
+    ],
+    "produces": []
+  },
+  "core:shrine": {
+    "role": "bonus",
+    "effects": [
+      { "key": "xp.skill.med", "op": "add", "value": 0.01 },
+      { "key": "xp.skill.cc", "op": "add", "value": 0.01 }
+    ],
+    "produces": []
+  },
+  "core:academy": {
+    "role": "bonus",
+    "effects": [
+      { "key": "xp.skill.katon", "op": "add", "value": 0.01 },
+      { "key": "xp.skill.futon", "op": "add", "value": 0.01 },
+      { "key": "xp.skill.raiton", "op": "add", "value": 0.01 },
+      { "key": "xp.skill.doton", "op": "add", "value": 0.01 },
+      { "key": "xp.skill.suiton", "op": "add", "value": 0.01 },
+      { "key": "xp.skill.nin", "op": "add", "value": 0.01 }
+    ],
+    "produces": []
+  },
+  "core:library": { "role": "shop", "effects": [], "produces": [], "duty": "scrolls" },
+  "core:hospital": {
+    "role": "bonus",
+    "effects": [{ "key": "wound.heal", "op": "add", "value": -0.05 }],
+    "produces": []
+  },
+  "core:forge": { "role": "shop", "effects": [], "produces": [] },
+  "core:lab": {
+    "role": "bonus",
+    "effects": [
+      { "key": "speed.skill.alch", "op": "add", "value": 0.01 },
+      { "key": "speed.skill.prov", "op": "add", "value": 0.01 },
+      { "key": "craft.keep", "op": "add", "value": 0.01 }
+    ],
+    "produces": []
+  },
+  "core:market": {
+    "role": "shop",
+    "effects": [{ "key": "shop.price", "op": "add", "value": -0.02 }],
+    "produces": []
+  },
+  "core:store": { "role": "storage", "effects": [], "produces": [], "duty": "storage" },
+  "core:barrier": { "role": "defence", "effects": [], "produces": [] },
+  "core:farms": { "role": "producer", "effects": [], "produces": ["food"] },
+  "core:hunt": { "role": "producer", "effects": [], "produces": ["food"] },
+  "core:mine": { "role": "producer", "effects": [], "produces": ["stone", "iron"] },
+  "core:sawmill": { "role": "producer", "effects": [], "produces": ["wood"] }
+}

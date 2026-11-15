@@ -14,6 +14,7 @@ import { meditateKind, meditationProvider } from './meditation.ts';
 import type { ModifierProvider } from './modifiers.ts';
 import { natureProvider } from './natures.ts';
 import { questSystem } from './quests.ts';
+import { villageProvider, villageSystem } from './village.ts';
 import { EXPLORE_KIND, WALK_KIND, exploreKind, walkKind, worldProvider } from './world.ts';
 import type { System } from './system.ts';
 
@@ -31,7 +32,7 @@ export interface Rules extends FightRules {
 }
 
 export const defaultRules: Rules = {
-  systems: [actionSystem, combatSystem, questSystem],
+  systems: [actionSystem, combatSystem, villageSystem, questSystem],
   actionKinds: {
     practice: practiceKind,
     drill: drillKind,
@@ -52,6 +53,7 @@ export const defaultRules: Rules = {
     obstacleProvider,
     natureProvider,
     worldProvider,
+    villageProvider,
   ],
   combatAi: defaultCombatAi,
   fightHooks: defaultFightHooks,

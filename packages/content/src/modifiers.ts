@@ -83,7 +83,9 @@ add('clone.pool', 'The shared pool of shadow clones');
 
 // Missions and exploration.
 add('mission.duration', 'Duration of every mission');
+add('mission.ryo', 'Ryo paid by missions (0.01 is 1% more)');
 add('mission.duration.nin', 'Duration of the mission stages a Ninjutsu technique performs');
+add('shop.price', 'Prices of the shop goods, tools and scrolls (-0.02 is 2% cheaper)', { wired: true });
 add('interval.explore', 'Time to explore a cell (-0.05 is 5% shorter)', { wired: true });
 add('interval.walk', 'Time of a walk to another cell (-0.05 is 5% shorter)', { wired: true });
 
