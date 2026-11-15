@@ -30,4 +30,8 @@ export * from './selectors.ts';
 export * from './state.ts';
 export * from './system.ts';
 export * from './unlocks.ts';
+export * from './regions.ts';
+export * from './world.ts';
+export * from './world-selectors.ts';
+export * from './world-state.ts';
 export * from './xp.ts';

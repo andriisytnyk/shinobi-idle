@@ -543,7 +543,11 @@ describe('A9: training gear', () => {
     expect(mod('interval.skill.herb').total).toBeCloseTo(1 - K.gearFx.sickle, 12);
     expect(mod('craft.keep.alch').total).toBeCloseTo(1 + 2 * K.gearFx.alembic, 12);
     expect(mod('interval.skill.prov').total).toBeCloseTo(1 / (1 + 2 * K.gearFx.stations), 12);
-    expect(mod('interval.explore').total).toBeCloseTo(1 - K.gearFx.maps, 12);
+    // Athletics level 1 takes its own small cut off the same key.
+    expect(mod('interval.explore').total).toBeCloseTo(
+      (1 - K.gearFx.maps) * (1 - K.scouting.athPerLevel),
+      12,
+    );
   });
 
   it('the mannequins raise Taijutsu XP', () => {

@@ -5,6 +5,7 @@ import type { GameEvent } from './events.ts';
 import { createStreams, type RngStreams } from './rng.ts';
 import type { TeamNatures } from './natures.ts';
 import { updateQuests } from './quests.ts';
+import { createWorld, type WorldState } from './world-state.ts';
 import { refreshUnlocks } from './unlocks.ts';
 
 export type Rank = 'student' | 'genin' | 'chunin';
@@ -79,13 +80,15 @@ export interface GameState {
   course: Record<string, string>;
   /** The rival's and Aya's natures, fixed when the native nature is chosen; null before. */
   team: TeamNatures | null;
+  /** Exploration: where the player stands, how often each cell was explored, the points found and the loot taken. */
+  world: WorldState;
   /** The pinned goal shown in the meta panel. */
   goal: EntityRef | null;
   /** One-off notices for the UI, newest last. The UI drains it; it is never saved. */
   events: GameEvent[];
 }
 
-export const STATE_VERSION = 8;
+export const STATE_VERSION = 9;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
@@ -118,6 +121,7 @@ export function createState(seed: number, content: ContentDb): GameState {
     meditation: {},
     course: {},
     team: null,
+    world: createWorld(content),
     goal: null,
     events: [],
   };

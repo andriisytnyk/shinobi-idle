@@ -6,6 +6,8 @@ export type EntityKind =
   | 'mission'
   | 'enemy'
   | 'region'
+  | 'cell'
+  | 'poi'
   | 'building'
   | 'quest'
   | 'gear'

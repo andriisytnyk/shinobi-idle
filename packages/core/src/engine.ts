@@ -15,6 +15,7 @@ import { evalReq, RANK_ORDER } from './requirements.ts';
 import { defaultRules, type Rules } from './rules.ts';
 import { isSkillUnlocked } from './selectors.ts';
 import type { GameState } from './state.ts';
+import { claimPoi, travelInstant, WALK_KIND } from './world.ts';
 
 /** A player or bot command. Concrete command types arrive with the stages that need them. */
 export type Command =
@@ -44,7 +45,11 @@ export type Command =
   /** The chakra paper test: sets the native nature, once, as a genin. `random` draws on the world stream. */
   | { type: 'nature.choose'; nature: NatureChoice }
   /** Adds a second nature (Chakra Control 20) or a third (40); only natures not owned. */
-  | { type: 'nature.add'; nature: NatureChoice };
+  | { type: 'nature.add'; nature: NatureChoice }
+  /** Goes to a cell explored to level 1, or to an outpost of an open region: `instant` pays ryo by region (free to an outpost), `walk` is free and takes time. `slot` defaults to 0. */
+  | { type: 'world.travel'; cell: string; mode: 'instant' | 'walk'; slot?: number }
+  /** Takes the one-time loot of a cache or vault the player has found and stands next to. */
+  | { type: 'world.claim'; poi: string };
 
 /** Longest player name. */
 export const PLAYER_NAME_MAX = 24;
@@ -221,6 +226,12 @@ function apply(
       return chooseNature(state, command.nature);
     case 'nature.add':
       return addNature(state, command.nature, content);
+    case 'world.travel':
+      if (command.mode === 'instant') return travelInstant(state, command.cell, content, rules);
+      if (command.mode !== 'walk') return { ok: false, reason: 'error.unknownCommand' };
+      return startAction(state, command.slot ?? 0, WALK_KIND, command.cell, content, rules);
+    case 'world.claim':
+      return claimPoi(state, command.poi, content);
     default:
       return { ok: false, reason: 'error.unknownCommand' };
   }

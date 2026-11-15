@@ -5,6 +5,7 @@ import { emit } from './events.ts';
 import { evalReq, RANK_ORDER } from './requirements.ts';
 import type { System } from './system.ts';
 import type { GameState } from './state.ts';
+import { refreshRegions } from './regions.ts';
 import { refreshUnlocks } from './unlocks.ts';
 
 /** Counter value a step is measured from: its counter right now, or 0 for a requirement step. */
@@ -44,6 +45,8 @@ function applyRewards(state: GameState, rewards: QuestRewards, content: ContentD
  * Emits `questStep` for each finished step and `questDone` when the last one falls.
  */
 export function updateQuests(state: GameState, content: ContentDb): void {
+  // Region flags first: a step may ask for an open region.
+  refreshRegions(state, content);
   for (let changed = true; changed;) {
     changed = false;
     for (const quest of content.quests) {

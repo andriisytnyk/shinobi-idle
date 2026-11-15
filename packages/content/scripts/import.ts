@@ -31,7 +31,7 @@ import {
   generatedDbSchema,
   type BossBase,
   type Building,
-  type Cell,
+  type CellBase,
   type GeneratedDb,
   type EnemyBase,
   type Exercise,
@@ -502,7 +502,7 @@ const missions: Mission[] = slice.missions.map((m) => {
 // ---------- regions and cells ----------
 
 const cellSlugs = { take: (k: string) => ids.take('cell', k) };
-const cells: Cell[] = [];
+const cells: CellBase[] = [];
 const regions: Region[] = slice.regions.map((r) => {
   const id = core(r.id);
   text('region', id, 'name', r.name);
@@ -514,7 +514,7 @@ const regions: Region[] = slice.regions.map((r) => {
       id: cid,
       region: id,
       index,
-      key: key as Cell['key'],
+      key: key as CellBase['key'],
       story: /^Сюжет/.test(note ?? ''),
     });
     return cid;

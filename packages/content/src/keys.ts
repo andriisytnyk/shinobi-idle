@@ -11,6 +11,7 @@ export type LocaleKind =
   | 'mission'
   | 'region'
   | 'cell'
+  | 'poi'
   | 'enemy'
   | 'boss'
   | 'building'
