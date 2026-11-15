@@ -68,7 +68,7 @@ describe('composeContent([core, testmod])', () => {
     expect(both.modifierKeys['testmod:forge.bonus']).toBeDefined();
     expect(both.modifierKeys['xp.skill.testmod:forge']).toBeDefined();
     expect(both.balance.K.ext?.testmod?.shellArmor).toBe(0.2);
-    expect(both.balance.K.ryoPerMin['testmod:trial' as 'D']).toBe(5);
+    expect(both.balance.K.ryoPerMin['testmod:trial']).toBe(5);
   });
 
   it('gives the test enemy a rare drop and the test boss a bounty and a scroll part', () => {
@@ -241,7 +241,11 @@ describe('composeContent errors name the pack', () => {
 
   it('reports a clashing locale key and a clashing icon', () => {
     const loc = mod('locclash', { locales: { uk: { 'rank.genin': 'Інший' } } });
-    throwsFor([corePack, loc], 'locclash', /locale key "rank.genin".*"core"/);
+    throwsFor([corePack, loc], 'locclash', /locale key "rank.genin" is not the pack's own/);
+    const own = (key: string) => mod('locown', { locales: { uk: { [key]: 'x' } } });
+    throwsFor([corePack, own('ui.hello')], 'locown', /is not the pack's own/);
+    throwsFor([corePack, own('skill.core:tai.note')], 'locown', /is not the pack's own/);
+    expect(() => composeContent([corePack, own('x.locown.hello')])).not.toThrow();
     const icon = mod('iconclash', { icons: { skill: { tai: 'anvil' } } });
     throwsFor([corePack, icon], 'iconclash', /icon skill "tai".*"core"/);
   });
@@ -296,7 +300,7 @@ describe('composeContent errors name the pack', () => {
     const p2 = mod('p_two', {
       patches: [{ target: { kind: 'enemies', id: 'core:wolf' }, set: { cl: 12 } }],
     });
-    throwsFor([corePack, p1, p2], 'p_two', /already patched by another pack/);
+    throwsFor([corePack, p1, p2], 'p_two', /already set by another pack/);
     const notList = mod('p_list', {
       patches: [{ target: { kind: 'enemies', id: 'core:wolf' }, append: { cl: [1] } }],
     });

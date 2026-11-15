@@ -6,6 +6,7 @@
  * `ContentDb` (`content.skills`, `content.natures`, `content.tags`, ...). The core and web tasks
  * remove each import of these constants; the importer still reads them as its input.
  */
+import type { IdTypes } from '@shinobi/content/typing';
 import vocab from './packs/core/data/hand/vocab.json' with { type: 'json' };
 import skills from './packs/core/data/generated/skills.json' with { type: 'json' };
 import cellKeys from './packs/core/data/hand/cell-keys.json' with { type: 'json' };
@@ -15,44 +16,48 @@ import traits from './packs/core/data/hand/traits.json' with { type: 'json' };
 
 const ids = (list: readonly { id: string }[]): string[] => list.map((e) => e.id);
 
-// ---------- literal unions of the built-in ids (static typing only) ----------
+// ---------- id types ----------
+// Ids are open strings. Code that has not been migrated sees the narrow built-in unions through the
+// deprecated tsconfig mapping of '@shinobi/content/typing' (see tsconfig.legacy-ids.json); the
+// narrow unions are also exported by name as Legacy<Name>.
 
-export type SkillId =
-  | 'tai'
-  | 'nin'
-  | 'katon'
-  | 'futon'
-  | 'raiton'
-  | 'doton'
-  | 'suiton'
-  | 'cc'
-  | 'med'
-  | 'ath'
-  | 'herb'
-  | 'scout'
-  | 'prov'
-  | 'alch'
-  | 'vit'
-  | 'eva';
-export type NatureId = 'katon' | 'futon' | 'raiton' | 'doton' | 'suiton';
-export type TechSkillId = 'tai' | 'nin' | NatureId;
-export type SkillGroup = 'train' | 'nin' | 'field' | 'craft' | 'combat';
-export type Rank = 'E' | 'D' | 'C' | 'B' | 'A' | 'S';
-export type PlayerRank = 'student' | 'genin' | 'chunin';
-export type RoleId =
-  'projectile' | 'series' | 'area' | 'control' | 'defense' | 'buff' | 'signature' | 'drill';
-export type TagId =
-  'interrupt' | 'area' | 'guard' | 'reveal' | 'bind' | 'dot' | 'pierce' | 'cleanse' | 'dispel';
-export type TraitId =
-  'armor' | 'caster' | 'pack' | 'evasive' | 'regen' | 'illusionist' | 'hidden' | 'poisoner';
-export type StateId = 'burn' | 'stun' | 'wet';
-export type MissionRank = 'D' | 'C' | 'V' | 'OP';
-export type CellKey = 'rock' | 'brush' | 'water' | 'mist' | 'rubble';
-export type StatusId = 'burn' | 'wet' | 'stun' | 'bind' | 'poison';
-export type ComboId = 'fanBurn' | 'shockWet' | 'mudEva' | 'steam';
-export type AttackStyle = 'melee' | 'ranged';
-export type EnemyRegion = 'academy' | 'forest' | 'plains' | 'valley' | 'exam' | 'mission';
-export type ZoneRegion = 'academy' | 'forest' | 'plains' | 'valley' | 'exam' | 'boss';
+export type {
+  LegacyAttackStyle,
+  LegacyCellKey,
+  LegacyComboId,
+  LegacyEnemyRegion,
+  LegacyMissionRank,
+  LegacyNatureId,
+  LegacyPlayerRank,
+  LegacyRank,
+  LegacyRoleId,
+  LegacySkillGroup,
+  LegacySkillId,
+  LegacyStateId,
+  LegacyStatusId,
+  LegacyTagId,
+  LegacyTechSkillId,
+  LegacyTraitId,
+  LegacyZoneRegion,
+} from './typing/legacy.ts';
+
+export type SkillId = IdTypes['skill'];
+export type NatureId = IdTypes['nature'];
+export type TechSkillId = IdTypes['techSkill'];
+export type SkillGroup = IdTypes['skillGroup'];
+export type Rank = IdTypes['techRank'];
+export type PlayerRank = IdTypes['playerRank'];
+export type RoleId = IdTypes['role'];
+export type TagId = IdTypes['tag'];
+export type TraitId = IdTypes['trait'];
+export type StateId = IdTypes['state'];
+export type MissionRank = IdTypes['missionRank'];
+export type CellKey = IdTypes['cellKey'];
+export type StatusId = IdTypes['status'];
+export type ComboId = IdTypes['combo'];
+export type AttackStyle = IdTypes['attackStyle'];
+export type EnemyRegion = IdTypes['enemyRegion'];
+export type ZoneRegion = IdTypes['zoneRegion'];
 
 // ---------- lists, derived from the data of the pack core ----------
 

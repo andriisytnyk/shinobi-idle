@@ -7,6 +7,23 @@
 import type { ContentDb, Req } from './schema.ts';
 import type { EntityListKey } from './pack.ts';
 
+/** The lists whose entities may carry modifiers, searched deeply. */
+const ENTITY_LISTS_FOR_SCAN = [
+  'practices',
+  'obstacles',
+  'pools',
+  'buildings',
+  'gear',
+  'items',
+  'techniques',
+  'missions',
+  'quests',
+  'exams',
+  'operations',
+  'zones',
+  'cells',
+] as const;
+
 export interface ClosureProblem {
   pack: string;
   message: string;
@@ -15,6 +32,8 @@ export interface ClosureProblem {
 export interface ClosureOptions {
   /** The pack that owns the entity `id` of `list`. */
   owner(list: string, id: string): string;
+  /** The pack that contributed the icon `id` of `kind`. */
+  iconOwner(kind: string, id: string): string;
   /** The locale kind of each list whose entities need a name and a description. */
   described: Partial<Record<EntityListKey, string>>;
 }
@@ -123,12 +142,26 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     }
   };
 
-  const mods = (field: string, list: readonly { key: string; nature?: string | undefined }[]) =>
-    list.forEach((m, i) => {
-      if (!Object.hasOwn(db.modifierKeys, m.key))
-        problem(`${field}[${i}].key`, `unknown modifier key "${m.key}"`);
-      if (m.nature !== undefined) ref(`${field}[${i}].nature`, m.nature, 'natures');
-    });
+  /** Every modifier anywhere in an entity: its key is a key of the composed database and its nature exists. */
+  const scanMods = (value: unknown, path: string): void => {
+    if (value === null || typeof value !== 'object') return;
+    if (Array.isArray(value)) {
+      value.forEach((v, i) => scanMods(v, `${path}[${i}]`));
+      return;
+    }
+    const o = value as Plain;
+    if (
+      typeof o.key === 'string' &&
+      (o.op === 'add' || o.op === 'mul') &&
+      typeof o.value === 'number'
+    ) {
+      if (!Object.hasOwn(db.modifierKeys, o.key))
+        problem(`${path}.key`, `unknown modifier key "${o.key}"`);
+      if (typeof o.nature === 'string') ref(`${path}.nature`, o.nature, 'natures');
+      return;
+    }
+    for (const [k, v] of Object.entries(o)) scanMods(v, `${path}.${k}`);
+  };
 
   // ----- vocabularies -----
   for (const s of db.skills) {
@@ -190,11 +223,22 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
   }
   for (const tier of db.ai.tiers) {
     at('ai', tier.id);
+    if (tier.minTier > db.playerRanks.length - 1)
+      problem(
+        'minTier',
+        `${tier.minTier} is above the highest player tier ${db.playerRanks.length - 1}`,
+      );
   }
-  at('ai', 'visibleTraits');
-  refs('visibleTraits', db.ai.visibleTraits, 'traits');
-  for (const s of db.statuses) at('statuses', s.id);
-  for (const r of db.playerRanks) at('playerRanks', r.id);
+  for (const [n, trait] of db.ai.visibleTraits.entries()) {
+    at('aiTrait', trait);
+    ref(`visibleTraits[${n}]`, trait, 'traits');
+  }
+  /** The tier of a player rank is its position in the list: the AI runs by tier. */
+  for (const [n, r] of db.playerRanks.entries()) {
+    at('playerRanks', r.id);
+    if (r.tier !== n)
+      problem('tier', `${r.tier} must be the position ${n} of the rank in the list`);
+  }
 
   // ----- techniques, seals, items, recipes -----
   for (const t of db.techniques) {
@@ -216,13 +260,10 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
   for (const p of db.practices) {
     at('practices', p.id);
     refs('pair', p.pair, 'skills');
-    p.insightMods.forEach((m, i) => mods(`insightMods[${i}]`, m));
-    p.enlightMods.forEach((m, i) => mods(`enlightMods[${i}]`, m));
   }
   for (const o of db.obstacles) {
     at('obstacles', o.id);
     req('req', o.req);
-    mods('mods', o.mods);
   }
   for (const h of db.herbs) {
     at('herbs', h.id);
@@ -231,7 +272,6 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
   for (const p of db.pools) {
     at('pools', p.id);
     ref('skill', p.skill, 'skills');
-    mods('mods', p.mods);
   }
   for (const i of db.items) {
     at('items', i.id);
@@ -297,6 +337,8 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
       if (p.kind === 'scrollPart') ref(`pay[${n}].technique`, p.technique, 'techniques');
     });
     if (m.resource !== null) ref('resource', m.resource, 'resources');
+    if (m.resourceMod !== null && !Object.hasOwn(db.modifierKeys, m.resourceMod))
+      problem('resourceMod', `unknown modifier key "${m.resourceMod}"`);
   }
   for (const t of db.team) {
     at('team', t.id);
@@ -342,8 +384,6 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
   }
   for (const b of db.buildings) {
     at('buildings', b.id);
-    mods('effects', b.effects);
-    mods('capstone', b.capstone);
     for (const res of b.produces) ref('produces', res, 'resources');
     for (const res of Object.keys(b.tier6 ?? {})) ref('tier6', res, 'resources');
   }
@@ -354,6 +394,8 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
       if (t.building) ref(`tiers[${n}].building.id`, t.building.id, 'buildings');
     });
     ref('fx.perTier', g.fx.perTier, 'gearFx');
+    if (!Object.hasOwn(db.modifierKeys, g.fx.key))
+      problem('fx.key', `unknown modifier key "${g.fx.key}"`);
   }
 
   // ----- quests, exams, zones, operations -----
@@ -409,6 +451,36 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
           problem('locale', `missing locale key ${key}`);
         }
       }
+    }
+  }
+  // ----- modifiers everywhere -----
+  for (const list of ENTITY_LISTS_FOR_SCAN) {
+    for (const e of (db as unknown as Record<string, { id: string }[]>)[list] ?? []) {
+      at(list, e.id);
+      scanMods(e, '');
+    }
+  }
+
+  // ----- icons: each one belongs to an entity of the kind -----
+  const iconLists: Record<string, string> = {
+    status: 'statuses',
+    trait: 'traits',
+    nature: 'natures',
+    currency: 'currencies',
+    ...Object.fromEntries(
+      db.entityKinds.filter((k) => k.list !== null).map((k) => [k.id, k.list as string]),
+    ),
+  };
+  for (const [kind, table] of Object.entries(db.icons)) {
+    for (const id of Object.keys(table)) {
+      const pack = options.iconOwner(kind, id);
+      const list = iconLists[kind];
+      const known =
+        list !== undefined &&
+        ((db as unknown as Record<string, { id: string }[]>)[list] ?? []).some((e) => e.id === id);
+      // The pack core keeps an icon for the Shield trait, which is out of the slice and has no entity.
+      if (!known && pack !== 'core')
+        problems.push({ pack, message: `icon ${kind} "${id}" names no entity of that kind` });
     }
   }
   return problems;

@@ -1,25 +1,7 @@
 import { z } from 'zod';
-import type {
-  AttackStyle,
-  CellKey,
-  ComboId,
-  EnemyRegion,
-  MissionRank,
-  NatureId,
-  PlayerRank,
-  Rank,
-  RoleId,
-  SkillGroup,
-  SkillId,
-  StateId,
-  StatusId,
-  TagId,
-  TechSkillId,
-  TraitId,
-  ZoneRegion,
-} from './constants.ts';
+import type { IdTypes } from '@shinobi/content/typing';
 import { modSchema, obstacleModSchema, type ModifierKeyInfo } from './modifiers.ts';
-import { legacy, open, openId } from './shim.ts';
+import { idOf, open, shapeOf } from './shim.ts';
 
 // ---------- identifiers ----------
 
@@ -32,17 +14,17 @@ export const packedId = z.string().regex(/^[a-z0-9_]+:[a-z0-9_]+$/, 'expected <p
 export const coreId = packedId;
 /** A vocabulary id: a bare core id (`tai`, `katon`) or `<pack>:<slug>`. */
 const vocabId = z.string().regex(/^[A-Za-z0-9_]+(:[a-z0-9_]+)?$/, 'expected an id');
-export const skillId = openId<SkillId>();
-export const natureId = openId<NatureId>();
-export const techSkillId = openId<TechSkillId>();
-export const rankId = openId<Rank>();
-export const playerRankId = openId<PlayerRank>();
-export const roleId = openId<RoleId>();
-export const tagId = openId<TagId>();
-export const traitId = openId<TraitId>();
-export const stateId = openId<StateId>();
-export const statusId = openId<StatusId>();
-export const comboId = openId<ComboId>();
+export const skillId = idOf('skill');
+export const natureId = idOf('nature');
+export const techSkillId = idOf('techSkill');
+export const rankId = idOf('techRank');
+export const playerRankId = idOf('playerRank');
+export const roleId = idOf('role');
+export const tagId = idOf('tag');
+export const traitId = idOf('trait');
+export const stateId = idOf('state');
+export const statusId = idOf('status');
+export const comboId = idOf('combo');
 
 const level = z.number().int().min(1).max(99);
 /** A slug for resources such as `plots` or `masonry`; names live in the locale. */
@@ -86,7 +68,7 @@ export const entityKindSchema = z.strictObject({ id: vocabId, list: z.string().n
 
 export const skillSchema = z.strictObject({
   id: skillId,
-  group: open<SkillGroup>(z.string().min(1)),
+  group: idOf('skillGroup'),
   /** How the skill is trained: tech, course, drill, insight, patch, map, recipe, station, none. */
   activity: z.string(),
   /** What opens the skill for training; `null` when it is open from the first day. */
@@ -132,20 +114,20 @@ export const TROPHY_KEYS = ['band', 'pelt', 'fang', 'coin', 'gem'] as const;
 export const techniqueEffectSchema = z.discriminatedUnion('kind', [
   z.strictObject({ kind: z.literal('damage') }),
   z.strictObject({ kind: z.literal('none') }),
-  z.strictObject({ kind: z.literal('shield'), fx: open<'shield'>(z.string().min(1)) }),
-  z.strictObject({ kind: z.literal('decoy'), fx: open<'decoy'>(z.string().min(1)) }),
-  z.strictObject({ kind: z.literal('evasionBuff'), fx: open<'evasionBuff'>(z.string().min(1)) }),
+  z.strictObject({ kind: z.literal('shield'), fx: idOf('fxShield') }),
+  z.strictObject({ kind: z.literal('decoy'), fx: idOf('fxDecoy') }),
+  z.strictObject({ kind: z.literal('evasionBuff'), fx: idOf('fxEvasionBuff') }),
   z.strictObject({ kind: z.literal('cleanse'), statuses: z.array(statusId).min(1) }),
   z.strictObject({
     kind: z.literal('passiveNegate'),
-    fx: open<'passiveNegate'>(z.string().min(1)),
+    fx: idOf('fxPassiveNegate'),
   }),
   z.strictObject({
     kind: z.literal('stance'),
-    fx: open<'gateOpening' | 'gateHealing'>(z.string().min(1)),
+    fx: idOf('fxStance'),
   }),
-  z.strictObject({ kind: z.literal('nextCast'), fx: open<'nextCast'>(z.string().min(1)) }),
-  z.strictObject({ kind: z.literal('reveal'), fx: open<'reveal'>(z.string().min(1)) }),
+  z.strictObject({ kind: z.literal('nextCast'), fx: idOf('fxNextCast') }),
+  z.strictObject({ kind: z.literal('reveal'), fx: idOf('fxReveal') }),
 ]);
 
 export const techniqueCombatSchema = z.strictObject({
@@ -289,7 +271,7 @@ export const itemFxSchema = z.discriminatedUnion('kind', [
     durationMs: z.number().int().min(1),
   }),
   /** Puts a weaker enemy to sleep; the chance is `K.itemFx.sleep.chance`. */
-  z.strictObject({ kind: z.literal('sleep'), fx: open<'sleep'>(z.string().min(1)) }),
+  z.strictObject({ kind: z.literal('sleep'), fx: idOf('fxSleep') }),
   /** Raises the XP of a skill (or of the five natures) for a number of completed actions. */
   z.strictObject({
     kind: z.literal('tonic'),
@@ -313,7 +295,7 @@ export const itemFxSchema = z.discriminatedUnion('kind', [
 
 export const itemSchema = z.strictObject({
   id: coreId,
-  kind: open<'ingredient' | 'tool' | 'misc' | 'consumable'>(z.string().min(1)),
+  kind: idOf('itemKind'),
   /** Tags the item carries (tools answer enemy traits). */
   tags: z.array(tagId),
   /** Extra sources that the data tables do not express: a merchant crate or the forge. */
@@ -325,7 +307,7 @@ export const itemSchema = z.strictObject({
   /** Key of the buy price in `K.goods`; the price itself is never stored on the item. */
   buy: z.string().min(1).optional(),
   /** Key of the sell price in `K.sell`. */
-  sell: open<(typeof TROPHY_KEYS)[number]>(z.string().min(1)).optional(),
+  sell: idOf('trophy').optional(),
   /** A tool that rides in the pouch; a pouch slot holds `K.pouchStack` of them. */
   pouch: z.boolean().optional(),
   /** A medic pouch upgrade: owning it (tier 1 to 3) lets the pouch use a healing slot on its own. */
@@ -370,7 +352,7 @@ export const coatSchema = z.strictObject({ poison: coreId, base: coreId, product
 
 export const recipeSchema = z.object({
   id: coreId,
-  skill: open<'alch' | 'prov'>(z.string().min(1)),
+  skill: idOf('recipeSkill'),
   level,
   ingredients: z.array(ingredientRef).min(1),
   /** Item produced and how many per craft. */
@@ -411,7 +393,7 @@ export const missionPaySchema = z.discriminatedUnion('kind', [
 /** The mission as the importer generates it. */
 export const missionBaseSchema = z.strictObject({
   id: coreId,
-  rank: openId<MissionRank>(),
+  rank: idOf('missionRank'),
   team: z.boolean(),
   /** Duration in minutes. */
   minutes: z.number().int().min(0),
@@ -502,7 +484,7 @@ export const cellBaseSchema = z.object({
   id: coreId,
   region: coreId,
   index: z.number().int().min(0),
-  key: openId<CellKey>().nullable(),
+  key: idOf('cellKey').nullable(),
   /** Whether the cell hosts a story event. */
   story: z.boolean(),
 });
@@ -520,7 +502,7 @@ export const regionSchema = z.object({
 /** The part of an enemy that the importer generates from the slice and the balance tables. */
 export const enemyBaseSchema = z.strictObject({
   id: coreId,
-  region: openId<EnemyRegion>(),
+  region: idOf('enemyRegion'),
   cl: z.number().int(),
   traits: z.array(traitId),
   /** A nature, `wheel` (counters the player's first nature) or none. */
@@ -536,21 +518,21 @@ export const bossBaseSchema = enemyBaseSchema.omit({ region: true });
 
 /** Hand-written combat data of one enemy or boss. Numbers are referenced by key, never stored. */
 export const enemyCombatDataSchema = z.strictObject({
-  style: openId<AttackStyle>(),
+  style: idOf('attackStyle'),
   /** Trophies the enemy can drop; the chance is the key of `K.dropChance` and equals the item slug. */
-  drops: z.array(
-    z.strictObject({ item: coreId, chance: open<(typeof TROPHY_KEYS)[number]>(z.string().min(1)) }),
-  ),
+  drops: z.array(z.strictObject({ item: coreId, chance: idOf('trophy') })),
 });
 
 /** What an enemy leaves behind, apart from the scroll part. Everything here is derived from the balance object at load. */
 const enemyLootShape = {
-  style: openId<AttackStyle>(),
+  style: idOf('attackStyle'),
   drops: z.array(z.strictObject({ item: coreId, chance: z.number().gt(0).lt(1) })),
   /** Ryo range of one kill: combat level times the `K.ryoDrop` range. */
   ryo: z.tuple([z.number().int().min(1), z.number().int().min(1)]),
   /** First-kill bounty of a boss and the share paid for repeats; `null` without a bounty. */
-  bounty: z.strictObject({ first: z.number().int().min(1), repeatShare: z.number() }).nullable(),
+  bounty: z
+    .strictObject({ first: z.number().int().min(1), repeatShare: z.number().min(0).max(1) })
+    .nullable(),
 };
 const partBase = { item: coreId, technique: coreId };
 
@@ -562,10 +544,10 @@ export const enemySchema = enemyBaseSchema.extend({
 
 /** A boss special: the structure is data, the numbers come from `K.bossFx` by `fx`. */
 export const bossSpecialSchema = z.discriminatedUnion('kind', [
-  z.strictObject({ kind: z.literal('packRespawn'), fx: open<'wolfPack'>(z.string().min(1)) }),
+  z.strictObject({ kind: z.literal('packRespawn'), fx: idOf('fxWolfPack') }),
   z.strictObject({
     kind: z.literal('rival'),
-    fx: open<'rivalDuel' | 'rivalTournament'>(z.string().min(1)),
+    fx: idOf('fxRival'),
     /** Casts a signature technique. */
     signature: z.boolean(),
     /** The rival's nature is the one that beats the player's first nature. */
@@ -573,25 +555,25 @@ export const bossSpecialSchema = z.discriminatedUnion('kind', [
   }),
   z.strictObject({
     kind: z.literal('evasionByMissingHp'),
-    fx: open<'drunkenEvasion'>(z.string().min(1)),
+    fx: idOf('fxDrunkenEvasion'),
   }),
   z.strictObject({
     kind: z.literal('heavyCast'),
-    fx: open<'heavyCast'>(z.string().min(1)),
+    fx: idOf('fxHeavyCast'),
     stun: z.boolean(),
   }),
   z.strictObject({
     kind: z.literal('twins'),
-    fx: open<'twins'>(z.string().min(1)),
+    fx: idOf('fxTwins'),
     poisonMist: z.boolean(),
   }),
   /** Hidden again at intervals; the bind lasts `K.bind.dur`. */
   z.strictObject({
     kind: z.literal('rehide'),
-    fx: open<'mistRehide'>(z.string().min(1)),
+    fx: idOf('fxMistRehide'),
     bindPlayer: z.boolean(),
   }),
-  z.strictObject({ kind: z.literal('illusion'), fx: open<'illusion'>(z.string().min(1)) }),
+  z.strictObject({ kind: z.literal('illusion'), fx: idOf('fxIllusion') }),
 ]);
 
 export const bossSchema = bossBaseSchema.extend({
@@ -661,7 +643,7 @@ export const GEAR_FX_KEYS = ['mannequin', 'sickle', 'alembic', 'stations', 'maps
  */
 export const gearFxSchema = z.strictObject({
   key: z.string().min(1),
-  perTier: open<(typeof GEAR_FX_KEYS)[number]>(z.string().min(1)),
+  perTier: idOf('gearFxKey'),
   effect: z.enum(['bonus', 'reduction', 'speed']),
 });
 
@@ -671,10 +653,10 @@ export const gearSchema = gearBaseSchema.extend({ fx: gearFxSchema });
 
 /** The condition tree shared by unlocks, checklists, quest objectives and goals. */
 export type Req =
-  | { t: 'skill'; skill: SkillId; level: number }
+  | { t: 'skill'; skill: IdTypes['skill']; level: number }
   | { t: 'technique'; id: string }
-  | { t: 'rank'; rank: PlayerRank }
-  | { t: 'nature'; nature: NatureId }
+  | { t: 'rank'; rank: IdTypes['playerRank'] }
+  | { t: 'nature'; nature: IdTypes['nature'] }
   | { t: 'item'; id: string; n: number }
   | { t: 'quest'; id: string; step?: number | undefined }
   | { t: 'building'; id: string; level: number }
@@ -699,19 +681,7 @@ export const reqSchema: z.ZodType<Req> = z.lazy(() =>
 
 export const entityRefSchema = z.strictObject({
   /** An entity kind of `entityKinds`. */
-  kind: open<
-    | 'skill'
-    | 'technique'
-    | 'item'
-    | 'recipe'
-    | 'mission'
-    | 'enemy'
-    | 'region'
-    | 'building'
-    | 'quest'
-    | 'gear'
-    | 'seal'
-  >(z.string().min(1)),
+  kind: idOf('entityKind'),
   id: z.string(),
 });
 
@@ -773,7 +743,7 @@ export const examSchema = z.strictObject({
 export const zoneSchema = z.strictObject({
   id: coreId,
   enemy: coreId,
-  region: openId<ZoneRegion>(),
+  region: idOf('zoneRegion'),
   /** What opens the zone; `null` when it is open from the first day. */
   unlock: reqSchema.nullable(),
 });
@@ -796,7 +766,7 @@ export const operationStageSchema = z.discriminatedUnion('t', [
 const operationPaySchema = z.strictObject({
   ryo: z.number().int().min(0),
   rep: z.number().int().min(0),
-  parts: z.array(z.strictObject({ technique: coreId, chance: open<'mission'>(z.string().min(1)) })),
+  parts: z.array(z.strictObject({ technique: coreId, chance: idOf('partChance') })),
 });
 export const operationRewardsSchema = z.strictObject({
   first: operationPaySchema,
@@ -834,7 +804,7 @@ export const AI_RULE_IDS = [
  * rules behave at this tier. The numbers a tier needs live in `K.ai[id]`.
  */
 export const aiTierSchema = z.strictObject({
-  id: open<'genin' | 'chunin'>(vocabId),
+  id: idOf('aiTier'),
   /** The lowest player tier (0 student, 1 genin, 2 chunin) that runs this tier. */
   minTier: z.number().int().min(0),
   rules: z.array(z.enum(AI_RULE_IDS)).min(1),
@@ -872,18 +842,7 @@ export const comboSchema = z.strictObject({ id: comboId, nature: natureId, onSta
 // ---------- balance ----------
 
 const pair = z.tuple([z.number(), z.number()]);
-/** The numbers every rival special shares: technique count, cadence and strength of the techniques and of the signature. */
-const rivalNumbers = z.object({
-  techniques: z.number().int(),
-  everyMs: z.number().int(),
-  mult: z.number(),
-  sigEveryMs: z.number().int(),
-  sigMult: z.number(),
-  sigOpenMs: z.number().int(),
-  hp: z.number(),
-  dmg: z.number(),
-});
-const byRank = open<Record<Rank, number>>(z.record(z.string(), z.number()));
+const byRank = shapeOf('byRank', z.record(z.string(), z.number()));
 
 export const balanceParamsSchema = z.object({
   cap: z.number().int(),
@@ -909,7 +868,8 @@ export const balanceParamsSchema = z.object({
   nonNativeCast: z.number(),
   power: byRank,
   tierMult: z.object({ '0': z.number(), '1': z.number(), '-1': z.number() }),
-  role: open<Record<RoleId, { m: number; cd: number; c: number }>>(
+  role: shapeOf(
+    'kRole',
     z.record(z.string(), z.object({ m: z.number(), cd: z.number(), c: z.number() })),
   ),
   rankCd: byRank,
@@ -920,101 +880,15 @@ export const balanceParamsSchema = z.object({
   masteryCost: z.number(),
   burn: z.object({ share: z.number(), dur: z.number() }),
   wet: z.object({ slow: z.number(), dur: z.number() }),
-  stun: open<{ C: number; B: number; D: number }>(z.record(z.string(), z.number())),
+  stun: shapeOf('stun', z.record(z.string(), z.number())),
   bind: z.object({ dur: z.number() }),
   poison: z.object({ pctPerSec: z.number(), dur: z.number() }),
-  combo: legacy(
-    z.object({
-      base: z.number(),
-      perLevel: z.number(),
-      perMastery: z.number(),
-      cap: z.number(),
-      fanBurn: z.number(),
-      shockWet: z.number(),
-      mudEva: z.number(),
-      steam: z.number(),
-    }),
-    z.record(z.string(), z.number()),
-  ),
-  techFx: legacy(
-    z.object({
-      shield: z.object({ mult: z.number(), durationMs: z.number().int() }),
-      decoy: z.object({ charges: z.number().int(), durationMs: z.number().int() }),
-      evasionBuff: z.object({ mult: z.number(), durationMs: z.number().int() }),
-      passiveNegate: z.object({ everyMs: z.number().int() }),
-      gateOpening: z.object({
-        taiDamage: z.number(),
-        staminaPerSec: z.number(),
-        woundsAfter: z.number().int(),
-      }),
-      gateHealing: z.object({
-        taiDamage: z.number(),
-        staminaPerSec: z.number(),
-        woundsAfter: z.number().int(),
-      }),
-      nextCast: z.object({ castMult: z.number() }),
-      reveal: z.object({ durationMs: z.number().int() }),
-    }),
-    z.record(z.string(), z.record(z.string(), z.number())),
-  ),
-  bossFx: legacy(
-    z.object({
-      wolfPack: z.object({
-        count: z.number().int(),
-        everyMs: z.number().int(),
-        hp: z.number(),
-        dmg: z.number(),
-        leaderHp: z.number(),
-        leaderDmg: z.number(),
-      }),
-      rivalDuel: rivalNumbers,
-      rivalTournament: rivalNumbers.extend({ habituationMult: z.number() }),
-      drunkenEvasion: z.object({ maxMult: z.number(), hp: z.number(), dmg: z.number() }),
-      heavyCast: z.object({
-        everyMs: z.number().int(),
-        castMs: z.number().int(),
-        damageMult: z.number(),
-        stunMs: z.number().int(),
-        hp: z.number(),
-        dmg: z.number(),
-      }),
-      twins: z.object({
-        count: z.number().int(),
-        hpEach: z.number(),
-        dmgEach: z.number(),
-        mistMult: z.number(),
-      }),
-      mistRehide: z.object({ everyMs: z.number().int(), hp: z.number(), dmg: z.number() }),
-      illusion: z.object({
-        everyMs: z.number().int(),
-        fleeAtHp: z.number(),
-        hp: z.number(),
-        dmg: z.number(),
-      }),
-    }),
-    z.record(z.string(), z.record(z.string(), z.number())),
-  ),
+  combo: shapeOf('combo', z.record(z.string(), z.number())),
+  techFx: shapeOf('techFx', z.record(z.string(), z.record(z.string(), z.number()))),
+  bossFx: shapeOf('bossFx', z.record(z.string(), z.record(z.string(), z.number()))),
   ryoDrop: pair,
-  dropChance: legacy(
-    z.object({
-      band: z.number(),
-      pelt: z.number(),
-      fang: z.number(),
-      coin: z.number(),
-      gem: z.number(),
-    }),
-    z.record(z.string(), z.number()),
-  ),
-  sell: legacy(
-    z.object({
-      band: z.number().int(),
-      pelt: z.number().int(),
-      fang: z.number().int(),
-      coin: z.number().int(),
-      gem: z.number().int(),
-    }),
-    z.record(z.string(), z.number()),
-  ),
+  dropChance: shapeOf('dropChance', z.record(z.string(), z.number())),
+  sell: shapeOf('kSell', z.record(z.string(), z.number())),
   wheel: z.number(),
   habituation: z.number(),
   habituationCap: z.number(),
@@ -1058,39 +932,12 @@ export const balanceParamsSchema = z.object({
   eEva: pair,
   boss: z.object({ hp: z.number(), dmg: z.number() }),
   pack: z.object({ n: z.number(), hp: z.number(), dmg: z.number() }),
-  trait: legacy(
-    z.object({
-      armor: z.number(),
-      armorOff: z.number(),
-      casterEvery: z.number(),
-      casterCast: z.number(),
-      casterMult: z.number(),
-      evasive: z.number(),
-      regenPct: z.number(),
-      illusionEvery: z.number(),
-      illusionDur: z.number(),
-      illusionAcc: z.number(),
-      hidden: z.number(),
-      hiddenAcc: z.number(),
-      hiddenFirst: z.number(),
-      poisonChance: z.number(),
-    }),
-    z.record(z.string(), z.number()),
-  ),
+  trait: shapeOf('trait', z.record(z.string(), z.number())),
   combatXp: z.object({ style: z.number(), vit: z.number(), eva: z.number() }),
-  ryoPerMin: legacy(
-    z.object({ D: z.number(), C: z.number(), V: z.number(), OP: z.number() }),
-    z.record(z.string(), z.number()),
-  ),
-  repPerMission: legacy(
-    z.object({ D: z.number(), C: z.number(), V: z.number() }),
-    z.record(z.string(), z.number()),
-  ),
+  ryoPerMin: shapeOf('ryoPerMin', z.record(z.string(), z.number())),
+  repPerMission: shapeOf('repPerMission', z.record(z.string(), z.number())),
   missionXpShare: z.number(),
-  missionRateCap: legacy(
-    z.object({ D: z.number(), C: z.number(), V: z.number() }),
-    z.record(z.string(), z.number()),
-  ),
+  missionRateCap: shapeOf('missionRateCap', z.record(z.string(), z.number())),
   shinobiResPerMission: z.number(),
   scroll: z.record(z.string(), z.number()),
   gearTier: z.array(z.number()),
@@ -1100,15 +947,7 @@ export const balanceParamsSchema = z.object({
   bounty: z.record(z.string(), z.number()),
   bountyRepeat: z.number(),
   /** Reputation: what each stage of the village needs (`stage2`, ...) and what the exam, a boss and the last quest pay; a pack adds `<pack>:<name>` keys. */
-  rep: legacy(
-    z.object({
-      stage2: z.number(),
-      exam: z.number(),
-      boss: z.number(),
-      questFinal: z.number(),
-    }),
-    z.record(z.string(), z.number()),
-  ),
+  rep: shapeOf('rep', z.record(z.string(), z.number())),
   intel: z.object({
     perCellLevel: z.number(),
     mail: z.number(),
@@ -1119,10 +958,7 @@ export const balanceParamsSchema = z.object({
     writtenTestMaxIntel: z.number(),
   }),
   partsPerScroll: z.number(),
-  partDrop: legacy(
-    z.object({ boss: z.number(), carrier: z.number(), mission: z.number() }),
-    z.record(z.string(), z.number()),
-  ),
+  partDrop: shapeOf('partDrop', z.record(z.string(), z.number())),
   tickMin: z.number(),
   /** Numbers of packs other than `core`, by pack id: nothing but that pack reads or sets them. */
   ext: z.record(z.string(), z.record(z.string(), z.number())).optional(),
@@ -1159,21 +995,9 @@ export const balanceParamsSchema = z.object({
   /** Selling: the share of the computed value a shop pays for a craft product; a herb is worth `herbBase + herbPerLevel x level`. */
   shop: z.object({ craftSellFactor: z.number(), herbBase: z.number(), herbPerLevel: z.number() }),
   /** Size of one owned gear tier, by `GEAR_FX_KEYS`. */
-  gearFx: legacy(
-    z.object({
-      mannequin: z.number(),
-      sickle: z.number(),
-      alembic: z.number(),
-      stations: z.number(),
-      maps: z.number(),
-    }),
-    z.record(z.string(), z.number()),
-  ),
+  gearFx: shapeOf('gearFx', z.record(z.string(), z.number())),
   /** Numbers of item effects that name them by key. */
-  itemFx: legacy(
-    z.object({ sleep: z.object({ chance: z.number() }) }),
-    z.record(z.string(), z.record(z.string(), z.number())),
-  ),
+  itemFx: shapeOf('itemFx', z.record(z.string(), z.record(z.string(), z.number()))),
   /** The sensei test: base seconds, shortening per level of the exam's skills, floor in seconds. */
   combat: z.object({
     xpTickMs: z.number().int(),
@@ -1184,14 +1008,8 @@ export const balanceParamsSchema = z.object({
   }),
   bindEva: z.number(),
   loadout: z.object({
-    slots: legacy(
-      z.object({ genin: z.number().int(), chunin: z.number().int() }),
-      z.record(z.string(), z.number().int()),
-    ),
-    natures: legacy(
-      z.object({ genin: z.number().int(), chunin: z.number().int() }),
-      z.record(z.string(), z.number().int()),
-    ),
+    slots: shapeOf('loadoutSlots', z.record(z.string(), z.number().int())),
+    natures: shapeOf('loadoutNatures', z.record(z.string(), z.number().int())),
     saved: z.number().int(),
     nameMax: z.number().int(),
     areaBodies: z.number(),
@@ -1225,22 +1043,8 @@ export const balanceParamsSchema = z.object({
      * interval of the collapse share is decided: under `stableCollapse` (stable) or over its
      * complement (collapse).
      */
-    sessionMinutes: legacy(
-      z.object({
-        zone: z.number().int().min(1),
-        boss: z.number().int().min(1),
-        operation: z.number().int().min(1),
-      }),
-      z.record(z.string(), z.number()),
-    ),
-    sessionHours: legacy(
-      z.object({
-        zone: z.number().min(1),
-        boss: z.number().min(1),
-        operation: z.number().min(1),
-      }),
-      z.record(z.string(), z.number()),
-    ),
+    sessionMinutes: shapeOf('sessionMinutes', z.record(z.string(), z.number())),
+    sessionHours: shapeOf('sessionHours', z.record(z.string(), z.number())),
     /** The fewest sessions, and the share of the session budget the "after supplies" forecast may use. */
     minSessions: z.number().int().min(1),
     afterShare: z.number().min(0).max(1),
@@ -1249,10 +1053,7 @@ export const balanceParamsSchema = z.object({
     /** The z of the Wilson interval of every share (1.64: a one-sided 95% bound). */
     confidenceZ: z.number().gt(0),
     /** The size of one batch of the first-fight run. */
-    batch: legacy(
-      z.object({ zone: z.number().int().min(1), operation: z.number().int().min(1) }),
-      z.record(z.string(), z.number()),
-    ),
+    batch: shapeOf('batch', z.record(z.string(), z.number())),
     verdict: z.object({
       /** A session whose win rate is under this has collapsed. */
       collapseBelow: z.number(),
@@ -1404,7 +1205,7 @@ export const contentDbSchema = z.object({
   regions: z.array(regionSchema),
   cells: z.array(cellSchema),
   /** What each kind of key cell needs. */
-  cellKeys: open<Record<CellKey, Req>>(z.record(z.string(), reqSchema)),
+  cellKeys: open<Record<IdTypes['cellKey'], Req>>(z.record(z.string(), reqSchema)),
   enemies: z.array(enemySchema),
   bosses: z.array(bossSchema),
   buildings: z.array(buildingSchema),

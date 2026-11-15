@@ -152,7 +152,7 @@ describe('items: source and consumer', () => {
 
 describe('enemy traits and natures', () => {
   for (const trait of TRAIT_IDS) {
-    const tag = TRAIT_ANSWER[trait];
+    const tag = TRAIT_ANSWER[trait] ?? '';
     it(`${trait}: has an answer (${tag}) and an enemy that uses it`, () => {
       const answers =
         content.techniques.filter((t) => t.tags.includes(tag)).length +
@@ -232,7 +232,7 @@ describe('map', () => {
 
   it('no story cell sits behind a nature key', () => {
     for (const c of content.cells) {
-      if (c.key !== null && KEY_NATURES[c.key].length > 0) {
+      if (c.key !== null && (KEY_NATURES[c.key] ?? []).length > 0) {
         expect(c.story, `${name('cell', c.id)} is a story cell behind a ${c.key} key`).toBe(false);
       }
     }

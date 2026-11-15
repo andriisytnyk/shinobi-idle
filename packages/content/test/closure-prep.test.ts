@@ -72,8 +72,8 @@ describe('the preparation numbers', () => {
 
   it('has the numbers every boss special needs, and no special without a hook or a marker', () => {
     for (const boss of content.bosses) expect(K.bossFx).toHaveProperty(boss.special.fx);
-    expect(K.bossFx.wolfPack.count).toBe(4);
-    expect(K.bossFx.illusion.fleeAtHp).toBe(0.3);
+    expect(K.bossFx.wolfPack?.count).toBe(4);
+    expect(K.bossFx.illusion?.fleeAtHp).toBe(0.3);
   });
 });
 

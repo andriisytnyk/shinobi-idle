@@ -1,8 +1,18 @@
 /**
- * The content of the pack `core` must not change by accident. `fixtures/core-snapshot.json` holds
- * a hash of every entity and every balance number as they were when the content was first
- * assembled from packs; an entity or number that differs fails here. New entities are added to
- * the fixture when they arrive; existing ones are never regenerated.
+ * The content of the pack `core` must not change by accident. `fixtures/core-snapshot.json` pins
+ * every list of the pack (hash per entity, plus the order of each list), every balance number,
+ * every locale string (hash per key), every icon and every modifier key. A change to any of them
+ * needs a deliberate fixture update in the same PR.
+ *
+ * Provenance: the entities and numbers that existed on `dev` before the packs (the 31 original
+ * lists, the balance numbers and the entities that #37 added) were generated from `origin/dev`,
+ * and the refactor proved to change none of them. The lists that are new with the packs
+ * (`skillGroups`, `natures`, `playerRanks`, `techRanks`, `missionRanks`, `villageStages`,
+ * `states`, `tags`, `roles`, `attackStyles`, `fightRegions`, `itemKinds`, `currencies`,
+ * `entityKinds`, `trophies`, `gearFx`), the list orders, the locales, the icons and the modifier
+ * keys did not exist as data on `dev`: they were generated from the state of the pack at the
+ * time the snapshot was extended (PR #50, iteration 1), which is the content that `dev` read from
+ * constants, so they pin the pack from there on.
  */
 import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
@@ -21,6 +31,10 @@ const canon = (v: unknown): string => {
 const hash = (v: unknown) => createHash('sha1').update(canon(v)).digest('hex').slice(0, 12);
 
 type Entry = { id?: string; item?: string; poison?: string };
+const keysOf = (value: unknown): string[] =>
+  Array.isArray(value)
+    ? (value as Entry[]).map((e, i) => e.id ?? e.item ?? e.poison ?? `#${i}`)
+    : Object.keys(value as object);
 const entries = (value: unknown): Record<string, string> => {
   if (Array.isArray(value))
     return Object.fromEntries(
@@ -30,21 +44,33 @@ const entries = (value: unknown): Record<string, string> => {
 };
 
 const db = composeContent([corePack]);
+const lists = db as unknown as Record<string, unknown>;
 const fixture = snapshot.entities as Record<string, Record<string, string>>;
+const META = new Set(['balance', 'packs', 'modifierKeys', 'icons', 'locales']);
 
 describe('core pack snapshot', () => {
+  it('pins every list of the pack', () => {
+    const actual = Object.keys(db).filter((k) => !META.has(k));
+    expect(actual.sort()).toEqual(Object.keys(fixture).sort());
+  });
+
   for (const [list, expected] of Object.entries(fixture)) {
     it(`keeps every entity of ${list}`, () => {
-      const value = (db as unknown as Record<string, unknown>)[list];
+      const value = lists[list];
       const actual = list === 'ai' ? { ai: hash(value) } : entries(value);
       for (const [id, h] of Object.entries(expected)) expect(actual[id], `${list} ${id}`).toBe(h);
-      // Entities that are not in the fixture are new on purpose: they need an entry.
       expect(
         Object.keys(actual).filter((id) => !(id in expected)),
         `${list}: not in the fixture`,
       ).toEqual([]);
     });
   }
+
+  it('keeps the order of every list (the order of ranks, groups and stages means something)', () => {
+    const order = snapshot.order as Record<string, string[]>;
+    for (const [list, expected] of Object.entries(order))
+      expect(list === 'ai' ? ['ai'] : keysOf(lists[list]), `order of ${list}`).toEqual(expected);
+  });
 
   it('keeps every balance number', () => {
     const flat: Record<string, unknown> = {};
@@ -57,5 +83,26 @@ describe('core pack snapshot', () => {
     const expected = snapshot.balance as Record<string, unknown>;
     for (const [path, value] of Object.entries(expected)) expect(flat[path], path).toEqual(value);
     expect(Object.keys(flat).filter((p) => !(p in expected))).toEqual([]);
+  });
+
+  it('keeps every locale string', () => {
+    for (const lang of ['uk', 'en'] as const) {
+      const expected = snapshot.locales[lang] as Record<string, string>;
+      const actual = Object.fromEntries(
+        Object.entries(db.locales[lang]).map(([k, v]) => [k, hash(v)]),
+      );
+      for (const [key, h] of Object.entries(expected))
+        expect(actual[key], `${lang} ${key}`).toBe(h);
+      expect(Object.keys(actual).filter((k) => !(k in expected))).toEqual([]);
+    }
+  });
+
+  it('keeps every icon and every modifier key', () => {
+    expect(db.icons).toEqual(snapshot.icons);
+    const expected = snapshot.modifierKeys as Record<string, string>;
+    const actual = Object.fromEntries(
+      Object.entries(db.modifierKeys).map(([k, v]) => [k, hash(v)]),
+    );
+    expect(actual).toEqual(expected);
   });
 });

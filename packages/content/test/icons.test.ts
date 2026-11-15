@@ -49,16 +49,17 @@ describe('icon registry', () => {
     expect(required.currency).toHaveLength(3);
   });
 
+  const need = (kind: string): string[] => required[kind] ?? [];
   for (const kind of ICON_KINDS) {
     it(`maps every ${kind} to an icon that exists in game-icons`, () => {
-      const missing = required[kind].filter((id) => iconFor(kind, id) === undefined);
+      const missing = need(kind).filter((id) => iconFor(kind, id) === undefined);
       expect(missing, `${kind} entities without an icon`).toEqual([]);
-      const unknown = required[kind].filter((id) => !exists(iconFor(kind, id) ?? ''));
+      const unknown = need(kind).filter((id) => !exists(iconFor(kind, id) ?? ''));
       expect(unknown, `${kind} entities whose icon is not in the collection`).toEqual([]);
     });
 
     it(`has no stale ${kind} entries`, () => {
-      const stale = Object.keys(ICON_MAP[kind]).filter((id) => !required[kind].includes(id));
+      const stale = Object.keys(ICON_MAP[kind] ?? {}).filter((id) => !need(kind).includes(id));
       expect(stale).toEqual([]);
     });
   }

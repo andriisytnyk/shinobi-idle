@@ -140,7 +140,7 @@ describe('cell keys', () => {
   it('define every kind of key and only existing techniques', () => {
     for (const key of CELL_KEYS) {
       expect(content.cellKeys[key], key).toBeTruthy();
-      for (const r of walk(content.cellKeys[key])) {
+      for (const r of walk(content.cellKeys[key] as Req)) {
         if (r.t === 'technique') expect(techIds.has(r.id), `${key}: ${r.id}`).toBe(true);
       }
     }

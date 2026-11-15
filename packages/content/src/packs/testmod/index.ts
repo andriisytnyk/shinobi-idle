@@ -91,7 +91,8 @@ const data = {
       tags: [],
       extraSources: [],
       madeFrom: [],
-      fx: { kind: 'heal', hp: 30 },
+      /** Removes the test status: the status is referenced, so the closure validator checks it. */
+      fx: { kind: 'cleanse', statuses: ['testmod:chill'] },
     },
   ],
   recipes: [
@@ -192,7 +193,8 @@ const data = {
       resource: null,
       ryo: 10,
       rep: 0,
-      unlock: null,
+      /** Opens at the rank of the pack. */
+      unlock: { t: 'rank', rank: 'testmod:adept' },
       shares: [1],
       slow: [[]],
       skip: [0],
@@ -276,8 +278,7 @@ export const testmodPack: ContentPack = {
       'item.testmod:scrollpart_ember_pulse.desc':
         'Тестова частина сувою, яку лишає тестовий бос: кілька частин складаються в сувій.',
       'item.testmod:elixir.name': 'Тестовий еліксир',
-      'item.testmod:elixir.desc':
-        'Тестовий витратний предмет, який трохи лікує того, хто його випив.',
+      'item.testmod:elixir.desc': 'Тестовий витратний предмет, який знімає тестовий стан холоду.',
       'recipe.testmod:elixir_brew.name': 'Тестове варіння еліксиру',
       'recipe.testmod:elixir_brew.desc':
         'Тестовий рецепт нової навички мода: з кульок виходить еліксир.',

@@ -10,9 +10,7 @@
  * Speed keys (`speed.skill.*`) hold "+X% speed": the cycle length is divided by `1 + X`.
  */
 import { z } from 'zod';
-import skillsJson from './packs/core/data/generated/skills.json' with { type: 'json' };
-import { open } from './shim.ts';
-import type { NatureId } from './constants.ts';
+import { idOf } from './shim.ts';
 
 export interface ModifierKeyInfo {
   /** One line saying what the key changes (English, for developers). */
@@ -162,36 +160,6 @@ export const CORE_MODIFIER_KEYS: Readonly<Table> = (() => {
 })();
 
 /**
- * Every valid key of a set of skills and pack declarations. Two declarations of one key, or a
- * pack key that a skill family already produces, are errors.
- */
-export function computeModifierKeys(
-  skills: readonly { id: string; activity: string }[],
-  declared: readonly Readonly<Table>[],
-): Table {
-  const out: Table = {};
-  for (const source of [skillFamilyKeys(skills), ...declared]) {
-    for (const [key, info] of Object.entries(source)) {
-      if (Object.hasOwn(out, key)) throw new Error(`Duplicate modifier key ${key}`);
-      out[key] = info;
-    }
-  }
-  return out;
-}
-
-/**
- * Every modifier key of the built-in pack.
- * @deprecated Read `content.modifierKeys`: the keys depend on the composed packs.
- */
-export const MODIFIER_KEYS: Readonly<Table> = computeModifierKeys(skillsJson, [CORE_MODIFIER_KEYS]);
-
-/**
- * Whether `key` is a modifier key of the built-in pack.
- * @deprecated Test against `content.modifierKeys`: the keys depend on the composed packs.
- */
-export const isModifierKey = (key: string): boolean => Object.hasOwn(MODIFIER_KEYS, key);
-
-/**
  * One structured modifier of a content entity. Whether `key` exists and `nature` names a nature is
  * checked against the composed database by `composeContent`, not here.
  */
@@ -200,7 +168,7 @@ export const modSchema = z.strictObject({
   op: z.enum(['add', 'mul']),
   value: z.number().refine(Number.isFinite),
   /** The chakra nature the modifier belongs to; it is inactive until the player owns it. */
-  nature: open<NatureId>(z.string().min(1)).optional(),
+  nature: idOf('nature').optional(),
 });
 export type Mod = z.infer<typeof modSchema>;
 

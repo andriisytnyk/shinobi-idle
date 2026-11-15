@@ -147,7 +147,9 @@ describe('boss specials', () => {
       fx: 'rivalTournament',
       signature: true,
     });
-    expect(K.bossFx.rivalTournament.techniques).toBeGreaterThan(K.bossFx.rivalDuel.techniques);
+    expect(K.bossFx.rivalTournament?.techniques ?? 0).toBeGreaterThan(
+      K.bossFx.rivalDuel?.techniques ?? 0,
+    );
   });
 });
 

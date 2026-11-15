@@ -3,9 +3,12 @@
  *
  * Order: packs are sorted topologically by `dependsOn` and `loadAfter`, ties by pack id, so the
  * result never depends on the order of the input array. Every error names the pack that caused it.
+ *
+ * Packs are third-party data: every accumulator that is keyed by a string a pack supplies is a
+ * `Map`, and the keys `__proto__`, `constructor` and `prototype` are rejected anywhere in pack data.
  */
 import type { ZodError } from 'zod';
-import { computeModifierKeys, type ModifierKeyInfo } from './modifiers.ts';
+import { skillFamilyKeys, type ModifierKeyInfo } from './modifiers.ts';
 import type { ContentPack, EntityListKey, Patch } from './pack.ts';
 import { validateClosure } from './closure.ts';
 import {
@@ -62,13 +65,24 @@ export const ENTITY_LISTS = [
   'combos',
 ] as const satisfies readonly EntityListKey[];
 
-/** Lists whose entries have no id of their own: the field that names the entry. */
-const KEYED_LISTS = { market: 'item', shop: 'item', coat: 'product' } as const;
+const ENTITY_LIST_SET: ReadonlySet<string> = new Set(ENTITY_LISTS);
 
-const LIST_SCHEMAS = contentDbSchema.shape as unknown as Record<
-  string,
-  { safeParse(v: unknown): { success: boolean; data?: unknown; error?: ZodError } }
->;
+/** Lists whose entries have no id of their own: the field that names the entry. */
+const KEYED_LISTS: ReadonlyMap<string, string> = new Map([
+  ['market', 'item'],
+  ['shop', 'item'],
+  ['coat', 'product'],
+]);
+
+/** Keys that would reach the prototype chain; they are never valid in pack data. */
+const FORBIDDEN_KEYS: ReadonlySet<string> = new Set(['__proto__', 'constructor', 'prototype']);
+
+const LIST_SCHEMAS = new Map(
+  Object.entries(contentDbSchema.shape) as unknown as [
+    string,
+    { safeParse(v: unknown): { success: boolean; data?: unknown; error?: ZodError } },
+  ][],
+);
 
 /** Whether `pack` may own `id`: the pack `core` owns bare ids and `core:` ids, every other pack its own prefix only. */
 export function ownsId(pack: string, id: string): boolean {
@@ -88,6 +102,30 @@ const issues = (error: ZodError | undefined): string =>
     .slice(0, 3)
     .map((i) => `${i.path.join('.') || '(root)'}: ${i.message}`)
     .join('; ');
+
+type Plain = Record<string, unknown>;
+const isPlain = (v: unknown): v is Plain =>
+  v !== null && typeof v === 'object' && !Array.isArray(v);
+
+/** Rejects a forbidden key anywhere in the data of a pack (own keys, so `JSON.parse` of `__proto__` is caught). */
+function scanKeys(pack: string, value: unknown, where: string, depth = 0): void {
+  if (depth > 40) fail(pack, `${where} is nested too deeply or is cyclic`);
+  if (value === null || typeof value !== 'object') return;
+  if (Array.isArray(value)) {
+    value.forEach((v, i) => scanKeys(pack, v, `${where}[${i}]`, depth + 1));
+    return;
+  }
+  for (const key of Object.keys(value)) {
+    if (FORBIDDEN_KEYS.has(key)) fail(pack, `forbidden key "${key}" at ${where}`);
+    scanKeys(pack, (value as Plain)[key], `${where}.${key}`, depth + 1);
+  }
+}
+
+/** Rejects an id that has a forbidden part (`constructor`, `x:__proto__`, ...). */
+function checkId(pack: string, id: string, what: string): void {
+  if (id.split(':').some((part) => FORBIDDEN_KEYS.has(part)))
+    fail(pack, `${what} "${id}" has a forbidden id part`);
+}
 
 // ---------- order ----------
 
@@ -133,10 +171,6 @@ function loadOrder(packs: readonly ContentPack[]): ContentPack[] {
 }
 
 // ---------- balance ----------
-
-type Plain = Record<string, unknown>;
-const isPlain = (v: unknown): v is Plain =>
-  v !== null && typeof v === 'object' && !Array.isArray(v);
 
 function mergeBalance(
   acc: Plain,
@@ -198,22 +232,28 @@ function markOwners(
 
 // ---------- patches ----------
 
+/**
+ * Applies one patch. `set` replaces a field and two packs may not set the same field; `append` adds
+ * items to a list and any number of packs may append to the same list (in load order).
+ */
 function applyPatch(
   pack: string,
   patch: Patch,
-  lists: Record<string, Plain[]>,
+  lists: Map<string, Plain[]>,
   patched: Set<string>,
+  patchedBy: Map<string, string>,
 ): void {
   const { kind, id } = patch.target;
-  const list = lists[kind];
-  const entity = list?.find((e) => e.id === id);
+  if (!ENTITY_LIST_SET.has(kind)) return fail(pack, `patch targets unknown list "${kind}"`);
+  const entity = lists.get(kind)?.find((e) => e.id === id);
   if (!entity) return fail(pack, `patch targets ${kind} "${id}", which does not exist`);
   const mark = (field: string) => {
     const key = `${kind}:${id}:${field}`;
     if (patched.has(key))
-      fail(pack, `patch to ${kind} "${id}" field "${field}" was already patched by another pack`);
+      fail(pack, `patch to ${kind} "${id}" field "${field}" was already set by another pack`);
     patched.add(key);
   };
+  patchedBy.set(`${kind}:${id}`, pack);
   for (const [field, value] of Object.entries(patch.set ?? {})) {
     if (field === 'id') fail(pack, `patch to ${kind} "${id}" may not change the id`);
     mark(field);
@@ -246,46 +286,64 @@ const DESCRIBED: Partial<Record<EntityListKey, string>> = {
   operations: 'operation',
 };
 
+/**
+ * Whether a pack may define the locale key: the pack `core` any key; another pack only keys of its
+ * own entities (`<kind>.<pack>:<slug>...`) and free strings under `x.<pack>.`.
+ */
+function ownsLocaleKey(pack: string, key: string): boolean {
+  if (pack === 'core') return true;
+  return key.startsWith(`x.${pack}.`) || new RegExp(`^[A-Za-z0-9_]+\\.${pack}:`).test(key);
+}
+
 export function composeContent(packs: readonly ContentPack[]): ContentDb {
   const ordered = loadOrder(packs);
-  const lists: Record<string, Plain[]> = {};
-  const keyed: Record<string, Plain[]> = { market: [], shop: [], coat: [] };
+  for (const pack of ordered) {
+    const { rules: _rules, ...plain } = pack;
+    void _rules;
+    scanKeys(pack.manifest.id, plain, 'pack');
+  }
+
+  const lists = new Map<string, Plain[]>();
+  const keyed = new Map<string, Plain[]>([
+    ['market', []],
+    ['shop', []],
+    ['coat', []],
+  ]);
   const owners = new Map<string, string>(); // `${list}:${id}` -> pack
-  const cellKeys: Plain = {};
+  const patchedBy = new Map<string, string>(); // `${list}:${id}` -> the last pack that patched it
+  const cellKeys = new Map<string, unknown>();
   const balance: Plain = {};
   const balanceOwners = new Map<string, string>();
-  const uk: Record<string, string> = {};
-  const en: Record<string, string> = {};
+  const uk = new Map<string, string>();
+  const en = new Map<string, string>();
   const localeOwners = new Map<string, string>();
-  const icons: IconTable = {};
+  const icons = new Map<string, Map<string, string>>();
   const iconOwners = new Map<string, string>();
-  const declared: Record<string, ModifierKeyInfo>[] = [];
+  const declared: { pack: string; keys: Record<string, ModifierKeyInfo> }[] = [];
   const ai = { visibleTraits: [] as unknown[], tiers: [] as Plain[] };
   const patches: { pack: string; patch: Patch }[] = [];
-  const idFields: [string, string][] = [];
 
   for (const pack of ordered) {
     const pid = pack.manifest.id;
-    const data = pack.data as Record<string, unknown>;
+    const data = pack.data as Plain;
 
     for (const key of Object.keys(data)) {
       const known =
-        (ENTITY_LISTS as readonly string[]).includes(key) ||
-        key in KEYED_LISTS ||
-        key === 'cellKeys' ||
-        key === 'ai';
+        ENTITY_LIST_SET.has(key) || KEYED_LISTS.has(key) || key === 'cellKeys' || key === 'ai';
       if (!known) fail(pid, `unknown data list "${key}"`);
     }
 
     for (const list of ENTITY_LISTS) {
       const raw = data[list];
       if (raw === undefined) continue;
-      const parsed = LIST_SCHEMAS[list]?.safeParse(raw);
+      const parsed = LIST_SCHEMAS.get(list)?.safeParse(raw);
       if (!parsed?.success) fail(pid, `${list}: ${issues(parsed?.error)}`);
       const items = (parsed?.data ?? []) as Plain[];
-      const target = (lists[list] ??= []);
+      let target = lists.get(list);
+      if (!target) lists.set(list, (target = []));
       for (const e of items) {
         const id = String(e.id);
+        checkId(pid, id, list);
         if (!ownsId(pid, id))
           fail(
             pid,
@@ -298,23 +356,21 @@ export function composeContent(packs: readonly ContentPack[]): ContentDb {
         target.push(e);
         if (list === 'cells')
           for (const poi of (e.pois as Plain[] | undefined) ?? []) {
-            const pk = `poi:${String(poi.id)}`;
-            if (!ownsId(pid, String(poi.id)))
-              fail(pid, `poi "${String(poi.id)}" is outside the pack namespace`);
+            const poiId = String(poi.id);
+            const pk = `poi:${poiId}`;
+            checkId(pid, poiId, 'poi');
+            if (!ownsId(pid, poiId)) fail(pid, `poi "${poiId}" is outside the pack namespace`);
             if (owners.has(pk))
-              fail(
-                pid,
-                `duplicate poi "${String(poi.id)}" (already defined by pack "${owners.get(pk)}")`,
-              );
+              fail(pid, `duplicate poi "${poiId}" (already defined by pack "${owners.get(pk)}")`);
             owners.set(pk, pid);
           }
       }
     }
 
-    for (const [list, field] of Object.entries(KEYED_LISTS)) {
+    for (const [list, field] of KEYED_LISTS) {
       const raw = data[list];
       if (raw === undefined) continue;
-      const parsed = LIST_SCHEMAS[list]?.safeParse(raw);
+      const parsed = LIST_SCHEMAS.get(list)?.safeParse(raw);
       if (!parsed?.success) fail(pid, `${list}: ${issues(parsed?.error)}`);
       for (const e of (parsed?.data ?? []) as Plain[]) {
         const key = String(e[field]);
@@ -325,29 +381,33 @@ export function composeContent(packs: readonly ContentPack[]): ContentDb {
             `duplicate ${list} entry "${key}" (already defined by pack "${owners.get(k)}")`,
           );
         owners.set(k, pid);
-        idFields.push([list, key]);
-        (keyed[list] as Plain[]).push(e);
+        keyed.get(list)?.push(e);
       }
     }
 
     if (data.cellKeys !== undefined) {
-      const parsed = LIST_SCHEMAS.cellKeys?.safeParse(data.cellKeys);
+      const parsed = LIST_SCHEMAS.get('cellKeys')?.safeParse(data.cellKeys);
       if (!parsed?.success) fail(pid, `cellKeys: ${issues(parsed?.error)}`);
       for (const [key, req] of Object.entries(parsed?.data as Plain)) {
+        checkId(pid, key, 'cellKeys');
         if (!ownsId(pid, key)) fail(pid, `cellKeys "${key}" is outside the pack namespace`);
-        if (Object.hasOwn(cellKeys, key)) fail(pid, `duplicate cellKeys "${key}"`);
-        cellKeys[key] = req;
+        if (cellKeys.has(key)) fail(pid, `duplicate cellKeys "${key}"`);
+        cellKeys.set(key, req);
         owners.set(`cellKeys:${key}`, pid);
       }
     }
 
     if (data.ai !== undefined) {
-      const parsed = LIST_SCHEMAS.ai?.safeParse(data.ai);
+      const parsed = LIST_SCHEMAS.get('ai')?.safeParse(data.ai);
       if (!parsed?.success) fail(pid, `ai: ${issues(parsed?.error)}`);
-      const a = parsed?.data as { visibleTraits: unknown[]; tiers: Plain[] };
-      ai.visibleTraits.push(...a.visibleTraits);
+      const a = parsed?.data as { visibleTraits: string[]; tiers: Plain[] };
+      for (const t of a.visibleTraits) {
+        ai.visibleTraits.push(t);
+        if (!owners.has(`aiTrait:${t}`)) owners.set(`aiTrait:${t}`, pid);
+      }
       for (const t of a.tiers) {
         const id = String(t.id);
+        checkId(pid, id, 'ai tier');
         if (!ownsId(pid, id)) fail(pid, `ai tier "${id}" is outside the pack namespace`);
         if (ai.tiers.some((x) => x.id === id)) fail(pid, `duplicate ai tier "${id}"`);
         ai.tiers.push(t);
@@ -357,24 +417,30 @@ export function composeContent(packs: readonly ContentPack[]): ContentDb {
 
     mergeBalance(balance, pack.balance as Plain, pid, [], balanceOwners);
 
-    for (const [target, source, owner] of [
+    for (const [target, source, label] of [
       [uk, pack.locales.uk, 'uk'],
       [en, pack.locales.en ?? {}, 'en'],
     ] as const) {
       for (const [key, value] of Object.entries(source)) {
-        const lk = `${owner}:${key}`;
+        if (!ownsLocaleKey(pid, key))
+          fail(
+            pid,
+            `locale key "${key}" is not the pack's own; use "<kind>.${pid}:<id>..." for its entities or "x.${pid}.<name>" for free strings`,
+          );
+        const lk = `${label}:${key}`;
         if (localeOwners.has(lk))
           fail(
             pid,
-            `locale key "${key}" (${owner}) is already defined by pack "${localeOwners.get(lk)}"`,
+            `locale key "${key}" (${label}) is already defined by pack "${localeOwners.get(lk)}"`,
           );
         localeOwners.set(lk, pid);
-        target[key] = value;
+        target.set(key, value);
       }
     }
 
     for (const [kind, table] of Object.entries(pack.icons)) {
-      const out = (icons[kind] ??= {});
+      let out = icons.get(kind);
+      if (!out) icons.set(kind, (out = new Map()));
       for (const [id, icon] of Object.entries(table)) {
         const ik = `${kind}:${id}`;
         if (iconOwners.has(ik))
@@ -382,7 +448,7 @@ export function composeContent(packs: readonly ContentPack[]): ContentDb {
         if (pid !== 'core' && !ownsId(pid, id))
           fail(pid, `icon ${kind} "${id}" is outside the pack namespace`);
         iconOwners.set(ik, pid);
-        out[id] = icon;
+        out.set(id, icon);
       }
     }
 
@@ -390,30 +456,38 @@ export function composeContent(packs: readonly ContentPack[]): ContentDb {
       for (const key of Object.keys(pack.modifierKeys))
         if (pid !== 'core' && !key.startsWith(`${pid}:`))
           fail(pid, `modifier key "${key}" must start with "${pid}:"`);
-      declared.push({ ...pack.modifierKeys });
+      declared.push({ pack: pid, keys: clone({ ...pack.modifierKeys }) });
     }
     for (const patch of pack.patches) patches.push({ pack: pid, patch });
   }
 
   // Patches run in load order, after everything is merged.
   const patched = new Set<string>();
-  for (const { pack, patch } of patches) applyPatch(pack, patch, lists, patched);
+  for (const { pack, patch } of patches) applyPatch(pack, patch, lists, patched, patchedBy);
 
-  const skills = (lists.skills ?? []) as { id: string; activity: string }[];
-  let modifierKeys: Record<string, ModifierKeyInfo>;
-  try {
-    modifierKeys = computeModifierKeys(skills, declared);
-  } catch (e) {
-    const packName = ordered.find((p) => p.manifest.id !== 'core')?.manifest.id ?? 'core';
-    return fail(packName, (e as Error).message);
+  // Modifier keys: the families of the composed skills, then each pack's declarations.
+  const skills = (lists.get('skills') ?? []) as { id: string; activity: string }[];
+  const modifierKeys = new Map<string, ModifierKeyInfo>();
+  const keyOwners = new Map<string, string>();
+  for (const [key, info] of Object.entries(skillFamilyKeys(skills))) {
+    modifierKeys.set(key, info);
+    const skill = skills.find((s) => key.endsWith(`.${s.id}`));
+    keyOwners.set(key, skill ? (owners.get(`skills:${skill.id}`) ?? 'core') : 'core');
   }
+  for (const { pack, keys } of declared)
+    for (const [key, info] of Object.entries(keys)) {
+      if (modifierKeys.has(key))
+        fail(pack, `modifier key "${key}" is already defined by pack "${keyOwners.get(key)}"`);
+      modifierKeys.set(key, info);
+      keyOwners.set(key, pack);
+    }
 
   const raw: Plain = {
-    ...Object.fromEntries(ENTITY_LISTS.map((l) => [l, lists[l] ?? []])),
-    market: keyed.market,
-    shop: keyed.shop,
-    coat: keyed.coat,
-    cellKeys,
+    ...Object.fromEntries(ENTITY_LISTS.map((l) => [l, lists.get(l) ?? []])),
+    market: keyed.get('market'),
+    shop: keyed.get('shop'),
+    coat: keyed.get('coat'),
+    cellKeys: Object.fromEntries(cellKeys),
     ai,
     balance,
   };
@@ -422,24 +496,39 @@ export function composeContent(packs: readonly ContentPack[]): ContentDb {
     const first = parsed.error.issues[0];
     const where = first ? first.path.join('.') : '';
     const list = String(first?.path[0] ?? '');
-    const id =
-      typeof first?.path[1] === 'number'
-        ? String((lists[list]?.[first.path[1]] ?? {}).id ?? '')
-        : '';
-    const owner = owners.get(`${list}:${id}`) ?? ordered[0]?.manifest.id ?? 'core';
-    return fail(owner, `after composing and patching: ${where}: ${issues(parsed.error)}`);
+    const index = first?.path[1];
+    const id = typeof index === 'number' ? String((lists.get(list)?.[index] ?? {}).id ?? '') : '';
+    const patcher = patchedBy.get(`${list}:${id}`);
+    const lastPack = ordered[ordered.length - 1]?.manifest.id ?? 'core';
+    const owner =
+      patcher ??
+      owners.get(`${list}:${id}`) ??
+      (list === 'balance' ? balanceOwners.get(`K.${String(first?.path[2] ?? '')}`) : undefined) ??
+      lastPack;
+    return fail(
+      owner,
+      `after composing${patcher ? ' and patching' : ''}: ${where}: ${issues(parsed.error)}`,
+    );
   }
 
+  const iconTable: IconTable = Object.fromEntries(
+    [...icons].map(([kind, table]) => [kind, Object.fromEntries(table)]),
+  );
   const db: ContentDb = {
     ...parsed.data,
     packs: ordered.map((p): PackManifest => clone(p.manifest)),
-    modifierKeys,
-    icons,
-    locales: { uk, en },
+    modifierKeys: Object.fromEntries(modifierKeys),
+    icons: iconTable,
+    locales: { uk: Object.fromEntries(uk), en: Object.fromEntries(en) },
   };
 
   const problems = validateClosure(db, {
-    owner: (list, id) => owners.get(`${list}:${id}`) ?? 'core',
+    owner: (list, id) =>
+      patchedBy.get(`${list}:${id}`) ??
+      owners.get(`${list}:${id}`) ??
+      ordered[0]?.manifest.id ??
+      'core',
+    iconOwner: (kind, id) => iconOwners.get(`${kind}:${id}`) ?? 'core',
     described: DESCRIBED,
   });
   if (problems.length > 0)

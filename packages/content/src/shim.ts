@@ -1,16 +1,20 @@
 import { z } from 'zod';
+import type { IdTypes, ShapeTypes } from '@shinobi/content/typing';
 
 /**
- * Typing shim. Every vocabulary id is an open string at run time: which ids exist is decided by the
- * composed packs and checked by `composeContent`, not by the schema. The static type stays the old
- * literal union only so that code written before the packs keeps compiling; it is deprecated and
- * goes away with the core and web tasks.
+ * Static typing of the open vocabularies. Every id is an open string at run time and every record
+ * keyed by vocabulary members is an open record: which members exist is decided by the composed
+ * packs and checked by `composeContent`, never by the schema. What the schema *says* about them to
+ * TypeScript comes from `@shinobi/content/typing` (see `typing/truth.ts` and `typing/legacy.ts`).
  */
 export const open = <T>(schema: z.ZodType): z.ZodType<T> => schema as unknown as z.ZodType<T>;
 
-/** An open id string whose static type is a deprecated literal union. */
-export const openId = <T extends string>() => open<T>(z.string().min(1));
+/** An id of the vocabulary `kind`: a non-empty string at run time. */
+export const idOf = <K extends keyof IdTypes>(_kind: K): z.ZodType<IdTypes[K]> =>
+  z.string().min(1) as unknown as z.ZodType<IdTypes[K]>;
 
-/** Keeps the static type of a shape that is open at run time (see `open`): the first argument gives the type, the second runs. */
-export const legacy = <T>(_shape: z.ZodType<T>, runtime: z.ZodType): z.ZodType<T> =>
-  runtime as unknown as z.ZodType<T>;
+/** A balance record whose keys are vocabulary members: `runtime` runs, `ShapeTypes[kind]` is its static type. */
+export const shapeOf = <K extends keyof ShapeTypes>(
+  _kind: K,
+  runtime: z.ZodType,
+): z.ZodType<ShapeTypes[K]> => runtime as unknown as z.ZodType<ShapeTypes[K]>;
