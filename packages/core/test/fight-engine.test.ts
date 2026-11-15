@@ -398,7 +398,7 @@ describe('the fight action wraps the fight engine', () => {
 
   it('uses the rule set AI: a rule set that only attacks casts nothing', () => {
     const state = strong(5);
-    const basicOnly = withAi(() => ({ kind: 'basic' }), defaultRules);
+    const basicOnly = withAi(() => ({ type: 'basic' }), defaultRules);
     dispatch(
       state,
       { type: 'action.start', slot: 0, kind: 'fight', id: 'core:dummy' },
@@ -432,12 +432,12 @@ describe('the fight action wraps the fight engine', () => {
 describe('fight engine basics', () => {
   it('reports its next event, and none once decided', () => {
     const fight = createFight(playerFor(34, 'katon'), enemyAt(34), 1, content, rules);
-    expect(fightNextEventIn(fight)).toBe(0);
+    expect(fightNextEventIn(fight, content, rules)).toBe(0);
     fightAdvance(fight, 0, content, rules);
-    expect(fightNextEventIn(fight)).toBeGreaterThan(0);
+    expect(fightNextEventIn(fight, content, rules)).toBeGreaterThan(0);
     fightAdvance(fight, sec(K.combat.fightCapMs / 1000), content, rules);
     expect(fightOutcome(fight)).not.toBe('ongoing');
-    expect(fightNextEventIn(fight)).toBeNull();
+    expect(fightNextEventIn(fight, content, rules)).toBeNull();
     const left = fightAdvance(fight, 12345, content, rules);
     expect(left).toBe(12345);
   });
@@ -446,7 +446,7 @@ describe('fight engine basics', () => {
     const fight = createFight(playerFor(34, 'katon'), enemyAt(34), 1, content, rules);
     pacify(fight);
     fightAdvance(fight, 0, content, rules);
-    const quietNext = fightNextEventIn(fight) ?? 0;
+    const quietNext = fightNextEventIn(fight, content, rules) ?? 0;
     expect(quietNext).toBeGreaterThanOrEqual(sec(0.4));
     const enemy = fight.enemies[0];
     if (!enemy) throw new Error('no enemy');
@@ -459,7 +459,7 @@ describe('fight engine basics', () => {
       op: 'mul',
       value: 2,
     });
-    expect(fightNextEventIn(fight)).toBe(sec(0.37));
+    expect(fightNextEventIn(fight, content, rules)).toBe(sec(0.37));
     enemy.effects.push({
       kind: 'periodic',
       id: 'p',
@@ -470,7 +470,7 @@ describe('fight engine basics', () => {
       every: sec(1),
       next: fight.t + sec(0.21),
     });
-    expect(fightNextEventIn(fight)).toBe(sec(0.21));
+    expect(fightNextEventIn(fight, content, rules)).toBe(sec(0.21));
     fightAdvance(fight, sec(0.37), content, rules);
     expect(enemy.effects.some((e) => e.id === 'm')).toBe(false);
     expect(enemy.effects.some((e) => e.id === 'p')).toBe(true);

@@ -9,6 +9,7 @@ import { nextSeed } from '../rng.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 import type { System } from '../system.ts';
+import { encounterFor } from './fight-encounter.ts';
 import { createFight, fightAdvance, fightNextEventIn, fightOutcome } from './fight.ts';
 import { secMs } from './numbers.ts';
 import { snapshotPlayer } from './snapshot.ts';
@@ -39,7 +40,13 @@ function startFight(
 ): CombatState['fight'] {
   const snapshot = snapshotPlayer(state, content, rules, pools);
   // The fight gets its own seed from the game's combat stream and runs on a stream of its own.
-  return createFight(snapshot, enemy, nextSeed(state.rng, 'combat'), content, rules);
+  return createFight(
+    snapshot,
+    encounterFor(enemy, content),
+    nextSeed(state.rng, 'combat'),
+    content,
+    rules,
+  );
 }
 
 /** A fight that has just begun: full health and pools. */
@@ -110,11 +117,11 @@ function victory(state: GameState, c: CombatState, content: ContentDb): void {
  * clock, so the system only wakes at the fight's next event or the end of the pause.
  */
 export const combatSystem: System = {
-  nextEventIn(state) {
+  nextEventIn(state, content, rules) {
     const c = state.combat;
     const slot = state.slots[fightSlotIndex(state)];
     if (!c || !slot || slot.share <= 0) return null;
-    const wait = c.phase === 'fight' ? fightNextEventIn(c.fight) : c.pause;
+    const wait = c.phase === 'fight' ? fightNextEventIn(c.fight, content, rules) : c.pause;
     if (wait === null) return 0;
     return Math.max(0, Math.ceil((wait - c.work) / slot.share));
   },
@@ -158,6 +165,18 @@ export const combatSystem: System = {
       report(state, c);
       const result = fightOutcome(c.fight);
       if (result === 'ongoing') return;
+      if (result === 'timeout') {
+        // A fight that ran out of time pays nothing and costs nothing: a new one starts at once.
+        c.carry += c.fight.t - c.fight.tally.lastUseAt;
+        const p = c.fight.player;
+        c.fight = startFight(state, enemy, content, rules, {
+          hp: p.hp,
+          chakra: p.chakra,
+          stamina: p.stamina,
+        });
+        c.paid = {};
+        continue;
+      }
       if (result === 'defeat') {
         emit(state, { type: 'playerDefeated', enemy: c.enemy });
         return stopSlot(state, index, 'defeated', content, rules);

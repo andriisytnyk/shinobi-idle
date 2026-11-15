@@ -215,6 +215,10 @@ export interface FightState {
   kit: PlayerKit;
   /** Rank tier of the player. */
   tier: number;
+  /** The player's natures, first one first (a `wheel` enemy counters the first). */
+  natures: NatureId[];
+  /** Id of the body the cast under way is aimed at; null when none. */
+  target: string | null;
   /** Trait ids the player knows per enemy entry id; an entry without a record is fully known. */
   knowledge: Record<string, string[]>;
   /** Times each technique has finished casting against this enemy, for habituation. */

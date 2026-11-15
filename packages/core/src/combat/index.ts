@@ -1,4 +1,7 @@
 export * from './fight-ai.ts';
+export * from './fight-encounter.ts';
+export * from './fight-hooks.ts';
+export * from './fight-parse.ts';
 export * from './fight-effects.ts';
 export * from './fight-sim.ts';
 export * from './fight-types.ts';

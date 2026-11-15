@@ -1,9 +1,8 @@
-import type { ContentDb, Enemy } from '@shinobi/content';
+import type { ContentDb } from '@shinobi/content';
 import { createStream, nextUint32 } from '../rng.ts';
 import { createFight, fightAdvance, fightTimeMs } from './fight.ts';
-import type { FightRules, FightTally } from './fight-types.ts';
+import type { Encounter, FightRules, FightTally } from './fight-types.ts';
 import type { PlayerSnapshot } from './numbers.ts';
-import { workOf } from './units.ts';
 
 /** What many fights of one player against one enemy add up to. */
 export interface FightSummary {
@@ -49,13 +48,12 @@ function addAll(into: Record<string, number>, from: Record<string, number>, n: n
  */
 export function simulateFights(
   snap: PlayerSnapshot,
-  enemy: Enemy,
+  encounter: Encounter,
   n: number,
   seed: number,
   content: ContentDb,
   rules: FightRules,
 ): FightSummary {
-  const cap = workOf(content.balance.K.combat.fightCapMs);
   const times: number[] = [];
   let lost = 0;
   let share = 0;
@@ -70,10 +68,10 @@ export function simulateFights(
     taken: 0,
   };
   for (let i = 0; i < n; i++) {
-    const fight = createFight(snap, enemy, fightSeed(seed, i), content, rules);
+    const fight = createFight(snap, encounter, fightSeed(seed, i), content, rules);
     fight.log = null;
     const startHp = fight.player.hp;
-    fightAdvance(fight, cap, content, rules);
+    fightAdvance(fight, fight.cap + 1, content, rules);
     const t: FightTally = fight.tally;
     addAll(tally.damage, t.damage, n);
     addAll(tally.uses, t.uses, n);
@@ -83,7 +81,7 @@ export function simulateFights(
     tally.interrupts += t.interrupts / n;
     tally.kills += t.kills / n;
     tally.taken += t.taken / n;
-    if (fight.result !== 'victory') continue;
+    if (fight.result !== 'victory' && fight.result !== 'fled') continue;
     times.push(fightTimeMs(fight));
     lost += startHp - fight.player.hp;
     share += (startHp - fight.player.hp) / fight.player.maxHp;

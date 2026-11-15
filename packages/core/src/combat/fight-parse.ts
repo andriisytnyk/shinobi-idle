@@ -18,20 +18,24 @@ import type { RngState } from '../rng.ts';
 import type {
   Combatant,
   Effect,
+  Encounter,
   FightLogLine,
+  FightResult,
   FightState,
   FightTally,
-  HeavyTimer,
   KitTechnique,
   ModStat,
   PlayerKit,
+  Spawn,
   Timer,
 } from './fight-types.ts';
+import { needOf, WORK_PER_MS, workOf } from './units.ts';
 
 /*
- * Reads a fight back from untrusted JSON (a save). Every field is checked; anything that does not
- * fit gives null, and the caller starts the fight over. Numbers that would make the engine spin
- * (a zero-length timer or tick) are rejected, not repaired.
+ * Reads a fight back from untrusted JSON (a save). Every field is checked and anything the engine
+ * could not run (a phase the side never has, a zero-length cast, a timer or tick that would spin,
+ * a number that is not a number) gives null, and the caller starts the fight over. Times that a
+ * valid fight keeps in a window around the fight clock are clamped into it.
  */
 
 type Raw = Record<string, unknown>;
@@ -40,12 +44,15 @@ const isRecord = (x: unknown): x is Raw => typeof x === 'object' && x !== null &
 const isNum = (x: unknown): x is number => typeof x === 'number' && Number.isFinite(x);
 const isInt = (x: unknown): x is number => isNum(x) && Number.isInteger(x);
 const isStr = (x: unknown): x is string => typeof x === 'string';
+const nonNeg = (x: unknown): x is number => isNum(x) && x >= 0;
+const share = (x: unknown): x is number => isNum(x) && x >= 0 && x <= 1;
 const oneOf = <T extends string>(list: readonly T[], x: unknown): x is T =>
   typeof x === 'string' && (list as readonly string[]).includes(x);
 
 const MOD_STATS: readonly ModStat[] = ['accuracy', 'evasion', 'speed', 'damageTaken'];
-const PHASES = ['idle', 'cast', 'recover', 'attack'] as const;
-const RESULTS = ['ongoing', 'victory', 'defeat'] as const;
+const RESULTS: readonly FightResult[] = ['ongoing', 'victory', 'defeat', 'fled', 'timeout'];
+/** The largest multiplier an effect may carry; more would make a timer fill in no time. */
+const MOD_LIMIT = 10;
 
 function numberRecord(raw: unknown): Record<string, number> | null {
   if (!isRecord(raw)) return null;
@@ -57,45 +64,52 @@ function numberRecord(raw: unknown): Record<string, number> | null {
   return out;
 }
 
-function parseEffect(raw: unknown): Effect | null {
+function parseEffect(raw: unknown, t: number): Effect | null {
   if (!isRecord(raw) || !isStr(raw.id) || !isStr(raw.src)) return null;
   if (raw.until !== null && !isInt(raw.until)) return null;
   if (raw.suppresses !== undefined && !isStr(raw.suppresses)) return null;
   const base = {
     id: raw.id,
     src: raw.src,
-    until: raw.until as number | null,
+    until: raw.until === null ? null : Math.max(raw.until as number, t),
     ...(raw.suppresses === undefined ? {} : { suppresses: raw.suppresses }),
   };
   if (raw.kind === 'modifier') {
     if (!oneOf(MOD_STATS, raw.stat) || !isNum(raw.value)) return null;
     if (raw.op !== 'mul' && raw.op !== 'add') return null;
+    if (raw.value < 0 || raw.value > MOD_LIMIT) return null;
     return { ...base, kind: 'modifier', stat: raw.stat, op: raw.op, value: raw.value };
   }
   if (raw.kind === 'periodic') {
     if (raw.mode !== 'damage' && raw.mode !== 'heal') return null;
-    if (!isNum(raw.amount) || !isInt(raw.every) || raw.every < 1 || !isInt(raw.next)) return null;
+    // A tick is at least a millisecond apart, or time could never pass.
+    if (!nonNeg(raw.amount) || !isInt(raw.every) || raw.every < WORK_PER_MS || !isInt(raw.next)) {
+      return null;
+    }
+    if (raw.base !== undefined && !nonNeg(raw.base)) return null;
     return {
       ...base,
       kind: 'periodic',
       mode: raw.mode,
       amount: raw.amount,
       every: raw.every,
-      next: raw.next,
+      // A tick is always within one step ahead of the clock; far behind would mean a flood of ticks.
+      next: Math.min(Math.max(raw.next, t), t + raw.every),
+      ...(raw.base === undefined ? {} : { base: raw.base }),
     };
   }
   return null;
 }
 
-function parseTimer(raw: unknown, needsSize: boolean): Timer | null {
+function parseTimer(raw: unknown, size: number): Timer | null {
   if (!isRecord(raw) || !isInt(raw.progress) || !isInt(raw.need)) return null;
-  if (raw.progress < 0 || raw.need < (needsSize ? 1 : 0)) return null;
+  if (raw.progress < 0 || raw.need < size) return null;
   return { progress: Math.min(raw.progress, raw.need), need: raw.need };
 }
 
-function parseCombatant(raw: unknown, side: Combatant['side']): Combatant | null {
-  if (!isRecord(raw) || raw.side !== side || !isStr(raw.id)) return null;
-  const nums = [
+function parseCombatant(raw: unknown, side: Combatant['side'], t: number): Combatant | null {
+  if (!isRecord(raw) || raw.side !== side || !isStr(raw.id) || !isStr(raw.entry)) return null;
+  const figures = [
     raw.hp,
     raw.maxHp,
     raw.chakra,
@@ -105,44 +119,52 @@ function parseCombatant(raw: unknown, side: Combatant['side']): Combatant | null
     raw.accuracy,
     raw.evasion,
     raw.damage,
+    raw.ward,
   ];
-  if (!nums.every(isNum) || !isInt(raw.intervalMs) || raw.intervalMs < 1) return null;
-  if (!oneOf(PHASES, raw.phase) || typeof raw.opening !== 'boolean') return null;
+  if (!figures.every(nonNeg) || !isInt(raw.intervalMs) || raw.intervalMs < 1) return null;
+  if ((raw.maxHp as number) <= 0) return null;
+  // The player is idle, casting or recovering; an enemy is always counting down to its attack.
+  const phases = side === 'player' ? ['idle', 'cast', 'recover'] : ['attack'];
+  if (typeof raw.phase !== 'string' || !phases.includes(raw.phase)) return null;
+  const phase = raw.phase as Combatant['phase'];
   if (raw.nature !== null && !oneOf(NATURE_IDS, raw.nature)) return null;
   if (raw.cast !== null && !isStr(raw.cast)) return null;
-  if (!Array.isArray(raw.traits) || !raw.traits.every((t) => oneOf(TRAIT_IDS, t))) return null;
+  if (!Array.isArray(raw.traits) || !raw.traits.every((x) => oneOf(TRAIT_IDS, x))) return null;
+  if (!Array.isArray(raw.specials) || !raw.specials.every(isStr)) return null;
   if (!Array.isArray(raw.effects)) return null;
   const effects: Effect[] = [];
   for (const e of raw.effects) {
-    const effect = parseEffect(e);
+    const effect = parseEffect(e, t);
     if (!effect) return null;
     effects.push(effect);
   }
   const cd = numberRecord(raw.cd);
-  const timer = parseTimer(raw.timer, side === 'enemy');
-  if (!cd || !timer) return null;
-  let heavy: HeavyTimer | null = null;
-  if (raw.heavy !== null) {
-    const t = parseTimer(raw.heavy, true);
-    if (!t || !isRecord(raw.heavy) || (raw.heavy.phase !== 'wait' && raw.heavy.phase !== 'cast')) {
-      return null;
-    }
-    heavy = { ...t, phase: raw.heavy.phase };
+  const data = numberRecord(raw.data);
+  const timer = parseTimer(raw.timer, phase === 'idle' ? 0 : needOf(1));
+  if (!cd || !data || !timer || !isRecord(raw.timers)) return null;
+  const timers: Record<string, Timer> = {};
+  for (const [name, value] of Object.entries(raw.timers)) {
+    const parsed = parseTimer(value, needOf(1));
+    if (!parsed) return null;
+    timers[name] = parsed;
   }
-  const illusion = raw.illusion === null ? null : parseTimer(raw.illusion, true);
-  if (raw.illusion !== null && !illusion) return null;
+  if (raw.wardUntil !== null && !isInt(raw.wardUntil)) return null;
+  if (!isInt(raw.decoys) || raw.decoys < 0) return null;
+  if (raw.fleeAt !== null && !share(raw.fleeAt)) return null;
+  if (typeof raw.fled !== 'boolean') return null;
+  const max = (x: unknown, m: number) => Math.min(m, x as number);
   const maxHp = raw.maxHp as number;
   const maxChakra = raw.maxChakra as number;
   const maxStamina = raw.maxStamina as number;
-  if (maxHp <= 0 || maxChakra < 0 || maxStamina < 0) return null;
   return {
     id: raw.id,
     side,
-    hp: Math.min(maxHp, Math.max(0, raw.hp as number)),
+    entry: raw.entry,
+    hp: max(raw.hp, maxHp),
     maxHp,
-    chakra: Math.min(maxChakra, Math.max(0, raw.chakra as number)),
+    chakra: max(raw.chakra, maxChakra),
     maxChakra,
-    stamina: Math.min(maxStamina, Math.max(0, raw.stamina as number)),
+    stamina: max(raw.stamina, maxStamina),
     maxStamina,
     accuracy: raw.accuracy as number,
     evasion: raw.evasion as number,
@@ -150,20 +172,25 @@ function parseCombatant(raw: unknown, side: Combatant['side']): Combatant | null
     intervalMs: raw.intervalMs,
     nature: raw.nature as NatureId | null,
     traits: raw.traits as TraitId[],
+    specials: raw.specials as string[],
     effects,
     cd,
-    phase: raw.phase,
+    phase,
     cast: raw.cast,
     timer,
-    heavy,
-    illusion,
-    opening: raw.opening,
+    timers,
+    data,
+    ward: raw.ward as number,
+    wardUntil: raw.wardUntil === null ? null : Math.max(raw.wardUntil as number, t),
+    decoys: raw.decoys,
+    fleeAt: raw.fleeAt,
+    fled: raw.fled,
   };
 }
 
 function parseKit(raw: unknown, content: ContentDb): PlayerKit | null {
   if (!isRecord(raw) || !Array.isArray(raw.techniques)) return null;
-  if (!isNum(raw.med) || !isNum(raw.chakraRegen) || !isNum(raw.staminaRegen)) return null;
+  if (!nonNeg(raw.med) || !nonNeg(raw.chakraRegen) || !nonNeg(raw.staminaRegen)) return null;
   const known = new Set(content.techniques.map((t) => t.id));
   const techniques: KitTechnique[] = [];
   for (const t of raw.techniques) {
@@ -174,8 +201,11 @@ function parseKit(raw: unknown, content: ContentDb): PlayerKit | null {
     if (!Array.isArray(t.tags) || !t.tags.every((tag) => oneOf(TAG_IDS, tag))) return null;
     if (t.state !== null && !oneOf(STATE_IDS, t.state)) return null;
     if (t.pool !== 'chakra' && t.pool !== 'stamina') return null;
-    const figures = [t.damage, t.castMs, t.cooldownMs, t.cost, t.accuracy, t.comboChance];
-    if (!figures.every(isNum) || typeof t.hitsAll !== 'boolean') return null;
+    // A cast takes at least a millisecond, or the player would act again without time passing.
+    if (!isInt(t.castMs) || t.castMs < 1 || !isInt(t.cooldownMs) || t.cooldownMs < 0) return null;
+    if (!share(t.comboChance)) return null;
+    const figures = [t.damage, t.cost, t.accuracy, t.habituationMult];
+    if (!figures.every(nonNeg) || typeof t.hitsAll !== 'boolean') return null;
     if (t.guaranteedCombo !== null && !oneOf(COMBO_IDS, t.guaranteedCombo)) return null;
     techniques.push({
       id: t.id,
@@ -185,14 +215,15 @@ function parseKit(raw: unknown, content: ContentDb): PlayerKit | null {
       tags: t.tags as TagId[],
       state: t.state,
       damage: t.damage as number,
-      castMs: t.castMs as number,
-      cooldownMs: t.cooldownMs as number,
+      castMs: t.castMs,
+      cooldownMs: t.cooldownMs,
       pool: t.pool,
       cost: t.cost as number,
       accuracy: t.accuracy as number,
-      comboChance: t.comboChance as number,
+      comboChance: t.comboChance,
       hitsAll: t.hitsAll,
       guaranteedCombo: t.guaranteedCombo as ComboId | null,
+      habituationMult: t.habituationMult as number,
     });
   }
   return { techniques, med: raw.med, chakraRegen: raw.chakraRegen, staminaRegen: raw.staminaRegen };
@@ -207,7 +238,7 @@ function parseTally(raw: unknown): FightTally | null {
   const masteryWork = numberRecord(raw.masteryWork);
   if (!damage || !uses || !statuses || !combos || !masteryWork) return null;
   const scalars = [raw.basic, raw.interrupts, raw.kills, raw.taken, raw.time, raw.lastUseAt];
-  if (!scalars.every(isNum)) return null;
+  if (!scalars.every(nonNeg)) return null;
   return {
     damage,
     uses,
@@ -224,6 +255,32 @@ function parseTally(raw: unknown): FightTally | null {
   };
 }
 
+function parseEncounter(raw: unknown, most: number): Encounter | null {
+  if (!isRecord(raw) || !isStr(raw.id) || !Array.isArray(raw.spawns)) return null;
+  if (!Array.isArray(raw.specials) || !raw.specials.every(isStr)) return null;
+  if (raw.spawns.length < 1 || raw.spawns.length > most) return null;
+  const spawns: Spawn[] = [];
+  for (const s of raw.spawns) {
+    if (!isRecord(s) || !isStr(s.enemy) || !isInt(s.cl) || s.cl < 0) return null;
+    if (!Array.isArray(s.traits) || !s.traits.every((x) => oneOf(TRAIT_IDS, x))) return null;
+    if (s.nature !== null && s.nature !== 'wheel' && !oneOf(NATURE_IDS, s.nature)) return null;
+    if (!isInt(s.count) || s.count < 1 || s.count > most) return null;
+    if (!isNum(s.hpMult) || s.hpMult <= 0 || !nonNeg(s.dmgMult)) return null;
+    if (s.fleeAt !== null && !share(s.fleeAt)) return null;
+    spawns.push({
+      enemy: s.enemy,
+      cl: s.cl,
+      traits: s.traits as TraitId[],
+      nature: s.nature as Spawn['nature'],
+      count: s.count,
+      hpMult: s.hpMult,
+      dmgMult: s.dmgMult as number,
+      fleeAt: s.fleeAt,
+    });
+  }
+  return { id: raw.id, spawns, specials: raw.specials as string[] };
+}
+
 /** The battle log lines still to be read; lines that do not fit are dropped, an absent log is empty. */
 function parseLog(raw: unknown): FightLogLine[] | null {
   if (raw === null) return null;
@@ -238,37 +295,68 @@ function parseLog(raw: unknown): FightLogLine[] | null {
   return lines;
 }
 
+function parseKnowledge(raw: unknown): Record<string, string[]> | null {
+  if (!isRecord(raw)) return null;
+  const out: Record<string, string[]> = {};
+  for (const [key, value] of Object.entries(raw)) {
+    if (!Array.isArray(value) || !value.every(isStr)) return null;
+    out[key] = value;
+  }
+  return out;
+}
+
 /** A saved fight, checked field by field; null when it is not a usable fight. */
 export function parseFight(raw: unknown, content: ContentDb): FightState | null {
   if (!isRecord(raw) || !isStr(raw.enemy) || !isInt(raw.t) || raw.t < 0) return null;
+  const K = content.balance.K;
+  const t = raw.t;
+  if (!isInt(raw.cap) || raw.cap < 1 || !isInt(raw.spawned) || raw.spawned < 0) return null;
   if (!isInt(raw.poolAt) || !oneOf(RESULTS, raw.result)) return null;
+  if (!isInt(raw.tier) || raw.tier < 0) return null;
   const rng = raw.rng;
   if (!Array.isArray(rng) || rng.length !== 4 || !rng.every((w) => isInt(w) && w >= 0)) return null;
-  const player = parseCombatant(raw.player, 'player');
-  if (!player || !Array.isArray(raw.enemies) || raw.enemies.length < 1) return null;
-  if (raw.enemies.length > Math.max(1, content.balance.K.pack.n)) return null;
+  const most = Math.max(1, K.combat.maxEnemies);
+  const encounter = parseEncounter(raw.encounter, most);
+  const player = parseCombatant(raw.player, 'player', t);
+  if (!encounter || !player || !Array.isArray(raw.enemies)) return null;
+  // Dead bodies are dropped when a new one spawns, so the list is at most twice the cap.
+  if (raw.enemies.length < 1 || raw.enemies.length > most + most) return null;
   const enemies: Combatant[] = [];
   for (const e of raw.enemies) {
-    const enemy = parseCombatant(e, 'enemy');
+    const enemy = parseCombatant(e, 'enemy', t);
     if (!enemy) return null;
     enemies.push(enemy);
   }
   const kit = parseKit(raw.kit, content);
   const uses = numberRecord(raw.uses);
   const tally = parseTally(raw.tally);
-  if (!kit || !uses || !tally) return null;
+  const knowledge = parseKnowledge(raw.knowledge);
+  if (!kit || !uses || !tally || !knowledge) return null;
+  if (!Array.isArray(raw.natures) || !raw.natures.every((n) => oneOf(NATURE_IDS, n))) return null;
+  if (raw.target !== null && !isStr(raw.target)) return null;
+  // A player who is casting casts a technique of the kit.
+  if (player.phase === 'cast' && !kit.techniques.some((x) => x.id === player.cast)) return null;
+  if (player.phase !== 'cast' && player.cast !== null) return null;
   const w = rng as number[];
   const state: RngState = [w[0] ?? 0, w[1] ?? 0, w[2] ?? 0, w[3] ?? 0];
   return {
-    t: raw.t,
+    t,
+    cap: raw.cap,
     rng: state,
     result: raw.result,
     enemy: raw.enemy,
+    encounter,
+    spawned: raw.spawned,
     player,
     enemies,
     kit,
+    tier: raw.tier,
+    natures: raw.natures as NatureId[],
+    target: raw.target,
+    knowledge,
     uses,
-    poolAt: raw.poolAt,
+    // The next regeneration is within one step of the clock.
+    poolAt: Math.min(Math.max(raw.poolAt, t), t + workOf(K.combat.regenMs)),
     tally,
     log: parseLog(raw.log),
   };

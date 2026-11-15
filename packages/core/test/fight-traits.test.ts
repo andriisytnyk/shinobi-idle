@@ -1,5 +1,5 @@
 /** A5: one test per enemy trait and its answer, with the numbers of the balance object. */
-import { content } from '@shinobi/content';
+import { content, type TraitId } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
   createFight,
@@ -7,14 +7,20 @@ import {
   fightAdvance,
   findEffect,
   needOf,
+  stat,
   statOf,
   type FightState,
+  type FightView,
+  type KitTechnique,
+  type ViewEnemy,
+  type ViewTechnique,
 } from '../src/index.ts';
 import {
   K,
   castAndHit,
   castOnce,
   castSeq,
+  ctxOf,
   enemyAt,
   pacify,
   quiet,
@@ -55,17 +61,17 @@ describe('Armor (answer: pierce)', () => {
     expect(fight.tally.damage[palm]).toBeCloseTo(tech(fight, palm).damage, 8);
     const off = findEffect(enemy, 'armorOff');
     expect(off?.until).toBe(fight.t + sec(K.trait.armorOff));
-    expect(statOf(enemy, 'damageTaken', 1)).toBe(1);
+    expect(stat(ctxOf(fight), enemy, 'damageTaken', 1)).toBe(1);
     expect(fight.tally.statuses.armorBreak).toBe(1);
     // After the window the armour is back.
     fightAdvance(
       fight,
       sec(K.trait.armorOff),
       content,
-      withAi(() => ({ kind: 'basic' })),
+      withAi(() => ({ type: 'basic' })),
     );
     expect(findEffect(enemy, 'armorOff')).toBeUndefined();
-    expect(statOf(enemy, 'damageTaken', 1)).toBeCloseTo(1 - K.trait.armor, 12);
+    expect(stat(ctxOf(fight), enemy, 'damageTaken', 1)).toBeCloseTo(1 - K.trait.armor, 12);
   });
 });
 
@@ -152,7 +158,10 @@ describe('Evasive (answer: bind)', () => {
     const enemy = fight.enemies[0];
     if (!enemy) throw new Error('no enemy');
     expect(enemy.evasion).toBeCloseTo(enemyEvasion, 9);
-    expect(statOf(enemy, 'evasion', enemy.evasion)).toBeCloseTo(enemyEvasion * K.trait.evasive, 9);
+    expect(stat(ctxOf(fight), enemy, 'evasion', enemy.evasion)).toBeCloseTo(
+      enemyEvasion * K.trait.evasive,
+      9,
+    );
 
     const { fight: bound } = castAndHit(
       { known: [bind], enemy: enemyAt(LEVEL, ['evasive']), ai: () => castOnce(bind) },
@@ -161,16 +170,19 @@ describe('Evasive (answer: bind)', () => {
     const target = bound.enemies[0];
     if (!target) throw new Error('no enemy');
     // Bind replaces Evasive rather than adding to it.
-    expect(statOf(target, 'evasion', target.evasion)).toBeCloseTo(enemyEvasion * K.bindEva, 9);
+    expect(stat(ctxOf(bound), target, 'evasion', target.evasion)).toBeCloseTo(
+      enemyEvasion * K.bindEva,
+      9,
+    );
     expect(findEffect(target, 'bind')?.until).toBe(bound.t + sec(K.bind.dur));
     fightAdvance(
       bound,
       sec(K.bind.dur),
       content,
-      withAi(() => ({ kind: 'basic' })),
+      withAi(() => ({ type: 'basic' })),
     );
     expect(findEffect(target, 'bind')).toBeUndefined();
-    expect(statOf(target, 'evasion', target.evasion)).toBeCloseTo(
+    expect(stat(ctxOf(bound), target, 'evasion', target.evasion)).toBeCloseTo(
       enemyEvasion * K.trait.evasive,
       9,
     );
@@ -206,7 +218,7 @@ describe('Regeneration (answer: damage over time)', () => {
       fight,
       sec(5),
       content,
-      withAi(() => ({ kind: 'basic' })),
+      withAi(() => ({ type: 'basic' })),
     );
     expect(enemy.hp - before).toBeCloseTo(5 * amount, 6);
   });
@@ -219,7 +231,7 @@ describe('Regeneration (answer: damage over time)', () => {
     );
     const enemy = fight.enemies[0];
     if (!enemy) throw new Error('no enemy');
-    const idle = withAi(() => ({ kind: 'basic' }));
+    const idle = withAi(() => ({ type: 'basic' }));
     let last = enemy.hp;
     for (let s = 0; s < 5; s++) {
       fightAdvance(fight, sec(1), content, idle);
@@ -254,7 +266,7 @@ describe('Regeneration (answer: damage over time)', () => {
       fight,
       sec(3),
       content,
-      withAi(() => ({ kind: 'basic' })),
+      withAi(() => ({ type: 'basic' })),
     );
     expect(before - enemy.hp).toBeCloseTo(3 * 7, 6);
   });
@@ -331,7 +343,7 @@ describe('Hidden (answer: reveal)', () => {
       fight,
       sec(K.trait.hidden),
       content,
-      withAi(() => ({ kind: 'basic' })),
+      withAi(() => ({ type: 'basic' })),
     );
     expect(findEffect(fight.player, 'hidden')).toBeUndefined();
   });
@@ -471,89 +483,210 @@ describe('the default AI answers a trait with its tagged technique', () => {
 });
 
 describe('the default AI decision rules, on hand-made views', () => {
-  const kt = (id: string, tags: string[], damage: number, extra = {}) => ({
+  const kt = (id: string, tags: string[], damage: number, extra = {}): KitTechnique => ({
     id,
-    skill: 'nin' as const,
-    role: 'projectile' as const,
-    rank: 'C' as const,
-    tags: tags as never,
+    skill: 'nin',
+    role: 'projectile',
+    rank: 'C',
+    tags: tags as KitTechnique['tags'],
     state: null,
     damage,
     castMs: 1000,
     cooldownMs: 6000,
-    pool: 'chakra' as const,
+    pool: 'chakra',
     cost: 1,
     accuracy: 100,
     comboChance: 0,
     hitsAll: false,
     guaranteedCombo: null,
+    habituationMult: 1,
     ...extra,
   });
-  function fightView(over: Record<string, unknown> = {}, ready = [kt('plain', [], 10)]) {
-    const fight = createFight(scripted([]), enemyAt(LEVEL), 1, content, rules);
-    return {
-      t: 0,
-      player: fight.player,
-      enemies: fight.enemies,
-      ready: ready.map((tech) => ({ tech, expected: tech.damage })),
-      castEndsIn: null,
-      nextCastIn: null,
-      casterAlive: false,
-      hidden: false,
-      illusion: false,
-      poisoned: false,
-      evasive: false,
-      armored: false,
-      regenUnchecked: false,
-      ...over,
-    };
-  }
+  const vt = (tech: KitTechnique): ViewTechnique => ({
+    tech,
+    cooldownLeft: 0,
+    affordable: true,
+    ready: true,
+    uses: 0,
+    expected: tech.damage,
+  });
+  const enemyView = (o: Partial<ViewEnemy> = {}): ViewEnemy => ({
+    id: 'e#0',
+    hp: 100,
+    hpShare: 1,
+    nature: null,
+    effects: [],
+    knownTraits: [],
+    workingTraits: [],
+    cast: null,
+    nextCastIn: null,
+    ...o,
+  });
+  const mk = (
+    techs: KitTechnique[],
+    enemies: ViewEnemy[] = [enemyView()],
+    playerEffects: string[] = [],
+  ): FightView => ({
+    t: 0,
+    tier: 1,
+    player: {
+      hp: 100,
+      maxHp: 100,
+      chakra: 100,
+      maxChakra: 100,
+      stamina: 100,
+      maxStamina: 100,
+      effects: playerEffects.map((id) => ({ id, kind: 'modifier', remaining: null })),
+    },
+    techniques: techs.map(vt),
+    enemies,
+    habituation: {},
+  });
+  const cast = (id: string) => ({ type: 'technique', id });
 
-  it('casts an interrupt only while a cast is under way and ends later than this one', () => {
-    const interrupt = kt('int', ['interrupt'], 1);
-    const ready = [interrupt, kt('big', [], 50)];
+  it('casts an interrupt only while a known cast is under way and ends later than this one', () => {
+    const techs = [kt('int', ['interrupt'], 1), kt('big', [], 50)];
+    const casting = (remaining: number, known = true) =>
+      mk(techs, [
+        enemyView({
+          knownTraits: known ? ['caster'] : [],
+          workingTraits: known ? ['caster'] : [],
+          cast: { kind: 'heavy', remaining },
+        }),
+      ]);
     const need = sec(1);
-    expect(defaultCombatAi(fightView({ castEndsIn: need + 1 }, ready))).toEqual({
-      kind: 'technique',
-      id: 'int',
-    });
-    expect(defaultCombatAi(fightView({ castEndsIn: need }, ready))).toEqual({
-      kind: 'technique',
-      id: 'big',
-    });
-    expect(defaultCombatAi(fightView({ castEndsIn: null }, ready))).toEqual({
-      kind: 'technique',
-      id: 'big',
-    });
+    expect(defaultCombatAi(casting(need + 1))).toEqual(cast('int'));
+    expect(defaultCombatAi(casting(need))).toEqual(cast('big'));
+    expect(defaultCombatAi(mk(techs))).toEqual(cast('big'));
+    // The trait is not known to the player: the wind-up is no reason to interrupt.
+    expect(defaultCombatAi(casting(need + 1, false))).toEqual(cast('big'));
   });
 
   it('keeps an interrupt back when the next heavy attack comes before it would be ready again', () => {
-    const ready = [kt('int', ['interrupt'], 30), kt('plain', [], 10)];
-    const soon = fightView({ casterAlive: true, nextCastIn: sec(2) }, ready);
-    expect(defaultCombatAi(soon)).toEqual({ kind: 'technique', id: 'plain' });
-    const late = fightView({ casterAlive: true, nextCastIn: sec(60) }, ready);
-    expect(defaultCombatAi(late)).toEqual({ kind: 'technique', id: 'int' });
+    const techs = [kt('int', ['interrupt'], 30), kt('plain', [], 10)];
+    const waiting = (inWork: number) =>
+      mk(techs, [
+        enemyView({ knownTraits: ['caster'], workingTraits: ['caster'], nextCastIn: inWork }),
+      ]);
+    expect(defaultCombatAi(waiting(sec(2)))).toEqual(cast('plain'));
+    expect(defaultCombatAi(waiting(sec(60)))).toEqual(cast('int'));
   });
 
-  it('answers each flag with its tag and falls back to the best damage, then to a basic attack', () => {
-    const answers: [string, string[]][] = [
-      ['hidden', ['reveal']],
-      ['evasive', ['bind']],
-      ['armored', ['pierce']],
-      ['illusion', ['dispel']],
-      ['poisoned', ['cleanse']],
-      ['regenUnchecked', ['dot']],
+  it('answers a known, working trait with its tag, and only then', () => {
+    const answers: [TraitId, string][] = [
+      ['hidden', 'reveal'],
+      ['evasive', 'bind'],
+      ['armor', 'pierce'],
+      ['regen', 'dot'],
     ];
-    for (const [flag, tags] of answers) {
-      const ready = [kt('answer', tags, 1), kt('big', [], 50)];
-      expect(defaultCombatAi(fightView({ [flag]: true }, ready))).toEqual({
-        kind: 'technique',
-        id: 'answer',
-      });
-      expect(defaultCombatAi(fightView({}, ready))).toEqual({ kind: 'technique', id: 'big' });
+    for (const [trait, tag] of answers) {
+      const techs = [kt('answer', [tag], 1), kt('big', [], 50)];
+      const view = (known: TraitId[], working: TraitId[]) =>
+        mk(techs, [enemyView({ knownTraits: known, workingTraits: working })]);
+      expect(defaultCombatAi(view([trait], [trait]))).toEqual(cast('answer'));
+      // Unknown: the AI does not answer it deliberately. Switched off: nothing to answer.
+      expect(defaultCombatAi(view([], []))).toEqual(cast('big'));
+      expect(defaultCombatAi(view([trait], []))).toEqual(cast('big'));
     }
-    expect(defaultCombatAi(fightView({}, []))).toEqual({ kind: 'basic' });
-    expect(defaultCombatAi(fightView({}, [kt('none', [], 0)]))).toEqual({ kind: 'basic' });
+  });
+
+  it('answers a status on the player with dispel or cleanse', () => {
+    const techs = [kt('dispel', ['dispel'], 1), kt('cleanse', ['cleanse'], 1), kt('big', [], 50)];
+    expect(defaultCombatAi(mk(techs, undefined, ['illusion']))).toEqual(cast('dispel'));
+    expect(defaultCombatAi(mk(techs, undefined, ['poison']))).toEqual(cast('cleanse'));
+    expect(defaultCombatAi(mk(techs))).toEqual(cast('big'));
+  });
+
+  it('uses area when more than one enemy lives, else the best damage, else a basic attack', () => {
+    const techs = [kt('area', ['area'], 10, { hitsAll: true }), kt('big', [], 50)];
+    expect(defaultCombatAi(mk(techs, [enemyView(), enemyView({ id: 'e#1' })]))).toEqual(
+      cast('area'),
+    );
+    expect(defaultCombatAi(mk(techs))).toEqual(cast('big'));
+    expect(defaultCombatAi(mk([]))).toEqual({ type: 'basic' });
+    expect(defaultCombatAi(mk([kt('none', [], 0)]))).toEqual({ type: 'basic' });
+  });
+});
+
+describe('the view the AI gets', () => {
+  it('lists every loadout technique with its cooldown, cost and affordability, and hides the fight internals', () => {
+    let seen: FightView | null = null;
+    const spy = withAi((view) => {
+      seen ??= view;
+      return { type: 'basic' };
+    });
+    const known = ['core:great_fireball', 'core:dynamic_entry'];
+    const snap = {
+      ...scripted(known),
+      loadout: ['core:great_fireball'],
+      tier: 2,
+      knowledge: { 'core:test': ['armor'] },
+    };
+    const fight = createFight(snap, enemyAt(LEVEL, ['armor', 'regen']), 1, content, spy);
+    fight.player.cd['core:great_fireball'] = sec(3);
+    fightAdvance(fight, 0, content, spy);
+    const view = seen as FightView | null;
+    expect(view?.tier).toBe(2);
+    expect(view?.techniques.map((t) => t.tech.id)).toEqual(['core:great_fireball']);
+    const t0 = view?.techniques[0];
+    expect(t0?.cooldownLeft).toBe(sec(3));
+    expect(t0?.ready).toBe(false);
+    expect(t0?.affordable).toBe(true);
+    expect(view?.enemies[0]?.knownTraits).toEqual(['armor']);
+    expect(view?.enemies[0]?.workingTraits).toEqual(['armor']);
+    expect(view?.enemies[0]?.hpShare).toBe(1);
+    // The view is a copy: changing it does not touch the fight.
+    (view?.techniques[0]?.tech.tags as string[]).push('x');
+    expect(fight.kit.techniques[0]?.tags).not.toContain('x');
+  });
+
+  it('keeps the loadout, knowledge and tier in the fight state', () => {
+    const snap = {
+      ...scripted(['core:great_fireball']),
+      tier: 1,
+      knowledge: { 'core:x': ['regen'] },
+    };
+    const fight = createFight(snap, enemyAt(LEVEL), 1, content, rules);
+    expect(fight.tier).toBe(1);
+    expect(fight.knowledge).toEqual({ 'core:x': ['regen'] });
+    expect(JSON.parse(JSON.stringify(fight))).toEqual(fight);
+  });
+
+  it('does not answer a trait the player does not know, in a real fight', () => {
+    const known = ['core:gale_palm', 'core:great_fireball'];
+    const first = (knowledge: Record<string, string[]>) => {
+      const snap = { ...scripted(known), knowledge };
+      const fight = quiet(createFight(snap, enemyAt(LEVEL, ['armor']), 1, content, rules));
+      runUntil(fight, (f) => Object.keys(f.tally.uses).length > 0, rules);
+      return Object.keys(fight.tally.uses)[0];
+    };
+    expect(first({})).toBe('core:gale_palm');
+    expect(first({ 'core:test': [] })).toBe('core:great_fireball');
+  });
+
+  it('accepts wait and item decisions without breaking the fight', () => {
+    const waits = withAi(() => ({ type: 'wait' }));
+    const fight = quiet(createFight(scripted([]), enemyAt(LEVEL), 1, content, waits));
+    fightAdvance(fight, sec(10), content, waits);
+    expect(fight.tally.basic).toBe(0);
+    expect(fight.result).toBe('ongoing');
+    const items = withAi(() => ({ type: 'item', id: 'core:pill' }));
+    const second = quiet(createFight(scripted([]), enemyAt(LEVEL), 1, content, items));
+    fightAdvance(second, sec(10), content, items);
+    expect(second.tally.basic).toBeGreaterThan(0);
+  });
+
+  it('aims a technique at the body the AI names', () => {
+    const snap = scripted(['core:dynamic_entry']);
+    const fight = quiet(createFight(snap, enemyAt(10, ['pack']), 1, content, rules));
+    const heavier = fight.enemies[1];
+    if (!heavier) throw new Error('no body');
+    heavier.hp += 1;
+    const ai = withAi(() => ({ type: 'technique', id: 'core:dynamic_entry', target: heavier.id }));
+    runUntil(fight, (f) => (f.tally.uses['core:dynamic_entry'] ?? 0) > 0, ai);
+    const hit = fight.enemies.filter((e) => e.hp < e.maxHp);
+    expect(hit.length).toBeLessThanOrEqual(1);
+    if (hit[0]) expect(hit[0].id).toBe(heavier.id);
   });
 });
 
@@ -562,7 +695,7 @@ describe('the AI is a pluggable rule', () => {
     const fight = quiet(
       createFight(scripted(['core:great_fireball']), enemyAt(LEVEL), 1, content, rules),
     );
-    const basic = withAi(() => ({ kind: 'basic' }));
+    const basic = withAi(() => ({ type: 'basic' }));
     fightAdvance(fight, sec(30), content, basic);
     expect(fight.tally.uses).toEqual({});
     expect(fight.tally.basic).toBeGreaterThan(5);
@@ -577,7 +710,7 @@ describe('the AI is a pluggable rule', () => {
       fight,
       sec(10),
       content,
-      withAi(() => ({ kind: 'technique', id: 'core:nope' })),
+      withAi(() => ({ type: 'technique', id: 'core:nope' })),
     );
     expect(fight.tally.basic).toBeGreaterThan(2);
   });

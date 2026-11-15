@@ -1,7 +1,6 @@
 import {
   content,
   type ContentDb,
-  type Enemy,
   type NatureId,
   type SkillId,
   type Technique,
@@ -9,6 +8,9 @@ import {
 } from '@shinobi/content';
 import {
   createFight,
+  encounterFor,
+  makeCtx,
+  type Encounter,
   defaultRules,
   fightAdvance,
   fightNextEventIn,
@@ -70,14 +72,18 @@ export function playerFor(c: number, nature: NatureId, options: BuildOptions = {
   };
 }
 
-export function enemyAt(cl: number, traits: TraitId[] = [], nature: Enemy['nature'] = null): Enemy {
+export function enemyAt(
+  cl: number,
+  traits: TraitId[] = [],
+  nature: 'wheel' | NatureId | null = null,
+): Encounter {
   const base = content.enemies.find((e) => e.id === 'core:bandit');
   if (!base) throw new Error('no bandit');
-  return { ...base, id: 'core:test', cl, traits, nature, carries: null };
+  return encounterFor({ ...base, id: 'core:test', cl, traits, nature, carries: null }, content);
 }
 
 /** A fight run to its end or the time cap. */
-export function runFight(snap: PlayerSnapshot, enemy: Enemy, seed: number): FightState {
+export function runFight(snap: PlayerSnapshot, enemy: Encounter, seed: number): FightState {
   const fight = createFight(snap, enemy, seed, content, rules);
   fightAdvance(fight, workOf(K.combat.fightCapMs), content, rules);
   return fight;
@@ -104,18 +110,20 @@ export function scripted(known: string[], levels: Partial<Record<SkillId, number
 export const castSeq =
   (...ids: string[]): CombatAi =>
   (view) => {
-    const id = ids.find((x) => view.ready.some((r) => r.tech.id === x));
-    return id ? { kind: 'technique', id } : { kind: 'basic' };
+    const id = ids.find((x) => view.techniques.some((r) => r.ready && r.tech.id === x));
+    return id ? { type: 'technique', id } : { type: 'basic' };
   };
 
 /** An AI that casts each of `ids` at most once, in order of readiness. */
 export function castOnce(...ids: string[]): CombatAi {
   const used = new Set<string>();
   return (view) => {
-    const id = ids.find((x) => !used.has(x) && view.ready.some((r) => r.tech.id === x));
-    if (!id) return { kind: 'basic' };
+    const id = ids.find(
+      (x) => !used.has(x) && view.techniques.some((r) => r.ready && r.tech.id === x),
+    );
+    if (!id) return { type: 'basic' };
     used.add(id);
-    return { kind: 'technique', id };
+    return { type: 'technique', id };
   };
 }
 
@@ -144,14 +152,14 @@ export function runUntil(
   limit = sec(600),
 ): FightState {
   while (!done(fight) && fight.result === 'ongoing' && fight.t < limit) {
-    fightAdvance(fight, fightNextEventIn(fight) ?? 1, c, r);
+    fightAdvance(fight, fightNextEventIn(fight, content, rules) ?? 1, c, r);
   }
   return fight;
 }
 
 export interface Scene {
   known: string[];
-  enemy: Enemy;
+  enemy: Encounter;
   ai: () => CombatAi;
   levels?: Partial<Record<SkillId, number>>;
   /** Changes the fight before it starts. */
@@ -198,3 +206,6 @@ export function syntheticTechnique(id: string, tags: Technique['tags']): Techniq
   if (!base) throw new Error('no sensing');
   return { ...base, id, tags, level: 1, skill: 'nin', state: null, noDamage: true };
 }
+
+/** A ctx for helpers that take one. */
+export const ctxOf = (fight: FightState) => makeCtx(fight, content, rules);

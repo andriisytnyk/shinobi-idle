@@ -7,6 +7,7 @@ import {
   type ActionKind,
 } from './actions.ts';
 import { defaultCombatAi } from './combat/fight-ai.ts';
+import { defaultFightHooks } from './combat/fight-hooks.ts';
 import type { CombatAi, FightRules } from './combat/fight-types.ts';
 import { fightKind } from './combat/kind.ts';
 import { combatSystem } from './combat/system.ts';
@@ -40,4 +41,5 @@ export const defaultRules: Rules = {
   },
   modifierProviders: [],
   combatAi: defaultCombatAi,
+  fightHooks: defaultFightHooks,
 };

@@ -1,62 +1,75 @@
-import type { TagId } from '@shinobi/content';
-import type { CombatAi, Decision, FightView, ReadyTechnique } from './fight-types.ts';
-import { WORK_PER_MS, workOf } from './units.ts';
+import { TRAIT_ANSWER, type TagId, type TraitId } from '@shinobi/content';
+import type { CombatAi, Decision, FightView, ViewTechnique } from './fight-types.ts';
+import { workOf } from './units.ts';
 
 /** The strongest ready technique among those that pass `test`, or undefined. */
 function best(
   view: FightView,
-  test: (r: ReadyTechnique) => boolean = () => true,
-): ReadyTechnique | undefined {
-  let top: ReadyTechnique | undefined;
-  for (const r of view.ready) {
-    if (test(r) && (!top || r.expected > top.expected)) top = r;
+  test: (r: ViewTechnique) => boolean = () => true,
+): ViewTechnique | undefined {
+  let top: ViewTechnique | undefined;
+  for (const r of view.techniques) {
+    if (r.ready && test(r) && (!top || r.expected > top.expected)) top = r;
   }
   return top;
 }
 
-const tagged = (tag: TagId) => (r: ReadyTechnique) => r.tech.tags.includes(tag);
+const tagged = (tag: TagId) => (r: ViewTechnique) => r.tech.tags.includes(tag);
 
-const use = (r: ReadyTechnique | undefined): Decision | null =>
-  r ? { kind: 'technique', id: r.tech.id } : null;
+const use = (r: ViewTechnique | undefined): Decision | null =>
+  r ? { type: 'technique', id: r.tech.id } : null;
+
+/** The trait whose answer is `tag`. */
+const traitOf = (tag: TagId): TraitId =>
+  (Object.keys(TRAIT_ANSWER) as TraitId[]).find((t) => TRAIT_ANSWER[t] === tag) ?? 'pack';
 
 /**
- * The default player AI. It answers a trait that is present with the technique tagged for it,
- * when that technique is ready and would do something: Interrupt only while a heavy attack is
- * being cast and the cast ends later than this one would, Reveal while hidden, Bind while Evasive
- * works, Pierce while armour is up, Area when more than one enemy lives, burning damage while
- * Regeneration is unchecked. Otherwise it casts the ready technique with the highest expected
- * damage (after habituation and the nature wheel), and falls back to the basic attack.
+ * The default player AI. It reads only the view. It answers a trait the player KNOWS with the
+ * technique tagged for it, when that technique is ready and would do something: Interrupt only
+ * while a heavy attack is being cast and the cast ends later than this one would, Reveal while
+ * hidden, Bind while Evasive works, Pierce while armour is up, burning damage while Regeneration is
+ * unchecked, Area when more than one enemy lives. Dispel and Cleanse answer the statuses on the
+ * player. Otherwise it casts the ready technique with the highest expected damage (after
+ * habituation and the nature wheel), and falls back to the basic attack.
  */
 export const defaultCombatAi: CombatAi = (view) => {
-  if (view.castEndsIn !== null) {
-    const castEndsIn = view.castEndsIn;
-    const decision = use(
-      best(view, (r) => tagged('interrupt')(r) && workOf(r.tech.castMs) < castEndsIn),
-    );
+  const knows = (trait: TraitId): boolean =>
+    view.enemies.some((e) => e.knownTraits.includes(trait));
+  const works = (trait: TraitId): boolean =>
+    view.enemies.some((e) => e.workingTraits.includes(trait));
+  const status = (id: string): boolean => view.player.effects.some((e) => e.id === id);
+
+  // A known caster's wind-up that would end after this technique's cast.
+  const casting = view.enemies.filter(
+    (e) => e.knownTraits.includes(traitOf('interrupt')) && e.cast,
+  );
+  const castEndsIn = casting.reduce<number | null>(
+    (soonest, e) =>
+      e.cast && (soonest === null || e.cast.remaining < soonest) ? e.cast.remaining : soonest,
+    null,
+  );
+  if (castEndsIn !== null) {
+    const left = castEndsIn;
+    const decision = use(best(view, (r) => tagged('interrupt')(r) && workOf(r.tech.castMs) < left));
     if (decision) return decision;
   }
-  if (view.illusion) {
+  if (status('illusion')) {
     const decision = use(best(view, tagged('dispel')));
     if (decision) return decision;
   }
-  if (view.poisoned) {
+  if (status('poison')) {
     const decision = use(best(view, tagged('cleanse')));
     if (decision) return decision;
   }
-  if (view.hidden) {
-    const decision = use(best(view, tagged('reveal')));
-    if (decision) return decision;
-  }
-  if (view.evasive) {
-    const decision = use(best(view, tagged('bind')));
-    if (decision) return decision;
-  }
-  if (view.regenUnchecked) {
-    const decision = use(best(view, (r) => tagged('dot')(r) || r.tech.state === 'burn'));
-    if (decision) return decision;
-  }
-  if (view.armored) {
-    const decision = use(best(view, tagged('pierce')));
+  const answers: [TraitId, (r: ViewTechnique) => boolean][] = [
+    ['hidden', tagged(TRAIT_ANSWER.hidden)],
+    ['evasive', tagged(TRAIT_ANSWER.evasive)],
+    ['regen', (r) => tagged('dot')(r) || r.tech.state === 'burn'],
+    ['armor', tagged(TRAIT_ANSWER.armor)],
+  ];
+  for (const [trait, test] of answers) {
+    if (!knows(trait) || !works(trait)) continue;
+    const decision = use(best(view, test));
     if (decision) return decision;
   }
   if (view.enemies.length > 1) {
@@ -64,14 +77,14 @@ export const defaultCombatAi: CombatAi = (view) => {
     if (decision) return decision;
   }
   // An interrupt is kept back for the next heavy attack when it would still be cooling down then.
-  const reserved = (r: ReadyTechnique): boolean =>
-    view.casterAlive &&
+  const nextCasts = view.enemies
+    .filter((e) => e.knownTraits.includes(traitOf('interrupt')) && e.nextCastIn !== null)
+    .map((e) => e.nextCastIn ?? 0);
+  const soonest = nextCasts.length > 0 ? Math.min(...nextCasts) : null;
+  const reserved = (r: ViewTechnique): boolean =>
+    soonest !== null &&
     tagged('interrupt')(r) &&
-    view.nextCastIn !== null &&
-    view.nextCastIn < workOf(r.tech.cooldownMs + r.tech.castMs);
+    soonest < workOf(r.tech.cooldownMs + r.tech.castMs);
   const filler = best(view, (r) => r.expected > 0 && !reserved(r));
-  return use(filler) ?? { kind: 'basic' };
+  return use(filler) ?? { type: 'basic' };
 };
-
-/** Work units per ms, re-exported for AIs that compare cast times with `FightView` timers. */
-export const AI_WORK_PER_MS = WORK_PER_MS;

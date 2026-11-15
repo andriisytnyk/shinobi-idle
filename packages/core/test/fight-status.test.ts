@@ -30,7 +30,7 @@ import {
 } from './fight-helpers.ts';
 
 const LEVEL = 34;
-const idle = withAi(() => ({ kind: 'basic' }));
+const idle = withAi(() => ({ type: 'basic' }));
 const only = (f: FightState) => {
   const e = f.enemies[0];
   if (!e) throw new Error('no enemy');
@@ -143,7 +143,8 @@ describe('Stun', () => {
         setup: (f) => {
           pacify(f);
           const e = only(f);
-          e.heavy = { phase: 'cast', progress: 1, need: needOf(K.trait.casterCast * 1000) };
+          e.data['caster.cast'] = 1;
+          e.timers.caster = { progress: 1, need: needOf(K.trait.casterCast * 1000) };
         },
       },
       id,
@@ -151,7 +152,8 @@ describe('Stun', () => {
     const e = only(fight);
     expect(findEffect(e, 'stun')?.until).toBe(fight.t + sec(seconds));
     expect(speedOf(e)).toBe(0);
-    expect(e.heavy).toMatchObject({ phase: 'wait', progress: 0 });
+    expect(e.data['caster.cast']).toBe(0);
+    expect(e.timers.caster).toMatchObject({ progress: 0 });
     // A stunned enemy skips time: its timers do not move.
     const progress = e.timer.progress;
     fightAdvance(fight, sec(seconds / 2), content, idle);

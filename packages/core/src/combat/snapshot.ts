@@ -1,7 +1,7 @@
 import type { ContentDb, SkillId } from '@shinobi/content';
 import { masteryLevel } from '../formulas.ts';
 import { computeMod } from '../modifiers.ts';
-import { skillLevel } from '../requirements.ts';
+import { RANK_ORDER, skillLevel } from '../requirements.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 import type { Levels, PlayerSnapshot } from './numbers.ts';
@@ -36,6 +36,7 @@ export function snapshotPlayer(
     mastery,
     known,
     natures: [...state.player.natures],
+    tier: RANK_ORDER.indexOf(state.player.rank),
     costMod: { chakra: cost('cost.chakra'), stamina: cost('cost.stamina') },
   };
   if (pools) Object.assign(snapshot, pools);
