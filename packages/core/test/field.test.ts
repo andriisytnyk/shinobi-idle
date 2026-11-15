@@ -11,8 +11,6 @@ import {
   refreshUnlocks,
   sellPrice,
   buyPrice,
-  actionInfo,
-  listSkillActions,
   serialize,
   MIGRATIONS,
   STATE_VERSION,
