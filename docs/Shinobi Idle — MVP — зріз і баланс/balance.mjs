@@ -60,7 +60,7 @@ export const K = {
   intel: { perCellLevel:1, mail:2, track:[3,5], caravanSkip:1, bingoLevel:2, writtenTestPerIntel:0.10, writtenTestMaxIntel:5 },
   partsPerScroll: 10, partDrop: { boss:2.0, carrier:0.12, mission:0.15 },
   // --- село ---
-  tickMin: 5, prod: 10, costBase: 20, costMult: [1,2.2,4.8,10.5,23,50], treasuryBase: 25, buildTicks: [1,2,3,4,5,8],
+  tickMin: 5, prod: 20, costBase: 20, costMult: [1,2.2,4.8,10.5,23,50], treasuryBase: 25, buildTicks: [1,2,3,4,5,8],
   bureauIncome: 20, storeCap: [200,200], shinobiCap: [30,10], shinobiT6: 30, towerStageMax: [3,6],
   // --- розвідка ---
   cellExplores: [24,84,156,240,360], cellLevelStep: 10,
