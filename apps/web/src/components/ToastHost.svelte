@@ -3,14 +3,38 @@
   import { toasts } from '../lib/toasts.svelte.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
+
+  /** On a phone three toasts at most are shown; the older ones are counted in a chip. */
+  let phone = $state(
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches,
+  );
+  $effect(() => {
+    const query = window.matchMedia('(max-width: 768px)');
+    const update = () => (phone = query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  });
+  const cap = $derived(phone ? 3 : 6);
+  const shown = $derived(toasts.list.slice(-cap));
+  const hidden = $derived(toasts.list.length - shown.length);
 </script>
 
 <div class="toasts" role="status" aria-live="polite">
-  {#each toasts.list as toast (toast.id)}
+  {#if hidden > 0}<p class="more" data-toasts-more>{t('toast.more', { n: hidden })}</p>{/if}
+  {#each shown as toast (toast.id)}
     <div class="toast" data-toast={toast.key}>
       <span>
         {t(toast.key, toast.params)}
         {#if toast.ref}<EntityLink kind={toast.ref.kind} id={toast.ref.id} />{/if}
+        {#if toast.gains}
+          <span class="gains" data-gains>
+            {#if toast.gains.ryo > 0}<span>{t('toast.gainRyo', { n: toast.gains.ryo })}</span>{/if}
+            {#each toast.gains.items as item (item.id)}
+              <span><EntityLink kind="item" id={item.id} /> ×{item.n}</span>
+            {/each}
+          </span>
+        {/if}
       </span>
       <button type="button" aria-label={t('modal.close')} onclick={() => toasts.dismiss(toast.id)}>
         <Icon name="lucide:x" size={14} />
@@ -20,10 +44,30 @@
 </div>
 
 <style>
+  .gains {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    color: var(--fg-dim);
+    font-size: 0.85rem;
+  }
+
+  .more {
+    align-self: flex-start;
+    margin: 0;
+    padding: 0 var(--space-2);
+    border-radius: 999px;
+    background: var(--surface-raised);
+    color: var(--fg-dim);
+    font-size: 0.8rem;
+    pointer-events: auto;
+  }
+
+  /* On a wide screen the toasts sit at the left of the page, clear of the side panel and the goal panel. */
   .toasts {
     position: fixed;
-    right: var(--space-4);
     bottom: calc(var(--now-height) + var(--space-3));
+    left: calc(var(--sidebar-width) + var(--space-4));
     z-index: 20;
     display: flex;
     flex-direction: column;
@@ -66,9 +110,13 @@
       min-height: 2.75rem;
     }
 
+    /* On a phone they stay at the top, clear of the bottom sheet and its action row. */
     .toasts {
+      top: var(--space-2);
       right: var(--space-3);
-      bottom: calc(var(--now-height) + var(--tabbar-height) + var(--space-2));
+      bottom: auto;
+      left: var(--space-3);
+      width: auto;
     }
   }
 </style>

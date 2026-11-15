@@ -1,18 +1,48 @@
 <script lang="ts">
   import { content } from '@shinobi/content';
-  import { counterValue, enemyStats, fightSlotIndex, killsKey, RATE_FULL } from '@shinobi/core';
+  import {
+    counterValue,
+    enemyStats,
+    evalReq,
+    fightSlotIndex,
+    killsKey,
+    RATE_FULL,
+    zoneAvailable,
+    zoneCellOf,
+  } from '@shinobi/core';
   import CombatLog from '../components/CombatLog.svelte';
   import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
   import StatBar from '../components/StatBar.svelte';
+  import ZoneWhere from '../components/ZoneWhere.svelte';
   import { formatInt } from '../lib/format.ts';
-  import { t } from '../lib/i18n.ts';
+  import { hasKey, t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
 
   /** Enemies of the Academy yard are open to everyone; the other regions arrive with missions. */
   const enemies = $derived(content.enemies.filter((e) => e.region === 'academy'));
+
+  /**
+   * Fight zones the player may see: a region zone once its cell was explored (its point is
+   * found), a boss zone once unlocked. Nothing undiscovered and nothing without a name is listed.
+   */
+  const zones = $derived(
+    game.read((gs) =>
+      content.zones.flatMap((z) => {
+        if (z.region === 'academy') return [];
+        const boss = z.region === 'boss';
+        const kind = boss ? ('boss' as const) : ('enemy' as const);
+        if (!hasKey(`${kind}.${z.enemy}.name`)) return [];
+        const available = zoneAvailable(gs, z.id, content);
+        const seen = boss
+          ? z.unlock === null || evalReq(gs, z.unlock, content).met
+          : zoneCellOf(z.id, content) !== null && available;
+        return seen ? [{ id: z.id, enemy: z.enemy, kind, available }] : [];
+      }),
+    ),
+  );
 
   const fight = $derived.by(() =>
     game.read((gs) => {
@@ -166,6 +196,32 @@
       {/each}
     </ul>
     <p class="idle">{t('combat.idle')}</p>
+
+    {#if zones.length > 0}
+      <h2>{t('combat.zones')}</h2>
+      <ul class="cards" data-zones>
+        {#each zones as zone (zone.id)}
+          <li class="card" data-zone={zone.id}>
+            <span class="icon"><Icon entity={{ kind: zone.kind, id: zone.enemy }} size={36} /></span
+            >
+            <div class="info">
+              <p class="name"><EntityLink kind={zone.kind} id={zone.enemy} /></p>
+              <ZoneWhere zone={zone.id} />
+              {#if !zone.available}<p class="why" id="why-zone-{zone.id}">
+                  {t('world.where.closed')}
+                </p>{/if}
+            </div>
+            <button
+              type="button"
+              class="start"
+              disabled={!zone.available}
+              aria-describedby={zone.available ? undefined : `why-zone-${zone.id}`}
+              onclick={() => start(zone.id)}>{t('combat.zoneStart')}</button
+            >
+          </li>
+        {/each}
+      </ul>
+    {/if}
   {/if}
 
   <h2>{t('combat.log')}</h2>
@@ -238,6 +294,19 @@
   .kills {
     margin: 0;
     color: var(--fg-dim);
+  }
+
+  .why {
+    margin: 0;
+    color: var(--fg-dim);
+    font-size: 0.8rem;
+  }
+
+  .start:disabled {
+    border-color: var(--line);
+    background: var(--surface-raised);
+    color: var(--fg-dim);
+    cursor: not-allowed;
   }
 
   .stop,

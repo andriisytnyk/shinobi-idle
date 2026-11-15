@@ -145,7 +145,10 @@ describe('A4: combat screen', () => {
     expect(body).toContain('data-enemy="core:dummy"');
     expect(body).toContain('Бойовий рівень');
     expect(body).toContain('Почати бій');
-    expect(body).not.toContain('core:bandit');
+    // Nothing undiscovered: no region zone, no boss zone, no raw id of a boss.
+    expect(body).not.toContain('data-enemy="core:bandit"');
+    expect(body).not.toContain('data-zone=');
+    expect(body).not.toContain('core:boss_');
   });
 
   it('shows bars, what each side does and the kills while fighting', () => {
@@ -257,12 +260,15 @@ describe('suggested next step', () => {
     expect(nav).toMatch(/data-nav="combat"[\s\S]*?data-marker/);
   });
 
-  it('has the journal and the bank in the main navigation', () => {
+  it('has the journal, the map and the fight on the tabs, and the bank in the side menu', () => {
     for (const body of [html(TabBar, {}), html(MainNav, {})]) {
       expect(body).toContain('href="#/quests"');
       expect(body).toContain('href="#/combat"');
-      expect(body).toContain('href="#/bank"');
+      expect(body).toContain('href="#/world"');
     }
+    // On a phone the bank is reached from «Ще» and the top bar.
+    expect(html(MainNav, {})).toContain('href="#/bank"');
+    expect(html(TabBar, {})).not.toContain('href="#/bank"');
   });
 });
 
