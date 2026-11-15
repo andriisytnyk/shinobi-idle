@@ -464,7 +464,7 @@
       "lateFromLevel": 4,
       "lateShare": 0.5
     },
-    "prod": 10,
+    "prod": 20,
     "costBase": 20,
     "costMult": [
       1,
