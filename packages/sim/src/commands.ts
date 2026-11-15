@@ -2,6 +2,7 @@ import { ukLocale } from '@shinobi/content';
 import { runBench } from './bench.ts';
 import type { Bot } from './bot.ts';
 import { bots } from './bots/index.ts';
+import { runCraftsCli, runFightCli, runFighterCli } from './cliSim.ts';
 import { buildReport, type Report } from './report.ts';
 import type { Milestone } from './runner.ts';
 
@@ -87,10 +88,15 @@ export function runCli(args: string[], registry: Readonly<Record<string, Bot>> =
         'Доступні команди:',
         ...Object.values(registry).map((bot) => `  ${bot.name}: ${bot.description}`),
         '  bench: вимір швидкості advance на 12 ігрових годин',
+        '  fight: бої з ворогом чи босом для типового гравця (pnpm sim fight --help)',
+        '  crafts: мирний бот збирає, варить, продає (pnpm sim crafts --help)',
         '\nПриклад: pnpm sim academy --seed 1 --runs 5 [--json]',
       ],
     };
   }
+  if (command === 'fight') return runFightCli(args.slice(1));
+  if (command === 'fighter') return runFighterCli(args.slice(1));
+  if (command === 'crafts') return runCraftsCli(args.slice(1));
   if (command === 'bench') {
     return {
       code: 0,
