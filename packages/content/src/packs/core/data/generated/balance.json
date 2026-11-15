@@ -187,14 +187,14 @@
       },
       "rivalTournament": {
         "techniques": 2,
-        "habituationMult": 2,
         "everyMs": 9000,
         "mult": 0.05,
         "sigEveryMs": 16000,
         "sigMult": 0.3,
         "sigOpenMs": 2000,
         "hp": 1,
-        "dmg": 1
+        "dmg": 1,
+        "habituationMult": 2
       },
       "drunkenEvasion": {
         "maxMult": 2,

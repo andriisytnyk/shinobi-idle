@@ -30,9 +30,7 @@ export interface IconRef {
  * @deprecated Read `content.currencies`.
  */
 export const CURRENCY_IDS = vocab.currencies.map((c) => c.id) as readonly string[] as readonly (
-  | 'ryo'
-  | 'rep'
-  | 'intel'
+  'ryo' | 'rep' | 'intel'
 )[];
 
 /**
@@ -58,6 +56,7 @@ export function iconFor(
 /** Every game-icons name the table uses, sorted and de-duplicated (default: the pack `core`). */
 export function mappedIconNames(icons: Readonly<IconTable> = ICON_MAP): string[] {
   const names = new Set<string>();
-  for (const table of Object.values(icons)) for (const name of Object.values(table)) names.add(name);
+  for (const table of Object.values(icons))
+    for (const name of Object.values(table)) names.add(name);
   return [...names].sort();
 }

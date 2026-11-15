@@ -1335,8 +1335,15 @@ export type ItemUse = z.infer<typeof itemUseSchema>;
 export type EntityRefData = z.infer<typeof entityRefSchema>;
 export type Balance = z.infer<typeof balanceSchema>;
 /** One pack of the composed database: its manifest. */
+const RESERVED_PACK_IDS: ReadonlySet<string> = new Set([
+  ...Object.getOwnPropertyNames(Object.prototype),
+  'prototype',
+]);
 export const packManifestSchema = z.strictObject({
-  id: z.string().regex(/^[a-z][a-z0-9_]*$/, 'expected a pack id like core or my_mod'),
+  id: z
+    .string()
+    .regex(/^[a-z][a-z0-9_]*$/, 'expected a pack id like core or my_mod')
+    .refine((id) => !RESERVED_PACK_IDS.has(id), 'a pack id may not be a member name of Object'),
   version: z.string().min(1),
   dependsOn: z.array(z.string()),
   loadAfter: z.array(z.string()),

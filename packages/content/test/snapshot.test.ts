@@ -68,8 +68,26 @@ describe('core pack snapshot', () => {
 
   it('keeps the order of every list (the order of ranks, groups and stages means something)', () => {
     const order = snapshot.order as Record<string, string[]>;
-    for (const [list, expected] of Object.entries(order))
+    // An order is required for every pinned list, so deleting one from the fixture fails.
+    expect(Object.keys(order).sort()).toEqual(Object.keys(fixture).sort());
+    for (const [list, expected] of Object.entries(order)) {
       expect(list === 'ai' ? ['ai'] : keysOf(lists[list]), `order of ${list}`).toEqual(expected);
+      expect([...expected].sort(), `fixture order of ${list}`).toEqual(
+        Object.keys(fixture[list] ?? {}).sort(),
+      );
+    }
+  });
+
+  it('keeps the order of the keys of every record of the balance object', () => {
+    const actual: Record<string, string[]> = {};
+    const walk = (p: string, v: unknown) => {
+      if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
+        actual[p || '(root)'] = Object.keys(v);
+        for (const [k, x] of Object.entries(v)) walk(p ? `${p}.${k}` : k, x);
+      }
+    };
+    walk('', db.balance);
+    expect(actual).toEqual(snapshot.balanceOrder);
   });
 
   it('keeps every balance number', () => {

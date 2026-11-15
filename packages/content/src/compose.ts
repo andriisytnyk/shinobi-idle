@@ -7,7 +7,7 @@
  * Packs are third-party data: every accumulator that is keyed by a string a pack supplies is a
  * `Map`, and the keys `__proto__`, `constructor` and `prototype` are rejected anywhere in pack data.
  */
-import type { ZodError } from 'zod';
+import { z, type ZodError } from 'zod';
 import { skillFamilyKeys, type ModifierKeyInfo } from './modifiers.ts';
 import type { ContentPack, EntityListKey, Patch } from './pack.ts';
 import { validateClosure } from './closure.ts';
@@ -91,7 +91,8 @@ export function ownsId(pack: string, id: string): boolean {
 }
 
 /** A deep copy of plain data (the packs are JSON-like). */
-const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
+const clone = <T>(value: T): T =>
+  value === undefined ? value : (JSON.parse(JSON.stringify(value)) as T);
 
 const fail = (pack: string, message: string): never => {
   throw new Error(`Content pack "${pack}": ${message}`);
@@ -127,14 +128,61 @@ function checkId(pack: string, id: string, what: string): void {
     fail(pack, `${what} "${id}" has a forbidden id part`);
 }
 
+// ---------- the envelope of a pack ----------
+
+const rec = z.record(z.string(), z.unknown());
+const patchSchema = z.union([
+  z.strictObject({
+    target: z.strictObject({ kind: z.string(), id: z.string() }),
+    set: rec.optional(),
+    append: z.record(z.string(), z.array(z.unknown())).optional(),
+  }),
+  z.strictObject({
+    balance: z.strictObject({
+      path: z.string().min(1),
+      set: z.union([z.number(), z.string(), z.boolean(), z.array(z.unknown())]),
+    }),
+  }),
+]);
+const packEnvelopeSchema = z.strictObject({
+  manifest: packManifestSchema,
+  data: rec,
+  balance: rec,
+  locales: z.strictObject({
+    uk: z.record(z.string(), z.string()),
+    en: z.record(z.string(), z.string()).optional(),
+  }),
+  icons: z.record(z.string(), z.record(z.string(), z.string())),
+  patches: z.array(patchSchema),
+  modifierKeys: z
+    .record(z.string(), z.strictObject({ desc: z.string(), flat: z.boolean(), wired: z.boolean() }))
+    .optional(),
+  rules: z.custom<unknown>((v) => v === undefined || typeof v === 'function').optional(),
+  ui: z.string().optional(),
+});
+
+/**
+ * Checks every pack before anything else reads it: forbidden keys, then the shape of the whole
+ * pack. A pack whose id cannot be read is named by its position in the input (`#2`).
+ */
+function checkPacks(packs: readonly ContentPack[]): void {
+  packs.forEach((p, i) => {
+    const raw = (p as { manifest?: { id?: unknown } } | null)?.manifest;
+    const label = typeof raw?.id === 'string' && raw.id !== '' ? raw.id : `#${i}`;
+    if (p === null || typeof p !== 'object') return fail(label, 'a pack must be an object');
+    const { rules: _rules, ...plain } = p;
+    void _rules;
+    scanKeys(label, plain, 'pack');
+    const parsed = packEnvelopeSchema.safeParse(p);
+    if (!parsed.success) fail(label, `malformed pack (${issues(parsed.error)})`);
+  });
+}
+
 // ---------- order ----------
 
 function loadOrder(packs: readonly ContentPack[]): ContentPack[] {
   const byId = new Map<string, ContentPack>();
   for (const p of packs) {
-    const parsed = packManifestSchema.safeParse(p.manifest);
-    if (!parsed.success)
-      fail(String((p.manifest as { id?: unknown }).id), `bad manifest (${issues(parsed.error)})`);
     if (byId.has(p.manifest.id)) fail(p.manifest.id, 'duplicate pack id');
     byId.set(p.manifest.id, p);
   }
@@ -242,7 +290,31 @@ function applyPatch(
   lists: Map<string, Plain[]>,
   patched: Set<string>,
   patchedBy: Map<string, string>,
+  balance: Plain,
+  balanceOwners: Map<string, string>,
 ): void {
+  if ('balance' in patch) {
+    const { path, set } = patch.balance;
+    const parts = path.split('.');
+    let at: unknown = balance;
+    for (const part of parts.slice(0, -1)) {
+      if (!isPlain(at) || !Object.hasOwn(at, part))
+        return fail(pack, `balance patch: "${path}" does not exist`);
+      at = at[part];
+    }
+    const last = parts[parts.length - 1] ?? '';
+    if (!isPlain(at) || !Object.hasOwn(at, last))
+      return fail(pack, `balance patch: "${path}" does not exist`);
+    if (isPlain(at[last])) return fail(pack, `balance patch: "${path}" is not a leaf`);
+    const key = `balance:${path}`;
+    if (patched.has(key))
+      return fail(pack, `balance patch: "${path}" was already set by another pack`);
+    patched.add(key);
+    at[last] = clone(set);
+    balanceOwners.set(path, pack);
+    if (parts[0] === 'K' && parts[1] !== undefined) balanceOwners.set(`K.${parts[1]}`, pack);
+    return;
+  }
   const { kind, id } = patch.target;
   if (!ENTITY_LIST_SET.has(kind)) return fail(pack, `patch targets unknown list "${kind}"`);
   const entity = lists.get(kind)?.find((e) => e.id === id);
@@ -296,12 +368,8 @@ function ownsLocaleKey(pack: string, key: string): boolean {
 }
 
 export function composeContent(packs: readonly ContentPack[]): ContentDb {
+  checkPacks(packs);
   const ordered = loadOrder(packs);
-  for (const pack of ordered) {
-    const { rules: _rules, ...plain } = pack;
-    void _rules;
-    scanKeys(pack.manifest.id, plain, 'pack');
-  }
 
   const lists = new Map<string, Plain[]>();
   const keyed = new Map<string, Plain[]>([
@@ -463,7 +531,8 @@ export function composeContent(packs: readonly ContentPack[]): ContentDb {
 
   // Patches run in load order, after everything is merged.
   const patched = new Set<string>();
-  for (const { pack, patch } of patches) applyPatch(pack, patch, lists, patched, patchedBy);
+  for (const { pack, patch } of patches)
+    applyPatch(pack, patch, lists, patched, patchedBy, balance, balanceOwners);
 
   // Modifier keys: the families of the composed skills, then each pack's declarations.
   const skills = (lists.get('skills') ?? []) as { id: string; activity: string }[];

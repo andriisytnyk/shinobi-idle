@@ -37,6 +37,8 @@ export type {
   PackBalance,
   PackRules,
   Patch,
+  EntityPatch,
+  BalancePatch,
   PatchTarget,
 } from './pack.ts';
 export * from './constants.ts';

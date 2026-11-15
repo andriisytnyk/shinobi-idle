@@ -1,6 +1,5 @@
 {
   "rock": { "t": "skill", "skill": "cc", "level": 15 },
-  "water": { "t": "skill", "skill": "cc", "level": 30 },
   "brush": {
     "t": "any",
     "of": [
@@ -8,6 +7,7 @@
       { "t": "technique", "id": "core:sickle_weasel" }
     ]
   },
+  "water": { "t": "skill", "skill": "cc", "level": 30 },
   "mist": {
     "t": "any",
     "of": [

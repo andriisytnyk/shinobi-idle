@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { testmodPack } from '@shinobi/content/testmod';
-import { composeContent, corePack, type ContentPack } from '../src/index.ts';
+import { composeContent, corePack, validateClosure, type ContentPack } from '../src/index.ts';
 import { mod, throwsFor } from './pack-helpers.ts';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test data is mutated loosely
@@ -169,7 +169,7 @@ describe('the closure validator catches more than references', () => {
     throwsFor(
       [corePack, tm((p) => (p.data.bosses![0]!.bounty.repeatShare = 5))],
       'testmod',
-      /bosses/,
+      /bosses: \d+\.bounty\.repeatShare/,
     );
   });
 
@@ -185,8 +185,9 @@ describe('the closure validator catches more than references', () => {
     });
     const db = composeContent([corePack, optional]);
     expect(db.balance.K.repPerMission['testmod:trial']).toBeUndefined();
-    // The core ranks V and OP have no rate cap or reputation entry either: the default is none.
+    // The core rank OP has no rate cap or reputation entry either (V has both): the default is none.
     expect(db.balance.K.missionRateCap['OP']).toBeUndefined();
+    expect(db.balance.K.repPerMission['OP']).toBeUndefined();
   });
 
   it('exercises the test pack: its rank, status and village stage are referenced and checked', () => {
@@ -235,28 +236,112 @@ describe('errors name the pack that caused them', () => {
     throwsFor([corePack, bad], 'traitor', /"traitor:ghost" is not a known traits/);
   });
 
-  it('names the pack whose modifier key clashes with a skill family key', () => {
-    const skill = mod('famclash', {
-      data: {
-        skills: [{ id: 'famclash:s', group: 'craft', activity: 'none', unlockReq: null }],
-      },
-      locales: {
-        uk: {
-          'skill.famclash:s.name': 'x',
-          'skill.famclash:s.desc': 'y',
-        },
-      },
+  it('refuses a declared modifier key that a skill family already produces', () => {
+    // A pack other than core cannot declare such a key (it must start with its own prefix), so the
+    // invariant is exercised with a core whose declarations clash with its own skill families.
+    const clash = {
+      ...corePack,
       modifierKeys: {
-        'famclash:a': { desc: 'A key of a test pack', flat: false, wired: false },
+        ...corePack.modifierKeys,
+        'xp.skill.tai': { desc: 'A key that a family produces', flat: false, wired: false },
       },
-    });
-    expect(() => composeContent([corePack, skill])).not.toThrow();
+    };
+    throwsFor([clash], 'core', /modifier key "xp.skill.tai" is already defined by pack "core"/);
   });
 
   it('copies the modifier keys of a pack instead of sharing them', () => {
     const key = both.modifierKeys['testmod:forge.bonus'];
     expect(key).toBeDefined();
     expect(key).not.toBe(testmodPack.modifierKeys?.['testmod:forge.bonus']);
+  });
+});
+
+describe('a malformed pack is named, not thrown as a TypeError', () => {
+  const broken = (change: (p: Record<string, unknown>) => void, name = 'broken'): ContentPack => {
+    const pack = JSON.parse(JSON.stringify(mod(name))) as Record<string, unknown>;
+    change(pack);
+    return pack as unknown as ContentPack;
+  };
+
+  it('names the pack for null, missing or wrongly typed fields', () => {
+    for (const field of ['data', 'balance', 'locales', 'icons', 'patches'])
+      throwsFor([corePack, broken((p) => (p[field] = null))], 'broken', /malformed pack/);
+    throwsFor([corePack, broken((p) => (p.locales = 5))], 'broken', /malformed pack/);
+    throwsFor([corePack, broken((p) => (p.patches = [null]))], 'broken', /malformed pack/);
+    throwsFor([corePack, broken((p) => (p.patches = [{}]))], 'broken', /malformed pack/);
+    throwsFor([corePack, broken((p) => (p.extra = 1))], 'broken', /malformed pack/);
+  });
+
+  it('names the pack by its position when its id cannot be read', () => {
+    throwsFor([corePack, broken((p) => delete p.manifest)], '#1', /malformed pack/);
+    throwsFor([corePack, broken((p) => (p.manifest = null))], '#1', /malformed pack/);
+    throwsFor([corePack, null as unknown as ContentPack], '#1', /must be an object/);
+  });
+
+  it('does not throw an unnamed error for a patch value that JSON cannot carry', () => {
+    const pack = mod('undef', {
+      patches: [{ target: { kind: 'enemies', id: 'core:wolf' }, set: { cl: undefined } }],
+    });
+    throwsFor([corePack, pack], 'undef', /after composing and patching|malformed/);
+  });
+
+  it('rejects pack ids that are member names of Object', () => {
+    for (const id of ['constructor', 'prototype'])
+      throwsFor([corePack, mod(id)], id, /member name of Object/);
+  });
+});
+
+describe('balance patches', () => {
+  const patch = (id: string, path: string, set: unknown): ContentPack =>
+    mod(id, { patches: [{ balance: { path, set } } as never] });
+
+  it('replaces an existing leaf in load order', () => {
+    const db = composeContent([corePack, patch('tweaker', 'K.power.E', 12)]);
+    expect(db.balance.K.power['E']).toBe(12);
+    expect(corePack.balance.K).toBeDefined();
+    expect(composeContent([corePack]).balance.K.power['E']).toBe(10);
+  });
+
+  it('refuses a missing path, an object, a clash and a bad value, naming the pack', () => {
+    throwsFor([corePack, patch('tweaker', 'K.nothing.here', 1)], 'tweaker', /does not exist/);
+    throwsFor([corePack, patch('tweaker', 'K.power', 1)], 'tweaker', /is not a leaf/);
+    throwsFor(
+      [corePack, patch('tweak_a', 'K.power.E', 11), patch('tweak_b', 'K.power.E', 12)],
+      'tweak_b',
+      /already set by another pack/,
+    );
+    throwsFor([corePack, patch('tweaker', 'K.power.E', 'abc')], 'tweaker', /after composing/);
+    throwsFor([corePack, patch('tweaker', 'K.__proto__.x', 1)], 'tweaker', /does not exist/);
+  });
+});
+
+describe('the closure validator scans every list of the database', () => {
+  it('finds an unknown modifier key in an extra field of the first entity of each list', () => {
+    const lists = Object.entries(both).filter(
+      ([k, v]) =>
+        !['balance', 'packs', 'modifierKeys', 'icons', 'locales'].includes(k) &&
+        typeof v === 'object',
+    );
+    expect(lists.length).toBeGreaterThan(40);
+    for (const [list, value] of lists) {
+      const copy = JSON.parse(JSON.stringify(both)) as Record<string, unknown>;
+      const target = copy[list] as Record<string, unknown>;
+      const holder: Record<string, unknown> = Array.isArray(target)
+        ? (target[0] as Record<string, unknown>)
+        : target;
+      if (typeof holder !== 'object' || holder === null) continue;
+      holder.zz = { key: 'made.up', op: 'add', value: 1 };
+      const problems = validateClosure(copy as unknown as typeof both, {
+        owner: () => 'testmod',
+        iconOwner: () => 'testmod',
+        described: {},
+      });
+      expect(
+        problems.some((p) => p.message.includes('unknown modifier key "made.up"')),
+        `${list} is not scanned`,
+      ).toBe(true);
+      void value;
+    }
   });
 });
 

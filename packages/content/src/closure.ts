@@ -7,23 +7,6 @@
 import type { ContentDb, Req } from './schema.ts';
 import type { EntityListKey } from './pack.ts';
 
-/** The lists whose entities may carry modifiers, searched deeply. */
-const ENTITY_LISTS_FOR_SCAN = [
-  'practices',
-  'obstacles',
-  'pools',
-  'buildings',
-  'gear',
-  'items',
-  'techniques',
-  'missions',
-  'quests',
-  'exams',
-  'operations',
-  'zones',
-  'cells',
-] as const;
-
 export interface ClosureProblem {
   pack: string;
   message: string;
@@ -454,10 +437,21 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     }
   }
   // ----- modifiers everywhere -----
-  for (const list of ENTITY_LISTS_FOR_SCAN) {
-    for (const e of (db as unknown as Record<string, { id: string }[]>)[list] ?? []) {
-      at(list, e.id);
-      scanMods(e, '');
+  // Every list of the database is scanned (derived from the database itself, so a list that a later
+  // task adds cannot be forgotten); only the balance object and what composeContent adds are not.
+  const NOT_SCANNED = new Set(['balance', 'packs', 'modifierKeys', 'icons', 'locales']);
+  for (const [list, value] of Object.entries(db)) {
+    if (NOT_SCANNED.has(list)) continue;
+    if (Array.isArray(value)) {
+      (value as Record<string, unknown>[]).forEach((e, n) => {
+        at(list, String(e.id ?? e.item ?? e.product ?? n));
+        scanMods(e, '');
+      });
+    } else if (value !== null && typeof value === 'object') {
+      for (const [key, e] of Object.entries(value)) {
+        at(list, key);
+        scanMods(e, '');
+      }
     }
   }
 

@@ -45,11 +45,23 @@ export interface PatchTarget {
  * top-level arrays. Patches run in load order after all packs are merged; a patch to an entity that
  * does not exist is an error naming the pack.
  */
-export interface Patch {
+export interface EntityPatch {
   target: PatchTarget;
   set?: Record<string, unknown>;
   append?: Record<string, readonly unknown[]>;
 }
+
+/**
+ * A change to a balance leaf of another pack: `path` is the dotted path from the balance object
+ * (`K.power.E`, `pace.tai`); the leaf must exist and `set` replaces it (a number, a string, a
+ * boolean or a list; never an object). Applied in load order with the entity patches; two packs
+ * may not set the same path.
+ */
+export interface BalancePatch {
+  balance: { path: string; set: number | string | boolean | readonly unknown[] };
+}
+
+export type Patch = EntityPatch | BalancePatch;
 
 /**
  * The behaviour of a pack: a function that receives the base rules object and returns the extended

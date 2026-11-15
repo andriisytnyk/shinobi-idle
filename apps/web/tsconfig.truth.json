@@ -1,0 +1,9 @@
+{
+  "//": "The normal type check of the app (svelte-check) without tsconfig.legacy-ids.json: against the truthful types of @shinobi/content. Run by `pnpm typecheck:open`; see open-typecheck.json.",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["svelte", "vite/client", "node"]
+  },
+  "include": ["src", "test", "scripts", "vite.config.ts"]
+}
