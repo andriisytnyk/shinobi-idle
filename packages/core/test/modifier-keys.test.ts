@@ -41,7 +41,7 @@ const CLEAR_MIND = 'core:tonik_iasnoho_rozumu';
 
 /** Fills a skill's pool to exactly `pct` percent of its capacity, the threshold a checkpoint names. */
 function reach(state: GameState, skill: SkillId, pct: number): void {
-  state.pools[skill].xp = (poolCapacity(skill, content) * pct) / 100;
+  state.pools[skill]!.xp = (poolCapacity(skill, content) * pct) / 100;
 }
 
 const withProvider = (...mods: Modifier[]): Rules => ({
@@ -91,11 +91,11 @@ describe('A5: pool checkpoints switch on exactly at their share', () => {
           ),
         );
       const below = genin();
-      below.pools[p.skill].xp = threshold - 0.001;
+      below.pools[p.skill]!.xp = threshold - 0.001;
       // Other checkpoints of the same skill below this one may be on; this one must not be.
       const countBelow = from(below).length;
       const at = genin();
-      at.pools[p.skill].xp = threshold;
+      at.pools[p.skill]!.xp = threshold;
       expect(from(at).length, p.id).toBe(countBelow + p.mods.length);
     }
   });
@@ -105,7 +105,7 @@ describe('A5: pool checkpoints switch on exactly at their share', () => {
     const p = checkpoint('herb', 10);
     const key = 'bush.stock';
     const threshold = (poolCapacity('herb', content) * 10) / 100;
-    state.pools.herb.xp = threshold - 1;
+    state.pools.herb!.xp = threshold - 1;
     expect(getMod(state, key, content).total).toBe(1);
     gainPoolXp(state, 'herb', 1, content);
     expect(state.events.some((e) => e.type === 'poolCheckpoint' && e.id === p.id)).toBe(true);
@@ -115,7 +115,7 @@ describe('A5: pool checkpoints switch on exactly at their share', () => {
   it('keeps the 95% checkpoints text-only', () => {
     const state = genin();
     for (const skill of Object.keys(state.pools) as (keyof typeof state.pools)[]) {
-      state.pools[skill].xp = poolCapacity(skill, content);
+      state.pools[skill]!.xp = poolCapacity(skill, content);
     }
     const sources = new Set(
       Object.keys(MODIFIER_KEYS)
@@ -135,17 +135,17 @@ describe('A4: each wired key changes its mechanic by exactly the modifier', () =
   const cases: Record<string, () => void> = {
     'xp.all': () => {
       const s = genin();
-      const before = s.skills.cc.xp;
+      const before = s.skills.cc!.xp;
       gainXp(s, 'cc', 100, content, withProvider(test('xp.all', 0.1)));
-      expect(s.skills.cc.xp - before).toBeCloseTo(110, 9);
+      expect(s.skills.cc!.xp - before).toBeCloseTo(110, 9);
     },
     'xp.skill.*': () => {
       // pool_cc_10: +5% Chakra Control XP
       const s = genin();
       reach(s, 'cc', 10);
-      const before = s.skills.cc.xp;
+      const before = s.skills.cc!.xp;
       gainXp(s, 'cc', 100, content, defaultRules);
-      expect(s.skills.cc.xp - before).toBeCloseTo(105, 9);
+      expect(s.skills.cc!.xp - before).toBeCloseTo(105, 9);
       expect(getMod(s, 'xp.skill.cc', content).parts[0]?.source).toEqual({
         kind: 'skill',
         id: 'cc',
@@ -163,7 +163,7 @@ describe('A4: each wired key changes its mechanic by exactly the modifier', () =
       );
       expect(s.mastery['core:clone']?.xp).toBeCloseTo(1200, 9);
       // The pool takes its share of the unmodified amount.
-      expect(s.pools.nin.xp).toBeCloseTo(poolGain(1000, content), 9);
+      expect(s.pools.nin!.xp).toBeCloseTo(poolGain(1000, content), 9);
     },
     'mastery.xp.skill.*': () => {
       // pool_med_10: +5% mastery XP of Meditation
@@ -427,12 +427,12 @@ describe('A4: each wired key changes its mechanic by exactly the modifier', () =
 
   it('stays split-invariant with every checkpoint reached and a gathering action running', () => {
     const a = genin(3);
-    a.pools.herb.xp = poolCapacity('herb', content);
+    a.pools.herb!.xp = poolCapacity('herb', content);
     setLevel(a, 'herb', 1);
     dispatch(a, start('gather', MINT), content);
     advance(a, 2 * HOUR, content);
     const b = genin(3);
-    b.pools.herb.xp = poolCapacity('herb', content);
+    b.pools.herb!.xp = poolCapacity('herb', content);
     setLevel(b, 'herb', 1);
     dispatch(b, start('gather', MINT), content);
     for (let i = 0; i < 7200; i++) advance(b, 1000, content);

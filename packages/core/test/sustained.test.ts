@@ -37,7 +37,7 @@ function grind(
   state.team = teamFor(content, nature);
   const levels = levelsFor(enemy.cl, nature);
   for (const skill of Object.keys(levels) as (keyof typeof levels)[])
-    setLevel(state, skill, levels[skill]);
+    setLevel(state, skill, levels[skill]!);
   refreshUnlocks(state, content, true);
   updateQuests(state, content);
   state.events = [];

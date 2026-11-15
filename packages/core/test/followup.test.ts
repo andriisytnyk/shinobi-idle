@@ -291,11 +291,11 @@ describe('names and loaded state are checked', () => {
     };
     const loaded = deserialize(JSON.stringify(raw), content);
     expect(loaded.loadouts.active).not.toContain('core:body_replacement');
-    expect(loaded.loadouts.active.length).toBeLessThanOrEqual(K.loadout.slots.genin);
+    expect(loaded.loadouts.active.length).toBeLessThanOrEqual(K.loadout.slots.genin!);
     const natures = loaded.loadouts.active
       .map((id) => content.techniques.find((t) => t.id === id)?.skill)
       .filter((s) => s === 'katon' || s === 'futon');
-    expect(new Set(natures).size).toBeLessThanOrEqual(K.loadout.natures.genin);
+    expect(new Set(natures).size).toBeLessThanOrEqual(K.loadout.natures.genin!);
   });
 });
 
@@ -342,7 +342,7 @@ describe('a stance-dependent signature', () => {
     expect(state.loadouts.signature).toBe(lotus);
     expect(state.loadouts.active).toContain(lotus);
     expect(state.loadouts.active).toContain('core:gate_of_healing');
-    expect(state.loadouts.active.length).toBeLessThanOrEqual(K.loadout.slots.genin);
+    expect(state.loadouts.active.length).toBeLessThanOrEqual(K.loadout.slots.genin!);
     // Turning the auto-loadout off and on again changes nothing about it.
     dispatch(state, { type: 'loadout.auto', on: false }, content);
     dispatch(state, { type: 'loadout.auto', on: true }, content);

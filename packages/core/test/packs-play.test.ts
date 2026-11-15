@@ -21,6 +21,8 @@ import {
   plainContent,
   plainRules,
   setSkill,
+  skillsOf,
+  poolsOf,
 } from './packs-helpers.ts';
 
 const start = (kind: string, id: string) => ({ type: 'action.start', slot: 0, kind, id }) as const;
@@ -30,9 +32,9 @@ describe('a game composed with the test pack', () => {
     const state = modGenin();
     expect(state.packs.map((p) => p.id)).toEqual(['core', 'testmod']);
     expect(state.rankOrder).toEqual(['student', 'genin', 'chunin', 'testmod:adept']);
-    expect(state.skills['testmod:forge']).toEqual({ xp: 0 });
-    expect(state.skills['testmod:aether']).toEqual({ xp: 0 });
-    expect(state.pools['testmod:forge']).toEqual({ xp: 0 });
+    expect(skillsOf(state)['testmod:forge']).toEqual({ xp: 0 });
+    expect(skillsOf(state)['testmod:aether']).toEqual({ xp: 0 });
+    expect(poolsOf(state)['testmod:forge']).toEqual({ xp: 0 });
     expect(state.currencies[TOKEN]).toBe(0);
     expect(Object.keys(state.currencies)).toEqual(['ryo', 'rep', 'intel', TOKEN]);
     // The core game has none of it.
@@ -47,11 +49,11 @@ describe('a game composed with the test pack', () => {
       ok: true,
     });
     advance(state, HOUR, modContent, modRules);
-    expect(state.skills['testmod:forge']?.xp).toBeGreaterThan(0);
+    expect(skillsOf(state)['testmod:forge']?.xp).toBeGreaterThan(0);
     expect(skillLevel(state, 'testmod:forge', modContent)).toBeGreaterThan(1);
     expect(state.bank['testmod:elixir']).toBeGreaterThan(10);
     expect(state.mastery['testmod:elixir_brew']?.xp).toBeGreaterThan(0);
-    expect(levelAt(state.skills['testmod:forge']?.xp ?? 0, modContent.balance.K.cap)).toBe(
+    expect(levelAt(skillsOf(state)['testmod:forge']?.xp ?? 0, modContent.balance.K.cap)).toBe(
       skillLevel(state, 'testmod:forge', modContent),
     );
     // The listing of the skill's actions follows its activity, not its id.
@@ -83,7 +85,7 @@ describe('a game composed with the test pack', () => {
 
     expect(dispatch(state, start('practice', technique), modContent, modRules).ok).toBe(true);
     advance(state, 30 * 60_000, modContent, modRules);
-    expect(state.skills['testmod:aether']?.xp).toBeGreaterThan(0);
+    expect(skillsOf(state)['testmod:aether']?.xp).toBeGreaterThan(0);
     const info = actionInfo(state, { kind: 'practice', id: technique }, modContent, modRules);
     const plain = modGenin();
     const base = actionInfo(plain, { kind: 'practice', id: technique }, modContent, modRules);
@@ -221,8 +223,8 @@ describe('a game composed with the test pack', () => {
       dispatch(s, start('craft', 'testmod:elixir_brew'), modContent, modRules);
     advance(forge, 600_000, modContent, modRules);
     advance(bare, 600_000, modContent, modRules);
-    expect(forge.skills['testmod:forge']?.xp).toBeGreaterThan(
-      bare.skills['testmod:forge']?.xp ?? 0,
+    expect(skillsOf(forge)['testmod:forge']?.xp).toBeGreaterThan(
+      skillsOf(bare)['testmod:forge']?.xp ?? 0,
     );
     expect(xpAt(2)).toBeGreaterThan(0);
   });

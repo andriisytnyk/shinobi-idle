@@ -20,6 +20,9 @@ import {
   plainRules,
   setSkill,
   withoutPackData,
+  skillsOf,
+  poolsOf,
+  setNatures,
 } from './packs-helpers.ts';
 
 const LEAF = 'core:leaf_whirlwind';
@@ -33,7 +36,7 @@ const start = (kind: string, id: string) => ({ type: 'action.start', slot: 0, ki
 function coreOnly(state: GameState, content: typeof plainContent): void {
   setSkill(state, 'tai', 12);
   state.player.rank = 'chunin';
-  state.player.natures = ['katon'];
+  setNatures(state, ['katon']);
   state.team = teamFor(content, 'katon');
 }
 
@@ -45,9 +48,9 @@ function withPack(): GameState {
   advance(state, HOUR, modContent, modRules);
   setSkill(state, 'testmod:forge', 3);
   setSkill(state, 'testmod:aether', 2);
-  state.pools['testmod:forge'] = { xp: 123 };
+  poolsOf(state)['testmod:forge'] = { xp: 123 };
   state.mastery['testmod:elixir_brew'] = { xp: 456 };
-  state.player.natures = ['katon', 'testmod:aether'];
+  setNatures(state, ['katon', 'testmod:aether']);
   state.player.rank = 'testmod:adept';
   state.currencies[TOKEN] = 7;
   state.bank['testmod:pellet'] = 5;
@@ -127,9 +130,9 @@ describe('a save made with the pack, loaded without it', () => {
     expect(again.player.rank).toBe('testmod:adept');
     expect(again.player.natures).toEqual(['katon', 'testmod:aether']);
     for (const skill of ['testmod:forge', 'testmod:aether']) {
-      expect(again.skills[skill]).toEqual(original.skills[skill]);
+      expect(skillsOf(again)[skill]).toEqual(skillsOf(original)[skill]);
     }
-    expect(again.pools['testmod:forge']).toEqual({ xp: 123 });
+    expect(poolsOf(again)['testmod:forge']).toEqual({ xp: 123 });
     expect(again.mastery['testmod:elixir_brew']).toEqual({ xp: 456 });
     expect(again.currencies[TOKEN]).toBe(TOKENS);
     expect(again.bank['testmod:pellet']).toBe(PELLETS);
@@ -180,7 +183,7 @@ describe('a core save loaded with the pack present', () => {
     expect(eventsOf(state, 'packsChanged')).toEqual([
       expect.objectContaining({ added: ['testmod'], removed: [] }),
     ]);
-    expect(state.skills['testmod:forge']).toEqual({ xp: 0 });
+    expect(skillsOf(state)['testmod:forge']).toEqual({ xp: 0 });
     expect(state.currencies[TOKEN]).toBe(0);
     expect(state.player.rank).toBe('chunin');
     expect(state.packs.map((p) => p.id)).toEqual(['core', 'testmod']);

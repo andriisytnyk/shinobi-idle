@@ -37,8 +37,17 @@ export function plainGenin(seed = 1): GameState {
   return state;
 }
 
+/** The skills of a state keyed by any id (the legacy mapping types the keys as the ids of the core pack). */
+export const skillsOf = (state: GameState): Record<string, { xp: number }> => state.skills;
+export const poolsOf = (state: GameState): Record<string, { xp: number }> => state.pools;
+
+/** Gives the player natures by id, whatever pack they come from. */
+export function setNatures(state: GameState, natures: string[]): void {
+  state.player.natures = natures as GameState['player']['natures'];
+}
+
 export function setSkill(state: GameState, skill: string, level: number): void {
-  state.skills[skill] = { xp: xpAt(level) };
+  skillsOf(state)[skill] = { xp: xpAt(level) };
 }
 
 /** The core data that a save without the pack must keep, whatever the pack did: the state without the pack bookkeeping. */

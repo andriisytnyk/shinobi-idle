@@ -98,10 +98,10 @@ describe('gather', () => {
       if (!herb) throw new Error('no herb');
       setLevel(s, 'herb', level);
       if (herb.req) setLevel(s, 'cc', 30);
-      const before = s.skills.herb.xp;
+      const before = s.skills.herb!.xp;
       ok(s, gather(herb.id));
       advance(s, HOUR, content, plainRules);
-      const perHour = s.skills.herb.xp - before;
+      const perHour = s.skills.herb!.xp - before;
       expect(perHour / rate(level, content)).toBeGreaterThan(0.98);
       expect(perHour / rate(level, content)).toBeLessThan(1.02);
     });
@@ -124,7 +124,7 @@ describe('gather', () => {
     ok(s, gather(MINT));
     advance(s, 60_000, content, plainRules);
     expect(s.mastery[MINT]?.xp).toBeGreaterThan(0);
-    expect(s.pools.herb.xp).toBeGreaterThan(0);
+    expect(s.pools.herb!.xp).toBeGreaterThan(0);
     expect(s.bushes[MINT]).toMatchObject({ size: expect.any(Number), carry: 0 });
   });
 
@@ -132,12 +132,12 @@ describe('gather', () => {
     const s = genin();
     s.gear[SICKLE] = 2;
     expect(getMod(s, 'interval.skill.herb', content).total).toBeCloseTo(
-      1 - 2 * K.gearFx.sickle,
+      1 - 2 * K.gearFx.sickle!,
       12,
     );
     ok(s, gather(MINT));
     const size = K.field.stockBase + 1;
-    const cycle = Math.round(K.gather * 1000 * (1 - 2 * K.gearFx.sickle));
+    const cycle = Math.round(K.gather * 1000 * (1 - 2 * K.gearFx.sickle!));
     advance(s, cycle * size, content, plainRules);
     expect(s.bank[MINT]).toBe(size);
   });
@@ -166,12 +166,12 @@ describe('craft', () => {
       const s = genin();
       setLevel(s, recipe.skill, level);
       for (const i of recipe.ingredients) s.bank[i.item] = BIG;
-      const before = s.skills[recipe.skill].xp;
+      const before = s.skills[recipe.skill]!.xp;
       ok(s, craft(id));
       advance(s, HOUR, content, plainRules);
       const crafts = s.counters['actions.craft'] ?? 0;
       expect(crafts).toBe(HOUR / (K.craft * 1000));
-      const perHour = s.skills[recipe.skill].xp - before;
+      const perHour = s.skills[recipe.skill]!.xp - before;
       expect(perHour / (rate(level, content) * K.craftXpMult)).toBeGreaterThan(0.98);
       expect(perHour / (rate(level, content) * K.craftXpMult)).toBeLessThan(1.02);
       for (const i of recipe.ingredients) expect(s.bank[i.item]).toBe(BIG - crafts * i.n);
@@ -224,8 +224,8 @@ describe('craft', () => {
     expect(s.counters['actions.craft']).toBe(crafts);
     const used = (BIG - (s.bank[MINT] ?? 0)) / 2;
     const kept = 1 - used / crafts;
-    expect(kept).toBeGreaterThan(2 * K.gearFx.alembic - 0.015);
-    expect(kept).toBeLessThan(2 * K.gearFx.alembic + 0.015);
+    expect(kept).toBeGreaterThan(2 * K.gearFx.alembic! - 0.015);
+    expect(kept).toBeLessThan(2 * K.gearFx.alembic! + 0.015);
     // The water was kept in exactly the same crafts.
     expect(BIG - (s.bank['core:water'] ?? 0)).toBe(used);
   });
@@ -235,7 +235,7 @@ describe('craft', () => {
     s.gear['core:stantsii_proviantu'] = 1;
     stocked(s, { 'core:rice': 20, 'core:salt': 10 });
     ok(s, craft('core:onihiri'));
-    const interval = Math.round((K.craft * 1000) / (1 + K.gearFx.stations));
+    const interval = Math.round((K.craft * 1000) / (1 + K.gearFx.stations!));
     advance(s, interval, content, plainRules);
     expect(s.counters['actions.craft']).toBe(1);
   });
@@ -330,9 +330,9 @@ describe('A6: tonics', () => {
     ok(s, start('meditate', med));
     const gains: number[] = [];
     for (let i = 0; i < 42; i++) {
-      const before = s.skills.med.xp;
+      const before = s.skills.med!.xp;
       advance(s, K.meditate * 1000, content, plainRules);
-      gains.push(s.skills.med.xp - before);
+      gains.push(s.skills.med!.xp - before);
     }
     for (let i = 0; i < 40; i++) expect(gains[i]).toBeCloseTo(baseXp * 1.05, 6);
     expect(gains[40]).toBeCloseTo(baseXp, 6);
@@ -462,7 +462,7 @@ describe('A8: shops', () => {
     const s = genin();
     stocked(s, { 'core:pelt': 3, [OINTMENT]: 4, 'core:kunai': 2, [MINT]: 2 });
     ok(s, { type: 'shop.sell', item: 'core:pelt', n: 2 });
-    expect(s.currencies.ryo).toBe(2 * K.sell.pelt);
+    expect(s.currencies.ryo).toBe(2 * K.sell.pelt!);
     expect(s.bank['core:pelt']).toBe(1);
     const ointment = (2 * (K.shop.herbBase + 5 * K.shop.herbPerLevel) + (K.goods.oil ?? 0)) / 2;
     expect(sellPrice(OINTMENT, content)).toBe(Math.floor(ointment * K.shop.craftSellFactor));
@@ -540,17 +540,17 @@ describe('A9: training gear', () => {
     s.gear['core:stantsii_proviantu'] = 2;
     s.gear['core:karty_i_kompas'] = 1;
     const mod = (key: string) => getMod(s, key, content);
-    expect(mod('xp.skill.tai').total).toBeCloseTo(1 + 2 * K.gearFx.mannequin, 12);
+    expect(mod('xp.skill.tai').total).toBeCloseTo(1 + 2 * K.gearFx.mannequin!, 12);
     expect(mod('xp.skill.tai').parts[0]?.source).toEqual({
       kind: 'gear',
       id: 'core:trenuvalni_manekeny',
     });
-    expect(mod('interval.skill.herb').total).toBeCloseTo(1 - K.gearFx.sickle, 12);
-    expect(mod('craft.keep.alch').total).toBeCloseTo(1 + 2 * K.gearFx.alembic, 12);
-    expect(mod('interval.skill.prov').total).toBeCloseTo(1 / (1 + 2 * K.gearFx.stations), 12);
+    expect(mod('interval.skill.herb').total).toBeCloseTo(1 - K.gearFx.sickle!, 12);
+    expect(mod('craft.keep.alch').total).toBeCloseTo(1 + 2 * K.gearFx.alembic!, 12);
+    expect(mod('interval.skill.prov').total).toBeCloseTo(1 / (1 + 2 * K.gearFx.stations!), 12);
     // Athletics level 1 takes its own small cut off the same key.
     expect(mod('interval.explore').total).toBeCloseTo(
-      (1 - K.gearFx.maps) * (1 - K.scouting.athPerLevel),
+      (1 - K.gearFx.maps!) * (1 - K.scouting.athPerLevel),
       12,
     );
   });
@@ -563,7 +563,10 @@ describe('A9: training gear', () => {
       ok(s, start('practice', 'core:leaf_whirlwind'));
       advance(s, 60_000, content, plainRules);
     }
-    expect(geared.skills.tai.xp / plain.skills.tai.xp).toBeCloseTo(1 + 3 * K.gearFx.mannequin, 6);
+    expect(geared.skills.tai!.xp / plain.skills.tai!.xp).toBeCloseTo(
+      1 + 3 * K.gearFx.mannequin!,
+      6,
+    );
   });
 });
 
@@ -585,8 +588,8 @@ describe('A11: a scripted run from genin with 500 ryo', () => {
     // Practice the two crafts up to their level 5 recipes.
     run(craft(ANTIDOTE), 90_000);
     run(craft('core:onihiri'), 90_000);
-    expect(s.skills.alch.xp).toBeGreaterThanOrEqual(xpAt(5));
-    expect(s.skills.prov.xp).toBeGreaterThanOrEqual(xpAt(5));
+    expect(s.skills.alch!.xp).toBeGreaterThanOrEqual(xpAt(5));
+    expect(s.skills.prov!.xp).toBeGreaterThanOrEqual(xpAt(5));
     run(gather(NETTLE), 120_000);
     run(craft(OINTMENT), 6 * K.craft * 1000);
     run(craft(CLEAR_MIND), 6 * K.craft * 1000);

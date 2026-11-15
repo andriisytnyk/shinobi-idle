@@ -112,7 +112,7 @@ describe('a hostile save', () => {
     expect(loaded.slots[0]?.data).toMatchObject({ s: 0 });
     advance(loaded, 60 * MIN, content);
     expect(loaded.counters['missions.done.core:mail']).toBeGreaterThanOrEqual(1);
-    expect(Number.isFinite(loaded.skills.ath.xp)).toBe(true);
+    expect(Number.isFinite(loaded.skills.ath!.xp)).toBe(true);
     expect(Reflect.has(Object, 'xp')).toBe(false);
     expect(Reflect.has(Object.prototype, 'xp')).toBe(false);
   }

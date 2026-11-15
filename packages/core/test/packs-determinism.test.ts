@@ -9,7 +9,7 @@ import {
   type GameState,
 } from '../src/index.ts';
 import { TOKEN } from '../src/testmod/index.ts';
-import { HOUR, modContent, modGenin, modRules, setSkill } from './packs-helpers.ts';
+import { HOUR, modContent, modGenin, modRules, setSkill, skillsOf } from './packs-helpers.ts';
 
 const start = (kind: string, id: string, slot = 0) =>
   ({ type: 'action.start', slot, kind, id }) as const;
@@ -47,7 +47,7 @@ describe('a game with the test pack', () => {
     const state = run(busy(), [2 * HOUR], 2 * HOUR);
     // Twelve payments of the system and the three tokens of the quest of the pack that the forge level finished.
     expect(state.currencies[TOKEN]).toBe(15);
-    expect(state.skills['testmod:forge']?.xp).toBeGreaterThan(0);
+    expect(skillsOf(state)['testmod:forge']?.xp).toBeGreaterThan(0);
     expect(state.stats.completed).toBeGreaterThan(100);
   });
 

@@ -145,7 +145,7 @@ describe('A7: building obstacles', () => {
 
   it('applies obstacle.cost modifiers to the price', () => {
     const s = rich();
-    s.pools.ath.xp = (poolCapacity('ath', content) * 10) / 100; // -5% obstacle price
+    s.pools.ath!.xp = (poolCapacity('ath', content) * 10) / 100; // -5% obstacle price
     const second = content.obstacles.find((o) => o.id === NEUTRAL[2]);
     if (!second) throw new Error('no obstacle');
     expect(buildCost(s, second, content, defaultRules)).toBe(Math.round(600 * 0.95));
@@ -179,9 +179,9 @@ describe('A7: laps', () => {
       const pillar = n >= K.athletics.pillarCount ? 1 + K.athletics.pillarXp : 1;
       const expected =
         built.reduce((sum, o) => sum + (rate(o.level, content) * K.obstacle) / 3600, 0) * pillar;
-      const before = s.skills.ath.xp;
+      const before = s.skills.ath!.xp;
       courseKind.complete(s, 'ath', content, defaultRules);
-      expect(s.skills.ath.xp - before).toBeCloseTo(expected, 6);
+      expect(s.skills.ath!.xp - before).toBeCloseTo(expected, 6);
       // Every built obstacle earned mastery.
       for (const o of built) expect(s.mastery[o.id]?.xp, o.id).toBeGreaterThan(0);
     },
@@ -196,12 +196,12 @@ describe('A7: laps', () => {
       expect(s.counters['actions.course'] ?? 0).toBe(0);
       advance(s, 1, content);
       expect(s.counters['actions.course']).toBe(1);
-      const before = s.skills.ath.xp;
+      const before = s.skills.ath!.xp;
       advance(s, HOUR, content);
       const meanRate =
         builtObstacles(s, content).reduce((sum, o) => sum + rate(o.level, content), 0) / n;
-      expect((s.skills.ath.xp - before) / meanRate).toBeGreaterThan(0.99);
-      expect((s.skills.ath.xp - before) / meanRate).toBeLessThan(1.01);
+      expect((s.skills.ath!.xp - before) / meanRate).toBeGreaterThan(0.99);
+      expect((s.skills.ath!.xp - before) / meanRate).toBeLessThan(1.01);
     }
   });
 
@@ -263,11 +263,11 @@ describe('A7: modifiers of built obstacles', () => {
     build(s, 2, 'core:obtiazhuvachi');
     const base = rich();
     const gainOf = (state: GameState, rules = defaultRules) => {
-      const before = state.skills.tai.xp;
+      const before = state.skills.tai!.xp;
       // gainXp via a practice cycle of a known technique is covered elsewhere; call the kind directly.
       state.known['core:leaf_whirlwind'] = true;
       rules.actionKinds.practice?.complete(state, 'core:leaf_whirlwind', content, rules);
-      return state.skills.tai.xp - before;
+      return state.skills.tai!.xp - before;
     };
     expect(gainOf(s) / gainOf(base)).toBeCloseTo(1.03, 9);
   });
@@ -275,10 +275,10 @@ describe('A7: modifiers of built obstacles', () => {
   it('resizes bonuses with obstacle.bonus and penalties with obstacle.penalty', () => {
     const s = rich();
     build(s, 2, 'core:obtiazhuvachi');
-    s.pools.ath.xp = (poolCapacity('ath', content) * 25) / 100; // +2% to every bonus
+    s.pools.ath!.xp = (poolCapacity('ath', content) * 25) / 100; // +2% to every bonus
     expect(getMod(s, 'xp.skill.tai', content).total).toBeCloseTo(1 + 0.03 * 1.02, 12);
     expect(getMod(s, 'speed.skill.ath', content).total).toBeCloseTo(1 - 0.02, 12);
-    s.pools.ath.xp = (poolCapacity('ath', content) * 50) / 100; // and -25% to every penalty
+    s.pools.ath!.xp = (poolCapacity('ath', content) * 50) / 100; // and -25% to every penalty
     expect(getMod(s, 'xp.skill.tai', content).total).toBeCloseTo(1 + 0.03 * 1.02, 12);
     expect(getMod(s, 'speed.skill.ath', content).total).toBeCloseTo(1 - 0.02 * 0.75, 12);
   });

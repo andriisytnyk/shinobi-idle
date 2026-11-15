@@ -21,7 +21,7 @@ export const HOUR = 3_600_000;
 export function openWorld(state: GameState): void {
   // The region flags follow from rank and Scouting (a save recomputes them), so the Scouting level is raised to open every region.
   const top = Math.max(...content.regions.map((r) => r.scout));
-  if (state.skills.scout.xp < xpAt(top)) state.skills.scout.xp = xpAt(top);
+  if (state.skills.scout!.xp < xpAt(top)) state.skills.scout!.xp = xpAt(top);
   refreshRegions(state, content, true);
   // The Forest of Death zones belong to the exam chain, which raises their flag.
   state.flags['region.exam.unlocked'] = true;
@@ -72,7 +72,7 @@ export function withNatures(state: GameState, ...natures: NatureId[]): GameState
 }
 
 export function setLevel(state: GameState, skill: SkillId, level: number): void {
-  state.skills[skill].xp = xpAt(level);
+  state.skills[skill]!.xp = xpAt(level);
 }
 
 export function start(kind: string, id: string, slot = 0) {

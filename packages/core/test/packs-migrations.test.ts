@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { advance, deserialize, MIGRATIONS, serialize, STATE_VERSION, xpAt } from '../src/index.ts';
-import { HOUR, modContent, modRules, plainContent, plainRules } from './packs-helpers.ts';
+import { HOUR, modContent, modRules, plainContent, plainRules, skillsOf } from './packs-helpers.ts';
 
 const fixture = (name: string): { tag: string; saves: Record<string, string> } =>
   JSON.parse(
@@ -60,7 +60,7 @@ for (const name of ['saves-v10', 'saves-v11', 'saves-v12', 'saves-v13']) {
       it(`${who}: loads with the test pack present and says the pack appeared`, () => {
         const state = deserialize(text, modContent, modRules);
         expect(state.packs.map((p) => p.id)).toEqual(['core', 'testmod']);
-        expect(state.skills['testmod:forge']).toEqual({ xp: 0 });
+        expect(skillsOf(state)['testmod:forge']).toEqual({ xp: 0 });
         expect(state.events).toContainEqual(
           expect.objectContaining({ type: 'packsChanged', added: ['testmod'], removed: [] }),
         );

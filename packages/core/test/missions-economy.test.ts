@@ -58,9 +58,9 @@ describe('A10: the economy of the board', () => {
       const minutes = list.reduce((s, m) => s + m.minutes, 0);
       const perMin = ryo / minutes;
       console.log(
-        `${rank} missions pay ${perMin.toFixed(2)} ryo per minute (the balance says ${K.ryoPerMin[rank]})`,
+        `${rank} missions pay ${perMin.toFixed(2)} ryo per minute (the balance says ${K.ryoPerMin[rank]!})`,
       );
-      expect(Math.abs(perMin - K.ryoPerMin[rank]) / K.ryoPerMin[rank]).toBeLessThan(0.05);
+      expect(Math.abs(perMin - K.ryoPerMin[rank]!) / K.ryoPerMin[rank]!).toBeLessThan(0.05);
     }
   });
 
@@ -102,7 +102,7 @@ describe('A10: the economy of the board', () => {
     const m = mission('core:rockfall');
     const slow = missionForecast(natural(m, false), m, content, defaultRules);
     const fast = natural(m, false);
-    fast.skills.doton.xp *= 4;
+    fast.skills.doton!.xp *= 4;
     const quick = missionForecast(fast, m, content, defaultRules);
     expect(quick.nominalMs).toBeLessThan(slow.nominalMs);
     expect(quick.ryoPerHour).toBeGreaterThan(slow.ryoPerHour);
