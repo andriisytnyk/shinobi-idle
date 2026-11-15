@@ -358,7 +358,7 @@ describe('hooks (D13)', () => {
       },
     };
     const state = genin();
-    state.skills.tai.xp = 0;
+    state.skills.tai!.xp = 0;
     booted = await bootApp([coreUi, watcher], state, '#/skills');
     seen.length = 0;
     await booted.go('#/bank');

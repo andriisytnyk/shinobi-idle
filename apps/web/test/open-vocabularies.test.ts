@@ -145,7 +145,8 @@ describe('the interface names no core vocabulary or entity (D3, D5, D6)', () => 
     for (const [name, entry] of Object.entries(ALLOWED)) {
       const file = files.find((f) => f.name === name);
       expect(file, name).toBeDefined();
-      for (const id of entry.ids) expect(quoted(id).test(file?.text ?? ''), `${name} ${id}`).toBe(true);
+      for (const id of entry.ids)
+        expect(quoted(id).test(file?.text ?? ''), `${name} ${id}`).toBe(true);
       expect(entry.why.length).toBeGreaterThan(20);
     }
   });

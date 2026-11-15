@@ -12,7 +12,7 @@
   import { techniqueRelations } from '../lib/technique-links.ts';
   import { game } from '../lib/store.ts';
   import { entityName } from '../lib/entities.ts';
-  import { promotedRank } from '../lib/vocab.ts';
+  import { asRank, promotedRank } from '../lib/vocab.ts';
 
   const content = game.content;
 
@@ -33,7 +33,7 @@
       if (!tech) return null;
       const of: Req[] = [{ t: 'skill', skill: tech.skill, level: tech.level }];
       if (tech.src === 'N' && tech.mentor === 'other')
-        of.push({ t: 'rank', rank: promotedRank(content) });
+        of.push({ t: 'rank', rank: asRank(promotedRank(content)) });
       return evalReq(gs, { t: 'all', of }, content);
     }),
   );

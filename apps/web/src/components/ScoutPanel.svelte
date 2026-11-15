@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { SkillId } from '@shinobi/content';
   import { exploreIntervalMs, walkMs } from '@shinobi/core';
   import { actionRef } from '../lib/entities.ts';
   import { formatDuration, formatInt } from '../lib/format.ts';
@@ -30,8 +31,8 @@
       const first = content.cells.find((c) => c.region === here) ?? content.cells[0];
       const other = content.cells.find((c) => c.region !== here);
       return {
-        xp: gs.skills[skill]?.xp ?? 0,
-        fraction: skillProgress(gs, skill).fraction,
+        xp: gs.skills[skill as SkillId]?.xp ?? 0,
+        fraction: skillProgress(gs, skill as SkillId).fraction,
         intel: held(gs, INTEL),
         action,
         exploreMs: exploreIntervalMs(gs, content, game.rules),

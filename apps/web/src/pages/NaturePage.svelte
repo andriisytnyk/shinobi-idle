@@ -1,6 +1,6 @@
 <script lang="ts">
+  import type { NatureId } from '@shinobi/content';
   import { natureConsequences, natureSetSummary, natureStatus } from '@shinobi/core';
-  import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
   import Modal from '../components/Modal.svelte';
   import NatureCard from '../components/NatureCard.svelte';
@@ -13,12 +13,12 @@
   const content = game.content;
 
   /** A choice waiting for the player's confirmation: a nature, or the paper's pick. */
-  let pending = $state<string | 'random' | null>(null);
+  let pending = $state<NatureId | 'random' | null>(null);
   /** The nature just chosen, shown with its consequences for the team. */
-  let result = $state<{ nature: string; first: boolean } | null>(null);
+  let result = $state<{ nature: NatureId; first: boolean } | null>(null);
   let error = $state<string | null>(null);
 
-  const natureIds = content.natures.map((n) => n.id);
+  const natureIds = content.natures.map((n) => n.id) as NatureId[];
   const status = $derived(game.read((gs) => natureStatus(gs, content)));
   const owned = $derived(game.read((gs) => gs.player.natures));
   const team = $derived(game.read((gs) => gs.team));

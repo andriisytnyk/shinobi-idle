@@ -193,7 +193,7 @@ describe('content and core are read-only for packs (item 4)', () => {
     // The game itself runs on the frozen content: starting and advancing write nothing into it.
     game.dispatch(START);
     booted.advance(60_000);
-    expect(game.state.skills.tai.xp).toBeGreaterThan(0);
+    expect(game.state.skills.tai!.xp).toBeGreaterThan(0);
   });
 });
 

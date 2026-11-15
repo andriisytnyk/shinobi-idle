@@ -1,5 +1,4 @@
 import type { ContentDb } from '@shinobi/content';
-import { localeKey } from '@shinobi/content';
 import { fallbackText, hasKey, reportMissing, t } from './i18n.ts';
 import { isEntityKind, type EntityRef } from './route.ts';
 
@@ -13,7 +12,7 @@ function localeKinds(kind: string): string[] {
 /** The first of an entity's text keys that has a text. */
 function textKey(ref: EntityRef, field: string): string | null {
   for (const kind of localeKinds(ref.kind)) {
-    const key = localeKey(kind, ref.id, field);
+    const key = `${kind}.${ref.id}.${field}`;
     if (hasKey(key)) return key;
   }
   return null;
@@ -28,7 +27,7 @@ export function humanId(id: string): string {
 export function entityName(ref: EntityRef): string {
   const key = textKey(ref, 'name');
   if (key) return t(key);
-  reportMissing(localeKey(localeKinds(ref.kind)[0] ?? ref.kind, ref.id, 'name'));
+  reportMissing(`${localeKinds(ref.kind)[0] ?? ref.kind}.${ref.id}.name`);
   return humanId(ref.id);
 }
 

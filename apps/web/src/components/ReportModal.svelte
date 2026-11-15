@@ -2,7 +2,7 @@
   import { actionRef, masteryRef } from '../lib/entities.ts';
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
-import { game } from '../lib/store.ts';
+  import { game } from '../lib/store.ts';
   import type { AnbuReport } from '../lib/persistence.ts';
   import EntityLink from './EntityLink.svelte';
   import Modal from './Modal.svelte';

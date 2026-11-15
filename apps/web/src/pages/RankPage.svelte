@@ -9,7 +9,7 @@
   import { senseiTestInfo } from '../lib/exam-test.ts';
   import { rankEntries } from '../lib/rank-ladder.ts';
   import { t } from '../lib/i18n.ts';
-  import { nextExamRank, rankIndex, rankName } from '../lib/vocab.ts';
+  import { asRank, nextExamRank, rankIndex, rankName } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
 
@@ -19,7 +19,7 @@
   /** The exam to show: the next one the player has to take, else the last one they passed. */
   const exam = $derived.by(() => {
     const pending = nextExamRank(content, rank);
-    if (pending !== null) return examFor(content, pending);
+    if (pending !== null) return examFor(content, asRank(pending));
     const taken = content.exams.filter(
       (e) => rankIndex(content, e.rank) <= rankIndex(content, rank),
     );

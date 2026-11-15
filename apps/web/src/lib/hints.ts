@@ -1,5 +1,5 @@
 import type { ContentDb, SkillId } from '@shinobi/content';
-import { nextExamRank, startRank } from './vocab.ts';
+import { asRank, nextExamRank, startRank } from './vocab.ts';
 import { cellLevel, evalReq, examFor, levelAt, skillLevel, type GameState } from '@shinobi/core';
 
 /** A one-time tutorial hint. Its text is `hint.<id>` and its title `hint.title.<id>`. */
@@ -57,7 +57,7 @@ export const HINTS: readonly HintDef[] = [
     id: 'examReady',
     when: (state, content) => {
       const next = nextExamRank(content, state.player.rank);
-      const exam = next === null ? undefined : examFor(content, next);
+      const exam = next === null ? undefined : examFor(content, asRank(next));
       // The checklist is shown while the first exam waits: later exams have no hint of their own.
       return (
         state.player.rank === startRank(content) &&

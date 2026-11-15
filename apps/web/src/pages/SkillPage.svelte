@@ -1,6 +1,11 @@
 <script lang="ts">
-  import { localeKey } from '@shinobi/content';
-  import { actionInfo, listSkillActions, nonNativeCastMult, skillUnlockStatus } from '@shinobi/core';
+  import { localeKey, type NatureId } from '@shinobi/content';
+  import {
+    actionInfo,
+    listSkillActions,
+    nonNativeCastMult,
+    skillUnlockStatus,
+  } from '@shinobi/core';
   import ActionTile from '../components/ActionTile.svelte';
   import GearLine from '../components/GearLine.svelte';
   import HerbTile from '../components/HerbTile.svelte';
@@ -41,7 +46,7 @@
   const natureLine = $derived.by(() =>
     game.read((gs) => {
       const natures = gs.player.natures;
-      if (!isNature(content, id) || !natures.includes(id)) return null;
+      if (!isNature(content, id) || !natures.includes(id as NatureId)) return null;
       const K = content.balance.K;
       if (natures[0] === id)
         return { text: 'nature.skillNative', pct: Math.round((K.nativeXp - 1) * 100) };

@@ -1,4 +1,4 @@
-import { content, localeKey, ukLocale } from '@shinobi/content';
+import { content, ukLocale } from '@shinobi/content';
 import { bump, createState, evalReq, updateQuests, xpAt, type GameState } from '@shinobi/core';
 import type { Component } from 'svelte';
 import { render } from 'svelte/server';
@@ -30,7 +30,7 @@ const html = <P extends Record<string, unknown>>(component: Component<P>, props:
   render(component, { props }).body;
 
 const name = (ref: EntityRef) =>
-  ukLocale[localeKey(ref.kind === 'status' ? 'state' : ref.kind, ref.id, 'name')] ?? ref.id;
+  ukLocale[`${ref.kind === 'status' ? 'state' : ref.kind}.${ref.id}.name`] ?? ref.id;
 
 const anchor = (ref: EntityRef) =>
   new RegExp(
@@ -41,7 +41,7 @@ const QUEST = 'core:graduation';
 const SCROLL = 'core:graduate_scroll';
 
 function setLevel(state: GameState, skill: 'tai' | 'nin' | 'cc' | 'ath' | 'med', level: number) {
-  state.skills[skill].xp = xpAt(level);
+  state.skills[skill]!.xp = xpAt(level);
 }
 
 /** A game at step 4 of the chain with three dummies down. */
@@ -369,7 +369,7 @@ describe('A6: developer tools', () => {
     game.dispatch({ type: 'action.start', slot: 0, kind: 'practice', id: 'core:leaf_whirlwind' });
     game.devAdvance(60_000);
     expect(game.state.now).toBe(before + 60_000);
-    expect(game.state.skills.tai.xp).toBeGreaterThan(0);
+    expect(game.state.skills.tai!.xp).toBeGreaterThan(0);
   });
 });
 

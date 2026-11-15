@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { NatureId } from '@shinobi/content';
   import type { NatureConsequences, NatureSetSummary } from '@shinobi/core';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
@@ -8,13 +9,13 @@
   import Icon from './Icon.svelte';
 
   interface Props {
-    nature: string;
+    nature: NatureId;
     cons: NatureConsequences;
     /** What the natures owned so far plus this one would open; shown while an extra nature is being chosen. */
     together?: NatureSetSummary | null;
     /** Label of the action button, or null when the nature cannot be chosen now. */
     action: 'choose' | 'add' | null;
-    onPick: (nature: string) => void;
+    onPick: (nature: NatureId) => void;
   }
 
   let { nature, cons, together = null, action, onPick }: Props = $props();

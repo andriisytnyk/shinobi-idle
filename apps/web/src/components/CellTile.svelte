@@ -3,7 +3,7 @@
   import { entityName } from '../lib/entities.ts';
   import { t } from '../lib/i18n.ts';
   import { GENERIC_POI_ICON, isEntryCell, keyIcon, keyNameKey, poiKindKey } from '../lib/world.ts';
-import { tryUi } from '../lib/ext/runtime.svelte.ts';
+  import { tryUi } from '../lib/ext/runtime.svelte.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
 

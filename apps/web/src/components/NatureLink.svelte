@@ -5,7 +5,7 @@
 
   interface Props {
     /** A nature of the content. */
-    id: string;
+    id: string | undefined;
   }
 
   let { id }: Props = $props();
@@ -14,6 +14,6 @@
   const hasSkill = $derived(game.content.skills.some((s) => s.id === id));
 </script>
 
-{#if hasSkill}<EntityLink kind="skill" {id} />{:else}<span class="nature-name"
+{#if id === undefined}<span class="nature-name">—</span>{:else if hasSkill}<EntityLink kind="skill" {id} />{:else}<span class="nature-name"
     >{natureName(id)}</span
   >{/if}

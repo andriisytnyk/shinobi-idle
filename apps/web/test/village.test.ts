@@ -187,7 +187,7 @@ describe('the village page', () => {
     app = null;
     target.innerHTML = '';
 
-    game.state.currencies.rep = K.rep.stage2;
+    game.state.currencies.rep = K.rep.stage2 ?? 0;
     game.devAdvance(0);
     mountVillage();
     expect(card('academy')?.querySelector('[data-max]')).not.toBeNull();

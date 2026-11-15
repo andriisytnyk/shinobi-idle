@@ -2,7 +2,7 @@ import type { ContentDb } from '@shinobi/content';
 import { isSkillUnlocked, skillLevel, type GameState, type Req } from '@shinobi/core';
 import { reqItemIds } from './crafts.ts';
 import { nextStep } from './next-step.ts';
-import { promotedRank, startRank } from './vocab.ts';
+import { asRank, promotedRank, startRank } from './vocab.ts';
 
 /** The requirement tree of the goal "learn this technique": the technique, its level and its rank. */
 export function techniqueGoal(id: string, content: ContentDb): Req | null {
@@ -13,7 +13,7 @@ export function techniqueGoal(id: string, content: ContentDb): Req | null {
     { t: 'skill', skill: tech.skill, level: tech.level },
   ];
   if (tech.src === 'N' && tech.mentor === 'other') {
-    of.push({ t: 'rank', rank: promotedRank(content) });
+    of.push({ t: 'rank', rank: asRank(promotedRank(content)) });
   }
   return { t: 'all', of };
 }

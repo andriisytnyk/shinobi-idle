@@ -51,9 +51,14 @@ function state(): GameState {
   gs.player.name = 'Тест';
   gs.player.rank = 'genin';
   gs.bank['testmod:pellet'] = 10;
-  gs.currencies[TOKEN] = 7;
+  (gs.currencies as Record<string, number>)[TOKEN] = 7;
   syncVillage(gs, game.content);
   return gs;
+}
+
+/** The XP of the pack's skill; the skills of the state are keyed by open ids. */
+function forgeXp(): number {
+  return (game.state.skills as Record<string, { xp: number } | undefined>)[SKILL]?.xp ?? 0;
 }
 
 /** Every text node under the app root. */
@@ -115,9 +120,9 @@ describe('the app booted with core and testmod (T1)', () => {
     start?.click();
     flushSync();
     expect(game.state.slots[0]?.action?.id).toBe('testmod:elixir_brew');
-    const before = game.state.skills[SKILL]?.xp ?? 0;
+    const before = forgeXp();
     booted.advance(60_000);
-    expect(game.state.skills[SKILL]?.xp ?? 0).toBeGreaterThan(before);
+    expect(forgeXp()).toBeGreaterThan(before);
     expect(game.state.bank['testmod:elixir'] ?? 0).toBeGreaterThan(0);
     expect(rawTexts()).toEqual([]);
   });
@@ -221,7 +226,10 @@ describe('the app booted with core and testmod (T1)', () => {
   for (const [name, hash, title] of PAGES) {
     it(`opens the ${name} page by route, with its name and no raw keys`, async () => {
       booted = await boot(hash);
-      expect(texts().some((s) => s.includes(title)), `${hash} shows «${title}»`).toBe(true);
+      expect(
+        texts().some((s) => s.includes(title)),
+        `${hash} shows «${title}»`,
+      ).toBe(true);
       expect(q('main [data-not-found]')).toBeNull();
       expect(rawTexts()).toEqual([]);
     });
@@ -229,8 +237,7 @@ describe('the app booted with core and testmod (T1)', () => {
 
   it('links the pages to each other', async () => {
     booted = await boot('#/item/testmod:pellet');
-    const hrefs = (root: string) =>
-      qa(`${root} a`).map((a) => a.getAttribute('href') ?? '');
+    const hrefs = (root: string) => qa(`${root} a`).map((a) => a.getAttribute('href') ?? '');
     expect(hrefs('main')).toContain('#/recipe/testmod:elixir_brew');
     await booted.go('#/recipe/testmod:elixir_brew');
     expect(hrefs('main')).toContain('#/item/testmod:pellet');
@@ -259,4 +266,3 @@ describe('the app booted with core and testmod (T1)', () => {
     settings.hints = false;
   });
 });
-

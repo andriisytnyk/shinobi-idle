@@ -1,5 +1,6 @@
 <script lang="ts">
   import { game } from '../lib/store.ts';
+  import type { IconKind } from '@shinobi/content';
   import { evalReq } from '@shinobi/core';
   import EntityLink from '../components/EntityLink.svelte';
   import Icon from '../components/Icon.svelte';
@@ -51,7 +52,7 @@
   <article class="entity-page" data-ui="entity-page" data-entity="{entity.kind}:{entity.id}">
     <p class="kind">{t(`entity.kind.${entity.kind}`)}</p>
     <h1 data-ui="entity-header">
-      {#if hasIcon}<Icon entity={{ kind: entity.kind, id: entity.id }} size={32} />{/if}
+      {#if hasIcon}<Icon entity={{ kind: entity.kind as IconKind, id: entity.id }} size={32} />{/if}
       {entityName(entity)}
     </h1>
     {#if desc}<p>{desc}</p>{:else}<p class="placeholder">{t('entity.placeholder')}</p>{/if}

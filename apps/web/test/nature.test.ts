@@ -102,7 +102,7 @@ describe('S4-3: the nature screen', () => {
   it('offers the second nature at Chakra Control 20, with the combined summary', () => {
     const state = genin();
     dispatch(state, { type: 'nature.choose', nature: 'katon' }, content);
-    state.skills.cc.xp = 100_000;
+    state.skills.cc!.xp = 100_000;
     game.replaceState(state);
     const body = html(NaturePage, {});
     expect(body).toContain('data-pick="futon"');
@@ -148,7 +148,7 @@ describe('S4-3: leading the new genin to the test', () => {
     dispatch(state, { type: 'nature.choose', nature: 'doton' }, content);
     game.replaceState(state);
     expect(html(NatureOffer, {})).not.toContain('data-nature-offer');
-    state.skills.cc.xp = 100_000;
+    state.skills.cc!.xp = 100_000;
     game.replaceState(state);
     expect(html(NatureOffer, {})).toContain('data-nature-offer="second"');
   });

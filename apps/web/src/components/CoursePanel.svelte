@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { localeKey } from '@shinobi/content';
+  import { localeKey, type SkillId } from '@shinobi/content';
   import {
     actionInfo,
     builtObstacles,
@@ -51,7 +51,7 @@
   function needs(slot: CourseSlotInfo, id: string) {
     const obstacle = content.obstacles.find((o) => o.id === id);
     if (!obstacle) return null;
-    const parts = [{ t: 'skill', skill, level: slot.level } as const];
+    const parts = [{ t: 'skill', skill: skill as SkillId, level: slot.level } as const];
     const own = obstacle.req;
     const tree = evalReq(game.state, { t: 'all', of: own ? [...parts, own] : [...parts] }, content);
     return tree.met ? null : tree;

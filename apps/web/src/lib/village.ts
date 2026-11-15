@@ -1,7 +1,7 @@
 import type { BuildingEffect, BuildingInfo } from '@shinobi/core';
 import { entityName } from './entities.ts';
 import { formatInt } from './format.ts';
-import { fallbackText, t } from './i18n.ts';
+import { fallbackText, hasKey, t } from './i18n.ts';
 import { game } from './store.ts';
 
 /** The order the roles are listed in on the village page. */
@@ -45,14 +45,13 @@ export function effectLines(effects: readonly BuildingEffect[]): string[] {
   }
   return [...lines.values()].map((l) => {
     const known = `village.fx.${l.family}`;
-    const text =
-      l.family === 'xp' || l.family === 'speed'
-        ? t(known, { skills: l.skills.join(', '), value: l.value })
-        : t(known, { value: l.value });
-    // An unknown key shows its name rather than nothing.
-    return text === known
-      ? t('village.fx.other', { key: fallbackText(`x.${l.key}`), value: l.value })
-      : text;
+    // A modifier that no text names shows its readable name rather than nothing.
+    if (!hasKey(known)) {
+      return t('village.fx.other', { key: fallbackText(`x.${l.key}`), value: l.value });
+    }
+    return l.family === 'xp' || l.family === 'speed'
+      ? t(known, { skills: l.skills.join(', '), value: l.value })
+      : t(known, { value: l.value });
   });
 }
 

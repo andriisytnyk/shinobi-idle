@@ -1,5 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
-import type { GameState } from '@shinobi/core';
+import type { GameState, Rank } from '@shinobi/core';
 import { localeKey } from '@shinobi/content';
 import { hasKey, t, textOf } from './i18n.ts';
 
@@ -48,6 +48,12 @@ export const natureIconRef = (
 /** Whether `id` is a nature of the content (a skill of the same id is the nature's skill). */
 export const isNature = (content: ContentDb, id: string): boolean =>
   content.natures.some((n) => n.id === id);
+
+/**
+ * A rank id as the core types it. The core types ranks as a closed union while it is migrated to
+ * open ids; the cast keeps this code valid under both the legacy and the truthful types.
+ */
+export const asRank = (id: string): Rank => id as Rank;
 
 /** The ranks in order, as ids. */
 export const rankIds = (content: ContentDb): string[] => content.playerRanks.map((r) => r.id);

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {
+  import {
     cellInfo,
     instantCost,
     travelBlocked,
@@ -13,7 +13,7 @@
   import { game } from '../lib/store.ts';
   import { keyIcon, keyNameKey, uniqueReq } from '../lib/world.ts';
   import PoiRow from './PoiRow.svelte';
-import RegionEntry from './RegionEntry.svelte';
+  import RegionEntry from './RegionEntry.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ModBreakdown from './ModBreakdown.svelte';

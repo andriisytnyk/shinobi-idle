@@ -120,7 +120,7 @@ describe('A3: the map follows the core', () => {
 
   it('a claim pays into the bank and removes the loot marker', () => {
     const state = genin();
-    state.skills.scout.xp = xpAt(20);
+    state.skills.scout!.xp = xpAt(20);
     explored(state, CACHE_CELL);
     state.world.location = CACHE_CELL;
     game.replaceState(state);
@@ -138,13 +138,13 @@ describe('A3: the map follows the core', () => {
 
   it('a region that opens is shown as open', () => {
     const state = genin();
-    state.skills.scout.xp = xpAt(9);
+    state.skills.scout!.xp = xpAt(9);
     game.replaceState(state);
     show({ cell: null, region: PLAINS });
     expect(q(`[data-region="${PLAINS}"]`)?.getAttribute('data-open')).toBe('false');
     expect(q('[data-region-closed]')).not.toBeNull();
 
-    game.state.skills.scout.xp = xpAt(10);
+    game.state.skills.scout!.xp = xpAt(10);
     game.devAdvance(1000);
     flushSync();
 
@@ -198,7 +198,11 @@ describe('A4: names are entity links', () => {
   });
 
   it('puts the cell of a fight zone on the enemy page, as links', () => {
-    app = mount(EntityPage, { target, context: coreContext(), props: { entity: { kind: 'enemy', id: 'core:wolf' } } });
+    app = mount(EntityPage, {
+      target,
+      context: coreContext(),
+      props: { entity: { kind: 'enemy', id: 'core:wolf' } },
+    });
     flushSync();
     const where = q('[data-zone-where]');
     expect(where?.querySelector(href('cell', 'core:prykordonnyi_lis_okolytsia'))).not.toBeNull();
@@ -255,7 +259,7 @@ describe('A5: a disabled control says why', () => {
 
   it('not located in the region, and not in the cell for a claim', () => {
     const state = genin();
-    state.skills.scout.xp = xpAt(20);
+    state.skills.scout!.xp = xpAt(20);
     explored(state, CACHE_CELL);
     game.replaceState(state);
     show({ cell: CACHE_CELL, region: VALLEY });
@@ -294,7 +298,7 @@ describe('A5: a disabled control says why', () => {
 
   it('an outpost trip is free and shows it', () => {
     const state = genin();
-    state.skills.scout.xp = xpAt(10);
+    state.skills.scout!.xp = xpAt(10);
     game.replaceState(state);
     game.devAdvance(1000);
     show({ cell: 'core:pivdennyi_trakt', region: PLAINS });
@@ -351,7 +355,7 @@ describe('the key-locked state', () => {
 describe('entering a newly opened region', () => {
   it('works from the visible controls: go to the region, then explore its first cell', () => {
     const state = genin();
-    state.skills.scout.xp = xpAt(10);
+    state.skills.scout!.xp = xpAt(10);
     game.replaceState(state);
     game.devAdvance(1000);
     show({ cell: null, region: PLAINS });

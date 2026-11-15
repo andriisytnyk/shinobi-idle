@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { content, localeKey, ukLocale } from '@shinobi/content';
+import { content, ukLocale } from '@shinobi/content';
 import { actionInfo, createState, syncVillage, xpAt, type GameState } from '@shinobi/core';
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -31,7 +31,7 @@ const TONIC = 'core:tonik_iasnoho_rozumu';
 const GEAR_SICKLE = 'core:serp_i_rukavytsi_travnyka';
 
 const name = (ref: EntityRef) =>
-  ukLocale[localeKey(ref.kind === 'status' ? 'state' : ref.kind, ref.id, 'name')] ?? ref.id;
+  ukLocale[`${ref.kind === 'status' ? 'state' : ref.kind}.${ref.id}.name`] ?? ref.id;
 
 const text = (el: Element | null | undefined) =>
   (el?.textContent ?? '').replace(/\s+/g, ' ').trim();
@@ -54,10 +54,10 @@ function genin(): GameState {
   state.player.rank = 'genin';
   syncVillage(state, content);
   state.player.name = 'Тест';
-  state.skills.herb.xp = xpAt(10);
-  state.skills.alch.xp = xpAt(10);
-  state.skills.prov.xp = xpAt(10);
-  state.skills.med.xp = xpAt(10);
+  state.skills.herb!.xp = xpAt(10);
+  state.skills.alch!.xp = xpAt(10);
+  state.skills.prov!.xp = xpAt(10);
+  state.skills.med!.xp = xpAt(10);
   state.currencies.ryo = 500;
   return state;
 }
@@ -332,7 +332,7 @@ describe('A6: a disabled control says why', () => {
   });
 
   it('a level that is too low, and a missing ingredient', () => {
-    game.state.skills.alch.xp = 0;
+    game.state.skills.alch!.xp = 0;
     app = mount(SkillPage, { target, context: coreContext(), props: { id: 'alch' } });
     flushSync();
     const why = (id: string) =>
@@ -342,7 +342,7 @@ describe('A6: a disabled control says why', () => {
       target.querySelector(`[data-recipe="${OINTMENT}"] .ct-action`)?.hasAttribute('disabled'),
     ).toBe(true);
 
-    game.state.skills.alch.xp = xpAt(10);
+    game.state.skills.alch!.xp = xpAt(10);
     game.devAdvance(0);
     flushSync();
     expect(why(OINTMENT)).toBe('missing');
@@ -355,7 +355,7 @@ describe('A6: a disabled control says why', () => {
   });
 
   it('a gear tier that the level or the ryo does not allow', () => {
-    game.state.skills.herb.xp = 0;
+    game.state.skills.herb!.xp = 0;
     const line = content.gear.find((g) => g.id === GEAR_SICKLE);
     if (!line) throw new Error('no sickle');
     game.state.currencies.ryo = 0;
