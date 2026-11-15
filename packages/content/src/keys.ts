@@ -21,6 +21,12 @@ export type LocaleKind =
   | 'tag'
   | 'role'
   | 'state'
+  | 'status'
+  | 'combo'
+  | 'zone'
+  | 'operation'
+  | 'exam'
+  | 'quest'
   | 'group';
 
 /** Localization key of an entity string, e.g. `technique.core:great_fireball.name`. */

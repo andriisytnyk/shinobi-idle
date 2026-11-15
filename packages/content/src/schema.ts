@@ -1,7 +1,11 @@
 import { z } from 'zod';
 import {
+  ATTACK_STYLES,
   CELL_KEYS,
+  COMBO_IDS,
   ENEMY_REGIONS,
+  STATUS_IDS,
+  ZONE_REGIONS,
   MISSION_RANKS,
   NATURE_IDS,
   PLAYER_RANK_IDS,
@@ -31,6 +35,8 @@ export const roleId = z.enum(ROLE_IDS);
 export const tagId = z.enum(TAG_IDS);
 export const traitId = z.enum(TRAIT_IDS);
 export const stateId = z.enum(STATE_IDS);
+export const statusId = z.enum(STATUS_IDS);
+export const comboId = z.enum(COMBO_IDS);
 
 const level = z.number().int().min(1).max(99);
 /** A slug for MVP resources such as `plots` or `masonry`; names live in the locale. */
@@ -54,7 +60,61 @@ export const sealSchema = z.object({
   kind: z.enum(['zodiac', 'special']),
 });
 
-export const techniqueSchema = z.strictObject({
+/** Keys of the technique effect numbers in `K.techFx`. */
+export const TECH_FX_KEYS = [
+  'shield',
+  'decoy',
+  'evasionBuff',
+  'passiveNegate',
+  'gateOpening',
+  'gateHealing',
+  'nextCast',
+  'reveal',
+] as const;
+/** Keys of the boss special numbers in `K.bossFx`. */
+export const BOSS_FX_KEYS = [
+  'wolfPack',
+  'rivalDuel',
+  'rivalTournament',
+  'drunkenEvasion',
+  'heavyCast',
+  'twins',
+  'mistRehide',
+  'illusion',
+] as const;
+/** Keys of the trophy tables `K.dropChance` and `K.sell`. */
+export const TROPHY_KEYS = ['band', 'pelt', 'fang', 'coin', 'gem'] as const;
+
+/**
+ * What a technique does besides damage. Numbers are never stored here: an effect names its entry
+ * of `K.techFx` by `fx`, and damage comes from the formulas.
+ */
+export const techniqueEffectSchema = z.discriminatedUnion('kind', [
+  z.strictObject({ kind: z.literal('damage') }),
+  z.strictObject({ kind: z.literal('none') }),
+  z.strictObject({ kind: z.literal('shield'), fx: z.literal('shield') }),
+  z.strictObject({ kind: z.literal('decoy'), fx: z.literal('decoy') }),
+  z.strictObject({ kind: z.literal('evasionBuff'), fx: z.literal('evasionBuff') }),
+  z.strictObject({ kind: z.literal('cleanse'), statuses: z.array(statusId).min(1) }),
+  z.strictObject({ kind: z.literal('passiveNegate'), fx: z.literal('passiveNegate') }),
+  z.strictObject({ kind: z.literal('stance'), fx: z.enum(['gateOpening', 'gateHealing']) }),
+  z.strictObject({ kind: z.literal('nextCast'), fx: z.literal('nextCast') }),
+  z.strictObject({ kind: z.literal('reveal'), fx: z.literal('reveal') }),
+]);
+
+export const techniqueCombatSchema = z.strictObject({
+  effect: techniqueEffectSchema,
+  /** Needs a stance (the First Gate) to be active. */
+  requiresStance: z.boolean().optional(),
+  /** The combo that always triggers with this technique. */
+  guaranteedCombo: comboId.optional(),
+  /** A series that hits every enemy. */
+  hitsAll: z.boolean().optional(),
+  /** Works without a slot in the loadout. */
+  outOfLoadout: z.boolean().optional(),
+});
+
+export const techniqueBaseSchema = z.strictObject({
   id: coreId,
   skill: techSkillId,
   level,
@@ -75,6 +135,11 @@ export const techniqueSchema = z.strictObject({
   sealsCanon: z.boolean(),
   tier: z.union([z.literal(-1), z.literal(0), z.literal(1)]),
   noDamage: z.boolean(),
+});
+
+export const techniqueSchema = techniqueBaseSchema.extend({
+  /** Combat behaviour; `null` for training drills, which are never cast. */
+  combat: techniqueCombatSchema.nullable(),
 });
 
 export const exerciseSchema = z.object({ id: coreId, level });
@@ -120,6 +185,29 @@ export const itemSchema = z.strictObject({
   madeFrom: z.array(ingredientRef),
   /** What using the item from the bank does, if it can be used. */
   use: itemUseSchema.optional(),
+  /** Key of the buy price in `K.goods`; the price itself is never stored on the item. */
+  buy: z.string().min(1).optional(),
+  /** Key of the sell price in `K.sell`. */
+  sell: z.enum(TROPHY_KEYS).optional(),
+  /** A tool that rides in the pouch; a pouch slot holds `K.pouchStack` of them. */
+  pouch: z.boolean().optional(),
+  /** A scroll that teaches the technique; the price of a library scroll is `K.scroll[level]`. */
+  scroll: z
+    .strictObject({
+      technique: coreId,
+      source: z.discriminatedUnion('t', [
+        z.strictObject({ t: z.literal('library'), level: z.number().int().min(1).max(5) }),
+        /** Found at a place on the map; never sold. */
+        z.strictObject({ t: z.literal('found') }),
+        /** Assembled from the technique's scroll parts. */
+        z.strictObject({ t: z.literal('parts') }),
+        /** Given by a quest chain. */
+        z.strictObject({ t: z.literal('quest') }),
+      ]),
+    })
+    .optional(),
+  /** A part of a scroll: `K.partsPerScroll` of them make the scroll of the technique. */
+  part: z.strictObject({ technique: coreId }).optional(),
 });
 
 export const marketEntrySchema = z.object({
@@ -194,7 +282,8 @@ export const regionSchema = z.object({
   cells: z.array(coreId),
 });
 
-export const enemySchema = z.strictObject({
+/** The part of an enemy that the importer generates from the slice and the balance tables. */
+export const enemyBaseSchema = z.strictObject({
   id: coreId,
   region: z.enum(ENEMY_REGIONS),
   cl: z.number().int(),
@@ -208,7 +297,62 @@ export const enemySchema = z.strictObject({
 });
 
 /** A boss has no region field: its place is a localized string. */
-export const bossSchema = enemySchema.omit({ region: true });
+export const bossBaseSchema = enemyBaseSchema.omit({ region: true });
+
+/** Hand-written combat data of one enemy or boss. Numbers are referenced by key, never stored. */
+export const enemyCombatDataSchema = z.strictObject({
+  style: z.enum(ATTACK_STYLES),
+  /** Trophies the enemy can drop; the chance is the key of `K.dropChance` and equals the item slug. */
+  drops: z.array(z.strictObject({ item: coreId, chance: z.enum(TROPHY_KEYS) })),
+});
+
+/** What an enemy leaves behind. Everything here is derived from the balance object at load. */
+const enemyLootSchema = z.strictObject({
+  style: z.enum(ATTACK_STYLES),
+  drops: z.array(z.strictObject({ item: coreId, chance: z.number().gt(0).lt(1) })),
+  /** Ryo range of one kill: combat level times the `K.ryoDrop` range. */
+  ryo: z.tuple([z.number().int().min(1), z.number().int().min(1)]),
+  /** A scroll part of the carried technique: by chance for an enemy, by count for a boss. */
+  scrollPart: z
+    .strictObject({
+      item: coreId,
+      technique: coreId,
+      chance: z.number().gt(0).lt(1).optional(),
+      count: z.number().int().min(1).optional(),
+    })
+    .nullable(),
+  /** First-kill bounty of a boss and the share paid for repeats; `null` without a bounty. */
+  bounty: z.strictObject({ first: z.number().int().min(1), repeatShare: z.number() }).nullable(),
+});
+
+export const enemySchema = enemyBaseSchema.extend(enemyLootSchema.shape);
+
+/** A boss special: the structure is data, the numbers come from `K.bossFx` by `fx`. */
+export const bossSpecialSchema = z.discriminatedUnion('kind', [
+  z.strictObject({ kind: z.literal('packRespawn'), fx: z.literal('wolfPack') }),
+  z.strictObject({
+    kind: z.literal('rival'),
+    fx: z.enum(['rivalDuel', 'rivalTournament']),
+    /** Casts a signature technique. */
+    signature: z.boolean(),
+    /** The rival's nature is the one that beats the player's first nature. */
+    nature: z.literal('beatsPlayerFirst'),
+  }),
+  z.strictObject({ kind: z.literal('evasionByMissingHp'), fx: z.literal('drunkenEvasion') }),
+  z.strictObject({ kind: z.literal('heavyCast'), fx: z.literal('heavyCast'), stun: z.boolean() }),
+  z.strictObject({ kind: z.literal('twins'), fx: z.literal('twins'), poisonMist: z.boolean() }),
+  /** Hidden again at intervals; the bind lasts `K.bind.dur`. */
+  z.strictObject({
+    kind: z.literal('rehide'),
+    fx: z.literal('mistRehide'),
+    bindPlayer: z.boolean(),
+  }),
+  z.strictObject({ kind: z.literal('illusion'), fx: z.literal('illusion') }),
+]);
+
+export const bossSchema = bossBaseSchema.extend(enemyLootSchema.shape).extend({
+  special: bossSpecialSchema,
+});
 
 export const buildingSchema = z.object({
   id: coreId,
@@ -324,6 +468,57 @@ export const examSchema = z.strictObject({
   }),
 });
 
+// ---------- combat world: zones, operations, statuses, traits, combos ----------
+
+/** A place where one enemy is fought over and over. */
+export const zoneSchema = z.strictObject({
+  id: coreId,
+  enemy: coreId,
+  region: z.enum(ZONE_REGIONS),
+  /** What opens the zone; `null` when it is open from the first day. */
+  unlock: reqSchema.nullable(),
+});
+
+export const operationStageSchema = z.discriminatedUnion('t', [
+  /** Traps and detours, no enemy; shortened when the requirement holds. */
+  z.strictObject({ t: z.literal('approach'), shortenedBy: reqSchema }),
+  z.strictObject({ t: z.literal('fight'), enemy: coreId }),
+  /** Several "days" of fights drawn from a pool, ending with a fixed enemy. */
+  z.strictObject({
+    t: z.literal('days'),
+    days: z.number().int().min(1),
+    fightsPerDay: z.number().int().min(1),
+    pool: z.array(coreId).min(1),
+    finale: coreId,
+  }),
+]);
+
+/** A series of fights with partial recovery between them (`K.opRegen`). */
+export const operationSchema = z.strictObject({
+  id: coreId,
+  unlock: reqSchema.nullable(),
+  /** Key of the recovery share between fights in the balance object. */
+  regen: z.literal('opRegen'),
+  stages: z.array(operationStageSchema).min(1),
+});
+
+/** A status; its numbers live in the balance object under the status id. */
+export const statusSchema = z.strictObject({ id: statusId });
+
+/** An enemy trait: the tag that answers it and where its numbers live in the balance object. */
+export const traitSchema = z.strictObject({
+  id: traitId,
+  answer: tagId,
+  numbers: z.strictObject({
+    /** The balance object that holds them: `K.trait`, or `K.pack` for the pack trait. */
+    from: z.enum(['trait', 'pack']),
+    keys: z.array(z.string().min(1)).min(1),
+  }),
+});
+
+/** A combo: `nature` hitting a fighter in `onState`; its number is `K.combo[id]`. */
+export const comboSchema = z.strictObject({ id: comboId, nature: natureId, onState: stateId });
+
 // ---------- balance ----------
 
 const pair = z.tuple([z.number(), z.number()]);
@@ -374,6 +569,53 @@ export const balanceParamsSchema = z.object({
     shockWet: z.number(),
     mudEva: z.number(),
     steam: z.number(),
+  }),
+  techFx: z.object({
+    shield: z.object({ mult: z.number(), durationMs: z.number().int() }),
+    decoy: z.object({ charges: z.number().int(), durationMs: z.number().int() }),
+    evasionBuff: z.object({ mult: z.number(), durationMs: z.number().int() }),
+    passiveNegate: z.object({ everyMs: z.number().int() }),
+    gateOpening: z.object({
+      taiDamage: z.number(),
+      staminaPerSec: z.number(),
+      woundsAfter: z.number().int(),
+    }),
+    gateHealing: z.object({
+      taiDamage: z.number(),
+      staminaPerSec: z.number(),
+      woundsAfter: z.number().int(),
+    }),
+    nextCast: z.object({ castMult: z.number() }),
+    reveal: z.object({ durationMs: z.number().int() }),
+  }),
+  bossFx: z.object({
+    wolfPack: z.object({ count: z.number().int(), everyMs: z.number().int() }),
+    rivalDuel: z.object({ techniques: z.number().int() }),
+    rivalTournament: z.object({ techniques: z.number().int(), habituationMult: z.number() }),
+    drunkenEvasion: z.object({ maxMult: z.number() }),
+    heavyCast: z.object({
+      everyMs: z.number().int(),
+      castMs: z.number().int(),
+      damageMult: z.number(),
+    }),
+    twins: z.object({ count: z.number().int() }),
+    mistRehide: z.object({ everyMs: z.number().int() }),
+    illusion: z.object({ everyMs: z.number().int(), fleeAtHp: z.number() }),
+  }),
+  ryoDrop: pair,
+  dropChance: z.object({
+    band: z.number(),
+    pelt: z.number(),
+    fang: z.number(),
+    coin: z.number(),
+    gem: z.number(),
+  }),
+  sell: z.object({
+    band: z.number().int(),
+    pelt: z.number().int(),
+    fang: z.number().int(),
+    coin: z.number().int(),
+    gem: z.number().int(),
   }),
   wheel: z.number(),
   habituation: z.number(),
@@ -522,15 +764,40 @@ export const contentDbSchema = z.object({
   balance: balanceSchema,
   quests: z.array(questSchema),
   exams: z.array(examSchema),
+  zones: z.array(zoneSchema),
+  operations: z.array(operationSchema),
+  statuses: z.array(statusSchema),
+  traits: z.array(traitSchema),
+  combos: z.array(comboSchema),
 });
 
-/** The part of the database the importer generates; quests and exams are hand-written. */
-export const generatedDbSchema = contentDbSchema.omit({ quests: true, exams: true });
+/**
+ * The part of the database the importer generates. Quests, exams and the combat world are
+ * hand-written; technique combat data and enemy loot are layered on at load (overlay.ts).
+ */
+export const generatedDbSchema = contentDbSchema
+  .omit({
+    quests: true,
+    exams: true,
+    zones: true,
+    operations: true,
+    statuses: true,
+    traits: true,
+    combos: true,
+  })
+  .extend({
+    techniques: z.array(techniqueBaseSchema),
+    enemies: z.array(enemyBaseSchema),
+    bosses: z.array(bossBaseSchema),
+  });
 export type GeneratedDb = z.infer<typeof generatedDbSchema>;
 
 export type Skill = z.infer<typeof skillSchema>;
 export type Seal = z.infer<typeof sealSchema>;
 export type Technique = z.infer<typeof techniqueSchema>;
+export type TechniqueBase = z.infer<typeof techniqueBaseSchema>;
+export type EnemyBase = z.infer<typeof enemyBaseSchema>;
+export type BossBase = z.infer<typeof bossBaseSchema>;
 export type Exercise = z.infer<typeof exerciseSchema>;
 export type Practice = z.infer<typeof practiceSchema>;
 export type Obstacle = z.infer<typeof obstacleSchema>;
@@ -554,6 +821,16 @@ export type QuestStep = z.infer<typeof questStepSchema>;
 export type QuestObjective = z.infer<typeof questObjectiveSchema>;
 export type QuestRewards = z.infer<typeof questRewardsSchema>;
 export type Exam = z.infer<typeof examSchema>;
+export type Zone = z.infer<typeof zoneSchema>;
+export type Operation = z.infer<typeof operationSchema>;
+export type OperationStage = z.infer<typeof operationStageSchema>;
+export type Status = z.infer<typeof statusSchema>;
+export type TraitEntity = z.infer<typeof traitSchema>;
+export type Combo = z.infer<typeof comboSchema>;
+export type TechniqueCombat = z.infer<typeof techniqueCombatSchema>;
+export type TechniqueEffect = z.infer<typeof techniqueEffectSchema>;
+export type BossSpecial = z.infer<typeof bossSpecialSchema>;
+export type EnemyCombatData = z.infer<typeof enemyCombatDataSchema>;
 export type ItemUse = z.infer<typeof itemUseSchema>;
 export type EntityRefData = z.infer<typeof entityRefSchema>;
 export type Balance = z.infer<typeof balanceSchema>;
