@@ -49,15 +49,13 @@ function yardstick(c: number, nature: string): PlayerSnapshot {
   levels.cc = Math.min(K.cap, d);
   const skills: string[] = ['tai', 'nin', ...NATURES];
   const known = content.techniques
-    .filter(
-      (t) => skills.includes(t.skill) && t.rank !== null && t.level <= (levels[t.skill] ?? 0),
-    )
+    .filter((t) => skills.includes(t.skill) && t.rank !== null && t.level <= (levels[t.skill] ?? 0))
     .map((t) => t.id);
   return {
     levels,
     mastery: Object.fromEntries(known.map((id) => [id, 20])),
     known,
-    natures: [nature],
+    natures: [nature] as PlayerSnapshot['natures'],
     costMod: { chakra: 1, stamina: 1 },
     tier: 2,
   };

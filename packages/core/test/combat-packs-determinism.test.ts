@@ -16,7 +16,16 @@ import {
   type GameState,
 } from '../src/index.ts';
 import { HOUR } from './helpers.ts';
-import { TECH, caster, encounter, mod, modRules, player, sec, withAi } from './combat-packs-helpers.ts';
+import {
+  TECH,
+  caster,
+  encounter,
+  mod,
+  modRules,
+  player,
+  sec,
+  withAi,
+} from './combat-packs-helpers.ts';
 
 function game(seed: number, zone: string): GameState {
   const state = createState(seed, mod);
@@ -29,7 +38,12 @@ function game(seed: number, zone: string): GameState {
     if (s) s.xp = 30_000;
   }
   state.known[TECH] = true;
-  const started = dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: zone }, mod, modRules);
+  const started = dispatch(
+    state,
+    { type: 'action.start', slot: 0, kind: 'fight', id: zone },
+    mod,
+    modRules,
+  );
   if (!started.ok) throw new Error(`cannot start ${zone}: ${started.reason}`);
   return state;
 }
@@ -68,7 +82,8 @@ describe('a game with the test pack', () => {
     const run = (chunk: number): string => {
       const fight = createFight(player([TECH]), encounter('testmod:boss_shell'), 9, mod, rules);
       const total = sec(120);
-      for (let t = 0; t < total; t += chunk) fightAdvance(fight, Math.min(chunk, total - t), mod, rules);
+      for (let t = 0; t < total; t += chunk)
+        fightAdvance(fight, Math.min(chunk, total - t), mod, rules);
       return JSON.stringify(fight);
     };
     const whole = run(sec(120));

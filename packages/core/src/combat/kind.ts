@@ -73,7 +73,7 @@ export const fightKind: ActionKind = {
 export const operationKind: ActionKind = {
   has: (id, content) => indexOf(content).operations.has(id),
   requirements: (_state, id, content): Req | null =>
-    indexOf(content).operations.get(id)?.unlock ?? null,
+    (indexOf(content).operations.get(id)?.unlock ?? null) as Req | null,
   blocked: (state, _id, content, _rules, slot) => fightBusyReason(state, slot, content),
   intervalMs: (_state, _id, content) => content.balance.K.combat.xpTickMs,
 

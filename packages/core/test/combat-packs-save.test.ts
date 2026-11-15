@@ -19,7 +19,17 @@ import {
   type FightState,
 } from '../src/index.ts';
 import { HOUR } from './helpers.ts';
-import { TECH, caster, core, encounter, mod, modRules, player, sec, withAi } from './combat-packs-helpers.ts';
+import {
+  TECH,
+  caster,
+  core,
+  encounter,
+  mod,
+  modRules,
+  player,
+  sec,
+  withAi,
+} from './combat-packs-helpers.ts';
 
 /** A fight against the pack enemy, a few seconds in, with the pack's status on both sides. */
 function packFight(known: string[] = []): FightState {
@@ -86,7 +96,12 @@ describe('a saved fight with the ids of a pack, read with the core pack alone', 
   it('keeps a fight against a core enemy that carries pack ids, minus the ids', () => {
     const state = createState(2, mod);
     const fightId = 'core:dummy';
-    const started = dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: fightId }, mod, modRules);
+    const started = dispatch(
+      state,
+      { type: 'action.start', slot: 0, kind: 'fight', id: fightId },
+      mod,
+      modRules,
+    );
     expect(started.ok).toBe(true);
     advance(state, 10_000, mod, modRules);
     const combat = state.combat;
@@ -96,7 +111,12 @@ describe('a saved fight with the ids of a pack, read with the core pack alone', 
     body.traits.push('testmod:shelled');
     body.specials.push('testmod:thirdStrike');
     body.nature = 'testmod:aether';
-    applyStatusById(makeCtx(combat.fight, mod, modRules), combat.fight.player, 'testmod:chill', 'tester');
+    applyStatusById(
+      makeCtx(combat.fight, mod, modRules),
+      combat.fight.player,
+      'testmod:chill',
+      'tester',
+    );
     const back = deserialize(serialize(state, 0), core, defaultRules);
     expect(back.combat?.enemy).toBe(fightId);
     const read = back.combat?.fight.enemies[0];

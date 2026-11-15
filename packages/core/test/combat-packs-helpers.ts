@@ -62,7 +62,10 @@ export const caster =
       ? { type: 'technique', id }
       : { type: 'wait' };
 
-export const withAi = (combatAi: CombatAi, base: Rules = modRules): Rules => ({ ...base, combatAi });
+export const withAi = (combatAi: CombatAi, base: Rules = modRules): Rules => ({
+  ...base,
+  combatAi,
+});
 
 /** Endless health for the player, none of his basic damage, and huge health for the enemies. */
 export function quiet(fight: FightState): FightState {

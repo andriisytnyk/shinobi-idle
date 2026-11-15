@@ -245,7 +245,12 @@ function build(content: ContentDb): FightData {
     trait: all.filter((t) => t.inflicts.length === 0 && t.priority !== null).sort(byPriority),
   };
   const tallyNames = new Set<string>();
-  for (const def of [...statuses.values(), ...[...tags.values()].flatMap((t) => [...t.onHit, ...t.onUse].flatMap((o) => (o.op === 'status' ? [o.def] : [])))]) {
+  for (const def of [
+    ...statuses.values(),
+    ...[...tags.values()].flatMap((t) =>
+      [...t.onHit, ...t.onUse].flatMap((o) => (o.op === 'status' ? [o.def] : [])),
+    ),
+  ]) {
     if (def.tally) tallyNames.add(def.tally.as);
   }
   const ai = {

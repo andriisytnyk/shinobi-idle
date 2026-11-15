@@ -1,4 +1,4 @@
-import type { AiTier, ContentDb, SkillId } from '@shinobi/content';
+import type { AiTier, ContentDb, Rank, SkillId } from '@shinobi/content';
 import type { RngState } from '../rng.ts';
 
 /** Stats an effect can change. Multipliers combine by product, additions as `1 + sum`. */
@@ -130,7 +130,7 @@ export interface KitTechnique {
   id: string;
   skill: SkillId;
   role: string;
-  rank: string;
+  rank: Rank;
   tags: string[];
   state: string | null;
   damage: number;

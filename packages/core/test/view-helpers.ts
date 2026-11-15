@@ -5,7 +5,10 @@ import { fightData, type AiVocab, type KitTechnique, type ViewTechnique } from '
 export const aiVocab: AiVocab = fightData(content).ai;
 
 /** The technique row of a hand-made view: ready, with the answers and the interrupt flag its data gives. */
-export function viewTechnique(tech: KitTechnique, over: Partial<ViewTechnique> = {}): ViewTechnique {
+export function viewTechnique(
+  tech: KitTechnique,
+  over: Partial<ViewTechnique> = {},
+): ViewTechnique {
   const data = fightData(content);
   return {
     tech,

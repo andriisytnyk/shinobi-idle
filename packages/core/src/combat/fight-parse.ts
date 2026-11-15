@@ -1,4 +1,4 @@
-import type { ContentDb, SkillId } from '@shinobi/content';
+import type { ContentDb, Rank, SkillId } from '@shinobi/content';
 import type { RngState } from '../rng.ts';
 import { fightData } from './fight-data.ts';
 import { PASSIVE_NEGATE_HOOK } from './fight-hooks.ts';
@@ -344,7 +344,7 @@ function parseKit(raw: unknown, content: ContentDb, v: Vocab): PlayerKit | null 
       id: t.id,
       skill: t.skill as SkillId,
       role: t.role,
-      rank: t.rank,
+      rank: t.rank as Rank,
       tags: t.tags as string[],
       state: t.state,
       damage: t.damage as number,

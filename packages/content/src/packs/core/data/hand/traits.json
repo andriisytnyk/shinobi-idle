@@ -4,10 +4,7 @@
     "answer": "pierce",
     "numbers": {
       "from": "trait",
-      "keys": [
-        "armor",
-        "armorOff"
-      ]
+      "keys": ["armor", "armorOff"]
     },
     "mods": [
       {
@@ -26,11 +23,7 @@
     "answer": "interrupt",
     "numbers": {
       "from": "trait",
-      "keys": [
-        "casterEvery",
-        "casterCast",
-        "casterMult"
-      ]
+      "keys": ["casterEvery", "casterCast", "casterMult"]
     },
     "hook": "trait:caster",
     "casts": true
@@ -40,11 +33,7 @@
     "answer": "area",
     "numbers": {
       "from": "pack",
-      "keys": [
-        "n",
-        "hp",
-        "dmg"
-      ]
+      "keys": ["n", "hp", "dmg"]
     },
     "swarm": "pack"
   },
@@ -53,9 +42,7 @@
     "answer": "bind",
     "numbers": {
       "from": "trait",
-      "keys": [
-        "evasive"
-      ]
+      "keys": ["evasive"]
     },
     "hook": "trait:evasive",
     "priority": 2
@@ -65,9 +52,7 @@
     "answer": "dot",
     "numbers": {
       "from": "trait",
-      "keys": [
-        "regenPct"
-      ]
+      "keys": ["regenPct"]
     },
     "regen": "trait.regenPct",
     "priority": 3
@@ -77,16 +62,10 @@
     "answer": "dispel",
     "numbers": {
       "from": "trait",
-      "keys": [
-        "illusionEvery",
-        "illusionDur",
-        "illusionAcc"
-      ]
+      "keys": ["illusionEvery", "illusionDur", "illusionAcc"]
     },
     "hook": "trait:illusionist",
-    "inflicts": [
-      "illusion"
-    ],
+    "inflicts": ["illusion"],
     "priority": 1
   },
   {
@@ -94,11 +73,7 @@
     "answer": "reveal",
     "numbers": {
       "from": "trait",
-      "keys": [
-        "hidden",
-        "hiddenAcc",
-        "hiddenFirst"
-      ]
+      "keys": ["hidden", "hiddenAcc", "hiddenFirst"]
     },
     "hook": "trait:hidden",
     "priority": 1
@@ -108,14 +83,10 @@
     "answer": "cleanse",
     "numbers": {
       "from": "trait",
-      "keys": [
-        "poisonChance"
-      ]
+      "keys": ["poisonChance"]
     },
     "hook": "trait:poisoner",
-    "inflicts": [
-      "poison"
-    ],
+    "inflicts": ["poison"],
     "priority": 2
   }
 ]

@@ -24,7 +24,8 @@ export function entryOf(content: ContentDb, id: string): Enemy | Boss | undefine
  * which `zoneBlocked` checks.
  */
 export function zoneRequirement(zone: Zone): Req | null {
-  return zone.unlock;
+  // The content names a rank by an open string; the core's requirement still types it by its own list of ranks.
+  return zone.unlock as Req | null;
 }
 
 /** Why a zone cannot be fought for a reason that is no flag: its cell is not explored yet. Null when nothing is in the way. */
@@ -85,6 +86,6 @@ export function approachMs(state: GameState, op: Operation, content: ContentDb):
   const K = content.balance.K;
   const stage = op.stages.find((s) => s.t === 'approach');
   if (!stage || stage.t !== 'approach') return 0;
-  const short = evalReq(state, stage.shortenedBy, content).met;
+  const short = evalReq(state, stage.shortenedBy as Req, content).met;
   return Math.round(K.operation.approachMs * (short ? K.operation.approachShort : 1));
 }

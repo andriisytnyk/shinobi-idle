@@ -55,10 +55,13 @@ for (const [list, now] of Object.entries(entities)) {
   const before = old.entities[list] ?? {};
   for (const id of new Set([...Object.keys(before), ...Object.keys(now)])) {
     if (before[id] !== now[id]) {
-      changes.push(`${list} ${id}: ${before[id] === undefined ? 'added' : now[id] === undefined ? 'removed' : 'changed'}`);
+      changes.push(
+        `${list} ${id}: ${before[id] === undefined ? 'added' : now[id] === undefined ? 'removed' : 'changed'}`,
+      );
     }
   }
-  if (JSON.stringify(old.order[list]) !== JSON.stringify(order[list])) changes.push(`${list}: order`);
+  if (JSON.stringify(old.order[list]) !== JSON.stringify(order[list]))
+    changes.push(`${list}: order`);
 }
 console.log(changes.join('\n') || 'nothing changed');
 writeFileSync(FILE, `${JSON.stringify({ ...old, entities, order }, null, 2)}\n`);

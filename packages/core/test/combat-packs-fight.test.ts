@@ -13,7 +13,6 @@ import {
   createFight,
   createState,
   fightAdvance,
-  findEffect,
   loadoutLimits,
   makeCtx,
   prepareFor,
@@ -53,7 +52,9 @@ const find = (list: readonly Effect[], id: string) => list.find((e) => e.id === 
 describe('a status that a pack adds: damage over time and a stat modifier, stacking to two', () => {
   /** A fight with a body that has the status applied `times` times, for the status alone to play. */
   function chilled(times: number): FightState {
-    const fight = pacify(quiet(createFight(player([]), encounter('testmod:shellback'), 1, mod, modRules)));
+    const fight = pacify(
+      quiet(createFight(player([]), encounter('testmod:shellback'), 1, mod, modRules)),
+    );
     const body = fight.enemies[0];
     if (!body) throw new Error('no body');
     for (let i = 0; i < times; i++) {
@@ -65,8 +66,14 @@ describe('a status that a pack adds: damage over time and a stat modifier, stack
   it('is put on the body that a technique of its state hits', () => {
     const fight = landed('testmod:shellback', TECH, 1);
     const body = fight.enemies[0];
-    expect(find(body?.effects ?? [], 'testmod:chill')).toMatchObject({ kind: 'periodic', stacks: 1 });
-    expect(find(body?.effects ?? [], 'testmod:chill#1')).toMatchObject({ kind: 'modifier', stat: 'speed' });
+    expect(find(body?.effects ?? [], 'testmod:chill')).toMatchObject({
+      kind: 'periodic',
+      stacks: 1,
+    });
+    expect(find(body?.effects ?? [], 'testmod:chill#1')).toMatchObject({
+      kind: 'modifier',
+      stat: 'speed',
+    });
     expect(fight.tally.statuses['testmod:chill']).toBe(1);
   });
 
@@ -152,7 +159,9 @@ describe('a combo that a pack adds', () => {
 
 describe('a trait that a pack adds', () => {
   it('changes the stats of its holder, until something stops it', () => {
-    const fight = pacify(quiet(createFight(player([TECH]), encounter('testmod:shellback'), 1, mod, modRules)));
+    const fight = pacify(
+      quiet(createFight(player([TECH]), encounter('testmod:shellback'), 1, mod, modRules)),
+    );
     const body = fight.enemies[0];
     if (!body) throw new Error('no body');
     expect(stat(ctxOf(fight), body, 'damageTaken', 1)).toBeCloseTo(1 - ext('shellArmor'), 9);
@@ -161,27 +170,43 @@ describe('a trait that a pack adds', () => {
     const cracked = hit.enemies[0];
     if (!cracked) throw new Error('no body');
     expect(find(cracked.effects, 'testmod:cracked')).toBeDefined();
-    expect(stat(makeCtx(hit, mod, modRules), cracked, 'damageTaken', 1)).toBeCloseTo(ext('crackMult'), 9);
+    expect(stat(makeCtx(hit, mod, modRules), cracked, 'damageTaken', 1)).toBeCloseTo(
+      ext('crackMult'),
+      9,
+    );
     expect(hit.tally.statuses['testmod:crackBreak']).toBe(1);
   });
 
   it('is answered by the auto-loadout and the pouch with the tag it names, from data', () => {
     const known = mod.techniques
-      .filter((t) => t.rank !== null && t.level <= 40 && ['tai', 'nin', 'katon', 'futon'].includes(t.skill))
+      .filter(
+        (t) =>
+          t.rank !== null && t.level <= 40 && ['tai', 'nin', 'katon', 'futon'].includes(t.skill),
+      )
       .map((t) => t.id);
     const snap = { ...player(known), tier: 2 };
     const limits = loadoutLimits(2, mod);
     const target = { traits: ['testmod:shelled'], nature: null };
     const plan = prepareFor(snap, limits, target, { 'core:tag': 5 }, 4, null, mod);
-    const answer = mod.traits.find((t) => t.id === 'testmod:shelled')?.answer;
+    const answer = mod.traits.find((t) => (t.id as string) === 'testmod:shelled')?.answer;
     expect(answer).toBe('area');
     expect(
-      plan.techniques.some((id) => mod.techniques.find((t) => t.id === id)?.tags.includes('area' as never)),
+      plan.techniques.some((id) =>
+        mod.techniques.find((t) => t.id === id)?.tags.includes('area' as never),
+      ),
     ).toBe(true);
     // The tool that carries the tag is in the pouch.
     expect(plan.pouch.map((p) => p.id)).toContain('core:tag');
     // A body without the trait asks for no such tool.
-    const none = prepareFor(snap, limits, { traits: [], nature: null }, { 'core:tag': 5 }, 4, null, mod);
+    const none = prepareFor(
+      snap,
+      limits,
+      { traits: [], nature: null },
+      { 'core:tag': 5 },
+      4,
+      null,
+      mod,
+    );
     expect(none.pouch.map((p) => p.id)).not.toContain('core:tag');
   });
 });
@@ -203,8 +228,13 @@ describe('a nature that a pack adds', () => {
   it('is the nature of the enemy that counters it in a wheel fight, first in the list that is strong against it', () => {
     const entry = { ...mod.enemies[0], id: 'core:test', nature: 'wheel' as const };
     const fight = createFight(
-      { ...player([]), natures: ['testmod:aether'] },
-      { ...encounter('testmod:shellback'), spawns: [{ ...encounter('testmod:shellback').spawns[0]!, enemy: entry.id, nature: 'wheel' }] },
+      { ...player([]), natures: ['testmod:aether' as never] },
+      {
+        ...encounter('testmod:shellback'),
+        spawns: [
+          { ...encounter('testmod:shellback').spawns[0]!, enemy: entry.id, nature: 'wheel' },
+        ],
+      },
       1,
       mod,
       modRules,
@@ -226,7 +256,9 @@ describe('a boss special that a pack adds, implemented by a hook of the pack', (
     const total = sec(60);
     if (chunk === undefined) fightAdvance(fight, total, mod, modRules);
     else for (let t = 0; t < total; t += chunk) fightAdvance(fight, chunk, mod, modRules);
-    return (fight.log ?? []).filter((l) => l.side === 'enemy').map((l) => (l.act === 'hit' ? l.dmg : null));
+    return (fight.log ?? [])
+      .filter((l) => l.side === 'enemy')
+      .map((l) => (l.act === 'hit' ? l.dmg : null));
   }
 
   it('makes every third attack a heavy one, and only those', () => {
@@ -277,24 +309,57 @@ describe('the battle analysis and the Bingo book with a pack enemy', () => {
   it('hides the trait of a pack enemy until the player has beaten it, like any other trait', () => {
     const state = genin();
     expect(bingoLevel(state, 'testmod:shellback', mod)).toBe(0);
-    const blind = analyzeFight(state, { kind: 'zone', id: 'testmod:shellback' }, opts, mod, modRules);
+    const blind = analyzeFight(
+      state,
+      { kind: 'zone', id: 'testmod:shellback' },
+      opts,
+      mod,
+      modRules,
+    );
     expect(blind?.coverage.filter((c) => c.trait === 'testmod:shelled')).toEqual([]);
     expect(blind?.hiddenTraits).toBe(1);
-    state.bingo['testmod:shellback'] = { seen: 1, wins: 1, losses: 0, timeouts: 0, bought: 0, bounty: 0 };
-    const known = analyzeFight(state, { kind: 'zone', id: 'testmod:shellback' }, opts, mod, modRules);
+    state.bingo['testmod:shellback'] = {
+      seen: 1,
+      wins: 1,
+      losses: 0,
+      timeouts: 0,
+      bought: 0,
+      bounty: 0,
+    };
+    const known = analyzeFight(
+      state,
+      { kind: 'zone', id: 'testmod:shellback' },
+      opts,
+      mod,
+      modRules,
+    );
     expect(known?.hiddenTraits).toBe(0);
     expect(known?.coverage.find((c) => c.trait === 'testmod:shelled')).toMatchObject({
       enemy: 'testmod:shellback',
     });
     // The book page says the same.
     expect(bingoView(state, 'testmod:shellback', mod)?.hiddenTraits).toEqual(['testmod:shelled']);
-    state.bingo['testmod:shellback'] = { seen: 0, wins: 0, losses: 0, timeouts: 0, bought: 0, bounty: 0 };
+    state.bingo['testmod:shellback'] = {
+      seen: 0,
+      wins: 0,
+      losses: 0,
+      timeouts: 0,
+      bought: 0,
+      bounty: 0,
+    };
     expect(bingoView(state, 'testmod:shellback', mod)?.hiddenTraits).toBeNull();
   });
 
   it('forecasts a boss of the pack, deterministically', () => {
     const state = genin();
-    state.bingo['testmod:boss_shell'] = { seen: 1, wins: 1, losses: 0, timeouts: 0, bought: 0, bounty: 0 };
+    state.bingo['testmod:boss_shell'] = {
+      seen: 1,
+      wins: 1,
+      losses: 0,
+      timeouts: 0,
+      bought: 0,
+      bounty: 0,
+    };
     const a = analyzeFight(state, target, opts, mod, modRules);
     const b = analyzeFight(state, target, opts, mod, modRules);
     expect(a).not.toBeNull();

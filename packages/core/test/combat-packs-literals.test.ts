@@ -16,18 +16,54 @@ function coreIds(): Map<string, string> {
   const add = (kind: string, list: readonly string[]) => {
     for (const id of list) if (!ids.has(id)) ids.set(id, kind);
   };
-  add('status', content.statuses.map((s) => s.id));
-  add('state', content.states.map((s) => s.id));
-  add('combo', content.combos.map((c) => c.id));
-  add('trait', content.traits.map((t) => t.id));
-  add('nature', content.natures.map((n) => n.id));
-  add('tag', content.tags.map((t) => t.id));
-  add('role', content.roles.map((r) => r.id));
-  add('skill', content.skills.map((s) => s.id));
-  add('currency', content.currencies.map((c) => c.id));
-  add('boss special', content.bosses.map((b) => b.special.kind));
-  add('hook', content.bosses.map((b) => b.special.hook));
-  add('hook', content.traits.flatMap((t) => (t.hook === undefined ? [] : [t.hook])));
+  add(
+    'status',
+    content.statuses.map((s) => s.id),
+  );
+  add(
+    'state',
+    content.states.map((s) => s.id),
+  );
+  add(
+    'combo',
+    content.combos.map((c) => c.id),
+  );
+  add(
+    'trait',
+    content.traits.map((t) => t.id),
+  );
+  add(
+    'nature',
+    content.natures.map((n) => n.id),
+  );
+  add(
+    'tag',
+    content.tags.map((t) => t.id),
+  );
+  add(
+    'role',
+    content.roles.map((r) => r.id),
+  );
+  add(
+    'skill',
+    content.skills.map((s) => s.id),
+  );
+  add(
+    'currency',
+    content.currencies.map((c) => c.id),
+  );
+  add(
+    'boss special',
+    content.bosses.map((b) => b.special.kind),
+  );
+  add(
+    'hook',
+    content.bosses.map((b) => b.special.hook),
+  );
+  add(
+    'hook',
+    content.traits.flatMap((t) => (t.hook === undefined ? [] : [t.hook])),
+  );
   return ids;
 }
 
@@ -46,7 +82,8 @@ function literals(source: string): string[] {
  * Everything here is engine vocabulary: the name of a technique effect kind, an item effect kind,
  * a field of the balance object, a pouch use or a stat, which happens to be spelled like an id.
  */
-const FX_KIND = 'the kind of a technique or item effect (a closed union of the content schema), not a tag';
+const FX_KIND =
+  'the kind of a technique or item effect (a closed union of the content schema), not a tag';
 const ALLOWED: Record<string, string> = {
   'fight-items.ts: cleanse': FX_KIND,
   'fight-items.ts: dispel': FX_KIND,
