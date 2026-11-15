@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import {
     buildingEffectsAt,
     villageBuildCost,
@@ -13,6 +12,8 @@
   import { game } from '../lib/store.ts';
   import { effectLines, resourceName } from '../lib/village.ts';
   import SimplePage from './SimplePage.svelte';
+
+  const content = game.content;
 
   interface Props {
     id: string;

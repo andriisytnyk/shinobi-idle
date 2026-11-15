@@ -56,7 +56,7 @@ export function flagPage(id: string, content: ContentDb): string | null {
   }
   const region = /^region.([^.]+).unlocked$/.exec(id);
   if (region) {
-    const found = content.regions.find((r) => r.id === `core:${region[1]}`);
+    const found = content.regions.find((r) => r.id.slice(r.id.lastIndexOf(':') + 1) === region[1]);
     return found ? hrefFor({ kind: 'region', id: found.id }) : '#/world';
   }
   if (id.startsWith('deposit.')) return '#/world';
@@ -71,7 +71,7 @@ function pageFor(state: GameState, node: ReqResult, content: ContentDb): string 
       return hrefFor({ kind: 'skill', id: req.skill });
     case 'technique': {
       const tech = content.techniques.find((t) => t.id === req.id);
-      return hrefFor({ kind: 'skill', id: tech?.skill ?? 'nin' });
+      return tech ? hrefFor({ kind: 'skill', id: tech.skill }) : '#/skills';
     }
     case 'rank': {
       // A rank is earned by its exam: go where the exam's first missing requirement is done, or

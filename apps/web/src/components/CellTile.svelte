@@ -2,7 +2,8 @@
   import type { CellInfo } from '@shinobi/core';
   import { entityName } from '../lib/entities.ts';
   import { t } from '../lib/i18n.ts';
-  import { isEntryCell, KEY_ICON, keyNameKey, POI_ICON, poiKindKey } from '../lib/world.ts';
+  import { GENERIC_POI_ICON, isEntryCell, keyIcon, keyNameKey, poiKindKey } from '../lib/world.ts';
+import { tryUi } from '../lib/ext/runtime.svelte.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
 
@@ -14,6 +15,7 @@
 
   let { info, selected = false }: Props = $props();
 
+  const ui = tryUi();
   const explored = $derived(info.level >= 1);
   const maxed = $derived(info.level >= info.maxLevel);
   /** Points the player has found; the others are not revealed here. */
@@ -59,7 +61,7 @@
     {/if}
     {#if info.key}
       <span class="badge key" data-key={info.key} class:unmet={keyLocked}>
-        <Icon name={KEY_ICON[info.key]} size={14} />
+        <Icon name={keyIcon(info.key)} size={14} />
         <span>{t(keyNameKey(info.key))}</span>
         {#if keyLocked}<Icon name="lucide:lock" size={12} />{/if}
       </span>
@@ -105,7 +107,7 @@
           role="img"
           aria-label={`${t(poiKindKey(poi.kind))}: ${name}`}
         >
-          <Icon name={POI_ICON[poi.kind]} size={16} />
+          <Icon name={ui?.registry.poiRenderer(poi.kind)?.icon ?? GENERIC_POI_ICON} size={16} />
         </li>
       {/each}
     </ul>

@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
-  import { MODIFIER_KEYS } from '@shinobi/content';
   import { getMod, type Modifier } from '@shinobi/core';
   import { isEntityKind } from '../lib/entities.ts';
   import { formatBonus } from '../lib/format.ts';
-  import { hasKey, t } from '../lib/i18n.ts';
+  import { fallbackText, hasKey, t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import EntityLink from './EntityLink.svelte';
+
+  const content = game.content;
 
   interface Props {
     /** Modifier keys that feed the figure, e.g. `xp.all` and `xp.skill.tai`. */
@@ -34,7 +34,7 @@
   const valueText = (m: Modifier) =>
     m.op === 'mul'
       ? `×${m.value}`
-      : MODIFIER_KEYS[m.key]?.flat
+      : content.modifierKeys[m.key]?.flat
         ? `${m.value < 0 ? '−' : '+'}${Math.abs(m.value)}`
         : formatBonus(1 + m.value);
   const sourceKey = (m: Modifier) => (typeof m.source === 'string' ? m.source : null);
@@ -56,7 +56,7 @@
               <EntityLink kind={part.source.kind} id={part.source.id} />
             {:else}
               {@const key = sourceKey(part)}
-              {key !== null && hasKey(key) ? t(key) : key}
+              {key !== null ? (hasKey(key) ? t(key) : fallbackText(key)) : ''}
             {/if}
           </span>
           <span>{valueText(part)}</span>
@@ -67,7 +67,7 @@
       {#if parts.length > 0}
         <span class="line total"
           ><span>{t('mod.total')}</span><span
-            >{keys.every((k) => MODIFIER_KEYS[k]?.flat)
+            >{keys.every((k) => content.modifierKeys[k]?.flat)
               ? `+${Math.round((total - 1) * 100) / 100}`
               : formatBonus(total)}</span
           ></span

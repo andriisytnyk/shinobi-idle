@@ -168,6 +168,52 @@ export interface EntityLinkSpec {
   mount?: Widget<'entity.sections'>;
 }
 
+/** What a skill-page panel or a point-of-interest renderer is given besides its container. */
+export interface SkillPanelContext {
+  /** The id of the skill whose page is drawn. */
+  skill: string;
+}
+export interface PoiContext {
+  /** The point of interest as the content has it: `kind` and the fields of that kind. */
+  poi: { id: string; kind: string } & Record<string, unknown>;
+  /** The cell it lies in. */
+  cell: string;
+}
+
+/** Drawn by a widget function (no framework assumed) or by a Svelte component placed in the tree of the app. */
+export type PanelMount<C> =
+  | ((el: HTMLElement, api: UiApi, ctx: C) => void | (() => void))
+  | {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      svelte: Component<any>;
+      /** Extra props; the component always gets the context fields as props too. */
+      props?: (ctx: C) => Record<string, unknown>;
+    };
+
+/**
+ * The part of a skill page that belongs to the skills of one activity (`skill.activity` of the
+ * content): a panel, and the page hint. A skill whose activity has no panel shows the generic list
+ * of its action tiles.
+ */
+export interface SkillPanelSpec {
+  /** The panel; without it the activity only sets the hint. */
+  mount?: PanelMount<SkillPanelContext>;
+  /** `replace`: instead of the action tiles; `after` (default): below them. */
+  place?: 'replace' | 'after';
+  /** The one-time hint of the page (`hint.<id>`); default `skillPage`. */
+  hint?: string;
+}
+
+/**
+ * How a point of interest of one kind looks in the cell panel: its icon (a game-icons name or
+ * `lucide:<name>`) and the lines under its name. A kind without a renderer is drawn generically:
+ * a generic icon, its name and description, and links to the entities its fields name.
+ */
+export interface PoiRendererSpec {
+  icon: string;
+  mount?: PanelMount<PoiContext>;
+}
+
 export interface SettingSpec {
   id: string;
   /** Localization key of the setting's label. */
@@ -185,6 +231,10 @@ export interface UiRegistrar {
   addNavItem(spec: NavItemSpec): void;
   addEntityLink(spec: EntityLinkSpec): void;
   addSetting(spec: SettingSpec): void;
+  /** The panel and hint of skill pages for skills of this activity. The later pack wins, with a warning. */
+  addSkillPanel(activity: string, spec: SkillPanelSpec): void;
+  /** The icon and the lines of points of interest of this kind. The later pack wins, with a warning. */
+  addPoiRenderer(kind: string, spec: PoiRendererSpec): void;
   addTheme(theme: UiTheme): void;
   /** Texts of this pack; every key must start with `x.<packId>.`. */
   addLocale(lang: string, messages: Record<string, string>): void;

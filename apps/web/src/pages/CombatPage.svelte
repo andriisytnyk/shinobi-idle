@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import {
     counterValue,
     enemyStats,
@@ -20,6 +19,8 @@
   import { hasKey, t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
+
+  const content = game.content;
 
   /** Enemies of the Academy yard are open to everyone; the other regions arrive with missions. */
   const enemies = $derived(content.enemies.filter((e) => e.region === 'academy'));

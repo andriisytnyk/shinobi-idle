@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { content, localeKey, TRAIT_ANSWER } from '@shinobi/content';
+  import { localeKey } from '@shinobi/content';
   import { actionInfo, evalReq, type Req } from '@shinobi/core';
   import ActionTile from '../components/ActionTile.svelte';
   import EntityLink from '../components/EntityLink.svelte';
@@ -12,6 +12,9 @@
   import { techniqueRelations } from '../lib/technique-links.ts';
   import { game } from '../lib/store.ts';
   import { entityName } from '../lib/entities.ts';
+  import { promotedRank } from '../lib/vocab.ts';
+
+  const content = game.content;
 
   interface Props {
     id: string;
@@ -29,7 +32,8 @@
     game.read((gs) => {
       if (!tech) return null;
       const of: Req[] = [{ t: 'skill', skill: tech.skill, level: tech.level }];
-      if (tech.src === 'N' && tech.mentor === 'other') of.push({ t: 'rank', rank: 'genin' });
+      if (tech.src === 'N' && tech.mentor === 'other')
+        of.push({ t: 'rank', rank: promotedRank(content) });
       return evalReq(gs, { t: 'all', of }, content);
     }),
   );
@@ -38,9 +42,7 @@
   const answers = $derived(
     (tech?.tags ?? []).map((tag) => ({
       tag,
-      traits: (Object.entries(TRAIT_ANSWER) as [keyof typeof TRAIT_ANSWER, string][])
-        .filter(([, answer]) => answer === tag)
-        .map(([trait]) => trait),
+      traits: content.traits.filter((trait) => trait.answer === tag).map((trait) => trait.id),
     })),
   );
 
@@ -117,11 +119,11 @@
       <h2>{t('technique.source')}</h2>
       <p>{t(`technique.src.${tech.src}`)}</p>
       <ul class="links">
-        {#if relations.academy}<li><EntityLink kind="building" id="core:academy" /></li>{/if}
-        {#if relations.library !== null}
+        {#if relations.academy}<li><EntityLink kind="building" id={relations.academy} /></li>{/if}
+        {#if relations.library}
           <li>
-            <EntityLink kind="building" id="core:library" />
-            {t('technique.libraryLevel', { n: relations.library })}
+            <EntityLink kind="building" id={relations.library.building} />
+            {t('technique.libraryLevel', { n: relations.library.level })}
           </li>
         {/if}
         {#each relations.carriers as carrier (carrier.id)}

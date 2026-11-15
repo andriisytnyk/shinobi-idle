@@ -10,7 +10,10 @@ import {
   encodeStored,
   type KeyValue,
 } from '../src/lib/persistence.ts';
-import { toastFor, type ToastSpec } from '../src/lib/toasts.svelte.ts';
+import { toastFor as toastForIn, type ToastSpec } from '../src/lib/toasts.svelte.ts';
+
+/** The toast of an event, for the content of the game under test. */
+const toastFor = (event: Parameters<typeof toastForIn>[0]) => toastForIn(event, content);
 
 const T0 = 1_800_000_000_000;
 const HOUR = 3_600_000;

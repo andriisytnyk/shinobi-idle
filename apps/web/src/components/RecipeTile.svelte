@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import { SHARE_FULL, type ActionInfo } from '@shinobi/core';
   import { blockOf, blockText, tierView } from '../lib/crafts.ts';
   import { formatInt, formatSeconds, formatXp } from '../lib/format.ts';
@@ -12,6 +11,8 @@
   import MasteryRing from './MasteryRing.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
   import ReqTree from './ReqTree.svelte';
+
+  const content = game.content;
 
   interface Props {
     info: ActionInfo;

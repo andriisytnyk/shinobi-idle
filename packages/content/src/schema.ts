@@ -591,8 +591,8 @@ export const buildingBaseSchema = z.object({
 
 /** What a building is for. */
 export const BUILDING_ROLES = ['producer', 'bonus', 'shop', 'storage', 'defence', 'admin'] as const;
-/** The one job of a building that the village rules themselves perform: the treasury, the stage cap, the store, the library scrolls. */
-export const BUILDING_DUTIES = ['treasury', 'stages', 'storage', 'scrolls'] as const;
+/** The one job of a building that the village rules themselves perform: the treasury, the stage cap, the store, the library scrolls. `teaching` marks the building whose mentors teach trainer techniques (the Academy); the interface links the technique pages to it. */
+export const BUILDING_DUTIES = ['treasury', 'stages', 'storage', 'scrolls', 'teaching'] as const;
 
 /** The hand-written part of a building: its role, what one level does, what it produces. */
 export const buildingFxSchema = z.strictObject({
@@ -620,6 +620,8 @@ export const resourceSchema = z.strictObject({
   kind: z.enum(['civil', 'shinobi', 'workforce', 'power']),
   /** Civil resources only: `base` costs `K.costBase` x multiplier, `late` costs a share of it from a level on. */
   cost: z.enum(['base', 'late']).optional(),
+  /** The icon the village page draws: `lucide:<name>` or a game-icons name; none: the generic one. */
+  icon: z.string().optional(),
 });
 
 export const gearTierSchema = z.object({
@@ -823,7 +825,8 @@ export const aiSchema = z.strictObject({
 });
 
 /** A status; its numbers live in the balance object under the status id. */
-export const statusSchema = z.strictObject({ id: statusId });
+/** A battle status. `nature` is the nature whose colour its icon takes in the interface (none: the plain text colour). */
+export const statusSchema = z.strictObject({ id: statusId, nature: natureId.optional() });
 
 /** An enemy trait: the tag that answers it and where its numbers live in the balance object. */
 export const traitSchema = z.strictObject({

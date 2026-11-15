@@ -1,11 +1,14 @@
 <script lang="ts">
-  import { content, localeKey } from '@shinobi/content';
+  import { localeKey } from '@shinobi/content';
   import { listMeditationMods, type MeditationModInfo } from '@shinobi/core';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import { toasts } from '../lib/toasts.svelte.ts';
   import EntityLink from './EntityLink.svelte';
+  import NatureLink from './NatureLink.svelte';
   import Icon from './Icon.svelte';
+
+  const content = game.content;
 
   const practices = $derived([...content.practices].sort((a, b) => a.level - b.level));
 
@@ -52,7 +55,7 @@
                 <p class="locked" data-locked>
                   <Icon name="lucide:lock" size={14} />
                   {t(why)}
-                  {#if m.lockedNature}<EntityLink kind="skill" id={m.lockedNature} />{/if}
+                  {#if m.lockedNature}<NatureLink id={m.lockedNature} />{/if}
                 </p>
               {:else if m.active}
                 <p class="on"><Icon name="lucide:check" size={14} /> {t('meditation.active')}</p>

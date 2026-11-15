@@ -23,3 +23,16 @@
           )
           <span class="state">
             Клітинку ще не розвідано: зона недоступна.
+      <section data-entity-links="" data-ui="entity-section">
+        <h2>
+          Пов'язане
+        <ul class="links">
+          <li>
+            <a class="entity-link" href="#/trait/pack">
+              Зграя
+          <li>
+            <a class="entity-link" href="#/item/core:pelt">
+              Вовча шкура
+          <li>
+            <a class="entity-link" href="#/item/core:gem">
+              Коштовність

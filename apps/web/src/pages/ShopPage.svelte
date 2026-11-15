@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import { evalReq, sellPrice, shopEntries, shopPrice } from '@shinobi/core';
   import { onMount } from 'svelte';
   import GearLine from '../components/GearLine.svelte';
@@ -9,8 +8,11 @@
   import { blockOf, shopSection, type ShopSection } from '../lib/crafts.ts';
   import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
+  import { held, moneyName, moneyOf } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
+
+  const content = game.content;
 
   interface Props {
     /** `sell` brings the sell section into view. */
@@ -19,7 +21,8 @@
 
   let { section }: Props = $props();
 
-  const ryo = $derived(game.read((gs) => gs.currencies.ryo));
+  const money = moneyOf(content);
+  const ryo = $derived(game.read((gs) => held(gs, money)));
   const goods = $derived(
     game.read((gs) =>
       shopEntries(content).flatMap((entry) => {
@@ -62,7 +65,9 @@
 
 <SimplePage title={t('shop.title')}>
   <Hint id="shop" />
-  <p class="purse" data-purse>{t('shop.purse', { n: formatInt(ryo) })}</p>
+  <p class="purse" data-purse>
+    {t('shop.purse', { n: formatInt(ryo), currency: moneyName(content) })}
+  </p>
   {#if shut}
     <p class="ct-why" id="shop-locked" data-shop-locked data-why="rank">{t('shop.shut')}</p>
   {/if}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { content, localeKey } from '@shinobi/content';
+  import { localeKey } from '@shinobi/content';
   import {
     actionInfo,
     builtObstacles,
@@ -18,6 +18,15 @@
   import Icon from './Icon.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
   import ReqTree from './ReqTree.svelte';
+
+  const content = game.content;
+
+  interface Props {
+    /** The skill whose page shows the course. */
+    skill: string;
+  }
+
+  let { skill }: Props = $props();
 
   const K = content.balance.K;
   const slots = $derived(game.read((gs) => listCourse(gs, content, game.rules)));
@@ -42,7 +51,7 @@
   function needs(slot: CourseSlotInfo, id: string) {
     const obstacle = content.obstacles.find((o) => o.id === id);
     if (!obstacle) return null;
-    const parts = [{ t: 'skill', skill: 'ath', level: slot.level } as const];
+    const parts = [{ t: 'skill', skill, level: slot.level } as const];
     const own = obstacle.req;
     const tree = evalReq(game.state, { t: 'all', of: own ? [...parts, own] : [...parts] }, content);
     return tree.met ? null : tree;
@@ -85,7 +94,7 @@
         <dd>
           {#if info}
             <ModBreakdown
-              keys={['xp.all', 'xp.skill.ath']}
+              keys={['xp.all', `xp.skill.${skill}`]}
               display={t('tile.xphValue', { n: formatXp(info.xpPerHour) })}
             />
           {:else}—{/if}

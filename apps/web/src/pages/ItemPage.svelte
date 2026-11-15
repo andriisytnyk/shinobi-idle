@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import EntityLink from '../components/EntityLink.svelte';
   import Icon from '../components/Icon.svelte';
   import { entityDesc, entityName, isEntityKind } from '../lib/entities.ts';
@@ -7,6 +6,8 @@
   import { t } from '../lib/i18n.ts';
   import { itemRelations, type ItemRelation } from '../lib/item-links.ts';
   import { game } from '../lib/store.ts';
+
+  const content = game.content;
 
   interface Props {
     id: string;

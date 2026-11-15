@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import { hasItem, masteryLevel, sellPrice } from '@shinobi/core';
   import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
@@ -13,6 +12,8 @@
   import { game } from '../lib/store.ts';
   import { toasts } from '../lib/toasts.svelte.ts';
   import SimplePage from './SimplePage.svelte';
+
+  const content = game.content;
 
   let tab = $state<BankTab>('all');
   let query = $state('');

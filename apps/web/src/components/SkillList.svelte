@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { content, localeKey, SKILL_GROUPS, type SkillGroup } from '@shinobi/content';
   import { skillUnlockStatus } from '@shinobi/core';
   import { t } from '../lib/i18n.ts';
   import { tryUi } from '../lib/ext/runtime.svelte.ts';
@@ -7,6 +6,7 @@
   import { markerOf } from '../lib/nav.ts';
   import { nextStep } from '../lib/next-step.ts';
   import { skillProgress } from '../lib/progress.ts';
+  import { groupName, isNature, natureColor } from '../lib/vocab.ts';
   import { currentRoute } from '../lib/router.svelte.ts';
   import { settings } from '../lib/settings.svelte.ts';
   import { game } from '../lib/store.ts';
@@ -14,9 +14,9 @@
   import Icon from './Icon.svelte';
   import ReqTree from './ReqTree.svelte';
 
-  const NATURE_SKILLS: readonly string[] = ['katon', 'futon', 'raiton', 'doton', 'suiton'];
+  const content = game.content;
 
-  let collapsed = $state<Partial<Record<SkillGroup, boolean>>>({});
+  let collapsed = $state<Record<string, boolean | undefined>>({});
 
   const ui = tryUi();
   const route = $derived(currentRoute());
@@ -31,21 +31,23 @@
   /** Groups come from the content, in the order the style document lists them. */
   const groups = $derived(
     game.read((gs) =>
-      SKILL_GROUPS.map((id) => ({
-        id,
-        skills: content.skills
-          .filter((s) => s.group === id)
-          .map((skill) => ({
-            skill,
-            lock: skillUnlockStatus(gs, skill.id, content),
-            progress: skillProgress(gs, skill.id),
-          }))
-          .filter((row) => !(settings.hideLocked && row.lock && !row.lock.met)),
-      })).filter((g) => g.skills.length > 0),
+      content.skillGroups
+        .map(({ id }) => ({
+          id,
+          skills: content.skills
+            .filter((s) => s.group === id)
+            .map((skill) => ({
+              skill,
+              lock: skillUnlockStatus(gs, skill.id, content),
+              progress: skillProgress(gs, skill.id),
+            }))
+            .filter((row) => !(settings.hideLocked && row.lock && !row.lock.met)),
+        }))
+        .filter((g) => g.skills.length > 0),
     ),
   );
 
-  const toggle = (id: SkillGroup) => {
+  const toggle = (id: string) => {
     collapsed[id] = !collapsed[id];
   };
 </script>
@@ -62,7 +64,7 @@
         <span class="chevron" class:open={!collapsed[group.id]}
           ><Icon name="lucide:chevron-right" size={14} /></span
         >
-        {t(localeKey('group', group.id, 'name'))}
+        {groupName(group.id)}
       </button>
       {#if !collapsed[group.id]}
         <ul>
@@ -75,8 +77,8 @@
               data-skill={skill.id}
               data-ui="skill-row"
               data-entity="skill:{skill.id}"
-              style:--skill-color={NATURE_SKILLS.includes(skill.id)
-                ? `var(--nature-${skill.id})`
+              style:--skill-color={isNature(content, skill.id)
+                ? natureColor(content, skill.id)
                 : 'var(--steel)'}
             >
               <span class="skill-icon"
@@ -185,7 +187,7 @@
   .skill-icon {
     grid-area: icon;
     display: inline-flex;
-    color: var(--skill-color);
+    color: var(--skill-color, var(--steel));
   }
 
   .locked .skill-icon {
@@ -235,7 +237,7 @@
   .native {
     margin-left: var(--space-2);
     padding: 0 var(--space-1);
-    border: var(--border-thin) solid var(--skill-color);
+    border: var(--border-thin) solid var(--skill-color, var(--steel));
     border-radius: var(--radius-sm);
     color: var(--fg-dim);
     font-size: var(--text-2xs);

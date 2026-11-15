@@ -6,9 +6,10 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { hrefFor } from '../src/lib/route.ts';
 import { game } from '../src/lib/store.ts';
 import SkillPage from '../src/pages/SkillPage.svelte';
+import { coreContext } from './helpers/core-registry.ts';
 
 const html = <P extends Record<string, unknown>>(component: Component<P>, props: P): string =>
-  render(component, { props }).body;
+  render(component, { props, context: coreContext() }).body;
 
 const count = (body: string, text: string) => body.split(text).length - 1;
 

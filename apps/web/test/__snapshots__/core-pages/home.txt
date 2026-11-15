@@ -19,7 +19,7 @@
             Репутація
         <dd>
           0
-      <div class="stat intel" data-entity="currency:intel" data-ui="topbar-currency">
+      <div class="stat" data-entity="currency:intel" data-ui="topbar-currency">
         <dt>
           <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
             <path d="#3653-17qd3ut" fill="currentColor">

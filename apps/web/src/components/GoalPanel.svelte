@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import { evalReq, natureStatus } from '@shinobi/core';
   import { webRef } from '../lib/entities.ts';
   import { senseiTestInfo } from '../lib/exam-test.ts';
@@ -14,6 +13,8 @@
   import NatureOffer from './NatureOffer.svelte';
   import NextStepCard from './NextStepCard.svelte';
   import ReqTree from './ReqTree.svelte';
+
+  const content = game.content;
 
   interface Props {
     onClose: () => void;

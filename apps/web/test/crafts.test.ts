@@ -13,11 +13,15 @@ import { nextStateHint } from '../src/lib/hints.ts';
 import { parseHash, hrefFor, type EntityRef } from '../src/lib/route.ts';
 import { settings } from '../src/lib/settings.svelte.ts';
 import { game } from '../src/lib/store.ts';
-import { toastFor } from '../src/lib/toasts.svelte.ts';
+import { toastFor as toastForIn } from '../src/lib/toasts.svelte.ts';
 import BankPage from '../src/pages/BankPage.svelte';
 import RecipePage from '../src/pages/RecipePage.svelte';
 import ShopPage from '../src/pages/ShopPage.svelte';
 import SkillPage from '../src/pages/SkillPage.svelte';
+import { coreContext } from './helpers/core-registry.ts';
+
+/** The toast of an event, for the content of the game under test. */
+const toastFor = (event: Parameters<typeof toastForIn>[0]) => toastForIn(event, content);
 
 const MINT = 'core:mint';
 const NETTLE = 'core:nettle';
@@ -84,7 +88,7 @@ describe('A3: views follow the core without a reload', () => {
   it('a finished craft changes the have and need counts and flags the missing ingredient', () => {
     game.state.bank[NETTLE] = 2;
     game.state.bank[OIL] = 1;
-    app = mount(SkillPage, { target, props: { id: 'alch' } });
+    app = mount(SkillPage, { target, context: coreContext(), props: { id: 'alch' } });
     flushSync();
     const row = (item: string) =>
       target.querySelector(`[data-recipe="${OINTMENT}"] [data-input="${item}"]`);
@@ -149,7 +153,7 @@ describe('A3: views follow the core without a reload', () => {
   });
 
   it('the herb tile shows the bush emptying and regrowing', () => {
-    app = mount(SkillPage, { target, props: { id: 'herb' } });
+    app = mount(SkillPage, { target, context: coreContext(), props: { id: 'herb' } });
     flushSync();
     const stock = () => text(target.querySelector(`[data-herb="${MINT}"] [data-stock]`));
     const size = game.read((gs) => gs.bushes[MINT]?.size ?? 5 + 1);
@@ -319,7 +323,7 @@ describe('A6: a disabled control says why', () => {
     game.devAdvance(0);
     flushSync();
     expect(target.querySelector(`[data-good="${OIL}"] [data-why]`)?.getAttribute('data-why')).toBe(
-      'ryo',
+      'money',
     );
     expect(text(target.querySelector(`[data-good="${OIL}"] [data-why]`))).toContain(
       'Не вистачає рьо',
@@ -329,7 +333,7 @@ describe('A6: a disabled control says why', () => {
 
   it('a level that is too low, and a missing ingredient', () => {
     game.state.skills.alch.xp = 0;
-    app = mount(SkillPage, { target, props: { id: 'alch' } });
+    app = mount(SkillPage, { target, context: coreContext(), props: { id: 'alch' } });
     flushSync();
     const why = (id: string) =>
       target.querySelector(`[data-recipe="${id}"] [data-why]`)?.getAttribute('data-why');
@@ -357,7 +361,7 @@ describe('A6: a disabled control says why', () => {
     game.state.currencies.ryo = 0;
     app = mount(GearLine, { target, props: { line } });
     flushSync();
-    expect(target.querySelector('[data-why]')?.getAttribute('data-why')).toBe('ryo');
+    expect(target.querySelector('[data-why]')?.getAttribute('data-why')).toBe('money');
     everyDisabledHasReason();
   });
 });
@@ -384,7 +388,7 @@ describe('the quantity field', () => {
 
     type(`${good} [data-qty]`, '26');
     expect(target.querySelector<HTMLButtonElement>(`[data-buy="${OIL}"]`)?.disabled).toBe(true);
-    expect(target.querySelector(`${good} [data-why]`)?.getAttribute('data-why')).toBe('ryo');
+    expect(target.querySelector(`${good} [data-why]`)?.getAttribute('data-why')).toBe('money');
 
     type(`${good} [data-qty]`, 'abc');
     expect(target.querySelector(`${good} [data-why]`)?.getAttribute('data-why')).toBe('qty');
@@ -441,7 +445,7 @@ describe('places and hints', () => {
 
   it('the five training skills show their gear line with a link to the shop', () => {
     for (const skill of ['tai', 'herb', 'alch', 'prov', 'scout']) {
-      app = mount(SkillPage, { target, props: { id: skill } });
+      app = mount(SkillPage, { target, context: coreContext(), props: { id: skill } });
       flushSync();
       const section = target.querySelector('[data-gear-section]');
       expect(section, skill).not.toBeNull();

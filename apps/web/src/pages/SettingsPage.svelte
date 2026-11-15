@@ -107,6 +107,15 @@
     {/if}
   </section>
 
+  <section data-ui="loaded-packs">
+    <h2>{t('settings.loadedPacks')}</h2>
+    <ul class="packs">
+      {#each game.packs as pack (pack.id)}
+        <li data-pack={pack.id}>{pack.id} <span class="version">{pack.version}</span></li>
+      {/each}
+    </ul>
+  </section>
+
   {#if disabledPacks.length > 0}
     <section data-ui="disabled-packs">
       <h2>{t('settings.disabledPacks')}</h2>
@@ -224,6 +233,17 @@
 {/if}
 
 <style>
+  .packs {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .version {
+    color: var(--fg-dim);
+    font-variant-numeric: tabular-nums;
+  }
+
   section {
     margin-bottom: var(--space-6);
   }

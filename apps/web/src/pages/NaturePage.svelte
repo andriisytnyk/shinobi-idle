@@ -1,28 +1,31 @@
 <script lang="ts">
-  import { content, NATURE_IDS, type NatureId } from '@shinobi/content';
   import { natureConsequences, natureSetSummary, natureStatus } from '@shinobi/core';
   import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
   import Modal from '../components/Modal.svelte';
   import NatureCard from '../components/NatureCard.svelte';
-  import { entityName } from '../lib/entities.ts';
+  import NatureLink from '../components/NatureLink.svelte';
+  import { natureName } from '../lib/vocab.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
 
+  const content = game.content;
+
   /** A choice waiting for the player's confirmation: a nature, or the paper's pick. */
-  let pending = $state<NatureId | 'random' | null>(null);
+  let pending = $state<string | 'random' | null>(null);
   /** The nature just chosen, shown with its consequences for the team. */
-  let result = $state<{ nature: NatureId; first: boolean } | null>(null);
+  let result = $state<{ nature: string; first: boolean } | null>(null);
   let error = $state<string | null>(null);
 
+  const natureIds = content.natures.map((n) => n.id);
   const status = $derived(game.read((gs) => natureStatus(gs, content)));
   const owned = $derived(game.read((gs) => gs.player.natures));
   const team = $derived(game.read((gs) => gs.team));
   const first = $derived(status.stage === 'test');
   /** Which natures can be chosen right now. */
   const choosable = $derived(
-    status.canChoose ? NATURE_IDS.filter((n) => !owned.includes(n)) : ([] as NatureId[]),
+    status.canChoose ? natureIds.filter((n) => !owned.includes(n)) : ([] as string[]),
   );
   const ordinal = $derived(
     status.stage === 'third' ? 'nature.ordinal.third' : 'nature.ordinal.second',
@@ -33,7 +36,7 @@
   const summary = $derived(owned.length > 0 ? natureSetSummary(owned, content) : null);
   const cards = $derived(
     game.read((gs) =>
-      NATURE_IDS.map((nature) => ({
+      natureIds.map((nature) => ({
         nature,
         cons: natureConsequences(nature, gs, content),
         together:
@@ -44,9 +47,7 @@
     ),
   );
 
-  const pendingName = $derived(
-    pending && pending !== 'random' ? entityName({ kind: 'skill', id: pending }) : '',
-  );
+  const pendingName = $derived(pending && pending !== 'random' ? natureName(pending) : '');
   const confirmText = $derived.by(() => {
     if (pending === null) return '';
     if (first) {
@@ -111,15 +112,15 @@
       <ul class="owned">
         {#each owned as nature, i (nature)}
           <li data-owned-nature={nature}>
-            <EntityLink kind="skill" id={nature} />
+            <NatureLink id={nature} />
             <span class="tag">{t(i === 0 ? 'nature.native' : 'nature.extra')}</span>
           </li>
         {/each}
       </ul>
       {#if team}
         <p class="team" data-team>
-          {t('nature.team.rival')}: <EntityLink kind="skill" id={team.rival} /> ·
-          {t('nature.team.aya')}: <EntityLink kind="skill" id={team.aya} />
+          {t('nature.team.rival')}: <NatureLink id={team.rival} /> ·
+          {t('nature.team.aya')}: <NatureLink id={team.aya} />
         </p>
       {/if}
       {#if summary}
@@ -183,17 +184,17 @@
     onClose={() => (result = null)}
   >
     <div data-result={done.nature}>
-      <p class="chosen"><EntityLink kind="skill" id={done.nature} /></p>
+      <p class="chosen"><NatureLink id={done.nature} /></p>
       <p>{t(`nature.character.${done.nature}`)}</p>
-      <p>{t('nature.result.skill')} <EntityLink kind="skill" id={done.nature} /></p>
+      <p>{t('nature.result.skill')} <NatureLink id={done.nature} /></p>
       {#if done.first && team}
         <h3>{t('nature.result.team')}</h3>
         <ul>
           <li>
             {t('nature.result.rival')}
-            <EntityLink kind="skill" id={team.rival} />
+            <NatureLink id={team.rival} />
           </li>
-          <li>{t('nature.result.aya')} <EntityLink kind="skill" id={team.aya} /></li>
+          <li>{t('nature.result.aya')} <NatureLink id={team.aya} /></li>
         </ul>
       {/if}
     </div>

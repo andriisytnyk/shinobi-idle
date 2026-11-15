@@ -1,29 +1,15 @@
-/** Entity kinds that have a page. Exercises, practices and obstacles are the action entities of the training skills. */
-export const ENTITY_KINDS = [
-  'skill',
-  'technique',
-  'item',
-  'recipe',
-  'mission',
-  'enemy',
-  'boss',
-  'region',
-  'building',
-  'gear',
-  'seal',
-  'exercise',
-  'practice',
-  'obstacle',
-  'status',
-  'trait',
-  'quest',
-  'exam',
-  'cell',
-  'poi',
-  'combo',
-] as const;
+import { tryActiveContent } from './active.ts';
 
-export type EntityKind = (typeof ENTITY_KINDS)[number];
+/**
+ * An entity kind: one of `content.entityKinds` of the running game. The kinds are data, so the type is
+ * a plain string; `isEntityKind` tells whether a name is one of them.
+ */
+export type EntityKind = string;
+
+/** Whether `kind` is an entity kind of the running game (its route is `#/<kind>/<id>`). */
+export function isEntityKind(kind: string): boolean {
+  return tryActiveContent()?.entityKinds.some((k) => k.id === kind) ?? false;
+}
 
 export interface EntityRef {
   kind: EntityKind;
@@ -58,7 +44,6 @@ export type Route =
 
 const TABS = ['missions', 'village', 'more'];
 
-const isKind = (s: string): s is EntityKind => (ENTITY_KINDS as readonly string[]).includes(s);
 const isPage = (s: string): s is PageName => (PAGES as readonly string[]).includes(s);
 
 /** Parses a location hash such as `#/skill/tai` or `#/technique/core:great_fireball`. */
@@ -82,7 +67,7 @@ export function parseHash(hash: string): Route {
     }
   }
   const id = rest.join('/');
-  if (isKind(first) && id !== '') {
+  if (isEntityKind(first) && id !== '') {
     try {
       return { page: 'entity', ref: { kind: first, id: decodeURIComponent(id) } };
     } catch {

@@ -1,21 +1,27 @@
 <script lang="ts">
-  import type { NatureId } from '@shinobi/content';
   import type { NatureConsequences, NatureSetSummary } from '@shinobi/core';
   import { t } from '../lib/i18n.ts';
+  import { game } from '../lib/store.ts';
+  import { natureCharacter, natureColor, natureIconRef } from '../lib/vocab.ts';
   import EntityLink from './EntityLink.svelte';
+  import NatureLink from './NatureLink.svelte';
   import Icon from './Icon.svelte';
 
   interface Props {
-    nature: NatureId;
+    nature: string;
     cons: NatureConsequences;
     /** What the natures owned so far plus this one would open; shown while an extra nature is being chosen. */
     together?: NatureSetSummary | null;
     /** Label of the action button, or null when the nature cannot be chosen now. */
     action: 'choose' | 'add' | null;
-    onPick: (nature: NatureId) => void;
+    onPick: (nature: string) => void;
   }
 
   let { nature, cons, together = null, action, onPick }: Props = $props();
+
+  const content = game.content;
+  const character = $derived(natureCharacter(nature));
+  const iconRef = $derived(natureIconRef(content, nature));
 </script>
 
 <li
@@ -24,13 +30,13 @@
   data-nature={nature}
   data-owned={cons.owned}
   data-native={cons.native}
-  style:--nature-color={`var(--nature-${nature})`}
+  style:--nature-color={natureColor(content, nature)}
 >
   <header>
-    <span class="icon"><Icon entity={{ kind: 'skill', id: nature }} size={28} /></span>
+    <span class="icon"><Icon entity={iconRef} size={28} /></span>
     <div class="title">
-      <h3><EntityLink kind="skill" id={nature} /></h3>
-      <p class="character">{t(`nature.character.${nature}`)}</p>
+      <h3><NatureLink id={nature} /></h3>
+      {#if character}<p class="character">{character}</p>{/if}
     </div>
     {#if cons.native}
       <span class="badge" data-badge="native">{t('nature.native')}</span>
@@ -75,21 +81,15 @@
     <div class="row" data-row="wheel">
       <dt>{t('nature.cons.wheel')}</dt>
       <dd>
-        <span class="pair"
-          >{t('nature.cons.strong')} <EntityLink kind="skill" id={cons.strongAgainst} /></span
-        >
-        <span class="pair"
-          >{t('nature.cons.weak')} <EntityLink kind="skill" id={cons.weakAgainst} /></span
-        >
+        <span class="pair">{t('nature.cons.strong')} <NatureLink id={cons.strongAgainst} /></span>
+        <span class="pair">{t('nature.cons.weak')} <NatureLink id={cons.weakAgainst} /></span>
       </dd>
     </div>
     <div class="row" data-row="team">
       <dt>{t('nature.team')}</dt>
       <dd>
-        <span class="pair"
-          >{t('nature.cons.rival')} <EntityLink kind="skill" id={cons.rival} /></span
-        >
-        <span class="pair">{t('nature.cons.aya')} <EntityLink kind="skill" id={cons.aya} /></span>
+        <span class="pair">{t('nature.cons.rival')} <NatureLink id={cons.rival} /></span>
+        <span class="pair">{t('nature.cons.aya')} <NatureLink id={cons.aya} /></span>
       </dd>
     </div>
     <div class="row" data-row="combos">
@@ -130,7 +130,7 @@
     min-width: 0;
     padding: var(--space-3);
     border: var(--border-thin) solid var(--line);
-    border-top: var(--border-heavy) solid var(--nature-color);
+    border-top: var(--border-heavy) solid var(--nature-color, var(--steel));
     border-radius: var(--radius-md);
     background: var(--surface);
     list-style: none;
@@ -148,7 +148,7 @@
 
   .icon {
     display: inline-flex;
-    color: var(--nature-color);
+    color: var(--nature-color, var(--steel));
   }
 
   .title {
@@ -175,7 +175,7 @@
 
   .badge {
     padding: 0 var(--space-2);
-    border: var(--border-thin) solid var(--nature-color);
+    border: var(--border-thin) solid var(--nature-color, var(--steel));
     border-radius: var(--radius-sm);
     font-size: var(--text-xs);
   }
@@ -231,7 +231,7 @@
     min-height: var(--control-md);
     margin-top: auto;
     padding: var(--space-1) var(--space-3);
-    border: var(--border-thin) solid var(--nature-color);
+    border: var(--border-thin) solid var(--nature-color, var(--steel));
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);
@@ -241,7 +241,7 @@
   }
 
   .pick:hover {
-    background: var(--nature-color);
+    background: var(--nature-color, var(--steel));
     color: var(--ink-900);
   }
 </style>

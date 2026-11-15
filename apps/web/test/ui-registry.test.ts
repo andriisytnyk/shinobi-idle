@@ -3,7 +3,7 @@ import { coreUi } from '../src/lib/ext/core-ui.ts';
 import { createRegistry } from '../src/lib/ext/registry.ts';
 import { isSlotName, SLOT_NAMES } from '../src/lib/ext/slots.ts';
 import type { UiPack, UiRegistrar } from '../src/lib/ext/types.ts';
-import { testmodUi } from './fixtures/testmod-ui.ts';
+import { testmodUi } from '../dev-packs/testmod-ui.ts';
 
 const pack = (id: string, setup: (ui: UiRegistrar) => void): UiPack => ({ id, setup });
 const noop = () => {};

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import {
     villageBuildings,
     villageQueue,
@@ -15,10 +14,13 @@
   import Stepper from '../components/Stepper.svelte';
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
+  import { held, moneyOf } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
   import { toasts } from '../lib/toasts.svelte.ts';
   import { perHour, resourceIcon, resourceName, ROLE_ORDER } from '../lib/village.ts';
   import SimplePage from './SimplePage.svelte';
+
+  const content = game.content;
 
   interface Props {
     /** The building the route asked for; its card is scrolled into view. */
@@ -34,7 +36,7 @@
   const queue = $derived(game.read((gs) => villageQueue(gs, content)));
   const stage = $derived(game.read((gs) => villageStage(gs, content)));
   const workforce = $derived(game.read((gs) => gs.village?.workforce ?? 0));
-  const ryo = $derived(game.read((gs) => gs.currencies.ryo));
+  const ryo = $derived(game.read((gs) => held(gs, moneyOf(content))));
 
   const civil = $derived(resources.filter((r) => r.kind === 'civil'));
   const shinobi = $derived(resources.filter((r) => r.kind === 'shinobi'));
@@ -126,7 +128,7 @@
         {#if donateInvalid}
           <p class="ct-why" id="why-donate" data-why="qty">{t('village.donate.invalid')}</p>
         {:else if donateTooMany}
-          <p class="ct-why" id="why-donate" data-why="ryo">
+          <p class="ct-why" id="why-donate" data-why="money">
             {t('village.donate.tooMany', { n: formatInt(ryo) })}
           </p>
         {/if}

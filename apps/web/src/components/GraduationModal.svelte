@@ -1,12 +1,14 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import { examFor } from '@shinobi/core';
   import { webRef } from '../lib/entities.ts';
   import { t } from '../lib/i18n.ts';
+  import { rankName } from '../lib/vocab.ts';
   import { navigate } from '../lib/router.svelte.ts';
   import { game } from '../lib/store.ts';
   import EntityLink from './EntityLink.svelte';
   import Modal from './Modal.svelte';
+
+  const content = game.content;
 
   interface Props {
     onClose: () => void;
@@ -14,10 +16,12 @@
 
   let { onClose }: Props = $props();
 
-  const exam = $derived(examFor(content, 'genin'));
+  /** The rank the player has just reached and the exam that led to it. */
+  const reached = $derived(game.read((gs) => gs.player.rank));
+  const exam = $derived(examFor(content, reached));
   /** Skills that opened with the rank. */
   const unlocked = $derived(
-    content.skills.filter((s) => s.unlockReq?.t === 'rank' && s.unlockReq.rank === 'genin'),
+    content.skills.filter((s) => s.unlockReq?.t === 'rank' && s.unlockReq.rank === reached),
   );
   const goal = $derived(game.read((gs) => webRef(gs.goal)));
   /** The chakra paper test is the first thing a new genin does: until a nature is chosen the screen is offered. */
@@ -47,7 +51,7 @@
     <p>{t('graduation.body')}</p>
 
     <h3>{t('graduation.rank')}</h3>
-    <p class="rank">{t(`rank.${game.state.player.rank}`)}</p>
+    <p class="rank">{rankName(reached)}</p>
 
     {#if needsTest}
       <section class="test" data-nature-test>

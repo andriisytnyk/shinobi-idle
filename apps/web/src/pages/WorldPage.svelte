@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import { cellInfo, listRegions, type CellInfo } from '@shinobi/core';
   import CellPanel from '../components/CellPanel.svelte';
   import CellTile from '../components/CellTile.svelte';
@@ -12,6 +11,8 @@
   import { navigate } from '../lib/router.svelte.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
+
+  const content = game.content;
 
   interface Props {
     /** What the route asks the map to show: a cell with its panel, or a region. */

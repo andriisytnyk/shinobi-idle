@@ -1,4 +1,4 @@
-import { content as defaultContent, type ContentDb } from '@shinobi/content';
+import type { ContentDb, PackManifest } from '@shinobi/content';
 import {
   advance,
   advanceOffline,
@@ -29,6 +29,8 @@ import {
   type KeyValue,
 } from './persistence.ts';
 import type { Signals } from './hints.ts';
+import { setActiveContent } from './active.ts';
+import { composeBoot } from './boot.ts';
 import { deepFreeze } from './freeze.ts';
 import { detach as detachData } from './read.ts';
 import { requestPersistentStorage } from './platform.ts';
@@ -85,8 +87,11 @@ export interface CommandHook {
 }
 
 export interface GameDeps {
+  /** The composed content of this game; the pack `core` alone when omitted. */
   content?: ContentDb;
   rules?: Rules;
+  /** The manifests of the packs the content was composed from. */
+  packs?: readonly PackManifest[];
   clock?: Clock;
   kv?: KeyValue;
   lock?: TabLock | null;
@@ -100,8 +105,11 @@ export interface GameDeps {
  */
 export function createGame(deps: GameDeps = {}) {
   // The content is data that nobody changes at run time; packs get it too, so it is frozen once.
-  const content = deepFreeze(deps.content ?? defaultContent);
-  const rules = deps.rules ?? defaultRules;
+  const base = deps.content === undefined || deps.rules === undefined ? composeBoot() : null;
+  const content = deepFreeze(deps.content ?? base?.content ?? composeBoot().content);
+  const rules = deps.rules ?? base?.rules ?? defaultRules;
+  const packs = deps.packs ?? content.packs;
+  setActiveContent(content);
   const clock = deps.clock ?? { now: () => 0 };
   const kv = deps.kv ?? null;
   const lock = deps.lock ?? null;
@@ -157,10 +165,10 @@ export function createGame(deps: GameDeps = {}) {
         event.type === 'playerDefeated'
       ) {
         lines.push({ id: ++logId, event });
-      } else if (event.type === 'rankUp' && event.rank === 'genin') {
+      } else if (event.type === 'rankUp' && content.exams.some((e) => e.rank === event.rank)) {
         graduation = true;
       }
-      const spec = toastFor(event);
+      const spec = toastFor(event, content);
       if (spec) toasts.push(spec);
     }
     if (lines.length > 0) log = [...log, ...lines].slice(-LOG_LIMIT);
@@ -358,6 +366,8 @@ export function createGame(deps: GameDeps = {}) {
     },
     content,
     rules,
+    /** The manifests of the packs this game was composed from, in load order. */
+    packs,
 
     /** Sends a command to the core and refreshes the views. */
     dispatch(original: Command): CommandResult {

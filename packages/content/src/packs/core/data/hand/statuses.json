@@ -1,12 +1,15 @@
 [
   {
-    "id": "burn"
+    "id": "burn",
+    "nature": "katon"
   },
   {
-    "id": "wet"
+    "id": "wet",
+    "nature": "suiton"
   },
   {
-    "id": "stun"
+    "id": "stun",
+    "nature": "raiton"
   },
   {
     "id": "bind"

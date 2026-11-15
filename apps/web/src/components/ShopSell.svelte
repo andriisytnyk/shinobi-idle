@@ -2,6 +2,7 @@
   import { entityName } from '../lib/entities.ts';
   import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
+  import { moneyName } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
   import { toasts } from '../lib/toasts.svelte.ts';
   import EntityLink from './EntityLink.svelte';
@@ -33,7 +34,9 @@
 <li class="ct-row" data-sell={item} data-owned={owned}>
   <span class="ct-icon"><Icon entity={{ kind: 'item', id: item }} size={28} /></span>
   <span class="grow"><EntityLink kind="item" id={item} /></span>
-  <span class="ct-muted" data-sell-price>{t('shop.sellPrice', { n: formatInt(price) })}</span>
+  <span class="ct-muted" data-sell-price
+    >{t('shop.sellPrice', { n: formatInt(price), currency: moneyName(game.content) })}</span
+  >
   <span class="ct-muted" data-have>{t('shop.owned', { n: formatInt(owned) })}</span>
   <Stepper
     bind:value={qty}

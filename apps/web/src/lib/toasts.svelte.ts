@@ -1,4 +1,4 @@
-import { content } from '@shinobi/content';
+import type { ContentDb } from '@shinobi/content';
 import type { GameEvent } from '@shinobi/core';
 import { actionRef, masteryRef } from './entities.ts';
 import { t, type Params } from './i18n.ts';
@@ -24,7 +24,7 @@ export interface Toast {
 export type ToastSpec = Omit<Toast, 'id'>;
 
 /** Maps a core event to the toast that announces it, or null for events that stay silent. */
-export function toastFor(event: GameEvent): ToastSpec | null {
+export function toastFor(event: GameEvent, content: ContentDb): ToastSpec | null {
   switch (event.type) {
     case 'levelUp':
       return {
@@ -33,7 +33,11 @@ export function toastFor(event: GameEvent): ToastSpec | null {
         ref: { kind: 'skill', id: event.skill },
       };
     case 'masteryUp':
-      return { key: 'toast.masteryUp', params: { n: event.level }, ref: masteryRef(event.key) };
+      return {
+        key: 'toast.masteryUp',
+        params: { n: event.level },
+        ref: masteryRef(event.key, content),
+      };
     case 'techniqueLearned':
       return {
         key: 'toast.techniqueLearned',
@@ -52,7 +56,7 @@ export function toastFor(event: GameEvent): ToastSpec | null {
       return { key: 'toast.questDone', params: {}, ref: { kind: 'quest', id: event.quest } };
     case 'itemUsed':
       // A tonic names a skill (or the group of natures), not a technique: the toast links to the tonic.
-      if (!event.target.startsWith('core:')) {
+      if (!content.techniques.some((x) => x.id === event.target)) {
         return { key: 'toast.tonicUsed', params: {}, ref: { kind: 'item', id: event.id } };
       }
       return {
@@ -93,7 +97,7 @@ export function toastFor(event: GameEvent): ToastSpec | null {
         key: 'toast.poiClaimed',
         params: {},
         ref: { kind: 'poi', id: event.poi },
-        gains: claimGains(event.poi),
+        gains: claimGains(event.poi, content),
       };
     case 'travelled':
       return { key: 'toast.travelled', params: {}, ref: { kind: 'cell', id: event.cell } };
@@ -113,7 +117,10 @@ export function toastFor(event: GameEvent): ToastSpec | null {
 }
 
 /** What claiming a cache or a vault gives. */
-function claimGains(poiId: string): { ryo: number; items: { id: string; n: number }[] } {
+function claimGains(
+  poiId: string,
+  content: ContentDb,
+): { ryo: number; items: { id: string; n: number }[] } {
   for (const cell of content.cells) {
     for (const poi of cell.pois) {
       if (poi.id !== poiId) continue;

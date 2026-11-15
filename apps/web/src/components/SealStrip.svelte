@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
+  import { game } from '../lib/store.ts';
   import EntityLink from './EntityLink.svelte';
+
+  const content = game.content;
 
   interface Props {
     /** Ids of the seals in casting order. */

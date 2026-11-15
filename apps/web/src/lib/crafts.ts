@@ -13,6 +13,10 @@ import {
 } from '@shinobi/core';
 import { t } from './i18n.ts';
 import { hrefFor } from './route.ts';
+import { rankName, skillByActivity } from './vocab.ts';
+
+/** The skill whose page holds herb gathering: the skill of the patch activity. */
+const herbSkill = (content: ContentDb): string | null => skillByActivity(content, 'patch');
 
 /** Where an item can be had from, as a shortcut link: its label key (no entity name in it) and target. */
 export interface ItemSource {
@@ -24,10 +28,11 @@ export interface ItemSource {
 
 /** The place to get an item: the herb page, the shop, the recipe that makes it, or the item's own page. */
 export function itemSource(id: string, content: ContentDb): ItemSource {
-  if (content.herbs.some((h) => h.id === id)) {
+  const gatherer = herbSkill(content);
+  if (gatherer && content.herbs.some((h) => h.id === id)) {
     return {
       kind: 'herb',
-      href: hrefFor({ kind: 'skill', id: 'herb' }),
+      href: hrefFor({ kind: 'skill', id: gatherer }),
       labelKey: 'craft.src.herb',
     };
   }
@@ -50,7 +55,9 @@ export function itemSource(id: string, content: ContentDb): ItemSource {
  * the recipe that makes it. Null when no such place exists (the caller picks a fallback).
  */
 export function itemPlace(id: string, content: ContentDb): string | null {
-  if (content.herbs.some((h) => h.id === id)) return hrefFor({ kind: 'skill', id: 'herb' });
+  const gatherer = herbSkill(content);
+  if (gatherer && content.herbs.some((h) => h.id === id))
+    return hrefFor({ kind: 'skill', id: gatherer });
   if (shopEntries(content).some((s) => s.item === id)) return '#/shop';
   const recipe = content.recipes.find((r) => r.output.item === id);
   return recipe ? hrefFor({ kind: 'skill', id: recipe.skill }) : null;
@@ -68,12 +75,19 @@ function buildingOf(req: Req): string | null {
   return null;
 }
 
-export type ShopSection = 'market' | 'forge' | 'library';
+/** The id of a shop section: `market` for goods that need no building, else the slug of the building that unlocks them. */
+export type ShopSection = string;
 
-/** Goods of the forge are the ones its building unlocks; everything else is the market's. */
+/** The market's section id: goods that no building unlocks. */
+export const MARKET_SECTION = 'market';
+
+/** The slug of an id: its part after the pack prefix. */
+export const slugOf = (id: string): string => id.slice(id.lastIndexOf(':') + 1);
+
+/** Goods that a building unlocks are the building's section; everything else is the market's. */
 export function shopSection(entry: ShopEntry): ShopSection {
   const building = buildingOf(entry.req);
-  return building === 'core:forge' ? 'forge' : building === 'core:library' ? 'library' : 'market';
+  return building === null ? MARKET_SECTION : slugOf(building);
 }
 
 /** Every item a requirement tree asks for, once each, in tree order. */
@@ -148,7 +162,7 @@ export function blockText(block: Block): string {
     case 'level':
       return t('reason.level', { n: block.n });
     case 'rank':
-      return t('reason.rank', { rank: t(`rank.${block.rank}`) });
+      return t('reason.rank', { rank: rankName(block.rank) });
     case 'missing':
       return t('error.missingIngredient');
     default:

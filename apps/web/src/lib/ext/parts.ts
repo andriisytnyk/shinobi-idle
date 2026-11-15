@@ -50,6 +50,8 @@ export const UI_PARTS = [
   'theme-select',
   /** The settings that packs registered. */
   'pack-settings',
+  /** The list of the content packs of this boot, with their versions. */
+  'loaded-packs',
   /** The notice about packs that were switched off because of an error. */
   'disabled-packs',
   /** The «Застосунок» section of the settings page. */

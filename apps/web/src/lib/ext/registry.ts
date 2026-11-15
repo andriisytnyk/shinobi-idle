@@ -5,6 +5,8 @@ import type {
   NavItemSpec,
   PageSpec,
   PageWrap,
+  PoiRendererSpec,
+  SkillPanelSpec,
   UiApi,
   SettingSpec,
   UiPack,
@@ -57,6 +59,14 @@ export interface NavEntry extends Owned, Omit<NavItemSpec, 'id'> {
 export interface LinkEntry extends Owned, EntityLinkSpec {}
 export interface SettingEntry extends Owned, Omit<SettingSpec, 'id'> {}
 export interface ThemeEntry extends Owned, Omit<UiTheme, 'id'> {}
+/** The panel of one skill activity. */
+export interface SkillPanelEntry extends Owned, SkillPanelSpec {
+  activity: string;
+}
+/** The renderer of one kind of point of interest. */
+export interface PoiRendererEntry extends Owned, PoiRendererSpec {
+  kind: string;
+}
 
 type Segment = { t: 'lit'; v: string } | { t: 'one'; name: string } | { t: 'rest'; name: string };
 
@@ -140,6 +150,10 @@ export interface UiRegistry {
   readonly themes: readonly ThemeEntry[];
   /** The theme with this id; the base theme for an unknown id. */
   theme(id: string): ThemeEntry | undefined;
+  /** The panel and hint for skills of this activity; the later pack wins. */
+  skillPanel(activity: string): SkillPanelEntry | undefined;
+  /** The renderer for points of interest of this kind; the later pack wins. */
+  poiRenderer(kind: string): PoiRendererEntry | undefined;
   /** Texts added by packs, by key. */
   readonly messages: Readonly<Record<string, string>>;
   /** Stylesheets that packs ship, in load order. */
@@ -166,6 +180,8 @@ export function createRegistry(packs: readonly UiPack[], guard: Guard = createGu
   const links: LinkEntry[] = [];
   const settings: SettingEntry[] = [];
   const themes: ThemeEntry[] = [];
+  const skillPanels: SkillPanelEntry[] = [];
+  const poiRenderers: PoiRendererEntry[] = [];
   const messages: Record<string, string> = {};
   const stylesheets: { packId: string; css: string }[] = [];
   const removedNav = new Map<string, NavRemoval[]>();
@@ -361,6 +377,34 @@ export function createRegistry(packs: readonly UiPack[], guard: Guard = createGu
         const { id: _id, ...rest } = spec;
         add(settings, { ...rest, key, packId });
       },
+      addSkillPanel(activity, spec) {
+        if (typeof activity !== 'string' || activity === '')
+          fail('a skill panel needs an activity');
+        const key = claim('skill-panel', activity);
+        if (spec.mount === undefined && spec.hint === undefined)
+          fail(`skill panel "${key}" needs a mount or a hint`);
+        const prior = skillPanels.findLast((p) => p.activity === activity);
+        if (prior && prior.packId !== packId) {
+          warn(
+            `skill panel for "${activity}" is set by "${prior.packId}" and by "${packId}"; the later pack wins`,
+          );
+        }
+        add(skillPanels, { ...spec, activity, key, packId });
+      },
+      addPoiRenderer(kind, spec) {
+        if (typeof kind !== 'string' || kind === '')
+          fail('a point-of-interest renderer needs a kind');
+        const key = claim('poi-renderer', kind);
+        if (typeof spec.icon !== 'string' || spec.icon === '')
+          fail(`poi renderer "${key}" needs an icon`);
+        const prior = poiRenderers.findLast((p) => p.kind === kind);
+        if (prior && prior.packId !== packId) {
+          warn(
+            `poi renderer for "${kind}" is set by "${prior.packId}" and by "${packId}"; the later pack wins`,
+          );
+        }
+        add(poiRenderers, { ...spec, kind, key, packId });
+      },
       addTheme,
       replacePage(id, mount) {
         const page = pageOf('replacePage', id);
@@ -479,6 +523,8 @@ export function createRegistry(packs: readonly UiPack[], guard: Guard = createGu
     setting: (key) => settings.find((s) => s.key === key),
     themes,
     theme: (id) => themes.find((t) => t.key === id) ?? themes.find((t) => t.key === BASE_THEME),
+    skillPanel: (activity) => skillPanels.findLast((p) => p.activity === activity),
+    poiRenderer: (kind) => poiRenderers.findLast((p) => p.kind === kind),
     messages,
     stylesheets,
     navRemovals: (key) => removedNav.get(key) ?? [],

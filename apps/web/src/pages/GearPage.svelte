@@ -1,8 +1,10 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
+  import { game } from '../lib/store.ts';
   import EntityLink from '../components/EntityLink.svelte';
   import GearLine from '../components/GearLine.svelte';
   import { t } from '../lib/i18n.ts';
+
+  const content = game.content;
 
   interface Props {
     id: string;

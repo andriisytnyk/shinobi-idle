@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import { actionInfo, cellInfo, locationCell, SHARE_FULL } from '@shinobi/core';
   import { actionRef } from '../lib/entities.ts';
   import { senseiTestInfo } from '../lib/exam-test.ts';
@@ -10,6 +9,8 @@
   import EntityLink from './EntityLink.svelte';
   import Slot from '../lib/ext/Slot.svelte';
   import Icon from './Icon.svelte';
+
+  const content = game.content;
 
   interface Row {
     slot: number;

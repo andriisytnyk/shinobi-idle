@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import { natureStatus } from '@shinobi/core';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
+
+  const content = game.content;
 
   const status = $derived(game.read((gs) => natureStatus(gs, content)));
   /** The nature test, or an extra nature once Chakra Control allows it. */

@@ -13,12 +13,16 @@ import { flagPage, objectiveTarget } from '../src/lib/next-step.ts';
 import { parseHash } from '../src/lib/route.ts';
 import { settings } from '../src/lib/settings.svelte.ts';
 import { game } from '../src/lib/store.ts';
-import { toastFor } from '../src/lib/toasts.svelte.ts';
+import { toastFor as toastForIn } from '../src/lib/toasts.svelte.ts';
 import { isWorldRoute, worldFocus } from '../src/lib/world.ts';
 import EntityPage from '../src/pages/EntityPage.svelte';
 import SkillPage from '../src/pages/SkillPage.svelte';
 import CombatPage from '../src/pages/CombatPage.svelte';
 import WorldPage from '../src/pages/WorldPage.svelte';
+import { coreContext } from './helpers/core-registry.ts';
+
+/** The toast of an event, for the content of the game under test. */
+const toastFor = (event: Parameters<typeof toastForIn>[0]) => toastForIn(event, content);
 
 const FOREST = 'core:forest';
 const PLAINS = 'core:plains';
@@ -58,7 +62,7 @@ let app: ReturnType<typeof mount> | null = null;
 function show(
   focus: { cell: string | null; region: string | null } = { cell: null, region: FOREST },
 ): void {
-  app = mount(WorldPage, { target, props: { focus } });
+  app = mount(WorldPage, { target, context: coreContext(), props: { focus } });
   flushSync();
 }
 
@@ -194,7 +198,7 @@ describe('A4: names are entity links', () => {
   });
 
   it('puts the cell of a fight zone on the enemy page, as links', () => {
-    app = mount(EntityPage, { target, props: { entity: { kind: 'enemy', id: 'core:wolf' } } });
+    app = mount(EntityPage, { target, context: coreContext(), props: { entity: { kind: 'enemy', id: 'core:wolf' } } });
     flushSync();
     const where = q('[data-zone-where]');
     expect(where?.querySelector(href('cell', 'core:prykordonnyi_lis_okolytsia'))).not.toBeNull();
@@ -216,7 +220,7 @@ describe('A4: names are entity links', () => {
     explored(state, TRAINING_CELL);
     state.world.location = TRAINING_CELL;
     game.replaceState(state);
-    app = mount(SkillPage, { target, props: { id: 'herb' } });
+    app = mount(SkillPage, { target, context: coreContext(), props: { id: 'herb' } });
     flushSync();
     // The breakdown lives behind the figure; opening it lists the training spot as a poi link.
     const trainingPoi = cellOf(TRAINING_CELL).pois.find((p) => p.kind === 'training');
@@ -454,7 +458,7 @@ describe('the Scouting page', () => {
     const state = genin();
     state.currencies.intel = 7;
     game.replaceState(state);
-    app = mount(SkillPage, { target, props: { id: 'scout' } });
+    app = mount(SkillPage, { target, context: coreContext(), props: { id: 'scout' } });
     flushSync();
     expect(q('[data-intel]')?.textContent).toBe('7');
     expect(q('[data-open-world]')?.getAttribute('href')).toBe('#/world');
@@ -554,7 +558,7 @@ describe('hints of the map', () => {
 
 describe('CellPanel on its own', () => {
   it('renders nothing for an unknown cell', () => {
-    app = mount(CellPanel, { target, props: { id: 'core:nowhere' } });
+    app = mount(CellPanel, { target, context: coreContext(), props: { id: 'core:nowhere' } });
     flushSync();
     expect(q('[data-cell-panel]')).toBeNull();
   });
