@@ -15,10 +15,13 @@
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
   import StatBar from '../components/StatBar.svelte';
+  import TimeBar from '../components/TimeBar.svelte';
   import ZoneWhere from '../components/ZoneWhere.svelte';
   import { formatInt } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
+  import { combatTiming, IDLE_TIMING } from '../lib/timing.ts';
+  import type { ProgressTiming } from '../lib/time-progress.ts';
   import SimplePage from './SimplePage.svelte';
 
   /** Enemies of the Academy yard are open to everyone; the other regions arrive with missions. */
@@ -60,20 +63,34 @@
           ? Math.min(1, Math.max(0, (timer.progress + combat.work * RATE_FULL) / timer.need))
           : 1;
 
-      let playerDoing: { key: string; tech: string | null; progress: number };
+      let playerDoing: {
+        key: string;
+        tech: string | null;
+        progress: number;
+        timing: ProgressTiming;
+      };
       if (p.phase === 'cast' && p.cast) {
-        playerDoing = { key: 'combat.doing.cast', tech: p.cast, progress: fraction(p.timer) };
+        playerDoing = {
+          key: 'combat.doing.cast',
+          tech: p.cast,
+          progress: fraction(p.timer),
+          timing: combatTiming(state, p.timer),
+        };
       } else if (p.phase === 'recover') {
-        playerDoing = { key: 'combat.doing.recover', tech: null, progress: 0 };
+        playerDoing = { key: 'combat.doing.recover', tech: null, progress: 0, timing: IDLE_TIMING };
       } else {
-        playerDoing = { key: 'combat.doing.ready', tech: null, progress: 0 };
+        playerDoing = { key: 'combat.doing.ready', tech: null, progress: 0, timing: IDLE_TIMING };
       }
 
       const front = f.enemies.find((e) => e.hp > 0) ?? f.enemies[0];
       const enemyDoing =
         combat.phase === 'respawn' || !front
-          ? { key: 'combat.doing.respawn', progress: 0 }
-          : { key: 'combat.doing.attack', progress: fraction(front.timer) };
+          ? { key: 'combat.doing.respawn', progress: 0, timing: IDLE_TIMING }
+          : {
+              key: 'combat.doing.attack',
+              progress: fraction(front.timer),
+              timing: combatTiming(state, front.timer),
+            };
 
       return {
         slot,
@@ -131,16 +148,12 @@
             />{/if}
         </p>
         {#if fight.playerDoing.tech}
-          <div
-            class="cast"
-            role="progressbar"
-            aria-valuemin="0"
-            aria-valuemax="100"
-            aria-valuenow={Math.round(fight.playerDoing.progress * 100)}
-            aria-label={t('combat.doing.cast')}
-          >
-            <span class="cast-fill" style:width="{fight.playerDoing.progress * 100}%"></span>
-          </div>
+          <TimeBar
+            timing={fight.playerDoing.timing}
+            size="md"
+            tone="chakra"
+            label={t('combat.doing.cast')}
+          />
         {/if}
       </div>
 
@@ -156,16 +169,12 @@
           <span class="doing-label">{t(fight.enemyDoing.key)}</span>
         </p>
         {#if fight.enemyDoing.progress > 0 || fight.c.phase === 'fight'}
-          <div
-            class="cast"
-            role="progressbar"
-            aria-valuemin="0"
-            aria-valuemax="100"
-            aria-valuenow={Math.round(fight.enemyDoing.progress * 100)}
-            aria-label={t('combat.doing.attack')}
-          >
-            <span class="cast-fill enemy" style:width="{fight.enemyDoing.progress * 100}%"></span>
-          </div>
+          <TimeBar
+            timing={fight.enemyDoing.timing}
+            size="md"
+            tone="enemy"
+            label={t('combat.doing.attack')}
+          />
         {/if}
         <p class="kills" data-kills>{t('combat.kills', { n: formatInt(fight.kills) })}</p>
       </div>
@@ -272,23 +281,6 @@
   .doing :global(a) {
     color: var(--accent);
     font-weight: 600;
-  }
-
-  .cast {
-    height: var(--bar-md);
-    border-radius: var(--radius-xs);
-    background: var(--line);
-    overflow: hidden;
-  }
-
-  .cast-fill {
-    display: block;
-    height: 100%;
-    background: var(--chakra);
-  }
-
-  .cast-fill.enemy {
-    background: var(--danger);
   }
 
   .kills {

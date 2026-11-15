@@ -31,6 +31,16 @@
   --nature-doton: #a9805b;
   --nature-suiton: #3b8fd9;
 
+  /* Progress of a running cycle, 0..1; animated by lib/time-progress.ts, read by bars, the seal strip and the emblem flash */
+  --tp: 0;
+
+  /* Skill groups: the tint of an action's emblem (techniques take their nature's colour) */
+  --group-train: #d98a3d;
+  --group-nin: #8b5cc6;
+  --group-field: #5e8c3a;
+  --group-craft: #c9a24a;
+  --group-combat: #c8372d;
+
   /* Rank stamps: D grey, C green, B blue, A purple, S red with gold */
   --rank-d: #8b929c;
   --rank-c: #5e8c3a;

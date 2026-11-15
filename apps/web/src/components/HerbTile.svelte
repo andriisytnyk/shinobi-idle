@@ -1,16 +1,19 @@
 <script lang="ts">
   import { content } from '@shinobi/content';
-  import { SHARE_FULL, type ActionInfo } from '@shinobi/core';
+  import type { ActionInfo } from '@shinobi/core';
   import { blockOf, blockText, bushView } from '../lib/crafts.ts';
   import { formatDuration, formatInt, formatSeconds, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
+  import { slotTiming } from '../lib/timing.ts';
   import { toasts } from '../lib/toasts.svelte.ts';
+  import ActionEmblem from './ActionEmblem.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import MasteryRing from './MasteryRing.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
   import ReqTree from './ReqTree.svelte';
+  import TimeBar from './TimeBar.svelte';
 
   interface Props {
     info: ActionInfo;
@@ -25,15 +28,13 @@
     ),
   );
   const running = $derived(slotIndex >= 0);
-  /** How far through the current cycle (an empty bush: through its regrow) the running action is, 0..1. */
-  const cycle = $derived(
-    game.read((gs) => {
-      const slot = gs.slots[slotIndex];
-      // An empty bush's cycle also holds the regrow, which the tile's interval leaves out.
-      const length = info.intervalMs + (bush.empty ? bush.regrowMs : 0);
-      return slot ? Math.min(1, slot.progress / (length * SHARE_FULL)) : 0;
-    }),
+  /** The running cycle; an empty bush's cycle also holds the regrow, which the tile's interval leaves out. */
+  const timing = $derived(
+    game.read((gs) =>
+      slotTiming(gs, slotIndex, info.intervalMs + (bush.empty ? bush.regrowMs : 0)),
+    ),
   );
+  const cycle = $derived(timing.fraction);
   const block = $derived(info.available ? null : blockOf(info.req));
   const stockFraction = $derived(bush.size > 0 ? bush.stock / bush.size : 0);
 
@@ -53,12 +54,12 @@
   data-ui="action-tile"
   data-entity="item:{info.id}"
 >
-  <div class="ct-head">
-    <h3 class="ct-name">
-      <span class="ct-icon"><Icon entity={{ kind: 'item', id: info.id }} size={22} /></span>
-      <EntityLink kind="item" id={info.id} />
-    </h3>
-    <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
+  <div class="ct-top">
+    <ActionEmblem kind="item" id={info.id} skill={info.skill} />
+    <div class="ct-head">
+      <h3 class="ct-name"><EntityLink kind="item" id={info.id} /></h3>
+      <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
+    </div>
   </div>
 
   <dl class="ct-facts">
@@ -113,9 +114,7 @@
   </div>
 
   {#if running}
-    <span class="ct-bar" aria-hidden="true"
-      ><span class="ct-fill" style:width="{cycle * 100}%"></span></span
-    >
+    <TimeBar {timing} part="action-progress" />
   {/if}
 
   {#if info.req && !info.available}

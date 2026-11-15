@@ -14,6 +14,8 @@ export const UI_PARTS = [
   'skill-row',
   /** The tile of one action: a technique, a herb, a recipe. */
   'action-tile',
+  /** The medallion of an action: its pictogram on a tinted disc, with the rank stamp of a technique. */
+  'action-emblem',
   /** The cycle progress bar of a running tile. */
   'action-progress',
   /** The XP-per-hour figure of a tile. */

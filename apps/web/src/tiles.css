@@ -25,11 +25,23 @@
   border-color: var(--accent);
 }
 
+/* An action tile: the emblem sits left of the head (title and mastery ring). */
+.ct-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
 .ct-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
+}
+
+.ct-top > .ct-head {
+  flex: 1;
+  min-width: 0;
 }
 
 .ct-name {

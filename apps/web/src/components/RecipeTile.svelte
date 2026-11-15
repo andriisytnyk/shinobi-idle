@@ -1,17 +1,20 @@
 <script lang="ts">
   import { content } from '@shinobi/content';
-  import { SHARE_FULL, type ActionInfo } from '@shinobi/core';
+  import type { ActionInfo } from '@shinobi/core';
   import { blockOf, blockText, tierView } from '../lib/crafts.ts';
   import { formatInt, formatSeconds, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
+  import { slotTiming } from '../lib/timing.ts';
   import { toasts } from '../lib/toasts.svelte.ts';
+  import ActionEmblem from './ActionEmblem.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import IngredientRow from './IngredientRow.svelte';
   import MasteryRing from './MasteryRing.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
   import ReqTree from './ReqTree.svelte';
+  import TimeBar from './TimeBar.svelte';
 
   interface Props {
     info: ActionInfo;
@@ -26,12 +29,7 @@
     ),
   );
   const running = $derived(slotIndex >= 0);
-  const cycle = $derived(
-    game.read((gs) => {
-      const slot = gs.slots[slotIndex];
-      return slot ? Math.min(1, slot.progress / (info.intervalMs * SHARE_FULL)) : 0;
-    }),
-  );
+  const timing = $derived(game.read((gs) => slotTiming(gs, slotIndex, info.intervalMs)));
   const block = $derived(info.available ? null : blockOf(info.req));
 
   function toggle(): void {
@@ -50,14 +48,12 @@
   data-ui="action-tile"
   data-entity="recipe:{info.id}"
 >
-  <div class="ct-head">
-    <h3 class="ct-name">
-      {#each info.outputs.slice(0, 1) as out (out.item)}
-        <span class="ct-icon"><Icon entity={{ kind: 'item', id: out.item }} size={22} /></span>
-      {/each}
-      <EntityLink kind="recipe" id={info.id} />
-    </h3>
-    <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
+  <div class="ct-top">
+    <ActionEmblem kind="recipe" id={info.id} skill={info.skill} />
+    <div class="ct-head">
+      <h3 class="ct-name"><EntityLink kind="recipe" id={info.id} /></h3>
+      <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
+    </div>
   </div>
 
   <dl class="ct-facts">
@@ -121,9 +117,7 @@
   </p>
 
   {#if running}
-    <span class="ct-bar" aria-hidden="true"
-      ><span class="ct-fill" style:width="{cycle * 100}%"></span></span
-    >
+    <TimeBar {timing} part="action-progress" />
   {/if}
 
   <button
