@@ -17,7 +17,9 @@ import { fileURLToPath } from 'node:url';
 import {
   countByFolder,
   dedupe,
+  entryPath,
   judge,
+  type MigratedEntry,
   parseSvelteCheck,
   parseTsc,
   type Diagnostic,
@@ -54,7 +56,7 @@ function run(target: (typeof targets)[number]): Diagnostic[] {
 }
 
 const config = JSON.parse(readFileSync(resolve(root, 'open-typecheck.json'), 'utf8')) as {
-  migrated: string[];
+  migrated: MigratedEntry[];
 };
 const migrated = config.migrated;
 
@@ -70,7 +72,9 @@ const unique = dedupe(all);
 console.log(
   `total (without duplicates): ${unique.length} error(s) in ${countByFolder(unique).length} folder(s)`,
 );
-console.log(`migrated folders: ${migrated.length === 0 ? 'none yet' : migrated.join(', ')}`);
+console.log(
+  `migrated: ${migrated.length === 0 ? 'none yet' : migrated.map((m) => (typeof m === 'string' ? m : `${entryPath(m)} (without ${(m.exclude ?? []).join(', ')})`)).join('; ')}`,
+);
 
 const verdict = judge(
   unique,

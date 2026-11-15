@@ -2,7 +2,7 @@ import { runBench } from './bench.ts';
 import type { Bot } from './bot.ts';
 import { bots } from './bots/index.ts';
 import { runCraftsCli, runFightCli, runFighterCli } from './cliSim.ts';
-import { buildEnvironment, parsePacks, type Environment } from './env.ts';
+import { buildEnvironment, parsePacks } from './env.ts';
 import { buildReport, type Report } from './report.ts';
 import type { Milestone } from './runner.ts';
 
