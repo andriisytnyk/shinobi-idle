@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { content, localeKey, ukLocale } from '@shinobi/content';
+import { content, ukLocale } from '@shinobi/content';
 import { actionInfo, createState, syncVillage, xpAt, type GameState } from '@shinobi/core';
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -13,11 +13,15 @@ import { nextStateHint } from '../src/lib/hints.ts';
 import { parseHash, hrefFor, type EntityRef } from '../src/lib/route.ts';
 import { settings } from '../src/lib/settings.svelte.ts';
 import { game } from '../src/lib/store.ts';
-import { toastFor } from '../src/lib/toasts.svelte.ts';
+import { toastFor as toastForIn } from '../src/lib/toasts.svelte.ts';
 import BankPage from '../src/pages/BankPage.svelte';
 import RecipePage from '../src/pages/RecipePage.svelte';
 import ShopPage from '../src/pages/ShopPage.svelte';
 import SkillPage from '../src/pages/SkillPage.svelte';
+import { coreContext } from './helpers/core-registry.ts';
+
+/** The toast of an event, for the content of the game under test. */
+const toastFor = (event: Parameters<typeof toastForIn>[0]) => toastForIn(event, content);
 
 const MINT = 'core:mint';
 const NETTLE = 'core:nettle';
@@ -27,7 +31,7 @@ const TONIC = 'core:tonik_iasnoho_rozumu';
 const GEAR_SICKLE = 'core:serp_i_rukavytsi_travnyka';
 
 const name = (ref: EntityRef) =>
-  ukLocale[localeKey(ref.kind === 'status' ? 'state' : ref.kind, ref.id, 'name')] ?? ref.id;
+  ukLocale[`${ref.kind === 'status' ? 'state' : ref.kind}.${ref.id}.name`] ?? ref.id;
 
 const text = (el: Element | null | undefined) =>
   (el?.textContent ?? '').replace(/\s+/g, ' ').trim();
@@ -50,10 +54,10 @@ function genin(): GameState {
   state.player.rank = 'genin';
   syncVillage(state, content);
   state.player.name = 'Тест';
-  state.skills.herb.xp = xpAt(10);
-  state.skills.alch.xp = xpAt(10);
-  state.skills.prov.xp = xpAt(10);
-  state.skills.med.xp = xpAt(10);
+  state.skills.herb!.xp = xpAt(10);
+  state.skills.alch!.xp = xpAt(10);
+  state.skills.prov!.xp = xpAt(10);
+  state.skills.med!.xp = xpAt(10);
   state.currencies.ryo = 500;
   return state;
 }
@@ -84,7 +88,7 @@ describe('A3: views follow the core without a reload', () => {
   it('a finished craft changes the have and need counts and flags the missing ingredient', () => {
     game.state.bank[NETTLE] = 2;
     game.state.bank[OIL] = 1;
-    app = mount(SkillPage, { target, props: { id: 'alch' } });
+    app = mount(SkillPage, { target, context: coreContext(), props: { id: 'alch' } });
     flushSync();
     const row = (item: string) =>
       target.querySelector(`[data-recipe="${OINTMENT}"] [data-input="${item}"]`);
@@ -149,7 +153,7 @@ describe('A3: views follow the core without a reload', () => {
   });
 
   it('the herb tile shows the bush emptying and regrowing', () => {
-    app = mount(SkillPage, { target, props: { id: 'herb' } });
+    app = mount(SkillPage, { target, context: coreContext(), props: { id: 'herb' } });
     flushSync();
     const stock = () => text(target.querySelector(`[data-herb="${MINT}"] [data-stock]`));
     const size = game.read((gs) => gs.bushes[MINT]?.size ?? 5 + 1);
@@ -319,17 +323,17 @@ describe('A6: a disabled control says why', () => {
     game.devAdvance(0);
     flushSync();
     expect(target.querySelector(`[data-good="${OIL}"] [data-why]`)?.getAttribute('data-why')).toBe(
-      'ryo',
+      'money',
     );
     expect(text(target.querySelector(`[data-good="${OIL}"] [data-why]`))).toContain(
-      'Не вистачає рьо',
+      'Не вистачає: Рьо',
     );
     everyDisabledHasReason();
   });
 
   it('a level that is too low, and a missing ingredient', () => {
-    game.state.skills.alch.xp = 0;
-    app = mount(SkillPage, { target, props: { id: 'alch' } });
+    game.state.skills.alch!.xp = 0;
+    app = mount(SkillPage, { target, context: coreContext(), props: { id: 'alch' } });
     flushSync();
     const why = (id: string) =>
       target.querySelector(`[data-recipe="${id}"] [data-why]`)?.getAttribute('data-why');
@@ -338,7 +342,7 @@ describe('A6: a disabled control says why', () => {
       target.querySelector(`[data-recipe="${OINTMENT}"] .ct-action`)?.hasAttribute('disabled'),
     ).toBe(true);
 
-    game.state.skills.alch.xp = xpAt(10);
+    game.state.skills.alch!.xp = xpAt(10);
     game.devAdvance(0);
     flushSync();
     expect(why(OINTMENT)).toBe('missing');
@@ -351,13 +355,13 @@ describe('A6: a disabled control says why', () => {
   });
 
   it('a gear tier that the level or the ryo does not allow', () => {
-    game.state.skills.herb.xp = 0;
+    game.state.skills.herb!.xp = 0;
     const line = content.gear.find((g) => g.id === GEAR_SICKLE);
     if (!line) throw new Error('no sickle');
     game.state.currencies.ryo = 0;
     app = mount(GearLine, { target, props: { line } });
     flushSync();
-    expect(target.querySelector('[data-why]')?.getAttribute('data-why')).toBe('ryo');
+    expect(target.querySelector('[data-why]')?.getAttribute('data-why')).toBe('money');
     everyDisabledHasReason();
   });
 });
@@ -384,7 +388,7 @@ describe('the quantity field', () => {
 
     type(`${good} [data-qty]`, '26');
     expect(target.querySelector<HTMLButtonElement>(`[data-buy="${OIL}"]`)?.disabled).toBe(true);
-    expect(target.querySelector(`${good} [data-why]`)?.getAttribute('data-why')).toBe('ryo');
+    expect(target.querySelector(`${good} [data-why]`)?.getAttribute('data-why')).toBe('money');
 
     type(`${good} [data-qty]`, 'abc');
     expect(target.querySelector(`${good} [data-why]`)?.getAttribute('data-why')).toBe('qty');
@@ -441,7 +445,7 @@ describe('places and hints', () => {
 
   it('the five training skills show their gear line with a link to the shop', () => {
     for (const skill of ['tai', 'herb', 'alch', 'prov', 'scout']) {
-      app = mount(SkillPage, { target, props: { id: skill } });
+      app = mount(SkillPage, { target, context: coreContext(), props: { id: skill } });
       flushSync();
       const section = target.querySelector('[data-gear-section]');
       expect(section, skill).not.toBeNull();

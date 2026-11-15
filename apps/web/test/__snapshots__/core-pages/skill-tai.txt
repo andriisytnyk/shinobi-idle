@@ -1,0 +1,784 @@
+<main class="main">
+  <div class="ui-page" data-page="core:entity.skill" data-ui="page">
+    <article class="skill-page" data-entity="skill:tai" data-skill="tai" data-ui="entity-page">
+      <header class="plate" data-ui="entity-header">
+        <h1>
+          <span class="plate-icon" style="color: var(--steel);">
+            <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+              <path d="#1346-olzib4" fill="currentColor">
+          Тайдзюцу
+        <span class="level">
+          Рів. 1
+      <p class="lore">
+        Тайдзюцу — шлях тих, хто б'ється тілом, а не чакрою.
+      <p class="unlock">
+        Академія, з першого дня.
+      <section data-ui="entity-section">
+        <h2>
+          Дії
+        <ul class="tiles">
+          <li class="tile" data-action="core:leaf_whirlwind" data-entity="technique:core:leaf_whirlwind" data-ui="action-tile">
+            <div class="top">
+              <span class="emblem md" data-emblem-icon="leaf-swirl" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#1935-zyv4gr" fill="currentColor">
+                <span class="rank">
+                  <span aria-label="Ранг техніки D" class="stamp xs" role="img" style="--stamp: var(--rank-d);">
+                    D
+              <div class="main">
+                <div class="head">
+                  <h3 class="name">
+                    <a class="entity-link" href="#/technique/core:leaf_whirlwind">
+                      Листяний вихор
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+            <dl class="facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  1
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  2 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      5 184 дос./год
+            <button class="action" type="button">
+              Почати
+          <li class="tile locked" data-action="core:dynamic_entry" data-entity="technique:core:dynamic_entry" data-ui="action-tile">
+            <div class="top">
+              <span class="emblem md" data-emblem-icon="boot-kick" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#867-15yo6y6" fill="currentColor">
+                <span class="rank">
+                  <span aria-label="Ранг техніки D" class="stamp xs" role="img" style="--stamp: var(--rank-d);">
+                    D
+              <div class="main">
+                <div class="head">
+                  <h3 class="name">
+                    <a class="entity-link" href="#/technique/core:dynamic_entry">
+                      Динамічний вхід
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+            <dl class="facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  10
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  2 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      10 363 дос./год
+            <div class="req">
+              <p class="locked-label">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row" data-entity="technique:core:dynamic_entry" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/technique/core:dynamic_entry">
+                          Динамічний вхід
+                        <span class="detail">
+                          ще не відкрито
+                  <li>
+                    <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/tai">
+                          Тайдзюцу
+                        <span class="detail">
+                          рів. 10
+                      <span class="count">
+                        1/10
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 10%;">
+          <li class="tile locked" data-action="core:leaf_gale" data-entity="technique:core:leaf_gale" data-ui="action-tile">
+            <div class="top">
+              <span class="emblem md" data-emblem-icon="soccer-kick" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#821-1r3f4sd" fill="currentColor">
+                <span class="rank">
+                  <span aria-label="Ранг техніки D" class="stamp xs" role="img" style="--stamp: var(--rank-d);">
+                    D
+              <div class="main">
+                <div class="head">
+                  <h3 class="name">
+                    <a class="entity-link" href="#/technique/core:leaf_gale">
+                      Листяний шквал
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+            <dl class="facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  15
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  2 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      15 226 дос./год
+            <div class="req">
+              <p class="locked-label">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row" data-entity="technique:core:leaf_gale" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/technique/core:leaf_gale">
+                          Листяний шквал
+                        <span class="detail">
+                          ще не відкрито
+                  <li>
+                    <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/tai">
+                          Тайдзюцу
+                        <span class="detail">
+                          рів. 15
+                      <span class="count">
+                        1/15
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 6.666666666666667%;">
+          <li class="tile locked" data-action="core:gate_of_opening" data-entity="technique:core:gate_of_opening" data-ui="action-tile">
+            <div class="top">
+              <span class="emblem md" data-emblem-icon="open-gate" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#475-5rbz1c" fill="currentColor">
+                <span class="rank">
+                  <span aria-label="Ранг техніки D" class="stamp xs" role="img" style="--stamp: var(--rank-d);">
+                    D
+              <div class="main">
+                <div class="head">
+                  <h3 class="name">
+                    <a class="entity-link" href="#/technique/core:gate_of_opening">
+                      Брама відкриття
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+            <dl class="facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  20
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  2 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      22 373 дос./год
+            <div class="req">
+              <p class="locked-label">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row" data-entity="technique:core:gate_of_opening" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/technique/core:gate_of_opening">
+                          Брама відкриття
+                        <span class="detail">
+                          ще не відкрито
+                  <li>
+                    <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/tai">
+                          Тайдзюцу
+                        <span class="detail">
+                          рів. 20
+                      <span class="count">
+                        1/20
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 5%;">
+          <li class="tile locked" data-action="core:gate_of_healing" data-entity="technique:core:gate_of_healing" data-ui="action-tile">
+            <div class="top">
+              <span class="emblem md" data-emblem-icon="heaven-gate" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#1053-1ot0w86" fill="currentColor">
+                <span class="rank">
+                  <span aria-label="Ранг техніки D" class="stamp xs" role="img" style="--stamp: var(--rank-d);">
+                    D
+              <div class="main">
+                <div class="head">
+                  <h3 class="name">
+                    <a class="entity-link" href="#/technique/core:gate_of_healing">
+                      Брама зцілення
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+            <dl class="facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  25
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  2 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      32 873 дос./год
+            <div class="req">
+              <p class="locked-label">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row" data-entity="technique:core:gate_of_healing" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/technique/core:gate_of_healing">
+                          Брама зцілення
+                        <span class="detail">
+                          ще не відкрито
+                  <li>
+                    <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/tai">
+                          Тайдзюцу
+                        <span class="detail">
+                          рів. 25
+                      <span class="count">
+                        1/25
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 4%;">
+          <li class="tile locked" data-action="core:lion_combo" data-entity="technique:core:lion_combo" data-ui="action-tile">
+            <div class="top">
+              <span class="emblem md" data-emblem-icon="lion" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#1673-1g2szko" fill="currentColor">
+                <span class="rank">
+                  <span aria-label="Ранг техніки C" class="stamp xs" role="img" style="--stamp: var(--rank-c);">
+                    C
+              <div class="main">
+                <div class="head">
+                  <h3 class="name">
+                    <a class="entity-link" href="#/technique/core:lion_combo">
+                      Левове комбо
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+            <dl class="facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  30
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  2 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      48 301 дос./год
+            <div class="req">
+              <p class="locked-label">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row" data-entity="technique:core:lion_combo" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/technique/core:lion_combo">
+                          Левове комбо
+                        <span class="detail">
+                          ще не відкрито
+                  <li>
+                    <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/tai">
+                          Тайдзюцу
+                        <span class="detail">
+                          рів. 30
+                      <span class="count">
+                        1/30
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 3.3333333333333335%;">
+          <li class="tile locked" data-action="core:leaf_great_whirlwind" data-entity="technique:core:leaf_great_whirlwind" data-ui="action-tile">
+            <div class="top">
+              <span class="emblem md" data-emblem-icon="half-tornado" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#1517-1tinl6j" fill="currentColor">
+                <span class="rank">
+                  <span aria-label="Ранг техніки C" class="stamp xs" role="img" style="--stamp: var(--rank-c);">
+                    C
+              <div class="main">
+                <div class="head">
+                  <h3 class="name">
+                    <a class="entity-link" href="#/technique/core:leaf_great_whirlwind">
+                      Листяний великий вихор
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+            <dl class="facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  35
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  2 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      70 970 дос./год
+            <div class="req">
+              <p class="locked-label">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row" data-entity="technique:core:leaf_great_whirlwind" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/technique/core:leaf_great_whirlwind">
+                          Листяний великий вихор
+                        <span class="detail">
+                          ще не відкрито
+                  <li>
+                    <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/tai">
+                          Тайдзюцу
+                        <span class="detail">
+                          рів. 35
+                      <span class="count">
+                        1/35
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 2.857142857142857%;">
+          <li class="tile locked" data-action="core:drunken_fist" data-entity="technique:core:drunken_fist" data-ui="action-tile">
+            <div class="top">
+              <span class="emblem md" data-emblem-icon="sake-bottle" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#1396-1c7jlxe" fill="currentColor">
+                <span class="rank">
+                  <span aria-label="Ранг техніки C" class="stamp xs" role="img" style="--stamp: var(--rank-c);">
+                    C
+              <div class="main">
+                <div class="head">
+                  <h3 class="name">
+                    <a class="entity-link" href="#/technique/core:drunken_fist">
+                      П'яний кулак
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+            <dl class="facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  40
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  2 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      104 278 дос./год
+            <div class="req">
+              <p class="locked-label">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row" data-entity="technique:core:drunken_fist" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/technique/core:drunken_fist">
+                          П'яний кулак
+                        <span class="detail">
+                          ще не відкрито
+                  <li>
+                    <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/tai">
+                          Тайдзюцу
+                        <span class="detail">
+                          рів. 40
+                      <span class="count">
+                        1/40
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 2.5%;">
+          <li class="tile locked" data-action="core:leaf_rising_wind" data-entity="technique:core:leaf_rising_wind" data-ui="action-tile">
+            <div class="top">
+              <span class="emblem md" data-emblem-icon="high-punch" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#1315-7mqlvg" fill="currentColor">
+                <span class="rank">
+                  <span aria-label="Ранг техніки C" class="stamp xs" role="img" style="--stamp: var(--rank-c);">
+                    C
+              <div class="main">
+                <div class="head">
+                  <h3 class="name">
+                    <a class="entity-link" href="#/technique/core:leaf_rising_wind">
+                      Листяний висхідний вітер
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+            <dl class="facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  45
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  2 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      153 218 дос./год
+            <div class="req">
+              <p class="locked-label">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row" data-entity="technique:core:leaf_rising_wind" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/technique/core:leaf_rising_wind">
+                          Листяний висхідний вітер
+                        <span class="detail">
+                          ще не відкрито
+                  <li>
+                    <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/tai">
+                          Тайдзюцу
+                        <span class="detail">
+                          рів. 45
+                      <span class="count">
+                        1/45
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 2.2222222222222223%;">
+          <li class="tile locked" data-action="core:front_lotus" data-entity="technique:core:front_lotus" data-ui="action-tile">
+            <div class="top">
+              <span class="emblem md" data-emblem-icon="lotus-flower" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#1929-1tnmi9t" fill="currentColor">
+                <span class="rank">
+                  <span aria-label="Ранг техніки B" class="stamp xs" role="img" style="--stamp: var(--rank-b);">
+                    B
+              <div class="main">
+                <div class="head">
+                  <h3 class="name">
+                    <a class="entity-link" href="#/technique/core:front_lotus">
+                      Передній лотос
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+            <dl class="facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  50
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  2 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      225 128 дос./год
+            <div class="req">
+              <p class="locked-label">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row" data-entity="technique:core:front_lotus" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/technique/core:front_lotus">
+                          Передній лотос
+                        <span class="detail">
+                          ще не відкрито
+                  <li>
+                    <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/tai">
+                          Тайдзюцу
+                        <span class="detail">
+                          рів. 50
+                      <span class="count">
+                        1/50
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 2%;">
+      <section data-gear-section="" data-ui="entity-section">
+        <h2>
+          Тренувальне спорядження
+        <section class="gear" data-gear="core:trenuvalni_manekeny" data-owned="0">
+          <h3 class="name">
+            <span class="icon">
+              <svg aria-hidden="true" class="icon" height="24" viewBox="0 0 512 512" width="24">
+                <path d="#1117-1hqar4q" fill="currentColor">
+            <a class="entity-link" href="#/gear/core:trenuvalni_manekeny">
+              Тренувальні манекени
+            <span class="tiers" data-tiers="">
+              рівні: 0 з 3
+          <p class="effect">
+            +3% досвіду за тир
+          <p class="next" data-next="">
+            Наступний рівень I. Ціна — Рьо: 300.
+          <div class="req">
+            <div class="group" data-met="false">
+              <ul class="rows">
+                <li>
+                  <div class="row met" data-met="true" data-ui="req-row">
+                    <span class="mark">
+                      <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                        <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <span class="label">
+                      Ранг: Генін
+                <li>
+                  <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
+                    <span class="mark">
+                      <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                        <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <span class="label">
+                      <a class="entity-link" href="#/skill/tai">
+                        Тайдзюцу
+                      <span class="detail">
+                        рів. 10
+                    <span class="count">
+                      1/10
+                    <span aria-hidden="true" class="bar">
+                      <span class="fill" style="width: 10%;">
+          <a class="shop-link ct-link" data-shop-link="" href="#/shop">
+            До крамниці
+      <section aria-label="Пул Майстерності" class="pool" data-entity="skill:tai" data-ui="pool-bar">
+        <h2>
+          Пул Майстерності
+        <p class="amount">
+          0 / 15 000
+        <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="bar" role="progressbar">
+          <span class="fill" style="width: 0%;">
+          <span class="tick" style="left: 10%;">
+          <span class="tick" style="left: 25%;">
+          <span class="tick" style="left: 50%;">
+          <span class="tick" style="left: 95%;">
+        <ul class="checkpoints">
+          <li data-checkpoint="core:pool_tai_10">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              10%
+            <span class="text">
+              −5% витрат витривалості на тайдзюцу
+            <span class="state" data-active="false">
+              Ще не діє
+          <li data-checkpoint="core:pool_tai_25">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              25%
+            <span class="text">
+              +5% шансу перервати ворожі печатки
+            <span class="state" data-active="false">
+              Ще не діє
+          <li data-checkpoint="core:pool_tai_50">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              50%
+            <span class="text">
+              +5% шкоди проти ворогів ближнього бою
+            <span class="state" data-active="false">
+              Ще не діє
+          <li data-checkpoint="core:pool_tai_95">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              95%
+            <span class="text">
+              +5% досвіду Атлетики й Живучості

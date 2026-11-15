@@ -6,9 +6,10 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { hrefFor } from '../src/lib/route.ts';
 import { game } from '../src/lib/store.ts';
 import SkillPage from '../src/pages/SkillPage.svelte';
+import { coreContext } from './helpers/core-registry.ts';
 
 const html = <P extends Record<string, unknown>>(component: Component<P>, props: P): string =>
-  render(component, { props }).body;
+  render(component, { props, context: coreContext() }).body;
 
 const count = (body: string, text: string) => body.split(text).length - 1;
 
@@ -61,7 +62,7 @@ describe('Athletics page: the course', () => {
 
   it('lights the pillar line from five built obstacles', () => {
     const state = fresh('genin');
-    state.skills.ath.xp = xpAt(40);
+    state.skills.ath!.xp = xpAt(40);
     for (const [slot, id] of [
       ['1', 'core:strybky_po_dakhakh'],
       ['2', 'core:obtiazhuvachi'],
@@ -85,7 +86,7 @@ describe('Athletics page: the course', () => {
       true,
     );
     advance(game.state, 10_000, content, game.rules);
-    expect(game.state.skills.ath.xp).toBeGreaterThan(0);
+    expect(game.state.skills.ath!.xp).toBeGreaterThan(0);
   });
 });
 
@@ -128,7 +129,7 @@ describe('pool checkpoints on a skill page', () => {
   it('show which checkpoints are active, with the structured effect', () => {
     const state = fresh('genin');
     const capacity = content.balance.K.poolCapPerItem * (content.herbs.length || 1);
-    state.pools.herb.xp = capacity;
+    state.pools.herb!.xp = capacity;
     game.replaceState(state);
     const body = html(SkillPage, { id: 'herb' });
     expect(count(body, 'data-active="true"')).toBeGreaterThan(0);

@@ -1,0 +1,503 @@
+<div class="top">
+  <header class="topbar">
+    <a class="brand" href="#/">
+      Shinobi Idle
+    <dl class="stats">
+      <div class="stat" data-entity="currency:ryo" data-ui="topbar-currency">
+        <dt>
+          <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+            <path d="#957-1xqth0s" fill="currentColor">
+          <span class="label">
+            Рьо
+        <dd>
+          1 234
+      <div class="stat" data-entity="currency:rep" data-ui="topbar-currency">
+        <dt>
+          <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+            <path d="#3201-oefg9l" fill="currentColor">
+          <span class="label">
+            Репутація
+        <dd>
+          0
+      <div class="stat" data-entity="currency:intel" data-ui="topbar-currency">
+        <dt>
+          <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+            <path d="#3653-17qd3ut" fill="currentColor">
+          <span class="label">
+            Intel
+        <dd>
+          0
+      <div class="stat rank">
+        <dt>
+          <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+            <path d="#300-1w5w1cd" fill="currentColor">
+          <span class="label">
+            Ранг
+        <dd>
+          <a class="rank-link" data-rank-plate="" href="#/rank">
+            Генін
+      <div class="stat nature">
+        <dt>
+          <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+            <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <circle cx="12" cy="12" r="10">
+              <path d="#17-19un69j">
+          <span class="label">
+            Природа
+        <dd>
+          <a class="nature-link" data-nature-link="" href="#/nature">
+            Тест природи
+            <span aria-label="Наступний крок тут" class="marker" data-marker="" role="img">
+      <div class="stat save" data-save="idle">
+        <dt class="label">
+          Збереження
+        <dd>
+          Не збережено
+    <div class="tools">
+      <label class="lang">
+        <span class="label">
+          Мова
+        <select aria-label="Мова" disabled="">
+          <option>
+            Українська
+      <a class="meta-toggle shop-link" data-bank-link="" href="#/bank">
+        <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+          <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <path d="#129-1i0q4rl">
+            <path d="#36-1xcqgks">
+        <span>
+          Банк
+      <a class="meta-toggle shop-link" data-village-link="" href="#/village">
+        <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+          <path d="#125-1dlw44n" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+        <span>
+          Село
+      <a class="meta-toggle shop-link" data-shop-link="" href="#/shop">
+        <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+          <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <path d="#282-1ybrt6b">
+            <path d="#48-1o8urc2">
+        <span>
+          Крамниця
+      <a class="meta-toggle more-link" href="#/more">
+        <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+          <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <path d="#327-agpa8t">
+            <circle cx="12" cy="12" r="3">
+        <span class="more-label">
+          Ще
+      <button aria-controls="meta-panel" aria-expanded="true" class="meta-toggle" type="button">
+        <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+          <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <rect height="18" rx="2" width="18" x="3" y="3">
+            <path d="#8-1fwukk9">
+        <span>
+          Мета
+---
+<div class="side">
+  <nav aria-label="Розділи гри" class="main-nav">
+    <ul>
+      <li>
+        <a data-nav="quests" data-ui="nav-item" href="#/quests">
+          <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+            <path d="#158-t2qbeh" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+          <span class="label">
+            Журнал
+      <li>
+        <a data-nav="missions" data-ui="nav-item" href="#/missions">
+          <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+            <path d="#2473-iia64e" fill="currentColor">
+          <span class="label">
+            Місії
+      <li>
+        <a data-nav="combat" data-ui="nav-item" href="#/combat">
+          <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+            <path d="#1122-4vrbkl" fill="currentColor">
+          <span class="label">
+            Бій
+      <li>
+        <a data-nav="world" data-ui="nav-item" href="#/world">
+          <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+            <path d="#260-1rmif5e" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+          <span class="label">
+            Світ
+      <li>
+        <a data-nav="bank" data-ui="nav-item" href="#/bank">
+          <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+            <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <path d="#129-1i0q4rl">
+              <path d="#36-1xcqgks">
+          <span class="label">
+            Банк
+      <li>
+        <a data-nav="shop" data-ui="nav-item" href="#/shop">
+          <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+            <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <path d="#282-1ybrt6b">
+              <path d="#48-1o8urc2">
+          <span class="label">
+            Крамниця
+      <li>
+        <a data-nav="village" data-ui="nav-item" href="#/village">
+          <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+            <path d="#125-1dlw44n" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+          <span class="label">
+            Село
+      <li>
+        <a data-nav="rank" data-ui="nav-item" href="#/rank">
+          <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+            <path d="#300-1w5w1cd" fill="currentColor">
+          <span class="label">
+            Академія
+      <li>
+        <a data-nav="help" data-ui="nav-item" href="#/help">
+          <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+            <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <circle cx="12" cy="12" r="10">
+              <path d="#44-q6qo8y">
+          <span class="label">
+            Довідка
+  <nav aria-label="Навички">
+    <div class="skill-list">
+      <section class="group">
+        <button aria-expanded="true" class="group-head" type="button">
+          <span class="chevron open">
+            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+              <path d="#14-mnqmls" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+          Тренувальні
+        <ul>
+          <li class="skill" data-entity="skill:tai" data-skill="tai" data-ui="skill-row" style="--skill-color: var(--steel);">
+            <span class="skill-icon">
+              <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                <path d="#1346-olzib4" fill="currentColor">
+            <span class="skill-name">
+              <a class="entity-link" href="#/skill/tai">
+                Тайдзюцу
+              <span aria-label="Наступний крок тут" class="marker" data-marker="" role="img">
+            <span class="skill-level">
+              Рів. 1
+            <span aria-hidden="true" class="xp-bar">
+              <span class="xp-fill" style="width: 0%;">
+          <li class="skill" data-entity="skill:cc" data-skill="cc" data-ui="skill-row" style="--skill-color: var(--steel);">
+            <span class="skill-icon">
+              <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                <path d="#381-8c3u1c" fill="currentColor">
+            <span class="skill-name">
+              <a class="entity-link" href="#/skill/cc">
+                Контроль чакри
+            <span class="skill-level">
+              Рів. 1
+            <span aria-hidden="true" class="xp-bar">
+              <span class="xp-fill" style="width: 0%;">
+          <li class="skill" data-entity="skill:med" data-skill="med" data-ui="skill-row" style="--skill-color: var(--steel);">
+            <span class="skill-icon">
+              <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                <path d="#1454-1ow43cq" fill="currentColor">
+            <span class="skill-name">
+              <a class="entity-link" href="#/skill/med">
+                Медитація
+            <span class="skill-level">
+              Рів. 1
+            <span aria-hidden="true" class="xp-bar">
+              <span class="xp-fill" style="width: 0%;">
+          <li class="skill" data-entity="skill:ath" data-skill="ath" data-ui="skill-row" style="--skill-color: var(--steel);">
+            <span class="skill-icon">
+              <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                <path d="#1157-ngkewu" fill="currentColor">
+            <span class="skill-name">
+              <a class="entity-link" href="#/skill/ath">
+                Атлетика
+            <span class="skill-level">
+              Рів. 1
+            <span aria-hidden="true" class="xp-bar">
+              <span class="xp-fill" style="width: 0%;">
+      <section class="group">
+        <button aria-expanded="true" class="group-head" type="button">
+          <span class="chevron open">
+            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+              <path d="#14-mnqmls" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+          Ніндзюцу
+        <ul>
+          <li class="skill" data-entity="skill:nin" data-skill="nin" data-ui="skill-row" style="--skill-color: var(--steel);">
+            <span class="skill-icon">
+              <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                <path d="#902-hvuc56" fill="currentColor">
+            <span class="skill-name">
+              <a class="entity-link" href="#/skill/nin">
+                Ніндзюцу
+            <span class="skill-level">
+              Рів. 1
+            <span aria-hidden="true" class="xp-bar">
+              <span class="xp-fill" style="width: 0%;">
+          <li class="skill locked" data-entity="skill:katon" data-skill="katon" data-ui="skill-row" style="--skill-color: var(--nature-katon);">
+            <span class="skill-icon">
+              <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                <path d="#675-1ha53yd" fill="currentColor">
+            <span class="skill-name">
+              <a class="entity-link" href="#/skill/katon">
+                Катон
+            <span aria-label="Навичка закрита" class="skill-level" role="img">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+            <span class="condition" data-lock="">
+              <div class="row" data-entity="skill:katon" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <span class="detail">
+                    Природа чакри:
+                  <a class="entity-link" href="#/skill/katon">
+                    Катон
+                  <a class="detail-link" href="#/nature">
+                    Обрати природу
+          <li class="skill locked" data-entity="skill:futon" data-skill="futon" data-ui="skill-row" style="--skill-color: var(--nature-futon);">
+            <span class="skill-icon">
+              <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                <path d="#2198-rgudd8" fill="currentColor">
+            <span class="skill-name">
+              <a class="entity-link" href="#/skill/futon">
+                Футон
+            <span aria-label="Навичка закрита" class="skill-level" role="img">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+            <span class="condition" data-lock="">
+              <div class="row" data-entity="skill:futon" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <span class="detail">
+                    Природа чакри:
+                  <a class="entity-link" href="#/skill/futon">
+                    Футон
+                  <a class="detail-link" href="#/nature">
+                    Обрати природу
+          <li class="skill locked" data-entity="skill:raiton" data-skill="raiton" data-ui="skill-row" style="--skill-color: var(--nature-raiton);">
+            <span class="skill-icon">
+              <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                <path d="#372-3t3ccv" fill="currentColor">
+            <span class="skill-name">
+              <a class="entity-link" href="#/skill/raiton">
+                Райтон
+            <span aria-label="Навичка закрита" class="skill-level" role="img">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+            <span class="condition" data-lock="">
+              <div class="row" data-entity="skill:raiton" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <span class="detail">
+                    Природа чакри:
+                  <a class="entity-link" href="#/skill/raiton">
+                    Райтон
+                  <a class="detail-link" href="#/nature">
+                    Обрати природу
+          <li class="skill locked" data-entity="skill:doton" data-skill="doton" data-ui="skill-row" style="--skill-color: var(--nature-doton);">
+            <span class="skill-icon">
+              <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                <path d="#448-1vra7a9" fill="currentColor">
+            <span class="skill-name">
+              <a class="entity-link" href="#/skill/doton">
+                Дотон
+            <span aria-label="Навичка закрита" class="skill-level" role="img">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+            <span class="condition" data-lock="">
+              <div class="row" data-entity="skill:doton" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <span class="detail">
+                    Природа чакри:
+                  <a class="entity-link" href="#/skill/doton">
+                    Дотон
+                  <a class="detail-link" href="#/nature">
+                    Обрати природу
+          <li class="skill locked" data-entity="skill:suiton" data-skill="suiton" data-ui="skill-row" style="--skill-color: var(--nature-suiton);">
+            <span class="skill-icon">
+              <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                <path d="#110-1yym8op" fill="currentColor">
+            <span class="skill-name">
+              <a class="entity-link" href="#/skill/suiton">
+                Суйтон
+            <span aria-label="Навичка закрита" class="skill-level" role="img">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+            <span class="condition" data-lock="">
+              <div class="row" data-entity="skill:suiton" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <span class="detail">
+                    Природа чакри:
+                  <a class="entity-link" href="#/skill/suiton">
+                    Суйтон
+                  <a class="detail-link" href="#/nature">
+                    Обрати природу
+      <section class="group">
+        <button aria-expanded="true" class="group-head" type="button">
+          <span class="chevron open">
+            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+              <path d="#14-mnqmls" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+          Польові
+        <ul>
+          <li class="skill" data-entity="skill:herb" data-skill="herb" data-ui="skill-row" style="--skill-color: var(--steel);">
+            <span class="skill-icon">
+              <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                <path d="#3373-1yazdhi" fill="currentColor">
+            <span class="skill-name">
+              <a class="entity-link" href="#/skill/herb">
+                Травництво
+            <span class="skill-level">
+              Рів. 1
+            <span aria-hidden="true" class="xp-bar">
+              <span class="xp-fill" style="width: 0%;">
+          <li class="skill" data-entity="skill:scout" data-skill="scout" data-ui="skill-row" style="--skill-color: var(--steel);">
+            <span class="skill-icon">
+              <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                <path d="#2029-1eo8sy" fill="currentColor">
+            <span class="skill-name">
+              <a class="entity-link" href="#/skill/scout">
+                Розвідка
+            <span class="skill-level">
+              Рів. 1
+            <span aria-hidden="true" class="xp-bar">
+              <span class="xp-fill" style="width: 0%;">
+      <section class="group">
+        <button aria-expanded="true" class="group-head" type="button">
+          <span class="chevron open">
+            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+              <path d="#14-mnqmls" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+          Ремесла
+        <ul>
+          <li class="skill" data-entity="skill:prov" data-skill="prov" data-ui="skill-row" style="--skill-color: var(--steel);">
+            <span class="skill-icon">
+              <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                <path d="#287-1if64yq" fill="currentColor">
+            <span class="skill-name">
+              <a class="entity-link" href="#/skill/prov">
+                Провіант
+            <span class="skill-level">
+              Рів. 1
+            <span aria-hidden="true" class="xp-bar">
+              <span class="xp-fill" style="width: 0%;">
+          <li class="skill" data-entity="skill:alch" data-skill="alch" data-ui="skill-row" style="--skill-color: var(--steel);">
+            <span class="skill-icon">
+              <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                <path d="#2497-1mpw7a4" fill="currentColor">
+            <span class="skill-name">
+              <a class="entity-link" href="#/skill/alch">
+                Алхімія
+            <span class="skill-level">
+              Рів. 1
+            <span aria-hidden="true" class="xp-bar">
+              <span class="xp-fill" style="width: 0%;">
+      <section class="group">
+        <button aria-expanded="true" class="group-head" type="button">
+          <span class="chevron open">
+            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+              <path d="#14-mnqmls" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+          Бойові
+        <ul>
+          <li class="skill locked" data-entity="skill:vit" data-skill="vit" data-ui="skill-row" style="--skill-color: var(--steel);">
+            <span class="skill-icon">
+              <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                <path d="#605-ucepax" fill="currentColor">
+            <span class="skill-name">
+              <a class="entity-link" href="#/skill/vit">
+                Живучість
+            <span aria-label="Навичка закрита" class="skill-level" role="img">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+            <span class="condition" data-lock="">
+              <div class="row" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  Перший бій
+          <li class="skill locked" data-entity="skill:eva" data-skill="eva" data-ui="skill-row" style="--skill-color: var(--steel);">
+            <span class="skill-icon">
+              <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                <path d="#843-729wlk" fill="currentColor">
+            <span class="skill-name">
+              <a class="entity-link" href="#/skill/eva">
+                Ухилення
+            <span aria-label="Навичка закрита" class="skill-level" role="img">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+            <span class="condition" data-lock="">
+              <div class="row" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  Перший бій
+---
+<main class="main">
+  <div class="ui-page" data-page="core:home" data-ui="page">
+    <article class="simple-page">
+      <h1>
+        Shinobi Idle
+      <p class="hello">
+        Вітаємо, Тест!
+      <section aria-label="Наступний крок" class="next" data-next-step="">
+        <p class="quest">
+          <a class="entity-link" href="#/quest/core:graduation">
+            Випуск
+        <p class="text">
+          Інструктор починає з тіла, а не з печаток: досягни Тайдзюцу 5 і Атлетики 5.
+        <div class="objective">
+          <div class="group" data-met="false">
+            <ul class="rows">
+              <li>
+                <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
+                  <span class="mark">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <span class="label">
+                    <a class="entity-link" href="#/skill/tai">
+                      Тайдзюцу
+                    <span class="detail">
+                      рів. 5
+                  <span class="count">
+                    1/5
+                  <span aria-hidden="true" class="bar">
+                    <span class="fill" style="width: 20%;">
+              <li>
+                <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                  <span class="mark">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <span class="label">
+                    <a class="entity-link" href="#/skill/ath">
+                      Атлетика
+                    <span class="detail">
+                      рів. 5
+                  <span class="count">
+                    1/5
+                  <span aria-hidden="true" class="bar">
+                    <span class="fill" style="width: 20%;">
+        <a class="go" data-go="" href="#/skill/tai">
+          Перейти
+      <p class="hint">
+        Відкрийте розділ «Навички» і оберіть, що тренувати.

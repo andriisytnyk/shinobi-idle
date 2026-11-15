@@ -1,12 +1,14 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import EntityLink from '../components/EntityLink.svelte';
   import Icon from '../components/Icon.svelte';
   import { entityDesc, entityName, isEntityKind } from '../lib/entities.ts';
+  import { itemKindName } from '../lib/vocab.ts';
   import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { itemRelations, type ItemRelation } from '../lib/item-links.ts';
   import { game } from '../lib/store.ts';
+
+  const content = game.content;
 
   interface Props {
     id: string;
@@ -41,7 +43,7 @@
 
 {#if item}
   <article class="item-page" data-item={id} data-ui="entity-page" data-entity="item:{id}">
-    <p class="kind">{t('entity.kind.item')} · {t(`item.kind.${item.kind}`)}</p>
+    <p class="kind">{t('entity.kind.item')} · {itemKindName(item.kind)}</p>
     <h1 data-ui="entity-header"><Icon entity={ref} size={32} /> {entityName(ref)}</h1>
     {#if desc}<p>{desc}</p>{/if}
     <p class="owned">{t('item.owned', { n: formatInt(owned) })}</p>

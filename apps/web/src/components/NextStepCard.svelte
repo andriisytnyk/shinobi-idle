@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import { t } from '../lib/i18n.ts';
   import { nextStep } from '../lib/next-step.ts';
   import { game } from '../lib/store.ts';
   import EntityLink from './EntityLink.svelte';
   import NatureOffer from './NatureOffer.svelte';
   import QuestObjective from './QuestObjective.svelte';
+
+  const content = game.content;
 
   const step = $derived(game.read((gs) => nextStep(gs, content)));
 </script>

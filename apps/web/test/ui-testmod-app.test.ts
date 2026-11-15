@@ -7,7 +7,7 @@ import type { UiPack } from '../src/lib/ext/types.ts';
 import { settings } from '../src/lib/settings.svelte.ts';
 import { game } from '../src/lib/store.ts';
 import { bootApp, genin, type BootedApp } from './helpers/boot-app.ts';
-import { testmodUi } from './fixtures/testmod-ui.ts';
+import { testmodUi } from '../dev-packs/testmod-ui.ts';
 
 vi.mock('../src/lib/store.ts', async () => {
   const { createGame } = await import('../src/lib/game.svelte.ts');
@@ -358,7 +358,7 @@ describe('hooks (D13)', () => {
       },
     };
     const state = genin();
-    state.skills.tai.xp = 0;
+    state.skills.tai!.xp = 0;
     booted = await bootApp([coreUi, watcher], state, '#/skills');
     seen.length = 0;
     await booted.go('#/bank');

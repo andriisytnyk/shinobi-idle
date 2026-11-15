@@ -10,7 +10,8 @@
   import ModParts from '../components/ModParts.svelte';
   import ReqTree from '../components/ReqTree.svelte';
   import Slot from '../lib/ext/Slot.svelte';
-  import { entityDesc } from '../lib/entities.ts';
+  import { entityDesc, entityName } from '../lib/entities.ts';
+  import { resourceName } from '../lib/vocab.ts';
   import { formatDuration, formatInt, formatXp } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
   import { cardState, followCommands, stagesOf, viewOf } from '../lib/mission-feed.svelte.ts';
@@ -23,7 +24,7 @@
     xpTotals,
   } from '../lib/missions.ts';
   import { game } from '../lib/store.ts';
-  import { toasts } from '../lib/toasts.svelte.ts';
+  import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import EntityPage from './EntityPage.svelte';
 
   interface Props {
@@ -110,13 +111,13 @@
             kind: MISSION_KIND,
             id: mission.id,
           });
-    if (!result.ok) toasts.push({ key: result.reason, params: {} });
+    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 
   function pinGoal(): void {
     if (!pin) return;
     const result = game.dispatch({ type: 'goal.set', ref: pin });
-    if (!result.ok) toasts.push({ key: result.reason, params: {} });
+    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 </script>
 
@@ -132,7 +133,7 @@
     <p class="kind">{t('entity.kind.mission')}</p>
     <h1 data-ui="entity-header">
       <MissionRankStamp rank={mission.rank} />
-      {t(`mission.${mission.id}.name`)}
+      {entityName({ kind: 'mission', id: mission.id })}
     </h1>
     <Hint id="missionPage" />
     <Slot name="mission.header" ctx={{ mission: mission.id }} />
@@ -234,7 +235,7 @@
           <dd>{Math.round(chance * 100)}%</dd>
         </div>
         {#if forecast.ryo > 0}
-          <div data-total="ryo" data-value={forecast.ryoPerHour}>
+          <div data-total="money" data-value={forecast.ryoPerHour}>
             <dt>{t('mission.ryoHour')}</dt>
             <dd>
               <ModParts
@@ -248,7 +249,7 @@
           </div>
         {/if}
         {#if forecast.rep > 0}
-          <div data-total="rep" data-value={forecast.repPerHour}>
+          <div data-total="renown" data-value={forecast.repPerHour}>
             <dt>{t('mission.repHour')}</dt>
             <dd>
               <ModParts
@@ -268,7 +269,7 @@
               <ModParts
                 display={t('mission.resourceValue', {
                   n: forecast.resource.units,
-                  name: t(`resource.${forecast.resource.slug}.name`),
+                  name: resourceName(forecast.resource.slug),
                 })}
                 parts={forecast.mods.resource}
               />

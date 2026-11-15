@@ -1,0 +1,624 @@
+<main class="main">
+  <div class="ui-page" data-page="core:entity.skill" data-ui="page">
+    <article class="skill-page" data-entity="skill:ath" data-skill="ath" data-ui="entity-page">
+      <header class="plate" data-ui="entity-header">
+        <h1>
+          <span class="plate-icon" style="color: var(--steel);">
+            <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+              <path d="#1157-ngkewu" fill="currentColor">
+          Атлетика
+        <span class="level">
+          Рів. 1
+      <p class="lore">
+        Атлетика збільшує витривалість шинобі, а вона потрібна і тайдзюцу, і ухиленню від ударів.
+      <p class="unlock">
+        Академія, з першого дня.
+      <section aria-label="Смуга перешкод" class="course" data-course="">
+        <h2>
+          Смуга перешкод
+        <div class="run" data-course-run="">
+          <dl class="facts">
+            <div>
+              <dt>
+                Збудовано
+              <dd>
+                0 з 6
+            <div>
+              <dt>
+                Коло
+              <dd>
+                2,5 с
+            <div>
+              <dt>
+                Досвід
+              <dd>
+                <span class="mod">
+                  <button aria-expanded="false" class="figure" type="button">
+                    0 дос./год
+          <p class="hint" data-course-empty="">
+            Збудуйте хоча б одну перешкоду, щоб пройти смугу.
+          <button class="action" disabled="" type="button">
+            Пройти смугу
+        <p class="pillar" data-pillar="false">
+          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+            <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+              <path d="#24-1tb3nx8">
+          Стовп: 0 з 5 перешкод — +5% досвіду Атлетики
+        <ol class="slots">
+          <li class="slot" data-slot="1">
+            <h3>
+              Слот 1
+              <span class="lvl">
+                відкривається з рівня Атлетики 1
+            <ul class="options">
+              <li class="option" data-obstacle="core:strybky_po_dakhakh">
+                <p class="name">
+                  <span class="emblem sm" data-emblem-icon="jump-across" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#945-1swkgw1" fill="currentColor">
+                  <a class="entity-link" href="#/obstacle/core:strybky_po_dakhakh">
+                    Стрибки по дахах
+                <p class="bonus">
+                  <span class="tag">
+                    Плюс
+                  +2% досвіду Атлетики
+                <p class="penalty">
+                  <span class="tag">
+                    Мінус
+                  −1% швидкості Травництва
+                <p class="price">
+                  Безкоштовно
+                <button class="action" type="button">
+                  Збудувати
+              <li class="option" data-obstacle="core:bih_navkolo_sela">
+                <p class="name">
+                  <span class="emblem sm" data-emblem-icon="sprint" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#401-ttijlg" fill="currentColor">
+                  <a class="entity-link" href="#/obstacle/core:bih_navkolo_sela">
+                    Біг навколо села
+                <p class="bonus">
+                  <span class="tag">
+                    Плюс
+                  −2% тривалості місій
+                <p class="penalty">
+                  <span class="tag">
+                    Мінус
+                  −1% досвіду Медитації
+                <p class="price">
+                  Безкоштовно
+                <button class="action" type="button">
+                  Збудувати
+          <li class="slot closed" data-slot="2">
+            <h3>
+              Слот 2
+              <span class="lvl">
+                відкривається з рівня Атлетики 10
+            <ul class="options">
+              <li class="option" data-obstacle="core:obtiazhuvachi">
+                <p class="name">
+                  <span class="emblem sm" data-emblem-icon="weight" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#959-1owm4r9" fill="currentColor">
+                  <a class="entity-link" href="#/obstacle/core:obtiazhuvachi">
+                    Обтяжувачі
+                <p class="bonus">
+                  <span class="tag">
+                    Плюс
+                  +3% досвіду Тайдзюцу
+                <p class="penalty">
+                  <span class="tag">
+                    Мінус
+                  −2% швидкості Атлетики
+                <div class="req" data-req="">
+                  <p class="locked-label">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                        <path d="#24-1tb3nx8">
+                    Поки закрито
+                  <div class="group" data-met="false">
+                    <ul class="rows">
+                      <li>
+                        <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                          <span class="mark">
+                            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                              <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                          <span class="label">
+                            <a class="entity-link" href="#/skill/ath">
+                              Атлетика
+                            <span class="detail">
+                              рів. 10
+                          <span class="count">
+                            1/10
+                          <span aria-hidden="true" class="bar">
+                            <span class="fill" style="width: 10%;">
+                <p class="price">
+                  Рьо: 600
+                <button class="action" disabled="" type="button">
+                  Збудувати
+              <li class="option" data-obstacle="core:vidzhymannia_na_paltsiakh">
+                <p class="name">
+                  <span class="emblem sm" data-emblem-icon="muscle-up" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#917-1lnknq0" fill="currentColor">
+                  <a class="entity-link" href="#/obstacle/core:vidzhymannia_na_paltsiakh">
+                    Віджимання на пальцях
+                <p class="bonus">
+                  <span class="tag">
+                    Плюс
+                  +2% пулу витривалості
+                <p class="penalty">
+                  <span class="tag">
+                    Мінус
+                  −1% швидкості Алхімії
+                <div class="req" data-req="">
+                  <p class="locked-label">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                        <path d="#24-1tb3nx8">
+                    Поки закрито
+                  <div class="group" data-met="false">
+                    <ul class="rows">
+                      <li>
+                        <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                          <span class="mark">
+                            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                              <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                          <span class="label">
+                            <a class="entity-link" href="#/skill/ath">
+                              Атлетика
+                            <span class="detail">
+                              рів. 10
+                          <span class="count">
+                            1/10
+                          <span aria-hidden="true" class="bar">
+                            <span class="fill" style="width: 10%;">
+                <p class="price">
+                  Рьо: 600
+                <button class="action" disabled="" type="button">
+                  Збудувати
+          <li class="slot closed" data-slot="3">
+            <h3>
+              Слот 3
+              <span class="lvl">
+                відкривається з рівня Атлетики 20
+            <ul class="options">
+              <li class="option" data-obstacle="core:koloda_nad_prirvoiu">
+                <p class="name">
+                  <span class="emblem sm" data-emblem-icon="cliff-crossing" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#416-wwolv0" fill="currentColor">
+                  <a class="entity-link" href="#/obstacle/core:koloda_nad_prirvoiu">
+                    Колода над прірвою
+                <p class="bonus">
+                  <span class="tag">
+                    Плюс
+                  +2% ухилення в бою
+                <p class="penalty">
+                  <span class="tag">
+                    Мінус
+                  −2% досвіду Атлетики
+                <div class="req" data-req="">
+                  <p class="locked-label">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                        <path d="#24-1tb3nx8">
+                    Поки закрито
+                  <div class="group" data-met="false">
+                    <ul class="rows">
+                      <li>
+                        <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                          <span class="mark">
+                            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                              <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                          <span class="label">
+                            <a class="entity-link" href="#/skill/ath">
+                              Атлетика
+                            <span class="detail">
+                              рів. 20
+                          <span class="count">
+                            1/20
+                          <span aria-hidden="true" class="bar">
+                            <span class="fill" style="width: 5%;">
+                <p class="price">
+                  Рьо: 1 350
+                <button class="action" disabled="" type="button">
+                  Збудувати
+              <li class="option" data-obstacle="core:ukhylennia_vid_kunaiv">
+                <p class="name">
+                  <span class="emblem sm" data-emblem-icon="dodge" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#198-2btmks" fill="currentColor">
+                  <a class="entity-link" href="#/obstacle/core:ukhylennia_vid_kunaiv">
+                    Ухилення від кунаїв
+                <p class="bonus">
+                  <span class="tag">
+                    Плюс
+                  +3% досвіду Ухилення
+                <p class="penalty">
+                  <span class="tag">
+                    Мінус
+                  −1% точності
+                <div class="req" data-req="">
+                  <p class="locked-label">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                        <path d="#24-1tb3nx8">
+                    Поки закрито
+                  <div class="group" data-met="false">
+                    <ul class="rows">
+                      <li>
+                        <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                          <span class="mark">
+                            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                              <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                          <span class="label">
+                            <a class="entity-link" href="#/skill/ath">
+                              Атлетика
+                            <span class="detail">
+                              рів. 20
+                          <span class="count">
+                            1/20
+                          <span aria-hidden="true" class="bar">
+                            <span class="fill" style="width: 5%;">
+                <p class="price">
+                  Рьо: 1 350
+                <button class="action" disabled="" type="button">
+                  Збудувати
+          <li class="slot closed" data-slot="4">
+            <h3>
+              Слот 4
+              <span class="lvl">
+                відкривається з рівня Атлетики 30
+            <ul class="options">
+              <li class="option" data-obstacle="core:bih_po_derevakh">
+                <p class="name">
+                  <span class="emblem sm" data-emblem-icon="tree-branch" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#1634-nfcbh9" fill="currentColor">
+                  <a class="entity-link" href="#/obstacle/core:bih_po_derevakh">
+                    Біг по деревах
+                <p class="bonus">
+                  <span class="tag">
+                    Плюс
+                  −3% часу дослідження клітинок
+                <p class="penalty">
+                  <span class="tag">
+                    Мінус
+                  −1% досвіду Тайдзюцу
+                <div class="req" data-req="">
+                  <p class="locked-label">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                        <path d="#24-1tb3nx8">
+                    Поки закрито
+                  <div class="group" data-met="false">
+                    <ul class="rows">
+                      <li>
+                        <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                          <span class="mark">
+                            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                              <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                          <span class="label">
+                            <a class="entity-link" href="#/skill/ath">
+                              Атлетика
+                            <span class="detail">
+                              рів. 30
+                          <span class="count">
+                            1/30
+                          <span aria-hidden="true" class="bar">
+                            <span class="fill" style="width: 3.3333333333333335%;">
+                      <li>
+                        <div class="row" data-entity="skill:cc" data-met="false" data-ui="req-row">
+                          <span class="mark">
+                            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                              <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                          <span class="label">
+                            <a class="entity-link" href="#/skill/cc">
+                              Контроль чакри
+                            <span class="detail">
+                              рів. 15
+                          <span class="count">
+                            1/15
+                          <span aria-hidden="true" class="bar">
+                            <span class="fill" style="width: 6.666666666666667%;">
+                <p class="price">
+                  Рьо: 2 400
+                <button class="action" disabled="" type="button">
+                  Збудувати
+              <li class="option" data-obstacle="core:lazinnia_po_skeli">
+                <p class="name">
+                  <span class="emblem sm" data-emblem-icon="mountaintop" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#710-jbb9n8" fill="currentColor">
+                  <a class="entity-link" href="#/obstacle/core:lazinnia_po_skeli">
+                    Лазіння по скелі
+                <p class="bonus">
+                  <span class="tag">
+                    Плюс
+                  +3% досвіду Атлетики
+                <p class="penalty">
+                  <span class="tag">
+                    Мінус
+                  −2% швидкості Провіанту
+                <div class="req" data-req="">
+                  <p class="locked-label">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                        <path d="#24-1tb3nx8">
+                    Поки закрито
+                  <div class="group" data-met="false">
+                    <ul class="rows">
+                      <li>
+                        <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                          <span class="mark">
+                            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                              <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                          <span class="label">
+                            <a class="entity-link" href="#/skill/ath">
+                              Атлетика
+                            <span class="detail">
+                              рів. 30
+                          <span class="count">
+                            1/30
+                          <span aria-hidden="true" class="bar">
+                            <span class="fill" style="width: 3.3333333333333335%;">
+                <p class="price">
+                  Рьо: 2 400
+                <button class="action" disabled="" type="button">
+                  Збудувати
+          <li class="slot closed" data-slot="5">
+            <h3>
+              Слот 5
+              <span class="lvl">
+                відкривається з рівня Атлетики 40
+            <ul class="options">
+              <li class="option" data-obstacle="core:perehony_z_supernykom">
+                <p class="name">
+                  <span class="emblem sm" data-emblem-icon="duel" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#595-77s7ic" fill="currentColor">
+                  <a class="entity-link" href="#/obstacle/core:perehony_z_supernykom">
+                    Перегони з суперником
+                <p class="bonus">
+                  <span class="tag">
+                    Плюс
+                  +3% досвіду Тайдзюцу
+                <p class="penalty">
+                  <span class="tag">
+                    Мінус
+                  −2% досвіду Медитації
+                <div class="req" data-req="">
+                  <p class="locked-label">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                        <path d="#24-1tb3nx8">
+                    Поки закрито
+                  <div class="group" data-met="false">
+                    <ul class="rows">
+                      <li>
+                        <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                          <span class="mark">
+                            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                              <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                          <span class="label">
+                            <a class="entity-link" href="#/skill/ath">
+                              Атлетика
+                            <span class="detail">
+                              рів. 40
+                          <span class="count">
+                            1/40
+                          <span aria-hidden="true" class="bar">
+                            <span class="fill" style="width: 2.5%;">
+                <p class="price">
+                  Рьо: 3 750
+                <button class="action" disabled="" type="button">
+                  Збудувати
+              <li class="option" data-obstacle="core:strybky_cherez_stovpy">
+                <p class="name">
+                  <span class="emblem sm" data-emblem-icon="ancient-columns" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#179-1stpbnq" fill="currentColor">
+                  <a class="entity-link" href="#/obstacle/core:strybky_cherez_stovpy">
+                    Стрибки через стовпи
+                <p class="bonus">
+                  <span class="tag">
+                    Плюс
+                  +2% швидкості дій Атлетики
+                <p class="penalty">
+                  <span class="tag">
+                    Мінус
+                  −1% пулу чакри
+                <div class="req" data-req="">
+                  <p class="locked-label">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                        <path d="#24-1tb3nx8">
+                    Поки закрито
+                  <div class="group" data-met="false">
+                    <ul class="rows">
+                      <li>
+                        <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                          <span class="mark">
+                            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                              <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                          <span class="label">
+                            <a class="entity-link" href="#/skill/ath">
+                              Атлетика
+                            <span class="detail">
+                              рів. 40
+                          <span class="count">
+                            1/40
+                          <span aria-hidden="true" class="bar">
+                            <span class="fill" style="width: 2.5%;">
+                <p class="price">
+                  Рьо: 3 750
+                <button class="action" disabled="" type="button">
+                  Збудувати
+          <li class="slot closed" data-slot="6">
+            <h3>
+              Слот 6
+              <span class="lvl">
+                відкривається з рівня Атлетики 50
+            <ul class="options">
+              <li class="option" data-obstacle="core:bih_po_vodi">
+                <p class="name">
+                  <span class="emblem sm" data-emblem-icon="splashy-stream" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#1271-4rwhzz" fill="currentColor">
+                  <a class="entity-link" href="#/obstacle/core:bih_po_vodi">
+                    Біг по воді
+                <p class="bonus">
+                  <span class="tag">
+                    Плюс
+                  +3% досвіду Контролю чакри
+                <p class="penalty">
+                  <span class="tag">
+                    Мінус
+                  −2% пулу витривалості
+                <div class="req" data-req="">
+                  <p class="locked-label">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                        <path d="#24-1tb3nx8">
+                    Поки закрито
+                  <div class="group" data-met="false">
+                    <ul class="rows">
+                      <li>
+                        <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                          <span class="mark">
+                            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                              <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                          <span class="label">
+                            <a class="entity-link" href="#/skill/ath">
+                              Атлетика
+                            <span class="detail">
+                              рів. 50
+                          <span class="count">
+                            1/50
+                          <span aria-hidden="true" class="bar">
+                            <span class="fill" style="width: 2%;">
+                      <li>
+                        <div class="row" data-entity="skill:cc" data-met="false" data-ui="req-row">
+                          <span class="mark">
+                            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                              <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                          <span class="label">
+                            <a class="entity-link" href="#/skill/cc">
+                              Контроль чакри
+                            <span class="detail">
+                              рів. 30
+                          <span class="count">
+                            1/30
+                          <span aria-hidden="true" class="bar">
+                            <span class="fill" style="width: 3.3333333333333335%;">
+                <p class="price">
+                  Рьо: 5 400
+                <button class="action" disabled="" type="button">
+                  Збудувати
+              <li class="option" data-obstacle="core:plavannia_proty_techii">
+                <p class="name">
+                  <span class="emblem sm" data-emblem-icon="swimfins" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                    <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                      <path d="#4396-1xcybq6" fill="currentColor">
+                  <a class="entity-link" href="#/obstacle/core:plavannia_proty_techii">
+                    Плавання проти течії
+                <p class="bonus">
+                  <span class="tag">
+                    Плюс
+                  +3% пулу витривалості
+                <p class="penalty">
+                  <span class="tag">
+                    Мінус
+                  −2% швидкості Травництва
+                <div class="req" data-req="">
+                  <p class="locked-label">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                        <path d="#24-1tb3nx8">
+                    Поки закрито
+                  <div class="group" data-met="false">
+                    <ul class="rows">
+                      <li>
+                        <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                          <span class="mark">
+                            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                              <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                          <span class="label">
+                            <a class="entity-link" href="#/skill/ath">
+                              Атлетика
+                            <span class="detail">
+                              рів. 50
+                          <span class="count">
+                            1/50
+                          <span aria-hidden="true" class="bar">
+                            <span class="fill" style="width: 2%;">
+                <p class="price">
+                  Рьо: 5 400
+                <button class="action" disabled="" type="button">
+                  Збудувати
+      <section aria-label="Пул Майстерності" class="pool" data-entity="skill:ath" data-ui="pool-bar">
+        <h2>
+          Пул Майстерності
+        <p class="amount">
+          0 / 18 000
+        <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="bar" role="progressbar">
+          <span class="fill" style="width: 0%;">
+          <span class="tick" style="left: 10%;">
+          <span class="tick" style="left: 25%;">
+          <span class="tick" style="left: 50%;">
+          <span class="tick" style="left: 95%;">
+        <ul class="checkpoints">
+          <li data-checkpoint="core:pool_ath_10">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              10%
+            <span class="text">
+              −5% вартості будівництва перешкод
+            <span class="state" data-active="false">
+              Ще не діє
+          <li data-checkpoint="core:pool_ath_25">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              25%
+            <span class="text">
+              +2% до всіх плюсів смуги
+            <span class="state" data-active="false">
+              Ще не діє
+          <li data-checkpoint="core:pool_ath_50">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              50%
+            <span class="text">
+              −25% до всіх мінусів смуги
+            <span class="state" data-active="false">
+              Ще не діє
+          <li data-checkpoint="core:pool_ath_95">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              95%
+            <span class="text">
+              −5% тривалості всіх місій

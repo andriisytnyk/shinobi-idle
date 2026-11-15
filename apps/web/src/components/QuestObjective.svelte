@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import type { Quest } from '@shinobi/content';
   import { evalReq } from '@shinobi/core';
   import { formatInt } from '../lib/format.ts';
@@ -14,6 +13,8 @@
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ReqTree from './ReqTree.svelte';
+
+  const content = game.content;
 
   interface Props {
     quest: Quest;

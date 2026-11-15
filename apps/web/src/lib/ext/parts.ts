@@ -58,6 +58,12 @@ export const UI_PARTS = [
   'theme-select',
   /** The settings that packs registered. */
   'pack-settings',
+  /** The list of the content packs of this boot, with their versions. */
+  'loaded-packs',
+  /** Content packs the core left out because they failed to compose. */
+  'failed-packs',
+  /** Rules of packs that the core switched off during the session. */
+  'disabled-rules',
   /** The notice about packs that were switched off because of an error. */
   'disabled-packs',
   /** The «Застосунок» section of the settings page. */

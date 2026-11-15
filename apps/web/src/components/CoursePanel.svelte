@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { content, localeKey } from '@shinobi/content';
+  import { localeKey, type SkillId } from '@shinobi/content';
   import {
     actionInfo,
     builtObstacles,
@@ -13,12 +13,22 @@
   import { formatInt, formatSeconds, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
-  import { toasts } from '../lib/toasts.svelte.ts';
+  import { currencyName, moneyOf } from '../lib/vocab.ts';
+  import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import ActionEmblem from './ActionEmblem.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
   import ReqTree from './ReqTree.svelte';
+
+  const content = game.content;
+
+  interface Props {
+    /** The skill whose page shows the course. */
+    skill: string;
+  }
+
+  let { skill }: Props = $props();
 
   const K = content.balance.K;
   const slots = $derived(game.read((gs) => listCourse(gs, content, game.rules)));
@@ -43,14 +53,19 @@
   function needs(slot: CourseSlotInfo, id: string) {
     const obstacle = content.obstacles.find((o) => o.id === id);
     if (!obstacle) return null;
-    const parts = [{ t: 'skill', skill: 'ath', level: slot.level } as const];
+    const parts = [{ t: 'skill', skill: skill as SkillId, level: slot.level } as const];
     const own = obstacle.req;
     const tree = evalReq(game.state, { t: 'all', of: own ? [...parts, own] : [...parts] }, content);
     return tree.met ? null : tree;
   }
 
-  function report(result: { ok: boolean; reason?: string }): void {
-    if (!result.ok && result.reason) toasts.push({ key: result.reason, params: {} });
+  function report(result: {
+    ok: boolean;
+    reason?: string;
+    params?: Record<string, string | number>;
+  }): void {
+    if (!result.ok && result.reason)
+      toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 
   const build = (slot: number, obstacle: string) =>
@@ -86,7 +101,7 @@
         <dd>
           {#if info}
             <ModBreakdown
-              keys={['xp.all', 'xp.skill.ath']}
+              keys={['xp.all', `xp.skill.${skill}`]}
               display={t('tile.xphValue', { n: formatXp(info.xpPerHour) })}
             />
           {:else}—{/if}
@@ -129,7 +144,7 @@
             {@const missing = needs(slot, option.id)}
             <li class="option" class:built={option.built} data-obstacle={option.id}>
               <p class="name">
-                <ActionEmblem kind="obstacle" id={option.id} skill="ath" size="sm" />
+                <ActionEmblem kind="obstacle" id={option.id} {skill} size="sm" />
                 <EntityLink kind="obstacle" id={option.id} />
                 {#if option.built}
                   <span class="mark"
@@ -152,7 +167,10 @@
                 <p class="price">
                   {option.cost === 0
                     ? t('course.free')
-                    : t('course.price', { n: formatInt(option.cost) })}
+                    : t('course.price', {
+                        n: formatInt(option.cost),
+                        currency: currencyName(moneyOf(content)),
+                      })}
                 </p>
                 <button
                   type="button"

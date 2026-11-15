@@ -1,4 +1,4 @@
-import { ukLocale } from '@shinobi/content';
+import { tryActiveContent } from './active.ts';
 
 export type Params = Record<string, string | number>;
 
@@ -82,8 +82,57 @@ export function createTranslator(messages: Messages) {
   };
 }
 
-/** Translates a key with `{name}` interpolation and Ukrainian plural support. */
-export const t = createTranslator(ukLocale);
+/** The Ukrainian strings of the running game: the merged locales of its packs. */
+const messages = (): Messages => tryActiveContent()?.locales.uk ?? {};
+
+/** Keys that were asked for and are missing, in the order they were first asked (for tests and the dev console). */
+const missing = new Set<string>();
+export const missingKeys = (): readonly string[] => [...missing];
+export const clearMissingKeys = (): void => missing.clear();
+
+/**
+ * A readable stand-in for a key that has no text: the last part of the entity id, or the last
+ * part of the key, with the underscores and dashes turned into spaces (`skill.testmod:forge.name`
+ * reads «Forge»). A key is never shown as it is.
+ */
+export function fallbackText(key: string): string {
+  const parts = key.split('.');
+  // The field of an entity text (`.name`, `.desc`) says nothing about what it is.
+  while (parts.length > 1 && /^(name|desc|note|home|place|client|unlock)$/.test(parts.at(-1) ?? ''))
+    parts.pop();
+  const idPart = parts.find((p) => p.includes(':'));
+  const raw = (idPart ? idPart.slice(idPart.lastIndexOf(':') + 1) : (parts.at(-1) ?? key)) || key;
+  const spaced = raw.replace(/[_-]+/g, ' ').trim();
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+}
+
+/** Says once per key, in the dev build only, that a text is missing. */
+export function reportMissing(key: string): void {
+  if (missing.has(key)) return;
+  missing.add(key);
+  if (import.meta.env?.DEV) console.warn(`Missing text: ${key}`);
+}
+
+/**
+ * Translates a key with `{name}` interpolation and Ukrainian plural support. A key without a text
+ * shows a readable stand-in (see `fallbackText`) and is reported once in the dev build.
+ */
+export function t(key: string, params: Params = {}): string {
+  const table = messages();
+  const template = Object.hasOwn(table, key) ? table[key] : undefined;
+  if (template === undefined) {
+    reportMissing(key);
+    return fallbackText(key);
+  }
+  return format(template, params, table);
+}
 
 /** Whether a key has a translation. */
-export const hasKey = (key: string): boolean => Object.hasOwn(ukLocale, key);
+export const hasKey = (key: string): boolean => Object.hasOwn(messages(), key);
+
+/** The text of the first of these keys that has one; with none, the stand-in for the first key. */
+export function textOf(keys: readonly string[], params: Params = {}, fallback?: string): string {
+  const key = keys.find(hasKey);
+  if (key === undefined && fallback !== undefined) return fallback;
+  return t(key ?? keys[0] ?? '', params);
+}

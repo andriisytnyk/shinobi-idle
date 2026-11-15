@@ -11,7 +11,8 @@
       }
     ],
     "duration": "burn.dur",
-    "suppresses": "regen"
+    "suppresses": "regen",
+    "nature": "katon"
   },
   {
     "id": "wet",
@@ -27,7 +28,8 @@
         }
       }
     ],
-    "duration": "wet.dur"
+    "duration": "wet.dur",
+    "nature": "suiton"
   },
   {
     "id": "stun",
@@ -44,7 +46,8 @@
       "byRank": "stun"
     },
     "refresh": "longest",
-    "interrupts": true
+    "interrupts": true,
+    "nature": "raiton"
   },
   {
     "id": "bind",

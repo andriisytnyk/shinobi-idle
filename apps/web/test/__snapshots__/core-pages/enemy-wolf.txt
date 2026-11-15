@@ -1,0 +1,38 @@
+<main class="main">
+  <div class="ui-page" data-page="core:entity" data-ui="page">
+    <article class="entity-page" data-entity="enemy:core:wolf" data-ui="entity-page">
+      <p class="kind">
+        Ворог
+      <h1 data-ui="entity-header">
+        <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+          <path d="#1037-vs6pjn" fill="currentColor">
+        Вовки
+      <p>
+        Лісові вовки нападають зграєю. Кожен слабкий поодинці, тож проти них добре діють удари по площі.
+      <section class="where" data-enemy-zones="" data-ui="entity-section">
+        <h2>
+          Де зустріти
+        <p class="where" data-zone-available="false" data-zone-where="core:zone_wolf">
+          <span class="dim">
+            Де:
+          <a class="entity-link" href="#/cell/core:prykordonnyi_lis_okolytsia">
+            Прикордонний ліс: околиця
+          (
+          <a class="entity-link" href="#/region/core:forest">
+            Ліси Країни Вогню
+          )
+          <span class="state">
+            Клітинку ще не розвідано: зона недоступна.
+      <section data-entity-links="" data-ui="entity-section">
+        <h2>
+          Пов'язане
+        <ul class="links">
+          <li>
+            <a class="entity-link" href="#/trait/pack">
+              Зграя
+          <li>
+            <a class="entity-link" href="#/item/core:pelt">
+              Вовча шкура
+          <li>
+            <a class="entity-link" href="#/item/core:gem">
+              Коштовність

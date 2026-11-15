@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import { evalReq, shopEntries } from '@shinobi/core';
   import { blockOf, itemSource } from '../lib/crafts.ts';
   import { formatInt } from '../lib/format.ts';
@@ -8,6 +7,8 @@
   import BuildingNeed from './BuildingNeed.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
+
+  const content = game.content;
 
   interface Props {
     item: string;

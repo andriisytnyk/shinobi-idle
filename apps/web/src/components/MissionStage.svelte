@@ -1,6 +1,8 @@
 <script lang="ts">
   import { formatBonus, formatDuration, formatInt, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
+  import { game } from '../lib/store.ts';
+  import { currencyOf, teammateName } from '../lib/vocab.ts';
   import type { StageView } from '../lib/missions.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
@@ -31,6 +33,9 @@
     slowK,
     fightSkills,
   }: Props = $props();
+
+  /** The currency that alternative stages pay: the one with the role study. */
+  const study = currencyOf(game.content, 'study') ?? '';
 
   const stage = $derived(view.forecast);
   const path = $derived(stage.path);
@@ -101,8 +106,8 @@
                 </div>
               {/if}
             {:else}
-              <span class="intel">
-                <Icon entity={{ kind: 'currency', id: 'intel' }} size={16} />
+              <span class="study">
+                <Icon entity={{ kind: 'currency', id: study }} size={16} />
                 {t('mission.stage.intel', { n: way.alt.intel })}
                 <span class="dim"
                   >{t('mission.stage.intelHave', { have: formatInt(way.have) })}</span
@@ -149,7 +154,7 @@
             {t('mission.who.self')}
           {:else}
             <span data-entity="teammate:{path.who}">
-              {t('mission.who.mate', { name: t(`teammate.${path.who}.name`) })}
+              {t('mission.who.mate', { name: teammateName(path.who) })}
             </span>
             <span class="dim" data-who-reason>{t('mission.who.reason')}</span>
           {/if}
@@ -342,7 +347,7 @@
     font-weight: 600;
   }
 
-  .intel {
+  .study {
     display: inline-flex;
     flex-wrap: wrap;
     align-items: center;

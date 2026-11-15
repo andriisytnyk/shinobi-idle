@@ -47,3 +47,11 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
+
+/*
+ * The look of the core pack's own entities. A pack colours its currencies and natures the same way:
+ * with a rule on the stable `data-ui` and `data-entity` attributes, or with a token that its data names.
+ */
+[data-ui='topbar-currency'][data-entity='currency:intel'] dt {
+  color: var(--chakra);
+}

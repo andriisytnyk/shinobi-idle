@@ -68,6 +68,6 @@ describe('Icon component', () => {
 
   it('falls back to a glyph for an unknown name instead of leaving a hole', () => {
     const { body } = render(Icon, { props: { name: 'no-such-icon' } });
-    expect(body).toContain('<path');
+    expect(body).toMatch(/<(path|circle)/);
   });
 });

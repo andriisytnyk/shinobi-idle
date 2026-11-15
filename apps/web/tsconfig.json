@@ -1,8 +1,8 @@
 {
-  "extends": ["../../tsconfig.base.json", "../../tsconfig.legacy-ids.json"],
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["svelte", "vite/client", "node"]
   },
-  "include": ["src", "test", "scripts", "vite.config.ts"]
+  "include": ["src", "test", "dev-packs", "scripts", "vite.config.ts"]
 }

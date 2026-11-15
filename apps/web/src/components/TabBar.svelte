@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import { useUi } from '../lib/ext/runtime.svelte.ts';
   import { t } from '../lib/i18n.ts';
   import { activeNav, markerOf, morePages, tabItems, tabOf } from '../lib/nav.ts';
@@ -7,6 +6,8 @@
   import { currentHash } from '../lib/router.svelte.ts';
   import { game } from '../lib/store.ts';
   import Icon from './Icon.svelte';
+
+  const content = game.content;
 
   const ui = useUi();
   const tabs = $derived(tabItems(ui.registry, (item) => !ui.navHidden(item.key)));

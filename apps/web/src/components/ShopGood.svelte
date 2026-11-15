@@ -1,22 +1,26 @@
 <script lang="ts">
   import { shopTotal, type ReqResult } from '@shinobi/core';
-  import { content } from '@shinobi/content';
   import { blockOf, blockText } from '../lib/crafts.ts';
   import { entityName } from '../lib/entities.ts';
   import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
+  import { currencyName, held, moneyOf } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
-  import { toasts } from '../lib/toasts.svelte.ts';
+  import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import BuildingNeed from './BuildingNeed.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ReqTree from './ReqTree.svelte';
   import Stepper from './Stepper.svelte';
 
+  const content = game.content;
+
   interface Props {
     item: string;
-    /** Price of one unit in ryo. */
+    /** Price of one unit in `currency`. */
     price: number;
+    /** The currency the price is paid in; the money of the game when the shop entry names none. */
+    currency?: string;
     /** What the bank holds. */
     owned: number;
     /** The requirement of the good, evaluated; unmet means it is locked. */
@@ -25,10 +29,12 @@
     quiet?: boolean;
   }
 
-  let { item, price, owned, req, quiet = false }: Props = $props();
+  let { item, price, owned, req, quiet = false, currency }: Props = $props();
 
   let qty = $state(1);
-  const ryo = $derived(game.read((gs) => gs.currencies.ryo ?? 0));
+  const money = $derived(currency ?? moneyOf(content));
+  const unit = $derived(currencyName(money));
+  const ryo = $derived(game.read((gs) => held(gs, money)));
   /** What the stack costs now: the Market's discount comes off the whole stack. */
   const total = $derived(
     game.read((gs) => shopTotal(gs, item, Math.max(1, qty), content, game.rules) ?? price * qty),
@@ -42,7 +48,7 @@
   function buy(): void {
     if (off) return;
     const result = game.dispatch({ type: 'shop.buy', item, n: qty });
-    if (!result.ok) toasts.push({ key: result.reason, params: {} });
+    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 </script>
 
@@ -55,7 +61,8 @@
 >
   <span class="ct-icon"><Icon entity={{ kind: 'item', id: item }} size={28} /></span>
   <span class="grow"><EntityLink kind="item" id={item} /></span>
-  <span class="ct-muted" data-price>{t('shop.price', { n: formatInt(price) })}</span>
+  <span class="ct-muted" data-price>{t('shop.price', { n: formatInt(price), currency: unit })}</span
+  >
   <span class="ct-muted" data-have>{t('shop.owned', { n: formatInt(owned) })}</span>
   <Stepper
     bind:value={qty}
@@ -89,8 +96,12 @@
   {:else if invalid}
     <p class="ct-why" id={whyId} data-why="qty">{t('qty.invalid')}</p>
   {:else if poor}
-    <p class="ct-why" id={whyId} data-why="ryo">
-      {t('shop.reason.ryo', { need: formatInt(total), have: formatInt(ryo) })}
+    <p class="ct-why" id={whyId} data-why="money">
+      {t('shop.reason.money', {
+        currency: unit,
+        need: formatInt(total),
+        have: formatInt(ryo),
+      })}
     </p>
   {/if}
 </li>

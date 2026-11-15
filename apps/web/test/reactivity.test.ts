@@ -14,7 +14,7 @@ function ready(): GameState {
   state.player.rank = 'genin';
   state.player.name = 'Тест';
   dispatch(state, { type: 'nature.choose', nature: 'katon' }, content);
-  state.skills.cc.xp = 100_000;
+  state.skills.cc!.xp = 100_000;
   return state;
 }
 

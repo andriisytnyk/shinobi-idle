@@ -451,6 +451,20 @@ export const testmodPack: ContentPack = {
       'mission.testmod:test_run.stage.0.label': 'Тестова робота',
       'quest.testmod:test_chain.name': 'Тестовий ланцюжок',
       'quest.testmod:test_chain.step.1': 'Досягни другого рівня тестової кузні.',
+      'quest.testmod:test_chain.desc':
+        'Тестовий ланцюжок доручень мода: одна ціль для перевірки журналу.',
+      'nature.testmod:aether.desc':
+        'Тестова природа мода: вона лише доводить, що мод додає природи даними.',
+      'missionRank.testmod:trial.name': 'Тестове випробування',
+      'missionRank.testmod:trial.desc':
+        'Тестовий ранг доручень мода: доручення цього рангу лише для перевірки.',
+      'missionRank.testmod:trial.stamp': 'Т',
+      'stage.testmod:stage3.name': 'Тестовий етап села',
+      'stage.testmod:stage3.desc': 'Тестовий етап села, який мод додає після відомих.',
+      'state.testmod:chilled.desc': 'Тестовий стан охолодження, на який діє тестове комбо.',
+      'tag.testmod:crack.desc': 'Тестова мітка техніки: відповідь на тестову рису панцира.',
+      'role.testmod:sapper.desc': 'Тестова роль техніки мода.',
+      'modifier.testmod:forge.bonus': 'Тестовий бонус кузні',
     },
   },
   icons: { skill: { 'testmod:forge': 'anvil' } },

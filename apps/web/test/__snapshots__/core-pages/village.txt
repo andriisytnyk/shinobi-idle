@@ -1,0 +1,8 @@
+<main class="main">
+  <div class="ui-page" data-page="core:village" data-ui="page">
+    <article class="simple-page">
+      <h1>
+        Село
+      <div class="village" data-village="">
+        <p class="ct-why" data-village-locked="">
+          Село з'явиться, коли ти станеш Геніном.

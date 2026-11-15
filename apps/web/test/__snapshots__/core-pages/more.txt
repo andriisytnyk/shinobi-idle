@@ -1,0 +1,72 @@
+<main class="main">
+  <div class="ui-page" data-page="core:more" data-ui="page">
+    <article class="simple-page">
+      <h1>
+        Ще
+      <ul class="menu">
+        <li>
+          <a data-more-bank="" href="#/bank">
+            <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+              <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <path d="#129-1i0q4rl">
+                <path d="#36-1xcqgks">
+            <span>
+              Банк
+            <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+              <path d="#14-mnqmls" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+        <li>
+          <a data-more-shop="" href="#/shop">
+            <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+              <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <path d="#282-1ybrt6b">
+                <path d="#48-1o8urc2">
+            <span>
+              Крамниця
+            <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+              <path d="#14-mnqmls" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+        <li>
+          <a data-more-village="" href="#/village">
+            <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+              <path d="#125-1dlw44n" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <span>
+              Село
+            <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+              <path d="#14-mnqmls" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+        <li>
+          <a href="#/rank">
+            <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+              <path d="#300-1w5w1cd" fill="currentColor">
+            <span>
+              Академія
+            <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+              <path d="#14-mnqmls" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+        <li>
+          <a href="#/help">
+            <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+              <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <circle cx="12" cy="12" r="10">
+                <path d="#44-q6qo8y">
+            <span>
+              Довідка
+            <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+              <path d="#14-mnqmls" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+        <li>
+          <a href="#/settings">
+            <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+              <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <path d="#327-agpa8t">
+                <circle cx="12" cy="12" r="3">
+            <span>
+              Налаштування
+            <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+              <path d="#14-mnqmls" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+        <li>
+          <a href="#/credits">
+            <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+              <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <circle cx="12" cy="12" r="10">
+                <path d="#17-19un69j">
+            <span>
+              Подяки й ліцензії
+            <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+              <path d="#14-mnqmls" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">

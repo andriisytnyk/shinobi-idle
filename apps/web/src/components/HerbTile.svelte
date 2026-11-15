@@ -1,12 +1,11 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import type { ActionInfo } from '@shinobi/core';
   import { blockOf, blockText, bushView } from '../lib/crafts.ts';
   import { formatDuration, formatInt, formatSeconds, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import { slotTiming } from '../lib/timing.ts';
-  import { toasts } from '../lib/toasts.svelte.ts';
+  import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import ActionEmblem from './ActionEmblem.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
@@ -14,6 +13,8 @@
   import ModBreakdown from './ModBreakdown.svelte';
   import ReqTree from './ReqTree.svelte';
   import TimeBar from './TimeBar.svelte';
+
+  const content = game.content;
 
   interface Props {
     info: ActionInfo;
@@ -42,7 +43,7 @@
     const result = running
       ? game.dispatch({ type: 'action.stop', slot: slotIndex })
       : game.dispatch({ type: 'action.start', slot: 0, kind: info.kind, id: info.id });
-    if (!result.ok) toasts.push({ key: result.reason, params: {} });
+    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 </script>
 
@@ -71,7 +72,7 @@
       <dt>{t('tile.interval')}</dt>
       <dd>
         <ModBreakdown
-          keys={['interval.skill.herb', 'speed.skill.herb']}
+          keys={[`interval.skill.${info.skill}`, `speed.skill.${info.skill}`]}
           display={formatSeconds(info.intervalMs)}
           base={formatSeconds(content.balance.K.gather * 1000)}
         />
@@ -81,7 +82,7 @@
       <dt>{t('tile.xph')}</dt>
       <dd>
         <ModBreakdown
-          keys={['xp.all', 'xp.skill.herb']}
+          keys={['xp.all', `xp.skill.${info.skill}`]}
           display={t('tile.xphValue', { n: formatXp(info.xpPerHour) })}
         />
       </dd>

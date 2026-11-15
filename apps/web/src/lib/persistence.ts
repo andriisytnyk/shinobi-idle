@@ -88,10 +88,13 @@ export interface LoadResult {
 export class LoadError extends Error {
   /** The stored text as it is, for export; null when even reading it failed. */
   readonly raw: string | null;
-  constructor(message: string, raw: string | null) {
+  /** What the player is told; the message is the technical detail. */
+  readonly reason: LoadReason;
+  constructor(message: string, raw: string | null, reason: LoadReason = 'core') {
     super(message);
     this.name = 'LoadError';
     this.raw = raw;
+    this.reason = reason;
   }
 }
 
@@ -128,16 +131,25 @@ export function decodeStored(raw: string): Stored {
   return { rev: 0, text: raw };
 }
 
-/** Rejects a text whose state is empty or alien: every skill of the content must be present. */
-export function assertSaneSave(text: string, content: ContentDb): void {
-  const parsed: unknown = JSON.parse(text);
-  const state =
-    typeof parsed === 'object' && parsed !== null ? (parsed as { state?: unknown }).state : null;
-  const skills =
-    typeof state === 'object' && state !== null ? (state as { skills?: unknown }).skills : null;
-  if (typeof skills !== 'object' || skills === null) throw new Error('Save has no skills');
-  for (const skill of content.skills) {
-    if (!(skill.id in skills)) throw new Error(`Save lacks the skill ${skill.id}`);
+/** Why a save could not be read: the key of the text the player sees (the technical message is kept apart). */
+export type LoadReason = 'notJson' | 'noState' | 'core';
+
+/**
+ * Rejects a text that is not a save at all: it must be JSON with a version and a state object. What
+ * the state holds is for the core loader to judge with the composed content and rules: a save made
+ * while a pack was absent lacks that pack's data, which the loader initialises.
+ */
+export function assertSaneSave(text: string): void {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch (error) {
+    throw new LoadError(error instanceof Error ? error.message : String(error), text, 'notJson');
+  }
+  const save =
+    typeof parsed === 'object' && parsed !== null ? (parsed as Record<string, unknown>) : {};
+  if (typeof save.v !== 'number' || typeof save.state !== 'object' || save.state === null) {
+    throw new LoadError('The text has no version or state', text, 'noState');
   }
 }
 
@@ -165,7 +177,7 @@ export async function loadGame(
   }
   try {
     const stored = decodeStored(raw);
-    assertSaneSave(stored.text, content);
+    assertSaneSave(stored.text);
     const state = deserialize(stored.text, content, rules);
     // An older format is upgraded on load; keep the old save until the player has played on.
     if ((JSON.parse(stored.text) as { v?: unknown }).v !== STATE_VERSION) {
@@ -175,6 +187,7 @@ export async function loadGame(
     const summary = advanceOffline(state, elapsed, content, rules);
     return { state, summary, report: buildReport(summary), rev: stored.rev };
   } catch (error) {
+    if (error instanceof LoadError) throw new LoadError(error.message, raw, error.reason);
     throw new LoadError(error instanceof Error ? error.message : String(error), raw);
   }
 }
@@ -216,7 +229,7 @@ export async function readBackup(
   if (raw === undefined) return null;
   try {
     const { text } = decodeStored(raw);
-    assertSaneSave(text, content);
+    assertSaneSave(text);
     return deserialize(text, content, rules);
   } catch {
     return null;
@@ -251,6 +264,6 @@ export function importSave(
   rules: Rules = defaultRules,
 ): GameState {
   const text = fromBase64(b64);
-  assertSaneSave(text, content);
+  assertSaneSave(text);
   return deserialize(text, content, rules);
 }

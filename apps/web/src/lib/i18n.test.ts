@@ -1,9 +1,26 @@
-import { describe, expect, it } from 'vitest';
-import { createTranslator, t } from './i18n.ts';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { setActiveContent } from './active.ts';
+import { composeBoot } from './boot.ts';
+import { clearMissingKeys, createTranslator, fallbackText, missingKeys, t } from './i18n.ts';
+
+beforeAll(() => setActiveContent(composeBoot().content));
 
 describe('t', () => {
-  it('returns the key for unknown strings', () => {
-    expect(t('no.such.key')).toBe('no.such.key');
+  it('never shows a key for an unknown string: it shows a readable stand-in and says so once', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    clearMissingKeys();
+    expect(t('no.such_key')).toBe('Such key');
+    expect(t('skill.testmod:forge.name')).toBe('Forge');
+    expect(t('skill.testmod:forge.name')).toBe('Forge');
+    expect(missingKeys()).toEqual(['no.such_key', 'skill.testmod:forge.name']);
+    expect(warn).toHaveBeenCalledTimes(2);
+    warn.mockRestore();
+  });
+
+  it('makes a stand-in from the id part of a key, without the field', () => {
+    expect(fallbackText('item.mod:ember_pulse.name')).toBe('Ember pulse');
+    expect(fallbackText('nav.skills')).toBe('Skills');
+    expect(fallbackText('nature.katon.name')).toBe('Katon');
   });
 
   it('reads Ukrainian strings from the content locale', () => {

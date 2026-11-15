@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import { evalReq, sellPrice, shopEntries, shopPrice } from '@shinobi/core';
   import { onMount } from 'svelte';
   import GearLine from '../components/GearLine.svelte';
@@ -9,8 +8,11 @@
   import { blockOf, shopSection, type ShopSection } from '../lib/crafts.ts';
   import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
+  import { currencyName, held, moneyOf, shopSectionName } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
+
+  const content = game.content;
 
   interface Props {
     /** `sell` brings the sell section into view. */
@@ -19,7 +21,18 @@
 
   let { section }: Props = $props();
 
-  const ryo = $derived(game.read((gs) => gs.currencies.ryo ?? 0));
+  const money = moneyOf(content);
+  /** What the player holds of each currency the shop takes: the money first, then the others, in order of appearance. */
+  const purses = $derived(
+    game.read((gs) => {
+      const ids = [money];
+      for (const entry of shopEntries(content)) {
+        const id = entry.currency ?? money;
+        if (!ids.includes(id)) ids.push(id);
+      }
+      return ids.map((id) => ({ id, n: held(gs, id) }));
+    }),
+  );
   const goods = $derived(
     game.read((gs) =>
       shopEntries(content).flatMap((entry) => {
@@ -29,6 +42,7 @@
           {
             item: entry.item,
             price,
+            currency: entry.currency ?? money,
             section: shopSection(entry),
             owned: gs.bank[entry.item] ?? 0,
             req: evalReq(gs, entry.req, content),
@@ -62,19 +76,24 @@
 
 <SimplePage title={t('shop.title')}>
   <Hint id="shop" />
-  <p class="purse" data-purse>{t('shop.purse', { n: formatInt(ryo) })}</p>
+  {#each purses as purse (purse.id)}
+    <p class="purse" data-purse data-purse-currency={purse.id === money ? undefined : purse.id}>
+      {t('shop.purse', { n: formatInt(purse.n), currency: currencyName(purse.id) })}
+    </p>
+  {/each}
   {#if shut}
     <p class="ct-why" id="shop-locked" data-shop-locked data-why="rank">{t('shop.shut')}</p>
   {/if}
 
   {#each SECTIONS as id (id)}
     <section class="ct-section" data-section={id}>
-      <h2>{t(`shop.section.${id}`)}</h2>
+      <h2>{shopSectionName(id)}</h2>
       <ul class="list">
         {#each goods.filter((g) => g.section === id) as good (good.item)}
           <ShopGood
             item={good.item}
             price={good.price}
+            currency={good.currency}
             owned={good.owned}
             req={good.req}
             quiet={shut}

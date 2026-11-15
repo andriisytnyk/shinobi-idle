@@ -1,16 +1,19 @@
 <script lang="ts">
-  import { content, type Gear } from '@shinobi/content';
+  import { type Gear } from '@shinobi/content';
   import { evalReq, nextTierPrice, nextTierReq, ownedTiers } from '@shinobi/core';
   import { blockOf, blockText } from '../lib/crafts.ts';
   import { entityDesc } from '../lib/entities.ts';
   import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
+  import { held, moneyName, moneyOf } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
-  import { toasts } from '../lib/toasts.svelte.ts';
+  import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import BuildingNeed from './BuildingNeed.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ReqTree from './ReqTree.svelte';
+
+  const content = game.content;
 
   interface Props {
     line: Gear;
@@ -32,7 +35,7 @@
         next: next ? { tier: next.tier } : null,
         price: nextTierPrice(gs, line, content),
         req: req ? evalReq(gs, req, content) : null,
-        ryo: gs.currencies.ryo ?? 0,
+        ryo: held(gs, moneyOf(content)),
       };
     }),
   );
@@ -42,7 +45,7 @@
 
   function buy(): void {
     const result = game.dispatch({ type: 'gear.buy', line: line.id });
-    if (!result.ok) toasts.push({ key: result.reason, params: {} });
+    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 </script>
 
@@ -59,7 +62,11 @@
     <p class="done" data-maxed>{t('gear.maxed')}</p>
   {:else if view.next && view.price !== null}
     <p class="next" data-next>
-      {t('gear.next', { tier: view.next.tier, price: formatInt(view.price) })}
+      {t('gear.next', {
+        tier: view.next.tier,
+        price: formatInt(view.price),
+        currency: moneyName(content),
+      })}
     </p>
     {#if view.req && !view.req.met}<div class="req"><ReqTree node={view.req} /></div>{/if}
     {#if !compact}
@@ -81,8 +88,12 @@
             />{:else}{blockText(block)}{/if}
         </p>
       {:else if poor}
-        <p class="ct-why" id="why-gear-{line.id}" data-why="ryo">
-          {t('shop.reason.ryo', { need: formatInt(view.price), have: formatInt(view.ryo) })}
+        <p class="ct-why" id="why-gear-{line.id}" data-why="money">
+          {t('shop.reason.money', {
+            currency: moneyName(content),
+            need: formatInt(view.price),
+            have: formatInt(view.ryo),
+          })}
         </p>
       {/if}
     {/if}

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import {
     counterValue,
     enemyStats,
@@ -23,6 +22,8 @@
   import { combatTiming, IDLE_TIMING } from '../lib/timing.ts';
   import type { ProgressTiming } from '../lib/time-progress.ts';
   import SimplePage from './SimplePage.svelte';
+
+  const content = game.content;
 
   /** Enemies of the Academy yard are open to everyone; the other regions arrive with missions. */
   const enemies = $derived(content.enemies.filter((e) => e.region === 'academy'));

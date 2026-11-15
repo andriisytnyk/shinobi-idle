@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { content, localeKey, TRAIT_ANSWER } from '@shinobi/content';
+  import { localeKey } from '@shinobi/content';
   import { actionInfo, evalReq, type Req } from '@shinobi/core';
   import ActionEmblem from '../components/ActionEmblem.svelte';
   import ActionTile from '../components/ActionTile.svelte';
@@ -7,12 +7,15 @@
   import Icon from '../components/Icon.svelte';
   import ReqTree from '../components/ReqTree.svelte';
   import SealStrip from '../components/SealStrip.svelte';
-  import { t } from '../lib/i18n.ts';
+  import { t, textOf } from '../lib/i18n.ts';
   import { techniqueGoal } from '../lib/goal.ts';
   import { techniqueRelations } from '../lib/technique-links.ts';
   import { game } from '../lib/store.ts';
   import { practiceView } from '../lib/timing.ts';
   import { entityName } from '../lib/entities.ts';
+  import { graduateRank } from '../lib/vocab.ts';
+
+  const content = game.content;
 
   interface Props {
     id: string;
@@ -30,7 +33,8 @@
     game.read((gs) => {
       if (!tech) return null;
       const of: Req[] = [{ t: 'skill', skill: tech.skill, level: tech.level }];
-      if (tech.src === 'N' && tech.mentor === 'other') of.push({ t: 'rank', rank: 'genin' });
+      if (tech.src === 'N' && tech.mentor === 'other')
+        of.push({ t: 'rank', rank: graduateRank(content) ?? '' });
       return evalReq(gs, { t: 'all', of }, content);
     }),
   );
@@ -39,9 +43,7 @@
   const answers = $derived(
     (tech?.tags ?? []).map((tag) => ({
       tag,
-      traits: (Object.entries(TRAIT_ANSWER) as [keyof typeof TRAIT_ANSWER, string][])
-        .filter(([, answer]) => answer === tag)
-        .map(([trait]) => trait),
+      traits: content.traits.filter((trait) => trait.answer === tag).map((trait) => trait.id),
     })),
   );
 
@@ -60,6 +62,7 @@
     }),
   );
 
+  const stateStatus = $derived(content.statuses.find((x) => x.state === tech?.state));
   const goal = $derived(techniqueGoal(id, content));
   const pinned = $derived(game.read((gs) => gs.goal?.kind === 'technique' && gs.goal.id === id));
 
@@ -96,7 +99,12 @@
       {#if tech.state}
         <div>
           <dt>{t('technique.effect')}</dt>
-          <dd><EntityLink kind="status" id={tech.state} /></dd>
+          <dd>
+            <!-- A state is not a status: the status that the state puts on a body names it in its data. -->
+            {#if stateStatus}<EntityLink kind="status" id={stateStatus.id} />{:else}{textOf([
+                `state.${tech.state}.name`,
+              ])}{/if}
+          </dd>
         </div>
       {/if}
       {#if answers.length > 0}
@@ -126,11 +134,11 @@
       <h2>{t('technique.source')}</h2>
       <p>{t(`technique.src.${tech.src}`)}</p>
       <ul class="links">
-        {#if relations.academy}<li><EntityLink kind="building" id="core:academy" /></li>{/if}
-        {#if relations.library !== null}
+        {#if relations.academy}<li><EntityLink kind="building" id={relations.academy} /></li>{/if}
+        {#if relations.library}
           <li>
-            <EntityLink kind="building" id="core:library" />
-            {t('technique.libraryLevel', { n: relations.library })}
+            <EntityLink kind="building" id={relations.library.building} />
+            {t('technique.libraryLevel', { n: relations.library.level })}
           </li>
         {/if}
         {#each relations.carriers as carrier (carrier.id)}

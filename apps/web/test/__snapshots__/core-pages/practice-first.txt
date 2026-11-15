@@ -1,0 +1,21 @@
+<main class="main">
+  <div class="ui-page" data-page="core:entity" data-ui="page">
+    <article class="entity-page" data-entity="practice:core:tykha_kimnata" data-ui="entity-page">
+      <p class="kind">
+        Практика
+      <h1 data-ui="entity-header">
+        <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+          <path d="#800-1enpkv5" fill="currentColor">
+        Тиха кімната
+      <p class="placeholder">
+        Сторінка цієї сутності з'явиться на наступних етапах.
+      <section data-entity-links="" data-ui="entity-section">
+        <h2>
+          Пов'язане
+        <ul class="links">
+          <li>
+            <a class="entity-link" href="#/skill/cc">
+              Контроль чакри
+          <li>
+            <a class="entity-link" href="#/skill/nin">
+              Ніндзюцу

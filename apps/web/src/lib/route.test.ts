@@ -1,7 +1,16 @@
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { setActiveContent } from './active.ts';
+import { composeBoot } from './boot.ts';
 import { hrefFor, parseHash } from './route.ts';
 
+// The kinds that have a route are the entity kinds of the content that is running.
+beforeAll(() => setActiveContent(composeBoot().content));
+
 describe('router', () => {
+  it('knows no kind that the content does not list', () => {
+    expect(parseHash('#/widget/x')).toEqual({ page: 'notFound', hash: '#/widget/x' });
+  });
+
   it('parses entity routes', () => {
     expect(parseHash('#/skill/tai')).toEqual({ page: 'entity', ref: { kind: 'skill', id: 'tai' } });
     expect(parseHash('#/technique/core:great_fireball')).toEqual({

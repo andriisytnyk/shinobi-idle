@@ -1,26 +1,28 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import {
     cellInfo,
     instantCost,
     travelBlocked,
     travelOptions,
     walkMs,
-    zoneAvailable,
     type CellInfo,
   } from '@shinobi/core';
   import { entityDesc } from '../lib/entities.ts';
   import { formatDuration, formatInt, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
+  import { currencyName, moneyOf, skillByActivity } from '../lib/vocab.ts';
+  import { keyIcon, keyNameKey, uniqueReq } from '../lib/world.ts';
   import { IDLE_TIMING, slotTiming } from '../lib/timing.ts';
-  import { KEY_ICON, keyNameKey, POI_ICON, poiKindKey, uniqueReq, zoneOf } from '../lib/world.ts';
+  import PoiRow from './PoiRow.svelte';
   import RegionEntry from './RegionEntry.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
   import ReqTree from './ReqTree.svelte';
   import TimeBar from './TimeBar.svelte';
+
+  const content = game.content;
 
   interface Props {
     id: string;
@@ -29,6 +31,8 @@
 
   let { id, onClose }: Props = $props();
 
+  /** The skill that explores: the one whose activity is the map. */
+  const scoutSkill = skillByActivity(content, 'map') ?? '';
   const cell = $derived(content.cells.find((c) => c.id === id));
   const info = $derived(game.read((gs): CellInfo | null => cellInfo(gs, id, content, game.rules)));
 
@@ -55,17 +59,6 @@
         walkMs: walkMs(gs, target, content, game.rules),
       };
     }),
-  );
-
-  /** Which fight zones of this cell are available now, by zone id. */
-  const zones = $derived(
-    game.read((gs) =>
-      Object.fromEntries(
-        (cell?.pois ?? []).flatMap((p) =>
-          p.kind === 'zone' ? [[p.zone, zoneAvailable(gs, p.zone, content)] as const] : [],
-        ),
-      ),
-    ),
   );
 
   /** The cycle of the exploring or the walk that is busy with this cell. */
@@ -128,7 +121,7 @@
         {/if}
         {#if info.key}
           <span class="badge" data-key={info.key}>
-            <Icon name={KEY_ICON[info.key]} size={14} />{t(keyNameKey(info.key))}
+            <Icon name={keyIcon(info.key)} size={14} />{t(keyNameKey(info.key))}
           </span>
         {/if}
       </div>
@@ -183,7 +176,7 @@
             <dt>{t('world.panel.xp')}</dt>
             <dd>
               <ModBreakdown
-                keys={['xp.all', 'xp.skill.scout']}
+                keys={['xp.all', `xp.skill.${scoutSkill}`]}
                 display={t('tile.xphValue', { n: formatXp(info.xpPerHour) })}
               />
             </dd>
@@ -205,74 +198,7 @@
           {/if}
           <ul class="poi-list">
             {#each found as poi (poi.id)}
-              {@const st = state(poi.id)}
-              {@const pdesc = entityDesc({ kind: 'poi', id: poi.id })}
-              <li
-                class="poi"
-                data-poi={poi.id}
-                data-poi-kind={poi.kind}
-                data-ui="poi-row"
-                data-entity="poi:{poi.id}"
-              >
-                <p class="poi-name">
-                  <Icon name={POI_ICON[poi.kind]} size={18} />
-                  <EntityLink kind="poi" id={poi.id} />
-                  <span class="kind">{t(poiKindKey(poi.kind))}</span>
-                </p>
-                {#if pdesc}<p class="small dim">{pdesc}</p>{/if}
-
-                {#if poi.kind === 'training'}
-                  <p class="small">
-                    {t('world.poi.trainingBonus', { pct: Math.round(poi.bonus * 100) })}
-                    <EntityLink kind="skill" id={poi.skill} />
-                  </p>
-                  <p class="small" data-training-active={info.located}>
-                    {info.located ? t('world.poi.trainingOn') : t('world.poi.trainingOff')}
-                  </p>
-                {:else if poi.kind === 'zone'}
-                  {@const zone = zoneOf(poi)}
-                  {#if zone}
-                    <p class="small">
-                      {t('world.poi.zoneEnemy')}
-                      <EntityLink kind="enemy" id={zone.enemy} />
-                    </p>
-                    <p class="small" data-zone-available={zones[zone.zone] === true}>
-                      {zones[zone.zone] ? t('world.where.open') : t('world.where.closed')}
-                      <a class="go" href="#/combat">{t('nav.combat')}</a>
-                    </p>
-                  {/if}
-                {:else if poi.kind === 'story'}
-                  <p class="small">{t('world.poi.story')}</p>
-                {:else if poi.kind === 'deposit'}
-                  <p class="small">
-                    {t('world.poi.deposit')}
-                    <EntityLink kind="building" id={poi.building} />
-                  </p>
-                {:else if poi.kind === 'outpost'}
-                  <p class="small">{t('world.poi.outpost')}</p>
-                {:else if poi.kind === 'mission'}
-                  <p class="small">
-                    {t('world.poi.mission')}
-                    <EntityLink kind="mission" id={poi.mission} />
-                  </p>
-                {:else if poi.kind === 'cache' || poi.kind === 'vault'}
-                  <p class="small">
-                    {t(poi.kind === 'cache' ? 'world.poi.lootCache' : 'world.poi.lootVault')}
-                    {#if poi.kind === 'cache'}
-                      {#if poi.ryo > 0}<span>{t('world.poi.ryo', { n: formatInt(poi.ryo) })}</span
-                        >{/if}
-                      {#each poi.items as item (item.item)}
-                        <span><EntityLink kind="item" id={item.item} /> ×{item.n}</span>
-                      {/each}
-                    {:else}
-                      <EntityLink kind="item" id={poi.item} />
-                    {/if}
-                  </p>
-                  {#if st?.claimed}
-                    <p class="small done" data-claimed>{t('world.poi.claimed')}</p>
-                  {/if}
-                {/if}
-              </li>
+              <PoiRow {poi} cell={id} />
             {/each}
           </ul>
         </section>
@@ -315,7 +241,10 @@
             {t('world.travel.instantShort')} ·
             {travel.cost === 0
               ? t('world.travel.free')
-              : t('world.travel.cost', { n: formatInt(travel.cost) })}
+              : t('world.travel.cost', {
+                  n: formatInt(travel.cost),
+                  currency: currencyName(moneyOf(content)),
+                })}
           </button>
           {#if busy.walk >= 0}
             <button
@@ -585,44 +514,6 @@
     margin: 0;
     padding: 0;
     list-style: none;
-  }
-
-  .poi {
-    padding-bottom: var(--space-3);
-    border-bottom: var(--border-thin) solid var(--line);
-  }
-
-  .poi:last-child {
-    padding-bottom: 0;
-    border-bottom: 0;
-  }
-
-  .poi-name {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-2);
-    margin: 0;
-    font-weight: 600;
-  }
-
-  .poi-name .kind {
-    color: var(--fg-dim);
-    font-size: var(--text-2xs);
-    font-weight: 400;
-  }
-
-  .go {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: var(--control-md);
-    min-height: var(--control-md);
-    color: var(--accent);
-  }
-
-  .done {
-    color: var(--success);
   }
 
   .panel :global(a) {

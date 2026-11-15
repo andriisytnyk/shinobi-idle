@@ -1,5 +1,4 @@
 import type { ContentDb } from '@shinobi/content';
-import { localeKey, ukLocale } from '@shinobi/content';
 import type { EntityRef } from './route.ts';
 
 export interface TechniqueRelations {
@@ -7,10 +6,10 @@ export interface TechniqueRelations {
   missions: string[];
   /** Enemies and bosses that carry the technique and can pass it on. */
   carriers: EntityRef[];
-  /** Library level that stocks the technique, when it comes from the village library. */
-  library: number | null;
-  /** Whether the Academy teaches it. */
-  academy: boolean;
+  /** The building whose scrolls teach it, and the level that stocks the scroll; null unless the Library sells it. */
+  library: { building: string; level: number } | null;
+  /** The building whose mentors teach it (the Academy); null for techniques of other sources. */
+  academy: string | null;
 }
 
 /** Where a technique is used and where it comes from, computed from the content tables. */
@@ -39,14 +38,17 @@ export function techniqueRelations(id: string, content: ContentDb): TechniqueRel
       .map((b) => ({ kind: 'boss' as const, id: b.id })),
   ];
 
-  // The library level is the one number in the home text that is data, not a name.
-  const home = ukLocale[localeKey('technique', id, 'home')] ?? '';
-  const level =
-    tech?.src === 'S' && home.startsWith('Бібліотека') ? /рівень (\d+)/.exec(home) : null;
+  // The Library sells the scroll of the technique at the level its source names.
+  const library = content.buildings.find((b) => b.duty === 'scrolls');
+  const source = content.items.find((i) => i.scroll?.technique === id)?.scroll?.source;
+  const teaching = content.buildings.find((b) => b.duty === 'teaching');
   return {
     missions,
     carriers,
-    library: level ? Number(level[1]) : null,
-    academy: tech?.src === 'N' && tech.mentor === 'academy',
+    library:
+      tech?.src === 'S' && library && source?.t === 'library'
+        ? { building: library.id, level: source.level }
+        : null,
+    academy: tech?.src === 'N' && tech.mentor === 'academy' ? (teaching?.id ?? null) : null,
   };
 }
