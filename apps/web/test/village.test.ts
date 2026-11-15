@@ -10,10 +10,13 @@ import { objectiveTarget } from '../src/lib/next-step.ts';
 import { parseHash } from '../src/lib/route.ts';
 import { settings } from '../src/lib/settings.svelte.ts';
 import { game } from '../src/lib/store.ts';
-import { toastFor } from '../src/lib/toasts.svelte.ts';
+import { toastFor as toastForIn } from '../src/lib/toasts.svelte.ts';
 import BuildingPage from '../src/pages/BuildingPage.svelte';
 import ShopPage from '../src/pages/ShopPage.svelte';
 import VillagePage from '../src/pages/VillagePage.svelte';
+
+/** The toast of an event, for the content of the game under test. */
+const toastFor = (event: Parameters<typeof toastForIn>[0]) => toastForIn(event, content);
 
 const K = content.balance.K;
 const TICK = K.tickMin * 60_000;
@@ -139,7 +142,7 @@ describe('the village page', () => {
     field.dispatchEvent(new Event('input', { bubbles: true }));
     flushSync();
     expect(target.querySelector('[data-treasury] [data-why]')?.getAttribute('data-why')).toBe(
-      'ryo',
+      'money',
     );
     expect(target.querySelector<HTMLButtonElement>('[data-donate]')?.disabled).toBe(true);
   });
@@ -184,7 +187,7 @@ describe('the village page', () => {
     app = null;
     target.innerHTML = '';
 
-    game.state.currencies.rep = K.rep.stage2;
+    game.state.currencies.rep = K.rep.stage2 ?? 0;
     game.devAdvance(0);
     mountVillage();
     expect(card('academy')?.querySelector('[data-max]')).not.toBeNull();

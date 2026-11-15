@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ReqResult } from '@shinobi/core';
-  import { webRef } from '../lib/entities.ts';
+  import { humanId, webRef } from '../lib/entities.ts';
+  import { rankName } from '../lib/vocab.ts';
   import { formatInt } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
   import { flagEntity } from '../lib/world.ts';
@@ -35,7 +36,11 @@
   /** A map flag (a point found, a region open) names the place it is about. */
   const flagRef = $derived(req.t === 'flag' ? flagEntity(req.id) : null);
   const flagText = $derived(
-    req.t === 'flag' ? (hasKey(`req.flag.${req.id}`) ? t(`req.flag.${req.id}`) : req.id) : '',
+    req.t === 'flag'
+      ? hasKey(`req.flag.${req.id}`)
+        ? t(`req.flag.${req.id}`)
+        : humanId(req.id)
+      : '',
   );
 </script>
 
@@ -73,7 +78,7 @@
       {:else if req.t === 'item'}
         {#if ref}<EntityLink kind={ref.kind} id={ref.id} />{/if}
       {:else if req.t === 'rank'}
-        {t('req.rank', { rank: t(`rank.${req.rank}`) })}
+        {t('req.rank', { rank: rankName(req.rank) })}
       {:else if req.t === 'flag' && flagRef}
         <EntityLink kind={flagRef.kind} id={flagRef.id} />
         <span class="detail">{t(flagRef.kind === 'poi' ? 'req.poiFound' : 'req.regionOpen')}</span>

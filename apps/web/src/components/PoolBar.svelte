@@ -1,11 +1,13 @@
 <script lang="ts">
-  import { content, localeKey, type SkillId } from '@shinobi/content';
+  import { localeKey, type SkillId } from '@shinobi/content';
   import { poolCapacity } from '@shinobi/core';
   import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import Icon from './Icon.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
+
+  const content = game.content;
 
   interface Props {
     skill: SkillId;
@@ -17,7 +19,7 @@
   const checkpoints = $derived(
     content.pools.filter((p) => p.skill === skill).sort((a, b) => a.pct - b.pct),
   );
-  const xp = $derived(game.read((gs) => gs.pools[skill].xp));
+  const xp = $derived(game.read((gs) => gs.pools[skill]?.xp ?? 0));
   const fraction = $derived(capacity > 0 ? Math.min(1, xp / capacity) : 0);
 </script>
 

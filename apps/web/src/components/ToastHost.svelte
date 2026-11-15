@@ -2,6 +2,7 @@
   import { t } from '../lib/i18n.ts';
   import { toasts } from '../lib/toasts.svelte.ts';
   import EntityLink from './EntityLink.svelte';
+  import RewardList from './RewardList.svelte';
   import Icon from './Icon.svelte';
 
   /** On a phone three toasts at most are shown; the older ones are counted in a chip. */
@@ -58,10 +59,11 @@
         {#if toast.ref}<EntityLink kind={toast.ref.kind} id={toast.ref.id} />{/if}
         {#if toast.gains}
           <span class="gains" data-gains>
-            {#if toast.gains.ryo > 0}<span>{t('toast.gainRyo', { n: toast.gains.ryo })}</span>{/if}
-            {#each toast.gains.items as item (item.id)}
-              <span><EntityLink kind="item" id={item.id} /> ×{item.n}</span>
-            {/each}
+            <RewardList
+              money={toast.gains.ryo}
+              currencies={toast.gains.currencies}
+              items={toast.gains.items}
+            />
             {#each toast.gains.missed ?? [] as item (item.id)}
               <span data-missed>
                 {t('toast.mission.missed')}

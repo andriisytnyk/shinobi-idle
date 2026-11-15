@@ -1,26 +1,20 @@
-import { content } from '@shinobi/content';
 import type { BuildingEffect, BuildingInfo } from '@shinobi/core';
 import { entityName } from './entities.ts';
 import { formatInt } from './format.ts';
-import { t } from './i18n.ts';
+import { hasKey, t } from './i18n.ts';
+import { game } from './store.ts';
 
 /** The order the roles are listed in on the village page. */
 export const ROLE_ORDER = ['producer', 'storage', 'shop', 'bonus', 'admin', 'defence'] as const;
 
-/** The icon (a Lucide name) of each resource; Shinobi Power and the unnamed ones share one. */
-export const RESOURCE_ICON: Readonly<Record<string, string>> = {
-  wood: 'lucide:trees',
-  stone: 'lucide:mountain',
-  iron: 'lucide:hammer',
-  food: 'lucide:wheat',
-  robocha_syla: 'lucide:users',
-};
-
-export const resourceIcon = (id: string): string => RESOURCE_ICON[id] ?? 'lucide:users';
-export const resourceName = (id: string): string => t(`resource.${id}.name`);
+/** The icon of a resource: the one its data names (Shinobi Power and the unnamed ones share a generic one). */
+export const resourceIcon = (id: string): string =>
+  game.content.resources.find((r) => r.id === id)?.icon ?? 'lucide:users';
+import { currencyName, modifierName, moneyOf, resourceName } from './vocab.ts';
+export { resourceName };
 
 /** Village ticks in one hour. */
-export const ticksPerHour = (): number => 60 / content.balance.K.tickMin;
+export const ticksPerHour = (): number => 60 / game.content.balance.K.tickMin;
 
 /** A per-tick amount as an amount per hour. */
 export const perHour = (perTick: number): number => perTick * ticksPerHour();
@@ -35,7 +29,7 @@ export function formatEffectValue(effect: BuildingEffect): string {
 
 /** The family a modifier key belongs to, and the skill it names when it has one. */
 function familyOf(key: string): { family: string; skill: string | null } {
-  const m = /^(xp|speed)\.skill\.([a-z]+)$/.exec(key);
+  const m = /^(xp|speed)\.skill\.([a-z0-9_:]+)$/.exec(key);
   return m ? { family: m[1] ?? key, skill: m[2] ?? null } : { family: key, skill: null };
 }
 
@@ -52,18 +46,19 @@ export function effectLines(effects: readonly BuildingEffect[]): string[] {
   }
   return [...lines.values()].map((l) => {
     const known = `village.fx.${l.family}`;
-    const text =
-      l.family === 'xp' || l.family === 'speed'
-        ? t(known, { skills: l.skills.join(', '), value: l.value })
-        : t(known, { value: l.value });
-    // An unknown key shows its name rather than nothing.
-    return text === known ? t('village.fx.other', { key: l.key, value: l.value }) : text;
+    // A modifier that no text names shows its readable name rather than nothing.
+    if (!hasKey(known)) {
+      return t('village.fx.other', { key: modifierName(l.key), value: l.value });
+    }
+    return l.family === 'xp' || l.family === 'speed'
+      ? t(known, { skills: l.skills.join(', '), value: l.value })
+      : t(known, { value: l.value });
   });
 }
 
 /** The missions that bring in a shinobi resource. */
 export const missionsGiving = (resource: string): string[] =>
-  content.missions.filter((m) => m.resource === resource).map((m) => m.id);
+  game.content.missions.filter((m) => m.resource === resource).map((m) => m.id);
 
 /** The need lines to show with have / need: the civil resources, the treasury and the shinobi resources. */
 export function costLines(info: BuildingInfo): BuildingInfo['needs'] {
@@ -99,7 +94,11 @@ export function whyOff(
       return {
         reason,
         shinobi: null,
-        text: t('village.why.treasury', { have: formatInt(n.current), need: formatInt(n.target) }),
+        text: t('village.why.treasury', {
+          have: formatInt(n.current),
+          need: formatInt(n.target),
+          currency: currencyName(moneyOf(game.content)),
+        }),
       };
     }
   }

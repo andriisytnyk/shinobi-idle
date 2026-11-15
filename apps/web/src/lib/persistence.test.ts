@@ -69,13 +69,13 @@ describe('loading a save', () => {
     const saved = practising();
     await saveGame(kv, clock, saved, 0);
 
-    const xpBefore = saved.skills.tai.xp;
+    const xpBefore = saved.skills.tai!.xp;
     clock.set(T0 + 2 * HOUR);
     const result = await loadGame(kv, clock, content);
     expect(result.summary?.simulatedMs).toBe(2 * HOUR);
     expect(result.summary?.capped).toBe(false);
     expect(result.state.now).toBe(saved.now + 2 * HOUR);
-    expect(result.state.skills.tai.xp).toBeGreaterThan(saved.skills.tai.xp);
+    expect(result.state.skills.tai!.xp).toBeGreaterThan(saved.skills.tai!.xp);
 
     // The same two hours run directly give the identical state: loading adds nothing of its own.
     advance(saved, 2 * HOUR, content);
@@ -85,7 +85,7 @@ describe('loading a save', () => {
     expect(report).not.toBeNull();
     expect(report?.simulatedMs).toBe(2 * HOUR);
     const tai = report?.skills.find((s) => s.skill === 'tai');
-    expect(tai?.xp).toBeCloseTo(result.state.skills.tai.xp - xpBefore, 6);
+    expect(tai?.xp).toBeCloseTo(result.state.skills.tai!.xp - xpBefore, 6);
     expect(report?.mastery.length).toBeGreaterThan(0);
   });
 
@@ -134,9 +134,9 @@ describe('loading a save', () => {
     expect(kv.data.get(SAVE_KEY)).toBe('not json');
   });
 
-  it('throws a LoadError for a well-formed envelope with an empty state', async () => {
+  it('throws a LoadError for an envelope without a state', async () => {
     const kv = memoryStore();
-    kv.data.set(SAVE_KEY, encodeStored(3, JSON.stringify({ v: 4, savedAt: 1, state: {} })));
+    kv.data.set(SAVE_KEY, encodeStored(3, JSON.stringify({ v: 4, savedAt: 1 })));
     await expect(loadGame(kv, fakeClock(T0), content)).rejects.toBeInstanceOf(LoadError);
   });
 
@@ -254,12 +254,12 @@ describe('export and import', () => {
     expect(serialize(restored, T0)).toBe(before);
   });
 
-  it('rejects an envelope with an empty or alien state', () => {
-    const empty = btoa(JSON.stringify({ v: 4, savedAt: 1, state: {} }));
+  it('rejects an envelope without a state, and accepts one that lacks a skill (the core fills it in)', () => {
+    const empty = btoa(JSON.stringify({ v: 4, savedAt: 1 }));
     expect(() => importSave(empty, content)).toThrow();
     const partial = JSON.parse(serialize(practising(), T0));
     delete partial.state.skills.tai;
-    expect(() => importSave(btoa(JSON.stringify(partial)), content)).toThrow();
+    expect(importSave(btoa(JSON.stringify(partial)), content).skills.tai).toBeDefined();
   });
 
   it('rejects text that is not a save', () => {

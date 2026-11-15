@@ -6,7 +6,7 @@ import { buildingLevel } from './village-state.ts';
 import { ownsNature, rankIndex, skillEntry } from './vocab.ts';
 import { levelAt, levelCap } from './xp.ts';
 
-/** The condition tree; the ids in it are open strings (the ids of the content type are narrower while the legacy mapping is on). */
+/** The condition tree; the ids in it are open strings. */
 export type Req =
   | { t: 'skill'; skill: string; level: number }
   | { t: 'technique'; id: string }

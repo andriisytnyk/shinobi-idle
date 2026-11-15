@@ -1,0 +1,1518 @@
+<main class="main">
+  <div class="ui-page" data-page="core:entity.skill" data-ui="page">
+    <article class="skill-page" data-entity="skill:alch" data-skill="alch" data-ui="entity-page">
+      <header class="plate" data-ui="entity-header">
+        <h1>
+          <span class="plate-icon" style="color: var(--steel);">
+            <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+              <path d="#2497-1mpw7a4" fill="currentColor">
+          Алхімія
+        <span class="level">
+          Рів. 1
+      <p class="lore">
+        Алхімія — хімія шинобі, від отрути на сенбоні до протиотрути. Дає зілля й отрути проти рис ворогів.
+      <p class="unlock">
+        Генін.
+      <section data-ui="entity-section">
+        <h2>
+          Дії
+        <ul class="tiles">
+          <li class="ct-tile" data-action="core:antidote" data-entity="recipe:core:antidote" data-recipe="core:antidote" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="pestle-mortar" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#1092-7cd30b" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:antidote">
+                    Протиотрута
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  1
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      2,5 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      20 736 дос./год
+            <div>
+              <p class="ct-caption">
+                Потрібно
+              <ul class="ct-list" data-inputs="">
+                <li class="input missing" data-entity="item:core:mint" data-input="core:mint" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#342-1nbqtma" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:mint">
+                      Цілюща м'ята
+                  <span aria-label="є 0, потрібно 2" class="count">
+                    0/2
+                  <a class="source" data-source="herb" href="#/skill/herb">
+                    Збирати
+                <li class="input missing" data-entity="item:core:water" data-input="core:water" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#268-wop5ce" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:water">
+                      Чиста вода
+                  <span aria-label="є 0, потрібно 1" class="count">
+                    0/1
+                  <a class="source" data-source="shop" href="#/shop">
+                    Купити
+                  <span class="locked" data-input-locked="">
+                    <span class="need" data-building-need="core:market">
+                      Потрібно:
+                      <a href="#/building/core:market">
+                        Ринок
+                      рівня 1
+            <div>
+              <p class="ct-caption">
+                Виходить
+              <ul class="ct-list" data-outputs="">
+                <li class="output" data-output="core:antidote">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#2152-14fqxmf" fill="currentColor">
+                  <span class="qty">
+                    ×2
+                  <a class="entity-link" href="#/item/core:antidote">
+                    Протиотрута
+                  <span class="ct-muted">
+                    У банку: 0
+            <p class="ct-note" data-tier="">
+              Ступінь 1 з 4: шанс додаткової одиниці 0%.
+              Наступний ступінь — з Майстерності 20.
+            <button aria-describedby="why-core:antidote" class="ct-action" disabled="" type="button">
+              Почати
+            <p class="ct-why" data-why="missing" id="why-core:antidote">
+              Бракує інгредієнтів.
+          <li class="ct-tile" data-action="core:tsiliushcha_maz" data-entity="recipe:core:tsiliushcha_maz" data-recipe="core:tsiliushcha_maz" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="heart-bottle" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#1245-i1pns4" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:tsiliushcha_maz">
+                    Цілюща мазь
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  5
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      2,5 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      28 211 дос./год
+            <div>
+              <p class="ct-caption">
+                Потрібно
+              <ul class="ct-list" data-inputs="">
+                <li class="input missing" data-entity="item:core:nettle" data-input="core:nettle" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#1611-1skmruf" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:nettle">
+                      Кропива
+                  <span aria-label="є 0, потрібно 2" class="count">
+                    0/2
+                  <a class="source" data-source="herb" href="#/skill/herb">
+                    Збирати
+                <li class="input missing" data-entity="item:core:oil" data-input="core:oil" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#1868-wtcbrf" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:oil">
+                      Олія
+                  <span aria-label="є 0, потрібно 1" class="count">
+                    0/1
+                  <a class="source" data-source="shop" href="#/shop">
+                    Купити
+                  <span class="locked" data-input-locked="">
+                    <span class="need" data-building-need="core:market">
+                      Потрібно:
+                      <a href="#/building/core:market">
+                        Ринок
+                      рівня 1
+            <div>
+              <p class="ct-caption">
+                Виходить
+              <ul class="ct-list" data-outputs="">
+                <li class="output" data-output="core:tsiliushcha_maz">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#1245-i1pns4" fill="currentColor">
+                  <span class="qty">
+                    ×2
+                  <a class="entity-link" href="#/item/core:tsiliushcha_maz">
+                    Цілюща мазь
+                  <span class="ct-muted">
+                    У банку: 0
+            <p class="ct-note" data-tier="">
+              Ступінь 1 з 4: шанс додаткової одиниці 0%.
+              Наступний ступінь — з Майстерності 20.
+            <button aria-describedby="why-core:tsiliushcha_maz" class="ct-action" disabled="" type="button">
+              Почати
+            <p class="ct-why" data-why="level" id="why-core:tsiliushcha_maz">
+              Рівень замалий: потрібен 5.
+            <div class="req">
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:alch" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/alch">
+                          Алхімія
+                        <span class="detail">
+                          рів. 5
+                      <span class="count">
+                        1/5
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 20%;">
+                  <li>
+                    <div class="row" data-entity="item:core:nettle" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:nettle">
+                          Кропива
+                      <span class="count">
+                        0/2
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+                  <li>
+                    <div class="row" data-entity="item:core:oil" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:oil">
+                          Олія
+                      <span class="count">
+                        0/1
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+          <li class="ct-tile" data-action="core:paralitychna_otruta" data-entity="recipe:core:paralitychna_otruta" data-recipe="core:paralitychna_otruta" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="round-potion" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#804-1w00djv" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:paralitychna_otruta">
+                    Паралітична отрута
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  10
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      2,5 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      41 451 дос./год
+            <div>
+              <p class="ct-caption">
+                Потрібно
+              <ul class="ct-list" data-inputs="">
+                <li class="input missing" data-entity="item:core:hogweed" data-input="core:hogweed" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#2793-6758lb" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:hogweed">
+                      Отруйний борщівник
+                  <span aria-label="є 0, потрібно 2" class="count">
+                    0/2
+                  <a class="source" data-source="herb" href="#/skill/herb">
+                    Збирати
+                <li class="input missing" data-entity="item:core:mint" data-input="core:mint" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#342-1nbqtma" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:mint">
+                      Цілюща м'ята
+                  <span aria-label="є 0, потрібно 1" class="count">
+                    0/1
+                  <a class="source" data-source="herb" href="#/skill/herb">
+                    Збирати
+            <div>
+              <p class="ct-caption">
+                Виходить
+              <ul class="ct-list" data-outputs="">
+                <li class="output" data-output="core:paralitychna_otruta">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#804-1w00djv" fill="currentColor">
+                  <span class="qty">
+                    ×1
+                  <a class="entity-link" href="#/item/core:paralitychna_otruta">
+                    Паралітична отрута
+                  <span class="ct-muted">
+                    У банку: 0
+            <p class="ct-note" data-tier="">
+              Ступінь 1 з 4: шанс додаткової одиниці 0%.
+              Наступний ступінь — з Майстерності 20.
+            <button aria-describedby="why-core:paralitychna_otruta" class="ct-action" disabled="" type="button">
+              Почати
+            <p class="ct-why" data-why="level" id="why-core:paralitychna_otruta">
+              Рівень замалий: потрібен 10.
+            <div class="req">
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:alch" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/alch">
+                          Алхімія
+                        <span class="detail">
+                          рів. 10
+                      <span class="count">
+                        1/10
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 10%;">
+                  <li>
+                    <div class="row" data-entity="item:core:hogweed" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:hogweed">
+                          Отруйний борщівник
+                      <span class="count">
+                        0/2
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+                  <li>
+                    <div class="row" data-entity="item:core:mint" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:mint">
+                          Цілюща м'ята
+                      <span class="count">
+                        0/1
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+          <li class="ct-tile" data-action="core:dymova_bomba" data-entity="recipe:core:dymova_bomba" data-recipe="core:dymova_bomba" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="smoke-bomb" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#4321-10f8c8b" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:dymova_bomba">
+                    Димова бомба
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  15
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      2,5 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      60 906 дос./год
+            <div>
+              <p class="ct-caption">
+                Потрібно
+              <ul class="ct-list" data-inputs="">
+                <li class="input missing" data-entity="item:core:saltpeter" data-input="core:saltpeter" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#2191-1asiax" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:saltpeter">
+                      Селітра
+                  <span aria-label="є 0, потрібно 1" class="count">
+                    0/1
+                  <a class="source" data-source="shop" href="#/shop">
+                    Купити
+                  <span class="locked" data-input-locked="">
+                    <span class="need" data-building-need="core:market">
+                      Потрібно:
+                      <a href="#/building/core:market">
+                        Ринок
+                      рівня 2
+                <li class="input missing" data-entity="item:core:nettle" data-input="core:nettle" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#1611-1skmruf" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:nettle">
+                      Кропива
+                  <span aria-label="є 0, потрібно 2" class="count">
+                    0/2
+                  <a class="source" data-source="herb" href="#/skill/herb">
+                    Збирати
+            <div>
+              <p class="ct-caption">
+                Виходить
+              <ul class="ct-list" data-outputs="">
+                <li class="output" data-output="core:dymova_bomba">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#4321-10f8c8b" fill="currentColor">
+                  <span class="qty">
+                    ×3
+                  <a class="entity-link" href="#/item/core:dymova_bomba">
+                    Димова бомба
+                  <span class="ct-muted">
+                    У банку: 0
+            <p class="ct-note" data-tier="">
+              Ступінь 1 з 4: шанс додаткової одиниці 0%.
+              Наступний ступінь — з Майстерності 20.
+            <button aria-describedby="why-core:dymova_bomba" class="ct-action" disabled="" type="button">
+              Почати
+            <p class="ct-why" data-why="level" id="why-core:dymova_bomba">
+              Рівень замалий: потрібен 15.
+            <div class="req">
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:alch" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/alch">
+                          Алхімія
+                        <span class="detail">
+                          рів. 15
+                      <span class="count">
+                        1/15
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 6.666666666666667%;">
+                  <li>
+                    <div class="row" data-entity="item:core:saltpeter" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:saltpeter">
+                          Селітра
+                      <span class="count">
+                        0/1
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+                  <li>
+                    <div class="row" data-entity="item:core:nettle" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:nettle">
+                          Кропива
+                      <span class="count">
+                        0/2
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+          <li class="ct-tile" data-action="core:sonnyi_poroshok" data-entity="recipe:core:sonnyi_poroshok" data-recipe="core:sonnyi_poroshok" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="powder" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#2795-1aheut1" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:sonnyi_poroshok">
+                    Сонний порошок
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  20
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      2,5 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      89 490 дос./год
+            <div>
+              <p class="ct-caption">
+                Потрібно
+              <ul class="ct-list" data-inputs="">
+                <li class="input missing" data-entity="item:core:poppy" data-input="core:poppy" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#1475-1nold0k" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:poppy">
+                      Сонний мак
+                  <span aria-label="є 0, потрібно 3" class="count">
+                    0/3
+                  <a class="source" data-source="herb" href="#/skill/herb">
+                    Збирати
+            <div>
+              <p class="ct-caption">
+                Виходить
+              <ul class="ct-list" data-outputs="">
+                <li class="output" data-output="core:sonnyi_poroshok">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#2795-1aheut1" fill="currentColor">
+                  <span class="qty">
+                    ×2
+                  <a class="entity-link" href="#/item/core:sonnyi_poroshok">
+                    Сонний порошок
+                  <span class="ct-muted">
+                    У банку: 0
+            <p class="ct-note" data-tier="">
+              Ступінь 1 з 4: шанс додаткової одиниці 0%.
+              Наступний ступінь — з Майстерності 20.
+            <button aria-describedby="why-core:sonnyi_poroshok" class="ct-action" disabled="" type="button">
+              Почати
+            <p class="ct-why" data-why="level" id="why-core:sonnyi_poroshok">
+              Рівень замалий: потрібен 20.
+            <div class="req">
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:alch" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/alch">
+                          Алхімія
+                        <span class="detail">
+                          рів. 20
+                      <span class="count">
+                        1/20
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 5%;">
+                  <li>
+                    <div class="row" data-entity="item:core:poppy" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:poppy">
+                          Сонний мак
+                      <span class="count">
+                        0/3
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+          <li class="ct-tile" data-action="core:krovospynna_maz" data-entity="recipe:core:krovospynna_maz" data-recipe="core:krovospynna_maz" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="bandage-roll" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#2043-nrdkti" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:krovospynna_maz">
+                    Кровоспинна мазь
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  25
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      2,5 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      131 491 дос./год
+            <div>
+              <p class="ct-caption">
+                Потрібно
+              <ul class="ct-list" data-inputs="">
+                <li class="input missing" data-entity="item:core:bloodgrass" data-input="core:bloodgrass" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#2699-bf6zjk" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:bloodgrass">
+                      Кровотрав
+                  <span aria-label="є 0, потрібно 2" class="count">
+                    0/2
+                  <a class="source" data-source="herb" href="#/skill/herb">
+                    Збирати
+                <li class="input missing" data-entity="item:core:oil" data-input="core:oil" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#1868-wtcbrf" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:oil">
+                      Олія
+                  <span aria-label="є 0, потрібно 1" class="count">
+                    0/1
+                  <a class="source" data-source="shop" href="#/shop">
+                    Купити
+                  <span class="locked" data-input-locked="">
+                    <span class="need" data-building-need="core:market">
+                      Потрібно:
+                      <a href="#/building/core:market">
+                        Ринок
+                      рівня 1
+            <div>
+              <p class="ct-caption">
+                Виходить
+              <ul class="ct-list" data-outputs="">
+                <li class="output" data-output="core:krovospynna_maz">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#2043-nrdkti" fill="currentColor">
+                  <span class="qty">
+                    ×2
+                  <a class="entity-link" href="#/item/core:krovospynna_maz">
+                    Кровоспинна мазь
+                  <span class="ct-muted">
+                    У банку: 0
+            <p class="ct-note" data-tier="">
+              Ступінь 1 з 4: шанс додаткової одиниці 0%.
+              Наступний ступінь — з Майстерності 20.
+            <button aria-describedby="why-core:krovospynna_maz" class="ct-action" disabled="" type="button">
+              Почати
+            <p class="ct-why" data-why="level" id="why-core:krovospynna_maz">
+              Рівень замалий: потрібен 25.
+            <div class="req">
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:alch" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/alch">
+                          Алхімія
+                        <span class="detail">
+                          рів. 25
+                      <span class="count">
+                        1/25
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 4%;">
+                  <li>
+                    <div class="row" data-entity="item:core:bloodgrass" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:bloodgrass">
+                          Кровотрав
+                      <span class="count">
+                        0/2
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+                  <li>
+                    <div class="row" data-entity="item:core:oil" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:oil">
+                          Олія
+                      <span class="count">
+                        0/1
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+          <li class="ct-tile" data-action="core:slozohinna_bomba" data-entity="recipe:core:slozohinna_bomba" data-recipe="core:slozohinna_bomba" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="stun-grenade" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#996-2czncp" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:slozohinna_bomba">
+                    Сльозогінна бомба
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  30
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      2,5 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      193 203 дос./год
+            <div>
+              <p class="ct-caption">
+                Потрібно
+              <ul class="ct-list" data-inputs="">
+                <li class="input missing" data-entity="item:core:silvermoss" data-input="core:silvermoss" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#341-n6fed8" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:silvermoss">
+                      Сріблястий мох
+                  <span aria-label="є 0, потрібно 2" class="count">
+                    0/2
+                  <a class="source" data-source="herb" href="#/skill/herb">
+                    Збирати
+                <li class="input missing" data-entity="item:core:saltpeter" data-input="core:saltpeter" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#2191-1asiax" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:saltpeter">
+                      Селітра
+                  <span aria-label="є 0, потрібно 1" class="count">
+                    0/1
+                  <a class="source" data-source="shop" href="#/shop">
+                    Купити
+                  <span class="locked" data-input-locked="">
+                    <span class="need" data-building-need="core:market">
+                      Потрібно:
+                      <a href="#/building/core:market">
+                        Ринок
+                      рівня 2
+            <div>
+              <p class="ct-caption">
+                Виходить
+              <ul class="ct-list" data-outputs="">
+                <li class="output" data-output="core:slozohinna_bomba">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#996-2czncp" fill="currentColor">
+                  <span class="qty">
+                    ×3
+                  <a class="entity-link" href="#/item/core:slozohinna_bomba">
+                    Сльозогінна бомба
+                  <span class="ct-muted">
+                    У банку: 0
+            <p class="ct-note" data-tier="">
+              Ступінь 1 з 4: шанс додаткової одиниці 0%.
+              Наступний ступінь — з Майстерності 20.
+            <button aria-describedby="why-core:slozohinna_bomba" class="ct-action" disabled="" type="button">
+              Почати
+            <p class="ct-why" data-why="level" id="why-core:slozohinna_bomba">
+              Рівень замалий: потрібен 30.
+            <div class="req">
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:alch" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/alch">
+                          Алхімія
+                        <span class="detail">
+                          рів. 30
+                      <span class="count">
+                        1/30
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 3.3333333333333335%;">
+                  <li>
+                    <div class="row" data-entity="item:core:silvermoss" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:silvermoss">
+                          Сріблястий мох
+                      <span class="count">
+                        0/2
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+                  <li>
+                    <div class="row" data-entity="item:core:saltpeter" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:saltpeter">
+                          Селітра
+                      <span class="count">
+                        0/1
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+          <li class="ct-tile" data-action="core:hirska_maz" data-entity="recipe:core:hirska_maz" data-recipe="core:hirska_maz" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="honey-jar" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#2138-1fy6hr3" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:hirska_maz">
+                    Гірська мазь
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  35
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      2,5 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      283 879 дос./год
+            <div>
+              <p class="ct-caption">
+                Потрібно
+              <ul class="ct-list" data-inputs="">
+                <li class="input missing" data-entity="item:core:edelweiss" data-input="core:edelweiss" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#831-9ho3s9" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:edelweiss">
+                      Гірський едельвейс
+                  <span aria-label="є 0, потрібно 2" class="count">
+                    0/2
+                  <a class="source" data-source="herb" href="#/skill/herb">
+                    Збирати
+                <li class="input missing" data-entity="item:core:oil" data-input="core:oil" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#1868-wtcbrf" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:oil">
+                      Олія
+                  <span aria-label="є 0, потрібно 1" class="count">
+                    0/1
+                  <a class="source" data-source="shop" href="#/shop">
+                    Купити
+                  <span class="locked" data-input-locked="">
+                    <span class="need" data-building-need="core:market">
+                      Потрібно:
+                      <a href="#/building/core:market">
+                        Ринок
+                      рівня 1
+            <div>
+              <p class="ct-caption">
+                Виходить
+              <ul class="ct-list" data-outputs="">
+                <li class="output" data-output="core:hirska_maz">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#2138-1fy6hr3" fill="currentColor">
+                  <span class="qty">
+                    ×2
+                  <a class="entity-link" href="#/item/core:hirska_maz">
+                    Гірська мазь
+                  <span class="ct-muted">
+                    У банку: 0
+            <p class="ct-note" data-tier="">
+              Ступінь 1 з 4: шанс додаткової одиниці 0%.
+              Наступний ступінь — з Майстерності 20.
+            <button aria-describedby="why-core:hirska_maz" class="ct-action" disabled="" type="button">
+              Почати
+            <p class="ct-why" data-why="level" id="why-core:hirska_maz">
+              Рівень замалий: потрібен 35.
+            <div class="req">
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:alch" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/alch">
+                          Алхімія
+                        <span class="detail">
+                          рів. 35
+                      <span class="count">
+                        1/35
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 2.857142857142857%;">
+                  <li>
+                    <div class="row" data-entity="item:core:edelweiss" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:edelweiss">
+                          Гірський едельвейс
+                      <span class="count">
+                        0/2
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+                  <li>
+                    <div class="row" data-entity="item:core:oil" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:oil">
+                          Олія
+                      <span class="count">
+                        0/1
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+          <li class="ct-tile" data-action="core:nervova_otruta" data-entity="recipe:core:nervova_otruta" data-recipe="core:nervova_otruta" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="potion-of-madness" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#1642-1t5nrp" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:nervova_otruta">
+                    Нервова отрута
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  40
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      2,5 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      417 111 дос./год
+            <div>
+              <p class="ct-caption">
+                Потрібно
+              <ul class="ct-list" data-inputs="">
+                <li class="input missing" data-entity="item:core:hogweed" data-input="core:hogweed" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#2793-6758lb" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:hogweed">
+                      Отруйний борщівник
+                  <span aria-label="є 0, потрібно 2" class="count">
+                    0/2
+                  <a class="source" data-source="herb" href="#/skill/herb">
+                    Збирати
+                <li class="input missing" data-entity="item:core:poppy" data-input="core:poppy" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#1475-1nold0k" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:poppy">
+                      Сонний мак
+                  <span aria-label="є 0, потрібно 2" class="count">
+                    0/2
+                  <a class="source" data-source="herb" href="#/skill/herb">
+                    Збирати
+            <div>
+              <p class="ct-caption">
+                Виходить
+              <ul class="ct-list" data-outputs="">
+                <li class="output" data-output="core:nervova_otruta">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#1642-1t5nrp" fill="currentColor">
+                  <span class="qty">
+                    ×1
+                  <a class="entity-link" href="#/item/core:nervova_otruta">
+                    Нервова отрута
+                  <span class="ct-muted">
+                    У банку: 0
+            <p class="ct-note" data-tier="">
+              Ступінь 1 з 4: шанс додаткової одиниці 0%.
+              Наступний ступінь — з Майстерності 20.
+            <button aria-describedby="why-core:nervova_otruta" class="ct-action" disabled="" type="button">
+              Почати
+            <p class="ct-why" data-why="level" id="why-core:nervova_otruta">
+              Рівень замалий: потрібен 40.
+            <div class="req">
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:alch" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/alch">
+                          Алхімія
+                        <span class="detail">
+                          рів. 40
+                      <span class="count">
+                        1/40
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 2.5%;">
+                  <li>
+                    <div class="row" data-entity="item:core:hogweed" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:hogweed">
+                          Отруйний борщівник
+                      <span class="count">
+                        0/2
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+                  <li>
+                    <div class="row" data-entity="item:core:poppy" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:poppy">
+                          Сонний мак
+                      <span class="count">
+                        0/2
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+          <li class="ct-tile" data-action="core:niukhalna_sil" data-entity="recipe:core:niukhalna_sil" data-recipe="core:niukhalna_sil" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="spray" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#2304-rb3lw" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:niukhalna_sil">
+                    Нюхальна сіль
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  45
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      2,5 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      612 873 дос./год
+            <div>
+              <p class="ct-caption">
+                Потрібно
+              <ul class="ct-list" data-inputs="">
+                <li class="input missing" data-entity="item:core:mint" data-input="core:mint" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#342-1nbqtma" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:mint">
+                      Цілюща м'ята
+                  <span aria-label="є 0, потрібно 2" class="count">
+                    0/2
+                  <a class="source" data-source="herb" href="#/skill/herb">
+                    Збирати
+                <li class="input missing" data-entity="item:core:salt" data-input="core:salt" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#2357-i9wigr" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:salt">
+                      Сіль
+                  <span aria-label="є 0, потрібно 1" class="count">
+                    0/1
+                  <a class="source" data-source="shop" href="#/shop">
+                    Купити
+                  <span class="locked" data-input-locked="">
+                    <span class="need" data-building-need="core:market">
+                      Потрібно:
+                      <a href="#/building/core:market">
+                        Ринок
+                      рівня 1
+                <li class="input missing" data-entity="item:core:water" data-input="core:water" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#268-wop5ce" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:water">
+                      Чиста вода
+                  <span aria-label="є 0, потрібно 1" class="count">
+                    0/1
+                  <a class="source" data-source="shop" href="#/shop">
+                    Купити
+                  <span class="locked" data-input-locked="">
+                    <span class="need" data-building-need="core:market">
+                      Потрібно:
+                      <a href="#/building/core:market">
+                        Ринок
+                      рівня 1
+            <div>
+              <p class="ct-caption">
+                Виходить
+              <ul class="ct-list" data-outputs="">
+                <li class="output" data-output="core:niukhalna_sil">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#2304-rb3lw" fill="currentColor">
+                  <span class="qty">
+                    ×3
+                  <a class="entity-link" href="#/item/core:niukhalna_sil">
+                    Нюхальна сіль
+                  <span class="ct-muted">
+                    У банку: 0
+            <p class="ct-note" data-tier="">
+              Ступінь 1 з 4: шанс додаткової одиниці 0%.
+              Наступний ступінь — з Майстерності 20.
+            <button aria-describedby="why-core:niukhalna_sil" class="ct-action" disabled="" type="button">
+              Почати
+            <p class="ct-why" data-why="level" id="why-core:niukhalna_sil">
+              Рівень замалий: потрібен 45.
+            <div class="req">
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:alch" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/alch">
+                          Алхімія
+                        <span class="detail">
+                          рів. 45
+                      <span class="count">
+                        1/45
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 2.2222222222222223%;">
+                  <li>
+                    <div class="row" data-entity="item:core:mint" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:mint">
+                          Цілюща м'ята
+                      <span class="count">
+                        0/2
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+                  <li>
+                    <div class="row" data-entity="item:core:salt" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:salt">
+                          Сіль
+                      <span class="count">
+                        0/1
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+                  <li>
+                    <div class="row" data-entity="item:core:water" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:water">
+                          Чиста вода
+                      <span class="count">
+                        0/1
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+          <li class="ct-tile" data-action="core:maz_vid_opikiv" data-entity="recipe:core:maz_vid_opikiv" data-recipe="core:maz_vid_opikiv" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="medicines" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#728-1v8zlty" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:maz_vid_opikiv">
+                    Мазь від опіків
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  50
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      2,5 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      900 511 дос./год
+            <div>
+              <p class="ct-caption">
+                Потрібно
+              <ul class="ct-list" data-inputs="">
+                <li class="input missing" data-entity="item:core:fireflower" data-input="core:fireflower" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#1391-r7ivy4" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:fireflower">
+                      Вогняна квітка
+                  <span aria-label="є 0, потрібно 2" class="count">
+                    0/2
+                  <a class="source" data-source="herb" href="#/skill/herb">
+                    Збирати
+                <li class="input missing" data-entity="item:core:oil" data-input="core:oil" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#1868-wtcbrf" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:oil">
+                      Олія
+                  <span aria-label="є 0, потрібно 1" class="count">
+                    0/1
+                  <a class="source" data-source="shop" href="#/shop">
+                    Купити
+                  <span class="locked" data-input-locked="">
+                    <span class="need" data-building-need="core:market">
+                      Потрібно:
+                      <a href="#/building/core:market">
+                        Ринок
+                      рівня 1
+            <div>
+              <p class="ct-caption">
+                Виходить
+              <ul class="ct-list" data-outputs="">
+                <li class="output" data-output="core:maz_vid_opikiv">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#728-1v8zlty" fill="currentColor">
+                  <span class="qty">
+                    ×2
+                  <a class="entity-link" href="#/item/core:maz_vid_opikiv">
+                    Мазь від опіків
+                  <span class="ct-muted">
+                    У банку: 0
+            <p class="ct-note" data-tier="">
+              Ступінь 1 з 4: шанс додаткової одиниці 0%.
+              Наступний ступінь — з Майстерності 20.
+            <button aria-describedby="why-core:maz_vid_opikiv" class="ct-action" disabled="" type="button">
+              Почати
+            <p class="ct-why" data-why="level" id="why-core:maz_vid_opikiv">
+              Рівень замалий: потрібен 50.
+            <div class="req">
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:alch" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/alch">
+                          Алхімія
+                        <span class="detail">
+                          рів. 50
+                      <span class="count">
+                        1/50
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 2%;">
+                  <li>
+                    <div class="row" data-entity="item:core:fireflower" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:fireflower">
+                          Вогняна квітка
+                      <span class="count">
+                        0/2
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+                  <li>
+                    <div class="row" data-entity="item:core:oil" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:oil">
+                          Олія
+                      <span class="count">
+                        0/1
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+      <section data-gear-section="" data-ui="entity-section">
+        <h2>
+          Тренувальне спорядження
+        <section class="gear" data-gear="core:perehinnyi_kub" data-owned="0">
+          <h3 class="name">
+            <span class="icon">
+              <svg aria-hidden="true" class="icon" height="24" viewBox="0 0 512 512" width="24">
+                <path d="#878-1aiuyc2" fill="currentColor">
+            <a class="entity-link" href="#/gear/core:perehinnyi_kub">
+              Перегінний куб
+            <span class="tiers" data-tiers="">
+              рівні: 0 з 2
+          <p class="effect">
+            +3% шансу зберегти інгредієнти за тир
+          <p class="next" data-next="">
+            Наступний рівень I. Ціна — Рьо: 300.
+          <div class="req">
+            <div class="group" data-met="false">
+              <ul class="rows">
+                <li>
+                  <div class="row met" data-met="true" data-ui="req-row">
+                    <span class="mark">
+                      <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                        <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <span class="label">
+                      Ранг: Генін
+                <li>
+                  <div class="row" data-entity="skill:alch" data-met="false" data-ui="req-row">
+                    <span class="mark">
+                      <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                        <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <span class="label">
+                      <a class="entity-link" href="#/skill/alch">
+                        Алхімія
+                      <span class="detail">
+                        рів. 20
+                    <span class="count">
+                      1/20
+                    <span aria-hidden="true" class="bar">
+                      <span class="fill" style="width: 5%;">
+          <a class="shop-link ct-link" data-shop-link="" href="#/shop">
+            До крамниці
+      <section aria-label="Пул Майстерності" class="pool" data-entity="skill:alch" data-ui="pool-bar">
+        <h2>
+          Пул Майстерності
+        <p class="amount">
+          0 / 16 500
+        <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="bar" role="progressbar">
+          <span class="fill" style="width: 0%;">
+          <span class="tick" style="left: 10%;">
+          <span class="tick" style="left: 25%;">
+          <span class="tick" style="left: 50%;">
+          <span class="tick" style="left: 95%;">
+        <ul class="checkpoints">
+          <li data-checkpoint="core:pool_alch_10">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              10%
+            <span class="text">
+              −5% часу варіння
+            <span class="state" data-active="false">
+              Ще не діє
+          <li data-checkpoint="core:pool_alch_25">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              25%
+            <span class="text">
+              +5% шансу зберегти будь-які інгредієнти
+            <span class="state" data-active="false">
+              Ще не діє
+          <li data-checkpoint="core:pool_alch_50">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              50%
+            <span class="text">
+              +5% шансу подвійного виробу
+            <span class="state" data-active="false">
+              Ще не діє
+          <li data-checkpoint="core:pool_alch_95">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              95%
+            <span class="text">
+              +5% досвіду Медичного ніндзюцу

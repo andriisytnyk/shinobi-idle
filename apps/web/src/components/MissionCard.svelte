@@ -6,7 +6,7 @@
   import { cardState, viewOf } from '../lib/mission-feed.svelte.ts';
   import { cleanRunChance, rewardsOf } from '../lib/missions.ts';
   import { game } from '../lib/store.ts';
-  import { toasts } from '../lib/toasts.svelte.ts';
+  import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import MissionRankStamp from './MissionRankStamp.svelte';
@@ -31,7 +31,7 @@
   function start(): void {
     if (state.kind === 'running') {
       const result = game.dispatch({ type: 'action.stop', slot: state.slot });
-      if (!result.ok) toasts.push({ key: result.reason, params: {} });
+      if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
       return;
     }
     const result = game.dispatch({
@@ -40,7 +40,7 @@
       kind: MISSION_KIND,
       id: mission.id,
     });
-    if (!result.ok) toasts.push({ key: result.reason, params: {} });
+    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 </script>
 

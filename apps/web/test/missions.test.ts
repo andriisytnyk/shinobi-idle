@@ -379,8 +379,8 @@ describe('the mission page', () => {
       cleanRunChance(forecast),
       10,
     );
-    expect(Number(q('[data-total="ryo"]')?.dataset.value)).toBeCloseTo(forecast.ryoPerHour, 6);
-    expect(Number(q('[data-total="rep"]')?.dataset.value)).toBeCloseTo(forecast.repPerHour, 6);
+    expect(Number(q('[data-total="money"]')?.dataset.value)).toBeCloseTo(forecast.ryoPerHour, 6);
+    expect(Number(q('[data-total="renown"]')?.dataset.value)).toBeCloseTo(forecast.repPerHour, 6);
     for (const stage of forecast.stages) {
       expect(
         Number(q(`[data-stage="${stage.index}"] [data-stage-time]`)?.dataset.ms),

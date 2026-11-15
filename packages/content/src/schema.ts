@@ -650,8 +650,8 @@ export const buildingBaseSchema = z.object({
 
 /** What a building is for. */
 export const BUILDING_ROLES = ['producer', 'bonus', 'shop', 'storage', 'defence', 'admin'] as const;
-/** The one job of a building that the village rules themselves perform: the treasury, the stage cap, the store, the library scrolls. */
-export const BUILDING_DUTIES = ['treasury', 'stages', 'storage', 'scrolls'] as const;
+/** The one job of a building that the village rules themselves perform: the treasury, the stage cap, the store, the library scrolls. `teaching` marks the building whose mentors teach trainer techniques (the Academy); the interface links the technique pages to it. */
+export const BUILDING_DUTIES = ['treasury', 'stages', 'storage', 'scrolls', 'teaching'] as const;
 
 /** The hand-written part of a building: its role, what one level does, what it produces. */
 export const buildingFxSchema = z.strictObject({
@@ -682,6 +682,8 @@ export const resourceSchema = z.strictObject({
   kind: z.enum(['civil', 'shinobi', 'workforce', 'power']),
   /** Civil resources only: `base` costs `K.costBase` x multiplier, `late` costs a share of it from a level on. */
   cost: z.enum(['base', 'late']).optional(),
+  /** The icon the village page draws: `lucide:<name>` or a game-icons name; none: the generic one. */
+  icon: z.string().optional(),
 });
 
 export const gearTierSchema = z.object({
@@ -965,6 +967,8 @@ export const statusSchema = z.strictObject({
   id: statusId,
   /** The technique state that puts this status on the body a technique hits. */
   state: stateId.optional(),
+  /** The nature whose colour its icon takes in the interface (none: the plain text colour). */
+  nature: natureId.optional(),
   ...statusFields,
 });
 

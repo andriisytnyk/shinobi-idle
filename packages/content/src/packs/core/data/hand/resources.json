@@ -1,14 +1,58 @@
 [
-  { "id": "wood", "kind": "civil", "cost": "base" },
-  { "id": "stone", "kind": "civil", "cost": "base" },
-  { "id": "iron", "kind": "civil", "cost": "late" },
-  { "id": "food", "kind": "civil" },
-  { "id": "okhorona", "kind": "shinobi" },
-  { "id": "kladka", "kind": "shinobi" },
-  { "id": "dilianky", "kind": "shinobi" },
-  { "id": "zroshennia", "kind": "shinobi" },
-  { "id": "zdorovia", "kind": "shinobi" },
-  { "id": "mistkist", "kind": "shinobi" },
-  { "id": "robocha_syla", "kind": "workforce" },
-  { "id": "syla_shynobi", "kind": "power" }
+  {
+    "id": "wood",
+    "kind": "civil",
+    "cost": "base",
+    "icon": "lucide:trees"
+  },
+  {
+    "id": "stone",
+    "kind": "civil",
+    "cost": "base",
+    "icon": "lucide:mountain"
+  },
+  {
+    "id": "iron",
+    "kind": "civil",
+    "cost": "late",
+    "icon": "lucide:hammer"
+  },
+  {
+    "id": "food",
+    "kind": "civil",
+    "icon": "lucide:wheat"
+  },
+  {
+    "id": "okhorona",
+    "kind": "shinobi"
+  },
+  {
+    "id": "kladka",
+    "kind": "shinobi"
+  },
+  {
+    "id": "dilianky",
+    "kind": "shinobi"
+  },
+  {
+    "id": "zroshennia",
+    "kind": "shinobi"
+  },
+  {
+    "id": "zdorovia",
+    "kind": "shinobi"
+  },
+  {
+    "id": "mistkist",
+    "kind": "shinobi"
+  },
+  {
+    "id": "robocha_syla",
+    "kind": "workforce",
+    "icon": "lucide:users"
+  },
+  {
+    "id": "syla_shynobi",
+    "kind": "power"
+  }
 ]

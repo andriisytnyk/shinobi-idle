@@ -1,4 +1,4 @@
-import { content as defaultContent, type ContentDb } from '@shinobi/content';
+import type { ContentDb, PackManifest } from '@shinobi/content';
 import {
   advance,
   advanceOffline,
@@ -27,13 +27,16 @@ import {
   type AnbuReport,
   type Clock,
   type KeyValue,
+  type LoadReason,
 } from './persistence.ts';
 import type { Signals } from './hints.ts';
+import { setActiveContent } from './active.ts';
+import { composeBoot } from './boot.ts';
 import { deepFreeze } from './freeze.ts';
 import { detach as detachData } from './read.ts';
 import { requestPersistentStorage } from './platform.ts';
 import type { TabLock } from './tab-lock.ts';
-import { toastFor, toasts as defaultToasts } from './toasts.svelte.ts';
+import { packsToasts, toastFor, toasts as defaultToasts } from './toasts.svelte.ts';
 
 /** How often the game loop runs. */
 export const TICK_MS = 100;
@@ -41,7 +44,7 @@ export const TICK_MS = 100;
 const SAVE_NOW: ReadonlySet<string> = new Set([
   'nature.choose',
   'nature.add',
-  'exam.genin.start',
+  'exam.start',
   'item.use',
   'item.coat',
   'shop.buy',
@@ -61,6 +64,12 @@ export type LogEvent = Extract<
   GameEvent,
   { type: 'combatLog' | 'enemyDefeated' | 'playerDefeated' }
 >;
+/** A rule a pack added that failed and was switched off for the session. */
+export interface RuleNotice {
+  pack: string;
+  rule: string;
+  reason: string;
+}
 export interface LogEntry {
   id: number;
   event: LogEvent;
@@ -85,8 +94,13 @@ export interface CommandHook {
 }
 
 export interface GameDeps {
+  /** The composed content of this game; the pack `core` alone when omitted. */
   content?: ContentDb;
   rules?: Rules;
+  /** The manifests of the packs the content was composed from. */
+  packs?: readonly PackManifest[];
+  /** The packs the core left out because they failed to compose. */
+  failed?: readonly { pack: string; error: string }[];
   clock?: Clock;
   kv?: KeyValue;
   lock?: TabLock | null;
@@ -100,8 +114,12 @@ export interface GameDeps {
  */
 export function createGame(deps: GameDeps = {}) {
   // The content is data that nobody changes at run time; packs get it too, so it is frozen once.
-  const content = deepFreeze(deps.content ?? defaultContent);
-  const rules = deps.rules ?? defaultRules;
+  const base = deps.content === undefined || deps.rules === undefined ? composeBoot() : null;
+  const content = deepFreeze(deps.content ?? base?.content ?? composeBoot().content);
+  const rules = deps.rules ?? base?.rules ?? defaultRules;
+  const packs = deps.packs ?? content.packs;
+  const failed = deps.failed ?? [];
+  setActiveContent(content);
   const clock = deps.clock ?? { now: () => 0 };
   const kv = deps.kv ?? null;
   const lock = deps.lock ?? null;
@@ -112,7 +130,9 @@ export function createGame(deps: GameDeps = {}) {
   let report = $state.raw<AnbuReport | null>(null);
   let phase = $state<Phase>('loading');
   let saveStatus = $state<SaveStatus>('idle');
-  let loadError = $state.raw<{ message: string; raw: string | null } | null>(null);
+  let loadError = $state.raw<{ message: string; raw: string | null; reason: LoadReason } | null>(
+    null,
+  );
   let hasBackup = $state(false);
   let log = $state.raw<LogEntry[]>([]);
   let logId = 0;
@@ -133,6 +153,14 @@ export function createGame(deps: GameDeps = {}) {
   const touch = () => {
     version++;
   };
+
+  /** A rule of a pack that the core switched off: listed for the session, told once. */
+  let ruleNotices = $state.raw<RuleNotice[]>([]);
+  function noteRule(pack: string, rule: string, reason: string): boolean {
+    if (ruleNotices.some((n) => n.pack === pack && n.rule === rule)) return false;
+    ruleNotices = [...ruleNotices, { pack, rule, reason }];
+    return true;
+  }
 
   /** Turns the events the core queued into toasts and empties the queue. */
   function drainEvents(): void {
@@ -163,10 +191,13 @@ export function createGame(deps: GameDeps = {}) {
         event.type === 'playerDefeated'
       ) {
         lines.push({ id: ++logId, event });
-      } else if (event.type === 'rankUp' && event.rank === 'genin') {
+      } else if (event.type === 'rankUp' && content.exams.some((e) => e.rank === event.rank)) {
         graduation = true;
       }
-      const spec = toastFor(event);
+      if (event.type === 'ruleDisabled' && !noteRule(event.pack, event.rule, event.reason))
+        continue;
+      if (event.type === 'packsChanged') for (const p of packsToasts(event)) toasts.push(p);
+      const spec = toastFor(event, content);
       if (spec) toasts.push(spec);
     }
     if (lines.length > 0) log = [...log, ...lines].slice(-LOG_LIMIT);
@@ -186,6 +217,7 @@ export function createGame(deps: GameDeps = {}) {
     lastWall += delta;
     if (delta > SLEEP_GAP_MS) {
       const summary = advanceOffline(state, delta, content, rules);
+      for (const r of summary.rulesDisabled ?? []) noteRule(r.pack, r.rule, r.reason);
       const next = buildReport(summary);
       if (next) report = next;
     } else {
@@ -291,8 +323,12 @@ export function createGame(deps: GameDeps = {}) {
       halt();
       loadError =
         error instanceof LoadError
-          ? { message: error.message, raw: error.raw }
-          : { message: error instanceof Error ? error.message : String(error), raw: null };
+          ? { message: error.message, raw: error.raw, reason: error.reason }
+          : {
+              message: error instanceof Error ? error.message : String(error),
+              raw: null,
+              reason: 'core' as const,
+            };
       phase = 'error';
     }
   }
@@ -364,6 +400,14 @@ export function createGame(deps: GameDeps = {}) {
     },
     content,
     rules,
+    /** The manifests of the packs this game was composed from, in load order. */
+    packs,
+    /** The packs the core left out, with the reason. */
+    failed,
+    /** Rules of packs switched off during this session. */
+    get ruleNotices(): readonly RuleNotice[] {
+      return ruleNotices;
+    },
 
     /** Sends a command to the core and refreshes the views. */
     dispatch(original: Command): CommandResult {

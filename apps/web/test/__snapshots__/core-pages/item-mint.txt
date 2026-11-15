@@ -1,0 +1,44 @@
+<main class="main">
+  <div class="ui-page" data-page="core:entity.item" data-ui="page">
+    <article class="item-page" data-entity="item:core:mint" data-item="core:mint" data-ui="entity-page">
+      <p class="kind">
+        Предмет · інгредієнт
+      <h1 data-ui="entity-header">
+        <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+          <path d="#342-1nbqtma" fill="currentColor">
+        Цілюща м'ята
+      <p>
+        Найпоширеніша лікарська трава: заспокоює й знезаражує. База простих ліків і тоніків для розуму.
+      <p class="owned">
+        У банку: 0
+      <button aria-pressed="false" class="pin" data-pin="" type="button">
+        Закріпити як мету
+      <section data-ui="entity-section">
+        <h2>
+          Звідки береться
+        <ul>
+          <li>
+            <a class="entity-link" href="#/skill/herb">
+              Травництво
+      <section data-ui="entity-section">
+        <h2>
+          Де використовується
+        <ul>
+          <li>
+            <a class="entity-link" href="#/recipe/core:antidote">
+              Протиотрута
+            <span class="n">
+              ×2
+          <li>
+            <a class="entity-link" href="#/recipe/core:paralitychna_otruta">
+              Паралітична отрута
+          <li>
+            <a class="entity-link" href="#/recipe/core:niukhalna_sil">
+              Нюхальна сіль
+            <span class="n">
+              ×2
+          <li>
+            <a class="entity-link" href="#/recipe/core:tonik_iasnoho_rozumu">
+              Тонік ясного розуму
+            <span class="n">
+              ×2

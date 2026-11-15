@@ -5,7 +5,7 @@ import type { IdTypes, ShapeTypes } from '@shinobi/content/typing';
  * Static typing of the open vocabularies. Every id is an open string at run time and every record
  * keyed by vocabulary members is an open record: which members exist is decided by the composed
  * packs and checked by `composeContent`, never by the schema. What the schema *says* about them to
- * TypeScript comes from `@shinobi/content/typing` (see `typing/truth.ts` and `typing/legacy.ts`).
+ * TypeScript comes from `@shinobi/content/typing` (see `typing/truth.ts`).
  */
 export const open = <T>(schema: z.ZodType): z.ZodType<T> => schema as unknown as z.ZodType<T>;
 

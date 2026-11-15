@@ -77,9 +77,11 @@ describe('the XP of a fight is not split by a guessed skill', () => {
 describe('the per-hour breakdown explains the figure', () => {
   /** The chain the open breakdown shows: base, modifiers, per mission, runs per hour. */
   function chain(total: 'ryo' | 'rep') {
-    (q(`[data-total="${total}"] button`) as HTMLButtonElement).click();
+    (
+      q(`[data-total="${total === 'ryo' ? 'money' : 'renown'}"] button`) as HTMLButtonElement
+    ).click();
     flushSync();
-    const lines = qa(`[data-total="${total}"] [data-line]`);
+    const lines = qa(`[data-total="${total === 'ryo' ? 'money' : 'renown'}"] [data-line]`);
     const base = Number(lines.find((l) => l.dataset.line === 'base')?.dataset.raw);
     const parts = lines
       .filter((l) => l.dataset.line === 'part')
@@ -103,7 +105,9 @@ describe('the per-hour breakdown explains the figure', () => {
     const forecast = missionForecast(state, mission, content, rules());
     for (const key of ['ryo', 'rep'] as const) {
       const c = chain(key);
-      const shown = Number(q(`[data-total="${key}"]`)?.dataset.value);
+      const shown = Number(
+        q(`[data-total="${key === 'ryo' ? 'money' : 'renown'}"]`)?.dataset.value,
+      );
       expect(c.base, key).toBe(mission[key]);
       if (key === 'ryo') expect(c.parts.length).toBeGreaterThan(0);
       // One mission: the base through the modifiers, rounded as the core rounds.
@@ -214,7 +218,7 @@ describe('the forecast follows what changes without a command', () => {
   it('shows a level that was gained at the next update, on a card too', async () => {
     booted = await bootApp([coreUi], player({ rankC: true }), '#/missions');
     expect(q('[data-mission="core:mail"]')?.dataset.state).toBe('blocked');
-    for (const skill of content.skills) game.state.skills[skill.id].xp = 10_000_000;
+    for (const skill of content.skills) game.state.skills[skill.id]!.xp = 10_000_000;
     booted.advance(100);
     expect(q('[data-mission="core:mail"]')?.dataset.state).toBe('startable');
   });
@@ -255,7 +259,7 @@ describe('links into the mission page', () => {
     village.levels['core:library'] = 3;
     village.levels['core:academy'] = 5;
     village.levels['core:store'] = 6;
-    state.currencies.rep = K.rep.stage2;
+    state.currencies.rep = K.rep.stage2 ?? 0;
     booted = await bootApp([coreUi], state, '#/village');
     const card = q('[data-building="core:grounds"]');
     expect(card?.querySelector('[data-why]')?.getAttribute('data-why')).toBe(

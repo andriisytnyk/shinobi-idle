@@ -217,7 +217,7 @@ describe('stable anchors (D11)', () => {
   it('every data-ui is a known part and entity-bound parts have data-entity', async () => {
     const state = genin();
     state.bank['core:mint'] = 3;
-    state.skills.tai.xp = 500;
+    state.skills.tai!.xp = 500;
     booted = await bootApp([coreUi], state);
     game.dispatch({ type: 'action.start', slot: 0, kind: 'practice', id: 'core:leaf_whirlwind' });
     const seen = new Set<string>();

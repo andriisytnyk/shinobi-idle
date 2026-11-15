@@ -1,5 +1,6 @@
-import { content, type SkillId } from '@shinobi/content';
+import type { SkillId } from '@shinobi/content';
 import { levelAt, levelCap, xpAt, type GameState } from '@shinobi/core';
+import { game } from './store.ts';
 
 export interface SkillProgress {
   level: number;
@@ -9,8 +10,8 @@ export interface SkillProgress {
 
 /** Level and progress to the next level of a skill. */
 export function skillProgress(state: GameState, skill: SkillId): SkillProgress {
-  const xp = state.skills[skill].xp;
-  const cap = levelCap(content);
+  const xp = state.skills[skill]?.xp ?? 0;
+  const cap = levelCap(game.content);
   const level = levelAt(xp, cap);
   if (level >= cap) return { level, fraction: 1 };
   const from = xpAt(level);

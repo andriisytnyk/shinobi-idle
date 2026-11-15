@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { teammateName } from '../lib/vocab.ts';
   import { t } from '../lib/i18n.ts';
   import type { MissionNow } from '../lib/missions.ts';
   import EntityLink from './EntityLink.svelte';
@@ -30,7 +31,7 @@
   </span>
   <span class="who" data-now-who={now.who}>
     {#if self}{t('mission.who.self')}{:else}{t('mission.who.mate', {
-        name: t(`teammate.${now.who}.name`),
+        name: teammateName(now.who),
       })}{/if}
   </span>
   {#if now.queued}

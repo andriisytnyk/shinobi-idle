@@ -1,0 +1,115 @@
+<main class="main">
+  <div class="ui-page" data-page="core:rank" data-ui="page">
+    <article class="simple-page">
+      <h1>
+        Академія
+      <section class="plate" data-rank="genin">
+        <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+          <path d="#300-1w5w1cd" fill="currentColor">
+        <div>
+          <p class="label">
+            Поточний ранг
+          <p class="rank">
+            Генін
+      <section class="exam" data-exam="core:genin_exam">
+        <h2>
+          <a class="entity-link" href="#/exam/core:genin_exam">
+            Іспит на Геніна
+        <p class="desc">
+          Тайдзюцу 10, Ніндзюцу 10, Контроль чакри 10 і три академічні техніки. Далі — тест сенсея з дзвіночками.
+        <p class="done" data-passed="">
+          <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+            <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+          Іспит на Геніна складено.
+        <p class="later">
+          Іспит на Чуніна з'явиться в наступних оновленнях.
+      <section class="ladder" data-ranks="">
+        <h2>
+          Ранги
+        <ol>
+          <li data-rank-row="student" data-state="done">
+            <span class="name">
+              Учень Академії
+            <span class="state">
+              Пройдено
+          <li data-rank-row="genin" data-state="current">
+            <span class="name">
+              Генін
+            <span class="state">
+              Твій ранг
+            <span class="opens">
+              <a class="entity-link" href="#/exam/core:genin_exam">
+                Іспит на Геніна
+            <div class="opens" data-opens="">
+              <span>
+                Відкриває:
+              <ul class="chips">
+                <li>
+                  <a class="entity-link" href="#/skill/herb">
+                    Травництво
+                <li>
+                  <a class="entity-link" href="#/skill/scout">
+                    Розвідка
+                <li>
+                  <a class="entity-link" href="#/skill/prov">
+                    Провіант
+                <li>
+                  <a class="entity-link" href="#/skill/alch">
+                    Алхімія
+                <li>
+                  <a class="entity-link" href="#/mission/core:cat">
+                    Знайти кота
+              <details class="more-opens">
+                <summary>
+                  ще 15
+                <ul class="chips">
+                  <li>
+                    <a class="entity-link" href="#/mission/core:weed">
+                      Прополоти поле
+                  <li>
+                    <a class="entity-link" href="#/mission/core:fire">
+                      Пожежа на рисовому складі
+                  <li>
+                    <a class="entity-link" href="#/mission/core:drought">
+                      Посуха на полях
+                  <li>
+                    <a class="entity-link" href="#/mission/core:courier">
+                      Термінова доставка
+                  <li>
+                    <a class="entity-link" href="#/mission/core:rockfall">
+                      Обвал на перевалі
+                  <li>
+                    <a class="entity-link" href="#/mission/core:thief">
+                      Вистежити злодія
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_spar">
+                      Спаринг в Академії
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_walls">
+                      Зведення стін
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_fence">
+                      Заряджені загородження
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_clear">
+                      Розчищення ділянок
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_water">
+                      Зрошення полів села
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_sanit">
+                      Санітарна варта
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_rubble">
+                      Розбір завалів
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_clones">
+                      Клони на будівництві
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_seal">
+                      Запечатування запасів
+          <li data-rank-row="chunin" data-state="ahead">
+            <span class="name">
+              Чунін
+            <span class="state">
+              Попереду

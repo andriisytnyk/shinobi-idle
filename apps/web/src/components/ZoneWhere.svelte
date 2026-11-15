@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import { zoneAvailable, zoneCellOf } from '@shinobi/core';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import EntityLink from './EntityLink.svelte';
+
+  const content = game.content;
 
   interface Props {
     /** Fight zone to place on the map. */

@@ -23,6 +23,13 @@ import SkillPage from '../../pages/SkillPage.svelte';
 import SkillsPage from '../../pages/SkillsPage.svelte';
 import TechniquePage from '../../pages/TechniquePage.svelte';
 import PwaSection from '../../components/PwaSection.svelte';
+import CoursePanel from '../../components/CoursePanel.svelte';
+import MeditationPanel from '../../components/MeditationPanel.svelte';
+import ScoutPanel from '../../components/ScoutPanel.svelte';
+import PoiLoot from '../../components/poi/PoiLoot.svelte';
+import PoiNote from '../../components/poi/PoiNote.svelte';
+import PoiTraining from '../../components/poi/PoiTraining.svelte';
+import PoiZone from '../../components/poi/PoiZone.svelte';
 import VillagePage from '../../pages/VillagePage.svelte';
 import WorldPage from '../../pages/WorldPage.svelte';
 import { svelteWidget } from './svelte-widget.ts';
@@ -194,6 +201,24 @@ export const coreUi: UiPack = {
         props: ({ params }) => ({ entity: { kind: params.kind, id: params.id } }),
       },
     });
+
+    // What the skill page draws for each skill activity; an activity that is not listed gets the action tiles.
+    ui.addSkillPanel('map', { mount: { svelte: ScoutPanel }, place: 'replace' });
+    ui.addSkillPanel('course', { mount: { svelte: CoursePanel }, place: 'replace' });
+    ui.addSkillPanel('insight', { mount: { svelte: MeditationPanel } });
+    ui.addSkillPanel('patch', { hint: 'herbalism' });
+    ui.addSkillPanel('recipe', { hint: 'crafting' });
+    ui.addSkillPanel('station', { hint: 'crafting' });
+
+    // How each kind of point of interest is drawn in the cell panel; other kinds are drawn generically.
+    ui.addPoiRenderer('outpost', { icon: 'lucide:tent', mount: { svelte: PoiNote } });
+    ui.addPoiRenderer('training', { icon: 'lucide:dumbbell', mount: { svelte: PoiTraining } });
+    ui.addPoiRenderer('zone', { icon: 'lucide:swords', mount: { svelte: PoiZone } });
+    ui.addPoiRenderer('story', { icon: 'lucide:scroll-text', mount: { svelte: PoiNote } });
+    ui.addPoiRenderer('deposit', { icon: 'lucide:pickaxe', mount: { svelte: PoiNote } });
+    ui.addPoiRenderer('cache', { icon: 'lucide:gift', mount: { svelte: PoiLoot } });
+    ui.addPoiRenderer('vault', { icon: 'lucide:key-round', mount: { svelte: PoiLoot } });
+    ui.addPoiRenderer('mission', { icon: 'lucide:clipboard-list', mount: { svelte: PoiNote } });
 
     ui.addNavItem({
       id: 'skills',

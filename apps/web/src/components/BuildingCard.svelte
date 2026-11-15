@@ -1,9 +1,10 @@
 <script lang="ts">
+  import { entityName } from '../lib/entities.ts';
   import type { BuildingInfo } from '@shinobi/core';
   import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
-  import { toasts } from '../lib/toasts.svelte.ts';
+  import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import {
     costLines,
     effectLines,
@@ -42,7 +43,7 @@
   function build(): void {
     if (!info.build.ok) return;
     const result = game.dispatch({ type: 'village.build', building: info.id });
-    if (!result.ok) toasts.push({ key: result.reason, params: {} });
+    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 </script>
 
@@ -59,10 +60,8 @@
   <header>
     <span class="icon"><Icon entity={{ kind: 'building', id: info.id }} size={32} /></span>
     <h3>
-      {#if page}<span data-name>{t(`building.${info.id}.name`)}</span>{:else}<EntityLink
-          kind="building"
-          id={info.id}
-        />{/if}
+      {#if page}<span data-name>{entityName({ kind: 'building', id: info.id })}</span
+        >{:else}<EntityLink kind="building" id={info.id} />{/if}
     </h3>
     <span class="level" data-level-text
       >{t('village.level', { n: info.level, max: info.maxLevel })}</span

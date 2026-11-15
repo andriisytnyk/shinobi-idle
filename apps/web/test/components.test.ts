@@ -35,7 +35,7 @@ const html = <P extends Record<string, unknown>>(component: Component<P>, props:
   render(component, { props }).body;
 
 const name = (ref: EntityRef) =>
-  ukLocale[localeKey(ref.kind === 'status' ? 'state' : ref.kind, ref.id, 'name')] ?? ref.id;
+  ukLocale[`${ref.kind === 'status' ? 'state' : ref.kind}.${ref.id}.name`] ?? ref.id;
 
 /** `<a ... href="#/kind/id" ...>Name</a>` for an entity, whatever classes Svelte adds. */
 const anchor = (ref: EntityRef) =>
@@ -108,7 +108,7 @@ describe('A5: requirement rows', () => {
 
   it('shows progress and marks met rows', () => {
     const state = fresh();
-    state.skills.tai.xp = xpAt(7);
+    state.skills.tai!.xp = xpAt(7);
     const body = html(ReqTree, {
       node: evalReq(state, { t: 'skill', skill: 'tai', level: 10 }, content),
     });

@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import { listRegions, travelBlocked, walkMs } from '@shinobi/core';
   import { formatDuration } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import { entryCellOf } from '../lib/world.ts';
   import EntityLink from './EntityLink.svelte';
+
+  const content = game.content;
 
   interface Props {
     region: string;

@@ -1,9 +1,9 @@
 import type { GameState } from '@shinobi/core';
-import type { UiApi, UiPack } from '../../src/lib/ext/types.ts';
+import type { UiApi, UiPack } from '../src/lib/ext/types.ts';
 
 /**
  * A UI pack that exercises every kind of extension point. It reads the game only through `UiApi`.
- * It will move into the `testmod` content pack later.
+ * It is the UI pack of the content pack `testmod` (`ui: 'testmod'`): the dev build loads both with `?packs=testmod`.
  */
 
 const SHARE_FULL = 1000;

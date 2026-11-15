@@ -6,7 +6,7 @@ import { coreUi } from '../src/lib/ext/core-ui.ts';
 import type { UiApi, UiPack } from '../src/lib/ext/types.ts';
 import { settings } from '../src/lib/settings.svelte.ts';
 import { game } from '../src/lib/store.ts';
-import { testmodUi } from './fixtures/testmod-ui.ts';
+import { testmodUi } from '../dev-packs/testmod-ui.ts';
 import { bootApp, genin, type BootedApp } from './helpers/boot-app.ts';
 
 vi.mock('../src/lib/store.ts', async () => {
@@ -54,7 +54,7 @@ describe('a pack error never stops the game (item 1)', () => {
     expect(warn.mock.calls.filter((c) => String(c[0]).includes('"bad"'))).toHaveLength(1);
     await booted.go('#/settings');
     expect(q('[data-ui="disabled-packs"]')?.textContent).toMatch(
-      /Розширення «bad» вимкнено через помилку: .*core:nope/,
+      /Інтерфейс розширення «bad» вимкнено через помилку.*core:nope/,
     );
   });
 
@@ -193,7 +193,7 @@ describe('content and core are read-only for packs (item 4)', () => {
     // The game itself runs on the frozen content: starting and advancing write nothing into it.
     game.dispatch(START);
     booted.advance(60_000);
-    expect(game.state.skills.tai.xp).toBeGreaterThan(0);
+    expect(game.state.skills.tai!.xp).toBeGreaterThan(0);
   });
 });
 

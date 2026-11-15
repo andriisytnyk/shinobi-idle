@@ -28,7 +28,7 @@ const FIREBALL = 'core:great_fireball';
 function caster(): GameState {
   const state = genin();
   state.player.natures = ['katon'];
-  state.skills.katon.xp = xpAt(40);
+  state.skills.katon!.xp = xpAt(40);
   state.known[FIREBALL] = true;
   return state;
 }

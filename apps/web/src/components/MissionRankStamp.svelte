@@ -1,5 +1,6 @@
 <script lang="ts">
   import { hasKey, t } from '../lib/i18n.ts';
+  import { missionRankName } from '../lib/vocab.ts';
 
   interface Props {
     /** A mission rank id of the content. */
@@ -12,11 +13,15 @@
   const color = $derived(
     `var(--rank-${rank.toLowerCase().replace(/[^a-z0-9]/g, '')}, var(--accent))`,
   );
-  const nameKey = $derived(`mission.rank.${rank}.name`);
-  const label = $derived(hasKey(nameKey) ? t(nameKey) : rank);
+  const label = $derived(missionRankName(rank));
+  const stampKey = $derived(`missionRank.${rank}.stamp`);
+  /** What the stamp shows: the rank itself for a short id (D, C), the pack's own short text, or the first letter of the name. */
+  const mark = $derived(
+    hasKey(stampKey) ? t(stampKey) : rank.includes(':') ? label.charAt(0).toUpperCase() : rank,
+  );
 </script>
 
-<span class="stamp" role="img" aria-label={label} style:--stamp={color}>{rank}</span>
+<span class="stamp" role="img" aria-label={label} style:--stamp={color}>{mark}</span>
 
 <style>
   .stamp {

@@ -1,8 +1,9 @@
-import { content } from '@shinobi/content';
+import type { ContentDb } from '@shinobi/content';
 import type { GameEvent } from '@shinobi/core';
 import { actionRef, masteryRef } from './entities.ts';
-import { t, type Params } from './i18n.ts';
+import type { Params } from './i18n.ts';
 import { missionToast } from './mission-toasts.ts';
+import { currencyName, resourceName } from './vocab.ts';
 import type { EntityRef } from './route.ts';
 
 export interface Toast {
@@ -16,6 +17,8 @@ export interface Toast {
   /** What a claimed cache or vault gave: ryo and items, the items as links; `missed` is what was due but not received. */
   gains?: {
     ryo: number;
+    /** Other currencies, by id. */
+    currencies?: Record<string, number>;
     items: { id: string; n: number }[];
     missed?: { id: string; n: number }[];
   };
@@ -31,7 +34,7 @@ export interface Toast {
 export type ToastSpec = Omit<Toast, 'id'>;
 
 /** Maps a core event to the toast that announces it, or null for events that stay silent. */
-export function toastFor(event: GameEvent): ToastSpec | null {
+export function toastFor(event: GameEvent, content: ContentDb): ToastSpec | null {
   // Missions have their own words for a stage, a finished run and a stop.
   const mission = missionToast(event, content);
   if (mission !== undefined) return mission;
@@ -43,7 +46,11 @@ export function toastFor(event: GameEvent): ToastSpec | null {
         ref: { kind: 'skill', id: event.skill },
       };
     case 'masteryUp':
-      return { key: 'toast.masteryUp', params: { n: event.level }, ref: masteryRef(event.key) };
+      return {
+        key: 'toast.masteryUp',
+        params: { n: event.level },
+        ref: masteryRef(event.key, content),
+      };
     case 'techniqueLearned':
       return {
         key: 'toast.techniqueLearned',
@@ -62,7 +69,7 @@ export function toastFor(event: GameEvent): ToastSpec | null {
       return { key: 'toast.questDone', params: {}, ref: { kind: 'quest', id: event.quest } };
     case 'itemUsed':
       // A tonic names a skill (or the group of natures), not a technique: the toast links to the tonic.
-      if (!event.target.startsWith('core:')) {
+      if (!content.techniques.some((x) => x.id === event.target)) {
         return { key: 'toast.tonicUsed', params: {}, ref: { kind: 'item', id: event.id } };
       }
       return {
@@ -103,7 +110,7 @@ export function toastFor(event: GameEvent): ToastSpec | null {
         key: 'toast.poiClaimed',
         params: {},
         ref: { kind: 'poi', id: event.poi },
-        gains: claimGains(event.poi),
+        gains: claimGains(event.poi, content),
       };
     case 'travelled':
       return { key: 'toast.travelled', params: {}, ref: { kind: 'cell', id: event.cell } };
@@ -115,20 +122,54 @@ export function toastFor(event: GameEvent): ToastSpec | null {
       };
     case 'villageStage':
       return { key: 'toast.villageStage', params: {} };
+    case 'packsChanged':
+      // Told by the store, which may have several notices for one event.
+      return null;
+    case 'ruleDisabled':
+      return {
+        key: 'toast.ruleDisabled',
+        params: { pack: event.pack },
+        persistent: true,
+      };
     case 'storageFull':
-      return { key: 'toast.storageFull', params: { name: t(`resource.${event.resource}.name`) } };
+      return { key: 'toast.storageFull', params: { name: resourceName(event.resource) } };
     default:
       return null;
   }
 }
 
+/** The params of a refusal for its text: a currency it names is shown by its name, not its id. */
+export function refusalParams(result: { params?: Params }): Params {
+  const params = { ...(result.params ?? {}) };
+  if (typeof params.currency === 'string') params.currency = currencyName(params.currency);
+  return params;
+}
+
+/** The notices for a save made with other packs than the game has now: one per kind of change. */
+export function packsToasts(event: Extract<GameEvent, { type: 'packsChanged' }>): ToastSpec[] {
+  const one = (key: string, list: string[]): ToastSpec[] =>
+    list.length === 0 ? [] : [{ key, params: { packs: list.join(', ') }, persistent: true }];
+  return [
+    ...one('toast.packsRemoved', event.removed),
+    ...one('toast.packsAdded', event.added),
+    ...one(
+      'toast.packsUpdated',
+      event.updated.map((u) => `${u.id} ${u.from} → ${u.to}`),
+    ),
+  ];
+}
+
 /** What claiming a cache or a vault gives. */
-function claimGains(poiId: string): { ryo: number; items: { id: string; n: number }[] } {
+function claimGains(poiId: string, content: ContentDb): NonNullable<Toast['gains']> {
   for (const cell of content.cells) {
     for (const poi of cell.pois) {
       if (poi.id !== poiId) continue;
       if (poi.kind === 'cache') {
-        return { ryo: poi.ryo, items: poi.items.map((i) => ({ id: i.item, n: i.n })) };
+        return {
+          ryo: poi.ryo,
+          currencies: poi.currencies ?? {},
+          items: poi.items.map((i) => ({ id: i.item, n: i.n })),
+        };
       }
       if (poi.kind === 'vault') return { ryo: 0, items: [{ id: poi.item, n: 1 }] };
     }

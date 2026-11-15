@@ -1,5 +1,6 @@
 import type { ContentDb } from '@shinobi/content';
 import type { EntityRef } from './route.ts';
+import { skillByActivity } from './vocab.ts';
 
 /** One line of "where it comes from" or "where it is used": a link, or plain text for places without a page. */
 export interface ItemRelation {
@@ -20,8 +21,9 @@ export function itemRelations(id: string, content: ContentDb): ItemRelations {
   const sources: ItemRelation[] = [];
   const usedIn: ItemRelation[] = [];
 
+  const gatherer = skillByActivity(content, 'patch');
   for (const herb of content.herbs) {
-    if (herb.id === id) sources.push({ ref: { kind: 'skill', id: 'herb' } });
+    if (herb.id === id && gatherer) sources.push({ ref: { kind: 'skill', id: gatherer } });
   }
   for (const recipe of content.recipes) {
     if (recipe.output.item === id)

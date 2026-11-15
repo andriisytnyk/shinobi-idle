@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
@@ -10,6 +9,8 @@
   import { stepStatus } from '../lib/next-step.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
+
+  const content = game.content;
 
   /** Chains that have started: those under way first, finished ones after. */
   const started = $derived(game.read((gs) => content.quests.filter((q) => gs.quests[q.id])));

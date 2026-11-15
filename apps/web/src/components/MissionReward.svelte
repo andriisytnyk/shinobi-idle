@@ -1,6 +1,7 @@
 <script lang="ts">
   import { formatInt } from '../lib/format.ts';
-  import { hasKey, t } from '../lib/i18n.ts';
+  import { t } from '../lib/i18n.ts';
+  import { currencyName, resourceName } from '../lib/vocab.ts';
   import type { Reward } from '../lib/missions.ts';
   import { resourceIcon } from '../lib/village.ts';
   import EntityLink from './EntityLink.svelte';
@@ -12,7 +13,6 @@
 
   let { reward }: Props = $props();
 
-  const currencyKey = $derived(reward.t === 'currency' ? `topbar.${reward.id}` : '');
   const percent = $derived(reward.t === 'item' ? Math.round(reward.chance * 100) : 100);
 </script>
 
@@ -24,7 +24,9 @@
 >
   {#if reward.t === 'currency'}
     <Icon entity={{ kind: 'currency', id: reward.id }} size={16} />
-    <span>+{formatInt(reward.n)} {hasKey(currencyKey) ? t(currencyKey) : reward.id}</span>
+    <span
+      >{t('reward.currency', { currency: currencyName(reward.id), n: formatInt(reward.n) })}</span
+    >
   {:else if reward.t === 'item'}
     <Icon entity={{ kind: 'item', id: reward.id }} size={16} />
     <span>
@@ -34,7 +36,9 @@
     </span>
   {:else}
     <Icon name={resourceIcon(reward.id)} size={16} />
-    <a href="#/village">+{formatInt(reward.n)} {t(`resource.${reward.id}.name`)}</a>
+    <a href="#/village"
+      >{t('reward.resource', { name: resourceName(reward.id), n: formatInt(reward.n) })}</a
+    >
   {/if}
 </span>
 

@@ -2,6 +2,7 @@ import type { ContentDb } from '@shinobi/content';
 import { isSkillUnlocked, skillLevel, type GameState, type Req } from '@shinobi/core';
 import { reqItemIds } from './crafts.ts';
 import { nextStep } from './next-step.ts';
+import { graduateRank, isAcademyRank } from './vocab.ts';
 
 /** The requirement tree of the goal "learn this technique": the technique, its level and its rank. */
 export function techniqueGoal(id: string, content: ContentDb): Req | null {
@@ -11,7 +12,9 @@ export function techniqueGoal(id: string, content: ContentDb): Req | null {
     { t: 'technique', id },
     { t: 'skill', skill: tech.skill, level: tech.level },
   ];
-  if (tech.src === 'N' && tech.mentor === 'other') of.push({ t: 'rank', rank: 'genin' });
+  if (tech.src === 'N' && tech.mentor === 'other') {
+    of.push({ t: 'rank', rank: graduateRank(content) ?? '' });
+  }
   return { t: 'all', of };
 }
 
@@ -24,7 +27,7 @@ export function suggestGoal(state: GameState, content: ContentDb): string | null
   let best: { id: string; gap: number; level: number } | null = null;
   for (const t of content.techniques) {
     if (t.src !== 'N' || state.known[t.id]) continue;
-    if (t.mentor !== 'academy' && state.player.rank === 'student') continue;
+    if (t.mentor !== 'academy' && isAcademyRank(content, state.player.rank)) continue;
     if (!isSkillUnlocked(state, t.skill, content)) continue;
     const gap = t.level - skillLevel(state, t.skill, content);
     if (gap <= 0) continue;

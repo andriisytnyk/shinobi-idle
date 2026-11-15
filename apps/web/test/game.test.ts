@@ -10,7 +10,10 @@ import {
   encodeStored,
   type KeyValue,
 } from '../src/lib/persistence.ts';
-import { toastFor, type ToastSpec } from '../src/lib/toasts.svelte.ts';
+import { toastFor as toastForIn, type ToastSpec } from '../src/lib/toasts.svelte.ts';
+
+/** The toast of an event, for the content of the game under test. */
+const toastFor = (event: Parameters<typeof toastForIn>[0]) => toastForIn(event, content);
 
 const T0 = 1_800_000_000_000;
 const HOUR = 3_600_000;
@@ -70,7 +73,7 @@ describe('game store', () => {
   it('turns level-ups into toasts and empties the event queue', () => {
     const { game, advance, pushed } = setup();
     startTai(game);
-    game.state.skills.tai.xp = xpAt(2) - 1;
+    game.state.skills.tai!.xp = xpAt(2) - 1;
     for (let i = 0; i < 400; i++) {
       advance(100);
       game.tick();
@@ -82,10 +85,10 @@ describe('game store', () => {
   it('catches up through the offline path after a sleep and reports it', () => {
     const { game, advance } = setup();
     const info = startTai(game);
-    const xp = game.state.skills.tai.xp;
+    const xp = game.state.skills.tai!.xp;
     advance(2 * HOUR);
     game.tick();
-    expect(game.state.skills.tai.xp).toBeGreaterThan(xp);
+    expect(game.state.skills.tai!.xp).toBeGreaterThan(xp);
     expect(game.state.now).toBeGreaterThanOrEqual(2 * HOUR);
     expect(game.report?.skills.some((s) => s.skill === 'tai')).toBe(true);
     expect(game.report?.mastery.some((m) => m.key === info.id)).toBe(true);

@@ -1,14 +1,26 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
+  import type { SkillId } from '@shinobi/content';
   import { exploreIntervalMs, walkMs } from '@shinobi/core';
   import { actionRef } from '../lib/entities.ts';
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { skillProgress } from '../lib/progress.ts';
+  import { currencyOf, held } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
+
+  const content = game.content;
+
+  interface Props {
+    /** The skill whose page shows the panel. */
+    skill: string;
+  }
+
+  let { skill }: Props = $props();
+  /** The currency exploring pays: the one with the role study. */
+  const study = currencyOf(content, 'study') ?? '';
 
   /** The Scouting page: its currency, what it is doing now, the time of an exploration and a way to the map. */
   const data = $derived(
@@ -21,9 +33,9 @@
       const first = content.cells.find((c) => c.region === here) ?? content.cells[0];
       const other = content.cells.find((c) => c.region !== here);
       return {
-        xp: gs.skills.scout.xp,
-        fraction: skillProgress(gs, 'scout').fraction,
-        intel: gs.currencies.intel ?? 0,
+        xp: gs.skills[skill as SkillId]?.xp ?? 0,
+        fraction: skillProgress(gs, skill as SkillId).fraction,
+        intel: held(gs, study),
         action,
         exploreMs: exploreIntervalMs(gs, content, game.rules),
         walkMs: first ? walkMs(gs, first, content, game.rules) : 0,
@@ -34,11 +46,11 @@
   const current = $derived(data.action);
 </script>
 
-<section class="scout" data-scout-panel>
+<section class="explore-panel" data-scout-panel>
   <p class="intro">{t('scout.intro')}</p>
   <dl class="facts">
     <div>
-      <dt><Icon entity={{ kind: 'currency', id: 'intel' }} size={16} /> {t('scout.intel')}</dt>
+      <dt><Icon entity={{ kind: 'currency', id: study }} size={16} /> {t('scout.intel')}</dt>
       <dd data-intel>{formatInt(data.intel)}</dd>
     </div>
     <div>
@@ -81,7 +93,7 @@
 </section>
 
 <style>
-  .scout {
+  .explore-panel {
     margin: var(--space-3) 0;
   }
 

@@ -2,6 +2,7 @@
   import { actionRef, masteryRef } from '../lib/entities.ts';
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
+  import { game } from '../lib/store.ts';
   import type { AnbuReport } from '../lib/persistence.ts';
   import EntityLink from './EntityLink.svelte';
   import Modal from './Modal.svelte';
@@ -38,7 +39,7 @@
     <h3>{t('report.mastery')}</h3>
     <ul>
       {#each report.mastery as row (row.key)}
-        {@const ref = masteryRef(row.key)}
+        {@const ref = masteryRef(row.key, game.content)}
         <li><EntityLink kind={ref.kind} id={ref.id} />: {t('report.levels', { n: row.levels })}</li>
       {/each}
     </ul>

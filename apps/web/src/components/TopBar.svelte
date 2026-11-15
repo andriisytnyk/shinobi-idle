@@ -1,7 +1,6 @@
 <script lang="ts">
   import { game } from '../lib/store.ts';
-  import { content } from '@shinobi/content';
-  import { entityName } from '../lib/entities.ts';
+  import { currencyName, held, natureIconRef, natureName, rankName } from '../lib/vocab.ts';
   import { t } from '../lib/i18n.ts';
   import { natureStatus } from '@shinobi/core';
   import { tryUi } from '../lib/ext/runtime.svelte.ts';
@@ -9,6 +8,8 @@
   import { markerOf } from '../lib/nav.ts';
   import { nextStep } from '../lib/next-step.ts';
   import Icon from './Icon.svelte';
+
+  const content = game.content;
 
   interface Props {
     metaOpen: boolean;
@@ -34,35 +35,21 @@
   <a class="brand" href="#/">{t('app.title')}</a>
 
   <dl class="stats">
-    <div class="stat" data-ui="topbar-currency" data-entity="currency:ryo">
-      <dt>
-        <Icon entity={{ kind: 'currency', id: 'ryo' }} size={16} /><span class="label"
-          >{t('topbar.ryo')}</span
-        >
-      </dt>
-      <dd>{numbers.format(game.state.currencies.ryo ?? 0)}</dd>
-    </div>
-    <div class="stat" data-ui="topbar-currency" data-entity="currency:rep">
-      <dt>
-        <Icon entity={{ kind: 'currency', id: 'rep' }} size={16} /><span class="label"
-          >{t('topbar.rep')}</span
-        >
-      </dt>
-      <dd>{numbers.format(game.state.currencies.rep ?? 0)}</dd>
-    </div>
-    <div class="stat intel" data-ui="topbar-currency" data-entity="currency:intel">
-      <dt>
-        <Icon entity={{ kind: 'currency', id: 'intel' }} size={16} /><span class="label"
-          >{t('topbar.intel')}</span
-        >
-      </dt>
-      <dd>{numbers.format(game.state.currencies.intel ?? 0)}</dd>
-    </div>
+    {#each content.currencies as currency (currency.id)}
+      <div class="stat" data-ui="topbar-currency" data-entity="currency:{currency.id}">
+        <dt>
+          <Icon entity={{ kind: 'currency', id: currency.id }} size={16} /><span class="label"
+            >{currencyName(currency.id)}</span
+          >
+        </dt>
+        <dd>{numbers.format(held(game.state, currency.id))}</dd>
+      </div>
+    {/each}
     <div class="stat rank">
       <dt><Icon name="rank-3" size={16} /><span class="label">{t('topbar.rank')}</span></dt>
       <dd>
         <a class="rank-link" href="#/rank" data-rank-plate
-          >{t(`rank.${game.state.player.rank}`)}{#if rankMarked}<span
+          >{rankName(game.state.player.rank)}{#if rankMarked}<span
               class="marker"
               data-marker
               role="img"
@@ -74,7 +61,7 @@
     {#if nature.stage !== 'locked'}
       <div class="stat nature">
         <dt>
-          {#if natures[0]}<Icon entity={{ kind: 'skill', id: natures[0] }} size={16} />{:else}<Icon
+          {#if natures[0]}<Icon entity={natureIconRef(content, natures[0])} size={16} />{:else}<Icon
               name="lucide:info"
               size={16}
             />{/if}<span class="label">{t('topbar.nature')}</span>
@@ -82,7 +69,7 @@
         <dd>
           <a class="nature-link" href="#/nature" data-nature-link
             >{#if natures.length === 0}{t('topbar.natureTest')}{:else}{natures
-                .map((n) => entityName({ kind: 'skill', id: n }))
+                .map((n) => natureName(n))
                 .join(', ')}{/if}{#if natureDue}<span
                 class="marker"
                 data-marker
@@ -179,10 +166,6 @@
   dd {
     margin: 0;
     font-variant-numeric: tabular-nums;
-  }
-
-  .stat.intel dt {
-    color: var(--chakra);
   }
 
   .stat.rank dd {

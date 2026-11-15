@@ -1,0 +1,19 @@
+<main class="main">
+  <div class="ui-page" data-page="core:entity" data-ui="page">
+    <article class="entity-page" data-entity="combo:fanBurn" data-ui="entity-page">
+      <p class="kind">
+        Комбо станів
+      <h1 data-ui="entity-header">
+        Футон по Горінню
+      <p>
+        Вітер роздуває полум'я: Горіння посилюється й починається заново.
+      <section data-entity-links="" data-ui="entity-section">
+        <h2>
+          Пов'язане
+        <ul class="links">
+          <li>
+            <a class="entity-link" href="#/skill/futon">
+              Футон
+          <li>
+            <a class="entity-link" href="#/status/burn">
+              Горіння

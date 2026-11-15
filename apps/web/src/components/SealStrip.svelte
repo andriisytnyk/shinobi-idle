@@ -6,6 +6,8 @@
   import { timeProgress, type ProgressTiming } from '../lib/time-progress.ts';
   import EntityLink from './EntityLink.svelte';
 
+  const content = game.content;
+
   interface Props {
     /** Ids of the seals in casting order. */
     seals: readonly string[];
@@ -17,7 +19,6 @@
 
   let { seals, view = null, compact = false }: Props = $props();
 
-  const content = game.content;
   const glyphOf = (id: string) => content.seals.find((s) => s.id === id)?.glyph ?? '?';
   const windows = $derived(view ? sealWindows(view.phases) : []);
   const sweep = $derived(view?.sweep ?? false);

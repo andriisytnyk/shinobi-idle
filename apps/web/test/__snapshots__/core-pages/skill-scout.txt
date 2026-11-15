@@ -1,0 +1,106 @@
+<main class="main">
+  <div class="ui-page" data-page="core:entity.skill" data-ui="page">
+    <article class="skill-page" data-entity="skill:scout" data-skill="scout" data-ui="entity-page">
+      <header class="plate" data-ui="entity-header">
+        <h1>
+          <span class="plate-icon" style="color: var(--steel);">
+            <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+              <path d="#2029-1eo8sy" fill="currentColor">
+          Розвідка
+        <span class="level">
+          Рів. 1
+      <p class="lore">
+        Розвідка відкриває нові місця на мапі й допомагає в місіях.
+      <p class="unlock">
+        Генін.
+      <section class="explore-panel" data-scout-panel="">
+        <p class="intro">
+          Розвідка відкриває мапу: чим вищий її рівень, тим глибше ти вивчаєш клітинки й тим більше регіонів стає тобі доступно.
+        <dl class="facts">
+          <div>
+            <dt>
+              <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                <path d="#3653-17qd3ut" fill="currentColor">
+              Intel
+            <dd data-intel="">
+              0
+          <div>
+            <dt>
+              Досвід
+            <dd>
+              0 · 0%
+          <div>
+            <dt>
+              Час однієї розвідки
+            <dd>
+              <span class="mod">
+                <button aria-expanded="false" class="figure" type="button">
+                  5 с
+          <div>
+            <dt>
+              Ходьба в межах регіону
+            <dd>
+              <span class="mod">
+                <button aria-expanded="false" class="figure" type="button">
+                  9 хв
+          <div>
+            <dt>
+              Ходьба між регіонами
+            <dd>
+              <span class="mod">
+                <button aria-expanded="false" class="figure" type="button">
+                  29 хв
+          <div>
+            <dt>
+              Поточна дія
+            <dd data-scout-current="">
+              <span class="dim">
+                Розвідка зараз не йде.
+        <p class="small dim">
+          Здобувається за кожен новий рівень клітинки.
+        <a class="open" data-open-world="" href="#/world">
+          <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+            <path d="#260-1rmif5e" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+          Відкрити мапу
+      <section data-gear-section="" data-ui="entity-section">
+        <h2>
+          Тренувальне спорядження
+        <section class="gear" data-gear="core:karty_i_kompas" data-owned="0">
+          <h3 class="name">
+            <span class="icon">
+              <svg aria-hidden="true" class="icon" height="24" viewBox="0 0 512 512" width="24">
+                <path d="#1374-1uiu0nc" fill="currentColor">
+            <a class="entity-link" href="#/gear/core:karty_i_kompas">
+              Карти й компас
+            <span class="tiers" data-tiers="">
+              рівні: 0 з 2
+          <p class="effect">
+            −3% часу дослідження за тир
+          <p class="next" data-next="">
+            Наступний рівень I. Ціна — Рьо: 300.
+          <div class="req">
+            <div class="group" data-met="false">
+              <ul class="rows">
+                <li>
+                  <div class="row met" data-met="true" data-ui="req-row">
+                    <span class="mark">
+                      <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                        <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <span class="label">
+                      Ранг: Генін
+                <li>
+                  <div class="row" data-entity="skill:scout" data-met="false" data-ui="req-row">
+                    <span class="mark">
+                      <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                        <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <span class="label">
+                      <a class="entity-link" href="#/skill/scout">
+                        Розвідка
+                      <span class="detail">
+                        рів. 10
+                    <span class="count">
+                      1/10
+                    <span aria-hidden="true" class="bar">
+                      <span class="fill" style="width: 10%;">
+          <a class="shop-link ct-link" data-shop-link="" href="#/shop">
+            До крамниці

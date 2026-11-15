@@ -1,0 +1,1403 @@
+<main class="main">
+  <div class="ui-page" data-page="core:missions" data-ui="page">
+    <article class="simple-page">
+      <h1>
+        Місії
+      <nav aria-label="Розділи журналу" class="journal" data-journal-tabs="">
+        <a data-journal="quests" href="#/quests">
+          Доручення
+        <a aria-current="page" class="active" data-journal="missions" href="#/missions">
+          Місії
+      <div class="bar" data-missions-bar="">
+        <label class="check">
+          <input data-only-available="" type="checkbox">
+          Лише доступні
+        <label class="sort">
+          <span>
+            Сортувати
+          <select data-sort="">
+            <option value="rank">
+              За порядком дошки
+            <option value="duration">
+              За тривалістю
+            <option value="ryoPerHour">
+              За рьо на годину
+      <section class="group" data-open="true" data-rank="D">
+        <header class="group-head">
+          <span aria-label="Ранг D" class="stamp" role="img" style="--stamp: var(--rank-d, var(--accent));">
+            D
+          <div class="titles">
+            <h2>
+              Ранг D
+            <p class="ct-note">
+              Дрібні доручення околиць: тут ти вчишся працювати з дошкою.
+        <ul class="ct-tiles">
+          <li class="ct-tile card" data-entity="mission:core:cat" data-mission="core:cat" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Ранг D" class="stamp" role="img" style="--stamp: var(--rank-d, var(--accent));">
+                  D
+                <a class="entity-link" href="#/mission/core:cat">
+                  Знайти кота
+              <span class="team" data-team="true">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Командна місія
+            <p class="ct-note client">
+              Дружина даймьо
+            <p class="ct-note" data-no-team="">
+              Команда ще не зібрана: її дає вибір природи чакри.
+              <a href="#/nature">
+                Обрати природу
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="66666.66666666667">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="2159.9999999999995">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:ryo" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#957-1xqth0s" fill="currentColor">
+                  <span>
+                    Рьо: 40
+              <li>
+                <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#3201-oefg9l" fill="currentColor">
+                  <span>
+                    Репутація: 2
+            <div class="why" data-why="error.requirementsNotMet" id="why-core:cat">
+              <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <a class="entity-link" href="#/skill/ath">
+                    Атлетика
+                  <span class="detail">
+                    рів. 5
+                <span class="count">
+                  1/5
+                <span aria-hidden="true" class="bar">
+                  <span class="fill" style="width: 20%;">
+              <p class="ct-why">
+                Вимоги до цієї дії не виконано.
+            <button aria-describedby="why-core:cat" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+          <li class="ct-tile card" data-entity="mission:core:weed" data-mission="core:weed" data-state="startable" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Ранг D" class="stamp" role="img" style="--stamp: var(--rank-d, var(--accent));">
+                  D
+                <a class="entity-link" href="#/mission/core:weed">
+                  Прополоти поле
+              <span class="team" data-team="false">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Сольна місія
+            <p class="ct-note client">
+              Селяни околиць
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="133333.33333333334">
+                  2 хв
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0.9">
+                  90%
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="539.9999999999999">
+                  540
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:ryo" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#957-1xqth0s" fill="currentColor">
+                  <span>
+                    Рьо: 20
+              <li>
+                <span class="reward" data-entity="item:core:rice" data-reward="item" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#1495-kpah6y" fill="currentColor">
+                  <span>
+                    <a class="entity-link" href="#/item/core:rice">
+                      Рис
+                    ×6
+            <button class="ct-action" data-start="" type="button">
+              Почати
+          <li class="ct-tile card" data-entity="mission:core:fire" data-mission="core:fire" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Ранг D" class="stamp" role="img" style="--stamp: var(--rank-d, var(--accent));">
+                  D
+                <a class="entity-link" href="#/mission/core:fire">
+                  Пожежа на рисовому складі
+              <span class="team" data-team="true">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Командна місія
+            <p class="ct-note client">
+              Купці околиць
+            <p class="ct-note" data-no-team="">
+              Команда ще не зібрана: її дає вибір природи чакри.
+              <a href="#/nature">
+                Обрати природу
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="0">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="0">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:ryo" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#957-1xqth0s" fill="currentColor">
+                  <span>
+                    Рьо: 70
+              <li>
+                <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#3201-oefg9l" fill="currentColor">
+                  <span>
+                    Репутація: 2
+              <li>
+                <span class="reward" data-entity="item:core:rice" data-reward="item" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#1495-kpah6y" fill="currentColor">
+                  <span>
+                    <a class="entity-link" href="#/item/core:rice">
+                      Рис
+                    ×6
+            <div class="why" data-why="error.requirementsNotMet" id="why-core:fire">
+              <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <a class="entity-link" href="#/skill/ath">
+                    Атлетика
+                  <span class="detail">
+                    рів. 10
+                <span class="count">
+                  1/10
+                <span aria-hidden="true" class="bar">
+                  <span class="fill" style="width: 10%;">
+              <p class="ct-why">
+                Вимоги до цієї дії не виконано.
+            <button aria-describedby="why-core:fire" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+          <li class="ct-tile card" data-entity="mission:core:drought" data-mission="core:drought" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Ранг D" class="stamp" role="img" style="--stamp: var(--rank-d, var(--accent));">
+                  D
+                <a class="entity-link" href="#/mission/core:drought">
+                  Посуха на полях
+              <span class="team" data-team="false">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Сольна місія
+            <p class="ct-note client">
+              Селяни околиць
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="0">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="0">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:ryo" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#957-1xqth0s" fill="currentColor">
+                  <span>
+                    Рьо: 60
+              <li>
+                <span class="reward" data-entity="item:core:rice" data-reward="item" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#1495-kpah6y" fill="currentColor">
+                  <span>
+                    <a class="entity-link" href="#/item/core:rice">
+                      Рис
+                    ×6
+              <li>
+                <span class="reward" data-entity="item:core:spice" data-reward="item" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#2557-kwv67e" fill="currentColor">
+                  <span>
+                    <a class="entity-link" href="#/item/core:spice">
+                      Спеції
+                    ×2
+            <div class="why" data-why="error.requirementsNotMet" id="why-core:drought">
+              <div class="row" data-entity="skill:suiton" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <a class="entity-link" href="#/skill/suiton">
+                    Суйтон
+                  <span class="detail">
+                    рів. 20
+                <span class="count">
+                  1/20
+                <span aria-hidden="true" class="bar">
+                  <span class="fill" style="width: 5%;">
+              <p class="ct-why">
+                Вимоги до цієї дії не виконано.
+            <button aria-describedby="why-core:drought" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+          <li class="ct-tile card" data-entity="mission:core:courier" data-mission="core:courier" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Ранг D" class="stamp" role="img" style="--stamp: var(--rank-d, var(--accent));">
+                  D
+                <a class="entity-link" href="#/mission/core:courier">
+                  Термінова доставка
+              <span class="team" data-team="false">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Сольна місія
+            <p class="ct-note client">
+              Гільдія купців
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="0">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="0">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:ryo" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#957-1xqth0s" fill="currentColor">
+                  <span>
+                    Рьо: 50
+            <div class="why" data-why="error.requirementsNotMet" id="why-core:courier">
+              <div class="row" data-entity="skill:nin" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <a class="entity-link" href="#/skill/nin">
+                    Ніндзюцу
+                  <span class="detail">
+                    рів. 5
+                <span class="count">
+                  1/5
+                <span aria-hidden="true" class="bar">
+                  <span class="fill" style="width: 20%;">
+              <p class="ct-why">
+                Вимоги до цієї дії не виконано.
+            <button aria-describedby="why-core:courier" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+          <li class="ct-tile card" data-entity="mission:core:rockfall" data-mission="core:rockfall" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Ранг D" class="stamp" role="img" style="--stamp: var(--rank-d, var(--accent));">
+                  D
+                <a class="entity-link" href="#/mission/core:rockfall">
+                  Обвал на перевалі
+              <span class="team" data-team="false">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Сольна місія
+            <p class="ct-note client">
+              Солевари
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="0">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="0">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:ryo" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#957-1xqth0s" fill="currentColor">
+                  <span>
+                    Рьо: 70
+              <li>
+                <span class="reward" data-entity="item:core:salt" data-reward="item" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#2357-i9wigr" fill="currentColor">
+                  <span>
+                    <a class="entity-link" href="#/item/core:salt">
+                      Сіль
+                    ×6
+            <div class="why" data-why="error.requirementsNotMet" id="why-core:rockfall">
+              <div class="row" data-entity="skill:doton" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <a class="entity-link" href="#/skill/doton">
+                    Дотон
+                  <span class="detail">
+                    рів. 30
+                <span class="count">
+                  1/30
+                <span aria-hidden="true" class="bar">
+                  <span class="fill" style="width: 3.3333333333333335%;">
+              <p class="ct-why">
+                Вимоги до цієї дії не виконано.
+            <button aria-describedby="why-core:rockfall" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+          <li class="ct-tile card" data-entity="mission:core:thief" data-mission="core:thief" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Ранг D" class="stamp" role="img" style="--stamp: var(--rank-d, var(--accent));">
+                  D
+                <a class="entity-link" href="#/mission/core:thief">
+                  Вистежити злодія
+              <span class="team" data-team="false">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Сольна місія
+            <p class="ct-note client">
+              Містечко
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="300000">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="1200">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:ryo" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#957-1xqth0s" fill="currentColor">
+                  <span>
+                    Рьо: 100
+              <li>
+                <span class="reward" data-entity="item:core:note" data-reward="item" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#459-1a7or8j" fill="currentColor">
+                  <span>
+                    <a class="entity-link" href="#/item/core:note">
+                      Відомості
+            <div class="why" data-why="error.requirementsNotMet" id="why-core:thief">
+              <div class="row" data-entity="skill:scout" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <a class="entity-link" href="#/skill/scout">
+                    Розвідка
+                  <span class="detail">
+                    рів. 20
+                <span class="count">
+                  1/20
+                <span aria-hidden="true" class="bar">
+                  <span class="fill" style="width: 5%;">
+              <p class="ct-why">
+                Вимоги до цієї дії не виконано.
+            <button aria-describedby="why-core:thief" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+      <section class="group" data-open="false" data-rank="C">
+        <header class="group-head">
+          <span aria-label="Ранг C" class="stamp" role="img" style="--stamp: var(--rank-c, var(--accent));">
+            C
+          <div class="titles">
+            <h2>
+              Ранг C
+            <p class="ct-note">
+              Серйозні доручення: команда, бої й довгі дороги.
+        <div class="gate" data-rank-gate="">
+          <p class="ct-locked">
+            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+              <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                <path d="#24-1tb3nx8">
+            Цей ранг ще закритий. Щоб його відкрити, потрібно:
+          <div class="row" data-met="false" data-ui="req-row">
+            <span class="mark">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <span class="label">
+              Дозвіл Хокаґе на місії рангу C
+        <ul class="ct-tiles">
+          <li class="ct-tile card closed" data-entity="mission:core:caravan" data-mission="core:caravan" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Ранг C" class="stamp" role="img" style="--stamp: var(--rank-c, var(--accent));">
+                  C
+                <a class="entity-link" href="#/mission/core:caravan">
+                  Супровід каравану
+              <span class="team" data-team="true">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Командна місія
+            <p class="ct-note client">
+              Гільдія купців
+            <p class="ct-note" data-no-team="">
+              Команда ще не зібрана: її дає вибір природи чакри.
+              <a href="#/nature">
+                Обрати природу
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="540000">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="3666.666666666667">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:ryo" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#957-1xqth0s" fill="currentColor">
+                  <span>
+                    Рьо: 550
+              <li>
+                <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#3201-oefg9l" fill="currentColor">
+                  <span>
+                    Репутація: 8
+              <li>
+                <span class="reward" data-entity="item:core:crate" data-reward="item" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#1439-1x5ajs3" fill="currentColor">
+                  <span>
+                    <a class="entity-link" href="#/item/core:crate">
+                      Ящик торговця
+            <div class="why" data-why="error.requirementsNotMet" id="why-core:caravan">
+              <div class="row" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  Дозвіл Хокаґе на місії рангу C
+              <p class="ct-why">
+                Вимоги до цієї дії не виконано.
+            <button aria-describedby="why-core:caravan" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+          <li class="ct-tile card closed" data-entity="mission:core:sealed" data-mission="core:sealed" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Ранг C" class="stamp" role="img" style="--stamp: var(--rank-c, var(--accent));">
+                  C
+                <a class="entity-link" href="#/mission/core:sealed">
+                  Запечатаний вантаж
+              <span class="team" data-team="false">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Сольна місія
+            <p class="ct-note client">
+              Гільдія купців
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="0">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="0">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:ryo" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#957-1xqth0s" fill="currentColor">
+                  <span>
+                    Рьо: 400
+            <div class="why" data-why="error.requirementsNotMet" id="why-core:sealed">
+              <div class="row" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  Дозвіл Хокаґе на місії рангу C
+              <p class="ct-why">
+                Вимоги до цієї дії не виконано.
+            <button aria-describedby="why-core:sealed" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+          <li class="ct-tile card closed" data-entity="mission:core:mail" data-mission="core:mail" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Ранг C" class="stamp" role="img" style="--stamp: var(--rank-c, var(--accent));">
+                  C
+                <a class="entity-link" href="#/mission/core:mail">
+                  Таємна пошта
+              <span class="team" data-team="false">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Сольна місія
+            <p class="ct-note client">
+              Вежа Каґе
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="0">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="0">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:ryo" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#957-1xqth0s" fill="currentColor">
+                  <span>
+                    Рьо: 440
+              <li>
+                <span class="reward" data-entity="currency:intel" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#3653-17qd3ut" fill="currentColor">
+                  <span>
+                    Intel: 2
+            <div class="why" data-why="error.requirementsNotMet" id="why-core:mail">
+              <div class="row" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  Дозвіл Хокаґе на місії рангу C
+              <p class="ct-why">
+                Вимоги до цієї дії не виконано.
+            <button aria-describedby="why-core:mail" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+          <li class="ct-tile card closed" data-entity="mission:core:well" data-mission="core:well" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Ранг C" class="stamp" role="img" style="--stamp: var(--rank-c, var(--accent));">
+                  C
+                <a class="entity-link" href="#/mission/core:well">
+                  Отруєна криниця
+              <span class="team" data-team="true">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Командна місія
+            <p class="ct-note client">
+              Містечко на Південних рівнинах
+            <p class="ct-note" data-no-team="">
+              Команда ще не зібрана: її дає вибір природи чакри.
+              <a href="#/nature">
+                Обрати природу
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="840000">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="2057.142857142857">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:ryo" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#957-1xqth0s" fill="currentColor">
+                  <span>
+                    Рьо: 480
+              <li>
+                <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#3201-oefg9l" fill="currentColor">
+                  <span>
+                    Репутація: 8
+              <li>
+                <span class="reward" data-entity="item:core:spice" data-reward="item" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#2557-kwv67e" fill="currentColor">
+                  <span>
+                    <a class="entity-link" href="#/item/core:spice">
+                      Спеції
+                    ×2
+            <div class="why" data-why="error.missingIngredient" id="why-core:well">
+              <div class="row" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  Дозвіл Хокаґе на місії рангу C
+              <p class="ct-why">
+                Бракує інгредієнтів.
+            <button aria-describedby="why-core:well" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+          <li class="ct-tile card closed" data-entity="mission:core:dig" data-mission="core:dig" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Ранг C" class="stamp" role="img" style="--stamp: var(--rank-c, var(--accent));">
+                  C
+                <a class="entity-link" href="#/mission/core:dig">
+                  Охорона розкопок
+              <span class="team" data-team="true">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Командна місія
+            <p class="ct-note client">
+              Храм Вогню
+            <p class="ct-note" data-no-team="">
+              Команда ще не зібрана: її дає вибір природи чакри.
+              <a href="#/nature">
+                Обрати природу
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="660000">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="3381.818181818182">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:ryo" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#957-1xqth0s" fill="currentColor">
+                  <span>
+                    Рьо: 620
+              <li>
+                <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#3201-oefg9l" fill="currentColor">
+                  <span>
+                    Репутація: 8
+              <li>
+                <span class="reward" data-entity="item:core:scrollpart_fire_dragon_flame_bullet" data-reward="item" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#1797-v7j9c3" fill="currentColor">
+                  <span>
+                    <a class="entity-link" href="#/item/core:scrollpart_fire_dragon_flame_bullet">
+                      Частина сувою: Полум'яна куля вогняного дракона
+                    <span class="chance">
+                      шанс 15%
+            <div class="why" data-why="error.requirementsNotMet" id="why-core:dig">
+              <div class="row" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  Дозвіл Хокаґе на місії рангу C
+              <p class="ct-why">
+                Вимоги до цієї дії не виконано.
+            <button aria-describedby="why-core:dig" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+      <section class="group" data-open="true" data-rank="V">
+        <header class="group-head">
+          <span aria-label="Місії села" class="stamp" role="img" style="--stamp: var(--rank-v, var(--accent));">
+            V
+          <div class="titles">
+            <h2>
+              Місії села
+            <p class="ct-note">
+              Кожна така місія приносить селу ресурс шинобі для будівель.
+        <ul class="ct-tiles">
+          <li class="ct-tile card" data-entity="mission:core:v_spar" data-mission="core:v_spar" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Місії села" class="stamp" role="img" style="--stamp: var(--rank-v, var(--accent));">
+                  V
+                <a class="entity-link" href="#/mission/core:v_spar">
+                  Спаринг в Академії
+              <span class="team" data-team="true">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Командна місія
+            <p class="ct-note client">
+              Околиці Листя
+            <p class="ct-note" data-no-team="">
+              Команда ще не зібрана: її дає вибір природи чакри.
+              <a href="#/nature">
+                Обрати природу
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="0">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="0">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#3201-oefg9l" fill="currentColor">
+                  <span>
+                    Репутація: 4
+              <li>
+                <span class="reward" data-entity="resource:syla_shynobi" data-reward="resource" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                  <a href="#/village">
+                    Сила шинобі: +3
+            <div class="why" data-why="error.requirementsNotMet" id="why-core:v_spar">
+              <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <a class="entity-link" href="#/skill/tai">
+                    Тайдзюцу
+                  <span class="detail">
+                    рів. 10
+                <span class="count">
+                  1/10
+                <span aria-hidden="true" class="bar">
+                  <span class="fill" style="width: 10%;">
+              <p class="ct-why">
+                Вимоги до цієї дії не виконано.
+            <button aria-describedby="why-core:v_spar" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+          <li class="ct-tile card" data-entity="mission:core:v_walls" data-mission="core:v_walls" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Місії села" class="stamp" role="img" style="--stamp: var(--rank-v, var(--accent));">
+                  V
+                <a class="entity-link" href="#/mission/core:v_walls">
+                  Зведення стін
+              <span class="team" data-team="true">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Командна місія
+            <p class="ct-note client">
+              Околиці Листя
+            <p class="ct-note" data-no-team="">
+              Команда ще не зібрана: її дає вибір природи чакри.
+              <a href="#/nature">
+                Обрати природу
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="0">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="0">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#3201-oefg9l" fill="currentColor">
+                  <span>
+                    Репутація: 4
+              <li>
+                <span class="reward" data-entity="resource:okhorona" data-reward="resource" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                  <a href="#/village">
+                    Охорона: +3
+            <div class="why" data-why="error.requirementsNotMet" id="why-core:v_walls">
+              <div class="row" data-entity="technique:core:earth_style_wall" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <a class="entity-link" href="#/technique/core:earth_style_wall">
+                    Стіна земляного стилю
+                  <span class="detail">
+                    ще не відкрито
+              <p class="ct-why">
+                Вимоги до цієї дії не виконано.
+            <button aria-describedby="why-core:v_walls" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+          <li class="ct-tile card" data-entity="mission:core:v_fence" data-mission="core:v_fence" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Місії села" class="stamp" role="img" style="--stamp: var(--rank-v, var(--accent));">
+                  V
+                <a class="entity-link" href="#/mission/core:v_fence">
+                  Заряджені загородження
+              <span class="team" data-team="true">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Командна місія
+            <p class="ct-note client">
+              Околиці Листя
+            <p class="ct-note" data-no-team="">
+              Команда ще не зібрана: її дає вибір природи чакри.
+              <a href="#/nature">
+                Обрати природу
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="120000">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="0">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#3201-oefg9l" fill="currentColor">
+                  <span>
+                    Репутація: 4
+              <li>
+                <span class="reward" data-entity="resource:okhorona" data-reward="resource" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                  <a href="#/village">
+                    Охорона: +3
+            <div class="why" data-why="error.missingIngredient" id="why-core:v_fence">
+              <div class="row" data-entity="technique:core:four_pillar_bind" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <a class="entity-link" href="#/technique/core:four_pillar_bind">
+                    Пута чотирьох стовпів
+                  <span class="detail">
+                    ще не відкрито
+              <p class="ct-why">
+                Бракує інгредієнтів.
+            <button aria-describedby="why-core:v_fence" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+          <li class="ct-tile card" data-entity="mission:core:v_clear" data-mission="core:v_clear" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Місії села" class="stamp" role="img" style="--stamp: var(--rank-v, var(--accent));">
+                  V
+                <a class="entity-link" href="#/mission/core:v_clear">
+                  Розчищення ділянок
+              <span class="team" data-team="true">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Командна місія
+            <p class="ct-note client">
+              Околиці Листя
+            <p class="ct-note" data-no-team="">
+              Команда ще не зібрана: її дає вибір природи чакри.
+              <a href="#/nature">
+                Обрати природу
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="0">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="0">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#3201-oefg9l" fill="currentColor">
+                  <span>
+                    Репутація: 4
+              <li>
+                <span class="reward" data-entity="resource:dilianky" data-reward="resource" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                  <a href="#/village">
+                    Ділянки: +3
+            <div class="why" data-why="error.requirementsNotMet" id="why-core:v_clear">
+              <div class="row" data-entity="technique:core:running_fire" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <a class="entity-link" href="#/technique/core:running_fire">
+                    Вогняна доріжка
+                  <span class="detail">
+                    ще не відкрито
+              <p class="ct-why">
+                Вимоги до цієї дії не виконано.
+            <button aria-describedby="why-core:v_clear" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+          <li class="ct-tile card" data-entity="mission:core:v_water" data-mission="core:v_water" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Місії села" class="stamp" role="img" style="--stamp: var(--rank-v, var(--accent));">
+                  V
+                <a class="entity-link" href="#/mission/core:v_water">
+                  Зрошення полів села
+              <span class="team" data-team="true">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Командна місія
+            <p class="ct-note client">
+              Околиці Листя
+            <p class="ct-note" data-no-team="">
+              Команда ще не зібрана: її дає вибір природи чакри.
+              <a href="#/nature">
+                Обрати природу
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="0">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="0">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#3201-oefg9l" fill="currentColor">
+                  <span>
+                    Репутація: 4
+              <li>
+                <span class="reward" data-entity="resource:zroshennia" data-reward="resource" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                  <a href="#/village">
+                    Зрошення: +3
+            <div class="why" data-why="error.requirementsNotMet" id="why-core:v_water">
+              <div class="row" data-entity="skill:suiton" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <a class="entity-link" href="#/skill/suiton">
+                    Суйтон
+                  <span class="detail">
+                    рів. 20
+                <span class="count">
+                  1/20
+                <span aria-hidden="true" class="bar">
+                  <span class="fill" style="width: 5%;">
+              <p class="ct-why">
+                Вимоги до цієї дії не виконано.
+            <button aria-describedby="why-core:v_water" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+          <li class="ct-tile card" data-entity="mission:core:v_sanit" data-mission="core:v_sanit" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Місії села" class="stamp" role="img" style="--stamp: var(--rank-v, var(--accent));">
+                  V
+                <a class="entity-link" href="#/mission/core:v_sanit">
+                  Санітарна варта
+              <span class="team" data-team="true">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Командна місія
+            <p class="ct-note client">
+              Околиці Листя
+            <p class="ct-note" data-no-team="">
+              Команда ще не зібрана: її дає вибір природи чакри.
+              <a href="#/nature">
+                Обрати природу
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="0">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="0">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#3201-oefg9l" fill="currentColor">
+                  <span>
+                    Репутація: 4
+              <li>
+                <span class="reward" data-entity="resource:zdorovia" data-reward="resource" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                  <a href="#/village">
+                    Здоров'я: +3
+            <div class="why" data-why="error.requirementsNotMet" id="why-core:v_sanit">
+              <div class="row" data-entity="technique:core:great_fireball" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <a class="entity-link" href="#/technique/core:great_fireball">
+                    Техніка великої вогняної кулі
+                  <span class="detail">
+                    ще не відкрито
+              <p class="ct-why">
+                Вимоги до цієї дії не виконано.
+            <button aria-describedby="why-core:v_sanit" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+          <li class="ct-tile card" data-entity="mission:core:v_rubble" data-mission="core:v_rubble" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Місії села" class="stamp" role="img" style="--stamp: var(--rank-v, var(--accent));">
+                  V
+                <a class="entity-link" href="#/mission/core:v_rubble">
+                  Розбір завалів
+              <span class="team" data-team="true">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Командна місія
+            <p class="ct-note client">
+              Околиці Листя
+            <p class="ct-note" data-no-team="">
+              Команда ще не зібрана: її дає вибір природи чакри.
+              <a href="#/nature">
+                Обрати природу
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="0">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="0">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#3201-oefg9l" fill="currentColor">
+                  <span>
+                    Репутація: 4
+              <li>
+                <span class="reward" data-entity="resource:kladka" data-reward="resource" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                  <a href="#/village">
+                    Кладка: +3
+            <div class="why" data-why="error.requirementsNotMet" id="why-core:v_rubble">
+              <div class="row" data-entity="skill:doton" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <a class="entity-link" href="#/skill/doton">
+                    Дотон
+                  <span class="detail">
+                    рів. 30
+                <span class="count">
+                  1/30
+                <span aria-hidden="true" class="bar">
+                  <span class="fill" style="width: 3.3333333333333335%;">
+              <p class="ct-why">
+                Вимоги до цієї дії не виконано.
+            <button aria-describedby="why-core:v_rubble" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+          <li class="ct-tile card" data-entity="mission:core:v_clones" data-mission="core:v_clones" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Місії села" class="stamp" role="img" style="--stamp: var(--rank-v, var(--accent));">
+                  V
+                <a class="entity-link" href="#/mission/core:v_clones">
+                  Клони на будівництві
+              <span class="team" data-team="true">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Командна місія
+            <p class="ct-note client">
+              Околиці Листя
+            <p class="ct-note" data-no-team="">
+              Команда ще не зібрана: її дає вибір природи чакри.
+              <a href="#/nature">
+                Обрати природу
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="0">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="0">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#3201-oefg9l" fill="currentColor">
+                  <span>
+                    Репутація: 4
+              <li>
+                <span class="reward" data-entity="resource:robocha_syla" data-reward="resource" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                  <a href="#/village">
+                    Робоча сила: +3
+            <div class="why" data-why="error.requirementsNotMet" id="why-core:v_clones">
+              <div class="row" data-entity="technique:core:shadow_clone" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <a class="entity-link" href="#/technique/core:shadow_clone">
+                    Техніка тіньового клонування
+                  <span class="detail">
+                    ще не відкрито
+              <p class="ct-why">
+                Вимоги до цієї дії не виконано.
+            <button aria-describedby="why-core:v_clones" class="ct-action" data-start="" disabled="" type="button">
+              Почати
+          <li class="ct-tile card" data-entity="mission:core:v_seal" data-mission="core:v_seal" data-state="blocked" data-ui="mission-card">
+            <div class="ct-head">
+              <h3 class="ct-name">
+                <span aria-label="Місії села" class="stamp" role="img" style="--stamp: var(--rank-v, var(--accent));">
+                  V
+                <a class="entity-link" href="#/mission/core:v_seal">
+                  Запечатування запасів
+              <span class="team" data-team="true">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <path d="#94-lwm9pk">
+                    <circle cx="9" cy="7" r="4">
+                Командна місія
+            <p class="ct-note client">
+              Околиці Листя
+            <p class="ct-note" data-no-team="">
+              Команда ще не зібрана: її дає вибір природи чакри.
+              <a href="#/nature">
+                Обрати природу
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Тривалість
+                <dd data-duration="" data-ms="0">
+                  —
+              <div>
+                <dt>
+                  Без невдач
+                <dd data-chance="" data-value="0">
+                  —
+              <div>
+                <dt>
+                  Рьо за годину
+                <dd data-ryo-hour="" data-value="0">
+                  —
+            <ul aria-label="Нагорода" class="ct-list rewards">
+              <li>
+                <span class="reward" data-entity="currency:rep" data-reward="currency" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#3201-oefg9l" fill="currentColor">
+                  <span>
+                    Репутація: 4
+              <li>
+                <span class="reward" data-entity="resource:mistkist" data-reward="resource" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                  <a href="#/village">
+                    Місткість: +3
+            <div class="why" data-why="error.requirementsNotMet" id="why-core:v_seal">
+              <div class="row" data-entity="technique:core:enclosing" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <a class="entity-link" href="#/technique/core:enclosing">
+                    Техніка запечатування
+                  <span class="detail">
+                    ще не відкрито
+              <p class="ct-why">
+                Вимоги до цієї дії не виконано.
+            <button aria-describedby="why-core:v_seal" class="ct-action" data-start="" disabled="" type="button">
+              Почати
