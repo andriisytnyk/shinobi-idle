@@ -71,6 +71,18 @@ describe('composeContent([core, testmod])', () => {
     expect(both.balance.K.ryoPerMin['testmod:trial' as 'D']).toBe(5);
   });
 
+  it('gives the test enemy a rare drop and the test boss a bounty and a scroll part', () => {
+    const rare = both.balance.K.bingo.rareBelow;
+    const enemy = both.enemies.find((e) => e.id === 'testmod:shellback');
+    expect(enemy?.drops.some((d) => d.chance < rare)).toBe(true);
+    const boss = both.bosses.find((b) => b.id === 'testmod:boss_shell');
+    expect(boss?.bounty?.first).toBeGreaterThan(0);
+    expect(boss?.scrollPart?.technique).toBe('testmod:ember_pulse');
+    expect(both.items.find((i) => i.id === boss?.scrollPart?.item)?.part?.technique).toBe(
+      'testmod:ember_pulse',
+    );
+  });
+
   it('applies the patch to the core enemy and leaves the core pack alone', () => {
     const wolf = both.enemies.find((e) => e.id === 'core:wolf');
     expect(wolf?.drops.map((d) => d.item)).toContain('testmod:pellet');

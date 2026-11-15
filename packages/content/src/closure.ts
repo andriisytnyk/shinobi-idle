@@ -383,6 +383,11 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
   }
   for (const o of db.operations) {
     at('operations', o.id);
+    for (const which of ['first', 'repeat'] as const)
+      o.rewards?.[which].parts.forEach((p, n) => {
+        ref(`rewards.${which}.parts[${n}].technique`, p.technique, 'techniques');
+        needNumber(`rewards.${which}.parts[${n}].chance`, `partDrop.${p.chance}`);
+      });
     req('unlock', o.unlock);
     o.stages.forEach((s, n) => {
       if (s.t === 'approach') req(`stages[${n}].shortenedBy`, s.shortenedBy);

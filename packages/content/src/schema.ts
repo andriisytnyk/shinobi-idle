@@ -796,7 +796,7 @@ export const operationStageSchema = z.discriminatedUnion('t', [
 const operationPaySchema = z.strictObject({
   ryo: z.number().int().min(0),
   rep: z.number().int().min(0),
-  parts: z.array(z.strictObject({ technique: coreId, chance: z.enum(['mission']) })),
+  parts: z.array(z.strictObject({ technique: coreId, chance: open<'mission'>(z.string().min(1)) })),
 });
 export const operationRewardsSchema = z.strictObject({
   first: operationPaySchema,
@@ -1119,7 +1119,10 @@ export const balanceParamsSchema = z.object({
     writtenTestMaxIntel: z.number(),
   }),
   partsPerScroll: z.number(),
-  partDrop: z.object({ boss: z.number(), carrier: z.number(), mission: z.number() }),
+  partDrop: legacy(
+    z.object({ boss: z.number(), carrier: z.number(), mission: z.number() }),
+    z.record(z.string(), z.number()),
+  ),
   tickMin: z.number(),
   /** Numbers of packs other than `core`, by pack id: nothing but that pack reads or sets them. */
   ext: z.record(z.string(), z.record(z.string(), z.number())).optional(),
@@ -1222,16 +1225,22 @@ export const balanceParamsSchema = z.object({
      * interval of the collapse share is decided: under `stableCollapse` (stable) or over its
      * complement (collapse).
      */
-    sessionMinutes: z.object({
-      zone: z.number().int().min(1),
-      boss: z.number().int().min(1),
-      operation: z.number().int().min(1),
-    }),
-    sessionHours: z.object({
-      zone: z.number().min(1),
-      boss: z.number().min(1),
-      operation: z.number().min(1),
-    }),
+    sessionMinutes: legacy(
+      z.object({
+        zone: z.number().int().min(1),
+        boss: z.number().int().min(1),
+        operation: z.number().int().min(1),
+      }),
+      z.record(z.string(), z.number()),
+    ),
+    sessionHours: legacy(
+      z.object({
+        zone: z.number().min(1),
+        boss: z.number().min(1),
+        operation: z.number().min(1),
+      }),
+      z.record(z.string(), z.number()),
+    ),
     /** The fewest sessions, and the share of the session budget the "after supplies" forecast may use. */
     minSessions: z.number().int().min(1),
     afterShare: z.number().min(0).max(1),
@@ -1240,7 +1249,10 @@ export const balanceParamsSchema = z.object({
     /** The z of the Wilson interval of every share (1.64: a one-sided 95% bound). */
     confidenceZ: z.number().gt(0),
     /** The size of one batch of the first-fight run. */
-    batch: z.object({ zone: z.number().int().min(1), operation: z.number().int().min(1) }),
+    batch: legacy(
+      z.object({ zone: z.number().int().min(1), operation: z.number().int().min(1) }),
+      z.record(z.string(), z.number()),
+    ),
     verdict: z.object({
       /** A session whose win rate is under this has collapsed. */
       collapseBelow: z.number(),

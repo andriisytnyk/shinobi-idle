@@ -235,7 +235,7 @@
       "core:fang": "fe918ca2133d",
       "core:note": "70b4f6da57b4",
       "core:scrollpart": "06e8a6069c00",
-      "core:notes": "3dd8d7b39c36",
+      "core:notes": "8f7cc23dbf67",
       "core:antidote": "ec8110d5f6a4",
       "core:tsiliushcha_maz": "3b31c5d23a2e",
       "core:paralitychna_otruta": "2c068518a91c",
@@ -529,8 +529,8 @@
       "core:zone_boss_ren2": "a59a66df5b19"
     },
     "operations": {
-      "core:op_hideout": "07d1bd511627",
-      "core:op_forest_of_death": "18a547e1e696"
+      "core:op_hideout": "128260622ce8",
+      "core:op_forest_of_death": "9781d1996b59"
     },
     "statuses": {
       "burn": "fc4bc580c0b7",
@@ -907,8 +907,6 @@
     "K.ai.geninReactionMs": 1000,
     "K.ai.guardBelow": 0.6,
     "K.woundHp": 0.1,
-    "K.regionZones.openFromRank": "genin",
-    "K.regionZones.regions": ["forest", "plains", "valley", "exam"],
     "K.operation.approachMs": 30000,
     "K.operation.approachShort": 0.5,
     "K.mission.perLevel": 0.01,
@@ -982,6 +980,31 @@
     "milestones.genin": 1,
     "milestones.clones": 5.1,
     "milestones.chunin": 14.3,
-    "milestones.cap": 24.1
+    "milestones.cap": 24.1,
+    "K.bingo.studiedWins.enemy": 25,
+    "K.bingo.studiedWins.boss": 3,
+    "K.bingo.rareBelow": 0.05,
+    "K.analysis.samples": 400,
+    "K.analysis.opSamples": 200,
+    "K.analysis.seed": 7,
+    "K.analysis.budgetMs": 5000,
+    "K.analysis.hintOptions": 3,
+    "K.analysis.sessionMinutes.zone": 15,
+    "K.analysis.sessionMinutes.boss": 60,
+    "K.analysis.sessionMinutes.operation": 60,
+    "K.analysis.sessionHours.zone": 5,
+    "K.analysis.sessionHours.boss": 16,
+    "K.analysis.sessionHours.operation": 16,
+    "K.analysis.minSessions": 4,
+    "K.analysis.afterShare": 0.25,
+    "K.analysis.horizonMinutes": 240,
+    "K.analysis.confidenceZ": 1.64,
+    "K.analysis.batch.zone": 50,
+    "K.analysis.batch.operation": 20,
+    "K.analysis.verdict.collapseBelow": 0.5,
+    "K.analysis.verdict.hopelessBelow": 0.1,
+    "K.analysis.verdict.stableMedian": 0.8,
+    "K.analysis.verdict.stableCollapse": 0.15,
+    "K.report.defeats": 5
   }
 }
