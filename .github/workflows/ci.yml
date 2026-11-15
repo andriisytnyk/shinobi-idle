@@ -36,3 +36,5 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+      - name: PWA manifest, icons and precache of the build
+        run: pnpm --filter @shinobi/web pwa:check
