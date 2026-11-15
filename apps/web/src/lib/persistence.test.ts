@@ -2,7 +2,12 @@ import { content } from '@shinobi/content';
 import { advance, createState, dispatch, serialize, type GameState } from '@shinobi/core';
 import { describe, expect, it } from 'vitest';
 import {
-  BROKEN_SAVE_KEY,
+  BACKUP_KEY,
+  LoadError,
+  backupSave,
+  decodeStored,
+  encodeStored,
+  readBackup,
   SAVE_KEY,
   buildReport,
   exportSave,
@@ -23,6 +28,10 @@ function memoryStore(): KeyValue & { data: Map<string, string> } {
     get: async (key) => data.get(key),
     set: async (key, value) => void data.set(key, value),
     del: async (key) => void data.delete(key),
+    update: async (key, fn) => {
+      const next = fn(data.get(key));
+      if (next !== undefined) data.set(key, next);
+    },
   };
 }
 
@@ -58,12 +67,11 @@ describe('loading a save', () => {
     const kv = memoryStore();
     const clock = fakeClock(T0);
     const saved = practising();
-    await saveGame(kv, clock, saved);
+    await saveGame(kv, clock, saved, 0);
 
     const xpBefore = saved.skills.tai.xp;
     clock.set(T0 + 2 * HOUR);
     const result = await loadGame(kv, clock, content);
-    expect(result.broken).toBe(false);
     expect(result.summary?.simulatedMs).toBe(2 * HOUR);
     expect(result.summary?.capped).toBe(false);
     expect(result.state.now).toBe(saved.now + 2 * HOUR);
@@ -85,7 +93,7 @@ describe('loading a save', () => {
     const kv = memoryStore();
     const clock = fakeClock(T0);
     const saved = practising();
-    await saveGame(kv, clock, saved);
+    await saveGame(kv, clock, saved, 0);
     clock.set(T0 + 30 * HOUR);
     const result = await loadGame(kv, clock, content);
     expect(result.summary?.requestedMs).toBe(30 * HOUR);
@@ -100,7 +108,7 @@ describe('loading a save', () => {
     const kv = memoryStore();
     const clock = fakeClock(T0);
     const saved = practising();
-    await saveGame(kv, clock, saved);
+    await saveGame(kv, clock, saved, 0);
     clock.set(T0 - HOUR);
     const result = await loadGame(kv, clock, content);
     expect(result.summary?.simulatedMs).toBe(0);
@@ -110,20 +118,103 @@ describe('loading a save', () => {
   it('gives no report for a short absence', async () => {
     const kv = memoryStore();
     const clock = fakeClock(T0);
-    await saveGame(kv, clock, practising());
+    await saveGame(kv, clock, practising(), 0);
     clock.set(T0 + 20_000);
     const result = await loadGame(kv, clock, content);
     expect(result.summary?.simulatedMs).toBe(20_000);
     expect(result.report).toBeNull();
   });
 
-  it('parks an unreadable save instead of overwriting it', async () => {
+  it('throws a LoadError and leaves a corrupted save untouched', async () => {
     const kv = memoryStore();
     kv.data.set(SAVE_KEY, 'not json');
+    const error = await loadGame(kv, fakeClock(T0), content).catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(LoadError);
+    expect((error as LoadError).raw).toBe('not json');
+    expect(kv.data.get(SAVE_KEY)).toBe('not json');
+  });
+
+  it('throws a LoadError for a well-formed envelope with an empty state', async () => {
+    const kv = memoryStore();
+    kv.data.set(SAVE_KEY, encodeStored(3, JSON.stringify({ v: 4, savedAt: 1, state: {} })));
+    await expect(loadGame(kv, fakeClock(T0), content)).rejects.toBeInstanceOf(LoadError);
+  });
+
+  it('throws a LoadError when reading the store fails, without a raw text', async () => {
+    const kv = memoryStore();
+    kv.get = async () => {
+      throw new Error('IndexedDB is blocked');
+    };
+    const error = await loadGame(kv, fakeClock(T0), content).catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(LoadError);
+    expect((error as LoadError).raw).toBeNull();
+    expect((error as LoadError).message).toContain('blocked');
+  });
+
+  it('reads a bare save text from before revisions as revision 0', async () => {
+    const kv = memoryStore();
+    kv.data.set(SAVE_KEY, serialize(practising(), T0));
     const result = await loadGame(kv, fakeClock(T0), content);
-    expect(result.broken).toBe(true);
-    expect(result.state.now).toBe(0);
-    expect(kv.data.get(BROKEN_SAVE_KEY)).toBe('not json');
+    expect(result.rev).toBe(0);
+  });
+
+  it('keeps an older-format save as the backup when it is upgraded on load', async () => {
+    const kv = memoryStore();
+    const old = JSON.stringify({ ...JSON.parse(serialize(practising(), T0)), v: 3 });
+    kv.data.set(SAVE_KEY, old);
+    await loadGame(kv, fakeClock(T0), content);
+    expect(kv.data.get(BACKUP_KEY)).toBe(old);
+  });
+});
+
+describe('revision guard', () => {
+  it('writes ascending revisions', async () => {
+    const kv = memoryStore();
+    const clock = fakeClock(T0);
+    const state = practising();
+    const first = await saveGame(kv, clock, state, 0);
+    expect(first).toEqual({ ok: true, rev: 1 });
+    const second = await saveGame(kv, clock, state, 1);
+    expect(second).toEqual({ ok: true, rev: 2 });
+    expect(decodeStored(kv.data.get(SAVE_KEY) ?? '').rev).toBe(2);
+  });
+
+  it('refuses to write over a newer stored revision and leaves it alone', async () => {
+    const kv = memoryStore();
+    const clock = fakeClock(T0);
+    const newer = practising();
+    advance(newer, HOUR, content);
+    // Another tab saved revisions 1..5.
+    kv.data.set(SAVE_KEY, encodeStored(5, serialize(newer, T0)));
+    const before = kv.data.get(SAVE_KEY);
+    const stale = practising();
+    const result = await saveGame(kv, clock, stale, 2);
+    expect(result).toEqual({ ok: false, reason: 'stale' });
+    expect(kv.data.get(SAVE_KEY)).toBe(before);
+  });
+
+  it('force writes above the stored revision (import, reset, restore)', async () => {
+    const kv = memoryStore();
+    kv.data.set(SAVE_KEY, encodeStored(5, serialize(practising(), T0)));
+    const result = await saveGame(kv, fakeClock(T0), practising(), 2, true);
+    expect(result).toEqual({ ok: true, rev: 6 });
+  });
+});
+
+describe('backup', () => {
+  it('copies the stored save and reads it back as a state', async () => {
+    const kv = memoryStore();
+    const state = practising();
+    await saveGame(kv, fakeClock(T0), state, 0);
+    await backupSave(kv);
+    const restored = await readBackup(kv, content);
+    expect(restored && serialize(restored, T0)).toBe(serialize(state, T0));
+  });
+
+  it('is absent when there is nothing to back up', async () => {
+    const kv = memoryStore();
+    await backupSave(kv);
+    expect(await readBackup(kv, content)).toBeNull();
   });
 });
 
@@ -160,6 +251,14 @@ describe('export and import', () => {
 
     const restored = importSave(text, content);
     expect(serialize(restored, T0)).toBe(before);
+  });
+
+  it('rejects an envelope with an empty or alien state', () => {
+    const empty = btoa(JSON.stringify({ v: 4, savedAt: 1, state: {} }));
+    expect(() => importSave(empty, content)).toThrow();
+    const partial = JSON.parse(serialize(practising(), T0));
+    delete partial.state.skills.tai;
+    expect(() => importSave(btoa(JSON.stringify(partial)), content)).toThrow();
   });
 
   it('rejects text that is not a save', () => {

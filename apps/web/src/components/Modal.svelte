@@ -12,12 +12,55 @@
   }
 
   let { title, paper = false, onClose, children, actions }: Props = $props();
+
+  let dialog: HTMLElement | undefined = $state();
+
+  // Focus moves into the dialog on open and back to where it was on close.
+  $effect(() => {
+    const before = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    dialog?.focus();
+    return () => {
+      before?.focus();
+    };
+  });
+
+  function onKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      event.stopPropagation();
+      onClose();
+    } else if (event.key === 'Tab' && dialog) {
+      // Keep Tab inside the dialog.
+      const items = [
+        ...dialog.querySelectorAll<HTMLElement>('button, input, textarea, a[href]'),
+      ].filter((el) => !el.hasAttribute('disabled'));
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (!first || !last) return;
+      if (
+        event.shiftKey &&
+        (document.activeElement === first || document.activeElement === dialog)
+      ) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  }
 </script>
 
-<svelte:window onkeydown={(e) => e.key === 'Escape' && onClose()} />
-
 <div class="backdrop">
-  <div class="dialog" class:paper role="dialog" aria-modal="true" aria-label={title}>
+  <div
+    class="dialog"
+    class:paper
+    role="dialog"
+    aria-modal="true"
+    aria-label={title}
+    tabindex="-1"
+    bind:this={dialog}
+    onkeydown={onKeydown}
+  >
     <h2>{title}</h2>
     <div class="body">{@render children?.()}</div>
     <div class="actions">
@@ -89,6 +132,11 @@
     color: var(--fg);
     font: inherit;
     cursor: pointer;
+  }
+
+  .actions :global(button:disabled) {
+    opacity: 0.5;
+    cursor: default;
   }
 
   .actions :global(button.primary) {

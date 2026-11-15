@@ -41,7 +41,8 @@ describe('interface strings', () => {
       'technique.src.': ['N', 'S', 'O', 'Q'],
       'item.kind.': ['ingredient', 'tool', 'misc', 'consumable'],
       'item.source.': ['crate', 'forge', 'market'],
-      'report.reason.': ['manual', 'requirements', 'replaced', 'missing', 'finished'],
+      'report.reason.': ['manual', 'requirements', 'replaced', 'missing', 'finished', 'defeated'],
+      'toast.stopped.': ['requirements', 'missing', 'finished', 'defeated'],
       'req.type.': ['quest', 'building'],
       'req.flag.': ['firstFight'],
       'entity.kind.': [
@@ -59,6 +60,8 @@ describe('interface strings', () => {
         'exercise',
         'practice',
         'obstacle',
+        'status',
+        'trait',
       ],
     };
     const missing: string[] = [];

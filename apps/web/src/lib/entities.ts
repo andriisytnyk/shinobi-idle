@@ -1,16 +1,21 @@
-import { content, localeKey } from '@shinobi/content';
+import { content, localeKey, type LocaleKind } from '@shinobi/content';
 import { hasKey, t } from './i18n.ts';
 import { ENTITY_KINDS, type EntityKind, type EntityRef } from './route.ts';
 
+/** The locale table that holds an entity kind's texts; statuses are stored as content states. */
+function localeKind(kind: EntityKind): LocaleKind {
+  return kind === 'status' ? 'state' : kind;
+}
+
 /** Localized display name of an entity; falls back to its id so a gap is visible, not blank. */
 export function entityName(ref: EntityRef): string {
-  const key = localeKey(ref.kind, ref.id, 'name');
+  const key = localeKey(localeKind(ref.kind), ref.id, 'name');
   return hasKey(key) ? t(key) : ref.id;
 }
 
 /** Localized description, or `null` when the entity has none yet. */
 export function entityDesc(ref: EntityRef): string | null {
-  const key = localeKey(ref.kind, ref.id, 'desc');
+  const key = localeKey(localeKind(ref.kind), ref.id, 'desc');
   return hasKey(key) ? t(key) : null;
 }
 

@@ -7,8 +7,9 @@
   import RankStamp from '../components/RankStamp.svelte';
   import ReqTree from '../components/ReqTree.svelte';
   import SealStrip from '../components/SealStrip.svelte';
-  import { hasKey, t } from '../lib/i18n.ts';
+  import { t } from '../lib/i18n.ts';
   import { techniqueGoal } from '../lib/goal.ts';
+  import { techniqueRelations } from '../lib/technique-links.ts';
   import { settings } from '../lib/settings.svelte.ts';
   import { game } from '../lib/store.ts';
   import { entityName } from '../lib/entities.ts';
@@ -21,14 +22,7 @@
 
   const tech = $derived(content.techniques.find((x) => x.id === id));
   const ref = $derived({ kind: 'technique', id } as const);
-  const note = $derived(
-    hasKey(localeKey('technique', id, 'note')) ? t(localeKey('technique', id, 'note')) : null,
-  );
-  const homes = $derived(
-    [localeKey('technique', id, 'home'), localeKey('technique', id, 'home2')]
-      .filter((k) => hasKey(k))
-      .map((k) => t(k)),
-  );
+  const relations = $derived(techniqueRelations(id, content));
   const known = $derived(game.state.known[id] === true);
 
   /** What it takes to learn the technique: its skill level, plus the rank for a mentor away from the Academy. */
@@ -75,8 +69,6 @@
       {#if tech.rank}<RankStamp rank={tech.rank} />{/if}
     </header>
 
-    {#if note}<p class="note">{note}</p>{/if}
-
     <dl class="facts">
       <div>
         <dt>{t('technique.role')}</dt>
@@ -92,7 +84,7 @@
       {#if tech.state}
         <div>
           <dt>{t('technique.effect')}</dt>
-          <dd>{t(localeKey('state', tech.state, 'name'))}</dd>
+          <dd><EntityLink kind="status" id={tech.state} /></dd>
         </div>
       {/if}
       {#if answers.length > 0}
@@ -104,7 +96,7 @@
               {/if}{t(localeKey('tag', a.tag, 'name'))}{#if a.traits.length > 0}
                 ({t('technique.counters')}
                 {#each a.traits as trait, j (trait)}{#if j > 0},
-                  {/if}{t(localeKey('trait', trait, 'name'))}{/each}){/if}
+                  {/if}<EntityLink kind="trait" id={trait} />{/each}){/if}
             {/each}
           </dd>
         </div>
@@ -120,10 +112,31 @@
 
     <section>
       <h2>{t('technique.source')}</h2>
-      <p>
-        {t(`technique.src.${tech.src}`)}{#if homes.length > 0}: {homes.join(', ')}{/if}
-      </p>
+      <p>{t(`technique.src.${tech.src}`)}</p>
+      <ul class="links">
+        {#if relations.academy}<li><EntityLink kind="building" id="core:academy" /></li>{/if}
+        {#if relations.library !== null}
+          <li>
+            <EntityLink kind="building" id="core:library" />
+            {t('technique.libraryLevel', { n: relations.library })}
+          </li>
+        {/if}
+        {#each relations.carriers as carrier (carrier.id)}
+          <li><EntityLink kind={carrier.kind} id={carrier.id} /></li>
+        {/each}
+      </ul>
     </section>
+
+    {#if relations.missions.length > 0}
+      <section data-missions>
+        <h2>{t('technique.missions')}</h2>
+        <ul class="links">
+          {#each relations.missions as mission (mission)}
+            <li><EntityLink kind="mission" id={mission} /></li>
+          {/each}
+        </ul>
+      </section>
+    {/if}
 
     {#if requirements}
       <section>
@@ -195,8 +208,9 @@
     font-weight: 400;
   }
 
-  .note {
-    font-style: italic;
+  .links {
+    margin: 0;
+    padding-left: var(--space-4);
   }
 
   .facts {

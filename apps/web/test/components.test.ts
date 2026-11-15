@@ -34,7 +34,8 @@ import TechniquePage from '../src/pages/TechniquePage.svelte';
 const html = <P extends Record<string, unknown>>(component: Component<P>, props: P): string =>
   render(component, { props }).body;
 
-const name = (ref: EntityRef) => ukLocale[localeKey(ref.kind, ref.id, 'name')] ?? ref.id;
+const name = (ref: EntityRef) =>
+  ukLocale[localeKey(ref.kind === 'status' ? 'state' : ref.kind, ref.id, 'name')] ?? ref.id;
 
 /** `<a ... href="#/kind/id" ...>Name</a>` for an entity, whatever classes Svelte adds. */
 const anchor = (ref: EntityRef) =>
@@ -195,6 +196,26 @@ describe('technique page', () => {
       expect(name({ kind: 'seal', id: seal })).toBe(names[i]);
       expect(body).toMatch(anchor({ kind: 'seal', id: seal }));
     });
+  });
+
+  it('links the mission that asks for it and prints no mission name as plain text', () => {
+    const body = html(TechniquePage, { id });
+    const mission = { kind: 'mission', id: 'core:v_sanit' } as const;
+    expect(name(mission)).toBe('Санітарна варта');
+    expect(body).toMatch(anchor(mission));
+    expectOnlyLinked(body, mission);
+    expect(body).not.toContain('Місія села');
+  });
+
+  it('links the status it applies and the traits its tags answer', () => {
+    const body = html(TechniquePage, { id });
+    expect(body).toContain('href="#/status/burn"');
+    expect(body).toContain('href="#/trait/');
+  });
+
+  it('links its source building', () => {
+    const body = html(TechniquePage, { id: 'core:leaf_whirlwind' });
+    expect(body).toMatch(anchor({ kind: 'building', id: 'core:academy' }));
   });
 
   it('shows name, rank stamp, role, status, requirements and the pin button', () => {

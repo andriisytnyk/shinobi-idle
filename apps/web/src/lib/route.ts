@@ -14,6 +14,8 @@ export const ENTITY_KINDS = [
   'exercise',
   'practice',
   'obstacle',
+  'status',
+  'trait',
 ] as const;
 
 export type EntityKind = (typeof ENTITY_KINDS)[number];

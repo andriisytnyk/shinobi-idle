@@ -115,4 +115,13 @@
     border-top: 1px solid var(--line);
     font-weight: 600;
   }
+
+  /* Whole-tap targets of at least 44 px on a phone. */
+  @media (max-width: 768px) {
+    .figure {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.75rem;
+    }
+  }
 </style>

@@ -6,6 +6,7 @@ import {
   deserialize,
   readSavedAt,
   serialize,
+  STATE_VERSION,
   type ActionStoppedEvent,
   type GameState,
   type OfflineSummary,
@@ -22,11 +23,15 @@ export interface KeyValue {
   get(key: string): Promise<string | undefined>;
   set(key: string, value: string): Promise<void>;
   del(key: string): Promise<void>;
+  /** Reads and writes one key in a single transaction; `fn` gets the old value and returns the new one. */
+  update(key: string, fn: (old: string | undefined) => string | undefined): Promise<void>;
 }
 
 export const SAVE_KEY = 'save';
 /** A save that could not be read is parked here instead of being overwritten. */
 export const BROKEN_SAVE_KEY = 'save.broken';
+/** The save as it was before an import, a reset, a restore or an upgrade of the format. */
+export const BACKUP_KEY = 'save.backup';
 
 /** What «Звіт АНБУ» shows after the game was closed or asleep. */
 export interface AnbuReport {
@@ -75,13 +80,71 @@ export interface LoadResult {
   /** The engine's account of the away time; null for a new game. */
   summary: OfflineSummary | null;
   report: AnbuReport | null;
-  /** True when a save existed but could not be read; it was parked, not deleted. */
-  broken: boolean;
+  /** Revision of the stored save this state was loaded from; 0 for a new game. */
+  rev: number;
+}
+
+/** A save that exists but could not be read. Nothing is overwritten when this is thrown. */
+export class LoadError extends Error {
+  /** The stored text as it is, for export; null when even reading it failed. */
+  readonly raw: string | null;
+  constructor(message: string, raw: string | null) {
+    super(message);
+    this.name = 'LoadError';
+    this.raw = raw;
+  }
 }
 
 /** A new game, seeded from the wall clock so each player gets their own random streams. */
 export function newGame(clock: Clock, content: ContentDb): GameState {
   return createState(Math.floor(clock.now()) % 0x7fffffff, content);
+}
+
+// ---------- stored form: a revision around the core's save text ----------
+
+interface Stored {
+  rev: number;
+  text: string;
+}
+
+/** What goes into IndexedDB: the core's save text plus a revision that only ever grows. */
+export function encodeStored(rev: number, text: string): string {
+  return JSON.stringify({ rev, save: text });
+}
+
+/** Reads the stored form; a bare save text from before revisions counts as revision 0. */
+export function decodeStored(raw: string): Stored {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (typeof parsed === 'object' && parsed !== null && 'save' in parsed) {
+      const { rev, save } = parsed as { rev?: unknown; save?: unknown };
+      if (typeof save === 'string') {
+        return { rev: typeof rev === 'number' && rev >= 0 ? Math.floor(rev) : 0, text: save };
+      }
+    }
+  } catch {
+    // Fall through: not the wrapped form.
+  }
+  return { rev: 0, text: raw };
+}
+
+/** Rejects a text whose state is empty or alien: every skill of the content must be present. */
+export function assertSaneSave(text: string, content: ContentDb): void {
+  const parsed: unknown = JSON.parse(text);
+  const state =
+    typeof parsed === 'object' && parsed !== null ? (parsed as { state?: unknown }).state : null;
+  const skills =
+    typeof state === 'object' && state !== null ? (state as { skills?: unknown }).skills : null;
+  if (typeof skills !== 'object' || skills === null) throw new Error('Save has no skills');
+  for (const skill of content.skills) {
+    if (!(skill.id in skills)) throw new Error(`Save lacks the skill ${skill.id}`);
+  }
+}
+
+/** Keeps the stored save as the one-generation backup. Does nothing when there is no save. */
+export async function backupSave(kv: KeyValue): Promise<void> {
+  const raw = await kv.get(SAVE_KEY);
+  if (raw !== undefined) await kv.set(BACKUP_KEY, raw);
 }
 
 /** Loads the save and catches the game up to the wall clock; starts a new game if there is none. */
@@ -91,25 +154,73 @@ export async function loadGame(
   content: ContentDb,
   rules: Rules = defaultRules,
 ): Promise<LoadResult> {
-  const text = await kv.get(SAVE_KEY);
-  if (text === undefined) {
-    return { state: newGame(clock, content), summary: null, report: null, broken: false };
+  let raw: string | undefined;
+  try {
+    raw = await kv.get(SAVE_KEY);
+  } catch (error) {
+    throw new LoadError(error instanceof Error ? error.message : String(error), null);
+  }
+  if (raw === undefined) {
+    return { state: newGame(clock, content), summary: null, report: null, rev: 0 };
   }
   try {
-    const state = deserialize(text, content, rules);
-    const savedAt = readSavedAt(text);
-    const elapsed = Math.max(0, clock.now() - savedAt);
+    const stored = decodeStored(raw);
+    assertSaneSave(stored.text, content);
+    const state = deserialize(stored.text, content, rules);
+    // An older format is upgraded on load; keep the old save until the player has played on.
+    if ((JSON.parse(stored.text) as { v?: unknown }).v !== STATE_VERSION) {
+      await kv.set(BACKUP_KEY, raw);
+    }
+    const elapsed = Math.max(0, clock.now() - readSavedAt(stored.text));
     const summary = advanceOffline(state, elapsed, content, rules);
-    return { state, summary, report: buildReport(summary), broken: false };
-  } catch {
-    await kv.set(BROKEN_SAVE_KEY, text);
-    return { state: newGame(clock, content), summary: null, report: null, broken: true };
+    return { state, summary, report: buildReport(summary), rev: stored.rev };
+  } catch (error) {
+    throw new LoadError(error instanceof Error ? error.message : String(error), raw);
   }
 }
 
-/** Writes the state with the current wall-clock time as `savedAt`. */
-export async function saveGame(kv: KeyValue, clock: Clock, state: GameState): Promise<void> {
-  await kv.set(SAVE_KEY, serialize(state, Math.floor(clock.now())));
+export type SaveResult = { ok: true; rev: number } | { ok: false; reason: 'stale' };
+
+/**
+ * Writes the state with the current wall-clock time as `savedAt` and the next revision. The write
+ * is one IndexedDB transaction that refuses when the stored revision is higher than `rev`, i.e.
+ * when another tab or an earlier session saved something newer. `force` (import, reset, restore)
+ * writes anyway, still above the stored revision.
+ */
+export async function saveGame(
+  kv: KeyValue,
+  clock: Clock,
+  state: GameState,
+  rev: number,
+  force = false,
+): Promise<SaveResult> {
+  const text = serialize(state, Math.floor(clock.now()));
+  let result: SaveResult = { ok: false, reason: 'stale' };
+  await kv.update(SAVE_KEY, (old) => {
+    const storedRev = old === undefined ? 0 : decodeStored(old).rev;
+    if (storedRev > rev && !force) return old;
+    const next = Math.max(storedRev, rev) + 1;
+    result = { ok: true, rev: next };
+    return encodeStored(next, text);
+  });
+  return result;
+}
+
+/** Reads the one-generation backup into a state; null when there is none or it cannot be read. */
+export async function readBackup(
+  kv: KeyValue,
+  content: ContentDb,
+  rules: Rules = defaultRules,
+): Promise<GameState | null> {
+  const raw = await kv.get(BACKUP_KEY);
+  if (raw === undefined) return null;
+  try {
+    const { text } = decodeStored(raw);
+    assertSaneSave(text, content);
+    return deserialize(text, content, rules);
+  } catch {
+    return null;
+  }
 }
 
 // ---------- export and import ----------
@@ -133,11 +244,13 @@ export function exportSave(state: GameState, clock: Clock): string {
   return toBase64(serialize(state, Math.floor(clock.now())));
 }
 
-/** Reads base64 save text. Throws when the text is not a save. */
+/** Reads base64 save text. Throws when the text is not a save or its state is empty. */
 export function importSave(
   b64: string,
   content: ContentDb,
   rules: Rules = defaultRules,
 ): GameState {
-  return deserialize(fromBase64(b64), content, rules);
+  const text = fromBase64(b64);
+  assertSaneSave(text, content);
+  return deserialize(text, content, rules);
 }

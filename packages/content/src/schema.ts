@@ -38,41 +38,13 @@ const resSlug = z.string().regex(/^[a-z0-9_]+$/);
 
 // ---------- skills and techniques ----------
 
-/** A requirement tree as plain data. The engine evaluates the same shape (`Req` in core). */
-export type ReqData =
-  | { t: 'skill'; skill: z.infer<typeof skillId>; level: number }
-  | { t: 'technique'; id: string }
-  | { t: 'rank'; rank: 'student' | 'genin' | 'chunin' }
-  | { t: 'nature'; nature: z.infer<typeof natureId> }
-  | { t: 'item'; id: string; n: number }
-  | { t: 'quest'; id: string; step?: number }
-  | { t: 'building'; id: string; level: number }
-  | { t: 'flag'; id: string; n?: number }
-  | { t: 'all'; of: ReqData[] }
-  | { t: 'any'; of: ReqData[] };
-
-export const reqSchema: z.ZodType<ReqData> = z.lazy(() =>
-  z.discriminatedUnion('t', [
-    z.strictObject({ t: z.literal('skill'), skill: skillId, level }),
-    z.strictObject({ t: z.literal('technique'), id: coreId }),
-    z.strictObject({ t: z.literal('rank'), rank: z.enum(['student', 'genin', 'chunin']) }),
-    z.strictObject({ t: z.literal('nature'), nature: natureId }),
-    z.strictObject({ t: z.literal('item'), id: coreId, n: z.number().int().min(1) }),
-    z.strictObject({ t: z.literal('quest'), id: z.string(), step: z.number().int().optional() }),
-    z.strictObject({ t: z.literal('building'), id: coreId, level: z.number().int() }),
-    z.strictObject({ t: z.literal('flag'), id: z.string(), n: z.number().int().optional() }),
-    z.strictObject({ t: z.literal('all'), of: z.array(reqSchema) }),
-    z.strictObject({ t: z.literal('any'), of: z.array(reqSchema) }),
-  ]),
-);
-
 export const skillSchema = z.strictObject({
   id: skillId,
   group: z.enum(SKILL_GROUPS),
   /** How the skill is trained: tech, course, drill, insight, patch, map, recipe, station, none. */
   activity: z.string(),
   /** What opens the skill for training; `null` when it is open from the first day. */
-  unlockReq: reqSchema.nullable(),
+  unlockReq: z.lazy(() => reqSchema).nullable(),
 });
 
 export const sealSchema = z.object({

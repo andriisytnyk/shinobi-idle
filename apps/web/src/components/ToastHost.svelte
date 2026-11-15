@@ -59,6 +59,13 @@
   }
 
   @media (max-width: 768px) {
+    button {
+      align-items: center;
+      justify-content: center;
+      min-width: 2.75rem;
+      min-height: 2.75rem;
+    }
+
     .toasts {
       right: var(--space-3);
       bottom: calc(var(--now-height) + var(--tabbar-height) + var(--space-2));

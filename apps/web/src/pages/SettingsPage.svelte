@@ -10,6 +10,8 @@
   let importText = $state('');
   let message = $state<{ ok: boolean; key: string } | null>(null);
   let confirmReset = $state(false);
+  let confirmImport = $state(false);
+  let typed = $state('');
 
   function doExport(): void {
     exported = game.exportText();
@@ -25,7 +27,18 @@
     }
   }
 
+  /** Checks the pasted text first, so a bad one is rejected before anyone is asked to confirm. */
+  function askImport(): void {
+    try {
+      game.previewImport(importText.trim());
+      confirmImport = true;
+    } catch {
+      message = { ok: false, key: 'settings.importFailed' };
+    }
+  }
+
   async function doImport(): Promise<void> {
+    confirmImport = false;
     try {
       await game.importText(importText.trim());
       importText = '';
@@ -35,8 +48,14 @@
     }
   }
 
+  async function doRestore(): Promise<void> {
+    const ok = await game.restoreBackup();
+    message = { ok, key: ok ? 'settings.restored' : 'settings.restoreFailed' };
+  }
+
   async function doReset(): Promise<void> {
     confirmReset = false;
+    typed = '';
     await game.reset();
     exported = '';
     message = { ok: true, key: 'settings.resetDone' };
@@ -82,7 +101,7 @@
       placeholder={t('settings.importPlaceholder')}
       bind:value={importText}></textarea>
     <div class="row">
-      <button type="button" disabled={importText.trim() === ''} onclick={doImport}>
+      <button type="button" disabled={importText.trim() === ''} onclick={askImport}>
         {t('settings.import')}
       </button>
     </div>
@@ -96,6 +115,9 @@
     <button type="button" class="danger" onclick={() => (confirmReset = true)}>
       {t('settings.reset')}
     </button>
+    {#if game.hasBackup}
+      <button type="button" onclick={doRestore}>{t('settings.restore')}</button>
+    {/if}
   </section>
 
   <section>
@@ -110,9 +132,28 @@
 {#if confirmReset}
   <Modal title={t('settings.resetConfirmTitle')} onClose={() => (confirmReset = false)}>
     <p>{t('settings.resetConfirm')}</p>
+    <label class="typed">
+      {t('settings.resetType', { word: t('settings.resetWord') })}
+      <input type="text" bind:value={typed} autocomplete="off" />
+    </label>
     {#snippet actions()}
       <button type="button" onclick={() => (confirmReset = false)}>{t('settings.cancel')}</button>
-      <button type="button" class="danger" onclick={doReset}>{t('settings.reset')}</button>
+      <button
+        type="button"
+        class="danger"
+        disabled={typed.trim().toLowerCase() !== t('settings.resetWord').toLowerCase()}
+        onclick={doReset}>{t('settings.reset')}</button
+      >
+    {/snippet}
+  </Modal>
+{/if}
+
+{#if confirmImport}
+  <Modal title={t('settings.importConfirmTitle')} onClose={() => (confirmImport = false)}>
+    <p>{t('settings.importConfirm')}</p>
+    {#snippet actions()}
+      <button type="button" onclick={() => (confirmImport = false)}>{t('settings.cancel')}</button>
+      <button type="button" class="danger" onclick={doImport}>{t('settings.import')}</button>
     {/snippet}
   </Modal>
 {/if}
@@ -187,6 +228,22 @@
     font-family: monospace;
     font-size: 0.8rem;
     word-break: break-all;
+  }
+
+  .typed {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .typed input {
+    min-height: 2.75rem;
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--fg);
+    font: inherit;
   }
 
   .message {

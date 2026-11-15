@@ -1,4 +1,6 @@
 <script lang="ts">
+  import BlockedScreen from './components/BlockedScreen.svelte';
+  import LoadErrorScreen from './components/LoadErrorScreen.svelte';
   import GoalPanel from './components/GoalPanel.svelte';
   import NowBar from './components/NowBar.svelte';
   import ReportModal from './components/ReportModal.svelte';
@@ -23,7 +25,11 @@
   const route = $derived(currentRoute());
 </script>
 
-{#if !game.ready}
+{#if game.phase === 'blocked'}
+  <BlockedScreen />
+{:else if game.phase === 'error'}
+  <LoadErrorScreen />
+{:else if !game.ready}
   <div class="boot" role="status">{t('app.loading')}</div>
 {:else}
   <div class="app" class:meta-open={metaOpen}>

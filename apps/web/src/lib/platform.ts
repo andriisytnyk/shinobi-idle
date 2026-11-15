@@ -1,4 +1,4 @@
-import { del, get, set } from 'idb-keyval';
+import { del, get, set, update } from 'idb-keyval';
 import type { Clock, KeyValue } from './persistence.ts';
 
 /**
@@ -14,6 +14,12 @@ export const indexedDbStore: KeyValue = {
   },
   set: (key, value) => set(key, value),
   del: (key) => del(key),
+  update: (key, fn) =>
+    update<string>(key, (old) => {
+      const next = fn(old);
+      // Returning the old value keeps the entry as it is; a missing one stays missing.
+      return next === undefined ? (old as string) : next;
+    }),
 };
 
 /** Asks the browser not to evict the save under storage pressure. Best effort; never throws. */

@@ -1,5 +1,5 @@
 import type { GameEvent } from '@shinobi/core';
-import { masteryRef } from './entities.ts';
+import { actionRef, masteryRef } from './entities.ts';
 import type { Params } from './i18n.ts';
 import type { EntityRef } from './route.ts';
 
@@ -37,6 +37,14 @@ export function toastFor(event: GameEvent): ToastSpec | null {
         ref: { kind: 'skill', id: event.skill },
       };
     case 'actionStopped':
+      // The player's own stop and a replacement by another action need no announcement.
+      if (event.reason === 'manual' || event.reason === 'replaced') return null;
+      return {
+        key: `toast.stopped.${event.reason}`,
+        params: {},
+        ref: actionRef(event),
+      };
+    default:
       return null;
   }
 }
