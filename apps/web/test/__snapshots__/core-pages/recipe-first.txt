@@ -1,0 +1,103 @@
+<main class="main">
+  <div class="ui-page" data-page="core:entity.recipe" data-ui="page">
+    <article class="recipe-page" data-entity="recipe:core:antidote" data-recipe-page="core:antidote" data-ui="entity-page">
+      <p class="kind">
+        Рецепт ·
+        <a class="entity-link" href="#/skill/alch">
+          Алхімія
+      <h1 data-ui="entity-header">
+        Протиотрута
+      <p>
+        Бій: знімає отруєння
+      <ul class="ct-tiles single">
+        <li class="ct-tile" data-action="core:antidote" data-entity="recipe:core:antidote" data-recipe="core:antidote" data-ui="action-tile">
+          <div class="ct-head">
+            <h3 class="ct-name">
+              <span class="ct-icon">
+                <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
+                  <path d="#2152-14fqxmf" fill="currentColor">
+              <a class="entity-link" href="#/recipe/core:antidote">
+                Протиотрута
+            <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+              <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                <circle class="track" cx="22" cy="22" r="18">
+                <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+              <span class="level">
+                1
+          <dl class="ct-facts">
+            <div>
+              <dt>
+                Потрібен рівень
+              <dd>
+                1
+            <div data-ui="action-interval">
+              <dt>
+                Цикл
+              <dd>
+                <span class="mod">
+                  <button aria-expanded="false" class="figure" type="button">
+                    2,5 с
+            <div data-ui="action-xp">
+              <dt>
+                Досвід
+              <dd>
+                <span class="mod">
+                  <button aria-expanded="false" class="figure" type="button">
+                    20 736 дос./год
+          <div>
+            <p class="ct-caption">
+              Потрібно
+            <ul class="ct-list" data-inputs="">
+              <li class="input missing" data-entity="item:core:mint" data-input="core:mint" data-missing="true" data-ui="ingredient-row">
+                <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                  <path d="#342-1nbqtma" fill="currentColor">
+                <span class="name">
+                  <a class="entity-link" href="#/item/core:mint">
+                    Цілюща м'ята
+                <span aria-label="є 0, потрібно 2" class="count">
+                  0/2
+                <a class="source" data-source="herb" href="#/skill/herb">
+                  Збирати
+              <li class="input missing" data-entity="item:core:water" data-input="core:water" data-missing="true" data-ui="ingredient-row">
+                <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                  <path d="#268-wop5ce" fill="currentColor">
+                <span class="name">
+                  <a class="entity-link" href="#/item/core:water">
+                    Чиста вода
+                <span aria-label="є 0, потрібно 1" class="count">
+                  0/1
+                <a class="source" data-source="shop" href="#/shop">
+                  Купити
+                <span class="locked" data-input-locked="">
+                  <span class="need" data-building-need="core:market">
+                    Потрібно:
+                    <a href="#/building/core:market">
+                      Ринок
+                    рівня 1
+          <div>
+            <p class="ct-caption">
+              Виходить
+            <ul class="ct-list" data-outputs="">
+              <li class="output" data-output="core:antidote">
+                <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                  <path d="#2152-14fqxmf" fill="currentColor">
+                <span class="qty">
+                  ×2
+                <a class="entity-link" href="#/item/core:antidote">
+                  Протиотрута
+                <span class="ct-muted">
+                  У банку: 0
+          <p class="ct-note" data-tier="">
+            Ступінь 1 з 4: шанс додаткової одиниці 0%.
+            Наступний ступінь — з Майстерності 20.
+          <button aria-describedby="why-core:antidote" class="ct-action" disabled="" type="button">
+            Почати
+          <p class="ct-why" data-why="missing" id="why-core:antidote">
+            Бракує інгредієнтів.
+      <section data-ui="entity-section">
+        <h2>
+          Де використовується
+        <ul>
+          <li>
+            <a class="entity-link" href="#/mission/core:well">
+              Отруєна криниця

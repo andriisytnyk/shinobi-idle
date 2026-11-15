@@ -1,0 +1,205 @@
+<main class="main">
+  <div class="ui-page" data-page="core:entity.technique" data-ui="page">
+    <article class="technique" data-entity="technique:core:great_fireball" data-technique="core:great_fireball" data-ui="entity-page">
+      <header class="scroll" data-ui="entity-header">
+        <span class="icon">
+          <svg aria-hidden="true" class="icon" height="40" style="color: var(--nature-katon);" viewBox="0 0 512 512" width="40">
+            <path d="#4415-1puwv3d" fill="currentColor">
+        <div class="title">
+          <p class="kind">
+            Техніка ·
+            <a class="entity-link" href="#/skill/katon">
+              Катон
+          <h1>
+            Техніка великої вогняної кулі
+        <span aria-label="Ранг техніки C" class="stamp" role="img" style="--stamp: var(--rank-c);">
+          C
+      <dl class="facts">
+        <div>
+          <dt>
+            Роль
+          <dd>
+            Снаряд
+        <div>
+          <dt>
+            Стан
+          <dd data-status="unknown">
+            <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+              <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                <path d="#24-1tb3nx8">
+            Ще не відкрита
+        <div>
+          <dt>
+            Накладає стан
+          <dd>
+            <a class="entity-link" href="#/status/burn">
+              Горіння
+        <div>
+          <dt>
+            Відповідає на
+          <dd>
+            Тривала шкода
+            (проти:
+            <a class="entity-link" href="#/trait/regen">
+              Регенерація
+            )
+      <section data-ui="entity-section">
+        <h2>
+          Печатки
+        <ol class="strip">
+          <li class="seal">
+            <span class="glyph" lang="ja">
+              巳
+            <span class="name">
+              <a class="entity-link" href="#/seal/core:snake">
+                Змія
+          <li class="seal">
+            <span class="glyph" lang="ja">
+              未
+            <span class="name">
+              <a class="entity-link" href="#/seal/core:ram">
+                Баран
+          <li class="seal">
+            <span class="glyph" lang="ja">
+              申
+            <span class="name">
+              <a class="entity-link" href="#/seal/core:monkey">
+                Мавпа
+          <li class="seal">
+            <span class="glyph" lang="ja">
+              亥
+            <span class="name">
+              <a class="entity-link" href="#/seal/core:boar">
+                Кабан
+          <li class="seal">
+            <span class="glyph" lang="ja">
+              午
+            <span class="name">
+              <a class="entity-link" href="#/seal/core:horse">
+                Кінь
+          <li class="seal">
+            <span class="glyph" lang="ja">
+              寅
+            <span class="name">
+              <a class="entity-link" href="#/seal/core:tiger">
+                Тигр
+      <section data-ui="entity-section">
+        <h2>
+          Звідки береться
+        <p>
+          Навчає наставник
+        <ul class="links">
+      <section data-missions="" data-ui="entity-section">
+        <h2>
+          Місії
+        <ul class="links">
+          <li>
+            <a class="entity-link" href="#/mission/core:v_sanit">
+              Санітарна варта
+      <section data-ui="entity-section">
+        <h2>
+          Вимоги
+        <div class="group" data-met="false">
+          <ul class="rows">
+            <li>
+              <div class="row" data-entity="skill:katon" data-met="false" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  <a class="entity-link" href="#/skill/katon">
+                    Катон
+                  <span class="detail">
+                    рів. 30
+                <span class="count">
+                  1/30
+                <span aria-hidden="true" class="bar">
+                  <span class="fill" style="width: 3.3333333333333335%;">
+            <li>
+              <div class="row met" data-met="true" data-ui="req-row">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="label">
+                  Ранг: Генін
+      <section data-ui="entity-section">
+        <h2>
+          Тренування й Майстерність
+        <ul class="tile-host">
+          <li class="tile locked" data-action="core:great_fireball" data-entity="technique:core:great_fireball" data-ui="action-tile">
+            <div class="head">
+              <h3 class="name">
+                <a class="entity-link" href="#/technique/core:great_fireball">
+                  Техніка великої вогняної кулі
+              <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                  <circle class="track" cx="22" cy="22" r="18">
+                  <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                <span class="level">
+                  1
+            <dl class="facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  30
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  2,5 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      48 301 дос./год
+            <div class="req">
+              <p class="locked-label">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row" data-entity="skill:katon" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <span class="detail">
+                          Природа чакри:
+                        <a class="entity-link" href="#/skill/katon">
+                          Катон
+                        <a class="detail-link" href="#/nature">
+                          Обрати природу
+                  <li>
+                    <div class="row" data-entity="technique:core:great_fireball" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/technique/core:great_fireball">
+                          Техніка великої вогняної кулі
+                        <span class="detail">
+                          ще не відкрито
+                  <li>
+                    <div class="row" data-entity="skill:katon" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/katon">
+                          Катон
+                        <span class="detail">
+                          рів. 30
+                      <span class="count">
+                        1/30
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 3.3333333333333335%;">
+      <button aria-pressed="false" class="pin" type="button">
+        Закріпити як мету

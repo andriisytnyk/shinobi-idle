@@ -1,0 +1,191 @@
+<main class="main">
+  <div class="ui-page" data-page="core:world" data-ui="page">
+    <article class="simple-page">
+      <h1>
+        Мапа світу
+      <div class="world" data-world="" style="--sheet-bottom: 768px;">
+        <p class="intro">
+          Країна Вогню розбита на регіони, а регіон — на клітинки. Розвідуй клітинку, щоб знайти в ній точки інтересу: місця тренування, зони боїв, родовища, схованки.
+        <nav aria-label="Регіони" class="regions">
+          <div aria-current="true" class="region active" data-open="true" data-region="core:forest">
+            <span class="region-icon">
+              <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
+                <path d="#1203-1vxsz0c" fill="currentColor">
+            <span class="region-name">
+              <a class="entity-link" href="#/region/core:forest">
+                Ліси Країни Вогню
+            <span class="region-status">
+              Досліджено 0 з 12
+              ·
+              <span data-region-here="">
+                Ти тут
+          <div class="region closed" data-open="false" data-region="core:plains">
+            <span class="region-icon">
+              <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
+                <path d="#947-1r9i7kh" fill="currentColor">
+            <span class="region-name">
+              <a class="entity-link" href="#/region/core:plains">
+                Південні рівнини Вогню
+            <span class="region-status">
+              <svg aria-hidden="true" class="icon" height="12" viewBox="0 0 24 24" width="12">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              Закрито
+          <div class="region closed" data-open="false" data-region="core:valley">
+            <span class="region-icon">
+              <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
+                <path d="#852-cfskse" fill="currentColor">
+            <span class="region-name">
+              <a class="entity-link" href="#/region/core:valley">
+                Долина Завершення
+            <span class="region-status">
+              <svg aria-hidden="true" class="icon" height="12" viewBox="0 0 24 24" width="12">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              Закрито
+        <div class="layout">
+          <div class="grid-wrap">
+            <ul aria-label="Клітинки регіону" class="grid" data-grid="core:forest">
+              <li class="tile here" data-cell="core:okolytsi_sela" data-entity="cell:core:okolytsi_sela" data-level="0" data-located="true" data-maxed="false" data-ui="world-cell">
+                <h3 class="name">
+                  <a class="entity-link" href="#/cell/core:okolytsi_sela">
+                    Околиці села
+                <div class="badges">
+                  <span class="badge here-badge" data-here="" title="Ти тут">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <path d="#100-1l0prz3">
+                        <circle cx="12" cy="10" r="3">
+                    Ти тут
+                  <span class="badge entry" data-entry="">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <path d="#52-s1zp7n" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    Вхід
+                <p class="unexplored">
+                  Не досліджено
+              <li class="tile" data-cell="core:rysovi_polia" data-entity="cell:core:rysovi_polia" data-level="0" data-located="false" data-maxed="false" data-ui="world-cell">
+                <h3 class="name">
+                  <a class="entity-link" href="#/cell/core:rysovi_polia">
+                    Рисові поля
+                <div class="badges">
+                <p class="unexplored">
+                  Не досліджено
+              <li class="tile" data-cell="core:zharyshche_skladu" data-entity="cell:core:zharyshche_skladu" data-level="0" data-located="false" data-maxed="false" data-ui="world-cell">
+                <h3 class="name">
+                  <a class="entity-link" href="#/cell/core:zharyshche_skladu">
+                    Згарище складу
+                <div class="badges">
+                <p class="unexplored">
+                  Не досліджено
+              <li class="tile" data-cell="core:uzlissia" data-entity="cell:core:uzlissia" data-level="0" data-located="false" data-maxed="false" data-ui="world-cell">
+                <h3 class="name">
+                  <a class="entity-link" href="#/cell/core:uzlissia">
+                    Узлісся
+                <div class="badges">
+                <p class="unexplored">
+                  Не досліджено
+              <li class="tile" data-cell="core:polihon_44_lis_smerti" data-entity="cell:core:polihon_44_lis_smerti" data-level="0" data-located="false" data-maxed="false" data-ui="world-cell">
+                <h3 class="name">
+                  <a class="entity-link" href="#/cell/core:polihon_44_lis_smerti">
+                    Полігон №44 «Ліс смерті»
+                <div class="badges">
+                <p class="unexplored">
+                  Не досліджено
+              <li class="tile" data-cell="core:prykordonnyi_lis_okolytsia" data-entity="cell:core:prykordonnyi_lis_okolytsia" data-level="0" data-located="false" data-maxed="false" data-ui="world-cell">
+                <h3 class="name">
+                  <a class="entity-link" href="#/cell/core:prykordonnyi_lis_okolytsia">
+                    Прикордонний ліс: околиця
+                <div class="badges">
+                <p class="unexplored">
+                  Не досліджено
+              <li class="tile" data-cell="core:prykordonnyi_lis_khashchi" data-entity="cell:core:prykordonnyi_lis_khashchi" data-level="0" data-located="false" data-maxed="false" data-ui="world-cell">
+                <h3 class="name">
+                  <a class="entity-link" href="#/cell/core:prykordonnyi_lis_khashchi">
+                    Прикордонний ліс: хащі
+                <div class="badges">
+                <p class="unexplored">
+                  Не досліджено
+              <li class="tile" data-cell="core:prykordonnyi_lis_brid" data-entity="cell:core:prykordonnyi_lis_brid" data-level="0" data-located="false" data-maxed="false" data-ui="world-cell">
+                <h3 class="name">
+                  <a class="entity-link" href="#/cell/core:prykordonnyi_lis_brid">
+                    Прикордонний ліс: брід
+                <div class="badges">
+                <p class="unexplored">
+                  Не досліджено
+              <li class="tile locked" data-cell="core:skelia_nad_vodospadom" data-entity="cell:core:skelia_nad_vodospadom" data-level="0" data-located="false" data-maxed="false" data-ui="world-cell">
+                <h3 class="name">
+                  <a class="entity-link" href="#/cell/core:skelia_nad_vodospadom">
+                    Скеля над водоспадом
+                <div class="badges">
+                  <span class="badge key unmet" data-key="rock">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <path d="#20-1jtid7o" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <span>
+                      Скелі й дерева
+                    <svg aria-hidden="true" class="icon" height="12" viewBox="0 0 24 24" width="12">
+                      <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                        <path d="#24-1tb3nx8">
+                <p class="unexplored">
+                  Не досліджено
+                <p class="need" data-need="">
+                  <svg aria-hidden="true" class="icon" height="12" viewBox="0 0 24 24" width="12">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                      <path d="#24-1tb3nx8">
+                  Закрито ключем
+              <li class="tile locked" data-cell="core:ternovi_zarosti" data-entity="cell:core:ternovi_zarosti" data-level="0" data-located="false" data-maxed="false" data-ui="world-cell">
+                <h3 class="name">
+                  <a class="entity-link" href="#/cell/core:ternovi_zarosti">
+                    Тернові зарості
+                <div class="badges">
+                  <span class="badge key unmet" data-key="brush">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <path d="#74-1x1to1u">
+                        <path d="#92-1wz3g7n">
+                    <span>
+                      Зарості
+                    <svg aria-hidden="true" class="icon" height="12" viewBox="0 0 24 24" width="12">
+                      <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                        <path d="#24-1tb3nx8">
+                <p class="unexplored">
+                  Не досліджено
+                <p class="need" data-need="">
+                  <svg aria-hidden="true" class="icon" height="12" viewBox="0 0 24 24" width="12">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                      <path d="#24-1tb3nx8">
+                  Закрито ключем
+              <li class="tile locked" data-cell="core:lisove_ozero" data-entity="cell:core:lisove_ozero" data-level="0" data-located="false" data-maxed="false" data-ui="world-cell">
+                <h3 class="name">
+                  <a class="entity-link" href="#/cell/core:lisove_ozero">
+                    Лісове озеро
+                <div class="badges">
+                  <span class="badge key unmet" data-key="water">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <path d="#261-19ko5zb" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <span>
+                      Вода
+                    <svg aria-hidden="true" class="icon" height="12" viewBox="0 0 24 24" width="12">
+                      <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                        <path d="#24-1tb3nx8">
+                <p class="unexplored">
+                  Не досліджено
+                <p class="need" data-need="">
+                  <svg aria-hidden="true" class="icon" height="12" viewBox="0 0 24 24" width="12">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                      <path d="#24-1tb3nx8">
+                  Закрито ключем
+              <li class="tile" data-cell="core:staryi_trakt" data-entity="cell:core:staryi_trakt" data-level="0" data-located="false" data-maxed="false" data-ui="world-cell">
+                <h3 class="name">
+                  <a class="entity-link" href="#/cell/core:staryi_trakt">
+                    Старий тракт
+                <div class="badges">
+                <p class="unexplored">
+                  Не досліджено

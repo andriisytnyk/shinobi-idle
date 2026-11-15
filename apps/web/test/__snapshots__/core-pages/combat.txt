@@ -1,0 +1,28 @@
+<main class="main">
+  <div class="ui-page" data-page="core:combat" data-ui="page">
+    <article class="simple-page">
+      <h1>
+        Тренувальний бій
+      <h2>
+        З ким битися
+      <ul class="cards">
+        <li class="card" data-enemy="core:dummy">
+          <span class="icon">
+            <svg aria-hidden="true" class="icon" height="36" viewBox="0 0 512 512" width="36">
+              <path d="#2789-v6xrmf" fill="currentColor">
+          <div class="info">
+            <p class="name">
+              <a class="entity-link" href="#/enemy/core:dummy">
+                Тренувальний манекен
+            <p class="meta">
+              Бойовий рівень 2 · Здоров'я 40
+          <button class="start" type="button">
+            Почати бій
+      <p class="idle">
+        Бій не йде. Оберіть супротивника.
+      <h2>
+        Журнал бою
+      <div aria-label="Журнал бою" aria-live="off" class="log" data-log="" role="log">
+        <p class="empty">
+          Журнал заповниться, щойно бій почнеться.
+        <ul>

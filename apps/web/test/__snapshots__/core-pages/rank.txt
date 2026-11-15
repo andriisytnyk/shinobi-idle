@@ -1,0 +1,25 @@
+<main class="main">
+  <div class="ui-page" data-page="core:rank" data-ui="page">
+    <article class="simple-page">
+      <h1>
+        Академія
+      <section class="plate" data-rank="genin">
+        <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+          <path d="#300-1w5w1cd" fill="currentColor">
+        <div>
+          <p class="label">
+            Поточний ранг
+          <p class="rank">
+            Генін
+      <section class="exam" data-exam="core:genin_exam">
+        <h2>
+          <a class="entity-link" href="#/exam/core:genin_exam">
+            Іспит на Геніна
+        <p class="desc">
+          Тайдзюцу 10, Ніндзюцу 10, Контроль чакри 10 і три академічні техніки. Далі — тест сенсея з дзвіночками.
+        <p class="done" data-passed="">
+          <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+            <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+          Іспит на Геніна складено.
+        <p class="later">
+          Іспит на Чуніна з'явиться в наступних оновленнях.
