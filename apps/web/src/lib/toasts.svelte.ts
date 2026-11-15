@@ -12,8 +12,11 @@ export interface Toast {
   ref?: EntityRef;
   /** What a claimed cache or vault gave: ryo and items, the items as links. */
   gains?: { ryo: number; items: { id: string; n: number }[] };
-  /** A button on the toast; pressing it runs `run` and closes the toast. */
-  action?: { labelKey: string; run: () => void };
+  /**
+   * A button on the toast; pressing it runs `run` and closes the toast, unless `run` returns (or
+   * resolves to) `false`: then the toast stays so the player can try again.
+   */
+  action?: { labelKey: string; run: () => void | boolean | Promise<void | boolean> };
   /** Stays until the player closes it or presses the action; never pushed out by newer toasts. */
   persistent?: boolean;
 }

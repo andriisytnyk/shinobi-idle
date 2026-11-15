@@ -24,12 +24,33 @@
     return toasts.list.filter((toast) => toast.persistent || keep.has(toast.id));
   });
   const hidden = $derived(toasts.list.length - shown.length);
+
+  // The host is last in the page, far from the start of the tab order. A toast with an action
+  // takes the focus when it appears, unless the player is typing in a field.
+  let host: HTMLElement | undefined = $state();
+  let focused = 0;
+  $effect(() => {
+    const toast = shown.find((x) => x.persistent && x.action);
+    if (!toast || toast.id === focused || !host) return;
+    focused = toast.id;
+    const active = document.activeElement;
+    const typing =
+      active instanceof HTMLElement &&
+      (active.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName));
+    if (typing) return;
+    host.querySelector<HTMLElement>(`[data-toast-id="${toast.id}"] [data-toast-action]`)?.focus();
+  });
 </script>
 
-<div class="toasts" role="status" aria-live="polite">
+<div class="toasts" role="status" aria-live="polite" bind:this={host}>
   {#if hidden > 0}<p class="more" data-toasts-more>{t('toast.more', { n: hidden })}</p>{/if}
   {#each shown as toast (toast.id)}
-    <div class="toast" data-toast={toast.key}>
+    <div
+      class="toast"
+      data-toast={toast.key}
+      data-toast-id={toast.id}
+      role={toast.persistent ? 'alert' : undefined}
+    >
       <span>
         {t(toast.key, toast.params)}
         {#if toast.ref}<EntityLink kind={toast.ref.kind} id={toast.ref.id} />{/if}
@@ -48,9 +69,9 @@
           type="button"
           class="action"
           data-toast-action
-          onclick={() => {
-            action.run();
-            toasts.dismiss(toast.id);
+          onclick={async () => {
+            // `false` means the action was refused: the toast stays for another try.
+            if ((await action.run()) !== false) toasts.dismiss(toast.id);
           }}
         >
           {t(action.labelKey)}
@@ -113,6 +134,11 @@
     font-weight: 600;
   }
 
+  /* The control height of PwaPanel's buttons; tokens.css has no variable for it yet. */
+  .toast {
+    --control-height: 2.75rem;
+  }
+
   button.action {
     flex: none;
     padding: var(--space-1) var(--space-3);
@@ -142,6 +168,10 @@
   }
 
   @media (max-width: 768px) {
+    button.action {
+      min-height: var(--control-height);
+    }
+
     button {
       align-items: center;
       justify-content: center;

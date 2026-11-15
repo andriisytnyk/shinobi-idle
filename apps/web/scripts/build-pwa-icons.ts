@@ -3,7 +3,7 @@
  * central 80% of the canvas, so the same picture serves as the maskable icon. Run with
  * `pnpm --filter @shinobi/web icons:pwa` and commit the PNGs.
  */
-import { mkdirSync, readFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
@@ -19,6 +19,8 @@ const targets = [
 ];
 
 mkdirSync(outDir, { recursive: true });
+// The favicon is the source itself.
+copyFileSync(`${root}assets/icon.svg`, `${root}public/icon.svg`);
 for (const { file, size } of targets) {
   // The SVG is rasterised at the target size (density scales the 512 px viewBox).
   await sharp(source, { density: (72 * size) / 512 })

@@ -32,6 +32,18 @@ if (!existsSync(dist)) {
   process.exit(1);
 }
 
+// ---------- colours: the ink token of tokens.css ----------
+
+const tokens = readFileSync(fileURLToPath(new URL('../src/tokens.css', import.meta.url)), 'utf8');
+const ink = /--ink-900:\s*(#[0-9a-fA-F]{3,8})\s*;/.exec(tokens)?.[1]?.toLowerCase();
+if (!ink) fail('--ink-900 not found in tokens.css');
+const sameInk = (value: unknown) => typeof value === 'string' && value.toLowerCase() === ink;
+const indexHtml = existsSync(join(dist, 'index.html'))
+  ? readFileSync(join(dist, 'index.html'), 'utf8')
+  : '';
+const metaTheme = /<meta\s+name="theme-color"\s+content="([^"]+)"/.exec(indexHtml)?.[1];
+if (!sameInk(metaTheme)) fail(`<meta name="theme-color"> is ${metaTheme}, expected ${ink}`);
+
 // ---------- manifest ----------
 
 const manifestPath = join(dist, 'manifest.webmanifest');
@@ -62,8 +74,8 @@ if (!existsSync(manifestPath)) {
   if (typeof manifest.description !== 'string' || !manifest.description) {
     fail('manifest.description');
   }
-  if (manifest.theme_color !== manifest.background_color || !manifest.theme_color) {
-    fail('manifest theme_color and background_color must be equal and set');
+  if (!sameInk(manifest.theme_color) || !sameInk(manifest.background_color)) {
+    fail(`manifest theme_color and background_color must be ${ink}`);
   }
   const icons = (manifest.icons ?? []) as { src: string; sizes: string; purpose?: string }[];
   const wanted = [
