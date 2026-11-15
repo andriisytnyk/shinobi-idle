@@ -14,6 +14,7 @@
   const hasSkill = $derived(game.content.skills.some((s) => s.id === id));
 </script>
 
-{#if id === undefined}<span class="nature-name">—</span>{:else if hasSkill}<EntityLink kind="skill" {id} />{:else}<span class="nature-name"
-    >{natureName(id)}</span
-  >{/if}
+{#if id === undefined}<span class="nature-name">—</span>{:else if hasSkill}<EntityLink
+    kind="skill"
+    {id}
+  />{:else}<span class="nature-name">{natureName(id)}</span>{/if}

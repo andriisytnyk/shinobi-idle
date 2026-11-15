@@ -69,13 +69,13 @@ describe('loading a save', () => {
     const saved = practising();
     await saveGame(kv, clock, saved, 0);
 
-    const xpBefore = saved.skills.tai.xp;
+    const xpBefore = saved.skills.tai!.xp;
     clock.set(T0 + 2 * HOUR);
     const result = await loadGame(kv, clock, content);
     expect(result.summary?.simulatedMs).toBe(2 * HOUR);
     expect(result.summary?.capped).toBe(false);
     expect(result.state.now).toBe(saved.now + 2 * HOUR);
-    expect(result.state.skills.tai.xp).toBeGreaterThan(saved.skills.tai.xp);
+    expect(result.state.skills.tai!.xp).toBeGreaterThan(saved.skills.tai!.xp);
 
     // The same two hours run directly give the identical state: loading adds nothing of its own.
     advance(saved, 2 * HOUR, content);
@@ -85,7 +85,7 @@ describe('loading a save', () => {
     expect(report).not.toBeNull();
     expect(report?.simulatedMs).toBe(2 * HOUR);
     const tai = report?.skills.find((s) => s.skill === 'tai');
-    expect(tai?.xp).toBeCloseTo(result.state.skills.tai.xp - xpBefore, 6);
+    expect(tai?.xp).toBeCloseTo(result.state.skills.tai!.xp - xpBefore, 6);
     expect(report?.mastery.length).toBeGreaterThan(0);
   });
 

@@ -1,4 +1,4 @@
 {
   "//": "Folders (repo-relative) that have been migrated to the truthful types of @shinobi/content: `pnpm typecheck:open` fails on any error inside them. A task adds its folder here when it is clean. When no error is left anywhere, delete tsconfig.legacy-ids.json, the `extends` lines that name it and the tsconfig.truth.json files; the script says so.",
-  "migrated": []
+  "migrated": ["apps/web/test", "apps/web/dev-packs"]
 }
