@@ -76,16 +76,28 @@ describe('honest intervals', () => {
     return counts;
   };
 
-  it(
-    'does not call a marginal boss stable: level 48 is not stable for at least 19 of 20 seeds',
-    { timeout: 900_000 },
-    () => {
-      // Whole sessions of the balance length: a shorter one does not see the Wounds spiral.
-      const counts = verdicts(boss(48, 100_000), 20, {});
-      console.log(`level 48, 20 seeds: ${JSON.stringify(counts)}`);
+  // One test per seed: a single test that plays twenty whole analyses blocks the worker for so long
+  // that the test runner loses contact with it on a slow CI machine.
+  describe('does not call a marginal boss stable: level 48', () => {
+    const counts: Record<string, number> = { stable: 0, risky: 0, hopeless: 0 };
+    const c = boss(48, 100_000);
+    let state: ReturnType<typeof build> | null = null;
+    const SEEDS = 20;
+    for (let seed = 1; seed <= SEEDS; seed++) {
+      it(`analysis seed ${seed}`, { timeout: 120_000 }, () => {
+        state ??= build(c, 500);
+        // Whole sessions of the balance length: a shorter one does not see the Wounds spiral.
+        const s = analyze(state, c.target, { samples: 1, seed }).session;
+        if (!s) throw new Error('no session');
+        counts[s.verdict] = (counts[s.verdict] ?? 0) + 1;
+      });
+    }
+    it('is not stable for at least 19 of 20 seeds', () => {
+      console.log(`level 48, ${SEEDS} seeds: ${JSON.stringify(counts)}`);
+      expect((counts.stable ?? 0) + (counts.risky ?? 0) + (counts.hopeless ?? 0)).toBe(SEEDS);
       expect(counts.stable ?? 0).toBeLessThanOrEqual(1);
-    },
-  );
+    });
+  });
 
   it(
     'calls a safe zone stable for every seed, and never with a zero-width interval before enough sessions',
