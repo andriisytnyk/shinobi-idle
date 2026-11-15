@@ -515,6 +515,12 @@
       "perLevel": 0.01,
       "floor": 120
     },
+    "natures": {
+      "second": 20,
+      "third": 40,
+      "max": 3,
+      "penaltyEnd": 50
+    },
     "offlineCapHours": 12,
     "masteryCap": 99,
     "meditation": {

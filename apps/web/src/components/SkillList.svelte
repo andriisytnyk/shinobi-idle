@@ -17,6 +17,7 @@
   let collapsed = $state<Partial<Record<SkillGroup, boolean>>>({});
 
   const route = $derived(currentRoute());
+  const native = $derived(game.state.player.natures[0] ?? null);
   const markedSkill = $derived(markerOf(nextStep(game.state, content)?.target ?? null).skill);
   const activeSkill = $derived(
     route.page === 'entity' && route.ref.kind === 'skill' ? route.ref.id : null,
@@ -78,7 +79,9 @@
                     data-marker
                     role="img"
                     aria-label={t('nav.next')}
-                  ></span>{/if}</span
+                  ></span>{/if}{#if native === skill.id}<span class="native" data-native
+                    >{t('skill.native')}</span
+                  >{/if}</span
               >
               {#if locked}
                 <span class="skill-level" role="img" aria-label={t('skill.locked')}
@@ -218,6 +221,15 @@
     height: 100%;
     background: var(--accent);
   }
+  .native {
+    margin-left: var(--space-2);
+    padding: 0 var(--space-1);
+    border: 1px solid var(--skill-color);
+    border-radius: var(--radius-sm);
+    color: var(--fg-dim);
+    font-size: 0.7rem;
+  }
+
   .marker {
     display: inline-block;
     width: 0.6rem;

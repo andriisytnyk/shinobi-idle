@@ -70,6 +70,8 @@ export function activeNav(route: Route): string | null {
       return route.tab;
     case 'help':
       return 'help';
+    case 'nature':
+      return 'skills';
     case 'credits':
     case 'settings':
       return 'more';

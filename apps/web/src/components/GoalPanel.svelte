@@ -1,6 +1,6 @@
 <script lang="ts">
   import { content } from '@shinobi/content';
-  import { evalReq } from '@shinobi/core';
+  import { evalReq, natureStatus } from '@shinobi/core';
   import { webRef } from '../lib/entities.ts';
   import { senseiTestInfo } from '../lib/exam-test.ts';
   import { formatDuration } from '../lib/format.ts';
@@ -10,6 +10,7 @@
   import { game } from '../lib/store.ts';
   import EntityLink from './EntityLink.svelte';
   import Hint from './Hint.svelte';
+  import NatureOffer from './NatureOffer.svelte';
   import NextStepCard from './NextStepCard.svelte';
   import ReqTree from './ReqTree.svelte';
 
@@ -27,6 +28,8 @@
   const quest = $derived(goal ? null : nextStep(game.state, content));
   /** With nothing pinned and no quest under way, the nearest technique is suggested. */
   const suggestion = $derived(goal || quest ? null : suggestGoal(game.state, content));
+  /** The quest card already leads to the nature test, so the test is offered separately only when it does not. */
+  const offerNature = $derived(!(quest && natureStatus(game.state, content).stage === 'test'));
 
   function pinSuggestion(): void {
     if (suggestion) game.dispatch({ type: 'goal.set', ref: { kind: 'technique', id: suggestion } });
@@ -40,6 +43,8 @@
   </div>
 
   <Hint id="goalPanel" />
+
+  {#if offerNature}<NatureOffer />{/if}
 
   {#if wait}
     <p class="wait" data-exam-wait role="status">

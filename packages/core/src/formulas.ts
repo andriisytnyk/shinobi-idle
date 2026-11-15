@@ -20,16 +20,33 @@ export function masteryLevel(state: GameState, key: string, content: ContentDb):
   return levelAt(state.mastery[key]?.xp ?? 0, content.balance.K.masteryCap);
 }
 
-/** Cast time in seconds. Mastery trims the seal count, but a technique with seals keeps at least one. */
+/**
+ * How much longer a technique of a non-native nature casts: 1 + K.nonNativeCast at skill level 1,
+ * shrinking linearly to 1 at the level the penalty ends (50).
+ */
+export function nonNativeCastMult(skillLvl: number, content: ContentDb): number {
+  const K = content.balance.K;
+  const end = K.natures.penaltyEnd;
+  const left = Math.min(1, Math.max(0, (end - skillLvl) / (end - 1)));
+  return 1 + K.nonNativeCast * left;
+}
+
+/**
+ * Cast time in seconds. Mastery trims the seal count, but a technique with seals keeps at least
+ * one. `nonNativeLevel` is the skill level of a technique of a non-native nature (see
+ * `nonNativeLevel` in natures.ts); it stretches the cast. Practice and fights both come through here.
+ */
 export function techniqueCastSeconds(
   sealCount: number,
   masteryLvl: number,
   content: ContentDb,
+  nonNativeLevel?: number,
 ): number {
   const K = content.balance.K;
-  if (sealCount === 0) return K.castBase;
+  const stretch = nonNativeLevel === undefined ? 1 : nonNativeCastMult(nonNativeLevel, content);
+  if (sealCount === 0) return K.castBase * stretch;
   const trimmed = sealCount * (1 - (K.masteryCast * masteryLvl) / K.masteryCap);
-  return K.castBase + K.castPerSeal * Math.max(1, trimmed);
+  return (K.castBase + K.castPerSeal * Math.max(1, trimmed)) * stretch;
 }
 
 /** Seconds between completions of a practice with the given cast time. */

@@ -18,7 +18,7 @@ import {
   type Command,
   type GameState,
 } from '../src/index.ts';
-import { genin, HOUR, plainRules, setLevel, start } from './helpers.ts';
+import { genin, HOUR, plainRules, setLevel, start, withNatures } from './helpers.ts';
 
 const K = content.balance.K;
 const MINT = 'core:mint';
@@ -368,11 +368,15 @@ describe('A6: tonics', () => {
 
   it('the elements tonic covers each of the five natures and spends a charge per action', () => {
     const s = genin();
+    withNatures(s, 'katon', 'futon', 'raiton');
     const tonic = 'core:tonik_stykhii';
     s.bank[tonic] = 1;
     ok(s, { type: 'item.use', id: tonic });
     for (const nature of ['katon', 'futon', 'raiton', 'doton', 'suiton']) {
-      expect(getMod(s, `xp.skill.${nature}`, content).parts).toHaveLength(1);
+      const fromTonic = getMod(s, `xp.skill.${nature}`, content).parts.filter(
+        (p) => typeof p.source !== 'string' && p.source.kind === 'item',
+      );
+      expect(fromTonic).toHaveLength(1);
     }
     expect(getMod(s, 'xp.skill.tai', content).parts).toHaveLength(0);
     refreshUnlocks(s, content, true);

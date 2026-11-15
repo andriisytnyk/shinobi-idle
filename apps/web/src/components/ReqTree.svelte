@@ -58,6 +58,7 @@
       {:else if req.t === 'nature'}
         <span class="detail">{t('req.nature')}</span>
         {#if ref}<EntityLink kind={ref.kind} id={ref.id} />{/if}
+        {#if !node.met}<a class="detail-link" href="#/nature">{t('req.natureLink')}</a>{/if}
       {:else if req.t === 'item'}
         {#if ref}<EntityLink kind={ref.kind} id={ref.id} />{/if}
       {:else if req.t === 'rank'}
@@ -139,6 +140,12 @@
   .detail {
     margin-left: var(--space-1);
     color: var(--fg-dim);
+    font-size: 0.85rem;
+  }
+
+  .detail-link {
+    margin-left: var(--space-2);
+    color: var(--accent);
     font-size: 0.85rem;
   }
 

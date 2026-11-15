@@ -11,7 +11,8 @@ import {
 import { builtObstacles, COURSE_ID, COURSE_KIND, lapXp } from './athletics.ts';
 import { bushOf, bushSize, gatherAverageSeconds, regrowMs } from './field.ts';
 import { getMod } from './mod.ts';
-import { evalReq, type Req, type ReqResult } from './requirements.ts';
+import { nonNativeLevel } from './natures.ts';
+import { evalReq, skillLevel, type Req, type ReqResult } from './requirements.ts';
 import { defaultRules, type Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 import { levelAt, xpAt } from './xp.ts';
@@ -100,6 +101,7 @@ function factsOf(
         t.sealSeq.length,
         masteryLevel(state, id, content),
         content,
+        nonNativeLevel(t.skill, state.player.natures, skillLevel(state, t.skill, content)),
       );
       return {
         skill: t.skill,

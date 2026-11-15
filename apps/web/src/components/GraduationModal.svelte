@@ -20,7 +20,14 @@
     content.skills.filter((s) => s.unlockReq?.t === 'rank' && s.unlockReq.rank === 'genin'),
   );
   const goal = $derived(webRef(game.state.goal));
+  /** The chakra paper test is the first thing a new genin does: until a nature is chosen the screen is offered. */
+  const needsTest = $derived(game.state.player.natures.length === 0);
   const reward = $derived(exam?.rewards.items ?? []);
+
+  function toNature(): void {
+    onClose();
+    navigate('#/nature');
+  }
 
   function toBank(): void {
     onClose();
@@ -41,6 +48,13 @@
 
     <h3>{t('graduation.rank')}</h3>
     <p class="rank">{t(`rank.${game.state.player.rank}`)}</p>
+
+    {#if needsTest}
+      <section class="test" data-nature-test>
+        <h3>{t('graduation.nature')}</h3>
+        <p>{t('graduation.natureBody')}</p>
+      </section>
+    {/if}
 
     {#if unlocked.length > 0}
       <h3>{t('graduation.unlocked')}</h3>
@@ -67,8 +81,15 @@
     {/if}
   </div>
   {#snippet actions()}
+    {#if needsTest}
+      <button type="button" class="primary" data-nature-go onclick={toNature}>
+        {t('graduation.natureGo')}
+      </button>
+    {/if}
     <button type="button" onclick={toBank}>{t('graduation.bank')}</button>
-    <button type="button" class="primary" onclick={onClose}>{t('graduation.close')}</button>
+    <button type="button" class={needsTest ? '' : 'primary'} onclick={onClose}
+      >{t('graduation.close')}</button
+    >
   {/snippet}
 </Modal>
 

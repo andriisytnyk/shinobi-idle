@@ -24,6 +24,7 @@
   import EntityPage from './pages/EntityPage.svelte';
   import HelpPage from './pages/HelpPage.svelte';
   import MorePage from './pages/MorePage.svelte';
+  import NaturePage from './pages/NaturePage.svelte';
   import QuestsPage from './pages/QuestsPage.svelte';
   import RankPage from './pages/RankPage.svelte';
   import SimplePage from './pages/SimplePage.svelte';
@@ -79,6 +80,8 @@
         <CombatPage />
       {:else if route.page === 'bank'}
         <BankPage />
+      {:else if route.page === 'nature'}
+        <NaturePage />
       {:else if route.page === 'help'}
         <HelpPage />
       {:else if route.page === 'credits'}

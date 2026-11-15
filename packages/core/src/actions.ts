@@ -11,10 +11,11 @@ import {
   techniqueCastSeconds,
 } from './formulas.ts';
 import { indexOf } from './lookup.ts';
+import { nonNativeLevel } from './natures.ts';
 import { cycleFactor } from './modifiers.ts';
 import { spendTonicCharges } from './buffs.ts';
 import { gainXp, grantMastery } from './progression.ts';
-import { evalReq, type Req } from './requirements.ts';
+import { evalReq, skillLevel, type Req } from './requirements.ts';
 import type { Rules } from './rules.ts';
 import { SHARE_FULL, type GameState } from './state.ts';
 import type { System } from './system.ts';
@@ -116,7 +117,10 @@ export const practiceKind = skillAction((state, id, content) => {
   const t = indexOf(content).techniques.get(id);
   if (!t) return null;
   const mastery = state ? masteryLevel(state, id, content) : 1;
-  const cast = techniqueCastSeconds(t.sealSeq.length, mastery, content);
+  const foreign = state
+    ? nonNativeLevel(t.skill, state.player.natures, skillLevel(state, t.skill, content))
+    : undefined;
+  const cast = techniqueCastSeconds(t.sealSeq.length, mastery, content, foreign);
   return {
     skill: t.skill,
     level: t.level,

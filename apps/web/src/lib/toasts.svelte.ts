@@ -46,6 +46,8 @@ export function toastFor(event: GameEvent): ToastSpec | null {
         params: {},
         ref: { kind: 'technique', id: event.target },
       };
+    case 'natureGained':
+      return { key: 'toast.natureGained', params: {}, ref: { kind: 'skill', id: event.nature } };
     case 'actionStopped':
       // The player's own stop and a replacement by another action need no announcement.
       if (event.reason === 'manual' || event.reason === 'replaced') return null;

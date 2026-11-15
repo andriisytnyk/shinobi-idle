@@ -869,6 +869,12 @@ export const balanceParamsSchema = z.object({
   bindEva: z.number(),
   illusionResist: z.number(),
   senseiTest: z.object({ base: z.number(), perLevel: z.number(), floor: z.number() }),
+  natures: z.object({
+    second: z.number().int(),
+    third: z.number().int(),
+    max: z.number().int(),
+    penaltyEnd: z.number().int(),
+  }),
   offlineCapHours: z.number(),
   masteryCap: z.number().int(),
   /**

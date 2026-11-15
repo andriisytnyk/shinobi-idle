@@ -63,6 +63,8 @@ function pageFor(state: GameState, node: ReqResult, content: ContentDb): string 
       const open = exam ? firstUnmet(evalReq(state, exam.checklist, content)) : null;
       return open ? pageFor(state, open, content) : '#/rank';
     }
+    case 'nature':
+      return '#/nature';
     case 'item':
       return '#/bank';
     case 'flag':

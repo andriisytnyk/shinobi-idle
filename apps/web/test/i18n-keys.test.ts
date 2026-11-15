@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { content, SKILL_IDS, ukLocale } from '@shinobi/content';
+import { content, NATURE_IDS, SKILL_IDS, ukLocale } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import { HINTS } from '../src/lib/hints.ts';
 
@@ -68,7 +68,10 @@ describe('interface strings', () => {
         'obstacle',
         'status',
         'trait',
+        'cell',
+        'combo',
       ],
+      'nature.character.': NATURE_IDS,
     };
     const missing: string[] = [];
     for (const [prefix, ids] of Object.entries(families)) {

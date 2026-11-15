@@ -29,6 +29,11 @@ export const BALANCE_EXT = {
   gearFx: { mannequin: 0.03, sickle: 0.05, alembic: 0.03, stations: 0.05, maps: 0.03 },
   /** Numbers of item effects that name them by key (the recipe text gives no number for the sleeping powder). */
   itemFx: { sleep: { chance: 0.5 } },
+  /**
+   * Chakra natures: Chakra Control needed for the second and the third nature, the most natures the
+   * slice allows, and the skill level at which the non-native cast penalty (K.nonNativeCast) is gone.
+   */
+  natures: { second: 20, third: 40, max: 3, penaltyEnd: 50 },
   /** Mastery levels stop here. */
   masteryCap: 99,
   /**

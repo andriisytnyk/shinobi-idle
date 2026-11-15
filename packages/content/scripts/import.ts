@@ -18,6 +18,7 @@ import {
   STATE_IDS,
   TAG_IDS,
   TRAIT_IDS,
+  type NatureId,
   type RoleId,
   type StateId,
   type TagId,
@@ -165,7 +166,9 @@ const skills: Skill[] = SKILL_IDS.map((id) => {
     ? null
     : fight
       ? { t: 'flag', id: FIRST_FIGHT_FLAG }
-      : { t: 'rank', rank: 'genin' };
+      : (NATURE_IDS as readonly string[]).includes(id)
+        ? { t: 'nature', nature: id as NatureId }
+        : { t: 'rank', rank: 'genin' };
   return { id, group, activity: n.mt ?? 'none', unlockReq };
 });
 for (const nat of NATURE_IDS)

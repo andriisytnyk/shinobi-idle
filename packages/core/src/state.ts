@@ -3,6 +3,7 @@ import type { CombatState } from './combat/types.ts';
 import type { EntityRef } from './entity.ts';
 import type { GameEvent } from './events.ts';
 import { createStreams, type RngStreams } from './rng.ts';
+import type { TeamNatures } from './natures.ts';
 import { updateQuests } from './quests.ts';
 import { refreshUnlocks } from './unlocks.ts';
 
@@ -76,13 +77,15 @@ export interface GameState {
   meditation: Record<string, MeditationEntry>;
   /** The Athletics course: the obstacle built in each slot, by slot number. */
   course: Record<string, string>;
+  /** The rival's and Aya's natures, fixed when the native nature is chosen; null before. */
+  team: TeamNatures | null;
   /** The pinned goal shown in the meta panel. */
   goal: EntityRef | null;
   /** One-off notices for the UI, newest last. The UI drains it; it is never saved. */
   events: GameEvent[];
 }
 
-export const STATE_VERSION = 7;
+export const STATE_VERSION = 8;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
@@ -114,6 +117,7 @@ export function createState(seed: number, content: ContentDb): GameState {
     bushes: {},
     meditation: {},
     course: {},
+    team: null,
     goal: null,
     events: [],
   };
