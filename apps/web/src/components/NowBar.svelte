@@ -8,6 +8,7 @@
   import { game } from '../lib/store.ts';
   import BuffStrip from './BuffStrip.svelte';
   import EntityLink from './EntityLink.svelte';
+  import Slot from '../lib/ext/Slot.svelte';
   import Icon from './Icon.svelte';
 
   interface Row {
@@ -109,7 +110,13 @@
   {:else}
     <ul class="slots">
       {#each shown as row (row.slot)}
-        <li class="slot" data-slot={row.slot}>
+        <li
+          class="slot"
+          data-slot={row.slot}
+          data-ui="now-slot"
+          data-slot-index={row.slot}
+          data-entity="{row.ref.kind}:{row.ref.id}"
+        >
           <span class="name"
             >{#if row.move}<span class="verb">{t(row.move.key)}</span>
             {/if}<EntityLink kind={row.ref.kind} id={row.ref.id} /></span
@@ -140,6 +147,7 @@
             >
           {/if}
           <button type="button" class="stop" onclick={() => stop(row.slot)}>{t('now.stop')}</button>
+          <Slot name="now.bar" ctx={{ slot: row.slot }} />
         </li>
       {/each}
     </ul>
@@ -172,7 +180,7 @@
   .title {
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   /* The wrapper adds no box: the buff chips are items of the bar itself. */
@@ -186,9 +194,9 @@
     align-items: center;
     flex-wrap: wrap;
     gap: var(--space-1) var(--space-2);
-    max-width: 24rem;
+    max-width: var(--size-24);
     min-width: 0;
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .place-label,
@@ -208,9 +216,9 @@
   .chip {
     padding: 0 var(--space-2);
     border: 1px solid var(--accent);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     color: var(--accent);
-    font-size: 0.8rem;
+    font-size: var(--font-size-0-8);
   }
 
   .chip :global(a) {
@@ -242,7 +250,7 @@
 
   .name {
     flex: none;
-    max-width: 14rem;
+    max-width: var(--size-14);
     overflow: hidden;
     font-weight: 600;
     text-overflow: ellipsis;
@@ -255,9 +263,9 @@
 
   .bar {
     flex: 1;
-    height: 6px;
-    min-width: 3rem;
-    border-radius: 3px;
+    height: var(--bar-6);
+    min-width: var(--size-3);
+    border-radius: var(--radius-3);
     background: var(--line);
     overflow: hidden;
   }
@@ -271,7 +279,7 @@
   .wait {
     flex: none;
     color: var(--accent);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
     font-weight: 600;
     white-space: nowrap;
   }
@@ -279,13 +287,13 @@
   .xph {
     flex: none;
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
     white-space: nowrap;
   }
 
   .stop,
   .more {
-    min-height: 2rem;
+    min-height: var(--control-size-xs);
     padding: var(--space-1) var(--space-3);
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
@@ -306,7 +314,7 @@
       flex-wrap: wrap;
       gap: var(--space-2);
       padding: var(--space-1) var(--space-3);
-      font-size: 0.85rem;
+      font-size: var(--font-size-0-85);
     }
 
     /* On a phone the buffs take a line of their own under the running action. */
@@ -322,12 +330,12 @@
     }
 
     .place {
-      max-width: 11rem;
+      max-width: var(--size-11);
     }
 
     /* The actions take a line of their own when the place and the action do not fit side by side. */
     .slots {
-      flex: 1 1 15rem;
+      flex: 1 1 var(--size-15);
     }
 
     .chip {
@@ -335,14 +343,14 @@
     }
 
     .name {
-      max-width: 9rem;
+      max-width: var(--size-9);
     }
 
     /* Whole-tap targets of at least 44 px on a phone. */
     .stop,
     .more {
-      min-width: 2.75rem;
-      min-height: 2.75rem;
+      min-width: var(--control-size);
+      min-height: var(--control-size);
     }
   }
 </style>

@@ -8,6 +8,11 @@ if (typeof window !== 'undefined') {
   });
 }
 
+/** The current location hash. Reactive. */
+export function currentHash(): string {
+  return hash;
+}
+
 /** The current route, derived from the location hash. Reactive. */
 export function currentRoute(): Route {
   return parseHash(hash);

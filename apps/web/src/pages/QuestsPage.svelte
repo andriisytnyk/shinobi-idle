@@ -104,7 +104,7 @@
     margin: var(--space-4) 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--font-size-1-1);
     font-weight: 400;
   }
 
@@ -131,7 +131,7 @@
   .name {
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--font-size-1-1);
   }
 
   .name :global(a) {
@@ -142,13 +142,13 @@
     .name :global(a) {
       display: inline-flex;
       align-items: center;
-      min-height: 2.75rem;
+      min-height: var(--control-size);
     }
   }
 
   .count {
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .desc {
@@ -166,7 +166,7 @@
     margin-bottom: var(--space-2);
     padding: var(--space-2) var(--space-3);
     border: 1px solid var(--line);
-    border-left-width: 4px;
+    border-left-width: var(--border-4);
     border-radius: var(--radius-sm);
     color: var(--fg-dim);
   }
@@ -185,7 +185,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    font-size: 0.8rem;
+    font-size: var(--font-size-0-8);
   }
 
   .step[data-status='current'] .mark {
@@ -217,7 +217,7 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-2);
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-1) var(--space-3);
     cursor: pointer;
   }

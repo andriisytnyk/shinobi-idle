@@ -111,13 +111,13 @@
 
   .label {
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .rank {
     color: var(--fg);
     font-family: var(--font-heading);
-    font-size: 1.2rem;
+    font-size: var(--font-size-1-2);
   }
 
   .exam {
@@ -133,7 +133,7 @@
   }
 
   h2 {
-    font-size: 1.2rem;
+    font-size: var(--font-size-1-2);
   }
 
   h2 :global(a) {
@@ -144,12 +144,12 @@
     h2 :global(a) {
       display: inline-flex;
       align-items: center;
-      min-height: 2.75rem;
+      min-height: var(--control-size);
     }
   }
 
   h3 {
-    font-size: 1rem;
+    font-size: var(--font-size-1);
   }
 
   .desc,
@@ -175,7 +175,7 @@
 
   .take,
   .secondary {
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     margin-top: var(--space-3);
     padding: var(--space-1) var(--space-4);
     border: 1px solid var(--accent);
@@ -208,8 +208,8 @@
   }
 
   .bar {
-    height: 8px;
-    border-radius: 4px;
+    height: var(--bar-8);
+    border-radius: var(--radius-4);
     background: var(--line);
     overflow: hidden;
   }
@@ -223,7 +223,7 @@
   .left {
     margin: var(--space-2) 0 0;
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .error {

@@ -14,11 +14,16 @@ body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-text);
-  font-size: 1rem;
+  font-size: var(--font-size-1);
   line-height: 1.5;
   /* Tabular numerals keep counters from jumping. */
   font-variant-numeric: tabular-nums;
   -webkit-text-size-adjust: 100%;
+}
+
+/* The wrapper PageHost puts around every page takes no part in the layout. */
+[data-ui='page'] {
+  display: contents;
 }
 
 a {
@@ -26,8 +31,8 @@ a {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline: var(--border-2) solid var(--accent);
+  outline-offset: var(--focus-offset);
 }
 
 button {

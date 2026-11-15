@@ -2,7 +2,7 @@
 
 .ct-tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--size-17)), 1fr));
   gap: var(--space-3);
   margin: 0;
   padding: 0;
@@ -36,7 +36,7 @@
   align-items: center;
   gap: var(--space-2);
   margin: 0;
-  font-size: 1rem;
+  font-size: var(--font-size-1);
   font-weight: 600;
 }
 
@@ -59,7 +59,7 @@
 
 .ct-facts dt {
   color: var(--fg-dim);
-  font-size: 0.75rem;
+  font-size: var(--font-size-0-75);
 }
 
 .ct-facts dd {
@@ -79,19 +79,19 @@
 .ct-caption {
   margin: 0 0 var(--space-1);
   color: var(--fg-dim);
-  font-size: 0.75rem;
+  font-size: var(--font-size-0-75);
 }
 
 .ct-note {
   margin: 0;
   color: var(--fg-dim);
-  font-size: 0.85rem;
+  font-size: var(--font-size-0-85);
 }
 
 .ct-bar {
   display: block;
-  height: 4px;
-  border-radius: 2px;
+  height: var(--bar-4);
+  border-radius: var(--radius-2);
   background: var(--line);
   overflow: hidden;
 }
@@ -107,7 +107,7 @@
 }
 
 .ct-action {
-  min-height: 2.75rem;
+  min-height: var(--control-size);
   padding: var(--space-2) var(--space-4);
   border: 1px solid var(--accent);
   border-radius: var(--radius-sm);
@@ -134,7 +134,7 @@
 .ct-why {
   margin: 0;
   color: var(--fg-dim);
-  font-size: 0.85rem;
+  font-size: var(--font-size-0-85);
 }
 
 .ct-why::before {
@@ -149,7 +149,7 @@
   gap: var(--space-1);
   margin: 0 0 var(--space-1);
   color: var(--fg-dim);
-  font-size: 0.85rem;
+  font-size: var(--font-size-0-85);
 }
 
 .ct-section {
@@ -160,7 +160,7 @@
   margin: 0 0 var(--space-2);
   color: var(--heading);
   font-family: var(--font-heading);
-  font-size: 1.1rem;
+  font-size: var(--font-size-1-1);
   font-weight: 400;
 }
 
@@ -177,7 +177,7 @@
 }
 
 .ct-row .grow {
-  flex: 1 1 8rem;
+  flex: 1 1 var(--size-8);
   min-width: 0;
   font-weight: 600;
 }
@@ -188,13 +188,13 @@
 
 .ct-muted {
   color: var(--fg-dim);
-  font-size: 0.85rem;
+  font-size: var(--font-size-0-85);
   font-variant-numeric: tabular-nums;
 }
 
 .ct-button {
-  min-width: 2.75rem;
-  min-height: 2.75rem;
+  min-width: var(--control-size);
+  min-height: var(--control-size);
   padding: var(--space-1) var(--space-3);
   border: 1px solid var(--accent);
   border-radius: var(--radius-sm);
@@ -213,7 +213,7 @@
 .ct-link {
   display: inline-flex;
   align-items: center;
-  min-height: 2.75rem;
+  min-height: var(--control-size);
 }
 
 @media (min-width: 769px) {

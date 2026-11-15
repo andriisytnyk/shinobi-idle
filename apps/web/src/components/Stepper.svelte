@@ -83,8 +83,8 @@
 
   button,
   input {
-    min-width: 2.75rem;
-    min-height: 2.75rem;
+    min-width: var(--control-size);
+    min-height: var(--control-size);
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
@@ -93,17 +93,17 @@
   }
 
   button {
-    font-size: 1.1rem;
+    font-size: var(--font-size-1-1);
     cursor: pointer;
   }
 
   .wide {
     padding: 0 var(--space-2);
-    font-size: 0.9rem;
+    font-size: var(--font-size-0-9);
   }
 
   input {
-    width: 4.5rem;
+    width: var(--size-4-5);
     background: var(--surface);
     text-align: center;
     font-variant-numeric: tabular-nums;

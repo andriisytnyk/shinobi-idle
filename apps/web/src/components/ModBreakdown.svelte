@@ -104,13 +104,13 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
-    min-width: 12rem;
+    min-width: var(--size-12);
     margin-top: var(--space-1);
     padding: var(--space-2);
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .line {
@@ -134,8 +134,8 @@
     .figure {
       display: inline-flex;
       align-items: center;
-      min-width: 2.75rem;
-      min-height: 2.75rem;
+      min-width: var(--control-size);
+      min-height: var(--control-size);
     }
   }
 </style>

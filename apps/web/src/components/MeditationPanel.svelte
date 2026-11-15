@@ -77,13 +77,13 @@
     margin: 0 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--font-size-1-1);
     font-weight: 400;
   }
 
   h3 {
     margin: 0;
-    font-size: 1rem;
+    font-size: var(--font-size-1);
   }
 
   ul {
@@ -114,7 +114,7 @@
 
   .mods {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(var(--size-15), 1fr));
     gap: var(--space-2);
   }
 
@@ -141,7 +141,7 @@
 
   .kind {
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--font-size-0-8);
   }
 
   .meta {
@@ -149,7 +149,7 @@
     flex-wrap: wrap;
     gap: var(--space-3);
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .unmet {
@@ -161,7 +161,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-1);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .locked {
@@ -173,7 +173,7 @@
   }
 
   button {
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-2) var(--space-3);
     border: 1px solid var(--accent);
     border-radius: var(--radius-sm);

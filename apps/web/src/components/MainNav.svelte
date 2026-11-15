@@ -1,17 +1,20 @@
 <script lang="ts">
   import { content } from '@shinobi/content';
+  import { useUi } from '../lib/ext/runtime.svelte.ts';
   import { t } from '../lib/i18n.ts';
-  import { activeNav, markerOf, NAV } from '../lib/nav.ts';
+  import { activeNav, markerOf, sideItems } from '../lib/nav.ts';
   import { nextStep } from '../lib/next-step.ts';
-  import { currentRoute } from '../lib/router.svelte.ts';
+  import { currentHash } from '../lib/router.svelte.ts';
   import { game } from '../lib/store.ts';
   import Icon from './Icon.svelte';
 
-  const items = NAV.filter((item) => item.side);
+  const ui = useUi();
+  const items = $derived(sideItems(ui.registry).filter((item) => !ui.navHidden(item.key)));
 
-  const route = $derived(currentRoute());
-  const active = $derived(activeNav(route));
-  const marker = $derived(game.read((gs) => markerOf(nextStep(gs, content)?.target ?? null).nav));
+  const active = $derived(activeNav(currentHash(), ui.registry));
+  const marker = $derived(
+    game.read((gs) => markerOf(nextStep(gs, content)?.target ?? null, ui.registry).nav),
+  );
 </script>
 
 <nav class="main-nav" aria-label={t('nav.pages')}>
@@ -19,13 +22,14 @@
     {#each items as item (item.id)}
       <li>
         <a
-          href={item.href}
+          href={item.route}
           class:active={active === item.id}
           aria-current={active === item.id ? 'page' : undefined}
           data-nav={item.id}
+          data-ui="nav-item"
         >
           <Icon name={item.icon} size={18} />
-          <span class="label">{t(item.label)}</span>
+          <span class="label">{ui.t(item.title)}</span>
           {#if marker === item.id}
             <span class="marker" data-marker role="img" aria-label={t('nav.next')}></span>
           {/if}
@@ -47,7 +51,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    min-height: 2.25rem;
+    min-height: var(--control-size-sm);
     padding: var(--space-1) var(--space-2);
     border-radius: var(--radius-sm);
     color: var(--fg);
@@ -60,7 +64,7 @@
 
   a.active {
     background: var(--surface-raised);
-    box-shadow: inset 3px 0 0 var(--accent);
+    box-shadow: inset var(--border-3) 0 0 var(--accent);
   }
 
   .label {
@@ -68,8 +72,8 @@
   }
 
   .marker {
-    width: 0.6rem;
-    height: 0.6rem;
+    width: var(--size-0-6);
+    height: var(--size-0-6);
     border-radius: 50%;
     background: var(--accent);
   }

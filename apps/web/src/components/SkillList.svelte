@@ -2,6 +2,8 @@
   import { content, localeKey, SKILL_GROUPS, type SkillGroup } from '@shinobi/content';
   import { skillUnlockStatus } from '@shinobi/core';
   import { t } from '../lib/i18n.ts';
+  import { tryUi } from '../lib/ext/runtime.svelte.ts';
+  import Slot from '../lib/ext/Slot.svelte';
   import { markerOf } from '../lib/nav.ts';
   import { nextStep } from '../lib/next-step.ts';
   import { skillProgress } from '../lib/progress.ts';
@@ -16,10 +18,11 @@
 
   let collapsed = $state<Partial<Record<SkillGroup, boolean>>>({});
 
+  const ui = tryUi();
   const route = $derived(currentRoute());
   const native = $derived(game.read((gs) => gs.player.natures[0] ?? null));
   const markedSkill = $derived(
-    game.read((gs) => markerOf(nextStep(gs, content)?.target ?? null).skill),
+    game.read((gs) => markerOf(nextStep(gs, content)?.target ?? null, ui?.registry ?? null).skill),
   );
   const activeSkill = $derived(
     route.page === 'entity' && route.ref.kind === 'skill' ? route.ref.id : null,
@@ -70,6 +73,8 @@
               class:active={activeSkill === skill.id}
               class:locked
               data-skill={skill.id}
+              data-ui="skill-row"
+              data-entity="skill:{skill.id}"
               style:--skill-color={NATURE_SKILLS.includes(skill.id)
                 ? `var(--nature-${skill.id})`
                 : 'var(--steel)'}
@@ -100,6 +105,7 @@
                   <span class="xp-fill" style:width="{progress.fraction * 100}%"></span>
                 </span>
               {/if}
+              <Slot name="sidebar.skill" ctx={{ skill: skill.id }} />
             </li>
           {/each}
         </ul>
@@ -120,21 +126,21 @@
     align-items: center;
     gap: var(--space-2);
     width: 100%;
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-1) var(--space-2);
     border: 0;
     background: none;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 0.8rem;
-    letter-spacing: 0.04em;
+    font-size: var(--font-size-0-8);
+    letter-spacing: var(--tracking-0-04);
     text-align: left;
     cursor: pointer;
   }
 
   .chevron {
     display: inline-flex;
-    transition: transform 0.15s;
+    transition: transform var(--duration-fast);
   }
 
   .chevron.open {
@@ -150,15 +156,15 @@
   .skill {
     position: relative;
     display: grid;
-    grid-template-columns: 1.5rem 1fr auto;
+    grid-template-columns: var(--size-1-5) 1fr auto;
     grid-template-areas:
       'icon name level'
       'bar bar bar';
     align-items: center;
     column-gap: var(--space-2);
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-2);
-    border-left: 3px solid transparent;
+    border-left: var(--border-3) solid transparent;
     border-radius: var(--radius-sm);
   }
 
@@ -200,22 +206,22 @@
     grid-area: level;
     display: inline-flex;
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--font-size-0-8);
     font-variant-numeric: tabular-nums;
   }
 
   .condition {
     grid-area: bar;
     position: relative;
-    z-index: 1;
-    font-size: 0.8rem;
+    z-index: var(--z-raised);
+    font-size: var(--font-size-0-8);
   }
 
   .xp-bar {
     grid-area: bar;
-    height: 3px;
+    height: var(--bar-3);
     margin-top: var(--space-1);
-    border-radius: 2px;
+    border-radius: var(--radius-2);
     background: var(--line);
     overflow: hidden;
   }
@@ -231,13 +237,13 @@
     border: 1px solid var(--skill-color);
     border-radius: var(--radius-sm);
     color: var(--fg-dim);
-    font-size: 0.7rem;
+    font-size: var(--font-size-0-7);
   }
 
   .marker {
     display: inline-block;
-    width: 0.6rem;
-    height: 0.6rem;
+    width: var(--size-0-6);
+    height: var(--size-0-6);
     margin-left: var(--space-2);
     border-radius: 50%;
     background: var(--accent);

@@ -33,6 +33,8 @@
   class:locked={keyLocked || regionClosed}
   class:here={info.located}
   data-cell={info.id}
+  data-ui="world-cell"
+  data-entity="cell:{info.id}"
   data-level={info.level}
   data-located={info.located}
   data-maxed={maxed}
@@ -127,7 +129,7 @@
     flex-direction: column;
     gap: var(--space-2);
     min-width: 0;
-    min-height: 7rem;
+    min-height: var(--size-7);
     padding: var(--space-3);
     border: 1px solid var(--line);
     border-radius: var(--radius);
@@ -141,7 +143,7 @@
   }
 
   .tile.here {
-    border-left: 4px solid var(--chakra);
+    border-left: var(--border-4) solid var(--chakra);
   }
 
   .tile.locked {
@@ -151,7 +153,7 @@
 
   .name {
     margin: 0;
-    font-size: 0.95rem;
+    font-size: var(--font-size-0-95);
     font-weight: 600;
     line-height: 1.25;
     overflow-wrap: anywhere;
@@ -160,7 +162,7 @@
   /* The name link stretches over the tile, so a tap anywhere on it opens the cell. */
   .name :global(a) {
     color: var(--fg);
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     display: inline-flex;
     align-items: center;
   }
@@ -181,12 +183,12 @@
   .badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.2rem;
+    gap: var(--size-0-2);
     padding: 0 var(--space-2);
     border: 1px solid var(--line);
-    border-radius: 999px;
-    font-size: 0.75rem;
-    line-height: 1.5rem;
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-0-75);
+    line-height: var(--line-height-1-5);
   }
 
   .entry {
@@ -224,12 +226,12 @@
 
   .pips {
     display: flex;
-    gap: 0.25rem;
+    gap: var(--space-1);
   }
 
   .pip {
-    width: 0.7rem;
-    height: 0.7rem;
+    width: var(--size-0-7);
+    height: var(--size-0-7);
     border: 1px solid var(--steel);
     border-radius: 50%;
   }
@@ -241,8 +243,8 @@
 
   .bar {
     display: block;
-    height: 4px;
-    border-radius: 2px;
+    height: var(--bar-4);
+    border-radius: var(--radius-2);
     background: var(--line);
     overflow: hidden;
   }
@@ -255,14 +257,14 @@
 
   .max {
     color: var(--success);
-    font-size: 0.75rem;
+    font-size: var(--font-size-0-75);
     font-weight: 600;
   }
 
   .unexplored {
     margin: 0;
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--font-size-0-8);
   }
 
   .pois {
@@ -281,8 +283,8 @@
 
   .need {
     position: relative;
-    z-index: 1;
+    z-index: var(--z-raised);
     margin: 0;
-    font-size: 0.8rem;
+    font-size: var(--font-size-0-8);
   }
 </style>

@@ -25,7 +25,7 @@
     .entity-link {
       display: inline-flex;
       align-items: center;
-      min-height: 2.75rem;
+      min-height: var(--control-size);
     }
   }
 

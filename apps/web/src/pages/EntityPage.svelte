@@ -23,15 +23,15 @@
   );
 </script>
 
-<article class="entity-page" data-entity={entity.id}>
+<article class="entity-page" data-ui="entity-page" data-entity="{entity.kind}:{entity.id}">
   <p class="kind">{t(`entity.kind.${entity.kind}`)}</p>
-  <h1>
+  <h1 data-ui="entity-header">
     {#if iconKind}<Icon entity={{ kind: iconKind, id: entity.id }} size={32} />{/if}
     {entityName(entity)}
   </h1>
   {#if desc}<p>{desc}</p>{:else}<p class="placeholder">{t('entity.placeholder')}</p>{/if}
   {#if zones.length > 0}
-    <section class="where" data-enemy-zones>
+    <section class="where" data-enemy-zones data-ui="entity-section">
       <h2>{t('world.where.title')}</h2>
       {#each zones as zone (zone.id)}<ZoneWhere zone={zone.id} />{/each}
     </section>
@@ -42,7 +42,7 @@
   .kind {
     margin: 0;
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   h1 {
@@ -52,7 +52,7 @@
     margin: var(--space-1) 0 var(--space-3);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.6rem;
+    font-size: var(--font-size-1-6);
     font-weight: 400;
   }
 
@@ -60,7 +60,7 @@
     margin: var(--space-4) 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--font-size-1-1);
     font-weight: 400;
   }
 

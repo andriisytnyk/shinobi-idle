@@ -216,7 +216,7 @@
 
   .random,
   .primary {
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-1) var(--space-4);
     border: 1px solid var(--accent);
     border-radius: var(--radius-sm);
@@ -236,11 +236,11 @@
   }
 
   h2 {
-    font-size: 1.1rem;
+    font-size: var(--font-size-1-1);
   }
 
   h3 {
-    font-size: 1rem;
+    font-size: var(--font-size-1);
   }
 
   .yours {
@@ -270,7 +270,7 @@
   .tag {
     margin-left: var(--space-1);
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .team {
@@ -285,12 +285,12 @@
   .note {
     margin: var(--space-2) 0 0;
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .cards {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--size-19)), 1fr));
     gap: var(--space-3);
     margin: var(--space-4) 0 0;
     padding: 0;
@@ -298,7 +298,7 @@
 
   .chosen {
     font-family: var(--font-heading);
-    font-size: 1.3rem;
+    font-size: var(--font-size-1-3);
   }
 
   [data-result] p,

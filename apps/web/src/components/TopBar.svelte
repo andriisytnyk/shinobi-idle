@@ -4,6 +4,8 @@
   import { entityName } from '../lib/entities.ts';
   import { t } from '../lib/i18n.ts';
   import { natureStatus } from '@shinobi/core';
+  import { tryUi } from '../lib/ext/runtime.svelte.ts';
+  import Slot from '../lib/ext/Slot.svelte';
   import { markerOf } from '../lib/nav.ts';
   import { nextStep } from '../lib/next-step.ts';
   import Icon from './Icon.svelte';
@@ -15,13 +17,16 @@
 
   let { metaOpen, onToggleMeta }: Props = $props();
 
+  const ui = tryUi();
   const numbers = new Intl.NumberFormat('uk');
   const nature = $derived(game.read((gs) => natureStatus(gs, content)));
   const natures = $derived(game.read((gs) => gs.player.natures));
   /** A nature is waiting to be chosen: the test, or an extra one. */
   const natureDue = $derived(nature.canChoose);
   const rankMarked = $derived(
-    game.read((gs) => markerOf(nextStep(gs, content)?.target ?? null).nav === 'rank'),
+    game.read(
+      (gs) => markerOf(nextStep(gs, content)?.target ?? null, ui?.registry ?? null).nav === 'rank',
+    ),
   );
 </script>
 
@@ -29,7 +34,7 @@
   <a class="brand" href="#/">{t('app.title')}</a>
 
   <dl class="stats">
-    <div class="stat">
+    <div class="stat" data-ui="topbar-currency" data-entity="currency:ryo">
       <dt>
         <Icon entity={{ kind: 'currency', id: 'ryo' }} size={16} /><span class="label"
           >{t('topbar.ryo')}</span
@@ -37,7 +42,7 @@
       </dt>
       <dd>{numbers.format(game.state.currencies.ryo)}</dd>
     </div>
-    <div class="stat">
+    <div class="stat" data-ui="topbar-currency" data-entity="currency:rep">
       <dt>
         <Icon entity={{ kind: 'currency', id: 'rep' }} size={16} /><span class="label"
           >{t('topbar.rep')}</span
@@ -45,7 +50,7 @@
       </dt>
       <dd>{numbers.format(game.state.currencies.rep)}</dd>
     </div>
-    <div class="stat intel">
+    <div class="stat intel" data-ui="topbar-currency" data-entity="currency:intel">
       <dt>
         <Icon entity={{ kind: 'currency', id: 'intel' }} size={16} /><span class="label"
           >{t('topbar.intel')}</span
@@ -128,6 +133,7 @@
       <span>{t('nav.meta')}</span>
     </button>
   </div>
+  <Slot name="topbar" />
 </header>
 
 <style>
@@ -144,7 +150,7 @@
   .brand {
     color: var(--accent);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--font-size-1-1);
     text-decoration: none;
     white-space: nowrap;
   }
@@ -204,16 +210,16 @@
   }
 
   .marker {
-    width: 0.6rem;
-    height: 0.6rem;
-    border: 2px solid var(--ink-900);
+    width: var(--size-0-6);
+    height: var(--size-0-6);
+    border: var(--border-2) solid var(--ink-900);
     border-radius: 50%;
     background: var(--accent);
   }
 
   .stat.save {
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .stat.save[data-save='error'] dd {
@@ -270,7 +276,7 @@
       order: 3;
       flex-basis: 100%;
       gap: var(--space-3);
-      font-size: 0.85rem;
+      font-size: var(--font-size-0-85);
     }
 
     .tools {
@@ -282,12 +288,12 @@
     .brand {
       display: inline-flex;
       align-items: center;
-      min-height: 2.75rem;
+      min-height: var(--control-size);
     }
 
     .rank-link,
     .nature-link {
-      min-height: 2.75rem;
+      min-height: var(--control-size);
     }
 
     .lang,
@@ -298,7 +304,7 @@
     /* The shop and bank links keep only their icons, so the brand and the tools share one row. */
     .shop-link {
       justify-content: center;
-      min-width: 2.75rem;
+      min-width: var(--control-size);
     }
 
     .shop-link span {

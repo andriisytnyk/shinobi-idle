@@ -25,18 +25,18 @@
     margin: 0;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.5rem;
+    font-size: var(--font-size-1-5);
     font-weight: 400;
   }
 
   p {
-    max-width: 32rem;
+    max-width: var(--size-32);
     margin: 0;
     color: var(--fg-dim);
   }
 
   button {
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-2) var(--space-4);
     border: 1px solid var(--accent);
     border-radius: var(--radius-sm);

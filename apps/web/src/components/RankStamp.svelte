@@ -22,13 +22,13 @@
     flex: none;
     align-items: center;
     justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    border: 2px solid var(--stamp);
+    width: var(--size-2-25);
+    height: var(--size-2-25);
+    border: var(--border-2) solid var(--stamp);
     border-radius: var(--radius-sm);
     color: var(--stamp);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--font-size-1-1);
     transform: rotate(-6deg);
   }
 </style>

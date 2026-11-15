@@ -130,7 +130,7 @@
     min-width: 0;
     padding: var(--space-3);
     border: 1px solid var(--line);
-    border-top: 4px solid var(--nature-color);
+    border-top: var(--border-4) solid var(--nature-color);
     border-radius: var(--radius);
     background: var(--surface);
     list-style: none;
@@ -160,7 +160,7 @@
     margin: 0;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.15rem;
+    font-size: var(--font-size-1-15);
     font-weight: 400;
   }
 
@@ -177,7 +177,7 @@
     padding: 0 var(--space-2);
     border: 1px solid var(--nature-color);
     border-radius: var(--radius-sm);
-    font-size: 0.8rem;
+    font-size: var(--font-size-0-8);
   }
 
   dl {
@@ -193,7 +193,7 @@
 
   dt {
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--font-size-0-8);
   }
 
   dd {
@@ -224,11 +224,11 @@
     padding: var(--space-2);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
-    font-size: 0.9rem;
+    font-size: var(--font-size-0-9);
   }
 
   .pick {
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     margin-top: auto;
     padding: var(--space-1) var(--space-3);
     border: 1px solid var(--nature-color);

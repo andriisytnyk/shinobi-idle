@@ -97,7 +97,7 @@
   h3 {
     margin: var(--space-3) 0 var(--space-1);
     color: var(--heading);
-    font-size: 0.95rem;
+    font-size: var(--font-size-0-95);
   }
 
   ul {
@@ -111,13 +111,13 @@
 
   .rank {
     font-family: var(--font-heading);
-    font-size: 1.2rem;
+    font-size: var(--font-size-1-2);
   }
 
   .note {
     margin-top: var(--space-1);
     color: var(--fg-dim);
-    font-size: 0.9rem;
+    font-size: var(--font-size-0-9);
   }
 
   div :global(a) {

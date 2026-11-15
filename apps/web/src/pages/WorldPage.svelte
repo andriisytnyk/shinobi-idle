@@ -185,7 +185,7 @@
 
   .regions {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(var(--size-11), 1fr));
     gap: var(--space-2);
     margin-bottom: var(--space-3);
   }
@@ -228,7 +228,7 @@
 
   .region-name :global(a) {
     color: var(--fg);
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     display: inline-flex;
     align-items: center;
   }
@@ -242,9 +242,9 @@
 
   .region-status {
     grid-area: status;
-    margin-top: -0.5rem;
+    margin-top: calc(-1 * var(--space-2));
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--font-size-0-8);
   }
 
   .closed-block {
@@ -260,7 +260,7 @@
     align-items: center;
     gap: var(--space-2);
     margin: 0 0 var(--space-2);
-    font-size: 1rem;
+    font-size: var(--font-size-1);
   }
 
   .layout {
@@ -299,7 +299,7 @@
   .scrim {
     position: fixed;
     inset: 0;
-    z-index: 11;
+    z-index: var(--z-popover);
     border: 0;
     background: var(--scrim);
     cursor: pointer;
@@ -310,11 +310,11 @@
     right: 0;
     bottom: var(--sheet-bottom);
     left: 0;
-    z-index: 12;
+    z-index: var(--z-popover-top);
     display: flex;
     flex-direction: column;
     max-height: min(80dvh, calc(100dvh - var(--sheet-bottom) - var(--space-4)));
-    border-top: 2px solid var(--accent);
+    border-top: var(--border-2) solid var(--accent);
     background: var(--surface-raised);
     overflow: hidden;
   }
@@ -351,28 +351,28 @@
     }
 
     .region-name {
-      font-size: 0.8rem;
+      font-size: var(--font-size-0-8);
       line-height: 1.2;
     }
 
     .region-name :global(a) {
-      min-height: 2.75rem;
+      min-height: var(--control-size);
     }
 
     .region-status {
       margin-top: 0;
-      font-size: 0.7rem;
+      font-size: var(--font-size-0-7);
     }
 
     /* Leaves the top of the screen to the toasts. */
     .side {
-      max-height: min(80dvh, calc(100dvh - var(--sheet-bottom) - 10rem));
+      max-height: min(80dvh, calc(100dvh - var(--sheet-bottom) - var(--size-10)));
     }
   }
 
   @media (min-width: 1280px) {
     .layout.with-panel {
-      grid-template-columns: minmax(0, 1fr) 22rem;
+      grid-template-columns: minmax(0, 1fr) var(--size-22);
     }
 
     .scrim {

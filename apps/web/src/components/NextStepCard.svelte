@@ -33,7 +33,7 @@
     margin: 0;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 0.9rem;
+    font-size: var(--font-size-0-9);
   }
 
   .quest :global(a) {
@@ -51,7 +51,7 @@
   .go {
     display: inline-flex;
     align-items: center;
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-1) var(--space-4);
     border: 1px solid var(--accent);
     border-radius: var(--radius-sm);

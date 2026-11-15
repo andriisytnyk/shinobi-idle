@@ -1,10 +1,16 @@
 <script lang="ts">
   import Icon from '../components/Icon.svelte';
   import Modal from '../components/Modal.svelte';
+  import { tryUi } from '../lib/ext/runtime.svelte.ts';
+  import Slot from '../lib/ext/Slot.svelte';
   import { t } from '../lib/i18n.ts';
   import { settings } from '../lib/settings.svelte.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
+
+  const ui = tryUi();
+  const themes = ui?.registry.themes ?? [];
+  const packSettings = ui?.registry.settings ?? [];
 
   let exported = $state('');
   let importText = $state('');
@@ -82,7 +88,47 @@
       {t('settings.hints')}
     </label>
     <button type="button" onclick={() => settings.resetHints()}>{t('settings.resetHints')}</button>
+    {#if ui && themes.length > 1}
+      <label class="select" data-ui="theme-select">
+        {t('settings.theme')}
+        <select value={settings.theme} onchange={(e) => (settings.theme = e.currentTarget.value)}>
+          {#each themes as theme (theme.key)}
+            <option value={theme.key}>{ui.t(theme.name)}</option>
+          {/each}
+        </select>
+      </label>
+    {/if}
   </section>
+
+  {#if ui && packSettings.length > 0}
+    <section data-ui="pack-settings">
+      <h2>{t('settings.packs')}</h2>
+      {#each packSettings as setting (setting.key)}
+        {#if setting.kind === 'toggle'}
+          <label class="check">
+            <input
+              type="checkbox"
+              checked={ui.settingValue(setting.key) === true}
+              onchange={(e) => ui.setSetting(setting.key, e.currentTarget.checked)}
+            />
+            {ui.t(setting.title)}
+          </label>
+        {:else}
+          <label class="select">
+            {ui.t(setting.title)}
+            <select
+              value={ui.settingValue(setting.key)}
+              onchange={(e) => ui.setSetting(setting.key, e.currentTarget.value)}
+            >
+              {#each setting.options ?? [] as option (option.value)}
+                <option value={option.value}>{ui.t(option.label)}</option>
+              {/each}
+            </select>
+          </label>
+        {/if}
+      {/each}
+    </section>
+  {/if}
 
   <section>
     <h2>{t('settings.save')}</h2>
@@ -127,6 +173,7 @@
       <Icon name="lucide:chevron-right" size={16} />
     </a>
   </section>
+  <Slot name="settings" />
 </SimplePage>
 
 {#if confirmReset}
@@ -167,20 +214,27 @@
     margin: 0 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--font-size-1-1);
     font-weight: 400;
+  }
+
+  .select {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
   }
 
   .check {
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    min-height: 2.75rem;
+    min-height: var(--control-size);
   }
 
   .check input {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: var(--size-1-25);
+    height: var(--size-1-25);
     accent-color: var(--accent);
   }
 
@@ -197,7 +251,7 @@
   }
 
   button {
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-1) var(--space-4);
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
@@ -225,8 +279,8 @@
     border-radius: var(--radius-sm);
     background: var(--surface);
     color: var(--fg);
-    font-family: monospace;
-    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-0-8);
     word-break: break-all;
   }
 
@@ -237,7 +291,7 @@
   }
 
   .typed input {
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-1) var(--space-2);
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);

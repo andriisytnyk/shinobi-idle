@@ -8,6 +8,7 @@
   import { t } from '../lib/i18n.ts';
   import { nextStep } from '../lib/next-step.ts';
   import { game } from '../lib/store.ts';
+  import Slot from '../lib/ext/Slot.svelte';
   import EntityLink from './EntityLink.svelte';
   import Hint from './Hint.svelte';
   import NatureOffer from './NatureOffer.svelte';
@@ -38,7 +39,7 @@
   }
 </script>
 
-<aside id="meta-panel" class="meta" aria-label={t('meta.title')}>
+<aside id="meta-panel" class="meta" aria-label={t('meta.title')} data-ui="goal-panel">
   <div class="head">
     <h2>{t('meta.title')}</h2>
     <button type="button" class="close" onclick={onClose}>{t('meta.close')}</button>
@@ -55,7 +56,7 @@
   {/if}
 
   {#if goal}
-    <div class="tree" data-goal>
+    <div class="tree" data-goal data-ui="goal-row">
       {#if result}
         <ReqTree node={result} />
       {:else if goalRef}
@@ -78,6 +79,7 @@
       </div>
     {/if}
   {/if}
+  <Slot name="goal.panel" />
 </aside>
 
 <style>
@@ -96,7 +98,7 @@
 
   .close {
     display: none;
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-1) var(--space-3);
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
@@ -114,7 +116,7 @@
     margin: 0;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1rem;
+    font-size: var(--font-size-1);
     font-weight: 400;
   }
 
@@ -154,7 +156,7 @@
 
   .pin,
   .unpin {
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     margin-top: var(--space-3);
     padding: var(--space-1) var(--space-3);
     border: 1px solid var(--line);

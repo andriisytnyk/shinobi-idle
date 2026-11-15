@@ -49,7 +49,13 @@
     </ul>
   </div>
 {:else}
-  <div class="row" class:met={node.met} data-met={node.met}>
+  <div
+    class="row"
+    class:met={node.met}
+    data-met={node.met}
+    data-ui="req-row"
+    data-entity={ref ? `${ref.kind}:${ref.id}` : undefined}
+  >
     <span class="mark"><Icon name={node.met ? 'lucide:check' : 'lucide:minus'} size={14} /></span>
     <span class="label">
       {#if req.t === 'skill'}
@@ -104,7 +110,7 @@
   .caption {
     margin: var(--space-1) 0;
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--font-size-0-8);
   }
 
   .row {
@@ -146,25 +152,25 @@
   .detail {
     margin-left: var(--space-1);
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .detail-link {
     margin-left: var(--space-2);
     color: var(--accent);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .count {
     grid-area: count;
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
     font-variant-numeric: tabular-nums;
   }
 
   .bar {
     grid-area: bar;
-    height: 3px;
-    border-radius: 2px;
+    height: var(--bar-3);
+    border-radius: var(--radius-2);
     background: var(--line);
     overflow: hidden;
   }

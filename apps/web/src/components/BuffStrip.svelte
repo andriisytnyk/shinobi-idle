@@ -45,7 +45,7 @@
     border: 1px solid var(--accent);
     border-radius: var(--radius-sm);
     color: var(--accent);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
     white-space: nowrap;
   }
 

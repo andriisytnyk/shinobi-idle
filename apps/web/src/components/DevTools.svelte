@@ -40,7 +40,7 @@
     position: fixed;
     left: var(--space-2);
     bottom: calc(var(--now-height) + var(--space-2));
-    z-index: 20;
+    z-index: var(--z-toast);
     max-width: calc(100% - var(--space-4));
     max-height: 60dvh;
     overflow-y: auto;
@@ -51,7 +51,7 @@
   }
 
   .dev[open] {
-    width: min(22rem, calc(100% - var(--space-4)));
+    width: min(var(--size-22), calc(100% - var(--space-4)));
   }
 
   @media (max-width: 768px) {
@@ -69,16 +69,16 @@
   .title {
     display: flex;
     align-items: center;
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     color: var(--danger);
-    font-size: 0.8rem;
+    font-size: var(--font-size-0-8);
     font-weight: 600;
     cursor: pointer;
   }
 
   .now {
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--font-size-0-8);
   }
 
   .row {
@@ -89,7 +89,7 @@
   }
 
   button {
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-1) var(--space-3);
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
@@ -105,7 +105,7 @@
     border: 1px solid var(--line);
     background: var(--bg);
     color: var(--fg);
-    font-family: monospace;
-    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-0-7);
   }
 </style>

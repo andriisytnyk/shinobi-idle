@@ -40,16 +40,16 @@
 {/snippet}
 
 {#if item}
-  <article class="item-page" data-item={id}>
+  <article class="item-page" data-item={id} data-ui="entity-page" data-entity="item:{id}">
     <p class="kind">{t('entity.kind.item')} · {t(`item.kind.${item.kind}`)}</p>
-    <h1><Icon entity={ref} size={32} /> {entityName(ref)}</h1>
+    <h1 data-ui="entity-header"><Icon entity={ref} size={32} /> {entityName(ref)}</h1>
     {#if desc}<p>{desc}</p>{/if}
     <p class="owned">{t('item.owned', { n: formatInt(owned) })}</p>
     <button type="button" class="pin" data-pin aria-pressed={pinned} onclick={togglePin}>
       {t(pinned ? 'technique.unpin' : 'technique.pin')}
     </button>
 
-    <section>
+    <section data-ui="entity-section">
       <h2>{t('item.sources')}</h2>
       {#if relations.sources.length > 0}
         <ul>
@@ -60,7 +60,7 @@
       {/if}
     </section>
 
-    <section>
+    <section data-ui="entity-section">
       <h2>{t('item.usedIn')}</h2>
       {#if relations.usedIn.length > 0}
         <ul>
@@ -79,7 +79,7 @@
   .kind {
     margin: 0;
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   h1 {
@@ -89,7 +89,7 @@
     margin: var(--space-1) 0 var(--space-3);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.6rem;
+    font-size: var(--font-size-1-6);
     font-weight: 400;
   }
 
@@ -97,7 +97,7 @@
     margin: var(--space-4) 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--font-size-1-1);
     font-weight: 400;
   }
 
@@ -111,7 +111,7 @@
   }
 
   .pin {
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-1) var(--space-3);
     border: 1px solid var(--accent);
     border-radius: var(--radius-sm);

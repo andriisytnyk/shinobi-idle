@@ -108,7 +108,7 @@
     align-items: center;
     gap: var(--space-2);
     margin: 0;
-    font-size: 1rem;
+    font-size: var(--font-size-1);
   }
 
   .name :global(a) {
@@ -122,7 +122,7 @@
 
   .tiers {
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
     font-weight: 400;
   }
 
@@ -138,6 +138,6 @@
   }
 
   .req {
-    font-size: 0.9rem;
+    font-size: var(--font-size-0-9);
   }
 </style>

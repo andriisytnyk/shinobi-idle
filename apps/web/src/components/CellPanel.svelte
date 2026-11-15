@@ -195,7 +195,13 @@
             {#each found as poi (poi.id)}
               {@const st = state(poi.id)}
               {@const pdesc = entityDesc({ kind: 'poi', id: poi.id })}
-              <li class="poi" data-poi={poi.id} data-poi-kind={poi.kind}>
+              <li
+                class="poi"
+                data-poi={poi.id}
+                data-poi-kind={poi.kind}
+                data-ui="poi-row"
+                data-entity="poi:{poi.id}"
+              >
                 <p class="poi-name">
                   <Icon name={POI_ICON[poi.kind]} size={18} />
                   <EntityLink kind="poi" id={poi.id} />
@@ -376,7 +382,7 @@
   .lvl {
     margin: 0;
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--font-size-0-8);
   }
 
   .body {
@@ -404,21 +410,21 @@
   }
 
   .actions .action {
-    flex: 1 1 6.5rem;
+    flex: 1 1 var(--size-6-5);
     padding-inline: var(--space-2);
   }
 
   .region {
     margin: 0;
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--font-size-0-8);
   }
 
   h2 {
     margin: 0;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.25rem;
+    font-size: var(--font-size-1-25);
     font-weight: 400;
     overflow-wrap: anywhere;
   }
@@ -428,7 +434,7 @@
     align-items: center;
     gap: var(--space-2);
     margin: 0 0 var(--space-2);
-    font-size: 0.95rem;
+    font-size: var(--font-size-0-95);
   }
 
   .close {
@@ -436,8 +442,8 @@
     align-items: center;
     justify-content: center;
     flex: none;
-    min-width: 2.75rem;
-    min-height: 2.75rem;
+    min-width: var(--control-size);
+    min-height: var(--control-size);
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
@@ -454,12 +460,12 @@
   .badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--space-1);
     padding: 0 var(--space-2);
     border: 1px solid var(--line);
-    border-radius: 999px;
-    font-size: 0.8rem;
-    line-height: 1.6rem;
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-0-8);
+    line-height: var(--line-height-1-6);
   }
 
   .badge.here {
@@ -477,7 +483,7 @@
 
   .small {
     margin: var(--space-1) 0;
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .block {
@@ -488,8 +494,8 @@
   }
 
   .bar {
-    height: 6px;
-    border-radius: 3px;
+    height: var(--bar-6);
+    border-radius: var(--radius-3);
     background: var(--line);
     overflow: hidden;
   }
@@ -510,7 +516,7 @@
     display: flex;
     justify-content: space-between;
     gap: var(--space-3);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .facts dt {
@@ -523,7 +529,7 @@
   }
 
   .action {
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-1) var(--space-3);
     border: 1px solid var(--accent);
     border-radius: var(--radius-sm);
@@ -555,7 +561,7 @@
   .why {
     margin: var(--space-1) 0 0;
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--font-size-0-8);
   }
 
   .poi-list {
@@ -588,7 +594,7 @@
 
   .poi-name .kind {
     color: var(--fg-dim);
-    font-size: 0.75rem;
+    font-size: var(--font-size-0-75);
     font-weight: 400;
   }
 
@@ -596,8 +602,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 2.75rem;
-    min-height: 2.75rem;
+    min-width: var(--control-size);
+    min-height: var(--control-size);
     color: var(--accent);
   }
 

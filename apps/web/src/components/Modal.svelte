@@ -53,6 +53,7 @@
 <div class="backdrop">
   <div
     class="dialog"
+    data-ui="modal"
     class:paper
     role="dialog"
     aria-modal="true"
@@ -77,7 +78,7 @@
   .backdrop {
     position: fixed;
     inset: 0;
-    z-index: 30;
+    z-index: var(--z-modal);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -89,7 +90,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
-    width: min(36rem, 100%);
+    width: min(var(--size-36), 100%);
     max-height: 100%;
     padding: var(--space-4);
     border: 1px solid var(--line);
@@ -100,8 +101,8 @@
 
   .dialog.paper {
     border-color: var(--paper-ink);
-    border-top: 0.75rem solid var(--ink-600);
-    border-bottom: 0.75rem solid var(--ink-600);
+    border-top: var(--border-0-75) solid var(--ink-600);
+    border-bottom: var(--border-0-75) solid var(--ink-600);
     background: var(--paper);
     color: var(--paper-ink);
   }
@@ -109,7 +110,7 @@
   h2 {
     margin: 0;
     font-family: var(--font-heading);
-    font-size: 1.3rem;
+    font-size: var(--font-size-1-3);
     font-weight: 400;
   }
 
@@ -124,7 +125,7 @@
   }
 
   .actions :global(button) {
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-1) var(--space-4);
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);

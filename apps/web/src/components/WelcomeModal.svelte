@@ -53,7 +53,7 @@
   }
 
   input {
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-1) var(--space-3);
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);

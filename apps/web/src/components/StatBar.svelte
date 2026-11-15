@@ -32,7 +32,7 @@
 <style>
   .stat {
     display: grid;
-    grid-template-columns: 7rem minmax(0, 1fr) auto;
+    grid-template-columns: var(--size-7) minmax(0, 1fr) auto;
     align-items: center;
     gap: var(--space-2);
     --tone: var(--hp);
@@ -52,12 +52,12 @@
 
   .label {
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .bar {
-    height: 10px;
-    border-radius: 5px;
+    height: var(--bar-10);
+    border-radius: var(--radius-5);
     background: var(--line);
     overflow: hidden;
   }
@@ -69,8 +69,8 @@
   }
 
   .value {
-    min-width: 5rem;
-    font-size: 0.85rem;
+    min-width: var(--size-5);
+    font-size: var(--font-size-0-85);
     text-align: right;
     font-variant-numeric: tabular-nums;
   }

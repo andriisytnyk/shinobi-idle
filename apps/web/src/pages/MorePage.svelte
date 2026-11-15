@@ -1,7 +1,16 @@
 <script lang="ts">
   import Icon from '../components/Icon.svelte';
+  import { tryUi } from '../lib/ext/runtime.svelte.ts';
   import { t } from '../lib/i18n.ts';
   import SimplePage from './SimplePage.svelte';
+
+  /** Pages that packs added to the menu; the built-in ones are listed below by hand. */
+  const ui = tryUi();
+  const extra = $derived(
+    ui?.registry.navItems.filter(
+      (n) => n.packId !== 'core' && n.group !== 'tab' && !ui.navHidden(n.key),
+    ) ?? [],
+  );
 </script>
 
 <SimplePage title={t('nav.more')}>
@@ -55,6 +64,15 @@
         <Icon name="lucide:chevron-right" size={16} />
       </a>
     </li>
+    {#each extra as item (item.key)}
+      <li>
+        <a href={item.route} data-more-item={item.id}>
+          <Icon name={item.icon} size={18} />
+          <span>{ui?.t(item.title)}</span>
+          <Icon name="lucide:chevron-right" size={16} />
+        </a>
+      </li>
+    {/each}
   </ul>
 </SimplePage>
 

@@ -72,7 +72,7 @@
 
   .where {
     margin: 0 0 var(--space-2);
-    font-size: 0.9rem;
+    font-size: var(--font-size-0-9);
   }
 
   .where :global(a) {
@@ -86,8 +86,8 @@
   }
 
   button {
-    flex: 1 1 10rem;
-    min-height: 2.75rem;
+    flex: 1 1 var(--size-10);
+    min-height: var(--control-size);
     padding: var(--space-1) var(--space-3);
     border: 1px solid var(--accent);
     border-radius: var(--radius-sm);
@@ -116,6 +116,6 @@
   .why {
     margin: var(--space-1) 0 0;
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--font-size-0-8);
   }
 </style>

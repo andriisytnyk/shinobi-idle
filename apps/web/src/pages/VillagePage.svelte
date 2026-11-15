@@ -10,6 +10,7 @@
   import BuildingCard from '../components/BuildingCard.svelte';
   import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
+  import Slot from '../lib/ext/Slot.svelte';
   import Icon from '../components/Icon.svelte';
   import Stepper from '../components/Stepper.svelte';
   import { formatDuration, formatInt } from '../lib/format.ts';
@@ -76,6 +77,7 @@
 <SimplePage title={t('village.title')}>
   <div class="village" data-village>
     <Hint id="village" />
+    <Slot name="village.header" />
     {#if !has}
       <p class="ct-why" data-village-locked>{t('village.locked')}</p>
     {:else}
@@ -249,7 +251,7 @@
     margin: 0 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--font-size-1-1);
     font-weight: 400;
   }
 
@@ -258,7 +260,7 @@
   }
 
   .big {
-    font-size: 1.5rem;
+    font-size: var(--font-size-1-5);
     font-variant-numeric: tabular-nums;
   }
 
@@ -279,7 +281,7 @@
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-1) var(--space-3);
-    min-height: 2rem;
+    min-height: var(--control-size-xs);
   }
 
   .req li.met .num {
@@ -289,11 +291,11 @@
   .req li a {
     display: inline-flex;
     align-items: center;
-    min-height: 2.75rem;
+    min-height: var(--control-size);
   }
 
   .stocks .name {
-    flex: 1 1 8rem;
+    flex: 1 1 var(--size-8);
   }
 
   .donate,

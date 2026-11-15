@@ -125,14 +125,14 @@
 
   .small {
     margin: 0 0 var(--space-3);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .open {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-1) var(--space-3);
     border: 1px solid var(--accent);
     border-radius: var(--radius-sm);

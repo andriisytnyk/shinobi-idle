@@ -14,8 +14,8 @@
 </script>
 
 {#if line}
-  <article class="gear-page" data-gear-page={id}>
-    <p class="kind">
+  <article class="gear-page" data-gear-page={id} data-ui="entity-page" data-entity="gear:{id}">
+    <p class="kind" data-ui="entity-header">
       {t('entity.kind.gear')} · <EntityLink kind="skill" id={line.skill} />
     </p>
     <div class="line"><GearLine {line} /></div>
@@ -28,10 +28,10 @@
   .kind {
     margin: 0 0 var(--space-3);
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .line {
-    max-width: 26rem;
+    max-width: var(--size-26);
   }
 </style>

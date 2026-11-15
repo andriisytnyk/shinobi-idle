@@ -55,12 +55,12 @@
     margin: 0;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.5rem;
+    font-size: var(--font-size-1-5);
     font-weight: 400;
   }
 
   p {
-    max-width: 36rem;
+    max-width: var(--size-36);
     margin: 0;
     color: var(--fg-dim);
   }
@@ -83,7 +83,7 @@
   }
 
   button {
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-2) var(--space-4);
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
@@ -106,14 +106,14 @@
   }
 
   textarea {
-    width: min(40rem, 100%);
+    width: min(var(--size-40), 100%);
     padding: var(--space-2);
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface);
     color: var(--fg);
-    font-family: monospace;
-    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-0-8);
   }
 
   .confirm {

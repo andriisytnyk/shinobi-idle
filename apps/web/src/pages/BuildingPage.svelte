@@ -46,12 +46,17 @@
 </script>
 
 <SimplePage title={t(`building.${id}.name`)}>
-  <div class="building-page" data-building-page={id}>
-    <p class="kind">{t('entity.kind.building')}</p>
+  <div
+    class="building-page"
+    data-building-page={id}
+    data-ui="entity-page"
+    data-entity="building:{id}"
+  >
+    <p class="kind" data-ui="entity-header">{t('entity.kind.building')}</p>
     {#if desc}<p>{desc}</p>{/if}
     {#if info}
       <BuildingCard {info} page />
-      <section class="ct-section" data-levels>
+      <section class="ct-section" data-levels data-ui="entity-section">
         <h2>{t('village.levels')}</h2>
         <ol>
           {#each levels as row (row.level)}
@@ -71,7 +76,7 @@
   .kind {
     margin: 0;
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   ol {

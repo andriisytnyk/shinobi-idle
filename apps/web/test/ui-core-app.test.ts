@@ -1,0 +1,228 @@
+// @vitest-environment happy-dom
+import { content } from '@shinobi/content';
+import { createState } from '@shinobi/core';
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { coreUi } from '../src/lib/ext/core-ui.ts';
+import { ENTITY_PARTS, UI_PARTS } from '../src/lib/ext/parts.ts';
+import { game } from '../src/lib/store.ts';
+import { bootApp, genin, type BootedApp } from './helpers/boot-app.ts';
+import { coreRegistry } from './helpers/core-registry.ts';
+
+vi.mock('../src/lib/store.ts', async () => {
+  const { createGame } = await import('../src/lib/game.svelte.ts');
+  return { game: createGame({ clock: { now: () => 0 } }) };
+});
+
+/** The routes that existed before the registries, as patterns, written out by hand. */
+const ROUTES = [
+  '#/',
+  '#/:kind/*id',
+  '#/bank',
+  '#/building/*id',
+  '#/cell/*id',
+  '#/combat',
+  '#/credits',
+  '#/exam/*id',
+  '#/gear/*id',
+  '#/help',
+  '#/item/*id',
+  '#/missions',
+  '#/more',
+  '#/nature',
+  '#/poi/*id',
+  '#/quest/*id',
+  '#/quests',
+  '#/rank',
+  '#/recipe/*id',
+  '#/region/*id',
+  '#/settings',
+  '#/shop',
+  '#/shop/sell',
+  '#/skill/*id',
+  '#/skills',
+  '#/technique/*id',
+  '#/village',
+  '#/village/*focus',
+  '#/world',
+];
+
+/** The nav items that existed before, with the hash each opens. */
+const NAV: Record<string, string> = {
+  skills: '#/skills',
+  quests: '#/quests',
+  combat: '#/combat',
+  world: '#/world',
+  bank: '#/bank',
+  shop: '#/shop',
+  village: '#/village',
+  rank: '#/rank',
+  help: '#/help',
+  more: '#/more',
+};
+
+const firstCell = content.cells[0];
+const poi = content.cells.flatMap((c) => c.pois)[0];
+/** One real hash for every registered page pattern. */
+const SAMPLE: Record<string, string> = {
+  'core:home': '#/',
+  'core:entity': `#/enemy/${content.enemies[0]?.id}`,
+  'core:entity.technique': `#/technique/${content.techniques[0]?.id}`,
+  'core:entity.recipe': `#/recipe/${content.recipes[0]?.id}`,
+  'core:entity.gear': `#/gear/${content.gear[0]?.id}`,
+  'core:entity.building': `#/building/${content.buildings[0]?.id}`,
+  'core:entity.item': `#/item/${content.items[0]?.id}`,
+  'core:entity.quest': `#/quest/${content.quests[0]?.id}`,
+  'core:entity.exam': '#/exam/core:genin',
+  'core:entity.skill': '#/skill/tai',
+  'core:entity.cell': `#/cell/${firstCell?.id}`,
+  'core:entity.region': `#/region/${firstCell?.region}`,
+  'core:entity.poi': `#/poi/${poi?.id}`,
+  'core:village.focus': '#/village/core:forge',
+};
+const sampleOf = (key: string, route: string): string => SAMPLE[key] ?? route;
+
+let booted: BootedApp | null = null;
+const errors: unknown[][] = [];
+
+beforeAll(async () => {
+  await game.start();
+});
+afterAll(() => game.stop());
+afterEach(() => {
+  booted?.destroy();
+  booted = null;
+  vi.restoreAllMocks();
+});
+
+describe('the built-in game through the registries', () => {
+  it('registers exactly the routes that existed before', () => {
+    expect(coreRegistry.pages.map((p) => p.route).sort()).toEqual([...ROUTES].sort());
+  });
+
+  it('registers the nav items that existed before, with the same targets', () => {
+    expect(Object.fromEntries(coreRegistry.navItems.map((n) => [n.id, n.route]))).toEqual(NAV);
+  });
+
+  it('opens every registered page without console errors, under the same hash', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation((...args) => void errors.push(args));
+    const warn = vi.spyOn(console, 'warn').mockImplementation((...args) => void errors.push(args));
+    errors.length = 0;
+    booted = await bootApp([coreUi]);
+    for (const page of coreRegistry.pages) {
+      const hash = sampleOf(page.key, page.route);
+      expect(hash, page.key).not.toContain('undefined');
+      await booted.go(hash);
+      expect(location.hash).toBe(hash);
+      const root = booted.target.querySelector('[data-ui="page"]');
+      expect(root?.getAttribute('data-page'), hash).toBe(page.key);
+      expect(root?.children.length, `${hash} drew nothing`).toBeGreaterThan(0);
+    }
+    spy.mockRestore();
+    warn.mockRestore();
+    expect(errors).toEqual([]);
+  });
+
+  it('opens every nav item from the sidebar and the tab bar', async () => {
+    booted = await bootApp([coreUi]);
+    const links = [...booted.target.querySelectorAll<HTMLAnchorElement>('a[data-ui="nav-item"]')];
+    expect(links.length).toBeGreaterThan(0);
+    for (const link of links) {
+      const id = link.dataset.nav ?? link.dataset.tab ?? '';
+      expect(link.getAttribute('href'), id).toBe(NAV[id]);
+    }
+    for (const [id, hash] of Object.entries(NAV)) {
+      await booted.go(hash);
+      expect(booted.target.querySelector('[data-ui="page"]'), id).not.toBeNull();
+    }
+  });
+
+  it('falls back to the generic page for an unknown kind and shows not-found for nonsense', async () => {
+    booted = await bootApp([coreUi]);
+    await booted.go('#/enemy/core:dummy');
+    expect(
+      booted.target.querySelector('[data-ui="entity-page"]')?.getAttribute('data-entity'),
+    ).toBe('enemy:core:dummy');
+    await booted.go('#/nothing/here');
+    expect(booted.target.querySelector('[data-ui="page"]')).toBeNull();
+    expect(booted.target.textContent).toContain('Такої сторінки немає');
+  });
+});
+
+describe('stable anchors (D11)', () => {
+  it('every data-ui is a known part and entity-bound parts have data-entity', async () => {
+    const state = genin();
+    state.bank['core:mint'] = 3;
+    state.skills.tai.xp = 500;
+    booted = await bootApp([coreUi], state);
+    game.dispatch({ type: 'action.start', slot: 0, kind: 'practice', id: 'core:leaf_whirlwind' });
+    const seen = new Set<string>();
+    const hashes = [
+      '#/skill/tai',
+      '#/skill/alch',
+      '#/skill/herb',
+      '#/recipe/' + content.recipes[0]?.id,
+      '#/technique/core:leaf_whirlwind',
+      '#/shop',
+      '#/bank',
+      '#/village',
+      '#/building/core:forge',
+      '#/world',
+      `#/cell/${firstCell?.id}`,
+      '#/settings',
+      '#/quests',
+      '#/enemy/core:dummy',
+    ];
+    for (const hash of hashes) {
+      await booted.go(hash);
+      for (const el of booted.target.querySelectorAll('[data-ui]')) {
+        const part = el.getAttribute('data-ui') ?? '';
+        seen.add(part);
+        expect(UI_PARTS as readonly string[], `${hash}: ${part}`).toContain(part);
+        if ((ENTITY_PARTS as readonly string[]).includes(part)) {
+          expect(el.getAttribute('data-entity'), `${hash}: ${part}`).toMatch(/^[a-z]+:.+/);
+        }
+      }
+    }
+    // Parts that the walk is expected to have met somewhere.
+    for (const part of [
+      'page',
+      'nav-item',
+      'skill-row',
+      'action-tile',
+      'action-xp',
+      'action-interval',
+      'action-progress',
+      'mastery-ring',
+      'pool-bar',
+      'req-row',
+      'now-slot',
+      'goal-panel',
+      'entity-page',
+      'entity-header',
+      'entity-section',
+      'ingredient-row',
+      'shop-good',
+      'bank-item',
+      'building-card',
+      'world-cell',
+      'topbar-currency',
+    ]) {
+      expect(seen, part).toContain(part);
+    }
+    const slot = booted.target.querySelector('[data-ui="now-slot"]');
+    expect(slot?.getAttribute('data-slot-index')).toBe('0');
+  });
+
+  it('puts a modal part on dialogs', async () => {
+    const state = createState(1, content);
+    booted = await bootApp([coreUi], state);
+    expect(booted.target.querySelector('[data-ui="modal"]')).not.toBeNull();
+  });
+
+  it('shows no pack content when only the built-in pack runs', async () => {
+    booted = await bootApp([coreUi], genin(), '#/skill/tai');
+    expect(booted.target.innerHTML).not.toContain('x.testmod.');
+    expect(booted.target.querySelector('[data-ui-widget]')).toBeNull();
+    expect(booted.target.querySelector('[data-ui="theme-select"]')).toBeNull();
+  });
+});

@@ -25,7 +25,7 @@
   .settings-link {
     display: inline-flex;
     align-items: center;
-    min-height: 2.75rem;
+    min-height: var(--control-size);
   }
 
   .hints {
@@ -45,7 +45,7 @@
   h2 {
     margin: 0 0 var(--space-1);
     color: var(--heading);
-    font-size: 1rem;
+    font-size: var(--font-size-1);
   }
 
   p {

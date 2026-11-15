@@ -51,6 +51,8 @@
   class:focused
   id="building-{info.id}"
   data-building={info.id}
+  data-ui="building-card"
+  data-entity="building:{info.id}"
   data-level={info.level}
   data-focused={focused}
 >
@@ -202,18 +204,18 @@
   }
 
   h3 {
-    flex: 1 1 8rem;
+    flex: 1 1 var(--size-8);
     margin: 0;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--font-size-1-1);
     font-weight: 400;
   }
 
   .level,
   .busy {
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .busy {
@@ -230,7 +232,7 @@
   .label {
     margin: 0;
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   dd {
@@ -271,7 +273,7 @@
     display: flex;
     justify-content: space-between;
     gap: var(--space-3);
-    max-width: 20rem;
+    max-width: var(--size-20);
   }
 
   .cost li.short .num {
@@ -288,6 +290,6 @@
   }
 
   .why {
-    font-size: 0.9rem;
+    font-size: var(--font-size-0-9);
   }
 </style>

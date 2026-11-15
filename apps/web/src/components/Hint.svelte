@@ -78,12 +78,12 @@
 
   .mark {
     display: inline-flex;
-    padding-top: 2px;
+    padding-top: var(--offset-2);
     color: var(--chakra);
   }
 
   .body {
-    flex: 1 1 12rem;
+    flex: 1 1 var(--size-12);
     min-width: 0;
   }
 
@@ -119,7 +119,7 @@
   }
 
   button {
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-1) var(--space-3);
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
@@ -133,7 +133,7 @@
   @media (max-width: 768px) {
     .collapsed button {
       padding-inline: var(--space-2);
-      font-size: 0.8rem;
+      font-size: var(--font-size-0-8);
     }
   }
 </style>

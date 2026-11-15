@@ -64,7 +64,7 @@
 
 <style>
   .log {
-    max-height: 16rem;
+    max-height: var(--size-16);
     padding: var(--space-2) var(--space-3);
     border: 1px solid var(--line);
     border-radius: var(--radius);
@@ -83,8 +83,8 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 0 var(--space-1);
-    padding: 2px 0;
-    font-size: 0.9rem;
+    padding: var(--offset-2) 0;
+    font-size: var(--font-size-0-9);
     overflow-wrap: anywhere;
   }
 

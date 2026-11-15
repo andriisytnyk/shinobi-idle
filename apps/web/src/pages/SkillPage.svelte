@@ -11,6 +11,7 @@
   import PoolBar from '../components/PoolBar.svelte';
   import RecipeTile from '../components/RecipeTile.svelte';
   import ReqTree from '../components/ReqTree.svelte';
+  import Slot from '../lib/ext/Slot.svelte';
   import ScoutPanel from '../components/ScoutPanel.svelte';
   import { entityDesc, entityName } from '../lib/entities.ts';
   import { hasKey, t } from '../lib/i18n.ts';
@@ -56,8 +57,13 @@
 </script>
 
 {#if skill && progress}
-  <article class="skill-page" data-skill={skill.id}>
-    <header class="plate">
+  <article
+    class="skill-page"
+    data-skill={skill.id}
+    data-ui="entity-page"
+    data-entity="skill:{skill.id}"
+  >
+    <header class="plate" data-ui="entity-header">
       <h1>
         <span
           class="plate-icon"
@@ -69,6 +75,7 @@
       </h1>
       <span class="level">{t('level.short', { n: progress.level })}</span>
     </header>
+    <Slot name="skill.header" ctx={{ skill: skill.id }} />
 
     {#if desc}<p class="lore">{desc}</p>{/if}
     {#if hasKey(unlockKey)}<p class="unlock">{t(unlockKey)}</p>{/if}
@@ -87,7 +94,7 @@
     {/if}
 
     {#if lock && !lock.met}
-      <section class="locked" data-locked>
+      <section data-ui="entity-section" class="locked" data-locked>
         <h2><Icon name="lucide:lock" size={18} /> {t('skill.locked')}</h2>
         <ReqTree node={lock} />
         {#if (NATURE_IDS as readonly string[]).includes(id)}
@@ -101,7 +108,7 @@
     {:else if id === 'ath'}
       <CoursePanel />
     {:else if actions.length > 0}
-      <section>
+      <section data-ui="entity-section">
         <h2>{t('skill.actions')}</h2>
         <ul class="tiles">
           {#each actions as info (info.kind + info.id)}
@@ -124,7 +131,7 @@
     {/if}
 
     {#if gear.length > 0}
-      <section data-gear-section>
+      <section data-ui="entity-section" data-gear-section>
         <h2>{t('skill.gear')}</h2>
         {#each gear as line (line.id)}
           <GearLine {line} compact />
@@ -133,6 +140,7 @@
     {/if}
 
     <PoolBar skill={skill.id} />
+    <Slot name="skill.footer" ctx={{ skill: skill.id }} />
   </article>
 {:else}
   <p>{t('route.notFound')}</p>
@@ -147,7 +155,7 @@
     padding: var(--space-3) var(--space-4);
     border-radius: var(--radius);
     background: var(--surface-raised);
-    border-left: 6px solid var(--steel);
+    border-left: var(--border-6) solid var(--steel);
   }
 
   h1 {
@@ -157,7 +165,7 @@
     margin: 0;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.6rem;
+    font-size: var(--font-size-1-6);
     font-weight: 400;
   }
 
@@ -168,7 +176,7 @@
     margin: var(--space-4) 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--font-size-1-1);
     font-weight: 400;
   }
 
@@ -210,7 +218,7 @@
 
   .tiles {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(var(--size-16), 1fr));
     gap: var(--space-3);
     margin: 0;
     padding: 0;

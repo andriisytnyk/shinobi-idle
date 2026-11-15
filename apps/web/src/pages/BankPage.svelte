@@ -154,7 +154,13 @@
 
   <ul class="items">
     {#each rows as { item, n, sellable, coatable, tonic } (item.id)}
-      <li class="item" class:none={n < 1} data-item={item.id}>
+      <li
+        class="item"
+        class:none={n < 1}
+        data-item={item.id}
+        data-ui="bank-item"
+        data-entity="item:{item.id}"
+      >
         <span class="icon"><Icon entity={{ kind: 'item', id: item.id }} size={32} /></span>
         <span class="name"><EntityLink kind="item" id={item.id} /></span>
         <span class="qty" aria-label={t('bank.quantity')}>&times;{formatInt(n)}</span>
@@ -276,10 +282,10 @@
 
   .tab {
     flex: none;
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-1) var(--space-3);
     border: 0;
-    border-bottom: 3px solid transparent;
+    border-bottom: var(--border-3) solid transparent;
     background: none;
     color: var(--fg-dim);
     font: inherit;
@@ -293,10 +299,10 @@
 
   .search {
     display: inline-flex;
-    flex: 1 1 12rem;
+    flex: 1 1 var(--size-12);
     align-items: center;
     gap: var(--space-2);
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: 0 var(--space-2);
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
@@ -307,7 +313,7 @@
   .search input {
     flex: 1;
     min-width: 0;
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     border: 0;
     background: none;
     color: var(--fg);
@@ -318,13 +324,13 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     cursor: pointer;
   }
 
   .goal-filter input {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: var(--size-1-25);
+    height: var(--size-1-25);
   }
 
   .empty,
@@ -380,7 +386,7 @@
   }
 
   .name {
-    flex: 1 1 8rem;
+    flex: 1 1 var(--size-8);
     min-width: 0;
     font-weight: 600;
   }
@@ -389,14 +395,14 @@
     .name :global(a) {
       display: inline-flex;
       align-items: center;
-      min-height: 2.75rem;
+      min-height: var(--control-size);
     }
   }
 
   .level {
     display: block;
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--font-size-0-8);
     font-weight: 400;
   }
 
@@ -414,7 +420,7 @@
   .act {
     display: inline-flex;
     align-items: center;
-    min-height: 2.75rem;
+    min-height: var(--control-size);
     padding: var(--space-1) var(--space-3);
     border: 1px solid var(--accent);
     border-radius: var(--radius-sm);
@@ -434,7 +440,7 @@
   .why {
     margin: 0;
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .why::before {

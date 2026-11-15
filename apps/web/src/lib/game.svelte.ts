@@ -77,6 +77,12 @@ export type SaveStatus = 'idle' | 'saved' | 'error';
  */
 export type Phase = 'loading' | 'playing' | 'blocked' | 'error';
 
+/** Listeners that UI packs add around commands. `before` may replace the command or return `false` to cancel it. */
+export interface CommandHook {
+  before?(command: Command): Command | false | void;
+  after?(command: Command, result: CommandResult): void;
+}
+
 export interface GameDeps {
   content?: ContentDb;
   rules?: Rules;
@@ -117,6 +123,9 @@ export function createGame(deps: GameDeps = {}) {
   let rev = 0;
   let lastWall = clock.now();
   let timers: number[] = [];
+  const commandHooks: CommandHook[] = [];
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- plain bookkeeping that no view reads
+  const eventListeners = new Set<(event: GameEvent) => void>();
   let detach: (() => void) | null = null;
 
   const touch = () => {
@@ -128,6 +137,7 @@ export function createGame(deps: GameDeps = {}) {
     const events = state.events;
     if (events.length === 0) return;
     state.events = [];
+    for (const listener of eventListeners) for (const event of events) listener(event);
     const lines: LogEntry[] = [];
     let urgent = false;
     for (const event of events) {
@@ -348,13 +358,33 @@ export function createGame(deps: GameDeps = {}) {
     rules,
 
     /** Sends a command to the core and refreshes the views. */
-    dispatch(command: Command): CommandResult {
+    dispatch(original: Command): CommandResult {
+      let command = original;
+      for (const hook of commandHooks) {
+        const verdict = hook.before?.(command);
+        if (verdict === false) return { ok: false, reason: 'error.cancelledByMod' };
+        if (verdict) command = verdict;
+      }
       const result = coreDispatch(state, command, content, rules);
       if (result.ok && command.type === 'action.start' && command.kind === 'fight') log = [];
       drainEvents();
       touch();
       if (result.ok && SAVE_NOW.has(command.type)) void save();
+      for (const hook of commandHooks) hook.after?.(command, result);
       return result;
+    },
+    /** Adds a listener around commands; returns the function that removes it. */
+    addCommandHook(hook: CommandHook): () => void {
+      commandHooks.push(hook);
+      return () => {
+        const at = commandHooks.indexOf(hook);
+        if (at >= 0) commandHooks.splice(at, 1);
+      };
+    },
+    /** Calls `fn` for every event the core queues, as the queue is drained. */
+    onEvent(fn: (event: GameEvent) => void): () => void {
+      eventListeners.add(fn);
+      return () => eventListeners.delete(fn);
     },
     dismissGraduation(): void {
       graduation = false;
