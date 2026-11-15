@@ -147,8 +147,10 @@ export function createGame(deps: GameDeps = {}) {
 
   // The reveal rule for the components: reading through `version` makes whatever uses it follow the game.
   // Many links on a page ask about the same few entities: answers are kept for one update of the game.
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a cache that no view reads
   const levels = new Map<string, RevealLevel>();
   let levelsAt = -1;
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a cache that no view reads
   const hints = new Map<string, string | null>();
   let hintsAt = -1;
   const reveal: RevealReader = {
