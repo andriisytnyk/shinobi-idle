@@ -19,10 +19,6 @@ const tagged = (tag: TagId) => (r: ViewTechnique) => r.tech.tags.includes(tag);
 const use = (r: ViewTechnique | undefined): Decision | null =>
   r ? { type: 'technique', id: r.tech.id } : null;
 
-/** The trait whose answer is `tag`. */
-const traitOf = (tag: TagId): TraitId =>
-  (Object.keys(TRAIT_ANSWER) as TraitId[]).find((t) => TRAIT_ANSWER[t] === tag) ?? 'pack';
-
 /**
  * The default player AI. It reads only the view. It answers a trait the player KNOWS with the
  * technique tagged for it, when that technique is ready and would do something: Interrupt only
@@ -39,13 +35,12 @@ export const defaultCombatAi: CombatAi = (view) => {
     view.enemies.some((e) => e.workingTraits.includes(trait));
   const status = (id: string): boolean => view.player.effects.some((e) => e.id === id);
 
-  // A known caster's wind-up that would end after this technique's cast.
-  const casting = view.enemies.filter(
-    (e) => e.knownTraits.includes(traitOf('interrupt')) && e.cast,
-  );
-  const castEndsIn = casting.reduce<number | null>(
+  // An interruptible wind-up under way that would end after this technique's cast.
+  const castEndsIn = view.enemies.reduce<number | null>(
     (soonest, e) =>
-      e.cast && (soonest === null || e.cast.remaining < soonest) ? e.cast.remaining : soonest,
+      e.cast?.interruptible && (soonest === null || e.cast.remaining < soonest)
+        ? e.cast.remaining
+        : soonest,
     null,
   );
   if (castEndsIn !== null) {
@@ -77,9 +72,7 @@ export const defaultCombatAi: CombatAi = (view) => {
     if (decision) return decision;
   }
   // An interrupt is kept back for the next heavy attack when it would still be cooling down then.
-  const nextCasts = view.enemies
-    .filter((e) => e.knownTraits.includes(traitOf('interrupt')) && e.nextCastIn !== null)
-    .map((e) => e.nextCastIn ?? 0);
+  const nextCasts = view.enemies.flatMap((e) => (e.nextCastIn === null ? [] : [e.nextCastIn]));
   const soonest = nextCasts.length > 0 ? Math.min(...nextCasts) : null;
   const reserved = (r: ViewTechnique): boolean =>
     soonest !== null &&

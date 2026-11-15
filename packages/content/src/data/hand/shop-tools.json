@@ -1,0 +1,9 @@
+[
+  { "item": "core:kunai", "building": { "id": "core:forge", "level": 1 } },
+  { "item": "core:shuriken", "building": { "id": "core:forge", "level": 1 } },
+  { "item": "core:senbon", "building": { "id": "core:forge", "level": 2 } },
+  { "item": "core:wire", "building": { "id": "core:forge", "level": 2 } },
+  { "item": "core:wiretrap", "building": { "id": "core:forge", "level": 3 } },
+  { "item": "core:tag", "building": { "id": "core:market", "level": 2 } },
+  { "item": "core:medpouch", "building": { "id": "core:market", "level": 3 } }
+]

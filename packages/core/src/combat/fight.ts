@@ -196,7 +196,7 @@ function addBodies(ctx: FightCtx, spawn: Spawn, n: number, staggered: boolean): 
       intervalMs: stats.intervalMs,
       nature: natureOf(spawn, fight.natures),
       traits: [...spawn.traits],
-      specials: [...fight.encounter.specials],
+      specials: [...fight.encounter.specials, ...spawn.specials],
       effects: [],
       cd: {},
       phase: 'attack',
@@ -442,11 +442,23 @@ function hurt(ctx: FightCtx, target: Combatant, amount: number, src: string): nu
   if (!alive(target)) {
     if (target.side === 'enemy') fight.tally.kills++;
     for (const hook of hooksOf(ctx, target)) hook.onDeath?.(ctx, target);
+    leave(ctx, target);
   } else if (target.fleeAt !== null && target.hp <= target.maxHp * target.fleeAt) {
     target.fled = true;
     target.hp = 0;
+    leave(ctx, target);
   }
   return applied;
+}
+
+/** A body is gone, by death or flight: tell its hooks and end every effect that lasts while it lives. */
+function leave(ctx: FightCtx, c: Combatant): void {
+  for (const hook of hooksOf(ctx, c)) hook.onLeave?.(ctx, c);
+  for (const holder of [ctx.fight.player, ...ctx.fight.enemies]) {
+    if (holder.effects.some((e) => e.whileAlive === c.id)) {
+      holder.effects = holder.effects.filter((e) => e.whileAlive !== c.id);
+    }
+  }
 }
 
 /**
@@ -492,11 +504,15 @@ export function addDecoys(c: Combatant, n: number): void {
   c.decoys = Math.max(0, c.decoys + n);
 }
 
-/** Cancels every cast of a combatant's hooks that is under way; returns whether any was. */
-function cancelCasts(ctx: FightCtx, target: Combatant): boolean {
+/**
+ * Cancels the casts of a combatant's hooks that are under way (only the interruptible ones when
+ * `interruptible` is set); returns whether any was.
+ */
+function cancelCasts(ctx: FightCtx, target: Combatant, interruptible = false): boolean {
   let any = false;
   for (const hook of hooksOf(ctx, target)) {
-    if (hook.castInfo?.(ctx, target)?.casting) {
+    const info = hook.castInfo?.(ctx, target);
+    if (info?.casting && (!interruptible || info.interruptible)) {
       hook.onCancel?.(ctx, target);
       any = true;
     }
@@ -617,8 +633,12 @@ function buildView(ctx: FightCtx): FightView {
     for (const hook of hooksOf(ctx, e)) {
       const info = hook.castInfo?.(ctx, e);
       if (!info || info.inWork === null) continue;
-      if (info.casting) cast = { kind: info.kind, remaining: info.inWork };
-      else nextCastIn = info.inWork;
+      // A cast under way can be seen; when the next one comes is known only for a known trait.
+      if (info.casting) {
+        cast = { kind: info.kind, remaining: info.inWork, interruptible: info.interruptible };
+      } else if (!e.traits.includes(hook.id as never) || knownTraits.includes(hook.id as never)) {
+        nextCastIn = info.inWork;
+      }
     }
     return {
       id: e.id,
@@ -759,7 +779,9 @@ function applyHit(ctx: FightCtx, tech: KitTechnique, target: Combatant, hab: num
     if (target.traits.includes('armor')) count(fight.tally.statuses, 'armorBreak');
   }
   if (tech.tags.includes('bind')) applyBind(ctx, target, K.bindEva, tech.id);
-  if (tech.tags.includes('interrupt') && cancelCasts(ctx, target)) fight.tally.interrupts++;
+  if (tech.tags.includes('interrupt') && cancelCasts(ctx, target, true)) {
+    fight.tally.interrupts++;
+  }
   const base = tech.damage * hab * wheelFactor(tech.skill, target.nature, content);
   const dealt = dealDamage(ctx, target, base, tech.id);
   if (!alive(target)) return dealt;

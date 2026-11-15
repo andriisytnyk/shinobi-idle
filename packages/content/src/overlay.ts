@@ -6,14 +6,22 @@
 import { z } from 'zod';
 import {
   bossBaseSchema,
+  coatSchema,
   coreId,
   enemyBaseSchema,
   enemyCombatDataSchema,
   bossSpecialSchema,
+  gearFxSchema,
+  itemFxSchema,
   itemSchema,
+  reqSchema,
   techniqueBaseSchema,
   techniqueCombatSchema,
+  type GearBase,
+  type HerbBase,
   type K,
+  type MarketEntry,
+  type ShopEntry,
 } from './schema.ts';
 
 export const techniqueCombatMapSchema = z.record(coreId, techniqueCombatSchema);
@@ -78,4 +86,59 @@ export function layerBosses(base: BossBase[], data: EnemyMap, specials: SpecialM
       special,
     };
   });
+}
+
+// ---------- field and crafts: herbs, items, shop, coating, gear ----------
+
+export const herbReqMapSchema = z.record(coreId, reqSchema);
+export const itemFxMapSchema = z.record(coreId, itemFxSchema);
+export const gearFxMapSchema = z.record(coreId, gearFxSchema);
+export const shopToolsSchema = z.array(
+  z.strictObject({
+    item: coreId,
+    building: z.strictObject({ id: coreId, level: z.number().int().min(1) }),
+  }),
+);
+export const coatListSchema = z.array(coatSchema);
+
+/** The building id of the Market; its goods are listed in the generated market table. */
+const MARKET = 'core:market';
+
+/** Adds the extra requirement of each herb; `null` when it has none. */
+export function layerHerbs(base: HerbBase[], reqs: z.infer<typeof herbReqMapSchema>) {
+  return base.map((h) => ({ ...h, req: reqs[h.id] ?? null }));
+}
+
+/** Adds the per-tier effect to each gear line; a line without one is a data error. */
+export function layerGear(base: GearBase[], fx: z.infer<typeof gearFxMapSchema>) {
+  return base.map((g) => {
+    const effect = fx[g.id];
+    if (effect === undefined) throw new Error(`No gear effect for ${g.id}`);
+    return { ...g, fx: effect };
+  });
+}
+
+/**
+ * Everything a shop sells, each with the requirement that opens it: the rank of Genin and the
+ * level of the building that supplies it. Market goods come from the market table, tools from the
+ * hand-written list.
+ */
+export function layerShop(
+  market: MarketEntry[],
+  tools: z.infer<typeof shopToolsSchema>,
+): ShopEntry[] {
+  const entry = (item: string, building: { id: string; level: number }): ShopEntry => ({
+    item,
+    req: {
+      t: 'all',
+      of: [
+        { t: 'rank', rank: 'genin' },
+        { t: 'building', id: building.id, level: building.level },
+      ],
+    },
+  });
+  return [
+    ...market.map((m) => entry(m.item, { id: MARKET, level: m.marketLevel })),
+    ...tools.map((t) => entry(t.item, t.building)),
+  ];
 }

@@ -544,21 +544,19 @@ describe('the default AI decision rules, on hand-made views', () => {
   });
   const cast = (id: string) => ({ type: 'technique', id });
 
-  it('casts an interrupt only while a known cast is under way and ends later than this one', () => {
+  it('casts an interrupt only while an interruptible cast is under way and ends later than this one', () => {
     const techs = [kt('int', ['interrupt'], 1), kt('big', [], 50)];
-    const casting = (remaining: number, known = true) =>
+    const casting = (remaining: number, interruptible = true) =>
       mk(techs, [
         enemyView({
-          knownTraits: known ? ['caster'] : [],
-          workingTraits: known ? ['caster'] : [],
-          cast: { kind: 'heavy', remaining },
+          cast: { kind: 'heavy', remaining, interruptible },
         }),
       ]);
     const need = sec(1);
     expect(defaultCombatAi(casting(need + 1))).toEqual(cast('int'));
     expect(defaultCombatAi(casting(need))).toEqual(cast('big'));
     expect(defaultCombatAi(mk(techs))).toEqual(cast('big'));
-    // The trait is not known to the player: the wind-up is no reason to interrupt.
+    // A cast an interrupt cannot stop is no reason to interrupt.
     expect(defaultCombatAi(casting(need + 1, false))).toEqual(cast('big'));
   });
 

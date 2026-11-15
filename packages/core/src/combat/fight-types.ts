@@ -23,6 +23,8 @@ interface EffectBase {
   until: number | null;
   /** Id of another effect that does nothing while this one is active. */
   suppresses?: string;
+  /** The effect ends when the body with this id leaves the fight, by death or flight. */
+  whileAlive?: string;
 }
 
 /** Changes a stat of its holder for a duration. */
@@ -185,9 +187,11 @@ export interface Spawn {
   dmgMult: number;
   /** The body leaves when its health share falls to this; null never. */
   fleeAt: number | null;
+  /** Hook ids only the bodies of this spawn carry (a pack leader's own mechanic). */
+  specials: string[];
 }
 
-/** What a fight is against: a list of spawns plus special hooks every body carries. */
+/** What a fight is against: a list of spawns plus special hooks every body of the fight carries. */
 export interface Encounter {
   /** Content id of the entry the encounter was built from. */
   id: string;
@@ -268,8 +272,8 @@ export interface ViewEnemy {
   knownTraits: readonly TraitId[];
   /** Known traits that are working at the moment (not switched off). */
   workingTraits: readonly TraitId[];
-  /** A cast under way: its kind and the work units until it ends. */
-  cast: { kind: string; remaining: number } | null;
+  /** A cast under way: its kind, the work units until it ends and whether an interrupt stops it. */
+  cast: { kind: string; remaining: number; interruptible: boolean } | null;
   /** Work units until a waiting caster of this body starts its cast; null when none. */
   nextCastIn: number | null;
 }
@@ -333,7 +337,7 @@ export interface FightHook {
   castInfo?(
     ctx: FightCtx,
     c: Combatant,
-  ): { kind: string; casting: boolean; inWork: number | null } | null;
+  ): { kind: string; casting: boolean; interruptible: boolean; inWork: number | null } | null;
   /** The combatant is about to make its basic attack. */
   onAttack?(ctx: FightCtx, c: Combatant, plan: AttackPlan): void;
   /** The combatant's attack hit `target` for `dealt`. */
@@ -342,6 +346,8 @@ export interface FightHook {
   onDamaged?(ctx: FightCtx, c: Combatant, dealt: number, src: string): void;
   /** The combatant fell. */
   onDeath?(ctx: FightCtx, c: Combatant): void;
+  /** The combatant left the fight, by death or flight; fires once, after `onDeath` for a death. */
+  onLeave?(ctx: FightCtx, c: Combatant): void;
 }
 
 /** The part of the rule set a fight reads. */

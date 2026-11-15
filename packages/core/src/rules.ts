@@ -9,9 +9,12 @@ import {
 import { defaultCombatAi } from './combat/fight-ai.ts';
 import { defaultFightHooks } from './combat/fight-hooks.ts';
 import type { CombatAi, FightRules } from './combat/fight-types.ts';
+import { tonicProvider } from './buffs.ts';
 import { fightKind } from './combat/kind.ts';
 import { combatSystem } from './combat/system.ts';
 import { senseiTestKind } from './exam.ts';
+import { craftKind, gatherKind } from './field.ts';
+import { gearProvider } from './gear.ts';
 import type { ModifierProvider } from './modifiers.ts';
 import { questSystem } from './quests.ts';
 import type { System } from './system.ts';
@@ -37,9 +40,11 @@ export const defaultRules: Rules = {
     meditate: meditateKind,
     obstacle: obstacleKind,
     fight: fightKind,
+    gather: gatherKind,
+    craft: craftKind,
     senseiTest: senseiTestKind,
   },
-  modifierProviders: [],
+  modifierProviders: [tonicProvider, gearProvider],
   combatAi: defaultCombatAi,
   fightHooks: defaultFightHooks,
 };

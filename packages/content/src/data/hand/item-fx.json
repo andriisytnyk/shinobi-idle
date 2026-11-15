@@ -1,0 +1,45 @@
+{
+  "core:antidote": { "kind": "cleanse", "statuses": ["poison"] },
+  "core:tsiliushcha_maz": { "kind": "heal", "hp": 40 },
+  "core:paralitychna_otruta": { "kind": "poison", "tag": "bind" },
+  "core:dymova_bomba": {
+    "kind": "bomb",
+    "target": "self",
+    "stat": "evasion",
+    "mult": 1.2,
+    "durationMs": 3000
+  },
+  "core:sonnyi_poroshok": { "kind": "sleep", "fx": "sleep" },
+  "core:krovospynna_maz": { "kind": "woundHeal", "woundMin": 1 },
+  "core:slozohinna_bomba": {
+    "kind": "bomb",
+    "target": "enemy",
+    "stat": "accuracy",
+    "mult": 0.85,
+    "durationMs": 5000
+  },
+  "core:hirska_maz": { "kind": "heal", "hp": 100 },
+  "core:nervova_otruta": { "kind": "poison", "tag": "dot" },
+  "core:niukhalna_sil": { "kind": "dispel", "tag": "dispel" },
+  "core:maz_vid_opikiv": {
+    "kind": "cleanse",
+    "statuses": ["burn"],
+    "resist": { "nature": "katon", "durationMs": 30000 }
+  },
+  "core:onihiri": { "kind": "heal", "hp": 30 },
+  "core:tonik_iasnoho_rozumu": { "kind": "tonic", "skill": "med", "xpBonus": 0.05, "charges": 40 },
+  "core:piliulia_viiskovoho_paika": { "kind": "restore", "chakra": 40, "stamina": 40 },
+  "core:sushenyi_paiok": { "kind": "ration", "duration": -0.05, "missions": 1 },
+  "core:krovotvorna_piliulia": { "kind": "heal", "hp": 50, "woundMin": 1 },
+  "core:tonik_kontsentratsii": { "kind": "tonic", "skill": "cc", "xpBonus": 0.05, "charges": 40 },
+  "core:bulion_ramenu": { "kind": "heal", "hp": 80 },
+  "core:chai_badorosti": { "kind": "tonic", "skill": "ath", "xpBonus": 0.05, "charges": 40 },
+  "core:iakitori_shynobi": { "kind": "heal", "hp": 120 },
+  "core:tonik_stykhii": {
+    "kind": "tonic",
+    "skill": "allNatures",
+    "xpBonus": 0.05,
+    "charges": 40
+  },
+  "core:piliulia_vidnovlennia_chakry": { "kind": "restore", "chakra": 120 }
+}

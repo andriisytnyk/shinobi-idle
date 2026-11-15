@@ -17,6 +17,18 @@ export const BALANCE_EXT = {
   bindEva: 0.3,
   /** Chance to resist an Illusionist's illusion per Meditation level (Медитація ÷ 200). */
   illusionResist: 0.005,
+  /** Herb bushes: stock is stockBase plus the herb's mastery level; an empty bush regrows for regrowMs. */
+  field: { stockBase: 5, regrowMs: 5000 },
+  /** Crafting mastery tiers (mastery levels 1 / 20 / 50 / 90): each tier above the first adds this chance of one bonus unit. */
+  craftRules: { masteryTiers: [1, 20, 50, 90], bonusPerTier: 0.25 },
+  /** A tonic holds at most this many times the charges of one tonic. */
+  tonic: { capMult: 2 },
+  /** Shop sell price of a craft product: this share of the value computed from its ingredients; herbs are worth herbBase + herbPerLevel x level. */
+  shop: { craftSellFactor: 0.35, herbBase: 2, herbPerLevel: 0 },
+  /** Size of one owned training-gear tier: XP share, time share, keep-ingredients chance, speed share, time share. */
+  gearFx: { mannequin: 0.03, sickle: 0.05, alembic: 0.03, stations: 0.05, maps: 0.03 },
+  /** Numbers of item effects that name them by key (the recipe text gives no number for the sleeping powder). */
+  itemFx: { sleep: { chance: 0.5 } },
   /** Mastery levels stop here. */
   masteryCap: 99,
   /**

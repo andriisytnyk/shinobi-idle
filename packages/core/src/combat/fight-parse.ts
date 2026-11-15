@@ -68,11 +68,13 @@ function parseEffect(raw: unknown, t: number): Effect | null {
   if (!isRecord(raw) || !isStr(raw.id) || !isStr(raw.src)) return null;
   if (raw.until !== null && !isInt(raw.until)) return null;
   if (raw.suppresses !== undefined && !isStr(raw.suppresses)) return null;
+  if (raw.whileAlive !== undefined && !isStr(raw.whileAlive)) return null;
   const base = {
     id: raw.id,
     src: raw.src,
     until: raw.until === null ? null : Math.max(raw.until as number, t),
     ...(raw.suppresses === undefined ? {} : { suppresses: raw.suppresses }),
+    ...(raw.whileAlive === undefined ? {} : { whileAlive: raw.whileAlive }),
   };
   if (raw.kind === 'modifier') {
     if (!oneOf(MOD_STATS, raw.stat) || !isNum(raw.value)) return null;
@@ -267,6 +269,7 @@ function parseEncounter(raw: unknown, most: number): Encounter | null {
     if (!isInt(s.count) || s.count < 1 || s.count > most) return null;
     if (!isNum(s.hpMult) || s.hpMult <= 0 || !nonNeg(s.dmgMult)) return null;
     if (s.fleeAt !== null && !share(s.fleeAt)) return null;
+    if (!Array.isArray(s.specials) || !s.specials.every(isStr)) return null;
     spawns.push({
       enemy: s.enemy,
       cl: s.cl,
@@ -276,6 +279,7 @@ function parseEncounter(raw: unknown, most: number): Encounter | null {
       hpMult: s.hpMult,
       dmgMult: s.dmgMult as number,
       fleeAt: s.fleeAt,
+      specials: s.specials as string[],
     });
   }
   return { id: raw.id, spawns, specials: raw.specials as string[] };

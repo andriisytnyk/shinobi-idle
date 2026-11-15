@@ -7,6 +7,7 @@ import {
   rate,
   techniqueCastSeconds,
 } from './formulas.ts';
+import { bushOf, bushSize, gatherAverageSeconds } from './field.ts';
 import { getMod } from './mod.ts';
 import { evalReq, type Req, type ReqResult } from './requirements.ts';
 import { defaultRules, type Rules } from './rules.ts';
@@ -55,6 +56,10 @@ export interface ActionInfo {
   masteryLevel: number;
   /** Fraction of the current mastery level, 0..1 (1 at the cap). */
   masteryProgress: number;
+  /** Items a craft uses per cycle, with how many the bank holds; empty for other actions. */
+  inputs: { item: string; n: number; have: number }[];
+  /** What a craft makes per cycle (before any bonus unit); empty for other actions. */
+  outputs: { item: string; n: number }[];
 }
 
 interface Facts {
@@ -62,6 +67,12 @@ interface Facts {
   level: number;
   /** Cycle length in ms before modifiers. */
   baseMs: number;
+  /** Milliseconds of work one completion is paid for, before modifiers; defaults to `baseMs`. */
+  rewardMs?: number;
+  /** Extra ms each completion costs on average at full speed, outside the cycle (herb regrow). */
+  extraMs?: number;
+  inputs?: { item: string; n: number }[];
+  outputs?: { item: string; n: number }[];
 }
 
 /** The skill, unlock level and unmodified cycle of an action of a built-in kind; null otherwise. */
@@ -96,6 +107,31 @@ function factsOf(state: GameState, kind: string, id: string, content: ContentDb)
       const o = index.obstacles.get(id);
       return o ? { skill: 'ath', level: o.level, baseMs: ms(K.obstacle) } : null;
     }
+    case 'gather': {
+      const h = index.herbs.get(id);
+      if (!h) return null;
+      const bush = bushOf(state, id);
+      const size = bush?.size ?? bushSize(state, id, content);
+      return {
+        skill: 'herb',
+        level: h.level,
+        baseMs: ms(K.gather),
+        rewardMs: gatherAverageSeconds(size, content) * MS_PER_SECOND,
+        extraMs: K.field.regrowMs / size,
+      };
+    }
+    case 'craft': {
+      const r = index.recipes.get(id);
+      if (!r) return null;
+      return {
+        skill: r.skill,
+        level: r.level,
+        baseMs: ms(K.craft),
+        rewardMs: K.craft * MS_PER_SECOND * K.craftXpMult,
+        inputs: r.ingredients.map((i) => ({ item: i.item, n: i.n })),
+        outputs: [r.output],
+      };
+    }
     default:
       return null;
   }
@@ -122,6 +158,7 @@ export function actionInfo(
   const facts = factsOf(state, action.kind, action.id, content);
   if (!facts) return null;
   const { skill, level, baseMs } = facts;
+  const rewardMs = facts.rewardMs ?? baseMs;
 
   const parts: Req[] = [];
   const unlock = skillUnlockReq(skill, content);
@@ -130,9 +167,13 @@ export function actionInfo(
   if (own) parts.push(...(own.t === 'all' ? own.of : [own]));
   const result = evalReq(state, { t: 'all', of: parts }, content);
 
-  const intervalMs = kind.intervalMs(state, action.id, content, rules);
   const K = content.balance.K;
-  let xpPerHour = (rate(level, content) * baseMs) / intervalMs;
+  let intervalMs = kind.intervalMs(state, action.id, content, rules);
+  // An empty bush's regrow is counted in the average (extraMs), not in the steady cycle.
+  if (facts.extraMs !== undefined && bushOf(state, action.id)?.stock === 0) {
+    intervalMs -= K.field.regrowMs;
+  }
+  let xpPerHour = (rate(level, content) * rewardMs) / (intervalMs + (facts.extraMs ?? 0));
   xpPerHour *= getMod(state, 'xp.all', content, rules).total;
   xpPerHour *= getMod(state, `xp.skill.${skill}`, content, rules).total;
   if (state.player.rank === 'student' && state.skills[skill].xp >= xpAt(K.academyCap)) {
@@ -151,6 +192,8 @@ export function actionInfo(
     xpPerHour,
     masteryLevel: mastery.level,
     masteryProgress: mastery.progress,
+    inputs: (facts.inputs ?? []).map((i) => ({ ...i, have: state.bank[i.item] ?? 0 })),
+    outputs: facts.outputs ?? [],
   };
 }
 
@@ -176,6 +219,14 @@ function skillActionIds(skill: SkillId, content: ContentDb): { kind: string; id:
       return by('meditate', content.practices);
     case 'ath':
       return by('obstacle', content.obstacles);
+    case 'herb':
+      return by('gather', content.herbs);
+    case 'alch':
+    case 'prov':
+      return by(
+        'craft',
+        content.recipes.filter((r) => r.skill === skill),
+      );
     default:
       return [];
   }

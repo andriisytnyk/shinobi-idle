@@ -27,6 +27,7 @@ export function encounterFor(
         hpMult: (boss ? K.boss.hp : 1) * (pack ? K.pack.hp : 1),
         dmgMult: (boss ? K.boss.dmg : 1) * (pack ? K.pack.dmg : 1),
         fleeAt: null,
+        specials: [],
       },
     ],
   };

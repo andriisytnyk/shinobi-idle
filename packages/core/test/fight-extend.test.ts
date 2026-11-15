@@ -315,7 +315,13 @@ describe('encounters', () => {
       }),
     ]);
     const plain = encounterFor(entry(bandit()), content);
-    expect(plain.spawns[0]).toMatchObject({ count: 1, hpMult: 1, dmgMult: 1, fleeAt: null });
+    expect(plain.spawns[0]).toMatchObject({
+      count: 1,
+      hpMult: 1,
+      dmgMult: 1,
+      fleeAt: null,
+      specials: [],
+    });
     expect(plain.specials).toEqual([]);
   });
 
@@ -349,6 +355,7 @@ describe('encounters', () => {
           hpMult: 1,
           dmgMult: 1,
           fleeAt: null,
+          specials: [],
         },
         {
           enemy: 'core:bandit',
@@ -359,6 +366,7 @@ describe('encounters', () => {
           hpMult: 2,
           dmgMult: 3,
           fleeAt: 0.5,
+          specials: [],
         },
       ],
     };
@@ -386,6 +394,7 @@ describe('encounters', () => {
           hpMult: 1,
           dmgMult: 1,
           fleeAt: null,
+          specials: [],
         },
       ],
     };
@@ -754,3 +763,245 @@ describe('signature habituation', () => {
 });
 
 void createState;
+
+// ---------- saving around the follow-up of an outcome ----------
+
+describe('a fight saved while it follows up an outcome', () => {
+  function fighting(seed: number) {
+    const state = genin(seed);
+    for (const skill of ['tai', 'nin', 'katon', 'vit', 'eva', 'med'] as const)
+      setLevel(state, skill, 25);
+    refreshUnlocks(state, content, true);
+    dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: 'core:bandit' }, content);
+    return state;
+  }
+
+  it('keeps the pause, carry and paid work of a fled fight across a save', () => {
+    const state = fighting(8);
+    const fight = state.combat!.fight;
+    fight.encounter.spawns[0]!.fleeAt = 0.99;
+    only(fight).fleeAt = 0.99;
+    for (let i = 0; i < 400 && state.combat?.phase !== 'respawn'; i++) advance(state, 100, content);
+    expect(state.combat?.phase).toBe('respawn');
+    expect(state.combat?.fight.result).toBe('fled');
+    const before = state.combat!;
+    const loaded = deserialize(serialize(state, 0), content);
+    expect(loaded.combat?.phase).toBe('respawn');
+    expect(loaded.combat?.pause).toBe(before.pause);
+    expect(loaded.combat?.carry).toBe(before.carry);
+    expect(loaded.combat?.paid).toEqual(before.paid);
+    advance(state, 40_000, content);
+    advance(loaded, 40_000, content);
+    expect(serialize(loaded, 0)).toBe(serialize(state, 0));
+  });
+
+  it('keeps the new fight that follows a timeout across a save', () => {
+    const state = fighting(9);
+    const old = state.combat!.fight;
+    for (const e of old.enemies) e.hp = e.maxHp = 1e9;
+    old.cap = sec(2);
+    advance(state, 2300, content);
+    expect(state.combat?.fight).not.toBe(old);
+    expect(state.combat?.phase).toBe('fight');
+    const loaded = deserialize(serialize(state, 0), content);
+    expect(loaded.combat?.fight.t).toBe(state.combat?.fight.t);
+    advance(state, 40_000, content);
+    advance(loaded, 40_000, content);
+    expect(serialize(loaded, 0)).toBe(serialize(state, 0));
+  });
+});
+
+// ---------- per-spawn specials, leaving, lifetimes, hook-owned casts ----------
+
+describe('spawn specials', () => {
+  it('apply only to the bodies of their spawn, besides the encounter-wide ones', () => {
+    const seen: Record<string, string[]> = {};
+    const mark = (id: string): FightHook => ({
+      id,
+      init: (_ctx, c) => void (seen[id] ??= []).push(c.id),
+    });
+    const custom = { ...rules, fightHooks: [mark('test:leader'), mark('test:all')] };
+    const spawn = (enemy: string, count: number, specials: string[]) => ({
+      enemy,
+      cl: 10,
+      traits: [],
+      nature: null,
+      count,
+      hpMult: 1,
+      dmgMult: 1,
+      fleeAt: null,
+      specials,
+    });
+    const encounter: Encounter = {
+      id: 'core:pack',
+      specials: ['test:all'],
+      spawns: [spawn('core:leader', 1, ['test:leader']), spawn('core:wolf', 3, [])],
+    };
+    const fight = createFight(scripted([]), encounter, 1, content, custom);
+    expect(seen['test:leader']).toHaveLength(1);
+    expect(seen['test:all']).toHaveLength(4);
+    expect(fight.enemies[0]?.specials).toEqual(['test:all', 'test:leader']);
+    expect(fight.enemies[1]?.specials).toEqual(['test:all']);
+    expect(parseFight(JSON.parse(JSON.stringify(fight)), content)).toEqual(fight);
+    // A body added later gets the same.
+    spawnEnemies(fight, 1, content, custom);
+    expect(seen['test:leader']).toHaveLength(1);
+    expect(seen['test:all']).toHaveLength(5);
+  });
+});
+
+describe('leaving the fight', () => {
+  const pair = (): FightState => {
+    const encounter: Encounter = {
+      id: 'core:two',
+      specials: ['test:watch'],
+      spawns: [
+        {
+          enemy: 'core:bandit',
+          cl: 6,
+          traits: [],
+          nature: null,
+          count: 2,
+          hpMult: 1,
+          dmgMult: 1,
+          fleeAt: 0.5,
+          specials: [],
+        },
+      ],
+    };
+    return quiet(createFight(scripted([]), encounter, 1, content, rules), 1000);
+  };
+  const left: string[] = [];
+  const watch: FightHook = { id: 'test:watch', onLeave: (_ctx, c) => void left.push(c.id) };
+  const custom = { ...rules, fightHooks: [...rules.fightHooks, watch] };
+  const aura = (id: string, owner: string) => ({
+    kind: 'modifier' as const,
+    id,
+    src: 'test',
+    until: null,
+    stat: 'evasion' as const,
+    op: 'mul' as const,
+    value: 2,
+    whileAlive: owner,
+  });
+
+  it('fires once for a death and once for a flight, and ends effects that last while the body lives', () => {
+    left.length = 0;
+    const fight = pair();
+    const [a, b] = fight.enemies;
+    if (!a || !b) throw new Error('no bodies');
+    addEffect(fight.player, aura('auraA', a.id));
+    addEffect(fight.player, aura('auraB', b.id));
+    addEffect(a, aura('selfOfB', b.id));
+    const ctx = { fight, content, rules: custom };
+    dealDamage(ctx, a, 1e9, 'x');
+    expect(left).toEqual([a.id]);
+    expect(fight.player.effects.map((e) => e.id)).toEqual(['auraB']);
+    // The second body flees instead of dying.
+    dealDamage(ctx, b, b.maxHp * 0.6, 'x');
+    expect(b.fled).toBe(true);
+    expect(left).toEqual([a.id, b.id]);
+    expect(fight.player.effects).toEqual([]);
+    expect(a.effects).toEqual([]);
+    // Nothing fires twice.
+    dealDamage(ctx, a, 10, 'x');
+    dealDamage(ctx, b, 10, 'x');
+    expect(left).toEqual([a.id, b.id]);
+  });
+
+  it('ends such an effect through the event path: split invariance holds', () => {
+    const run = (chunk: number) => {
+      const fight = pair();
+      const [a] = fight.enemies;
+      if (!a) throw new Error('no bodies');
+      addEffect(fight.player, aura('auraA', a.id));
+      a.hp = a.maxHp = 40;
+      // It bleeds to death on a tick, so the aura ends at an event of the fight.
+      addEffect(a, {
+        kind: 'periodic',
+        id: 'bleed',
+        src: 'test',
+        until: null,
+        mode: 'damage',
+        amount: 10,
+        every: sec(1),
+        next: sec(1),
+      });
+      for (let done = 0; done < sec(30); done += chunk) {
+        fightAdvance(fight, Math.min(chunk, sec(30) - done), content, custom);
+      }
+      return JSON.stringify(fight);
+    };
+    const whole = run(sec(30));
+    for (const chunk of [1_000_003, 777_777]) expect(run(chunk)).toBe(whole);
+    const player = (JSON.parse(whole) as FightState).player;
+    expect(player.effects.some((e) => e.id === 'auraA')).toBe(false);
+  });
+});
+
+describe('casts owned by a hook', () => {
+  // A special with its own wind-up: wait, then cast for three seconds, then a heavy blow.
+  const charge: FightHook = {
+    id: 'test:charge',
+    init(_ctx, c) {
+      c.timers.charge = { progress: 0, need: sec(2) * 1000 };
+      c.data.charging = 0;
+    },
+    onTimer(ctx, c) {
+      const timer = c.timers.charge;
+      if (!timer) return;
+      if (c.data.charging === 0) {
+        c.data.charging = 1;
+        timer.need = sec(3) * 1000;
+      } else {
+        ctx.fight.tally.taken += 1000;
+        c.data.charging = 0;
+        timer.need = sec(2) * 1000;
+      }
+    },
+    onCancel(_ctx, c) {
+      c.data.charging = 0;
+      c.timers.charge = { progress: 0, need: sec(2) * 1000 };
+    },
+    castInfo(_ctx, c) {
+      const timer = c.timers.charge;
+      if (!timer) return null;
+      return {
+        kind: 'charge',
+        interruptible: true,
+        casting: c.data.charging === 1,
+        inWork: Math.max(0, Math.ceil((timer.need - timer.progress) / 1000)),
+      };
+    },
+  };
+  const custom = { ...rules, fightHooks: [...rules.fightHooks, charge] };
+  const encounter = () =>
+    encounterFor(
+      content.enemies.find((e) => e.id === 'core:bandit')!,
+      content,
+      ['test:charge'],
+    );
+
+  it('is interrupted by the default AI, which reads the cast from the view', () => {
+    let interrupted = 0;
+    for (let seed = 1; seed <= 30; seed++) {
+      const fight = quiet(
+        pacify(createFight(scripted(['core:dynamic_entry']), encounter(), seed, content, custom)),
+      );
+      fightAdvance(fight, sec(5.5), content, custom);
+      if (fight.tally.interrupts === 1) {
+        interrupted++;
+        // The blow of this wind-up never came.
+        expect(fight.tally.taken).toBe(0);
+      } else expect(fight.tally.taken).toBe(1000);
+    }
+    expect(interrupted).toBeGreaterThan(10);
+  });
+
+  it('is not interrupted when there is no interrupt technique', () => {
+    const fight = quiet(pacify(createFight(scripted([]), encounter(), 1, content, custom)));
+    fightAdvance(fight, sec(5.5), content, custom);
+    expect(fight.tally.interrupts).toBe(0);
+    expect(fight.tally.taken).toBe(1000);
+  });
+});

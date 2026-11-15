@@ -34,8 +34,8 @@ import {
   type GeneratedDb,
   type EnemyBase,
   type Exercise,
-  type Gear,
-  type Herb,
+  type GearBase,
+  type HerbBase,
   type Item,
   type MarketEntry,
   type Mission,
@@ -272,7 +272,7 @@ const addItem = (item: Item, name: string, desc: string | undefined) => {
 const itemName = (id: string) => need(map.ITEMS[id], `item ${id} missing in map data`)[0];
 const itemDesc = (id: string) => need(map.ITEMS[id], `item ${id} missing in map data`)[2];
 
-const herbs: Herb[] = slice.herbs.map((h) => ({ id: core(h.id), level: h.level }));
+const herbs: HerbBase[] = slice.herbs.map((h) => ({ id: core(h.id), level: h.level }));
 
 // Recipe ids come from the Ukrainian name; the antidote keeps a readable id because missions use it.
 const recipeSlugs = { take: (k: string, forced?: string) => ids.take('recipe', k, forced) };
@@ -386,13 +386,13 @@ const market: MarketEntry[] = slice.market.map(([raw, supplier, lvl]) => ({
 }));
 
 const gearSlugs = { take: (k: string) => ids.take('gear', k) };
-const gear: Gear[] = slice.gear.map(([name, skill, tiers, effect]) => {
+const gear: GearBase[] = slice.gear.map(([name, skill, tiers, effect]) => {
   const id = core(gearSlugs.take(name));
   text('gear', id, 'name', name);
   text('gear', id, 'desc', effect);
   return {
     id,
-    skill: skill as Gear['skill'],
+    skill: skill as GearBase['skill'],
     tiers: tiers.map(([tier, level, req]) => {
       let building: { id: string; level: number } | null = null;
       if (req) {

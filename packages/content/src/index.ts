@@ -20,9 +20,14 @@ import techniques from './data/generated/techniques.json' with { type: 'json' };
 import handBossSpecials from './data/hand/boss-specials.json' with { type: 'json' };
 import handCombos from './data/hand/combos.json' with { type: 'json' };
 import handEnemyCombat from './data/hand/enemy-combat.json' with { type: 'json' };
+import handCoat from './data/hand/coat.json' with { type: 'json' };
 import handExams from './data/hand/exams.json' with { type: 'json' };
+import handGearFx from './data/hand/gear-fx.json' with { type: 'json' };
+import handHerbReqs from './data/hand/herb-reqs.json' with { type: 'json' };
 import handItemEcon from './data/hand/item-econ.json' with { type: 'json' };
+import handItemFx from './data/hand/item-fx.json' with { type: 'json' };
 import handItems from './data/hand/items.json' with { type: 'json' };
+import handShopTools from './data/hand/shop-tools.json' with { type: 'json' };
 import handOperations from './data/hand/operations.json' with { type: 'json' };
 import handQuests from './data/hand/quests.json' with { type: 'json' };
 import handStatuses from './data/hand/statuses.json' with { type: 'json' };
@@ -36,11 +41,19 @@ import uiUk from './locales/ui.uk.json' with { type: 'json' };
 import { z } from 'zod';
 import {
   bossSpecialMapSchema,
+  coatListSchema,
   enemyCombatMapSchema,
+  gearFxMapSchema,
+  herbReqMapSchema,
   itemEconMapSchema,
+  itemFxMapSchema,
   layerBosses,
   layerEnemies,
+  layerGear,
+  layerHerbs,
+  layerShop,
   layerTechniques,
+  shopToolsSchema,
   techniqueCombatMapSchema,
 } from './overlay.ts';
 import {
@@ -48,6 +61,9 @@ import {
   bossBaseSchema,
   contentDbSchema,
   enemyBaseSchema,
+  gearBaseSchema,
+  herbBaseSchema,
+  marketEntrySchema,
   techniqueBaseSchema,
   type ContentDb,
 } from './schema.ts';
@@ -55,6 +71,7 @@ import {
 const bal = balanceSchema.parse(balance);
 const itemEcon = itemEconMapSchema.parse(handItemEcon);
 const enemyCombat = enemyCombatMapSchema.parse(handEnemyCombat);
+const itemFx = itemFxMapSchema.parse(handItemFx);
 
 /** The validated content database. Parsing fails loudly if the generated data drifts from the schemas. */
 export const content: ContentDb = contentDbSchema.parse({
@@ -67,10 +84,16 @@ export const content: ContentDb = contentDbSchema.parse({
   exercises,
   practices,
   obstacles,
-  herbs,
+  herbs: layerHerbs(z.array(herbBaseSchema).parse(herbs), herbReqMapSchema.parse(handHerbReqs)),
   pools,
-  items: [...items, ...handItems].map((i) => ({ ...i, ...itemEcon[i.id] })),
+  items: [...items, ...handItems].map((i) => ({
+    ...i,
+    ...itemEcon[i.id],
+    ...(itemFx[i.id] ? { fx: itemFx[i.id] } : {}),
+  })),
   market,
+  shop: layerShop(z.array(marketEntrySchema).parse(market), shopToolsSchema.parse(handShopTools)),
+  coat: coatListSchema.parse(handCoat),
   recipes,
   missions,
   regions,
@@ -83,7 +106,7 @@ export const content: ContentDb = contentDbSchema.parse({
     bal.K,
   ),
   buildings,
-  gear,
+  gear: layerGear(z.array(gearBaseSchema).parse(gear), gearFxMapSchema.parse(handGearFx)),
   balance,
   quests: handQuests,
   exams: handExams,

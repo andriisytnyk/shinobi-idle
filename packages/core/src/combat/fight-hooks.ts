@@ -75,6 +75,7 @@ const caster: FightHook = {
     const rate = speed(ctx, c);
     return {
       kind: 'heavy',
+      interruptible: true,
       casting: c.data['caster.cast'] === 1,
       inWork: rate > 0 ? Math.ceil(Math.max(0, timer.need - timer.progress) / rate) : null,
     };

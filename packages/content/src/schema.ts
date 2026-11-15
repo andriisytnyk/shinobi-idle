@@ -156,7 +156,13 @@ export const practiceSchema = z.strictObject({
 
 export const obstacleSchema = z.object({ id: coreId, level, slot: z.number().int().min(1) });
 
-export const herbSchema = z.object({ id: coreId, level });
+/** The part of a herb that the importer generates; the extra requirement is layered on at load. */
+export const herbBaseSchema = z.object({ id: coreId, level });
+
+export const herbSchema = herbBaseSchema.extend({
+  /** What the herb needs besides its Herbalism level (a Chakra Control level for rare herbs); `null` for none. */
+  req: z.lazy(() => reqSchema).nullable(),
+});
 
 export const poolCheckpointSchema = z.object({
   id: coreId,
@@ -173,6 +179,62 @@ export const itemUseSchema = z.strictObject({
   t: z.literal('masteryHour'),
   mentor: z.enum(['academy', 'other']),
 });
+
+/** Combat stats a bomb can change. */
+export const BOMB_STATS = ['evasion', 'accuracy'] as const;
+
+/**
+ * What a crafted product does when used. The numbers of an effect live here, once, taken from the
+ * recipe text; the rules read them and never carry a literal of their own.
+ */
+export const itemFxSchema = z.discriminatedUnion('kind', [
+  /** Restores health at once; `woundMin` also shortens the healing of one Wound stack after the fight. */
+  z.strictObject({
+    kind: z.literal('heal'),
+    hp: z.number().int().min(1),
+    woundMin: z.number().int().min(1).optional(),
+  }),
+  z.strictObject({
+    kind: z.literal('restore'),
+    chakra: z.number().int().min(1).optional(),
+    stamina: z.number().int().min(1).optional(),
+  }),
+  /** Removes statuses; `resist` also gives resistance to a nature for a while. */
+  z.strictObject({
+    kind: z.literal('cleanse'),
+    statuses: z.array(statusId).min(1),
+    resist: z.strictObject({ nature: natureId, durationMs: z.number().int().min(1) }).optional(),
+  }),
+  /** Dispels an enemy illusion; answers the tag. */
+  z.strictObject({ kind: z.literal('dispel'), tag: tagId }),
+  /** After the fight, shortens the healing of one Wound stack. */
+  z.strictObject({ kind: z.literal('woundHeal'), woundMin: z.number().int().min(1) }),
+  /** A combat modifier on the player (`self`) or on the enemy for a while: the stat is multiplied by `mult`. */
+  z.strictObject({
+    kind: z.literal('bomb'),
+    target: z.enum(['self', 'enemy']),
+    stat: z.enum(BOMB_STATS),
+    mult: z.number().gt(0),
+    durationMs: z.number().int().min(1),
+  }),
+  /** Puts a weaker enemy to sleep; the chance is `K.itemFx.sleep.chance`. */
+  z.strictObject({ kind: z.literal('sleep'), fx: z.literal('sleep') }),
+  /** Raises the XP of a skill (or of the five natures) for a number of completed actions. */
+  z.strictObject({
+    kind: z.literal('tonic'),
+    skill: z.union([skillId, z.literal('allNatures')]),
+    xpBonus: z.number().gt(0),
+    charges: z.number().int().min(1),
+  }),
+  /** Shortens one mission: its duration changes by `duration` (a fraction, negative). */
+  z.strictObject({
+    kind: z.literal('ration'),
+    duration: z.number().lt(0),
+    missions: z.number().int().min(1),
+  }),
+  /** A weapon poison; the tag is what the coated senbon answer. */
+  z.strictObject({ kind: z.literal('poison'), tag: tagId }),
+]);
 
 export const itemSchema = z.strictObject({
   id: coreId,
@@ -208,6 +270,8 @@ export const itemSchema = z.strictObject({
     .optional(),
   /** A part of a scroll: `K.partsPerScroll` of them make the scroll of the technique. */
   part: z.strictObject({ technique: coreId }).optional(),
+  /** What the product does; every recipe output has one. */
+  fx: itemFxSchema.optional(),
 });
 
 export const marketEntrySchema = z.object({
@@ -217,6 +281,15 @@ export const marketEntrySchema = z.object({
   /** Market building level that unlocks the entry. */
   marketLevel: z.number().int(),
 });
+
+/** What a shop sells: the item and what must hold before it can be bought. The price is `K.goods[item.buy]`. */
+export const shopEntrySchema = z.strictObject({
+  item: coreId,
+  req: z.lazy(() => reqSchema),
+});
+
+/** Coating: one `poison` and a batch of `base` make a batch of `product` (counts come from the product's `madeFrom`). */
+export const coatSchema = z.strictObject({ poison: coreId, base: coreId, product: coreId });
 
 export const recipeSchema = z.object({
   id: coreId,
@@ -365,11 +438,26 @@ export const gearTierSchema = z.object({
   building: z.object({ id: coreId, level: z.number().int() }).nullable(),
 });
 
-export const gearSchema = z.object({
+export const gearBaseSchema = z.object({
   id: coreId,
   skill: skillId,
   tiers: z.array(gearTierSchema).min(1),
 });
+
+/** Keys of the per-tier numbers in `K.gearFx`. */
+export const GEAR_FX_KEYS = ['mannequin', 'sickle', 'alembic', 'stations', 'maps'] as const;
+
+/**
+ * What each owned tier of a gear line does. The modifier key is data; the size of one tier is
+ * `K.gearFx[perTier]`. `bonus` adds it, `reduction` subtracts it, `speed` divides time by 1 + it.
+ */
+export const gearFxSchema = z.strictObject({
+  key: z.string().min(1),
+  perTier: z.enum(GEAR_FX_KEYS),
+  effect: z.enum(['bonus', 'reduction', 'speed']),
+});
+
+export const gearSchema = gearBaseSchema.extend({ fx: gearFxSchema });
 
 // ---------- requirements, quests, exams ----------
 
@@ -724,6 +812,27 @@ export const balanceParamsSchema = z.object({
   clone: z.object({ pool: z.number(), link: z.number() }),
   academyCap: z.number().int(),
   academySlow: z.number(),
+  /** Herb bushes: stock is `stockBase` plus the herb's mastery level; an empty bush regrows for `regrowMs`. */
+  field: z.object({ stockBase: z.number().int(), regrowMs: z.number().int() }),
+  /** Crafting: mastery levels that open each tier, and the chance of a bonus unit per tier above the first. */
+  craftRules: z.object({
+    masteryTiers: z.array(z.number().int()).min(2),
+    bonusPerTier: z.number(),
+  }),
+  /** A tonic can hold at most this many times the charges of one tonic. */
+  tonic: z.object({ capMult: z.number() }),
+  /** Selling: the share of the computed value a shop pays for a craft product; a herb is worth `herbBase + herbPerLevel x level`. */
+  shop: z.object({ craftSellFactor: z.number(), herbBase: z.number(), herbPerLevel: z.number() }),
+  /** Size of one owned gear tier, by `GEAR_FX_KEYS`. */
+  gearFx: z.object({
+    mannequin: z.number(),
+    sickle: z.number(),
+    alembic: z.number(),
+    stations: z.number(),
+    maps: z.number(),
+  }),
+  /** Numbers of item effects that name them by key. */
+  itemFx: z.object({ sleep: z.object({ chance: z.number() }) }),
   /** The sensei test: base seconds, shortening per level of the exam's skills, floor in seconds. */
   combat: z.object({
     xpTickMs: z.number().int(),
@@ -763,6 +872,8 @@ export const contentDbSchema = z.object({
   pools: z.array(poolCheckpointSchema),
   items: z.array(itemSchema),
   market: z.array(marketEntrySchema),
+  shop: z.array(shopEntrySchema),
+  coat: z.array(coatSchema),
   recipes: z.array(recipeSchema),
   missions: z.array(missionSchema),
   regions: z.array(regionSchema),
@@ -789,6 +900,8 @@ export const generatedDbSchema = contentDbSchema
   .omit({
     quests: true,
     exams: true,
+    shop: true,
+    coat: true,
     zones: true,
     operations: true,
     statuses: true,
@@ -799,6 +912,8 @@ export const generatedDbSchema = contentDbSchema
     techniques: z.array(techniqueBaseSchema),
     enemies: z.array(enemyBaseSchema),
     bosses: z.array(bossBaseSchema),
+    herbs: z.array(herbBaseSchema),
+    gear: z.array(gearBaseSchema),
   });
 export type GeneratedDb = z.infer<typeof generatedDbSchema>;
 
@@ -812,6 +927,12 @@ export type Exercise = z.infer<typeof exerciseSchema>;
 export type Practice = z.infer<typeof practiceSchema>;
 export type Obstacle = z.infer<typeof obstacleSchema>;
 export type Herb = z.infer<typeof herbSchema>;
+export type HerbBase = z.infer<typeof herbBaseSchema>;
+export type ItemFx = z.infer<typeof itemFxSchema>;
+export type ShopEntry = z.infer<typeof shopEntrySchema>;
+export type Coat = z.infer<typeof coatSchema>;
+export type GearFx = z.infer<typeof gearFxSchema>;
+export type GearBase = z.infer<typeof gearBaseSchema>;
 export type PoolCheckpoint = z.infer<typeof poolCheckpointSchema>;
 export type Item = z.infer<typeof itemSchema>;
 export type MarketEntry = z.infer<typeof marketEntrySchema>;
