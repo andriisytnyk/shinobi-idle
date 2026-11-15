@@ -4,7 +4,7 @@
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import idRegistry from '../src/data/id-registry.json' with { type: 'json' };
+import idRegistry from '../src/packs/core/id-registry.json' with { type: 'json' };
 import {
   content,
   KEY_NATURES,
@@ -152,7 +152,7 @@ describe('items: source and consumer', () => {
 
 describe('enemy traits and natures', () => {
   for (const trait of TRAIT_IDS) {
-    const tag = TRAIT_ANSWER[trait];
+    const tag = TRAIT_ANSWER[trait] ?? '';
     it(`${trait}: has an answer (${tag}) and an enemy that uses it`, () => {
       const answers =
         content.techniques.filter((t) => t.tags.includes(tag)).length +
@@ -232,7 +232,7 @@ describe('map', () => {
 
   it('no story cell sits behind a nature key', () => {
     for (const c of content.cells) {
-      if (c.key !== null && KEY_NATURES[c.key].length > 0) {
+      if (c.key !== null && (KEY_NATURES[c.key] ?? []).length > 0) {
         expect(c.story, `${name('cell', c.id)} is a story cell behind a ${c.key} key`).toBe(false);
       }
     }
@@ -387,7 +387,7 @@ describe('identity and localization', () => {
       }
     };
     for (const folder of ['generated', 'hand']) {
-      const dir = new URL(`../src/data/${folder}/`, import.meta.url);
+      const dir = new URL(`../src/packs/core/data/${folder}/`, import.meta.url);
       for (const file of readdirSync(dir)) {
         visit(JSON.parse(readFileSync(new URL(file, dir), 'utf8')), `${folder}/${file}`);
       }

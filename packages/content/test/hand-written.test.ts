@@ -1,6 +1,6 @@
 /** Hand-written content: the «Випуск» chain, the Genin exam and the graduate scroll. */
 import { describe, expect, it } from 'vitest';
-import idRegistry from '../src/data/id-registry.json' with { type: 'json' };
+import idRegistry from '../src/packs/core/id-registry.json' with { type: 'json' };
 import { content, ukLocale, type Req } from '../src/index.ts';
 
 const techIds = new Set(content.techniques.map((t) => t.id));
