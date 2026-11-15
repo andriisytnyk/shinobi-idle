@@ -91,7 +91,7 @@
     flex-wrap: wrap;
     gap: var(--space-1) var(--space-3);
     color: var(--fg-dim);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .more {
@@ -101,7 +101,7 @@
     border-radius: var(--radius-pill);
     background: var(--surface-raised);
     color: var(--fg-dim);
-    font-size: var(--font-size-0-8);
+    font-size: var(--text-xs);
     pointer-events: auto;
   }
 
@@ -114,7 +114,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
-    width: min(var(--size-22), calc(100vw - 2 * var(--space-4)));
+    width: min(var(--toast-width), calc(100vw - 2 * var(--space-4)));
     pointer-events: none;
   }
 
@@ -124,8 +124,8 @@
     justify-content: space-between;
     gap: var(--space-2);
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--accent);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--accent);
+    border-radius: var(--radius-md);
     background: var(--surface-raised);
     pointer-events: auto;
   }
@@ -135,16 +135,11 @@
     font-weight: 600;
   }
 
-  /* The control height of PwaPanel's buttons; tokens.css has no variable for it yet. */
-  .toast {
-    --control-height: var(--size-2-75);
-  }
-
   button.action {
     flex: none;
     padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--accent);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--accent);
+    border-radius: var(--radius-md);
     color: var(--accent);
     font-weight: 600;
   }
@@ -155,7 +150,7 @@
   }
 
   button:focus-visible {
-    outline: var(--border-2) solid var(--accent);
+    outline: var(--border-thick) solid var(--accent);
     outline-offset: var(--focus-offset);
   }
 
@@ -170,14 +165,14 @@
 
   @media (max-width: 768px) {
     button.action {
-      min-height: var(--control-height);
+      min-height: var(--control-md);
     }
 
     button {
       align-items: center;
       justify-content: center;
-      min-width: var(--control-size);
-      min-height: var(--control-size);
+      min-width: var(--control-md);
+      min-height: var(--control-md);
     }
 
     /* On a phone they stay at the top, clear of the bottom sheet and its action row. */

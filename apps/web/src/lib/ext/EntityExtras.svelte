@@ -18,7 +18,13 @@
     {#each links as link (link.key)}
       <li>
         {#if link.href}
-          <a href={link.href(entity, ui.createApi(link.packId))}>{ui.t(link.title)}</a>
+          {@const target = ui.guard.call(
+            link.key,
+            'its href builder',
+            () => link.href?.(entity, ui.createApi(link.packId)) ?? null,
+            null,
+          )}
+          {#if target !== null}<a href={target}>{ui.t(link.title)}</a>{/if}
         {:else if link.mount}
           <WidgetHost
             entry={{ key: link.key, packId: link.packId, widget: link.mount }}

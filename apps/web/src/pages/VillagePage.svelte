@@ -239,8 +239,8 @@
 
   .panel {
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface);
   }
 
@@ -251,7 +251,7 @@
     margin: 0 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: var(--font-size-1-1);
+    font-size: var(--text-md);
     font-weight: 400;
   }
 
@@ -260,7 +260,7 @@
   }
 
   .big {
-    font-size: var(--font-size-1-5);
+    font-size: var(--text-xl);
     font-variant-numeric: tabular-nums;
   }
 
@@ -281,7 +281,7 @@
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-1) var(--space-3);
-    min-height: var(--control-size-xs);
+    min-height: var(--control-xs);
   }
 
   .req li.met .num {
@@ -291,11 +291,11 @@
   .req li a {
     display: inline-flex;
     align-items: center;
-    min-height: var(--control-size);
+    min-height: var(--control-md);
   }
 
   .stocks .name {
-    flex: 1 1 var(--size-8);
+    flex: 1 1 var(--panel-min);
   }
 
   .donate,

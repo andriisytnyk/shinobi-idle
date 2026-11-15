@@ -99,8 +99,8 @@
     flex-direction: column;
     gap: var(--space-3);
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface-raised);
     list-style: none;
   }
@@ -118,7 +118,7 @@
 
   .name {
     margin: 0;
-    font-size: var(--font-size-1);
+    font-size: var(--text-sm);
     font-weight: 600;
   }
 
@@ -136,7 +136,7 @@
 
   dt {
     color: var(--fg-dim);
-    font-size: var(--font-size-0-75);
+    font-size: var(--text-2xs);
   }
 
   dd {
@@ -145,8 +145,8 @@
   }
 
   .cycle {
-    height: var(--bar-4);
-    border-radius: var(--radius-2);
+    height: var(--bar-thin);
+    border-radius: var(--radius-xs);
     background: var(--line);
     overflow: hidden;
   }
@@ -158,9 +158,9 @@
   }
 
   .action {
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     padding: var(--space-2) var(--space-4);
-    border: 1px solid var(--accent);
+    border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-sm);
     background: var(--accent);
     color: var(--ink-900);
@@ -180,10 +180,10 @@
     gap: var(--space-1);
     margin: 0 0 var(--space-1);
     color: var(--fg-dim);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .req {
-    font-size: var(--font-size-0-9);
+    font-size: var(--text-xs);
   }
 </style>

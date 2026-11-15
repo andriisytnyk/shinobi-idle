@@ -182,7 +182,7 @@
     margin: 0 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: var(--font-size-1-1);
+    font-size: var(--text-md);
     font-weight: 400;
   }
 
@@ -192,13 +192,13 @@
     gap: var(--space-2);
     margin: 0 0 var(--space-2);
     color: var(--heading);
-    font-size: var(--font-size-1);
+    font-size: var(--text-sm);
     font-weight: 600;
   }
 
   .lvl {
     color: var(--fg-dim);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
     font-weight: 400;
   }
 
@@ -208,8 +208,8 @@
     flex-direction: column;
     gap: var(--space-2);
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface-raised);
   }
 
@@ -227,7 +227,7 @@
 
   dt {
     color: var(--fg-dim);
-    font-size: var(--font-size-0-8);
+    font-size: var(--text-xs);
   }
 
   dd {
@@ -268,7 +268,7 @@
 
   .options {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(var(--size-16), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(var(--tile-min), 1fr));
     gap: var(--space-3);
     margin: 0;
     padding: 0;
@@ -292,13 +292,13 @@
     align-items: center;
     gap: var(--space-1);
     color: var(--success);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
     font-weight: 400;
   }
 
   .tag {
     color: var(--fg-dim);
-    font-size: var(--font-size-0-8);
+    font-size: var(--text-xs);
   }
 
   .penalty {
@@ -317,9 +317,9 @@
   }
 
   .action {
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--accent);
+    border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-sm);
     background: var(--accent);
     color: var(--ink-900);

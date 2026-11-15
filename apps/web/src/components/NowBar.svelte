@@ -173,14 +173,14 @@
     gap: var(--space-4);
     min-height: var(--now-height);
     padding: var(--space-2) var(--space-4);
-    border-top: 1px solid var(--line);
+    border-top: var(--border-thin) solid var(--line);
     background: var(--surface);
   }
 
   .title {
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   /* The wrapper adds no box: the buff chips are items of the bar itself. */
@@ -194,9 +194,9 @@
     align-items: center;
     flex-wrap: wrap;
     gap: var(--space-1) var(--space-2);
-    max-width: var(--size-24);
+    max-width: var(--measure);
     min-width: 0;
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .place-label,
@@ -215,10 +215,10 @@
 
   .chip {
     padding: 0 var(--space-2);
-    border: 1px solid var(--accent);
+    border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-pill);
     color: var(--accent);
-    font-size: var(--font-size-0-8);
+    font-size: var(--text-xs);
   }
 
   .chip :global(a) {
@@ -249,8 +249,9 @@
   }
 
   .name {
+    --_max-width: 14rem;
     flex: none;
-    max-width: var(--size-14);
+    max-width: var(--_max-width);
     overflow: hidden;
     font-weight: 600;
     text-overflow: ellipsis;
@@ -262,10 +263,11 @@
   }
 
   .bar {
+    --_min-width: 3rem;
     flex: 1;
-    height: var(--bar-6);
-    min-width: var(--size-3);
-    border-radius: var(--radius-3);
+    height: var(--bar-md);
+    min-width: var(--_min-width);
+    border-radius: var(--radius-xs);
     background: var(--line);
     overflow: hidden;
   }
@@ -279,7 +281,7 @@
   .wait {
     flex: none;
     color: var(--accent);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
     font-weight: 600;
     white-space: nowrap;
   }
@@ -287,15 +289,15 @@
   .xph {
     flex: none;
     color: var(--fg-dim);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
     white-space: nowrap;
   }
 
   .stop,
   .more {
-    min-height: var(--control-size-xs);
+    min-height: var(--control-xs);
     padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);
@@ -314,7 +316,7 @@
       flex-wrap: wrap;
       gap: var(--space-2);
       padding: var(--space-1) var(--space-3);
-      font-size: var(--font-size-0-85);
+      font-size: var(--text-xs);
     }
 
     /* On a phone the buffs take a line of their own under the running action. */
@@ -330,12 +332,14 @@
     }
 
     .place {
-      max-width: var(--size-11);
+      --_max-width: 11rem;
+      max-width: var(--_max-width);
     }
 
     /* The actions take a line of their own when the place and the action do not fit side by side. */
     .slots {
-      flex: 1 1 var(--size-15);
+      --_flex: 15rem;
+      flex: 1 1 var(--_flex);
     }
 
     .chip {
@@ -343,14 +347,15 @@
     }
 
     .name {
-      max-width: var(--size-9);
+      --_max-width: 9rem;
+      max-width: var(--_max-width);
     }
 
     /* Whole-tap targets of at least 44 px on a phone. */
     .stop,
     .more {
-      min-width: var(--control-size);
-      min-height: var(--control-size);
+      min-width: var(--control-md);
+      min-height: var(--control-md);
     }
   }
 </style>

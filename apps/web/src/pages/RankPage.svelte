@@ -99,8 +99,8 @@
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface);
     color: var(--steel);
   }
@@ -111,13 +111,13 @@
 
   .label {
     color: var(--fg-dim);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .rank {
     color: var(--fg);
     font-family: var(--font-heading);
-    font-size: var(--font-size-1-2);
+    font-size: var(--text-lg);
   }
 
   .exam {
@@ -133,7 +133,7 @@
   }
 
   h2 {
-    font-size: var(--font-size-1-2);
+    font-size: var(--text-lg);
   }
 
   h2 :global(a) {
@@ -144,12 +144,12 @@
     h2 :global(a) {
       display: inline-flex;
       align-items: center;
-      min-height: var(--control-size);
+      min-height: var(--control-md);
     }
   }
 
   h3 {
-    font-size: var(--font-size-1);
+    font-size: var(--text-sm);
   }
 
   .desc,
@@ -160,8 +160,8 @@
 
   .checklist {
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface);
   }
 
@@ -175,10 +175,10 @@
 
   .take,
   .secondary {
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     margin-top: var(--space-3);
     padding: var(--space-1) var(--space-4);
-    border: 1px solid var(--accent);
+    border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-sm);
     background: var(--accent);
     color: var(--ink-900);
@@ -203,13 +203,13 @@
 
   .test {
     padding: var(--space-3);
-    border: 1px solid var(--accent);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--accent);
+    border-radius: var(--radius-md);
   }
 
   .bar {
-    height: var(--bar-8);
-    border-radius: var(--radius-4);
+    height: var(--bar-thick);
+    border-radius: var(--radius-sm);
     background: var(--line);
     overflow: hidden;
   }
@@ -223,7 +223,7 @@
   .left {
     margin: var(--space-2) 0 0;
     color: var(--fg-dim);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .error {

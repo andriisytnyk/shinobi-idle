@@ -154,7 +154,7 @@
   }
 
   .req {
-    font-size: var(--font-size-0-9);
+    font-size: var(--text-xs);
   }
 
   .qty {

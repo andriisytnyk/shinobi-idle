@@ -121,7 +121,7 @@ describe('themes (A4)', () => {
     flushSync();
     expect(accent()).toBe('#ff4fa3');
     expect(root().style.getPropertyValue('--space-1')).toBe('0.4rem');
-    expect(root().style.getPropertyValue('--control-size')).toBe('3rem');
+    expect(root().style.getPropertyValue('--control-md')).toBe('3rem');
     expect(getComputedStyle(root()).getPropertyValue('--accent').trim()).toBe('#ff4fa3');
     expect(document.querySelectorAll('style[data-ui-theme]')).toHaveLength(1);
 
@@ -158,6 +158,23 @@ describe('themes (A4)', () => {
     booted.destroy();
     booted = await bootApp([coreUi], genin(), '#/settings');
     expect(q('[data-ui="theme-select"]')).toBeNull();
+  });
+
+  it('moves the whole control scale, which every button, field, select and nav item follows', async () => {
+    booted = await bootApp([coreUi, testmodUi], genin(), '#/settings');
+    settings.theme = 'testmod:bright';
+    flushSync();
+    // The scale is set on the root; the components read it (no-raw-lengths checks that they all do).
+    expect(
+      ['--control-xs', '--control-sm', '--control-md'].map((t) => root().style.getPropertyValue(t)),
+    ).toEqual(['2.25rem', '2.5rem', '3rem']);
+    // The controls the theme reaches are on the page: buttons, a select, a text field, nav items.
+    expect(qa('main button').length).toBeGreaterThan(0);
+    expect(q('[data-ui="theme-select"] select')).not.toBeNull();
+    expect(q('a[data-ui="nav-item"]')).not.toBeNull();
+    settings.theme = 'core:base';
+    flushSync();
+    expect(root().style.getPropertyValue('--control-md')).toBe('');
   });
 
   it('removes the theme when the app is closed', async () => {

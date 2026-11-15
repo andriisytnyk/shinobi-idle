@@ -79,8 +79,8 @@
   .source {
     display: inline-flex;
     align-items: center;
-    min-height: var(--control-size);
-    font-size: var(--font-size-0-85);
+    min-height: var(--control-md);
+    font-size: var(--text-xs);
   }
 
   @media (min-width: 769px) {

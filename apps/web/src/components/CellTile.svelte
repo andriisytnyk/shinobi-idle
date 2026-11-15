@@ -124,15 +124,16 @@
 
 <style>
   .tile {
+    --_min-height: 7rem;
     position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
     min-width: 0;
-    min-height: var(--size-7);
+    min-height: var(--_min-height);
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface-raised);
     list-style: none;
   }
@@ -143,7 +144,7 @@
   }
 
   .tile.here {
-    border-left: var(--border-4) solid var(--chakra);
+    border-left: var(--border-heavy) solid var(--chakra);
   }
 
   .tile.locked {
@@ -153,7 +154,7 @@
 
   .name {
     margin: 0;
-    font-size: var(--font-size-0-95);
+    font-size: var(--text-sm);
     font-weight: 600;
     line-height: 1.25;
     overflow-wrap: anywhere;
@@ -162,7 +163,7 @@
   /* The name link stretches over the tile, so a tap anywhere on it opens the cell. */
   .name :global(a) {
     color: var(--fg);
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     display: inline-flex;
     align-items: center;
   }
@@ -171,7 +172,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    border-radius: var(--radius);
+    border-radius: var(--radius-md);
   }
 
   .badges {
@@ -181,14 +182,15 @@
   }
 
   .badge {
+    --_line-height: 1.5rem;
     display: inline-flex;
     align-items: center;
-    gap: var(--size-0-2);
+    gap: var(--space-1);
     padding: 0 var(--space-2);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-pill);
-    font-size: var(--font-size-0-75);
-    line-height: var(--line-height-1-5);
+    font-size: var(--text-2xs);
+    line-height: var(--_line-height);
   }
 
   .entry {
@@ -230,9 +232,11 @@
   }
 
   .pip {
-    width: var(--size-0-7);
-    height: var(--size-0-7);
-    border: 1px solid var(--steel);
+    --_width: 0.7rem;
+    --_height: 0.7rem;
+    width: var(--_width);
+    height: var(--_height);
+    border: var(--border-thin) solid var(--steel);
     border-radius: 50%;
   }
 
@@ -243,8 +247,8 @@
 
   .bar {
     display: block;
-    height: var(--bar-4);
-    border-radius: var(--radius-2);
+    height: var(--bar-thin);
+    border-radius: var(--radius-xs);
     background: var(--line);
     overflow: hidden;
   }
@@ -257,14 +261,14 @@
 
   .max {
     color: var(--success);
-    font-size: var(--font-size-0-75);
+    font-size: var(--text-2xs);
     font-weight: 600;
   }
 
   .unexplored {
     margin: 0;
     color: var(--fg-dim);
-    font-size: var(--font-size-0-8);
+    font-size: var(--text-xs);
   }
 
   .pois {
@@ -285,6 +289,6 @@
     position: relative;
     z-index: var(--z-raised);
     margin: 0;
-    font-size: var(--font-size-0-8);
+    font-size: var(--text-xs);
   }
 </style>

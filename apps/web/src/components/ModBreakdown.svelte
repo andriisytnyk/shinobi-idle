@@ -87,7 +87,7 @@
   .figure {
     padding: 0;
     border: 0;
-    border-bottom: 1px dotted var(--fg-dim);
+    border-bottom: var(--border-thin) dotted var(--fg-dim);
     background: none;
     color: inherit;
     font: inherit;
@@ -104,13 +104,13 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
-    min-width: var(--size-12);
+    min-width: var(--card-min);
     margin-top: var(--space-1);
     padding: var(--space-2);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .line {
@@ -125,7 +125,7 @@
 
   .total {
     padding-top: var(--space-1);
-    border-top: 1px solid var(--line);
+    border-top: var(--border-thin) solid var(--line);
     font-weight: 600;
   }
 
@@ -134,8 +134,8 @@
     .figure {
       display: inline-flex;
       align-items: center;
-      min-width: var(--control-size);
-      min-height: var(--control-size);
+      min-width: var(--control-md);
+      min-height: var(--control-md);
     }
   }
 </style>

@@ -14,8 +14,8 @@ body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-text);
-  font-size: var(--font-size-1);
-  line-height: 1.5;
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
   /* Tabular numerals keep counters from jumping. */
   font-variant-numeric: tabular-nums;
   -webkit-text-size-adjust: 100%;
@@ -31,7 +31,7 @@ a {
 }
 
 :focus-visible {
-  outline: var(--border-2) solid var(--accent);
+  outline: var(--border-thick) solid var(--accent);
   outline-offset: var(--focus-offset);
 }
 

@@ -187,8 +187,8 @@
     flex-direction: column;
     gap: var(--space-2);
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface);
   }
 
@@ -204,18 +204,18 @@
   }
 
   h3 {
-    flex: 1 1 var(--size-8);
+    flex: 1 1 var(--panel-min);
     margin: 0;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: var(--font-size-1-1);
+    font-size: var(--text-md);
     font-weight: 400;
   }
 
   .level,
   .busy {
     color: var(--fg-dim);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .busy {
@@ -232,7 +232,7 @@
   .label {
     margin: 0;
     color: var(--fg-dim);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   dd {
@@ -270,10 +270,11 @@
   }
 
   .cost li {
+    --_max-width: 20rem;
     display: flex;
     justify-content: space-between;
     gap: var(--space-3);
-    max-width: var(--size-20);
+    max-width: var(--_max-width);
   }
 
   .cost li.short .num {
@@ -290,6 +291,6 @@
   }
 
   .why {
-    font-size: var(--font-size-0-9);
+    font-size: var(--text-xs);
   }
 </style>

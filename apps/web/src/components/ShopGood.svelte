@@ -98,7 +98,7 @@
 <style>
   .why-box {
     flex: 1 0 100%;
-    font-size: var(--font-size-0-9);
+    font-size: var(--text-xs);
   }
 
   .ct-why {

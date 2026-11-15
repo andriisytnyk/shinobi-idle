@@ -75,12 +75,26 @@ const SAMPLE: Record<string, string> = {
   'core:entity.building': `#/building/${content.buildings[0]?.id}`,
   'core:entity.item': `#/item/${content.items[0]?.id}`,
   'core:entity.quest': `#/quest/${content.quests[0]?.id}`,
-  'core:entity.exam': '#/exam/core:genin',
+  'core:entity.exam': `#/exam/${content.exams[0]?.id}`,
   'core:entity.skill': '#/skill/tai',
   'core:entity.cell': `#/cell/${firstCell?.id}`,
   'core:entity.region': `#/region/${firstCell?.region}`,
   'core:entity.poi': `#/poi/${poi?.id}`,
   'core:village.focus': '#/village/core:forge',
+};
+/** The collection each entity kind lives in, to check that the sample hashes name real entities. */
+const REAL: Record<string, readonly { id: string }[]> = {
+  enemy: content.enemies,
+  technique: content.techniques,
+  recipe: content.recipes,
+  gear: content.gear,
+  building: content.buildings,
+  item: content.items,
+  quest: content.quests,
+  exam: content.exams,
+  cell: content.cells,
+  region: content.regions,
+  poi: content.cells.flatMap((c) => c.pois),
 };
 const sampleOf = (key: string, route: string): string => SAMPLE[key] ?? route;
 
@@ -98,6 +112,20 @@ afterEach(() => {
 });
 
 describe('the built-in game through the registries', () => {
+  it('uses sample hashes that name real entities', () => {
+    for (const hash of Object.values(SAMPLE)) {
+      const [, kind = '', ...rest] = hash.split('/');
+      const list = REAL[kind];
+      if (!list) continue;
+      const id = decodeURIComponent(rest.join('/'));
+      expect(
+        list.some((e) => e.id === id),
+        hash,
+      ).toBe(true);
+    }
+    expect(Object.keys(REAL).length).toBeGreaterThan(5);
+  });
+
   it('registers exactly the routes that existed before', () => {
     expect(coreRegistry.pages.map((p) => p.route).sort()).toEqual([...ROUTES].sort());
   });

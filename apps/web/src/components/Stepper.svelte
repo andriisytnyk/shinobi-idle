@@ -83,9 +83,9 @@
 
   button,
   input {
-    min-width: var(--control-size);
-    min-height: var(--control-size);
-    border: 1px solid var(--line);
+    min-width: var(--control-md);
+    min-height: var(--control-md);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);
@@ -93,17 +93,18 @@
   }
 
   button {
-    font-size: var(--font-size-1-1);
+    font-size: var(--text-md);
     cursor: pointer;
   }
 
   .wide {
     padding: 0 var(--space-2);
-    font-size: var(--font-size-0-9);
+    font-size: var(--text-xs);
   }
 
   input {
-    width: var(--size-4-5);
+    --_width: 4.5rem;
+    width: var(--_width);
     background: var(--surface);
     text-align: center;
     font-variant-numeric: tabular-nums;

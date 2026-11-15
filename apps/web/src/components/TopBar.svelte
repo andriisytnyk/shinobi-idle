@@ -143,14 +143,14 @@
     gap: var(--space-4);
     min-height: var(--topbar-height);
     padding: 0 var(--space-4);
-    border-bottom: 1px solid var(--line);
+    border-bottom: var(--border-thin) solid var(--line);
     background: var(--surface);
   }
 
   .brand {
     color: var(--accent);
     font-family: var(--font-heading);
-    font-size: var(--font-size-1-1);
+    font-size: var(--text-md);
     text-decoration: none;
     white-space: nowrap;
   }
@@ -210,16 +210,16 @@
   }
 
   .marker {
-    width: var(--size-0-6);
-    height: var(--size-0-6);
-    border: var(--border-2) solid var(--ink-900);
+    width: var(--icon-xs);
+    height: var(--icon-xs);
+    border: var(--border-thick) solid var(--ink-900);
     border-radius: 50%;
     background: var(--accent);
   }
 
   .stat.save {
     color: var(--fg-dim);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .stat.save[data-save='error'] dd {
@@ -242,7 +242,7 @@
   select,
   .meta-toggle {
     padding: var(--space-1) var(--space-2);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);
@@ -276,7 +276,7 @@
       order: 3;
       flex-basis: 100%;
       gap: var(--space-3);
-      font-size: var(--font-size-0-85);
+      font-size: var(--text-xs);
     }
 
     .tools {
@@ -288,12 +288,12 @@
     .brand {
       display: inline-flex;
       align-items: center;
-      min-height: var(--control-size);
+      min-height: var(--control-md);
     }
 
     .rank-link,
     .nature-link {
-      min-height: var(--control-size);
+      min-height: var(--control-md);
     }
 
     .lang,
@@ -304,7 +304,7 @@
     /* The shop and bank links keep only their icons, so the brand and the tools share one row. */
     .shop-link {
       justify-content: center;
-      min-width: var(--control-size);
+      min-width: var(--control-md);
     }
 
     .shop-link span {

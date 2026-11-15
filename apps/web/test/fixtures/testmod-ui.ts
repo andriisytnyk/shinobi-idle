@@ -97,7 +97,13 @@ export const testmodUi: UiPack = {
   theme: {
     id: 'bright',
     name: 'x.testmod.theme',
-    tokens: { '--accent': '#ff4fa3', '--space-1': '0.4rem', '--control-size': '3rem' },
+    tokens: {
+      '--accent': '#ff4fa3',
+      '--space-1': '0.4rem',
+      '--control-xs': '2.25rem',
+      '--control-sm': '2.5rem',
+      '--control-md': '3rem',
+    },
     css: '[data-ui="page"] { outline: 0; }',
   },
   setup(ui) {

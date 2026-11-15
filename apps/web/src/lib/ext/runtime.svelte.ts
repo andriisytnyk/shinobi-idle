@@ -3,14 +3,17 @@ import * as core from '@shinobi/core';
 import type { Command } from '@shinobi/core';
 import { getContext, setContext, untrack } from 'svelte';
 import type { Game } from '../game.svelte.ts';
+import { deepFreeze } from '../freeze.ts';
 import { createTranslator, t as baseT, type Params } from '../i18n.ts';
 import { hrefFor, type EntityRef } from '../route.ts';
 import { navigate } from '../router.svelte.ts';
 import { browserStorage, type createSettings, type TextStorage } from '../settings.svelte.ts';
 import { toasts } from '../toasts.svelte.ts';
 import { createDomHub } from './dom-hub.ts';
+import { corePublic } from './core-allowlist.ts';
+import { createGuard } from './guard.ts';
 import { createRegistry, type ThemeEntry, type UiRegistry } from './registry.ts';
-import type { CoreApi, HookMap, PackStorage, UiApi, UiPack } from './types.ts';
+import type { HookMap, PackStorage, UiApi, UiPack } from './types.ts';
 
 type Settings = ReturnType<typeof createSettings>;
 
@@ -28,18 +31,6 @@ export interface Runnable {
   widget: (el: HTMLElement, api: UiApi, ctx: never) => void | (() => void);
 }
 
-/** The core without the functions that change a state they are given: the UI packs change the game through `dispatch`. */
-const { dispatch: _dispatch, advance: _advance, advanceOffline: _offline, ...publicCore } = core;
-const corePublic: CoreApi = Object.freeze(publicCore) as CoreApi;
-
-function deepFreeze<T>(value: T): T {
-  if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) {
-    Object.freeze(value);
-    for (const v of Object.values(value)) deepFreeze(v);
-  }
-  return value;
-}
-
 export const STORAGE_PREFIX = 'shinobi.ui.';
 
 /**
@@ -48,12 +39,13 @@ export const STORAGE_PREFIX = 'shinobi.ui.';
  */
 export function createUi(packs: readonly UiPack[], deps: UiDeps) {
   const { game, settings } = deps;
-  const registry: UiRegistry = createRegistry(packs);
+  const guard = createGuard();
+  const registry: UiRegistry = createRegistry(packs, guard);
   const packT = createTranslator(registry.messages);
   const text = deps.storage === undefined ? browserStorage() : deps.storage;
   const hub = createDomHub({
     createApi: (packId, owner, scope) => createApi(packId, owner, scope),
-    warn: (key, phase, error) => warn(key, phase, error),
+    warn: (key, phase, error) => guard.warn(key, phase, error),
   });
 
   /** Translates a key of the game or of a pack. */
@@ -89,11 +81,7 @@ export function createUi(packs: readonly UiPack[], deps: UiDeps) {
         }
         untrack(() => {
           for (const sub of [...subscribers]) {
-            try {
-              sub.fn();
-            } catch (error) {
-              warn(sub.owner, 'a subscription', error);
-            }
+            guard.call(sub.owner, 'a subscription', sub.fn, undefined);
           }
         });
       });
@@ -112,11 +100,15 @@ export function createUi(packs: readonly UiPack[], deps: UiDeps) {
   ): ReturnType<HookMap[K]>[] {
     const out: ReturnType<HookMap[K]>[] = [];
     for (const l of [...(listeners[name] ?? [])]) {
-      try {
-        out.push((l.fn as (...a: unknown[]) => ReturnType<HookMap[K]>)(...args));
-      } catch (error) {
-        warn(l.owner, `the "${name}" hook`, error);
-      }
+      const call = l.fn as (...a: unknown[]) => ReturnType<HookMap[K]>;
+      out.push(
+        guard.call(
+          l.owner,
+          `the "${name}" hook`,
+          () => call(...args),
+          undefined as ReturnType<HookMap[K]>,
+        ),
+      );
     }
     return out;
   }
@@ -126,13 +118,15 @@ export function createUi(packs: readonly UiPack[], deps: UiDeps) {
     before(command) {
       let current = command;
       for (const l of [...(listeners['command:before'] ?? [])]) {
-        try {
-          const verdict = (l.fn as HookMap['command:before'])(current);
-          if (verdict === false) return false;
-          if (verdict) current = verdict;
-        } catch (error) {
-          warn(l.owner, 'the "command:before" hook', error);
-        }
+        const before = l.fn as HookMap['command:before'];
+        const verdict = guard.call(
+          l.owner,
+          'the "command:before" hook',
+          () => before(current),
+          undefined,
+        );
+        if (verdict === false) return false;
+        if (verdict) current = verdict;
       }
       return current === command ? undefined : current;
     },
@@ -149,14 +143,6 @@ export function createUi(packs: readonly UiPack[], deps: UiDeps) {
     const version = game.version;
     if (snap?.version !== version) snap = { version, state: deepFreeze(game.read((s) => s)) };
     return snap.state;
-  }
-
-  const warned = new Set<string>();
-  /** One warning per widget, whatever it does next. */
-  function warn(key: string, phase: string, error: unknown): void {
-    if (warned.has(key)) return;
-    warned.add(key);
-    console.warn(`[ui] "${key}" failed in ${phase}; it is left out`, error);
   }
 
   function storageOf(packId: string): PackStorage {
@@ -279,7 +265,7 @@ export function createUi(packs: readonly UiPack[], deps: UiDeps) {
         entry.widget(el, createApi(entry.packId, entry.key, scope), ctx as never),
       );
     } catch (error) {
-      warn(entry.key, 'setup', error);
+      guard.warn(entry.key, 'setup', error);
       for (const off of [...scope]) off();
       el.replaceChildren();
       return () => {};
@@ -289,10 +275,27 @@ export function createUi(packs: readonly UiPack[], deps: UiDeps) {
       try {
         cleanup?.();
       } catch (error) {
-        warn(entry.key, 'cleanup', error);
+        guard.warn(entry.key, 'cleanup', error);
       }
       el.replaceChildren();
     };
+  }
+
+  /** Starts the packs now, in load order; one that throws is switched off as a whole. */
+  const stopPacks: (() => void)[] = [];
+  for (const pack of packs) {
+    if (!pack.start || !registry.packs.includes(pack.id)) continue;
+    const scope = new Set<() => void>();
+    try {
+      const stop = untrack(() => pack.start?.(createApi(pack.id, pack.id, scope)));
+      stopPacks.push(() => {
+        for (const off of [...scope]) off();
+        stop?.();
+      });
+    } catch (error) {
+      for (const off of [...scope]) off();
+      registry.disablePack(pack.id, error);
+    }
   }
 
   return {
@@ -306,34 +309,11 @@ export function createUi(packs: readonly UiPack[], deps: UiDeps) {
       injected: hub.count(),
       subscriptions: subscribers.size,
     }),
-    /** Starts every pack (`start`); the returned function unloads them. */
-    start(): () => void {
-      const stops: (() => void)[] = [];
-      for (const pack of packs) {
-        if (!pack.start) continue;
-        const scope = new Set<() => void>();
-        try {
-          const stop = untrack(() => pack.start?.(createApi(pack.id, pack.id, scope)));
-          stops.push(() => {
-            for (const off of [...scope]) off();
-            stop?.();
-          });
-        } catch (error) {
-          warn(pack.id, 'start', error);
-        }
-      }
-      return () => {
-        for (const stop of stops.reverse()) {
-          try {
-            stop();
-          } catch (error) {
-            warn('stop', 'unload', error);
-          }
-        }
-      };
-    },
     /** Drops the observers, the subscriptions and the command hook. */
     dispose(): void {
+      for (const stop of stopPacks.reverse())
+        guard.call('unload', 'stopping a pack', stop, undefined);
+      stopPacks.length = 0;
       hub.dispose();
       subscribers.clear();
       stopRoot();
@@ -345,7 +325,19 @@ export function createUi(packs: readonly UiPack[], deps: UiDeps) {
     settingValue,
     /** Whether a pack removed the nav item with this key; reads settings, so it is reactive. */
     navHidden: (key: string): boolean =>
-      registry.isNavRemoved(key, (packId) => createApi(packId, packId)),
+      registry
+        .navRemovals(key)
+        .some((r) =>
+          r.when
+            ? guard.call(
+                `${r.packId}:nav`,
+                'a nav predicate',
+                () => r.when?.(createApi(r.packId, r.packId)) === true,
+                false,
+              )
+            : true,
+        ),
+    guard,
     setSetting(key: string, value: boolean | string): void {
       const entry = registry.setting(key);
       if (!entry) throw new Error(`Unknown setting "${key}"`);

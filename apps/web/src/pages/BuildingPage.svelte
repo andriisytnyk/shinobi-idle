@@ -76,7 +76,7 @@
   .kind {
     margin: 0;
     color: var(--fg-dim);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   ol {
@@ -90,7 +90,7 @@
     flex-direction: column;
     gap: var(--space-1);
     padding: var(--space-2) 0;
-    border-top: 1px solid var(--line);
+    border-top: var(--border-thin) solid var(--line);
     color: var(--fg-dim);
   }
 

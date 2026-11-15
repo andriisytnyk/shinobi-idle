@@ -29,6 +29,7 @@ import {
   type KeyValue,
 } from './persistence.ts';
 import type { Signals } from './hints.ts';
+import { deepFreeze } from './freeze.ts';
 import { detach as detachData } from './read.ts';
 import { requestPersistentStorage } from './platform.ts';
 import type { TabLock } from './tab-lock.ts';
@@ -98,7 +99,8 @@ export interface GameDeps {
  * the state re-runs after every tick.
  */
 export function createGame(deps: GameDeps = {}) {
-  const content = deps.content ?? defaultContent;
+  // The content is data that nobody changes at run time; packs get it too, so it is frozen once.
+  const content = deepFreeze(deps.content ?? defaultContent);
   const rules = deps.rules ?? defaultRules;
   const clock = deps.clock ?? { now: () => 0 };
   const kv = deps.kv ?? null;
@@ -362,7 +364,11 @@ export function createGame(deps: GameDeps = {}) {
       let command = original;
       for (const hook of commandHooks) {
         const verdict = hook.before?.(command);
-        if (verdict === false) return { ok: false, reason: 'error.cancelledByMod' };
+        if (verdict === false) {
+          // Said once, here, so that every caller is covered: the tiles, the Now bar, the map, the fight.
+          toasts.push({ key: 'error.cancelledByMod', params: {} });
+          return { ok: false, reason: 'error.cancelledByMod' };
+        }
         if (verdict) command = verdict;
       }
       const result = coreDispatch(state, command, content, rules);

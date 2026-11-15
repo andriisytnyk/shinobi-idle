@@ -170,6 +170,8 @@
   "settings.cancel": "Скасувати",
   "settings.theme": "Тема",
   "settings.packs": "Розширення інтерфейсу",
+  "settings.disabledPacks": "Вимкнені розширення",
+  "settings.packDisabled": "Розширення «{pack}» вимкнено через помилку: {error}",
   "theme.base": "Стандартна",
   "route.entity": "Сторінка сутності",
   "toast.mod": "{text}",

@@ -18,17 +18,19 @@
 
 <style>
   .stamp {
+    --_width: 2.25rem;
+    --_height: 2.25rem;
     display: inline-flex;
     flex: none;
     align-items: center;
     justify-content: center;
-    width: var(--size-2-25);
-    height: var(--size-2-25);
-    border: var(--border-2) solid var(--stamp);
+    width: var(--_width);
+    height: var(--_height);
+    border: var(--border-thick) solid var(--stamp);
     border-radius: var(--radius-sm);
     color: var(--stamp);
     font-family: var(--font-heading);
-    font-size: var(--font-size-1-1);
+    font-size: var(--text-md);
     transform: rotate(-6deg);
   }
 </style>

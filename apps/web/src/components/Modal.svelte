@@ -90,19 +90,21 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
-    width: min(var(--size-36), 100%);
+    width: min(var(--modal-width), 100%);
     max-height: 100%;
     padding: var(--space-4);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface);
     color: var(--fg);
   }
 
   .dialog.paper {
+    --_border-top: 0.75rem;
+    --_border-bottom: 0.75rem;
     border-color: var(--paper-ink);
-    border-top: var(--border-0-75) solid var(--ink-600);
-    border-bottom: var(--border-0-75) solid var(--ink-600);
+    border-top: var(--_border-top) solid var(--ink-600);
+    border-bottom: var(--_border-bottom) solid var(--ink-600);
     background: var(--paper);
     color: var(--paper-ink);
   }
@@ -110,7 +112,7 @@
   h2 {
     margin: 0;
     font-family: var(--font-heading);
-    font-size: var(--font-size-1-3);
+    font-size: var(--text-lg);
     font-weight: 400;
   }
 
@@ -125,9 +127,9 @@
   }
 
   .actions :global(button) {
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-4);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);

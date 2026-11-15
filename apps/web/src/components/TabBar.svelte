@@ -9,8 +9,12 @@
   import Icon from './Icon.svelte';
 
   const ui = useUi();
-  const tabs = $derived(tabItems(ui.registry).filter((item) => !ui.navHidden(item.key)));
-  const more = $derived(morePages(ui.registry));
+  const tabs = $derived(tabItems(ui.registry, (item) => !ui.navHidden(item.key)));
+  /** Items without a tab of their own, those that did not fit in the bar among them: they keep «Ще» lit. */
+  const more = $derived([
+    ...morePages(ui.registry),
+    ...ui.registry.navItems.filter((item) => !tabs.includes(item)).map((item) => item.id),
+  ]);
   // Pages reached from the "More" tab keep it lit.
   const activeTab = $derived.by(() => {
     const id = activeNav(currentHash(), ui.registry);
@@ -55,12 +59,14 @@
   }
 
   .marker {
+    --_top: 2px;
+    --_right: 6px;
     position: absolute;
-    top: calc(-1 * var(--offset-2));
-    right: calc(-1 * var(--offset-6));
-    width: var(--size-0-6);
-    height: var(--size-0-6);
-    border: var(--border-2) solid var(--surface);
+    top: calc(-1 * var(--_top));
+    right: calc(-1 * var(--_right));
+    width: var(--icon-xs);
+    height: var(--icon-xs);
+    border: var(--border-thick) solid var(--surface);
     border-radius: 50%;
     background: var(--accent);
   }
@@ -69,21 +75,22 @@
     .tabbar {
       display: flex;
       height: var(--tabbar-height);
-      border-top: 1px solid var(--line);
+      border-top: var(--border-thin) solid var(--line);
       background: var(--surface);
     }
 
     a {
+      --_gap: 2px;
       display: flex;
       flex: 1;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: var(--offset-2);
+      gap: var(--_gap);
       min-width: 0;
-      border-top: var(--border-3) solid transparent;
+      border-top: var(--border-heavy) solid transparent;
       color: var(--fg-dim);
-      font-size: var(--font-size-0-65);
+      font-size: var(--text-2xs);
       text-decoration: none;
     }
 

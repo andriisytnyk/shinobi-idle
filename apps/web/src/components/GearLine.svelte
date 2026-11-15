@@ -97,8 +97,8 @@
     align-items: flex-start;
     gap: var(--space-2);
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface-raised);
   }
 
@@ -108,7 +108,7 @@
     align-items: center;
     gap: var(--space-2);
     margin: 0;
-    font-size: var(--font-size-1);
+    font-size: var(--text-sm);
   }
 
   .name :global(a) {
@@ -122,7 +122,7 @@
 
   .tiers {
     color: var(--fg-dim);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
     font-weight: 400;
   }
 
@@ -138,6 +138,6 @@
   }
 
   .req {
-    font-size: var(--font-size-0-9);
+    font-size: var(--text-xs);
   }
 </style>

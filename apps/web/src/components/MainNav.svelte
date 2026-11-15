@@ -43,7 +43,7 @@
   ul {
     margin: 0 0 var(--space-3);
     padding: 0 0 var(--space-3);
-    border-bottom: 1px solid var(--line);
+    border-bottom: var(--border-thin) solid var(--line);
     list-style: none;
   }
 
@@ -51,7 +51,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    min-height: var(--control-size-sm);
+    min-height: var(--control-sm);
     padding: var(--space-1) var(--space-2);
     border-radius: var(--radius-sm);
     color: var(--fg);
@@ -64,7 +64,7 @@
 
   a.active {
     background: var(--surface-raised);
-    box-shadow: inset var(--border-3) 0 0 var(--accent);
+    box-shadow: inset var(--border-heavy) 0 0 var(--accent);
   }
 
   .label {
@@ -72,8 +72,8 @@
   }
 
   .marker {
-    width: var(--size-0-6);
-    height: var(--size-0-6);
+    width: var(--icon-xs);
+    height: var(--icon-xs);
     border-radius: 50%;
     background: var(--accent);
   }

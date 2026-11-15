@@ -167,13 +167,15 @@
 
 <style>
   .scroll {
+    --_border-top: 0.6rem;
+    --_border-bottom: 0.6rem;
     display: flex;
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
-    border: 1px solid var(--paper-ink);
-    border-top: var(--border-0-6) solid var(--ink-600);
-    border-bottom: var(--border-0-6) solid var(--ink-600);
+    border: var(--border-thin) solid var(--paper-ink);
+    border-top: var(--_border-top) solid var(--ink-600);
+    border-bottom: var(--_border-bottom) solid var(--ink-600);
     border-radius: var(--radius-sm);
     background: var(--paper);
     color: var(--paper-ink);
@@ -193,13 +195,13 @@
 
   .kind {
     margin: 0;
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   h1 {
     margin: 0;
     font-family: var(--font-heading);
-    font-size: var(--font-size-1-4);
+    font-size: var(--text-xl);
     font-weight: 400;
   }
 
@@ -207,7 +209,7 @@
     margin: var(--space-4) 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: var(--font-size-1-1);
+    font-size: var(--text-md);
     font-weight: 400;
   }
 
@@ -217,15 +219,16 @@
   }
 
   .facts {
+    --_grid-template-columns: 11rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(var(--size-11), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(var(--_grid-template-columns), 1fr));
     gap: var(--space-3);
     margin: var(--space-3) 0 0;
   }
 
   dt {
     color: var(--fg-dim);
-    font-size: var(--font-size-0-8);
+    font-size: var(--text-xs);
   }
 
   dd {
@@ -241,16 +244,17 @@
   }
 
   .tile-host {
-    max-width: var(--size-20);
+    --_max-width: 20rem;
+    max-width: var(--_max-width);
     margin: 0;
     padding: 0;
   }
 
   .pin {
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     margin-top: var(--space-4);
     padding: var(--space-2) var(--space-4);
-    border: 1px solid var(--accent);
+    border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-sm);
     background: none;
     color: var(--accent);

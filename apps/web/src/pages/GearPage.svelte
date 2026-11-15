@@ -28,10 +28,11 @@
   .kind {
     margin: 0 0 var(--space-3);
     color: var(--fg-dim);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .line {
-    max-width: var(--size-26);
+    --_max-width: 26rem;
+    max-width: var(--_max-width);
   }
 </style>

@@ -32,13 +32,14 @@
   }
 
   .seal {
+    --_min-width: 4rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--space-1);
-    min-width: var(--size-4);
+    min-width: var(--_min-width);
     padding: var(--space-2);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
   }
@@ -46,11 +47,11 @@
   .glyph {
     color: var(--accent);
     font-family: var(--font-kanji);
-    font-size: var(--font-size-1-8);
+    font-size: var(--text-display);
     line-height: 1;
   }
 
   .name {
-    font-size: var(--font-size-0-8);
+    font-size: var(--text-xs);
   }
 </style>

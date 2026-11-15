@@ -69,19 +69,20 @@
     margin: 0 0 var(--space-1);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: var(--font-size-1-1);
+    font-size: var(--text-md);
     font-weight: 400;
   }
 
   .amount {
     margin: 0 0 var(--space-2);
     color: var(--fg-dim);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .bar {
+    --_height: 0.75rem;
     position: relative;
-    height: var(--size-0-75);
+    height: var(--_height);
     border-radius: var(--radius-sm);
     background: var(--line);
   }
@@ -94,10 +95,13 @@
   }
 
   .tick {
+    --_top: 3px;
+    --_bottom: 3px;
+    --_width: 2px;
     position: absolute;
-    top: calc(-1 * var(--offset-3));
-    bottom: calc(-1 * var(--offset-3));
-    width: var(--bar-2);
+    top: calc(-1 * var(--_top));
+    bottom: calc(-1 * var(--_bottom));
+    width: var(--_width);
     background: var(--fg-dim);
   }
 
@@ -127,15 +131,16 @@
 
   .state {
     margin-left: auto;
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .pct {
+    --_width: 4.5rem;
     display: inline-flex;
     flex: none;
     align-items: center;
     gap: var(--space-1);
-    width: var(--size-4-5);
+    width: var(--_width);
     font-weight: 600;
   }
 

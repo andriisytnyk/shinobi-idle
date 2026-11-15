@@ -19,7 +19,7 @@
     margin: 0 0 var(--space-3);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: var(--font-size-1-6);
+    font-size: var(--text-2xl);
     font-weight: 400;
   }
 </style>

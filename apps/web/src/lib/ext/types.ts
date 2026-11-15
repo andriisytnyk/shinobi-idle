@@ -1,11 +1,10 @@
 import type { ContentDb } from '@shinobi/content';
-import type * as Core from '@shinobi/core';
 import type { Command, CommandResult, GameEvent, GameState, ModResult } from '@shinobi/core';
 import type { Component } from 'svelte';
 import type { SlotContext, SlotContexts, SlotName } from './slots.ts';
 
-/** Public selectors and helpers of the core. The functions that change a state are left out: `dispatch` is the way. */
-export type CoreApi = Omit<typeof Core, 'dispatch' | 'advance' | 'advanceOffline'>;
+export type { CoreApi } from './core-allowlist.ts';
+import type { CoreApi } from './core-allowlist.ts';
 
 export interface PackStorage {
   /** A JSON value stored for this pack, or `undefined`. Separate from the save and from other packs. */
@@ -33,8 +32,11 @@ export interface DomApi {
 
 /** Hooks a pack may listen to. They run in pack load order; one that throws is skipped with one warning. */
 export interface HookMap {
-  /** Before: the location hash changed, the page is not drawn yet. After: the new page is drawn. */
-  route: (e: { phase: 'before' | 'after'; from: string; to: string }) => void;
+  /**
+   * Before: runs synchronously when the hash has changed and the old page is still on screen; return `false`
+   * to stay where you were, or another hash to go there instead. After: the new page is drawn.
+   */
+  route: (e: { phase: 'before' | 'after'; from: string; to: string }) => void | false | string;
   /** After every update of the game state. */
   state: () => void;
   /** Every game event drained from the core queue: level-up, item, quest step, fight log line. */

@@ -284,10 +284,10 @@
 
   .tab {
     flex: none;
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-3);
     border: 0;
-    border-bottom: var(--border-3) solid transparent;
+    border-bottom: var(--border-heavy) solid transparent;
     background: none;
     color: var(--fg-dim);
     font: inherit;
@@ -301,12 +301,12 @@
 
   .search {
     display: inline-flex;
-    flex: 1 1 var(--size-12);
+    flex: 1 1 var(--card-min);
     align-items: center;
     gap: var(--space-2);
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     padding: 0 var(--space-2);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface);
     color: var(--fg-dim);
@@ -315,7 +315,7 @@
   .search input {
     flex: 1;
     min-width: 0;
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     border: 0;
     background: none;
     color: var(--fg);
@@ -326,13 +326,13 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     cursor: pointer;
   }
 
   .goal-filter input {
-    width: var(--size-1-25);
-    height: var(--size-1-25);
+    width: var(--icon-md);
+    height: var(--icon-md);
   }
 
   .empty,
@@ -356,8 +356,8 @@
     gap: var(--space-2) var(--space-3);
     margin-bottom: var(--space-2);
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface);
   }
 
@@ -388,7 +388,7 @@
   }
 
   .name {
-    flex: 1 1 var(--size-8);
+    flex: 1 1 var(--panel-min);
     min-width: 0;
     font-weight: 600;
   }
@@ -397,14 +397,14 @@
     .name :global(a) {
       display: inline-flex;
       align-items: center;
-      min-height: var(--control-size);
+      min-height: var(--control-md);
     }
   }
 
   .level {
     display: block;
     color: var(--fg-dim);
-    font-size: var(--font-size-0-8);
+    font-size: var(--text-xs);
     font-weight: 400;
   }
 
@@ -422,9 +422,9 @@
   .act {
     display: inline-flex;
     align-items: center;
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--accent);
+    border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);
@@ -442,7 +442,7 @@
   .why {
     margin: 0;
     color: var(--fg-dim);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .why::before {

@@ -216,9 +216,9 @@
 
   .random,
   .primary {
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-4);
-    border: 1px solid var(--accent);
+    border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);
@@ -236,18 +236,18 @@
   }
 
   h2 {
-    font-size: var(--font-size-1-1);
+    font-size: var(--text-md);
   }
 
   h3 {
-    font-size: var(--font-size-1);
+    font-size: var(--text-sm);
   }
 
   .yours {
     margin: var(--space-4) 0;
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface);
   }
 
@@ -270,7 +270,7 @@
   .tag {
     margin-left: var(--space-1);
     color: var(--fg-dim);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .team {
@@ -285,12 +285,13 @@
   .note {
     margin: var(--space-2) 0 0;
     color: var(--fg-dim);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .cards {
+    --_grid-template-columns: 19rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--size-19)), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--_grid-template-columns)), 1fr));
     gap: var(--space-3);
     margin: var(--space-4) 0 0;
     padding: 0;
@@ -298,7 +299,7 @@
 
   .chosen {
     font-family: var(--font-heading);
-    font-size: var(--font-size-1-3);
+    font-size: var(--text-lg);
   }
 
   [data-result] p,

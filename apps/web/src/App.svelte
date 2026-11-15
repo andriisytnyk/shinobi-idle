@@ -23,7 +23,7 @@
   import { createStyleInjector, createThemeApplier } from './lib/ext/theme.ts';
   import type { UiPack } from './lib/ext/types.ts';
   import { t } from './lib/i18n.ts';
-  import { currentHash, currentRoute } from './lib/router.svelte.ts';
+  import { currentHash, currentRoute, setBeforeRoute } from './lib/router.svelte.ts';
   import { settings } from './lib/settings.svelte.ts';
   import { game } from './lib/store.ts';
 
@@ -55,9 +55,8 @@
     return () => styles.apply([]);
   });
 
-  // The packs start with the app and are unloaded with it; the observers watch the app root.
+  // The observers watch the app root; the packs themselves were started when the registries were made.
   let appEl = $state<HTMLElement>();
-  $effect(() => ui.start());
   $effect(() => {
     if (appEl) return ui.hub.attach(appEl);
   });
@@ -69,7 +68,6 @@
   const route = $derived(currentRoute());
 
   // Hooks for the packs: the route (the hash changed / the page is drawn) and the state (after every update).
-  const hashOf = (url = '') => (url.includes('#') ? url.slice(url.indexOf('#')) : '');
   let lastHash = untrack(() => hash);
   $effect(() => {
     const to = hash;
@@ -79,11 +77,14 @@
       if (from !== to) ui.emit('route', { phase: 'after', from, to });
     });
   });
+  // «before» is asked by the router itself, synchronously, while the old page is still on screen.
   $effect(() => {
-    const on = (e: HashChangeEvent) =>
-      ui.emit('route', { phase: 'before', from: hashOf(e.oldURL), to: hashOf(e.newURL) });
-    window.addEventListener('hashchange', on);
-    return () => window.removeEventListener('hashchange', on);
+    setBeforeRoute((from, to) => {
+      const verdicts = ui.emit('route', { phase: 'before', from, to });
+      if (verdicts.includes(false)) return false;
+      return verdicts.findLast((v) => typeof v === 'string') as string | undefined;
+    });
+    return () => setBeforeRoute(null);
   });
   $effect(() => {
     void game.version;
@@ -171,7 +172,7 @@
   .side {
     grid-area: side;
     padding: var(--space-3);
-    border-right: 1px solid var(--line);
+    border-right: var(--border-thin) solid var(--line);
     background: var(--surface);
     overflow-y: auto;
   }
@@ -183,14 +184,15 @@
   }
 
   .main.dev {
-    padding-bottom: var(--size-5);
+    --_padding-bottom: 5rem;
+    padding-bottom: var(--_padding-bottom);
   }
 
   .meta {
     grid-area: meta;
     display: flex;
     flex-direction: column;
-    border-left: 1px solid var(--line);
+    border-left: var(--border-thin) solid var(--line);
     overflow: hidden;
   }
 

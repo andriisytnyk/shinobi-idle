@@ -1,16 +1,19 @@
 <script lang="ts">
   import Icon from '../components/Icon.svelte';
   import { tryUi } from '../lib/ext/runtime.svelte.ts';
+  import { tabItems } from '../lib/nav.ts';
   import { t } from '../lib/i18n.ts';
   import SimplePage from './SimplePage.svelte';
 
   /** Pages that packs added to the menu; the built-in ones are listed below by hand. */
   const ui = tryUi();
-  const extra = $derived(
-    ui?.registry.navItems.filter(
-      (n) => n.packId !== 'core' && n.group !== 'tab' && !ui.navHidden(n.key),
-    ) ?? [],
-  );
+  const extra = $derived.by(() => {
+    if (!ui) return [];
+    const inBar = new Set(tabItems(ui.registry, (item) => !ui.navHidden(item.key)));
+    return ui.registry.navItems.filter(
+      (n) => n.packId !== 'core' && !inBar.has(n) && !ui.navHidden(n.key),
+    );
+  });
 </script>
 
 <SimplePage title={t('nav.more')}>
@@ -92,8 +95,8 @@
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface-raised);
     color: var(--fg);
     text-decoration: none;

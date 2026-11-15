@@ -126,14 +126,14 @@
     align-items: center;
     gap: var(--space-2);
     width: 100%;
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-2);
     border: 0;
     background: none;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: var(--font-size-0-8);
-    letter-spacing: var(--tracking-0-04);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
     text-align: left;
     cursor: pointer;
   }
@@ -154,17 +154,18 @@
   }
 
   .skill {
+    --_grid-template-columns: 1.5rem;
     position: relative;
     display: grid;
-    grid-template-columns: var(--size-1-5) 1fr auto;
+    grid-template-columns: var(--_grid-template-columns) 1fr auto;
     grid-template-areas:
       'icon name level'
       'bar bar bar';
     align-items: center;
     column-gap: var(--space-2);
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     padding: var(--space-2);
-    border-left: var(--border-3) solid transparent;
+    border-left: var(--border-heavy) solid transparent;
     border-radius: var(--radius-sm);
   }
 
@@ -206,7 +207,7 @@
     grid-area: level;
     display: inline-flex;
     color: var(--fg-dim);
-    font-size: var(--font-size-0-8);
+    font-size: var(--text-xs);
     font-variant-numeric: tabular-nums;
   }
 
@@ -214,14 +215,14 @@
     grid-area: bar;
     position: relative;
     z-index: var(--z-raised);
-    font-size: var(--font-size-0-8);
+    font-size: var(--text-xs);
   }
 
   .xp-bar {
     grid-area: bar;
-    height: var(--bar-3);
+    height: var(--bar-thin);
     margin-top: var(--space-1);
-    border-radius: var(--radius-2);
+    border-radius: var(--radius-xs);
     background: var(--line);
     overflow: hidden;
   }
@@ -234,16 +235,16 @@
   .native {
     margin-left: var(--space-2);
     padding: 0 var(--space-1);
-    border: 1px solid var(--skill-color);
+    border: var(--border-thin) solid var(--skill-color);
     border-radius: var(--radius-sm);
     color: var(--fg-dim);
-    font-size: var(--font-size-0-7);
+    font-size: var(--text-2xs);
   }
 
   .marker {
     display: inline-block;
-    width: var(--size-0-6);
-    height: var(--size-0-6);
+    width: var(--icon-xs);
+    height: var(--icon-xs);
     margin-left: var(--space-2);
     border-radius: 50%;
     background: var(--accent);

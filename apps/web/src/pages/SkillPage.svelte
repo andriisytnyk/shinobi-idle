@@ -148,14 +148,15 @@
 
 <style>
   .plate {
+    --_border-left: 6px;
     display: flex;
     align-items: baseline;
     justify-content: space-between;
     gap: var(--space-4);
     padding: var(--space-3) var(--space-4);
-    border-radius: var(--radius);
+    border-radius: var(--radius-md);
     background: var(--surface-raised);
-    border-left: var(--border-6) solid var(--steel);
+    border-left: var(--_border-left) solid var(--steel);
   }
 
   h1 {
@@ -165,7 +166,7 @@
     margin: 0;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: var(--font-size-1-6);
+    font-size: var(--text-2xl);
     font-weight: 400;
   }
 
@@ -176,7 +177,7 @@
     margin: var(--space-4) 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: var(--font-size-1-1);
+    font-size: var(--text-md);
     font-weight: 400;
   }
 
@@ -208,8 +209,8 @@
 
   .locked {
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
   }
 
   .locked h2 {
@@ -218,7 +219,7 @@
 
   .tiles {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(var(--size-16), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(var(--tile-min), 1fr));
     gap: var(--space-3);
     margin: 0;
     padding: 0;

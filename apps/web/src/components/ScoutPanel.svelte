@@ -94,8 +94,8 @@
     gap: var(--space-2);
     margin: 0 0 var(--space-2);
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface);
   }
 
@@ -125,16 +125,16 @@
 
   .small {
     margin: 0 0 var(--space-3);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .open {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--accent);
+    border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-sm);
     color: var(--accent);
     font-weight: 600;

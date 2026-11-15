@@ -70,14 +70,14 @@
   .kind {
     margin: 0;
     color: var(--fg-dim);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   h1 {
     margin: var(--space-1) 0 var(--space-3);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: var(--font-size-1-6);
+    font-size: var(--text-2xl);
     font-weight: 400;
   }
 
@@ -85,12 +85,12 @@
     margin: var(--space-4) 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: var(--font-size-1-1);
+    font-size: var(--text-md);
     font-weight: 400;
   }
 
   .single {
-    max-width: var(--size-24);
+    max-width: var(--measure);
   }
 
   ul {

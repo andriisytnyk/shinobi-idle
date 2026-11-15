@@ -10,11 +10,27 @@ import { navTarget } from './next-step.ts';
 export const sideItems = (registry: UiRegistry): NavEntry[] =>
   registry.navItems.filter((n) => n.group !== 'tab').sort((a, b) => a.order - b.order);
 
-/** The items of the phone tab bar, in order. */
-export const tabItems = (registry: UiRegistry): NavEntry[] =>
-  registry.navItems
-    .filter((n) => n.group !== 'side')
+/** Tabs that fit in the phone tab bar: «Ще» always has its place, the others take the rest in order. */
+export const MAX_TABS = 5;
+
+/**
+ * The items of the phone tab bar, in order, at most `MAX_TABS`. A pack that moves more items here
+ * than fit does not overflow the bar: the extra ones (the last by order) are listed on «Ще».
+ */
+export function tabItems(
+  registry: UiRegistry,
+  visible: (item: NavEntry) => boolean = () => true,
+): NavEntry[] {
+  const sorted = registry.navItems
+    .filter((n) => n.group !== 'side' && visible(n))
     .sort((a, b) => (a.tabOrder ?? a.order) - (b.tabOrder ?? b.order));
+  const more = sorted.filter((n) => n.id === 'more');
+  const kept = new Set([
+    ...more,
+    ...sorted.filter((n) => n.id !== 'more').slice(0, MAX_TABS - more.length),
+  ]);
+  return sorted.filter((n) => kept.has(n));
+}
 
 /** Ids of the items that have no tab of their own on a phone: they are reached from «Ще» and keep that tab lit. */
 export const morePages = (registry: UiRegistry): string[] =>

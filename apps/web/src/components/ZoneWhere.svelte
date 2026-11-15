@@ -32,7 +32,7 @@
 <style>
   .where {
     margin: 0;
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .dim {

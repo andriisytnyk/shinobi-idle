@@ -31,8 +31,9 @@
 
 <style>
   .stat {
+    --_grid-template-columns: 7rem;
     display: grid;
-    grid-template-columns: var(--size-7) minmax(0, 1fr) auto;
+    grid-template-columns: var(--_grid-template-columns) minmax(0, 1fr) auto;
     align-items: center;
     gap: var(--space-2);
     --tone: var(--hp);
@@ -52,12 +53,12 @@
 
   .label {
     color: var(--fg-dim);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .bar {
-    height: var(--bar-10);
-    border-radius: var(--radius-5);
+    height: var(--bar-thick);
+    border-radius: var(--radius-sm);
     background: var(--line);
     overflow: hidden;
   }
@@ -69,8 +70,9 @@
   }
 
   .value {
-    min-width: var(--size-5);
-    font-size: var(--font-size-0-85);
+    --_min-width: 5rem;
+    min-width: var(--_min-width);
+    font-size: var(--text-xs);
     text-align: right;
     font-variant-numeric: tabular-nums;
   }

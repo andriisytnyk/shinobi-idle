@@ -376,13 +376,13 @@
     justify-content: space-between;
     gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
-    border-bottom: 1px solid var(--line);
+    border-bottom: var(--border-thin) solid var(--line);
   }
 
   .lvl {
     margin: 0;
     color: var(--fg-dim);
-    font-size: var(--font-size-0-8);
+    font-size: var(--text-xs);
   }
 
   .body {
@@ -399,7 +399,7 @@
   .actions {
     flex: none;
     padding: var(--space-2) var(--space-4);
-    border-top: 1px solid var(--accent);
+    border-top: var(--border-thin) solid var(--accent);
     background: var(--surface-raised);
   }
 
@@ -410,21 +410,22 @@
   }
 
   .actions .action {
-    flex: 1 1 var(--size-6-5);
+    --_flex: 6.5rem;
+    flex: 1 1 var(--_flex);
     padding-inline: var(--space-2);
   }
 
   .region {
     margin: 0;
     color: var(--fg-dim);
-    font-size: var(--font-size-0-8);
+    font-size: var(--text-xs);
   }
 
   h2 {
     margin: 0;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: var(--font-size-1-25);
+    font-size: var(--text-lg);
     font-weight: 400;
     overflow-wrap: anywhere;
   }
@@ -434,7 +435,7 @@
     align-items: center;
     gap: var(--space-2);
     margin: 0 0 var(--space-2);
-    font-size: var(--font-size-0-95);
+    font-size: var(--text-sm);
   }
 
   .close {
@@ -442,9 +443,9 @@
     align-items: center;
     justify-content: center;
     flex: none;
-    min-width: var(--control-size);
-    min-height: var(--control-size);
-    border: 1px solid var(--line);
+    min-width: var(--control-md);
+    min-height: var(--control-md);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);
@@ -458,14 +459,15 @@
   }
 
   .badge {
+    --_line-height: 1.6rem;
     display: inline-flex;
     align-items: center;
     gap: var(--space-1);
     padding: 0 var(--space-2);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-pill);
-    font-size: var(--font-size-0-8);
-    line-height: var(--line-height-1-6);
+    font-size: var(--text-xs);
+    line-height: var(--_line-height);
   }
 
   .badge.here {
@@ -483,19 +485,19 @@
 
   .small {
     margin: var(--space-1) 0;
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .block {
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface);
   }
 
   .bar {
-    height: var(--bar-6);
-    border-radius: var(--radius-3);
+    height: var(--bar-md);
+    border-radius: var(--radius-xs);
     background: var(--line);
     overflow: hidden;
   }
@@ -516,7 +518,7 @@
     display: flex;
     justify-content: space-between;
     gap: var(--space-3);
-    font-size: var(--font-size-0-85);
+    font-size: var(--text-xs);
   }
 
   .facts dt {
@@ -529,9 +531,9 @@
   }
 
   .action {
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--accent);
+    border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-sm);
     background: var(--accent);
     color: var(--ink-900);
@@ -561,7 +563,7 @@
   .why {
     margin: var(--space-1) 0 0;
     color: var(--fg-dim);
-    font-size: var(--font-size-0-8);
+    font-size: var(--text-xs);
   }
 
   .poi-list {
@@ -575,7 +577,7 @@
 
   .poi {
     padding-bottom: var(--space-3);
-    border-bottom: 1px solid var(--line);
+    border-bottom: var(--border-thin) solid var(--line);
   }
 
   .poi:last-child {
@@ -594,7 +596,7 @@
 
   .poi-name .kind {
     color: var(--fg-dim);
-    font-size: var(--font-size-0-75);
+    font-size: var(--text-2xs);
     font-weight: 400;
   }
 
@@ -602,8 +604,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: var(--control-size);
-    min-height: var(--control-size);
+    min-width: var(--control-md);
+    min-height: var(--control-md);
     color: var(--accent);
   }
 

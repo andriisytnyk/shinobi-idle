@@ -56,11 +56,13 @@
   {/if}
 
   {#if goal}
-    <div class="tree" data-goal data-ui="goal-row">
+    <div class="tree" data-goal>
       {#if result}
-        <ReqTree node={result} />
+        <ReqTree node={result} part="goal-row" />
       {:else if goalRef}
-        <p class="target"><EntityLink kind={goalRef.kind} id={goalRef.id} /></p>
+        <p class="target" data-ui="goal-row" data-entity="{goalRef.kind}:{goalRef.id}">
+          <EntityLink kind={goalRef.kind} id={goalRef.id} />
+        </p>
       {/if}
     </div>
     {#if result?.met}<p class="done">{t('meta.done')}</p>{/if}
@@ -98,9 +100,9 @@
 
   .close {
     display: none;
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);
@@ -116,7 +118,7 @@
     margin: 0;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: var(--font-size-1);
+    font-size: var(--text-sm);
     font-weight: 400;
   }
 
@@ -128,8 +130,8 @@
   .wait {
     margin: 0 0 var(--space-3);
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--accent);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--accent);
+    border-radius: var(--radius-md);
     font-weight: 600;
   }
 
@@ -141,8 +143,8 @@
 
   .suggest {
     padding: var(--space-3);
-    border: 1px dashed var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) dashed var(--line);
+    border-radius: var(--radius-md);
   }
 
   .suggest p {
@@ -156,10 +158,10 @@
 
   .pin,
   .unpin {
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     margin-top: var(--space-3);
     padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { coreUi } from '../src/lib/ext/core-ui.ts';
-import { createRegistry, UiPackError } from '../src/lib/ext/registry.ts';
+import { createRegistry } from '../src/lib/ext/registry.ts';
 import { isSlotName, SLOT_NAMES } from '../src/lib/ext/slots.ts';
 import type { UiPack, UiRegistrar } from '../src/lib/ext/types.ts';
 import { testmodUi } from './fixtures/testmod-ui.ts';
@@ -9,15 +9,17 @@ const pack = (id: string, setup: (ui: UiRegistrar) => void): UiPack => ({ id, se
 const noop = () => {};
 const page = (id: string, route: string) => ({ id, route, title: 'x', mount: noop });
 
-/** The message of the error a registration throws. */
+/** Why the last pack was switched off: a pack that breaks a rule is disabled, never thrown out of the boot. */
 function failure(packs: UiPack[]): string {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
   try {
-    createRegistry(packs);
-  } catch (error) {
-    expect(error).toBeInstanceOf(UiPackError);
-    return (error as Error).message;
+    const registry = createRegistry(packs);
+    const message = registry.disabled.at(-1)?.message;
+    if (message === undefined) throw new Error('expected the pack to be disabled');
+    return message;
+  } finally {
+    warn.mockRestore();
   }
-  throw new Error('expected the registration to be rejected');
 }
 
 describe('registration rules (A6)', () => {
@@ -161,8 +163,8 @@ describe('registration rules (A6)', () => {
     ]);
     expect(registry.widgets('topbar').map((w) => w.key)).toEqual(['two:b', 'one:a']);
     expect(registry.navItems.find((n) => n.key === 'core:bank')?.group).toBe('tab');
-    expect(registry.isNavRemoved('core:help', () => ({}) as never)).toBe(true);
-    expect(registry.isNavRemoved('core:bank', () => ({}) as never)).toBe(false);
+    expect(registry.navRemovals('core:help')).toHaveLength(1);
+    expect(registry.navRemovals('core:bank')).toHaveLength(0);
     const gone = createRegistry([
       pack('one', (ui) => ui.addWidget('topbar', noop, { id: 'a' })),
       pack('two', (ui) => ui.removeWidget('one:a')),
@@ -182,6 +184,105 @@ describe('registration rules (A6)', () => {
     expect(registry.matchPage('#/help')?.page.mount).toBe(second);
     expect(String(warn.mock.calls[0]?.[0])).toContain('"one"');
     expect(String(warn.mock.calls[0]?.[0])).toContain('"two"');
+    warn.mockRestore();
+  });
+});
+
+describe('a pack that fails is switched off as a whole', () => {
+  it('rolls back everything it registered, leaves the others alone, and does not throw', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const good = pack('good', (ui) => ui.addWidget('topbar', noop, { id: 'w' }));
+    const bad = pack('bad', (ui) => {
+      ui.addWidget('topbar', noop, { id: 'w' });
+      ui.addPage(page('p', '#/x/bad/p'));
+      ui.addLocale('uk', { 'x.bad.key': 'a' });
+      ui.addSetting({ id: 's', title: 'x', kind: 'toggle', default: false });
+      ui.addTheme({ id: 't', name: 'x', tokens: {} });
+      ui.addStylesheet('a { }');
+      ui.moveNavItem('core:bank', { order: 99 });
+      ui.removeNavItem('core:help');
+      ui.removeWidget('good:w');
+      ui.reorderWidget('good:w', 1);
+      ui.replacePage('core:help', noop);
+      ui.wrapPage('core:help', noop);
+      ui.removeNavItem('core:nope');
+    });
+    const registry = createRegistry([coreUi, good, bad]);
+    expect(registry.disabled.map((d) => d.packId)).toEqual(['bad']);
+    expect(registry.disabled[0]?.message).toMatch(/UI pack "bad".*removeNavItem.*core:nope/);
+    expect(registry.packs).toEqual(['core', 'good']);
+    expect(registry.widgets('topbar').map((w) => w.key)).toEqual(['good:w']);
+    expect(registry.pages.some((p) => p.packId === 'bad')).toBe(false);
+    expect(registry.matchPage('#/x/bad/p')).toBeNull();
+    expect(registry.messages['x.bad.key']).toBeUndefined();
+    expect(registry.settings).toEqual([]);
+    expect(registry.themes.map((t) => t.key)).toEqual(['core:base']);
+    expect(registry.stylesheets).toEqual([]);
+    expect(registry.navItems.find((n) => n.key === 'core:bank')?.order).toBe(40);
+    expect(registry.navRemovals('core:help')).toEqual([]);
+    expect(registry.widgets('topbar')[0]?.order).toBe(100);
+    const help = registry.pages.find((p) => p.key === 'core:help');
+    expect(help?.wraps).toEqual([]);
+    expect(help?.replacedBy).toBeUndefined();
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it('survives a pack that throws a plain error, a bad id and a repeated id', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const registry = createRegistry([
+      coreUi,
+      pack('boom', () => {
+        throw new Error('kaput');
+      }),
+      pack('Bad Id', noop),
+      pack('twice', noop),
+      pack('twice', noop),
+    ]);
+    expect(registry.disabled.map((d) => d.packId)).toEqual(['boom', 'Bad Id', 'twice']);
+    expect(registry.disabled[0]?.message).toBe('kaput');
+    expect(registry.packs).toEqual(['core', 'twice']);
+    warn.mockRestore();
+  });
+
+  it('lets the built-in pack stop the boot', () => {
+    expect(() =>
+      createRegistry([
+        pack('core', () => {
+          throw new Error('core is broken');
+        }),
+      ]),
+    ).toThrow('core is broken');
+  });
+
+  it('warns with both pack ids for every kind of conflict; the later pack wins', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const registry = createRegistry([
+      coreUi,
+      pack('one', (ui) => {
+        ui.addWidget('topbar', noop, { id: 'w', order: 10 });
+        ui.moveNavItem('core:bank', { order: 11 });
+        ui.wrapPage('core:help', noop);
+        ui.reorderWidget('one:w', 20);
+      }),
+      pack('two', (ui) => {
+        ui.moveNavItem('core:bank', { order: 12 });
+        ui.wrapPage('core:help', noop);
+        ui.reorderWidget('one:w', 30);
+      }),
+    ]);
+    const lines = warn.mock.calls.map((c) => String(c[0]));
+    for (const subject of ['nav item "core:bank"', 'page "core:help"', 'widget "one:w"']) {
+      const line = lines.find((l) => l.includes(subject));
+      expect(line, subject).toContain('"one"');
+      expect(line, subject).toContain('"two"');
+    }
+    expect(registry.navItems.find((n) => n.key === 'core:bank')?.order).toBe(12);
+    expect(registry.widgets('topbar')[0]?.order).toBe(30);
+    expect(registry.pages.find((p) => p.key === 'core:help')?.wraps.map((w) => w.packId)).toEqual([
+      'one',
+      'two',
+    ]);
     warn.mockRestore();
   });
 });

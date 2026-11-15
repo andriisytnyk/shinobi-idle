@@ -11,6 +11,13 @@
   const ui = tryUi();
   const themes = ui?.registry.themes ?? [];
   const packSettings = ui?.registry.settings ?? [];
+  const disabledPacks = ui?.registry.disabled ?? [];
+  /** The theme in use: an unknown stored id means the base theme, and the picker must say so. */
+  const currentTheme = $derived(
+    themes.some((theme) => theme.key === settings.theme)
+      ? settings.theme
+      : (themes.find((theme) => theme.key === 'core:base') ?? themes[0])?.key,
+  );
 
   let exported = $state('');
   let importText = $state('');
@@ -91,7 +98,7 @@
     {#if ui && themes.length > 1}
       <label class="select" data-ui="theme-select">
         {t('settings.theme')}
-        <select value={settings.theme} onchange={(e) => (settings.theme = e.currentTarget.value)}>
+        <select value={currentTheme} onchange={(e) => (settings.theme = e.currentTarget.value)}>
           {#each themes as theme (theme.key)}
             <option value={theme.key}>{ui.t(theme.name)}</option>
           {/each}
@@ -99,6 +106,17 @@
       </label>
     {/if}
   </section>
+
+  {#if disabledPacks.length > 0}
+    <section data-ui="disabled-packs">
+      <h2>{t('settings.disabledPacks')}</h2>
+      {#each disabledPacks as pack (pack.packId)}
+        <p class="message bad" role="status">
+          {t('settings.packDisabled', { pack: pack.packId, error: pack.message })}
+        </p>
+      {/each}
+    </section>
+  {/if}
 
   {#if ui && packSettings.length > 0}
     <section data-ui="pack-settings">
@@ -214,7 +232,7 @@
     margin: 0 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: var(--font-size-1-1);
+    font-size: var(--text-md);
     font-weight: 400;
   }
 
@@ -225,16 +243,20 @@
     margin-bottom: var(--space-2);
   }
 
+  .select select {
+    min-height: var(--control-md);
+  }
+
   .check {
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    min-height: var(--control-size);
+    min-height: var(--control-md);
   }
 
   .check input {
-    width: var(--size-1-25);
-    height: var(--size-1-25);
+    width: var(--icon-md);
+    height: var(--icon-md);
     accent-color: var(--accent);
   }
 
@@ -251,9 +273,9 @@
   }
 
   button {
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-4);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);
@@ -275,12 +297,12 @@
     width: 100%;
     margin-top: var(--space-2);
     padding: var(--space-2);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface);
     color: var(--fg);
     font-family: var(--font-mono);
-    font-size: var(--font-size-0-8);
+    font-size: var(--text-xs);
     word-break: break-all;
   }
 
@@ -291,9 +313,9 @@
   }
 
   .typed input {
-    min-height: var(--control-size);
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-2);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface);
     color: var(--fg);
@@ -314,8 +336,8 @@
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface-raised);
     color: var(--fg);
     text-decoration: none;
