@@ -15,6 +15,10 @@
               Ніндзюцу
           <h1>
             Техніка клонування
+        <button class="text" data-entity="technique:core:clone" data-pinned="false" data-ui="pin-goal" type="button">
+          <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+            <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+          Закріпити як мету
       <dl class="facts">
         <div>
           <dt>
@@ -79,6 +83,9 @@
                   1/1
                 <span aria-hidden="true" class="bar">
                   <span class="fill" style="width: 100%;">
+        <p class="pin-caption">
+          <button class="link" data-entity="technique:core:clone" data-pinned="false" data-ui="pin-goal" type="button">
+            Закріпити як мету
       <section data-ui="entity-section">
         <h2>
           Тренування й Майстерність
@@ -96,12 +103,16 @@
                   <h3 class="name">
                     <a class="entity-link" href="#/technique/core:clone">
                       Техніка клонування
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
+                  <span class="corner">
+                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                        <circle class="track" cx="22" cy="22" r="18">
+                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                      <span class="level">
+                        1
+                    <button aria-label="Закріпити як мету" class="pin" data-entity="technique:core:clone" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <div class="live compact" data-fraction="0.000" data-mode="still" data-seal-strip="" style="--tp: 0;">
                   <ol aria-label="Печатки" class="strip">
                     <li class="seal" data-seal-index="0" style="--_k: 1000;" title="Баран">
@@ -133,5 +144,3 @@
                       5 184 дос./год
             <button class="action" type="button">
               Почати
-      <button aria-pressed="false" class="pin" type="button">
-        Закріпити як мету

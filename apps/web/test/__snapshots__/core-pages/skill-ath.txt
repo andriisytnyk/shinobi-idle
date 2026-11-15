@@ -36,7 +36,7 @@
                   <button aria-expanded="false" class="figure" type="button">
                     0 дос./год
           <p class="hint" data-course-empty="">
-            Збудуйте хоча б одну перешкоду, щоб пройти смугу.
+            Збудуй хоча б одну перешкоду, щоб пройти смугу.
           <button class="action" disabled="" type="button">
             Пройти смугу
         <p class="pillar" data-pillar="false">
@@ -59,6 +59,10 @@
                       <path d="#945-1swkgw1" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:strybky_po_dakhakh">
                     Стрибки по дахах
+                  <span class="pin-end">
+                    <button aria-label="Закріпити як мету" class="pin" data-entity="obstacle:core:strybky_po_dakhakh" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <p class="bonus">
                   <span class="tag">
                     Плюс
@@ -78,6 +82,10 @@
                       <path d="#401-ttijlg" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:bih_navkolo_sela">
                     Біг навколо села
+                  <span class="pin-end">
+                    <button aria-label="Закріпити як мету" class="pin" data-entity="obstacle:core:bih_navkolo_sela" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <p class="bonus">
                   <span class="tag">
                     Плюс
@@ -103,6 +111,10 @@
                       <path d="#959-1owm4r9" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:obtiazhuvachi">
                     Обтяжувачі
+                  <span class="pin-end">
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="obstacle:core:obtiazhuvachi" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <p class="bonus">
                   <span class="tag">
                     Плюс
@@ -134,6 +146,9 @@
                             1/10
                           <span aria-hidden="true" class="bar">
                             <span class="fill" style="width: 10%;">
+                  <p class="pin-caption">
+                    <button class="link" data-entity="obstacle:core:obtiazhuvachi" data-pinned="false" data-ui="pin-goal" type="button">
+                      Закріпити як мету
                 <p class="price">
                   Рьо: 600
                 <button class="action" disabled="" type="button">
@@ -145,6 +160,10 @@
                       <path d="#917-1lnknq0" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:vidzhymannia_na_paltsiakh">
                     Віджимання на пальцях
+                  <span class="pin-end">
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="obstacle:core:vidzhymannia_na_paltsiakh" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <p class="bonus">
                   <span class="tag">
                     Плюс
@@ -176,6 +195,9 @@
                             1/10
                           <span aria-hidden="true" class="bar">
                             <span class="fill" style="width: 10%;">
+                  <p class="pin-caption">
+                    <button class="link" data-entity="obstacle:core:vidzhymannia_na_paltsiakh" data-pinned="false" data-ui="pin-goal" type="button">
+                      Закріпити як мету
                 <p class="price">
                   Рьо: 600
                 <button class="action" disabled="" type="button">
@@ -193,6 +215,10 @@
                       <path d="#416-wwolv0" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:koloda_nad_prirvoiu">
                     Колода над прірвою
+                  <span class="pin-end">
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="obstacle:core:koloda_nad_prirvoiu" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <p class="bonus">
                   <span class="tag">
                     Плюс
@@ -224,6 +250,9 @@
                             1/20
                           <span aria-hidden="true" class="bar">
                             <span class="fill" style="width: 5%;">
+                  <p class="pin-caption">
+                    <button class="link" data-entity="obstacle:core:koloda_nad_prirvoiu" data-pinned="false" data-ui="pin-goal" type="button">
+                      Закріпити як мету
                 <p class="price">
                   Рьо: 1 350
                 <button class="action" disabled="" type="button">
@@ -235,6 +264,10 @@
                       <path d="#198-2btmks" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:ukhylennia_vid_kunaiv">
                     Ухилення від кунаїв
+                  <span class="pin-end">
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="obstacle:core:ukhylennia_vid_kunaiv" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <p class="bonus">
                   <span class="tag">
                     Плюс
@@ -266,6 +299,9 @@
                             1/20
                           <span aria-hidden="true" class="bar">
                             <span class="fill" style="width: 5%;">
+                  <p class="pin-caption">
+                    <button class="link" data-entity="obstacle:core:ukhylennia_vid_kunaiv" data-pinned="false" data-ui="pin-goal" type="button">
+                      Закріпити як мету
                 <p class="price">
                   Рьо: 1 350
                 <button class="action" disabled="" type="button">
@@ -283,6 +319,10 @@
                       <path d="#1634-nfcbh9" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:bih_po_derevakh">
                     Біг по деревах
+                  <span class="pin-end">
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="obstacle:core:bih_po_derevakh" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <p class="bonus">
                   <span class="tag">
                     Плюс
@@ -328,6 +368,9 @@
                             1/15
                           <span aria-hidden="true" class="bar">
                             <span class="fill" style="width: 6.666666666666667%;">
+                  <p class="pin-caption">
+                    <button class="link" data-entity="obstacle:core:bih_po_derevakh" data-pinned="false" data-ui="pin-goal" type="button">
+                      Закріпити як мету
                 <p class="price">
                   Рьо: 2 400
                 <button class="action" disabled="" type="button">
@@ -339,6 +382,10 @@
                       <path d="#710-jbb9n8" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:lazinnia_po_skeli">
                     Лазіння по скелі
+                  <span class="pin-end">
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="obstacle:core:lazinnia_po_skeli" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <p class="bonus">
                   <span class="tag">
                     Плюс
@@ -370,6 +417,9 @@
                             1/30
                           <span aria-hidden="true" class="bar">
                             <span class="fill" style="width: 3.3333333333333335%;">
+                  <p class="pin-caption">
+                    <button class="link" data-entity="obstacle:core:lazinnia_po_skeli" data-pinned="false" data-ui="pin-goal" type="button">
+                      Закріпити як мету
                 <p class="price">
                   Рьо: 2 400
                 <button class="action" disabled="" type="button">
@@ -387,6 +437,10 @@
                       <path d="#595-77s7ic" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:perehony_z_supernykom">
                     Перегони з суперником
+                  <span class="pin-end">
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="obstacle:core:perehony_z_supernykom" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <p class="bonus">
                   <span class="tag">
                     Плюс
@@ -418,6 +472,9 @@
                             1/40
                           <span aria-hidden="true" class="bar">
                             <span class="fill" style="width: 2.5%;">
+                  <p class="pin-caption">
+                    <button class="link" data-entity="obstacle:core:perehony_z_supernykom" data-pinned="false" data-ui="pin-goal" type="button">
+                      Закріпити як мету
                 <p class="price">
                   Рьо: 3 750
                 <button class="action" disabled="" type="button">
@@ -429,6 +486,10 @@
                       <path d="#179-1stpbnq" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:strybky_cherez_stovpy">
                     Стрибки через стовпи
+                  <span class="pin-end">
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="obstacle:core:strybky_cherez_stovpy" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <p class="bonus">
                   <span class="tag">
                     Плюс
@@ -460,6 +521,9 @@
                             1/40
                           <span aria-hidden="true" class="bar">
                             <span class="fill" style="width: 2.5%;">
+                  <p class="pin-caption">
+                    <button class="link" data-entity="obstacle:core:strybky_cherez_stovpy" data-pinned="false" data-ui="pin-goal" type="button">
+                      Закріпити як мету
                 <p class="price">
                   Рьо: 3 750
                 <button class="action" disabled="" type="button">
@@ -477,6 +541,10 @@
                       <path d="#1271-4rwhzz" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:bih_po_vodi">
                     Біг по воді
+                  <span class="pin-end">
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="obstacle:core:bih_po_vodi" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <p class="bonus">
                   <span class="tag">
                     Плюс
@@ -522,6 +590,9 @@
                             1/30
                           <span aria-hidden="true" class="bar">
                             <span class="fill" style="width: 3.3333333333333335%;">
+                  <p class="pin-caption">
+                    <button class="link" data-entity="obstacle:core:bih_po_vodi" data-pinned="false" data-ui="pin-goal" type="button">
+                      Закріпити як мету
                 <p class="price">
                   Рьо: 5 400
                 <button class="action" disabled="" type="button">
@@ -533,6 +604,10 @@
                       <path d="#4396-1xcybq6" fill="currentColor">
                   <a class="entity-link" href="#/obstacle/core:plavannia_proty_techii">
                     Плавання проти течії
+                  <span class="pin-end">
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="obstacle:core:plavannia_proty_techii" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <p class="bonus">
                   <span class="tag">
                     Плюс
@@ -564,6 +639,9 @@
                             1/50
                           <span aria-hidden="true" class="bar">
                             <span class="fill" style="width: 2%;">
+                  <p class="pin-caption">
+                    <button class="link" data-entity="obstacle:core:plavannia_proty_techii" data-pinned="false" data-ui="pin-goal" type="button">
+                      Закріпити як мету
                 <p class="price">
                   Рьо: 5 400
                 <button class="action" disabled="" type="button">

@@ -45,6 +45,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="skill:ath" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Дружина даймьо
             <p class="ct-note" data-no-team="">
@@ -94,6 +97,9 @@
                   1/5
                 <span aria-hidden="true" class="bar">
                   <span class="fill" style="width: 20%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="skill:ath" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
             <button aria-describedby="why-core:cat" class="ct-action" data-start="" disabled="" type="button">
@@ -159,6 +165,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="skill:ath" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Купці околиць
             <p class="ct-note" data-no-team="">
@@ -216,6 +225,9 @@
                   1/10
                 <span aria-hidden="true" class="bar">
                   <span class="fill" style="width: 10%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="skill:ath" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
             <button aria-describedby="why-core:fire" class="ct-action" data-start="" disabled="" type="button">
@@ -233,6 +245,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Сольна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="skill:suiton" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Селяни околиць
             <dl class="ct-facts">
@@ -288,6 +303,9 @@
                   1/20
                 <span aria-hidden="true" class="bar">
                   <span class="fill" style="width: 5%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="skill:suiton" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
             <button aria-describedby="why-core:drought" class="ct-action" data-start="" disabled="" type="button">
@@ -305,6 +323,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Сольна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="skill:nin" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Гільдія купців
             <dl class="ct-facts">
@@ -344,6 +365,9 @@
                   1/5
                 <span aria-hidden="true" class="bar">
                   <span class="fill" style="width: 20%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="skill:nin" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
             <button aria-describedby="why-core:courier" class="ct-action" data-start="" disabled="" type="button">
@@ -361,6 +385,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Сольна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="skill:doton" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Солевари
             <dl class="ct-facts">
@@ -408,6 +435,9 @@
                   1/30
                 <span aria-hidden="true" class="bar">
                   <span class="fill" style="width: 3.3333333333333335%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="skill:doton" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
             <button aria-describedby="why-core:rockfall" class="ct-action" data-start="" disabled="" type="button">
@@ -425,6 +455,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Сольна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="skill:scout" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Містечко
             <dl class="ct-facts">
@@ -471,6 +504,9 @@
                   1/20
                 <span aria-hidden="true" class="bar">
                   <span class="fill" style="width: 5%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="skill:scout" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
             <button aria-describedby="why-core:thief" class="ct-action" data-start="" disabled="" type="button">
@@ -826,6 +862,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="skill:tai" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <p class="ct-note" data-no-team="">
@@ -877,6 +916,9 @@
                   1/10
                 <span aria-hidden="true" class="bar">
                   <span class="fill" style="width: 10%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="skill:tai" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
             <button aria-describedby="why-core:v_spar" class="ct-action" data-start="" disabled="" type="button">
@@ -894,6 +936,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="technique:core:earth_style_wall" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <p class="ct-note" data-no-team="">
@@ -941,6 +986,9 @@
                     Стіна земляного стилю
                   <span class="detail">
                     ще не відкрито
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="technique:core:earth_style_wall" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
             <button aria-describedby="why-core:v_walls" class="ct-action" data-start="" disabled="" type="button">
@@ -958,6 +1006,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="technique:core:four_pillar_bind" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <p class="ct-note" data-no-team="">
@@ -1005,6 +1056,9 @@
                     Пута чотирьох стовпів
                   <span class="detail">
                     ще не відкрито
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="technique:core:four_pillar_bind" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
               <p class="ct-why">
                 Бракує інгредієнтів.
             <button aria-describedby="why-core:v_fence" class="ct-action" data-start="" disabled="" type="button">
@@ -1022,6 +1076,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="technique:core:running_fire" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <p class="ct-note" data-no-team="">
@@ -1069,6 +1126,9 @@
                     Вогняна доріжка
                   <span class="detail">
                     ще не відкрито
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="technique:core:running_fire" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
             <button aria-describedby="why-core:v_clear" class="ct-action" data-start="" disabled="" type="button">
@@ -1086,6 +1146,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="skill:suiton" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <p class="ct-note" data-no-team="">
@@ -1137,6 +1200,9 @@
                   1/20
                 <span aria-hidden="true" class="bar">
                   <span class="fill" style="width: 5%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="skill:suiton" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
             <button aria-describedby="why-core:v_water" class="ct-action" data-start="" disabled="" type="button">
@@ -1154,6 +1220,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="technique:core:great_fireball" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <p class="ct-note" data-no-team="">
@@ -1201,6 +1270,9 @@
                     Техніка великої вогняної кулі
                   <span class="detail">
                     ще не відкрито
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="technique:core:great_fireball" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
             <button aria-describedby="why-core:v_sanit" class="ct-action" data-start="" disabled="" type="button">
@@ -1218,6 +1290,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="skill:doton" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <p class="ct-note" data-no-team="">
@@ -1269,6 +1344,9 @@
                   1/30
                 <span aria-hidden="true" class="bar">
                   <span class="fill" style="width: 3.3333333333333335%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="skill:doton" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
             <button aria-describedby="why-core:v_rubble" class="ct-action" data-start="" disabled="" type="button">
@@ -1286,6 +1364,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="technique:core:shadow_clone" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <p class="ct-note" data-no-team="">
@@ -1333,6 +1414,9 @@
                     Техніка тіньового клонування
                   <span class="detail">
                     ще не відкрито
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="technique:core:shadow_clone" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
             <button aria-describedby="why-core:v_clones" class="ct-action" data-start="" disabled="" type="button">
@@ -1350,6 +1434,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="technique:core:enclosing" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <p class="ct-note" data-no-team="">
@@ -1397,6 +1484,9 @@
                     Техніка запечатування
                   <span class="detail">
                     ще не відкрито
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="technique:core:enclosing" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
             <button aria-describedby="why-core:v_seal" class="ct-action" data-start="" disabled="" type="button">

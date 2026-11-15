@@ -19,12 +19,16 @@
               <h3 class="ct-name">
                 <a class="entity-link" href="#/recipe/core:antidote">
                   Протиотрута
-              <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                  <circle class="track" cx="22" cy="22" r="18">
-                  <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                <span class="level">
-                  1
+              <span class="ct-corner">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                  <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
+                <button aria-label="Закріпити як мету" class="pin always" data-entity="recipe:core:antidote" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
           <dl class="ct-facts">
             <div>
               <dt>

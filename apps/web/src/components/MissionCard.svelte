@@ -4,12 +4,13 @@
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
   import { cardState, viewOf } from '../lib/mission-feed.svelte.ts';
-  import { cleanRunChance, rewardsOf } from '../lib/missions.ts';
+  import { cleanRunChance, pinTarget, rewardsOf } from '../lib/missions.ts';
   import { game } from '../lib/store.ts';
   import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import MissionRankStamp from './MissionRankStamp.svelte';
+  import PinGoal from './PinGoal.svelte';
   import MissionReward from './MissionReward.svelte';
   import ReqTree from './ReqTree.svelte';
 
@@ -26,6 +27,8 @@
   const state = $derived(cardState(mission, view.blocker));
   const rewards = $derived(rewardsOf(forecast, game.content));
   const chance = $derived(cleanRunChance(forecast));
+  /** A blocked mission pins the first unmet entity of its blocker, the same target as the mission page. */
+  const pin = $derived(state.kind === 'blocked' ? pinTarget(state.blocker) : null);
   const clientKey = $derived(`mission.${mission.id}.client`);
 
   function start(): void {
@@ -62,6 +65,7 @@
       <Icon name="lucide:users" size={14} />
       {t(mission.team ? 'mission.team.yes' : 'mission.team.no')}
     </span>
+    {#if pin}<PinGoal kind={pin.kind} id={pin.id} always />{/if}
   </div>
   {#if hasKey(clientKey)}<p class="ct-note client">{t(clientKey)}</p>{/if}
   {#if mission.team && !hasTeam}
@@ -108,6 +112,9 @@
     <div class="why" id="why-{mission.id}" data-why={state.reason}>
       {#if state.blocker}
         <ReqTree node={state.blocker} />
+        {#if pin}
+          <p class="ct-pin-caption"><PinGoal kind={pin.kind} id={pin.id} variant="link" /></p>
+        {/if}
       {/if}
       {#if state.by}
         <p class="ct-why" data-by>

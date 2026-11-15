@@ -11,7 +11,9 @@
         Найпоширеніша лікарська трава: заспокоює й знезаражує. База простих ліків і тоніків для розуму.
       <p class="owned">
         У банку: 0
-      <button aria-pressed="false" class="pin" data-pin="" type="button">
+      <button class="text" data-entity="item:core:mint" data-pinned="false" data-ui="pin-goal" type="button">
+        <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+          <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
         Закріпити як мету
       <section data-ui="entity-section">
         <h2>
