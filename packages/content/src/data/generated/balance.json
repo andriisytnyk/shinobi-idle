@@ -576,7 +576,7 @@
       "samples": 1000,
       "opSamples": 300,
       "seed": 7,
-      "budgetMs": 3000,
+      "budgetMs": 5000,
       "hintOptions": 3
     },
     "report": {
