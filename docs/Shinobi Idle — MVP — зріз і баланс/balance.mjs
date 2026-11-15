@@ -45,7 +45,7 @@ export const K = {
   // --- вороги ---
   eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [40,4.5], eEva: [30,4.2],
   boss: { hp:3.2, dmg:1.5 }, pack: { n:3, hp:0.4, dmg:0.4 },
-  trait: { armor:0.30, armorOff:6, casterEvery:12, casterCast:3, casterMult:3, evasive:2.0, regenPct:0.01, illusionEvery:10, illusionDur:6, illusionAcc:0.25,
+  trait: { armor:0.30, armorOff:6, casterEvery:12, casterCast:3, casterMult:3, evasive:1.6, regenPct:0.01, illusionEvery:10, illusionDur:6, illusionAcc:0.25,
     hidden:8, hiddenAcc:0.4, hiddenFirst:2.0, poisonChance:0.35 },
   // --- бій: досвід за годину бою в зоні рівня Z, частки від rate(Z) ---
   combatXp: { style:0.70, vit:0.35, eva:0.30 },
