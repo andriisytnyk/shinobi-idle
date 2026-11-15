@@ -214,6 +214,14 @@ export interface PacksChangedEvent extends EventBase {
   removed: string[];
 }
 
+/** A rule that a pack added failed and was switched off for this session: its pack, the rule and why. */
+export interface RuleDisabledEvent extends EventBase {
+  type: 'ruleDisabled';
+  pack: string;
+  rule: string;
+  reason: string;
+}
+
 export type GameEvent =
   | LevelUpEvent
   | MasteryUpEvent
@@ -247,7 +255,8 @@ export type GameEvent =
   | BuildingBuiltEvent
   | VillageStageEvent
   | StorageFullEvent
-  | PacksChangedEvent;
+  | PacksChangedEvent
+  | RuleDisabledEvent;
 
 type WithoutAt<T> = T extends unknown ? Omit<T, 'at'> : never;
 

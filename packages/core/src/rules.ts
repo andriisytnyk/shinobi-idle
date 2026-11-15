@@ -1,4 +1,5 @@
 import type { ContentDb, ContentPack } from '@shinobi/content';
+import { guardKind, guardProvider, tagOrigin } from './guard.ts';
 import { actionSystem, drillKind, practiceKind, type ActionKind } from './actions.ts';
 import { COURSE_KIND, courseKind, obstacleProvider } from './athletics.ts';
 import { defaultCombatAi } from './combat/fight-ai.ts';
@@ -176,10 +177,50 @@ export function composeRules(
   for (const manifest of content.packs) {
     const fn = byId.get(manifest.id)?.rules as unknown as PackRulesFn | undefined;
     if (fn === undefined) continue;
-    const next: unknown = fn(rules, content);
-    if (!isRules(next))
-      throw new Error(`the rules of the pack "${manifest.id}" are not a rule set`);
-    rules = next;
+    let next: unknown;
+    try {
+      next = fn(rules, content);
+    } catch (error) {
+      const why = error instanceof Error ? error.message : String(error);
+      throw new PackRulesError(
+        manifest.id,
+        `the rules of the pack "${manifest.id}" failed: ${why}`,
+      );
+    }
+    if (!isRules(next)) {
+      throw new PackRulesError(
+        manifest.id,
+        `the rules of the pack "${manifest.id}" are not a rule set`,
+      );
+    }
+    rules = adopt(rules, next, manifest.id);
   }
   return rules;
+}
+
+/** An error in the rules function of a pack (or in a rule it adds); `pack` names the pack. */
+export class PackRulesError extends Error {
+  readonly pack: string;
+  constructor(pack: string, message: string) {
+    super(message);
+    this.name = 'PackRulesError';
+    this.pack = pack;
+  }
+}
+
+/**
+ * What a pack's function made of the rules: every entry that is new or replaced is recorded as the
+ * pack's and guarded (see `guard.ts`), so nothing a pack adds can stop or corrupt `advance`.
+ */
+function adopt(before: Rules, after: Rules, pack: string): Rules {
+  const systems = after.systems.map((s) => (before.systems.includes(s) ? s : tagOrigin(s, pack)));
+  const actionKinds: Record<string, ActionKind> = {};
+  for (const [key, kind] of Object.entries(after.actionKinds)) {
+    const old = Object.hasOwn(before.actionKinds, key) ? before.actionKinds[key] : undefined;
+    actionKinds[key] = old === kind ? kind : guardKind(kind, pack);
+  }
+  const modifierProviders = after.modifierProviders.map((p) =>
+    before.modifierProviders.includes(p) ? p : guardProvider(p, pack),
+  );
+  return { ...after, systems, actionKinds, modifierProviders };
 }

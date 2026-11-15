@@ -25,7 +25,9 @@ import { addNature, chooseNature, type NatureChoice } from './natures.ts';
 import { shopBuy, shopSell } from './shop.ts';
 import { updateQuests } from './quests.ts';
 import { evalReq, type ReqResult } from './requirements.ts';
+import { callSystem, disableSystem, isDisabled, originOf, validWait } from './guard.ts';
 import { defaultRules, type Rules } from './rules.ts';
+import type { System } from './system.ts';
 import { isSkillUnlocked } from './selectors.ts';
 import type { GameState } from './state.ts';
 import { cancelBuild, donateToTreasury, spendWorkforce, startBuild } from './village.ts';
@@ -121,10 +123,29 @@ export function advance(
   updateQuests(state, content);
   let remaining = ms;
   let stalled = 0;
+  // Consecutive steps at +0 ms for each system of a pack other than core.
+  const zeros = new Map<System, number>();
   for (;;) {
     let next: number | null = null;
     for (const system of rules.systems) {
-      const wait = system.nextEventIn(state, content, rules);
+      if (isDisabled(state, system)) continue;
+      const wait = callSystem(
+        state,
+        system,
+        () => system.nextEventIn(state, content, rules),
+        null,
+        validWait,
+      );
+      const pack = originOf(system);
+      if (pack !== undefined) {
+        const streak = wait === 0 ? (zeros.get(system) ?? 0) + 1 : 0;
+        zeros.set(system, streak);
+        // A system of a pack that keeps asking for an event now, with no time passing, is switched off.
+        if (streak >= STALL_LIMIT) {
+          disableSystem(state, system, pack, new Error('asks for an event at +0 ms without end'));
+          continue;
+        }
+      }
       if (wait !== null && (next === null || wait < next)) next = wait;
     }
     if (next === null || next > remaining) break;
@@ -132,16 +153,23 @@ export function advance(
     if (stalled > STALL_LIMIT) {
       throw new Error('advance made no progress: a system keeps asking for time 0');
     }
+    if (next > 0) zeros.clear();
     elapse(state, next, content, rules);
     remaining -= next;
-    for (const system of rules.systems) system.run(state, content, rules);
+    for (const system of rules.systems) {
+      if (!isDisabled(state, system))
+        callSystem(state, system, () => system.run(state, content, rules), undefined);
+    }
   }
   elapse(state, remaining, content, rules);
 }
 
 function elapse(state: GameState, dt: number, content: ContentDb, rules: Rules): void {
   if (dt === 0) return;
-  for (const system of rules.systems) system.elapse?.(state, dt, content, rules);
+  for (const system of rules.systems) {
+    if (isDisabled(state, system)) continue;
+    callSystem(state, system, () => system.elapse?.(state, dt, content, rules), undefined);
+  }
   state.now += dt;
 }
 

@@ -1,11 +1,5 @@
-import {
-  composeContent,
-  content as builtIn,
-  corePack,
-  type ContentDb,
-  type ContentPack,
-} from '@shinobi/content';
-import { composeRules, defaultRules, type Rules } from '@shinobi/core';
+import { content as builtIn, corePack, type ContentDb, type ContentPack } from '@shinobi/content';
+import { composeGame, defaultRules, type FailedPack, type Rules } from '@shinobi/core';
 import { testmodPack } from '@shinobi/core/testmod';
 
 /** The content and the rules a sim run plays on: the packs it was asked for, composed. */
@@ -14,6 +8,8 @@ export interface Environment {
   rules: Rules;
   /** The ids of the packs, in the order they were asked for. */
   packs: string[];
+  /** Packs left out because they failed to compose. */
+  failed?: FailedPack[];
 }
 
 /** The packs the CLI knows by name. Another pack would be added here (or loaded by a later task). */
@@ -46,6 +42,12 @@ export function buildEnvironment(ids: readonly string[] = ['core']): Environment
     const pack = KNOWN.get(id);
     return pack ? [pack] : [];
   });
-  const content = composeContent(packs);
-  return { content, rules: composeRules(defaultRules, packs, content), packs: [...ids] };
+  // A pack that fails to compose is left out with the packs that depend on it; the run goes on without it.
+  const game = composeGame(packs);
+  return {
+    content: game.content,
+    rules: game.rules,
+    packs: game.content.packs.map((p) => p.id),
+    failed: game.failed,
+  };
 }
