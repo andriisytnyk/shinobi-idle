@@ -1,4 +1,10 @@
-import type { Boss, ContentDb, Enemy, Operation } from '@shinobi/content';
+import {
+  FIRST_FIGHT_FLAG,
+  type Boss,
+  type ContentDb,
+  type Enemy,
+  type Operation,
+} from '@shinobi/content';
 import { stopSlot } from '../actions.ts';
 import { bump, defeatsKey, killsKey } from '../counters.ts';
 import { emit } from '../events.ts';
@@ -118,7 +124,7 @@ function blank(
     pause: 0,
     paid: {},
     carry: 0,
-    style: 'tai',
+    style: fight.tally.style,
     owner,
     run,
   };
@@ -144,7 +150,7 @@ export function newMissionCombat(
   rules: Rules,
   owner: number,
 ): CombatState {
-  state.flags.firstFight = true;
+  state.flags[FIRST_FIGHT_FLAG] = true;
   // The pouch is topped up from the bank on the way into the fight, as for any fight.
   ensurePouch(state, content);
   refillPouch(state, content);
@@ -288,7 +294,7 @@ function victory(
   const fallen = entryOf(content, c.enemy);
   if (fallen) {
     const loot = rollLoot(state, fallen);
-    grantLoot(state, c.enemy, loot);
+    grantLoot(state, c.enemy, loot, content);
     recordLoot(state, key, loot);
     noteBounty(state, c.enemy, loot.bounty);
   }
@@ -373,6 +379,27 @@ export const combatSystem: System = {
       report(state, c);
       const result = fightOutcome(c.fight);
       if (result === 'ongoing') return;
+      if (result === 'void') {
+        // A hook of a pack failed: no win, no loss, no loot, no Wound. A new fight starts at once, without the hook.
+        emit(state, {
+          type: 'ruleDisabled',
+          pack: c.fight.fault?.pack ?? '',
+          rule: `fightHook.${c.fight.fault?.hook ?? ''}`,
+          reason: c.fight.fault?.reason ?? '',
+        });
+        c.carry += c.fight.t - c.fight.tally.lastUseAt;
+        const p = c.fight.player;
+        c.fight = startFight(
+          state,
+          entry,
+          content,
+          rules,
+          { hp: p.hp, chakra: p.chakra, stamina: p.stamina },
+          c.fight.encounter.support,
+        );
+        c.paid = {};
+        continue;
+      }
       if (result === 'timeout') {
         // A fight that ran out of time pays nothing and costs nothing: a new one starts at once.
         noteFight(state, c.enemy, 'timeout', content);

@@ -47,7 +47,7 @@ export const playerAccuracy = (state: GameState, skill: SkillId, content: Conten
 /** The skill level a basic attack uses: the higher of Taijutsu and Ninjutsu. */
 export function basicSkillLevel(state: GameState, content: ContentDb): number {
   const levels = levelsOf(state, content);
-  return Math.max(levels.tai, levels.nin);
+  return Math.max(levels.tai ?? 1, levels.nin ?? 1);
 }
 
 export const basicAttack = (state: GameState, content: ContentDb): BasicAttack =>

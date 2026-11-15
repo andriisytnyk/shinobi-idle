@@ -7,7 +7,6 @@ import {
   type Operation,
   type SkillId,
   type Technique,
-  type TraitId,
 } from '@shinobi/content';
 import { rebalanceShares } from '../actions.ts';
 import { advance, dispatch } from '../engine.ts';
@@ -21,12 +20,14 @@ import { scrollOf } from '../scrolls.ts';
 import { buyPrice } from '../shop.ts';
 import type { GameState } from '../state.ts';
 import { bingoLevel, dropShown, isFirstWin, revealAt } from './bingo.ts';
+import { voidCount } from './fight-guard.ts';
+import { figure, need } from './need.ts';
 import { createFight, fightAdvance, fightTimeMs } from './fight.ts';
 import { encounterFor } from './fight-encounter.ts';
-import { pouchUse } from './fight-items.ts';
 import { simulateFights } from './fight-sim.ts';
 import type { Encounter, FightState } from './fight-types.ts';
-import { answersTrait, itemAnswers, planTarget } from './loadout.ts';
+import { itemAnswers } from './fight-items.ts';
+import { answersTrait, planTarget } from './loadout.ts';
 import { secMs, type PlayerSnapshot } from './numbers.ts';
 import { snapshotPlayer } from './snapshot.ts';
 import { FIGHT_KIND, OPERATION_KIND, isCombatKind } from './system.ts';
@@ -59,7 +60,7 @@ export const UNKNOWN: Unknown = 'unknown';
 export interface TraitCoverage {
   /** The enemy entry the trait belongs to (an operation has several). */
   enemy: string;
-  trait: TraitId;
+  trait: string;
   answered: boolean;
   by: { kind: 'technique' | 'item'; id: string }[];
 }
@@ -87,7 +88,7 @@ export type HintOption =
 
 export interface Hint {
   enemy: string;
-  trait: TraitId;
+  trait: string;
   /** The cheapest first. */
   options: HintOption[];
 }
@@ -213,6 +214,8 @@ export interface Once {
 }
 
 export interface Analysis {
+  /** Present when a hook of a pack failed during the analysis: that many fights were cut short (counted as neither a defeat nor a Wound) and the forecast is unreliable. */
+  voided?: number;
   target: AnalysisTarget;
   fresh: Fresh;
   /** For each trait the player knows, what answers it; the others are only counted. */
@@ -445,15 +448,15 @@ function coverageOf(
   });
   for (const entry of entries) {
     const known = snap.knowledge?.[entry.id] ?? [];
-    const { traits } = planTarget(entry, known, first);
+    const { traits } = planTarget(entry, known, first, content);
     hidden += entry.traits.filter((t) => !known.includes(t)).length;
     for (const trait of traits) {
       const by: TraitCoverage['by'] = [
         ...carried
-          .filter((t) => answersTrait(t, trait))
+          .filter((t) => answersTrait(t, trait, content))
           .map((t) => ({ kind: 'technique' as const, id: t.id })),
         ...packed
-          .filter((i) => itemAnswers(i, trait))
+          .filter((i) => itemAnswers(i, trait, content))
           .map((i) => ({ kind: 'item' as const, id: i.id })),
       ];
       coverage.push({ enemy: entry.id, trait, answered: by.length > 0, by });
@@ -523,12 +526,13 @@ function hintsFor(
     done.add(`${c.enemy}.${c.trait}`);
     const options: HintOption[] = [];
     for (const tech of content.techniques) {
-      if (tech.rank === null || state.known[tech.id] || !answersTrait(tech, c.trait)) continue;
+      if (tech.rank === null || state.known[tech.id] || !answersTrait(tech, c.trait, content))
+        continue;
       const o = techniqueOption(tech, state, content);
       if (o) options.push(o);
     }
     for (const item of content.items) {
-      if (!itemAnswers(item, c.trait) || pouchUse(item) === 'sleep') continue;
+      if (!itemAnswers(item, c.trait, content)) continue;
       const o = toolOption(state, item, content);
       if (o) options.push(o);
     }
@@ -580,6 +584,8 @@ interface FreshTotals {
  * result does not depend on how the slices were cut.
  */
 export interface AnalysisJob {
+  /** Fights a failing hook of a pack cut short while the job ran; the figures are unreliable when there are any. */
+  voided?: number;
   target: AnalysisTarget;
   seed: number;
   samples: number;
@@ -677,7 +683,7 @@ function onceOf(
           parts: rewards.first.parts.map((p) => ({
             item: scrollPartId(p.technique),
             count: 1,
-            chance: content.balance.K.partDrop[p.chance],
+            chance: need(content.balance.K.partDrop[p.chance], `partDrop.${p.chance}`),
           })),
         }
       : null;
@@ -703,10 +709,12 @@ export function startAnalysis(
   if (!found || found.entries.length === 0) return null;
   const snap = snapshotFor(state, found.entries, opts, content, rules);
   const samples = opts.samples ?? (found.op ? K.analysis.opSamples : K.analysis.samples);
-  const size = found.op ? K.analysis.batch.operation : K.analysis.batch.zone;
-  const minutes = opts.sessionMinutes ?? K.analysis.sessionMinutes[target.kind];
+  const size = figure(K.analysis.batch, found.op ? 'operation' : 'zone', 'analysis.batch');
+  const minutes =
+    opts.sessionMinutes ??
+    figure(K.analysis.sessionMinutes, target.kind, 'analysis.sessionMinutes');
   const minSessions = opts.minSessions ?? K.analysis.minSessions;
-  const hours = K.analysis.sessionHours[target.kind];
+  const hours = figure(K.analysis.sessionHours, target.kind, 'analysis.sessionHours');
   const maxSessions = Math.max(
     minSessions,
     opts.maxSessions ??
@@ -831,7 +839,7 @@ function playSession(
   job.share ??= clone.slots[at]?.share ?? 0;
 
   const skills = Object.keys(clone.skills) as SkillId[];
-  const xp0 = Object.fromEntries(skills.map((k) => [k, clone.skills[k].xp]));
+  const xp0 = Object.fromEntries(skills.map((k) => [k, clone.skills[k]?.xp ?? 0]));
   const mastery0 = Object.fromEntries(Object.entries(clone.mastery).map(([k, v]) => [k, v.xp]));
   const rec: SessionRecord = {
     wins: 0,
@@ -886,7 +894,7 @@ function playSession(
   rec.wounds = r?.wounds ?? 0;
   rec.used = { ...(r?.items ?? {}) };
   for (const k of skills) {
-    const d = clone.skills[k].xp - (xp0[k] ?? 0);
+    const d = (clone.skills[k]?.xp ?? 0) - (xp0[k] ?? 0);
     if (d > 0) rec.xp[k] = d;
   }
   for (const [k, v] of Object.entries(clone.mastery)) {
@@ -955,11 +963,31 @@ function suppliesOf(job: AnalysisJob): Supply[] {
 }
 
 /** Runs one unit of work: a batch of the first-fight run, a session, or a session of the after-supplies forecast. Returns false when there is nothing left. */
-function unit(job: AnalysisJob, found: Resolved, content: ContentDb, rules: Rules): boolean {
+/**
+ * The rules an analysis plays with: a copy whose fight hooks have a disabled set of their own, so a hook
+ * that fails here is not switched off for the live game and the game is told nothing. One per job.
+ */
+const detached = new WeakMap<AnalysisJob, Rules>();
+function ownRules(job: AnalysisJob, live: Rules): Rules {
+  let own = detached.get(job);
+  if (!own) detached.set(job, (own = { ...live, fightHooks: [...live.fightHooks] }));
+  return own;
+}
+
+function unit(job: AnalysisJob, found: Resolved, content: ContentDb, live: Rules): boolean {
+  const rules = ownRules(job, live);
+  try {
+    return step(job, found, content, rules);
+  } finally {
+    job.voided = voidCount(rules.fightHooks);
+  }
+}
+
+function step(job: AnalysisJob, found: Resolved, content: ContentDb, rules: Rules): boolean {
   const f = job.fresh;
   const A = content.balance.K.analysis;
   if (f.done < f.batches) {
-    const size = found.op ? A.batch.operation : A.batch.zone;
+    const size = figure(A.batch, found.op ? 'operation' : 'zone', 'analysis.batch');
     const n = Math.min(size, job.samples - f.done * size);
     const seed = nextUint32(createStream(job.seed, `fresh.${f.done}`));
     const fig = found.op
@@ -1042,6 +1070,7 @@ function assemble(job: AnalysisJob, found: Resolved, content: ContentDb): Analys
     session: played ? sessionOf(job, found, content) : null,
     sessionBlocked: job.blockedReason,
     once: job.once,
+    ...(job.voided ? { voided: job.voided } : {}),
   };
 }
 

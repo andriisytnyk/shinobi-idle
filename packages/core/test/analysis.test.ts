@@ -401,7 +401,7 @@ describe('a job that runs in slices', () => {
       if (progress.finished) break;
       // Between the slices the game may change: the job has its own copy of the state.
       advance(state, 1000, content);
-      state.currencies.ryo += 1;
+      state.currencies.ryo = (state.currencies.ryo ?? 0) + 1;
     }
     expect(seen).toEqual([...seen].sort((a, b) => a - b));
     expect(analysisProgress(job, content).finished).toBe(true);

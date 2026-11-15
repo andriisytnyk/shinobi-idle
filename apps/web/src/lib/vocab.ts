@@ -98,8 +98,7 @@ export {
 export const moneyName = (content: ContentDb): string => currencyName(moneyOf(content));
 
 /** How much of a currency the player holds; a currency the save does not know holds none. */
-export const held = (state: GameState, id: string): number =>
-  (state.currencies as Record<string, number | undefined>)[id] ?? 0;
+export const held = (state: GameState, id: string): number => state.currencies[id] ?? 0;
 
 /**
  * A short Ukrainian phrase for why a rule of a pack was switched off, for the reasons that are

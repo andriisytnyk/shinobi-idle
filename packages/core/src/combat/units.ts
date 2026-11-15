@@ -9,13 +9,14 @@ export const WORK_PER_MS = 1000;
 export const RATE_FULL = 1000;
 
 /** Fight clock units in `ms` milliseconds. */
-export const workOf = (ms: number): number => ms * WORK_PER_MS;
+/** Whole work units in `ms` milliseconds (rounded to the nearest unit: every time of a fight is an integer). */
+export const workOf = (ms: number): number => Math.round(ms * WORK_PER_MS);
 
 /**
  * Size of a timer that needs `ms` milliseconds at full speed. Timers fill by `work x speed`, so a
  * slowed combatant takes longer, in whole numbers.
  */
-export const needOf = (ms: number): number => ms * WORK_PER_MS * RATE_FULL;
+export const needOf = (ms: number): number => Math.round(ms * WORK_PER_MS * RATE_FULL);
 
 /** Length of one tick of a damage or heal over time, in ms. */
 export const TICK_MS = 1000;

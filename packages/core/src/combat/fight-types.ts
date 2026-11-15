@@ -1,15 +1,4 @@
-import type {
-  AiTier,
-  ComboId,
-  ContentDb,
-  NatureId,
-  Rank,
-  RoleId,
-  SkillId,
-  StateId,
-  TagId,
-  TraitId,
-} from '@shinobi/content';
+import type { AiTier, ContentDb, Rank, SkillId } from '@shinobi/content';
 import type { RngState } from '../rng.ts';
 
 /** Stats an effect can change. Multipliers combine by product, additions as `1 + sum`. */
@@ -26,6 +15,9 @@ interface EffectBase {
   suppresses?: string;
   /** The effect ends when the body with this id leaves the fight, by death or flight. */
   whileAlive?: string;
+  /** Stacks held, for a status that stacks; `unit` is the strength of one. */
+  stacks?: number;
+  unit?: number;
 }
 
 /** Changes a stat of its holder for a duration. */
@@ -35,7 +27,7 @@ export interface ModifierEffect extends EffectBase {
   op: 'mul' | 'add';
   value: number;
   /** For `resist`: the nature of the attackers whose damage is multiplied by `value`. */
-  nature?: NatureId;
+  nature?: string;
 }
 
 /** Hurts or heals its holder `amount` every `every` work units until it ends; `stamina` drains the stamina pool instead. */
@@ -75,9 +67,9 @@ export interface Combatant {
   evasion: number;
   damage: number;
   intervalMs: number;
-  nature: NatureId | null;
+  nature: string | null;
   /** Traits, as content ids; the fight hooks give them their behaviour. */
-  traits: TraitId[];
+  traits: string[];
   /** Further hook ids (boss specials and the like). */
   specials: string[];
   effects: Effect[];
@@ -137,10 +129,10 @@ export interface KitEffect {
 export interface KitTechnique {
   id: string;
   skill: SkillId;
-  role: RoleId;
+  role: string;
   rank: Rank;
-  tags: TagId[];
-  state: StateId | null;
+  tags: string[];
+  state: string | null;
   damage: number;
   castMs: number;
   cooldownMs: number;
@@ -152,7 +144,7 @@ export interface KitTechnique {
   /** Whether it hits every enemy (area role or tag, or a series the data marks as hitting all). */
   hitsAll: boolean;
   /** The combo that fires whenever its rule is met, without a roll. */
-  guaranteedCombo: ComboId | null;
+  guaranteedCombo: string | null;
   /** Scale of the habituation step: 1, or the signature's slower step. */
   habituationMult: number;
   fx: KitEffect;
@@ -224,8 +216,8 @@ export interface Spawn {
   /** Content id of the enemy or boss entry. */
   enemy: string;
   cl: number;
-  traits: TraitId[];
-  nature: NatureId | 'wheel' | null;
+  traits: string[];
+  nature: string | null;
   /** How many bodies of this kind. */
   count: number;
   /** Scaling of health and damage against the level formulas. */
@@ -239,7 +231,7 @@ export interface Spawn {
 
 /** A teammate's support in a fight: every `everyMs` a hit of `damage` x the player's basic damage, with the state of the nature. */
 export interface TeamSupport {
-  nature: NatureId;
+  nature: string;
   everyMs: number;
   damage: number;
 }
@@ -254,7 +246,8 @@ export interface Encounter {
   support?: TeamSupport[];
 }
 
-export type FightResult = 'ongoing' | 'victory' | 'defeat' | 'fled' | 'timeout';
+/** `void`: a hook of another pack failed and the fight was cut short; it pays and costs nothing. */
+export type FightResult = 'ongoing' | 'victory' | 'defeat' | 'fled' | 'timeout' | 'void';
 
 export interface FightState {
   /** The fight clock in work units. */
@@ -264,6 +257,8 @@ export interface FightState {
   /** The fight's own random stream. */
   rng: RngState;
   result: FightResult;
+  /** The pack and the hook that ended the fight as void. */
+  fault?: { pack: string; hook: string; reason: string };
   /** Content id of the entry fought. */
   enemy: string;
   encounter: Encounter;
@@ -275,7 +270,7 @@ export interface FightState {
   /** Rank tier of the player. */
   tier: number;
   /** The player's natures, first one first (a `wheel` enemy counters the first). */
-  natures: NatureId[];
+  natures: string[];
   /** Id of the body the cast under way is aimed at; null when none. */
   target: string | null;
   /** Trait ids the player knows per enemy entry id; an entry without a record is fully known. `special` stands for the boss mechanic. */
@@ -322,6 +317,10 @@ export interface ViewTechnique {
   power: number;
   /** False while it needs a stance and none is active. */
   stanceOk: boolean;
+  /** The traits it answers: it carries the tag that counters them, or its state switches them off. */
+  answers: readonly string[];
+  /** Whether it stops interruptible casts. */
+  interrupts: boolean;
 }
 
 /** A pouch slot as the AI sees it. */
@@ -332,18 +331,32 @@ export interface ViewPouch {
   /** Tags the item answers with, and what using it does. */
   tags: readonly string[];
   use: string;
+  /** The traits it answers, whether it stops interruptible casts, whether it guards against heavy casts. */
+  answers: readonly string[];
+  interrupts: boolean;
+  guard: boolean;
+}
+
+/** What the player AI knows of the traits of the content. */
+export interface AiVocab {
+  /** Traits whose effects on the player the AI answers, in order, with the effect ids they inflict. */
+  inflicted: readonly { trait: string; effects: readonly string[] }[];
+  /** Traits the AI answers on their own, in order. */
+  answered: readonly string[];
+  /** Traits that wind up heavy casts. */
+  casters: readonly string[];
 }
 
 export interface ViewEnemy {
   id: string;
   hp: number;
   hpShare: number;
-  nature: NatureId | null;
+  nature: string | null;
   effects: readonly ViewEffect[];
   /** Traits of this enemy the player knows. */
-  knownTraits: readonly TraitId[];
+  knownTraits: readonly string[];
   /** Known traits that are working at the moment (not switched off). */
-  workingTraits: readonly TraitId[];
+  workingTraits: readonly string[];
   /** A cast under way: its kind, the work units until it ends and in all, how strong it is (x damage) and whether an interrupt stops it. */
   cast: {
     kind: string;
@@ -385,7 +398,9 @@ export interface FightView {
   /** The tier of the AI that plays: its ordered rule list and how the rules behave. */
   ai: AiTier;
   /** Traits that show on sight. */
-  visibleTraits: readonly TraitId[];
+  visibleTraits: readonly string[];
+  /** What the traits of the content are, as the rules need them. */
+  vocab: AiVocab;
   pouch: readonly ViewPouch[];
   /** The pouch slot used automatically and the health share it triggers below; null without the medic pouch. */
   medic: { slot: number; below: number } | null;
@@ -424,6 +439,13 @@ export interface AttackPlan {
  */
 export interface FightHook {
   id: string;
+  /**
+   * Numbers this hook derives for its body from data and publishes as `c.data` keys for other hooks
+   * to read. Runs for every hook of the body, before any `init`, whenever the body is first read: for
+   * a fresh body and for one loaded from a save. Must be idempotent (write a key only when it is
+   * missing) and must not touch the fight otherwise.
+   */
+  publish?(ctx: FightCtx, c: Combatant): void;
   /** A body has appeared: add effects, timers and data. */
   init?(ctx: FightCtx, c: Combatant): void;
   /** A multiplier on one of the combatant's stats, computed from its current state; 1 for none. */

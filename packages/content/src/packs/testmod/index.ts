@@ -23,15 +23,64 @@ const data = {
   currencies: [{ id: 'testmod:token' }],
   villageStages: [{ id: 'testmod:stage3', rep: 'testmod:stage3', cap: 6 }],
   states: [{ id: 'testmod:chilled' }],
-  statuses: [{ id: 'testmod:chill' }],
-  combos: [{ id: 'testmod:frostburn', nature: 'testmod:aether', onState: 'testmod:chilled' }],
-  tags: [{ id: 'testmod:crack' }],
+  /**
+   * A status with a damage over time and a stat modifier (two effects of one status), which stacks
+   * to two: a technique whose state is `testmod:chilled` puts it on the body it hits.
+   */
+  statuses: [
+    {
+      id: 'testmod:chill',
+      state: 'testmod:chilled',
+      effects: [
+        { kind: 'periodic', from: 'maxHp', amount: 'ext.testmod.chillDot' },
+        { kind: 'modifier', stat: 'speed', op: 'mul', value: 'ext.testmod.chillSlow' },
+      ],
+      duration: 'ext.testmod.chillSecs',
+      stacks: 2,
+    },
+  ],
+  /** Its nature (skill) hitting a body that is chilled breaks the chill in a blow of `K.combo` times the hit. */
+  combos: [
+    {
+      id: 'testmod:frostburn',
+      nature: 'testmod:aether',
+      onState: 'testmod:chilled',
+      effect: { kind: 'burst' },
+    },
+  ],
+  /** A tag that cracks a shell: the body takes more damage while the crack lasts and the trait stops. */
+  tags: [
+    {
+      id: 'testmod:crack',
+      onHit: [
+        {
+          op: 'effect',
+          id: 'testmod:cracked',
+          effects: [
+            { kind: 'modifier', stat: 'damageTaken', op: 'mul', value: 'ext.testmod.crackMult' },
+          ],
+          duration: 'ext.testmod.crackSecs',
+          suppresses: 'testmod:shelled',
+          tally: { as: 'testmod:crackBreak', whenSuppressing: true },
+        },
+      ],
+    },
+  ],
   roles: [{ id: 'testmod:sapper' }],
+  /** Armour in data: it cuts damage by `K.ext.testmod.shellArmor`; a core tool tag answers it. */
   traits: [
     {
       id: 'testmod:shelled',
-      answer: 'testmod:crack',
+      answer: 'area',
       numbers: { from: 'ext.testmod', keys: ['shellArmor'] },
+      mods: [
+        {
+          stat: 'damageTaken',
+          op: 'mul',
+          value: { path: 'ext.testmod.shellArmor', oneMinus: true },
+        },
+      ],
+      priority: 5,
     },
   ],
 
@@ -56,7 +105,7 @@ const data = {
   techniques: [
     {
       id: 'testmod:ember_pulse',
-      skill: 'katon',
+      skill: 'testmod:aether',
       level: 3,
       rank: 'D',
       rankCanon: false,
@@ -70,7 +119,8 @@ const data = {
       sealsCanon: false,
       tier: 0,
       noDamage: false,
-      combat: { effect: { kind: 'damage' } },
+      /** The combo fires whenever its rule is met (a chilled body), without a roll. */
+      combat: { effect: { kind: 'damage' }, guaranteedCombo: 'testmod:frostburn' },
     },
     {
       /** A trainer technique of the test nature: the player practises it to train the skill. */
@@ -181,11 +231,22 @@ const data = {
         technique: 'testmod:ember_pulse',
         count: 2,
       },
-      special: { kind: 'heavyCast', fx: 'testmod:heavy', stun: false },
+      /** Every third attack is a heavy one: a hook the pack's `rules` registers. */
+      special: {
+        kind: 'testmod:thirdStrike',
+        fx: 'testmod:third',
+        hook: 'testmod:thirdStrike',
+        numbers: ['mult'],
+      },
     },
   ],
 
   // ----- world -----
+  /** The places where the pack's enemy and boss are fought. */
+  zones: [
+    { id: 'testmod:zone_shellback', enemy: 'testmod:shellback', region: 'academy', unlock: null },
+    { id: 'testmod:zone_boss_shell', enemy: 'testmod:boss_shell', region: 'boss', unlock: null },
+  ],
   regions: [{ id: 'testmod:grove', scout: 1, cells: ['testmod:grove_edge'] }],
   cells: [
     {
@@ -298,19 +359,19 @@ export const testmodPack: ContentPack = {
       missionRateCap: { 'testmod:trial': 20 },
       role: { 'testmod:sapper': { m: 0.5, cd: 8, c: 1 } },
       combo: { 'testmod:frostburn': 0.3 },
-      bossFx: {
-        'testmod:heavy': {
-          everyMs: 25000,
-          castMs: 3000,
-          damageMult: 1.5,
-          stunMs: 0,
-          hp: 1,
-          dmg: 1,
-        },
-      },
+      bossFx: { 'testmod:third': { mult: 2.5, hp: 1, dmg: 1 } },
       rep: { 'testmod:stage3': 500 },
       goods: { 'testmod:charm': 10 },
-      ext: { testmod: { shellArmor: 0.2 } },
+      ext: {
+        testmod: {
+          shellArmor: 0.2,
+          chillDot: 0.01,
+          chillSlow: 0.8,
+          chillSecs: 6,
+          crackMult: 1.25,
+          crackSecs: 8,
+        },
+      },
     },
     pace: {
       'testmod:forge': [3, 7, 11, 17, 25],
@@ -415,6 +476,11 @@ export const testmodPack: ContentPack = {
     },
   },
   patches: [
+    {
+      /** The wheel both ways: a core nature beats the test nature, which beats another core one. */
+      target: { kind: 'natures', id: 'doton' },
+      append: { strongAgainst: ['testmod:aether'] },
+    },
     {
       /** A new drop row on a core enemy: the pack changes another pack's entity explicitly. */
       target: { kind: 'enemies', id: 'core:wolf' },

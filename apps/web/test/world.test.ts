@@ -97,7 +97,7 @@ describe('A3: the map follows the core', () => {
 
     expect(tile(PLAIN_CELL)?.getAttribute('data-level')).toBe('1');
     expect(tile(PLAIN_CELL)?.querySelectorAll('.pip.on')).toHaveLength(1);
-    expect(game.state.currencies.intel).toBe(content.balance.K.intel.perCellLevel);
+    expect(game.state.currencies.intel ?? 0).toBe(content.balance.K.intel.perCellLevel);
   });
 
   it('travel moves the location marker', () => {

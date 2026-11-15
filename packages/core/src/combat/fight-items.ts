@@ -1,20 +1,11 @@
 import type { ContentDb, Item } from '@shinobi/content';
-import { addEffect, removeEffect } from './fight-effects.ts';
-import {
-  alive,
-  applyBind,
-  cancelCasts,
-  count,
-  dealDamage,
-  pickTarget,
-  roll,
-  rollHit,
-  secWork,
-  stat,
-} from './fight.ts';
+import { addEffect } from './fight-effects.ts';
+import { alive, cancelCasts, count, dealDamage, pickTarget, roll, rollHit, stat } from './fight.ts';
+import { fightData } from './fight-data.ts';
+import { applyStatus, removeStatus, removeTagged, runTagOps } from './fight-status.ts';
 import type { Combatant, FightCtx, FightState } from './fight-types.ts';
 import { hitChance } from './numbers.ts';
-import { TICK_MS, workOf } from './units.ts';
+import { workOf } from './units.ts';
 
 /*
  * Tools and pills in a fight. What an item does comes from its data (its effect, its tags) and the
@@ -33,8 +24,11 @@ function itemOf(content: ContentDb, id: string): Item | undefined {
   return items.get(id);
 }
 
-/** How an item acts in a fight, or null when it cannot ride in the pouch. */
-export function pouchUse(item: Item): string | null {
+/**
+ * How an item acts in a fight, or null when it cannot ride in the pouch. A tool's tags say what it
+ * does when the content is known (`sweep`, `snare`, `venom`); without it a tool is a thrown one.
+ */
+export function pouchUse(item: Item, content?: ContentDb): string | null {
   const fx = item.fx;
   if (fx) {
     switch (fx.kind) {
@@ -50,17 +44,61 @@ export function pouchUse(item: Item): string | null {
     }
   }
   if (!item.pouch) return null;
-  if (item.tags.includes('area')) return 'area';
-  if (item.tags.includes('bind')) return 'bind';
-  if (item.tags.includes('dot')) return 'dot';
+  if (content) {
+    const tags = fightData(content).tags;
+    for (const tag of item.tags) {
+      const use = tags.get(tag)?.pouch;
+      if (use) return use;
+    }
+  }
   return 'throw';
 }
 
+/**
+ * Whether an item answers a trait when used from the pouch: it carries the tag that counters the
+ * trait and rides in the pouch (a sleeping powder is for the player to use by hand, not an answer).
+ */
+export function itemAnswers(item: Item, trait: string, content: ContentDb): boolean {
+  const use = pouchUse(item, content);
+  if (use === null || use === 'sleep') return false;
+  const def = fightData(content).traits.get(trait);
+  return def !== undefined && (item.tags as readonly string[]).includes(def.answer);
+}
+
 /** What the AI sees of an item in the pouch. */
-export function itemView(content: ContentDb, id: string): { tags: string[]; use: string } | null {
+export interface ItemFacts {
+  tags: readonly string[];
+  use: string;
+  answers: readonly string[];
+  interrupts: boolean;
+  guard: boolean;
+}
+
+const itemFacts = new WeakMap<ContentDb, Map<string, ItemFacts | null>>();
+
+export function itemView(content: ContentDb, id: string): ItemFacts | null {
+  let facts = itemFacts.get(content);
+  if (!facts) {
+    facts = new Map();
+    itemFacts.set(content, facts);
+  }
+  const have = facts.get(id);
+  if (have !== undefined) return have;
   const item = itemOf(content, id);
-  const use = item ? pouchUse(item) : null;
-  return item && use ? { tags: [...item.tags], use } : null;
+  const use = item ? pouchUse(item, content) : null;
+  let made: ItemFacts | null = null;
+  if (item && use) {
+    const data = fightData(content);
+    made = Object.freeze({
+      tags: Object.freeze([...item.tags]),
+      use,
+      answers: Object.freeze([...data.traits.keys()].filter((t) => itemAnswers(item, t, content))),
+      interrupts: item.tags.some((tag) => data.tags.get(tag)?.interrupts === true),
+      guard: item.tags.some((tag) => data.tags.get(tag)?.guard === true),
+    });
+  }
+  facts.set(id, made);
+  return made;
 }
 
 /** Whether a body is an ordinary enemy rather than a boss. */
@@ -94,8 +132,10 @@ export function applyItem(ctx: FightCtx, id: string): boolean {
   const { fight, content } = ctx;
   const K = content.balance.K;
   const item = itemOf(content, id);
-  const use = item ? pouchUse(item) : null;
+  const use = item ? pouchUse(item, content) : null;
   if (!item || !use) return false;
+  const data = fightData(content);
+  const interrupts = item.tags.some((tag) => data.tags.get(tag)?.interrupts === true);
   const player = fight.player;
   const fx = item.fx;
   const living = fight.enemies.filter(alive);
@@ -115,7 +155,7 @@ export function applyItem(ctx: FightCtx, id: string): boolean {
       return true;
     case 'cleanse':
       if (fx?.kind === 'cleanse') {
-        for (const status of fx.statuses) removeEffect(player, status);
+        for (const status of fx.statuses) removeStatus(player, status);
         // An ointment against burns also hardens the skin against that nature for a while.
         if (fx.resist) {
           addEffect(player, {
@@ -132,14 +172,15 @@ export function applyItem(ctx: FightCtx, id: string): boolean {
       }
       return true;
     case 'dispel':
-      removeEffect(player, 'illusion');
+      // What the item answers is what its tag takes off the player.
+      if (fx?.kind === 'dispel') removeTagged(player, data.tags.get(fx.tag)?.removes ?? []);
       return true;
     case 'bomb':
       if (fx?.kind === 'bomb') {
         if (fx.target === 'self') addBomb(fight, player, id, fx.stat, fx.mult, fx.durationMs);
         else for (const e of living) addBomb(fight, e, id, fx.stat, fx.mult, fx.durationMs);
       }
-      if (item.tags.includes('interrupt')) {
+      if (interrupts) {
         let any = false;
         for (const e of living) any = cancelCasts(ctx, e, true) || any;
         if (any) fight.tally.interrupts++;
@@ -147,45 +188,35 @@ export function applyItem(ctx: FightCtx, id: string): boolean {
       return true;
     case 'sleep':
       // A sleeping powder works on an ordinary enemy, by chance: it is stunned for a while.
-      if (first && ordinary(content, first) && roll(fight, K.itemFx.sleep.chance)) {
-        addEffect(first, {
-          kind: 'modifier',
-          id: 'stun',
-          src: id,
-          until: fight.t + secWork(K.stun.C),
-          stat: 'speed',
-          op: 'mul',
-          value: 0,
-        });
-        cancelCasts(ctx, first);
-        count(fight.tally.statuses, 'stun');
+      if (fx?.kind === 'sleep' && first && ordinary(content, first)) {
+        const chance = (K.itemFx[fx.fx] as { chance?: number } | undefined)?.chance ?? 0;
+        const status = fx.status === undefined ? undefined : data.statuses.get(fx.status);
+        if (roll(fight, chance) && status) {
+          applyStatus(ctx, first, status, id, {
+            rank: fx.rank ?? null,
+            ...(fx.refresh === undefined ? {} : { refresh: fx.refresh }),
+          });
+        }
       }
       return true;
-    case 'area':
+    case 'sweep':
       for (const e of living) dealDamage(ctx, e, fight.kit.toolDamage, id);
       return true;
-    case 'bind':
-      for (const e of living) applyBind(ctx, e, K.bindEva, id);
+    case 'snare':
+    case 'venom': {
+      // The tool does what its tag says: a snare on every body, a venom on the one aimed at.
+      const ops = item.tags.flatMap((tag) => {
+        const def = data.tags.get(tag);
+        return def?.pouch === use ? def.onUse : [];
+      });
+      if (use === 'snare') for (const e of living) runTagOps(ctx, e, ops, id);
+      else if (first) runTagOps(ctx, first, ops, id);
       return true;
-    case 'dot':
-      if (first) {
-        addEffect(first, {
-          kind: 'periodic',
-          id: 'toolPoison',
-          src: id,
-          until: fight.t + secWork(K.toolFx.dot.durS),
-          suppresses: 'regen',
-          mode: 'damage',
-          amount: K.toolFx.dot.pct * first.maxHp,
-          every: workOf(TICK_MS),
-          next: fight.t + workOf(TICK_MS),
-        });
-      }
-      return true;
+    }
     default: {
       // A thrown tool: an interrupting one always stops a cast, the damage needs a hit.
       if (!first) return true;
-      if (item.tags.includes('interrupt') && cancelCasts(ctx, first, true)) {
+      if (interrupts && cancelCasts(ctx, first, true)) {
         fight.tally.interrupts++;
       }
       const chance = hitChance(

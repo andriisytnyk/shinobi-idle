@@ -47,7 +47,11 @@ for (const [key, nums] of Object.entries(over)) {
 export type Entry = Enemy | Boss;
 
 /** The nature that beats `nature`, and the one it beats. */
-export const beaten = (nature: NatureId): NatureId => NATURE_WHEEL[nature];
+export const beaten = (nature: NatureId): NatureId => {
+  const found = content.natures.find((n) => n.id === nature)?.strongAgainst[0];
+  if (!found) throw new Error('no beaten nature');
+  return found as NatureId;
+};
 export const beater = (nature: NatureId): NatureId => {
   const found = NATURE_IDS.find((n) => NATURE_WHEEL[n] === nature);
   if (!found) throw new Error('no beater');
@@ -95,7 +99,7 @@ export function playerFor(entry: Entry, nature: NatureId, opts: PlayerOptions): 
     snap.loadout = autoLoadout(snap, limits, null, content);
     return snap;
   }
-  const target = planTarget(entry, everything, nature);
+  const target = planTarget(entry, everything, nature, content);
   // The chunin vest adds a pouch slot.
   const slots = K.pouch.slots + (tier >= 2 ? K.pouch.vest : 0);
   const plan = prepareFor(snap, limits, target, wellStocked(c), slots, null, content);

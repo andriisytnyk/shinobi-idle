@@ -1,5 +1,6 @@
-import type { Boss, Enemy } from '@shinobi/content';
+import type { Boss, ContentDb, Enemy } from '@shinobi/content';
 import { addCurrency, addItem } from '../bank.ts';
+import { currencyFor } from './currency.ts';
 import { emit } from '../events.ts';
 import { nextFloat, nextInt } from '../rng.ts';
 import type { GameState } from '../state.ts';
@@ -11,6 +12,8 @@ export interface Loot {
   bounty: number;
   /** Trophies and scroll parts, by item id. */
   items: Record<string, number>;
+  /** The currency the ryo and the bounty are paid in, when the entry names one; else the money currency. */
+  currency?: string;
 }
 
 /** The loot stream of the game: loot never touches the stream that decides fights. */
@@ -24,6 +27,7 @@ const STREAM = 'loot';
  */
 export function rollLoot(state: GameState, entry: Enemy | Boss): Loot {
   const loot: Loot = { ryo: 0, bounty: 0, items: {} };
+  if (entry.currency !== undefined) loot.currency = entry.currency;
   const [low, high] = entry.ryo;
   loot.ryo = low + nextInt(state.rng, STREAM, Math.max(1, high - low + 1));
   for (const drop of entry.drops) {
@@ -46,8 +50,8 @@ export function rollLoot(state: GameState, entry: Enemy | Boss): Loot {
 }
 
 /** Puts a loot in the bank and the purse, and tells the UI. */
-export function grantLoot(state: GameState, enemy: string, loot: Loot): void {
-  addCurrency(state, 'ryo', loot.ryo + loot.bounty);
+export function grantLoot(state: GameState, enemy: string, loot: Loot, content: ContentDb): void {
+  addCurrency(state, currencyFor(content, 'money', loot.currency), loot.ryo + loot.bounty);
   const items = Object.entries(loot.items).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
   for (const [id, n] of items) addItem(state, id, n);
   emit(state, {

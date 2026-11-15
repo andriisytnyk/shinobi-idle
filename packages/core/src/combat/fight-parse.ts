@@ -1,20 +1,8 @@
-import {
-  COMBO_IDS,
-  NATURE_IDS,
-  RANKS,
-  ROLE_IDS,
-  SKILL_IDS,
-  STATE_IDS,
-  TAG_IDS,
-  TRAIT_IDS,
-  type ComboId,
-  type ContentDb,
-  type NatureId,
-  type SkillId,
-  type TagId,
-  type TraitId,
-} from '@shinobi/content';
+import type { ContentDb, Rank, SkillId } from '@shinobi/content';
 import type { RngState } from '../rng.ts';
+import { fightData } from './fight-data.ts';
+import { PASSIVE_NEGATE_HOOK } from './fight-hooks.ts';
+import { TEAM_HOOK } from './fight-team-id.ts';
 import type {
   Combatant,
   Effect,
@@ -41,6 +29,84 @@ import { needOf, WORK_PER_MS, workOf } from './units.ts';
  * valid fight keeps in a window around the fight clock are clamped into it.
  */
 
+/**
+ * The vocabulary a saved fight is checked against: the ids of the content in hand. An id of a pack
+ * that is not loaded (a status, trait, combo, nature or special) is dropped from the fight; one that
+ * the fight cannot do without (a technique, the encounter) discards it.
+ */
+interface Vocab {
+  natures: ReadonlySet<string>;
+  traits: ReadonlySet<string>;
+  skills: ReadonlySet<string>;
+  roles: ReadonlySet<string>;
+  ranks: ReadonlySet<string>;
+  tags: ReadonlySet<string>;
+  states: ReadonlySet<string>;
+  combos: ReadonlySet<string>;
+  statuses: ReadonlySet<string>;
+  /** Every id a status, or an effect a tag defines, goes by in a fight, and every name the report counts one under. */
+  effects: ReadonlySet<string>;
+  /** The hook ids the content names, and the ones of the engine. */
+  specials: ReadonlySet<string>;
+  basicSkill: SkillId | null;
+  /** The smallest size of a hook timer. */
+  timerMin: number;
+}
+
+const vocabs = new WeakMap<ContentDb, Vocab>();
+
+function vocabOf(content: ContentDb): Vocab {
+  let v = vocabs.get(content);
+  if (!v) {
+    const ids = (list: readonly { id: string }[]) => new Set(list.map((e) => e.id));
+    const effects = new Set<string>();
+    for (const st of content.statuses) {
+      effects.add(st.id);
+      if (st.tally) effects.add(st.tally.as);
+    }
+    for (const tag of content.tags) {
+      for (const op of [...(tag.onHit ?? []), ...(tag.onUse ?? [])]) {
+        if (op.op !== 'effect') continue;
+        effects.add(op.id);
+        if (op.tally) effects.add(op.tally.as);
+      }
+    }
+    const specials = new Set<string>([PASSIVE_NEGATE_HOOK, TEAM_HOOK]);
+    for (const t of content.traits) if (t.hook !== undefined) specials.add(t.hook);
+    for (const b of content.bosses) {
+      specials.add(b.special.hook);
+      if (b.special.companions) specials.add(b.special.companions.hook);
+    }
+    v = {
+      natures: ids(content.natures),
+      traits: ids(content.traits),
+      skills: ids(content.skills),
+      roles: ids(content.roles),
+      ranks: ids(content.techRanks),
+      tags: ids(content.tags),
+      states: ids(content.states),
+      combos: ids(content.combos),
+      statuses: ids(content.statuses),
+      effects,
+      specials,
+      basicSkill: fightData(content).basicSkill,
+      timerMin: needOf(content.balance.K.combat.timerMinMs),
+    };
+    vocabs.set(content, v);
+  }
+  return v;
+}
+
+/** An effect id of the engine or of the pack core is bare; one of another pack names a status, trait or special of its own. */
+function knownEffect(id: string, v: Vocab): boolean {
+  const base = id.split('#')[0] ?? id;
+  return !base.includes(':') || v.effects.has(base) || v.traits.has(base) || v.specials.has(base);
+}
+
+/** The ids of a list that the vocabulary knows; the rest are dropped. */
+const known = (list: readonly string[], set: ReadonlySet<string>): string[] =>
+  list.filter((id) => set.has(id));
+
 type Raw = Record<string, unknown>;
 
 const isRecord = (x: unknown): x is Raw => typeof x === 'object' && x !== null && !Array.isArray(x);
@@ -51,6 +117,8 @@ const nonNeg = (x: unknown): x is number => isNum(x) && x >= 0;
 const share = (x: unknown): x is number => isNum(x) && x >= 0 && x <= 1;
 const oneOf = <T extends string>(list: readonly T[], x: unknown): x is T =>
   typeof x === 'string' && (list as readonly string[]).includes(x);
+const inSet = (set: ReadonlySet<string>, x: unknown): x is string =>
+  typeof x === 'string' && set.has(x);
 
 const MOD_STATS: readonly ModStat[] = [
   'accuracy',
@@ -72,7 +140,7 @@ const KIT_EFFECTS: readonly KitEffect['kind'][] = [
   'nextCast',
   'reveal',
 ];
-const RESULTS: readonly FightResult[] = ['ongoing', 'victory', 'defeat', 'fled', 'timeout'];
+const RESULTS: readonly FightResult[] = ['ongoing', 'victory', 'defeat', 'fled', 'timeout', 'void'];
 /** The largest multiplier an effect may carry; more would make a timer fill in no time. */
 const MOD_LIMIT = 10;
 
@@ -86,8 +154,12 @@ function numberRecord(raw: unknown): Record<string, number> | null {
   return out;
 }
 
-function parseEffect(raw: unknown, t: number): Effect | null {
+/** An effect read back; `'drop'` for one whose status, trait or nature the content does not have. */
+function parseEffect(raw: unknown, t: number, v: Vocab): Effect | 'drop' | null {
   if (!isRecord(raw) || !isStr(raw.id) || !isStr(raw.src)) return null;
+  if (!knownEffect(raw.id, v)) return 'drop';
+  if (raw.stacks !== undefined && (!isInt(raw.stacks) || raw.stacks < 1)) return null;
+  if (raw.unit !== undefined && !nonNeg(raw.unit)) return null;
   if (raw.until !== null && !isInt(raw.until)) return null;
   if (raw.suppresses !== undefined && !isStr(raw.suppresses)) return null;
   if (raw.whileAlive !== undefined && !isStr(raw.whileAlive)) return null;
@@ -97,12 +169,14 @@ function parseEffect(raw: unknown, t: number): Effect | null {
     until: raw.until === null ? null : Math.max(raw.until as number, t),
     ...(raw.suppresses === undefined ? {} : { suppresses: raw.suppresses }),
     ...(raw.whileAlive === undefined ? {} : { whileAlive: raw.whileAlive }),
+    ...(raw.stacks === undefined ? {} : { stacks: raw.stacks }),
+    ...(raw.unit === undefined ? {} : { unit: raw.unit }),
   };
   if (raw.kind === 'modifier') {
     if (!oneOf(MOD_STATS, raw.stat) || !isNum(raw.value)) return null;
     if (raw.op !== 'mul' && raw.op !== 'add') return null;
     if (raw.value < 0 || raw.value > MOD_LIMIT) return null;
-    if (raw.nature !== undefined && !oneOf(NATURE_IDS, raw.nature)) return null;
+    if (raw.nature !== undefined && !inSet(v.natures, raw.nature)) return 'drop';
     return {
       ...base,
       kind: 'modifier',
@@ -139,7 +213,12 @@ function parseTimer(raw: unknown, size: number): Timer | null {
   return { progress: Math.min(raw.progress, raw.need), need: raw.need };
 }
 
-function parseCombatant(raw: unknown, side: Combatant['side'], t: number): Combatant | null {
+function parseCombatant(
+  raw: unknown,
+  side: Combatant['side'],
+  t: number,
+  v: Vocab,
+): Combatant | null {
   if (!isRecord(raw) || raw.side !== side || !isStr(raw.id) || !isStr(raw.entry)) return null;
   const figures = [
     raw.hp,
@@ -159,16 +238,16 @@ function parseCombatant(raw: unknown, side: Combatant['side'], t: number): Comba
   const phases = side === 'player' ? ['idle', 'cast', 'recover'] : ['attack'];
   if (typeof raw.phase !== 'string' || !phases.includes(raw.phase)) return null;
   const phase = raw.phase as Combatant['phase'];
-  if (raw.nature !== null && !oneOf(NATURE_IDS, raw.nature)) return null;
+  if (raw.nature !== null && !isStr(raw.nature)) return null;
   if (raw.cast !== null && !isStr(raw.cast)) return null;
-  if (!Array.isArray(raw.traits) || !raw.traits.every((x) => oneOf(TRAIT_IDS, x))) return null;
+  if (!Array.isArray(raw.traits) || !raw.traits.every(isStr)) return null;
   if (!Array.isArray(raw.specials) || !raw.specials.every(isStr)) return null;
   if (!Array.isArray(raw.effects)) return null;
   const effects: Effect[] = [];
   for (const e of raw.effects) {
-    const effect = parseEffect(e, t);
-    if (!effect) return null;
-    effects.push(effect);
+    const effect = parseEffect(e, t, v);
+    if (effect === null) return null;
+    if (effect !== 'drop') effects.push(effect);
   }
   const cd = numberRecord(raw.cd);
   const data = numberRecord(raw.data);
@@ -176,7 +255,7 @@ function parseCombatant(raw: unknown, side: Combatant['side'], t: number): Comba
   if (!cd || !data || !timer || !isRecord(raw.timers)) return null;
   const timers: Record<string, Timer> = {};
   for (const [name, value] of Object.entries(raw.timers)) {
-    const parsed = parseTimer(value, needOf(1));
+    const parsed = parseTimer(value, v.timerMin);
     if (!parsed) return null;
     timers[name] = parsed;
   }
@@ -203,8 +282,10 @@ function parseCombatant(raw: unknown, side: Combatant['side'], t: number): Comba
     evasion: raw.evasion as number,
     damage: raw.damage as number,
     intervalMs: raw.intervalMs,
-    nature: raw.nature as NatureId | null,
-    traits: raw.traits as TraitId[],
+    // A nature, trait or special of a pack that is not loaded is dropped: the body fights without it.
+    nature: inSet(v.natures, raw.nature) ? raw.nature : null,
+    traits: known(raw.traits as string[], v.traits),
+    // A special is a hook id: one nothing registers does nothing, so it is kept as it is.
     specials: raw.specials as string[],
     effects,
     cd,
@@ -240,7 +321,7 @@ function parseKitEffect(raw: unknown): KitEffect | null {
   };
 }
 
-function parseKit(raw: unknown, content: ContentDb): PlayerKit | null {
+function parseKit(raw: unknown, content: ContentDb, v: Vocab): PlayerKit | null {
   if (!isRecord(raw) || !Array.isArray(raw.techniques)) return null;
   if (!nonNeg(raw.med) || !nonNeg(raw.chakraRegen) || !nonNeg(raw.staminaRegen)) return null;
   if (!nonNeg(raw.toolDamage)) return null;
@@ -248,26 +329,26 @@ function parseKit(raw: unknown, content: ContentDb): PlayerKit | null {
   const techniques: KitTechnique[] = [];
   for (const t of raw.techniques) {
     if (!isRecord(t) || !isStr(t.id) || !known.has(t.id)) return null;
-    if (!oneOf(SKILL_IDS, t.skill) || !oneOf(ROLE_IDS, t.role) || !oneOf(RANKS, t.rank)) {
+    if (!inSet(v.skills, t.skill) || !inSet(v.roles, t.role) || !inSet(v.ranks, t.rank)) {
       return null;
     }
-    if (!Array.isArray(t.tags) || !t.tags.every((tag) => oneOf(TAG_IDS, tag))) return null;
-    if (t.state !== null && !oneOf(STATE_IDS, t.state)) return null;
+    if (!Array.isArray(t.tags) || !t.tags.every((tag) => inSet(v.tags, tag))) return null;
+    if (t.state !== null && !inSet(v.states, t.state)) return null;
     if (t.pool !== 'chakra' && t.pool !== 'stamina') return null;
     // A cast takes at least a millisecond, or the player would act again without time passing.
     if (!isInt(t.castMs) || t.castMs < 1 || !isInt(t.cooldownMs) || t.cooldownMs < 0) return null;
     if (!share(t.comboChance)) return null;
     const figures = [t.damage, t.cost, t.accuracy, t.habituationMult];
     if (!figures.every(nonNeg) || typeof t.hitsAll !== 'boolean') return null;
-    if (t.guaranteedCombo !== null && !oneOf(COMBO_IDS, t.guaranteedCombo)) return null;
+    if (t.guaranteedCombo !== null && !isStr(t.guaranteedCombo)) return null;
     const fx = parseKitEffect(t.fx);
     if (!fx || typeof t.requiresStance !== 'boolean') return null;
     techniques.push({
       id: t.id,
-      skill: t.skill,
+      skill: t.skill as SkillId,
       role: t.role,
-      rank: t.rank,
-      tags: t.tags as TagId[],
+      rank: t.rank as Rank,
+      tags: t.tags as string[],
       state: t.state,
       damage: t.damage as number,
       castMs: t.castMs,
@@ -277,7 +358,8 @@ function parseKit(raw: unknown, content: ContentDb): PlayerKit | null {
       accuracy: t.accuracy as number,
       comboChance: t.comboChance,
       hitsAll: t.hitsAll,
-      guaranteedCombo: t.guaranteedCombo as ComboId | null,
+      // A combo of a pack that is not loaded cannot fire any more.
+      guaranteedCombo: inSet(v.combos, t.guaranteedCombo) ? t.guaranteedCombo : null,
       habituationMult: t.habituationMult as number,
       fx,
       requiresStance: t.requiresStance,
@@ -292,12 +374,16 @@ function parseKit(raw: unknown, content: ContentDb): PlayerKit | null {
   };
 }
 
-function parseTally(raw: unknown): FightTally | null {
-  if (!isRecord(raw) || !oneOf(SKILL_IDS, raw.style)) return null;
+function parseTally(raw: unknown, v: Vocab): FightTally | null {
+  if (!isRecord(raw) || !isStr(raw.style)) return null;
   const damage = numberRecord(raw.damage);
   const uses = numberRecord(raw.uses);
   const statuses = numberRecord(raw.statuses);
   const combos = numberRecord(raw.combos);
+  // What counts a status or a combo that the content no longer has is dropped.
+  if (statuses)
+    for (const key of Object.keys(statuses)) if (!knownEffect(key, v)) delete statuses[key];
+  if (combos) for (const key of Object.keys(combos)) if (!v.combos.has(key)) delete combos[key];
   const masteryWork = numberRecord(raw.masteryWork);
   if (!damage || !uses || !statuses || !combos || !masteryWork) return null;
   const scalars = [
@@ -311,6 +397,9 @@ function parseTally(raw: unknown): FightTally | null {
     raw.woundMin,
   ];
   if (!scalars.every(nonNeg)) return null;
+  // A style of a skill that is not loaded falls back to the style of basic attacks; with none, there is no fight to read.
+  const style = v.skills.has(raw.style) ? raw.style : v.basicSkill;
+  if (style === null) return null;
   return {
     damage,
     uses,
@@ -321,7 +410,8 @@ function parseTally(raw: unknown): FightTally | null {
     kills: raw.kills as number,
     taken: raw.taken as number,
     time: raw.time as number,
-    style: raw.style as SkillId,
+    // A style of a skill that is not loaded falls back to the style of basic attacks.
+    style: style as SkillId,
     lastUseAt: raw.lastUseAt as number,
     masteryWork,
     wounds: raw.wounds as number,
@@ -329,15 +419,15 @@ function parseTally(raw: unknown): FightTally | null {
   };
 }
 
-function parseEncounter(raw: unknown, most: number): Encounter | null {
+function parseEncounter(raw: unknown, most: number, v: Vocab): Encounter | null {
   if (!isRecord(raw) || !isStr(raw.id) || !Array.isArray(raw.spawns)) return null;
   if (!Array.isArray(raw.specials) || !raw.specials.every(isStr)) return null;
   if (raw.spawns.length < 1 || raw.spawns.length > most) return null;
   const spawns: Spawn[] = [];
   for (const s of raw.spawns) {
     if (!isRecord(s) || !isStr(s.enemy) || !isInt(s.cl) || s.cl < 0) return null;
-    if (!Array.isArray(s.traits) || !s.traits.every((x) => oneOf(TRAIT_IDS, x))) return null;
-    if (s.nature !== null && s.nature !== 'wheel' && !oneOf(NATURE_IDS, s.nature)) return null;
+    if (!Array.isArray(s.traits) || !s.traits.every(isStr)) return null;
+    if (s.nature !== null && !isStr(s.nature)) return null;
     if (!isInt(s.count) || s.count < 1 || s.count > most) return null;
     if (!isNum(s.hpMult) || s.hpMult <= 0 || !nonNeg(s.dmgMult)) return null;
     if (s.fleeAt !== null && !share(s.fleeAt)) return null;
@@ -345,8 +435,8 @@ function parseEncounter(raw: unknown, most: number): Encounter | null {
     spawns.push({
       enemy: s.enemy,
       cl: s.cl,
-      traits: s.traits as TraitId[],
-      nature: s.nature as Spawn['nature'],
+      traits: known(s.traits as string[], v.traits),
+      nature: s.nature === 'wheel' || inSet(v.natures, s.nature) ? s.nature : null,
       count: s.count,
       hpMult: s.hpMult,
       dmgMult: s.dmgMult as number,
@@ -354,14 +444,21 @@ function parseEncounter(raw: unknown, most: number): Encounter | null {
       specials: s.specials as string[],
     });
   }
-  const encounter: Encounter = { id: raw.id, spawns, specials: raw.specials as string[] };
+  const encounter: Encounter = {
+    id: raw.id,
+    spawns,
+    specials: raw.specials as string[],
+  };
   if (raw.support !== undefined) {
     if (!Array.isArray(raw.support) || raw.support.length > 2) return null;
     const support: TeamSupport[] = [];
     for (const s of raw.support) {
-      if (!isRecord(s) || !oneOf(NATURE_IDS, s.nature)) return null;
+      if (!isRecord(s) || !isStr(s.nature)) return null;
       if (!isInt(s.everyMs) || s.everyMs < 1 || !isNum(s.damage) || s.damage < 0) return null;
-      support.push({ nature: s.nature as NatureId, everyMs: s.everyMs, damage: s.damage });
+      // A teammate whose nature is not loaded gives no support.
+      if (v.natures.has(s.nature)) {
+        support.push({ nature: s.nature, everyMs: s.everyMs, damage: s.damage });
+      }
     }
     encounter.support = support;
   }
@@ -416,38 +513,44 @@ export function parseFight(raw: unknown, content: ContentDb): FightState | null 
   const rng = raw.rng;
   if (!Array.isArray(rng) || rng.length !== 4 || !rng.every((w) => isInt(w) && w >= 0)) return null;
   const most = Math.max(1, K.combat.maxEnemies);
-  const encounter = parseEncounter(raw.encounter, most);
-  const player = parseCombatant(raw.player, 'player', t);
+  const v = vocabOf(content);
+  const encounter = parseEncounter(raw.encounter, most, v);
+  const player = parseCombatant(raw.player, 'player', t, v);
   if (!encounter || !player || !Array.isArray(raw.enemies)) return null;
   // Dead bodies are dropped when a new one spawns, so the list is at most twice the cap.
   if (raw.enemies.length < 1 || raw.enemies.length > most + most) return null;
   const enemies: Combatant[] = [];
   for (const e of raw.enemies) {
-    const enemy = parseCombatant(e, 'enemy', t);
+    const enemy = parseCombatant(e, 'enemy', t, v);
     if (!enemy) return null;
     enemies.push(enemy);
   }
-  const kit = parseKit(raw.kit, content);
+  const kit = parseKit(raw.kit, content, v);
   const uses = numberRecord(raw.uses);
-  const tally = parseTally(raw.tally);
+  const tally = parseTally(raw.tally, v);
   const knowledge = parseKnowledge(raw.knowledge);
   const pouch = parsePouch(raw.pouch, content);
   if (!kit || !uses || !tally || !knowledge || !pouch) return null;
   if (raw.medic !== null && (!isInt(raw.medic) || raw.medic < 0 || raw.medic >= pouch.length)) {
     return null;
   }
-  if (!Array.isArray(raw.natures) || !raw.natures.every((n) => oneOf(NATURE_IDS, n))) return null;
+  if (!Array.isArray(raw.natures) || !raw.natures.every(isStr)) return null;
   if (raw.target !== null && !isStr(raw.target)) return null;
   // A player who is casting casts a technique of the kit.
   if (player.phase === 'cast' && !kit.techniques.some((x) => x.id === player.cast)) return null;
   if (player.phase !== 'cast' && player.cast !== null) return null;
   const w = rng as number[];
   const state: RngState = [w[0] ?? 0, w[1] ?? 0, w[2] ?? 0, w[3] ?? 0];
+  const fault =
+    isRecord(raw.fault) && isStr(raw.fault.pack) && isStr(raw.fault.hook) && isStr(raw.fault.reason)
+      ? { pack: raw.fault.pack, hook: raw.fault.hook, reason: raw.fault.reason }
+      : undefined;
   return {
     t,
     cap: raw.cap,
     rng: state,
     result: raw.result,
+    ...(fault ? { fault } : {}),
     enemy: raw.enemy,
     encounter,
     spawned: raw.spawned,
@@ -455,7 +558,7 @@ export function parseFight(raw: unknown, content: ContentDb): FightState | null 
     enemies,
     kit,
     tier: raw.tier,
-    natures: raw.natures as NatureId[],
+    natures: known(raw.natures as string[], v.natures),
     target: raw.target,
     knowledge,
     pouch,

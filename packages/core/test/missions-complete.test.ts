@@ -39,9 +39,9 @@ describe('every board mission can be completed', () => {
       const spent = runUntilDone(state, m.id, 6 * 60 * MIN);
       expect(state.counters[`missions.done.${m.id}`], `${m.id} finished in ${spent} ms`).toBe(1);
       // ryo and Reputation exactly as the data says; Reputation only for team missions.
-      expect(state.currencies.ryo - before.ryo).toBeGreaterThanOrEqual(m.ryo);
-      expect(state.currencies.rep - before.rep).toBeGreaterThanOrEqual(m.team ? m.rep : 0);
-      if (!m.team) expect(state.currencies.rep).toBe(0);
+      expect(state.currencies.ryo! - before.ryo!).toBeGreaterThanOrEqual(m.ryo);
+      expect(state.currencies.rep! - before.rep!).toBeGreaterThanOrEqual(m.team ? m.rep : 0);
+      if (!m.team) expect(state.currencies.rep!).toBe(0);
     });
   }
 });
@@ -231,8 +231,8 @@ describe('village missions', () => {
     runUntilDone(state, 'core:v_spar', 30 * MIN, 2);
     expect(villageUnits(state, 'syla_shynobi')).toBe(2 * K.shinobiResPerMission);
     expect(state.missions.pending).toEqual({});
-    expect(state.currencies.rep).toBe(2 * mission('core:v_spar').rep);
-    expect(state.currencies.ryo).toBe(0);
+    expect(state.currencies.rep!).toBe(2 * mission('core:v_spar').rep);
+    expect(state.currencies.ryo!).toBe(0);
     expect(state.counters['missions.rank.V']).toBe(2);
   });
 

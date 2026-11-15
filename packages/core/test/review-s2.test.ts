@@ -180,7 +180,7 @@ describe('the bounty in the book', () => {
     expect(bingoView(state, boss.id, content)?.bounty?.paid).toBe(0);
     const pay = (): number => {
       const loot = rollLoot(state, boss);
-      grantLoot(state, boss.id, loot);
+      grantLoot(state, boss.id, loot, content);
       noteBounty(state, boss.id, loot.bounty);
       noteFight(state, boss.id, 'win', content);
       return loot.bounty;

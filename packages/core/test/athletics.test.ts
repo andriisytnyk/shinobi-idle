@@ -55,11 +55,11 @@ describe('A7: building obstacles', () => {
   it('builds slot 1 for free and charges base x slot squared for the rest', () => {
     const s = rich();
     expect(build(s, 1, NEUTRAL[1] as string)).toEqual({ ok: true });
-    expect(s.currencies.ryo).toBe(1_000_000);
+    expect(s.currencies.ryo!).toBe(1_000_000);
     for (let slot = 2; slot <= 6; slot++) {
-      const before = s.currencies.ryo;
+      const before = s.currencies.ryo!;
       expect(build(s, slot, NEUTRAL[slot] as string)).toEqual({ ok: true });
-      expect(before - s.currencies.ryo, `slot ${slot}`).toBe(K.obstacleBase * slot ** 2);
+      expect(before - s.currencies.ryo!, `slot ${slot}`).toBe(K.obstacleBase * slot ** 2);
     }
     expect(K.obstacleBase * 4).toBe(600);
     expect(Object.keys(s.course).sort()).toEqual(['1', '2', '3', '4', '5', '6']);
@@ -68,14 +68,14 @@ describe('A7: building obstacles', () => {
   it('replaces the first obstacle with the other one at full cost, slot 1 included', () => {
     const s = rich();
     build(s, 1, 'core:strybky_po_dakhakh');
-    expect(s.currencies.ryo).toBe(1_000_000);
+    expect(s.currencies.ryo!).toBe(1_000_000);
     expect(build(s, 1, 'core:bih_navkolo_sela')).toEqual({ ok: true });
-    expect(s.currencies.ryo).toBe(1_000_000 - K.obstacleBase);
+    expect(s.currencies.ryo!).toBe(1_000_000 - K.obstacleBase);
     expect(s.course['1']).toBe('core:bih_navkolo_sela');
     build(s, 3, 'core:koloda_nad_prirvoiu');
-    const before = s.currencies.ryo;
+    const before = s.currencies.ryo!;
     expect(build(s, 3, 'core:ukhylennia_vid_kunaiv')).toEqual({ ok: true });
-    expect(before - s.currencies.ryo).toBe(K.obstacleBase * 9);
+    expect(before - s.currencies.ryo!).toBe(K.obstacleBase * 9);
     expect(build(s, 3, 'core:ukhylennia_vid_kunaiv')).toEqual({
       ok: false,
       reason: 'error.alreadyBuilt',
@@ -140,7 +140,7 @@ describe('A7: building obstacles', () => {
     expect(serialize(s)).toBe(before);
     s.currencies.ryo = 600;
     expect(build(s, 2, 'core:vidzhymannia_na_paltsiakh')).toEqual({ ok: true });
-    expect(s.currencies.ryo).toBe(0);
+    expect(s.currencies.ryo!).toBe(0);
   });
 
   it('applies obstacle.cost modifiers to the price', () => {
@@ -149,9 +149,9 @@ describe('A7: building obstacles', () => {
     const second = content.obstacles.find((o) => o.id === NEUTRAL[2]);
     if (!second) throw new Error('no obstacle');
     expect(buildCost(s, second, content, defaultRules)).toBe(Math.round(600 * 0.95));
-    const before = s.currencies.ryo;
+    const before = s.currencies.ryo!;
     build(s, 2, NEUTRAL[2] as string);
-    expect(before - s.currencies.ryo).toBe(570);
+    expect(before - s.currencies.ryo!).toBe(570);
   });
 
   it('lists the slots with costs and why an option is closed', () => {

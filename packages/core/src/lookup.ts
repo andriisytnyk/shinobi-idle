@@ -99,7 +99,6 @@ export function shopEntries(content: ContentDb): ShopEntry[] {
   for (const item of content.items) {
     const source = item.scroll?.source;
     if (!library || source?.t !== 'library') continue;
-    // The cast goes with the legacy id mapping: the content type of a requirement names narrow ids.
     const req = {
       t: 'all',
       of: [graduateReq(content), { t: 'building', id: library.id, level: source.level }],

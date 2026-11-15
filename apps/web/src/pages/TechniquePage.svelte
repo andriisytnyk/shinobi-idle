@@ -62,6 +62,7 @@
     }),
   );
 
+  const stateStatus = $derived(content.statuses.find((x) => x.state === tech?.state));
   const goal = $derived(techniqueGoal(id, content));
   const pinned = $derived(game.read((gs) => gs.goal?.kind === 'technique' && gs.goal.id === id));
 
@@ -99,11 +100,10 @@
         <div>
           <dt>{t('technique.effect')}</dt>
           <dd>
-            <!-- A state is not a status; the status page exists only where the content has a status of the same id. -->
-            {#if content.statuses.some((x) => x.id === tech.state)}<EntityLink
-                kind="status"
-                id={tech.state}
-              />{:else}{textOf([`state.${tech.state}.name`])}{/if}
+            <!-- A state is not a status: the status that the state puts on a body names it in its data. -->
+            {#if stateStatus}<EntityLink kind="status" id={stateStatus.id} />{:else}{textOf([
+                `state.${tech.state}.name`,
+              ])}{/if}
           </dd>
         </div>
       {/if}

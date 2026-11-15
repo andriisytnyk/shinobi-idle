@@ -22,6 +22,26 @@ import {
 } from '../src/index.ts';
 
 export const K = content.balance.K;
+
+/** A number of the balance object by its dotted path (`trait.armor`, `bossFx.twins.count`); a miss fails the test with the path. */
+export function fig(path: string): number {
+  let v: unknown = K;
+  for (const part of path.split('.')) {
+    v = (v as Record<string, unknown> | undefined)?.[part];
+  }
+  if (typeof v !== 'number') throw new Error(`balance K.${path} is not a number`);
+  return v;
+}
+
+/** A row of the balance object that holds numbers (`bossFx.twins`), by its dotted path. */
+export function row(path: string): Record<string, number> {
+  let v: unknown = K;
+  for (const part of path.split('.')) {
+    v = (v as Record<string, unknown> | undefined)?.[part];
+  }
+  if (typeof v !== 'object' || v === null) throw new Error(`balance K.${path} is not a row`);
+  return v as Record<string, number>;
+}
 export const rules = defaultRules;
 
 /** A typical player build for combat level `c`, as in the balance simulator (`build`). */
@@ -45,7 +65,7 @@ export function levelsFor(c: number, nature: NatureId): PlayerSnapshot['levels']
 export function knownFor(levels: PlayerSnapshot['levels'], nature: NatureId): string[] {
   const skills: SkillId[] = ['tai', 'nin', nature];
   return content.techniques
-    .filter((t) => skills.includes(t.skill) && t.rank !== null && t.level <= levels[t.skill])
+    .filter((t) => skills.includes(t.skill) && t.rank !== null && t.level <= (levels[t.skill] ?? 0))
     .map((t) => t.id);
 }
 
@@ -100,7 +120,7 @@ export function scripted(known: string[], levels: Partial<Record<SkillId, number
   const all = {} as PlayerSnapshot['levels'];
   for (const skill of content.skills) all[skill.id] = 40;
   return {
-    levels: { ...all, ...levels },
+    levels: { ...all, ...levels } as PlayerSnapshot['levels'],
     mastery: Object.fromEntries(known.map((id) => [id, 20])),
     known,
     natures: ['katon'],

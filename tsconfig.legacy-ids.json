@@ -1,8 +1,0 @@
-{
-  "//": "Deprecated. Code that has not been migrated to the open vocabularies of @shinobi/content type-checks against the narrow ids of the built-in pack. Remove this file and the `extends` entries that name it when the core and web tasks are done.",
-  "compilerOptions": {
-    "paths": {
-      "@shinobi/content/typing": ["./packages/content/src/typing/legacy.ts"]
-    }
-  }
-}

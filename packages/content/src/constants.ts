@@ -17,29 +17,7 @@ import traits from './packs/core/data/hand/traits.json' with { type: 'json' };
 const ids = (list: readonly { id: string }[]): string[] => list.map((e) => e.id);
 
 // ---------- id types ----------
-// Ids are open strings. Code that has not been migrated sees the narrow built-in unions through the
-// deprecated tsconfig mapping of '@shinobi/content/typing' (see tsconfig.legacy-ids.json); the
-// narrow unions are also exported by name as Legacy<Name>.
-
-export type {
-  LegacyAttackStyle,
-  LegacyCellKey,
-  LegacyComboId,
-  LegacyEnemyRegion,
-  LegacyMissionRank,
-  LegacyNatureId,
-  LegacyPlayerRank,
-  LegacyRank,
-  LegacyRoleId,
-  LegacySkillGroup,
-  LegacySkillId,
-  LegacyStateId,
-  LegacyStatusId,
-  LegacyTagId,
-  LegacyTechSkillId,
-  LegacyTraitId,
-  LegacyZoneRegion,
-} from './typing/legacy.ts';
+// Ids are open strings: a pack adds members, which `composeContent` checks against the composed registry.
 
 export type SkillId = IdTypes['skill'];
 export type NatureId = IdTypes['nature'];

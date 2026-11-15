@@ -131,7 +131,7 @@ describe('the village page', () => {
     flushSync();
     target.querySelector<HTMLButtonElement>('[data-donate]')?.click();
     flushSync();
-    expect(game.state.currencies.ryo).toBe(180);
+    expect(game.state.currencies.ryo ?? 0).toBe(180);
     expect(v().treasury).toBe(120);
     expect(text(target.querySelector('[data-treasury-amount]'))).toBe('120');
     // «макс» puts all the ryo in the field.

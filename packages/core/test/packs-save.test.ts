@@ -8,6 +8,8 @@ import {
   teamFor,
   type GameEvent,
   type GameState,
+  loadoutLimits,
+  pouchSlotCount,
 } from '../src/index.ts';
 import { TOKEN, TOKEN_TICKS } from '../src/testmod/index.ts';
 import {
@@ -144,15 +146,20 @@ describe('a save made with the pack, loaded without it', () => {
     expect(again.quests['testmod:test_chain']).toEqual(original.quests['testmod:test_chain']);
     expect(again.known['testmod:aether_touch']).toBe(true);
     // The whole state is what the original was: a round trip through the core game changed nothing.
-    // Two branches are left out: the automatic loadout and the pouch are derived from the rank by the
-    // fight code, which still orders the ranks by its own list and does not know the rank of the pack.
-    const derived = ['loadouts', 'pouch', 'packs'];
+    // Only the list of packs differs: it records when each pack was attached.
+    const derived = ['packs'];
     const strip = (state: GameState) => {
       const copy = JSON.parse(serialize(state)).state as Record<string, unknown>;
       for (const key of derived) delete copy[key];
+      // The basis of the automatic loadout holds the tier of the rank: the one made before the rank was set is stale.
+      delete (copy.loadouts as Record<string, unknown>).basis;
       return copy;
     };
     expect(strip(again)).toEqual(strip(original));
+    // A pack rank above the last listed one gets the tier, the loadout limits and the pouch of the rank below it.
+    expect(again.loadouts.basis.startsWith('3:')).toBe(true);
+    expect(loadoutLimits(3, modContent)).toEqual(loadoutLimits(2, modContent));
+    expect(pouchSlotCount(again, modContent)).toBeGreaterThan(0);
   });
 
   it('survives two round trips through the core game', () => {

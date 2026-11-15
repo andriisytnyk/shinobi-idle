@@ -7,6 +7,17 @@
 import type { ContentDb, Req } from './schema.ts';
 import type { EntityListKey } from './pack.ts';
 
+/** The effects the engine and the core hooks put on a body under their own ids (not statuses): a tag or a trait may name them. */
+const ENGINE_EFFECTS: ReadonlySet<string> = new Set([
+  'illusion',
+  'revealed',
+  'twinMist',
+  'stance',
+  'stanceDrain',
+  'evasionBuff',
+  'resist',
+]);
+
 export interface ClosureProblem {
   pack: string;
   message: string;
@@ -44,6 +55,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     styles: ids(db.attackStyles),
     fightRegions: ids(db.fightRegions),
     kinds: ids(db.itemKinds),
+    currencies: ids(db.currencies),
     trophies: ids(db.trophies),
     gearFx: ids(db.gearFx),
     entityKinds: ids(db.entityKinds),
@@ -60,7 +72,6 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     cells: ids(db.cells),
     regions: ids(db.regions),
     resources: ids(db.resources),
-    currencies: ids(db.currencies),
   };
   type SetName = keyof typeof set;
 
@@ -208,16 +219,94 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     at('gearFx', g.id);
     needNumber('gearFx', `gearFx.${g.id}`);
   }
+  /** A number reference of fight data: a path of the balance object, or one minus a path; a literal needs no check. */
+  const numRef = (field: string, r: unknown): void => {
+    if (typeof r === 'string') needNumber(field, r);
+    else if (r !== null && typeof r === 'object') needNumber(field, (r as { path: string }).path);
+  };
+  const tagOps = (
+    field: string,
+    ops: readonly { op: string; status?: string; value?: unknown }[] | undefined,
+  ) =>
+    (ops ?? []).forEach((o, i) => {
+      if (o.op === 'effect') body(`${field}[${i}].`, o as Parameters<typeof body>[1]);
+      if (o.op !== 'status') return;
+      ref(`${field}[${i}].status`, o.status, 'statuses');
+      if (o.value !== undefined) numRef(`${field}[${i}].value`, o.value);
+    });
+  const body = (
+    field: string,
+    st: {
+      effects?: readonly (
+        { kind: 'modifier'; value: unknown } | { kind: 'periodic'; amount: unknown; over?: unknown }
+      )[];
+      duration?: unknown;
+    },
+  ): void => {
+    for (const [n, e] of (st.effects ?? []).entries()) {
+      if (e.kind === 'modifier') numRef(`${field}effects[${n}].value`, e.value);
+      else {
+        numRef(`${field}effects[${n}].amount`, e.amount);
+        if (e.over !== undefined) numRef(`${field}effects[${n}].over`, e.over);
+      }
+    }
+    const d = st.duration;
+    if (d !== undefined) {
+      if (typeof d === 'object' && d !== null && 'byRank' in d)
+        needNumber(`${field}duration.byRank`, (d as { byRank: string }).byRank);
+      else numRef(`${field}duration`, d);
+    }
+    if (st.effects !== undefined && d === undefined)
+      problem(`${field}duration`, 'a status with effects needs a duration');
+  };
+  for (const st of db.statuses) {
+    at('statuses', st.id);
+    if (st.state !== undefined) ref('state', st.state, 'states');
+    body('', st);
+  }
+  /** Every id an effect goes by in a fight and that data can name: statuses, effects a tag defines, traits. */
+  const effectIds = new Set<string>([...set.statuses, ...set.traits]);
+  for (const tag of db.tags)
+    for (const op of [...(tag.onHit ?? []), ...(tag.onUse ?? [])])
+      if (op.op === 'effect') effectIds.add(op.id);
+  /** A reference of fight data to an effect or trait: one of another pack must exist; the engine's and the core's own effects are bare. */
+  const effectRef = (field: string, value: string): void => {
+    if (!effectIds.has(value) && !ENGINE_EFFECTS.has(value))
+      problem(field, `"${value}" names no status, effect or trait`);
+  };
+  for (const st of db.statuses) {
+    at('statuses', st.id);
+    if (st.suppresses !== undefined) effectRef('suppresses', st.suppresses);
+  }
+  for (const tag of db.tags) {
+    at('tags', tag.id);
+    for (const id of tag.removes ?? []) effectRef('removes', id);
+    for (const op of [...(tag.onHit ?? []), ...(tag.onUse ?? [])])
+      if (op.op === 'effect' && op.suppresses !== undefined) effectRef('suppresses', op.suppresses);
+    tagOps('onHit', tag.onHit);
+    tagOps('onUse', tag.onUse);
+  }
   for (const c of db.combos) {
     at('combos', c.id);
-    ref('nature', c.nature, 'natures');
+    if (c.nature !== undefined) ref('nature', c.nature, 'natures');
+    if (c.tag !== undefined) ref('tag', c.tag, 'tags');
+    if (c.nature === undefined && c.tag === undefined)
+      problem('nature', 'a combo needs a nature or a tag to be triggered by');
     ref('onState', c.onState, 'states');
+    if (c.effect.status !== undefined) ref('effect.status', c.effect.status, 'statuses');
+    if (c.effect.kind === 'status' && c.effect.status === undefined)
+      problem('effect.status', 'a status combo names its status');
     needNumber('combo', `combo.${c.id}`);
   }
   for (const t of db.traits) {
     at('traits', t.id);
     ref('answer', t.answer, 'tags');
     for (const key of t.numbers.keys) needNumber('numbers', `${t.numbers.from}.${key}`);
+    (t.mods ?? []).forEach((m, i) => numRef(`mods[${i}].value`, m.value));
+    for (const id of t.inflicts ?? []) effectRef('inflicts', id);
+    if (t.swarm !== undefined)
+      for (const key of ['n', 'hp', 'dmg']) needNumber('swarm', `${t.swarm}.${key}`);
+    if (t.regen !== undefined) numRef('regen', t.regen);
   }
   for (const tier of db.ai.tiers) {
     at('ai', tier.id);
@@ -362,9 +451,23 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
       if (p.kind === 'mission') ref(`${f}.mission`, p.mission, 'missions');
     });
   }
+  for (const role of ['money', 'renown', 'study'] as const) {
+    if (!db.currencies.some((c) => c.role === role)) {
+      at('currencies', role);
+      problem('role', `no currency has the role ${role}`);
+    }
+  }
+  for (const op of db.operations) {
+    at('operations', op.id);
+    for (const pay of op.rewards ? [op.rewards.first, op.rewards.repeat] : []) {
+      if (pay.currency !== undefined) ref('rewards.currency', pay.currency, 'currencies');
+      if (pay.repCurrency !== undefined) ref('rewards.repCurrency', pay.repCurrency, 'currencies');
+    }
+  }
   for (const list of ['enemies', 'bosses'] as const) {
     for (const e of db[list]) {
       at(list, e.id);
+      if (e.currency !== undefined) ref('currency', e.currency, 'currencies');
       if (list === 'enemies') ref('region', (e as { region: string }).region, 'fightRegions');
       refs('traits', e.traits, 'traits');
       if (e.nature !== null) ref('nature', e.nature, 'natures', ['wheel']);
@@ -380,6 +483,22 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
   for (const b of db.bosses) {
     at('bosses', b.id);
     needNumber('special.fx', `bossFx.${b.special.fx}`);
+    for (const key of b.special.numbers ?? [])
+      needNumber('special.numbers', `bossFx.${b.special.fx}.${key}`);
+    if (b.special.companions)
+      needNumber('special.companions.fx', `bossFx.${b.special.companions.fx}`);
+    refs('special.adds', b.special.adds ?? [], 'traits');
+    if (b.special.fleeAt !== undefined) {
+      const row = (db.balance.K.bossFx as Record<string, Record<string, number> | undefined>)[
+        b.special.fx
+      ];
+      const share = row?.[b.special.fleeAt];
+      if (typeof share !== 'number' || share < 0 || share > 1)
+        problem(
+          'special.fleeAt',
+          `bossFx.${b.special.fx}.${b.special.fleeAt} must be a share from 0 to 1`,
+        );
+    }
   }
   for (const b of db.buildings) {
     at('buildings', b.id);

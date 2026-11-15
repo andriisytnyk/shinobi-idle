@@ -1,3 +1,4 @@
+import { isAcademyRank, rankIndex } from '../vocab.ts';
 import type { ContentDb } from '@shinobi/content';
 import { addItem } from '../bank.ts';
 import type { CommandResult } from '../engine.ts';
@@ -18,9 +19,11 @@ import type { FightState } from './fight-types.ts';
 /** Slots of the pouch: the base count, and the extra the chunin vest gives. */
 export function pouchSlotCount(state: GameState, content: ContentDb): number {
   // A student carries no pouch; it comes with the rank of Genin, the vest adds a slot.
-  if (state.player.rank === 'student') return 0;
+  if (isAcademyRank(content, state.player.rank)) return 0;
   const p = content.balance.K.pouch;
-  return p.slots + (state.player.rank === p.vestRank ? p.vest : 0);
+  // The vest comes with its rank and stays with every rank above it.
+  const vest = rankIndex(content, state.player.rank) >= rankIndex(content, p.vestRank);
+  return p.slots + (vest ? p.vest : 0);
 }
 
 /** The highest medic pouch upgrade in the bank, 0 when none. */

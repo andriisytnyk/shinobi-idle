@@ -4,9 +4,7 @@
  * ids are `string` and a record keyed by vocabulary members is `Record<string, T>`, which
  * `noUncheckedIndexedAccess` makes callers check.
  *
- * The old narrow view is `legacy.ts`. `@shinobi/content/typing` resolves here for the package
- * itself; `packages/core`, `packages/sim` and `apps/web` map it to `legacy.ts` in their
- * tsconfig while they are not migrated (see docs/dev/architecture.md). Never imported at run time.
+ * Never imported at run time.
  */
 export interface IdTypes {
   skill: string;

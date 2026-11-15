@@ -437,7 +437,7 @@ describe('A8: shops', () => {
     s.currencies.ryo = 500;
     ok(s, { type: 'shop.buy', item: 'core:rice', n: 10 });
     // The Market's 2% comes off the whole stack: 30 ryo of rice cost 29.
-    expect(s.currencies.ryo).toBe(500 - Math.round(10 * (K.goods.rice ?? 0) * 0.98));
+    expect(s.currencies.ryo!).toBe(500 - Math.round(10 * (K.goods.rice ?? 0) * 0.98));
     expect(s.bank['core:rice']).toBe(10);
     withBuildings(s, { 'core:forge': 2 });
     ok(s, { type: 'shop.buy', item: 'core:senbon', n: 15 });
@@ -448,27 +448,27 @@ describe('A8: shops', () => {
     const s = genin();
     s.currencies.ryo = 5;
     refused(s, { type: 'shop.buy', item: 'core:rice', n: 2 }, 'error.notEnoughRyo');
-    expect(s.currencies.ryo).toBe(5);
+    expect(s.currencies.ryo!).toBe(5);
     refused(s, { type: 'shop.buy', item: MINT, n: 1 }, 'error.notForSale');
     refused(s, { type: 'shop.buy', item: 'core:rice', n: 0 }, 'error.invalidAmount');
     refused(s, { type: 'shop.buy', item: 'core:rice', n: 1.5 }, 'error.invalidAmount');
     const student = createState(1, content);
     student.currencies.ryo = 500;
     refused(student, { type: 'shop.buy', item: 'core:rice', n: 1 }, 'error.requirementsNotMet');
-    expect(student.currencies.ryo).toBe(500);
+    expect(student.currencies.ryo!).toBe(500);
   });
 
   it('sells trophies and craft products, and refuses the rest', () => {
     const s = genin();
     stocked(s, { 'core:pelt': 3, [OINTMENT]: 4, 'core:kunai': 2, [MINT]: 2 });
     ok(s, { type: 'shop.sell', item: 'core:pelt', n: 2 });
-    expect(s.currencies.ryo).toBe(2 * K.sell.pelt!);
+    expect(s.currencies.ryo!).toBe(2 * K.sell.pelt!);
     expect(s.bank['core:pelt']).toBe(1);
     const ointment = (2 * (K.shop.herbBase + 5 * K.shop.herbPerLevel) + (K.goods.oil ?? 0)) / 2;
     expect(sellPrice(OINTMENT, content)).toBe(Math.floor(ointment * K.shop.craftSellFactor));
-    const before = s.currencies.ryo;
+    const before = s.currencies.ryo!;
     ok(s, { type: 'shop.sell', item: OINTMENT, n: 4 });
-    expect(s.currencies.ryo).toBe(before + 4 * (sellPrice(OINTMENT, content) ?? 0));
+    expect(s.currencies.ryo!).toBe(before + 4 * (sellPrice(OINTMENT, content) ?? 0));
     refused(s, { type: 'shop.sell', item: 'core:kunai', n: 1 }, 'error.notSellable');
     refused(s, { type: 'shop.sell', item: MINT, n: 1 }, 'error.notSellable');
     refused(s, { type: 'shop.sell', item: 'core:pelt', n: 5 }, 'error.noItem');
@@ -506,12 +506,12 @@ describe('A9: training gear', () => {
     refused(s, { type: 'gear.buy', line: 'core:ghost' }, 'error.unknownGear');
     ok(s, { type: 'gear.buy', line: SICKLE });
     expect(s.gear[SICKLE]).toBe(1);
-    expect(s.currencies.ryo).toBe(10_000 - (K.gearTier[0] ?? 0));
+    expect(s.currencies.ryo!).toBe(10_000 - (K.gearTier[0] ?? 0));
     refused(s, { type: 'gear.buy', line: SICKLE }, 'error.requirementsNotMet');
     setLevel(s, 'herb', 30);
     ok(s, { type: 'gear.buy', line: SICKLE });
     expect(s.gear[SICKLE]).toBe(2);
-    expect(s.currencies.ryo).toBe(10_000 - (K.gearTier[0] ?? 0) - (K.gearTier[1] ?? 0));
+    expect(s.currencies.ryo!).toBe(10_000 - (K.gearTier[0] ?? 0) - (K.gearTier[1] ?? 0));
     refused(s, { type: 'gear.buy', line: SICKLE }, 'error.gearMaxed');
   });
 
@@ -595,7 +595,7 @@ describe('A11: a scripted run from genin with 500 ryo', () => {
     run(craft(CLEAR_MIND), 6 * K.craft * 1000);
     expect(s.bank[OINTMENT] ?? 0).toBeGreaterThanOrEqual(10);
     expect(s.bank[CLEAR_MIND] ?? 0).toBeGreaterThanOrEqual(5);
-    expect(s.currencies.ryo).toBeGreaterThanOrEqual(0);
+    expect(s.currencies.ryo!).toBeGreaterThanOrEqual(0);
   });
 });
 

@@ -118,14 +118,14 @@ describe('the API gives no way to write to the game (A7)', () => {
     const snapshot = ui.read();
     // The same data the UI reads.
     expect(snapshot).toEqual(game.read((s) => s));
-    const ryo = snapshot.currencies.ryo;
+    const ryo = snapshot.currencies.ryo ?? 0;
     expect(() => {
       snapshot.currencies.ryo = ryo + 1000;
     }).toThrow(TypeError);
     expect(() => {
       snapshot.slots.push({ action: null, progress: 0, share: 0, data: null });
     }).toThrow(TypeError);
-    expect(game.state.currencies.ryo).toBe(ryo);
+    expect(game.state.currencies.ryo ?? 0).toBe(ryo);
     expect(ui.read().currencies.ryo).toBe(ryo);
 
     // After a store update the next read is a fresh snapshot of the game.

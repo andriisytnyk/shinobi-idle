@@ -1,23 +1,14 @@
-import {
-  NATURE_IDS,
-  NATURE_WHEEL,
-  TRAIT_ANSWER,
-  type Boss,
-  type ContentDb,
-  type Enemy,
-  type Item,
-  type NatureId,
-  type Technique,
-  type TraitId,
-} from '@shinobi/content';
+import type { Boss, ContentDb, Enemy, Item, Technique } from '@shinobi/content';
 import { addItem } from '../bank.ts';
 import { MS_PER_SECOND } from '../formulas.ts';
 import type { CommandResult } from '../engine.ts';
 import { indexOf } from '../lookup.ts';
-import { RANK_ORDER } from '../requirements.ts';
+import { rankIndex } from '../vocab.ts';
 import type { GameState } from '../state.ts';
 import { wheelFactor } from './fight.ts';
-import { pouchUse } from './fight-items.ts';
+import { answersTraitData, beatenBy, dotShareOf, fightData } from './fight-data.ts';
+import { itemAnswers, itemView, pouchUse } from './fight-items.ts';
+import { need } from './need.ts';
 import { techniqueFigures, type PlayerSnapshot } from './numbers.ts';
 import { ensurePouch, medicTier, refillPouch } from './pouch.ts';
 import { knowledgeOf } from './bingo.ts';
@@ -38,15 +29,24 @@ export interface LoadoutLimits {
 
 export function loadoutLimits(tier: number, content: ContentDb): LoadoutLimits | null {
   const L = content.balance.K.loadout;
-  if (tier >= RANK_ORDER.indexOf('chunin'))
-    return { slots: L.slots.chunin, natures: L.natures.chunin };
-  if (tier >= RANK_ORDER.indexOf('genin'))
-    return { slots: L.slots.genin, natures: L.natures.genin };
-  return null;
+  const slots: Record<string, number | undefined> = L.slots;
+  const natures: Record<string, number | undefined> = L.natures;
+  // The limits of the highest rank the balance lists that the player's tier reaches: a rank above the last listed keeps its limits.
+  let best: { at: number; rank: string } | null = null;
+  for (const rank of Object.keys(L.slots)) {
+    const at = rankIndex(content, rank);
+    if (at >= 0 && at <= tier && (!best || at > best.at)) best = { at, rank };
+  }
+  if (!best) return null;
+  return {
+    slots: need(slots[best.rank], `loadout.slots.${best.rank}`),
+    natures: need(natures[best.rank], `loadout.natures.${best.rank}`),
+  };
 }
 
-const natureOf = (tech: Technique): NatureId | null =>
-  (NATURE_IDS as readonly string[]).includes(tech.skill) ? (tech.skill as NatureId) : null;
+/** The nature a technique is of: its skill, when the skill is a nature of the wheel. */
+const natureOf = (tech: Technique, content: ContentDb): string | null =>
+  fightData(content).strong.has(tech.skill) ? tech.skill : null;
 
 const isStance = (tech: Technique): boolean => tech.combat?.effect.kind === 'stance';
 
@@ -55,14 +55,16 @@ const isGuard = (tech: Technique): boolean => {
   return kind === 'shield' || kind === 'decoy' || kind === 'evasionBuff';
 };
 
-/** Whether a technique answers a trait: it carries the answering tag, or burns (which stops Regeneration). */
-export function answersTrait(tech: Technique, trait: TraitId): boolean {
-  return tech.tags.includes(TRAIT_ANSWER[trait]) || (trait === 'regen' && tech.state === 'burn');
+/** Whether a technique answers a trait: it carries the answering tag, or its state switches the trait off (burning stops Regeneration). */
+export function answersTrait(tech: Technique, trait: string, content: ContentDb): boolean {
+  const data = fightData(content);
+  const def = data.traits.get(trait);
+  return def !== undefined && answersTraitData(data, tech.tags, tech.state, def);
 }
 
 interface Cand {
   tech: Technique;
-  nature: NatureId | null;
+  nature: string | null;
   /** Damage per second the technique is expected to add, against the enemy's nature when it has one. */
   score: number;
 }
@@ -70,18 +72,22 @@ interface Cand {
 function scoreOf(
   snap: PlayerSnapshot,
   tech: Technique,
-  enemy: NatureId | null,
+  enemy: string | null,
   content: ContentDb,
 ): number {
   const K = content.balance.K;
+  const data = fightData(content);
   const n = techniqueFigures(snap, tech, content);
   if (!(n.damage > 0)) return 0;
   // An area technique counts as hitting several bodies; burning adds its share on top.
   const bodies =
-    tech.role === 'area' || tech.tags.includes('area') || tech.combat?.hitsAll
+    data.wideRoles.has(tech.role) ||
+    tech.tags.some((tag) => data.tags.get(tag)?.hitsAll === true) ||
+    tech.combat?.hitsAll
       ? K.loadout.areaBodies
       : 1;
-  const burn = tech.state === 'burn' ? 1 + K.burn.share : 1;
+  const status = tech.state === null ? undefined : data.byState.get(tech.state);
+  const burn = status ? 1 + dotShareOf(status, content) : 1;
   const seconds = (n.castMs + n.cooldownMs) / MS_PER_SECOND;
   return (
     (n.damage * bodies * burn * wheelFactor(tech.skill, enemy, content)) /
@@ -108,11 +114,11 @@ export interface PlanOptions {
   /** The technique that must stay in the loadout (the signature). */
   keep?: string | null;
   /** Traits of the enemy the player knows; the plan carries an answer to each it can. */
-  traits?: readonly TraitId[];
+  traits?: readonly string[];
   /** The enemy's nature: the wheel favours or spoils the player's natures. */
-  nature?: NatureId | null;
+  nature?: string | null;
   /** Traits whose answer the pouch will carry: a technique that only answers (does no damage) is skipped for them. */
-  covered?: ReadonlySet<TraitId>;
+  covered?: ReadonlySet<string>;
 }
 
 /**
@@ -136,7 +142,11 @@ export function planLoadout(
     // Stances cost Wounds: they, and the techniques that need one, are for the player to take by
     // hand, or as the signature (the player has opted in to the price).
     if ((isStance(tech) || tech.combat?.requiresStance) && tech.id !== options.keep) continue;
-    cands.push({ tech, nature: natureOf(tech), score: scoreOf(snap, tech, enemy, content) });
+    cands.push({
+      tech,
+      nature: natureOf(tech, content),
+      score: scoreOf(snap, tech, enemy, content),
+    });
   }
   // A signature that needs a stance brings the best stance the player knows.
   let stance: Cand | undefined;
@@ -150,14 +160,14 @@ export function planLoadout(
         tech.rank !== null &&
         (!stance || tech.level > stance.tech.level)
       ) {
-        stance = { tech, nature: natureOf(tech), score: 0 };
+        stance = { tech, nature: natureOf(tech, content), score: 0 };
       }
     }
     if (stance) cands.push(stance);
   }
   if (!limits) return cands.map((c) => c.tech.id).sort();
 
-  const natures = NATURE_IDS.filter((n) => cands.some((c) => c.nature === n));
+  const natures = fightData(content).natures.filter((n) => cands.some((c) => c.nature === n));
   // The signature stays: only the nature sets that include its nature are considered.
   const keepNature = options.keep
     ? (cands.find((c) => c.tech.id === options.keep)?.nature ?? null)
@@ -178,15 +188,15 @@ export function planLoadout(
     if (stance) add(pool.find((c) => c.tech === stance?.tech));
     let covered = 0;
     for (const trait of traits) {
-      if (chosen.some((c) => answersTrait(c.tech, trait))) {
+      if (chosen.some((c) => answersTrait(c.tech, trait, content))) {
         covered++;
         continue;
       }
       let answering = pool.filter(
-        (c) => answersTrait(c.tech, trait) && !c.tech.combat?.requiresStance,
+        (c) => answersTrait(c.tech, trait, content) && !c.tech.combat?.requiresStance,
       );
       // A heavy caster is also met with a guard when nothing interrupts it.
-      if (answering.length === 0 && trait === 'caster')
+      if (answering.length === 0 && fightData(content).traits.get(trait)?.casts)
         answering = pool.filter((c) => isGuard(c.tech));
       const pick = answering.sort(byScore)[0];
       // An answer that only answers, when the pouch has a tool for it, leaves its slot to an attack.
@@ -221,31 +231,10 @@ export const autoLoadout = (
 
 // ---------- the pouch ----------
 
-/** Whether an item answers a trait when used from the pouch. */
-export function itemAnswers(item: Item, trait: TraitId): boolean {
-  const use = pouchUse(item);
-  switch (trait) {
-    case 'caster':
-      return (use === 'throw' || use === 'bomb') && item.tags.includes('interrupt');
-    case 'pack':
-      return use === 'area';
-    case 'evasive':
-      return use === 'bind';
-    case 'regen':
-      return use === 'dot';
-    case 'illusionist':
-      return use === 'dispel';
-    case 'poisoner':
-      return item.fx?.kind === 'cleanse' && item.fx.statuses.includes('poison');
-    default:
-      return false;
-  }
-}
-
 export interface PouchPlanInput {
   bank: Readonly<Record<string, number>>;
   slots: number;
-  traits: readonly TraitId[];
+  traits: readonly string[];
   /** Techniques of the loadout: a trait one of them answers needs no tool. */
   loadout: readonly string[];
 }
@@ -258,7 +247,9 @@ export interface PouchPlanInput {
 export function planPouch(input: PouchPlanInput, content: ContentDb): { id: string; n: number }[] {
   const index = indexOf(content);
   const cap = content.balance.K.pouchStack;
-  const owned = content.items.filter((i) => (input.bank[i.id] ?? 0) > 0 && pouchUse(i) !== null);
+  const owned = content.items.filter(
+    (i) => (input.bank[i.id] ?? 0) > 0 && pouchUse(i, content) !== null,
+  );
   const slots: { id: string; n: number }[] = [];
   const take = (item: Item | undefined): void => {
     if (!item || slots.length >= input.slots || slots.some((s) => s.id === item.id)) return;
@@ -266,7 +257,7 @@ export function planPouch(input: PouchPlanInput, content: ContentDb): { id: stri
   };
   let heal: Item | undefined;
   for (const i of owned) {
-    if (pouchUse(i) === 'heal' && i.fx?.kind === 'heal') {
+    if (pouchUse(i, content) === 'heal' && i.fx?.kind === 'heal') {
       if (!heal || (heal.fx?.kind === 'heal' && i.fx.hp > heal.fx.hp)) heal = i;
     }
   }
@@ -274,17 +265,16 @@ export function planPouch(input: PouchPlanInput, content: ContentDb): { id: stri
   const techs = input.loadout
     .map((id) => index.techniques.get(id))
     .filter((t): t is Technique => !!t);
-  const toolFor = (trait: TraitId) =>
-    owned.find((i) => itemAnswers(i, trait) && pouchUse(i) !== 'sleep');
+  const toolFor = (trait: string) => owned.find((i) => itemAnswers(i, trait, content));
   // A tool for a trait nothing in the loadout answers first, then a spare for those the loadout answers when its technique is cooling down.
   for (const trait of input.traits)
-    if (!techs.some((t) => answersTrait(t, trait))) take(toolFor(trait));
+    if (!techs.some((t) => answersTrait(t, trait, content))) take(toolFor(trait));
   for (const trait of input.traits) take(toolFor(trait));
-  if (input.traits.includes('caster')) {
-    take(owned.find((i) => pouchUse(i) === 'bomb' && i.tags.includes('guard')));
+  if (input.traits.some((t) => fightData(content).traits.get(t)?.casts)) {
+    take(owned.find((i) => pouchUse(i, content) === 'bomb' && itemView(content, i.id)?.guard));
   }
-  take(owned.find((i) => pouchUse(i) === 'restore'));
-  take(owned.find((i) => pouchUse(i) === 'throw'));
+  take(owned.find((i) => pouchUse(i, content) === 'restore'));
+  take(owned.find((i) => pouchUse(i, content) === 'throw'));
   return slots;
 }
 
@@ -296,16 +286,17 @@ export function planPouch(input: PouchPlanInput, content: ContentDb): { id: stri
 export function planTarget(
   entry: Enemy | Boss,
   known: readonly string[],
-  first: NatureId | undefined,
-): { traits: TraitId[]; nature: NatureId | null } {
+  first: string | undefined,
+  content: ContentDb,
+): { traits: string[]; nature: string | null } {
   const traits = entry.traits.filter((t) => known.includes(t));
-  // A boss whose mechanic is known and that casts heavily is met like a caster.
-  if ('special' in entry && entry.special.kind === 'heavyCast' && known.includes('special')) {
-    if (!traits.includes('caster')) traits.push('caster');
+  // A boss whose mechanic is known is met like the bodies that carry the traits it adds (a heavy cast: a caster).
+  if ('special' in entry && known.includes('special')) {
+    for (const trait of entry.special.adds ?? []) if (!traits.includes(trait)) traits.push(trait);
   }
-  let nature: NatureId | null;
+  let nature: string | null;
   if (entry.nature === 'wheel') {
-    nature = first ? (NATURE_IDS.find((n) => NATURE_WHEEL[n] === first) ?? null) : null;
+    nature = first ? beatenBy(content, first) : null;
   } else nature = entry.nature;
   return { traits, nature };
 }
@@ -315,11 +306,11 @@ export function targetOf(
   state: GameState,
   entryId: string,
   content: ContentDb,
-): { traits: TraitId[]; nature: NatureId | null } | null {
+): { traits: string[]; nature: string | null } | null {
   const entry = entryOf(content, entryId);
   if (!entry) return null;
   const known = knowledgeOf(state, content, [entryId])[entryId] ?? [];
-  return planTarget(entry, known, state.player.natures[0]);
+  return planTarget(entry, known, state.player.natures[0], content);
 }
 
 /**
@@ -330,16 +321,16 @@ export function targetOf(
 export function prepareFor(
   snap: PlayerSnapshot,
   limits: LoadoutLimits | null,
-  target: { traits: readonly TraitId[]; nature: NatureId | null },
+  target: { traits: readonly string[]; nature: string | null },
   bank: Readonly<Record<string, number>>,
   slots: number,
   signature: string | null,
   content: ContentDb,
 ): { techniques: string[]; pouch: { id: string; n: number }[] } {
   // Traits a tool of the bank can answer, for the loadout to spare a slot for an attack.
-  const owned = content.items.filter((i) => (bank[i.id] ?? 0) > 0 && pouchUse(i) !== null);
-  const covered = new Set<TraitId>(
-    target.traits.filter((t) => owned.some((i) => itemAnswers(i, t) && pouchUse(i) !== 'sleep')),
+  const owned = content.items.filter((i) => (bank[i.id] ?? 0) > 0 && pouchUse(i, content) !== null);
+  const covered = new Set<string>(
+    target.traits.filter((t) => owned.some((i) => itemAnswers(i, t, content))),
   );
   const techniques = planLoadout(
     snap,
@@ -353,7 +344,8 @@ export function prepareFor(
 
 // ---------- commands ----------
 
-const tierOf = (state: GameState): number => RANK_ORDER.indexOf(state.player.rank);
+const tierOf = (state: GameState, content: ContentDb): number =>
+  rankIndex(content, state.player.rank);
 
 /** Why a list of techniques cannot be a loadout of this player, or null when it can. */
 function invalidLoadout(
@@ -361,16 +353,16 @@ function invalidLoadout(
   ids: readonly string[],
   content: ContentDb,
 ): string | null {
-  const limits = loadoutLimits(tierOf(state), content);
+  const limits = loadoutLimits(tierOf(state, content), content);
   if (!limits) return 'error.noLoadoutYet';
   const index = indexOf(content);
   if (new Set(ids).size !== ids.length) return 'error.duplicateTechnique';
-  const natures = new Set<NatureId>();
+  const natures = new Set<string>();
   for (const id of ids) {
     const tech = index.techniques.get(id);
     if (!tech || !state.known[id] || tech.rank === null) return 'error.unknownTechnique';
     if (tech.combat?.outOfLoadout) return 'error.alwaysAvailable';
-    const nature = natureOf(tech);
+    const nature = natureOf(tech, content);
     if (nature) natures.add(nature);
   }
   if (ids.length > limits.slots) return 'error.tooManyTechniques';
@@ -381,11 +373,11 @@ function invalidLoadout(
 /** What the automatic loadout is built from: the rank and how many techniques are known. */
 function basisOf(state: GameState, content: ContentDb): string {
   const known = content.techniques.filter((t) => state.known[t.id] && t.rank !== null).length;
-  return `${tierOf(state)}:${known}`;
+  return `${tierOf(state, content)}:${known}`;
 }
 
 function buildAuto(state: GameState, content: ContentDb): string[] {
-  const limits = loadoutLimits(tierOf(state), content);
+  const limits = loadoutLimits(tierOf(state, content), content);
   return limits
     ? autoLoadout(planningSnapshot(state, content), limits, state.loadouts.signature, content)
     : [];
@@ -488,7 +480,7 @@ export function saveLoadout(state: GameState, name: string, content: ContentDb):
   ) {
     return { ok: false, reason: 'error.invalidName' };
   }
-  if (tierOf(state) < 1) return { ok: false, reason: 'error.noLoadoutYet' };
+  if (tierOf(state, content) < 1) return { ok: false, reason: 'error.noLoadoutYet' };
   if (!(clean in l.saved) && Object.keys(l.saved).length >= content.balance.K.loadout.saved) {
     return { ok: false, reason: 'error.tooManyLoadouts' };
   }
@@ -537,7 +529,7 @@ export function prepareLoadout(
   content: ContentDb,
 ): CommandResult {
   if (state.combat) return { ok: false, reason: 'error.fighting' };
-  const limits = loadoutLimits(tierOf(state), content);
+  const limits = loadoutLimits(tierOf(state, content), content);
   if (!limits) return { ok: false, reason: 'error.noLoadoutYet' };
   const entry = fightTarget(content, encounter)?.enemy ?? entryOf(content, encounter);
   const target = entry ? targetOf(state, entry.id, content) : null;
@@ -571,7 +563,7 @@ export function prepareLoadout(
   // With the medic pouch the first healing slot is emptied on its own.
   const heal = plan.pouch.findIndex((p) => {
     const def = indexOf(content).items.get(p.id);
-    return def !== undefined && pouchUse(def) === 'heal';
+    return def !== undefined && pouchUse(def, content) === 'heal';
   });
   state.pouch.medic = heal >= 0 && medicTier(state, content) >= 1 ? heal : null;
   return { ok: true };

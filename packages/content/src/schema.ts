@@ -99,6 +99,10 @@ export const skillSchema = z.strictObject({
   activity: z.string(),
   /** What opens the skill for training; `null` when it is open from the first day. */
   unlockReq: z.lazy(() => reqSchema).nullable(),
+  /** How the skill acts in a fight: `basic` marks the style of basic attacks (and the style that earns XP for them); `physical` marks the skills whose techniques spend stamina and use the physical damage stat. */
+  fight: z
+    .strictObject({ basic: z.boolean().optional(), physical: z.boolean().optional() })
+    .optional(),
 });
 
 export const sealSchema = z.object({
@@ -309,7 +313,15 @@ export const itemFxSchema = z.discriminatedUnion('kind', [
     durationMs: z.number().int().min(1),
   }),
   /** Puts a weaker enemy to sleep; the chance is `K.itemFx.sleep.chance`. */
-  z.strictObject({ kind: z.literal('sleep'), fx: idOf('fxSleep') }),
+  z.strictObject({
+    kind: z.literal('sleep'),
+    fx: idOf('fxSleep'),
+    /** The status it puts on the body, and the rank whose duration (the status's `byRank` row) it lasts. */
+    status: statusId.optional(),
+    rank: rankId.optional(),
+    /** What the powder does to a stun already there: the rule belongs to the source of the application. */
+    refresh: z.enum(['replace', 'longest', 'strongest']).optional(),
+  }),
   /** Raises the XP of a skill (or of the five natures) for a number of completed actions. */
   z.strictObject({
     kind: z.literal('tonic'),
@@ -573,6 +585,8 @@ const enemyLootShape = {
   drops: z.array(z.strictObject({ item: coreId, chance: z.number().gt(0).lt(1) })),
   /** Ryo range of one kill: combat level times the `K.ryoDrop` range. */
   ryo: z.tuple([z.number().int().min(1), z.number().int().min(1)]),
+  /** The currency the ryo range and the bounty are paid in; the `money` currency when absent. */
+  currency: z.string().min(1).optional(),
   /** First-kill bounty of a boss and the share paid for repeats; `null` without a bounty. */
   bounty: z
     .strictObject({ first: z.number().int().min(1), repeatShare: z.number().min(0).max(1) })
@@ -586,39 +600,34 @@ export const enemySchema = enemyBaseSchema.extend({
   scrollPart: z.strictObject({ ...partBase, chance: z.number().gt(0).lt(1) }).nullable(),
 });
 
-/** A boss special: the structure is data, the numbers come from `K.bossFx` by `fx`. */
-export const bossSpecialSchema = z.discriminatedUnion('kind', [
-  z.strictObject({ kind: z.literal('packRespawn'), fx: idOf('fxWolfPack') }),
-  z.strictObject({
-    kind: z.literal('rival'),
-    fx: idOf('fxRival'),
-    /** Casts a signature technique. */
-    signature: z.boolean(),
-    /** The rival's nature is the one that beats the player's first nature. */
-    nature: z.literal('beatsPlayerFirst'),
-  }),
-  z.strictObject({
-    kind: z.literal('evasionByMissingHp'),
-    fx: idOf('fxDrunkenEvasion'),
-  }),
-  z.strictObject({
-    kind: z.literal('heavyCast'),
-    fx: idOf('fxHeavyCast'),
-    stun: z.boolean(),
-  }),
-  z.strictObject({
-    kind: z.literal('twins'),
-    fx: idOf('fxTwins'),
-    poisonMist: z.boolean(),
-  }),
-  /** Hidden again at intervals; the bind lasts `K.bind.dur`. */
-  z.strictObject({
-    kind: z.literal('rehide'),
-    fx: idOf('fxMistRehide'),
-    bindPlayer: z.boolean(),
-  }),
-  z.strictObject({ kind: z.literal('illusion'), fx: idOf('fxIllusion') }),
-]);
+/**
+ * A boss special. The numbers come from `K.bossFx[fx]`; the behaviour is the fight hook `hook`,
+ * which a pack's `rules` registers. The rest says what the encounter is made of, in data: a rival
+ * takes the nature that beats the player's first (`nature`), a pack of weaker bodies stands by the
+ * leader (`companions`), several equal bodies make the boss (`bodies`: the keys `count`,
+ * `hpEach`, `dmgEach` of `K.bossFx[fx]`), the body leaves at a share of health (`fleeAt`: the key
+ * of that share), and a plan treats a body whose mechanic is known as carrying `adds`.
+ */
+export const bossSpecialSchema = z.strictObject({
+  /** The mechanic's id (`rival`, `heavyCast`, `<pack>:<name>`). */
+  kind: z.string().min(1),
+  /** The entry of `K.bossFx` that holds the numbers. */
+  fx: z.string().min(1),
+  /** The fight hook of the mechanic. */
+  hook: z.string().min(1),
+  nature: z.literal('beatsPlayerFirst').optional(),
+  adds: z.array(traitId).optional(),
+  companions: z.strictObject({ fx: z.string().min(1), hook: z.string().min(1) }).optional(),
+  bodies: z.boolean().optional(),
+  fleeAt: z.string().min(1).optional(),
+  /** The keys of `K.bossFx[fx]` the hook reads: the closure proves they exist, so the hook never falls back to a default. */
+  numbers: z.array(z.string().min(1)).optional(),
+  /** What the mechanic does, as the design table lists it; no rule reads these. */
+  signature: z.boolean().optional(),
+  stun: z.boolean().optional(),
+  poisonMist: z.boolean().optional(),
+  bindPlayer: z.boolean().optional(),
+});
 
 export const bossSchema = bossBaseSchema.extend({
   ...enemyLootShape,
@@ -817,6 +826,9 @@ export const operationStageSchema = z.discriminatedUnion('t', [
 const operationPaySchema = z.strictObject({
   ryo: z.number().int().min(0),
   rep: z.number().int().min(0),
+  /** The currencies `ryo` and `rep` are paid in; the `money` and `renown` currencies when absent. */
+  currency: z.string().min(1).optional(),
+  repCurrency: z.string().min(1).optional(),
   parts: z.array(z.strictObject({ technique: coreId, chance: idOf('partChance') })),
 });
 export const operationRewardsSchema = z.strictObject({
@@ -873,23 +885,169 @@ export const aiSchema = z.strictObject({
   tiers: z.array(aiTierSchema).min(1),
 });
 
-/** A status; its numbers live in the balance object under the status id. */
-/** A battle status. `nature` is the nature whose colour its icon takes in the interface (none: the plain text colour). */
-export const statusSchema = z.strictObject({ id: statusId, nature: natureId.optional() });
+/**
+ * A number of the balance object: a literal, the path from `K` (`wet.slow`), or `1 - K[path]`
+ * (`{ path, oneMinus }`). Data never repeats a balance number: it names where it lives.
+ */
+export const numRefSchema = z.union([
+  z.number(),
+  z.string().min(1),
+  z.strictObject({ path: z.string().min(1), oneMinus: z.literal(true) }),
+]);
+export type NumRef = z.infer<typeof numRefSchema>;
 
-/** An enemy trait: the tag that answers it and where its numbers live in the balance object. */
+/** Stats an effect can change in a fight. */
+export const FIGHT_STATS = [
+  'accuracy',
+  'evasion',
+  'speed',
+  'damageTaken',
+  'taiDamage',
+  'resist',
+] as const;
+
+/** A multiplier (or an addition) on one stat of the body that holds it. */
+export const statModSchema = z.strictObject({
+  stat: z.enum(FIGHT_STATS),
+  op: z.enum(['mul', 'add']),
+  value: numRefSchema,
+});
+
+/** One effect a status puts on its holder: a change of a stat, or damage every second. */
+export const statusEffectSchema = z.discriminatedUnion('kind', [
+  z.strictObject({
+    kind: z.literal('modifier'),
+    stat: z.enum(FIGHT_STATS),
+    op: z.enum(['mul', 'add']),
+    value: numRefSchema,
+  }),
+  /**
+   * Damage every second: `amount` per second of the damage of the hit that applied it (`hit`,
+   * spread over `over` seconds when given) or of the holder's maximum health (`maxHp`).
+   */
+  z.strictObject({
+    kind: z.literal('periodic'),
+    from: z.enum(['hit', 'maxHp']),
+    amount: numRefSchema,
+    over: numRefSchema.optional(),
+  }),
+]);
+
+/**
+ * A status. A technique whose `state` is the status's `state` puts it on the body it hits; a tag, a
+ * combo or a hook can apply it too. Its numbers live in the balance object and are named by the
+ * references here. `duration` is in seconds, or `byRank`: the row of `K` that gives the seconds by
+ * the rank of the technique. A second application refreshes it, or adds a stack up to `stacks`.
+ */
+const statusFields = {
+  effects: z.array(statusEffectSchema).min(1).optional(),
+  duration: z.union([numRefSchema, z.strictObject({ byRank: z.string().min(1) })]).optional(),
+  /** The id of a trait or effect that does nothing while this status lasts. */
+  suppresses: z.string().min(1).optional(),
+  /** The most stacks; 1 (the default) refreshes instead of stacking. */
+  stacks: z.number().int().min(1).optional(),
+  /** What a second application does to the first: replace it, keep the longer end, keep the stronger modifier. */
+  refresh: z.enum(['replace', 'longest', 'strongest']).optional(),
+  /** Applying it cancels the casts of its holder. */
+  interrupts: z.boolean().optional(),
+  /** What the battle report counts it as; `false`: not counted. `whenSuppressing`: only when the holder has the suppressed trait. */
+  tally: z
+    .union([
+      z.literal(false),
+      z.strictObject({ as: z.string().min(1), whenSuppressing: z.boolean().optional() }),
+    ])
+    .optional(),
+};
+
+export const statusSchema = z.strictObject({
+  id: statusId,
+  /** The technique state that puts this status on the body a technique hits. */
+  state: stateId.optional(),
+  /** The nature whose colour its icon takes in the interface (none: the plain text colour). */
+  nature: natureId.optional(),
+  ...statusFields,
+});
+
+/** What a tag does when a technique that carries it hits, or a tool that carries it is used. */
+export const tagOpSchema = z.discriminatedUnion('op', [
+  /** Applies a status; `value` replaces the status's own first modifier value. */
+  z.strictObject({ op: z.literal('status'), status: statusId, value: numRefSchema.optional() }),
+  /** Applies an effect the tag defines itself, under its own id (not a status of the vocabulary). */
+  z.strictObject({ op: z.literal('effect'), id: z.string().min(1), ...statusFields }),
+  /** Stops the interruptible casts of the body. */
+  z.strictObject({ op: z.literal('cancelCast') }),
+]);
+
+/** The uses a tool of the pouch can have in a fight besides the ones its effect names. */
+export const POUCH_USES = ['sweep', 'snare', 'venom'] as const;
+
+/** A tag of techniques and tools: what it makes them do in a fight, besides answering traits. */
+export const tagSchema = z.strictObject({
+  id: z.string().regex(/^[A-Za-z0-9_]+(:[a-z0-9_]+)?$/, 'expected an id'),
+  /** A technique with the tag hits every body. */
+  hitsAll: z.boolean().optional(),
+  /** When a technique with the tag hits a body. */
+  onHit: z.array(tagOpSchema).optional(),
+  /** When a tool with the tag is used from the pouch (a `snare` on every body, a `venom` on one). */
+  onUse: z.array(tagOpSchema).optional(),
+  /** Effects the tag takes off the caster when a technique (or a tool) that carries it is used. */
+  removes: z.array(z.string().min(1)).optional(),
+  /** What a pouch tool with the tag does: `sweep` hurts every body, `snare` and `venom` apply `onUse`. */
+  pouch: z.enum(POUCH_USES).optional(),
+  /** A tool with the tag guards against heavy casts. */
+  guard: z.boolean().optional(),
+});
+
+/** A role of techniques. */
+export const roleSchema = z.strictObject({
+  id: z.string().regex(/^[A-Za-z0-9_]+(:[a-z0-9_]+)?$/, 'expected an id'),
+  /** A technique of the role hits every body. */
+  hitsAll: z.boolean().optional(),
+});
+
+/**
+ * An enemy trait: the tag that answers it and where its numbers live in the balance object. Its
+ * behaviour is data when data can say it (`mods`: stat multipliers that stop while something
+ * suppresses the trait; `regen`: heals a share of health every second) and a fight hook otherwise.
+ */
 export const traitSchema = z.strictObject({
   id: traitId,
   answer: tagId,
   numbers: z.strictObject({
-    /** The balance object that holds them: `K.trait`, or `K.pack` for the pack trait. */
+    /** The balance object that holds them: `K.trait`, `K.pack` or `K.ext.<pack>`. */
     from: z.string().min(1),
     keys: z.array(z.string().min(1)).min(1),
   }),
+  mods: z.array(statModSchema).optional(),
+  /** Heals this share (a balance reference) of maximum health every second until suppressed. */
+  regen: numRefSchema.optional(),
+  hook: z.string().min(1).optional(),
+  /** Effects of the player this trait puts on him (the player AI answers them with the trait's answer). */
+  inflicts: z.array(z.string().min(1)).optional(),
+  /** The row of the balance object (`n`, `hp`, `dmg`) that makes a body of this trait a swarm: `n` bodies of `hp` and `dmg` each. */
+  swarm: z.string().min(1).optional(),
+  /** The trait winds up heavy casts: a guard also answers it. */
+  casts: z.boolean().optional(),
+  /** Where the player AI answers this trait among the others (lower first); without it the AI has a rule of its own. */
+  priority: z.number().int().optional(),
 });
 
-/** A combo: `nature` hitting a fighter in `onState`; its number is `K.combo[id]`. */
-export const comboSchema = z.strictObject({ id: comboId, nature: natureId, onState: stateId });
+/**
+ * A combo: a technique of `nature` (its skill) or with `tag` hitting a body that has the status of
+ * `onState`. Its number is `K.combo[id]`. `boost` strengthens that status, `lengthen` stretches the
+ * status the technique itself applies, `status` applies `status` with the number as its value, and
+ * `burst` ends the status in a blow of that many times the hit.
+ */
+export const comboSchema = z.strictObject({
+  id: comboId,
+  nature: natureId.optional(),
+  tag: tagId.optional(),
+  onState: stateId,
+  effect: z.strictObject({
+    kind: z.enum(['boost', 'lengthen', 'status', 'burst']),
+    status: statusId.optional(),
+  }),
+});
 
 // ---------- balance ----------
 
@@ -1068,6 +1226,10 @@ export const balanceParamsSchema = z.object({
     hitEven: z.number(),
     fightCapMs: z.number().int(),
     maxEnemies: z.number().int(),
+    timerFires: z.number().int(),
+    timerMinMs: z.number().int(),
+    hookEventsPerSec: z.number().int(),
+    hookStatMax: z.number(),
   }),
   bindEva: z.number(),
   loadout: z.object({
@@ -1241,8 +1403,8 @@ export const contentDbSchema = z.object({
   missionRanks: z.array(vocabSchema),
   villageStages: z.array(villageStageSchema),
   states: z.array(vocabSchema),
-  tags: z.array(vocabSchema),
-  roles: z.array(vocabSchema),
+  tags: z.array(tagSchema),
+  roles: z.array(roleSchema),
   attackStyles: z.array(vocabSchema),
   fightRegions: z.array(vocabSchema),
   itemKinds: z.array(vocabSchema),
@@ -1390,6 +1552,10 @@ export type Zone = z.infer<typeof zoneSchema>;
 export type Operation = z.infer<typeof operationSchema>;
 export type OperationStage = z.infer<typeof operationStageSchema>;
 export type Status = z.infer<typeof statusSchema>;
+export type StatusEffectData = z.infer<typeof statusEffectSchema>;
+export type TagEntity = z.infer<typeof tagSchema>;
+export type TagOpData = z.infer<typeof tagOpSchema>;
+export type RoleEntity = z.infer<typeof roleSchema>;
 export type TraitEntity = z.infer<typeof traitSchema>;
 export type Combo = z.infer<typeof comboSchema>;
 export type AiTier = z.infer<typeof aiTierSchema>;
