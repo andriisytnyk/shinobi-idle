@@ -29,9 +29,6 @@ export interface IconRef {
   id: string;
 }
 
-/** Statuses a fighter can carry. Burn, stun and wet are content states; bind and poison are core effects. */
-export const STATUS_IDS = ['burn', 'wet', 'stun', 'bind', 'poison'] as const;
-
 /** Currency ids as they appear in `state.currencies`. */
 export const CURRENCY_IDS = ['ryo', 'rep', 'intel'] as const;
 
@@ -168,6 +165,27 @@ export const ICON_MAP: Readonly<Record<IconKind, Readonly<Record<string, string>
     'core:scrollpart': 'scroll-unfurled',
     'core:notes': 'notebook',
     'core:graduate_scroll': 'tied-scroll',
+    // Technique scrolls and their parts
+    'core:scroll_lion_combo': 'tied-scroll',
+    'core:scroll_drunken_fist': 'tied-scroll',
+    'core:scrollpart_drunken_fist': 'scroll-unfurled',
+    'core:scroll_enclosing': 'tied-scroll',
+    'core:scroll_temporary_paralysis': 'tied-scroll',
+    'core:scroll_hidden_shadow_snake_hands': 'tied-scroll',
+    'core:scrollpart_hidden_shadow_snake_hands': 'scroll-unfurled',
+    'core:scroll_shadow_clone': 'tied-scroll',
+    'core:scroll_dragon_fire': 'tied-scroll',
+    'core:scroll_fire_dragon_flame_bullet': 'tied-scroll',
+    'core:scroll_vacuum_wave': 'tied-scroll',
+    'core:scroll_wave_of_inspiration': 'tied-scroll',
+    'core:scrollpart_wave_of_inspiration': 'scroll-unfurled',
+    'core:scroll_false_darkness': 'tied-scroll',
+    'core:scrollpart_false_darkness': 'scroll-unfurled',
+    'core:scroll_earth_dragon_bullet': 'tied-scroll',
+    'core:scroll_water_prison': 'tied-scroll',
+    'core:scrollpart_water_prison': 'scroll-unfurled',
+    'core:scroll_gunshot': 'tied-scroll',
+    'core:scroll_starch_syrup_capturing_field': 'tied-scroll',
     // Consumables (recipe outputs)
     'core:antidote': 'fizzing-flask',
     'core:tsiliushcha_maz': 'heart-bottle',

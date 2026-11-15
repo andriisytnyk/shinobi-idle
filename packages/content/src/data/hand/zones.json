@@ -1,0 +1,278 @@
+[
+  {
+    "id": "core:zone_dummy",
+    "enemy": "core:dummy",
+    "region": "academy",
+    "unlock": null
+  },
+  {
+    "id": "core:zone_bandit",
+    "enemy": "core:bandit",
+    "region": "forest",
+    "unlock": {
+      "t": "flag",
+      "id": "region.forest.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_arsonist",
+    "enemy": "core:arsonist",
+    "region": "forest",
+    "unlock": {
+      "t": "flag",
+      "id": "region.forest.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_wolf",
+    "enemy": "core:wolf",
+    "region": "forest",
+    "unlock": {
+      "t": "flag",
+      "id": "region.forest.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_wolfmask",
+    "enemy": "core:wolfmask",
+    "region": "forest",
+    "unlock": {
+      "t": "flag",
+      "id": "region.forest.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_centipede",
+    "enemy": "core:centipede",
+    "region": "forest",
+    "unlock": {
+      "t": "flag",
+      "id": "region.forest.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_tiger",
+    "enemy": "core:tiger",
+    "region": "forest",
+    "unlock": {
+      "t": "flag",
+      "id": "region.forest.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_merc_pack",
+    "enemy": "core:merc_pack",
+    "region": "plains",
+    "unlock": {
+      "t": "flag",
+      "id": "region.plains.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_heavy",
+    "enemy": "core:heavy",
+    "region": "plains",
+    "unlock": {
+      "t": "flag",
+      "id": "region.plains.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_marauder",
+    "enemy": "core:marauder",
+    "region": "plains",
+    "unlock": {
+      "t": "flag",
+      "id": "region.plains.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_poisoner",
+    "enemy": "core:poisoner",
+    "region": "plains",
+    "unlock": {
+      "t": "flag",
+      "id": "region.plains.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_kumo",
+    "enemy": "core:kumo",
+    "region": "plains",
+    "unlock": {
+      "t": "flag",
+      "id": "region.plains.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_suna",
+    "enemy": "core:suna",
+    "region": "plains",
+    "unlock": {
+      "t": "flag",
+      "id": "region.plains.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_hunter",
+    "enemy": "core:hunter",
+    "region": "valley",
+    "unlock": {
+      "t": "flag",
+      "id": "region.valley.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_hunter_caster",
+    "enemy": "core:hunter_caster",
+    "region": "valley",
+    "unlock": {
+      "t": "flag",
+      "id": "region.valley.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_kiri_hunter",
+    "enemy": "core:kiri_hunter",
+    "region": "valley",
+    "unlock": {
+      "t": "flag",
+      "id": "region.valley.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_guard_pack",
+    "enemy": "core:guard_pack",
+    "region": "valley",
+    "unlock": {
+      "t": "flag",
+      "id": "region.valley.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_veteran",
+    "enemy": "core:veteran",
+    "region": "valley",
+    "unlock": {
+      "t": "flag",
+      "id": "region.valley.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_oro_aide",
+    "enemy": "core:oro_aide",
+    "region": "valley",
+    "unlock": {
+      "t": "flag",
+      "id": "region.valley.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_serpent",
+    "enemy": "core:serpent",
+    "region": "exam",
+    "unlock": {
+      "t": "flag",
+      "id": "region.exam.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_leech",
+    "enemy": "core:leech",
+    "region": "exam",
+    "unlock": {
+      "t": "flag",
+      "id": "region.exam.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_fake_genin",
+    "enemy": "core:fake_genin",
+    "region": "exam",
+    "unlock": {
+      "t": "flag",
+      "id": "region.exam.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_foreign_genin",
+    "enemy": "core:foreign_genin",
+    "region": "exam",
+    "unlock": {
+      "t": "flag",
+      "id": "region.exam.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_boss_wolf",
+    "enemy": "core:boss_wolf",
+    "region": "boss",
+    "unlock": {
+      "t": "flag",
+      "id": "boss.wolf.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_boss_ren1",
+    "enemy": "core:boss_ren1",
+    "region": "boss",
+    "unlock": {
+      "t": "flag",
+      "id": "boss.ren1.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_boss_fighter",
+    "enemy": "core:boss_fighter",
+    "region": "boss",
+    "unlock": {
+      "t": "flag",
+      "id": "boss.fighter.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_boss_hunter",
+    "enemy": "core:boss_hunter",
+    "region": "boss",
+    "unlock": {
+      "t": "flag",
+      "id": "boss.hunter.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_boss_twins",
+    "enemy": "core:boss_twins",
+    "region": "boss",
+    "unlock": {
+      "t": "flag",
+      "id": "boss.twins.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_boss_mist",
+    "enemy": "core:boss_mist",
+    "region": "boss",
+    "unlock": {
+      "t": "flag",
+      "id": "boss.mist.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_boss_nameless",
+    "enemy": "core:boss_nameless",
+    "region": "boss",
+    "unlock": {
+      "t": "flag",
+      "id": "boss.nameless.unlocked"
+    }
+  },
+  {
+    "id": "core:zone_boss_ren2",
+    "enemy": "core:boss_ren2",
+    "region": "boss",
+    "unlock": {
+      "t": "flag",
+      "id": "boss.ren2.unlocked"
+    }
+  }
+]

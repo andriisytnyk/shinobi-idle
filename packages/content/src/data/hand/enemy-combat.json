@@ -1,0 +1,249 @@
+{
+  "core:dummy": {
+    "style": "melee",
+    "drops": []
+  },
+  "core:bandit": {
+    "style": "melee",
+    "drops": []
+  },
+  "core:arsonist": {
+    "style": "ranged",
+    "drops": []
+  },
+  "core:wolf": {
+    "style": "melee",
+    "drops": [
+      {
+        "item": "core:pelt",
+        "chance": "pelt"
+      },
+      {
+        "item": "core:gem",
+        "chance": "gem"
+      }
+    ]
+  },
+  "core:wolfmask": {
+    "style": "melee",
+    "drops": []
+  },
+  "core:centipede": {
+    "style": "melee",
+    "drops": []
+  },
+  "core:tiger": {
+    "style": "melee",
+    "drops": [
+      {
+        "item": "core:fang",
+        "chance": "fang"
+      }
+    ]
+  },
+  "core:thief": {
+    "style": "melee",
+    "drops": []
+  },
+  "core:merc_pack": {
+    "style": "melee",
+    "drops": [
+      {
+        "item": "core:band",
+        "chance": "band"
+      },
+      {
+        "item": "core:gem",
+        "chance": "gem"
+      }
+    ]
+  },
+  "core:heavy": {
+    "style": "melee",
+    "drops": []
+  },
+  "core:marauder": {
+    "style": "melee",
+    "drops": []
+  },
+  "core:poisoner": {
+    "style": "ranged",
+    "drops": []
+  },
+  "core:kumo": {
+    "style": "ranged",
+    "drops": []
+  },
+  "core:suna": {
+    "style": "ranged",
+    "drops": []
+  },
+  "core:hunter": {
+    "style": "melee",
+    "drops": [
+      {
+        "item": "core:coin",
+        "chance": "coin"
+      }
+    ]
+  },
+  "core:hunter_caster": {
+    "style": "ranged",
+    "drops": [
+      {
+        "item": "core:coin",
+        "chance": "coin"
+      }
+    ]
+  },
+  "core:kiri_hunter": {
+    "style": "ranged",
+    "drops": [
+      {
+        "item": "core:coin",
+        "chance": "coin"
+      }
+    ]
+  },
+  "core:guard_pack": {
+    "style": "melee",
+    "drops": [
+      {
+        "item": "core:coin",
+        "chance": "coin"
+      },
+      {
+        "item": "core:gem",
+        "chance": "gem"
+      }
+    ]
+  },
+  "core:veteran": {
+    "style": "melee",
+    "drops": [
+      {
+        "item": "core:band",
+        "chance": "band"
+      },
+      {
+        "item": "core:coin",
+        "chance": "coin"
+      }
+    ]
+  },
+  "core:oro_aide": {
+    "style": "ranged",
+    "drops": [
+      {
+        "item": "core:coin",
+        "chance": "coin"
+      }
+    ]
+  },
+  "core:serpent": {
+    "style": "melee",
+    "drops": [
+      {
+        "item": "core:fang",
+        "chance": "fang"
+      }
+    ]
+  },
+  "core:leech": {
+    "style": "melee",
+    "drops": [
+      {
+        "item": "core:fang",
+        "chance": "fang"
+      },
+      {
+        "item": "core:gem",
+        "chance": "gem"
+      }
+    ]
+  },
+  "core:fake_genin": {
+    "style": "melee",
+    "drops": []
+  },
+  "core:foreign_genin": {
+    "style": "ranged",
+    "drops": []
+  },
+  "core:boss_wolf": {
+    "style": "melee",
+    "drops": [
+      {
+        "item": "core:pelt",
+        "chance": "pelt"
+      },
+      {
+        "item": "core:gem",
+        "chance": "gem"
+      }
+    ]
+  },
+  "core:boss_ren1": {
+    "style": "melee",
+    "drops": [
+      {
+        "item": "core:gem",
+        "chance": "gem"
+      }
+    ]
+  },
+  "core:boss_fighter": {
+    "style": "melee",
+    "drops": [
+      {
+        "item": "core:gem",
+        "chance": "gem"
+      }
+    ]
+  },
+  "core:boss_hunter": {
+    "style": "ranged",
+    "drops": [
+      {
+        "item": "core:gem",
+        "chance": "gem"
+      }
+    ]
+  },
+  "core:boss_twins": {
+    "style": "ranged",
+    "drops": [
+      {
+        "item": "core:gem",
+        "chance": "gem"
+      }
+    ]
+  },
+  "core:boss_mist": {
+    "style": "ranged",
+    "drops": [
+      {
+        "item": "core:gem",
+        "chance": "gem"
+      }
+    ]
+  },
+  "core:boss_nameless": {
+    "style": "ranged",
+    "drops": [
+      {
+        "item": "core:gem",
+        "chance": "gem"
+      }
+    ]
+  },
+  "core:boss_ren2": {
+    "style": "melee",
+    "drops": [
+      {
+        "item": "core:gem",
+        "chance": "gem"
+      }
+    ]
+  }
+}
