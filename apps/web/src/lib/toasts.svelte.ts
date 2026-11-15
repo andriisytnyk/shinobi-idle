@@ -2,6 +2,7 @@ import { content } from '@shinobi/content';
 import type { GameEvent } from '@shinobi/core';
 import { actionRef, masteryRef } from './entities.ts';
 import { t, type Params } from './i18n.ts';
+import { missionToast } from './mission-toasts.ts';
 import type { EntityRef } from './route.ts';
 
 export interface Toast {
@@ -9,9 +10,15 @@ export interface Toast {
   /** Message key; the text ends where the entity link begins. */
   key: string;
   params: Params;
+  /** An entity the toast is about, as a link before the text (the sentence goes on after the name). */
+  subject?: EntityRef;
   ref?: EntityRef;
-  /** What a claimed cache or vault gave: ryo and items, the items as links. */
-  gains?: { ryo: number; items: { id: string; n: number }[] };
+  /** What a claimed cache or vault gave: ryo and items, the items as links; `missed` is what was due but not received. */
+  gains?: {
+    ryo: number;
+    items: { id: string; n: number }[];
+    missed?: { id: string; n: number }[];
+  };
   /**
    * A button on the toast; pressing it runs `run` and closes the toast, unless `run` returns (or
    * resolves to) `false`: then the toast stays so the player can try again.
@@ -25,6 +32,9 @@ export type ToastSpec = Omit<Toast, 'id'>;
 
 /** Maps a core event to the toast that announces it, or null for events that stay silent. */
 export function toastFor(event: GameEvent): ToastSpec | null {
+  // Missions have their own words for a stage, a finished run and a stop.
+  const mission = missionToast(event, content);
+  if (mission !== undefined) return mission;
   switch (event.type) {
     case 'levelUp':
       return {

@@ -155,6 +155,11 @@ export interface NavItemSpec {
   order: number;
   /** Position in the tab bar; defaults to `order`. */
   tabOrder?: number;
+  /**
+   * On a phone: the id of the tab-bar item this item belongs to. Its pages light that tab (not «Ще»
+   * when this item has no tab of its own), and the next-step marker points there.
+   */
+  tab?: string;
 }
 
 export interface EntityLinkSpec {

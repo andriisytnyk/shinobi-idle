@@ -3,6 +3,7 @@
   import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
+  import JournalTabs from '../components/JournalTabs.svelte';
   import QuestObjective from '../components/QuestObjective.svelte';
   import { entityDesc } from '../lib/entities.ts';
   import { hasKey, t } from '../lib/i18n.ts';
@@ -68,6 +69,7 @@
 {/snippet}
 
 <SimplePage title={t('quests.title')}>
+  <JournalTabs current="quests" />
   <Hint id="quests" />
 
   {#if started.length === 0}

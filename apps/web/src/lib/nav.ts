@@ -36,6 +36,10 @@ export function tabItems(
 export const morePages = (registry: UiRegistry): string[] =>
   registry.navItems.filter((n) => n.group === 'side').map((n) => n.id);
 
+/** The tab that lights on a phone for a nav item: the item's own `tab` when it names one, else the item itself. */
+export const tabOf = (registry: UiRegistry, id: string | null): string | null =>
+  id === null ? null : (registry.navItems.find((n) => n.id === id)?.tab ?? id);
+
 /** The nav item a location hash belongs to, or null when none does. */
 export function activeNav(hash: string, registry: UiRegistry): string | null {
   return registry.matchPage(hash)?.page.nav ?? null;
