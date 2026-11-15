@@ -20,7 +20,8 @@ import { wheelFactor } from './fight.ts';
 import { pouchUse } from './fight-items.ts';
 import { techniqueFigures, type PlayerSnapshot } from './numbers.ts';
 import { ensurePouch, medicTier, refillPouch } from './pouch.ts';
-import { knowledgeOf, planningSnapshot } from './snapshot.ts';
+import { knowledgeOf } from './bingo.ts';
+import { planningSnapshot } from './snapshot.ts';
 import { entryOf, fightTarget } from './zones.ts';
 
 /*
@@ -55,7 +56,7 @@ const isGuard = (tech: Technique): boolean => {
 };
 
 /** Whether a technique answers a trait: it carries the answering tag, or burns (which stops Regeneration). */
-function answersTrait(tech: Technique, trait: TraitId): boolean {
+export function answersTrait(tech: Technique, trait: TraitId): boolean {
   return tech.tags.includes(TRAIT_ANSWER[trait]) || (trait === 'regen' && tech.state === 'burn');
 }
 
@@ -221,7 +222,7 @@ export const autoLoadout = (
 // ---------- the pouch ----------
 
 /** Whether an item answers a trait when used from the pouch. */
-function itemAnswers(item: Item, trait: TraitId): boolean {
+export function itemAnswers(item: Item, trait: TraitId): boolean {
   const use = pouchUse(item);
   switch (trait) {
     case 'caster':

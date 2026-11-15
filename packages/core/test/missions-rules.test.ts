@@ -23,7 +23,7 @@ import {
   type GameState,
   type Rules,
 } from '../src/index.ts';
-import { genin, plainRules } from './helpers.ts';
+import { genin, openWorld, plainRules } from './helpers.ts';
 import {
   BOARD,
   DC,
@@ -473,6 +473,7 @@ describe('A7: failures', () => {
   describe('one fight-capable action at a time', () => {
     const two = (id: string) => {
       const state = ableFor(mission(id));
+      openWorld(state);
       state.slots.push({ action: null, progress: 0, share: 0, data: null });
       return state;
     };

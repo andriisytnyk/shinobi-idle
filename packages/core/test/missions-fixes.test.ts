@@ -14,6 +14,7 @@ import {
   xpAt,
   type Rules,
 } from '../src/index.ts';
+import { openWorld } from './helpers.ts';
 import { ableFor, mission, player, runUntilDone, startMission } from './missions-helpers.ts';
 
 const MIN = 60_000;
@@ -238,6 +239,7 @@ describe('modifiers of the rewards', () => {
 describe('fights in two slots', () => {
   const twoSlots = (id: string) => {
     const state = ableFor(mission(id));
+    openWorld(state);
     state.slots.push({ action: null, progress: 0, share: 0, data: null });
     return state;
   };

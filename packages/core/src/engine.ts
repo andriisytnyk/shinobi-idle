@@ -11,6 +11,8 @@ import {
 } from './combat/loadout.ts';
 import { setMedicSlot, setPouchSlot, usePouchSlot } from './combat/pouch.ts';
 import { buildObstacle } from './athletics.ts';
+import { studyEnemy } from './combat/bingo.ts';
+import { combineParts } from './scrolls.ts';
 import type { EntityRef } from './entity.ts';
 import { emit } from './events.ts';
 import { examFor, SENSEI_TEST_KIND } from './exam.ts';
@@ -21,7 +23,7 @@ import { buyMeditationLevel } from './meditation.ts';
 import { addNature, chooseNature, type NatureChoice } from './natures.ts';
 import { shopBuy, shopSell } from './shop.ts';
 import { updateQuests } from './quests.ts';
-import { evalReq, RANK_ORDER } from './requirements.ts';
+import { evalReq, RANK_ORDER, type ReqResult } from './requirements.ts';
 import { defaultRules, type Rules } from './rules.ts';
 import { isSkillUnlocked } from './selectors.ts';
 import type { GameState } from './state.ts';
@@ -36,6 +38,10 @@ export type Command =
   | { type: 'exam.genin.start'; slot?: number }
   /** Uses a bank item on a target (for the graduate scroll, an academy technique id). */
   | { type: 'item.use'; id: string; target?: string | undefined }
+  /** Turns the scroll parts of a technique (`item` names a part or the scroll) into its scroll. */
+  | { type: 'item.combine'; item: string }
+  /** Spends Intel to raise the Bingo knowledge level of an enemy or boss by one. */
+  | { type: 'bingo.study'; enemy: string }
   /** Coats a batch of `base` (senbon) with one `poison`. */
   | { type: 'item.coat'; poison: string; base: string }
   /** Buys `n` of a shop good or tool. */
@@ -90,7 +96,8 @@ export type Command =
 /** Longest player name. */
 export const PLAYER_NAME_MAX = 24;
 
-export type CommandResult = { ok: true } | { ok: false; reason: string };
+/** A refusal carries the requirement tree that was not met when the command was a learning one. */
+export type CommandResult = { ok: true } | { ok: false; reason: string; req?: ReqResult };
 
 /** Consecutive zero-length steps tolerated before the loop is declared stuck. */
 const STALL_LIMIT = 10_000;
@@ -228,6 +235,10 @@ function apply(
     }
     case 'item.use':
       return useItem(state, command.id, command.target, content, rules);
+    case 'item.combine':
+      return combineParts(state, command.item, content);
+    case 'bingo.study':
+      return studyEnemy(state, command.enemy, content);
     case 'item.coat':
       return coatItem(state, command.poison, command.base, content);
     case 'shop.buy':

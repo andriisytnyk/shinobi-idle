@@ -8,7 +8,7 @@ import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 import { ensurePouch, refillPouch } from './pouch.ts';
 import { fightBusyReason, newCombat, newOperation } from './system.ts';
-import { entryOf, fightTarget, zoneRequirement } from './zones.ts';
+import { entryOf, fightTarget, zoneBlocked, zoneRequirement } from './zones.ts';
 
 /** Combat XP of one tick against the enemy being fought. Combat XP is paid by time, so it follows the slot share like all combat time. */
 function payTick(state: GameState, fallback: string, content: ContentDb, rules: Rules): void {
@@ -31,9 +31,15 @@ export const fightKind: ActionKind = {
   requirements(_state, id, content): Req | null {
     // An enemy id is gated like the zone that holds the enemy.
     const zone = indexOf(content).zones.get(id) ?? indexOf(content).zoneByEnemy.get(id);
-    return zone ? zoneRequirement(zone, content) : null;
+    return zone ? zoneRequirement(zone) : null;
   },
-  blocked: (state, _id, content, _rules, slot) => fightBusyReason(state, slot, content),
+  blocked(state, id, content, _rules, slot) {
+    const busy = fightBusyReason(state, slot, content);
+    if (busy) return busy;
+    // A region zone is fought only once its cell has been explored.
+    const zone = indexOf(content).zones.get(id) ?? indexOf(content).zoneByEnemy.get(id);
+    return zone ? zoneBlocked(state, zone, content) : null;
+  },
   intervalMs: (_state, _id, content) => content.balance.K.combat.xpTickMs,
 
   complete(state, id, content, rules) {

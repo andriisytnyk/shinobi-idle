@@ -69,5 +69,10 @@
   },
   "core:gem": {
     "sell": "gem"
+  },
+  "core:notes": {
+    "use": {
+      "t": "notes"
+    }
   }
 }

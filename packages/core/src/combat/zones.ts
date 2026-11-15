@@ -1,7 +1,16 @@
 import type { Boss, ContentDb, Enemy, Operation, Zone } from '@shinobi/content';
+import { setFlag } from '../flags.ts';
 import { indexOf } from '../lookup.ts';
+import { cellLevel } from '../world.ts';
+
 import { evalReq, type Req } from '../requirements.ts';
 import type { GameState } from '../state.ts';
+
+/** Whether the zone's cell is explored to level 1; a zone tied to no cell is always explored. */
+export function zoneExplored(state: GameState, zoneId: string, content: ContentDb): boolean {
+  const cell = indexOf(content).zoneCell.get(zoneId);
+  return cell ? cellLevel(state, cell, content) >= 1 : true;
+}
 
 /** The enemy or boss entry with this id. */
 export function entryOf(content: ContentDb, id: string): Enemy | Boss | undefined {
@@ -10,17 +19,29 @@ export function entryOf(content: ContentDb, id: string): Enemy | Boss | undefine
 }
 
 /**
- * What must hold to fight in a zone. A region zone is open from the rank the balance extension
- * names (until exploration supplies the region flags); the Academy yard is always open, and a
- * boss zone opens with its flag.
+ * What must hold to fight in a zone: its flag (a region zone: the region is open; a boss zone:
+ * the boss was unlocked; the Academy yard has none). A region zone also needs its cell explored,
+ * which `zoneBlocked` checks.
  */
-export function zoneRequirement(zone: Zone, content: ContentDb): Req | null {
-  const open = content.balance.K.regionZones;
-  // The regions that open with their flag are named in the balance extension.
-  if (open.openFromRank !== 'off' && open.regions.includes(zone.region)) {
-    return { t: 'rank', rank: open.openFromRank };
-  }
+export function zoneRequirement(zone: Zone): Req | null {
   return zone.unlock;
+}
+
+/** Why a zone cannot be fought for a reason that is no flag: its cell is not explored yet. Null when nothing is in the way. */
+export function zoneBlocked(state: GameState, zone: Zone, content: ContentDb): string | null {
+  return zoneExplored(state, zone.id, content) ? null : 'error.zoneNotExplored';
+}
+
+/**
+ * Unlocks a boss for fighting: raises the flag its zone names. This is the one way quests and
+ * missions open a boss. Returns false for an id that is no boss or whose zone has no flag.
+ */
+export function unlockBoss(state: GameState, boss: string, content: ContentDb): boolean {
+  const index = indexOf(content);
+  const zone = index.bosses.has(boss) ? index.zoneByEnemy.get(boss) : index.zones.get(boss);
+  if (!zone || !index.bosses.has(zone.enemy) || zone.unlock?.t !== 'flag') return false;
+  setFlag(state, zone.unlock.id, zone.unlock.n ?? true);
+  return true;
 }
 
 /** What a `fight` action id names: a zone, or an enemy fought without one. Null when it names neither. */
