@@ -183,7 +183,7 @@ export function createGame(deps: GameDeps = {}) {
   }
 
   /** Writes the save; a refusal because a newer one is stored hands the game to the other tab. */
-  async function save(force = false): Promise<void> {
+  async function writeSave(force: boolean): Promise<void> {
     if (!kv || phase === 'blocked' || phase === 'error') return;
     try {
       const result = await saveGame(kv, clock, state, rev, force);
@@ -197,6 +197,16 @@ export function createGame(deps: GameDeps = {}) {
     } catch {
       saveStatus = 'error';
     }
+  }
+
+  /**
+   * Saves one after another. Two writes in flight would both carry the same revision, and the
+   * second would find the first one's newer revision in the store and take it for another tab.
+   */
+  let writing: Promise<void> = Promise.resolve();
+  function save(force = false): Promise<void> {
+    writing = writing.then(() => writeSave(force));
+    return writing;
   }
 
   function begin(): void {

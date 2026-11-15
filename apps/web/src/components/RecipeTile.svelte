@@ -124,7 +124,7 @@
     class="ct-action"
     class:stop={running}
     disabled={!info.available && !running}
-    aria-describedby={block ? `why-${info.id}` : undefined}
+    aria-describedby={block && !running ? `why-${info.id}` : undefined}
     onclick={toggle}
   >
     {t(running ? 'tile.stop' : 'tile.start')}

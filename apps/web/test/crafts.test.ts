@@ -268,9 +268,20 @@ describe('A5: the bank filter «потрібне для мети»', () => {
     target.querySelector<HTMLElement>('[data-tab="all"]')?.click();
     const search = target.querySelector<HTMLInputElement>('[data-search]');
     if (!search) throw new Error('no search');
-    search.value = 'м\u2019ята';
+    const ids = () =>
+      [...target.querySelectorAll('[data-item]')].map((e) => e.getAttribute('data-item'));
+    flushSync();
+    expect(ids().sort()).toEqual([MINT, TONIC].sort());
+    // A part of a name, in any case, keeps only the items that carry it.
+    search.value = name({ kind: 'item', id: TONIC }).slice(1, 6).toUpperCase();
     search.dispatchEvent(new Event('input', { bubbles: true }));
     flushSync();
+    expect(ids()).toEqual([TONIC]);
+    search.value = 'такого немає';
+    search.dispatchEvent(new Event('input', { bubbles: true }));
+    flushSync();
+    expect(ids()).toEqual([]);
+    expect(target.querySelector('[data-empty]')).not.toBeNull();
     expect(bankTab(content.items.find((i) => i.id === MINT)!)).toBe('ingredients');
   });
 });
@@ -294,9 +305,12 @@ describe('A6: a disabled control says why', () => {
     game.state.player.rank = 'student';
     app = mount(ShopPage, { target, props: {} });
     flushSync();
-    expect(target.querySelector(`[data-good="${OIL}"] [data-why]`)?.getAttribute('data-why')).toBe(
-      'rank',
+    // One notice for the whole shop, no reason or tree repeated on the rows.
+    expect(text(target.querySelector('[data-shop-locked]'))).toBe(
+      'Крамниці відкриються зі званням Геніна.',
     );
+    expect(target.querySelector('[data-good] [data-why]')).toBeNull();
+    expect(target.querySelector('[data-good] .why-box')).toBeNull();
     expect(target.querySelector('[data-gear] [data-why]')?.getAttribute('data-why')).toBe('rank');
     everyDisabledHasReason();
 
@@ -344,6 +358,75 @@ describe('A6: a disabled control says why', () => {
     flushSync();
     expect(target.querySelector('[data-why]')?.getAttribute('data-why')).toBe('ryo');
     everyDisabledHasReason();
+  });
+});
+
+describe('the quantity field', () => {
+  const type = (selector: string, value: string) => {
+    const input = target.querySelector<HTMLInputElement>(selector);
+    if (!input) throw new Error(`no ${selector}`);
+    input.value = value;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    flushSync();
+  };
+  const good = `[data-good="${OIL}"]`;
+
+  it('buys a typed amount, with +10 and «макс», and says why when it is not possible', () => {
+    game.state.currencies.ryo = 100;
+    app = mount(ShopPage, { target, props: {} });
+    flushSync();
+    // Oil costs 4: 100 ryo afford 25.
+    target.querySelector<HTMLElement>(`${good} [data-max]`)?.click();
+    flushSync();
+    expect(target.querySelector<HTMLInputElement>(`${good} [data-qty]`)?.value).toBe('25');
+    expect(target.querySelector<HTMLButtonElement>(`[data-buy="${OIL}"]`)?.disabled).toBe(false);
+
+    type(`${good} [data-qty]`, '26');
+    expect(target.querySelector<HTMLButtonElement>(`[data-buy="${OIL}"]`)?.disabled).toBe(true);
+    expect(target.querySelector(`${good} [data-why]`)?.getAttribute('data-why')).toBe('ryo');
+
+    type(`${good} [data-qty]`, 'abc');
+    expect(target.querySelector(`${good} [data-why]`)?.getAttribute('data-why')).toBe('qty');
+    expect(target.querySelector<HTMLButtonElement>(`[data-buy="${OIL}"]`)?.disabled).toBe(true);
+
+    type(`${good} [data-qty]`, '7');
+    target.querySelector<HTMLElement>(`${good} [data-ten]`)?.click();
+    flushSync();
+    expect(target.querySelector<HTMLInputElement>(`${good} [data-qty]`)?.value).toBe('17');
+    // Enter in the field buys.
+    target
+      .querySelector(`${good} [data-qty]`)
+      ?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    flushSync();
+    expect(game.state.bank[OIL]).toBe(17);
+    expect(game.state.currencies.ryo).toBe(100 - 17 * 4);
+  });
+
+  it('arrow keys step the amount', () => {
+    app = mount(ShopPage, { target, props: {} });
+    flushSync();
+    const field = target.querySelector(`${good} [data-qty]`);
+    field?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+    field?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+    flushSync();
+    expect(target.querySelector<HTMLInputElement>(`${good} [data-qty]`)?.value).toBe('3');
+  });
+
+  it('sells everything with «макс» and refuses more than the bank holds', () => {
+    game.state.bank[OINTMENT] = 60;
+    app = mount(ShopPage, { target, props: {} });
+    flushSync();
+    const row = `[data-sell="${OINTMENT}"]`;
+    type(`${row} [data-qty]`, '61');
+    expect(target.querySelector(`${row} [data-why]`)?.getAttribute('data-why')).toBe('qty');
+    expect(target.querySelector<HTMLButtonElement>(`${row} [data-sell-button]`)?.disabled).toBe(
+      true,
+    );
+    target.querySelector<HTMLElement>(`${row} [data-max]`)?.click();
+    flushSync();
+    target.querySelector<HTMLButtonElement>(`${row} [data-sell-button]`)?.click();
+    flushSync();
+    expect(game.state.bank[OINTMENT]).toBeUndefined();
   });
 });
 

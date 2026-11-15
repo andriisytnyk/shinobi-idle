@@ -2,38 +2,87 @@
   import { t } from '../lib/i18n.ts';
 
   interface Props {
+    /** The amount; 0 while the typed text is not a whole number of at least 1. */
     value: number;
-    min?: number;
+    /** What the «макс» button sets: the most that can be bought or sold (at least 1 is used). */
     max?: number;
-    /** Accessible name of the whole control. */
+    /** Accessible name: says what the amount is of. */
     label: string;
+    /** Pressing Enter in the field. */
+    onSubmit?: () => void;
   }
 
-  let { value = $bindable(1), min = 1, max = 999, label }: Props = $props();
+  let { value = $bindable(1), max = 1, label, onSubmit }: Props = $props();
+
+  let text = $state(String(value));
+
+  const parse = (s: string): number => (/^\d{1,7}$/.test(s.trim()) ? Number(s) : 0);
+
+  // The parent may change the amount (a smaller bank); the field follows when it differs.
+  $effect(() => {
+    if (value >= 1 && value !== parse(text)) text = String(value);
+  });
 
   const set = (n: number) => {
-    value = Math.min(max, Math.max(min, n));
+    const next = Math.max(1, Math.min(9_999_999, n));
+    text = String(next);
+    value = next;
   };
+  const current = () => (value >= 1 ? value : 0);
 </script>
 
 <div class="stepper" role="group" aria-label={label}>
-  <button type="button" data-dec aria-label={t('stepper.dec')} onclick={() => set(value - 1)}>
+  <button
+    type="button"
+    data-dec
+    aria-label={t('stepper.dec', { what: label })}
+    onclick={() => set(current() - 1)}
+  >
     &minus;
   </button>
-  <output aria-live="polite" data-qty>{value}</output>
-  <button type="button" data-inc aria-label={t('stepper.inc')} onclick={() => set(value + 1)}>
+  <input
+    type="text"
+    inputmode="numeric"
+    autocomplete="off"
+    data-qty
+    aria-label={label}
+    aria-invalid={value < 1}
+    bind:value={text}
+    oninput={() => (value = parse(text))}
+    onkeydown={(e) => {
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        set(current() + 1);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        set(current() - 1);
+      } else if (e.key === 'Enter') {
+        onSubmit?.();
+      }
+    }}
+  />
+  <button
+    type="button"
+    data-inc
+    aria-label={t('stepper.inc', { what: label })}
+    onclick={() => set(current() + 1)}
+  >
     +
   </button>
+  <button type="button" class="wide" data-ten onclick={() => set(current() + 10)}>+10</button>
+  <button type="button" class="wide" data-max onclick={() => set(max)}>{t('stepper.max')}</button>
 </div>
 
 <style>
   .stepper {
     display: inline-flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--space-1);
   }
 
-  button {
+  button,
+  input {
     min-width: 2.75rem;
     min-height: 2.75rem;
     border: 1px solid var(--line);
@@ -41,13 +90,26 @@
     background: var(--surface-raised);
     color: var(--fg);
     font: inherit;
+  }
+
+  button {
     font-size: 1.1rem;
     cursor: pointer;
   }
 
-  output {
-    min-width: 2.25rem;
+  .wide {
+    padding: 0 var(--space-2);
+    font-size: 0.9rem;
+  }
+
+  input {
+    width: 4.5rem;
+    background: var(--surface);
     text-align: center;
     font-variant-numeric: tabular-nums;
+  }
+
+  input[aria-invalid='true'] {
+    border-color: var(--danger);
   }
 </style>

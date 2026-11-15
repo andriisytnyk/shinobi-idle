@@ -6,7 +6,7 @@
   import Hint from '../components/Hint.svelte';
   import ShopGood from '../components/ShopGood.svelte';
   import ShopSell from '../components/ShopSell.svelte';
-  import { shopSection, type ShopSection } from '../lib/crafts.ts';
+  import { blockOf, shopSection, type ShopSection } from '../lib/crafts.ts';
   import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
@@ -47,6 +47,11 @@
     ),
   );
 
+  /** Every good waits for a rank: the shop says so once instead of on each row. */
+  const shut = $derived(
+    goods.length > 0 && goods.every((g) => !g.req.met && blockOf(g.req)?.kind === 'rank'),
+  );
+
   const SECTIONS: readonly ShopSection[] = ['market', 'forge'];
 
   let sellBox = $state<HTMLElement | null>(null);
@@ -58,13 +63,22 @@
 <SimplePage title={t('shop.title')}>
   <Hint id="shop" />
   <p class="purse" data-purse>{t('shop.purse', { n: formatInt(ryo) })}</p>
+  {#if shut}
+    <p class="ct-why" id="shop-locked" data-shop-locked data-why="rank">{t('shop.shut')}</p>
+  {/if}
 
   {#each SECTIONS as id (id)}
     <section class="ct-section" data-section={id}>
       <h2>{t(`shop.section.${id}`)}</h2>
       <ul class="list">
         {#each goods.filter((g) => g.section === id) as good (good.item)}
-          <ShopGood item={good.item} price={good.price} owned={good.owned} req={good.req} />
+          <ShopGood
+            item={good.item}
+            price={good.price}
+            owned={good.owned}
+            req={good.req}
+            quiet={shut}
+          />
         {/each}
       </ul>
     </section>
