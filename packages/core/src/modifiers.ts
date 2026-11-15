@@ -48,3 +48,30 @@ export function computeMod(
   for (const g of groups.values()) total *= (1 + g.add) * g.mul;
   return { total, parts };
 }
+
+/** The total of `key` minus one: a share (0.05 for +5%) or, for a flat key, a count of units. */
+export function bonusOf(
+  providers: readonly ModifierProvider[],
+  state: GameState,
+  key: string,
+  content: ContentDb,
+): number {
+  return computeMod(providers, state, key, content).total - 1;
+}
+
+/**
+ * How much longer than its base an action cycle of `skill` takes: the interval modifiers divided
+ * by the speed modifiers. `extraSpeed` names one more speed key, for example `speed.practice`.
+ */
+export function cycleFactor(
+  providers: readonly ModifierProvider[],
+  state: GameState,
+  skill: string,
+  content: ContentDb,
+  extraSpeed?: string,
+): number {
+  const slower = computeMod(providers, state, `interval.skill.${skill}`, content).total;
+  let faster = computeMod(providers, state, `speed.skill.${skill}`, content).total;
+  if (extraSpeed) faster *= computeMod(providers, state, extraSpeed, content).total;
+  return slower / Math.max(faster, Number.EPSILON);
+}

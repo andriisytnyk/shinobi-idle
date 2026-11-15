@@ -1,4 +1,7 @@
 export * from './actions.ts';
+export * from './athletics.ts';
+export * from './checkpoints.ts';
+export * from './meditation.ts';
 export * from './bank.ts';
 export * from './combat/index.ts';
 export * from './counters.ts';

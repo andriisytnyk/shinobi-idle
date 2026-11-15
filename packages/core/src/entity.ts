@@ -9,7 +9,9 @@ export type EntityKind =
   | 'building'
   | 'quest'
   | 'gear'
-  | 'seal';
+  | 'seal'
+  | 'practice'
+  | 'obstacle';
 
 /** A pointer to a content entity; the UI turns it into a link. */
 export interface EntityRef {

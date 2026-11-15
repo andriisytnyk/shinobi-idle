@@ -1,0 +1,12 @@
+{
+  "core:bih_po_derevakh": {
+    "t": "skill",
+    "skill": "cc",
+    "level": 15
+  },
+  "core:bih_po_vodi": {
+    "t": "skill",
+    "skill": "cc",
+    "level": 30
+  }
+}

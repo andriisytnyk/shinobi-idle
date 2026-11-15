@@ -28,12 +28,13 @@ describe('A9: core source hygiene', () => {
   it('keeps numeric literals to unit conversions and structural constants', () => {
     // Anything else is a balance number and belongs in the content balance object.
     const allowed: Record<string, number[]> = {
+      'checkpoints.ts': [100], // percent to share
       'engine.ts': [24], // longest player name
       'events.ts': [200],
       'formulas.ts': [1000, 3600],
       'progression.ts': [100],
       'save.ts': [4, 6], // four words of an rng stream; nesting depth of slot data
-      'state.ts': [1000, 4, 5], // share scale, rng words, save version
+      'state.ts': [1000, 4, 6], // share scale, rng words, save version
       'xp.ts': [4, 7, 300], // the fixed Melvor level curve
     };
     const offenders: string[] = [];

@@ -1,4 +1,6 @@
 import {
+  COURSE_ID,
+  COURSE_KIND,
   evalReq,
   examFor,
   listSkillActions,
@@ -47,6 +49,15 @@ export const academyBot: Bot = {
       // Lowest current level first; the first listed wins a tie.
       const target = skills.reduce((a, b) => (b.current < a.current ? b : a));
       if (target.req.t !== 'skill') return null;
+      // Athletics runs the course: the first time, the free obstacle of slot 1 has to be built.
+      if (target.req.skill === 'ath' && Object.keys(state.course).length === 0) {
+        const free = content.obstacles.find((o) => o.slot === content.balance.K.athletics.freeSlot);
+        if (!free) return null;
+        return [
+          { type: 'athletics.build', slot: free.slot, obstacle: free.id },
+          ...(start(COURSE_KIND, COURSE_ID) ?? []),
+        ];
+      }
       let best: ActionInfo | null = null;
       for (const action of listSkillActions(state, target.req.skill, content, rules)) {
         if (action.available && (!best || action.xpPerHour > best.xpPerHour)) best = action;

@@ -1,17 +1,13 @@
-import {
-  actionSystem,
-  drillKind,
-  meditateKind,
-  obstacleKind,
-  practiceKind,
-  type ActionKind,
-} from './actions.ts';
+import { actionSystem, drillKind, practiceKind, type ActionKind } from './actions.ts';
+import { COURSE_KIND, courseKind, obstacleProvider } from './athletics.ts';
 import { tonicProvider } from './buffs.ts';
+import { checkpointProvider } from './checkpoints.ts';
 import { fightKind } from './combat/kind.ts';
 import { combatSystem } from './combat/system.ts';
 import { senseiTestKind } from './exam.ts';
 import { craftKind, gatherKind } from './field.ts';
 import { gearProvider } from './gear.ts';
+import { meditateKind, meditationProvider } from './meditation.ts';
 import type { ModifierProvider } from './modifiers.ts';
 import { questSystem } from './quests.ts';
 import type { System } from './system.ts';
@@ -33,11 +29,17 @@ export const defaultRules: Rules = {
     practice: practiceKind,
     drill: drillKind,
     meditate: meditateKind,
-    obstacle: obstacleKind,
+    [COURSE_KIND]: courseKind,
     fight: fightKind,
     gather: gatherKind,
     craft: craftKind,
     senseiTest: senseiTestKind,
   },
-  modifierProviders: [tonicProvider, gearProvider],
+  modifierProviders: [
+    tonicProvider,
+    gearProvider,
+    checkpointProvider,
+    meditationProvider,
+    obstacleProvider,
+  ],
 };

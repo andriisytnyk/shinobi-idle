@@ -179,7 +179,8 @@ describe('A2: determinism', () => {
     { type: 'action.start', slot: 0, kind: 'drill', id: 'core:lystok_na_lobi' },
     { type: 'action.start', slot: 0, kind: 'meditate', id: 'core:tykha_kimnata' },
     { type: 'action.stop', slot: 0 },
-    { type: 'action.start', slot: 0, kind: 'obstacle', id: 'core:strybky_po_dakhakh' },
+    { type: 'athletics.build', slot: 1, obstacle: 'core:strybky_po_dakhakh' },
+    { type: 'action.start', slot: 0, kind: 'course', id: 'ath' },
     { type: 'action.start', slot: 0, kind: 'practice', id: LEAF },
   ];
 

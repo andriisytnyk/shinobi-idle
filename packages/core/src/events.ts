@@ -90,6 +90,26 @@ export interface GoalSetEvent extends EventBase {
   id: string;
 }
 
+/** A finished meditation cycle gave an Insight or an Enlightenment. */
+export interface MeditationGainEvent extends EventBase {
+  type: 'meditationGain';
+  practice: string;
+  kind: 'insight' | 'enlight';
+}
+/** A level of a practice modifier was bought; `mod` is `insight.0`, `enlight.2` and so on. */
+export interface MeditationBoughtEvent extends EventBase {
+  type: 'meditationBought';
+  practice: string;
+  mod: string;
+  level: number;
+}
+/** An obstacle was built in a slot of the Athletics course. */
+export interface ObstacleBuiltEvent extends EventBase {
+  type: 'obstacleBuilt';
+  slot: number;
+  obstacle: string;
+}
+
 export type GameEvent =
   | LevelUpEvent
   | MasteryUpEvent
@@ -104,7 +124,10 @@ export type GameEvent =
   | RankUpEvent
   | ItemGainedEvent
   | ItemUsedEvent
-  | GoalSetEvent;
+  | GoalSetEvent
+  | MeditationGainEvent
+  | MeditationBoughtEvent
+  | ObstacleBuiltEvent;
 
 type WithoutAt<T> = T extends unknown ? Omit<T, 'at'> : never;
 

@@ -41,9 +41,9 @@ import {
   type Mission,
   type MissionPay,
   type MissionStage,
-  type Obstacle,
-  type PoolCheckpoint,
-  type Practice,
+  type ObstacleBase,
+  type PoolCheckpointBase,
+  type PracticeBase,
   type Recipe,
   type Region,
   type Seal,
@@ -222,7 +222,7 @@ const exercises: Exercise[] = slice.exercises.map((e) => {
 });
 
 const obstacleSlugs = { take: (k: string) => ids.take('obstacle', k) };
-const obstacles: Obstacle[] = slice.obstacles.map((o) => {
+const obstacles: ObstacleBase[] = slice.obstacles.map((o) => {
   const m = /^Слот (\d+): (.+)$/.exec(o.uk);
   if (!m) throw new Error(`Import: obstacle "${o.uk}" has no slot number`);
   const id = core(obstacleSlugs.take(m[2] ?? o.uk));
@@ -235,7 +235,7 @@ const skillByName = new Map(
   skills.map((s) => [need(locale[localeKey('skill', s.id, 'name')], s.id), s.id]),
 );
 const practiceSlugs = { take: (k: string) => ids.take('practice', k) };
-const practices: Practice[] = slice.practices.map((p) => {
+const practices: PracticeBase[] = slice.practices.map((p) => {
   const id = core(practiceSlugs.take(p.uk));
   const pair = p.pair.split(' + ').map((n) => need(skillByName.get(n), `practice skill "${n}"`));
   p.insight.forEach((s, i) => text('practice', id, `insight.${i}`, s));
@@ -244,17 +244,17 @@ const practices: Practice[] = slice.practices.map((p) => {
   return {
     id,
     level: p.level,
-    pair: pair as Practice['pair'],
+    pair: pair as PracticeBase['pair'],
     insight: p.insight.length,
     enlight: p.enlight.length,
   };
 });
 
-const pools: PoolCheckpoint[] = Object.entries(slice.pools).flatMap(([skill, list]) =>
+const pools: PoolCheckpointBase[] = Object.entries(slice.pools).flatMap(([skill, list]) =>
   list.map((p) => {
     const id = core(`pool_${skill}_${p.pct}`);
     text('pool', id, 'desc', p.text);
-    return { id, skill: skill as PoolCheckpoint['skill'], pct: p.pct };
+    return { id, skill: skill as PoolCheckpointBase['skill'], pct: p.pct };
   }),
 );
 

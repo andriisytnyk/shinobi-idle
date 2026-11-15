@@ -35,6 +35,13 @@ export interface QuestProgress {
   done: boolean;
 }
 
+/** What one practice has earned and the player has bought: unspent Insights and Enlightenments, and levels bought by modifier (`insight.0`, `enlight.2`). */
+export interface MeditationEntry {
+  insight: number;
+  enlight: number;
+  bought: Record<string, number>;
+}
+
 export interface GameState {
   /** Save format version. */
   v: number;
@@ -65,13 +72,17 @@ export interface GameState {
   bushes: Record<string, { stock: number; size: number; carry: number }>;
   /** Training gear owned: tiers bought, by gear line id. */
   gear: Record<string, number>;
+  /** Meditation: Insights and Enlightenments earned and the levels bought, by practice id. */
+  meditation: Record<string, MeditationEntry>;
+  /** The Athletics course: the obstacle built in each slot, by slot number. */
+  course: Record<string, string>;
   /** The pinned goal shown in the meta panel. */
   goal: EntityRef | null;
   /** One-off notices for the UI, newest last. The UI drains it; it is never saved. */
   events: GameEvent[];
 }
 
-export const STATE_VERSION = 5;
+export const STATE_VERSION = 6;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
@@ -101,6 +112,8 @@ export function createState(seed: number, content: ContentDb): GameState {
     buffs: {},
     gear: {},
     bushes: {},
+    meditation: {},
+    course: {},
     goal: null,
     events: [],
   };
