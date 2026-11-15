@@ -234,18 +234,18 @@ export const testmodUi: UiPack = {
       line.dataset.testmod = 'mastery-line';
       el.append(line);
       const id = (el.getAttribute('data-entity') ?? '').split(':').slice(1).join(':');
-      let shown = '';
+      let seen = -1;
       const draw = () => {
+        const xp = tileApi.read((s) => s.mastery[id]?.xp ?? 0);
+        // The line depends on nothing but the Mastery XP, which changes once per cycle.
+        if (xp === seen) return;
+        seen = xp;
         const { levelAt, xpAt } = tileApi.core;
         const cap = tileApi.content.balance.K.masteryCap;
-        const xp = tileApi.read((s) => s.mastery[id]?.xp ?? 0);
         const level = levelAt(xp, cap);
         const left = level >= cap ? 0 : xpAt(level + 1) - xp;
         const text = tileApi.t('x.testmod.masteryLine', { n: Math.round(left) });
-        if (text !== shown) {
-          shown = text;
-          line.textContent = text;
-        }
+        line.textContent = text;
       };
       const off = tileApi.subscribe(draw);
       draw();

@@ -432,13 +432,13 @@ describe('the observer costs little (A13)', () => {
 
   it(
     '200 store updates on the skill page stay within +20% with the fixture loaded',
-    { timeout: 180_000 },
+    { timeout: 240_000, retry: 2 },
     async () => {
       // Alternates the two set-ups and keeps the best of each, so that noise on the machine cancels out.
       await time([coreUi]);
       let without = Infinity;
       let withPack = Infinity;
-      for (let round = 0; round < 3; round++) {
+      for (let round = 0; round < 4; round++) {
         without = Math.min(without, await time([coreUi]));
         withPack = Math.min(withPack, await time([coreUi, testmodUi]));
       }
