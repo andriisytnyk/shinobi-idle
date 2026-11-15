@@ -3,13 +3,14 @@ import { setFlag } from '../flags.ts';
 import { indexOf } from '../lookup.ts';
 import { cellLevel } from '../world.ts';
 
+import { evalReq, type Req } from '../requirements.ts';
+import type { GameState } from '../state.ts';
+
 /** Whether the zone's cell is explored to level 1; a zone tied to no cell is always explored. */
 export function zoneExplored(state: GameState, zoneId: string, content: ContentDb): boolean {
   const cell = indexOf(content).zoneCell.get(zoneId);
   return cell ? cellLevel(state, cell, content) >= 1 : true;
 }
-import { evalReq, type Req } from '../requirements.ts';
-import type { GameState } from '../state.ts';
 
 /** The enemy or boss entry with this id. */
 export function entryOf(content: ContentDb, id: string): Enemy | Boss | undefined {

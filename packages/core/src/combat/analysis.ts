@@ -1,33 +1,35 @@
-import type {
-  Boss,
-  ContentDb,
-  Enemy,
-  Item,
-  Operation,
-  SkillId,
-  Technique,
-  TraitId,
+import {
+  scrollPartId,
+  type Boss,
+  type ContentDb,
+  type Enemy,
+  type Item,
+  type Operation,
+  type SkillId,
+  type Technique,
+  type TraitId,
 } from '@shinobi/content';
+import { rebalanceShares } from '../actions.ts';
 import { advance, dispatch } from '../engine.ts';
 import { MS_PER_HOUR, MS_PER_MINUTE, MS_PER_SECOND } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
 import { bossNature } from '../natures.ts';
 import { createStream, createStreams, nextInt, nextUint32 } from '../rng.ts';
 import type { Rules } from '../rules.ts';
-import { buyPrice } from '../shop.ts';
 import { deserialize, serialize } from '../save.ts';
 import { scrollOf } from '../scrolls.ts';
+import { buyPrice } from '../shop.ts';
 import type { GameState } from '../state.ts';
 import { bingoLevel, revealAt } from './bingo.ts';
-import { FIGHT_KIND, OPERATION_KIND } from './system.ts';
 import { createFight, fightAdvance, fightTimeMs } from './fight.ts';
 import { encounterFor } from './fight-encounter.ts';
 import { pouchUse } from './fight-items.ts';
 import { simulateFights } from './fight-sim.ts';
-import type { FightState } from './fight-types.ts';
+import type { Encounter, FightState } from './fight-types.ts';
 import { answersTrait, itemAnswers, planTarget } from './loadout.ts';
 import { secMs, type PlayerSnapshot } from './numbers.ts';
 import { snapshotPlayer } from './snapshot.ts';
+import { FIGHT_KIND, OPERATION_KIND, isCombatKind } from './system.ts';
 import { approachMs, entryOf, fightTarget, opSteps } from './zones.ts';
 
 /** What a battle analysis is asked about: a fight zone, a boss (its id or its zone's), or an operation. */
@@ -37,16 +39,21 @@ export interface AnalysisTarget {
 }
 
 export interface AnalysisOptions {
-  /** Fights per run of a zone or boss, or runs of an operation; the balance default when absent. */
+  /** Fights of the first-fight run (runs, for an operation); the balance default when absent. */
   samples?: number;
   /** Seed of the simulation; the balance default when absent. It never touches the game's streams. */
   seed?: number;
   /** A loadout to try in place of the player's (ids of techniques the player knows). */
   loadout?: readonly string[];
-  /** Minutes of a session and the number of sessions averaged; the balance defaults when absent. */
+  /** Minutes of one session, and the fewest and most sessions; the balance defaults when absent. */
   sessionMinutes?: number;
-  sessionRuns?: number;
+  minSessions?: number;
+  maxSessions?: number;
 }
+
+/** The marker of what the Bingo book does not show yet. It never depends on what is hidden. */
+export type Unknown = 'unknown';
+export const UNKNOWN: Unknown = 'unknown';
 
 /** One answer to a known trait: a technique of the loadout or an item of the pouch. */
 export interface TraitCoverage {
@@ -67,7 +74,7 @@ export type HintOption =
       /** `mentor`: taught at that skill level; `library`: a scroll of the Library; `carrier`: parts from the enemies that carry it; `scroll`: a scroll found elsewhere; `quest`: a quest line. */
       source: 'mentor' | 'library' | 'carrier' | 'scroll' | 'quest';
       ryo: number | null;
-      /** Enemies that carry it, for a carrier source. */
+      /** Enemies that carry it, for a carrier source, as far as the Bingo book shows them. */
       carriers: string[];
     }
   | {
@@ -85,65 +92,111 @@ export interface Hint {
   options: HintOption[];
 }
 
-export interface Analysis {
-  target: AnalysisTarget;
+/** A spread over the sessions: the tenth percentile, the median, the ninetieth, the mean and how many sessions it comes from. */
+export interface Band {
+  p10: number;
+  median: number;
+  p90: number;
+  mean: number;
+  n: number;
+}
+
+/**
+ * The first fight of a fresh character against the target: one fight (or one operation run) with
+ * the Wounds, pouch and loadout as they are now. These are not yields: the per-hour figures here
+ * assume nothing changes from one fight to the next, which Wounds and the pouch make untrue.
+ */
+export interface Fresh {
   samples: number;
-  /** Share of fights (or operation runs) won, 0 to 1. */
   winRate: number;
+  /** Standard error of `winRate`, so that the UI can round it honestly. */
+  winRateSe: number;
   /** Mean time of a won fight (or run), ms, and of any fight (or run). */
   meanWinMs: number;
   meanMs: number;
-  /** Wins (or clears) per hour of playing the target over and over. */
+  /** What playing fresh fights back to back would give per hour. */
   winsPerHour: number;
   woundsPerHour: number;
-  /** Pouch units used per hour, by item id. */
   itemsPerHour: Record<string, number>;
+}
+
+/** What the sessions say about the target as a whole. */
+export type Verdict = 'stable' | 'risky' | 'hopeless';
+
+/**
+ * The target played as sessions of the real game loop on detached copies of the state: the fight
+ * action started in the slot it would take, the other slots as they are, Wounds, the pouch, the
+ * regeneration and the pauses all as in play; the sessions are independent. Everything here is
+ * the distribution over the sessions. Figures that assume the player restarts at once after a
+ * defeat say so in `assumesRestart`; what happens when the player does not is in `untilDefeat`.
+ * Loot figures follow the Bingo knowledge level through \`revealAt\`.
+ */
+export interface Session {
+  minutes: number;
+  /** Sessions played. */
+  runs: number;
+  /** The share of full speed the fight slot had (thousandths), with the other slots as they are now. */
+  share: number;
+  assumesRestart: true;
+  /** Wins over wins, defeats and timeouts of a session (for an operation: clears over clears and defeats). */
+  winRate: Band;
+  winsPerHour: Band;
+  /** Share of sessions whose win rate fell under the collapse threshold, and its standard error. */
+  collapseShare: number;
+  collapseShareSe: number;
+  verdict: Verdict;
+  /** Without an immediate restart: the sessions that never saw a defeat, and the minutes to the first one (a session without one counts as its length). */
+  untilDefeat: { noDefeatShare: number; minutes: Band };
+  /** Per-hour yields, means over the sessions, without one-off rewards. */
+  ryoPerHour: number | Unknown;
+  bountyPerHour: number | Unknown;
+  loot: Record<string, number | Unknown> | Unknown;
+  /** Skill XP and mastery XP per hour, as they landed (the other slots included). */
+  xpPerHour: Partial<Record<SkillId, number>>;
+  masteryPerHour: Record<string, number>;
+  /** Wound stacks over the sessions: the mean and the most reached; and Wounds earned per hour. */
+  woundStacks: { mean: number; max: number };
+  woundsPerHour: number;
+  itemsPerHour: Record<string, number>;
+}
+
+/** Rewards that can be had once: the first-kill bounty and the first clear of an operation. */
+export interface Once {
+  bounty: number | Unknown;
+  clear: { ryo: number; rep: number; items: Record<string, number> } | null;
+}
+
+export interface Analysis {
+  target: AnalysisTarget;
+  fresh: Fresh;
   /** For each trait the player knows, what answers it; the others are only counted. */
   coverage: TraitCoverage[];
   hiddenTraits: number;
   hints: Hint[];
-  /** The same target played as a session on a detached copy of the game; null when it cannot be started from this state. */
+  /** The session forecast; null when the target cannot be started from this state. */
   session: Session | null;
+  once: Once;
 }
 
-/**
- * The figures of a session: the real game loop run on a copy of the state for the session length
- * of the balance object, restarting the target after every defeat, with Wounds, the pouch, the
- * regeneration between fights and the pauses all as in play. Averaged over several runs.
- * Loot figures follow the Bingo knowledge level: what the book would hide is `'unknown'` or counted
- * in `lootUnknown` without naming it.
- */
-export interface Session {
-  minutes: number;
-  runs: number;
-  /** Wins over wins, defeats and timeouts of the session (for an operation: clears over clears and defeats). */
-  winRate: number;
-  winsPerHour: number;
-  ryoPerHour: number | 'unknown';
-  /** Items gained per hour by item id; a row the book does not show yet is counted in `lootUnknown` instead. */
-  lootPerHour: Record<string, number | 'unknown'>;
-  lootUnknown: number;
-  /** Skill XP and mastery XP per hour, as they landed. */
-  xpPerHour: Partial<Record<SkillId, number>>;
-  masteryPerHour: Record<string, number>;
-  /** Wound stacks over the session: the mean and the most reached; and Wounds earned per hour. */
-  woundStacks: { mean: number; max: number };
-  woundsPerHour: number;
-  /** Pouch units used per hour, by item id. */
-  itemsPerHour: Record<string, number>;
-  /** How much the sessions differed from one another (standard deviation over the runs; 0 for one run): a marginal target tips one way or the other. */
-  spread: { winRate: number; winsPerHour: number };
+/** How far a job is: units done of units expected so far (the sessions may stop early), and whether it is finished. */
+export interface AnalysisProgress {
+  done: number;
+  total: number;
+  finished: boolean;
 }
 
 /** The difference of two analyses of one target: B minus A. */
 export interface LoadoutComparison {
   a: Analysis;
   b: Analysis;
-  winRate: number;
-  meanWinMs: number;
-  winsPerHour: number;
-  /** Differences of the session figures; null when either side cannot be played as a session. */
-  session: { winRate: number; winsPerHour: number; woundStacksMax: number } | null;
+  fresh: { winRate: number; meanWinMs: number };
+  /** Differences of the session medians and means; null when either side cannot be played as a session. */
+  session: {
+    winRate: number;
+    winsPerHour: number;
+    collapseShare: number;
+    woundStacksMax: number;
+  } | null;
 }
 
 type Entry = Enemy | Boss;
@@ -198,10 +251,10 @@ function snapshotFor(
   return snap;
 }
 
-const encounterOf = (state: GameState, entry: Entry, content: ContentDb) =>
+const encounterOf = (state: GameState, entry: Entry, content: ContentDb): Encounter =>
   encounterFor(entry, content, [], 'special' in entry ? bossNature(state, entry) : null);
 
-/** What many plays of the target add up to, per play (a fight, or an operation run from the first step). */
+/** What a batch of plays of the target adds up to, per play (a fight, or an operation run from the first step). */
 interface Figures {
   runs: number;
   wins: number;
@@ -210,19 +263,11 @@ interface Figures {
   winMs: number;
   wounds: number;
   items: Record<string, number>;
-  masteryWork: Record<string, number>;
-  /** Enemies defeated per play, by entry id. */
-  defeated: Record<string, number>;
-}
-
-function addTo(into: Record<string, number>, from: Readonly<Record<string, number>>, n: number) {
-  for (const [key, value] of Object.entries(from)) into[key] = (into[key] ?? 0) + value / n;
 }
 
 function runZone(
   snap: PlayerSnapshot,
-  entry: Entry,
-  state: GameState,
+  encounter: Encounter,
   samples: number,
   seed: number,
   content: ContentDb,
@@ -230,7 +275,7 @@ function runZone(
 ): Figures {
   const sum = simulateFights(
     snap,
-    encounterOf(state, entry, content),
+    encounter,
     samples,
     seed,
     content,
@@ -244,8 +289,6 @@ function runZone(
     winMs: sum.timeMs.mean,
     wounds: sum.wounds,
     items: sum.items,
-    masteryWork: sum.masteryWork,
-    defeated: { [entry.id]: sum.winRate },
   };
 }
 
@@ -253,7 +296,8 @@ function runZone(
 function runOperation(
   snap: PlayerSnapshot,
   op: Operation,
-  state: GameState,
+  encounters: Readonly<Record<string, Encounter>>,
+  approach: number,
   runs: number,
   seed: number,
   content: ContentDb,
@@ -262,16 +306,7 @@ function runOperation(
   const K = content.balance.K;
   const steps = opSteps(op);
   const rng = createStream(seed, 'analysis.pick');
-  const total: Figures = {
-    runs,
-    wins: 0,
-    allMs: 0,
-    winMs: 0,
-    wounds: 0,
-    items: {},
-    masteryWork: {},
-    defeated: {},
-  };
+  const total: Figures = { runs, wins: 0, allMs: 0, winMs: 0, wounds: 0, items: {} };
   const respawn = secMs(K.respawn);
   for (let r = 0; r < runs; r++) {
     let pools: { hp?: number; chakra?: number; stamina?: number } = {};
@@ -281,19 +316,19 @@ function runOperation(
     let won = true;
     for (const [i, step] of steps.entries()) {
       if (step.t === 'approach') {
-        ms += approachMs(state, op, content);
+        ms += approach;
         continue;
       }
       const id = step.t === 'fight' ? step.enemy : step.pool[nextIntFrom(rng, step.pool.length)];
-      const entry = id === undefined ? undefined : entryOf(content, id);
-      if (!entry) {
+      const encounter = id === undefined ? undefined : encounters[id];
+      if (!encounter) {
         won = false;
         break;
       }
       const seedOf = nextUint32(createStream(seed, `analysis.${r}.${i}`));
       const fight: FightState = createFight(
         { ...snap, ...pools, pouch, wounds },
-        encounterOf(state, entry, content),
+        encounter,
         seedOf,
         content,
         rules,
@@ -301,7 +336,6 @@ function runOperation(
       fight.log = null;
       fightAdvance(fight, fight.cap + 1, content, rules);
       ms += fightTimeMs(fight);
-      addTo(total.masteryWork, fight.tally.masteryWork, runs);
       snap.pouch?.forEach((slot, k) => {
         const spent = (pouch[k]?.n ?? slot.n) - (fight.pouch[k]?.n ?? slot.n);
         if (slot.id !== '' && spent > 0)
@@ -317,7 +351,6 @@ function runOperation(
         won = false;
         break;
       }
-      total.defeated[entry.id] = (total.defeated[entry.id] ?? 0) + 1 / runs;
       wounds = Math.min(
         K.wound.max,
         wounds + fight.tally.wounds + (fight.player.data.low === 1 ? 1 : 0),
@@ -386,10 +419,15 @@ const byCost = (a: HintOption, b: HintOption): number =>
   (a.kind === 'technique' ? a.level : 0) - (b.kind === 'technique' ? b.level : 0) ||
   (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
 
-function techniqueOption(tech: Technique, content: ContentDb): HintOption | null {
+/**
+ * A way to learn a technique. A technique that only enemies carry is offered only when the Bingo
+ * book already shows the player one that carries it; otherwise it is not offered at all, so a hint
+ * cannot name a carrier the book hides.
+ */
+function techniqueOption(tech: Technique, state: GameState, content: ContentDb): HintOption | null {
   const index = indexOf(content);
   const carriers = [...content.enemies, ...content.bosses]
-    .filter((e) => e.carries === tech.id)
+    .filter((e) => e.carries === tech.id && revealAt(bingoLevel(state, e.id, content)).carries)
     .map((e) => e.id);
   const base = { kind: 'technique' as const, id: tech.id, skill: tech.skill, level: tech.level };
   if (tech.src === 'N') return { ...base, source: 'mentor', ryo: 0, carriers: [] };
@@ -400,7 +438,8 @@ function techniqueOption(tech: Technique, content: ContentDb): HintOption | null
     return { ...base, source: 'library', ryo: buyPrice(def.id, content), carriers: [] };
   }
   if (carriers.length > 0) return { ...base, source: 'carrier', ryo: null, carriers };
-  if (def) return { ...base, source: 'scroll', ryo: null, carriers: [] };
+  if (def && def.scroll?.source.t !== 'parts')
+    return { ...base, source: 'scroll', ryo: null, carriers: [] };
   return null;
 }
 
@@ -437,7 +476,7 @@ function hintsFor(
     const options: HintOption[] = [];
     for (const tech of content.techniques) {
       if (tech.rank === null || state.known[tech.id] || !answersTrait(tech, c.trait)) continue;
-      const o = techniqueOption(tech, content);
+      const o = techniqueOption(tech, state, content);
       if (o) options.push(o);
     }
     for (const item of content.items) {
@@ -455,79 +494,19 @@ function hintsFor(
   return hints;
 }
 
-// ---------- the analysis ----------
+// ---------- the job ----------
 
-/**
- * A quick simulation of the target with the player as they are now: the loadout, the pouch, the
- * Wounds, the modifiers and what the Bingo book lets the tactics know. It runs on a snapshot with
- * a seed of its own and never reads or moves the game's random streams or any part of the state.
- * Returns null for a target that does not exist.
- */
-export function analyzeFight(
-  state: GameState,
-  target: AnalysisTarget,
-  opts: AnalysisOptions,
-  content: ContentDb,
-  rules: Rules,
-): Analysis | null {
-  const K = content.balance.K;
-  const found = resolve(target, content);
-  if (!found || found.entries.length === 0) return null;
-  const snap = snapshotFor(state, found.entries, opts, content, rules);
-  const seed = opts.seed ?? K.analysis.seed;
-  const fig = found.op
-    ? runOperation(
-        snap,
-        found.op,
-        state,
-        opts.samples ?? K.analysis.opSamples,
-        seed,
-        content,
-        rules,
-      )
-    : runZone(
-        snap,
-        found.entries[0] as Entry,
-        state,
-        opts.samples ?? K.analysis.samples,
-        seed,
-        content,
-        rules,
-      );
-  const samples = fig.runs;
-  // One cycle: a play of the target and the pause before the next (zones; an operation run holds its own).
-  const cycleMs = fig.allMs + (found.op ? 0 : secMs(K.respawn));
-  const perHour = cycleMs > 0 ? MS_PER_HOUR / cycleMs : 0;
-  const winRate = samples === 0 ? 0 : fig.wins / samples;
-
-  const itemsPerHour: Record<string, number> = {};
-  for (const [id, n] of Object.entries(fig.items)) itemsPerHour[id] = n * perHour;
-  const { coverage, hidden } = coverageOf(snap, found.entries, state, content);
-  return {
-    target,
-    samples,
-    winRate,
-    meanWinMs: fig.winMs,
-    meanMs: fig.allMs,
-    winsPerHour: winRate * perHour,
-    woundsPerHour: fig.wounds * perHour,
-    itemsPerHour,
-    coverage,
-    hiddenTraits: hidden,
-    hints: hintsFor(coverage, state, content),
-    session: sessionOf(state, target, found, opts, seed, content, rules),
-  };
-}
-
-// ---------- the session ----------
-
-interface SessionRun {
+/** What one played session leaves behind; plain JSON. */
+interface SessionRecord {
   wins: number;
   fights: number;
+  /** Game ms of the first defeat, or null for a session without one. */
+  firstDefeatMs: number | null;
   ryo: number;
+  bounty: number;
+  gained: Record<string, number>;
   xp: Partial<Record<SkillId, number>>;
   mastery: Record<string, number>;
-  gained: Record<string, number>;
   used: Record<string, number>;
   wounds: number;
   stackSum: number;
@@ -535,16 +514,76 @@ interface SessionRun {
   steps: number;
 }
 
-/** The id the fight action takes for a target: a boss named by its own id is fought through its zone. */
-function actionOf(target: AnalysisTarget, found: Resolved, content: ContentDb): string {
-  if (found.op) return found.op.id;
-  const index = indexOf(content);
-  return index.zones.has(target.id)
-    ? target.id
-    : (index.zoneByEnemy.get(target.id)?.id ?? target.id);
+/** The first-fight run, summed over its batches. */
+interface FreshTotals {
+  batches: number;
+  done: number;
+  n: number;
+  wins: number;
+  allMs: number;
+  winMs: number;
+  wounds: number;
+  items: Record<string, number>;
 }
 
-/** The enemy ids and the items a target can leave, from the content data, for the knowledge gate. */
+/**
+ * An analysis under way, as plain JSON: it holds the state as saved text and the numbers worked
+ * out at the start, so it can be run in slices, between which the game may change freely. The
+ * result does not depend on how the slices were cut.
+ */
+export interface AnalysisJob {
+  target: AnalysisTarget;
+  seed: number;
+  samples: number;
+  minutes: number;
+  minSessions: number;
+  maxSessions: number;
+  loadout: string[] | null;
+  stateText: string;
+  snap: PlayerSnapshot;
+  encounters: Record<string, Encounter>;
+  approach: number;
+  /** Bingo levels of the target's entries and their wins, as they were at the start. */
+  levels: Record<string, number>;
+  wins: Record<string, number>;
+  coverage: TraitCoverage[];
+  hidden: number;
+  hints: Hint[];
+  once: Once;
+  fresh: FreshTotals;
+  sessions: SessionRecord[];
+  /** The share the fight slot had at the first session; null before it. */
+  share: number | null;
+  /** True when the target could not be started in a session. */
+  blocked: boolean;
+  stopped: boolean;
+}
+
+/** The middle of the unit interval. */
+const MEDIAN = 1 / 2;
+
+/** Quantile of a sorted list by linear interpolation. */
+function quantile(sorted: readonly number[], p: number): number {
+  if (sorted.length === 0) return 0;
+  const at = (sorted.length - 1) * p;
+  const low = Math.floor(at);
+  const high = Math.ceil(at);
+  return (sorted[low] ?? 0) + ((sorted[high] ?? 0) - (sorted[low] ?? 0)) * (at - low);
+}
+
+function bandOf(values: readonly number[]): Band {
+  const sorted = [...values].sort((a, b) => a - b);
+  const n = sorted.length;
+  return {
+    p10: quantile(sorted, 0.1),
+    median: quantile(sorted, MEDIAN),
+    p90: quantile(sorted, 0.9),
+    mean: n === 0 ? 0 : sorted.reduce((a, b) => a + b, 0) / n,
+    n,
+  };
+}
+
+/** The item ids a target can leave, with the enemies that carry each and whether it is a scroll part. */
 function lootSources(found: Resolved): Map<string, { enemies: string[]; part: boolean }> {
   const sources = new Map<string, { enemies: string[]; part: boolean }>();
   for (const e of found.entries) {
@@ -563,54 +602,165 @@ function lootSources(found: Resolved): Map<string, { enemies: string[]; part: bo
   return sources;
 }
 
-/** Plays one session on a detached copy of the state with a stream set of its own. */
-function playSession(
+/** The rewards that can be had once, gated like the Bingo view. */
+function onceOf(
+  state: GameState,
+  found: Resolved,
+  levels: Readonly<Record<string, number>>,
+  content: ContentDb,
+): Once {
+  const shown = found.entries.every((e) => revealAt(levels[e.id] ?? 0).bounty);
+  let bounty = 0;
+  for (const e of found.entries) {
+    if (e.bounty && (state.bingo[e.id]?.wins ?? 0) === 0) bounty += e.bounty.first;
+  }
+  const rewards = found.op?.rewards;
+  const clear =
+    found.op && rewards && state.flags[found.op.clearFlag] === undefined
+      ? {
+          ryo: rewards.first.ryo,
+          rep: rewards.first.rep,
+          items: Object.fromEntries(
+            rewards.first.parts.map((p) => [
+              scrollPartId(p.technique),
+              content.balance.K.partDrop[p.chance],
+            ]),
+          ),
+        }
+      : null;
+  return { bounty: shown ? bounty : UNKNOWN, clear };
+}
+
+/**
+ * Starts an analysis of the target for the player as they are now: the loadout, the pouch, the
+ * Wounds, the modifiers, the other slots and what the Bingo book lets the tactics know. The state
+ * is read once; nothing in it or in the game's random streams is touched. A player in the middle
+ * of a fight is analysed as one who starts the target now: the fight itself is not carried, but
+ * the Wounds, the pouch and the slots are. Null for a target that does not exist.
+ */
+export function startAnalysis(
   state: GameState,
   target: AnalysisTarget,
-  found: Resolved,
-  minutes: number,
-  loadout: readonly string[] | undefined,
-  seed: number,
+  opts: AnalysisOptions,
   content: ContentDb,
   rules: Rules,
-): SessionRun | null {
-  const clone = deserialize(serialize(state, 0), content, rules);
-  clone.rng = createStreams(seed);
+): AnalysisJob | null {
+  const K = content.balance.K;
+  const found = resolve(target, content);
+  if (!found || found.entries.length === 0) return null;
+  const snap = snapshotFor(state, found.entries, opts, content, rules);
+  const samples = opts.samples ?? (found.op ? K.analysis.opSamples : K.analysis.samples);
+  const size = found.op ? K.analysis.batch.operation : K.analysis.batch.zone;
+  const minutes = opts.sessionMinutes ?? K.analysis.sessionMinutes;
+  const minSessions = opts.minSessions ?? K.analysis.minSessions;
+  const hours = K.analysis.sessionHours[target.kind];
+  const maxSessions = Math.max(
+    minSessions,
+    opts.maxSessions ??
+      Math.floor((hours * MS_PER_HOUR) / Math.max(MS_PER_MINUTE, minutes * MS_PER_MINUTE)),
+  );
+  const levels: Record<string, number> = {};
+  const wins: Record<string, number> = {};
+  const encounters: Record<string, Encounter> = {};
+  for (const e of found.entries) {
+    levels[e.id] = bingoLevel(state, e.id, content);
+    wins[e.id] = state.bingo[e.id]?.wins ?? 0;
+    encounters[e.id] = encounterOf(state, e, content);
+  }
+  const { coverage, hidden } = coverageOf(snap, found.entries, state, content);
+  return {
+    target,
+    seed: opts.seed ?? K.analysis.seed,
+    samples,
+    minutes,
+    minSessions,
+    maxSessions,
+    loadout: opts.loadout ? [...opts.loadout] : null,
+    stateText: serialize(state, 0),
+    snap,
+    encounters,
+    approach: found.op ? approachMs(state, found.op, content) : 0,
+    levels,
+    wins,
+    coverage,
+    hidden,
+    hints: hintsFor(coverage, state, content),
+    once: onceOf(state, found, levels, content),
+    fresh: {
+      batches: Math.ceil(samples / Math.max(1, size)),
+      done: 0,
+      n: 0,
+      wins: 0,
+      allMs: 0,
+      winMs: 0,
+      wounds: 0,
+      items: {},
+    },
+    sessions: [],
+    share: null,
+    blocked: false,
+    stopped: false,
+  };
+}
+
+/** Plays one session on a detached copy of the state, with a stream set of its own. */
+function playSession(
+  job: AnalysisJob,
+  found: Resolved,
+  index: number,
+  content: ContentDb,
+  rules: Rules,
+): SessionRecord | null {
+  const clone = deserialize(job.stateText, content, rules);
+  clone.rng = createStreams(nextUint32(createStream(job.seed, `session.${index}`)));
   clone.events = [];
   clone.report = {};
   clone.combat = null;
-  for (const slot of clone.slots) {
-    slot.action = null;
-    slot.progress = 0;
-    slot.data = null;
+  // The target takes the slot the fight is in, or the first free one; the other slots go on as they are.
+  const running = clone.slots.findIndex((s) => s.action !== null && isCombatKind(s.action.kind));
+  const free = clone.slots.findIndex((s) => s.action === null);
+  const at = running >= 0 ? running : free >= 0 ? free : 0;
+  for (const [i, slot] of clone.slots.entries()) {
+    if (i === at || (slot.action !== null && isCombatKind(slot.action.kind))) {
+      slot.action = null;
+      slot.progress = 0;
+      slot.data = null;
+    }
   }
-  if (loadout) {
+  rebalanceShares(clone);
+  if (job.loadout) {
     const known = new Set(Object.keys(clone.known));
-    clone.loadouts.active = loadout.filter((id, i, all) => known.has(id) && all.indexOf(id) === i);
+    clone.loadouts.active = job.loadout.filter(
+      (id, i, all) => known.has(id) && all.indexOf(id) === i,
+    );
     clone.loadouts.auto = false;
     if (clone.loadouts.signature && !clone.loadouts.active.includes(clone.loadouts.signature)) {
       clone.loadouts.signature = null;
     }
   }
+  const id = found.op
+    ? found.op.id
+    : indexOf(content).zones.has(job.target.id)
+      ? job.target.id
+      : (indexOf(content).zoneByEnemy.get(job.target.id)?.id ?? job.target.id);
   const kind = found.op ? OPERATION_KIND : FIGHT_KIND;
-  const id = actionOf(target, found, content);
   const start = (): boolean =>
-    dispatch(clone, { type: 'action.start', slot: 0, kind, id }, content, rules).ok;
+    dispatch(clone, { type: 'action.start', slot: at, kind, id }, content, rules).ok;
   if (!start()) return null;
+  job.share ??= clone.slots[at]?.share ?? 0;
 
-  const sources = lootSources(found);
   const skills = Object.keys(clone.skills) as SkillId[];
   const xp0 = Object.fromEntries(skills.map((k) => [k, clone.skills[k].xp]));
   const mastery0 = Object.fromEntries(Object.entries(clone.mastery).map(([k, v]) => [k, v.xp]));
-  const bank0 = { ...clone.bank };
-  const ryo0 = clone.currencies.ryo;
-  const run: SessionRun = {
+  const rec: SessionRecord = {
     wins: 0,
     fights: 0,
+    firstDefeatMs: null,
     ryo: 0,
+    bounty: 0,
+    gained: {},
     xp: {},
     mastery: {},
-    gained: {},
     used: {},
     wounds: 0,
     stackSum: 0,
@@ -618,132 +768,272 @@ function playSession(
     steps: 0,
   };
   const win = found.op ? 'operationCleared' : 'enemyDefeated';
-  for (let t = 0; t < minutes * MS_PER_MINUTE; t += MS_PER_SECOND) {
+  const firstKill = new Set<string>();
+  const gain = (items: readonly { id: string; n: number }[]): void => {
+    for (const it of items) rec.gained[it.id] = (rec.gained[it.id] ?? 0) + it.n;
+  };
+  for (let t = 0; t < job.minutes * MS_PER_MINUTE; t += MS_PER_SECOND) {
     advance(clone, MS_PER_SECOND, content, rules);
     for (const e of clone.events) {
       if (e.type === win) {
-        run.wins++;
-        run.fights++;
-      } else if (e.type === 'playerDefeated') run.fights++;
+        rec.wins++;
+        rec.fights++;
+      } else if (e.type === 'playerDefeated') {
+        rec.fights++;
+        rec.firstDefeatMs ??= t + MS_PER_SECOND;
+      } else if (e.type === 'loot') {
+        rec.ryo += e.ryo;
+        // The first-kill bounty is a one-off; the share paid for repeats is a yield.
+        if (e.bounty > 0 && (job.wins[e.enemy] ?? 0) === 0 && !firstKill.has(e.enemy)) {
+          firstKill.add(e.enemy);
+        } else rec.bounty += e.bounty;
+        gain(e.items);
+      } else if (e.type === 'operationPaid' && !e.first) {
+        rec.ryo += e.ryo;
+        gain(e.items);
+      }
     }
     clone.events = [];
-    run.steps++;
-    run.stackSum += clone.wounds.stacks;
-    run.stackMax = Math.max(run.stackMax, clone.wounds.stacks);
-    // A defeat (or a finished operation) ends the action; the player starts it again at once.
-    if (!clone.slots[0]?.action && !start()) break;
+    rec.steps++;
+    rec.stackSum += clone.wounds.stacks;
+    rec.stackMax = Math.max(rec.stackMax, clone.wounds.stacks);
+    // A defeat (or a finished operation) ends the action; this forecast restarts it at once.
+    if (!clone.slots[at]?.action && !start()) break;
   }
   const r = clone.report[id];
-  if (!found.op) run.fights += r?.timeouts ?? 0;
-  run.wounds = r?.wounds ?? 0;
-  run.used = { ...(r?.items ?? {}) };
-  run.ryo = clone.currencies.ryo - ryo0;
+  if (!found.op) rec.fights += r?.timeouts ?? 0;
+  rec.wounds = r?.wounds ?? 0;
+  rec.used = { ...(r?.items ?? {}) };
   for (const k of skills) {
     const d = clone.skills[k].xp - (xp0[k] ?? 0);
-    if (d > 0) run.xp[k] = d;
+    if (d > 0) rec.xp[k] = d;
   }
   for (const [k, v] of Object.entries(clone.mastery)) {
     const d = v.xp - (mastery0[k] ?? 0);
-    if (d > 0) run.mastery[k] = d;
+    if (d > 0) rec.mastery[k] = d;
   }
-  for (const item of sources.keys()) {
-    const d = (clone.bank[item] ?? 0) - (bank0[item] ?? 0);
-    if (d > 0) run.gained[item] = d;
-  }
-  const partRewards = found.op?.rewards?.repeat.parts ?? [];
-  for (const part of partRewards) {
-    const item = content.items.find((i) => i.part?.technique === part.technique)?.id;
-    if (item) {
-      const d = (clone.bank[item] ?? 0) - (bank0[item] ?? 0);
-      if (d > 0) run.gained[item] = (run.gained[item] ?? 0) + d;
-    }
-  }
-  return run;
+  return rec;
 }
 
-/** The session figures averaged over the runs the balance object names, gated by what the Bingo book shows. */
-function sessionOf(
-  state: GameState,
-  target: AnalysisTarget,
-  found: Resolved,
-  opts: AnalysisOptions,
-  seed: number,
-  content: ContentDb,
-  rules: Rules,
-): Session | null {
-  const K = content.balance.K;
-  const minutes = opts.sessionMinutes ?? K.analysis.sessionMinutes;
-  const runs = opts.sessionRuns ?? K.analysis.sessionRuns[target.kind];
-  const played: SessionRun[] = [];
-  for (let i = 0; i < runs; i++) {
-    const run = playSession(state, target, found, minutes, opts.loadout, seed + i, content, rules);
-    if (!run) return null;
-    played.push(run);
+const rateOf = (r: SessionRecord): number => (r.fights === 0 ? 0 : r.wins / r.fights);
+
+/** Whether the sessions so far are enough. */
+function enough(job: AnalysisJob, content: ContentDb): boolean {
+  const K = content.balance.K.analysis;
+  const n = job.sessions.length;
+  if (job.blocked || n >= job.maxSessions) return true;
+  if (n < job.minSessions) return false;
+  // A target that is surely won or surely lost needs the sessions to agree; a marginal one gets them all.
+  const fresh = job.fresh.n === 0 ? MEDIAN : job.fresh.wins / job.fresh.n;
+  if (fresh > K.stopFresh && fresh < 1 - K.stopFresh) return false;
+  const rates = job.sessions.map(rateOf);
+  return Math.max(...rates) - Math.min(...rates) <= K.agree;
+}
+
+/** Runs one unit of work: a batch of the first-fight run, or one session. Returns false when there is nothing left. */
+function unit(job: AnalysisJob, found: Resolved, content: ContentDb, rules: Rules): boolean {
+  const f = job.fresh;
+  if (f.done < f.batches) {
+    const K = content.balance.K.analysis;
+    const size = found.op ? K.batch.operation : K.batch.zone;
+    const n = Math.min(size, job.samples - f.done * size);
+    const seed = nextUint32(createStream(job.seed, `fresh.${f.done}`));
+    const fig = found.op
+      ? runOperation(job.snap, found.op, job.encounters, job.approach, n, seed, content, rules)
+      : runZone(
+          job.snap,
+          job.encounters[found.entries[0]?.id ?? ''] as Encounter,
+          n,
+          seed,
+          content,
+          rules,
+        );
+    f.done++;
+    f.n += fig.runs;
+    f.wins += fig.wins;
+    f.allMs += fig.allMs * fig.runs;
+    f.winMs += fig.winMs * fig.wins;
+    f.wounds += fig.wounds * fig.runs;
+    for (const [id, v] of Object.entries(fig.items))
+      f.items[id] = (f.items[id] ?? 0) + v * fig.runs;
+    return true;
   }
-  const hours = (minutes * runs * MS_PER_MINUTE) / MS_PER_HOUR;
-  const sum = (pick: (r: SessionRun) => number): number => played.reduce((n, r) => n + pick(r), 0);
-  const merge = (pick: (r: SessionRun) => Record<string, number>): Record<string, number> => {
+  if (job.stopped) return false;
+  if (enough(job, content)) {
+    job.stopped = true;
+    return false;
+  }
+  const rec = playSession(job, found, job.sessions.length, content, rules);
+  if (!rec) {
+    job.blocked = true;
+    job.stopped = true;
+    return false;
+  }
+  job.sessions.push(rec);
+  if (enough(job, content)) job.stopped = true;
+  return true;
+}
+
+/** The result so far, complete once the job is finished. Gated by the Bingo levels the job started with. */
+function assemble(job: AnalysisJob, found: Resolved, content: ContentDb): Analysis {
+  const K = content.balance.K;
+  const f = job.fresh;
+  const winRate = f.n === 0 ? 0 : f.wins / f.n;
+  const respawn = found.op ? 0 : secMs(K.respawn);
+  const meanMs = f.n === 0 ? 0 : f.allMs / f.n;
+  const perHour = meanMs + respawn > 0 ? MS_PER_HOUR / (meanMs + respawn) : 0;
+  const itemsPerHour: Record<string, number> = {};
+  for (const [id, v] of Object.entries(f.items))
+    itemsPerHour[id] = (v / Math.max(1, f.n)) * perHour;
+  const fresh: Fresh = {
+    samples: f.n,
+    winRate,
+    winRateSe: f.n === 0 ? 0 : Math.sqrt((winRate * (1 - winRate)) / f.n),
+    meanWinMs: f.wins === 0 ? 0 : f.winMs / f.wins,
+    meanMs,
+    winsPerHour: winRate * perHour,
+    woundsPerHour: (f.n === 0 ? 0 : f.wounds / f.n) * perHour,
+    itemsPerHour,
+  };
+  return {
+    target: job.target,
+    fresh,
+    coverage: job.coverage,
+    hiddenTraits: job.hidden,
+    hints: job.hints,
+    session: job.sessions.length === 0 || job.blocked ? null : sessionOf(job, found, content),
+    once: job.once,
+  };
+}
+
+function sessionOf(job: AnalysisJob, found: Resolved, content: ContentDb): Session {
+  const V = content.balance.K.analysis.verdict;
+  const runs = job.sessions.length;
+  const hours = (job.minutes * runs * MS_PER_MINUTE) / MS_PER_HOUR;
+  const sum = (pick: (r: SessionRecord) => number): number =>
+    job.sessions.reduce((n, r) => n + pick(r), 0);
+  const merge = (pick: (r: SessionRecord) => Record<string, number | undefined>) => {
     const out: Record<string, number> = {};
-    for (const r of played) {
-      for (const [k, v] of Object.entries(pick(r))) out[k] = (out[k] ?? 0) + v / hours;
+    for (const r of job.sessions) {
+      for (const [k, v] of Object.entries(pick(r))) out[k] = (out[k] ?? 0) + (v ?? 0) / hours;
     }
     return out;
   };
-  const fights = sum((r) => r.fights);
+  const rates = job.sessions.map(rateOf);
+  const winRate = bandOf(rates);
+  const perHourEach = MS_PER_HOUR / (job.minutes * MS_PER_MINUTE);
+  const collapsed = rates.filter((r) => r < V.collapseBelow).length / runs;
   const steps = sum((r) => r.steps);
-
-  // What the book lets the player see of the loot: the same rules as the Bingo view.
-  const levels = found.entries.map((e) => revealAt(bingoLevel(state, e.id, content)));
-  const ryoKnown = levels.every((l) => l.ryo);
-  const lootPerHour: Record<string, number | 'unknown'> = {};
-  let lootUnknown = 0;
-  const gained = merge((r) => r.gained);
-  const sources = lootSources(found);
-  for (const [item, perHour] of Object.entries(gained)) {
-    const source = sources.get(item);
-    if (!source) {
-      lootPerHour[item] = perHour;
-      continue;
+  const levels = found.entries.map((e) => revealAt(job.levels[e.id] ?? 0));
+  const loot = (() => {
+    // Loot is shown from the level the book admits it exists; below that one constant says so.
+    if (!levels.every((l) => l.carries && l.drops)) return UNKNOWN;
+    const gained = merge((r) => r.gained);
+    const rows: Record<string, number | Unknown> = {};
+    const exact = levels.every((l) => l.chances);
+    for (const item of lootSources(found).keys())
+      rows[item] = exact ? (gained[item] ?? 0) : UNKNOWN;
+    for (const part of found.op?.rewards?.repeat.parts ?? []) {
+      rows[scrollPartId(part.technique)] = gained[scrollPartId(part.technique)] ?? 0;
     }
-    const reveals = source.enemies.map((id) => revealAt(bingoLevel(state, id, content)));
-    const shown = reveals.every((l) => (source.part ? l.carries : l.drops));
-    if (!shown) lootUnknown++;
-    else lootPerHour[item] = reveals.every((l) => l.chances) ? perHour : 'unknown';
-  }
-  const spreadOf = (values: number[]): number => {
-    if (values.length < 2) return 0;
-    const mean = values.reduce((a, b) => a + b, 0) / values.length;
-    return Math.sqrt(values.reduce((a, b) => a + (b - mean) ** 2, 0) / (values.length - 1));
-  };
+    return rows;
+  })();
+  const ryoShown = levels.every((l) => l.ryo);
+  const bountyShown = levels.every((l) => l.bounty);
+  const verdict: Verdict =
+    winRate.median < V.hopelessBelow
+      ? 'hopeless'
+      : winRate.median >= V.stableMedian && collapsed <= V.stableCollapse
+        ? 'stable'
+        : 'risky';
   return {
-    minutes,
+    minutes: job.minutes,
     runs,
-    winRate: fights === 0 ? 0 : sum((r) => r.wins) / fights,
-    winsPerHour: sum((r) => r.wins) / hours,
-    ryoPerHour: ryoKnown ? sum((r) => r.ryo) / hours : 'unknown',
-    lootPerHour,
-    lootUnknown,
-    xpPerHour: merge((r) => r.xp as Record<string, number>) as Partial<Record<SkillId, number>>,
+    share: job.share ?? 0,
+    assumesRestart: true,
+    winRate,
+    winsPerHour: bandOf(job.sessions.map((r) => r.wins * perHourEach)),
+    collapseShare: collapsed,
+    collapseShareSe: Math.sqrt((collapsed * (1 - collapsed)) / runs),
+    verdict,
+    untilDefeat: {
+      noDefeatShare: job.sessions.filter((r) => r.firstDefeatMs === null).length / runs,
+      minutes: bandOf(
+        job.sessions.map((r) => (r.firstDefeatMs ?? job.minutes * MS_PER_MINUTE) / MS_PER_MINUTE),
+      ),
+    },
+    ryoPerHour: ryoShown ? sum((r) => r.ryo) / hours : UNKNOWN,
+    bountyPerHour: bountyShown ? sum((r) => r.bounty) / hours : UNKNOWN,
+    loot,
+    xpPerHour: merge((r) => r.xp) as Partial<Record<SkillId, number>>,
     masteryPerHour: merge((r) => r.mastery),
     woundStacks: {
       mean: steps === 0 ? 0 : sum((r) => r.stackSum) / steps,
-      max: Math.max(0, ...played.map((r) => r.stackMax)),
+      max: Math.max(0, ...job.sessions.map((r) => r.stackMax)),
     },
     woundsPerHour: sum((r) => r.wounds) / hours,
     itemsPerHour: merge((r) => r.used),
-    spread: {
-      winRate: spreadOf(played.map((r) => (r.fights === 0 ? 0 : r.wins / r.fights))),
-      winsPerHour: spreadOf(played.map((r) => (r.wins * MS_PER_HOUR) / (minutes * MS_PER_MINUTE))),
-    },
   };
+}
+
+/** The job's progress: units done of the units expected so far (the sessions may stop early). */
+export function analysisProgress(job: AnalysisJob, content: ContentDb): AnalysisProgress {
+  const finished = job.fresh.done >= job.fresh.batches && job.stopped;
+  const sessionsLeft = finished
+    ? 0
+    : Math.max(0, (enoughNow(job, content) ? 0 : job.maxSessions) - job.sessions.length);
+  const done = job.fresh.done + job.sessions.length;
+  return {
+    done,
+    total: done + (finished ? 0 : job.fresh.batches - job.fresh.done + sessionsLeft),
+    finished,
+  };
+}
+
+const enoughNow = (job: AnalysisJob, content: ContentDb): boolean =>
+  job.fresh.done >= job.fresh.batches && enough(job, content);
+
+/**
+ * Runs `n` units of the job (batches of the first-fight run, then sessions) and returns how far
+ * it got and the result so far. It reads no clock; a unit is the same whatever the slice.
+ */
+export function stepAnalysis(
+  job: AnalysisJob,
+  n: number,
+  content: ContentDb,
+  rules: Rules,
+): { progress: AnalysisProgress; result: Analysis } {
+  const found = resolve(job.target, content);
+  if (!found) throw new Error(`analysis target ${job.target.id} is gone`);
+  for (let i = 0; i < n && unit(job, found, content, rules); i++);
+  return { progress: analysisProgress(job, content), result: assemble(job, found, content) };
+}
+
+/**
+ * Analyses the target to the end in one go: `startAnalysis` and `stepAnalysis` until finished.
+ * Null for a target that does not exist.
+ */
+export function analyzeFight(
+  state: GameState,
+  target: AnalysisTarget,
+  opts: AnalysisOptions,
+  content: ContentDb,
+  rules: Rules,
+): Analysis | null {
+  const job = startAnalysis(state, target, opts, content, rules);
+  if (!job) return null;
+  for (;;) {
+    const { progress, result } = stepAnalysis(job, Number.MAX_SAFE_INTEGER, content, rules);
+    if (progress.finished) return result;
+  }
 }
 
 /** A loadout to compare: the techniques of its slots. */
 export type LoadoutChoice = readonly string[];
 
 /**
- * Plays the target with each of two loadouts (same seed, so the same dice) and returns the
- * differences, second minus first, of the main figures.
+ * Plays the target with each of two loadouts (same seeds, so the same dice) and returns the
+ * differences, second minus first, of the first-fight win rate and of the session figures.
  */
 export function compareLoadouts(
   state: GameState,
@@ -757,18 +1047,22 @@ export function compareLoadouts(
   const first = analyzeFight(state, target, { ...opts, loadout: a }, content, rules);
   const second = analyzeFight(state, target, { ...opts, loadout: b }, content, rules);
   if (!first || !second) return null;
+  const x = first.session;
+  const y = second.session;
   return {
     a: first,
     b: second,
-    winRate: second.winRate - first.winRate,
-    meanWinMs: second.meanWinMs - first.meanWinMs,
-    winsPerHour: second.winsPerHour - first.winsPerHour,
+    fresh: {
+      winRate: second.fresh.winRate - first.fresh.winRate,
+      meanWinMs: second.fresh.meanWinMs - first.fresh.meanWinMs,
+    },
     session:
-      first.session && second.session
+      x && y
         ? {
-            winRate: second.session.winRate - first.session.winRate,
-            winsPerHour: second.session.winsPerHour - first.session.winsPerHour,
-            woundStacksMax: second.session.woundStacks.max - first.session.woundStacks.max,
+            winRate: y.winRate.median - x.winRate.median,
+            winsPerHour: y.winsPerHour.mean - x.winsPerHour.mean,
+            collapseShare: y.collapseShare - x.collapseShare,
+            woundStacksMax: y.woundStacks.max - x.woundStacks.max,
           }
         : null,
   };

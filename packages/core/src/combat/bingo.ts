@@ -36,11 +36,11 @@ export interface Reveal {
   /** Traits that show on sight (level 1) and the hidden ones and the mechanic (level 2). */
   traits: boolean;
   hiddenTraits: boolean;
-  /** The technique it carries (so the part it drops) and the ryo it pays (level 2). */
+  /** The technique it carries (so the part it drops), the trophies it drops and the ryo it pays (level 2). */
   carries: boolean;
   ryo: boolean;
-  /** The trophies it drops, exact chances and the bounty (level 3). */
   drops: boolean;
+  /** Exact chances and the bounty (level 3). */
   chances: boolean;
   bounty: boolean;
 }
@@ -50,7 +50,7 @@ export const revealAt = (level: number): Reveal => ({
   hiddenTraits: level >= 2,
   carries: level >= 2,
   ryo: level >= 2,
-  drops: level >= 3,
+  drops: level >= 2,
   chances: level >= 3,
   bounty: level >= 3,
 });
@@ -202,8 +202,8 @@ export interface BingoView {
   /** Level 2 and up: every trait, the mechanic and the technique the entry carries. */
   hiddenTraits: string[] | null;
   carries: string | null;
-  /** Level 3: exact drop chances and the first-kill bounty; null before. */
-  drops: { item: string; chance: number }[] | null;
+  /** Level 2: what it drops; level 3 adds the exact chances and the first-kill bounty. Null before. */
+  drops: { item: string; chance: number | null }[] | null;
   bounty: { first: number; repeatShare: number; paid: number } | null;
 }
 
@@ -232,7 +232,9 @@ export function bingoView(state: GameState, id: string, content: ContentDb): Bin
     traits: reveal.traits ? entry.traits.filter((t) => visible.includes(t)) : [],
     hiddenTraits: reveal.hiddenTraits ? entry.traits.filter((t) => !visible.includes(t)) : null,
     carries: reveal.carries ? entry.carries : null,
-    drops: reveal.chances ? entry.drops.map((d) => ({ ...d })) : null,
+    drops: reveal.drops
+      ? entry.drops.map((d) => ({ item: d.item, chance: reveal.chances ? d.chance : null }))
+      : null,
     bounty: reveal.bounty && entry.bounty ? { ...entry.bounty, paid: b.bounty } : null,
   };
 }

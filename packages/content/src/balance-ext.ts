@@ -186,12 +186,17 @@ export const BALANCE_EXT = {
   /** Battle analysis: fights per zone or boss run, runs per operation, the seed, the time budget (ms) of a default run, and the options a hint lists. */
   analysis: {
     samples: 400,
-    opSamples: 100,
+    opSamples: 200,
     seed: 7,
     budgetMs: 5000,
     hintOptions: 3,
-    sessionMinutes: 240,
-    sessionRuns: { zone: 1, boss: 6, operation: 6 },
+    sessionMinutes: 120,
+    sessionHours: { zone: 8, boss: 30, operation: 30 },
+    minSessions: 4,
+    agree: 0.05,
+    stopFresh: 0.03,
+    batch: { zone: 50, operation: 20 },
+    verdict: { collapseBelow: 0.5, hopelessBelow: 0.1, stableMedian: 0.8, stableCollapse: 0.05 },
   },
   /** Battle report: the latest defeats it keeps. */
   report: { defeats: 5 },

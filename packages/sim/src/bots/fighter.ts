@@ -10,6 +10,7 @@ import {
   pouchUse,
   skillLevel,
   targetOf,
+  zoneBlocked,
   zoneRequirement,
   type ActionInfo,
   type Command,
@@ -124,7 +125,8 @@ export function createFighterBot(): Bot {
         .sort((a, b) => b.entry.cl - a.entry.cl);
       for (const c of candidates) {
         if (c.entry.cl > reach || (bans.get(c.zone.id) ?? 0) > state.now) continue;
-        const req = zoneRequirement(c.zone, content);
+        if (zoneBlocked(state, c.zone, content)) continue;
+        const req = zoneRequirement(c.zone);
         if (req && !evalReq(state, req, content).met) continue;
         if (estimate(c.zone, c.entry) >= FIGHTER.minWinRate) {
           best = c;

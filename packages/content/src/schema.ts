@@ -1052,12 +1052,30 @@ export const balanceParamsSchema = z.object({
     seed: z.number().int(),
     budgetMs: z.number().int(),
     hintOptions: z.number().int().min(1),
-    /** The session forecast: minutes of one session, and how many sessions are averaged for each kind of target. */
+    /**
+     * The session forecast: minutes of one session; the game hours the sessions may take in all, by
+     * kind of target; the fewest sessions; how closely their win rates must agree (and how near
+     * 0 or 1 the first fight must be) for the forecast to stop early; the size of one batch of the
+     * first-fight run; and the thresholds of the verdict.
+     */
     sessionMinutes: z.number().int().min(1),
-    sessionRuns: z.object({
-      zone: z.number().int().min(1),
-      boss: z.number().int().min(1),
-      operation: z.number().int().min(1),
+    sessionHours: z.object({
+      zone: z.number().min(1),
+      boss: z.number().min(1),
+      operation: z.number().min(1),
+    }),
+    minSessions: z.number().int().min(1),
+    agree: z.number().min(0),
+    stopFresh: z.number().min(0),
+    batch: z.object({ zone: z.number().int().min(1), operation: z.number().int().min(1) }),
+    verdict: z.object({
+      /** A session whose win rate is under this has collapsed. */
+      collapseBelow: z.number(),
+      /** A median session win rate under this is hopeless. */
+      hopelessBelow: z.number(),
+      /** Stable: the median is at least this and no more than `stableCollapse` of the sessions collapse. */
+      stableMedian: z.number(),
+      stableCollapse: z.number(),
     }),
   }),
   /** Battle report: how many of the latest defeats a report keeps. */

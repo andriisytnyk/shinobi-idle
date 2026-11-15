@@ -191,7 +191,15 @@ export function equipFor(
   level = 1,
 ): void {
   state.counters[killsKey(entryId)] = (state.counters[killsKey(entryId)] ?? 0) + 1;
-  state.seen[entryId] = true;
+  const book = (state.bingo[entryId] ??= {
+    seen: 1,
+    wins: 0,
+    losses: 0,
+    timeouts: 0,
+    bought: 0,
+    bounty: 0,
+  });
+  book.wins++;
   if (state.player.rank === RANK_STUDENT) return;
   if (equip.pouch === 'shop') stockFromShop(state, content, rules);
   if (equip.food === 'model') {

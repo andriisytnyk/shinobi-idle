@@ -1,5 +1,6 @@
 import type { ContentDb } from '@shinobi/content';
 import { indexOf } from '../lookup.ts';
+import { entryOf } from './zones.ts';
 import type { GameState } from '../state.ts';
 import { fightTimeMs, habituation } from './fight.ts';
 import type { FightState } from './fight-types.ts';
@@ -273,10 +274,10 @@ export function parseReport(raw: unknown, content: ContentDb): TargetReport | nu
   r.wounds = count(raw.wounds);
   if (Array.isArray(raw.defeats)) {
     for (const d of raw.defeats.slice(-content.balance.K.report.defeats)) {
-      if (!isRecord(d) || typeof d.enemy !== 'string') continue;
+      if (!isRecord(d) || typeof d.enemy !== 'string' || !entryOf(content, d.enemy)) continue;
       r.defeats.push({
         at: count(d.at),
-        enemy: d.enemy.slice(0, 64),
+        enemy: d.enemy,
         tMs: count(d.tMs),
         chakra: Math.min(100, count(d.chakra)),
         stamina: Math.min(100, count(d.stamina)),

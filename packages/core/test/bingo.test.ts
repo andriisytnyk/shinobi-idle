@@ -132,9 +132,12 @@ describe('bingo.study', () => {
     expect(bingoView(state, hidden, content)?.hiddenTraits).toBeNull();
     noteFight(state, hidden, 'win', content);
     expect(bingoView(state, hidden, content)?.hiddenTraits).toEqual(['hidden']);
-    expect(bingoView(state, hidden, content)?.drops).toBeNull();
+    // Level 2 shows what it drops, without the chances.
+    expect(bingoView(state, hidden, content)?.drops?.every((d) => d.chance === null)).toBe(true);
     study(state, hidden);
-    expect(bingoView(state, hidden, content)?.drops).not.toBeNull();
+    expect(
+      bingoView(state, hidden, content)?.drops?.every((d) => typeof d.chance === 'number'),
+    ).toBe(true);
     expect(bingoView(state, 'core:nobody', content)).toBeNull();
   });
 });
@@ -214,14 +217,14 @@ describe('the book in a save', () => {
     });
   });
 
-  it('migrates a version 10 save: `seen` and the counters become the book', () => {
+  it('migrates a version 11 save: `seen` and the counters become the book', () => {
     const state = fighter(12, 30);
     const raw = JSON.parse(serialize(state, 0)) as {
       v: number;
       state: Record<string, unknown>;
     };
-    raw.v = 10;
-    raw.state.v = 10;
+    raw.v = 11;
+    raw.state.v = 11;
     delete raw.state.bingo;
     delete raw.state.report;
     raw.state.seen = { [ENEMY]: true, 'core:bandit': true };
