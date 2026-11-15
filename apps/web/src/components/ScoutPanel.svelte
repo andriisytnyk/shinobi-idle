@@ -16,7 +16,10 @@
       const action =
         gs.slots.find((s) => s.action?.kind === 'explore' || s.action?.kind === 'walk')?.action ??
         null;
-      const first = content.cells[0];
+      // A cell in the region the player stands in, and one in another region: the two lengths of a walk.
+      const here = content.cells.find((c) => c.id === gs.world.location)?.region;
+      const first = content.cells.find((c) => c.region === here) ?? content.cells[0];
+      const other = content.cells.find((c) => c.region !== here);
       return {
         xp: gs.skills.scout.xp,
         fraction: skillProgress(gs, 'scout').fraction,
@@ -24,6 +27,7 @@
         action,
         exploreMs: exploreIntervalMs(gs, content, game.rules),
         walkMs: first ? walkMs(gs, first, content, game.rules) : 0,
+        walkBetweenMs: other ? walkMs(gs, other, content, game.rules) : 0,
       };
     }),
   );
@@ -48,6 +52,12 @@
     <div>
       <dt>{t('scout.walk')}</dt>
       <dd><ModBreakdown keys={['interval.walk']} display={formatDuration(data.walkMs)} /></dd>
+    </div>
+    <div>
+      <dt>{t('scout.walkBetween')}</dt>
+      <dd>
+        <ModBreakdown keys={['interval.walk']} display={formatDuration(data.walkBetweenMs)} />
+      </dd>
     </div>
     <div>
       <dt>{t('scout.current')}</dt>

@@ -1,13 +1,15 @@
 <script lang="ts">
   import { content } from '@shinobi/content';
   import { t } from '../lib/i18n.ts';
-  import { activeNav, markerOf, MORE_PAGES, NAV } from '../lib/nav.ts';
+  import { activeNav, markerOf, MORE_PAGES, NAV, TAB_ORDER } from '../lib/nav.ts';
   import { nextStep } from '../lib/next-step.ts';
   import { currentRoute } from '../lib/router.svelte.ts';
   import { game } from '../lib/store.ts';
   import Icon from './Icon.svelte';
 
-  const tabs = NAV.filter((item) => item.tab);
+  const tabs = NAV.filter((item) => item.tab).sort(
+    (a, b) => TAB_ORDER.indexOf(a.id) - TAB_ORDER.indexOf(b.id),
+  );
 
   const route = $derived(currentRoute());
   // Pages reached from the "More" tab keep it lit.

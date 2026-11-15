@@ -73,3 +73,53 @@ export function flagEntity(flag: string): EntityRef | null {
   const region = /^region\.([^.]+)\.unlocked$/.exec(flag);
   return region ? { kind: 'region', id: `core:${region[1]}` } : null;
 }
+
+/** The cell where a region is entered: the first one with an outpost, to which the trip is free. */
+export function entryCellOf(regionId: string): string | null {
+  return (
+    content.cells.find((c) => c.region === regionId && c.pois.some((p) => p.kind === 'outpost'))
+      ?.id ?? null
+  );
+}
+
+/** Whether a cell has an outpost, which the grid marks as an entry. */
+export const isEntryCell = (cellId: string): boolean =>
+  content.cells.some((c) => c.id === cellId && c.pois.some((p) => p.kind === 'outpost'));
+
+const reqKey = (n: ReqResult): string => {
+  const r = n.req;
+  switch (r.t) {
+    case 'skill':
+      return `skill:${r.skill}`;
+    case 'technique':
+    case 'flag':
+    case 'quest':
+    case 'building':
+      return `${r.t}:${r.id}`;
+    case 'item':
+      return `item:${r.id}`;
+    case 'rank':
+      return `rank:${r.rank}`;
+    case 'nature':
+      return `nature:${r.nature}`;
+    default:
+      return `${r.t}:${JSON.stringify(r)}`;
+  }
+};
+
+/** A requirement tree with its nested "all" groups merged and a row asked twice shown once (the higher level wins). */
+export function uniqueReq(node: ReqResult): ReqResult {
+  if (node.req.t !== 'all') return node;
+  const rows = new Map<string, ReqResult>();
+  const walk = (n: ReqResult): void => {
+    if (n.req.t === 'all') {
+      n.children.forEach(walk);
+      return;
+    }
+    const key = reqKey(n);
+    const have = rows.get(key);
+    if (!have || n.target > have.target) rows.set(key, n);
+  };
+  walk(node);
+  return { ...node, children: [...rows.values()] };
+}

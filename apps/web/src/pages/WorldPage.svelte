@@ -6,6 +6,7 @@
   import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
+  import RegionEntry from '../components/RegionEntry.svelte';
   import ReqTree from '../components/ReqTree.svelte';
   import { t } from '../lib/i18n.ts';
   import { navigate } from '../lib/router.svelte.ts';
@@ -57,6 +58,39 @@
   const selected = $derived(focus.cell);
   const close = () => navigate(`#/world`);
 
+  /** Below the wide layout the cell panel is a modal bottom sheet. */
+  let sheetMode = $state(typeof window !== 'undefined' && window.innerWidth < 1280);
+  $effect(() => {
+    const query = window.matchMedia('(max-width: 1279px)');
+    const update = () => (sheetMode = query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  });
+
+  let side = $state<HTMLElement | undefined>();
+  const open = $derived(selected !== null);
+
+  // Focus goes into the panel when it opens and back to where it was when it closes.
+  $effect(() => {
+    if (!open || !side) return;
+    const before = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    side.focus({ preventScroll: true });
+    return () => before?.focus({ preventScroll: true });
+  });
+
+  // While the sheet covers the page, the page behind does not scroll.
+  $effect(() => {
+    if (!open || !sheetMode) return;
+    const main = document.querySelector<HTMLElement>('.main');
+    if (!main) return;
+    const was = main.style.overflow;
+    main.style.overflow = 'hidden';
+    return () => {
+      main.style.overflow = was;
+    };
+  });
+
   function onKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape' && selected) close();
   }
@@ -104,6 +138,8 @@
       </section>
     {/if}
 
+    {#if active && active.open}<RegionEntry region={activeId} />{/if}
+
     <div class="layout" class:with-panel={selected !== null}>
       <div class="grid-wrap">
         <ul class="grid" aria-label={t('world.region.grid')} data-grid={activeId}>
@@ -121,9 +157,17 @@
           aria-label={t('world.panel.close')}
           onclick={close}
         ></button>
-        <aside class="side" data-side>
+        <div
+          class="side"
+          data-side
+          bind:this={side}
+          tabindex="-1"
+          role="dialog"
+          aria-modal={sheetMode ? 'true' : undefined}
+          aria-label={t('world.panel.label')}
+        >
           {#key selected}<CellPanel id={selected} onClose={close} />{/key}
-        </aside>
+        </div>
       {/if}
     </div>
   </div>
@@ -267,17 +311,62 @@
     bottom: var(--sheet-bottom);
     left: 0;
     z-index: 12;
-    max-height: 70dvh;
-    padding: var(--space-4);
-    padding-bottom: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    max-height: min(80dvh, calc(100dvh - var(--sheet-bottom) - var(--space-4)));
     border-top: 2px solid var(--accent);
     background: var(--surface-raised);
-    overflow-y: auto;
+    overflow: hidden;
+  }
+
+  .side:focus {
+    outline: none;
   }
 
   @media (max-width: 768px) {
     .world {
       --sheet-bottom: calc(var(--now-height) + var(--tabbar-height));
+    }
+
+    /* The grid must start near the top: the three regions share one row and the intro is left to the hint. */
+    .intro {
+      display: none;
+    }
+
+    .regions {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-1);
+    }
+
+    .region {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'name'
+        'status';
+      padding: var(--space-1) var(--space-2);
+    }
+
+    .region-icon {
+      display: none;
+    }
+
+    .region-name {
+      font-size: 0.8rem;
+      line-height: 1.2;
+    }
+
+    .region-name :global(a) {
+      min-height: 2.75rem;
+    }
+
+    .region-status {
+      margin-top: 0;
+      font-size: 0.7rem;
+    }
+
+    /* Leaves the top of the screen to the toasts. */
+    .side {
+      max-height: min(80dvh, calc(100dvh - var(--sheet-bottom) - 10rem));
     }
   }
 

@@ -72,7 +72,7 @@
         id: cell.id,
         training: cell.pois.flatMap((p) =>
           p.kind === 'training' && state.world.pois[p.id]
-            ? [{ poi: p.id, pct: Math.round(p.bonus * 100) }]
+            ? [{ poi: p.id, skill: p.skill, pct: Math.round(p.bonus * 100) }]
             : [],
         ),
       };
@@ -98,7 +98,7 @@
       {#each place.training as spot (spot.poi)}
         <span class="chip" data-training-bonus>
           {t('world.trainingNow', { pct: spot.pct })}
-          <EntityLink kind="poi" id={spot.poi} />
+          <EntityLink kind="skill" id={spot.skill} />
         </span>
       {/each}
     </div>

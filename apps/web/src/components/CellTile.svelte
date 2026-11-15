@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { CellInfo } from '@shinobi/core';
-  import { entityName, webRef } from '../lib/entities.ts';
+  import { entityName } from '../lib/entities.ts';
   import { t } from '../lib/i18n.ts';
-  import { KEY_ICON, keyNameKey, POI_ICON, poiKindKey, unmetLeaves } from '../lib/world.ts';
+  import { isEntryCell, KEY_ICON, keyNameKey, POI_ICON, poiKindKey } from '../lib/world.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
 
@@ -23,7 +23,6 @@
   );
   const regionClosed = $derived(info.why === 'error.regionClosed');
   const keyLocked = $derived(info.keyReq !== null && !info.keyReq.met);
-  const keyRows = $derived(info.keyReq ? unmetLeaves(info.keyReq) : []);
 
   const started = $derived(!explored && info.explores > 0);
 </script>
@@ -44,6 +43,11 @@
     {#if info.located}
       <span class="badge here-badge" data-here title={t('world.tile.here')}>
         <Icon name="lucide:map-pin" size={14} />{t('world.tile.here')}
+      </span>
+    {/if}
+    {#if isEntryCell(info.id) && !regionClosed}
+      <span class="badge entry" data-entry>
+        <Icon name="lucide:tent" size={14} />{t('world.tile.entry')}
       </span>
     {/if}
     {#if loot}
@@ -107,16 +111,11 @@
 
   {#if regionClosed}
     <p class="need" data-need>{t('world.tile.regionClosed')}</p>
-  {:else if keyLocked && keyRows.length > 0}
+  {:else if keyLocked}
+    <!-- The full requirement, as links, is in the cell panel. -->
     <p class="need" data-need>
-      <span class="dim">{t('world.tile.need')}</span>
-      {#each keyRows as row, i (i)}
-        {#if i > 0}<span class="dim">/</span>{/if}
-        {@const ref = webRef(row.ref)}
-        {#if ref}<EntityLink kind={ref.kind} id={ref.id} />{/if}
-        {#if row.req.t === 'skill'}<span class="dim">{t('req.level', { n: row.req.level })}</span
-          >{/if}
-      {/each}
+      <Icon name="lucide:lock" size={12} />
+      {t('world.tile.lockedShort')}
     </p>
   {/if}
 </li>
@@ -188,6 +187,11 @@
     border-radius: 999px;
     font-size: 0.75rem;
     line-height: 1.5rem;
+  }
+
+  .entry {
+    border-color: var(--leaf);
+    color: var(--leaf);
   }
 
   .here-badge {
@@ -280,15 +284,5 @@
     z-index: 1;
     margin: 0;
     font-size: 0.8rem;
-  }
-
-  .need :global(a) {
-    color: var(--fg);
-    font-weight: 600;
-    text-decoration: underline;
-  }
-
-  .dim {
-    color: var(--fg-dim);
   }
 </style>

@@ -4,6 +4,7 @@ import { createState, xpAt, type GameState } from '@shinobi/core';
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import CellPanel from '../src/components/CellPanel.svelte';
+import Hint from '../src/components/Hint.svelte';
 import NowBar from '../src/components/NowBar.svelte';
 import ZoneWhere from '../src/components/ZoneWhere.svelte';
 import { createGame } from '../src/lib/game.svelte.ts';
@@ -16,6 +17,7 @@ import { toastFor } from '../src/lib/toasts.svelte.ts';
 import { isWorldRoute, worldFocus } from '../src/lib/world.ts';
 import EntityPage from '../src/pages/EntityPage.svelte';
 import SkillPage from '../src/pages/SkillPage.svelte';
+import CombatPage from '../src/pages/CombatPage.svelte';
 import WorldPage from '../src/pages/WorldPage.svelte';
 
 const FOREST = 'core:forest';
@@ -333,10 +335,88 @@ describe('A6: undiscovered points stay hidden', () => {
 });
 
 describe('the key-locked state', () => {
-  it('shows the requirement as links on the tile', () => {
+  it('keeps the tile short: a key badge and a lock label, no requirement text', () => {
     show();
-    const need = tile(KEYED)?.querySelector('[data-need]');
-    expect(need?.querySelector('a[href="#/skill/cc"]')).not.toBeNull();
+    const t = tile(KEYED);
+    expect(t?.querySelector('[data-key="rock"]')).not.toBeNull();
+    expect(t?.querySelector('[data-need]')?.textContent).toContain(name('world.tile.lockedShort'));
+    expect(t?.querySelector('a[href="#/skill/cc"]')).toBeNull();
+  });
+});
+
+describe('entering a newly opened region', () => {
+  it('works from the visible controls: go to the region, then explore its first cell', () => {
+    const state = genin();
+    state.skills.scout.xp = xpAt(10);
+    game.replaceState(state);
+    game.devAdvance(1000);
+    show({ cell: null, region: PLAINS });
+    // The entry cell is marked, and the region header offers the trip.
+    expect(tile('core:pivdennyi_trakt')?.querySelector('[data-entry]')).not.toBeNull();
+    expect(q('[data-region-entry]')).not.toBeNull();
+    expect(q('[data-region-walk]')?.textContent).toMatch(/[0-9]/);
+
+    unmount(app!);
+    app = null;
+    show({ cell: 'core:mistechko_na_rivnynakh', region: PLAINS });
+    // Not there yet: exploring says why and names the action that fixes it.
+    expect(reason('explore')).toBe(name('error.notInRegion'));
+    expect(name('error.notInRegion')).toContain(name('world.entry.go'));
+    expect(q('[data-explore]')?.hasAttribute('disabled')).toBe(true);
+
+    q('[data-region-enter]')?.click();
+    flushSync();
+    expect(game.state.world.location).toBe('core:pivdennyi_trakt');
+    expect(q('[data-explore]')?.hasAttribute('disabled')).toBe(false);
+    q('[data-explore]')?.click();
+    game.devAdvance((FIRST_LEVEL + 2) * 5000);
+    flushSync();
+    expect(tile('core:mistechko_na_rivnynakh')?.getAttribute('data-level')).toBe('1');
+  });
+});
+
+describe('the cell panel keeps its actions in view', () => {
+  it('has a header with the close button and an action row outside the scrolling body', () => {
+    show({ cell: PLAIN_CELL, region: FOREST });
+    const panel = q('[data-cell-panel]');
+    expect(panel?.querySelector(':scope > .head .close')).not.toBeNull();
+    expect(panel?.querySelector(':scope > .actions [data-explore]')).not.toBeNull();
+    expect(panel?.querySelector(':scope > .body [data-explore]')).toBeNull();
+    expect(q('[data-side]')?.getAttribute('role')).toBe('dialog');
+  });
+});
+
+describe('hints show one at a time', () => {
+  it('lets a second hint wait until the first is dismissed', () => {
+    settings.hints = true;
+    settings.resetHints();
+    const other = document.createElement('div');
+    document.body.append(other);
+    const first = mount(Hint, { target, props: { id: 'world' } });
+    const second = mount(Hint, { target: other, props: { id: 'worldKey' } });
+    flushSync();
+    expect(document.querySelectorAll('[data-hint]')).toHaveLength(1);
+    expect(q('[data-hint="world"]')).not.toBeNull();
+    settings.dismissHint('world');
+    flushSync();
+    expect(other.querySelector('[data-hint="worldKey"]')).not.toBeNull();
+    unmount(first);
+    unmount(second);
+    other.remove();
+  });
+});
+
+describe('the combat page lists only what is discovered', () => {
+  it('shows a found zone with its cell and a startable button, never a locked boss', () => {
+    const state = genin();
+    explored(state, 'core:prykordonnyi_lis_okolytsia');
+    game.replaceState(state);
+    app = mount(CombatPage, { target });
+    flushSync();
+    expect(q('[data-zone="core:zone_wolf"]')).not.toBeNull();
+    expect(q('[data-zone="core:zone_wolf"] .start')?.hasAttribute('disabled')).toBe(false);
+    expect(q('[data-zone="core:zone_bandit"]')).toBeNull();
+    expect(target.innerHTML).not.toContain('core:boss_');
   });
 });
 
