@@ -28,6 +28,7 @@ import {
   type Clock,
   type KeyValue,
 } from './persistence.ts';
+import type { Signals } from './hints.ts';
 import { detach as detachData } from './read.ts';
 import { requestPersistentStorage } from './platform.ts';
 import type { TabLock } from './tab-lock.ts';
@@ -109,6 +110,8 @@ export function createGame(deps: GameDeps = {}) {
   let logId = 0;
   /** Set when the player has just graduated; the graduation modal clears it. */
   let graduation = $state(false);
+  /** One-off happenings of this session that hints wait for (a craft that ran out of ingredients). */
+  let signals = $state.raw<Signals>({});
 
   /** Revision of the save this tab last read or wrote; a stored revision above it means a newer save exists. */
   let rev = 0;
@@ -130,6 +133,9 @@ export function createGame(deps: GameDeps = {}) {
     for (const event of events) {
       // Changes the player must not lose to a reload are saved at once, not on the next timer.
       if (event.type === 'rankUp' || event.type === 'natureGained') urgent = true;
+      if (event.type === 'actionStopped' && event.missing && !signals.craftStopped) {
+        signals = { ...signals, craftStopped: true };
+      }
       if (
         event.type === 'combatLog' ||
         event.type === 'enemyDefeated' ||
@@ -224,6 +230,7 @@ export function createGame(deps: GameDeps = {}) {
     state = next;
     log = [];
     graduation = false;
+    signals = {};
     lastWall = clock.now();
     touch();
   }
@@ -298,6 +305,10 @@ export function createGame(deps: GameDeps = {}) {
     get combatLog(): LogEntry[] {
       void version;
       return log;
+    },
+    /** Happenings of this session that hints wait for. */
+    get signals(): Signals {
+      return signals;
     },
     /** Whether the graduation modal is due. */
     get graduation(): boolean {

@@ -29,8 +29,8 @@ export interface EntityRef {
   id: string;
 }
 
-/** Pages with a route of their own and no id: `#/quests`, `#/rank`, `#/combat`, `#/bank`, `#/help`, `#/nature`. */
-export const PAGES = ['quests', 'rank', 'combat', 'bank', 'help', 'nature'] as const;
+/** Pages with a route of their own and no id: `#/quests`, `#/rank`, `#/combat`, `#/bank`, `#/shop`, `#/help`, `#/nature`. */
+export const PAGES = ['quests', 'rank', 'combat', 'bank', 'shop', 'help', 'nature'] as const;
 export type PageName = (typeof PAGES)[number];
 
 export type Route =
@@ -39,6 +39,8 @@ export type Route =
   | { page: 'entity'; ref: EntityRef }
   | { page: 'tab'; tab: string }
   | { page: PageName }
+  /** The shop with its sell section brought into view: `#/shop/sell`. */
+  | { page: 'shop'; section: 'sell' }
   | { page: 'credits' }
   | { page: 'settings' }
   | { page: 'notFound'; hash: string };
@@ -56,6 +58,9 @@ export function parseHash(hash: string): Route {
   if (first === 'skills' && rest.length === 0) return { page: 'skills' };
   if (first === 'credits' && rest.length === 0) return { page: 'credits' };
   if (first === 'settings' && rest.length === 0) return { page: 'settings' };
+  if (first === 'shop' && rest.length === 1 && rest[0] === 'sell') {
+    return { page: 'shop', section: 'sell' };
+  }
   if (isPage(first) && rest.length === 0) return { page: first };
   if (TABS.includes(first) && rest.length === 0) return { page: 'tab', tab: first };
   const id = rest.join('/');

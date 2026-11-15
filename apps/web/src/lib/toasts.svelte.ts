@@ -41,6 +41,10 @@ export function toastFor(event: GameEvent): ToastSpec | null {
     case 'questDone':
       return { key: 'toast.questDone', params: {}, ref: { kind: 'quest', id: event.quest } };
     case 'itemUsed':
+      // A tonic names a skill (or the group of natures), not a technique: the toast links to the tonic.
+      if (!event.target.startsWith('core:')) {
+        return { key: 'toast.tonicUsed', params: {}, ref: { kind: 'item', id: event.id } };
+      }
       return {
         key: 'toast.itemUsed',
         params: {},
@@ -51,6 +55,14 @@ export function toastFor(event: GameEvent): ToastSpec | null {
     case 'actionStopped':
       // The player's own stop and a replacement by another action need no announcement.
       if (event.reason === 'manual' || event.reason === 'replaced') return null;
+      // A craft that ran out of an ingredient names it, as a link.
+      if (event.missing) {
+        return {
+          key: 'toast.stopped.ingredient',
+          params: {},
+          ref: { kind: 'item', id: event.missing },
+        };
+      }
       return {
         key: `toast.stopped.${event.reason}`,
         params: {},

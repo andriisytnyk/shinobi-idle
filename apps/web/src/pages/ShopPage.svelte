@@ -1,0 +1,119 @@
+<script lang="ts">
+  import { content } from '@shinobi/content';
+  import { buyPrice, evalReq, sellPrice, waiveBuildings } from '@shinobi/core';
+  import { onMount } from 'svelte';
+  import GearLine from '../components/GearLine.svelte';
+  import Hint from '../components/Hint.svelte';
+  import ShopGood from '../components/ShopGood.svelte';
+  import ShopSell from '../components/ShopSell.svelte';
+  import { shopSection, type ShopSection } from '../lib/crafts.ts';
+  import { formatInt } from '../lib/format.ts';
+  import { t } from '../lib/i18n.ts';
+  import { game } from '../lib/store.ts';
+  import SimplePage from './SimplePage.svelte';
+
+  interface Props {
+    /** `sell` brings the sell section into view. */
+    section?: 'sell';
+  }
+
+  let { section }: Props = $props();
+
+  const ryo = $derived(game.read((gs) => gs.currencies.ryo));
+  const goods = $derived(
+    game.read((gs) =>
+      content.shop.flatMap((entry) => {
+        const price = buyPrice(entry.item, content);
+        if (price === null) return [];
+        return [
+          {
+            item: entry.item,
+            price,
+            section: shopSection(entry),
+            owned: gs.bank[entry.item] ?? 0,
+            req: evalReq(gs, waiveBuildings(entry.req), content),
+          },
+        ];
+      }),
+    ),
+  );
+  const sells = $derived(
+    game.read((gs) =>
+      content.items.flatMap((item) => {
+        const owned = gs.bank[item.id] ?? 0;
+        const price = owned > 0 ? sellPrice(item.id, content) : null;
+        return price === null ? [] : [{ item: item.id, owned, price }];
+      }),
+    ),
+  );
+
+  const SECTIONS: readonly ShopSection[] = ['market', 'forge'];
+
+  let sellBox = $state<HTMLElement | null>(null);
+  onMount(() => {
+    if (section === 'sell') sellBox?.scrollIntoView?.({ block: 'start' });
+  });
+</script>
+
+<SimplePage title={t('shop.title')}>
+  <Hint id="shop" />
+  <p class="purse" data-purse>{t('shop.purse', { n: formatInt(ryo) })}</p>
+
+  {#each SECTIONS as id (id)}
+    <section class="ct-section" data-section={id}>
+      <h2>{t(`shop.section.${id}`)}</h2>
+      <ul class="list">
+        {#each goods.filter((g) => g.section === id) as good (good.item)}
+          <ShopGood item={good.item} price={good.price} owned={good.owned} req={good.req} />
+        {/each}
+      </ul>
+    </section>
+  {/each}
+
+  <section class="ct-section" data-section="sell" bind:this={sellBox}>
+    <h2>{t('shop.section.sell')}</h2>
+    {#if sells.length === 0}
+      <p class="empty" data-sell-empty>{t('shop.sellEmpty')}</p>
+    {:else}
+      <ul class="list">
+        {#each sells as row (row.item)}
+          <ShopSell item={row.item} owned={row.owned} price={row.price} />
+        {/each}
+      </ul>
+    {/if}
+  </section>
+
+  <section class="ct-section" data-section="gear">
+    <h2>{t('shop.section.gear')}</h2>
+    <div class="gears">
+      {#each content.gear as line (line.id)}
+        <GearLine {line} />
+      {/each}
+    </div>
+  </section>
+</SimplePage>
+
+<style>
+  .purse {
+    margin: 0;
+    color: var(--fg-dim);
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+  }
+
+  .gears {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: var(--space-3);
+  }
+
+  .empty {
+    color: var(--fg-dim);
+  }
+</style>

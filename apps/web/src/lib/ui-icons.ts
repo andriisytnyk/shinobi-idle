@@ -22,6 +22,7 @@ export const UI_ICON_NAMES = [
   'plus',
   'search',
   'settings',
+  'store',
   'x',
 ] as const;
 

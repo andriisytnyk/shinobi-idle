@@ -6,6 +6,7 @@
   import { formatDuration, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
+  import BuffStrip from './BuffStrip.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
 
@@ -50,6 +51,7 @@
 
 <footer class="now" aria-label={t('now.title')}>
   <span class="title">{t('now.title')}</span>
+  <div class="buff-slot"><BuffStrip /></div>
   {#if rows.length === 0}
     <span class="idle">{t('now.idle')}</span>
   {:else}
@@ -111,6 +113,11 @@
     color: var(--heading);
     font-family: var(--font-heading);
     font-size: 0.85rem;
+  }
+
+  /* The wrapper adds no box: the buff chips are items of the bar itself. */
+  .buff-slot {
+    display: contents;
   }
 
   .idle {
@@ -199,9 +206,16 @@
 
   @media (max-width: 768px) {
     .now {
+      flex-wrap: wrap;
       gap: var(--space-2);
       padding: var(--space-1) var(--space-3);
       font-size: 0.85rem;
+    }
+
+    /* On a phone the buffs take a line of their own under the running action. */
+    .buff-slot :global(.buffs) {
+      order: 5;
+      flex: 1 0 100%;
     }
 
     .title,

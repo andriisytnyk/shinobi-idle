@@ -13,7 +13,7 @@
   // Pages reached from the "More" tab keep it lit.
   const activeTab = $derived.by(() => {
     const id = activeNav(route);
-    return id === 'help' || id === 'rank' ? 'more' : id;
+    return id === 'help' || id === 'rank' || id === 'shop' ? 'more' : id;
   });
   const marker = $derived(game.read((gs) => markerOf(nextStep(gs, content)?.target ?? null).nav));
 </script>
