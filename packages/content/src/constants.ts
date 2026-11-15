@@ -28,6 +28,9 @@ export const SKILL_GROUPS = ['train', 'nin', 'field', 'craft', 'combat'] as cons
 
 export const RANKS = ['E', 'D', 'C', 'B', 'A', 'S'] as const;
 
+/** Ranks the player holds, lowest first. */
+export const PLAYER_RANK_IDS = ['student', 'genin', 'chunin'] as const;
+
 /** Technique roles (Ukrainian role names are only localization strings). */
 export const ROLE_IDS = [
   'projectile',
@@ -108,6 +111,7 @@ export type NatureId = (typeof NATURE_IDS)[number];
 export type TechSkillId = (typeof TECH_SKILL_IDS)[number];
 export type SkillGroup = (typeof SKILL_GROUPS)[number];
 export type Rank = (typeof RANKS)[number];
+export type PlayerRank = (typeof PLAYER_RANK_IDS)[number];
 export type RoleId = (typeof ROLE_IDS)[number];
 export type TagId = (typeof TAG_IDS)[number];
 export type TraitId = (typeof TRAIT_IDS)[number];

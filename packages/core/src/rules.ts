@@ -6,7 +6,11 @@ import {
   practiceKind,
   type ActionKind,
 } from './actions.ts';
+import { fightKind } from './combat/kind.ts';
+import { combatSystem } from './combat/system.ts';
+import { senseiTestKind } from './exam.ts';
 import type { ModifierProvider } from './modifiers.ts';
+import { questSystem } from './quests.ts';
 import type { System } from './system.ts';
 
 /**
@@ -21,12 +25,14 @@ export interface Rules {
 }
 
 export const defaultRules: Rules = {
-  systems: [actionSystem],
+  systems: [actionSystem, combatSystem, questSystem],
   actionKinds: {
     practice: practiceKind,
     drill: drillKind,
     meditate: meditateKind,
     obstacle: obstacleKind,
+    fight: fightKind,
+    senseiTest: senseiTestKind,
   },
   modifierProviders: [],
 };

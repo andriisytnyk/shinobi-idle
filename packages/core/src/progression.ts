@@ -1,6 +1,6 @@
 import type { ContentDb, SkillId } from '@shinobi/content';
 import { emit } from './events.ts';
-import { masteryLevel, poolCapacity } from './formulas.ts';
+import { masteryLevel, poolCapacity, poolGain } from './formulas.ts';
 import { indexOf } from './lookup.ts';
 import { computeMod } from './modifiers.ts';
 import type { Rules } from './rules.ts';
@@ -79,4 +79,19 @@ export function gainPoolXp(
       emit(state, { type: 'poolCheckpoint', skill, id: checkpoint.id, pct: checkpoint.pct });
     }
   }
+}
+
+/**
+ * The one way mastery is earned: `amount` goes to the mastery key and the pool share of it to
+ * the skill's pool. Practice, combat and item use all call this.
+ */
+export function grantMastery(
+  state: GameState,
+  key: string,
+  skill: SkillId,
+  amount: number,
+  content: ContentDb,
+): void {
+  gainMasteryXp(state, key, amount, content);
+  gainPoolXp(state, skill, poolGain(amount, content), content);
 }

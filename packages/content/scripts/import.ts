@@ -27,11 +27,11 @@ import { BALANCE_EXT } from '../src/balance-ext.ts';
 import { localeKey, type LocaleKind } from '../src/keys.ts';
 import {
   balanceParamsSchema,
-  contentDbSchema,
+  generatedDbSchema,
   type Boss,
   type Building,
   type Cell,
-  type ContentDb,
+  type GeneratedDb,
   type Enemy,
   type Exercise,
   type Gear,
@@ -534,7 +534,7 @@ const balance = { K: params, pace: bal.pace, capHours: bal.capHours, milestones:
 
 // ---------- assemble, validate, write ----------
 
-const db: ContentDb = contentDbSchema.parse({
+const db: GeneratedDb = generatedDbSchema.parse({
   skills,
   seals,
   techniques,

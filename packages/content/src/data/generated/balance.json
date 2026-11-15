@@ -386,6 +386,16 @@
     },
     "academyCap": 10,
     "academySlow": 0.25,
+    "combat": {
+      "xpTickMs": 1000,
+      "regenMs": 1000,
+      "hitEven": 0.5
+    },
+    "senseiTest": {
+      "base": 300,
+      "perLevel": 0.01,
+      "floor": 120
+    },
     "offlineCapHours": 12,
     "masteryCap": 99
   },

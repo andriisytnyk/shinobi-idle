@@ -1,13 +1,20 @@
 import type { ContentDb } from '@shinobi/content';
 import { rebalanceShares, stopSlot } from './actions.ts';
-import { evalReq } from './requirements.ts';
+import { examFor, SENSEI_TEST_KIND } from './exam.ts';
+import { useItem } from './items.ts';
+import { updateQuests } from './quests.ts';
+import { evalReq, RANK_ORDER } from './requirements.ts';
 import { defaultRules, type Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 
 /** A player or bot command. Concrete command types arrive with the stages that need them. */
 export type Command =
   | { type: 'action.start'; slot: number; kind: string; id: string }
-  | { type: 'action.stop'; slot: number };
+  | { type: 'action.stop'; slot: number }
+  /** Starts the Genin exam's sensei test; the checklist must be met. `slot` defaults to 0. */
+  | { type: 'exam.genin.start'; slot?: number }
+  /** Uses a bank item on a target (for the graduate scroll, an academy technique id). */
+  | { type: 'item.use'; id: string; target: string };
 
 export type CommandResult = { ok: true } | { ok: false; reason: string };
 
@@ -25,6 +32,9 @@ export function advance(
   rules: Rules = defaultRules,
 ): void {
   if (!Number.isInteger(ms) || ms < 0) throw new RangeError(`advance needs whole ms, got ${ms}`);
+  // The state may have changed since the last call (a loaded save, a command that was not
+  // followed by time), so quest objectives are checked before any time passes.
+  updateQuests(state, content);
   let remaining = ms;
   let stalled = 0;
   for (;;) {
@@ -51,6 +61,32 @@ function elapse(state: GameState, dt: number, content: ContentDb, rules: Rules):
   state.now += dt;
 }
 
+function startAction(
+  state: GameState,
+  slotIndex: number,
+  kindName: string,
+  id: string,
+  content: ContentDb,
+  rules: Rules,
+): CommandResult {
+  const slot = state.slots[slotIndex];
+  if (!slot) return { ok: false, reason: 'error.invalidSlot' };
+  const kind = rules.actionKinds[kindName];
+  if (!kind) return { ok: false, reason: 'error.unknownActionKind' };
+  if (!kind.has(id, content)) return { ok: false, reason: 'error.unknownAction' };
+  const req = kind.requirements(state, id, content, rules);
+  if (req && !evalReq(state, req, content).met) {
+    return { ok: false, reason: 'error.requirementsNotMet' };
+  }
+  stopSlot(state, slotIndex, 'replaced', content, rules);
+  slot.action = { kind: kindName, id };
+  slot.progress = 0;
+  slot.data = null;
+  rebalanceShares(state);
+  kind.start?.(state, slotIndex, id, content, rules);
+  return { ok: true };
+}
+
 /** Applies a command to the state. Failures carry a localization key. */
 export function dispatch(
   state: GameState,
@@ -58,25 +94,20 @@ export function dispatch(
   content: ContentDb,
   rules: Rules = defaultRules,
 ): CommandResult {
+  const result = apply(state, command, content, rules);
+  if (result.ok) updateQuests(state, content);
+  return result;
+}
+
+function apply(
+  state: GameState,
+  command: Command,
+  content: ContentDb,
+  rules: Rules,
+): CommandResult {
   switch (command.type) {
-    case 'action.start': {
-      const slot = state.slots[command.slot];
-      if (!slot) return { ok: false, reason: 'error.invalidSlot' };
-      const kind = rules.actionKinds[command.kind];
-      if (!kind) return { ok: false, reason: 'error.unknownActionKind' };
-      if (!kind.has(command.id, content)) return { ok: false, reason: 'error.unknownAction' };
-      const req = kind.requirements(state, command.id, content, rules);
-      if (req && !evalReq(state, req, content).met) {
-        return { ok: false, reason: 'error.requirementsNotMet' };
-      }
-      stopSlot(state, command.slot, 'replaced', content, rules);
-      slot.action = { kind: command.kind, id: command.id };
-      slot.progress = 0;
-      slot.data = null;
-      rebalanceShares(state);
-      kind.start?.(state, command.slot, command.id, content, rules);
-      return { ok: true };
-    }
+    case 'action.start':
+      return startAction(state, command.slot, command.kind, command.id, content, rules);
     case 'action.stop': {
       const slot = state.slots[command.slot];
       if (!slot) return { ok: false, reason: 'error.invalidSlot' };
@@ -84,6 +115,16 @@ export function dispatch(
       stopSlot(state, command.slot, 'manual', content, rules);
       return { ok: true };
     }
+    case 'exam.genin.start': {
+      const exam = examFor(content, 'genin');
+      if (!exam) return { ok: false, reason: 'error.examNotAvailable' };
+      if (RANK_ORDER.indexOf(state.player.rank) >= RANK_ORDER.indexOf(exam.rank)) {
+        return { ok: false, reason: 'error.examPassed' };
+      }
+      return startAction(state, command.slot ?? 0, SENSEI_TEST_KIND, exam.id, content, rules);
+    }
+    case 'item.use':
+      return useItem(state, command.id, command.target, content);
     default:
       return { ok: false, reason: 'error.unknownCommand' };
   }
