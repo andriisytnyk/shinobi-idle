@@ -138,7 +138,7 @@ describe('fight action', () => {
     expect(dispatch(state, fight(), content)).toEqual({ ok: true });
     expect(state.combat?.enemy).toBe(DUMMY);
     advance(state, 5000, content);
-    expect(state.combat?.hp).toBeGreaterThan(0);
+    expect(state.combat?.fight.player.hp).toBeGreaterThan(0);
     dispatch(state, { type: 'action.stop', slot: 0 }, content);
     expect(state.combat).toBeNull();
   });
@@ -182,11 +182,13 @@ describe('fight action', () => {
     const state = createState(7, content);
     dispatch(state, fight(), content);
     advance(state, 1, content);
-    const c = state.combat;
-    expect(c?.cast).toBe('core:leaf_whirlwind');
-    expect(c?.stamina).toBeLessThan(playerMaxStamina(state, content));
+    const player = state.combat?.fight.player;
+    expect(player?.cast).toBe('core:leaf_whirlwind');
+    expect(player?.stamina).toBeLessThan(playerMaxStamina(state, content));
     advance(state, 1000, content);
-    expect(state.combat?.cd['core:leaf_whirlwind']).toBeGreaterThan(state.now);
+    expect(state.combat?.fight.player.cd['core:leaf_whirlwind']).toBeGreaterThan(
+      state.combat?.fight.t ?? Infinity,
+    );
   });
 });
 

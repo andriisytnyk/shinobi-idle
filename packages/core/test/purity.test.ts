@@ -32,8 +32,10 @@ describe('A9: core source hygiene', () => {
       'events.ts': [200],
       'formulas.ts': [1000, 3600],
       'progression.ts': [100],
+      'combat/fight-parse.ts': [4], // four words of an rng stream
+      'combat/units.ts': [1000], // work units per ms, speed scale, ms per tick
       'save.ts': [4], // four words of an rng stream
-      'state.ts': [1000, 4],
+      'state.ts': [1000, 4, 5], // share scale, rng words, save format version
       'xp.ts': [4, 7, 300], // the fixed Melvor level curve
     };
     const offenders: string[] = [];

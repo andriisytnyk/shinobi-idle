@@ -11,8 +11,12 @@ export const BALANCE_EXT = {
   offlineCapHours: 12,
   /** The sensei test: 300 s, 1% shorter per level of the exam's skills, never under 120 s. */
   senseiTest: { base: 300, perLevel: 0.01, floor: 120 },
-  /** Combat timing: ms per combat XP tick, ms per pool regeneration step, hit share at equal ratings. */
-  combat: { xpTickMs: 1000, regenMs: 1000, hitEven: 0.5 },
+  /** Combat timing: ms per combat XP tick, ms per pool regeneration step, hit share at equal ratings, and the longest fight (ms) that battle analysis simulates before calling it lost. */
+  combat: { xpTickMs: 1000, regenMs: 1000, hitEven: 0.5, fightCapMs: 240000 },
+  /** Evasion multiplier of a bound enemy (the balance tables: Сковування, ухилення ×0.3). */
+  bindEva: 0.3,
+  /** Chance to resist an Illusionist's illusion per Meditation level (Медитація ÷ 200). */
+  illusionResist: 0.005,
   /** Mastery levels stop here. */
   masteryCap: 99,
   /**

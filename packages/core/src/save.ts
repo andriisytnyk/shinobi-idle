@@ -6,9 +6,11 @@ import {
   type SkillId,
 } from '@shinobi/content';
 import { rebalanceShares } from './actions.ts';
-import { playerMaxChakra, playerMaxHp, playerMaxStamina } from './combat/stats.ts';
-import { combatUnits, FIGHT_KIND, newCombat } from './combat/system.ts';
+import { parseFight } from './combat/fight-parse.ts';
+import { secMs } from './combat/numbers.ts';
+import { FIGHT_KIND, newCombat } from './combat/system.ts';
 import type { CombatState } from './combat/types.ts';
+import { workOf } from './combat/units.ts';
 import type { EntityKind } from './entity.ts';
 import { emit } from './events.ts';
 import { MS_PER_HOUR, poolCapacity } from './formulas.ts';
@@ -54,6 +56,8 @@ export const MIGRATIONS: readonly Migration[] = [
   }),
   // v3 -> v4: counters, quest progress, the running fight and the pinned goal.
   (state) => ({ ...state, counters: {}, quests: {}, combat: null, goal: null }),
+  // v4 -> v5: the fight became a self-contained fight state; an old fight in progress restarts.
+  (state) => ({ ...state, combat: null }),
 ];
 
 const isRecord = (x: unknown): x is Raw => typeof x === 'object' && x !== null && !Array.isArray(x);
@@ -124,52 +128,34 @@ function sanitizeSlot(
   return { slot, lost };
 }
 
-const finite = (x: unknown): number => (typeof x === 'number' && Number.isFinite(x) ? x : 0);
-
 /** A saved fight, checked field by field; null when it is not a usable fight. */
-function sanitizeCombat(raw: unknown, state: GameState, content: ContentDb): CombatState | null {
+function sanitizeCombat(raw: unknown, content: ContentDb): CombatState | null {
   if (!isRecord(raw) || typeof raw.enemy !== 'string') return null;
   const enemy = indexOf(content).enemies.get(raw.enemy);
   if (!enemy) return null;
-  const fresh = newCombat(state, enemy, content);
-  const clock = Math.floor(nonNegative(raw.clock));
-  const horizon = clock + combatUnits(MS_PER_HOUR);
-  const time = (x: unknown, lowest: number): number =>
-    Math.min(horizon, Math.max(lowest, Math.floor(nonNegative(x))));
-  const combat: CombatState = {
-    ...fresh,
-    phase: raw.phase === 'respawn' ? 'respawn' : 'fight',
-    clock,
-    enemyHp: finite(raw.enemyHp),
-    hp: finite(raw.hp),
-    chakra: nonNegative(raw.chakra),
-    stamina: nonNegative(raw.stamina),
-    pPhase: raw.pPhase === 'cast' || raw.pPhase === 'recover' ? raw.pPhase : 'ready',
-    pAt: time(raw.pAt, 0),
-    cast:
-      typeof raw.cast === 'string' && indexOf(content).techniques.has(raw.cast) ? raw.cast : null,
-    eAt: time(raw.eAt, 0),
-    respawnAt: time(raw.respawnAt, 0),
-    // Regeneration steps one second at a time, so a stale value must not mean millions of steps.
-    regenAt: time(raw.regenAt, clock),
-    cd: pick(raw.cd, (key, v) =>
-      indexOf(content).techniques.has(key) && typeof v === 'number' && Number.isFinite(v)
-        ? Math.min(horizon, Math.floor(v))
-        : undefined,
-    ),
-    style: SKILL_ID_SET.has(String(raw.style)) ? (raw.style as SkillId) : 'tai',
-    lastActionAt: Math.min(clock, Math.floor(nonNegative(raw.lastActionAt))),
-    fx: { player: [], enemy: [] },
+  const fight = parseFight(raw.fight, content);
+  if (!fight || fight.enemy !== enemy.id) return null;
+  const respawn = raw.phase === 'respawn';
+  // A won fight waits out the pause; a fight in progress cannot be decided yet.
+  if (respawn !== (fight.result === 'victory') || fight.result === 'defeat') return null;
+  const K = content.balance.K;
+  const horizon = workOf(MS_PER_HOUR);
+  const paid = pick(raw.paid, (key, v) =>
+    indexOf(content).techniques.has(key) && typeof v === 'number' && Number.isFinite(v) && v >= 0
+      ? v
+      : undefined,
+  );
+  const style = fight.tally.style;
+  return {
+    enemy: enemy.id,
+    phase: respawn ? 'respawn' : 'fight',
+    fight,
+    work: Math.min(horizon, Math.floor(nonNegative(raw.work))),
+    pause: Math.min(workOf(secMs(K.respawn)), Math.floor(nonNegative(raw.pause))),
+    paid,
+    carry: Math.min(horizon, Math.floor(nonNegative(raw.carry))),
+    style: SKILL_ID_SET.has(String(raw.style)) ? (raw.style as SkillId) : style,
   };
-  if (combat.pPhase === 'cast' && combat.cast === null) combat.pPhase = 'ready';
-  if (combat.pPhase !== 'cast') combat.cast = null;
-  if (combat.phase === 'fight' && combat.enemyHp <= 0) combat.enemyHp = fresh.enemyHp;
-  combat.enemyHp = Math.min(combat.enemyHp, fresh.enemyHp);
-  if (combat.hp <= 0) combat.hp = fresh.hp;
-  combat.hp = Math.min(combat.hp, playerMaxHp(state, content));
-  combat.chakra = Math.min(combat.chakra, playerMaxChakra(state, content));
-  combat.stamina = Math.min(combat.stamina, playerMaxStamina(state, content));
-  return combat;
 }
 
 const SKILL_ID_SET: ReadonlySet<string> = new Set(SKILL_IDS);
@@ -286,12 +272,12 @@ export function deserialize(
   }
   // A fight needs both its slot and its state; either one alone is dropped or rebuilt.
   const fighting = state.slots.some((s) => s.action?.kind === FIGHT_KIND);
-  state.combat = fighting ? sanitizeCombat(raw.combat, state, content) : null;
+  state.combat = fighting ? sanitizeCombat(raw.combat, content) : null;
   if (fighting && !state.combat) {
     for (const slot of state.slots) {
       if (slot.action?.kind === FIGHT_KIND) {
         const enemy = indexOf(content).enemies.get(slot.action.id);
-        if (enemy) state.combat = newCombat(state, enemy, content);
+        if (enemy) state.combat = newCombat(state, enemy, content, rules);
       }
     }
   }

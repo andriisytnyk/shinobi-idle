@@ -725,7 +725,14 @@ export const balanceParamsSchema = z.object({
   academyCap: z.number().int(),
   academySlow: z.number(),
   /** The sensei test: base seconds, shortening per level of the exam's skills, floor in seconds. */
-  combat: z.object({ xpTickMs: z.number().int(), regenMs: z.number().int(), hitEven: z.number() }),
+  combat: z.object({
+    xpTickMs: z.number().int(),
+    regenMs: z.number().int(),
+    hitEven: z.number(),
+    fightCapMs: z.number().int(),
+  }),
+  bindEva: z.number(),
+  illusionResist: z.number(),
   senseiTest: z.object({ base: z.number(), perLevel: z.number(), floor: z.number() }),
   offlineCapHours: z.number(),
   masteryCap: z.number().int(),
