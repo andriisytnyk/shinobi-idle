@@ -15,7 +15,7 @@
     /** The base as a number, for the machine-readable line. */
     baseRaw?: number;
     /** Extra lines after the parts (a ration, a floor, the runs per hour), already as text; `raw` is the number behind the text. */
-    notes?: { label: string; value: string; key?: string; raw?: number }[];
+    notes?: { label: string; value: string; id?: string; raw?: number }[];
   }
 
   let { display, parts, base, baseRaw, notes = [] }: Props = $props();
@@ -56,7 +56,7 @@
         </span>
       {/each}
       {#each notes as note (note.label)}
-        <span class="line" data-line="note" data-key={note.key} data-raw={note.raw}
+        <span class="line" data-line="note" data-key={note.id} data-raw={note.raw}
           ><span>{note.label}</span><span>{note.value}</span></span
         >
       {/each}

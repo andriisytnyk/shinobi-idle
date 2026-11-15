@@ -85,13 +85,13 @@
     if (!chain) return [];
     return [
       {
-        key: 'perMission',
+        id: 'perMission',
         label: t('mission.chain.perMission'),
         value: formatXp(chain.perMission),
         raw: chain.perMission,
       },
       {
-        key: 'runs',
+        id: 'runs',
         label: t('mission.chain.runs'),
         value: `×${runsFormat.format(chain.runs)}`,
         raw: chain.runs,
