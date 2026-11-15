@@ -3,10 +3,12 @@
  * hooks are registered in does not matter, and every time of a fight stays a whole number whatever
  * factors the data puts on it.
  */
-import { content as core, type ContentDb } from '@shinobi/content';
+import { content as core, corePack, type ContentDb } from '@shinobi/content';
+import { testmodPack } from '../src/testmod/index.ts';
 import { describe, expect, it } from 'vitest';
 import {
   advance,
+  composeGame,
   createFight,
   createState,
   defaultRules,
@@ -117,7 +119,7 @@ describe('a hook of another pack that fails', () => {
       const hook = evil({ id: `evil:${name}`, ...over });
       const fight = play(hook);
       expect(fight.result).toBe('void');
-      expect(fight.fault).toEqual({ pack: 'evil', hook: `evil:${name}` });
+      expect(fight.fault).toMatchObject({ pack: 'evil', hook: `evil:${name}` });
     });
   }
 
@@ -229,11 +231,17 @@ describe('a hook of another pack that fails', () => {
     expect(() => advance(state, 5 * 60_000, broken, rules)).not.toThrow();
     const voided = state.events.filter((e) => e.type === 'ruleDisabled');
     expect(voided.length).toBeGreaterThan(0);
-    expect(voided[0]).toMatchObject({ pack: 'evil', hook: 'evil:armor' });
+    expect(voided[0]).toMatchObject({ pack: 'evil', rule: 'fightHook.evil:armor' });
     expect(state.wounds.stacks).toBe(wounds);
     const back = deserialize(serialize(state, 0), broken, rules);
     expect(() => advance(back, 5 * 60_000, broken, rules)).not.toThrow();
     void startFight;
+  });
+
+  it('is an error naming the pack when the composed rules lack a hook its content names', () => {
+    const game = composeGame([corePack, { ...testmodPack, rules: undefined }]);
+    expect(game.failed[0]?.pack).toBe('testmod');
+    expect(game.failed[0]?.error).toContain('testmod:thirdStrike');
   });
 
   it('is found by the check of hook names when the content names a hook no pack registers', () => {

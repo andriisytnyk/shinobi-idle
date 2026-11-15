@@ -88,13 +88,7 @@ function literals(source: string): string[] {
  */
 const FX_KIND =
   'the kind of a technique or item effect (a closed union of the content schema), not a tag';
-const RANK =
-  'a player rank compared by its place in the rank list; goes with `rankIndex` of the open-state task';
 const ALLOWED: Record<string, string> = {
-  'loadout.ts: chunin': RANK,
-  'loadout.ts: genin': RANK,
-  'pouch.ts: student': RANK,
-  'snapshot.ts: student': RANK,
   'fight-items.ts: cleanse': FX_KIND,
   'fight-items.ts: dispel': FX_KIND,
   'fight-parse.ts: cleanse': FX_KIND,

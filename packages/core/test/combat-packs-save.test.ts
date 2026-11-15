@@ -124,5 +124,9 @@ describe('a saved fight with the ids of a pack, read with the core pack alone', 
     expect(read?.nature).toBeNull();
     expect(back.combat?.fight.player.effects.some((e) => e.id.startsWith('testmod:'))).toBe(false);
     expect(() => advance(back, HOUR, core)).not.toThrow();
+    // And back with the pack: the game is valid and plays on (what the fight carried of the pack is gone, as for any fight in progress).
+    const again = deserialize(serialize(back, 0), mod, modRules);
+    expect(again.combat?.enemy).toBe(fightId);
+    expect(() => advance(again, HOUR, mod, modRules)).not.toThrow();
   });
 });

@@ -81,7 +81,14 @@ const diff = (part: string, before: Record<string, unknown> = {}, now: Record<st
 for (const list of Object.keys(entities)) {
   diff(`entities.${list}`, old.entities?.[list] as Record<string, unknown>, entities[list] ?? {});
 }
-for (const part of ['order', 'balance', 'balanceOrder', 'locales', 'modifierKeys', 'icons'] as const) {
+for (const part of [
+  'order',
+  'balance',
+  'balanceOrder',
+  'locales',
+  'modifierKeys',
+  'icons',
+] as const) {
   diff(part, old[part], fresh[part] as Record<string, unknown>);
 }
 console.log(changes.join('\n') || 'nothing changed');

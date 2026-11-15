@@ -2,7 +2,7 @@ import type { ContentDb, SkillId } from '@shinobi/content';
 import { masteryLevel } from '../formulas.ts';
 import { computeMods } from '../modifiers.ts';
 import { skillLevel } from '../requirements.ts';
-import { rankIndex } from '../vocab.ts';
+import { isAcademyRank, rankIndex } from '../vocab.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 import type { Levels, PlayerSnapshot } from './numbers.ts';
@@ -60,7 +60,7 @@ export function snapshotPlayer(
   snapshot.wounds = state.wounds.stacks;
   snapshot.knowledge = knowledgeOf(state, content, entries);
   // A student fights with everything they know; from Genin the loadout is the player's.
-  if (state.player.rank !== 'student') {
+  if (!isAcademyRank(content, state.player.rank)) {
     const active = effectiveLoadout(state, content);
     snapshot.loadout = active;
     const sig = state.loadouts.signature;

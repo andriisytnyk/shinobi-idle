@@ -89,6 +89,20 @@ describe('a save made on dev in the middle of a fight', () => {
   });
 
   it('plays on as it did there', { timeout: 300_000 }, () => {
+    if (process.env.UPDATE_GOLDEN === 'expected') {
+      // Keeps the saves made on 31e7746 and records what the engine of dev plays from them (after a change of the save format).
+      const old = JSON.parse(readFileSync(FIXTURE, 'utf8')) as Record<
+        string,
+        { save: string; expected: string }
+      >;
+      for (const rec of Object.values(old)) rec.expected = digest(played(rec.save));
+      writeFileSync(
+        FIXTURE,
+        `${JSON.stringify(old)}
+`,
+      );
+      return;
+    }
     if (process.env.UPDATE_GOLDEN === '1') {
       const out: Record<string, { save: string; expected: string }> = {};
       for (const t of list) {
