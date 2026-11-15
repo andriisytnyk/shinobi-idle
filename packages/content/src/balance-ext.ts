@@ -173,6 +173,7 @@ export const BALANCE_EXT = {
     floor: 0.5,
     masteryTime: 0.003,
     slowAlt: 2,
+    minFactor: 0.2,
     success: { base: 0.9, perLevel: 0.01, perMastery: 0.002, cap: 0.99 },
   },
   /** The team: a teammate stands at 80% of the player's level, performs with mastery 10, and in a fight hits every 9 s for 60% of the player's basic damage with the state of its nature. */

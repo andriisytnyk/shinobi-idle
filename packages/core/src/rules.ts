@@ -14,7 +14,7 @@ import { gearProvider } from './gear.ts';
 import { meditateKind, meditationProvider } from './meditation.ts';
 import type { ModifierProvider } from './modifiers.ts';
 import { natureProvider } from './natures.ts';
-import { missionKind, MISSION_KIND, rationProvider } from './missions/index.ts';
+import { missionKind, MISSION_KIND } from './missions/index.ts';
 import { questSystem } from './quests.ts';
 import { EXPLORE_KIND, WALK_KIND, exploreKind, walkKind, worldProvider } from './world.ts';
 import type { System } from './system.ts';
@@ -56,7 +56,6 @@ export const defaultRules: Rules = {
     obstacleProvider,
     natureProvider,
     worldProvider,
-    rationProvider,
   ],
   combatAi: defaultCombatAi,
   fightHooks: defaultFightHooks,

@@ -35,7 +35,8 @@ export interface ActionKind {
   intervalMs(state: GameState, id: string, content: ContentDb, rules: Rules, slot?: number): number;
   /**
    * Pays out one finished cycle. Returning 'stop' ends the action (one-shot actions); 'abort'
-   * ends it too but means nothing was done, so the cycle is not counted.
+   * ends it too but means nothing was done, so the cycle is not counted. 'step' goes on without
+   * counting the cycle: it was a part of a longer action (a stage of a mission) that counts itself.
    */
   complete(
     state: GameState,
@@ -43,9 +44,15 @@ export interface ActionKind {
     content: ContentDb,
     rules: Rules,
     slot?: number,
-  ): 'continue' | 'stop' | 'abort' | void;
+  ): 'continue' | 'stop' | 'abort' | 'step' | void;
   /** A reason (localization key) the action cannot start for a cause that is not a requirement, or null. */
-  blocked?(state: GameState, id: string, content: ContentDb, rules: Rules): string | null;
+  blocked?(
+    state: GameState,
+    id: string,
+    content: ContentDb,
+    rules: Rules,
+    slot?: number,
+  ): string | null;
   /** The item the action lacks for its next cycle, if any; names the cause when it stops or is refused. */
   missing?(state: GameState, id: string, content: ContentDb, rules: Rules): string | null;
   /** The skill the action trains, when it trains one; a locked skill refuses its actions. */
@@ -234,6 +241,13 @@ export const actionSystem: System = {
         if (result === 'abort') {
           const lacking = kind.missing?.(state, id, content, rules);
           return stopSlot(state, index, lacking ? 'requirements' : 'finished', content, rules);
+        }
+        if (result === 'step') {
+          const req = kind.requirements(state, id, content, rules);
+          if (req && !evalReq(state, req, content).met) {
+            return stopSlot(state, index, 'requirements', content, rules);
+          }
+          continue;
         }
         const trained = kind.skill?.(id, content);
         if (trained) spendTonicCharges(state, trained);

@@ -1,14 +1,15 @@
 import type { ContentDb, Mission, MissionPay } from '@shinobi/content';
 import { effectiveLoadout } from '../combat/loadout.ts';
-import { entryOf } from '../combat/zones.ts';
-import { MS_PER_HOUR, rate } from '../formulas.ts';
+import { MS_PER_HOUR } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
-import { computeMod } from '../modifiers.ts';
-import { evalReq, skillLevel, type ReqResult } from '../requirements.ts';
+import { computeMod, type Modifier } from '../modifiers.ts';
+import { xpGain } from '../progression.ts';
+import { evalReq, type ReqResult } from '../requirements.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
-import { SELF, planStage, type StagePlan } from './plan.ts';
-import { missionRequirements } from './run.ts';
+import { planStage, type StagePlan } from './plan.ts';
+import { armedRation } from './ration.ts';
+import { missionRequirements, resourceUnits, stageXp } from './run.ts';
 
 /** How one stage is done and how it goes now, and at the next Mastery step of the technique used. */
 export interface StageForecast {
@@ -17,7 +18,7 @@ export interface StageForecast {
   /** Localization key of the stage's label. */
   labelKey: string;
   /** The path the game would take; null when the stage is blocked. */
-  path: Pick<StagePlan, 'who' | 'skill' | 'tech' | 'slow'> | null;
+  path: Pick<StagePlan, 'who' | 'skill' | 'tech' | 'slow' | 'intel'> | null;
   /** Length of one attempt, ms, and the chance an attempt succeeds. */
   ms: number;
   chance: number;
@@ -37,7 +38,13 @@ export interface MissionForecast {
   ryo: number;
   rep: number;
   pay: MissionPay[];
-  /** Per hour of running the mission over and over: ryo, Reputation and the XP of each skill. */
+  /** Village resource: the slug and the units one finished mission brings after the modifiers; null for none. */
+  resource: { slug: string; units: number } | null;
+  /** The modifiers that went into the ryo, the Reputation and the resource units, for the breakdown. */
+  mods: { ryo: Modifier[]; rep: Modifier[]; resource: Modifier[] };
+  /** The share the armed ration takes off the mission (0 with none armed). */
+  ration: number;
+  /** Per hour of running the mission over and over: ryo, Reputation and the XP of each skill (what is really added, caps and slowdowns counted). */
   ryoPerHour: number;
   repPerHour: number;
   xpPerHour: Record<string, number>;
@@ -58,16 +65,16 @@ export function missionForecast(
   content: ContentDb,
   rules: Rules,
 ): MissionForecast {
-  const K = content.balance.K;
   const mods = rules.modifierProviders;
-  const cap = K.missionRateCap[mission.rank as 'D' | 'C' | 'V'] ?? 0;
+  const ration = armedRation(state, content);
+  const style = styleGuess(state, content);
   const stages: StageForecast[] = [];
-  const xpMs: Record<string, number> = {};
+  const xpAmount: Record<string, number> = {};
   let nominal = 0;
   let expected = 0;
   let doable = true;
   mission.stages.forEach((stage, index) => {
-    const plan = planStage(state, mission, index, content, rules);
+    const plan = planStage(state, mission, index, content, rules, ration);
     const labelKey = `mission.${mission.id}.stage.${index}.label`;
     if (!plan) {
       doable = false;
@@ -83,47 +90,43 @@ export function missionForecast(
       });
       return;
     }
-    const after = plan.tech !== '' ? planStage(state, mission, index, content, rules, 0, 1) : null;
-    const expectedMs = plan.ms / Math.max(plan.chance, Number.EPSILON);
+    const after =
+      plan.tech !== '' ? planStage(state, mission, index, content, rules, ration, 1) : null;
+    const attempts = 1 / Math.max(plan.chance, Number.EPSILON);
     nominal += plan.ms;
-    expected += expectedMs;
-    if (plan.who === SELF) {
-      if (plan.skill !== '') {
-        const level = Math.min(skillLevel(state, plan.skill as never, content), cap);
-        xpMs[plan.skill] =
-          (xpMs[plan.skill] ?? 0) + K.missionXpShare * rate(level, content) * expectedMs;
-      } else if (stage.t === 'combat') {
-        const entry = entryOf(content, stage.enemy);
-        const pool = K.missionXpShare * rate(Math.min(entry?.cl ?? 0, cap), content) * expectedMs;
-        const xp = K.combatXp;
-        const total = xp.style + xp.vit + xp.eva;
-        const style = styleGuess(state, content);
-        xpMs[style] = (xpMs[style] ?? 0) + (pool * xp.style) / total;
-        xpMs.vit = (xpMs.vit ?? 0) + (pool * xp.vit) / total;
-        xpMs.eva = (xpMs.eva ?? 0) + (pool * xp.eva) / total;
-      }
+    expected += plan.ms * attempts;
+    // The XP of an attempt as the grant would add it, once per expected attempt.
+    for (const [skill, amount] of stageXp(state, mission, index, plan, style, content).xp) {
+      xpAmount[skill] =
+        (xpAmount[skill] ?? 0) + xpGain(state, skill, amount, content, rules) * attempts;
     }
     stages.push({
       index,
       kind: stage.t,
       labelKey,
-      path: { who: plan.who, skill: plan.skill, tech: plan.tech, slow: plan.slow },
+      path: {
+        who: plan.who,
+        skill: plan.skill,
+        tech: plan.tech,
+        slow: plan.slow,
+        intel: plan.intel,
+      },
       ms: plan.ms,
       chance: plan.chance,
-      expectedMs,
+      expectedMs: plan.ms * attempts,
       next: after ? { ms: after.ms, chance: after.chance } : null,
     });
   });
-  const ryo = Math.round(mission.ryo * computeMod(mods, state, 'mission.ryo', content).total);
-  const rep = mission.team
-    ? Math.round(mission.rep * computeMod(mods, state, 'mission.rep', content).total)
-    : 0;
+  const ryoMod = computeMod(mods, state, 'mission.ryo', content);
+  const repMod = computeMod(mods, state, 'mission.rep', content);
+  const resMod = mission.resourceMod
+    ? computeMod(mods, state, mission.resourceMod, content)
+    : { total: 1, parts: [] as Modifier[] };
+  const ryo = Math.round(mission.ryo * ryoMod.total);
+  const rep = mission.team ? Math.round(mission.rep * repMod.total) : 0;
   const hours = expected / MS_PER_HOUR;
   const xpPerHour: Record<string, number> = {};
-  for (const [skill, v] of Object.entries(xpMs)) {
-    // `xpMs` holds XP per hour x ms; over the expected time it is the hourly rate.
-    xpPerHour[skill] = expected > 0 ? v / expected : 0;
-  }
+  for (const [skill, v] of Object.entries(xpAmount)) xpPerHour[skill] = hours > 0 ? v / hours : 0;
   return {
     id: mission.id,
     stages,
@@ -132,6 +135,11 @@ export function missionForecast(
     ryo,
     rep,
     pay: mission.pay,
+    resource: mission.resource
+      ? { slug: mission.resource, units: resourceUnits(state, mission, content, rules) }
+      : null,
+    mods: { ryo: ryoMod.parts, rep: repMod.parts, resource: resMod.parts },
+    ration,
     ryoPerHour: hours > 0 ? ryo / hours : 0,
     repPerHour: hours > 0 ? rep / hours : 0,
     xpPerHour,

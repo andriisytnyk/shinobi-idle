@@ -39,6 +39,8 @@ export interface StagePlan {
   mastery: number;
   /** Whether this is a slower fallback. */
   slow: boolean;
+  /** Intel spent to do the stage with no skill (0: none). */
+  intel: number;
   /** Length of one attempt, ms. */
   ms: number;
   /** Chance that an attempt succeeds, 0..1. */
@@ -46,15 +48,7 @@ export interface StagePlan {
 }
 
 /** A way to do a stage before its numbers are worked out. */
-interface Candidate {
-  who: string;
-  skill: string;
-  tech: string;
-  level: number;
-  min: number;
-  mastery: number;
-  slow: boolean;
-}
+type Candidate = Omit<StagePlan, 'ms' | 'chance'>;
 
 /** The time one attempt of a stage takes by its share of the mission's minutes, ms; the shares add up to the whole mission. */
 export function stageBaseMs(mission: Mission, index: number): number {
@@ -126,7 +120,8 @@ function candidates(
   const out: Candidate[] = [];
   const team = mission.team ? teammates(state, content) : [];
   const K = content.balance.K;
-  const self = (c: Omit<Candidate, 'who'>): void => void out.push({ who: SELF, ...c });
+  const self = (c: Omit<Candidate, 'who' | 'intel'>): void =>
+    void out.push({ who: SELF, intel: 0, ...c });
   const level = (skill: string): number => skillLevel(state, skill as SkillId, content);
 
   /** One requirement `skill >= min`, done by the player, then by each teammate who can. */
@@ -156,6 +151,7 @@ function candidates(
           min,
           mastery: K.team.mastery,
           slow,
+          intel: 0,
         });
       }
     }
@@ -191,10 +187,24 @@ function candidates(
       self({ skill: '', tech: '', level: 0, min: 0, mastery: 1, slow: false });
       break;
   }
+  // Intel can stand in for a stage's skill: it is the way of last resort.
+  const cost = mission.skip[index] ?? 0;
+  if (cost > 0 && state.currencies.intel >= cost) {
+    out.push({
+      who: SELF,
+      skill: '',
+      tech: '',
+      level: 0,
+      min: 0,
+      mastery: 1,
+      slow: false,
+      intel: cost,
+    });
+  }
   return out;
 }
 
-/** What `ration` (a share, negative) and the mission duration modifiers do to a stage of `skill`. */
+/** What `ration` (a share, negative) and the mission duration modifiers do to a stage of `skill`, never below the floor of the balance. */
 function durationFactor(
   state: GameState,
   skill: string,
@@ -206,7 +216,7 @@ function durationFactor(
   if (skill === 'nin') {
     factor *= computeMod(rules.modifierProviders, state, 'mission.duration.nin', content).total;
   }
-  return Math.max(0, factor * (1 + ration));
+  return Math.max(content.balance.K.mission.minFactor, factor * (1 + ration));
 }
 
 /** The numbers of an attempt of `c`: its length in ms and its chance. */
@@ -247,10 +257,15 @@ function figures(
   return { ...c, ms, chance };
 }
 
+/** Which way is preferred: the player's own normal way first, then a teammate or a slow fallback, then Intel. */
+const tierOf = (c: Candidate): number => (c.intel > 0 ? 2 : c.who === SELF && !c.slow ? 0 : 1);
+
 /**
- * The way the game would do a stage now: of every way the player or a teammate can, the fastest
- * (the player first on a tie). `ration` is the share (negative) a ration takes off, `extraMastery`
- * adds mastery levels to the technique used (to preview the next step). Null when none works.
+ * The way the game would do a stage now. The player does it whenever they meet it by a normal
+ * way; a teammate does it only when the player cannot, or can only by a slower fallback; Intel
+ * is the last resort. Within a kind of way the fastest wins (the player first on a tie).
+ * `ration` is the share (negative) a ration takes off, `extraMastery` adds mastery levels to the
+ * technique used (to preview the next step). Null when no way works.
  */
 export function planStage(
   state: GameState,
@@ -261,8 +276,11 @@ export function planStage(
   ration = 0,
   extraMastery = 0,
 ): StagePlan | null {
+  const all = candidates(state, mission, index, content);
+  const tier = Math.min(...all.map(tierOf));
   let best: StagePlan | null = null;
-  for (const c of candidates(state, mission, index, content)) {
+  for (const c of all) {
+    if (tierOf(c) !== tier) continue;
     const plan = figures(
       state,
       mission,

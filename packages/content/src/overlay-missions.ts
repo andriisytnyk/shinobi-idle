@@ -26,6 +26,7 @@ export function layerMissions(
     if (!x) throw new Error(`No hand data for mission ${m.id}`);
     if (x.shares.length !== m.stages.length) throw new Error(`${m.id}: one share per stage`);
     if (x.slow.length !== m.stages.length) throw new Error(`${m.id}: one slow list per stage`);
+    if (x.skip.length !== m.stages.length) throw new Error(`${m.id}: one Intel cost per stage`);
     if (x.pay.length !== m.pay.length) throw new Error(`${m.id}: one amount per payment`);
     return {
       ...m,
@@ -37,6 +38,8 @@ export function layerMissions(
       unlock: x.unlock,
       shares: x.shares,
       slow: x.slow,
+      skip: x.skip,
+      resourceMod: x.resourceMod,
     };
   });
 }

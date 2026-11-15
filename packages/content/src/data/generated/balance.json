@@ -584,6 +584,7 @@
       "floor": 0.5,
       "masteryTime": 0.003,
       "slowAlt": 2,
+      "minFactor": 0.2,
       "success": {
         "base": 0.9,
         "perLevel": 0.01,

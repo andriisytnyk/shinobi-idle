@@ -3,32 +3,24 @@ import { removeItem } from '../bank.ts';
 import type { CommandResult } from '../engine.ts';
 import { emit } from '../events.ts';
 import { indexOf } from '../lookup.ts';
-import type { Modifier, ModifierProvider } from '../modifiers.ts';
 import type { GameState } from '../state.ts';
 
 /** The buff entry a ration leaves: it is no skill's, so no tonic reads it. */
 export const RATION_BUFF = 'mission';
 
 /**
- * An armed ration shortens the next mission: while its buff is in `state.buffs` it adds its
- * duration share to `mission.duration`, and the next mission to begin takes the charge.
+ * The share (negative) that the armed ration takes off the next mission; 0 with none armed. It is
+ * not a modifier: the run that begins next takes it once and keeps it for its whole length, and
+ * forecasts take it from here, so the ration enters a duration in exactly one place.
  */
-export const rationProvider: ModifierProvider = (state, content) => {
-  const out: Modifier[] = [];
+export function armedRation(state: GameState, content: ContentDb): number {
   const items = indexOf(content).items;
   for (const [id, buff] of Object.entries(state.buffs)) {
     const fx = items.get(id)?.fx;
-    if (fx?.kind !== 'ration' || buff.charges < 1) continue;
-    out.push({
-      key: 'mission.duration',
-      op: 'add',
-      value: fx.duration,
-      group: 'items',
-      source: { kind: 'item', id },
-    });
+    if (fx?.kind === 'ration' && buff.charges >= 1) return fx.duration;
   }
-  return out;
-};
+  return 0;
+}
 
 /** Uses a ration from the bank: it is armed for the next mission, and one already armed is not doubled. */
 export function useRation(state: GameState, id: string, content: ContentDb): CommandResult {

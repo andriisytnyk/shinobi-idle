@@ -365,24 +365,20 @@ describe('A4: each wired key changes its mechanic by exactly the modifier', () =
     },
     'mission.ryo': () => {
       const s = genin();
-      payMission(
-        s,
-        missionById('core:cat'),
-        false,
-        content,
-        withProvider(test('mission.ryo', 0.1)),
-      );
+      payMission(s, missionById('core:cat'), [], content, withProvider(test('mission.ryo', 0.1)));
       expect(s.currencies.ryo).toBe(Math.round(missionById('core:cat').ryo * 1.1));
+    },
+    'power.sparring': () => {
+      const s = genin();
+      const spar = missionById('core:v_spar');
+      payMission(s, spar, [], content, withProvider(test('power.sparring', 1)));
+      expect(s.missions.pending[spar.resource ?? '']).toBe(
+        content.balance.K.shinobiResPerMission * 2,
+      );
     },
     'mission.rep': () => {
       const s = genin();
-      payMission(
-        s,
-        missionById('core:cat'),
-        false,
-        content,
-        withProvider(test('mission.rep', 0.5)),
-      );
+      payMission(s, missionById('core:cat'), [], content, withProvider(test('mission.rep', 0.5)));
       expect(s.currencies.rep).toBe(Math.round(missionById('core:cat').rep * 1.5));
     },
     'meditation.enlightChance': () => {

@@ -14,7 +14,7 @@ import { bossNature } from '../natures.ts';
 import type { TeamSupport } from './fight-types.ts';
 import { createFight, fightAdvance, fightNextEventIn, fightOutcome } from './fight.ts';
 import { secMs } from './numbers.ts';
-import { refillPouch, syncPouch } from './pouch.ts';
+import { ensurePouch, refillPouch, syncPouch } from './pouch.ts';
 import { snapshotPlayer } from './snapshot.ts';
 import type { CombatState, RunState } from './types.ts';
 import { WORK_PER_MS, workOf } from './units.ts';
@@ -37,12 +37,20 @@ export const combatUnits = (ms: number): number => workOf(ms);
 
 /** Index of the slot running a fight or an operation, or -1. */
 export function fightSlotIndex(state: GameState): number {
-  return state.slots.findIndex(
-    (s) =>
-      s.action !== null &&
-      (isCombatKind(s.action.kind) || (s.action.kind === MISSION_KIND && state.combat !== null)),
-  );
+  const owner = state.combat?.owner ?? -1;
+  const kind = state.slots[owner]?.action?.kind;
+  return kind !== undefined && (isCombatKind(kind) || kind === MISSION_KIND) ? owner : -1;
 }
+
+/** Whether a fight is going that another slot owns: a slot that wants to fight must wait or be refused. */
+export function fightBusy(state: GameState, slot: number): boolean {
+  const owner = state.combat?.owner;
+  return owner !== undefined && owner !== slot && state.slots[owner]?.action != null;
+}
+
+/** The reason a fight cannot start in `slot` now (a localization key), or null. */
+export const fightBusyReason = (state: GameState, slot: number | undefined): string | null =>
+  slot !== undefined && fightBusy(state, slot) ? 'error.fightBusy' : null;
 
 type Pools = { hp: number; chakra: number; stamina: number };
 
@@ -75,6 +83,7 @@ function blank(
   entry: Enemy | Boss,
   fight: CombatState['fight'],
   run: RunState | null,
+  owner: number,
 ): CombatState {
   return {
     enemy: entry.id,
@@ -85,6 +94,7 @@ function blank(
     paid: {},
     carry: 0,
     style: 'tai',
+    owner,
     run,
   };
 }
@@ -95,8 +105,9 @@ export function newCombat(
   entry: Enemy | Boss,
   content: ContentDb,
   rules: Rules,
+  owner: number,
 ): CombatState {
-  return blank(entry, startFight(state, entry, content, rules), null);
+  return blank(entry, startFight(state, entry, content, rules), null, owner);
 }
 
 /** A fight of a mission's combat stage: full pools, the current loadout and pouch (no refill), and the teammates' support. */
@@ -106,9 +117,13 @@ export function newMissionCombat(
   support: readonly TeamSupport[],
   content: ContentDb,
   rules: Rules,
+  owner: number,
 ): CombatState {
   state.flags.firstFight = true;
-  return blank(entry, startFight(state, entry, content, rules, undefined, support), null);
+  // The pouch is topped up from the bank on the way into the fight, as for any fight.
+  ensurePouch(state, content);
+  refillPouch(state, content);
+  return blank(entry, startFight(state, entry, content, rules, undefined, support), null, owner);
 }
 
 /** The enemy of an operation step; a step that draws from a pool draws on the combat stream. */
@@ -124,6 +139,7 @@ export function newOperation(
   op: Operation,
   content: ContentDb,
   rules: Rules,
+  owner: number,
 ): CombatState | null {
   const steps = opSteps(op);
   const approach = steps[0]?.t === 'approach';
@@ -131,7 +147,7 @@ export function newOperation(
   const enemy = enemyOfStep(state, steps[at]);
   const entry = enemy ? entryOf(content, enemy) : undefined;
   if (!entry) return null;
-  const c = blank(entry, startFight(state, entry, content, rules), { op: op.id, step: at });
+  const c = blank(entry, startFight(state, entry, content, rules), { op: op.id, step: at }, owner);
   if (approach) {
     c.phase = 'approach';
     c.pause = workOf(approachMs(state, op, content));

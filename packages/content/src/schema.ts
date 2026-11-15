@@ -386,6 +386,10 @@ export const missionExtraSchema = z.strictObject({
   pay: z.array(z.number().int().min(1)),
   /** For each stage, the indices of its alternatives that are slower fallbacks (they take twice the time). */
   slow: z.array(z.array(z.number().int().min(0))),
+  /** For each stage, the Intel that does it with no skill at all (0: it cannot be bought). */
+  skip: z.array(z.number().int().min(0)),
+  /** Modifier key that scales the village resource units the mission brings (null: none). */
+  resourceMod: z.string().nullable(),
 });
 
 export const missionSchema = missionBaseSchema.extend({
@@ -393,6 +397,8 @@ export const missionSchema = missionBaseSchema.extend({
   unlock: z.lazy(() => reqSchema).nullable(),
   shares: z.array(z.number().int().min(1)).min(1),
   slow: z.array(z.array(z.number().int().min(0))),
+  skip: z.array(z.number().int().min(0)),
+  resourceMod: z.string().nullable(),
 });
 
 /**
@@ -1042,6 +1048,8 @@ export const balanceParamsSchema = z.object({
     floor: z.number(),
     masteryTime: z.number(),
     slowAlt: z.number(),
+    /** The shortest a stage can get: the share of its base time that the modifiers cannot go under. */
+    minFactor: z.number(),
     success: z.object({
       base: z.number(),
       perLevel: z.number(),

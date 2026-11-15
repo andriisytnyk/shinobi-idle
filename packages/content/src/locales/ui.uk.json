@@ -707,5 +707,7 @@
   "world.panel.actions": "Дії",
   "world.explore.short": "Розвідати",
   "world.travel.instantShort": "Миттєво",
-  "world.travel.walkShort": "Пішки"
+  "world.travel.walkShort": "Пішки",
+  "error.fightBusy": "Інший слот уже веде бій. Дочекайся його кінця або зупини той слот.",
+  "mission.consumed.note": "Ліки, предмети й пайок, що пішли в діло, не повертаються, якщо ти зупиниш місію."
 }

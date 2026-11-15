@@ -6,7 +6,9 @@
     },
     "shares": [1, 2],
     "pay": [],
-    "slow": [[], []]
+    "slow": [[], []],
+    "skip": [0, 0],
+    "resourceMod": null
   },
   "core:weed": {
     "unlock": {
@@ -15,7 +17,9 @@
     },
     "shares": [1],
     "pay": [6],
-    "slow": [[]]
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null
   },
   "core:fire": {
     "unlock": {
@@ -24,7 +28,9 @@
     },
     "shares": [2, 2, 2],
     "pay": [6],
-    "slow": [[], [1], []]
+    "slow": [[], [1], []],
+    "skip": [0, 0, 0],
+    "resourceMod": null
   },
   "core:drought": {
     "unlock": {
@@ -33,7 +39,9 @@
     },
     "shares": [1],
     "pay": [6, 2],
-    "slow": [[1]]
+    "slow": [[1]],
+    "skip": [0],
+    "resourceMod": null
   },
   "core:courier": {
     "unlock": {
@@ -42,7 +50,9 @@
     },
     "shares": [1],
     "pay": [],
-    "slow": [[]]
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null
   },
   "core:rockfall": {
     "unlock": {
@@ -51,7 +61,9 @@
     },
     "shares": [1],
     "pay": [6],
-    "slow": [[]]
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null
   },
   "core:thief": {
     "unlock": {
@@ -60,7 +72,9 @@
     },
     "shares": [3, 5],
     "pay": [1],
-    "slow": [[], []]
+    "slow": [[], []],
+    "skip": [0, 0],
+    "resourceMod": null
   },
   "core:caravan": {
     "unlock": {
@@ -69,7 +83,9 @@
     },
     "shares": [8, 9, 8],
     "pay": [1],
-    "slow": [[], [], []]
+    "slow": [[], [], []],
+    "skip": [1, 0, 0],
+    "resourceMod": null
   },
   "core:sealed": {
     "unlock": {
@@ -78,7 +94,9 @@
     },
     "shares": [1, 2],
     "pay": [],
-    "slow": [[], []]
+    "slow": [[], []],
+    "skip": [0, 0],
+    "resourceMod": null
   },
   "core:mail": {
     "unlock": {
@@ -87,7 +105,9 @@
     },
     "shares": [1],
     "pay": [2],
-    "slow": [[]]
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null
   },
   "core:well": {
     "unlock": {
@@ -96,7 +116,9 @@
     },
     "shares": [8, 2, 12],
     "pay": [2],
-    "slow": [[], [], []]
+    "slow": [[], [], []],
+    "skip": [0, 0, 0],
+    "resourceMod": null
   },
   "core:dig": {
     "unlock": {
@@ -105,7 +127,9 @@
     },
     "shares": [8, 9, 11],
     "pay": [1],
-    "slow": [[], [], []]
+    "slow": [[], [], []],
+    "skip": [0, 0, 0],
+    "resourceMod": null
   },
   "core:v_spar": {
     "unlock": {
@@ -114,7 +138,9 @@
     },
     "shares": [1],
     "pay": [],
-    "slow": [[]]
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": "power.sparring"
   },
   "core:v_walls": {
     "unlock": {
@@ -123,7 +149,9 @@
     },
     "shares": [1],
     "pay": [],
-    "slow": [[]]
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null
   },
   "core:v_fence": {
     "unlock": {
@@ -132,7 +160,9 @@
     },
     "shares": [3, 1],
     "pay": [],
-    "slow": [[], []]
+    "slow": [[], []],
+    "skip": [0, 0],
+    "resourceMod": null
   },
   "core:v_clear": {
     "unlock": {
@@ -141,7 +171,9 @@
     },
     "shares": [1],
     "pay": [],
-    "slow": [[]]
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null
   },
   "core:v_water": {
     "unlock": {
@@ -150,7 +182,9 @@
     },
     "shares": [1],
     "pay": [],
-    "slow": [[]]
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null
   },
   "core:v_sanit": {
     "unlock": {
@@ -159,7 +193,9 @@
     },
     "shares": [1],
     "pay": [],
-    "slow": [[]]
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null
   },
   "core:v_rubble": {
     "unlock": {
@@ -168,7 +204,9 @@
     },
     "shares": [1],
     "pay": [],
-    "slow": [[]]
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null
   },
   "core:v_clones": {
     "unlock": {
@@ -177,7 +215,9 @@
     },
     "shares": [1],
     "pay": [],
-    "slow": [[]]
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null
   },
   "core:v_seal": {
     "unlock": {
@@ -186,12 +226,16 @@
     },
     "shares": [1],
     "pay": [],
-    "slow": [[]]
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null
   },
   "core:op_hideout": {
     "unlock": null,
     "shares": [1, 1, 1, 1],
     "pay": [1],
-    "slow": [[], [], [], []]
+    "slow": [[], [], [], []],
+    "skip": [0, 0, 0, 0],
+    "resourceMod": null
   }
 }

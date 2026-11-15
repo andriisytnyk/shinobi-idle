@@ -40,6 +40,8 @@ export interface CombatState {
   carry: number;
   /** Skill that earns combat style XP: that of the technique last used; basic attacks are Taijutsu. */
   style: SkillId;
+  /** Index of the slot that owns this fight: the one that started it, and the only one that may end or replace it. */
+  owner: number;
   /** The operation run this fight belongs to; null for a zone fight. */
   run: RunState | null;
 }

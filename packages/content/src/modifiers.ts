@@ -91,6 +91,9 @@ add(
   },
 );
 add('mission.ryo', 'Ryo paid by a finished mission (0.05 is 5% more)', { wired: true });
+add('power.sparring', 'Shinobi power units a finished sparring mission brings (1 is 100% more)', {
+  wired: true,
+});
 add('mission.rep', 'Reputation paid by a finished team mission (0.05 is 5% more)', { wired: true });
 add('interval.explore', 'Time to explore a cell (-0.05 is 5% shorter)', { wired: true });
 add('interval.walk', 'Time of a walk to another cell (-0.05 is 5% shorter)', { wired: true });

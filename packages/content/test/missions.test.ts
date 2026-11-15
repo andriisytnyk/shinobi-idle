@@ -36,6 +36,26 @@ describe('missions: data', () => {
     expect(slow.sort()).toEqual(['core:drought:0:ath', 'core:fire:1:ath']);
   });
 
+  it('buys the ambush stage of the caravan with Intel, as the balance says, and nothing else', () => {
+    for (const m of content.missions) {
+      expect(m.skip, m.id).toHaveLength(m.stages.length);
+      expect(
+        m.skip.some((n) => n > 0),
+        m.id,
+      ).toBe(m.id === 'core:caravan');
+    }
+    expect(content.missions.find((m) => m.id === 'core:caravan')?.skip).toEqual([
+      K.intel.caravanSkip,
+      0,
+      0,
+    ]);
+  });
+
+  it('scales the units of the sparring mission by its own modifier key', () => {
+    const keyed = content.missions.filter((m) => m.resourceMod !== null);
+    expect(keyed.map((m) => [m.id, m.resourceMod])).toEqual([['core:v_spar', 'power.sparring']]);
+  });
+
   it('pays in kind as the balance tables say', () => {
     const pay = (id: string) => content.missions.find((m) => m.id === id)?.pay;
     expect(pay('core:weed')).toEqual([{ kind: 'item', item: 'core:rice', n: 6 }]);

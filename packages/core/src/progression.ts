@@ -9,22 +9,21 @@ import { refreshUnlocks } from './unlocks.ts';
 import { levelAt, xpAt } from './xp.ts';
 
 /**
- * Adds skill XP. Modifiers `xp.all` and `xp.skill.<id>` apply. A student's XP is slowed from the
- * Academy cap on: a grant that crosses the cap is split there, full below and slowed above.
- * XP stops at the level cap. Emits `levelUp` and refreshes unlocks.
+ * The XP a grant of `amount` really adds to `skill` now: the modifiers `xp.all` and
+ * `xp.skill.<id>` applied, a student's slowdown from the Academy cap on (a grant that crosses the
+ * cap is split there, full below and slowed above), and none beyond the level cap. `gainXp` adds
+ * exactly this, and forecasts read it so that they cannot disagree with the grant.
  */
-export function gainXp(
+export function xpGain(
   state: GameState,
   skill: SkillId,
   amount: number,
   content: ContentDb,
   rules: Rules,
-): void {
-  if (!(amount > 0)) return;
+): number {
+  if (!(amount > 0)) return 0;
   const K = content.balance.K;
-  const cap = K.cap;
   const entry = state.skills[skill];
-  const before = levelAt(entry.xp, cap);
   const mods = rules.modifierProviders;
   const raw =
     amount *
@@ -35,7 +34,24 @@ export function gainXp(
     const room = Math.max(0, xpAt(K.academyCap) - entry.xp);
     gained = raw <= room ? raw : room + (raw - room) * K.academySlow;
   }
-  entry.xp = Math.min(entry.xp + gained, xpAt(cap));
+  return Math.max(0, Math.min(entry.xp + gained, xpAt(K.cap)) - entry.xp);
+}
+
+/**
+ * Adds skill XP (see `xpGain`). XP stops at the level cap. Emits `levelUp` and refreshes unlocks.
+ */
+export function gainXp(
+  state: GameState,
+  skill: SkillId,
+  amount: number,
+  content: ContentDb,
+  rules: Rules,
+): void {
+  if (!(amount > 0)) return;
+  const cap = content.balance.K.cap;
+  const entry = state.skills[skill];
+  const before = levelAt(entry.xp, cap);
+  entry.xp = Math.min(entry.xp + xpGain(state, skill, amount, content, rules), xpAt(cap));
   const after = levelAt(entry.xp, cap);
   if (after === before) return;
   for (let level = before + 1; level <= after; level++) {
