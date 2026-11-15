@@ -13,6 +13,7 @@ import { addEffect, findEffect, isSuppressed, removeEffect } from '../combat/fig
 import { applyStatusById } from '../combat/fight-status.ts';
 import type { Combatant, FightCtx, FightHook } from '../combat/fight-types.ts';
 import { secMs } from '../combat/numbers.ts';
+import { figure } from '../combat/need.ts';
 import { needOf, TICK_MS, workOf } from '../combat/units.ts';
 
 /*
@@ -25,12 +26,21 @@ import { needOf, TICK_MS, workOf } from '../combat/units.ts';
  * Armour and Regeneration are data (`mods`, `regen` of the trait), not hooks.
  */
 
+/** A number of the `K.trait` row of the balance object. */
+const trait = (K: { trait: Readonly<Record<string, number>> }, key: string): number =>
+  figure(K.trait, key, 'trait');
+
 const timerOf = (ms: number) => ({ progress: 0, need: needOf(ms) });
 
 // ---------- capabilities: numbers a special publishes for the trait it strengthens ----------
 
 /** The caster's numbers a heavy-cast boss publishes (ms and a multiplier), read by the Caster trait. */
-const CAST = { every: 'caster.everyMs', cast: 'caster.castMs', mult: 'caster.mult', stun: 'caster.stunMs' };
+const CAST = {
+  every: 'caster.everyMs',
+  cast: 'caster.castMs',
+  mult: 'caster.mult',
+  stun: 'caster.stunMs',
+};
 /** The share of evasion at no health a drunken boss ramps to, read by the Evasive trait. */
 const RAMP = 'evasive.rampTo';
 /** The ms between illusions of a boss that casts them faster than an ordinary illusionist. */
@@ -74,12 +84,12 @@ const evasive: FightHook = {
   id: 'trait:evasive',
   stat(ctx, c, stat) {
     if (stat !== 'evasion' || isSuppressed(c, 'evasive')) return 1;
-    const K = ctx.content.balance.K;
+    const flat = trait(ctx.content.balance.K, 'evasive');
     const ramp = c.data[RAMP];
-    if (ramp === undefined) return K.trait.evasive;
+    if (ramp === undefined) return flat;
     // From the trait's factor at full health to the special's at none.
     const missing = c.maxHp > 0 ? 1 - Math.max(0, c.hp) / c.maxHp : 0;
-    return K.trait.evasive + (ramp - K.trait.evasive) * missing;
+    return flat + (ramp - flat) * missing;
   },
 };
 
@@ -97,8 +107,13 @@ function casterNumbers(
       stun: c.data[CAST.stun] ?? 0,
     };
   }
-  const t = ctx.content.balance.K.trait;
-  return { every: secMs(t.casterEvery), cast: secMs(t.casterCast), mult: t.casterMult, stun: 0 };
+  const K = ctx.content.balance.K;
+  return {
+    every: secMs(trait(K, 'casterEvery')),
+    cast: secMs(trait(K, 'casterCast')),
+    mult: trait(K, 'casterMult'),
+    stun: 0,
+  };
 }
 
 const casterTimer = (ctx: FightCtx, c: Combatant) => {
@@ -164,7 +179,7 @@ const illusionist: FightHook = {
     const K = ctx.content.balance.K;
     // The Nameless casts faster than an ordinary illusionist.
     const every = c.data[ILLUSION_EVERY];
-    const need = every !== undefined ? needOf(every) : needOf(secMs(K.trait.illusionEvery));
+    const need = every !== undefined ? needOf(every) : needOf(secMs(trait(K, 'illusionEvery')));
     c.timers.illusionist = { progress: 0, need };
   },
   onTimer(ctx, _c, name) {
@@ -175,10 +190,10 @@ const illusionist: FightHook = {
       kind: 'modifier',
       id: 'illusion',
       src: 'trait:illusionist',
-      until: ctx.fight.t + secWork(K.trait.illusionDur),
+      until: ctx.fight.t + secWork(trait(K, 'illusionDur')),
       stat: 'accuracy',
       op: 'mul',
-      value: K.trait.illusionAcc,
+      value: trait(K, 'illusionAcc'),
     });
     ctx.fight.tally.statuses.illusion = (ctx.fight.tally.statuses.illusion ?? 0) + 1;
   },
@@ -192,10 +207,10 @@ function hide(ctx: FightCtx, c: Combatant, src = 'trait:hidden'): void {
     kind: 'modifier',
     id: 'hidden',
     src,
-    until: ctx.fight.t + secWork(K.trait.hidden),
+    until: ctx.fight.t + secWork(trait(K, 'hidden')),
     stat: 'accuracy',
     op: 'mul',
-    value: K.trait.hiddenAcc,
+    value: trait(K, 'hiddenAcc'),
   });
 }
 
@@ -212,7 +227,7 @@ const hidden: FightHook = {
     // The opening blow, while the player has not yet found the enemy, is stronger and sure.
     if (findEffect(ctx.fight.player, 'hidden')) {
       const K = ctx.content.balance.K;
-      plan.damage *= K.trait.hiddenFirst;
+      plan.damage *= trait(K, 'hiddenFirst');
       plan.chance = K.hitMax;
     }
   },
@@ -222,7 +237,7 @@ const hidden: FightHook = {
 const poisoner: FightHook = {
   id: 'trait:poisoner',
   onAttackHit(ctx, _c, target) {
-    if (alive(target) && roll(ctx.fight, ctx.content.balance.K.trait.poisonChance)) {
+    if (alive(target) && roll(ctx.fight, trait(ctx.content.balance.K, 'poisonChance'))) {
       applyStatusById(ctx, target, 'poison', 'trait:poisoner');
     }
   },

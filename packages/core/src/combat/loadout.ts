@@ -8,6 +8,7 @@ import type { GameState } from '../state.ts';
 import { wheelFactor } from './fight.ts';
 import { answersTraitData, beatenBy, dotShareOf, fightData } from './fight-data.ts';
 import { itemAnswers, itemView, pouchUse } from './fight-items.ts';
+import { need } from './need.ts';
 import { techniqueFigures, type PlayerSnapshot } from './numbers.ts';
 import { ensurePouch, medicTier, refillPouch } from './pouch.ts';
 import { knowledgeOf } from './bingo.ts';
@@ -29,9 +30,15 @@ export interface LoadoutLimits {
 export function loadoutLimits(tier: number, content: ContentDb): LoadoutLimits | null {
   const L = content.balance.K.loadout;
   if (tier >= RANK_ORDER.indexOf('chunin'))
-    return { slots: L.slots.chunin, natures: L.natures.chunin };
+    return {
+      slots: need(L.slots.chunin, 'loadout.slots.chunin'),
+      natures: need(L.natures.chunin, 'loadout.natures.chunin'),
+    };
   if (tier >= RANK_ORDER.indexOf('genin'))
-    return { slots: L.slots.genin, natures: L.natures.genin };
+    return {
+      slots: need(L.slots.genin, 'loadout.slots.genin'),
+      natures: need(L.natures.genin, 'loadout.natures.genin'),
+    };
   return null;
 }
 
@@ -133,7 +140,11 @@ export function planLoadout(
     // Stances cost Wounds: they, and the techniques that need one, are for the player to take by
     // hand, or as the signature (the player has opted in to the price).
     if ((isStance(tech) || tech.combat?.requiresStance) && tech.id !== options.keep) continue;
-    cands.push({ tech, nature: natureOf(tech, content), score: scoreOf(snap, tech, enemy, content) });
+    cands.push({
+      tech,
+      nature: natureOf(tech, content),
+      score: scoreOf(snap, tech, enemy, content),
+    });
   }
   // A signature that needs a stance brings the best stance the player knows.
   let stance: Cand | undefined;

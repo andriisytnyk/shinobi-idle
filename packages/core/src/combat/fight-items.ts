@@ -1,15 +1,6 @@
 import type { ContentDb, Item } from '@shinobi/content';
 import { addEffect } from './fight-effects.ts';
-import {
-  alive,
-  cancelCasts,
-  count,
-  dealDamage,
-  pickTarget,
-  roll,
-  rollHit,
-  stat,
-} from './fight.ts';
+import { alive, cancelCasts, count, dealDamage, pickTarget, roll, rollHit, stat } from './fight.ts';
 import { fightData } from './fight-data.ts';
 import { applyStatus, removeStatus, removeTagged, runTagOps } from './fight-status.ts';
 import type { Combatant, FightCtx, FightState } from './fight-types.ts';

@@ -20,6 +20,7 @@ import { scrollOf } from '../scrolls.ts';
 import { buyPrice } from '../shop.ts';
 import type { GameState } from '../state.ts';
 import { bingoLevel, dropShown, isFirstWin, revealAt } from './bingo.ts';
+import { figure, need } from './need.ts';
 import { createFight, fightAdvance, fightTimeMs } from './fight.ts';
 import { encounterFor } from './fight-encounter.ts';
 import { simulateFights } from './fight-sim.ts';
@@ -522,7 +523,8 @@ function hintsFor(
     done.add(`${c.enemy}.${c.trait}`);
     const options: HintOption[] = [];
     for (const tech of content.techniques) {
-      if (tech.rank === null || state.known[tech.id] || !answersTrait(tech, c.trait, content)) continue;
+      if (tech.rank === null || state.known[tech.id] || !answersTrait(tech, c.trait, content))
+        continue;
       const o = techniqueOption(tech, state, content);
       if (o) options.push(o);
     }
@@ -676,7 +678,7 @@ function onceOf(
           parts: rewards.first.parts.map((p) => ({
             item: scrollPartId(p.technique),
             count: 1,
-            chance: content.balance.K.partDrop[p.chance],
+            chance: need(content.balance.K.partDrop[p.chance], `partDrop.${p.chance}`),
           })),
         }
       : null;
@@ -702,10 +704,12 @@ export function startAnalysis(
   if (!found || found.entries.length === 0) return null;
   const snap = snapshotFor(state, found.entries, opts, content, rules);
   const samples = opts.samples ?? (found.op ? K.analysis.opSamples : K.analysis.samples);
-  const size = found.op ? K.analysis.batch.operation : K.analysis.batch.zone;
-  const minutes = opts.sessionMinutes ?? K.analysis.sessionMinutes[target.kind];
+  const size = figure(K.analysis.batch, found.op ? 'operation' : 'zone', 'analysis.batch');
+  const minutes =
+    opts.sessionMinutes ??
+    figure(K.analysis.sessionMinutes, target.kind, 'analysis.sessionMinutes');
   const minSessions = opts.minSessions ?? K.analysis.minSessions;
-  const hours = K.analysis.sessionHours[target.kind];
+  const hours = figure(K.analysis.sessionHours, target.kind, 'analysis.sessionHours');
   const maxSessions = Math.max(
     minSessions,
     opts.maxSessions ??
@@ -830,7 +834,7 @@ function playSession(
   job.share ??= clone.slots[at]?.share ?? 0;
 
   const skills = Object.keys(clone.skills) as SkillId[];
-  const xp0 = Object.fromEntries(skills.map((k) => [k, clone.skills[k].xp]));
+  const xp0 = Object.fromEntries(skills.map((k) => [k, clone.skills[k]?.xp ?? 0]));
   const mastery0 = Object.fromEntries(Object.entries(clone.mastery).map(([k, v]) => [k, v.xp]));
   const rec: SessionRecord = {
     wins: 0,
@@ -885,7 +889,7 @@ function playSession(
   rec.wounds = r?.wounds ?? 0;
   rec.used = { ...(r?.items ?? {}) };
   for (const k of skills) {
-    const d = clone.skills[k].xp - (xp0[k] ?? 0);
+    const d = (clone.skills[k]?.xp ?? 0) - (xp0[k] ?? 0);
     if (d > 0) rec.xp[k] = d;
   }
   for (const [k, v] of Object.entries(clone.mastery)) {
@@ -958,7 +962,7 @@ function unit(job: AnalysisJob, found: Resolved, content: ContentDb, rules: Rule
   const f = job.fresh;
   const A = content.balance.K.analysis;
   if (f.done < f.batches) {
-    const size = found.op ? A.batch.operation : A.batch.zone;
+    const size = figure(A.batch, found.op ? 'operation' : 'zone', 'analysis.batch');
     const n = Math.min(size, job.samples - f.done * size);
     const seed = nextUint32(createStream(job.seed, `fresh.${f.done}`));
     const fig = found.op

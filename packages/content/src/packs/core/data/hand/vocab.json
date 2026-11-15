@@ -127,7 +127,7 @@
       "id": "interrupt",
       "onHit": [
         {
-          "op": "interrupt"
+          "op": "cancelCast"
         }
       ]
     },
@@ -288,13 +288,16 @@
   ],
   "currencies": [
     {
-      "id": "ryo"
+      "id": "ryo",
+      "role": "money"
     },
     {
-      "id": "rep"
+      "id": "rep",
+      "role": "renown"
     },
     {
-      "id": "intel"
+      "id": "intel",
+      "role": "study"
     }
   ],
   "entityKinds": [

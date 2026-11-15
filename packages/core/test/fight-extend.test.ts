@@ -705,20 +705,21 @@ describe('fight hooks', () => {
     expect(run(bare)).toBeGreaterThanOrEqual(run(rules));
     const hooks = rules.fightHooks.map((h) => h.id).sort();
     expect(hooks).toEqual([
-      'armor',
-      'caster',
-      'evasive',
-      'hidden',
-      'illusionist',
       'passiveNegate',
-      'poisoner',
-      'regen',
+      'special:evasionByMissingHp',
+      'special:heavyCast',
+      'special:illusion',
       'special:packRespawn',
       'special:rehide',
       'special:rival.duel',
       'special:rival.tournament',
       'special:team',
       'special:twins',
+      'trait:caster',
+      'trait:evasive',
+      'trait:hidden',
+      'trait:illusionist',
+      'trait:poisoner',
     ]);
   });
 });

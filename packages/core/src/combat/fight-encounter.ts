@@ -5,7 +5,7 @@ import type { Encounter, Spawn, TeamSupport } from './fight-types.ts';
 /** A row of the balance object that holds plain numbers. */
 function bossFxOf(K: object, key: string): Record<string, number> {
   const row = Object.hasOwn(K, key) ? (K as Record<string, unknown>)[key] : undefined;
-  return typeof row === "object" && row !== null ? (row as Record<string, number>) : {};
+  return typeof row === 'object' && row !== null ? (row as Record<string, number>) : {};
 }
 
 /** The numbers of a `K.bossFx` entry, or none when the content has no such entry. */
@@ -31,7 +31,9 @@ export function encounterFor(
   const K = content.balance.K;
   const boss = !('region' in entry);
   const traits = fightData(content).traits;
-  const swarmRow = entry.traits.map((t) => traits.get(t)?.swarm).find((row) => row !== undefined && row !== null);
+  const swarmRow = entry.traits
+    .map((t) => traits.get(t)?.swarm)
+    .find((row) => row !== undefined && row !== null);
   const swarm = swarmRow ? bossFxOf(K, swarmRow) : null;
   const base: Spawn = {
     enemy: entry.id,

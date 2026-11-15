@@ -33,6 +33,7 @@ import {
   withTechniques,
   runUntil,
 } from './fight-helpers.ts';
+import { aiVocab, viewTechnique } from './view-helpers.ts';
 
 const chunin = content.ai.tiers.find((t) => t.id === 'chunin');
 if (!chunin) throw new Error('no chunin AI tier');
@@ -516,16 +517,7 @@ describe('the default AI decision rules, on hand-made views', () => {
     requiresStance: false,
     ...extra,
   });
-  const vt = (tech: KitTechnique): ViewTechnique => ({
-    tech,
-    cooldownLeft: 0,
-    affordable: true,
-    ready: true,
-    uses: 0,
-    expected: tech.damage,
-    power: tech.damage,
-    stanceOk: true,
-  });
+  const vt = (tech: KitTechnique): ViewTechnique => viewTechnique(tech);
   const enemyView = (o: Partial<ViewEnemy> = {}): ViewEnemy => ({
     id: 'e#0',
     hp: 100,
@@ -562,6 +554,7 @@ describe('the default AI decision rules, on hand-made views', () => {
     habituation: {},
     ai: chunin,
     visibleTraits: content.ai.visibleTraits,
+    vocab: aiVocab,
     pouch: [],
     medic: null,
     stance: null,

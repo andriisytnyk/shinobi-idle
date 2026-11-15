@@ -66,9 +66,7 @@ export interface StatusDef {
   tally: { as: string; whenSuppressing: boolean } | null;
 }
 
-export type TagOp =
-  | { op: 'status'; def: StatusDef; value: Num | null }
-  | { op: 'interrupt' };
+export type TagOp = { op: 'status'; def: StatusDef; value: Num | null } | { op: 'cancelCast' };
 
 export interface TagDef {
   id: string;
@@ -184,10 +182,15 @@ function build(content: ContentDb): FightData {
   const ops = (list: TagEntity['onHit']): TagOp[] => {
     const out: TagOp[] = [];
     for (const o of list ?? []) {
-      if (o.op === 'interrupt') out.push({ op: 'interrupt' });
+      if (o.op === 'cancelCast') out.push({ op: 'cancelCast' });
       else if (o.op === 'status') {
         const def = statuses.get(o.status);
-        if (def) out.push({ op: 'status', def, value: o.value === undefined ? null : compileNum(o.value) });
+        if (def)
+          out.push({
+            op: 'status',
+            def,
+            value: o.value === undefined ? null : compileNum(o.value),
+          });
       } else {
         const { op: _op, id, ...body } = o;
         void _op;
@@ -201,7 +204,7 @@ function build(content: ContentDb): FightData {
     tags.set(t.id, {
       id: t.id,
       hitsAll: t.hitsAll === true,
-      interrupts: (t.onHit ?? []).some((o) => o.op === 'interrupt'),
+      interrupts: (t.onHit ?? []).some((o) => o.op === 'cancelCast'),
       onHit: ops(t.onHit),
       onUse: ops(t.onUse),
       removes: [...(t.removes ?? [])],
@@ -289,11 +292,7 @@ export function answersTraitData(
 export const balanceOf = (content: ContentDb): Balance => content.balance.K as unknown as Balance;
 
 /** Seconds that a row of the balance object gives for a rank: the row's own entry, else the nearest rank that has one. */
-export function secondsByRank(
-  content: ContentDb,
-  row: string,
-  rank: string | null,
-): number {
+export function secondsByRank(content: ContentDb, row: string, rank: string | null): number {
   const data = fightData(content);
   const table = read2(balanceOf(content), row);
   const at = rank === null ? -1 : data.ranks.indexOf(rank);

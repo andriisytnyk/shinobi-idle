@@ -130,7 +130,10 @@ export function applyStatus(
   }
   if (def.interrupts) cancelCasts(ctx, target);
   const tally = def.tally;
-  if (tally && (!tally.whenSuppressing || (def.suppresses !== null && target.traits.includes(def.suppresses)))) {
+  if (
+    tally &&
+    (!tally.whenSuppressing || (def.suppresses !== null && target.traits.includes(def.suppresses)))
+  ) {
     count(fight.tally.statuses, tally.as);
   }
 }
@@ -200,11 +203,7 @@ export function comboPriors(ctx: FightCtx, tech: KitTechnique, target: Combatant
  * The combos that stretch the status the technique itself applies: each that is triggered and fires
  * multiplies its duration. Evaluated at the moment the status is applied.
  */
-export function comboScale(
-  ctx: FightCtx,
-  tech: KitTechnique,
-  priors: ComboPriors,
-): number {
+export function comboScale(ctx: FightCtx, tech: KitTechnique, priors: ComboPriors): number {
   const K = balanceOf(ctx.content);
   let scale = 1;
   for (const [i, c] of fightData(ctx.content).combos.entries()) {

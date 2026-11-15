@@ -89,10 +89,6 @@ function knownEffect(id: string, v: Vocab): boolean {
 const known = (list: readonly string[], set: ReadonlySet<string>): string[] =>
   list.filter((id) => set.has(id));
 
-/** Whether the content has an enemy or boss entry with this id. */
-const entryKnown = (content: ContentDb, id: string): boolean =>
-  content.enemies.some((e) => e.id === id) || content.bosses.some((b) => b.id === id);
-
 type Raw = Record<string, unknown>;
 
 const isRecord = (x: unknown): x is Raw => typeof x === 'object' && x !== null && !Array.isArray(x);
@@ -271,7 +267,8 @@ function parseCombatant(
     // A nature, trait or special of a pack that is not loaded is dropped: the body fights without it.
     nature: inSet(v.natures, raw.nature) ? raw.nature : null,
     traits: known(raw.traits as string[], v.traits),
-    specials: known(raw.specials as string[], v.specials),
+    // A special is a hook id: one nothing registers does nothing, so it is kept as it is.
+    specials: raw.specials as string[],
     effects,
     cd,
     phase,
@@ -366,7 +363,8 @@ function parseTally(raw: unknown, v: Vocab): FightTally | null {
   const statuses = numberRecord(raw.statuses);
   const combos = numberRecord(raw.combos);
   // What counts a status or a combo that the content no longer has is dropped.
-  if (statuses) for (const key of Object.keys(statuses)) if (!knownEffect(key, v)) delete statuses[key];
+  if (statuses)
+    for (const key of Object.keys(statuses)) if (!knownEffect(key, v)) delete statuses[key];
   if (combos) for (const key of Object.keys(combos)) if (!v.combos.has(key)) delete combos[key];
   const masteryWork = numberRecord(raw.masteryWork);
   if (!damage || !uses || !statuses || !combos || !masteryWork) return null;
@@ -400,15 +398,13 @@ function parseTally(raw: unknown, v: Vocab): FightTally | null {
   };
 }
 
-function parseEncounter(raw: unknown, most: number, content: ContentDb, v: Vocab): Encounter | null {
+function parseEncounter(raw: unknown, most: number, v: Vocab): Encounter | null {
   if (!isRecord(raw) || !isStr(raw.id) || !Array.isArray(raw.spawns)) return null;
   if (!Array.isArray(raw.specials) || !raw.specials.every(isStr)) return null;
   if (raw.spawns.length < 1 || raw.spawns.length > most) return null;
   const spawns: Spawn[] = [];
   for (const s of raw.spawns) {
     if (!isRecord(s) || !isStr(s.enemy) || !isInt(s.cl) || s.cl < 0) return null;
-    // An entry of a pack that is not loaded makes the encounter unknown.
-    if (!entryKnown(content, s.enemy)) return null;
     if (!Array.isArray(s.traits) || !s.traits.every(isStr)) return null;
     if (s.nature !== null && !isStr(s.nature)) return null;
     if (!isInt(s.count) || s.count < 1 || s.count > most) return null;
@@ -424,13 +420,13 @@ function parseEncounter(raw: unknown, most: number, content: ContentDb, v: Vocab
       hpMult: s.hpMult,
       dmgMult: s.dmgMult as number,
       fleeAt: s.fleeAt,
-      specials: known(s.specials as string[], v.specials),
+      specials: s.specials as string[],
     });
   }
   const encounter: Encounter = {
     id: raw.id,
     spawns,
-    specials: known(raw.specials as string[], v.specials),
+    specials: raw.specials as string[],
   };
   if (raw.support !== undefined) {
     if (!Array.isArray(raw.support) || raw.support.length > 2) return null;
@@ -497,7 +493,7 @@ export function parseFight(raw: unknown, content: ContentDb): FightState | null 
   if (!Array.isArray(rng) || rng.length !== 4 || !rng.every((w) => isInt(w) && w >= 0)) return null;
   const most = Math.max(1, K.combat.maxEnemies);
   const v = vocabOf(content);
-  const encounter = parseEncounter(raw.encounter, most, content, v);
+  const encounter = parseEncounter(raw.encounter, most, v);
   const player = parseCombatant(raw.player, 'player', t, v);
   if (!encounter || !player || !Array.isArray(raw.enemies)) return null;
   // Dead bodies are dropped when a new one spawns, so the list is at most twice the cap.

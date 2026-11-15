@@ -119,7 +119,8 @@ const answer: Rule = (view) => {
   for (const { trait, effects } of view.vocab.inflicted) {
     if (!effects.some((effect) => status(view, effect))) continue;
     const decision =
-      use(best(view, (r) => r.answers.includes(trait))) ?? item(view, (p) => p.answers.includes(trait));
+      use(best(view, (r) => r.answers.includes(trait))) ??
+      item(view, (p) => p.answers.includes(trait));
     if (decision) return decision;
   }
   for (const effect of view.player.effects) {

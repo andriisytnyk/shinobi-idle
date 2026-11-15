@@ -3,7 +3,7 @@ import { content, type TraitId } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
   advance,
-  applyPoison,
+  applyStatusById,
   createFight,
   defaultRules,
   dispatch,
@@ -220,7 +220,7 @@ describe('what each tool does, and what it costs', () => {
     expect(salt.fight.pouch[0]?.n).toBe(2);
 
     const cure = itemFight(ids.antidote);
-    applyPoison(ctxOf(cure.fight), cure.fight.player, 'x');
+    applyStatusById(ctxOf(cure.fight), cure.fight.player, 'poison', 'x');
     expect(findEffect(cure.fight.player, 'poison')).toBeDefined();
     fightAdvance(cure.fight, workOf(200), content, cure.r);
     expect(findEffect(cure.fight.player, 'poison')).toBeUndefined();

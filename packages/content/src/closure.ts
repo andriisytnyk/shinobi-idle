@@ -44,6 +44,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     styles: ids(db.attackStyles),
     fightRegions: ids(db.fightRegions),
     kinds: ids(db.itemKinds),
+    currencies: ids(db.currencies),
     trophies: ids(db.trophies),
     gearFx: ids(db.gearFx),
     entityKinds: ids(db.entityKinds),
@@ -404,9 +405,23 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
       if (p.kind === 'mission') ref(`${f}.mission`, p.mission, 'missions');
     });
   }
+  for (const role of ['money', 'renown', 'study'] as const) {
+    if (!db.currencies.some((c) => c.role === role)) {
+      at('currencies', role);
+      problem('role', `no currency has the role ${role}`);
+    }
+  }
+  for (const op of db.operations) {
+    at('operations', op.id);
+    for (const pay of op.rewards ? [op.rewards.first, op.rewards.repeat] : []) {
+      if (pay.currency !== undefined) ref('rewards.currency', pay.currency, 'currencies');
+      if (pay.repCurrency !== undefined) ref('rewards.repCurrency', pay.repCurrency, 'currencies');
+    }
+  }
   for (const list of ['enemies', 'bosses'] as const) {
     for (const e of db[list]) {
       at(list, e.id);
+      if (e.currency !== undefined) ref('currency', e.currency, 'currencies');
       if (list === 'enemies') ref('region', (e as { region: string }).region, 'fightRegions');
       refs('traits', e.traits, 'traits');
       if (e.nature !== null) ref('nature', e.nature, 'natures', ['wheel']);

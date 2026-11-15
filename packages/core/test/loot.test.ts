@@ -167,7 +167,7 @@ describe('A3: what a win pays matches the content data', () => {
     const state = createState(8, content);
     const wolf = content.enemies.find((e) => e.id === 'core:wolf');
     if (!wolf) throw new Error('no wolf');
-    grantLoot(state, wolf.id, { ryo: 12, bounty: 3, items: { 'core:pelt': 2 } });
+    grantLoot(state, wolf.id, { ryo: 12, bounty: 3, items: { 'core:pelt': 2 } }, content);
     expect(state.currencies.ryo).toBe(15);
     expect(state.bank['core:pelt']).toBe(2);
     expect(state.events.at(-1)).toMatchObject({ type: 'loot', enemy: wolf.id, ryo: 12, bounty: 3 });

@@ -16,6 +16,7 @@ import {
 } from '../src/index.ts';
 import { K, enemyAt, scripted, sec } from './fight-helpers.ts';
 import { fighter, know, startFight } from './prep-state.ts';
+import { aiVocab, viewTechnique } from './view-helpers.ts';
 import { advance } from '../src/index.ts';
 
 const tierOf = (id: 'genin' | 'chunin'): AiTier => {
@@ -73,16 +74,7 @@ const shield = (id: string) =>
       statuses: [],
     },
   });
-const vt = (tech: KitTechnique): ViewTechnique => ({
-  tech,
-  cooldownLeft: 0,
-  affordable: true,
-  ready: true,
-  uses: 0,
-  expected: tech.damage,
-  power: tech.damage,
-  stanceOk: true,
-});
+const vt = (tech: KitTechnique): ViewTechnique => viewTechnique(tech);
 const enemyView = (o: Partial<ViewEnemy> = {}): ViewEnemy => ({
   id: 'e#0',
   hp: 100,
@@ -117,6 +109,7 @@ function view(id: 'genin' | 'chunin', techs: KitTechnique[], enemies: ViewEnemy[
     habituation: {},
     ai,
     visibleTraits: content.ai.visibleTraits,
+    vocab: aiVocab,
     pouch: [],
     medic: null,
     stance: null,

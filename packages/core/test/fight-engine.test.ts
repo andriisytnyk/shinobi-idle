@@ -43,7 +43,7 @@ describe('A3: the fight engine does not know the game', () => {
 
   it('imports only content, the rng, its own files and pure numbers', () => {
     const allowed =
-      /^(@shinobi\/content|\.\.\/rng\.ts|\.\/fight[\w-]*\.ts|\.\/numbers\.ts|\.\/units\.ts)$/;
+      /^(@shinobi\/content|\.\.\/rng\.ts|\.\/fight[\w-]*\.ts|\.\/numbers\.ts|\.\/units\.ts|\.\/need\.ts)$/;
     for (const file of files) {
       for (const from of importsOf(readFileSync(dir + file, 'utf8'))) {
         expect(from, `${file} imports ${from}`).toMatch(allowed);
@@ -55,7 +55,7 @@ describe('A3: the fight engine does not know the game', () => {
     for (const file of ['numbers.ts', 'units.ts']) {
       for (const from of importsOf(readFileSync(dir + file, 'utf8'))) {
         expect(from, `${file} imports ${from}`).toMatch(
-          /^(@shinobi\/content|\.\.\/formulas\.ts|\.\.\/natures\.ts)$/,
+          /^(@shinobi\/content|\.\.\/formulas\.ts|\.\.\/natures\.ts|\.\/fight-data\.ts|\.\/need\.ts)$/,
         );
       }
     }

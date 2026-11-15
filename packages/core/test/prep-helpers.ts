@@ -95,7 +95,7 @@ export function playerFor(entry: Entry, nature: NatureId, opts: PlayerOptions): 
     snap.loadout = autoLoadout(snap, limits, null, content);
     return snap;
   }
-  const target = planTarget(entry, everything, nature);
+  const target = planTarget(entry, everything, nature, content);
   // The chunin vest adds a pouch slot.
   const slots = K.pouch.slots + (tier >= 2 ? K.pouch.vest : 0);
   const plan = prepareFor(snap, limits, target, wellStocked(c), slots, null, content);

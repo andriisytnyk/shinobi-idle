@@ -36,6 +36,16 @@ const resSlug = z.string().regex(/^[a-z0-9_]+(:[a-z0-9_]+)?$/);
 export const vocabSchema = z.strictObject({ id: vocabId });
 export type VocabEntry = z.infer<typeof vocabSchema>;
 
+/**
+ * A currency. `role` says what the rules use it for when they pay or charge without naming one:
+ * `money` (what enemies drop and bounties pay), `renown` (what a cleared operation adds) and
+ * `study` (what studying an enemy costs). A reward or a drop may name another currency.
+ */
+export const currencySchema = z.strictObject({
+  id: vocabId,
+  role: z.enum(['money', 'renown', 'study']).optional(),
+});
+
 /** A sidebar group of skills; the list order is the display order. */
 export const skillGroupSchema = vocabSchema;
 
@@ -539,6 +549,8 @@ const enemyLootShape = {
   drops: z.array(z.strictObject({ item: coreId, chance: z.number().gt(0).lt(1) })),
   /** Ryo range of one kill: combat level times the `K.ryoDrop` range. */
   ryo: z.tuple([z.number().int().min(1), z.number().int().min(1)]),
+  /** The currency the ryo range and the bounty are paid in; the `money` currency when absent. */
+  currency: z.string().min(1).optional(),
   /** First-kill bounty of a boss and the share paid for repeats; `null` without a bounty. */
   bounty: z
     .strictObject({ first: z.number().int().min(1), repeatShare: z.number().min(0).max(1) })
@@ -769,6 +781,9 @@ export const operationStageSchema = z.discriminatedUnion('t', [
 const operationPaySchema = z.strictObject({
   ryo: z.number().int().min(0),
   rep: z.number().int().min(0),
+  /** The currencies `ryo` and `rep` are paid in; the `money` and `renown` currencies when absent. */
+  currency: z.string().min(1).optional(),
+  repCurrency: z.string().min(1).optional(),
   parts: z.array(z.strictObject({ technique: coreId, chance: idOf('partChance') })),
 });
 export const operationRewardsSchema = z.strictObject({
@@ -913,7 +928,7 @@ export const tagOpSchema = z.discriminatedUnion('op', [
   /** Applies an effect the tag defines itself, under its own id (not a status of the vocabulary). */
   z.strictObject({ op: z.literal('effect'), id: z.string().min(1), ...statusFields }),
   /** Stops the interruptible casts of the body. */
-  z.strictObject({ op: z.literal('interrupt') }),
+  z.strictObject({ op: z.literal('cancelCast') }),
 ]);
 
 /** The uses a tool of the pouch can have in a fight besides the ones its effect names. */
@@ -1331,7 +1346,7 @@ export const contentDbSchema = z.object({
   attackStyles: z.array(vocabSchema),
   fightRegions: z.array(vocabSchema),
   itemKinds: z.array(vocabSchema),
-  currencies: z.array(vocabSchema),
+  currencies: z.array(currencySchema),
   entityKinds: z.array(entityKindSchema),
   trophies: z.array(vocabSchema),
   gearFx: z.array(vocabSchema),

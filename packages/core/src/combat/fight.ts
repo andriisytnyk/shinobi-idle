@@ -1,6 +1,7 @@
-import type { ContentDb, Technique } from '@shinobi/content';
+import type { ContentDb, SkillId, Technique } from '@shinobi/content';
 import { createStream, nextFloatFrom } from '../rng.ts';
 import { addEffect, findEffect, isSuppressed, removeEffect, statOf } from './fight-effects.ts';
+import { figure, need } from './need.ts';
 import { answersTraitData, balanceOf, beatenBy, fightData, type TraitMod } from './fight-data.ts';
 import { PASSIVE_NEGATE_HOOK } from './fight-hooks.ts';
 import { applyItem, itemView } from './fight-items.ts';
@@ -59,7 +60,7 @@ export const alive = (c: Combatant): boolean => c.hp > 0;
 /** Work units in a number of seconds of the balance object. */
 export const secWork = (seconds: number): number => workOf(secMs(seconds));
 
-function emptyTally(): FightTally {
+function emptyTally(style: SkillId): FightTally {
   return {
     damage: {},
     uses: {},
@@ -70,7 +71,7 @@ function emptyTally(): FightTally {
     kills: 0,
     taken: 0,
     time: 0,
-    style: 'tai',
+    style,
     lastUseAt: 0,
     masteryWork: {},
     wounds: 0,
@@ -209,40 +210,50 @@ function kitEffect(tech: Technique, snap: PlayerSnapshot, content: ContentDb): K
   const effect = tech.combat?.effect;
   if (!effect || tech.rank === null) return fx;
   fx.kind = effect.kind;
+  const levelOf = snap.levels[tech.skill] ?? 1;
+  // The numbers of an effect are the row of `K.techFx` its data names.
+  const techFx: Record<string, Record<string, number> | undefined> = K.techFx;
+  const row = (key: string) => need(techFx[key], `techFx.${key}`);
   switch (effect.kind) {
-    case 'shield':
+    case 'shield': {
+      const r = row(effect.fx);
       fx.amount =
-        (K.power[tech.rank] ?? 0) *
-        (K.techFx.shield?.mult ?? 0) *
-        (1 + K.levelScale * (snap.levels[tech.skill] ?? 0));
-      fx.durationMs = K.techFx.shield.durationMs;
+        need(K.power[tech.rank], `power.${tech.rank}`) *
+        figure(r, 'mult', `techFx.${effect.fx}`) *
+        (1 + K.levelScale * levelOf);
+      fx.durationMs = figure(r, 'durationMs', `techFx.${effect.fx}`);
       break;
-    case 'decoy':
-      fx.amount = K.techFx.decoy.charges;
-      fx.durationMs = K.techFx.decoy.durationMs;
+    }
+    case 'decoy': {
+      const r = row(effect.fx);
+      fx.amount = figure(r, 'charges', `techFx.${effect.fx}`);
+      fx.durationMs = figure(r, 'durationMs', `techFx.${effect.fx}`);
       break;
-    case 'evasionBuff':
-      fx.mult = K.techFx.evasionBuff.mult;
-      fx.durationMs = K.techFx.evasionBuff.durationMs;
+    }
+    case 'evasionBuff': {
+      const r = row(effect.fx);
+      fx.mult = figure(r, 'mult', `techFx.${effect.fx}`);
+      fx.durationMs = figure(r, 'durationMs', `techFx.${effect.fx}`);
       break;
+    }
     case 'cleanse':
       fx.statuses = [...effect.statuses];
       break;
     case 'passiveNegate':
-      fx.everyMs = K.techFx.passiveNegate.everyMs;
+      fx.everyMs = figure(row(effect.fx), 'everyMs', `techFx.${effect.fx}`);
       break;
     case 'stance': {
-      const gate = K.techFx[effect.fx];
-      fx.mult = gate.taiDamage;
-      fx.drain = gate.staminaPerSec;
-      fx.wounds = gate.woundsAfter;
+      const gate = row(effect.fx);
+      fx.mult = figure(gate, 'taiDamage', `techFx.${effect.fx}`);
+      fx.drain = figure(gate, 'staminaPerSec', `techFx.${effect.fx}`);
+      fx.wounds = figure(gate, 'woundsAfter', `techFx.${effect.fx}`);
       break;
     }
     case 'nextCast':
-      fx.mult = K.techFx.nextCast.castMult;
+      fx.mult = figure(row(effect.fx), 'castMult', `techFx.${effect.fx}`);
       break;
     case 'reveal':
-      fx.durationMs = K.techFx.reveal.durationMs;
+      fx.durationMs = figure(row(effect.fx), 'durationMs', `techFx.${effect.fx}`);
       break;
     default:
       break;
@@ -278,8 +289,10 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
       cost: n.cost,
       accuracy: accuracyOf(snap.levels, tech.skill, content) * wound,
       comboChance: Math.min(
-        K.combo.cap,
-        K.combo.base + K.combo.perLevel * (snap.levels[tech.skill] ?? 0) + K.combo.perMastery * mastery,
+        figure(K.combo, 'cap', 'combo'),
+        figure(K.combo, 'base', 'combo') +
+          figure(K.combo, 'perLevel', 'combo') * (snap.levels[tech.skill] ?? 1) +
+          figure(K.combo, 'perMastery', 'combo') * mastery,
       ),
       hitsAll:
         data.wideRoles.has(tech.role) ||
@@ -294,7 +307,7 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
   return {
     techniques,
     toolDamage: (K.toolTag[0] + K.toolTag[1] * style) * wound,
-    med: snap.levels.med,
+    med: snap.levels.med ?? 1,
     chakraRegen: chakraRegenOf(snap.levels, content),
     staminaRegen: staminaRegenOf(snap.levels, content),
   };
@@ -413,6 +426,7 @@ export function createFight(
   rules: FightRules,
 ): FightState {
   const K = content.balance.K;
+  const data = fightData(content);
   const levels = snap.levels;
   const wound = woundFactor(snap.wounds ?? 0, content);
   const maxHp = maxHpOf(levels, content) * wound;
@@ -469,7 +483,7 @@ export function createFight(
     medic: snap.medic ?? null,
     uses: {},
     poolAt: workOf(K.combat.regenMs),
-    tally: emptyTally(),
+    tally: emptyTally(data.basicSkill ?? data.techSkills[0] ?? ('' as SkillId)),
     log: [],
   };
   const ctx = makeCtx(fight, content, rules);
@@ -749,7 +763,10 @@ const techViews = new WeakMap<KitTechnique, KitTechnique>();
 const techFactsOf = new WeakMap<KitTechnique, { answers: string[]; interrupts: boolean }>();
 
 /** What a technique answers and whether it interrupts, from the data; the same for the whole fight. */
-function techFacts(content: ContentDb, tech: KitTechnique): { answers: string[]; interrupts: boolean } {
+function techFacts(
+  content: ContentDb,
+  tech: KitTechnique,
+): { answers: string[]; interrupts: boolean } {
   let facts = techFactsOf.get(tech);
   if (!facts) {
     const data = fightData(content);

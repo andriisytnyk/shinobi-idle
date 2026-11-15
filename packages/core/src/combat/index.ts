@@ -1,3 +1,4 @@
+export * from './currency.ts';
 export * from './fight-ai.ts';
 export * from './fight-items.ts';
 export * from './fight-encounter.ts';
