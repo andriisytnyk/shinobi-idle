@@ -119,7 +119,20 @@ export const testmodUi: UiPack = {
         box.dataset.testmod = 'figures';
         el.append(box);
         let shown = '';
+        let inputs = '';
         const draw = () => {
+          // What the figures depend on: the running actions and the skill's XP. Nothing else needs a recount.
+          const key = [
+            api.read((s) =>
+              s.slots.map((sl) =>
+                sl.action ? `${sl.action.kind}:${sl.action.id}:${sl.share}` : '-',
+              ),
+            ),
+            api.read((s) => s.skills[ctx.skill as keyof typeof s.skills]?.xp),
+            api.setting('hideMax'),
+          ].join('#');
+          if (key === inputs) return;
+          inputs = key;
           const rows = skillFigures(api, ctx.skill, api.setting('hideMax') !== true);
           const text = rows.map((r) => r.join('=')).join('|');
           if (text === shown) return;
@@ -228,8 +241,13 @@ export const testmodUi: UiPack = {
         return false;
       }
     });
-    // A line in every action tile, whether it is there now or appears later.
-    return api.dom.observe({ part: 'action-tile' }, (el, tileApi) => {
+    // A line in every action tile, whether it is there now or appears later. One subscription serves
+    // all the lines, so that the cost of an update does not grow with the number of tiles.
+    const lines = new Map<HTMLElement, () => void>();
+    const offUpdates = api.subscribe(() => {
+      for (const draw of lines.values()) draw();
+    });
+    const offObserve = api.dom.observe({ part: 'action-tile' }, (el, tileApi) => {
       const line = document.createElement('p');
       line.dataset.testmod = 'mastery-line';
       el.append(line);
@@ -237,22 +255,25 @@ export const testmodUi: UiPack = {
       let seen = -1;
       const draw = () => {
         const xp = tileApi.read((s) => s.mastery[id]?.xp ?? 0);
-        // The line depends on nothing but the Mastery XP, which changes once per cycle.
+        // The line depends on nothing but the Mastery XP.
         if (xp === seen) return;
         seen = xp;
         const { levelAt, xpAt } = tileApi.core;
         const cap = tileApi.content.balance.K.masteryCap;
         const level = levelAt(xp, cap);
         const left = level >= cap ? 0 : xpAt(level + 1) - xp;
-        const text = tileApi.t('x.testmod.masteryLine', { n: Math.round(left) });
-        line.textContent = text;
+        line.textContent = tileApi.t('x.testmod.masteryLine', { n: Math.round(left) });
       };
-      const off = tileApi.subscribe(draw);
+      lines.set(el, draw);
       draw();
       return () => {
-        off();
+        lines.delete(el);
         line.remove();
       };
     });
+    return () => {
+      offUpdates();
+      offObserve();
+    };
   },
 };

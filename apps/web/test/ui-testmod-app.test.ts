@@ -438,9 +438,13 @@ describe('the observer costs little (A13)', () => {
       await time([coreUi]);
       let without = Infinity;
       let withPack = Infinity;
-      for (let round = 0; round < 4; round++) {
-        without = Math.min(without, await time([coreUi]));
-        withPack = Math.min(withPack, await time([coreUi, testmodUi]));
+      for (let round = 0; round < 5; round++) {
+        // The order alternates: whatever the first run leaves behind (garbage, toasts) must not favour either.
+        for (const loaded of round % 2 === 0 ? [false, true] : [true, false]) {
+          const ms = await time(loaded ? [coreUi, testmodUi] : [coreUi]);
+          if (loaded) withPack = Math.min(withPack, ms);
+          else without = Math.min(without, ms);
+        }
       }
       console.info(`200 updates: ${without.toFixed(1)} ms without, ${withPack.toFixed(1)} ms with`);
       expect(withPack).toBeLessThanOrEqual(without * 1.2);
