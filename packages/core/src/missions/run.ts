@@ -174,7 +174,7 @@ function beginStage(
   const entry = stage.t === 'combat' ? entryOf(content, stage.enemy) : undefined;
   if (stage.t === 'combat' && !entry) return false;
   if (stage.t === 'items') removeItem(state, stage.item, stage.n);
-  const intelCurrency = currencyOf(content, 'intel');
+  const intelCurrency = currencyOf(content, 'study');
   if (plan.intel > 0 && !reuse && intelCurrency !== null) {
     removeCurrency(state, intelCurrency, plan.intel);
   }
@@ -329,8 +329,8 @@ export function payMission(
     ? Math.round(mission.rep * computeMod(mods, state, 'mission.rep', content).total)
     : 0;
   const money = currencyOf(content, 'money');
-  const reputation = currencyOf(content, 'reputation');
-  const intel = currencyOf(content, 'intel');
+  const reputation = currencyOf(content, 'renown');
+  const intel = currencyOf(content, 'study');
   if (money !== null) addCurrency(state, money, ryo);
   if (reputation !== null) addCurrency(state, reputation, rep);
   const items = indexOf(content).items;

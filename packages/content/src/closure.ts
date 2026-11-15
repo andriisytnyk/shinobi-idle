@@ -154,17 +154,12 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     ref('group', s.group, 'groups');
     req('unlockReq', s.unlockReq);
   }
-  const roleOwner = new Map<string, string>();
-  for (const c of db.currencies) {
-    at('currencies', c.id);
-    if (c.role === undefined) continue;
-    const other = roleOwner.get(c.role);
-    if (other !== undefined) problem('role', `the role "${c.role}" is already held by "${other}"`);
-    else roleOwner.set(c.role, c.id);
+  for (const role of ['money', 'renown', 'study'] as const) {
+    if (!db.currencies.some((c) => c.role === role)) {
+      at('currencies', role);
+      problem('role', `no currency has the role ${role}`);
+    }
   }
-  for (const role of ['money', 'reputation'] as const)
-    if (!roleOwner.has(role))
-      problems.push({ pack: 'core', message: `no currency has the role "${role}"` });
   for (const n of db.natures) {
     at('natures', n.id);
     // A nature trains through the skill that has its id.

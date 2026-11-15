@@ -36,6 +36,16 @@ const resSlug = z.string().regex(/^[a-z0-9_]+(:[a-z0-9_]+)?$/);
 export const vocabSchema = z.strictObject({ id: vocabId });
 export type VocabEntry = z.infer<typeof vocabSchema>;
 
+/**
+ * A currency. `role` says what the rules use it for when they pay or charge without naming one:
+ * `money` (what enemies drop and bounties pay), `renown` (what a cleared operation adds) and
+ * `study` (what studying an enemy costs). A reward or a drop may name another currency.
+ */
+export const currencySchema = z.strictObject({
+  id: vocabId,
+  role: z.enum(['money', 'renown', 'study']).optional(),
+});
+
 /** A sidebar group of skills; the list order is the display order. */
 export const skillGroupSchema = vocabSchema;
 
@@ -61,19 +71,6 @@ export const playerRankSchema = z.strictObject({
   id: vocabId,
   tier: z.number().int().min(0),
   academy: z.boolean().optional(),
-});
-
-/** The jobs a currency does for the rules (a pack's own currencies have none and are plain counters). */
-export const CURRENCY_ROLES = ['money', 'reputation', 'intel'] as const;
-/**
- * A currency of the game. `role` names the job the rules give it: `money` pays for shops, obstacles,
- * travel and the village treasury and is what loot and missions pay; `reputation` opens the stages
- * of the village; `intel` studies enemies and skips mission stages. Prices and rewards that name no
- * currency use the one with the role `money`.
- */
-export const currencySchema = z.strictObject({
-  id: vocabId,
-  role: z.enum(CURRENCY_ROLES).optional(),
 });
 
 /**
@@ -366,7 +363,7 @@ export const marketEntrySchema = z.object({
 export const shopEntrySchema = z.strictObject({
   item: coreId,
   req: z.lazy(() => reqSchema),
-  /** The currency the price is paid in (a `currencies` id); omitted: the currency with the role `money`. */
+  /** The currency the price is paid in (a `currencies` id); omitted: the currency with the role `money`. The `renown` currency is what Reputation is counted in: it opens the village stages. */
   currency: vocabId.optional(),
 });
 
@@ -731,7 +728,7 @@ export const questRewardsSchema = z.strictObject({
   items: z.array(ingredientRef),
   ryo: z.number().int().min(0),
   rep: z.number().int().min(0),
-  /** More currencies by id (a pack's own); `ryo` and `rep` are the `money` and `reputation` ones. */
+  /** More currencies by id (a pack's own); `ryo` and `rep` are the `money` and `renown` ones. */
   currencies: z.record(vocabId, z.number().int().min(0)).optional(),
   flags: z.array(z.string().min(1)),
   rank: playerRankId.nullable(),

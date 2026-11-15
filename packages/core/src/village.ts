@@ -86,7 +86,7 @@ export function stageForRep(content: ContentDb, rep: number): number {
 
 /** The Reputation of the player: the balance of the currency with the role `reputation`. */
 export function reputationOf(state: GameState, content: ContentDb): number {
-  const currency = currencyOf(content, 'reputation');
+  const currency = currencyOf(content, 'renown');
   return currency === null ? 0 : (state.currencies[currency] ?? 0);
 }
 

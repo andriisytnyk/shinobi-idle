@@ -178,7 +178,7 @@ function candidates(
   }
   // Intel can stand in for a stage's skill: it is the way of last resort.
   const cost = mission.skip[index] ?? 0;
-  const intel = currencyOf(content, 'intel');
+  const intel = currencyOf(content, 'study');
   if (cost > 0 && intel !== null && (state.currencies[intel] ?? 0) >= cost) {
     out.push({
       who: SELF,

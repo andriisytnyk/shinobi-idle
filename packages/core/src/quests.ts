@@ -31,7 +31,7 @@ function applyRewards(state: GameState, rewards: QuestRewards, content: ContentD
     if (addItem(state, item, n)) emit(state, { type: 'itemGained', id: item, n });
   }
   const money = currencyOf(content, 'money');
-  const reputation = currencyOf(content, 'reputation');
+  const reputation = currencyOf(content, 'renown');
   if (money !== null) addCurrency(state, money, rewards.ryo);
   if (reputation !== null) addCurrency(state, reputation, rewards.rep);
   for (const [currency, n] of Object.entries(rewards.currencies ?? {})) {

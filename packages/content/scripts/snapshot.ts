@@ -1,15 +1,14 @@
 /**
- * Regenerates `test/fixtures/core-snapshot.json`, the pin of the content of the pack `core` that
- * `test/snapshot.test.ts` checks. Run it (`pnpm --filter @shinobi/content snapshot`) only when a
- * change to the pack is deliberate, and list every added, changed or moved entity in the PR.
- * The hashing is the one of the test; the output is then formatted by Prettier.
+ * Regenerates `test/fixtures/core-snapshot.json` from the pack `core` as it is now, with the same
+ * hashing as `test/snapshot.test.ts`, and prints every entity, list and order that changed against
+ * the fixture on disk. Run it on purpose, when a content change is meant: `pnpm --filter
+ * @shinobi/content exec tsx scripts/snapshot.ts`; list what it printed in the PR description.
  */
 import { createHash } from 'node:crypto';
-import { spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { composeContent, corePack } from '../src/index.ts';
+
+const FILE = new URL('../test/fixtures/core-snapshot.json', import.meta.url);
 
 const canon = (v: unknown): string => {
   if (Array.isArray(v)) return `[${v.map(canon).join(',')}]`;
@@ -35,64 +34,34 @@ const entries = (value: unknown): Record<string, string> => {
   return Object.fromEntries(Object.entries(value as object).map(([id, e]) => [id, hash(e)]));
 };
 
-const db = composeContent([corePack]);
-const lists = db as unknown as Record<string, unknown>;
+const db = composeContent([corePack]) as unknown as Record<string, unknown>;
 const META = new Set(['balance', 'packs', 'modifierKeys', 'icons', 'locales']);
-const listNames = Object.keys(db).filter((k) => !META.has(k));
-
-const flat: Record<string, unknown> = {};
-const balanceOrder: Record<string, string[]> = {};
-const walk = (p: string, v: unknown) => {
-  if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
-    balanceOrder[p || '(root)'] = Object.keys(v);
-    for (const [k, x] of Object.entries(v)) walk(p ? `${p}.${k}` : k, x);
-  } else flat[p] = v;
-};
-walk('', db.balance);
-
-const hashed = (record: Readonly<Record<string, string>>) =>
-  Object.fromEntries(Object.entries(record).map(([k, v]) => [k, hash(v)]));
-
-/** Keeps the key order of the current fixture where there is one, so a regeneration diffs by what changed. */
-const ordered = <T>(record: Record<string, T>, like: unknown): Record<string, T> => {
-  const known = like !== null && typeof like === 'object' ? Object.keys(like) : [];
-  const keys = [
-    ...known.filter((k) => k in record),
-    ...Object.keys(record).filter((k) => !known.includes(k)),
-  ];
-  return Object.fromEntries(keys.map((k) => [k, record[k] as T]));
+const old = JSON.parse(readFileSync(FILE, 'utf8')) as {
+  entities: Record<string, Record<string, string>>;
+  order: Record<string, string[]>;
+  [key: string]: unknown;
 };
 
-const here = dirname(fileURLToPath(import.meta.url));
-const out = resolve(here, '../test/fixtures/core-snapshot.json');
-let before: Record<string, unknown> = {};
-try {
-  before = JSON.parse(readFileSync(out, 'utf8')) as Record<string, unknown>;
-} catch {
-  // no fixture yet
+const entities: Record<string, Record<string, string>> = {};
+const order: Record<string, string[]> = {};
+for (const list of Object.keys(db).filter((k) => !META.has(k))) {
+  const value = db[list];
+  entities[list] = list === 'ai' ? { ai: hash(value) } : entries(value);
+  order[list] = list === 'ai' ? ['ai'] : keysOf(value);
 }
-const snapshot = {
-  entities: ordered(
-    Object.fromEntries(
-      listNames.map((l) => [l, l === 'ai' ? { ai: hash(lists[l]) } : entries(lists[l])]),
-    ),
-    before.entities,
-  ),
-  balance: ordered(flat, before.balance),
-  order: ordered(
-    Object.fromEntries(listNames.map((l) => [l, l === 'ai' ? ['ai'] : keysOf(lists[l])])),
-    before.order,
-  ),
-  locales: { uk: hashed(db.locales.uk), en: hashed(db.locales.en) },
-  icons: db.icons,
-  modifierKeys: Object.fromEntries(Object.entries(db.modifierKeys).map(([k, v]) => [k, hash(v)])),
-  balanceOrder,
-};
 
-writeFileSync(out, `${JSON.stringify(snapshot, null, 2)}\n`);
-spawnSync('pnpm', ['exec', 'prettier', '--write', out], {
-  cwd: here,
-  shell: true,
-  stdio: 'inherit',
-});
-console.log(`wrote ${out}`);
+const changes: string[] = [];
+for (const [list, now] of Object.entries(entities)) {
+  const before = old.entities[list] ?? {};
+  for (const id of new Set([...Object.keys(before), ...Object.keys(now)])) {
+    if (before[id] !== now[id]) {
+      changes.push(
+        `${list} ${id}: ${before[id] === undefined ? 'added' : now[id] === undefined ? 'removed' : 'changed'}`,
+      );
+    }
+  }
+  if (JSON.stringify(old.order[list]) !== JSON.stringify(order[list]))
+    changes.push(`${list}: order`);
+}
+console.log(changes.join('\n') || 'nothing changed');
+writeFileSync(FILE, `${JSON.stringify({ ...old, entities, order }, null, 2)}\n`);

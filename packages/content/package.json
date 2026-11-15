@@ -10,7 +10,6 @@
   },
   "scripts": {
     "import": "tsx scripts/import.ts",
-    "snapshot": "tsx scripts/snapshot.ts",
     "check": "tsx scripts/counts.ts && vitest run",
     "test": "vitest run",
     "typecheck": "tsc --noEmit -p ."

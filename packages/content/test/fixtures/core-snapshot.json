@@ -1,5 +1,129 @@
 {
   "entities": {
+    "skillGroups": {
+      "train": "3a47cee87792",
+      "nin": "df605df0603b",
+      "field": "e15394ff06dd",
+      "craft": "8896c11e2944",
+      "combat": "beef9300f2d9"
+    },
+    "natures": {
+      "katon": "b94bbf50c7c8",
+      "futon": "3e33f1cc89fb",
+      "raiton": "7dfc108c9515",
+      "doton": "9caad9a4401a",
+      "suiton": "a9a54c8d1378"
+    },
+    "playerRanks": {
+      "student": "c81ae440195a",
+      "genin": "0e4c2b572a90",
+      "chunin": "3715582ed8f4"
+    },
+    "techRanks": {
+      "E": "e6a5b9d9cdf5",
+      "D": "107ff80f163f",
+      "C": "c926bc799932",
+      "B": "671c5563fcca",
+      "A": "6de64698dd4a",
+      "S": "9ca86860a835"
+    },
+    "missionRanks": {
+      "D": "107ff80f163f",
+      "C": "c926bc799932",
+      "V": "44e9ec0ecd6f",
+      "OP": "10fae6f716dc"
+    },
+    "villageStages": {
+      "stage1": "0e1891c0a830",
+      "stage2": "51b58e02d550"
+    },
+    "states": {
+      "burn": "fc4bc580c0b7",
+      "stun": "c3ca1fc7f4ad",
+      "wet": "defd047fd6a2"
+    },
+    "tags": {
+      "interrupt": "5e30f660ecaf",
+      "area": "1b44eae0eac1",
+      "guard": "5c9c7f50ca27",
+      "reveal": "b52e505608fc",
+      "bind": "5ad1ff581b0a",
+      "dot": "31b787083211",
+      "pierce": "b558e0fe517d",
+      "cleanse": "19d9ec7f9aa8",
+      "dispel": "32d810cad56f"
+    },
+    "roles": {
+      "projectile": "de66d1e406c4",
+      "series": "d0dbb2e80e50",
+      "area": "1b44eae0eac1",
+      "control": "37515f2d68e1",
+      "defense": "77e6c433fd86",
+      "buff": "0f136a112097",
+      "signature": "6c834e4e5e34",
+      "drill": "16c0834ab9bf"
+    },
+    "attackStyles": {
+      "melee": "20c827ff3256",
+      "ranged": "5deb683be89c"
+    },
+    "fightRegions": {
+      "academy": "f4ea5ef3bf0c",
+      "forest": "a9df6a63784d",
+      "plains": "a96dd12b0ebc",
+      "valley": "ad1ab1bfb1cf",
+      "exam": "fc61f8887bea",
+      "mission": "8d2511eb259b",
+      "boss": "a3340d7c48b9"
+    },
+    "itemKinds": {
+      "ingredient": "9ba7ffd9579d",
+      "tool": "976b173a4310",
+      "misc": "0baf70e0a73c",
+      "consumable": "bf2c031868e9"
+    },
+    "currencies": {
+      "ryo": "526067ddc138",
+      "rep": "2014a685a9ea",
+      "intel": "d7db45f17985"
+    },
+    "entityKinds": {
+      "skill": "3447140e943e",
+      "technique": "67bec4bfe02e",
+      "item": "c60e03cac2e0",
+      "recipe": "c2e8d3dd5f66",
+      "mission": "07f3a6df4e54",
+      "enemy": "417e27a31ad4",
+      "boss": "e56918f86b6f",
+      "region": "755b6079cc27",
+      "building": "66374dd77cc6",
+      "gear": "1d1b2f316a08",
+      "seal": "8de6ca1415d6",
+      "exercise": "23e627438b95",
+      "practice": "10726c26ca28",
+      "obstacle": "390afae7d383",
+      "status": "5eb676418ffb",
+      "trait": "617d3f39999f",
+      "quest": "52f93b2329a9",
+      "exam": "e04b7cbd4832",
+      "cell": "d43aa0f87e02",
+      "poi": "4f49700fc708",
+      "combo": "b4270f7129ed"
+    },
+    "trophies": {
+      "band": "1f8b652fed94",
+      "pelt": "a0a75a452258",
+      "fang": "3c8bebf8d04d",
+      "coin": "44a0327afed0",
+      "gem": "76d9a9d04198"
+    },
+    "gearFx": {
+      "mannequin": "51632694f97a",
+      "sickle": "7dd42c83b15a",
+      "alembic": "b3699e56881a",
+      "stations": "b09d15606d1c",
+      "maps": "3d5d6de0a0ae"
+    },
     "skills": {
       "tai": "f3ab5bee5030",
       "nin": "60e2c8aabb75",
@@ -557,130 +681,6 @@
     },
     "ai": {
       "ai": "0d0acb16d9aa"
-    },
-    "skillGroups": {
-      "train": "3a47cee87792",
-      "nin": "df605df0603b",
-      "field": "e15394ff06dd",
-      "craft": "8896c11e2944",
-      "combat": "beef9300f2d9"
-    },
-    "natures": {
-      "katon": "b94bbf50c7c8",
-      "futon": "3e33f1cc89fb",
-      "raiton": "7dfc108c9515",
-      "doton": "9caad9a4401a",
-      "suiton": "a9a54c8d1378"
-    },
-    "playerRanks": {
-      "student": "c81ae440195a",
-      "genin": "0e4c2b572a90",
-      "chunin": "3715582ed8f4"
-    },
-    "techRanks": {
-      "E": "e6a5b9d9cdf5",
-      "D": "107ff80f163f",
-      "C": "c926bc799932",
-      "B": "671c5563fcca",
-      "A": "6de64698dd4a",
-      "S": "9ca86860a835"
-    },
-    "missionRanks": {
-      "D": "107ff80f163f",
-      "C": "c926bc799932",
-      "V": "44e9ec0ecd6f",
-      "OP": "10fae6f716dc"
-    },
-    "villageStages": {
-      "stage1": "0e1891c0a830",
-      "stage2": "51b58e02d550"
-    },
-    "states": {
-      "burn": "fc4bc580c0b7",
-      "stun": "c3ca1fc7f4ad",
-      "wet": "defd047fd6a2"
-    },
-    "tags": {
-      "interrupt": "5e30f660ecaf",
-      "area": "1b44eae0eac1",
-      "guard": "5c9c7f50ca27",
-      "reveal": "b52e505608fc",
-      "bind": "5ad1ff581b0a",
-      "dot": "31b787083211",
-      "pierce": "b558e0fe517d",
-      "cleanse": "19d9ec7f9aa8",
-      "dispel": "32d810cad56f"
-    },
-    "roles": {
-      "projectile": "de66d1e406c4",
-      "series": "d0dbb2e80e50",
-      "area": "1b44eae0eac1",
-      "control": "37515f2d68e1",
-      "defense": "77e6c433fd86",
-      "buff": "0f136a112097",
-      "signature": "6c834e4e5e34",
-      "drill": "16c0834ab9bf"
-    },
-    "attackStyles": {
-      "melee": "20c827ff3256",
-      "ranged": "5deb683be89c"
-    },
-    "fightRegions": {
-      "academy": "f4ea5ef3bf0c",
-      "forest": "a9df6a63784d",
-      "plains": "a96dd12b0ebc",
-      "valley": "ad1ab1bfb1cf",
-      "exam": "fc61f8887bea",
-      "mission": "8d2511eb259b",
-      "boss": "a3340d7c48b9"
-    },
-    "itemKinds": {
-      "ingredient": "9ba7ffd9579d",
-      "tool": "976b173a4310",
-      "misc": "0baf70e0a73c",
-      "consumable": "bf2c031868e9"
-    },
-    "currencies": {
-      "ryo": "526067ddc138",
-      "rep": "bc9b24f15860",
-      "intel": "de89c0dc90eb"
-    },
-    "entityKinds": {
-      "skill": "3447140e943e",
-      "technique": "67bec4bfe02e",
-      "item": "c60e03cac2e0",
-      "recipe": "c2e8d3dd5f66",
-      "mission": "07f3a6df4e54",
-      "enemy": "417e27a31ad4",
-      "boss": "e56918f86b6f",
-      "region": "755b6079cc27",
-      "building": "66374dd77cc6",
-      "gear": "1d1b2f316a08",
-      "seal": "8de6ca1415d6",
-      "exercise": "23e627438b95",
-      "practice": "10726c26ca28",
-      "obstacle": "390afae7d383",
-      "status": "5eb676418ffb",
-      "trait": "617d3f39999f",
-      "quest": "52f93b2329a9",
-      "exam": "e04b7cbd4832",
-      "cell": "d43aa0f87e02",
-      "poi": "4f49700fc708",
-      "combo": "b4270f7129ed"
-    },
-    "trophies": {
-      "band": "1f8b652fed94",
-      "pelt": "a0a75a452258",
-      "fang": "3c8bebf8d04d",
-      "coin": "44a0327afed0",
-      "gem": "76d9a9d04198"
-    },
-    "gearFx": {
-      "mannequin": "51632694f97a",
-      "sickle": "7dd42c83b15a",
-      "alembic": "b3699e56881a",
-      "stations": "b09d15606d1c",
-      "maps": "3d5d6de0a0ae"
     }
   },
   "balance": {

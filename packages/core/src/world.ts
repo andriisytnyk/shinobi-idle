@@ -154,7 +154,7 @@ function exploreOnce(state: GameState, cell: Cell, content: ContentDb, rules: Ru
   state.world.explores[cell.id] = before + 1;
   const after = levelForExplores(before + 1, content);
   if (after > level) {
-    const intel = currencyOf(content, 'intel');
+    const intel = currencyOf(content, 'study');
     if (intel !== null) addCurrency(state, intel, K.intel.perCellLevel);
     if (after === 1) discover(state, cell);
     emit(state, { type: 'cellLevelUp', cell: cell.id, level: after, max: after >= max });

@@ -23,7 +23,7 @@ export function graduateRank(content: ContentDb): string | null {
   return indexOf(content).graduateRank;
 }
 
-/** The currency that has the role (`money`, `reputation`, `intel`), or null when none has it. */
+/** The currency that has the role (`money`, `renown`, `study`), or null when none has it. */
 export function currencyOf(content: ContentDb, role: string): string | null {
   return indexOf(content).currencyByRole.get(role) ?? null;
 }
