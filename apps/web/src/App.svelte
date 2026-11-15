@@ -18,6 +18,7 @@
   import { game } from './lib/store.ts';
   import { t } from './lib/i18n.ts';
   import { currentRoute } from './lib/router.svelte.ts';
+  import { isWorldRoute, worldFocus } from './lib/world.ts';
   import BankPage from './pages/BankPage.svelte';
   import CombatPage from './pages/CombatPage.svelte';
   import CreditsPage from './pages/CreditsPage.svelte';
@@ -35,6 +36,7 @@
   import SettingsPage from './pages/SettingsPage.svelte';
   import SkillPage from './pages/SkillPage.svelte';
   import TechniquePage from './pages/TechniquePage.svelte';
+  import WorldPage from './pages/WorldPage.svelte';
 
   // The meta panel starts open beside the page on wide screens and closed on phones, where it is an overlay.
   let metaOpen = $state(window.matchMedia('(min-width: 769px)').matches);
@@ -85,6 +87,8 @@
         <BankPage />
       {:else if route.page === 'shop'}
         <ShopPage section={'section' in route ? route.section : undefined} />
+      {:else if isWorldRoute(route)}
+        <WorldPage focus={worldFocus(route)} />
       {:else if route.page === 'nature'}
         <NaturePage />
       {:else if route.page === 'help'}
