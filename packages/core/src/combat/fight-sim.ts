@@ -14,6 +14,13 @@ export interface FightSummary {
   timeMs: { mean: number; p50: number; p90: number; p99: number };
   /** Health lost in the won fights: mean, and as a share of the player's maximum. */
   hpLost: { mean: number; share: number };
+  /** Mean fight time in ms over all the fights, won or not. */
+  timeAllMs: number;
+  /** Per-fight average of the Wounds a fight costs (a defeat, a low finish, stances). */
+  wounds: number;
+  /** Per-fight averages of the pouch units used, by item id, and of the mastery work, by technique id. */
+  items: Record<string, number>;
+  masteryWork: Record<string, number>;
   /** Per-fight averages of the tally over all fights. */
   tally: {
     damage: Record<string, number>;
@@ -45,6 +52,8 @@ function addAll(into: Record<string, number>, from: Record<string, number>, n: n
 /**
  * Runs `n` fights of the player against the enemy and aggregates them. Every fight has its own
  * seed derived from `seed`. Reads its arguments only; no game state, no shared mutable state.
+ * With `regen` the fights follow one another as in a zone: a won fight is followed by one that
+ * starts with the health that is left plus that share of the maximum, a lost one by a fresh start.
  */
 export function simulateFights(
   snap: PlayerSnapshot,
@@ -53,8 +62,14 @@ export function simulateFights(
   seed: number,
   content: ContentDb,
   rules: FightRules,
+  regen?: number,
 ): FightSummary {
+  let carried: number | undefined;
   const times: number[] = [];
+  const items: Record<string, number> = {};
+  const masteryWork: Record<string, number> = {};
+  let allMs = 0;
+  let wounds = 0;
   let lost = 0;
   let share = 0;
   const tally: FightSummary['tally'] = {
@@ -68,7 +83,8 @@ export function simulateFights(
     taken: 0,
   };
   for (let i = 0; i < n; i++) {
-    const fight = createFight(snap, encounter, fightSeed(seed, i), content, rules);
+    const start = carried === undefined ? snap : { ...snap, hp: carried };
+    const fight = createFight(start, encounter, fightSeed(seed, i), content, rules);
     fight.log = null;
     const startHp = fight.player.hp;
     fightAdvance(fight, fight.cap + 1, content, rules);
@@ -81,7 +97,24 @@ export function simulateFights(
     tally.interrupts += t.interrupts / n;
     tally.kills += t.kills / n;
     tally.taken += t.taken / n;
-    if (fight.result !== 'victory' && fight.result !== 'fled') continue;
+    addAll(masteryWork, t.masteryWork, n);
+    snap.pouch?.forEach((slot, i) => {
+      const spent = slot.n - (fight.pouch[i]?.n ?? slot.n);
+      if (slot.id !== '' && spent > 0) items[slot.id] = (items[slot.id] ?? 0) + spent / n;
+    });
+    allMs += fightTimeMs(fight) / n;
+    const won = fight.result === 'victory' || fight.result === 'fled';
+    wounds +=
+      ((fight.result === 'defeat' ? 1 : 0) +
+        (won && fight.player.data.low === 1 ? 1 : 0) +
+        t.wounds) /
+      n;
+    // A zone fight that follows a win starts with the health left and a share more; any other starts fresh.
+    carried =
+      won && regen !== undefined
+        ? Math.min(fight.player.maxHp, fight.player.hp + regen * fight.player.maxHp)
+        : undefined;
+    if (!won) continue;
     times.push(fightTimeMs(fight));
     lost += startHp - fight.player.hp;
     share += (startHp - fight.player.hp) / fight.player.maxHp;
@@ -96,6 +129,10 @@ export function simulateFights(
     winRate: n === 0 ? 0 : wins / n,
     timeMs: { mean, p50: p(1 / 2), p90: p(0.9), p99: p(0.99) },
     hpLost: { mean: wins === 0 ? 0 : lost / wins, share: wins === 0 ? 0 : share / wins },
+    timeAllMs: allMs,
+    wounds,
+    items,
+    masteryWork,
     tally,
   };
 }

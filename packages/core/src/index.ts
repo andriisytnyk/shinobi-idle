@@ -15,6 +15,7 @@ export * from './field.ts';
 export * from './flags.ts';
 export * from './gear.ts';
 export * from './shop.ts';
+export * from './scrolls.ts';
 export * from './formulas.ts';
 export * from './items.ts';
 export * from './mod.ts';

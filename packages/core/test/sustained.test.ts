@@ -15,6 +15,7 @@ import {
 } from '../src/index.ts';
 import { levelsFor } from './fight-helpers.ts';
 import { setLevel } from './helpers.ts';
+import { openWorld } from './prep-state.ts';
 
 const HOURS = 2;
 // The thief is a mission enemy: no zone, fought only through its mission, so not here.
@@ -31,6 +32,7 @@ function grind(
   if (!enemy) throw new Error(enemyId);
   const state = createState(77, content);
   state.player.rank = 'genin';
+  openWorld(state);
   state.player.natures = [nature];
   state.team = teamFor(nature);
   const levels = levelsFor(enemy.cl, nature);

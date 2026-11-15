@@ -45,7 +45,7 @@ import {
   tech,
   withAi,
 } from './fight-helpers.ts';
-import { genin, setLevel } from './helpers.ts';
+import { fightingGenin as genin, setLevel } from './helpers.ts';
 
 const LEVEL = 34;
 const only = (f: FightState): Combatant => {

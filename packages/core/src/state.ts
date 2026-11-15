@@ -1,4 +1,6 @@
 import type { ContentDb, NatureId, SkillId } from '@shinobi/content';
+import type { BingoEntry } from './combat/bingo.ts';
+import type { TargetReport } from './combat/report.ts';
 import type { CombatState, LoadoutState, PouchState, WoundState } from './combat/types.ts';
 import type { EntityRef } from './entity.ts';
 import type { GameEvent } from './events.ts';
@@ -94,15 +96,17 @@ export interface GameState {
   pouch: PouchState;
   /** Wound stacks and the time left on the current one. */
   wounds: WoundState;
-  /** Enemy and boss entries the player has met: what is known of them is derived from this and the kill counters. */
-  seen: Record<string, true>;
+  /** The Bingo book: sightings, wins and losses per enemy or boss id; the knowledge level is computed from it. */
+  bingo: Record<string, BingoEntry>;
+  /** Battle reports by target (zone, enemy or operation id): what the fights against it added up to. */
+  report: Record<string, TargetReport>;
   /** Missions: village resource units earned that no village has taken yet, by resource slug (the village stage consumes them). */
   missions: { pending: Record<string, number> };
   /** One-off notices for the UI, newest last. The UI drains it; it is never saved. */
   events: GameEvent[];
 }
 
-export const STATE_VERSION = 12;
+export const STATE_VERSION = 13;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
@@ -135,7 +139,8 @@ export function createState(seed: number, content: ContentDb): GameState {
     loadouts: { active: [], auto: true, signature: null, basis: '', saved: {} },
     pouch: { slots: [], medic: null },
     wounds: { stacks: 0, left: 0 },
-    seen: {},
+    bingo: {},
+    report: {},
     meditation: {},
     course: {},
     team: null,

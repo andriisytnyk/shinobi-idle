@@ -10,12 +10,15 @@ import {
   type Command,
   type GameState,
 } from '../src/index.ts';
-import { setLevel } from './helpers.ts';
+import { openWorld, setLevel } from './helpers.ts';
+
+export { openWorld };
 
 /** A genin whose combat skills stand at `level`, with the techniques those levels open. */
 export function fighter(seed = 1, level = 36, nature: NatureId = 'katon'): GameState {
   const state = createState(seed, content);
   state.player.rank = 'genin';
+  openWorld(state);
   state.player.natures = [nature];
   const skills: SkillId[] = ['tai', 'nin', nature, 'vit', 'eva', 'med', 'ath', 'cc'];
   for (const skill of skills) setLevel(state, skill, level);
@@ -27,6 +30,12 @@ export function fighter(seed = 1, level = 36, nature: NatureId = 'katon'): GameS
   updateQuests(state, content);
   state.events = [];
   return state;
+}
+
+/** The Bingo book of the player says they have beaten `id` (level 2, or the studied level 3). */
+export function know(state: GameState, id: string, level: 2 | 3 = 2): void {
+  const wins = level === 3 ? 100 : 1;
+  state.bingo[id] = { seen: 1, wins, losses: 0, timeouts: 0, bought: 0, bounty: 0 };
 }
 
 /** Puts items in the bank. */

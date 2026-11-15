@@ -16,8 +16,16 @@ import {
 import { K, rules, sec } from './fight-helpers.ts';
 import { playerFor } from './prep-helpers.ts';
 import { setLevel } from './helpers.ts';
-import { fighter, ids, run, startFight, startOperation, stock, unlock } from './prep-state.ts';
-import { dispatch } from '../src/index.ts';
+import {
+  fighter,
+  ids,
+  openWorld,
+  run,
+  startFight,
+  startOperation,
+  stock,
+  unlock,
+} from './prep-state.ts';
 
 const op = (id: string) => {
   const o = content.operations.find((x) => x.id === id);
@@ -52,10 +60,11 @@ function runThrough(state: GameState, limitMs = 3_600_000): string[] {
 }
 
 describe('zones', () => {
-  it('open the region zones from the rank the balance extension names, until real flags exist', () => {
-    expect(K.regionZones.openFromRank).toBe('genin');
+  it('open a region zone with its region flag and its explored cell, and no switch is left', () => {
+    expect('regionZones' in K).toBe(false);
     const student = fighter(1, 10);
     student.player.rank = 'student';
+    student.flags = {};
     expect(startFight(student, 'core:zone_bandit')).toEqual({
       ok: false,
       reason: 'error.requirementsNotMet',
@@ -67,21 +76,14 @@ describe('zones', () => {
     expect(startFight(student, 'core:zone_dummy')).toEqual({ ok: true });
   });
 
-  it('go back to their region flags when the switch is turned off', () => {
-    const off = {
-      ...content,
-      balance: {
-        ...content.balance,
-        K: { ...K, regionZones: { ...K.regionZones, openFromRank: 'off' as const } },
-      },
-    };
+  it('wait for the region flag, and for the cell to be explored', () => {
     const state = fighter(1, 10);
-    const open = () =>
-      dispatch(
-        state,
-        { type: 'action.start', slot: 0, kind: 'fight', id: 'core:zone_marauder' },
-        off,
-      );
+    state.flags = {};
+    state.world.explores = {};
+    const open = () => startFight(state, 'core:zone_marauder');
+    expect(open()).toEqual({ ok: false, reason: 'error.zoneNotExplored' });
+    openWorld(state);
+    state.flags = {};
     expect(open()).toEqual({ ok: false, reason: 'error.requirementsNotMet' });
     setFlag(state, 'region.plains.unlocked');
     expect(open()).toEqual({ ok: true });
@@ -136,6 +138,7 @@ describe('the hideout', () => {
 
   it('begins with the approach, shorter for a good scout', () => {
     const state = strong();
+    setLevel(state, 'scout', 1);
     unlock(state, 'op.hideout.unlocked');
     startOperation(state, 'core:op_hideout');
     expect(state.combat?.phase).toBe('approach');

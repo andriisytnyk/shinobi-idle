@@ -137,14 +137,14 @@ describe('A11: saves', () => {
   });
 
   it('migrates a version 11 save: nothing waits for a village yet', () => {
-    expect(STATE_VERSION).toBe(12);
+    expect(STATE_VERSION).toBeGreaterThanOrEqual(12);
     const state = createState(3, content);
     const raw = JSON.parse(serialize(state)) as { v: number; state: Record<string, unknown> };
     raw.v = 11;
     raw.state.v = 11;
     delete raw.state.missions;
     const loaded = deserialize(JSON.stringify(raw), content);
-    expect(loaded.v).toBe(12);
+    expect(loaded.v).toBe(STATE_VERSION);
     expect(loaded.missions).toEqual({ pending: {} });
   });
 
