@@ -5,6 +5,7 @@ import {
   advance,
   createState,
   grantLoot,
+  noteBounty,
   noteFight,
   rollLoot,
   serialize,
@@ -67,15 +68,30 @@ describe('A3: what a win pays matches the content data', () => {
     const state = createState(2, content);
     const first = rollLoot(state, boss);
     expect(first.bounty).toBe(boss.bounty.first);
+    noteBounty(state, boss.id, first.bounty);
     noteFight(state, boss.id, 'win', content);
     const again = rollLoot(state, boss);
     expect(again.bounty).toBe(Math.round(boss.bounty.first * K.bountyRepeat));
+    noteBounty(state, boss.id, again.bounty);
     noteFight(state, boss.id, 'win', content);
     expect(rollLoot(state, boss).bounty).toBe(again.bounty);
     // An enemy with no bounty pays none.
     const plain = content.enemies[1];
     if (!plain) throw new Error('no enemy');
     expect(rollLoot(state, plain).bounty).toBe(0);
+  });
+
+  it('leaves the first-kill bounty owed after a win that paid none, as a mission fight does', () => {
+    const boss = content.bosses.find((b) => b.bounty !== null);
+    if (!boss?.bounty) throw new Error('no boss with a bounty');
+    const state = createState(3, content);
+    // The mission fight counts in the book (a win) and pays its own rewards, not the bounty.
+    noteFight(state, boss.id, 'win', content);
+    noteFight(state, boss.id, 'win', content);
+    expect(state.bingo[boss.id]?.wins).toBe(2);
+    expect(rollLoot(state, boss).bounty).toBe(boss.bounty.first);
+    noteBounty(state, boss.id, boss.bounty.first);
+    expect(rollLoot(state, boss).bounty).toBe(Math.round(boss.bounty.first * K.bountyRepeat));
   });
 
   it('pays the bounty to the purse and records it in the book through a real boss fight', () => {

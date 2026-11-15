@@ -126,9 +126,19 @@ export function noteBounty(state: GameState, id: string, ryo: number): void {
   if (ryo > 0) entryFor(state, id).bounty += ryo;
 }
 
-/** Whether the entry is a first kill (no win yet recorded). */
+/**
+ * Whether the entry's first-kill bounty is still owed: none has been paid. A win that paid no
+ * bounty (a mission fight, which pays its own rewards) does not use it up.
+ */
 export const isFirstWin = (state: GameState, id: string): boolean =>
-  (state.bingo[id]?.wins ?? 0) === 0;
+  (state.bingo[id]?.bounty ?? 0) === 0;
+
+/**
+ * Whether the book shows a drop of this chance at this level: common loot from level 2, rare loot
+ * (a chance under the balance value rareBelow) only once the entry is studied.
+ */
+export const dropShown = (level: number, chance: number, content: ContentDb): boolean =>
+  level >= (chance < content.balance.K.bingo.rareBelow ? 3 : 2);
 
 /**
  * What the knowledge level lets the player's tactics use: nothing at level 0, the traits that
@@ -233,7 +243,9 @@ export function bingoView(state: GameState, id: string, content: ContentDb): Bin
     hiddenTraits: reveal.hiddenTraits ? entry.traits.filter((t) => !visible.includes(t)) : null,
     carries: reveal.carries ? entry.carries : null,
     drops: reveal.drops
-      ? entry.drops.map((d) => ({ item: d.item, chance: reveal.chances ? d.chance : null }))
+      ? entry.drops
+          .filter((d) => dropShown(level, d.chance, content))
+          .map((d) => ({ item: d.item, chance: reveal.chances ? d.chance : null }))
       : null,
     bounty: reveal.bounty && entry.bounty ? { ...entry.bounty, paid: b.bounty } : null,
   };

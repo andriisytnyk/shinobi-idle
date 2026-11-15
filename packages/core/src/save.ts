@@ -570,15 +570,21 @@ export function deserialize(
     };
   }
   state.bingo = pick(raw.bingo, (key, v) => {
-    if (!entryOf(content, key) || !isRecord(v)) return undefined;
+    const entry = entryOf(content, key);
+    if (!entry || !isRecord(v)) return undefined;
     const n = (x: unknown): number => Math.floor(nonNegative(x));
+    // The bounty paid cannot exceed what the content allows for the wins: the first, then the repeat share.
+    const wins = n(v.wins);
+    const ceiling = entry.bounty
+      ? entry.bounty.first + wins * Math.round(entry.bounty.first * entry.bounty.repeatShare)
+      : 0;
     return {
       seen: n(v.seen),
-      wins: n(v.wins),
+      wins,
       losses: n(v.losses),
       timeouts: n(v.timeouts),
       bought: Math.min(BINGO_MAX, n(v.bought)),
-      bounty: n(v.bounty),
+      bounty: Math.min(ceiling, n(v.bounty)),
     };
   });
   state.report = pick(raw.report, (key, v) =>

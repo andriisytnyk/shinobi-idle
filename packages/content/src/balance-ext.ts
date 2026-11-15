@@ -182,7 +182,7 @@ export const BALANCE_EXT = {
   /** Health share below which a won fight still costs a Wound. */
   woundHp: 0.1,
   /** The Bingo book: wins that fully study an ordinary enemy and a boss. */
-  bingo: { studiedWins: { enemy: 25, boss: 3 } },
+  bingo: { studiedWins: { enemy: 25, boss: 3 }, rareBelow: 0.05 },
   /** Battle analysis: fights per zone or boss run, runs per operation, the seed, the time budget (ms) of a default run, and the options a hint lists. */
   analysis: {
     samples: 400,
@@ -190,13 +190,14 @@ export const BALANCE_EXT = {
     seed: 7,
     budgetMs: 5000,
     hintOptions: 3,
-    sessionMinutes: 60,
-    sessionHours: { zone: 4, boss: 20, operation: 20 },
+    sessionMinutes: { zone: 15, boss: 60, operation: 60 },
+    sessionHours: { zone: 5, boss: 16, operation: 16 },
     minSessions: 4,
-    agree: 0.05,
-    stopFresh: 0.03,
+    afterShare: 0.25,
+    horizonMinutes: 240,
+    confidenceZ: 1.64,
     batch: { zone: 50, operation: 20 },
-    verdict: { collapseBelow: 0.5, hopelessBelow: 0.1, stableMedian: 0.8, stableCollapse: 0.05 },
+    verdict: { collapseBelow: 0.5, hopelessBelow: 0.1, stableMedian: 0.8, stableCollapse: 0.15 },
   },
   /** Battle report: the latest defeats it keeps. */
   report: { defeats: 5 },

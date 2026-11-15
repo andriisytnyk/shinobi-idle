@@ -20,7 +20,7 @@ import { deserialize, serialize } from '../save.ts';
 import { scrollOf } from '../scrolls.ts';
 import { buyPrice } from '../shop.ts';
 import type { GameState } from '../state.ts';
-import { bingoLevel, revealAt } from './bingo.ts';
+import { bingoLevel, dropShown, isFirstWin, revealAt } from './bingo.ts';
 import { createFight, fightAdvance, fightTimeMs } from './fight.ts';
 import { encounterFor } from './fight-encounter.ts';
 import { pouchUse } from './fight-items.ts';
@@ -101,6 +101,13 @@ export interface Band {
   n: number;
 }
 
+/** The Wilson score interval of a share, with the number of trials it comes from. Honest at small n, where a plain standard error claims certainty. */
+export interface Ci {
+  lo: number;
+  hi: number;
+  n: number;
+}
+
 /**
  * The first fight of a fresh character against the target: one fight (or one operation run) with
  * the Wounds, pouch and loadout as they are now. These are not yields: the per-hour figures here
@@ -109,8 +116,8 @@ export interface Band {
 export interface Fresh {
   samples: number;
   winRate: number;
-  /** Standard error of `winRate`, so that the UI can round it honestly. */
-  winRateSe: number;
+  /** The interval of `winRate`, so that the UI can round it honestly. */
+  winRateCi: Ci;
   /** Mean time of a won fight (or run), ms, and of any fight (or run). */
   meanWinMs: number;
   meanMs: number;
@@ -120,16 +127,43 @@ export interface Fresh {
   itemsPerHour: Record<string, number>;
 }
 
-/** What the sessions say about the target as a whole. */
+/**
+ * What the sessions say about the target as a whole: `stable` only when the upper bound of the
+ * collapse share is under the balance threshold; `hopeless` when the median session is lost;
+ * otherwise `risky`, which also covers a forecast that ran out of budget before the interval
+ * could decide.
+ */
 export type Verdict = 'stable' | 'risky' | 'hopeless';
+
+/** A consumable the sessions use: what it costs per hour, what the player has, and how long that lasts. */
+export interface Supply {
+  item: string;
+  perHour: number;
+  /** Units in the pouch and the bank, as the refill rule sees them. */
+  stock: number;
+  lastsMinutes: number;
+}
+
+/** The forecast for the time after the consumables that run out within the horizon are gone. */
+export interface AfterSupplies {
+  removed: string[];
+  runs: number;
+  winRate: Band;
+  winsPerHour: Band;
+  collapseShare: number;
+  collapseCi: Ci;
+  verdict: Verdict;
+}
 
 /**
  * The target played as sessions of the real game loop on detached copies of the state: the fight
  * action started in the slot it would take, the other slots as they are, Wounds, the pouch, the
  * regeneration and the pauses all as in play; the sessions are independent. Everything here is
- * the distribution over the sessions. Figures that assume the player restarts at once after a
+ * the distribution over the sessions, and is stated for the time the supplies last:
+ * `horizonMinutes` is the shortest `lastsMinutes` (null: nothing that runs out is used). What
+ * comes after is in `afterSupplies`. Figures that assume the player restarts at once after a
  * defeat say so in `assumesRestart`; what happens when the player does not is in `untilDefeat`.
- * Loot figures follow the Bingo knowledge level through \`revealAt\`.
+ * Loot figures follow the Bingo knowledge level through revealAt.
  */
 export interface Session {
   minutes: number;
@@ -138,15 +172,20 @@ export interface Session {
   /** The share of full speed the fight slot had (thousandths), with the other slots as they are now. */
   share: number;
   assumesRestart: true;
+  /** The consumables used, the soonest to run out first, and the time until the first runs out. */
+  supplies: Supply[];
+  horizonMinutes: number | null;
   /** Wins over wins, defeats and timeouts of a session (for an operation: clears over clears and defeats). */
   winRate: Band;
+  /** The interval of the pooled win rate over every fight of every session. */
+  winRateCi: Ci;
   winsPerHour: Band;
-  /** Share of sessions whose win rate fell under the collapse threshold, and its standard error. */
+  /** Share of sessions whose win rate fell under the collapse threshold, and its interval. */
   collapseShare: number;
-  collapseShareSe: number;
+  collapseCi: Ci;
   verdict: Verdict;
-  /** Without an immediate restart: the sessions that never saw a defeat, and the minutes to the first one (a session without one counts as its length). */
-  untilDefeat: { noDefeatShare: number; minutes: Band };
+  /** Without an immediate restart: the sessions that never saw a defeat (with the interval), and the minutes to the first one (a session without one counts as its length). */
+  untilDefeat: { noDefeatShare: number; noDefeatCi: Ci; minutes: Band };
   /** Per-hour yields, means over the sessions, without one-off rewards. */
   ryoPerHour: number | Unknown;
   bountyPerHour: number | Unknown;
@@ -158,12 +197,19 @@ export interface Session {
   woundStacks: { mean: number; max: number };
   woundsPerHour: number;
   itemsPerHour: Record<string, number>;
+  /** After the supplies run out; null when nothing runs out within the planning horizon. */
+  afterSupplies: AfterSupplies | null;
 }
 
 /** Rewards that can be had once: the first-kill bounty and the first clear of an operation. */
 export interface Once {
   bounty: number | Unknown;
-  clear: { ryo: number; rep: number; items: Record<string, number> } | null;
+  /** The first clear: ryo and reputation, and the scroll parts it may give, each as a count and a chance. */
+  clear: {
+    ryo: number;
+    rep: number;
+    parts: { item: string; count: number; chance: number }[];
+  } | null;
 }
 
 export interface Analysis {
@@ -173,8 +219,10 @@ export interface Analysis {
   coverage: TraitCoverage[];
   hiddenTraits: number;
   hints: Hint[];
-  /** The session forecast; null when the target cannot be started from this state. */
+  /** The session forecast; null when the target cannot be started from this state (see `sessionBlocked`). */
   session: Session | null;
+  /** Why there is no session: the localization key of the refusal; null when there is one. */
+  sessionBlocked: string | null;
   once: Once;
 }
 
@@ -543,19 +591,25 @@ export interface AnalysisJob {
   snap: PlayerSnapshot;
   encounters: Record<string, Encounter>;
   approach: number;
-  /** Bingo levels of the target's entries and their wins, as they were at the start. */
+  /** Bingo levels of the target's entries as they were at the start, and which of them still owe a first-kill bounty. */
   levels: Record<string, number>;
-  wins: Record<string, number>;
+  owed: Record<string, boolean>;
+  /** Units of each item in the pouch and the bank at the start, as the refill rule sees them. */
+  stock: Record<string, number>;
   coverage: TraitCoverage[];
   hidden: number;
   hints: Hint[];
   once: Once;
   fresh: FreshTotals;
   sessions: SessionRecord[];
+  /** The sessions of the forecast for after the supplies, the items taken away in it (null until known), and their most. */
+  after: SessionRecord[];
+  removed: string[] | null;
+  maxAfter: number;
   /** The share the fight slot had at the first session; null before it. */
   share: number | null;
-  /** True when the target could not be started in a session. */
-  blocked: boolean;
+  /** The refusal that kept the target from starting in a session, if it did not start. */
+  blockedReason: string | null;
   stopped: boolean;
 }
 
@@ -612,7 +666,7 @@ function onceOf(
   const shown = found.entries.every((e) => revealAt(levels[e.id] ?? 0).bounty);
   let bounty = 0;
   for (const e of found.entries) {
-    if (e.bounty && (state.bingo[e.id]?.wins ?? 0) === 0) bounty += e.bounty.first;
+    if (e.bounty && isFirstWin(state, e.id)) bounty += e.bounty.first;
   }
   const rewards = found.op?.rewards;
   const clear =
@@ -620,12 +674,11 @@ function onceOf(
       ? {
           ryo: rewards.first.ryo,
           rep: rewards.first.rep,
-          items: Object.fromEntries(
-            rewards.first.parts.map((p) => [
-              scrollPartId(p.technique),
-              content.balance.K.partDrop[p.chance],
-            ]),
-          ),
+          parts: rewards.first.parts.map((p) => ({
+            item: scrollPartId(p.technique),
+            count: 1,
+            chance: content.balance.K.partDrop[p.chance],
+          })),
         }
       : null;
   return { bounty: shown ? bounty : UNKNOWN, clear };
@@ -651,7 +704,7 @@ export function startAnalysis(
   const snap = snapshotFor(state, found.entries, opts, content, rules);
   const samples = opts.samples ?? (found.op ? K.analysis.opSamples : K.analysis.samples);
   const size = found.op ? K.analysis.batch.operation : K.analysis.batch.zone;
-  const minutes = opts.sessionMinutes ?? K.analysis.sessionMinutes;
+  const minutes = opts.sessionMinutes ?? K.analysis.sessionMinutes[target.kind];
   const minSessions = opts.minSessions ?? K.analysis.minSessions;
   const hours = K.analysis.sessionHours[target.kind];
   const maxSessions = Math.max(
@@ -660,11 +713,11 @@ export function startAnalysis(
       Math.floor((hours * MS_PER_HOUR) / Math.max(MS_PER_MINUTE, minutes * MS_PER_MINUTE)),
   );
   const levels: Record<string, number> = {};
-  const wins: Record<string, number> = {};
+  const owed: Record<string, boolean> = {};
   const encounters: Record<string, Encounter> = {};
   for (const e of found.entries) {
     levels[e.id] = bingoLevel(state, e.id, content);
-    wins[e.id] = state.bingo[e.id]?.wins ?? 0;
+    owed[e.id] = isFirstWin(state, e.id);
     encounters[e.id] = encounterOf(state, e, content);
   }
   const { coverage, hidden } = coverageOf(snap, found.entries, state, content);
@@ -681,7 +734,8 @@ export function startAnalysis(
     encounters,
     approach: found.op ? approachMs(state, found.op, content) : 0,
     levels,
-    wins,
+    owed,
+    stock: stockOf(state),
     coverage,
     hidden,
     hints: hintsFor(coverage, state, content),
@@ -697,22 +751,45 @@ export function startAnalysis(
       items: {},
     },
     sessions: [],
+    after: [],
+    removed: null,
+    maxAfter: Math.max(2, Math.floor(maxSessions * K.analysis.afterShare)),
     share: null,
-    blocked: false,
+    blockedReason: null,
     stopped: false,
   };
+}
+
+/** Units of every item in the pouch and the bank: what the refill rule has to draw on. */
+function stockOf(state: GameState): Record<string, number> {
+  const stock: Record<string, number> = { ...state.bank };
+  for (const slot of state.pouch.slots) {
+    if (slot.id !== '') stock[slot.id] = (stock[slot.id] ?? 0) + slot.n;
+  }
+  return stock;
 }
 
 /** Plays one session on a detached copy of the state, with a stream set of its own. */
 function playSession(
   job: AnalysisJob,
   found: Resolved,
-  index: number,
+  label: string,
+  removed: readonly string[],
   content: ContentDb,
   rules: Rules,
-): SessionRecord | null {
+): SessionRecord | string {
   const clone = deserialize(job.stateText, content, rules);
-  clone.rng = createStreams(nextUint32(createStream(job.seed, `session.${index}`)));
+  clone.rng = createStreams(nextUint32(createStream(job.seed, label)));
+  // The forecast for after the supplies: the consumables that ran out are not there.
+  for (const item of removed) {
+    delete clone.bank[item];
+    for (const slot of clone.pouch.slots) {
+      if (slot.id === item) {
+        slot.id = '';
+        slot.n = 0;
+      }
+    }
+  }
   clone.events = [];
   clone.report = {};
   clone.combat = null;
@@ -744,9 +821,13 @@ function playSession(
       ? job.target.id
       : (indexOf(content).zoneByEnemy.get(job.target.id)?.id ?? job.target.id);
   const kind = found.op ? OPERATION_KIND : FIGHT_KIND;
-  const start = (): boolean =>
-    dispatch(clone, { type: 'action.start', slot: at, kind, id }, content, rules).ok;
-  if (!start()) return null;
+  let refusal = '';
+  const start = (): boolean => {
+    const result = dispatch(clone, { type: 'action.start', slot: at, kind, id }, content, rules);
+    if (!result.ok) refusal = result.reason;
+    return result.ok;
+  };
+  if (!start()) return refusal;
   job.share ??= clone.slots[at]?.share ?? 0;
 
   const skills = Object.keys(clone.skills) as SkillId[];
@@ -784,7 +865,7 @@ function playSession(
       } else if (e.type === 'loot') {
         rec.ryo += e.ryo;
         // The first-kill bounty is a one-off; the share paid for repeats is a yield.
-        if (e.bounty > 0 && (job.wins[e.enemy] ?? 0) === 0 && !firstKill.has(e.enemy)) {
+        if (e.bounty > 0 && job.owed[e.enemy] && !firstKill.has(e.enemy)) {
           firstKill.add(e.enemy);
         } else rec.bounty += e.bounty;
         gain(e.items);
@@ -817,25 +898,68 @@ function playSession(
 
 const rateOf = (r: SessionRecord): number => (r.fights === 0 ? 0 : r.wins / r.fights);
 
-/** Whether the sessions so far are enough. */
-function enough(job: AnalysisJob, content: ContentDb): boolean {
-  const K = content.balance.K.analysis;
-  const n = job.sessions.length;
-  if (job.blocked || n >= job.maxSessions) return true;
-  if (n < job.minSessions) return false;
-  // A target that is surely won or surely lost needs the sessions to agree; a marginal one gets them all.
-  const fresh = job.fresh.n === 0 ? MEDIAN : job.fresh.wins / job.fresh.n;
-  if (fresh > K.stopFresh && fresh < 1 - K.stopFresh) return false;
-  const rates = job.sessions.map(rateOf);
-  return Math.max(...rates) - Math.min(...rates) <= K.agree;
+/** The Wilson score interval of `k` successes in `n` trials. */
+function wilson(k: number, n: number, z: number): Ci {
+  if (n === 0) return { lo: 0, hi: 1, n: 0 };
+  const p = k / n;
+  const z2 = z * z;
+  const d = 1 + z2 / n;
+  const c = (p + z2 / (n + n)) / d;
+  const h = (z * Math.sqrt((p * (1 - p)) / n + z2 / ((n + n) * (n + n)))) / d;
+  return { lo: Math.max(0, c - h), hi: Math.min(1, c + h), n };
 }
 
-/** Runs one unit of work: a batch of the first-fight run, or one session. Returns false when there is nothing left. */
+/** How many of the sessions collapsed. */
+const collapsedIn = (records: readonly SessionRecord[], content: ContentDb): number =>
+  records.filter((r) => rateOf(r) < content.balance.K.analysis.verdict.collapseBelow).length;
+
+/**
+ * Whether the sessions so far settle the question: the interval of the collapse share is wholly
+ * under the stable threshold or wholly over its complement; or the budget is spent.
+ */
+function decided(
+  records: readonly SessionRecord[],
+  most: number,
+  least: number,
+  content: ContentDb,
+): boolean {
+  const n = records.length;
+  if (n >= most) return true;
+  if (n < least) return false;
+  const A = content.balance.K.analysis;
+  const ci = wilson(collapsedIn(records, content), n, A.confidenceZ);
+  return ci.hi < A.verdict.stableCollapse || ci.lo > 1 - A.verdict.stableCollapse;
+}
+
+/** The consumables the sessions use, with what they cost per hour and how long the stock lasts. */
+function suppliesOf(job: AnalysisJob): Supply[] {
+  const hours = (job.minutes * job.sessions.length * MS_PER_MINUTE) / MS_PER_HOUR;
+  if (hours === 0) return [];
+  const used: Record<string, number> = {};
+  for (const r of job.sessions) {
+    for (const [item, n] of Object.entries(r.used)) used[item] = (used[item] ?? 0) + n;
+  }
+  return Object.entries(used)
+    .filter(([, n]) => n > 0)
+    .map(([item, n]) => {
+      const perHour = n / hours;
+      const stock = job.stock[item] ?? 0;
+      return {
+        item,
+        perHour,
+        stock,
+        lastsMinutes: (stock / perHour) * (MS_PER_HOUR / MS_PER_MINUTE),
+      };
+    })
+    .sort((a, b) => a.lastsMinutes - b.lastsMinutes || (a.item < b.item ? -1 : 1));
+}
+
+/** Runs one unit of work: a batch of the first-fight run, a session, or a session of the after-supplies forecast. Returns false when there is nothing left. */
 function unit(job: AnalysisJob, found: Resolved, content: ContentDb, rules: Rules): boolean {
   const f = job.fresh;
+  const A = content.balance.K.analysis;
   if (f.done < f.batches) {
-    const K = content.balance.K.analysis;
-    const size = found.op ? K.batch.operation : K.batch.zone;
+    const size = found.op ? A.batch.operation : A.batch.zone;
     const n = Math.min(size, job.samples - f.done * size);
     const seed = nextUint32(createStream(job.seed, `fresh.${f.done}`));
     const fig = found.op
@@ -859,19 +983,32 @@ function unit(job: AnalysisJob, found: Resolved, content: ContentDb, rules: Rule
     return true;
   }
   if (job.stopped) return false;
-  if (enough(job, content)) {
-    job.stopped = true;
-    return false;
+  if (!decided(job.sessions, job.maxSessions, job.minSessions, content)) {
+    const rec = playSession(job, found, `session.${job.sessions.length}`, [], content, rules);
+    if (typeof rec === 'string') {
+      job.blockedReason = rec;
+      job.stopped = true;
+      return false;
+    }
+    job.sessions.push(rec);
+    return true;
   }
-  const rec = playSession(job, found, job.sessions.length, content, rules);
-  if (!rec) {
-    job.blocked = true;
-    job.stopped = true;
-    return false;
+  // The main forecast is done: what runs out within the planning horizon is taken away for the second one.
+  job.removed ??= suppliesOf(job)
+    .filter((x) => x.lastsMinutes <= A.horizonMinutes)
+    .map((x) => x.item);
+  const least = Math.min(job.minSessions, job.maxAfter);
+  if (job.removed.length > 0 && !decided(job.after, job.maxAfter, least, content)) {
+    const rec = playSession(job, found, `after.${job.after.length}`, job.removed, content, rules);
+    if (typeof rec === 'string') {
+      job.stopped = true;
+      return false;
+    }
+    job.after.push(rec);
+    return true;
   }
-  job.sessions.push(rec);
-  if (enough(job, content)) job.stopped = true;
-  return true;
+  job.stopped = true;
+  return false;
 }
 
 /** The result so far, complete once the job is finished. Gated by the Bingo levels the job started with. */
@@ -888,26 +1025,36 @@ function assemble(job: AnalysisJob, found: Resolved, content: ContentDb): Analys
   const fresh: Fresh = {
     samples: f.n,
     winRate,
-    winRateSe: f.n === 0 ? 0 : Math.sqrt((winRate * (1 - winRate)) / f.n),
+    winRateCi: wilson(f.wins, f.n, K.analysis.confidenceZ),
     meanWinMs: f.wins === 0 ? 0 : f.winMs / f.wins,
     meanMs,
     winsPerHour: winRate * perHour,
     woundsPerHour: (f.n === 0 ? 0 : f.wounds / f.n) * perHour,
     itemsPerHour,
   };
+  const played = job.sessions.length > 0 && job.blockedReason === null;
   return {
     target: job.target,
     fresh,
     coverage: job.coverage,
     hiddenTraits: job.hidden,
     hints: job.hints,
-    session: job.sessions.length === 0 || job.blocked ? null : sessionOf(job, found, content),
+    session: played ? sessionOf(job, found, content) : null,
+    sessionBlocked: job.blockedReason,
     once: job.once,
   };
 }
 
-function sessionOf(job: AnalysisJob, found: Resolved, content: ContentDb): Session {
+/** The verdict of a set of sessions. */
+function verdictOf(rates: readonly number[], ci: Ci, content: ContentDb): Verdict {
   const V = content.balance.K.analysis.verdict;
+  const median = bandOf(rates).median;
+  if (median < V.hopelessBelow) return 'hopeless';
+  return median >= V.stableMedian && ci.hi < V.stableCollapse ? 'stable' : 'risky';
+}
+
+function sessionOf(job: AnalysisJob, found: Resolved, content: ContentDb): Session {
+  const K = content.balance.K.analysis;
   const runs = job.sessions.length;
   const hours = (job.minutes * runs * MS_PER_MINUTE) / MS_PER_HOUR;
   const sum = (pick: (r: SessionRecord) => number): number =>
@@ -920,50 +1067,76 @@ function sessionOf(job: AnalysisJob, found: Resolved, content: ContentDb): Sessi
     return out;
   };
   const rates = job.sessions.map(rateOf);
-  const winRate = bandOf(rates);
   const perHourEach = MS_PER_HOUR / (job.minutes * MS_PER_MINUTE);
-  const collapsed = rates.filter((r) => r < V.collapseBelow).length / runs;
+  const collapseCi = wilson(collapsedIn(job.sessions, content), runs, K.confidenceZ);
   const steps = sum((r) => r.steps);
-  const levels = found.entries.map((e) => revealAt(job.levels[e.id] ?? 0));
+  const levels = found.entries.map((e) => ({ at: job.levels[e.id] ?? 0, e }));
+  const reveal = levels.map(({ at }) => revealAt(at));
   const loot = (() => {
     // Loot is shown from the level the book admits it exists; below that one constant says so.
-    if (!levels.every((l) => l.carries && l.drops)) return UNKNOWN;
+    if (!reveal.every((l) => l.carries && l.drops)) return UNKNOWN;
     const gained = merge((r) => r.gained);
     const rows: Record<string, number | Unknown> = {};
-    const exact = levels.every((l) => l.chances);
-    for (const item of lootSources(found).keys())
-      rows[item] = exact ? (gained[item] ?? 0) : UNKNOWN;
+    for (const [item, source] of lootSources(found)) {
+      // A scroll part shows with the carried technique (level 2); a trophy by its chance: common at level 2, rare at level 3.
+      const shown = levels
+        .filter(({ e }) => source.enemies.includes(e.id))
+        .every(({ at, e }) =>
+          source.part
+            ? revealAt(at).carries
+            : dropShown(at, e.drops.find((d) => d.item === item)?.chance ?? 1, content),
+        );
+      if (!shown) continue;
+      rows[item] = levels.every(({ at }) => revealAt(at).chances) ? (gained[item] ?? 0) : UNKNOWN;
+    }
     for (const part of found.op?.rewards?.repeat.parts ?? []) {
       rows[scrollPartId(part.technique)] = gained[scrollPartId(part.technique)] ?? 0;
     }
     return rows;
   })();
-  const ryoShown = levels.every((l) => l.ryo);
-  const bountyShown = levels.every((l) => l.bounty);
-  const verdict: Verdict =
-    winRate.median < V.hopelessBelow
-      ? 'hopeless'
-      : winRate.median >= V.stableMedian && collapsed <= V.stableCollapse
-        ? 'stable'
-        : 'risky';
+  const supplies = suppliesOf(job);
+  const noDefeat = job.sessions.filter((r) => r.firstDefeatMs === null).length;
+  const pooled = wilson(
+    sum((r) => r.wins),
+    sum((r) => r.fights),
+    K.confidenceZ,
+  );
+  let after: AfterSupplies | null = null;
+  if (job.after.length > 0 && job.removed) {
+    const afterRates = job.after.map(rateOf);
+    const ci = wilson(collapsedIn(job.after, content), job.after.length, K.confidenceZ);
+    after = {
+      removed: job.removed,
+      runs: job.after.length,
+      winRate: bandOf(afterRates),
+      winsPerHour: bandOf(job.after.map((r) => r.wins * perHourEach)),
+      collapseShare: ci.n === 0 ? 0 : collapsedIn(job.after, content) / job.after.length,
+      collapseCi: ci,
+      verdict: verdictOf(afterRates, ci, content),
+    };
+  }
   return {
     minutes: job.minutes,
     runs,
     share: job.share ?? 0,
     assumesRestart: true,
-    winRate,
+    supplies,
+    horizonMinutes: supplies[0]?.lastsMinutes ?? null,
+    winRate: bandOf(rates),
+    winRateCi: pooled,
     winsPerHour: bandOf(job.sessions.map((r) => r.wins * perHourEach)),
-    collapseShare: collapsed,
-    collapseShareSe: Math.sqrt((collapsed * (1 - collapsed)) / runs),
-    verdict,
+    collapseShare: collapsedIn(job.sessions, content) / runs,
+    collapseCi,
+    verdict: verdictOf(rates, collapseCi, content),
     untilDefeat: {
-      noDefeatShare: job.sessions.filter((r) => r.firstDefeatMs === null).length / runs,
+      noDefeatShare: noDefeat / runs,
+      noDefeatCi: wilson(noDefeat, runs, K.confidenceZ),
       minutes: bandOf(
         job.sessions.map((r) => (r.firstDefeatMs ?? job.minutes * MS_PER_MINUTE) / MS_PER_MINUTE),
       ),
     },
-    ryoPerHour: ryoShown ? sum((r) => r.ryo) / hours : UNKNOWN,
-    bountyPerHour: bountyShown ? sum((r) => r.bounty) / hours : UNKNOWN,
+    ryoPerHour: reveal.every((l) => l.ryo) ? sum((r) => r.ryo) / hours : UNKNOWN,
+    bountyPerHour: reveal.every((l) => l.bounty) ? sum((r) => r.bounty) / hours : UNKNOWN,
     loot,
     xpPerHour: merge((r) => r.xp) as Partial<Record<SkillId, number>>,
     masteryPerHour: merge((r) => r.mastery),
@@ -973,6 +1146,7 @@ function sessionOf(job: AnalysisJob, found: Resolved, content: ContentDb): Sessi
     },
     woundsPerHour: sum((r) => r.wounds) / hours,
     itemsPerHour: merge((r) => r.used),
+    afterSupplies: after,
   };
 }
 
@@ -981,17 +1155,15 @@ export function analysisProgress(job: AnalysisJob, content: ContentDb): Analysis
   const finished = job.fresh.done >= job.fresh.batches && job.stopped;
   const sessionsLeft = finished
     ? 0
-    : Math.max(0, (enoughNow(job, content) ? 0 : job.maxSessions) - job.sessions.length);
-  const done = job.fresh.done + job.sessions.length;
+    : Math.max(0, job.maxSessions + job.maxAfter - job.sessions.length - job.after.length);
+  void content;
+  const done = job.fresh.done + job.sessions.length + job.after.length;
   return {
     done,
     total: done + (finished ? 0 : job.fresh.batches - job.fresh.done + sessionsLeft),
     finished,
   };
 }
-
-const enoughNow = (job: AnalysisJob, content: ContentDb): boolean =>
-  job.fresh.done >= job.fresh.batches && enough(job, content);
 
 /**
  * Runs `n` units of the job (batches of the first-fight run, then sessions) and returns how far

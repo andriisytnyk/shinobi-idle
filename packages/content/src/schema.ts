@@ -1094,7 +1094,11 @@ export const balanceParamsSchema = z.object({
   /**
    * The Bingo book: wins that study an enemy completely, for an ordinary enemy and for a boss.
    */
-  bingo: z.object({ studiedWins: z.object({ enemy: z.number().int(), boss: z.number().int() }) }),
+  bingo: z.object({
+    studiedWins: z.object({ enemy: z.number().int(), boss: z.number().int() }),
+    /** A drop with a chance under this is rare loot: the book shows it only when the entry is studied. */
+    rareBelow: z.number(),
+  }),
   /**
    * Battle analysis: fights per run of a zone or boss and runs of an operation, the seed of the
    * run (it never touches the game's streams), the time budget in ms a default run must keep to,
@@ -1107,20 +1111,29 @@ export const balanceParamsSchema = z.object({
     budgetMs: z.number().int(),
     hintOptions: z.number().int().min(1),
     /**
-     * The session forecast: minutes of one session; the game hours the sessions may take in all, by
-     * kind of target; the fewest sessions; how closely their win rates must agree (and how near
-     * 0 or 1 the first fight must be) for the forecast to stop early; the size of one batch of the
-     * first-fight run; and the thresholds of the verdict.
+     * The session forecast: minutes of one session and the game hours the sessions may take in
+     * all, by kind of target; the thresholds of the verdict. A forecast stops early only when the
+     * interval of the collapse share is decided: under `stableCollapse` (stable) or over its
+     * complement (collapse).
      */
-    sessionMinutes: z.number().int().min(1),
+    sessionMinutes: z.object({
+      zone: z.number().int().min(1),
+      boss: z.number().int().min(1),
+      operation: z.number().int().min(1),
+    }),
     sessionHours: z.object({
       zone: z.number().min(1),
       boss: z.number().min(1),
       operation: z.number().min(1),
     }),
+    /** The fewest sessions, and the share of the session budget the "after supplies" forecast may use. */
     minSessions: z.number().int().min(1),
-    agree: z.number().min(0),
-    stopFresh: z.number().min(0),
+    afterShare: z.number().min(0).max(1),
+    /** The planning horizon, in minutes: consumables that run out within it are taken away in the "after supplies" forecast. */
+    horizonMinutes: z.number().int().min(1),
+    /** The z of the Wilson interval of every share (1.64: a one-sided 95% bound). */
+    confidenceZ: z.number().gt(0),
+    /** The size of one batch of the first-fight run. */
     batch: z.object({ zone: z.number().int().min(1), operation: z.number().int().min(1) }),
     verdict: z.object({
       /** A session whose win rate is under this has collapsed. */

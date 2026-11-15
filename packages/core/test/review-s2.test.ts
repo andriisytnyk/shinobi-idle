@@ -144,12 +144,16 @@ describe('the analysis shows loot only as far as the Bingo book does, and hides 
       const view = bingoView(state, 'core:wolf', content);
       const trophies = content.enemies.find((e) => e.id === 'core:wolf')?.drops ?? [];
       for (const d of trophies) {
-        if (level < 2) expect(s.loot).toBe(UNKNOWN);
-        else {
-          const row = (s.loot as Record<string, unknown>)[d.item];
-          expect(typeof row === 'number', `${d.item} at ${level}`).toBe(level === 3);
-          expect(view?.drops?.find((x) => x.item === d.item)?.chance === null).toBe(level === 2);
+        if (level < 2) {
+          expect(s.loot).toBe(UNKNOWN);
+          continue;
         }
+        // Common loot from level 2, rare loot (a chance under the balance value) only once studied.
+        const rare = d.chance < K.bingo.rareBelow;
+        const row = (s.loot as Record<string, unknown>)[d.item];
+        expect(row !== undefined, `${d.item} shown at ${level}`).toBe(!rare || level === 3);
+        if (row !== undefined) expect(typeof row === 'number').toBe(level === 3);
+        expect(view?.drops?.some((x) => x.item === d.item) ?? false).toBe(!rare || level === 3);
       }
     }
   });

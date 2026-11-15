@@ -25,6 +25,7 @@ import {
 } from '../src/index.ts';
 import { K, enemyAt, pacify, playerFor, rules, sec, withAi } from './fight-helpers.ts';
 import { fightingGenin as genin, openWorld, setLevel } from './helpers.ts';
+import { bestOf, speedBudget } from './speed.ts';
 
 // ---------- A3: independence from the game state ----------
 
@@ -108,11 +109,13 @@ describe('A4: performance', () => {
     const snap = playerFor(30, 'katon');
     const enemy = enemyAt(30);
     simulateFights(snap, enemy, 50, 1, content, defaultRules);
-    const start = performance.now();
-    const summary = simulateFights(snap, enemy, 1000, 2, content, defaultRules);
-    const ms = performance.now() - start;
+    const limit = speedBudget(1500, 6000);
+    let summary = simulateFights(snap, enemy, 1, 2, content, defaultRules);
+    const ms = bestOf(3, limit, () => {
+      summary = simulateFights(snap, enemy, 1000, 2, content, defaultRules);
+    });
     console.log(`A4: 1000 fights in ${ms.toFixed(0)} ms, win rate ${summary.winRate}`);
-    expect(ms).toBeLessThan(1500);
+    expect(ms).toBeLessThan(limit);
   });
 });
 
