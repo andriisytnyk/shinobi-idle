@@ -47,7 +47,8 @@
     "buy": "wire"
   },
   "core:medpouch": {
-    "buy": "medpouch"
+    "buy": "medpouch",
+    "medic": 1
   },
   "core:psenbon": {
     "pouch": true

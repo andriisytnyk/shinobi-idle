@@ -326,19 +326,17 @@ describe('encounters', () => {
   });
 
   it('builds spawns from a boss entry: health and damage are scaled', () => {
-    const boss = content.bosses[0];
+    // The fighter has no mechanic that changes its body: one spawn with the boss numbers.
+    const boss = content.bosses.find((b) => b.id === 'core:boss_fighter');
     if (!boss) throw new Error('no boss');
     const encounter = encounterFor(boss, content, ['test:special']);
-    const mult = boss.traits.includes('pack') ? K.pack.hp : 1;
-    expect(encounter.spawns[0]?.hpMult).toBeCloseTo(K.boss.hp * mult, 9);
-    expect(encounter.spawns[0]?.dmgMult).toBeCloseTo(
-      K.boss.dmg * (boss.traits.includes('pack') ? K.pack.dmg : 1),
-      9,
-    );
+    expect(encounter.spawns).toHaveLength(1);
+    expect(encounter.spawns[0]?.hpMult).toBeCloseTo(K.boss.hp, 9);
+    expect(encounter.spawns[0]?.dmgMult).toBeCloseTo(K.boss.dmg, 9);
     expect(encounter.specials).toEqual(['test:special']);
     const fight = createFight(scripted([]), encounter, 1, content, rules);
-    expect(only(fight).maxHp).toBeCloseTo((K.eHp[0] + K.eHp[1] * boss.cl) * K.boss.hp * mult, 6);
-    expect(only(fight).specials).toEqual(['test:special']);
+    expect(only(fight).maxHp).toBeCloseTo((K.eHp[0] + K.eHp[1] * boss.cl) * K.boss.hp, 6);
+    expect(only(fight).specials).toEqual(['test:special', 'special:evasionByMissingHp']);
   });
 
   it('holds several kinds of body, each with its own scaling', () => {
@@ -712,8 +710,14 @@ describe('fight hooks', () => {
       'evasive',
       'hidden',
       'illusionist',
+      'passiveNegate',
       'poisoner',
       'regen',
+      'special:packRespawn',
+      'special:rehide',
+      'special:rival.duel',
+      'special:rival.tournament',
+      'special:twins',
     ]);
   });
 });
@@ -971,6 +975,8 @@ describe('casts owned by a hook', () => {
         interruptible: true,
         casting: c.data.charging === 1,
         inWork: Math.max(0, Math.ceil((timer.need - timer.progress) / 1000)),
+        total: sec(2),
+        mult: 1,
       };
     },
   };

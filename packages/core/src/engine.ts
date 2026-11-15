@@ -1,5 +1,15 @@
 import type { ContentDb } from '@shinobi/content';
 import { rebalanceShares, stopSlot } from './actions.ts';
+import {
+  deleteSavedLoadout,
+  loadSavedLoadout,
+  prepareLoadout,
+  saveLoadout,
+  setAutoLoadout,
+  setLoadout,
+  setSignature,
+} from './combat/loadout.ts';
+import { setMedicSlot, setPouchSlot, usePouchSlot } from './combat/pouch.ts';
 import type { EntityRef } from './entity.ts';
 import { emit } from './events.ts';
 import { examFor, SENSEI_TEST_KIND } from './exam.ts';
@@ -33,7 +43,24 @@ export type Command =
   | { type: 'goal.set'; ref: EntityRef }
   | { type: 'goal.clear' }
   /** Names the player: 1 to 24 characters once trimmed. */
-  | { type: 'player.setName'; name: string };
+  | { type: 'player.setName'; name: string }
+  /** Sets the loadout by hand (this switches the automatic loadout off). */
+  | { type: 'loadout.set'; techniques: string[] }
+  /** Switches the automatic loadout on or off; on rebuilds it at once. */
+  | { type: 'loadout.auto'; on: boolean }
+  | { type: 'loadout.save'; name: string }
+  | { type: 'loadout.load'; name: string }
+  | { type: 'loadout.delete'; name: string }
+  /** Marks a technique of the loadout (mastery 25 or more) as the signature, or clears it. */
+  | { type: 'loadout.signature'; technique: string | null }
+  /** Builds the best loadout and pouch for a zone, enemy or boss id. */
+  | { type: 'loadout.prepare'; encounter: string }
+  /** Puts an item (or nothing) in a pouch slot and packs it from the bank. */
+  | { type: 'pouch.set'; slot: number; item: string | null }
+  /** Uses a healing or restoring slot by hand during a fight. */
+  | { type: 'pouch.use'; slot: number }
+  /** Chooses the slot the medic pouch uses on its own (null: none). */
+  | { type: 'pouch.medic'; slot: number | null };
 
 /** Longest player name. */
 export const PLAYER_NAME_MAX = 24;
@@ -200,6 +227,26 @@ function apply(
       state.player.name = name;
       return { ok: true };
     }
+    case 'loadout.set':
+      return setLoadout(state, command.techniques, content);
+    case 'loadout.auto':
+      return setAutoLoadout(state, command.on, content);
+    case 'loadout.save':
+      return saveLoadout(state, command.name, content);
+    case 'loadout.load':
+      return loadSavedLoadout(state, command.name, content);
+    case 'loadout.delete':
+      return deleteSavedLoadout(state, command.name);
+    case 'loadout.signature':
+      return setSignature(state, command.technique, content);
+    case 'loadout.prepare':
+      return prepareLoadout(state, command.encounter, content);
+    case 'pouch.set':
+      return setPouchSlot(state, command.slot, command.item, content);
+    case 'pouch.use':
+      return usePouchSlot(state, command.slot, content, rules);
+    case 'pouch.medic':
+      return setMedicSlot(state, command.slot, content);
     default:
       return { ok: false, reason: 'error.unknownCommand' };
   }

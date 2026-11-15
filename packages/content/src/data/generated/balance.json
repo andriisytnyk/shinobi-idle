@@ -169,25 +169,39 @@
     "bossFx": {
       "wolfPack": {
         "count": 4,
-        "everyMs": 20000
+        "everyMs": 20000,
+        "hp": 0.12,
+        "dmg": 0.05
       },
       "rivalDuel": {
-        "techniques": 1
+        "techniques": 1,
+        "everyMs": 9000,
+        "mult": 0.05,
+        "sigEveryMs": 16000,
+        "sigMult": 0.3
       },
       "rivalTournament": {
         "techniques": 2,
+        "everyMs": 9000,
+        "mult": 0.05,
+        "sigEveryMs": 16000,
+        "sigMult": 0.3,
         "habituationMult": 2
       },
       "drunkenEvasion": {
-        "maxMult": 3
+        "maxMult": 2
       },
       "heavyCast": {
-        "everyMs": 15000,
+        "everyMs": 20000,
         "castMs": 2500,
-        "damageMult": 4
+        "damageMult": 2,
+        "stunMs": 500
       },
       "twins": {
-        "count": 2
+        "count": 2,
+        "hpEach": 0.5,
+        "dmgEach": 0.5,
+        "mistMult": 0.3
       },
       "mistRehide": {
         "everyMs": 25000
@@ -509,6 +523,50 @@
       "maxEnemies": 8
     },
     "bindEva": 0.3,
+    "loadout": {
+      "slots": {
+        "genin": 4,
+        "chunin": 5
+      },
+      "natures": {
+        "genin": 1,
+        "chunin": 2
+      },
+      "saved": 5
+    },
+    "signature": {
+      "minMastery": 25,
+      "xpBonus": 0.1
+    },
+    "pouch": {
+      "slots": 3,
+      "vest": 1
+    },
+    "ai": {
+      "genin": {
+        "strongMult": 3.5,
+        "reactMs": 1000
+      },
+      "chunin": {
+        "strongMult": 0,
+        "reactMs": 0
+      },
+      "guardBelow": 0.6
+    },
+    "woundHp": 0.1,
+    "regionZones": {
+      "openFromRank": "genin"
+    },
+    "operation": {
+      "approachMs": 30000,
+      "approachShort": 0.5
+    },
+    "toolFx": {
+      "dot": {
+        "pct": 0.012,
+        "durS": 10
+      }
+    },
     "illusionResist": 0.005,
     "senseiTest": {
       "base": 300,

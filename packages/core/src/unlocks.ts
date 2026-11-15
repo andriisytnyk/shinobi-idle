@@ -1,4 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
+import { syncLoadout } from './combat/loadout.ts';
 import { emit } from './events.ts';
 import { skillLevel } from './requirements.ts';
 import type { GameState } from './state.ts';
@@ -18,5 +19,7 @@ export function refreshUnlocks(state: GameState, content: ContentDb, silent = fa
     learned.push(t.id);
     if (!silent) emit(state, { type: 'techniqueLearned', id: t.id });
   }
+  // The automatic loadout follows what the player knows and the rank.
+  syncLoadout(state, content);
   return learned;
 }

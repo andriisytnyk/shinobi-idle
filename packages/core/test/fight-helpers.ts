@@ -69,6 +69,8 @@ export function playerFor(c: number, nature: NatureId, options: BuildOptions = {
     known,
     natures: [nature],
     costMod: { chakra: 1, stamina: 1 },
+    // The full tactics: these tests are about what the AI can do, not about the rank it plays at.
+    tier: 2,
   };
 }
 
@@ -103,6 +105,7 @@ export function scripted(known: string[], levels: Partial<Record<SkillId, number
     known,
     natures: ['katon'],
     costMod: { chakra: 1, stamina: 1 },
+    tier: 2,
   } satisfies PlayerSnapshot;
 }
 

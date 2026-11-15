@@ -60,6 +60,12 @@ export interface CombatLogEvent extends EventBase {
   /** Damage dealt by a hit; 0 otherwise. */
   dmg: number;
 }
+/** An operation was finished; `first` is true the first time. The rewards of a clear hang on this. */
+export interface OperationClearedEvent extends EventBase {
+  type: 'operationCleared';
+  op: string;
+  first: boolean;
+}
 export interface QuestStepEvent extends EventBase {
   type: 'questStep';
   quest: string;
@@ -99,6 +105,7 @@ export type GameEvent =
   | EnemyDefeatedEvent
   | PlayerDefeatedEvent
   | CombatLogEvent
+  | OperationClearedEvent
   | QuestStepEvent
   | QuestDoneEvent
   | RankUpEvent

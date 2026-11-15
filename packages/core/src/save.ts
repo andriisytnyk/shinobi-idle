@@ -8,9 +8,20 @@ import {
 import { rebalanceShares } from './actions.ts';
 import { parseFight } from './combat/fight-parse.ts';
 import { secMs } from './combat/numbers.ts';
-import { FIGHT_KIND, newCombat } from './combat/system.ts';
-import type { CombatState } from './combat/types.ts';
+import { pouchUse } from './combat/fight-items.ts';
+import { LOADOUT_NAME_MAX, syncLoadout } from './combat/loadout.ts';
+import { ensurePouch } from './combat/pouch.ts';
+import {
+  FIGHT_KIND,
+  OPERATION_KIND,
+  isCombatKind,
+  newCombat,
+  newOperation,
+} from './combat/system.ts';
+import type { CombatState, LoadoutState, PouchState, RunState } from './combat/types.ts';
 import { workOf } from './combat/units.ts';
+import { woundIntervalMs } from './combat/wounds.ts';
+import { entryOf, fightTarget, opSteps } from './combat/zones.ts';
 import type { EntityKind } from './entity.ts';
 import { emit } from './events.ts';
 import { MS_PER_HOUR, MS_PER_SECOND, masteryLevel, poolCapacity } from './formulas.ts';
@@ -60,6 +71,16 @@ export const MIGRATIONS: readonly Migration[] = [
   (state) => ({ ...state, buffs: {}, gear: {}, bushes: {} }),
   // v5 -> v6: the fight became a self-contained fight state; an old fight in progress restarts.
   (state) => ({ ...state, combat: null }),
+  // v6 -> v7: loadouts, the pouch, Wounds and what the player has seen. The fight carries a pouch,
+  // technique effects and boss hooks now, so a fight in progress restarts; the loadout rebuilds itself.
+  (state) => ({
+    ...state,
+    combat: null,
+    loadouts: { active: [], auto: true, signature: null, basis: '', saved: {} },
+    pouch: { slots: [], medic: null },
+    wounds: { stacks: 0, left: 0 },
+    seen: {},
+  }),
 ];
 
 /** Deepest nesting a slot's data may have. */
@@ -143,16 +164,53 @@ function sanitizeSlot(
 }
 
 /** A saved fight, checked field by field; null when it is not a usable fight. */
-function sanitizeCombat(raw: unknown, content: ContentDb): CombatState | null {
+function sanitizeRun(
+  raw: unknown,
+  action: { kind: string; id: string },
+  content: ContentDb,
+): RunState | null | undefined {
+  // A zone fight has no run, an operation always has one; `undefined` says the save is unusable.
+  if (action.kind === FIGHT_KIND) return raw === null || raw === undefined ? null : undefined;
+  const op = indexOf(content).operations.get(action.id);
+  if (!op || !isRecord(raw) || raw.op !== op.id) return undefined;
+  const step = raw.step;
+  if (typeof step !== 'number' || !Number.isInteger(step) || step < 0) return undefined;
+  return step < opSteps(op).length ? { op: op.id, step } : undefined;
+}
+
+/** Whether an enemy id is one the run's step can have put in the fight. */
+function stepAllows(run: RunState, enemy: string, content: ContentDb): boolean {
+  const op = indexOf(content).operations.get(run.op);
+  const step = op ? opSteps(op)[run.step] : undefined;
+  if (!step || step.t === 'approach') return false;
+  return step.t === 'fight' ? step.enemy === enemy : step.pool.includes(enemy);
+}
+
+function sanitizeCombat(
+  raw: unknown,
+  action: { kind: string; id: string },
+  content: ContentDb,
+): CombatState | null {
   if (!isRecord(raw) || typeof raw.enemy !== 'string') return null;
-  const enemy = indexOf(content).enemies.get(raw.enemy);
+  const enemy = entryOf(content, raw.enemy);
   if (!enemy) return null;
+  const run = sanitizeRun(raw.run, action, content);
+  if (run === undefined) return null;
+  if (run && !stepAllows(run, enemy.id, content)) return null;
   const fight = parseFight(raw.fight, content);
-  if (!fight || fight.enemy !== enemy.id) return null;
-  const respawn = raw.phase === 'respawn';
-  // A won fight waits out the pause; a fight in progress cannot be decided yet.
+  if (!fight || !entryOf(content, fight.enemy)) return null;
+  const phase = raw.phase === 'respawn' || raw.phase === 'approach' ? raw.phase : 'fight';
+  // A won fight waits out the pause; a fight in progress or yet to begin cannot be decided.
   const rewarded = fight.result === 'victory' || fight.result === 'fled';
-  if (respawn !== rewarded || fight.result === 'defeat' || fight.result === 'timeout') return null;
+  if (
+    (phase === 'respawn') !== rewarded ||
+    fight.result === 'defeat' ||
+    fight.result === 'timeout'
+  ) {
+    return null;
+  }
+  if (phase !== 'respawn' && fight.enemy !== enemy.id) return null;
+  if (phase === 'approach' && (!run || fight.t !== 0)) return null;
   const K = content.balance.K;
   const horizon = workOf(MS_PER_HOUR);
   const paid = pick(raw.paid, (key, v) =>
@@ -163,14 +221,72 @@ function sanitizeCombat(raw: unknown, content: ContentDb): CombatState | null {
   const style = fight.tally.style;
   return {
     enemy: enemy.id,
-    phase: respawn ? 'respawn' : 'fight',
+    phase,
     fight,
     work: Math.min(horizon, Math.floor(nonNegative(raw.work))),
-    pause: Math.min(workOf(secMs(K.respawn)), Math.floor(nonNegative(raw.pause))),
+    pause: Math.min(
+      workOf(Math.max(secMs(K.respawn), K.operation.approachMs)),
+      Math.floor(nonNegative(raw.pause)),
+    ),
     paid,
     carry: Math.min(horizon, Math.floor(nonNegative(raw.carry))),
     style: SKILL_ID_SET.has(String(raw.style)) ? (raw.style as SkillId) : style,
+    run,
   };
+}
+
+/** A loadout read back: ids the content or the player no longer has are dropped. */
+function sanitizeLoadouts(raw: unknown, state: GameState, content: ContentDb): LoadoutState {
+  const out: LoadoutState = { active: [], auto: true, signature: null, basis: '', saved: {} };
+  if (!isRecord(raw)) return out;
+  const index = indexOf(content);
+  const ids = (list: unknown): string[] =>
+    Array.isArray(list)
+      ? [...new Set(list.filter((x): x is string => typeof x === 'string'))].filter(
+          (id) =>
+            state.known[id] === true &&
+            index.techniques.get(id)?.rank !== null &&
+            index.techniques.has(id),
+        )
+      : [];
+  out.auto = raw.auto !== false;
+  out.active = ids(raw.active).slice(0, content.balance.K.loadout.slots.chunin);
+  out.signature =
+    typeof raw.signature === 'string' && out.active.includes(raw.signature) ? raw.signature : null;
+  out.basis = typeof raw.basis === 'string' ? raw.basis : '';
+  if (isRecord(raw.saved)) {
+    for (const [name, entry] of Object.entries(raw.saved)) {
+      if (name.length < 1 || name.length > LOADOUT_NAME_MAX || !isRecord(entry)) continue;
+      if (Object.keys(out.saved).length >= content.balance.K.loadout.saved) break;
+      const techniques = ids(entry.techniques);
+      const sig =
+        typeof entry.signature === 'string' && techniques.includes(entry.signature)
+          ? entry.signature
+          : null;
+      out.saved[name] = { techniques, signature: sig };
+    }
+  }
+  return out;
+}
+
+/** A pouch read back: only items that can ride in it, at most a stack each. */
+function sanitizePouch(raw: unknown, content: ContentDb): PouchState {
+  const out: PouchState = { slots: [], medic: null };
+  if (!isRecord(raw) || !Array.isArray(raw.slots)) return out;
+  const index = indexOf(content);
+  const cap = content.balance.K.pouchStack;
+  const most = content.balance.K.pouch.slots + content.balance.K.pouch.vest;
+  for (const s of raw.slots.slice(0, most)) {
+    const item = isRecord(s) && typeof s.id === 'string' ? index.items.get(s.id) : undefined;
+    const n = isRecord(s) ? Math.floor(nonNegative(s.n)) : 0;
+    out.slots.push(
+      item && pouchUse(item) !== null ? { id: item.id, n: Math.min(cap, n) } : { id: '', n: 0 },
+    );
+  }
+  const medic = raw.medic;
+  if (typeof medic === 'number' && Number.isInteger(medic) && out.slots[medic]?.id)
+    out.medic = medic;
+  return out;
 }
 
 const SKILL_ID_SET: ReadonlySet<string> = new Set(SKILL_IDS);
@@ -245,6 +361,27 @@ export function deserialize(
   state.known = pick(raw.known, (key) =>
     index.techniques.has(key) || index.recipeIds.has(key) ? (true as const) : undefined,
   );
+  state.loadouts = sanitizeLoadouts(raw.loadouts, state, content);
+  state.pouch = sanitizePouch(raw.pouch, content);
+  if (isRecord(raw.wounds)) {
+    const stacks = Math.min(
+      Math.floor(nonNegative(raw.wounds.stacks)),
+      content.balance.K.wound.max,
+    );
+    state.wounds = {
+      stacks,
+      left:
+        stacks > 0
+          ? Math.max(
+              1,
+              Math.min(woundIntervalMs(content), Math.floor(nonNegative(raw.wounds.left))),
+            )
+          : 0,
+    };
+  }
+  state.seen = pick(raw.seen, (key, v) =>
+    v === true && entryOf(content, key) ? (true as const) : undefined,
+  );
   if (Array.isArray(raw.slots) && raw.slots.length > 0) {
     state.slots = [];
     raw.slots.forEach((s: unknown, i) => {
@@ -308,15 +445,19 @@ export function deserialize(
       );
     }
   }
+  ensurePouch(state, content);
+  syncLoadout(state, content);
   // A fight needs both its slot and its state; either one alone is dropped or rebuilt.
-  const fighting = state.slots.some((s) => s.action?.kind === FIGHT_KIND);
-  state.combat = fighting ? sanitizeCombat(raw.combat, content) : null;
-  if (fighting && !state.combat) {
-    for (const slot of state.slots) {
-      if (slot.action?.kind === FIGHT_KIND) {
-        const enemy = indexOf(content).enemies.get(slot.action.id);
-        if (enemy) state.combat = newCombat(state, enemy, content, rules);
-      }
+  const slot = state.slots.find((s) => s.action !== null && isCombatKind(s.action.kind));
+  const action = slot?.action ?? null;
+  state.combat = action ? sanitizeCombat(raw.combat, action, content) : null;
+  if (action && !state.combat) {
+    if (action.kind === FIGHT_KIND) {
+      const target = fightTarget(content, action.id);
+      if (target) state.combat = newCombat(state, target.enemy, content, rules);
+    } else if (action.kind === OPERATION_KIND) {
+      const op = indexOf(content).operations.get(action.id);
+      if (op) state.combat = newOperation(state, op, content, rules);
     }
   }
   updateQuests(state, content);

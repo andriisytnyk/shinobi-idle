@@ -1,4 +1,5 @@
 import type {
+  Boss,
   ContentDb,
   Enemy,
   Exam,
@@ -7,12 +8,14 @@ import type {
   Herb,
   Item,
   Obstacle,
+  Operation,
   PoolCheckpoint,
   Practice,
   Quest,
   Recipe,
   ShopEntry,
   Technique,
+  Zone,
 } from '@shinobi/content';
 
 /** Id lookups over a content database, built once per database. */
@@ -22,6 +25,9 @@ export interface ContentIndex {
   practices: Map<string, Practice>;
   obstacles: Map<string, Obstacle>;
   enemies: Map<string, Enemy>;
+  bosses: Map<string, Boss>;
+  zones: Map<string, Zone>;
+  operations: Map<string, Operation>;
   items: Map<string, Item>;
   herbs: Map<string, Herb>;
   recipes: Map<string, Recipe>;
@@ -76,6 +82,9 @@ function build(content: ContentDb): ContentIndex {
   }
   return {
     enemies: byId(content.enemies),
+    bosses: byId(content.bosses),
+    zones: byId(content.zones),
+    operations: byId(content.operations),
     items: byId(content.items),
     herbs: byId(content.herbs),
     recipes: byId(content.recipes),

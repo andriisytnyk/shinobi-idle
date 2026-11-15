@@ -1,4 +1,5 @@
 import type {
+  AiTier,
   ComboId,
   ContentDb,
   NatureId,
@@ -12,7 +13,7 @@ import type {
 import type { RngState } from '../rng.ts';
 
 /** Stats an effect can change. Multipliers combine by product, additions as `1 + sum`. */
-export type ModStat = 'accuracy' | 'evasion' | 'speed' | 'damageTaken';
+export type ModStat = 'accuracy' | 'evasion' | 'speed' | 'damageTaken' | 'taiDamage';
 
 interface EffectBase {
   /** One effect per id on a combatant: applying it again refreshes it, it never stacks. */
@@ -35,10 +36,10 @@ export interface ModifierEffect extends EffectBase {
   value: number;
 }
 
-/** Hurts or heals its holder `amount` every `every` work units until it ends. */
+/** Hurts or heals its holder `amount` every `every` work units until it ends; `stamina` drains the stamina pool instead. */
 export interface PeriodicEffect extends EffectBase {
   kind: 'periodic';
-  mode: 'damage' | 'heal';
+  mode: 'damage' | 'heal' | 'stamina';
   amount: number;
   every: number;
   /** Fight clock time of the next tick. */
@@ -95,11 +96,39 @@ export interface Combatant {
   /** Damage absorbed before health, and the fight clock time it lapses (null: never). */
   ward: number;
   wardUntil: number | null;
-  /** Hits left that turn into a miss. */
+  /** Hits left that turn into a miss, and the fight clock time they lapse (null: never). */
   decoys: number;
+  decoyUntil: number | null;
   /** The enemy leaves the fight when its health share falls to this; null never. */
   fleeAt: number | null;
   fled: boolean;
+}
+
+/** What a technique does besides damage, with its numbers resolved for this player. */
+export interface KitEffect {
+  /** `damage` for a plain attack, else the kind named by the technique's combat data. */
+  kind:
+    | 'damage'
+    | 'none'
+    | 'shield'
+    | 'decoy'
+    | 'evasionBuff'
+    | 'cleanse'
+    | 'passiveNegate'
+    | 'stance'
+    | 'nextCast'
+    | 'reveal';
+  /** Shield strength, decoy charges. */
+  amount: number;
+  /** Evasion multiplier, Taijutsu damage share of a stance, cast time scale of the next cast. */
+  mult: number;
+  durationMs: number;
+  /** Stamina per second of a stance, Wounds after the fight it leaves, and the period of a passive. */
+  drain: number;
+  wounds: number;
+  everyMs: number;
+  /** Statuses a cleanse removes. */
+  statuses: string[];
 }
 
 /** A technique as the fight uses it: its content facts and its numbers for this player. */
@@ -124,12 +153,23 @@ export interface KitTechnique {
   guaranteedCombo: ComboId | null;
   /** Scale of the habituation step: 1, or the signature's slower step. */
   habituationMult: number;
+  fx: KitEffect;
+  /** Cannot be cast while no stance is active. */
+  requiresStance: boolean;
+}
+
+/** One slot of the pouch as the fight carries it: an item id (empty when the slot is) and the units left. */
+export interface PouchSlot {
+  id: string;
+  n: number;
 }
 
 /** What the player brings into the fight. */
 export interface PlayerKit {
   /** The techniques of the loadout. */
   techniques: KitTechnique[];
+  /** Damage of a thrown tool, wounds counted. */
+  toolDamage: number;
   /** Meditation level: it resists illusions. */
   med: number;
   chakraRegen: number;
@@ -158,6 +198,10 @@ export interface FightTally {
   style: SkillId;
   /** Fight clock time of the previous technique cast, or 0. */
   lastUseAt: number;
+  /** Wounds the fight has earned beyond defeat and low health: stances. */
+  wounds: number;
+  /** Minutes of Wound healing the items used in the fight will shorten after it. */
+  woundMin: number;
   /** Work units between a technique's start and the one before it, per technique: the basis of mastery XP. */
   masteryWork: Record<string, number>;
 }
@@ -223,8 +267,11 @@ export interface FightState {
   natures: NatureId[];
   /** Id of the body the cast under way is aimed at; null when none. */
   target: string | null;
-  /** Trait ids the player knows per enemy entry id; an entry without a record is fully known. */
+  /** Trait ids the player knows per enemy entry id; an entry without a record is fully known. `special` stands for the boss mechanic. */
   knowledge: Record<string, string[]>;
+  /** The pouch, slot by slot, and the slot the medic pouch uses on its own (null: none). */
+  pouch: PouchSlot[];
+  medic: number | null;
   /** Times each technique has finished casting against this enemy, for habituation. */
   uses: Record<string, number>;
   /** Fight clock time of the next pool regeneration. */
@@ -260,6 +307,20 @@ export interface ViewTechnique {
   uses: number;
   /** Damage it is expected to do now, after habituation, the nature wheel and the number of targets. */
   expected: number;
+  /** Its raw damage, with nothing counted: what a plain tactic ranks by. */
+  power: number;
+  /** False while it needs a stance and none is active. */
+  stanceOk: boolean;
+}
+
+/** A pouch slot as the AI sees it. */
+export interface ViewPouch {
+  slot: number;
+  id: string;
+  n: number;
+  /** Tags the item answers with, and what using it does. */
+  tags: readonly string[];
+  use: string;
 }
 
 export interface ViewEnemy {
@@ -272,10 +333,18 @@ export interface ViewEnemy {
   knownTraits: readonly TraitId[];
   /** Known traits that are working at the moment (not switched off). */
   workingTraits: readonly TraitId[];
-  /** A cast under way: its kind, the work units until it ends and whether an interrupt stops it. */
-  cast: { kind: string; remaining: number; interruptible: boolean } | null;
+  /** A cast under way: its kind, the work units until it ends and in all, how strong it is (x damage) and whether an interrupt stops it. */
+  cast: {
+    kind: string;
+    remaining: number;
+    total: number;
+    mult: number;
+    interruptible: boolean;
+  } | null;
   /** Work units until a waiting caster of this body starts its cast; null when none. */
   nextCastIn: number | null;
+  /** The body the fight turns on, which the AI aims at first. */
+  leader: boolean;
 }
 
 /** What the player AI sees when it must choose. Everything in it is a copy. */
@@ -290,6 +359,9 @@ export interface FightView {
     stamina: number;
     maxStamina: number;
     effects: readonly ViewEffect[];
+    /** Damage the ward still absorbs, and the decoy charges left. */
+    ward: number;
+    decoys: number;
   };
   /** Every technique of the loadout. */
   techniques: readonly ViewTechnique[];
@@ -297,6 +369,24 @@ export interface FightView {
   enemies: readonly ViewEnemy[];
   /** Casts per technique so far (habituation counts). */
   habituation: Readonly<Record<string, number>>;
+  /** The tier of the AI that plays: its ordered rule list and how the rules behave. */
+  ai: AiTier;
+  /** Traits that show on sight. */
+  visibleTraits: readonly TraitId[];
+  pouch: readonly ViewPouch[];
+  /** The pouch slot used automatically and the health share it triggers below; null without the medic pouch. */
+  medic: { slot: number; below: number } | null;
+  /** The technique id of the active stance, if any. */
+  stance: string | null;
+  /** Whether the next cast is already hastened. */
+  hastened: boolean;
+  /** The reaction delay of this tier in work units, and the share of health below which a spare buff is cast. */
+  reactWork: number;
+  guardBelow: number;
+  /** The strongest-cast threshold of this tier (x damage). */
+  strongMult: number;
+  /** Work units a tool or pill takes to use. */
+  itemWork: number;
 }
 
 export type CombatAi = (view: FightView) => Decision;
@@ -337,7 +427,15 @@ export interface FightHook {
   castInfo?(
     ctx: FightCtx,
     c: Combatant,
-  ): { kind: string; casting: boolean; interruptible: boolean; inWork: number | null } | null;
+  ): {
+    kind: string;
+    casting: boolean;
+    interruptible: boolean;
+    inWork: number | null;
+    /** Work units the whole wind-up takes, and how hard the blow is (x the body's damage). */
+    total: number;
+    mult: number;
+  } | null;
   /** The combatant is about to make its basic attack. */
   onAttack?(ctx: FightCtx, c: Combatant, plan: AttackPlan): void;
   /** The combatant's attack hit `target` for `dealt`. */
@@ -346,6 +444,10 @@ export interface FightHook {
   onDamaged?(ctx: FightCtx, c: Combatant, dealt: number, src: string): void;
   /** The combatant fell. */
   onDeath?(ctx: FightCtx, c: Combatant): void;
+  /** Whether the body is the one the fight turns on (a pack leader that keeps calling the pack back): the AI aims at it first. */
+  leader?(ctx: FightCtx, c: Combatant): boolean;
+  /** A multiplier on the habituation step of the player's techniques used against this combatant; 1 for none. */
+  habituation?(ctx: FightCtx, c: Combatant): number;
   /** The combatant left the fight, by death or flight; fires once, after `onDeath` for a death. */
   onLeave?(ctx: FightCtx, c: Combatant): void;
 }

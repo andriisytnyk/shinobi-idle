@@ -1,7 +1,8 @@
-import { NATURE_IDS, NATURE_WHEEL } from '@shinobi/content';
-import type { ComboId, ContentDb, NatureId, Rank, SkillId } from '@shinobi/content';
+import { NATURE_IDS, NATURE_WHEEL, TECH_SKILL_IDS } from '@shinobi/content';
+import type { ComboId, ContentDb, NatureId, Rank, SkillId, Technique } from '@shinobi/content';
 import { createStream, nextFloatFrom } from '../rng.ts';
 import { addEffect, findEffect, isSuppressed, removeEffect, statOf } from './fight-effects.ts';
+import { applyItem, itemView } from './fight-items.ts';
 import type {
   Combatant,
   Decision,
@@ -12,6 +13,7 @@ import type {
   FightState,
   FightTally,
   FightView,
+  KitEffect,
   KitTechnique,
   ModStat,
   PeriodicEffect,
@@ -61,13 +63,15 @@ function emptyTally(): FightTally {
     style: 'tai',
     lastUseAt: 0,
     masteryWork: {},
+    wounds: 0,
+    woundMin: 0,
   };
 }
 
 /** A deep copy of plain JSON. */
 const plain = <T>(x: T): T => JSON.parse(JSON.stringify(x)) as T;
 
-const count = (record: Record<string, number>, key: string, n = 1): void => {
+export const count = (record: Record<string, number>, key: string, n = 1): void => {
   record[key] = (record[key] ?? 0) + n;
 };
 
@@ -104,14 +108,78 @@ export function roll(fight: FightState, chance: number): boolean {
 
 // ---------- creation ----------
 
+/** The share of the combat stats that Wound stacks leave. */
+export function woundFactor(wounds: number, content: ContentDb): number {
+  const w = content.balance.K.wound;
+  return Math.max(0, 1 - w.stat * Math.min(w.max, Math.max(0, wounds)));
+}
+
+/** What a technique does besides damage, with the numbers of the balance object resolved for this player. */
+function kitEffect(tech: Technique, snap: PlayerSnapshot, content: ContentDb): KitEffect {
+  const K = content.balance.K;
+  const fx: KitEffect = {
+    kind: 'damage',
+    amount: 0,
+    mult: 1,
+    durationMs: 0,
+    drain: 0,
+    wounds: 0,
+    everyMs: 0,
+    statuses: [],
+  };
+  const effect = tech.combat?.effect;
+  if (!effect || tech.rank === null) return fx;
+  fx.kind = effect.kind;
+  switch (effect.kind) {
+    case 'shield':
+      fx.amount =
+        K.power[tech.rank] * K.techFx.shield.mult * (1 + K.levelScale * snap.levels[tech.skill]);
+      fx.durationMs = K.techFx.shield.durationMs;
+      break;
+    case 'decoy':
+      fx.amount = K.techFx.decoy.charges;
+      fx.durationMs = K.techFx.decoy.durationMs;
+      break;
+    case 'evasionBuff':
+      fx.mult = K.techFx.evasionBuff.mult;
+      fx.durationMs = K.techFx.evasionBuff.durationMs;
+      break;
+    case 'cleanse':
+      fx.statuses = [...effect.statuses];
+      break;
+    case 'passiveNegate':
+      fx.everyMs = K.techFx.passiveNegate.everyMs;
+      break;
+    case 'stance': {
+      const gate = K.techFx[effect.fx];
+      fx.mult = gate.taiDamage;
+      fx.drain = gate.staminaPerSec;
+      fx.wounds = gate.woundsAfter;
+      break;
+    }
+    case 'nextCast':
+      fx.mult = K.techFx.nextCast.castMult;
+      break;
+    case 'reveal':
+      fx.durationMs = K.techFx.reveal.durationMs;
+      break;
+    default:
+      break;
+  }
+  return fx;
+}
+
 function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
   const K = content.balance.K;
   const known = new Set(snap.known);
   const loadout = snap.loadout ? new Set(snap.loadout) : null;
+  const wound = woundFactor(snap.wounds ?? 0, content);
   const techniques: KitTechnique[] = [];
+  let style = 0;
+  for (const skill of TECH_SKILL_IDS) style = Math.max(style, snap.levels[skill]);
   for (const tech of content.techniques) {
     if (!known.has(tech.id) || tech.rank === null) continue;
-    if (loadout && !loadout.has(tech.id)) continue;
+    if (loadout && !loadout.has(tech.id) && !tech.combat?.outOfLoadout) continue;
     const n = techniqueFigures(snap, tech, content);
     const mastery = snap.mastery[tech.id] ?? 1;
     techniques.push({
@@ -121,12 +189,12 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
       rank: tech.rank,
       tags: [...tech.tags],
       state: tech.state,
-      damage: n.damage,
+      damage: n.damage * wound,
       castMs: n.castMs,
       cooldownMs: n.cooldownMs,
       pool: n.pool,
       cost: n.cost,
-      accuracy: accuracyOf(snap.levels, tech.skill, content),
+      accuracy: accuracyOf(snap.levels, tech.skill, content) * wound,
       comboChance: Math.min(
         K.combo.cap,
         K.combo.base + K.combo.perLevel * snap.levels[tech.skill] + K.combo.perMastery * mastery,
@@ -134,10 +202,13 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
       hitsAll: tech.role === 'area' || tech.tags.includes('area') || tech.combat?.hitsAll === true,
       guaranteedCombo: tech.combat?.guaranteedCombo ?? null,
       habituationMult: snap.signature === tech.id ? K.signatureHabituation : 1,
+      fx: kitEffect(tech, snap, content),
+      requiresStance: tech.combat?.requiresStance === true,
     });
   }
   return {
     techniques,
+    toolDamage: (K.toolTag[0] + K.toolTag[1] * style) * wound,
     med: snap.levels.med,
     chakraRegen: chakraRegenOf(snap.levels, content),
     staminaRegen: staminaRegenOf(snap.levels, content),
@@ -213,6 +284,7 @@ function addBodies(ctx: FightCtx, spawn: Spawn, n: number, staggered: boolean): 
       ward: 0,
       wardUntil: null,
       decoys: 0,
+      decoyUntil: null,
       fleeAt: spawn.fleeAt,
       fled: false,
     };
@@ -236,7 +308,8 @@ export function createFight(
 ): FightState {
   const K = content.balance.K;
   const levels = snap.levels;
-  const maxHp = maxHpOf(levels, content);
+  const wound = woundFactor(snap.wounds ?? 0, content);
+  const maxHp = maxHpOf(levels, content) * wound;
   const maxChakra = maxChakraOf(levels, content);
   const maxStamina = maxStaminaOf(levels, content);
   const basic = basicAttackOf(levels, content);
@@ -250,9 +323,9 @@ export function createFight(
     maxChakra,
     stamina: Math.min(maxStamina, snap.stamina ?? maxStamina),
     maxStamina,
-    accuracy: basic.accuracy,
-    evasion: evasionOf(levels, content),
-    damage: basic.damage,
+    accuracy: basic.accuracy * wound,
+    evasion: evasionOf(levels, content) * wound,
+    damage: basic.damage * wound,
     intervalMs: basic.intervalMs,
     nature: null,
     traits: [],
@@ -267,6 +340,7 @@ export function createFight(
     ward: 0,
     wardUntil: null,
     decoys: 0,
+    decoyUntil: null,
     fleeAt: null,
     fled: false,
   };
@@ -285,12 +359,21 @@ export function createFight(
     natures: [...snap.natures],
     target: null,
     knowledge: plain(snap.knowledge ?? {}),
+    pouch: (snap.pouch ?? []).map((s) => ({ id: s.id, n: s.n })),
+    medic: snap.medic ?? null,
     uses: {},
     poolAt: workOf(K.combat.regenMs),
     tally: emptyTally(),
     log: [],
   };
   const ctx = makeCtx(fight, content, rules);
+  // Passive techniques out of the loadout work through a hook of the player's own.
+  for (const tech of fight.kit.techniques) {
+    if (tech.fx.kind === 'passiveNegate' && !player.specials.includes('passiveNegate')) {
+      player.specials.push('passiveNegate');
+    }
+  }
+  for (const hook of hooksOf(ctx, player)) hook.init?.(ctx, player);
   for (const spawn of fight.encounter.spawns) addBodies(ctx, spawn, spawn.count, spawn.count > 1);
   return fight;
 }
@@ -328,6 +411,7 @@ export function fightNextEventIn(
       if (e.until !== null) take(e.until - fight.t);
     }
     if (c.ward > 0 && c.wardUntil !== null) take(c.wardUntil - fight.t);
+    if (c.decoys > 0 && c.decoyUntil !== null) take(c.decoyUntil - fight.t);
     const rate = speed(ctx, c);
     for (const name in c.timers) {
       const timer = c.timers[name];
@@ -431,18 +515,24 @@ function note(
  * credited to `src` when the target is an enemy. Tells the hooks, and sends an enemy that falls
  * to its flee share away. Returns the health actually taken.
  */
-function hurt(ctx: FightCtx, target: Combatant, amount: number, src: string): number {
+export function hurt(ctx: FightCtx, target: Combatant, amount: number, src: string): number {
   const fight = ctx.fight;
   if (!alive(target) || !(amount > 0)) return 0;
   const applied = Math.min(amount, target.hp);
   target.hp -= applied;
   if (target.side === 'enemy') count(fight.tally.damage, src, applied);
-  else fight.tally.taken += applied;
+  else {
+    fight.tally.taken += applied;
+    // A fight that took the player this low costs a Wound even when it is won.
+    if (target.hp <= target.maxHp * ctx.content.balance.K.woundHp) target.data.low = 1;
+  }
   for (const hook of hooksOf(ctx, target)) hook.onDamaged?.(ctx, target, applied, src);
   if (!alive(target)) {
     if (target.side === 'enemy') fight.tally.kills++;
     for (const hook of hooksOf(ctx, target)) hook.onDeath?.(ctx, target);
     leave(ctx, target);
+    // A fallen body keeps no effects: its ticks would never be handled, and a save would not read them back.
+    target.effects = [];
   } else if (target.fleeAt !== null && target.hp <= target.maxHp * target.fleeAt) {
     target.fled = true;
     target.hp = 0;
@@ -469,6 +559,7 @@ export function rollHit(ctx: FightCtx, target: Combatant, chance: number | null)
   if (chance !== null && !roll(ctx.fight, chance)) return false;
   if (target.decoys > 0) {
     target.decoys--;
+    if (target.decoys === 0) target.decoyUntil = null;
     return false;
   }
   return true;
@@ -508,7 +599,7 @@ export function addDecoys(c: Combatant, n: number): void {
  * Cancels the casts of a combatant's hooks that are under way (only the interruptible ones when
  * `interruptible` is set); returns whether any was.
  */
-function cancelCasts(ctx: FightCtx, target: Combatant, interruptible = false): boolean {
+export function cancelCasts(ctx: FightCtx, target: Combatant, interruptible = false): boolean {
   let any = false;
   for (const hook of hooksOf(ctx, target)) {
     const info = hook.castInfo?.(ctx, target);
@@ -521,7 +612,7 @@ function cancelCasts(ctx: FightCtx, target: Combatant, interruptible = false): b
 }
 
 /** Bind lowers evasion and switches Evasive off; a weaker bind never replaces a stronger one. */
-function applyBind(ctx: FightCtx, target: Combatant, evasion: number, src: string): void {
+export function applyBind(ctx: FightCtx, target: Combatant, evasion: number, src: string): void {
   const fight = ctx.fight;
   const until = fight.t + secWork(ctx.content.balance.K.bind.dur);
   const old = findEffect(target, 'bind');
@@ -565,7 +656,7 @@ function stunSeconds(rank: Rank, content: ContentDb): number {
 }
 
 /** The nature wheel: +wheel against a nature the technique beats, -wheel against one that beats it. */
-function wheelFactor(skill: SkillId, nature: NatureId | null, content: ContentDb): number {
+export function wheelFactor(skill: SkillId, nature: NatureId | null, content: ContentDb): number {
   if (nature === null || !(NATURE_IDS as readonly string[]).includes(skill)) return 1;
   const wheel = content.balance.K.wheel;
   const own = skill as NatureId;
@@ -580,14 +671,31 @@ function habituation(previous: number, mult: number, content: ContentDb): number
   return 1 - Math.min(K.habituationCap, K.habituation * mult * previous);
 }
 
-function lowestHp(enemies: readonly Combatant[]): Combatant | undefined {
+/** How much faster the player's techniques wear off against this body: the product of its hooks' multipliers. */
+function habituationScale(ctx: FightCtx, target: Combatant | undefined): number {
+  if (!target) return 1;
+  let scale = 1;
+  for (const hook of hooksOf(ctx, target)) scale *= hook.habituation?.(ctx, target) ?? 1;
+  return scale;
+}
+
+/** The stance technique that is active on the player, or null. */
+function activeStance(fight: FightState): string | null {
+  const e = findEffect(fight.player, 'stance');
+  return e ? e.src : null;
+}
+
+export function lowestHp(enemies: readonly Combatant[]): Combatant | undefined {
   let best: Combatant | undefined;
   for (const e of enemies) if (alive(e) && (!best || e.hp < best.hp)) best = e;
   return best;
 }
 
 /** The body an attack is aimed at: the one the AI named if it lives, else the weakest. */
-function pickTarget(fight: FightState, id: string | null | undefined): Combatant | undefined {
+export function pickTarget(
+  fight: FightState,
+  id: string | null | undefined,
+): Combatant | undefined {
   const named = id ? fight.enemies.find((e) => e.id === id && alive(e)) : undefined;
   return named ?? lowestHp(fight.enemies);
 }
@@ -603,27 +711,40 @@ const viewEffects = (fight: FightState, c: Combatant): ViewEffect[] =>
 
 function buildView(ctx: FightCtx): FightView {
   const { fight, content } = ctx;
+  const K = content.balance.K;
   const player = fight.player;
+  const tier = aiTierOf(content, fight.tier);
   const living = fight.enemies.filter(alive);
   const primary = lowestHp(living);
+  const stance = activeStance(fight);
   const techniques: ViewTechnique[] = fight.kit.techniques.map((tech) => {
     const cooldownLeft = Math.max(0, (player.cd[tech.id] ?? 0) - fight.t);
     const affordable = (tech.pool === 'chakra' ? player.chakra : player.stamina) >= tech.cost;
     const uses = fight.uses[tech.id] ?? 0;
     const wheel = wheelFactor(tech.skill, primary?.nature ?? null, content);
     const targets = tech.hitsAll ? living.length : 1;
+    const stanceOk = !tech.requiresStance || stance !== null;
+    const hab = habituation(uses, tech.habituationMult * habituationScale(ctx, primary), content);
     return {
-      tech: { ...tech, tags: [...tech.tags] },
+      tech: { ...tech, tags: [...tech.tags], fx: { ...tech.fx, statuses: [...tech.fx.statuses] } },
       cooldownLeft,
       affordable,
-      ready: cooldownLeft === 0 && affordable,
+      ready: cooldownLeft === 0 && affordable && stanceOk,
       uses,
-      expected: tech.damage * habituation(uses, tech.habituationMult, content) * wheel * targets,
+      expected:
+        tech.damage *
+        hab *
+        wheel *
+        targets *
+        (tech.skill === 'tai' ? stat(ctx, player, 'taiDamage', 1) : 1),
+      power: tech.damage,
+      stanceOk,
     };
   });
   const enemies: ViewEnemy[] = living.map((e) => {
     const known = fight.knowledge[e.entry];
     const knownTraits = known ? e.traits.filter((t) => known.includes(t)) : [...e.traits];
+    const mechanicKnown = !known || known.includes('special');
     const workingTraits = knownTraits.filter((trait) => {
       const hook = ctx.rules.fightHooks.find((h) => h.id === trait);
       return hook?.working ? hook.working(ctx, e) : !isSuppressed(e, trait);
@@ -635,8 +756,16 @@ function buildView(ctx: FightCtx): FightView {
       if (!info || info.inWork === null) continue;
       // A cast under way can be seen; when the next one comes is known only for a known trait.
       if (info.casting) {
-        cast = { kind: info.kind, remaining: info.inWork, interruptible: info.interruptible };
-      } else if (!e.traits.includes(hook.id as never) || knownTraits.includes(hook.id as never)) {
+        cast = {
+          kind: info.kind,
+          remaining: info.inWork,
+          total: info.total,
+          mult: info.mult,
+          interruptible: info.interruptible,
+        };
+      } else if (
+        e.traits.includes(hook.id as never) ? knownTraits.includes(hook.id as never) : mechanicKnown
+      ) {
         nextCastIn = info.inWork;
       }
     }
@@ -650,6 +779,7 @@ function buildView(ctx: FightCtx): FightView {
       workingTraits,
       cast,
       nextCastIn,
+      leader: hooksOf(ctx, e).some((h) => h.leader?.(ctx, e) === true),
     };
   });
   return {
@@ -663,11 +793,39 @@ function buildView(ctx: FightCtx): FightView {
       stamina: player.stamina,
       maxStamina: player.maxStamina,
       effects: viewEffects(fight, player),
+      ward: player.ward,
+      decoys: player.decoys,
     },
     techniques,
     enemies,
     habituation: { ...fight.uses },
+    ai: tier,
+    visibleTraits: content.ai.visibleTraits,
+    pouch: fight.pouch.flatMap((slot, i) => {
+      const view = slot.n > 0 ? itemView(content, slot.id) : null;
+      return view ? [{ slot: i, id: slot.id, n: slot.n, tags: view.tags, use: view.use }] : [];
+    }),
+    medic:
+      fight.medic !== null && (fight.pouch[fight.medic]?.n ?? 0) > 0
+        ? { slot: fight.medic, below: content.balance.K.pillAt }
+        : null,
+    stance,
+    hastened: (player.data.hasten ?? 0) > 0,
+    reactWork: workOf(K.ai[tier.id].reactMs),
+    guardBelow: K.ai.guardBelow,
+    strongMult: K.ai[tier.id].strongMult,
+    itemWork: secWork(K.pillAction),
   };
+}
+
+/** The AI tier that plays a player of this tier: the highest one whose minimum the tier meets. */
+function aiTierOf(content: ContentDb, tier: number) {
+  let chosen = content.ai.tiers[0];
+  for (const t of content.ai.tiers) {
+    if (t.minTier <= tier && (!chosen || t.minTier >= chosen.minTier)) chosen = t;
+  }
+  if (!chosen) throw new Error('the content has no AI tier');
+  return chosen;
 }
 
 function act(ctx: FightCtx): void {
@@ -679,6 +837,7 @@ function act(ctx: FightCtx): void {
     const tech = chosen && fight.kit.techniques.find((t) => t.id === chosen.tech.id);
     if (tech) return startCast(fight, tech, decision.target);
   }
+  if (decision.type === 'item' && useFromPouch(ctx, decision.id, decision.target)) return;
   if (decision.type === 'wait') {
     fight.player.phase = 'recover';
     fight.player.timer.need = needOf(TICK_MS);
@@ -687,13 +846,34 @@ function act(ctx: FightCtx): void {
   basicAttack(ctx, decision.type === 'basic' ? decision.target : undefined);
 }
 
+/** Takes one unit of `id` from the pouch, uses it (it takes the item's action time) and reports whether it could. */
+function useFromPouch(ctx: FightCtx, id: string, target: string | undefined): boolean {
+  const { fight, content } = ctx;
+  const slot = fight.pouch.find((s) => s.id === id && s.n > 0);
+  if (!slot) return false;
+  fight.target = target ?? null;
+  const used = applyItem(ctx, id);
+  fight.target = null;
+  if (!used) return false;
+  slot.n--;
+  count(fight.tally.uses, id);
+  fight.player.phase = 'recover';
+  fight.player.timer.need = needOf(secMs(content.balance.K.pillAction));
+  return true;
+}
+
 function startCast(fight: FightState, tech: KitTechnique, target: string | undefined): void {
   const player = fight.player;
   if (tech.pool === 'chakra') player.chakra -= tech.cost;
   else player.stamina -= tech.cost;
   player.phase = 'cast';
   player.cast = tech.id;
-  player.timer.need = needOf(tech.castMs);
+  // A hastened cast is shortened once.
+  const hasten = player.data.hasten ?? 0;
+  player.data.hasten = 0;
+  player.timer.need = needOf(
+    hasten > 0 ? Math.max(1, Math.round(tech.castMs * hasten)) : tech.castMs,
+  );
   fight.target = target ?? null;
   // Mastery is paid for the fight time since the previous technique use (or the fight's start).
   count(fight.tally.masteryWork, tech.id, fight.t - fight.tally.lastUseAt);
@@ -702,11 +882,28 @@ function startCast(fight: FightState, tech: KitTechnique, target: string | undef
   note(fight, 'player', 'cast', tech.id, 0);
 }
 
+/**
+ * The basic attack is an auto-attack: it lands the moment it is chosen and is next allowed an
+ * interval later, but it does not stop the player from casting in the meantime. Chosen before it
+ * is allowed again, the player waits for the next moment anything can happen: the attack, a
+ * technique coming off cooldown, or the next regeneration step.
+ */
 function basicAttack(ctx: FightCtx, targetId: string | undefined): void {
   const fight = ctx.fight;
   const player = fight.player;
-  player.phase = 'recover';
-  player.timer.need = needOf(player.intervalMs);
+  const due = player.data.basicAt ?? 0;
+  if (fight.t < due) {
+    let wait = due - fight.t;
+    for (const id of Object.keys(player.cd)) {
+      const left = (player.cd[id] ?? 0) - fight.t;
+      if (left > 0 && left < wait) wait = left;
+    }
+    wait = Math.min(wait, fight.poolAt - fight.t > 0 ? fight.poolAt - fight.t : wait);
+    player.phase = 'recover';
+    player.timer.need = Math.max(1, wait) * RATE_FULL;
+    return;
+  }
+  player.data.basicAt = fight.t + workOf(player.intervalMs);
   fight.tally.style = 'tai';
   fight.tally.basic++;
   const target = pickTarget(fight, targetId);
@@ -717,7 +914,8 @@ function basicAttack(ctx: FightCtx, targetId: string | undefined): void {
     ctx.content,
   );
   if (rollHit(ctx, target, chance)) {
-    note(fight, 'player', 'hit', null, dealDamage(ctx, target, player.damage, 'basic'));
+    const damage = player.damage * stat(ctx, player, 'taiDamage', 1);
+    note(fight, 'player', 'hit', null, dealDamage(ctx, target, damage, 'basic'));
   } else note(fight, 'player', 'miss', null, 0);
 }
 
@@ -731,11 +929,11 @@ function resolveCast(ctx: FightCtx): void {
   const previous = fight.uses[tech.id] ?? 0;
   fight.uses[tech.id] = previous + 1;
   count(fight.tally.uses, tech.id);
-  const hab = habituation(previous, tech.habituationMult, content);
   // Tags that work on the player rather than on an enemy act when the cast ends.
   if (tech.tags.includes('reveal')) removeEffect(player, 'hidden');
   if (tech.tags.includes('dispel')) removeEffect(player, 'illusion');
   if (tech.tags.includes('cleanse')) removeEffect(player, 'poison');
+  applyTechniqueEffect(ctx, tech);
   const hurtsEnemy =
     tech.damage > 0 ||
     tech.state !== null ||
@@ -753,8 +951,92 @@ function resolveCast(ctx: FightCtx): void {
       content,
     );
     if (rollHit(ctx, target, chance)) {
+      const hab = habituation(
+        previous,
+        tech.habituationMult * habituationScale(ctx, target),
+        content,
+      );
       note(fight, 'player', 'hit', tech.id, applyHit(ctx, tech, target, hab));
     } else note(fight, 'player', 'miss', tech.id, 0);
+  }
+}
+
+/** What a technique does to the player's side besides hurting an enemy, from its combat data. */
+function applyTechniqueEffect(ctx: FightCtx, tech: KitTechnique): void {
+  const fight = ctx.fight;
+  const player = fight.player;
+  const fx = tech.fx;
+  const until = fight.t + workOf(fx.durationMs);
+  switch (fx.kind) {
+    case 'shield':
+      grantWard(player, fx.amount, until);
+      break;
+    case 'decoy':
+      addDecoys(player, fx.amount);
+      player.decoyUntil = until;
+      break;
+    case 'evasionBuff':
+      addEffect(player, {
+        kind: 'modifier',
+        id: 'evasionBuff',
+        src: tech.id,
+        until,
+        stat: 'evasion',
+        op: 'mul',
+        value: fx.mult,
+      });
+      break;
+    case 'cleanse':
+      for (const status of fx.statuses) removeEffect(player, status);
+      break;
+    case 'nextCast':
+      player.data.hasten = fx.mult;
+      break;
+    case 'reveal':
+      // The Hidden trait stops working for a while: no body can hide or hide again.
+      for (const e of fight.enemies) {
+        if (!alive(e)) continue;
+        addEffect(e, {
+          kind: 'modifier',
+          id: 'revealed',
+          src: tech.id,
+          until,
+          stat: 'accuracy',
+          op: 'mul',
+          value: 1,
+        });
+      }
+      break;
+    case 'stance': {
+      // One stance at a time: the new one replaces the old; it costs a Wound after the fight, once.
+      addEffect(player, {
+        kind: 'modifier',
+        id: 'stance',
+        src: tech.id,
+        until: null,
+        stat: 'taiDamage',
+        op: 'add',
+        value: fx.mult,
+      });
+      addEffect(player, {
+        kind: 'periodic',
+        id: 'stanceDrain',
+        src: tech.id,
+        until: null,
+        mode: 'stamina',
+        amount: fx.drain,
+        every: workOf(TICK_MS),
+        next: fight.t + workOf(TICK_MS),
+      });
+      const key = `stance.${tech.id}`;
+      if (!player.data[key]) {
+        player.data[key] = 1;
+        fight.tally.wounds += fx.wounds;
+      }
+      break;
+    }
+    default:
+      break;
   }
 }
 
@@ -782,7 +1064,11 @@ function applyHit(ctx: FightCtx, tech: KitTechnique, target: Combatant, hab: num
   if (tech.tags.includes('interrupt') && cancelCasts(ctx, target, true)) {
     fight.tally.interrupts++;
   }
-  const base = tech.damage * hab * wheelFactor(tech.skill, target.nature, content);
+  const base =
+    tech.damage *
+    hab *
+    wheelFactor(tech.skill, target.nature, content) *
+    (tech.skill === 'tai' ? stat(ctx, fight.player, 'taiDamage', 1) : 1);
   const dealt = dealDamage(ctx, target, base, tech.id);
   if (!alive(target)) return dealt;
 
@@ -855,7 +1141,11 @@ function enemyAttack(ctx: FightCtx, enemy: Combatant): void {
   const fight = ctx.fight;
   const player = fight.player;
   const plan = {
-    chance: hitChance(enemy.accuracy, stat(ctx, player, 'evasion', player.evasion), ctx.content),
+    chance: hitChance(
+      stat(ctx, enemy, 'accuracy', enemy.accuracy),
+      stat(ctx, player, 'evasion', player.evasion),
+      ctx.content,
+    ),
     damage: enemy.damage,
   };
   const hooks = hooksOf(ctx, enemy);
@@ -869,19 +1159,29 @@ function enemyAttack(ctx: FightCtx, enemy: Combatant): void {
   for (const hook of hooks) hook.onAttackHit?.(ctx, enemy, player, dealt);
 }
 
+/** The chance that an attack of `attacker` lands on `target`, accuracy and evasion modifiers counted. */
+export function hitChanceOf(ctx: FightCtx, attacker: Combatant, target: Combatant): number {
+  return hitChance(
+    stat(ctx, attacker, 'accuracy', attacker.accuracy),
+    stat(ctx, target, 'evasion', target.evasion),
+    ctx.content,
+  );
+}
+
 /** A heavy blow that always lands (unless a decoy takes it), for hooks such as the caster's. */
-export function heavyBlow(ctx: FightCtx, enemy: Combatant, damage: number): void {
+export function heavyBlow(ctx: FightCtx, enemy: Combatant, damage: number): boolean {
   const player = ctx.fight.player;
   if (!rollHit(ctx, player, null)) {
     note(ctx.fight, 'enemy', 'miss', null, 0);
-    return;
+    return false;
   }
   note(ctx.fight, 'enemy', 'hit', null, dealDamage(ctx, player, damage, enemy.id));
+  return true;
 }
 
 function tickEffects(ctx: FightCtx, c: Combatant): void {
   const fight = ctx.fight;
-  for (const e of c.effects) {
+  for (const e of [...c.effects]) {
     if (e.kind !== 'periodic') continue;
     while (alive(c) && e.next <= fight.t && (e.until === null || e.next <= e.until)) {
       if (!isSuppressed(c, e.id)) tick(ctx, c, e);
@@ -892,7 +1192,15 @@ function tickEffects(ctx: FightCtx, c: Combatant): void {
 
 function tick(ctx: FightCtx, c: Combatant, e: PeriodicEffect): void {
   if (e.mode === 'damage') hurt(ctx, c, e.amount, e.src);
-  else c.hp = Math.min(c.maxHp, c.hp + e.amount);
+  else if (e.mode === 'heal') c.hp = Math.min(c.maxHp, c.hp + e.amount);
+  else {
+    // A stance burns stamina and ends when none is left.
+    c.stamina = Math.max(0, c.stamina - e.amount);
+    if (c.stamina <= 0) {
+      removeEffect(c, 'stance');
+      removeEffect(c, 'stanceDrain');
+    }
+  }
 }
 
 function expire(fight: FightState, c: Combatant): void {
@@ -902,6 +1210,10 @@ function expire(fight: FightState, c: Combatant): void {
   if (c.ward > 0 && c.wardUntil !== null && c.wardUntil <= fight.t) {
     c.ward = 0;
     c.wardUntil = null;
+  }
+  if (c.decoyUntil !== null && c.decoyUntil <= fight.t) {
+    c.decoys = 0;
+    c.decoyUntil = null;
   }
 }
 
@@ -942,6 +1254,7 @@ function handle(ctx: FightCtx): void {
     }
     runTimers(ctx, e);
   }
+  runTimers(ctx, player);
   if (checkResult(fight)) return;
 
   while (fight.poolAt <= fight.t) {

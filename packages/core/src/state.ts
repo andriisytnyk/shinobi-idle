@@ -1,9 +1,10 @@
 import type { ContentDb, NatureId, SkillId } from '@shinobi/content';
-import type { CombatState } from './combat/types.ts';
+import type { CombatState, LoadoutState, PouchState, WoundState } from './combat/types.ts';
 import type { EntityRef } from './entity.ts';
 import type { GameEvent } from './events.ts';
 import { createStreams, type RngStreams } from './rng.ts';
 import { updateQuests } from './quests.ts';
+import { ensurePouch } from './combat/pouch.ts';
 import { refreshUnlocks } from './unlocks.ts';
 
 export type Rank = 'student' | 'genin' | 'chunin';
@@ -67,11 +68,19 @@ export interface GameState {
   gear: Record<string, number>;
   /** The pinned goal shown in the meta panel. */
   goal: EntityRef | null;
+  /** The techniques taken into a fight, the signature and the saved loadouts. */
+  loadouts: LoadoutState;
+  /** The pouch of tools and pills, and the slot the medic pouch uses on its own. */
+  pouch: PouchState;
+  /** Wound stacks and the time left on the current one. */
+  wounds: WoundState;
+  /** Enemy and boss entries the player has met: what is known of them is derived from this and the kill counters. */
+  seen: Record<string, true>;
   /** One-off notices for the UI, newest last. The UI drains it; it is never saved. */
   events: GameEvent[];
 }
 
-export const STATE_VERSION = 6;
+export const STATE_VERSION = 7;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
@@ -101,9 +110,14 @@ export function createState(seed: number, content: ContentDb): GameState {
     buffs: {},
     gear: {},
     bushes: {},
+    loadouts: { active: [], auto: true, signature: null, basis: '', saved: {} },
+    pouch: { slots: [], medic: null },
+    wounds: { stacks: 0, left: 0 },
+    seen: {},
     goal: null,
     events: [],
   };
+  ensurePouch(state, content);
   refreshUnlocks(state, content, true);
   updateQuests(state, content);
   state.events = [];

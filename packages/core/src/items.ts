@@ -1,6 +1,7 @@
 import type { ContentDb } from '@shinobi/content';
 import { addItem, hasItem, removeItem } from './bank.ts';
 import { useTonic } from './buffs.ts';
+import { shortenWounds } from './combat/wounds.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
 import { indexOf } from './lookup.ts';
@@ -23,6 +24,17 @@ export function useItem(
   if ((state.bank[id] ?? 0) < 1) return { ok: false, reason: 'error.noItem' };
   // A tonic needs no target: it starts a buff on its own skill.
   if (item.fx?.kind === 'tonic') return useTonic(state, id, content);
+  // An ointment or a blood-making pill shortens the healing of the current Wound stack.
+  const fx = item.fx;
+  const woundMin =
+    fx?.kind === 'woundHeal' ? fx.woundMin : fx?.kind === 'heal' ? fx.woundMin : undefined;
+  if (woundMin !== undefined) {
+    if (state.wounds.stacks < 1) return { ok: false, reason: 'error.noWounds' };
+    removeItem(state, id, 1);
+    shortenWounds(state, woundMin, content);
+    emit(state, { type: 'itemUsed', id, target: 'wounds' });
+    return { ok: true };
+  }
   const use = item.use;
   if (!use) return { ok: false, reason: 'error.itemNotUsable' };
   const technique = target === undefined ? undefined : index.techniques.get(target);

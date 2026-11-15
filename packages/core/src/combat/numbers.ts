@@ -27,6 +27,11 @@ export interface PlayerSnapshot {
   tier?: number;
   /** The signature technique, which habituates more slowly. */
   signature?: string;
+  /** The pouch, slot by slot (an empty slot has an empty id), and the slot the medic pouch empties on its own. */
+  pouch?: { id: string; n: number }[];
+  medic?: number | null;
+  /** Wound stacks; each one cuts the combat stats. */
+  wounds?: number;
 }
 
 export type Levels = PlayerSnapshot['levels'];
