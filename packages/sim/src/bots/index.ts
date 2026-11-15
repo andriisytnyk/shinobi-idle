@@ -1,5 +1,9 @@
 import type { Bot } from '../bot.ts';
 import { academyBot } from './academy.ts';
+import { fighterBot } from './fighter.ts';
 
-/** Every bot the CLI can run, by name. Later stages add theirs here. */
-export const bots: Readonly<Record<string, Bot>> = { [academyBot.name]: academyBot };
+/** Every bot the CLI can list, by name. The fighter has its own command with an hourly report: `pnpm sim fighter`. */
+export const bots: Readonly<Record<string, Bot>> = {
+  [academyBot.name]: academyBot,
+  [fighterBot.name]: fighterBot,
+};

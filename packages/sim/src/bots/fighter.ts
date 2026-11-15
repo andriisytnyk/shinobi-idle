@@ -10,12 +10,12 @@ import {
   pouchUse,
   skillLevel,
   targetOf,
-  waiveBuildings,
   zoneRequirement,
   type ActionInfo,
   type Command,
 } from '@shinobi/core';
 import type { Bot, BotContext } from '../bot.ts';
+import { combatSkills, KIND_FIGHT, styleSkills } from '../constants.ts';
 import { fightSnapshot, encounterOf, runFights } from '../fights.ts';
 
 const MINUTE = 60_000;
@@ -55,6 +55,7 @@ export function createFighterBot(): Bot {
   const lastDefeats = new Map<string, number>();
   let mode: Mode = 'fight';
   let since = 0;
+  let lastNow = 0;
 
   return {
     name: 'fighter',
@@ -63,6 +64,15 @@ export function createFighterBot(): Bot {
     reviewMs: FIGHTER.reviewMs,
 
     decide({ state, content, rules }: BotContext): Command[] | null {
+      // A new run starts at an earlier game time than the last one ended: forget the old run.
+      if (state.now < lastNow) {
+        estimates.clear();
+        bans.clear();
+        lastDefeats.clear();
+        mode = 'fight';
+        since = 0;
+      }
+      lastNow = state.now;
       const commands: Command[] = [];
       const running = state.slots[0]?.action ?? null;
 
@@ -74,8 +84,9 @@ export function createFighterBot(): Bot {
       }
 
       const levelOf = (id: SkillId) => skillLevel(state, id, content);
-      const style = Math.max(levelOf('tai'), levelOf('nin'));
-      const power = (levelOf('vit') + levelOf('eva') + style) / 3;
+      const style = Math.max(...styleSkills(content).map(levelOf));
+      const defence = combatSkills(content).map(levelOf);
+      const power = defence.reduce((a, b) => a + b, style) / (defence.length + 1);
       const reach = power * FIGHTER.reachFactor + FIGHTER.reachMargin;
 
       const fingerprint = [
@@ -133,7 +144,7 @@ export function createFighterBot(): Bot {
       }
 
       let action: { kind: string; id: string } | null = null;
-      if (mode === 'fight' && best) action = { kind: 'fight', id: best.zone.id };
+      if (mode === 'fight' && best) action = { kind: KIND_FIGHT, id: best.zone.id };
       else {
         let pick: ActionInfo | null = null;
         let pickLevel = Infinity;
@@ -160,7 +171,7 @@ export function createFighterBot(): Bot {
       const offered = content.shop.flatMap((s) => {
         const item = content.items.find((i) => i.id === s.item);
         if (!item || pouchUse(item) === null) return [];
-        return evalReq(state, waiveBuildings(s.req), content).met ? [item.id] : [];
+        return evalReq(state, s.req, content).met ? [item.id] : [];
       });
       const hypothetical = { ...state.bank };
       for (const id of offered) hypothetical[id] = Math.max(hypothetical[id] ?? 0, stack);
@@ -209,3 +220,6 @@ export function createFighterBot(): Bot {
     },
   };
 }
+
+/** The instance the CLI registry holds; it forgets a finished run when a new one starts at an earlier game time. */
+export const fighterBot: Bot = createFighterBot();

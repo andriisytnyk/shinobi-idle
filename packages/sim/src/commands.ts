@@ -2,7 +2,7 @@ import { ukLocale } from '@shinobi/content';
 import { runBench } from './bench.ts';
 import type { Bot } from './bot.ts';
 import { bots } from './bots/index.ts';
-import { runCraftsCli, runFightCli } from './cliSim.ts';
+import { runCraftsCli, runFightCli, runFighterCli } from './cliSim.ts';
 import { buildReport, type Report } from './report.ts';
 import type { Milestone } from './runner.ts';
 
@@ -95,6 +95,7 @@ export function runCli(args: string[], registry: Readonly<Record<string, Bot>> =
     };
   }
   if (command === 'fight') return runFightCli(args.slice(1));
+  if (command === 'fighter') return runFighterCli(args.slice(1));
   if (command === 'crafts') return runCraftsCli(args.slice(1));
   if (command === 'bench') {
     return {

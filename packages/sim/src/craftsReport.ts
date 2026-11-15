@@ -1,7 +1,8 @@
 import { content as defaultContent, type ContentDb } from '@shinobi/content';
-import { defaultRules, listSkillActions, type Rules } from '@shinobi/core';
+import { defaultRules, listSkillActions, type GameState, type Rules } from '@shinobi/core';
 import { createCraftsBot } from './bots/crafts.ts';
 import { buildGeninStart } from './character.ts';
+import { KIND_CRAFT, KIND_GATHER } from './constants.ts';
 import { HOUR_MS, runHourly, type HourRow } from './hourly.ts';
 
 /** Ryo a fresh Genin starts the crafts run with, so that the first goods can be bought. */
@@ -13,6 +14,8 @@ export interface CraftsHour {
   levels: Record<string, number>;
   ryoSold: number;
   ryoSpent: number;
+  /** Ryo sold minus ryo spent on goods. */
+  ryoNet: number;
   crafted: number;
   gathered: number;
   /** Share of the hour with nothing running because the bot found nothing to start, 0 to 1. */
@@ -25,7 +28,14 @@ export interface CraftsReport {
   skills: string[];
   rows: CraftsHour[];
   /** Totals over the run. */
-  totals: { ryoSold: number; ryoSpent: number; crafted: number; gathered: number; idle: number };
+  totals: {
+    ryoSold: number;
+    ryoSpent: number;
+    ryoNet: number;
+    crafted: number;
+    gathered: number;
+    idle: number;
+  };
   rejected: number;
   firstRejection: string | null;
 }
@@ -33,15 +43,11 @@ export interface CraftsReport {
 const round = (n: number, d = 4): number => Math.round(n * 10 ** d) / 10 ** d;
 
 /** The skills that train through gather or craft actions, found from the content. */
-export function tradeSkills(
-  content: ContentDb,
-  rules: Rules,
-  state: Parameters<typeof listSkillActions>[0],
-): string[] {
+export function tradeSkills(content: ContentDb, rules: Rules, state: GameState): string[] {
   return content.skills
     .filter((s) =>
       listSkillActions(state, s.id, content, rules).some(
-        (a) => a.kind === 'gather' || a.kind === 'craft',
+        (a) => a.kind === KIND_GATHER || a.kind === KIND_CRAFT,
       ),
     )
     .map((s) => s.id);
@@ -69,6 +75,7 @@ export function craftsReport(o: {
     levels: Object.fromEntries(skills.map((id) => [id, r.levels[id] ?? 1])),
     ryoSold: r.ryoSold,
     ryoSpent: r.ryoSpent,
+    ryoNet: r.ryoSold - r.ryoSpent,
     crafted: r.crafted,
     gathered: r.gathered,
     idle: round(r.idleMs / HOUR_MS),
@@ -82,6 +89,7 @@ export function craftsReport(o: {
     totals: {
       ryoSold: total((r) => r.ryoSold),
       ryoSpent: total((r) => r.ryoSpent),
+      ryoNet: total((r) => r.ryoNet),
       crafted: total((r) => r.crafted),
       gathered: total((r) => r.gathered),
       idle: round(total((r) => r.idle) / Math.max(1, rows.length)),

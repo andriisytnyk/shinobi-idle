@@ -6,24 +6,25 @@ import {
   type SkillId,
 } from '@shinobi/content';
 import {
+  addItem,
   createState,
   dispatch,
   examFor,
   killsKey,
   pouchUse,
   refreshUnlocks,
+  syncVillage,
   teamFor,
   xpAt,
   type GameState,
   type Rank,
   type Rules,
 } from '@shinobi/core';
+import { CHUNIN_FROM_LEVEL, RANK_CHUNIN, RANK_GENIN, RANK_STUDENT } from './constants.ts';
 
-/** Mastery level of every known technique of a typical character (the balance model uses 20). */
+/** Mastery level of every known technique of a yardstick character (the balance model uses 20). */
 export const TYPICAL_MASTERY = 20;
-/** Level from which a typical character is a Chunin (the content has no Chunin exam yet). */
-export const CHUNIN_FROM_LEVEL = 40;
-/** Ryo a typical character is given to buy the shop's pouch items with. */
+/** Ryo a yardstick character is given to buy the shop's pouch items with. */
 const SHOPPING_RYO = 1_000_000;
 
 export interface CharacterOptions {
@@ -37,21 +38,43 @@ export interface CharacterOptions {
   ryo?: number;
 }
 
-/** Rank a typical character of this level holds: a student up to the Academy cap, a Chunin from `CHUNIN_FROM_LEVEL`. */
+/** Rank a yardstick character of this level holds: a student up to the Academy cap, a Chunin from `CHUNIN_FROM_LEVEL`. */
 export function rankForLevel(level: number, content: ContentDb): Rank {
-  if (level <= content.balance.K.academyCap) return 'student';
-  return level >= CHUNIN_FROM_LEVEL ? 'chunin' : 'genin';
+  if (level <= content.balance.K.academyCap) return RANK_STUDENT;
+  return level >= CHUNIN_FROM_LEVEL ? RANK_CHUNIN : RANK_GENIN;
 }
 
 const isNature = (id: string): boolean => (NATURE_IDS as readonly string[]).includes(id);
 
+/** The village buildings the shop's requirements name, with the level each needs. */
+function shopBuildingLevels(req: Req, out: Record<string, number>): void {
+  if (req.t === 'building') out[req.id] = Math.max(out[req.id] ?? 0, req.level);
+  else if (req.t === 'all' || req.t === 'any') for (const r of req.of) shopBuildingLevels(r, out);
+}
+
 /**
- * A character at `level`, made the way the game makes one: a fresh state with the skills'
- * experience, the nature choice and the mastery of every technique the levels teach. Only plain
- * state fields are written; techniques are learned through `refreshUnlocks`.
+ * Gives a Genin's village the buildings the shop needs to sell what a yardstick character is
+ * measured with (goods, tools). Building takes days of village ticks and resources, which a
+ * measurement of fights or crafts is not about, so the levels are written to the village state
+ * (`village.levels`) rather than built through `village.build`. A student has no village.
  */
-export function buildCharacter(content: ContentDb, rules: Rules, o: CharacterOptions): GameState {
-  void rules;
+export function grantShopBuildings(state: GameState, content: ContentDb): void {
+  syncVillage(state, content);
+  const village = state.village;
+  if (!village) return;
+  const need: Record<string, number> = {};
+  for (const entry of content.shop) shopBuildingLevels(entry.req, need);
+  for (const [id, level] of Object.entries(need)) {
+    village.levels[id] = Math.max(village.levels[id] ?? 0, level);
+  }
+}
+
+/**
+ * A yardstick character at `level`: every skill at the same level, mastery 20 on every known
+ * technique, a village with the shop's buildings. It is a fixed measuring stick, not a state a
+ * player reaches. Techniques are learned through `refreshUnlocks`; only plain state is written.
+ */
+export function buildCharacter(content: ContentDb, o: CharacterOptions): GameState {
   const K = content.balance.K;
   const state = createState(o.seed, content);
   state.player.rank = o.rank;
@@ -64,6 +87,7 @@ export function buildCharacter(content: ContentDb, rules: Rules, o: CharacterOpt
     state.skills[skill.id] = { xp: xpAt(level) };
   }
   refreshUnlocks(state, content, true);
+  grantShopBuildings(state, content);
   const mastery = Math.min(K.masteryCap, Math.max(1, o.mastery ?? TYPICAL_MASTERY));
   for (const tech of content.techniques) {
     if (state.known[tech.id] && tech.rank !== null) state.mastery[tech.id] = { xp: xpAt(mastery) };
@@ -90,10 +114,10 @@ export function buildGeninStart(
   ryo: number,
   natures: readonly NatureId[] = [],
 ): GameState {
-  const exam = examFor(content, 'genin');
+  const exam = examFor(content, RANK_GENIN);
   const needs = exam ? examSkillLevels(exam.checklist) : {};
   const state = createState(seed, content);
-  state.player.rank = 'genin';
+  state.player.rank = RANK_GENIN;
   state.player.natures = [...natures];
   const native = natures[0];
   if (native) state.team = teamFor(native);
@@ -101,6 +125,7 @@ export function buildGeninStart(
     state.skills[skill] = { xp: xpAt(level) };
   }
   refreshUnlocks(state, content, true);
+  grantShopBuildings(state, content);
   state.currencies.ryo = ryo;
   state.events = [];
   return state;
@@ -124,17 +149,54 @@ export function stockFromShop(state: GameState, content: ContentDb, rules: Rules
   state.currencies.ryo = kept;
 }
 
-/** The character's pouch and loadout for one enemy: it knows the enemy, stocks the pouch and lets the engine plan. */
+export type PouchMode = 'none' | 'shop';
+export type FoodMode = 'none' | 'model';
+
+export interface Equipment {
+  /** `shop`: the pouch items the shop sells, a full stack each; `none`: no tools. */
+  pouch: PouchMode;
+  /** `model`: the meals the balance model gives the player (see `modelFood`); `none`: no food. */
+  food: FoodMode;
+}
+
+/**
+ * The meal the balance model carries at a level: the healing item whose healing is the largest
+ * not above the model's `K.food` step for that level (the smallest one when all are above), and a
+ * full pouch stack of it (`K.pouchStack`, as in the model). Read from the balance data and the
+ * items' effects; null when the content has no healing item.
+ */
+export function modelFood(level: number, content: ContentDb): { item: string; n: number } | null {
+  const K = content.balance.K;
+  const step = [...K.food].reverse().find(([from]) => from <= level) ?? K.food[0];
+  if (!step) return null;
+  const meals = content.items.flatMap((i) =>
+    i.fx?.kind === 'heal' && pouchUse(i) === 'heal' ? [{ id: i.id, hp: i.fx.hp }] : [],
+  );
+  const byId = (a: { id: string }, b: { id: string }) => (a.id < b.id ? -1 : 1);
+  const below = meals.filter((m) => m.hp <= step[1]).sort((a, b) => b.hp - a.hp || byId(a, b));
+  const pick = below[0] ?? [...meals].sort((a, b) => a.hp - b.hp || byId(a, b))[0];
+  return pick ? { item: pick.id, n: K.pouchStack } : null;
+}
+
+/**
+ * The character's pouch and loadout for one enemy: it knows the enemy, carries what `equip` says
+ * and lets the engine plan (`loadout.prepare`). Meals go to the bank, where the plan finds them.
+ */
 export function equipFor(
   state: GameState,
   entryId: string,
   content: ContentDb,
   rules: Rules,
+  equip: Equipment = { pouch: 'shop', food: 'none' },
+  level = 1,
 ): void {
   state.counters[killsKey(entryId)] = (state.counters[killsKey(entryId)] ?? 0) + 1;
   state.seen[entryId] = true;
-  if (state.player.rank !== 'student') {
-    stockFromShop(state, content, rules);
-    dispatch(state, { type: 'loadout.prepare', encounter: entryId }, content, rules);
+  if (state.player.rank === RANK_STUDENT) return;
+  if (equip.pouch === 'shop') stockFromShop(state, content, rules);
+  if (equip.food === 'model') {
+    const food = modelFood(level, content);
+    if (food) addItem(state, food.item, food.n);
   }
+  dispatch(state, { type: 'loadout.prepare', encounter: entryId }, content, rules);
 }

@@ -15,3 +15,5 @@ export * from './fightReport.ts';
 export * from './fights.ts';
 export * from './hourly.ts';
 export * from './model.ts';
+export * from './constants.ts';
+export * from './fighterReport.ts';

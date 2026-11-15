@@ -6,11 +6,11 @@ import {
   listSkillActions,
   sellPrice,
   skillLevel,
-  waiveBuildings,
   type ActionInfo,
   type Command,
 } from '@shinobi/core';
 import type { Bot, BotContext } from '../bot.ts';
+import { KIND_CRAFT as CRAFT, KIND_GATHER as GATHER } from '../constants.ts';
 
 /** Knobs of the strategy, in one place. The bot names no content ids. */
 const CRAFTS = {
@@ -20,10 +20,6 @@ const CRAFTS = {
   cashFloor: 20,
   reviewMs: 2000,
 } as const;
-
-/** Action kinds the bot works with; the kinds' names come from the engine's rule set. */
-const GATHER = 'gather';
-const CRAFT = 'craft';
 
 /**
  * Crafts bot: a peaceful player. It trains the lowest of its trade skills (the skills that have
@@ -87,7 +83,7 @@ export function createCraftsBot(): Bot {
       );
       const goodPrice = (item: string): number | null => {
         const entry = content.shop.find((s) => s.item === item);
-        if (!entry || !evalReq(state, waiveBuildings(entry.req), content).met) return null;
+        if (!entry || !evalReq(state, entry.req, content).met) return null;
         return buyPrice(item, content);
       };
 
