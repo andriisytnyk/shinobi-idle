@@ -227,7 +227,10 @@
         "dmg": 1.25
       }
     },
-    "ryoDrop": [5, 8],
+    "ryoDrop": [
+      5,
+      8
+    ],
     "dropChance": {
       "band": 0.25,
       "pelt": 0.4,
@@ -250,10 +253,16 @@
     "hpPerVit": 8,
     "chakraBase": 120,
     "chakraPerMed": 0.005,
-    "chakraRegen": [0.6, 0.02],
+    "chakraRegen": [
+      0.6,
+      0.02
+    ],
     "staminaBase": 100,
     "staminaPerAth": 0.01,
-    "staminaRegen": [1, 0.02],
+    "staminaRegen": [
+      1,
+      0.02
+    ],
     "accBase": 40,
     "accPerLevel": 5,
     "evaBase": 30,
@@ -261,21 +270,45 @@
     "hitMin": 0.05,
     "hitMax": 0.95,
     "basicInterval": 2.4,
-    "basicDmg": [8, 0.45],
+    "basicDmg": [
+      8,
+      0.45
+    ],
     "dodgeStamina": 2,
     "ccCostPerLevel": 0.0015,
     "pillAction": 0.5,
     "pouchStack": 4,
     "pillAt": 0.45,
     "food": [
-      [1, 30],
-      [5, 40],
-      [20, 50],
-      [30, 80],
-      [35, 100],
-      [45, 120]
+      [
+        1,
+        30
+      ],
+      [
+        5,
+        40
+      ],
+      [
+        20,
+        50
+      ],
+      [
+        30,
+        80
+      ],
+      [
+        35,
+        100
+      ],
+      [
+        45,
+        120
+      ]
     ],
-    "toolTag": [8, 0.4],
+    "toolTag": [
+      8,
+      0.4
+    ],
     "zoneHpRegen": 0.8,
     "opRegen": 0.25,
     "respawn": 3,
@@ -285,11 +318,23 @@
       "healMin": 10,
       "healFloorMin": 2.5
     },
-    "eHp": [20, 9.8],
-    "eDmg": [4, 0.45],
+    "eHp": [
+      20,
+      9.8
+    ],
+    "eDmg": [
+      4,
+      0.45
+    ],
     "eInterval": 2.6,
-    "eAcc": [40, 4.5],
-    "eEva": [30, 4.2],
+    "eAcc": [
+      40,
+      4.5
+    ],
+    "eEva": [
+      30,
+      4.2
+    ],
     "boss": {
       "hp": 3.2,
       "dmg": 1.5
@@ -345,7 +390,11 @@
       "4": 1600,
       "5": 3500
     },
-    "gearTier": [300, 1500, 5000],
+    "gearTier": [
+      300,
+      1500,
+      5000
+    ],
     "obstacleBase": 150,
     "goods": {
       "water": 1,
@@ -364,7 +413,11 @@
       "tag": 30,
       "medpouch": 2500
     },
-    "travel": [15, 30, 45],
+    "travel": [
+      15,
+      30,
+      45
+    ],
     "bounty": {
       "boss_wolf": 400,
       "boss_fighter": 900,
@@ -382,7 +435,10 @@
     "intel": {
       "perCellLevel": 1,
       "mail": 2,
-      "track": [3, 5],
+      "track": [
+        3,
+        5
+      ],
       "caravanSkip": 1,
       "bingoLevel": 2,
       "writtenTestPerIntel": 0.1,
@@ -410,15 +466,44 @@
     },
     "prod": 20,
     "costBase": 20,
-    "costMult": [1, 2.2, 4.8, 10.5, 23, 50],
+    "costMult": [
+      1,
+      2.2,
+      4.8,
+      10.5,
+      23,
+      50
+    ],
     "treasuryBase": 25,
-    "buildTicks": [1, 2, 3, 4, 5, 8],
+    "buildTicks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      8
+    ],
     "bureauIncome": 20,
-    "storeCap": [200, 200],
-    "shinobiCap": [30, 10],
+    "storeCap": [
+      200,
+      200
+    ],
+    "shinobiCap": [
+      30,
+      10
+    ],
     "shinobiT6": 30,
-    "towerStageMax": [3, 6],
-    "cellExplores": [24, 84, 156, 240, 360],
+    "towerStageMax": [
+      3,
+      6
+    ],
+    "cellExplores": [
+      24,
+      84,
+      156,
+      240,
+      360
+    ],
     "cellLevelStep": 10,
     "clone": {
       "pool": 1,
@@ -431,7 +516,12 @@
       "regrowMs": 5000
     },
     "craftRules": {
-      "masteryTiers": [1, 20, 50, 90],
+      "masteryTiers": [
+        1,
+        20,
+        50,
+        90
+      ],
       "bonusPerTier": 0.25
     },
     "tonic": {
@@ -542,7 +632,10 @@
       "minFactor": 0.2,
       "maxDefeats": 3,
       "defaultStyle": "tai",
-      "fightSkills": ["vit", "eva"],
+      "fightSkills": [
+        "vit",
+        "eva"
+      ],
       "success": {
         "base": 0.9,
         "perLevel": 0.01,
@@ -567,9 +660,18 @@
     },
     "crate": {
       "goods": {
-        "core:oil": [2, 4],
-        "core:salt": [2, 4],
-        "core:spice": [1, 2]
+        "core:oil": [
+          2,
+          4
+        ],
+        "core:salt": [
+          2,
+          4
+        ],
+        "core:spice": [
+          1,
+          2
+        ]
       },
       "gem": {
         "item": "core:gem",
@@ -609,8 +711,16 @@
       "enlightChance": 0.02,
       "insightLevels": 8,
       "enlightLevels": 5,
-      "insightGates": [1, 40, 80],
-      "enlightGates": [20, 60, 99]
+      "insightGates": [
+        1,
+        40,
+        80
+      ],
+      "enlightGates": [
+        20,
+        60,
+        99
+      ]
     },
     "athletics": {
       "freeSlot": 1,
@@ -619,20 +729,104 @@
     }
   },
   "pace": {
-    "tai": [13, 29, 48, 72, 108],
-    "nin": [11, 26, 46, 75, 112],
-    "cc": [11, 26, 50, 80, 117],
-    "med": [13, 33, 56, 86, 123],
-    "ath": [13, 33, 56, 86, 123],
-    "herb": [11, 26, 46, 69, 99],
-    "scout": [13, 31, 53, 81, 115],
-    "prov": [3, 7, 11, 19, 26],
-    "alch": [3, 7, 11, 17, 25],
-    "katon": [13, 33, 56, 80, 117],
-    "futon": [13, 33, 56, 80, 117],
-    "raiton": [13, 33, 56, 80, 134],
-    "doton": [13, 33, 56, 80, 110],
-    "suiton": [13, 33, 56, 86, 116]
+    "tai": [
+      13,
+      29,
+      48,
+      72,
+      108
+    ],
+    "nin": [
+      11,
+      26,
+      46,
+      75,
+      112
+    ],
+    "cc": [
+      11,
+      26,
+      50,
+      80,
+      117
+    ],
+    "med": [
+      13,
+      33,
+      56,
+      86,
+      123
+    ],
+    "ath": [
+      13,
+      33,
+      56,
+      86,
+      123
+    ],
+    "herb": [
+      11,
+      26,
+      46,
+      69,
+      99
+    ],
+    "scout": [
+      13,
+      31,
+      53,
+      81,
+      115
+    ],
+    "prov": [
+      3,
+      7,
+      11,
+      19,
+      26
+    ],
+    "alch": [
+      3,
+      7,
+      11,
+      17,
+      25
+    ],
+    "katon": [
+      13,
+      33,
+      56,
+      80,
+      117
+    ],
+    "futon": [
+      13,
+      33,
+      56,
+      80,
+      117
+    ],
+    "raiton": [
+      13,
+      33,
+      56,
+      80,
+      134
+    ],
+    "doton": [
+      13,
+      33,
+      56,
+      80,
+      110
+    ],
+    "suiton": [
+      13,
+      33,
+      56,
+      86,
+      116
+    ]
   },
   "capHours": 24.1,
   "milestones": {

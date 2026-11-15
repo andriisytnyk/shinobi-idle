@@ -2,42 +2,60 @@
   {
     "id": "core:tykha_kimnata",
     "level": 1,
-    "pair": ["cc", "nin"],
+    "pair": [
+      "cc",
+      "nin"
+    ],
     "insight": 3,
     "enlight": 3
   },
   {
     "id": "core:medytatsiia_v_rusi",
     "level": 10,
-    "pair": ["tai", "eva"],
+    "pair": [
+      "tai",
+      "eva"
+    ],
     "insight": 3,
     "enlight": 3
   },
   {
     "id": "core:lisove_sviatylyshche",
     "level": 20,
-    "pair": ["herb", "alch"],
+    "pair": [
+      "herb",
+      "alch"
+    ],
     "insight": 3,
     "enlight": 3
   },
   {
     "id": "core:bilia_vohnyshcha",
     "level": 30,
-    "pair": ["katon", "prov"],
+    "pair": [
+      "katon",
+      "prov"
+    ],
     "insight": 3,
     "enlight": 3
   },
   {
     "id": "core:pid_vodospadom",
     "level": 40,
-    "pair": ["suiton", "ath"],
+    "pair": [
+      "suiton",
+      "ath"
+    ],
     "insight": 3,
     "enlight": 3
   },
   {
     "id": "core:sad_kameniv",
     "level": 50,
-    "pair": ["doton", "vit"],
+    "pair": [
+      "doton",
+      "vit"
+    ],
     "insight": 3,
     "enlight": 3
   }

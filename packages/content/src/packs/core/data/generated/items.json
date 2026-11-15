@@ -94,14 +94,18 @@
     "id": "core:salt",
     "kind": "ingredient",
     "tags": [],
-    "extraSources": ["crate"],
+    "extraSources": [
+      "crate"
+    ],
     "madeFrom": []
   },
   {
     "id": "core:oil",
     "kind": "ingredient",
     "tags": [],
-    "extraSources": ["crate"],
+    "extraSources": [
+      "crate"
+    ],
     "madeFrom": []
   },
   {
@@ -129,42 +133,60 @@
     "id": "core:spice",
     "kind": "ingredient",
     "tags": [],
-    "extraSources": ["crate"],
+    "extraSources": [
+      "crate"
+    ],
     "madeFrom": []
   },
   {
     "id": "core:kunai",
     "kind": "tool",
-    "tags": ["interrupt"],
-    "extraSources": ["forge"],
+    "tags": [
+      "interrupt"
+    ],
+    "extraSources": [
+      "forge"
+    ],
     "madeFrom": []
   },
   {
     "id": "core:shuriken",
     "kind": "tool",
-    "tags": ["interrupt"],
-    "extraSources": ["forge"],
+    "tags": [
+      "interrupt"
+    ],
+    "extraSources": [
+      "forge"
+    ],
     "madeFrom": []
   },
   {
     "id": "core:senbon",
     "kind": "tool",
     "tags": [],
-    "extraSources": ["forge"],
+    "extraSources": [
+      "forge"
+    ],
     "madeFrom": []
   },
   {
     "id": "core:wire",
     "kind": "tool",
     "tags": [],
-    "extraSources": ["forge"],
+    "extraSources": [
+      "forge"
+    ],
     "madeFrom": []
   },
   {
     "id": "core:wiretrap",
     "kind": "tool",
-    "tags": ["bind"],
-    "extraSources": ["forge"],
+    "tags": [
+      "bind"
+    ],
+    "extraSources": [
+      "forge"
+    ],
     "madeFrom": [
       {
         "item": "core:wire",
@@ -175,14 +197,18 @@
   {
     "id": "core:tag",
     "kind": "tool",
-    "tags": ["area"],
+    "tags": [
+      "area"
+    ],
     "extraSources": [],
     "madeFrom": []
   },
   {
     "id": "core:psenbon",
     "kind": "tool",
-    "tags": ["dot"],
+    "tags": [
+      "dot"
+    ],
     "extraSources": [],
     "madeFrom": [
       {
@@ -198,7 +224,9 @@
   {
     "id": "core:parsenbon",
     "kind": "tool",
-    "tags": ["bind"],
+    "tags": [
+      "bind"
+    ],
     "extraSources": [],
     "madeFrom": [
       {
@@ -284,7 +312,9 @@
   {
     "id": "core:antidote",
     "kind": "consumable",
-    "tags": ["cleanse"],
+    "tags": [
+      "cleanse"
+    ],
     "extraSources": [],
     "madeFrom": []
   },
@@ -298,21 +328,27 @@
   {
     "id": "core:paralitychna_otruta",
     "kind": "consumable",
-    "tags": ["bind"],
+    "tags": [
+      "bind"
+    ],
     "extraSources": [],
     "madeFrom": []
   },
   {
     "id": "core:dymova_bomba",
     "kind": "consumable",
-    "tags": ["guard"],
+    "tags": [
+      "guard"
+    ],
     "extraSources": [],
     "madeFrom": []
   },
   {
     "id": "core:sonnyi_poroshok",
     "kind": "consumable",
-    "tags": ["bind"],
+    "tags": [
+      "bind"
+    ],
     "extraSources": [],
     "madeFrom": []
   },
@@ -326,7 +362,9 @@
   {
     "id": "core:slozohinna_bomba",
     "kind": "consumable",
-    "tags": ["interrupt"],
+    "tags": [
+      "interrupt"
+    ],
     "extraSources": [],
     "madeFrom": []
   },
@@ -340,14 +378,18 @@
   {
     "id": "core:nervova_otruta",
     "kind": "consumable",
-    "tags": ["dot"],
+    "tags": [
+      "dot"
+    ],
     "extraSources": [],
     "madeFrom": []
   },
   {
     "id": "core:niukhalna_sil",
     "kind": "consumable",
-    "tags": ["dispel"],
+    "tags": [
+      "dispel"
+    ],
     "extraSources": [],
     "madeFrom": []
   },

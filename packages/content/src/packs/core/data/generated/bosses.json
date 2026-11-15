@@ -2,7 +2,9 @@
   {
     "id": "core:boss_wolf",
     "cl": 22,
-    "traits": ["pack"],
+    "traits": [
+      "pack"
+    ],
     "nature": "doton",
     "carries": null,
     "hp": 754,
@@ -20,7 +22,9 @@
   {
     "id": "core:boss_fighter",
     "cl": 32,
-    "traits": ["evasive"],
+    "traits": [
+      "evasive"
+    ],
     "nature": null,
     "carries": "core:drunken_fist",
     "hp": 1068,
@@ -29,7 +33,10 @@
   {
     "id": "core:boss_hunter",
     "cl": 36,
-    "traits": ["caster", "evasive"],
+    "traits": [
+      "caster",
+      "evasive"
+    ],
     "nature": "raiton",
     "carries": "core:false_darkness",
     "hp": 1193,
@@ -38,7 +45,10 @@
   {
     "id": "core:boss_twins",
     "cl": 38,
-    "traits": ["hidden", "poisoner"],
+    "traits": [
+      "hidden",
+      "poisoner"
+    ],
     "nature": null,
     "carries": null,
     "hp": 1256,
@@ -47,7 +57,9 @@
   {
     "id": "core:boss_mist",
     "cl": 40,
-    "traits": ["hidden"],
+    "traits": [
+      "hidden"
+    ],
     "nature": "suiton",
     "carries": "core:water_prison",
     "hp": 1318,
@@ -56,7 +68,9 @@
   {
     "id": "core:boss_nameless",
     "cl": 44,
-    "traits": ["illusionist"],
+    "traits": [
+      "illusionist"
+    ],
     "nature": "katon",
     "carries": null,
     "hp": 1444,

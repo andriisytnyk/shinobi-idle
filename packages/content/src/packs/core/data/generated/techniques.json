@@ -6,7 +6,9 @@
     "rank": "D",
     "rankCanon": true,
     "role": "series",
-    "tags": ["interrupt"],
+    "tags": [
+      "interrupt"
+    ],
     "state": null,
     "src": "N",
     "mentor": "academy",
@@ -22,7 +24,9 @@
     "rank": "D",
     "rankCanon": true,
     "role": "projectile",
-    "tags": ["interrupt"],
+    "tags": [
+      "interrupt"
+    ],
     "state": null,
     "src": "N",
     "mentor": "other",
@@ -38,7 +42,9 @@
     "rank": "D",
     "rankCanon": true,
     "role": "series",
-    "tags": ["interrupt"],
+    "tags": [
+      "interrupt"
+    ],
     "state": null,
     "src": "N",
     "mentor": "other",
@@ -102,7 +108,9 @@
     "rank": "C",
     "rankCanon": true,
     "role": "area",
-    "tags": ["area"],
+    "tags": [
+      "area"
+    ],
     "state": null,
     "src": "N",
     "mentor": "other",
@@ -170,7 +178,11 @@
     "state": null,
     "src": "N",
     "mentor": "academy",
-    "sealSeq": ["core:ram", "core:snake", "core:tiger"],
+    "sealSeq": [
+      "core:ram",
+      "core:snake",
+      "core:tiger"
+    ],
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false
@@ -186,7 +198,11 @@
     "state": null,
     "src": "N",
     "mentor": "academy",
-    "sealSeq": ["core:dog", "core:boar", "core:ram"],
+    "sealSeq": [
+      "core:dog",
+      "core:boar",
+      "core:ram"
+    ],
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false
@@ -198,11 +214,19 @@
     "rank": "D",
     "rankCanon": true,
     "role": "defense",
-    "tags": ["guard"],
+    "tags": [
+      "guard"
+    ],
     "state": null,
     "src": "N",
     "mentor": "academy",
-    "sealSeq": ["core:tiger", "core:boar", "core:ox", "core:dog", "core:snake"],
+    "sealSeq": [
+      "core:tiger",
+      "core:boar",
+      "core:ox",
+      "core:dog",
+      "core:snake"
+    ],
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false
@@ -218,7 +242,9 @@
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:tiger"],
+    "sealSeq": [
+      "core:tiger"
+    ],
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false
@@ -230,7 +256,9 @@
     "rank": "D",
     "rankCanon": true,
     "role": "projectile",
-    "tags": ["interrupt"],
+    "tags": [
+      "interrupt"
+    ],
     "state": null,
     "src": "N",
     "mentor": "other",
@@ -262,11 +290,15 @@
     "rank": "D",
     "rankCanon": false,
     "role": "control",
-    "tags": ["reveal"],
+    "tags": [
+      "reveal"
+    ],
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:ram"],
+    "sealSeq": [
+      "core:ram"
+    ],
     "sealsCanon": false,
     "tier": 0,
     "noDamage": true
@@ -294,11 +326,15 @@
     "rank": "D",
     "rankCanon": true,
     "role": "control",
-    "tags": ["bind"],
+    "tags": [
+      "bind"
+    ],
     "state": null,
     "src": "S",
     "mentor": null,
-    "sealSeq": ["core:rat"],
+    "sealSeq": [
+      "core:rat"
+    ],
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false
@@ -310,7 +346,9 @@
     "rank": "C",
     "rankCanon": true,
     "role": "control",
-    "tags": ["bind"],
+    "tags": [
+      "bind"
+    ],
     "state": null,
     "src": "O",
     "mentor": null,
@@ -330,7 +368,9 @@
     "state": null,
     "src": "Q",
     "mentor": null,
-    "sealSeq": ["core:clone"],
+    "sealSeq": [
+      "core:clone"
+    ],
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false
@@ -342,11 +382,15 @@
     "rank": "B",
     "rankCanon": true,
     "role": "series",
-    "tags": ["area"],
+    "tags": [
+      "area"
+    ],
     "state": null,
     "src": "Q",
     "mentor": null,
-    "sealSeq": ["core:clone"],
+    "sealSeq": [
+      "core:clone"
+    ],
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false
@@ -362,7 +406,9 @@
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:tiger"],
+    "sealSeq": [
+      "core:tiger"
+    ],
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false
@@ -378,7 +424,9 @@
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:tiger"],
+    "sealSeq": [
+      "core:tiger"
+    ],
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false
@@ -390,11 +438,15 @@
     "rank": "D",
     "rankCanon": false,
     "role": "area",
-    "tags": ["area"],
+    "tags": [
+      "area"
+    ],
     "state": "burn",
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:tiger"],
+    "sealSeq": [
+      "core:tiger"
+    ],
     "sealsCanon": true,
     "tier": -1,
     "noDamage": false
@@ -406,11 +458,20 @@
     "rank": "C",
     "rankCanon": true,
     "role": "projectile",
-    "tags": ["dot"],
+    "tags": [
+      "dot"
+    ],
     "state": "burn",
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:snake", "core:ram", "core:monkey", "core:boar", "core:horse", "core:tiger"],
+    "sealSeq": [
+      "core:snake",
+      "core:ram",
+      "core:monkey",
+      "core:boar",
+      "core:horse",
+      "core:tiger"
+    ],
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false
@@ -422,11 +483,20 @@
     "rank": "C",
     "rankCanon": true,
     "role": "series",
-    "tags": ["dot"],
+    "tags": [
+      "dot"
+    ],
     "state": "burn",
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:rat", "core:tiger", "core:dog", "core:ox", "core:hare", "core:tiger"],
+    "sealSeq": [
+      "core:rat",
+      "core:tiger",
+      "core:dog",
+      "core:ox",
+      "core:hare",
+      "core:tiger"
+    ],
     "sealsCanon": true,
     "tier": -1,
     "noDamage": false
@@ -438,11 +508,18 @@
     "rank": "C",
     "rankCanon": true,
     "role": "projectile",
-    "tags": ["dot"],
+    "tags": [
+      "dot"
+    ],
     "state": "burn",
     "src": "S",
     "mentor": null,
-    "sealSeq": ["core:snake", "core:dragon", "core:hare", "core:tiger"],
+    "sealSeq": [
+      "core:snake",
+      "core:dragon",
+      "core:hare",
+      "core:tiger"
+    ],
     "sealsCanon": true,
     "tier": 1,
     "noDamage": false
@@ -454,7 +531,9 @@
     "rank": "B",
     "rankCanon": true,
     "role": "area",
-    "tags": ["area"],
+    "tags": [
+      "area"
+    ],
     "state": "burn",
     "src": "S",
     "mentor": null,
@@ -482,7 +561,9 @@
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:bird"],
+    "sealSeq": [
+      "core:bird"
+    ],
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false
@@ -498,7 +579,9 @@
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:bird"],
+    "sealSeq": [
+      "core:bird"
+    ],
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false
@@ -514,7 +597,9 @@
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:bird"],
+    "sealSeq": [
+      "core:bird"
+    ],
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false
@@ -526,11 +611,20 @@
     "rank": "C",
     "rankCanon": true,
     "role": "projectile",
-    "tags": ["pierce"],
+    "tags": [
+      "pierce"
+    ],
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:snake", "core:ram", "core:boar", "core:horse", "core:bird", "core:clap"],
+    "sealSeq": [
+      "core:snake",
+      "core:ram",
+      "core:boar",
+      "core:horse",
+      "core:bird",
+      "core:clap"
+    ],
     "sealsCanon": true,
     "tier": -1,
     "noDamage": false
@@ -542,11 +636,20 @@
     "rank": "C",
     "rankCanon": true,
     "role": "area",
-    "tags": ["area", "reveal"],
+    "tags": [
+      "area",
+      "reveal"
+    ],
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:tiger", "core:ox", "core:dog", "core:hare", "core:snake"],
+    "sealSeq": [
+      "core:tiger",
+      "core:ox",
+      "core:dog",
+      "core:hare",
+      "core:snake"
+    ],
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false
@@ -558,11 +661,18 @@
     "rank": "C",
     "rankCanon": true,
     "role": "area",
-    "tags": ["pierce", "reveal"],
+    "tags": [
+      "pierce",
+      "reveal"
+    ],
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:snake", "core:dragon", "core:bird"],
+    "sealSeq": [
+      "core:snake",
+      "core:dragon",
+      "core:bird"
+    ],
     "sealsCanon": true,
     "tier": 1,
     "noDamage": false
@@ -574,11 +684,19 @@
     "rank": "B",
     "rankCanon": true,
     "role": "area",
-    "tags": ["pierce", "area"],
+    "tags": [
+      "pierce",
+      "area"
+    ],
     "state": null,
     "src": "S",
     "mentor": null,
-    "sealSeq": ["core:rat", "core:snake", "core:horse", "core:dog"],
+    "sealSeq": [
+      "core:rat",
+      "core:snake",
+      "core:horse",
+      "core:dog"
+    ],
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false
@@ -594,7 +712,9 @@
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:monkey"],
+    "sealSeq": [
+      "core:monkey"
+    ],
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false
@@ -610,7 +730,9 @@
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:monkey"],
+    "sealSeq": [
+      "core:monkey"
+    ],
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false
@@ -626,7 +748,9 @@
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:monkey"],
+    "sealSeq": [
+      "core:monkey"
+    ],
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false
@@ -638,11 +762,19 @@
     "rank": "C",
     "rankCanon": false,
     "role": "control",
-    "tags": ["bind"],
+    "tags": [
+      "bind"
+    ],
     "state": "stun",
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:ram", "core:boar", "core:dog", "core:bird", "core:hare"],
+    "sealSeq": [
+      "core:ram",
+      "core:boar",
+      "core:dog",
+      "core:bird",
+      "core:hare"
+    ],
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false
@@ -654,11 +786,17 @@
     "rank": "C",
     "rankCanon": true,
     "role": "projectile",
-    "tags": ["interrupt"],
+    "tags": [
+      "interrupt"
+    ],
     "state": "stun",
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:ox", "core:hare", "core:monkey"],
+    "sealSeq": [
+      "core:ox",
+      "core:hare",
+      "core:monkey"
+    ],
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false
@@ -670,11 +808,19 @@
     "rank": "C",
     "rankCanon": false,
     "role": "projectile",
-    "tags": ["interrupt"],
+    "tags": [
+      "interrupt"
+    ],
     "state": "stun",
     "src": "O",
     "mentor": null,
-    "sealSeq": ["core:hare", "core:dog", "core:boar", "core:ram", "core:rat"],
+    "sealSeq": [
+      "core:hare",
+      "core:dog",
+      "core:boar",
+      "core:ram",
+      "core:rat"
+    ],
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false
@@ -686,11 +832,16 @@
     "rank": "B",
     "rankCanon": true,
     "role": "projectile",
-    "tags": ["pierce", "interrupt"],
+    "tags": [
+      "pierce",
+      "interrupt"
+    ],
     "state": "stun",
     "src": "O",
     "mentor": null,
-    "sealSeq": ["core:snake"],
+    "sealSeq": [
+      "core:snake"
+    ],
     "sealsCanon": true,
     "tier": 1,
     "noDamage": false
@@ -706,7 +857,9 @@
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:snake"],
+    "sealSeq": [
+      "core:snake"
+    ],
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false
@@ -718,7 +871,9 @@
     "rank": "D",
     "rankCanon": true,
     "role": "control",
-    "tags": ["bind"],
+    "tags": [
+      "bind"
+    ],
     "state": null,
     "src": "N",
     "mentor": "other",
@@ -738,7 +893,9 @@
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:snake"],
+    "sealSeq": [
+      "core:snake"
+    ],
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false
@@ -766,11 +923,17 @@
     "rank": "C",
     "rankCanon": true,
     "role": "area",
-    "tags": ["area"],
+    "tags": [
+      "area"
+    ],
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:boar", "core:ox", "core:unique"],
+    "sealSeq": [
+      "core:boar",
+      "core:ox",
+      "core:unique"
+    ],
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false
@@ -782,11 +945,15 @@
     "rank": "C",
     "rankCanon": false,
     "role": "control",
-    "tags": ["bind"],
+    "tags": [
+      "bind"
+    ],
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:tiger"],
+    "sealSeq": [
+      "core:tiger"
+    ],
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false
@@ -802,7 +969,11 @@
     "state": null,
     "src": "S",
     "mentor": null,
-    "sealSeq": ["core:ram", "core:horse", "core:dragon"],
+    "sealSeq": [
+      "core:ram",
+      "core:horse",
+      "core:dragon"
+    ],
     "sealsCanon": true,
     "tier": 1,
     "noDamage": false
@@ -814,11 +985,18 @@
     "rank": "B",
     "rankCanon": true,
     "role": "defense",
-    "tags": ["guard"],
+    "tags": [
+      "guard"
+    ],
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:tiger", "core:hare", "core:boar", "core:dog"],
+    "sealSeq": [
+      "core:tiger",
+      "core:hare",
+      "core:boar",
+      "core:dog"
+    ],
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false
@@ -834,7 +1012,9 @@
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:dragon"],
+    "sealSeq": [
+      "core:dragon"
+    ],
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false
@@ -850,7 +1030,11 @@
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:ox", "core:snake", "core:ram"],
+    "sealSeq": [
+      "core:ox",
+      "core:snake",
+      "core:ram"
+    ],
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false
@@ -866,7 +1050,9 @@
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:dragon"],
+    "sealSeq": [
+      "core:dragon"
+    ],
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false
@@ -882,7 +1068,9 @@
     "state": null,
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:tiger"],
+    "sealSeq": [
+      "core:tiger"
+    ],
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false
@@ -898,7 +1086,11 @@
     "state": "wet",
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:dragon", "core:tiger", "core:hare"],
+    "sealSeq": [
+      "core:dragon",
+      "core:tiger",
+      "core:hare"
+    ],
     "sealsCanon": true,
     "tier": -1,
     "noDamage": false
@@ -910,7 +1102,9 @@
     "rank": "C",
     "rankCanon": true,
     "role": "control",
-    "tags": ["bind"],
+    "tags": [
+      "bind"
+    ],
     "state": "wet",
     "src": "O",
     "mentor": null,
@@ -935,11 +1129,15 @@
     "rank": "C",
     "rankCanon": true,
     "role": "area",
-    "tags": ["area"],
+    "tags": [
+      "area"
+    ],
     "state": "wet",
     "src": "S",
     "mentor": null,
-    "sealSeq": ["core:tiger"],
+    "sealSeq": [
+      "core:tiger"
+    ],
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false
@@ -951,11 +1149,16 @@
     "rank": "C",
     "rankCanon": true,
     "role": "control",
-    "tags": ["bind"],
+    "tags": [
+      "bind"
+    ],
     "state": "wet",
     "src": "S",
     "mentor": null,
-    "sealSeq": ["core:ram", "core:tiger"],
+    "sealSeq": [
+      "core:ram",
+      "core:tiger"
+    ],
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false
@@ -967,11 +1170,19 @@
     "rank": "B",
     "rankCanon": true,
     "role": "defense",
-    "tags": ["guard"],
+    "tags": [
+      "guard"
+    ],
     "state": "wet",
     "src": "N",
     "mentor": "other",
-    "sealSeq": ["core:tiger", "core:snake", "core:rat", "core:snake", "core:tiger"],
+    "sealSeq": [
+      "core:tiger",
+      "core:snake",
+      "core:rat",
+      "core:snake",
+      "core:tiger"
+    ],
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false

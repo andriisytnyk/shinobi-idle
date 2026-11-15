@@ -17,7 +17,9 @@
       "item": "core:antidote",
       "n": 2
     },
-    "tags": ["cleanse"]
+    "tags": [
+      "cleanse"
+    ]
   },
   {
     "id": "core:tsiliushcha_maz",
@@ -57,7 +59,9 @@
       "item": "core:paralitychna_otruta",
       "n": 1
     },
-    "tags": ["bind"]
+    "tags": [
+      "bind"
+    ]
   },
   {
     "id": "core:dymova_bomba",
@@ -77,7 +81,9 @@
       "item": "core:dymova_bomba",
       "n": 3
     },
-    "tags": ["guard"]
+    "tags": [
+      "guard"
+    ]
   },
   {
     "id": "core:sonnyi_poroshok",
@@ -93,7 +99,9 @@
       "item": "core:sonnyi_poroshok",
       "n": 2
     },
-    "tags": ["bind"]
+    "tags": [
+      "bind"
+    ]
   },
   {
     "id": "core:krovospynna_maz",
@@ -133,7 +141,9 @@
       "item": "core:slozohinna_bomba",
       "n": 3
     },
-    "tags": ["interrupt"]
+    "tags": [
+      "interrupt"
+    ]
   },
   {
     "id": "core:hirska_maz",
@@ -173,7 +183,9 @@
       "item": "core:nervova_otruta",
       "n": 1
     },
-    "tags": ["dot"]
+    "tags": [
+      "dot"
+    ]
   },
   {
     "id": "core:niukhalna_sil",
@@ -197,7 +209,9 @@
       "item": "core:niukhalna_sil",
       "n": 3
     },
-    "tags": ["dispel"]
+    "tags": [
+      "dispel"
+    ]
   },
   {
     "id": "core:maz_vid_opikiv",
