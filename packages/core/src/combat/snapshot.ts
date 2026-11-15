@@ -2,7 +2,7 @@ import type { ContentDb, SkillId } from '@shinobi/content';
 import { defeatsKey, killsKey, studiedKey } from '../counters.ts';
 import { masteryLevel } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
-import { computeMod } from '../modifiers.ts';
+import { computeMods } from '../modifiers.ts';
 import { RANK_ORDER, skillLevel } from '../requirements.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
@@ -81,9 +81,14 @@ export function snapshotPlayer(
   pools?: { hp: number; chakra: number; stamina: number },
   entries: readonly string[] = [],
 ): PlayerSnapshot {
-  const cost = (key: string) => computeMod(rules.modifierProviders, state, key, content).total;
   const snapshot = planningSnapshot(state, content);
-  snapshot.costMod = { chakra: cost('cost.chakra'), stamina: cost('cost.stamina') };
+  const [chakra, stamina] = computeMods(
+    rules.modifierProviders,
+    state,
+    ['cost.chakra', 'cost.stamina'],
+    content,
+  );
+  snapshot.costMod = { chakra: chakra?.total ?? 1, stamina: stamina?.total ?? 1 };
   snapshot.wounds = state.wounds.stacks;
   snapshot.knowledge = knowledgeOf(state, content, entries);
   // A student fights with everything they know; from Genin the loadout is the player's.

@@ -33,10 +33,22 @@ export function computeMod(
   key: string,
   content: ContentDb,
 ): ModResult {
-  const parts: Modifier[] = [];
-  for (const provider of providers) {
-    for (const m of provider(state, content)) if (m.key === key) parts.push(m);
-  }
+  return computeMods(providers, state, [key], content)[0] ?? { total: 1, parts: [] };
+}
+
+/** The totals of several keys, asking each provider once: what a fight start needs for its cost modifiers. */
+export function computeMods(
+  providers: readonly ModifierProvider[],
+  state: GameState,
+  keys: readonly string[],
+  content: ContentDb,
+): ModResult[] {
+  const all: Modifier[] = [];
+  for (const provider of providers) for (const m of provider(state, content)) all.push(m);
+  return keys.map((key) => combine(all.filter((m) => m.key === key)));
+}
+
+function combine(parts: Modifier[]): ModResult {
   if (parts.length === 0) return { total: 1, parts };
   const groups = new Map<ModifierGroup, { add: number; mul: number }>();
   for (const m of parts) {

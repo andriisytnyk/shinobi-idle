@@ -685,6 +685,25 @@ function activeStance(fight: FightState): string | null {
   return e ? e.src : null;
 }
 
+const techViews = new WeakMap<KitTechnique, KitTechnique>();
+
+/**
+ * A frozen copy of a kit technique for the view, made once per technique: the AI reads it, never
+ * changes it, and copying it at every decision would be most of the cost of a decision.
+ */
+function viewOf(tech: KitTechnique): KitTechnique {
+  let copy = techViews.get(tech);
+  if (!copy) {
+    copy = Object.freeze({
+      ...tech,
+      tags: Object.freeze([...tech.tags]) as KitTechnique['tags'],
+      fx: Object.freeze({ ...tech.fx, statuses: Object.freeze([...tech.fx.statuses]) as string[] }),
+    });
+    techViews.set(tech, copy);
+  }
+  return copy;
+}
+
 export function lowestHp(enemies: readonly Combatant[]): Combatant | undefined {
   let best: Combatant | undefined;
   for (const e of enemies) if (alive(e) && (!best || e.hp < best.hp)) best = e;
@@ -726,7 +745,7 @@ function buildView(ctx: FightCtx): FightView {
     const stanceOk = !tech.requiresStance || stance !== null;
     const hab = habituation(uses, tech.habituationMult * habituationScale(ctx, primary), content);
     return {
-      tech: { ...tech, tags: [...tech.tags], fx: { ...tech.fx, statuses: [...tech.fx.statuses] } },
+      tech: viewOf(tech),
       cooldownLeft,
       affordable,
       ready: cooldownLeft === 0 && affordable && stanceOk,
@@ -782,7 +801,9 @@ function buildView(ctx: FightCtx): FightView {
       workingTraits,
       cast,
       nextCastIn,
-      leader: hooksOf(ctx, e).some((h) => h.leader?.(ctx, e) === true),
+      leader: ctx.rules.fightHooks.some(
+        (h) => h.leader !== undefined && e.specials.includes(h.id) && h.leader(ctx, e),
+      ),
     };
   });
   return {
