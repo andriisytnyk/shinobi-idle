@@ -19,6 +19,7 @@ export const HINTS: readonly HintDef[] = [
   { id: 'quests' },
   { id: 'rank' },
   { id: 'bank' },
+  { id: 'nature' },
   {
     id: 'levelUp',
     when: (state, content) =>

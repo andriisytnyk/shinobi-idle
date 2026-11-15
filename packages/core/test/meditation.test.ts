@@ -11,7 +11,7 @@ import {
   xpAt,
   type GameState,
 } from '../src/index.ts';
-import { genin, HOUR, plainRules, start } from './helpers.ts';
+import { genin, HOUR, plainRules, start, withNatures } from './helpers.ts';
 
 const QUIET = 'core:tykha_kimnata';
 const FIRE = 'core:bilia_vohnyshcha';
@@ -172,7 +172,7 @@ describe('A5: modifiers of a nature the player does not own stay locked', () => 
     const locked = listMeditationMods(s, FIRE, content).filter((m) => m.lockedNature !== null);
     expect(locked.map((m) => m.ref)).toEqual(['insight.0', 'enlight.1']);
     expect(locked.every((m) => m.lockedNature === 'katon' && !m.active)).toBe(true);
-    s.player.natures.push('katon');
+    withNatures(s, 'futon', 'katon'); // katon is owned but not native: no native bonus
     expect(getMod(s, 'xp.skill.katon', content).total).toBeCloseTo(1.08, 12);
     expect(getMod(s, 'burn.duration', content).total).toBeCloseTo(1.1, 12);
     expect(listMeditationMods(s, FIRE, content).filter((m) => m.lockedNature !== null)).toEqual([]);

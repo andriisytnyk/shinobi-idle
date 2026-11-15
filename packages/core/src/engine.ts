@@ -8,6 +8,7 @@ import { buyGear } from './gear.ts';
 import { coatItem, useItem } from './items.ts';
 import { indexOf } from './lookup.ts';
 import { buyMeditationLevel } from './meditation.ts';
+import { addNature, chooseNature, type NatureChoice } from './natures.ts';
 import { shopBuy, shopSell } from './shop.ts';
 import { updateQuests } from './quests.ts';
 import { evalReq, RANK_ORDER } from './requirements.ts';
@@ -39,7 +40,11 @@ export type Command =
   | { type: 'goal.set'; ref: EntityRef }
   | { type: 'goal.clear' }
   /** Names the player: 1 to 24 characters once trimmed. */
-  | { type: 'player.setName'; name: string };
+  | { type: 'player.setName'; name: string }
+  /** The chakra paper test: sets the native nature, once, as a genin. `random` draws on the world stream. */
+  | { type: 'nature.choose'; nature: NatureChoice }
+  /** Adds a second nature (Chakra Control 20) or a third (40); only natures not owned. */
+  | { type: 'nature.add'; nature: NatureChoice };
 
 /** Longest player name. */
 export const PLAYER_NAME_MAX = 24;
@@ -212,6 +217,10 @@ function apply(
       state.player.name = name;
       return { ok: true };
     }
+    case 'nature.choose':
+      return chooseNature(state, command.nature);
+    case 'nature.add':
+      return addNature(state, command.nature, content);
     default:
       return { ok: false, reason: 'error.unknownCommand' };
   }

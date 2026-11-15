@@ -3,12 +3,13 @@ import {
   createState,
   defaultRules,
   gearProvider,
+  teamFor,
   tonicProvider,
   xpAt,
   type GameState,
   type Rules,
 } from '../src/index.ts';
-import type { SkillId } from '@shinobi/content';
+import type { NatureId, SkillId } from '@shinobi/content';
 
 export const HOUR = 3_600_000;
 
@@ -16,6 +17,14 @@ export const HOUR = 3_600_000;
 export function genin(seed = 1): GameState {
   const state = createState(seed, content);
   state.player.rank = 'genin';
+  return state;
+}
+
+/** Gives a state the natures in order (the first is the native one), with the team's natures that follow. */
+export function withNatures(state: GameState, ...natures: NatureId[]): GameState {
+  state.player.natures = natures;
+  const [native] = natures;
+  state.team = native ? teamFor(native) : null;
   return state;
 }
 

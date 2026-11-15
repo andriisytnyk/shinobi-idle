@@ -19,6 +19,7 @@ import { bushSize } from './field.ts';
 import { MS_PER_HOUR, MS_PER_SECOND, poolCapacity } from './formulas.ts';
 import { maxLevels, parseModRef } from './meditation.ts';
 import { indexOf } from './lookup.ts';
+import { teamFor } from './natures.ts';
 import { RANK_ORDER } from './requirements.ts';
 import { STREAM_NAMES } from './rng.ts';
 import { defaultRules, type Rules } from './rules.ts';
@@ -79,6 +80,14 @@ export const MIGRATIONS: readonly Migration[] = [
         })
       : state.slots;
     return { ...state, slots, meditation: {}, course };
+  },
+  // v7 -> v8: the team's natures follow from the native nature; a save that has one gets them,
+  // every other genin has none yet and is led to the nature test.
+  (state) => {
+    const natures =
+      isRecord(state.player) && Array.isArray(state.player.natures) ? state.player.natures : [];
+    const native = NATURE_IDS.find((n) => n === natures[0]);
+    return { ...state, team: native ? teamFor(native) : null };
   },
 ];
 
@@ -237,6 +246,10 @@ export function deserialize(
       (n, i): n is NatureId =>
         (NATURE_IDS as readonly unknown[]).includes(n) && natures.indexOf(n) === i,
     );
+    state.player.natures = state.player.natures.slice(0, content.balance.K.natures.max);
+    // The team's natures follow from the native nature alone, so they are recomputed, never trusted.
+    const native = state.player.natures[0];
+    state.team = native ? teamFor(native) : null;
   }
 
   const skillXp = isRecord(raw.skills) ? raw.skills : {};

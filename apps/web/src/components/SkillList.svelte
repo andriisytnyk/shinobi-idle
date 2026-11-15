@@ -17,24 +17,29 @@
   let collapsed = $state<Partial<Record<SkillGroup, boolean>>>({});
 
   const route = $derived(currentRoute());
-  const markedSkill = $derived(markerOf(nextStep(game.state, content)?.target ?? null).skill);
+  const native = $derived(game.read((gs) => gs.player.natures[0] ?? null));
+  const markedSkill = $derived(
+    game.read((gs) => markerOf(nextStep(gs, content)?.target ?? null).skill),
+  );
   const activeSkill = $derived(
     route.page === 'entity' && route.ref.kind === 'skill' ? route.ref.id : null,
   );
 
   /** Groups come from the content, in the order the style document lists them. */
   const groups = $derived(
-    SKILL_GROUPS.map((id) => ({
-      id,
-      skills: content.skills
-        .filter((s) => s.group === id)
-        .map((skill) => ({
-          skill,
-          lock: skillUnlockStatus(game.state, skill.id, content),
-          progress: skillProgress(game.state, skill.id),
-        }))
-        .filter((row) => !(settings.hideLocked && row.lock && !row.lock.met)),
-    })).filter((g) => g.skills.length > 0),
+    game.read((gs) =>
+      SKILL_GROUPS.map((id) => ({
+        id,
+        skills: content.skills
+          .filter((s) => s.group === id)
+          .map((skill) => ({
+            skill,
+            lock: skillUnlockStatus(gs, skill.id, content),
+            progress: skillProgress(gs, skill.id),
+          }))
+          .filter((row) => !(settings.hideLocked && row.lock && !row.lock.met)),
+      })).filter((g) => g.skills.length > 0),
+    ),
   );
 
   const toggle = (id: SkillGroup) => {
@@ -78,7 +83,9 @@
                     data-marker
                     role="img"
                     aria-label={t('nav.next')}
-                  ></span>{/if}</span
+                  ></span>{/if}{#if native === skill.id}<span class="native" data-native
+                    >{t('skill.native')}</span
+                  >{/if}</span
               >
               {#if locked}
                 <span class="skill-level" role="img" aria-label={t('skill.locked')}
@@ -218,6 +225,15 @@
     height: 100%;
     background: var(--accent);
   }
+  .native {
+    margin-left: var(--space-2);
+    padding: 0 var(--space-1);
+    border: 1px solid var(--skill-color);
+    border-radius: var(--radius-sm);
+    color: var(--fg-dim);
+    font-size: 0.7rem;
+  }
+
   .marker {
     display: inline-block;
     width: 0.6rem;

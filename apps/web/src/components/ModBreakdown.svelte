@@ -22,10 +22,12 @@
   let open = $state(false);
 
   const parts = $derived.by((): Modifier[] =>
-    keys.flatMap((key) => getMod(game.state, key, content, game.rules).parts),
+    game.read((gs) => keys.flatMap((key) => getMod(gs, key, content, game.rules).parts)),
   );
   const total = $derived(
-    keys.reduce((acc, key) => acc * getMod(game.state, key, content, game.rules).total, 1),
+    game.read((gs) =>
+      keys.reduce((acc, key) => acc * getMod(gs, key, content, game.rules).total, 1),
+    ),
   );
 
   /** A flat key counts units (`+5`); the others are shares (`+5%`) or factors. */

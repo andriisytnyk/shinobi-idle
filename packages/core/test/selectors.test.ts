@@ -12,7 +12,7 @@ import {
   skillUnlockStatus,
   xpAt,
 } from '../src/index.ts';
-import { genin, HOUR, setLevel, start } from './helpers.ts';
+import { genin, HOUR, setLevel, start, withNatures } from './helpers.ts';
 
 describe('skill unlock rules', () => {
   it('opens tai, nin, cc, med and ath from the first day', () => {
@@ -40,12 +40,17 @@ describe('skill unlock rules', () => {
       'eva',
     ]);
     expect(skillUnlockStatus(state, 'vit', content)?.req).toEqual({ t: 'flag', id: 'firstFight' });
-    expect(skillUnlockStatus(state, 'katon', content)?.req).toEqual({ t: 'rank', rank: 'genin' });
+    expect(skillUnlockStatus(state, 'katon', content)?.req).toEqual({
+      t: 'nature',
+      nature: 'katon',
+    });
   });
 
   it('opens the rank-gated skills at genin and vit and eva with the firstFight flag', () => {
     const state = createState(1, content);
     state.player.rank = 'genin';
+    expect(isSkillUnlocked(state, 'katon', content)).toBe(false);
+    withNatures(state, 'katon');
     expect(isSkillUnlocked(state, 'katon', content)).toBe(true);
     expect(isSkillUnlocked(state, 'alch', content)).toBe(true);
     expect(isSkillUnlocked(state, 'vit', content)).toBe(false);
@@ -108,7 +113,7 @@ describe('listSkillActions', () => {
     const state = createState(1, content);
     const first = listSkillActions(state, 'katon', content)[0];
     expect(first?.available).toBe(false);
-    expect(first?.req?.children[0]?.req).toEqual({ t: 'rank', rank: 'genin' });
+    expect(first?.req?.children[0]?.req).toEqual({ t: 'nature', nature: 'katon' });
   });
 
   it('lists drills, practices and the course for cc, med and ath, and nothing for skills with no actions yet', () => {

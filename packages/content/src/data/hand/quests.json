@@ -68,5 +68,29 @@
       }
     ],
     "rewards": { "items": [], "ryo": 0, "rep": 0, "flags": ["leaf_headband"], "rank": null }
+  },
+  {
+    "id": "core:mission_board",
+    "chain": "core:mission_board",
+    "unlock": { "t": "rank", "rank": "genin" },
+    "steps": [
+      {
+        "textKey": "quest.core:mission_board.step.1",
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "any",
+            "of": [
+              { "t": "nature", "nature": "katon" },
+              { "t": "nature", "nature": "futon" },
+              { "t": "nature", "nature": "raiton" },
+              { "t": "nature", "nature": "doton" },
+              { "t": "nature", "nature": "suiton" }
+            ]
+          }
+        }
+      }
+    ],
+    "rewards": { "items": [], "ryo": 0, "rep": 0, "flags": [], "rank": null }
   }
 ]

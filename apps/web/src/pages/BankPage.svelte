@@ -12,9 +12,11 @@
 
   /** Items the player holds, in the order of the content. */
   const rows = $derived(
-    content.items
-      .filter((item) => (game.state.bank[item.id] ?? 0) > 0)
-      .map((item) => ({ item, n: game.state.bank[item.id] ?? 0 })),
+    game.read((gs) =>
+      content.items
+        .filter((item) => (gs.bank[item.id] ?? 0) > 0)
+        .map((item) => ({ item, n: gs.bank[item.id] ?? 0 })),
+    ),
   );
 
   /** The item being used, while the player picks a target. */
@@ -23,11 +25,13 @@
 
   const pickingItem = $derived(content.items.find((i) => i.id === picking));
   const targets = $derived(
-    pickingItem?.use
-      ? content.techniques.filter(
-          (tech) => tech.mentor === pickingItem.use?.mentor && game.state.known[tech.id] === true,
-        )
-      : [],
+    game.read((gs) =>
+      pickingItem?.use
+        ? content.techniques.filter(
+            (tech) => tech.mentor === pickingItem.use?.mentor && gs.known[tech.id] === true,
+          )
+        : [],
+    ),
   );
 
   function use(target: string): void {

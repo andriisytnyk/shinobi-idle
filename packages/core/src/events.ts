@@ -1,4 +1,4 @@
-import type { SkillId } from '@shinobi/content';
+import type { NatureId, SkillId } from '@shinobi/content';
 import type { GameState } from './state.ts';
 
 /** The queue keeps the newest events only (battle log lines first to go); the UI drains it long before this matters. */
@@ -110,6 +110,13 @@ export interface ObstacleBuiltEvent extends EventBase {
   obstacle: string;
 }
 
+/** A chakra nature was chosen; `first` marks the native nature found by the test. */
+export interface NatureGainedEvent extends EventBase {
+  type: 'natureGained';
+  nature: NatureId;
+  first: boolean;
+}
+
 export type GameEvent =
   | LevelUpEvent
   | MasteryUpEvent
@@ -127,7 +134,8 @@ export type GameEvent =
   | GoalSetEvent
   | MeditationGainEvent
   | MeditationBoughtEvent
-  | ObstacleBuiltEvent;
+  | ObstacleBuiltEvent
+  | NatureGainedEvent;
 
 type WithoutAt<T> = T extends unknown ? Omit<T, 'at'> : never;
 

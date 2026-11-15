@@ -99,7 +99,7 @@ function v6Save(patch: (state: Record<string, unknown>) => void, version = 6): s
 
 describe('A9: save migration to version 7', () => {
   it('is the seventh step', () => {
-    expect(STATE_VERSION).toBe(7);
+    expect(STATE_VERSION).toBe(8);
     expect(MIGRATIONS).toHaveLength(STATE_VERSION - 1);
   });
 
@@ -108,7 +108,7 @@ describe('A9: save migration to version 7', () => {
       v6Save(() => {}),
       content,
     );
-    expect(state.v).toBe(7);
+    expect(state.v).toBe(STATE_VERSION);
     expect(state.meditation).toEqual({});
     expect(state.course).toEqual({});
   });

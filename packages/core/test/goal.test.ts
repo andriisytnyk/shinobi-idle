@@ -84,6 +84,11 @@ describe('locked skills', () => {
     expect(result).toEqual({ ok: false, reason: 'error.skillLocked' });
     expect(state.slots[0]?.action).toBeNull();
     state.player.rank = 'genin';
+    expect(dispatch(state, start('practice', tech.id), content)).toEqual({
+      ok: false,
+      reason: 'error.skillLocked',
+    });
+    expect(dispatch(state, { type: 'nature.choose', nature: 'katon' }, content).ok).toBe(true);
     expect(dispatch(state, start('practice', tech.id), content).ok).toBe(true);
   });
 });

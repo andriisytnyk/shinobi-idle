@@ -17,32 +17,33 @@
     xpPerHour: number | null;
   }
 
-  const rows = $derived.by((): Row[] => {
-    const state = game.state;
-    const out: Row[] = [];
-    state.slots.forEach((slot, index) => {
-      if (!slot.action) return;
-      const info = actionInfo(state, slot.action, content, game.rules);
-      // Fights and exams are not skill tiles, so their cycle comes straight from their kind.
-      const kind = game.rules.actionKinds[slot.action.kind];
-      const intervalMs =
-        info?.intervalMs ?? kind?.intervalMs(state, slot.action.id, content, game.rules);
-      if (intervalMs === undefined) return;
-      out.push({
-        slot: index,
-        ref: actionRef(slot.action),
-        fraction: Math.min(1, slot.progress / (intervalMs * SHARE_FULL)),
-        xpPerHour: info ? (info.xpPerHour * slot.share) / SHARE_FULL : null,
+  const rows = $derived.by((): Row[] =>
+    game.read((state) => {
+      const out: Row[] = [];
+      state.slots.forEach((slot, index) => {
+        if (!slot.action) return;
+        const info = actionInfo(state, slot.action, content, game.rules);
+        // Fights and exams are not skill tiles, so their cycle comes straight from their kind.
+        const kind = game.rules.actionKinds[slot.action.kind];
+        const intervalMs =
+          info?.intervalMs ?? kind?.intervalMs(state, slot.action.id, content, game.rules);
+        if (intervalMs === undefined) return;
+        out.push({
+          slot: index,
+          ref: actionRef(slot.action),
+          fraction: Math.min(1, slot.progress / (intervalMs * SHARE_FULL)),
+          xpPerHour: info ? (info.xpPerHour * slot.share) / SHARE_FULL : null,
+        });
       });
-    });
-    return out;
-  });
+      return out;
+    }),
+  );
 
   /** On a phone the bar is one line; the toggle opens the other slots. */
   let expanded = $state(false);
   const shown = $derived(expanded ? rows : rows.slice(0, 1));
 
-  const wait = $derived(senseiTestInfo(game.state, game.rules, content));
+  const wait = $derived(game.read((gs) => senseiTestInfo(gs, game.rules, content)));
 
   const stop = (slot: number) => void game.dispatch({ type: 'action.stop', slot });
 </script>

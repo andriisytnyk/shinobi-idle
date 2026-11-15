@@ -1,7 +1,9 @@
 <script lang="ts">
   import { game } from '../lib/store.ts';
   import { content } from '@shinobi/content';
+  import { entityName } from '../lib/entities.ts';
   import { t } from '../lib/i18n.ts';
+  import { natureStatus } from '@shinobi/core';
   import { markerOf } from '../lib/nav.ts';
   import { nextStep } from '../lib/next-step.ts';
   import Icon from './Icon.svelte';
@@ -14,8 +16,12 @@
   let { metaOpen, onToggleMeta }: Props = $props();
 
   const numbers = new Intl.NumberFormat('uk');
+  const nature = $derived(game.read((gs) => natureStatus(gs, content)));
+  const natures = $derived(game.read((gs) => gs.player.natures));
+  /** A nature is waiting to be chosen: the test, or an extra one. */
+  const natureDue = $derived(nature.canChoose);
   const rankMarked = $derived(
-    markerOf(nextStep(game.state, content)?.target ?? null).nav === 'rank',
+    game.read((gs) => markerOf(nextStep(gs, content)?.target ?? null).nav === 'rank'),
   );
 </script>
 
@@ -60,6 +66,28 @@
         >
       </dd>
     </div>
+    {#if nature.stage !== 'locked'}
+      <div class="stat nature">
+        <dt>
+          {#if natures[0]}<Icon entity={{ kind: 'skill', id: natures[0] }} size={16} />{:else}<Icon
+              name="lucide:info"
+              size={16}
+            />{/if}<span class="label">{t('topbar.nature')}</span>
+        </dt>
+        <dd>
+          <a class="nature-link" href="#/nature" data-nature-link
+            >{#if natures.length === 0}{t('topbar.natureTest')}{:else}{natures
+                .map((n) => entityName({ kind: 'skill', id: n }))
+                .join(', ')}{/if}{#if natureDue}<span
+                class="marker"
+                data-marker
+                role="img"
+                aria-label={t('nav.next')}
+              ></span>{/if}</a
+          >
+        </dd>
+      </div>
+    {/if}
     <div class="stat save" data-save={game.saveStatus}>
       <dt class="label">{t('topbar.save')}</dt>
       <dd>{t(`topbar.save.${game.saveStatus}`)}</dd>
@@ -155,6 +183,14 @@
     text-decoration: none;
   }
 
+  .nature-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--accent);
+    text-decoration: none;
+  }
+
   .marker {
     width: 0.6rem;
     height: 0.6rem;
@@ -236,7 +272,8 @@
       min-height: 2.75rem;
     }
 
-    .rank-link {
+    .rank-link,
+    .nature-link {
       min-height: 2.75rem;
     }
 

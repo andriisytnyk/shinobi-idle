@@ -18,7 +18,7 @@
   const ref = $derived({ kind: 'item', id } as const);
   const desc = $derived(entityDesc(ref));
   const relations = $derived(itemRelations(id, content));
-  const owned = $derived(game.state.bank[id] ?? 0);
+  const owned = $derived(game.read((gs) => gs.bank[id] ?? 0));
 </script>
 
 {#snippet line(rel: ItemRelation)}

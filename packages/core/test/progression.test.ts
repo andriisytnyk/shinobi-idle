@@ -20,7 +20,7 @@ import {
   type GameEvent,
   type Rules,
 } from '../src/index.ts';
-import { genin, HOUR, plainRules, setLevel, start } from './helpers.ts';
+import { genin, HOUR, plainRules, setLevel, start, withNatures } from './helpers.ts';
 
 const K = content.balance.K;
 
@@ -66,6 +66,8 @@ describe('A4: XP per hour follows the rate formula', () => {
     it(`level ${level}`, () => {
       const t = content.techniques.find((x) => x.id === id)!;
       const state = genin();
+      // A second nature, so the skill is open and no native bonus mixes into the rate.
+      if (t.skill === 'katon') withNatures(state, 'futon', 'katon');
       setLevel(state, t.skill, level);
       state.known[id] = true;
       expect(dispatch(state, start(kind, id), content).ok).toBe(true);
@@ -222,6 +224,7 @@ describe('A7: mastery pace', () => {
 
   it('practice with seals gets faster as mastery trims them', () => {
     const state = genin();
+    withNatures(state, 'katon');
     setLevel(state, 'katon', 30);
     state.known['core:great_fireball'] = true;
     const early = (() => {

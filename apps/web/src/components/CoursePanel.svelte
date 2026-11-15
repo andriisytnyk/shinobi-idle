@@ -20,13 +20,15 @@
   import ReqTree from './ReqTree.svelte';
 
   const K = content.balance.K;
-  const slots = $derived(listCourse(game.state, content, game.rules));
-  const built = $derived(builtObstacles(game.state, content));
+  const slots = $derived(game.read((gs) => listCourse(gs, content, game.rules)));
+  const built = $derived(game.read((gs) => builtObstacles(gs, content)));
   const total = $derived(slots.length);
   const info = $derived(
-    actionInfo(game.state, { kind: COURSE_KIND, id: COURSE_ID }, content, game.rules),
+    game.read((gs) => actionInfo(gs, { kind: COURSE_KIND, id: COURSE_ID }, content, game.rules)),
   );
-  const slotIndex = $derived(game.state.slots.findIndex((s) => s.action?.kind === COURSE_KIND));
+  const slotIndex = $derived(
+    game.read((gs) => gs.slots.findIndex((s) => s.action?.kind === COURSE_KIND)),
+  );
   const running = $derived(slotIndex >= 0);
   const pillar = $derived(built.length >= K.athletics.pillarCount);
 

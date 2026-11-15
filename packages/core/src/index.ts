@@ -17,6 +17,7 @@ export * from './shop.ts';
 export * from './formulas.ts';
 export * from './items.ts';
 export * from './mod.ts';
+export * from './natures.ts';
 export * from './modifiers.ts';
 export * from './offline.ts';
 export * from './progression.ts';

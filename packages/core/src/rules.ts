@@ -12,6 +12,7 @@ import { craftKind, gatherKind } from './field.ts';
 import { gearProvider } from './gear.ts';
 import { meditateKind, meditationProvider } from './meditation.ts';
 import type { ModifierProvider } from './modifiers.ts';
+import { natureProvider } from './natures.ts';
 import { questSystem } from './quests.ts';
 import type { System } from './system.ts';
 
@@ -46,6 +47,7 @@ export const defaultRules: Rules = {
     checkpointProvider,
     meditationProvider,
     obstacleProvider,
+    natureProvider,
   ],
   combatAi: defaultCombatAi,
   fightHooks: defaultFightHooks,
