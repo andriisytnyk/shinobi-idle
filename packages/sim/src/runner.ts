@@ -1,6 +1,8 @@
 import { content as defaultContent, type ContentDb } from '@shinobi/content';
 import {
   advance,
+  type Command,
+  type CommandResult,
   createState,
   defaultRules,
   dispatch,
@@ -34,6 +36,11 @@ export interface RunOptions {
   limitMs: number;
   /** Rejected commands after which the run stops as failed. */
   rejectLimit?: number;
+  /** Watches the run without changing it: every command with its result, and every step before time moves. */
+  observer?: {
+    command?(command: Command, result: CommandResult): void;
+    step?(state: Readonly<GameState>, ms: number): void;
+  };
 }
 
 export interface RunResult {
@@ -102,19 +109,25 @@ export function runBot(bot: Bot, options: RunOptions): RunResult {
   let firstRejection: string | null = null;
   let goalAt: number | null = bot.goal.reached(state) ? state.now : null;
   let changed = true;
+  let lastDecision = -Infinity;
 
   while (goalAt === null && state.now < options.limitMs && rejected <= rejectLimit) {
-    if (changed || state.slots.some((slot) => !slot.action)) {
+    const due = bot.reviewMs !== undefined && state.now - lastDecision >= bot.reviewMs;
+    if (changed || due || state.slots.some((slot) => !slot.action)) {
       changed = false;
+      lastDecision = state.now;
       for (const command of bot.decide({ state, content, rules }) ?? []) {
         const result = dispatch(state, command, content, rules);
+        options.observer?.command?.(command, result);
         if (!result.ok) {
           rejected++;
           firstRejection ??= result.reason;
         }
       }
     }
-    advance(state, Math.min(stepMs, options.limitMs - state.now), content, rules);
+    const step = Math.min(stepMs, options.limitMs - state.now);
+    options.observer?.step?.(state, step);
+    advance(state, step, content, rules);
     const events = state.events.splice(0);
     for (const event of events) {
       const milestone = milestoneOf(event);

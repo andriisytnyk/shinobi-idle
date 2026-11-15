@@ -26,5 +26,7 @@ export interface Bot {
   /** One line shown by `pnpm sim` (Ukrainian). */
   description: string;
   goal: BotGoal;
+  /** When set, the runner also asks again after this much game time without a decision (ms). */
+  reviewMs?: number;
   decide(ctx: BotContext): Command[] | null;
 }
