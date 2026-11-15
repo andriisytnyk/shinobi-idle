@@ -403,7 +403,8 @@ describe('the fight action wraps the fight engine', () => {
     );
     advance(state, 40_000, content, basicOnly);
     expect(Object.keys(state.mastery)).toEqual([]);
-    expect(state.combat?.fight.tally.basic ?? 0).toBeGreaterThan(0);
+    // The dummy falls to plain strikes alone.
+    expect(state.counters['kills.core:dummy'] ?? 0).toBeGreaterThan(0);
   });
 
   it('draws only from the combat and loot streams', () => {

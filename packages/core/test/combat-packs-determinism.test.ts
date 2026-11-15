@@ -11,6 +11,7 @@ import {
   deserialize,
   dispatch,
   fightAdvance,
+  refreshUnlocks,
   serialize,
   teamFor,
   type GameState,
@@ -38,6 +39,8 @@ function game(seed: number, zone: string): GameState {
     if (s) s.xp = 30_000;
   }
   state.known[TECH] = true;
+  // What the skills allow is known from the start, as in a game that has been played (a load works it out).
+  refreshUnlocks(state, mod, true);
   const started = dispatch(
     state,
     { type: 'action.start', slot: 0, kind: 'fight', id: zone },

@@ -1,5 +1,6 @@
 import type { AiTier, ContentDb, Rank, SkillId } from '@shinobi/content';
 import type { RngState } from '../rng.ts';
+import type { EvasionPart } from './numbers.ts';
 
 /** Stats an effect can change. Multipliers combine by product, additions as `1 + sum`. */
 export type ModStat = 'accuracy' | 'evasion' | 'speed' | 'damageTaken' | 'taiDamage' | 'resist';
@@ -73,6 +74,8 @@ export interface LastAct {
   combos: string[];
   /** Fight clock time at which it was resolved or broken off. */
   at: number;
+  /** For an attack that missed: the defensive technique that did it (chosen among the known ones in proportion to their contribution); null for none. */
+  avoidedBy: string | null;
 }
 
 /** One fighter. The player and every enemy have this shape. */
@@ -201,6 +204,8 @@ export interface PlayerKit {
   med: number;
   chakraRegen: number;
   staminaRegen: number;
+  /** The parts of the player's evasion rating, with their sources (the rating itself is the player's `evasion`, wounds counted). */
+  evasion: EvasionPart[];
 }
 
 /** What happened in a fight; battle analysis averages these over many fights. */
@@ -245,8 +250,10 @@ export interface FightLogLine {
   tech: string | null;
   /** Damage dealt by a hit; 0 otherwise. */
   dmg: number;
-  /** The id of the combatant the action is of (set on `cast`, `resolve` and `interrupt`). */
+  /** The id of the combatant the action is of (set on `cast`, `resolve` and `interrupted`). */
   by?: string;
+  /** On a `miss` of an attack on the player: the defensive technique that avoided it. */
+  via?: string;
 }
 
 /** One kind of enemy body an encounter puts into the fight. */
@@ -446,8 +453,6 @@ export interface FightView {
   stance: string | null;
   /** Whether the next cast is already hastened. */
   hastened: boolean;
-  /** The share of health below which a spare buff is cast. */
-  guardBelow: number;
   /** Work units a tool or pill takes to use. */
   itemWork: number;
 }

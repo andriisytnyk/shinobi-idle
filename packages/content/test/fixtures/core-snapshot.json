@@ -173,7 +173,7 @@
       "core:front_lotus": "f0dfc63e01f0",
       "core:clone": "2a0f46b5e6cc",
       "core:transformation": "5d22c0877a8b",
-      "core:body_replacement": "8a8e956199cf",
+      "core:body_replacement": "ac9acaeb6aeb",
       "core:body_flicker": "0ad24c67bbfb",
       "core:shadow_shuriken": "05094667e108",
       "core:enclosing": "c8130a4298ce",
@@ -220,7 +220,7 @@
       "core:water_prison": "fed316008c5d",
       "core:gunshot": "34dc37d4300e",
       "core:starch_syrup_capturing_field": "5993f42419bb",
-      "core:water_formation_wall": "9cfdcc6433cf"
+      "core:water_formation_wall": "cd7dde77e0ff"
     },
     "exercises": {
       "core:lystok_na_lobi": "ceb9b919cc5e",
@@ -273,7 +273,7 @@
       "core:pool_tai_50": "2160871a62e3",
       "core:pool_tai_95": "629efbd6e2ac",
       "core:pool_nin_10": "9e1d472c35a3",
-      "core:pool_nin_25": "a45c875cd522",
+      "core:pool_nin_25": "2005eb185d23",
       "core:pool_nin_50": "afb748c47f28",
       "core:pool_nin_95": "1fe6487f265c",
       "core:pool_katon_10": "446fd96b3ede",
@@ -679,7 +679,7 @@
       "steam": "0094cbf559e3"
     },
     "ai": {
-      "ai": "3129a9a8ee57"
+      "ai": "08234a09ddd5"
     }
   },
   "balance": {
@@ -1150,7 +1150,6 @@
     "K.pouch.slots": 3,
     "K.pouch.vest": 1,
     "K.pouch.vestRank": "chunin",
-    "K.ai.guardBelow": 0.6,
     "K.ai.enemyTier.chunin": 30,
     "K.woundHp": 0.1,
     "K.bingo.studiedWins.enemy": 25,
@@ -2443,7 +2442,7 @@
       "pool.core:pool_med_50.desc": "cfae8acbcca4",
       "pool.core:pool_med_95.desc": "3dba8626bd3d",
       "pool.core:pool_nin_10.desc": "e189e2eb6aac",
-      "pool.core:pool_nin_25.desc": "e86f811c7f43",
+      "pool.core:pool_nin_25.desc": "ddab783b63a0",
       "pool.core:pool_nin_50.desc": "e558b585570c",
       "pool.core:pool_nin_95.desc": "e0be5f6d39e1",
       "pool.core:pool_prov_10.desc": "a1a4ff8952d8",
@@ -3070,9 +3069,9 @@
       "teammate.core:ren.name": "f71791fe4d7e",
       "teammate.core:ren.role": "da4415de0a08",
       "technique.core:body_flicker.desc": "c82588d001cb",
-      "technique.core:body_replacement.desc": "21a459f39269",
+      "technique.core:body_replacement.desc": "7fe0f6d827c1",
       "technique.core:chakra_halving_drill.desc": "6d8a8b7ea2dc",
-      "technique.core:clone.desc": "30cb85d2fabc",
+      "technique.core:clone.desc": "4ae6a4b7d98a",
       "technique.core:double_suicide_decapitation.desc": "91e1b132bee5",
       "technique.core:dragon_fire.desc": "d1b96bab3f6b",
       "technique.core:drunken_fist.desc": "fc2a616cd130",
@@ -3080,7 +3079,7 @@
       "technique.core:earth_dragon_bullet.desc": "59d35a550f64",
       "technique.core:earth_flow_river.desc": "8766d026667a",
       "technique.core:earth_softening_drill.desc": "35156ca157ad",
-      "technique.core:earth_style_wall.desc": "6ab1404eb257",
+      "technique.core:earth_style_wall.desc": "fb0df3b73998",
       "technique.core:enclosing.desc": "09bfe6680a9a",
       "technique.core:false_darkness.desc": "41441bc7adb6",
       "technique.core:fire_breath_control_drill.desc": "388462bbd22c",
@@ -3094,7 +3093,7 @@
       "technique.core:great_fireball.desc": "c971d21d3715",
       "technique.core:gunshot.desc": "9112e496da7d",
       "technique.core:hidden_shadow_snake_hands.desc": "21eb958ff1d0",
-      "technique.core:hiding_in_mist.desc": "8130d34f64c9",
+      "technique.core:hiding_in_mist.desc": "0635efcc0823",
       "technique.core:hiding_like_a_mole.desc": "a1792a9911c0",
       "technique.core:leaf_gale.desc": "b8823e982518",
       "technique.core:leaf_great_whirlwind.desc": "522d62606ab6",
@@ -3123,8 +3122,8 @@
       "technique.core:temporary_paralysis.desc": "a77cecaa138a",
       "technique.core:transformation.desc": "970da9488c81",
       "technique.core:vacuum_wave.desc": "6767221ca0e4",
-      "technique.core:water_clone.desc": "6214d0701ec8",
-      "technique.core:water_formation_wall.desc": "460f064d2b37",
+      "technique.core:water_clone.desc": "e96e3f9b2452",
+      "technique.core:water_formation_wall.desc": "fcf7017e4274",
       "technique.core:water_prison.desc": "71f7c1e4136c",
       "technique.core:wave_of_inspiration.desc": "44b373055dbb",
       "technique.core:wild_water_wave.desc": "139e92fa187a",
@@ -3462,7 +3461,7 @@
       "quest.core:graduation.desc": "87056449f444",
       "quest.core:graduation.step.1": "3427d57152c8",
       "quest.core:graduation.step.2": "55a9e8b7dcc3",
-      "quest.core:graduation.step.3": "de635871ea78",
+      "quest.core:graduation.step.3": "bbff2e43b4e3",
       "quest.core:graduation.step.4": "3be92ddb0918",
       "quest.core:graduation.step.5": "341232aa9dd6",
       "quest.core:graduation.final": "34f0d68e51bc",
@@ -3615,7 +3614,7 @@
       "hint.rank": "5149408296df",
       "hint.bank": "d29a4b1e8a1b",
       "hint.levelUp": "1206a9b50f4e",
-      "hint.mastery": "4a214c63ff31",
+      "hint.mastery": "f9a9994c2111",
       "hint.examReady": "f53579a22b9a",
       "hint.graduation": "f5fed6fe6093",
       "welcome.hello": "dfc9d97aab21",
@@ -3625,6 +3624,7 @@
       "error.duplicateTechnique": "31de6137f00b",
       "error.emptySlot": "b15902813f0e",
       "error.fighting": "7c1f278a08c5",
+      "error.passiveTechnique": "4c7300bdcb07",
       "error.invalidLoadout": "aec8d7a11fe6",
       "error.itemInPouch": "a1e9a419961d",
       "error.noLoadoutYet": "2c7ce9146083",
@@ -5281,7 +5281,6 @@
       "vestRank"
     ],
     "K.ai": [
-      "guardBelow",
       "enemyTier"
     ],
     "K.ai.enemyTier": [

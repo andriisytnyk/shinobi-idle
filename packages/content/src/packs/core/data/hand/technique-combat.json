@@ -71,7 +71,6 @@
       "kind": "passiveNegate",
       "fx": "passiveNegate"
     },
-    "outOfLoadout": true,
     "passive": {
       "fx": "passiveNegate"
     }

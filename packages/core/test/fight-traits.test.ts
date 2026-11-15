@@ -42,7 +42,11 @@ if (!chunin) throw new Error('no chunin AI tier');
 const LEVEL = 34;
 const enemyHp = K.eHp[0] + K.eHp[1] * LEVEL;
 const enemyDamage = K.eDmg[0] + K.eDmg[1] * LEVEL;
-const enemyEvasion = K.eEva[0] + K.eEva[1] * LEVEL;
+// An enemy of this level waits by the chunin tier, and the rank tier adds its term to the rating.
+const enemyEvasion =
+  K.eEva[0] +
+  K.eEva[1] * LEVEL +
+  K.rating.evaTier * (content.ai.tiers.find((t) => t.id === 'chunin')?.minTier ?? 0);
 
 describe('Armor (answer: pierce)', () => {
   const dyn = 'core:dynamic_entry';
@@ -91,6 +95,9 @@ describe('Caster (answer: interrupt)', () => {
     const fight = quiet(
       pacify(createFight(scripted(known), enemyAt(LEVEL, ['caster']), seed, content, rules)),
     );
+    // The wind-up is under way when the player first decides: the AI prefers an interrupting technique then.
+    const caster = fight.enemies[0]?.timers.caster;
+    if (caster) caster.progress = caster.need - sec(0.3) * 1000;
     fightAdvance(
       fight,
       sec(fig('trait.casterEvery') + fig('trait.casterCast') + 1),
@@ -569,12 +576,11 @@ describe('the default AI decision rules, on hand-made views', () => {
     medic: null,
     stance: null,
     hastened: false,
-    guardBelow: K.ai.guardBelow,
     itemWork: sec(K.pillAction),
   });
   const cast = (id: string) => ({ type: 'technique', id });
 
-  it('casts an interrupt only while an interruptible cast is under way and ends later than this one', () => {
+  it('casts an interrupt only while an interruptible cast is under way', () => {
     const techs = [kt('int', ['interrupt'], 1), kt('big', [], 50)];
     const casting = (remaining: number, interruptible = true) =>
       mk(techs, [
@@ -582,21 +588,21 @@ describe('the default AI decision rules, on hand-made views', () => {
           cast: { kind: 'heavy', remaining, total: remaining, mult: 3, interruptible, known: true },
         }),
       ]);
-    const need = sec(1);
-    expect(defaultCombatAi(casting(need + 1))).toEqual(cast('int'));
-    expect(defaultCombatAi(casting(need))).toEqual(cast('big'));
+    // The AI does not plan around when the cast ends: it interrupts whenever one is under way and can be stopped.
+    expect(defaultCombatAi(casting(sec(5)))).toEqual(cast('int'));
+    expect(defaultCombatAi(casting(1))).toEqual(cast('int'));
     expect(defaultCombatAi(mk(techs))).toEqual(cast('big'));
     // A cast an interrupt cannot stop is no reason to interrupt.
-    expect(defaultCombatAi(casting(need + 1, false))).toEqual(cast('big'));
+    expect(defaultCombatAi(casting(sec(5), false))).toEqual(cast('big'));
   });
 
-  it('keeps an interrupt back when the next heavy attack comes before it would be ready again', () => {
+  it('does not keep an interrupt back for the next heavy attack: it does not plan around casts', () => {
     const techs = [kt('int', ['interrupt'], 30), kt('plain', [], 10)];
     const waiting = (inWork: number) =>
       mk(techs, [
         enemyView({ knownTraits: ['caster'], workingTraits: ['caster'], nextCastIn: inWork }),
       ]);
-    expect(defaultCombatAi(waiting(sec(2)))).toEqual(cast('plain'));
+    expect(defaultCombatAi(waiting(sec(2)))).toEqual(cast('int'));
     expect(defaultCombatAi(waiting(sec(60)))).toEqual(cast('int'));
   });
 

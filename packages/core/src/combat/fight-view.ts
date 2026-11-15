@@ -1,6 +1,7 @@
 import type { ContentDb } from '@shinobi/content';
 import { makeCtx, speed } from './fight.ts';
 import type { Combatant, FightAct, FightRules, FightState, LastAct } from './fight-types.ts';
+import type { EvasionPart } from './numbers.ts';
 import { WORK_PER_MS } from './units.ts';
 
 /*
@@ -30,6 +31,8 @@ export interface CombatantStatus {
   endsMs: number | null;
   /** The action that ended last; null before the first. */
   last: LastActStatus | null;
+  /** The player's evasion rating split by source (the base, the rank, every defensive technique, gear); absent for an enemy. */
+  evasion?: { total: number; parts: EvasionPart[] };
 }
 
 /** The status of one combatant of a fight. */
@@ -61,7 +64,11 @@ export function combatantStatus(
             statuses: [...c.last.statuses],
             combos: [...c.last.combos],
             atMs: Math.floor(c.last.at / WORK_PER_MS),
+            avoidedBy: c.last.avoidedBy,
           },
+    ...(c === fight.player
+      ? { evasion: { total: c.evasion, parts: fight.kit.evasion.map((p) => ({ ...p })) } }
+      : {}),
   };
 }
 

@@ -77,7 +77,6 @@ describe('technique combat data', () => {
     expect(effectOf('core:rope_escape')?.effect).toEqual({ kind: 'cleanse', statuses: ['bind'] });
     expect(effectOf('core:body_replacement')).toEqual({
       effect: { kind: 'passiveNegate', fx: 'passiveNegate' },
-      outOfLoadout: true,
       passive: { fx: 'passiveNegate' },
     });
     // Every defensive technique is passive and names a row of the passive numbers that exists.

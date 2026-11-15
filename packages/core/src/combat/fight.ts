@@ -15,7 +15,7 @@ import {
   validCastInfo,
   type GuardOptions,
 } from './fight-guard.ts';
-import { PASSIVE_NEGATE_HOOK } from './fight-hooks.ts';
+
 import { applyItem, itemView } from './fight-items.ts';
 import {
   applyStatus,
@@ -51,10 +51,15 @@ import type {
 } from './fight-types.ts';
 import {
   accuracyOf,
+  accuracyTierTerm,
   basicAttackOf,
   chakraRegenOf,
   enemyStats,
   evasionOf,
+  evasionParts,
+  evasionTierTerm,
+  KNOWLEDGE_MAX,
+  knowledgeTerm,
   hitChance,
   maxChakraOf,
   maxHpOf,
@@ -249,37 +254,12 @@ function kitEffect(tech: Technique, snap: PlayerSnapshot, content: ContentDb): K
   const effect = tech.combat?.effect;
   if (!effect || tech.rank === null) return fx;
   fx.kind = effect.kind;
-  const levelOf = snap.levels[tech.skill] ?? 1;
   // The numbers of an effect are the row of `K.techFx` its data names.
   const techFx: Record<string, Record<string, number> | undefined> = K.techFx;
   const row = (key: string) => need(techFx[key], `techFx.${key}`);
   switch (effect.kind) {
-    case 'shield': {
-      const r = row(effect.fx);
-      fx.amount =
-        need(K.power[tech.rank], `power.${tech.rank}`) *
-        figure(r, 'mult', `techFx.${effect.fx}`) *
-        (1 + K.levelScale * levelOf);
-      fx.durationMs = figure(r, 'durationMs', `techFx.${effect.fx}`);
-      break;
-    }
-    case 'decoy': {
-      const r = row(effect.fx);
-      fx.amount = figure(r, 'charges', `techFx.${effect.fx}`);
-      fx.durationMs = figure(r, 'durationMs', `techFx.${effect.fx}`);
-      break;
-    }
-    case 'evasionBuff': {
-      const r = row(effect.fx);
-      fx.mult = figure(r, 'mult', `techFx.${effect.fx}`);
-      fx.durationMs = figure(r, 'durationMs', `techFx.${effect.fx}`);
-      break;
-    }
     case 'cleanse':
       fx.statuses = [...effect.statuses];
-      break;
-    case 'passiveNegate':
-      fx.everyMs = figure(row(effect.fx), 'everyMs', `techFx.${effect.fx}`);
       break;
     case 'stance': {
       const gate = row(effect.fx);
@@ -311,6 +291,8 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
   for (const skill of data.techSkills) style = Math.max(style, snap.levels[skill] ?? 0);
   for (const tech of content.techniques) {
     if (!known.has(tech.id) || tech.rank === null) continue;
+    // A defensive technique is passive: it adds to the evasion rating and is never in the hand.
+    if (tech.combat?.passive !== undefined) continue;
     if (loadout && !loadout.has(tech.id) && !tech.combat?.outOfLoadout) continue;
     const n = techniqueFigures(snap, tech, content);
     const mastery = snap.mastery[tech.id] ?? 1;
@@ -326,7 +308,9 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
       cooldownMs: n.cooldownMs,
       pool: n.pool,
       cost: n.cost,
-      accuracy: accuracyOf(snap.levels, tech.skill, content) * wound,
+      accuracy:
+        (accuracyOf(snap.levels, tech.skill, content) + accuracyTierTerm(snap.tier ?? 0, content)) *
+        wound,
       comboChance: Math.min(
         figure(K.combo, 'cap', 'combo'),
         figure(K.combo, 'base', 'combo') +
@@ -349,6 +333,7 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
     med: snap.levels.med ?? 1,
     chakraRegen: chakraRegenOf(snap.levels, content),
     staminaRegen: staminaRegenOf(snap.levels, content),
+    evasion: evasionParts(snap, content),
   };
 }
 
@@ -361,6 +346,32 @@ function natureOf(spawn: Spawn, natures: readonly string[], content: ContentDb):
 }
 
 const idleTimer = (): Timer => ({ progress: 0, need: 0 });
+
+/** The key of the player's data that holds how well the player knows an enemy entry. */
+const knowKey = (entry: string): string => `know.${entry}`;
+
+/** The rating a target defends with against `attacker`: its evasion, and for the player what knowing the attacker adds, then the stat modifiers. */
+export function evasionAgainst(ctx: FightCtx, target: Combatant, attacker: Combatant): number {
+  let base = target.evasion;
+  if (target.side === 'player' && attacker.side === 'enemy') {
+    const level = target.data[knowKey(attacker.entry)] ?? KNOWLEDGE_MAX;
+    base += knowledgeTerm(level, ctx.content);
+  }
+  return stat(ctx, target, 'evasion', base);
+}
+
+/** The defensive technique that did an avoidance, chosen among the ones the player knows in proportion to what each adds to the rating; null when none. */
+function avoidedBy(ctx: FightCtx): string | null {
+  const parts = ctx.fight.kit.evasion.filter((p) => p.source === 'technique' && p.value > 0);
+  const total = parts.reduce((n, p) => n + p.value, 0);
+  if (total <= 0) return null;
+  let at = nextFloatFrom(ctx.fight.rng) * total;
+  for (const p of parts) {
+    at -= p.value;
+    if (at < 0) return p.id;
+  }
+  return parts[parts.length - 1]?.id ?? null;
+}
 
 /** The AI tier an enemy body waits by: the tier its data names, else the highest tier whose combat level it reaches. */
 function enemyTierOf(content: ContentDb, spawn: Spawn): AiTier {
@@ -438,7 +449,8 @@ function addBodies(ctx: FightCtx, spawn: Spawn, n: number, staggered: boolean): 
   const maxHp = stats.maxHp * spawn.hpMult;
   const added: Combatant[] = [];
   // An enemy waits for the moment as long as its AI tier says, then winds its attack up for the rest of its cycle.
-  const waitMs = enemyTierOf(content, spawn).waitMs;
+  const tier = enemyTierOf(content, spawn);
+  const waitMs = tier.waitMs;
   const strikeMs = Math.max(secMs(K.castFloor), stats.intervalMs - waitMs);
   for (let i = 0; i < bodies; i++) {
     const c: Combatant = {
@@ -451,8 +463,8 @@ function addBodies(ctx: FightCtx, spawn: Spawn, n: number, staggered: boolean): 
       maxChakra: 0,
       stamina: 0,
       maxStamina: 0,
-      accuracy: stats.accuracy,
-      evasion: stats.evasion,
+      accuracy: stats.accuracy + accuracyTierTerm(tier.minTier, content),
+      evasion: stats.evasion + evasionTierTerm(tier.minTier, content),
       damage: stats.damage * spawn.dmgMult,
       waitMs,
       strikeMs,
@@ -519,7 +531,7 @@ export function createFight(
     maxChakra,
     stamina: Math.min(maxStamina, snap.stamina ?? maxStamina),
     maxStamina,
-    accuracy: basic.accuracy * wound,
+    accuracy: (basic.accuracy + accuracyTierTerm(snap.tier ?? 0, content)) * wound,
     evasion: evasionOf(snap, content) * wound,
     damage: basic.damage * wound,
     waitMs: aiTierOf(content, snap.tier ?? 0).waitMs,
@@ -566,13 +578,11 @@ export function createFight(
     log: [],
   };
   player.timer = { progress: 0, need: needOf(player.waitMs) };
-  const ctx = makeCtx(fight, content, rules);
-  // Passive techniques out of the loadout work through a hook of the player's own.
-  for (const tech of fight.kit.techniques) {
-    if (tech.fx.kind === 'passiveNegate' && !player.specials.includes(PASSIVE_NEGATE_HOOK)) {
-      player.specials.push(PASSIVE_NEGATE_HOOK);
-    }
+  // How well each enemy of the fight is known; an enemy the snapshot says nothing about is known completely.
+  for (const spawn of encounter.spawns) {
+    player.data[knowKey(spawn.enemy)] = snap.knowledgeLevel?.[spawn.enemy] ?? KNOWLEDGE_MAX;
   }
+  const ctx = makeCtx(fight, content, rules);
   // Teammates of a team mission support the player through a hook of the player's own.
   if (fight.encounter.support?.length) player.specials.push(TEAM_HOOK);
   for (const hook of hooksOf(ctx, player)) {
@@ -711,6 +721,7 @@ function checkResult(fight: FightState): boolean {
 
 /** What the action that is being resolved did, collected from the notes of its hits. */
 interface ActRecord {
+  avoidedBy: string | null;
   hit: boolean;
   miss: boolean;
   damage: number;
@@ -726,6 +737,7 @@ function note(
   tech: string | null,
   dmg: number,
   by?: string,
+  via?: string,
 ): void {
   if (resolving) {
     if (act === 'hit') {
@@ -733,7 +745,14 @@ function note(
       resolving.damage += dmg;
     } else if (act === 'miss') resolving.miss = true;
   }
-  fight.log?.push(by === undefined ? { side, act, tech, dmg } : { side, act, tech, dmg, by });
+  fight.log?.push({
+    side,
+    act,
+    tech,
+    dmg,
+    ...(by === undefined ? {} : { by }),
+    ...(via === undefined ? {} : { via }),
+  });
 }
 
 /** What of `after` is more than in `before`, by key. */
@@ -753,6 +772,7 @@ function resolveAs(
   const { fight } = ctx;
   const was = resolving;
   const rec: ActRecord = {
+    avoidedBy: null,
     hit: false,
     miss: false,
     damage: 0,
@@ -773,6 +793,7 @@ function resolveAs(
     statuses: grown(rec.statuses, fight.tally.statuses),
     combos: grown(rec.combos, fight.tally.combos),
     at: fight.t,
+    avoidedBy: rec.avoidedBy,
   };
   if (log) note(fight, c.side, 'resolve', act.id, rec.damage, c.id);
   return rec;
@@ -917,6 +938,7 @@ export function breakAct(ctx: FightCtx, c: Combatant): boolean {
     statuses: [],
     combos: [],
     at: fight.t,
+    avoidedBy: null,
   };
   note(fight, c.side, 'interrupted', act.id, 0, c.id);
   if (c === fight.player) fight.target = null;
@@ -1164,7 +1186,6 @@ function buildView(ctx: FightCtx): FightView {
     stance,
     hastened: (player.data.hasten ?? 0) > 0,
 
-    guardBelow: K.ai.guardBelow,
     itemWork: secWork(K.pillAction),
   };
 }
@@ -1232,6 +1253,7 @@ function finishRest(ctx: FightCtx): void {
     statuses: [],
     combos: [],
     at: fight.t,
+    avoidedBy: null,
   };
   note(fight, 'player', 'resolve', null, 0, player.id);
 }
@@ -1330,7 +1352,7 @@ function finishBasic(ctx: FightCtx, targetId: string | null): void {
   if (!target) return;
   const chance = hitChance(
     stat(ctx, player, 'accuracy', player.accuracy),
-    stat(ctx, target, 'evasion', target.evasion),
+    evasionAgainst(ctx, target, player),
     ctx.content,
   );
   if (rollHit(ctx, target, chance)) {
@@ -1383,7 +1405,7 @@ function resolveCast(ctx: FightCtx, id: string | null): void {
   for (const target of targets) {
     const chance = hitChance(
       stat(ctx, player, 'accuracy', tech.accuracy),
-      stat(ctx, target, 'evasion', target.evasion),
+      evasionAgainst(ctx, target, player),
       content,
     );
     if (rollHit(ctx, target, chance)) {
@@ -1404,24 +1426,6 @@ function applyTechniqueEffect(ctx: FightCtx, tech: KitTechnique): void {
   const fx = tech.fx;
   const until = fight.t + workOf(fx.durationMs);
   switch (fx.kind) {
-    case 'shield':
-      grantWard(player, fx.amount, until);
-      break;
-    case 'decoy':
-      addDecoys(player, fx.amount);
-      player.decoyUntil = until;
-      break;
-    case 'evasionBuff':
-      addEffect(player, {
-        kind: 'modifier',
-        id: 'evasionBuff',
-        src: tech.id,
-        until,
-        stat: 'evasion',
-        op: 'mul',
-        value: fx.mult,
-      });
-      break;
     case 'cleanse':
       for (const status of fx.statuses) removeEffect(player, status);
       break;
@@ -1515,7 +1519,7 @@ function enemyAttack(ctx: FightCtx, enemy: Combatant): void {
   const plan: AttackPlan = {
     chance: hitChance(
       stat(ctx, enemy, 'accuracy', enemy.accuracy),
-      stat(ctx, player, 'evasion', player.evasion),
+      evasionAgainst(ctx, player, enemy),
       ctx.content,
     ),
     damage: enemy.damage,
@@ -1538,7 +1542,9 @@ function enemyAttack(ctx: FightCtx, enemy: Combatant): void {
     plan.damage *= resist.value;
   }
   if (!rollHit(ctx, player, plan.chance)) {
-    note(fight, 'enemy', 'miss', null, 0);
+    const via = avoidedBy(ctx);
+    if (resolving) resolving.avoidedBy = via;
+    note(fight, 'enemy', 'miss', null, 0, undefined, via ?? undefined);
     return;
   }
   const dealt = dealDamage(ctx, player, plan.damage, enemy.id);
@@ -1560,7 +1566,7 @@ function enemyAttack(ctx: FightCtx, enemy: Combatant): void {
 export function hitChanceOf(ctx: FightCtx, attacker: Combatant, target: Combatant): number {
   return hitChance(
     stat(ctx, attacker, 'accuracy', attacker.accuracy),
-    stat(ctx, target, 'evasion', target.evasion),
+    evasionAgainst(ctx, target, attacker),
     ctx.content,
   );
 }

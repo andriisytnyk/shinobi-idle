@@ -5,6 +5,7 @@ import type { CommandResult } from '../engine.ts';
 import { emit } from '../events.ts';
 import { indexOf } from '../lookup.ts';
 import type { GameState } from '../state.ts';
+import { KNOWLEDGE_MAX } from './numbers.ts';
 import { entryOf, zoneExplored } from './zones.ts';
 
 /**
@@ -25,7 +26,7 @@ export interface BingoEntry {
 }
 
 /** Levels of knowledge: unknown, seen, defeated, studied. */
-export const BINGO_MAX = 3;
+export const BINGO_MAX = KNOWLEDGE_MAX;
 /** The level Intel cannot buy: it is earned by a first win (or, for a boss, a first fight). */
 const BOUGHT_GAP = 1;
 

@@ -1,7 +1,7 @@
 import type { ContentDb, Rank, SkillId } from '@shinobi/content';
 import type { RngState } from '../rng.ts';
 import { fightData } from './fight-data.ts';
-import { PASSIVE_NEGATE_HOOK } from './fight-hooks.ts';
+import type { EvasionPart } from './numbers.ts';
 import { TEAM_HOOK } from './fight-team-id.ts';
 import type {
   Combatant,
@@ -73,7 +73,7 @@ function vocabOf(content: ContentDb): Vocab {
         if (op.tally) effects.add(op.tally.as);
       }
     }
-    const specials = new Set<string>([PASSIVE_NEGATE_HOOK, TEAM_HOOK]);
+    const specials = new Set<string>([TEAM_HOOK]);
     for (const t of content.traits) if (t.hook !== undefined) specials.add(t.hook);
     for (const b of content.bosses) {
       specials.add(b.special.hook);
@@ -209,6 +209,7 @@ function parseEffect(raw: unknown, t: number, v: Vocab): Effect | 'drop' | null 
   return null;
 }
 
+const EVASION_SOURCES = ['base', 'tier', 'technique', 'modifiers'] as const;
 const ACT_KINDS = ['technique', 'basic', 'item', 'attack', 'rest'] as const;
 
 /** An action of a combatant: `undefined` for none, `null` when it is not a usable one. */
@@ -232,7 +233,9 @@ function parseLast(raw: unknown, t: number): LastAct | null | undefined {
   if (!nonNeg(raw.damage) || !isInt(raw.at) || raw.at < 0 || raw.at > t) return null;
   if (!Array.isArray(raw.statuses) || !raw.statuses.every(isStr)) return null;
   if (!Array.isArray(raw.combos) || !raw.combos.every(isStr)) return null;
+  if (raw.avoidedBy !== null && !isStr(raw.avoidedBy)) return null;
   return {
+    avoidedBy: raw.avoidedBy,
     kind: raw.kind,
     id: raw.id,
     outcome: raw.outcome,
@@ -371,6 +374,13 @@ function parseKit(raw: unknown, content: ContentDb, v: Vocab): PlayerKit | null 
   if (!nonNeg(raw.med) || !nonNeg(raw.chakraRegen) || !nonNeg(raw.staminaRegen)) return null;
   if (!nonNeg(raw.toolDamage)) return null;
   const known = new Set(content.techniques.map((t) => t.id));
+  if (!Array.isArray(raw.evasion)) return null;
+  const evasion: EvasionPart[] = [];
+  for (const p of raw.evasion) {
+    if (!isRecord(p) || !oneOf(EVASION_SOURCES, p.source) || !nonNeg(p.value)) return null;
+    if (p.id !== null && !(isStr(p.id) && known.has(p.id))) return null;
+    evasion.push({ source: p.source, id: p.id, value: p.value });
+  }
   const techniques: KitTechnique[] = [];
   for (const t of raw.techniques) {
     if (!isRecord(t) || !isStr(t.id) || !known.has(t.id)) return null;
@@ -416,6 +426,7 @@ function parseKit(raw: unknown, content: ContentDb, v: Vocab): PlayerKit | null 
     med: raw.med,
     chakraRegen: raw.chakraRegen,
     staminaRegen: raw.staminaRegen,
+    evasion,
   };
 }
 
@@ -527,6 +538,7 @@ function parseLog(raw: unknown): FightLogLine[] | null {
       tech: l.tech,
       dmg: l.dmg,
       ...(isStr(l.by) ? { by: l.by } : {}),
+      ...(isStr(l.via) ? { via: l.via } : {}),
     });
   }
   return lines;

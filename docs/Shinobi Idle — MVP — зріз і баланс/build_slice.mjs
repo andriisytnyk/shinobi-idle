@@ -19,7 +19,7 @@ for (const sk of TECH_SK) {
   for (const x of by[sk].m.filter(x => x.l <= P.CAP || P.TECH.change[x.n])) {
     if (P.TECH.hide.includes(x.n)) continue;
     const ch = P.TECH.change[x.n] || {};
-    const t = { skill:sk, level:ch.l ?? x.l, uk:x.n, en:x.en, rank:ch.rk ?? x.rk, rankCanon:ch.rkc ?? !!x.rkc, role:x.role, tags:x.tags||[], state:x.state||"",
+    const t = { skill:sk, level:ch.l ?? x.l, uk:x.n, en:x.en, rank:ch.rk ?? x.rk, rankCanon:ch.rkc ?? !!x.rkc, role:x.role, tags:x.tags||[], state:ch.st ?? (x.state||""),
       src:ch.src ?? x.src, home:ch.home ?? x.home, home2:ch.home2||"", req:ch.d ?? x.d ?? "", note:x.g||"", patched:ch.why||"" };
     if (t.level <= P.CAP) techniques.push(t);
   }

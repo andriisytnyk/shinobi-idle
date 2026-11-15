@@ -385,7 +385,14 @@ function sanitizeLoadouts(raw: unknown, state: GameState, content: ContentDb): L
     const natures = new Set<string>();
     for (const id of new Set(list.filter((x): x is string => typeof x === 'string'))) {
       const tech = index.techniques.get(id);
-      if (!tech || tech.rank === null || tech.combat?.outOfLoadout || state.known[id] !== true) {
+      // A defensive technique is passive and never in the hand: a loadout saved with one has the slot freed.
+      if (
+        !tech ||
+        tech.rank === null ||
+        tech.combat?.outOfLoadout ||
+        tech.combat?.passive !== undefined ||
+        state.known[id] !== true
+      ) {
         continue;
       }
       const nature = natureOf(id);

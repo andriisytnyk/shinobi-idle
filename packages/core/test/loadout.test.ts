@@ -115,11 +115,11 @@ describe('slots and natures by rank', () => {
 });
 
 describe('techniques outside the slots', () => {
-  it('keeps Body Replacement out of the slots and always in the fight', () => {
+  it('keeps Body Replacement out of the slots: it is passive and adds to the evasion instead', () => {
     const state = fighter(1, 40);
     const body = 'core:body_replacement';
     expect(state.known[body]).toBe(true);
-    expect(attempt(state, [body])).toEqual({ ok: false, reason: 'error.alwaysAvailable' });
+    expect(attempt(state, [body])).toEqual({ ok: false, reason: 'error.passiveTechnique' });
     expect(loadout(state)).not.toContain(body);
     run(state, { type: 'loadout.set', techniques: ['core:leaf_whirlwind'] });
     const snap = snapshotPlayer(state, content, defaultRules);
@@ -131,7 +131,8 @@ describe('techniques outside the slots', () => {
       content,
       defaultRules,
     );
-    expect(fight.kit.techniques.map((t) => t.id).sort()).toEqual([body, 'core:leaf_whirlwind']);
+    expect(fight.kit.techniques.map((t) => t.id)).toEqual(['core:leaf_whirlwind']);
+    expect(fight.kit.evasion.some((p) => p.source === 'technique' && p.id === body)).toBe(true);
   });
 });
 

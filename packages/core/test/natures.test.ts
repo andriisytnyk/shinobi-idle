@@ -29,6 +29,7 @@ import {
   type GameState,
 } from '../src/index.ts';
 import { genin, setLevel, start, withNatures } from './helpers.ts';
+import { modContent, modGenin } from './packs-helpers.ts';
 
 const K = content.balance.K;
 const choose = (s: GameState, nature: NatureId | 'random') =>
@@ -364,8 +365,8 @@ describe('natureConsequences', () => {
     expect(suiton.missions).toContain('core:v_water');
     expect(suiton.buildings).toContain('core:farms');
     expect(suiton.cells).toEqual([]);
-    expect(suiton.strongAgainst).toBe('katon');
-    expect(suiton.weakAgainst).toBe('doton');
+    expect(suiton.strongAgainst).toEqual(['katon']);
+    expect(suiton.weakAgainst).toEqual(['doton']);
     expect(suiton.rival).toBe('doton');
     expect(suiton.aya).toBe('raiton');
     expect(suiton.combos.length).toBeGreaterThan(0);
@@ -447,5 +448,31 @@ describe('A8: save and determinism', () => {
     };
     expect(run(1)).toBe(run(1));
     expect(run(1)).toBe(run(6));
+  });
+});
+
+describe('the wheel of a pack nature', () => {
+  const aether = 'testmod:aether';
+  const state = modGenin();
+
+  it('lists the nature it beats, and the nature it beats lists it', () => {
+    const own = natureConsequences(aether, state, modContent);
+    expect(own.strongAgainst).toEqual(['katon']);
+    // The core nature the pack patched to beat it is the one it is weak against, not itself.
+    expect(own.weakAgainst).toEqual(['doton']);
+    const katon = natureConsequences('katon', state, modContent);
+    expect(katon.weakAgainst).toContain(aether);
+    // The core nature that beat katon before the pack still does.
+    expect(katon.weakAgainst).toContain('suiton');
+    expect(katon.weakAgainst).not.toContain('katon');
+  });
+
+  it('is unchanged for the core natures with the core pack alone', () => {
+    for (const n of NATURE_IDS) {
+      const c = natureConsequences(n, state, content);
+      expect(c.weakAgainst).not.toContain(n);
+      expect(c.strongAgainst).toHaveLength(1);
+      expect(c.weakAgainst).toHaveLength(1);
+    }
   });
 });

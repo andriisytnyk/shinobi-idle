@@ -35,6 +35,21 @@ export interface PlayerSnapshot {
   medic?: number | null;
   /** Wound stacks; each one cuts the combat stats. */
   wounds?: number;
+  /** The total of the `evasion` modifiers (gear, obstacles, tonics); absent means 1, none. */
+  evasionMod?: number;
+  /** How well the player knows each enemy of the fight (Bingo level); an enemy without an entry is known completely. */
+  knowledgeLevel?: Record<string, number>;
+}
+
+/** The highest level of knowledge of an enemy: unknown, seen, defeated, studied. */
+export const KNOWLEDGE_MAX = 3;
+
+/** One part of the evasion rating, with where it comes from. */
+export interface EvasionPart {
+  /** `base`; `tier` (the rank of the player); `technique` (a known defensive technique, `id` names it); `modifiers` (gear and the like). */
+  source: 'base' | 'tier' | 'technique' | 'modifiers';
+  id: string | null;
+  value: number;
 }
 
 export type Levels = PlayerSnapshot['levels'];
@@ -78,26 +93,58 @@ export function staminaRegenOf(levels: Levels, content: ContentDb): number {
 }
 
 /**
- * The evasion rating of the player: the base, a term per rank tier and what the known defensive
- * techniques add, scaled by their mastery (the share a technique gives for merely being known at
- * mastery 1, all of it at the cap). There is no skill term.
+ * The parts of the evasion rating of the player, each with its source: the base, a term per rank
+ * tier, what every known defensive technique adds (the share of its full value that mastery has
+ * earned: `base` of it for knowing it at mastery 1, all of it at the cap), and the evasion
+ * modifiers of gear and the like over the sum. There is no skill term. What knowing the attacker
+ * adds comes per enemy, in the fight.
  */
-export function evasionOf(
-  snap: Pick<PlayerSnapshot, 'tier' | 'known' | 'mastery'>,
+export function evasionParts(
+  snap: Pick<PlayerSnapshot, 'tier' | 'known' | 'mastery' | 'evasionMod'>,
   content: ContentDb,
-): number {
+): EvasionPart[] {
   const K = content.balance.K;
-  let rating = K.evaBase + K.rating.evaTier * (snap.tier ?? 0);
+  const parts: EvasionPart[] = [
+    { source: 'base', id: null, value: K.evaBase },
+    { source: 'tier', id: null, value: K.rating.evaTier * (snap.tier ?? 0) },
+  ];
   const known = new Set(snap.known);
   for (const tech of content.techniques) {
     const fx = tech.combat?.passive?.fx;
     if (fx === undefined || !known.has(tech.id)) continue;
     const row = need(K.passiveFx[fx], `passiveFx.${fx}`);
     const share = (Math.max(1, snap.mastery[tech.id] ?? 1) - 1) / (K.masteryCap - 1);
-    rating += row.evasion * (row.base + (1 - row.base) * Math.min(1, share));
+    parts.push({
+      source: 'technique',
+      id: tech.id,
+      value: row.evasion * (row.base + (1 - row.base) * Math.min(1, share)),
+    });
   }
-  return rating;
+  const sum = parts.reduce((n, p) => n + p.value, 0);
+  const mod = snap.evasionMod ?? 1;
+  if (mod !== 1) parts.push({ source: 'modifiers', id: null, value: sum * (mod - 1) });
+  return parts;
 }
+
+/** The evasion rating of the player: the sum of its parts. */
+export function evasionOf(
+  snap: Pick<PlayerSnapshot, 'tier' | 'known' | 'mastery' | 'evasionMod'>,
+  content: ContentDb,
+): number {
+  return evasionParts(snap, content).reduce((n, p) => n + p.value, 0);
+}
+
+/** What a rank tier adds to the accuracy rating of whoever attacks. */
+export const accuracyTierTerm = (tier: number, content: ContentDb): number =>
+  content.balance.K.rating.accTier * tier;
+
+/** What a rank tier adds to the evasion rating of whoever defends. */
+export const evasionTierTerm = (tier: number, content: ContentDb): number =>
+  content.balance.K.rating.evaTier * tier;
+
+/** What knowing an enemy at `level` adds to the evasion rating of the player against it. */
+export const knowledgeTerm = (level: number, content: ContentDb): number =>
+  content.balance.K.rating.knowledge * level;
 
 /** Accuracy rating when attacking with a technique of `skill`. */
 export function accuracyOf(levels: Levels, skill: SkillId, content: ContentDb): number {

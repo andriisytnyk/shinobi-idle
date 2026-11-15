@@ -707,7 +707,6 @@ describe('fight hooks', () => {
     expect(run(bare)).toBeGreaterThanOrEqual(run(rules));
     const hooks = rules.fightHooks.map((h) => h.id).sort();
     expect(hooks).toEqual([
-      'passiveNegate',
       'special:evasionByMissingHp',
       'special:heavyCast',
       'special:illusion',
@@ -997,6 +996,9 @@ describe('casts owned by a hook', () => {
       const fight = quiet(
         pacify(createFight(scripted(['core:dynamic_entry']), encounter(), seed, content, custom)),
       );
+      // The wind-up is under way when the player first decides.
+      const timer = fight.enemies[0]?.timers.charge;
+      if (timer) timer.progress = timer.need - sec(0.3) * 1000;
       fightAdvance(fight, sec(5.5), content, custom);
       if (fight.tally.interrupts === 1) {
         interrupted++;

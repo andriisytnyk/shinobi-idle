@@ -214,9 +214,12 @@ describe('the heavy cast of the hunter', () => {
     body.timer.need = 1e18;
     f.player.accuracy = 1e9;
     body.evasion = 0;
-    // The chunin tactics interrupt every wind-up they can; an interrupted cast never lands or stuns.
-    advanceBy(f, 60, rules);
-    expect(f.tally.interrupts).toBeGreaterThan(0);
+    // The cast is under way when the player decides: the AI prefers its interrupting technique then, and an interrupted cast never lands or stuns.
+    const caster = body.timers.caster;
+    if (!caster) throw new Error('no caster timer');
+    caster.progress = caster.need - sec(0.3) * 1000;
+    advanceBy(f, 2.5, rules);
+    expect(f.tally.interrupts).toBe(1);
     expect(f.tally.taken).toBe(0);
     expect(findEffect(f.player, 'stun')).toBeUndefined();
   });

@@ -859,7 +859,6 @@ export const operationSchema = z.strictObject({
 export const AI_RULE_IDS = [
   'heal',
   'interrupt',
-  'defend',
   'answer',
   'maintain',
   'signature',
@@ -1256,9 +1255,8 @@ export const balanceParamsSchema = z.object({
   }),
   signature: z.object({ minMastery: z.number().int(), xpBonus: z.number() }),
   pouch: z.object({ slots: z.number().int(), vest: z.number().int(), vestRank: playerRankId }),
-  /** `guardBelow`: the health share below which a spare buff is cast; `enemyTier`: the lowest combat level of an enemy that waits by each AI tier (the lowest tier needs none). */
+  /** `enemyTier`: the lowest combat level of an enemy that waits by each AI tier (the lowest tier needs none). */
   ai: z.object({
-    guardBelow: z.number(),
     enemyTier: z.record(z.string(), z.number().int().min(0)),
   }),
   woundHp: z.number(),

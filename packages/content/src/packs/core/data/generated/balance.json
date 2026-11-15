@@ -628,7 +628,6 @@
       "vestRank": "chunin"
     },
     "ai": {
-      "guardBelow": 0.6,
       "enemyTier": {
         "chunin": 30
       }

@@ -6,7 +6,7 @@ import { isAcademyRank, rankIndex } from '../vocab.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 import type { Levels, PlayerSnapshot } from './numbers.ts';
-import { knowledgeOf } from './bingo.ts';
+import { bingoLevel, knowledgeOf } from './bingo.ts';
 import { effectiveLoadout } from './loadout.ts';
 import { medicTier } from './pouch.ts';
 
@@ -50,13 +50,17 @@ export function snapshotPlayer(
   entries: readonly string[] = [],
 ): PlayerSnapshot {
   const snapshot = planningSnapshot(state, content);
-  const [chakra, stamina] = computeMods(
+  const [chakra, stamina, evasion] = computeMods(
     rules.modifierProviders,
     state,
-    ['cost.chakra', 'cost.stamina'],
+    ['cost.chakra', 'cost.stamina', 'evasion'],
     content,
   );
   snapshot.costMod = { chakra: chakra?.total ?? 1, stamina: stamina?.total ?? 1 };
+  snapshot.evasionMod = evasion?.total ?? 1;
+  snapshot.knowledgeLevel = Object.fromEntries(
+    entries.map((id) => [id, bingoLevel(state, id, content)]),
+  );
   snapshot.wounds = state.wounds.stacks;
   snapshot.knowledge = knowledgeOf(state, content, entries);
   // A student fights with everything they know; from Genin the loadout is the player's.
