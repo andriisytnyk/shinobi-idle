@@ -60,6 +60,7 @@
       <HintHost />
       {#if route.page === 'home'}
         <SimplePage title={t('home.title')}>
+          <p class="hello">{t('welcome.hello', { name: game.state.player.name })}</p>
           <NextStepCard />
           <p class="hint">{t('home.hint')}</p>
         </SimplePage>
@@ -188,6 +189,11 @@
 
   .tabs {
     grid-area: tabs;
+  }
+
+  .hello {
+    margin: 0 0 var(--space-3);
+    font-weight: 600;
   }
 
   .hint {

@@ -1,12 +1,13 @@
 <script lang="ts">
   import { content } from '@shinobi/content';
-  import { evalReq, examFor, SENSEI_TEST_KIND, SHARE_FULL } from '@shinobi/core';
+  import { evalReq, examFor } from '@shinobi/core';
   import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
   import ReqTree from '../components/ReqTree.svelte';
   import { entityDesc } from '../lib/entities.ts';
   import { formatDuration } from '../lib/format.ts';
+  import { senseiTestInfo } from '../lib/exam-test.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
@@ -17,16 +18,7 @@
   const checklist = $derived(exam ? evalReq(game.state, exam.checklist, content) : null);
 
   /** The sensei test, while it runs, as a progress action. */
-  const test = $derived.by(() => {
-    const state = game.state;
-    const index = state.slots.findIndex((s) => s.action?.kind === SENSEI_TEST_KIND);
-    const slot = state.slots[index];
-    const kind = game.rules.actionKinds[SENSEI_TEST_KIND];
-    if (!slot?.action || !kind) return null;
-    const total = kind.intervalMs(state, slot.action.id, content, game.rules) * SHARE_FULL;
-    const left = slot.share > 0 ? Math.max(0, total - slot.progress) / slot.share : 0;
-    return { slot: index, fraction: Math.min(1, slot.progress / total), left };
-  });
+  const test = $derived(senseiTestInfo(game.state, game.rules, content));
 
   let error = $state<string | null>(null);
 

@@ -4,7 +4,7 @@
   import { evalReq } from '@shinobi/core';
   import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
-  import { counterEnemy, counterProgress } from '../lib/next-step.ts';
+  import { counterEnemy, counterProgress, withoutRankRows } from '../lib/next-step.ts';
   import { game } from '../lib/store.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
@@ -20,7 +20,7 @@
 
   const objective = $derived(quest.steps[index]?.objective);
   const result = $derived(
-    objective?.t === 'req' ? evalReq(game.state, objective.req, content) : null,
+    objective?.t === 'req' ? withoutRankRows(evalReq(game.state, objective.req, content)) : null,
   );
   const counted = $derived(
     objective?.t === 'counter' ? counterProgress(game.state, quest, index, objective) : null,

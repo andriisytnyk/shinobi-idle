@@ -24,7 +24,9 @@
   const pickingItem = $derived(content.items.find((i) => i.id === picking));
   const targets = $derived(
     pickingItem?.use
-      ? content.techniques.filter((tech) => tech.mentor === pickingItem.use?.mentor)
+      ? content.techniques.filter(
+          (tech) => tech.mentor === pickingItem.use?.mentor && game.state.known[tech.id] === true,
+        )
       : [],
   );
 

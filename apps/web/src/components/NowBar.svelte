@@ -2,7 +2,8 @@
   import { content } from '@shinobi/content';
   import { actionInfo, SHARE_FULL } from '@shinobi/core';
   import { actionRef } from '../lib/entities.ts';
-  import { formatXp } from '../lib/format.ts';
+  import { senseiTestInfo } from '../lib/exam-test.ts';
+  import { formatDuration, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import EntityLink from './EntityLink.svelte';
@@ -41,6 +42,8 @@
   let expanded = $state(false);
   const shown = $derived(expanded ? rows : rows.slice(0, 1));
 
+  const wait = $derived(senseiTestInfo(game.state, game.rules, content));
+
   const stop = (slot: number) => void game.dispatch({ type: 'action.stop', slot });
 </script>
 
@@ -68,6 +71,11 @@
                 n: formatXp(row.xpPerHour),
               })}{/if}</span
           >
+          {#if wait && wait.slot === row.slot}
+            <span class="wait" data-exam-wait
+              >{t('rank.testLeft', { time: formatDuration(wait.left) })}</span
+            >
+          {/if}
           <button type="button" class="stop" onclick={() => stop(row.slot)}>{t('now.stop')}</button>
         </li>
       {/each}
@@ -153,6 +161,14 @@
     display: block;
     height: 100%;
     background: var(--accent);
+  }
+
+  .wait {
+    flex: none;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
   }
 
   .xph {

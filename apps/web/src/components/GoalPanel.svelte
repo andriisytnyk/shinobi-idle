@@ -2,6 +2,8 @@
   import { content } from '@shinobi/content';
   import { evalReq } from '@shinobi/core';
   import { webRef } from '../lib/entities.ts';
+  import { senseiTestInfo } from '../lib/exam-test.ts';
+  import { formatDuration } from '../lib/format.ts';
   import { goalReq, suggestGoal } from '../lib/goal.ts';
   import { t } from '../lib/i18n.ts';
   import { nextStep } from '../lib/next-step.ts';
@@ -17,6 +19,7 @@
 
   let { onClose }: Props = $props();
 
+  const wait = $derived(senseiTestInfo(game.state, game.rules, content));
   const goal = $derived(game.state.goal);
   const goalRef = $derived(webRef(goal));
   const req = $derived(goal ? goalReq(goal, content) : null);
@@ -37,6 +40,12 @@
   </div>
 
   <Hint id="goalPanel" />
+
+  {#if wait}
+    <p class="wait" data-exam-wait role="status">
+      {t('exam.wait', { time: formatDuration(wait.left) })}
+    </p>
+  {/if}
 
   {#if goal}
     <div class="tree" data-goal>
@@ -105,6 +114,14 @@
   .empty {
     margin: 0 0 var(--space-3);
     color: var(--fg-dim);
+  }
+
+  .wait {
+    margin: 0 0 var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    font-weight: 600;
   }
 
   .done {

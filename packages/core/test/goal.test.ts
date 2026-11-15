@@ -5,7 +5,10 @@ import {
   createState,
   deserialize,
   dispatch,
+  emit,
+  EVENT_CAP,
   evalReq,
+  type Command,
   isSkillUnlocked,
   serialize,
   type GameState,
@@ -96,6 +99,32 @@ describe('the first fight', () => {
     expect(isSkillUnlocked(state, 'vit', content)).toBe(true);
     expect(isSkillUnlocked(state, 'eva', content)).toBe(true);
     expect(evalReq(state, { t: 'flag', id: 'firstFight' }, content).met).toBe(true);
+  });
+});
+
+describe('event queue eviction and input checks', () => {
+  it('drops battle log lines before any other event when the queue is full', () => {
+    const state = createState(1, content);
+    emit(state, { type: 'rankUp', rank: 'genin' });
+    for (let i = 0; i < EVENT_CAP + 50; i++) {
+      emit(state, {
+        type: 'combatLog',
+        side: 'enemy',
+        act: 'miss',
+        tech: null,
+        enemy: DUMMY,
+        dmg: 0,
+      });
+    }
+    expect(state.events).toHaveLength(EVENT_CAP);
+    expect(state.events.some((e) => e.type === 'rankUp')).toBe(true);
+  });
+
+  it('refuses a malformed goal and a name with control characters', () => {
+    const state = createState(1, content);
+    const bad = { type: 'goal.set', ref: null } as unknown as Command;
+    expect(dispatch(state, bad, content)).toEqual({ ok: false, reason: 'error.invalidGoal' });
+    expect(dispatch(state, { type: 'player.setName', name: 'a\nb' }, content).ok).toBe(false);
   });
 });
 

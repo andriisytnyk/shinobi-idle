@@ -106,6 +106,7 @@ function startAction(
 
 /** Whether a goal reference names an entity the content has, of a kind that can be pinned. */
 function goalExists(ref: EntityRef, content: ContentDb): boolean {
+  if (typeof ref !== 'object' || ref === null || typeof ref.id !== 'string') return false;
   const index = indexOf(content);
   switch (ref.kind) {
     case 'technique':
@@ -172,7 +173,8 @@ function apply(
       return { ok: true };
     case 'player.setName': {
       const name = typeof command.name === 'string' ? command.name.trim() : '';
-      if (name.length < 1 || name.length > PLAYER_NAME_MAX) {
+      // No control characters: a name is one line of plain text.
+      if (name.length < 1 || name.length > PLAYER_NAME_MAX || /\p{Cc}/u.test(name)) {
         return { ok: false, reason: 'error.invalidName' };
       }
       state.player.name = name;

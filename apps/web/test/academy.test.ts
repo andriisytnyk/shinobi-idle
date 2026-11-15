@@ -1,5 +1,5 @@
 import { content, localeKey, ukLocale } from '@shinobi/content';
-import { bump, createState, updateQuests, xpAt, type GameState } from '@shinobi/core';
+import { bump, createState, evalReq, updateQuests, xpAt, type GameState } from '@shinobi/core';
 import type { Component } from 'svelte';
 import { render } from 'svelte/server';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -7,6 +7,7 @@ import CombatLog from '../src/components/CombatLog.svelte';
 import DevTools from '../src/components/DevTools.svelte';
 import GoalPanel from '../src/components/GoalPanel.svelte';
 import HintHost from '../src/components/HintHost.svelte';
+import NowBar from '../src/components/NowBar.svelte';
 import MainNav from '../src/components/MainNav.svelte';
 import TabBar from '../src/components/TabBar.svelte';
 import { isDevMode } from '../src/lib/dev.ts';
@@ -14,7 +15,7 @@ import { migrateLocalGoal } from '../src/lib/goal-migration.ts';
 import { HINTS, nextStateHint } from '../src/lib/hints.ts';
 import type { LogEntry } from '../src/lib/game.svelte.ts';
 import { markerOf } from '../src/lib/nav.ts';
-import { nextStep } from '../src/lib/next-step.ts';
+import { nextStep, objectiveTarget, withoutRankRows } from '../src/lib/next-step.ts';
 import { hrefFor, type EntityRef } from '../src/lib/route.ts';
 import { SETTINGS_KEY, settings, type TextStorage } from '../src/lib/settings.svelte.ts';
 import { game } from '../src/lib/store.ts';
@@ -230,8 +231,13 @@ describe('suggested next step', () => {
     expect(nextStep(state, content)?.target).toBe('#/skill/tai');
     const four = atStepFour();
     expect(nextStep(four, content)?.target).toBe('#/combat');
-    setLevel(four, 'tai', 10);
     four.quests[QUEST] = { step: 4, base: 0, done: false };
+    // Step 5 is the exam: the first missing requirement of its checklist, then the Academy page.
+    expect(nextStep(four, content)?.target).toBe('#/skill/tai');
+    setLevel(four, 'tai', 10);
+    expect(nextStep(four, content)?.target).toBe('#/skill/nin');
+    setLevel(four, 'nin', 10);
+    setLevel(four, 'cc', 10);
     expect(nextStep(four, content)?.target).toBe('#/rank');
     four.quests[QUEST] = { step: 5, base: 0, done: true };
     expect(nextStep(four, content)).toBeNull();
@@ -431,5 +437,80 @@ describe('graduation', () => {
     expect(game.state.bank[SCROLL]).toBe(1);
     game.dismissGraduation();
     expect(game.graduation).toBe(false);
+  });
+});
+
+describe('where an objective is done', () => {
+  const state = createState(1, content);
+  const go = (objective: Parameters<typeof objectiveTarget>[1]) =>
+    objectiveTarget(state, objective, content);
+
+  it('maps each objective type to the page of the action', () => {
+    expect(go({ t: 'counter', counter: 'kills.core:dummy', n: 10 })).toBe('#/combat');
+    expect(go({ t: 'counter', counter: 'actions.drill', n: 3 })).toBe('#/quests');
+    expect(go({ t: 'req', req: { t: 'skill', skill: 'ath', level: 5 } })).toBe('#/skill/ath');
+    expect(go({ t: 'req', req: { t: 'technique', id: 'core:rope_escape' } })).toBe('#/skill/nin');
+    expect(go({ t: 'req', req: { t: 'item', id: SCROLL, n: 1 } })).toBe('#/bank');
+    expect(go({ t: 'req', req: { t: 'flag', id: 'firstFight' } })).toBe('#/combat');
+    expect(go({ t: 'req', req: { t: 'quest', id: QUEST } })).toBe('#/quests');
+    // The exam: the first thing its checklist still lacks, else the Academy page.
+    expect(go({ t: 'req', req: { t: 'rank', rank: 'genin' } })).toBe('#/skill/tai');
+    const ready = createState(1, content);
+    for (const skill of ['tai', 'nin', 'cc'] as const) setLevel(ready, skill, 10);
+    expect(objectiveTarget(ready, { t: 'req', req: { t: 'rank', rank: 'genin' } }, content)).toBe(
+      '#/rank',
+    );
+  });
+
+  it('hides an unmet rank row that sits beside the real objectives', () => {
+    const tree = evalReq(
+      state,
+      {
+        t: 'all',
+        of: [
+          { t: 'rank', rank: 'genin' },
+          { t: 'skill', skill: 'tai', level: 10 },
+        ],
+      },
+      content,
+    );
+    expect(withoutRankRows(tree).children.map((c) => c.req.t)).toEqual(['skill']);
+    const five = atStepFour();
+    five.quests[QUEST] = { step: 4, base: 0, done: false };
+    game.replaceState(five);
+    expect(html(QuestsPage, {})).not.toContain('Ранг: Генін');
+  });
+});
+
+describe('waiting for the sensei test', () => {
+  it('shows the remaining time in the Now bar and the Goal panel from any page', () => {
+    const state = createState(1, content);
+    for (const skill of ['tai', 'nin', 'cc'] as const) setLevel(state, skill, 10);
+    game.replaceState(state);
+    expect(html(GoalPanel, { onClose: () => {} })).not.toContain('data-exam-wait');
+    expect(game.dispatch({ type: 'exam.genin.start' }).ok).toBe(true);
+    expect(html(GoalPanel, { onClose: () => {} })).toContain('data-exam-wait');
+    expect(html(NowBar, {})).toContain('data-exam-wait');
+  });
+});
+
+describe('navigation and the log', () => {
+  it('has five tabs and no sections that do not exist yet', () => {
+    const body = html(TabBar, {});
+    expect(body.match(/data-tab=/g)).toHaveLength(5);
+    for (const text of [body, html(MainNav, {})]) {
+      expect(text).not.toContain('#/missions');
+      expect(text).not.toContain('#/village');
+    }
+  });
+
+  it('says the fight continues when the log is empty mid-fight', () => {
+    expect(html(CombatLog, { entries: [], fighting: true })).toContain('Бій триває');
+    expect(html(CombatLog, { entries: [], fighting: false })).toContain('Журнал заповниться');
+  });
+
+  it('keeps hint texts free of words for a sidebar that phones do not have', () => {
+    const keys = Object.keys(ukLocale).filter((k) => k.startsWith('hint.') || k === 'home.hint');
+    for (const key of keys) expect(ukLocale[key], key).not.toMatch(/ліворуч|бічн/i);
   });
 });

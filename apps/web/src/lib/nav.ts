@@ -36,22 +36,6 @@ export const NAV: readonly NavItem[] = [
   { id: 'bank', href: '#/bank', label: 'nav.bank', icon: 'lucide:package', tab: true, side: true },
   { id: 'rank', href: '#/rank', label: 'nav.rank', icon: 'rank-3', tab: false, side: true },
   {
-    id: 'missions',
-    href: '#/missions',
-    label: 'nav.missions',
-    icon: 'tied-scroll',
-    tab: true,
-    side: true,
-  },
-  {
-    id: 'village',
-    href: '#/village',
-    label: 'nav.village',
-    icon: 'huts-village',
-    tab: true,
-    side: true,
-  },
-  {
     id: 'help',
     href: '#/help',
     label: 'nav.help',

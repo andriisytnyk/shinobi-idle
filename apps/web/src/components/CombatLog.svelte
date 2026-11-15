@@ -7,21 +7,26 @@
   interface Props {
     /** Lines of the battle log, oldest first. */
     entries: readonly LogEntry[];
+    /** A fight is running, so an empty log means the page was opened mid-fight. */
+    fighting?: boolean;
   }
 
-  let { entries }: Props = $props();
+  let { entries, fighting = false }: Props = $props();
 
   /** The newest line is shown last; the list keeps itself scrolled to it. */
   let box: HTMLElement | undefined = $state();
   $effect(() => {
     void entries.length;
-    if (box) box.scrollTop = box.scrollHeight;
+    // Follow the newest line only while the reader is at the bottom; scrolling up to read stays put.
+    if (box && box.scrollHeight - box.scrollTop - box.clientHeight < 48) {
+      box.scrollTop = box.scrollHeight;
+    }
   });
 </script>
 
-<div class="log" bind:this={box} role="log" aria-label={t('combat.log')} data-log>
+<div class="log" bind:this={box} role="log" aria-live="off" aria-label={t('combat.log')} data-log>
   {#if entries.length === 0}
-    <p class="empty">{t('combat.logEmpty')}</p>
+    <p class="empty">{t(fighting ? 'combat.logContinues' : 'combat.logEmpty')}</p>
   {/if}
   <ul>
     {#each entries as { id, event } (id)}
@@ -74,6 +79,10 @@
   }
 
   li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 var(--space-1);
     padding: 2px 0;
     font-size: 0.9rem;
     overflow-wrap: anywhere;

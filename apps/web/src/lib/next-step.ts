@@ -1,5 +1,5 @@
 import type { ContentDb, Quest, QuestObjective } from '@shinobi/content';
-import { counterValue, evalReq, type GameState, type ReqResult } from '@shinobi/core';
+import { counterValue, evalReq, examFor, type GameState, type ReqResult } from '@shinobi/core';
 import { hrefFor } from './route.ts';
 
 export type StepStatus = 'done' | 'current' | 'pending';
@@ -47,7 +47,7 @@ function firstUnmet(node: ReqResult): ReqResult | null {
 }
 
 /** The page where an unmet requirement row is worked on. */
-function pageFor(node: ReqResult, content: ContentDb): string {
+function pageFor(state: GameState, node: ReqResult, content: ContentDb): string {
   const req = node.req;
   switch (req.t) {
     case 'skill':
@@ -56,8 +56,13 @@ function pageFor(node: ReqResult, content: ContentDb): string {
       const tech = content.techniques.find((t) => t.id === req.id);
       return hrefFor({ kind: 'skill', id: tech?.skill ?? 'nin' });
     }
-    case 'rank':
-      return '#/rank';
+    case 'rank': {
+      // A rank is earned by its exam: go where the exam's first missing requirement is done, or
+      // to the Academy page once the whole checklist holds.
+      const exam = examFor(content, req.rank);
+      const open = exam ? firstUnmet(evalReq(state, exam.checklist, content)) : null;
+      return open ? pageFor(state, open, content) : '#/rank';
+    }
     case 'item':
       return '#/bank';
     case 'flag':
@@ -77,7 +82,7 @@ export function objectiveTarget(
     return counterEnemy(objective.counter) !== null ? '#/combat' : '#/quests';
   }
   const open = firstUnmet(evalReq(state, objective.req, content));
-  return open ? pageFor(open, content) : '#/quests';
+  return open ? pageFor(state, open, content) : '#/quests';
 }
 
 export interface NextStep {
@@ -111,4 +116,14 @@ export function navTarget(hash: string): { nav: string; skill: string | null } {
   const [, first = '', id = ''] = hash.split('/');
   if (first === 'skill') return { nav: 'skills', skill: decodeURIComponent(id) };
   return { nav: first, skill: null };
+}
+
+/**
+ * A requirement result without the unmet rank rows that sit beside the real objectives: the rank
+ * is the outcome of the exam, so listing it as a task of its own only confuses.
+ */
+export function withoutRankRows(node: ReqResult): ReqResult {
+  if (node.children.length === 0) return node;
+  const rest = node.children.filter((c) => !(c.req.t === 'rank' && !c.met));
+  return { ...node, children: (rest.length > 0 ? rest : node.children).map(withoutRankRows) };
 }

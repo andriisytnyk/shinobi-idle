@@ -175,7 +175,7 @@
   {/if}
 
   <h2>{t('combat.log')}</h2>
-  <CombatLog entries={game.combatLog} />
+  <CombatLog entries={game.combatLog} fighting={fight !== null} />
 </SimplePage>
 
 <style>
