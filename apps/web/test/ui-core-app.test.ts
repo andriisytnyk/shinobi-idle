@@ -1,9 +1,12 @@
 // @vitest-environment happy-dom
 import { content } from '@shinobi/content';
 import { createState } from '@shinobi/core';
+import { flushSync } from 'svelte';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { coreUi } from '../src/lib/ext/core-ui.ts';
 import { ENTITY_PARTS, UI_PARTS } from '../src/lib/ext/parts.ts';
+import { APP_ICON_CREDIT } from '../src/lib/credits.ts';
+import { toasts } from '../src/lib/toasts.svelte.ts';
 import { game } from '../src/lib/store.ts';
 import { bootApp, genin, type BootedApp } from './helpers/boot-app.ts';
 import { coreRegistry } from './helpers/core-registry.ts';
@@ -145,6 +148,36 @@ describe('the built-in game through the registries', () => {
     await booted.go('#/nothing/here');
     expect(booted.target.querySelector('[data-ui="page"]')).toBeNull();
     expect(booted.target.textContent).toContain('Такої сторінки немає');
+  });
+});
+
+describe('sections registered by the built-in pack', () => {
+  it('shows the application section on the settings page in a plain browser', async () => {
+    booted = await bootApp([coreUi], genin(), '#/settings');
+    const section = booted.target.querySelector(
+      '[data-ui-widget="core:pwa"] [data-ui="pwa-section"]',
+    );
+    expect(section).not.toBeNull();
+    expect(section?.querySelector('[data-pwa-panel] h3')?.textContent).toBe('Застосунок');
+    expect(section?.querySelector('[data-pwa-version]')?.textContent).toMatch(/Версія .+ збірка/);
+    // Nothing to install or update in a browser tab that is not an installed app.
+    expect(section?.querySelector('[data-pwa-install]')).toBeNull();
+    expect(section?.querySelector('[data-pwa-apply]')).toBeNull();
+  });
+
+  it('credits the application icon on the credits page', async () => {
+    booted = await bootApp([coreUi], genin(), '#/credits');
+    const block = booted.target.querySelector('[data-app-icon-credit]');
+    expect(block?.textContent).toContain(APP_ICON_CREDIT.icon);
+    expect(block?.textContent).toContain(APP_ICON_CREDIT.author);
+    expect(block?.querySelector('a')?.getAttribute('href')).toBe(APP_ICON_CREDIT.url);
+  });
+
+  it('puts the toast part on toasts, and the persistent one keeps its alert role', async () => {
+    booted = await bootApp([coreUi]);
+    toasts.push({ key: 'toast.mod', params: { text: 'тост' } });
+    flushSync();
+    expect(booted.target.querySelector('[data-ui="toast"]')?.textContent).toContain('тост');
   });
 });
 

@@ -51,7 +51,7 @@
 
   .version {
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   button {
@@ -70,13 +70,13 @@
   }
 
   button:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
+    outline: var(--border-2) solid var(--accent);
+    outline-offset: var(--focus-offset);
   }
 
   @media (max-width: 768px) {
     button {
-      min-height: 2.75rem;
+      min-height: var(--control-size);
     }
   }
 </style>

@@ -21,8 +21,10 @@ import ShopPage from '../../pages/ShopPage.svelte';
 import SkillPage from '../../pages/SkillPage.svelte';
 import SkillsPage from '../../pages/SkillsPage.svelte';
 import TechniquePage from '../../pages/TechniquePage.svelte';
+import PwaSection from '../../components/PwaSection.svelte';
 import VillagePage from '../../pages/VillagePage.svelte';
 import WorldPage from '../../pages/WorldPage.svelte';
+import { svelteWidget } from './svelte-widget.ts';
 import type { UiPack } from './types.ts';
 
 /**
@@ -33,6 +35,9 @@ export const coreUi: UiPack = {
   id: 'core',
   theme: { id: 'base', name: 'theme.base', tokens: {} },
   setup(ui) {
+    // The «Застосунок» section of the settings page: install state, version, update.
+    ui.addWidget('settings', svelteWidget(PwaSection), { id: 'pwa', order: 10 });
+
     ui.addPage({ id: 'home', route: '#/', title: 'home.title', mount: { svelte: HomePage } });
     ui.addPage({
       id: 'skills',

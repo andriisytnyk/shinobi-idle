@@ -21,7 +21,7 @@ function walk(dir: string): string[] {
 const LENGTH = /(?<![\w-])(-?\d*\.?\d+)(px|rem|em)\b/g;
 
 /** Files that still hold literals: owned by a task that is under way. Remove an entry when it is converted. */
-const PENDING = new Set(['components/ToastHost.svelte']);
+const PENDING = new Set<string>();
 
 /** The CSS of a file: the `<style>` blocks of a component, or the whole stylesheet. */
 function cssOf(file: string, text: string): string {

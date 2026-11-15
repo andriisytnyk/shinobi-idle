@@ -49,6 +49,7 @@
       class="toast"
       data-toast={toast.key}
       data-toast-id={toast.id}
+      data-ui="toast"
       role={toast.persistent ? 'alert' : undefined}
     >
       <span>
@@ -90,17 +91,17 @@
     flex-wrap: wrap;
     gap: var(--space-1) var(--space-3);
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--font-size-0-85);
   }
 
   .more {
     align-self: flex-start;
     margin: 0;
     padding: 0 var(--space-2);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--surface-raised);
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--font-size-0-8);
     pointer-events: auto;
   }
 
@@ -109,11 +110,11 @@
     position: fixed;
     bottom: calc(var(--now-height) + var(--space-3));
     left: calc(var(--sidebar-width) + var(--space-4));
-    z-index: 20;
+    z-index: var(--z-toast);
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
-    width: min(22rem, calc(100vw - 2 * var(--space-4)));
+    width: min(var(--size-22), calc(100vw - 2 * var(--space-4)));
     pointer-events: none;
   }
 
@@ -136,7 +137,7 @@
 
   /* The control height of PwaPanel's buttons; tokens.css has no variable for it yet. */
   .toast {
-    --control-height: 2.75rem;
+    --control-height: var(--size-2-75);
   }
 
   button.action {
@@ -154,8 +155,8 @@
   }
 
   button:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
+    outline: var(--border-2) solid var(--accent);
+    outline-offset: var(--focus-offset);
   }
 
   button {
@@ -175,8 +176,8 @@
     button {
       align-items: center;
       justify-content: center;
-      min-width: 2.75rem;
-      min-height: 2.75rem;
+      min-width: var(--control-size);
+      min-height: var(--control-size);
     }
 
     /* On a phone they stay at the top, clear of the bottom sheet and its action row. */

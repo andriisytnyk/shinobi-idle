@@ -3,8 +3,7 @@
  * An element that represents an entity also carries `data-entity="<kind>:<id>"`, and one that
  * stands for a numbered place carries `data-slot-index`. With the slot names these are the
  * public contract for packs: `api.dom.observe({ part, kind?, id? }, …)` finds elements by them.
- * Adding a part is a compatible change; renaming one is not. The toast has no part yet: its
- * component belongs to another task that is under way.
+ * Adding a part is a compatible change; renaming one is not.
  */
 export const UI_PARTS = [
   /** The root of a page; `data-page` is the page's registry key. */
@@ -45,10 +44,14 @@ export const UI_PARTS = [
   /** A currency figure of the top bar. */
   'topbar-currency',
   'modal',
+  /** A toast of the toast host. */
+  'toast',
   /** The theme picker of the settings page. */
   'theme-select',
   /** The settings that packs registered. */
   'pack-settings',
+  /** The «Застосунок» section of the settings page. */
+  'pwa-section',
 ] as const;
 
 export type UiPart = (typeof UI_PARTS)[number];
