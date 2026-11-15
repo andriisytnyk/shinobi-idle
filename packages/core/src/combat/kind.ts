@@ -8,7 +8,7 @@ import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 import { ensurePouch, refillPouch } from './pouch.ts';
 import { isCombatKind, newCombat, newOperation } from './system.ts';
-import { entryOf, fightTarget, zoneRequirement } from './zones.ts';
+import { entryOf, fightTarget, zoneBlocked, zoneRequirement } from './zones.ts';
 
 /** One fight gives way to another: a fight or run already going in another slot stops. */
 function clearOthers(state: GameState, slot: number, content: ContentDb, rules: Rules): void {
@@ -40,7 +40,12 @@ export const fightKind: ActionKind = {
   requirements(_state, id, content): Req | null {
     // An enemy id is gated like the zone that holds the enemy.
     const zone = indexOf(content).zones.get(id) ?? indexOf(content).zoneByEnemy.get(id);
-    return zone ? zoneRequirement(zone, content) : null;
+    return zone ? zoneRequirement(zone) : null;
+  },
+  // A region zone is fought only once its cell has been explored.
+  blocked(state, id, content) {
+    const zone = indexOf(content).zones.get(id) ?? indexOf(content).zoneByEnemy.get(id);
+    return zone ? zoneBlocked(state, zone, content) : null;
   },
   intervalMs: (_state, _id, content) => content.balance.K.combat.xpTickMs,
 

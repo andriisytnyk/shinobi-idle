@@ -1,6 +1,6 @@
 import type { Boss, ContentDb, Enemy, Operation } from '@shinobi/content';
 import { stopSlot } from '../actions.ts';
-import { bump, defeatsKey, killsKey, studiedKey } from '../counters.ts';
+import { bump, defeatsKey, killsKey } from '../counters.ts';
 import { emit } from '../events.ts';
 import { MS_PER_HOUR } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
@@ -11,6 +11,10 @@ import type { GameState } from '../state.ts';
 import type { System } from '../system.ts';
 import { encounterFor } from './fight-encounter.ts';
 import { bossNature } from '../natures.ts';
+import { noteFight, noteSighting } from './bingo.ts';
+import { grantLoot, rollLoot } from './loot.ts';
+import { recordFight, recordItems, recordLoot, recordWounds, stampDefeat } from './report.ts';
+import { payOperation } from './rewards.ts';
 import { createFight, fightAdvance, fightNextEventIn, fightOutcome } from './fight.ts';
 import { secMs } from './numbers.ts';
 import { refillPouch, syncPouch } from './pouch.ts';
@@ -50,7 +54,7 @@ function startFight(
   rules: Rules,
   pools?: Pools,
 ): CombatState['fight'] {
-  state.seen[entry.id] = true;
+  noteSighting(state, entry.id, content);
   const snapshot = snapshotPlayer(state, content, rules, pools, [entry.id]);
   // The fight gets its own seed from the game's combat stream and runs on a stream of its own.
   return createFight(
@@ -151,11 +155,36 @@ function report(state: GameState, c: CombatState): void {
 }
 
 /** The Wounds a finished fight costs: the stances it used, and falling low in a won fight; items then shorten the healing. */
-function woundsAfter(state: GameState, c: CombatState, content: ContentDb, lost: boolean): void {
+function woundsAfter(
+  state: GameState,
+  c: CombatState,
+  content: ContentDb,
+  lost: boolean,
+  key: string,
+): void {
   const tally = c.fight.tally;
   const low = c.fight.player.data.low === 1 && !lost ? 1 : 0;
-  addWounds(state, (lost ? 1 : 0) + low + tally.wounds, content);
+  const n = (lost ? 1 : 0) + low + tally.wounds;
+  addWounds(state, n, content);
+  recordWounds(state, key, n);
   if (tally.woundMin > 0) shortenWounds(state, tally.woundMin, content);
+}
+
+/** The id the battle report of the running fight is filed under: the zone, enemy or operation the slot holds. */
+function reportKey(state: GameState, index: number): string {
+  return state.slots[index]?.action?.id ?? '';
+}
+
+/** Copies the fight's pouch to the state and returns the units it used since the last copy. */
+function syncAndCount(state: GameState, c: CombatState): Record<string, number> {
+  const before = state.pouch.slots.map((s) => s.n);
+  syncPouch(state, c.fight);
+  const used: Record<string, number> = {};
+  state.pouch.slots.forEach((s, i) => {
+    const spent = (before[i] ?? 0) - s.n;
+    if (spent > 0 && s.id !== '') used[s.id] = (used[s.id] ?? 0) + spent;
+  });
+  return used;
 }
 
 /** The player recovers a share of health and both pools. */
@@ -166,11 +195,12 @@ function recover(player: CombatState['fight']['player'], share: number): void {
 }
 
 /** An operation was finished: its first-clear flag is raised and the event the rewards will hang on is sent. */
-function cleared(state: GameState, op: Operation): void {
+function cleared(state: GameState, op: Operation, content: ContentDb): void {
   const first = state.flags[op.clearFlag] === undefined;
   state.flags[op.clearFlag] = true;
   bump(state, `ops.${op.id}`);
   emit(state, { type: 'operationCleared', op: op.id, first });
+  payOperation(state, op, first, content);
 }
 
 /**
@@ -179,7 +209,7 @@ function cleared(state: GameState, op: Operation): void {
  * share, the pouch is not refilled and the next step's enemy comes. Returns true when the
  * operation is over.
  */
-function victory(state: GameState, c: CombatState, content: ContentDb): boolean {
+function victory(state: GameState, c: CombatState, content: ContentDb, key: string): boolean {
   const K = content.balance.K;
   const player = c.fight.player;
   c.phase = 'respawn';
@@ -188,7 +218,17 @@ function victory(state: GameState, c: CombatState, content: ContentDb): boolean 
   c.carry += c.fight.t - c.fight.tally.lastUseAt + c.pause;
   bump(state, killsKey(c.enemy));
   emit(state, { type: 'enemyDefeated', enemy: c.enemy });
-  woundsAfter(state, c, content, false);
+  // Loot is rolled before the book counts the win, so the first win pays the full bounty. A
+  // fight that ended with an enemy leaving counts as won.
+  const fallen = entryOf(content, c.enemy);
+  if (fallen) {
+    const loot = rollLoot(state, fallen);
+    grantLoot(state, c.enemy, loot);
+    recordLoot(state, key, loot);
+  }
+  noteFight(state, c.enemy, 'win', content);
+  recordFight(state, key, c.fight, 'win', content);
+  woundsAfter(state, c, content, false, key);
   if (!c.run) {
     player.hp = Math.min(player.maxHp, player.hp + K.zoneHpRegen * player.maxHp);
     player.chakra = player.maxChakra;
@@ -202,7 +242,7 @@ function victory(state: GameState, c: CombatState, content: ContentDb): boolean 
   c.run.step++;
   const next = enemyOfStep(state, opSteps(op)[c.run.step]);
   if (next === null) {
-    cleared(state, op);
+    cleared(state, op, content);
     return true;
   }
   c.enemy = next;
@@ -262,14 +302,15 @@ export const combatSystem: System = {
       }
       c.work = fightAdvance(c.fight, c.work, content, rules);
       settle(state, c, content, rules);
-      syncPouch(state, c.fight);
+      const key = reportKey(state, index);
+      recordItems(state, key, syncAndCount(state, c));
       report(state, c);
       const result = fightOutcome(c.fight);
       if (result === 'ongoing') return;
       if (result === 'timeout') {
         // A fight that ran out of time pays nothing and costs nothing: a new one starts at once.
-        // The player watched the whole fight, so the enemy is known now.
-        bump(state, studiedKey(c.enemy));
+        noteFight(state, c.enemy, 'timeout', content);
+        recordFight(state, key, c.fight, 'timeout', content);
         c.carry += c.fight.t - c.fight.tally.lastUseAt;
         const p = c.fight.player;
         c.fight = startFight(state, entry, content, rules, {
@@ -283,11 +324,15 @@ export const combatSystem: System = {
       if (result === 'defeat') {
         emit(state, { type: 'playerDefeated', enemy: c.enemy });
         bump(state, defeatsKey(c.enemy));
-        woundsAfter(state, c, content, true);
+        noteFight(state, c.enemy, 'loss', content);
+        recordFight(state, key, c.fight, 'loss', content);
+        stampDefeat(state, key);
+        woundsAfter(state, c, content, true, key);
         // A defeat ends an operation run with the action: nothing of it is kept.
         return stopSlot(state, index, 'defeated', content, rules);
       }
-      if (victory(state, c, content)) return stopSlot(state, index, 'finished', content, rules);
+      if (victory(state, c, content, key))
+        return stopSlot(state, index, 'finished', content, rules);
     }
   },
 };

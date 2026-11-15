@@ -60,6 +60,29 @@ export interface CombatLogEvent extends EventBase {
   /** Damage dealt by a hit; 0 otherwise. */
   dmg: number;
 }
+/** What a win paid: ryo, the bounty of a boss, trophies and scroll parts. */
+export interface LootEvent extends EventBase {
+  type: 'loot';
+  enemy: string;
+  ryo: number;
+  bounty: number;
+  items: { id: string; n: number }[];
+}
+/** The Bingo book raised the knowledge level of an enemy. */
+export interface BingoLevelEvent extends EventBase {
+  type: 'bingoLevel';
+  enemy: string;
+  level: number;
+}
+/** A cleared operation paid its rewards. */
+export interface OperationPaidEvent extends EventBase {
+  type: 'operationPaid';
+  op: string;
+  first: boolean;
+  ryo: number;
+  rep: number;
+  items: { id: string; n: number }[];
+}
 /** An operation was finished; `first` is true the first time. The rewards of a clear hang on this. */
 export interface OperationClearedEvent extends EventBase {
   type: 'operationCleared';
@@ -162,6 +185,9 @@ export type GameEvent =
   | PlayerDefeatedEvent
   | CombatLogEvent
   | OperationClearedEvent
+  | OperationPaidEvent
+  | LootEvent
+  | BingoLevelEvent
   | QuestStepEvent
   | QuestDoneEvent
   | RankUpEvent

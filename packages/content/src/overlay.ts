@@ -52,7 +52,7 @@ export const bossSpecialMapSchema = z.record(coreId, bossSpecialSchema);
 /** The economy fields of an item that the generated data does not know. */
 export const itemEconMapSchema = z.record(
   coreId,
-  itemSchema.pick({ buy: true, sell: true, pouch: true, medic: true }),
+  itemSchema.pick({ buy: true, sell: true, pouch: true, medic: true, use: true }),
 );
 
 type TechniqueBase = z.infer<typeof techniqueBaseSchema>;
@@ -125,6 +125,8 @@ export const coatListSchema = z.array(coatSchema);
 
 /** The building id of the Market; its goods are listed in the generated market table. */
 const MARKET = 'core:market';
+/** The building id of the Library, which supplies the scrolls of its levels. */
+const LIBRARY = 'core:library';
 
 /** Adds the extra requirement of each herb; `null` when it has none. */
 export function layerHerbs(base: HerbBase[], reqs: z.infer<typeof herbReqMapSchema>) {
@@ -148,6 +150,10 @@ export function layerGear(base: GearBase[], fx: z.infer<typeof gearFxMapSchema>)
 export function layerShop(
   market: MarketEntry[],
   tools: z.infer<typeof shopToolsSchema>,
+  scrolls: readonly {
+    id: string;
+    scroll?: { source: { t: string; level?: number } } | undefined;
+  }[] = [],
 ): ShopEntry[] {
   const entry = (item: string, building: { id: string; level: number }): ShopEntry => ({
     item,
@@ -162,6 +168,12 @@ export function layerShop(
   return [
     ...market.map((m) => entry(m.item, { id: MARKET, level: m.marketLevel })),
     ...tools.map((t) => entry(t.item, t.building)),
+    // A library scroll is sold once the Library has reached its level.
+    ...scrolls.flatMap((i) =>
+      i.scroll?.source.t === 'library' && i.scroll.source.level !== undefined
+        ? [entry(i.id, { id: LIBRARY, level: i.scroll.source.level })]
+        : [],
+    ),
   ];
 }
 

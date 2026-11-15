@@ -566,14 +566,21 @@
       "guardBelow": 0.6
     },
     "woundHp": 0.1,
-    "regionZones": {
-      "openFromRank": "genin",
-      "regions": [
-        "forest",
-        "plains",
-        "valley",
-        "exam"
-      ]
+    "bingo": {
+      "studiedWins": {
+        "enemy": 25,
+        "boss": 3
+      }
+    },
+    "analysis": {
+      "samples": 1000,
+      "opSamples": 300,
+      "seed": 7,
+      "budgetMs": 3000,
+      "hintOptions": 3
+    },
+    "report": {
+      "defeats": 5
     },
     "operation": {
       "approachMs": 30000,

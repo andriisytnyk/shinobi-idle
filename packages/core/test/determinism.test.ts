@@ -256,7 +256,7 @@ describe('A12: saves', () => {
     const loaded = deserialize(serialize(state, 0), content);
     expect(loaded.combat?.run).toEqual(state.combat?.run);
     expect(loaded.slots[0]?.action).toEqual({ kind: 'operation', id: 'core:op_hideout' });
-    expect(loaded.seen['core:guard_pack']).toBe(true);
+    expect(loaded.bingo['core:guard_pack']?.seen).toBeGreaterThanOrEqual(1);
   });
 
   for (const boss of content.bosses) {
@@ -288,7 +288,7 @@ describe('A12: saves', () => {
   });
 
   it('migrates a version 9 save: the new branches appear, a fight in progress starts over', () => {
-    expect(STATE_VERSION).toBe(10);
+    expect(STATE_VERSION).toBe(11);
     expect(MIGRATIONS).toHaveLength(STATE_VERSION - 1);
     const state = fighter(54, 36, 'katon');
     dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: 'core:bandit' }, content);
@@ -309,16 +309,16 @@ describe('A12: saves', () => {
       style: 'tai',
     };
     const loaded = deserialize(JSON.stringify(raw), content);
-    expect(loaded.v).toBe(10);
+    expect(loaded.v).toBe(11);
     expect(loaded.wounds).toEqual({ stacks: 0, left: 0 });
     expect(loaded.pouch.slots).toHaveLength(3);
-    expect(loaded.seen['core:bandit']).toBe(true);
+    expect(loaded.bingo['core:bandit']?.seen).toBeGreaterThanOrEqual(1);
     expect(loaded.loadouts.auto).toBe(true);
     expect(loaded.loadouts.active.length).toBeGreaterThan(0);
     expect(loaded.combat?.enemy).toBe('core:bandit');
     expect(loaded.combat?.fight.t).toBe(0);
     advance(loaded, 5000, content);
-    expect(createState(1, content).v).toBe(10);
+    expect(createState(1, content).v).toBe(11);
   });
 
   it('cleans a doctored loadout, pouch and wound state on load', () => {

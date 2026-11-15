@@ -11,7 +11,12 @@ const isCount = (n: unknown): n is number =>
 
 /** Buy price of one unit, or null when the item has no price (it is not for sale). */
 export function buyPrice(itemId: string, content: ContentDb): number | null {
-  const key = indexOf(content).items.get(itemId)?.buy;
+  const item = indexOf(content).items.get(itemId);
+  // A library scroll costs what its level in the scroll table says.
+  if (item?.scroll?.source.t === 'library') {
+    return content.balance.K.scroll[String(item.scroll.source.level)] ?? null;
+  }
+  const key = item?.buy;
   return key === undefined ? null : (content.balance.K.goods[key] ?? null);
 }
 

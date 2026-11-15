@@ -1,12 +1,11 @@
 import type { ContentDb, SkillId } from '@shinobi/content';
-import { defeatsKey, killsKey, studiedKey } from '../counters.ts';
 import { masteryLevel } from '../formulas.ts';
-import { indexOf } from '../lookup.ts';
 import { computeMods } from '../modifiers.ts';
 import { RANK_ORDER, skillLevel } from '../requirements.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 import type { Levels, PlayerSnapshot } from './numbers.ts';
+import { knowledgeOf } from './bingo.ts';
 import { effectiveLoadout } from './loadout.ts';
 import { medicTier } from './pouch.ts';
 
@@ -15,38 +14,6 @@ export function levelsOf(state: GameState, content: ContentDb): Levels {
   const levels = {} as Record<SkillId, number>;
   for (const skill of content.skills) levels[skill.id] = skillLevel(state, skill.id, content);
   return levels;
-}
-
-/**
- * What the player knows of each enemy entry, as trait ids: nothing before the first sight, the
- * openly visible traits once seen, and every trait and the mechanic of a boss once beaten
- * (`special`). The counters and `state.seen` are what the Bingo book will later be read from.
- */
-export function knowledgeOf(
-  state: GameState,
-  content: ContentDb,
-  entries: readonly string[],
-): Record<string, string[]> {
-  const index = indexOf(content);
-  const visible: readonly string[] = content.ai.visibleTraits;
-  const out: Record<string, string[]> = {};
-  for (const id of entries) {
-    const entry = index.enemies.get(id) ?? index.bosses.get(id);
-    if (!entry) continue;
-    // Losing to an enemy teaches as much as beating it: the player has seen it all.
-    // Beating an enemy, losing to it or watching a fight with it to the time cap teaches the player
-    // all of it, hidden traits and mechanic included. A fight stopped early teaches nothing more
-    // than the first sight.
-    const beaten =
-      (state.counters[killsKey(id)] ?? 0) +
-        (state.counters[defeatsKey(id)] ?? 0) +
-        (state.counters[studiedKey(id)] ?? 0) >
-      0;
-    if (beaten) out[id] = [...entry.traits, 'special'];
-    else if (state.seen[id]) out[id] = entry.traits.filter((t) => visible.includes(t));
-    else out[id] = [];
-  }
-  return out;
 }
 
 /** The numbers every part of the player's planning reads: levels, masteries, techniques, natures, rank. Costs are not modified. */

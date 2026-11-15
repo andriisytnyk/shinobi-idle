@@ -8,7 +8,9 @@ import {
 import { rebalanceShares } from './actions.ts';
 import { COURSE_ID, COURSE_KIND } from './athletics.ts';
 import { tonicCharges } from './buffs.ts';
+import { BINGO_MAX } from './combat/bingo.ts';
 import { parseFight } from './combat/fight-parse.ts';
+import { parseReport } from './combat/report.ts';
 import { secMs } from './combat/numbers.ts';
 import { pouchUse } from './combat/fight-items.ts';
 import { loadoutLimits, syncLoadout } from './combat/loadout.ts';
@@ -122,6 +124,34 @@ export const MIGRATIONS: readonly Migration[] = [
       wounds: { stacks: 0, left: 0 },
       seen: {},
     };
+  },
+  // v10 -> v11: the Bingo book replaces `seen`; battle reports start empty. An entry the old rule
+  // counted as beaten (a win, a defeat or a watched fight) keeps its knowledge as a bought level 2.
+  (state) => {
+    const seen = isRecord(state.seen) ? state.seen : {};
+    const counters = isRecord(state.counters) ? state.counters : {};
+    const bingo: Record<string, unknown> = {};
+    const ids = new Set<string>(Object.keys(seen));
+    for (const key of Object.keys(counters)) {
+      const m = /^(?:kills|defeats|studied)\.(.+)$/.exec(key);
+      if (m?.[1]) ids.add(m[1]);
+    }
+    for (const id of ids) {
+      const wins = nonNegative(counters[`kills.${id}`]);
+      const losses = nonNegative(counters[`defeats.${id}`]);
+      const timeouts = nonNegative(counters[`studied.${id}`]);
+      bingo[id] = {
+        seen: Math.max(1, wins + losses + timeouts),
+        wins,
+        losses,
+        timeouts,
+        bought: wins + losses + timeouts > 0 ? 2 : 0,
+        bounty: 0,
+      };
+    }
+    const { seen: _seen, ...rest } = state;
+    void _seen;
+    return { ...rest, bingo, report: {} };
   },
 ];
 
@@ -477,8 +507,22 @@ export function deserialize(
           : 0,
     };
   }
-  state.seen = pick(raw.seen, (key, v) =>
-    v === true && entryOf(content, key) ? (true as const) : undefined,
+  state.bingo = pick(raw.bingo, (key, v) => {
+    if (!entryOf(content, key) || !isRecord(v)) return undefined;
+    const n = (x: unknown): number => Math.floor(nonNegative(x));
+    return {
+      seen: n(v.seen),
+      wins: n(v.wins),
+      losses: n(v.losses),
+      timeouts: n(v.timeouts),
+      bought: Math.min(BINGO_MAX, n(v.bought)),
+      bounty: n(v.bounty),
+    };
+  });
+  state.report = pick(raw.report, (key, v) =>
+    index.zones.has(key) || index.operations.has(key) || entryOf(content, key)
+      ? (parseReport(v, content) ?? undefined)
+      : undefined,
   );
   if (Array.isArray(raw.slots) && raw.slots.length > 0) {
     state.slots = [];

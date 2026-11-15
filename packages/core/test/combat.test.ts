@@ -17,7 +17,7 @@ import {
   defaultRules,
   type GameState,
 } from '../src/index.ts';
-import { HOUR, genin, setLevel } from './helpers.ts';
+import { HOUR, genin, openWorld, setLevel } from './helpers.ts';
 
 const DUMMY = 'core:dummy';
 const fight = (id = DUMMY) => ({ type: 'action.start', slot: 0, kind: 'fight', id }) as const;
@@ -146,6 +146,7 @@ describe('fight action', () => {
   it('stops with a defeated event when the player falls', () => {
     const state = createState(4, content);
     state.player.rank = 'genin';
+    openWorld(state);
     const boss = content.enemies.reduce((a, b) => (a.cl > b.cl ? a : b));
     dispatch(state, fight(boss.id), content);
     advance(state, 10 * 60 * 1000, content);
@@ -168,9 +169,9 @@ describe('fight action', () => {
     expect(state.counters['actions.fight']).toBeGreaterThan(200);
   });
 
-  it('uses only the combat stream', () => {
+  it('uses only the combat and loot streams', () => {
     const state = createState(6, content);
-    const others = (s: GameState) => JSON.stringify([s.rng.action, s.rng.loot, s.rng.world]);
+    const others = (s: GameState) => JSON.stringify([s.rng.action, s.rng.world]);
     const before = others(state);
     const combatBefore = JSON.stringify(state.rng.combat);
     dispatch(state, fight(), content);

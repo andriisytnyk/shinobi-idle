@@ -200,10 +200,11 @@ export const poolCheckpointSchema = poolCheckpointBaseSchema.extend({
 export const ingredientRef = z.object({ item: coreId, n: z.number().int().min(1) });
 
 /** One hour of practice for a chosen technique of the given mentor. */
-export const itemUseSchema = z.strictObject({
-  t: z.literal('masteryHour'),
-  mentor: z.enum(['academy', 'other']),
-});
+export const itemUseSchema = z.discriminatedUnion('t', [
+  z.strictObject({ t: z.literal('masteryHour'), mentor: z.enum(['academy', 'other']) }),
+  /** Notes: one hour of practice for a technique the player already knows, chosen by the player. */
+  z.strictObject({ t: z.literal('notes') }),
+]);
 
 /** Combat stats a bomb can change. */
 export const BOMB_STATS = ['evasion', 'accuracy'] as const;
@@ -645,6 +646,17 @@ export const operationStageSchema = z.discriminatedUnion('t', [
   }),
 ]);
 
+/** One clear's pay: ryo, reputation and scroll parts (each a chance given by a key of `K.partDrop`). */
+const operationPaySchema = z.strictObject({
+  ryo: z.number().int().min(0),
+  rep: z.number().int().min(0),
+  parts: z.array(z.strictObject({ technique: coreId, chance: z.enum(['mission']) })),
+});
+export const operationRewardsSchema = z.strictObject({
+  first: operationPaySchema,
+  repeat: operationPaySchema,
+});
+
 /** A series of fights with partial recovery between them (`K.opRegen`). */
 export const operationSchema = z.strictObject({
   id: coreId,
@@ -653,6 +665,8 @@ export const operationSchema = z.strictObject({
   clearFlag: z.string().min(1),
   /** Key of the recovery share between fights in the balance object. */
   regen: z.literal('opRegen'),
+  /** What a clear pays: the first time, and on every repeat; `null` for an operation whose rewards come from elsewhere. */
+  rewards: operationRewardsSchema.nullable(),
   stages: z.array(operationStageSchema).min(1),
 });
 
@@ -984,10 +998,24 @@ export const balanceParamsSchema = z.object({
   pouch: z.object({ slots: z.number().int(), vest: z.number().int(), vestRank: playerRankId }),
   ai: z.object({ geninReactionMs: z.number().int(), guardBelow: z.number() }),
   woundHp: z.number(),
-  regionZones: z.object({
-    openFromRank: z.union([playerRankId, z.literal('off')]),
-    regions: z.array(z.string()),
+  /**
+   * The Bingo book: wins that study an enemy completely, for an ordinary enemy and for a boss.
+   */
+  bingo: z.object({ studiedWins: z.object({ enemy: z.number().int(), boss: z.number().int() }) }),
+  /**
+   * Battle analysis: fights per run of a zone or boss and runs of an operation, the seed of the
+   * run (it never touches the game's streams), the time budget in ms a default run must keep to,
+   * and the most options one hint lists.
+   */
+  analysis: z.object({
+    samples: z.number().int().min(1),
+    opSamples: z.number().int().min(1),
+    seed: z.number().int(),
+    budgetMs: z.number().int(),
+    hintOptions: z.number().int().min(1),
   }),
+  /** Battle report: how many of the latest defeats a report keeps. */
+  report: z.object({ defeats: z.number().int().min(1) }),
   operation: z.object({ approachMs: z.number().int(), approachShort: z.number() }),
   toolFx: z.object({ dot: z.object({ pct: z.number(), durS: z.number() }), resist: z.number() }),
   illusionResist: z.number(),

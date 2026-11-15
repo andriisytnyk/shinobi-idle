@@ -163,8 +163,12 @@ export const BALANCE_EXT = {
   ai: { geninReactionMs: 1000, guardBelow: 0.6 },
   /** Health share below which a won fight still costs a Wound. */
   woundHp: 0.1,
-  /** Until exploration gives real flags, every region zone is open from this rank. */
-  regionZones: { openFromRank: 'genin', regions: ['forest', 'plains', 'valley', 'exam'] },
+  /** The Bingo book: wins that fully study an ordinary enemy and a boss. */
+  bingo: { studiedWins: { enemy: 25, boss: 3 } },
+  /** Battle analysis: fights per zone or boss run, runs per operation, the seed, the time budget (ms) of a default run, and the options a hint lists. */
+  analysis: { samples: 1000, opSamples: 300, seed: 7, budgetMs: 3000, hintOptions: 3 },
+  /** Battle report: the latest defeats it keeps. */
+  report: { defeats: 5 },
   /** Operations: ms of the approach stage, and its share when the shortening requirement holds. */
   operation: { approachMs: 30000, approachShort: 0.5 },
   /** Numbers of tools that the item data does not carry: the poisoned senbon's damage over time (share of maximum health per second, seconds), and the damage multiplier of a burn ointment against the nature it names. */

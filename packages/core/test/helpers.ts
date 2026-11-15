@@ -3,9 +3,12 @@ import {
   createState,
   defaultRules,
   gearProvider,
+  poiFlag,
+  refreshRegions,
   teamFor,
   tonicProvider,
   xpAt,
+  zoneCellOf,
   type GameState,
   type Rules,
 } from '../src/index.ts';
@@ -13,10 +16,41 @@ import type { NatureId, SkillId } from '@shinobi/content';
 
 export const HOUR = 3_600_000;
 
+/** Opens the regions and explores every cell that holds a fight zone to level 1, as a played game would have. */
+export function openWorld(state: GameState): void {
+  // The region flags follow from rank and Scouting (a save recomputes them), so the Scouting level is raised to open every region.
+  const top = Math.max(...content.regions.map((r) => r.scout));
+  if (state.skills.scout.xp < xpAt(top)) state.skills.scout.xp = xpAt(top);
+  refreshRegions(state, content, true);
+  // The Forest of Death zones belong to the exam chain, which raises their flag.
+  state.flags['region.exam.unlocked'] = true;
+  for (const zone of content.zones) {
+    const cell = zoneCellOf(zone.id, content);
+    if (cell) {
+      state.world.explores[cell] = Math.max(
+        state.world.explores[cell] ?? 0,
+        content.balance.K.cellExplores[0] ?? 1,
+      );
+      // Level 1 finds the points of the cell, as exploring would have.
+      for (const poi of content.cells.find((c) => c.id === cell)?.pois ?? []) {
+        state.world.pois[poi.id] = true;
+        state.flags[poiFlag(poi.id)] = true;
+      }
+    }
+  }
+}
+
 /** A genin, so the Academy slowdown stays out of the way. */
 export function genin(seed = 1): GameState {
   const state = createState(seed, content);
   state.player.rank = 'genin';
+  return state;
+}
+
+/** A genin who can fight in any zone: the regions are open and the zone cells explored. */
+export function fightingGenin(seed = 1): GameState {
+  const state = genin(seed);
+  openWorld(state);
   return state;
 }
 

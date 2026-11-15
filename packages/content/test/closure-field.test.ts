@@ -94,7 +94,13 @@ describe('A10: every ingredient is obtainable', () => {
 describe('A10: shops and prices', () => {
   it('every shop item has a price in the balance goods table', () => {
     for (const s of content.shop) {
-      const key = items.get(s.item)?.buy;
+      const item = items.get(s.item);
+      // A library scroll is priced by the level of its source in `K.scroll`.
+      if (item?.scroll?.source.t === 'library') {
+        expect(K.scroll[String(item.scroll.source.level)], `${s.item}: scroll`).toBeGreaterThan(0);
+        continue;
+      }
+      const key = item?.buy;
       expect(key, `${s.item}: buy key`).toBeDefined();
       expect(K.goods[key ?? ''], `${s.item}: price`).toBeGreaterThan(0);
     }

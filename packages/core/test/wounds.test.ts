@@ -16,7 +16,7 @@ import {
   woundIntervalMs,
 } from '../src/index.ts';
 import { K, enemyAt, playerFor, scripted, rules } from './fight-helpers.ts';
-import { genin, setLevel } from './helpers.ts';
+import { fightingGenin as genin, setLevel } from './helpers.ts';
 import { fighter, ids, run, startFight, stock } from './prep-state.ts';
 
 const MINUTE = 60_000;

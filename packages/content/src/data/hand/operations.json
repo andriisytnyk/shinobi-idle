@@ -7,6 +7,23 @@
     },
     "clearFlag": "op.hideout.cleared",
     "regen": "opRegen",
+    "rewards": {
+      "first": {
+        "ryo": 1500,
+        "rep": 40,
+        "parts": []
+      },
+      "repeat": {
+        "ryo": 0,
+        "rep": 0,
+        "parts": [
+          {
+            "technique": "core:water_prison",
+            "chance": "mission"
+          }
+        ]
+      }
+    },
     "stages": [
       {
         "t": "approach",
@@ -38,6 +55,7 @@
     },
     "clearFlag": "op.forest_of_death.cleared",
     "regen": "opRegen",
+    "rewards": null,
     "stages": [
       {
         "t": "days",

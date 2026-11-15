@@ -122,7 +122,10 @@ export const content: ContentDb = contentDbSchema.parse({
     ...(itemFx[i.id] ? { fx: itemFx[i.id] } : {}),
   })),
   market,
-  shop: layerShop(z.array(marketEntrySchema).parse(market), shopToolsSchema.parse(handShopTools)),
+  shop: layerShop(z.array(marketEntrySchema).parse(market), shopToolsSchema.parse(handShopTools), [
+    ...items,
+    ...handItems,
+  ]),
   coat: coatListSchema.parse(handCoat),
   recipes,
   missions,
