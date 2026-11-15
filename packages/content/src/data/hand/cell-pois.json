@@ -1,0 +1,327 @@
+{
+  "core:okolytsi_sela": [
+    {
+      "id": "core:poi_okolytsi_sela_outpost",
+      "kind": "outpost"
+    }
+  ],
+  "core:zharyshche_skladu": [
+    {
+      "id": "core:poi_zharyshche_skladu_story",
+      "kind": "story"
+    }
+  ],
+  "core:uzlissia": [
+    {
+      "id": "core:poi_uzlissia_zone_bandit",
+      "kind": "zone",
+      "zone": "core:zone_bandit"
+    },
+    {
+      "id": "core:poi_uzlissia_zone_arsonist",
+      "kind": "zone",
+      "zone": "core:zone_arsonist"
+    }
+  ],
+  "core:polihon_44_lis_smerti": [
+    {
+      "id": "core:poi_polihon_44_lis_smerti_training",
+      "kind": "training",
+      "skill": "herb",
+      "bonus": 0.1
+    },
+    {
+      "id": "core:poi_polihon_44_lis_smerti_zone_centipede",
+      "kind": "zone",
+      "zone": "core:zone_centipede"
+    },
+    {
+      "id": "core:poi_polihon_44_lis_smerti_zone_tiger",
+      "kind": "zone",
+      "zone": "core:zone_tiger"
+    }
+  ],
+  "core:prykordonnyi_lis_okolytsia": [
+    {
+      "id": "core:poi_prykordonnyi_lis_okolytsia_zone_wolf",
+      "kind": "zone",
+      "zone": "core:zone_wolf"
+    }
+  ],
+  "core:prykordonnyi_lis_khashchi": [
+    {
+      "id": "core:poi_prykordonnyi_lis_khashchi_zone_wolfmask",
+      "kind": "zone",
+      "zone": "core:zone_wolfmask"
+    }
+  ],
+  "core:prykordonnyi_lis_brid": [
+    {
+      "id": "core:poi_prykordonnyi_lis_brid_story",
+      "kind": "story"
+    }
+  ],
+  "core:skelia_nad_vodospadom": [
+    {
+      "id": "core:poi_skelia_nad_vodospadom_story",
+      "kind": "story"
+    }
+  ],
+  "core:ternovi_zarosti": [
+    {
+      "id": "core:poi_ternovi_zarosti_deposit",
+      "kind": "deposit",
+      "building": "core:sawmill"
+    },
+    {
+      "id": "core:poi_ternovi_zarosti_cache",
+      "kind": "cache",
+      "items": [],
+      "ryo": 150
+    }
+  ],
+  "core:lisove_ozero": [
+    {
+      "id": "core:poi_lisove_ozero_deposit",
+      "kind": "deposit",
+      "building": "core:hunt"
+    }
+  ],
+  "core:pivdennyi_trakt": [
+    {
+      "id": "core:poi_pivdennyi_trakt_outpost",
+      "kind": "outpost"
+    }
+  ],
+  "core:mistechko_na_rivnynakh": [
+    {
+      "id": "core:poi_mistechko_na_rivnynakh_mission_well",
+      "kind": "mission",
+      "mission": "core:well"
+    }
+  ],
+  "core:khram_vohniu": [
+    {
+      "id": "core:poi_khram_vohniu_training",
+      "kind": "training",
+      "skill": "katon",
+      "bonus": 0.1
+    }
+  ],
+  "core:karavannyi_shliakh": [
+    {
+      "id": "core:poi_karavannyi_shliakh_zone_merc_pack",
+      "kind": "zone",
+      "zone": "core:zone_merc_pack"
+    },
+    {
+      "id": "core:poi_karavannyi_shliakh_zone_suna",
+      "kind": "zone",
+      "zone": "core:zone_suna"
+    }
+  ],
+  "core:tabir_naimantsiv": [
+    {
+      "id": "core:poi_tabir_naimantsiv_zone_heavy",
+      "kind": "zone",
+      "zone": "core:zone_heavy"
+    },
+    {
+      "id": "core:poi_tabir_naimantsiv_zone_kumo",
+      "kind": "zone",
+      "zone": "core:zone_kumo"
+    }
+  ],
+  "core:sukhe_richyshche": [
+    {
+      "id": "core:poi_sukhe_richyshche_zone_poisoner",
+      "kind": "zone",
+      "zone": "core:zone_poisoner"
+    }
+  ],
+  "core:ruiny_prykordonnoi_fortetsi": [
+    {
+      "id": "core:poi_ruiny_prykordonnoi_fortetsi_story",
+      "kind": "story"
+    },
+    {
+      "id": "core:poi_ruiny_prykordonnoi_fortetsi_mission_dig",
+      "kind": "mission",
+      "mission": "core:dig"
+    }
+  ],
+  "core:skhovyshche_fortetsi": [
+    {
+      "id": "core:poi_skhovyshche_fortetsi_vault",
+      "kind": "vault",
+      "item": "core:scroll_fire_dragon_flame_bullet"
+    }
+  ],
+  "core:soliani_kopalni": [
+    {
+      "id": "core:poi_soliani_kopalni_deposit",
+      "kind": "deposit",
+      "building": "core:mine"
+    }
+  ],
+  "core:stepovi_zarosti": [
+    {
+      "id": "core:poi_stepovi_zarosti_cache",
+      "kind": "cache",
+      "items": [
+        {
+          "item": "core:band",
+          "n": 3
+        },
+        {
+          "item": "core:notes",
+          "n": 2
+        }
+      ],
+      "ryo": 0
+    }
+  ],
+  "core:kamiani_pahorby": [
+    {
+      "id": "core:poi_kamiani_pahorby_deposit",
+      "kind": "deposit",
+      "building": "core:mine"
+    }
+  ],
+  "core:pokynutyi_khutir": [
+    {
+      "id": "core:poi_pokynutyi_khutir_zone_marauder",
+      "kind": "zone",
+      "zone": "core:zone_marauder"
+    }
+  ],
+  "core:pivnichnyi_trakt": [
+    {
+      "id": "core:poi_pivnichnyi_trakt_outpost",
+      "kind": "outpost"
+    }
+  ],
+  "core:statui_zasnovnykiv": [
+    {
+      "id": "core:poi_statui_zasnovnykiv_training",
+      "kind": "training",
+      "skill": "tai",
+      "bonus": 0.1
+    }
+  ],
+  "core:bereh_riky": [
+    {
+      "id": "core:poi_bereh_riky_zone_hunter",
+      "kind": "zone",
+      "zone": "core:zone_hunter"
+    },
+    {
+      "id": "core:poi_bereh_riky_zone_hunter_caster",
+      "kind": "zone",
+      "zone": "core:zone_hunter_caster"
+    }
+  ],
+  "core:stezhka_myslyvtsia": [
+    {
+      "id": "core:poi_stezhka_myslyvtsia_story",
+      "kind": "story"
+    }
+  ],
+  "core:skhovok_pid_vodospadom": [
+    {
+      "id": "core:poi_skhovok_pid_vodospadom_story",
+      "kind": "story"
+    },
+    {
+      "id": "core:poi_skhovok_pid_vodospadom_mission_op_hideout",
+      "kind": "mission",
+      "mission": "core:op_hideout"
+    }
+  ],
+  "core:sviate_mistse_bilia_vodospadu": [
+    {
+      "id": "core:poi_sviate_mistse_bilia_vodospadu_training",
+      "kind": "training",
+      "skill": "med",
+      "bonus": 0.1
+    }
+  ],
+  "core:tumannyi_iar": [
+    {
+      "id": "core:poi_tumannyi_iar_zone_kiri_hunter",
+      "kind": "zone",
+      "zone": "core:zone_kiri_hunter"
+    },
+    {
+      "id": "core:poi_tumannyi_iar_cache",
+      "kind": "cache",
+      "items": [
+        {
+          "item": "core:band",
+          "n": 2
+        },
+        {
+          "item": "core:gem",
+          "n": 1
+        }
+      ],
+      "ryo": 0
+    }
+  ],
+  "core:kamiani_ustupy": [
+    {
+      "id": "core:poi_kamiani_ustupy_deposit",
+      "kind": "deposit",
+      "building": "core:mine"
+    }
+  ],
+  "core:zavalena_pechera": [
+    {
+      "id": "core:poi_zavalena_pechera_cache",
+      "kind": "cache",
+      "items": [
+        {
+          "item": "core:notes",
+          "n": 3
+        }
+      ],
+      "ryo": 300
+    }
+  ],
+  "core:stare_pole_boiu": [
+    {
+      "id": "core:poi_stare_pole_boiu_cache",
+      "kind": "cache",
+      "items": [
+        {
+          "item": "core:coin",
+          "n": 5
+        }
+      ],
+      "ryo": 0
+    },
+    {
+      "id": "core:poi_stare_pole_boiu_zone_veteran",
+      "kind": "zone",
+      "zone": "core:zone_veteran"
+    }
+  ],
+  "core:prykordonna_zastava": [
+    {
+      "id": "core:poi_prykordonna_zastava_outpost",
+      "kind": "outpost"
+    }
+  ],
+  "core:verkhivia_riky": [
+    {
+      "id": "core:poi_verkhivia_riky_zone_guard_pack",
+      "kind": "zone",
+      "zone": "core:zone_guard_pack"
+    },
+    {
+      "id": "core:poi_verkhivia_riky_zone_oro_aide",
+      "kind": "zone",
+      "zone": "core:zone_oro_aide"
+    }
+  ]
+}

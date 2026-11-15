@@ -34,6 +34,18 @@ export const BALANCE_EXT = {
    * slice allows, and the skill level at which the non-native cast penalty (K.nonNativeCast) is gone.
    */
   natures: { second: 20, third: 40, max: 3, penaltyEnd: 50 },
+  /**
+   * Exploration: a cell with no point of interest stops at this level in the slice; a walk takes
+   * 10 minutes within a region and 30 between regions; Athletics shortens explore and walk time by
+   * 0.1% per level, never by more than 10%.
+   */
+  scouting: {
+    plainMaxLevel: 3,
+    walkWithinMin: 10,
+    walkBetweenMin: 30,
+    athPerLevel: 0.001,
+    athCap: 0.1,
+  },
   /** Mastery levels stop here. */
   masteryCap: 99,
   /**

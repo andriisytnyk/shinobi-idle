@@ -522,6 +522,13 @@
       "penaltyEnd": 50
     },
     "offlineCapHours": 12,
+    "scouting": {
+      "plainMaxLevel": 3,
+      "walkWithinMin": 10,
+      "walkBetweenMin": 30,
+      "athPerLevel": 0.001,
+      "athCap": 0.1
+    },
     "masteryCap": 99,
     "meditation": {
       "insightChance": 0.05,

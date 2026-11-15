@@ -7,6 +7,9 @@ import { z } from 'zod';
 import { modSchema, obstacleModSchema } from './modifiers.ts';
 import {
   bossBaseSchema,
+  poiSchema,
+  type CellBase,
+  type Poi,
   coatSchema,
   coreId,
   enemyBaseSchema,
@@ -30,6 +33,21 @@ import {
 
 export const techniqueCombatMapSchema = z.record(coreId, techniqueCombatSchema);
 export const enemyCombatMapSchema = z.record(coreId, enemyCombatDataSchema);
+/** Points of interest by cell id. */
+export const cellPoiMapSchema = z.record(coreId, z.array(poiSchema));
+
+/** Gives every cell its points of interest; a cell the map does not name has none. */
+export function layerCells(
+  cells: readonly CellBase[],
+  pois: Readonly<Record<string, readonly Poi[]>>,
+): (CellBase & { pois: Poi[] })[] {
+  for (const id of Object.keys(pois)) {
+    if (!cells.some((c) => c.id === id))
+      throw new Error(`Points of interest for unknown cell ${id}`);
+  }
+  return cells.map((c) => ({ ...c, pois: [...(pois[c.id] ?? [])] }));
+}
+
 export const bossSpecialMapSchema = z.record(coreId, bossSpecialSchema);
 /** The economy fields of an item that the generated data does not know. */
 export const itemEconMapSchema = z.record(

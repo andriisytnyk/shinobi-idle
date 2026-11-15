@@ -364,7 +364,39 @@ export const missionSchema = z.strictObject({
 
 // ---------- world ----------
 
-export const cellSchema = z.object({
+/**
+ * A point of interest in a cell, found when the cell is explored to level 1. Kinds:
+ * `outpost` (a free travel target), `training` (a bonus to one skill's XP while the player is
+ * there), `zone` (a fight zone that opens), `story` (sets a flag quests read), `deposit` (a
+ * building of the village gains a level), `cache` (one-time loot), `vault` (one whole scroll) and
+ * `mission` (a mission is on offer). Names and descriptions are localized under `poi.<id>`.
+ */
+export const poiSchema = z.discriminatedUnion('kind', [
+  z.strictObject({ id: coreId, kind: z.literal('outpost') }),
+  z.strictObject({
+    id: coreId,
+    kind: z.literal('training'),
+    skill: skillId,
+    /** Share of extra XP of the skill (0.1 is +10%). */
+    bonus: z.number().gt(0),
+  }),
+  z.strictObject({ id: coreId, kind: z.literal('zone'), zone: coreId }),
+  z.strictObject({ id: coreId, kind: z.literal('story') }),
+  z.strictObject({ id: coreId, kind: z.literal('deposit'), building: coreId }),
+  z.strictObject({
+    id: coreId,
+    kind: z.literal('cache'),
+    items: z.array(ingredientRef),
+    ryo: z.number().int().min(0),
+  }),
+  z.strictObject({ id: coreId, kind: z.literal('vault'), item: coreId }),
+  z.strictObject({ id: coreId, kind: z.literal('mission'), mission: coreId }),
+]);
+export type Poi = z.infer<typeof poiSchema>;
+export type PoiKind = Poi['kind'];
+
+/** A cell as the importer generates it; points of interest are hand-written and layered on at load. */
+export const cellBaseSchema = z.object({
   id: coreId,
   region: coreId,
   index: z.number().int().min(0),
@@ -372,6 +404,9 @@ export const cellSchema = z.object({
   /** Whether the cell hosts a story event. */
   story: z.boolean(),
 });
+
+export const cellSchema = cellBaseSchema.extend({ pois: z.array(poiSchema) });
+export type CellBase = z.infer<typeof cellBaseSchema>;
 
 export const regionSchema = z.object({
   id: coreId,
@@ -876,6 +911,17 @@ export const balanceParamsSchema = z.object({
     penaltyEnd: z.number().int(),
   }),
   offlineCapHours: z.number(),
+  /**
+   * Exploration: the highest level of a cell with no point of interest, the minutes of a walk
+   * within a region and between regions, and the Athletics cut of explore and walk time per level (up to a cap).
+   */
+  scouting: z.object({
+    plainMaxLevel: z.number().int(),
+    walkWithinMin: z.number(),
+    walkBetweenMin: z.number(),
+    athPerLevel: z.number(),
+    athCap: z.number(),
+  }),
   masteryCap: z.number().int(),
   /**
    * Meditation: chance per finished cycle of an Insight and of an Enlightenment, the levels a
@@ -931,6 +977,8 @@ export const contentDbSchema = z.object({
   missions: z.array(missionSchema),
   regions: z.array(regionSchema),
   cells: z.array(cellSchema),
+  /** What each kind of key cell needs. */
+  cellKeys: z.record(z.enum(CELL_KEYS), reqSchema),
   enemies: z.array(enemySchema),
   bosses: z.array(bossSchema),
   buildings: z.array(buildingSchema),
@@ -956,12 +1004,14 @@ export const generatedDbSchema = contentDbSchema
     shop: true,
     coat: true,
     zones: true,
+    cellKeys: true,
     operations: true,
     statuses: true,
     traits: true,
     combos: true,
   })
   .extend({
+    cells: z.array(cellBaseSchema),
     techniques: z.array(techniqueBaseSchema),
     enemies: z.array(enemyBaseSchema),
     bosses: z.array(bossBaseSchema),

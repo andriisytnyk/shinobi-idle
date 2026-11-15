@@ -84,7 +84,8 @@ add('clone.pool', 'The shared pool of shadow clones');
 // Missions and exploration.
 add('mission.duration', 'Duration of every mission');
 add('mission.duration.nin', 'Duration of the mission stages a Ninjutsu technique performs');
-add('interval.explore', 'Time to explore a cell');
+add('interval.explore', 'Time to explore a cell (-0.05 is 5% shorter)', { wired: true });
+add('interval.walk', 'Time of a walk to another cell (-0.05 is 5% shorter)', { wired: true });
 
 // Field and crafts.
 add('bush.stock', 'Herbs a bush holds before it must regrow (whole units)', {

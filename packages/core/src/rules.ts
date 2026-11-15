@@ -14,6 +14,7 @@ import { meditateKind, meditationProvider } from './meditation.ts';
 import type { ModifierProvider } from './modifiers.ts';
 import { natureProvider } from './natures.ts';
 import { questSystem } from './quests.ts';
+import { EXPLORE_KIND, WALK_KIND, exploreKind, walkKind, worldProvider } from './world.ts';
 import type { System } from './system.ts';
 
 /**
@@ -40,6 +41,8 @@ export const defaultRules: Rules = {
     gather: gatherKind,
     craft: craftKind,
     senseiTest: senseiTestKind,
+    [EXPLORE_KIND]: exploreKind,
+    [WALK_KIND]: walkKind,
   },
   modifierProviders: [
     tonicProvider,
@@ -48,6 +51,7 @@ export const defaultRules: Rules = {
     meditationProvider,
     obstacleProvider,
     natureProvider,
+    worldProvider,
   ],
   combatAi: defaultCombatAi,
   fightHooks: defaultFightHooks,

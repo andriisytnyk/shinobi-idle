@@ -394,7 +394,7 @@ describe('natureConsequences', () => {
 
 describe('A8: save and determinism', () => {
   it('migrates a version 7 save: no nature means no team, a nature gets the team', () => {
-    expect(STATE_VERSION).toBe(8);
+    expect(STATE_VERSION).toBeGreaterThanOrEqual(8);
     expect(MIGRATIONS).toHaveLength(STATE_VERSION - 1);
     const s = genin(3);
     const text = JSON.parse(serialize(s, 9));

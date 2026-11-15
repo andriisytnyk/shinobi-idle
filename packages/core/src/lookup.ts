@@ -1,5 +1,6 @@
 import type {
   ContentDb,
+  Cell,
   Enemy,
   Exam,
   Exercise,
@@ -7,9 +8,11 @@ import type {
   Herb,
   Item,
   Obstacle,
+  Poi,
   PoolCheckpoint,
   Practice,
   Quest,
+  Region,
   Recipe,
   ShopEntry,
   Technique,
@@ -38,6 +41,12 @@ export interface ContentIndex {
   /** Number of masteries per skill. */
   masteryCount: Map<string, number>;
   poolCheckpoints: Map<string, PoolCheckpoint[]>;
+  cells: Map<string, Cell>;
+  regions: Map<string, Region>;
+  /** Every point of interest with the cell it lies in. */
+  pois: Map<string, { poi: Poi; cell: Cell }>;
+  /** The cell whose point of interest opens a fight zone. */
+  zoneCell: Map<string, Cell>;
 }
 
 const cache = new WeakMap<ContentDb, ContentIndex>();
@@ -74,7 +83,19 @@ function build(content: ContentDb): ContentIndex {
     list.push(p);
     poolCheckpoints.set(p.skill, list);
   }
+  const pois = new Map<string, { poi: Poi; cell: Cell }>();
+  const zoneCell = new Map<string, Cell>();
+  for (const cell of content.cells) {
+    for (const poi of cell.pois) {
+      pois.set(poi.id, { poi, cell });
+      if (poi.kind === 'zone') zoneCell.set(poi.zone, cell);
+    }
+  }
   return {
+    cells: byId(content.cells),
+    regions: byId(content.regions),
+    pois,
+    zoneCell,
     enemies: byId(content.enemies),
     items: byId(content.items),
     herbs: byId(content.herbs),
