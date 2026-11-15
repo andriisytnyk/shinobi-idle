@@ -1,5 +1,6 @@
 import {
   NATURE_IDS,
+  isModifierKey,
   TECH_SKILL_IDS,
   type ContentDb,
   type Mission,
@@ -208,13 +209,16 @@ function candidates(
 function durationFactor(
   state: GameState,
   skill: string,
+  tech: string,
   ration: number,
   content: ContentDb,
   rules: Rules,
 ): number {
   let factor = computeMod(rules.modifierProviders, state, 'mission.duration', content).total;
-  if (skill === 'nin') {
-    factor *= computeMod(rules.modifierProviders, state, 'mission.duration.nin', content).total;
+  // A stage a technique of a skill performs may be shortened by a key of that skill (`mission.duration.<skill>`).
+  const key = `mission.duration.${skill}`;
+  if (tech !== '' && isModifierKey(key)) {
+    factor *= computeMod(rules.modifierProviders, state, key, content).total;
   }
   return Math.max(content.balance.K.mission.minFactor, factor * (1 + ration));
 }
@@ -245,7 +249,7 @@ function figures(
         byLevel *
         byMastery *
         (c.slow ? M.slowAlt : 1) *
-        durationFactor(state, c.skill, ration, content, rules),
+        durationFactor(state, c.skill, c.tech, ration, content, rules),
     ),
   );
   const chance = fixed

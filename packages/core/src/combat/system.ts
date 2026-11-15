@@ -48,9 +48,30 @@ export function fightBusy(state: GameState, slot: number): boolean {
   return owner !== undefined && owner !== slot && state.slots[owner]?.action != null;
 }
 
-/** The reason a fight cannot start in `slot` now (a localization key), or null. */
-export const fightBusyReason = (state: GameState, slot: number | undefined): string | null =>
-  slot !== undefined && fightBusy(state, slot) ? 'error.fightBusy' : null;
+/**
+ * Whether another slot runs an action that can hold the fight: a fight, an operation, or a
+ * mission that has a combat stage. Only one such action runs at a time.
+ */
+export function fightCapableElsewhere(state: GameState, slot: number, content: ContentDb): boolean {
+  const missions = indexOf(content).missions;
+  return state.slots.some((other, index) => {
+    const action = other.action;
+    if (index === slot || !action) return false;
+    if (isCombatKind(action.kind)) return true;
+    return (
+      action.kind === MISSION_KIND &&
+      (missions.get(action.id)?.stages.some((st) => st.t === 'combat') ?? false)
+    );
+  });
+}
+
+/** The reason a fight-capable action cannot start in `slot` now (a localization key), or null. */
+export const fightBusyReason = (
+  state: GameState,
+  slot: number | undefined,
+  content: ContentDb,
+): string | null =>
+  slot !== undefined && fightCapableElsewhere(state, slot, content) ? 'error.fightBusy' : null;
 
 type Pools = { hp: number; chakra: number; stamina: number };
 

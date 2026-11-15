@@ -80,7 +80,8 @@ describe('the forecast reads the grant', () => {
       content,
       defaultRules,
     );
-    expect(clones.xpPerHour.nin ?? 0).toBeGreaterThanOrEqual(0);
+    // Ninjutsu stands below the cap here, so the Shadow Clone stage pays XP.
+    expect(clones.xpPerHour.nin ?? 0).toBeGreaterThan(0);
     // Below the cap the forecast equals what a run adds, per hour of expected time.
     const low = player({ natures: ['katon'], levels: { herb: 5 } });
     const forecast = missionForecast(low, mission('core:weed'), content, defaultRules);
@@ -166,7 +167,7 @@ describe('counters', () => {
     expect(state.counters['missions.stage.skill']).toBe(done);
     expect(state.counters['missions.tech.doton']).toBe(done);
     expect(state.counters['missions.elemental']).toBe(done);
-    expect(state.counters['missions.village.elemental'] ?? 0).toBe(0);
+    expect(state.counters['missions.elemental.V'] ?? 0).toBe(0);
   });
 
   it('does not count a technique a teammate performed, or a plain skill', () => {
@@ -176,12 +177,13 @@ describe('counters', () => {
     runUntilDone(state, 'core:v_water', 60 * MIN);
     expect(state.counters['missions.done.core:v_water']).toBe(1);
     expect(state.counters['missions.elemental'] ?? 0).toBe(0);
-    expect(state.counters['missions.village.elemental'] ?? 0).toBe(0);
+    expect(state.counters['missions.elemental.V'] ?? 0).toBe(0);
     const spar = ableFor(mission('core:v_spar'));
     startMission(spar, 'core:v_spar');
     runUntilDone(spar, 'core:v_spar', 60 * MIN, 3);
     expect(spar.counters['actions.mission']).toBe(3);
-    expect(spar.counters['missions.tech.tai'] ?? 0).toBeGreaterThanOrEqual(0);
+    // The sparring is done with a Taijutsu technique, and no other.
+    expect(spar.counters['missions.tech.tai']).toBe(3);
     expect(spar.counters['missions.elemental'] ?? 0).toBe(0);
   });
 });
@@ -280,8 +282,11 @@ describe('fights in two slots', () => {
       raw.state.combat.owner = owner as number;
       const loaded = deserialize(JSON.stringify(raw), content);
       // The mission is the only thing that can hold a fight, so it takes the fight back at its own slot or restarts.
-      if (loaded.combat) expect(loaded.combat.owner).toBe(0);
+      expect(loaded.combat === null || loaded.combat.owner === 0).toBe(true);
       expect(loaded.slots[0]?.action?.kind).toBe('mission');
+      // Whatever was kept, the mission goes on and finishes.
+      advance(loaded, 30 * MIN, content);
+      expect(loaded.counters['missions.done.core:thief'] ?? 0).toBeGreaterThanOrEqual(1);
     }
   });
 

@@ -109,7 +109,8 @@ describe('A11: saves', () => {
     expect(state.combat).not.toBeNull();
     expect(state.slots[0]?.data).toMatchObject({ s: 1, f: 1 });
     roundTrip(state, 10 * MIN);
-    expect(state.counters['missions.done.core:thief']).toBeGreaterThanOrEqual(0);
+    // The fight was won and the mission finished after the save.
+    expect(state.counters['missions.done.core:thief']).toBeGreaterThanOrEqual(1);
   });
 
   it('round-trips with a won fight waiting for the end of its stage', () => {

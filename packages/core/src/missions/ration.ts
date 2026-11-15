@@ -29,7 +29,7 @@ export function useRation(state: GameState, id: string, content: ContentDb): Com
   const have = state.buffs[id]?.charges ?? 0;
   if (have >= fx.missions) return { ok: false, reason: 'error.rationArmed' };
   if (!removeItem(state, id, 1)) return { ok: false, reason: 'error.noItem' };
-  state.buffs[id] = { skill: RATION_BUFF, charges: have + fx.missions };
+  state.buffs[id] = { skill: RATION_BUFF, charges: Math.min(fx.missions, have + fx.missions) };
   emit(state, { type: 'itemUsed', id, target: 'missions' });
   return { ok: true };
 }

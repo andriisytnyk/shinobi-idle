@@ -33,7 +33,7 @@ export const fightKind: ActionKind = {
     const zone = indexOf(content).zones.get(id) ?? indexOf(content).zoneByEnemy.get(id);
     return zone ? zoneRequirement(zone, content) : null;
   },
-  blocked: (state, _id, _content, _rules, slot) => fightBusyReason(state, slot),
+  blocked: (state, _id, content, _rules, slot) => fightBusyReason(state, slot, content),
   intervalMs: (_state, _id, content) => content.balance.K.combat.xpTickMs,
 
   complete(state, id, content, rules) {
@@ -65,7 +65,7 @@ export const operationKind: ActionKind = {
   has: (id, content) => indexOf(content).operations.has(id),
   requirements: (_state, id, content): Req | null =>
     indexOf(content).operations.get(id)?.unlock ?? null,
-  blocked: (state, _id, _content, _rules, slot) => fightBusyReason(state, slot),
+  blocked: (state, _id, content, _rules, slot) => fightBusyReason(state, slot, content),
   intervalMs: (_state, _id, content) => content.balance.K.combat.xpTickMs,
 
   complete(state, id, content, rules) {

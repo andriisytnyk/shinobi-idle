@@ -251,10 +251,10 @@ describe('village missions', () => {
     const state = ableFor(mission('core:v_water'), ['suiton']);
     startMission(state, 'core:v_water');
     runUntilDone(state, 'core:v_water', 60 * MIN, 1);
-    expect(state.counters['missions.village.elemental']).toBe(1);
+    expect(state.counters['missions.elemental.V']).toBe(1);
     const fists = ableFor(mission('core:v_spar'));
     startMission(fists, 'core:v_spar');
     runUntilDone(fists, 'core:v_spar', 60 * MIN, 1);
-    expect(fists.counters['missions.village.elemental'] ?? 0).toBe(0);
+    expect(fists.counters['missions.elemental.V'] ?? 0).toBe(0);
   });
 });

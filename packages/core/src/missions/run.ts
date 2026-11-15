@@ -9,7 +9,7 @@ import { stopSlot, type ActionKind } from '../actions.ts';
 import { addCurrency, addItem, hasItem, removeCurrency, removeItem } from '../bank.ts';
 import { actionsKey, bump } from '../counters.ts';
 import { emit } from '../events.ts';
-import { MS_PER_SECOND, SECONDS_PER_HOUR, rate } from '../formulas.ts';
+import { MS_PER_HOUR, MS_PER_SECOND, SECONDS_PER_HOUR, rate } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
 import { computeMod } from '../modifiers.ts';
 import { gainXp, grantMastery } from '../progression.ts';
@@ -22,7 +22,7 @@ import { drainPendingResources } from '../village.ts';
 import { MISSION_KIND, fightBusy, fightBusyReason, newMissionCombat } from '../combat/system.ts';
 import { refillPouch } from '../combat/pouch.ts';
 import type { TeamSupport } from '../combat/fight-types.ts';
-import { SELF, planStage, stageReq, teammates, type StagePlan } from './plan.ts';
+import { SELF, planStage, stageBaseMs, stageReq, teammates, type StagePlan } from './plan.ts';
 
 export { MISSION_KIND };
 
@@ -33,18 +33,24 @@ export const missionRankKey = (rank: string): string => `missions.rank.${rank}`;
 export const missionTechKey = (skill: string): string => `missions.tech.${skill}`;
 /** Stages finished, by the kind of stage. */
 export const missionStageKey = (kind: string): string => `missions.stage.${kind}`;
+/** Missions of a rank finished with a stage the player performed with an elemental (nature) technique. */
+export const missionElementalKey = (rank: string): string => `missions.elemental.${rank}`;
 export const MISSIONS_TOTAL = 'missions.total';
 /** Missions finished in which the player performed a stage with an elemental (nature) technique. */
 export const MISSIONS_ELEMENTAL = 'missions.elemental';
-/** Village missions finished with an elemental stage the player performed. */
-export const MISSIONS_VILLAGE_ELEMENTAL = 'missions.village.elemental';
+
+/** The localization key of the stop for lost fights, and for a stage that cannot go on. */
+const TOO_HARD = 'error.missionTooHard';
+const CANNOT_GO_ON = 'error.requirementsNotMet';
+const RUNNING_ELSEWHERE = 'error.missionRunning';
 
 /**
- * The state of the mission in a slot, plain JSON: `s` the stage under way, `a` the failed attempts
- * at it, `r` the ration share (negative) taken off this run, `f` the fight of a combat stage (0
- * none, 1 running, 2 won), `w` whether the stage's time is up while its fight still runs, `st` the
- * skill the fight's style XP goes to, `tk` the skills of the techniques the player performed in
- * this run, and `p` how the stage is done.
+ * The state of the mission in a slot, plain JSON: `s` the stage under way, `a` the failed
+ * attempts at it, `r` the ration share (negative) taken off this run, `f` the fight of a combat
+ * stage (0 none, 1 running, 2 won), `w` whether the stage's time is up while its fight still
+ * runs, `q` whether the stage waits for the fight to be free, `st` the skill the fight's style XP
+ * goes to, `tk` the skills of the techniques the player performed in this run, and `p` how the
+ * stage is done.
  */
 export interface MissionRun {
   s: number;
@@ -52,6 +58,7 @@ export interface MissionRun {
   r: number;
   f: 0 | 1 | 2;
   w: 0 | 1;
+  q: 0 | 1;
   st: string;
   tk: string[];
   p: StagePlan;
@@ -60,31 +67,55 @@ export interface MissionRun {
 const isRecord = (x: unknown): x is Record<string, unknown> =>
   typeof x === 'object' && x !== null && !Array.isArray(x);
 const num = (x: unknown): x is number => typeof x === 'number' && Number.isFinite(x);
+const whole = (x: unknown, min: number, max: number): x is number =>
+  typeof x === 'number' && Number.isInteger(x) && x >= min && x <= max;
 
-/** A saved plan, or null when it is not a usable one. */
-function readPlan(raw: unknown): StagePlan | null {
+/**
+ * A saved plan, or null when it is not a usable one: every id must be one the content has (found
+ * by own-property lookups only), every number in its range, and the length of an attempt within
+ * the longest a stage can last.
+ */
+function readPlan(
+  raw: unknown,
+  mission: Mission,
+  stage: number,
+  content: ContentDb,
+): StagePlan | null {
   if (!isRecord(raw)) return null;
+  const K = content.balance.K;
   const { who, skill, tech, level, min, mastery, slow, intel, ms, chance } = raw;
   if (typeof who !== 'string' || typeof skill !== 'string' || typeof tech !== 'string') return null;
-  if (!num(level) || !num(min) || !num(mastery) || typeof slow !== 'boolean') return null;
-  if (!num(intel) || !Number.isInteger(intel) || intel < 0) return null;
-  if (!num(ms) || !Number.isInteger(ms) || ms < 1 || !num(chance) || chance < 0 || chance > 1) {
+  if (who !== SELF && !content.team.some((t) => t.id === who)) return null;
+  if (skill !== '' && !content.skills.some((s) => s.id === skill)) return null;
+  if (tech !== '' && !indexOf(content).techniques.has(tech)) return null;
+  if (!whole(level, 0, K.cap) || !whole(min, 0, K.cap) || !whole(mastery, 1, K.masteryCap)) {
     return null;
   }
+  if (typeof slow !== 'boolean' || !whole(intel, 0, mission.skip[stage] ?? 0)) return null;
+  // The longest a stage can last: its base time, slowed, and never longer than the offline cap.
+  const longest = Math.min(
+    K.offlineCapHours * MS_PER_HOUR,
+    stageBaseMs(mission, stage) * K.mission.slowAlt * K.cap,
+  );
+  if (!whole(ms, 1, Math.max(1, longest)) || !num(chance) || chance < 0 || chance > 1) return null;
   return { who, skill, tech, level, min, mastery, slow, intel, ms, chance };
 }
 
 /** The run saved in a slot's data, or null when there is none or it does not fit `mission`. */
-export function readRun(data: JsonValue, mission: Mission): MissionRun | null {
+export function readRun(data: JsonValue, mission: Mission, content: ContentDb): MissionRun | null {
   if (!isRecord(data)) return null;
-  const { s, a, r, f, w, st, tk } = data;
-  if (!num(s) || !Number.isInteger(s) || s < 0 || s >= mission.stages.length) return null;
-  if (!num(a) || !Number.isInteger(a) || a < 0 || !num(r) || r > 0 || r <= -1) return null;
+  const { s, a, r, f, w, q, st, tk } = data;
+  if (!whole(s, 0, mission.stages.length - 1)) return null;
+  if (!whole(a, 0, Number.MAX_SAFE_INTEGER) || !num(r) || r > 0 || r <= -1) return null;
   if (f !== 0 && f !== 1 && f !== 2) return null;
-  if ((w !== 0 && w !== 1) || typeof st !== 'string') return null;
-  if (!Array.isArray(tk) || !tk.every((x) => typeof x === 'string')) return null;
-  const p = readPlan(data.p);
-  return p ? { s, a, r, f, w, st, tk: tk as string[], p } : null;
+  if ((w !== 0 && w !== 1) || (q !== 0 && q !== 1)) return null;
+  if (typeof st !== 'string' || (st !== '' && !content.skills.some((k) => k.id === st)))
+    return null;
+  if (!Array.isArray(tk) || tk.length > mission.stages.length) return null;
+  if (!tk.every((x) => typeof x === 'string' && content.skills.some((k) => k.id === x)))
+    return null;
+  const p = readPlan(data.p, mission, s, content);
+  return p ? { s, a, r, f, w, q, st, tk: tk as string[], p } : null;
 }
 
 const missionOf = (content: ContentDb, id: string): Mission | undefined =>
@@ -125,8 +156,9 @@ type NewRun = Omit<MissionRun, 'p'> & { p: StagePlan | null };
 /**
  * Starts stage `index` of `run` in slot `at`: works out how it is done (`reuse` keeps the plan of
  * a repeated attempt that was paid for with Intel), takes the items of an items stage and the
- * Intel of a bought stage, and starts the fight of a combat stage. False when it cannot begin (no
- * way to do it, the items or Intel are gone, or another slot owns a fight); nothing is taken then.
+ * Intel of a bought stage, and starts the fight of a combat stage. If another slot owns the fight
+ * the combat stage waits (`q`) and starts when the fight is free. False when the stage cannot
+ * begin (no way to do it, or the items or Intel are gone); nothing is taken then.
  */
 function beginStage(
   state: GameState,
@@ -145,20 +177,23 @@ function beginStage(
   if (!plan) return false;
   if (stage.t === 'items' && !hasItem(state, stage.item, stage.n)) return false;
   const entry = stage.t === 'combat' ? entryOf(content, stage.enemy) : undefined;
-  if (stage.t === 'combat' && (!entry || fightBusy(state, at))) return false;
+  if (stage.t === 'combat' && !entry) return false;
   if (stage.t === 'items') removeItem(state, stage.item, stage.n);
   if (plan.intel > 0 && !reuse) removeCurrency(state, 'intel', plan.intel);
-  const next: MissionRun = { ...run, s: index, p: plan, w: 0, f: 0, st: '' };
+  const next: MissionRun = { ...run, s: index, p: plan, w: 0, q: 0, f: 0, st: '' };
   if (entry) {
-    state.combat = newMissionCombat(
-      state,
-      entry,
-      supportOf(state, mission, content),
-      content,
-      rules,
-      at,
-    );
-    next.f = 1;
+    if (fightBusy(state, at)) next.q = 1;
+    else {
+      state.combat = newMissionCombat(
+        state,
+        entry,
+        supportOf(state, mission, content),
+        content,
+        rules,
+        at,
+      );
+      next.f = 1;
+    }
   }
   store(state, at, next);
   slot.progress = 0;
@@ -179,6 +214,7 @@ function beginRun(
     r: spendRation(state, content),
     f: 0,
     w: 0,
+    q: 0,
     st: '',
     tk: [],
     p: null,
@@ -194,11 +230,15 @@ export interface StageXp {
   mastery: { id: string; skill: SkillId; amount: number } | null;
 }
 
+/** The skill a fight's style XP goes to: that of the technique last used, or the balance's default. */
+export const styleSkill = (state: GameState, content: ContentDb): string =>
+  state.combat?.style ?? content.balance.K.mission.defaultStyle;
+
 /**
  * The XP and Mastery XP of one attempt of a stage the player did, before modifiers: a share of the
- * practice rate at the level of the stage (never above the rank's cap), by the attempt's time. A
- * combat stage pays what a fight pays, in the same proportions, at the enemy's level. A teammate's
- * stage pays nothing. `style` is the skill of the fight's style XP.
+ * practice rate at the level of the stage (never above the mission's rate cap), by the attempt's
+ * time. A combat stage pays what a fight pays, in the same proportions, at the enemy's level. A
+ * teammate's stage pays nothing. `style` is the skill of the fight's style XP.
  */
 export function stageXp(
   state: GameState,
@@ -211,11 +251,10 @@ export function stageXp(
   const none: StageXp = { xp: [], mastery: null };
   if (plan.who !== SELF) return none;
   const K = content.balance.K;
-  const cap = K.missionRateCap[mission.rank as 'D' | 'C' | 'V'] ?? 0;
   const hours = plan.ms / MS_PER_SECOND / SECONDS_PER_HOUR;
   if (plan.skill !== '') {
     const skill = plan.skill as SkillId;
-    const level = Math.min(skillLevel(state, skill, content), cap);
+    const level = Math.min(skillLevel(state, skill, content), mission.rateCap);
     const tech = indexOf(content).techniques.get(plan.tech);
     return {
       xp: [[skill, K.missionXpShare * rate(level, content) * hours]],
@@ -227,14 +266,15 @@ export function stageXp(
   const stage = mission.stages[index];
   const entry = stage?.t === 'combat' ? entryOf(content, stage.enemy) : undefined;
   if (!entry) return none;
-  const xp = K.combatXp;
-  const total = xp.style + xp.vit + xp.eva;
-  const pool = K.missionXpShare * rate(Math.min(entry.cl, cap), content) * hours;
+  // The weights are those of the fight's own XP: the style skill and each of the other fight skills.
+  const weights: Record<string, number> = K.combatXp;
+  const others = K.mission.fightSkills.filter((s) => Object.hasOwn(weights, s));
+  const total = K.combatXp.style + others.reduce((sum, s) => sum + (weights[s] ?? 0), 0);
+  const pool = K.missionXpShare * rate(Math.min(entry.cl, mission.rateCap), content) * hours;
   return {
     xp: [
-      [style as SkillId, (pool * xp.style) / total],
-      ['vit', (pool * xp.vit) / total],
-      ['eva', (pool * xp.eva) / total],
+      [style as SkillId, (pool * K.combatXp.style) / total],
+      ...others.map((s): [SkillId, number] => [s, (pool * (weights[s] ?? 0)) / total]),
     ],
     mastery: null,
   };
@@ -323,10 +363,9 @@ export function payMission(
   bump(state, missionRankKey(mission.rank));
   const skills = [...new Set(performed)];
   for (const skill of skills) bump(state, missionTechKey(skill));
-  const elemental = skills.some((s) => (NATURE_IDS as readonly string[]).includes(s));
-  if (elemental) {
+  if (skills.some((s) => (NATURE_IDS as readonly string[]).includes(s))) {
     bump(state, MISSIONS_ELEMENTAL);
-    if (mission.rank === 'V') bump(state, MISSIONS_VILLAGE_ELEMENTAL);
+    bump(state, missionElementalKey(mission.rank));
   }
   emit(state, { type: 'missionDone', mission: mission.id, ryo, rep });
 }
@@ -375,32 +414,32 @@ function advanceStage(
 }
 
 export const missionKind: ActionKind = {
-  has: (id, content) => {
-    const m = missionOf(content, id);
-    return m !== undefined && m.rank !== 'OP';
-  },
+  has: (id, content) => missionOf(content, id)?.board ?? false,
 
   blocked(state, id, content, _rules, slot) {
-    // A combat stage needs the fight to be free when it comes; say so at the start if it is not.
     const mission = missionOf(content, id);
-    return mission?.stages.some((s) => s.t === 'combat') ? fightBusyReason(state, slot) : null;
+    if (!mission || slot === undefined) return null;
+    // The same mission cannot run in two slots at once.
+    const other = state.slots.findIndex(
+      (s, i) => i !== slot && s.action?.kind === MISSION_KIND && s.action.id === id,
+    );
+    if (other >= 0) return RUNNING_ELSEWHERE;
+    // A mission with a combat stage ahead needs the fight to be free, so only one such action runs.
+    return mission.stages.some((s) => s.t === 'combat')
+      ? fightBusyReason(state, slot, content)
+      : null;
   },
 
   requirements(state, id, content, rules) {
     const mission = missionOf(content, id);
     if (!mission) return null;
     const at = slotOf(state, id);
-    const run = at >= 0 ? readRun(state.slots[at]?.data ?? null, mission) : null;
+    const run = at >= 0 ? readRun(state.slots[at]?.data ?? null, mission, content) : null;
     if (!run) return missionRequirements(state, mission, 0, content, rules);
-    // The items of the stage under way are gone already, and what it needs has its plan.
+    // The stage under way is met: its items are gone, its Intel is paid, a way has been found.
     const stage = mission.stages[run.s];
-    return missionRequirements(
-      state,
-      mission,
-      stage?.t === 'items' ? run.s + 1 : run.s,
-      content,
-      rules,
-    );
+    const settled = stage?.t === 'items' || run.p.intel > 0;
+    return missionRequirements(state, mission, settled ? run.s + 1 : run.s, content, rules);
   },
 
   missing(state, id, content) {
@@ -409,11 +448,14 @@ export const missionKind: ActionKind = {
     return stage?.t === 'items' ? stage.item : null;
   },
 
+  abortCause: () => CANNOT_GO_ON,
+
   intervalMs(state, id, content, rules, slot) {
     const mission = missionOf(content, id);
     if (!mission) return 1;
-    const run = readRun(state.slots[slot ?? slotOf(state, id)]?.data ?? null, mission);
+    const run = readRun(state.slots[slot ?? slotOf(state, id)]?.data ?? null, mission, content);
     if (!run) return planStage(state, mission, 0, content, rules)?.ms ?? 1;
+    if (run.q === 1) return content.balance.K.combat.xpTickMs;
     return run.w === 1 ? waitMs(content) : run.p.ms;
   },
 
@@ -431,11 +473,29 @@ export const missionKind: ActionKind = {
     const mission = missionOf(content, id);
     const at = slot ?? slotOf(state, id);
     if (!mission || at < 0) return 'abort';
-    const run = readRun(state.slots[at]?.data ?? null, mission);
+    const run = readRun(state.slots[at]?.data ?? null, mission, content);
     // A run that cannot be read starts over. A stage is a step: only a finished mission counts.
     if (!run) return beginRun(state, at, mission, content, rules) ? 'step' : 'abort';
     const stage = mission.stages[run.s];
     if (!stage) return 'abort';
+    if (run.q === 1) {
+      // The stage waited for the fight to be free: begin it now if it is, else wait on.
+      const entry = stage.t === 'combat' ? entryOf(content, stage.enemy) : undefined;
+      if (!entry) return 'abort';
+      if (fightBusy(state, at)) return 'step';
+      state.combat = newMissionCombat(
+        state,
+        entry,
+        supportOf(state, mission, content),
+        content,
+        rules,
+        at,
+      );
+      store(state, at, { ...run, q: 0, f: 1 });
+      const waiting = state.slots[at];
+      if (waiting) waiting.progress = 0;
+      return 'step';
+    }
     if (stage.t === 'combat') {
       if (run.f !== 2) {
         // The stage's time is up, but it ends with its fight, which still goes on.
@@ -446,7 +506,7 @@ export const missionKind: ActionKind = {
       payStageXp(state, mission, run.s, run.p, run.st, content, rules);
       return advanceStage(state, at, mission, run, content, rules) ? 'step' : 'abort';
     }
-    const ok = stage.t === 'items' || nextFloat(state.rng, 'world') < run.p.chance;
+    const ok = stage.t === 'items' || nextFloat(state.rng, 'action') < run.p.chance;
     emit(state, { type: 'missionStage', mission: mission.id, stage: run.s, ok });
     payStageXp(state, mission, run.s, run.p, '', content, rules);
     if (ok) return advanceStage(state, at, mission, run, content, rules) ? 'step' : 'abort';
@@ -459,16 +519,20 @@ export const missionKind: ActionKind = {
   combatEnded(state, at, result, content, rules) {
     const slot = state.slots[at];
     const mission = slot?.action ? missionOf(content, slot.action.id) : undefined;
-    const run = mission && slot ? readRun(slot.data, mission) : null;
-    const style = state.combat?.style ?? 'tai';
+    const run = mission && slot ? readRun(slot.data, mission, content) : null;
+    const style = styleSkill(state, content);
     state.combat = null;
     if (!mission || !run) return stopSlot(state, at, 'missing', content, rules);
     if (result === 'defeat') {
-      // The Wounds are counted already. The stage starts over with a new fight; the stages before it stand.
+      // The Wounds are counted already. The stage starts over with a new fight; the stages before it stand,
+      // until the fight has been lost as many times in a row as the balance allows.
       emit(state, { type: 'missionStage', mission: mission.id, stage: run.s, ok: false });
       const again = { ...run, a: run.a + 1 };
+      if (again.a >= content.balance.K.mission.maxDefeats) {
+        return stopSlot(state, at, 'requirements', content, rules, TOO_HARD);
+      }
       if (!beginStage(state, at, mission, again, run.s, content, rules)) {
-        stopSlot(state, at, 'defeated', content, rules);
+        stopSlot(state, at, 'requirements', content, rules, CANNOT_GO_ON);
       }
       return;
     }
@@ -482,7 +546,7 @@ export const missionKind: ActionKind = {
     emit(state, { type: 'missionStage', mission: mission.id, stage: run.s, ok: true });
     payStageXp(state, mission, run.s, run.p, style, content, rules);
     if (!advanceStage(state, at, mission, run, content, rules)) {
-      stopSlot(state, at, 'requirements', content, rules);
+      stopSlot(state, at, 'requirements', content, rules, CANNOT_GO_ON);
     }
   },
 };
@@ -493,7 +557,7 @@ export function repairMissions(state: GameState, content: ContentDb, rules: Rule
     const mission =
       slot.action?.kind === MISSION_KIND ? missionOf(content, slot.action.id) : undefined;
     if (!mission) return;
-    const run = readRun(slot.data, mission);
+    const run = readRun(slot.data, mission, content);
     const stage = run ? mission.stages[run.s] : undefined;
     const wanted = run?.f === 1 && stage?.t === 'combat' ? stage.enemy : null;
     // A fight belongs here only if this slot is its owner; any other fight is somebody else's.
@@ -503,7 +567,7 @@ export function repairMissions(state: GameState, content: ContentDb, rules: Rule
     if (fightHere) state.combat = null;
     slot.progress = 0;
     if (!beginRun(state, at, mission, content, rules)) {
-      stopSlot(state, at, 'requirements', content, rules);
+      stopSlot(state, at, 'requirements', content, rules, CANNOT_GO_ON);
     }
   });
 }

@@ -137,6 +137,7 @@ export const content: ContentDb = contentDbSchema.parse({
   missions: layerMissions(
     z.array(missionBaseSchema).parse(missions),
     missionExtraMapSchema.parse(handMissions),
+    bal.K.missionRateCap,
   ),
   team: handTeam,
   regions,

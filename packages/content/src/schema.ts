@@ -390,6 +390,8 @@ export const missionExtraSchema = z.strictObject({
   skip: z.array(z.number().int().min(0)),
   /** Modifier key that scales the village resource units the mission brings (null: none). */
   resourceMod: z.string().nullable(),
+  /** Whether the mission is on the mission board (the operation is not). */
+  board: z.boolean(),
 });
 
 export const missionSchema = missionBaseSchema.extend({
@@ -399,6 +401,9 @@ export const missionSchema = missionBaseSchema.extend({
   slow: z.array(z.array(z.number().int().min(0))),
   skip: z.array(z.number().int().min(0)),
   resourceMod: z.string().nullable(),
+  board: z.boolean(),
+  /** The highest level a stage of the mission is paid XP at: `K.missionRateCap` of its rank (0 for a rank with none). */
+  rateCap: z.number(),
 });
 
 /**
@@ -1089,6 +1094,12 @@ export const balanceParamsSchema = z.object({
     slowAlt: z.number(),
     /** The shortest a stage can get: the share of its base time that the modifiers cannot go under. */
     minFactor: z.number(),
+    /** Consecutive lost fights at one combat stage after which the mission stops. */
+    maxDefeats: z.number().int().min(1),
+    /** The skill a fight's style XP goes to when no technique was used. */
+    defaultStyle: skillId,
+    /** The skills besides the style skill that a fight pays XP to, in the proportions of `K.combatXp`. */
+    fightSkills: z.array(skillId),
     success: z.object({
       base: z.number(),
       perLevel: z.number(),

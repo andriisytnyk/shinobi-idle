@@ -17,6 +17,7 @@ export const missionExtraMapSchema = z.record(coreId, missionExtraSchema);
 export function layerMissions(
   base: readonly MissionBase[],
   extra: Readonly<Record<string, MissionExtra>>,
+  rateCap: Readonly<Record<string, number>>,
 ): Mission[] {
   for (const id of Object.keys(extra)) {
     if (!base.some((m) => m.id === id)) throw new Error(`Hand data for unknown mission ${id}`);
@@ -40,6 +41,8 @@ export function layerMissions(
       slow: x.slow,
       skip: x.skip,
       resourceMod: x.resourceMod,
+      board: x.board,
+      rateCap: Object.hasOwn(rateCap, m.rank) ? (rateCap[m.rank] ?? 0) : 0,
     };
   });
 }

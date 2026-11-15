@@ -1,4 +1,4 @@
-import type { ContentDb, Mission, MissionPay } from '@shinobi/content';
+import { isModifierKey, type ContentDb, type Mission, type MissionPay } from '@shinobi/content';
 import { effectiveLoadout } from '../combat/loadout.ts';
 import { MS_PER_HOUR } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
@@ -41,7 +41,16 @@ export interface MissionForecast {
   /** Village resource: the slug and the units one finished mission brings after the modifiers; null for none. */
   resource: { slug: string; units: number } | null;
   /** The modifiers that went into the ryo, the Reputation and the resource units, for the breakdown. */
-  mods: { ryo: Modifier[]; rep: Modifier[]; resource: Modifier[] };
+  mods: {
+    ryo: Modifier[];
+    rep: Modifier[];
+    resource: Modifier[];
+    /** Every mission's duration modifiers, and for each skill a technique of which performs a stage the modifiers of that skill's own key. */
+    duration: Modifier[];
+    durationBySkill: Record<string, Modifier[]>;
+  };
+  /** The share of its base time a stage cannot be shortened below (`K.mission.minFactor`). */
+  durationFloor: number;
   /** The share the armed ration takes off the mission (0 with none armed). */
   ration: number;
   /** Per hour of running the mission over and over: ryo, Reputation and the XP of each skill (what is really added, caps and slowdowns counted). */
@@ -55,7 +64,10 @@ export interface MissionForecast {
 /** The skill a fight of the player's loadout earns style XP in, as far as it can be told beforehand. */
 function styleGuess(state: GameState, content: ContentDb): string {
   const first = effectiveLoadout(state, content)[0];
-  return (first && indexOf(content).techniques.get(first)?.skill) || 'tai';
+  return (
+    (first && indexOf(content).techniques.get(first)?.skill) ||
+    content.balance.K.mission.defaultStyle
+  );
 }
 
 /** Forecast of one mission for the player as they are now: path, time and chance of each stage, rewards, and the rates per hour. */
@@ -117,6 +129,14 @@ export function missionForecast(
       next: after ? { ms: after.ms, chance: after.chance } : null,
     });
   });
+  const durationBySkill: Record<string, Modifier[]> = {};
+  for (const stage of stages) {
+    const skill = stage.path?.tech ? stage.path.skill : '';
+    const key = `mission.duration.${skill}`;
+    if (skill !== '' && isModifierKey(key) && !Object.hasOwn(durationBySkill, skill)) {
+      durationBySkill[skill] = computeMod(mods, state, key, content).parts;
+    }
+  }
   const ryoMod = computeMod(mods, state, 'mission.ryo', content);
   const repMod = computeMod(mods, state, 'mission.rep', content);
   const resMod = mission.resourceMod
@@ -138,7 +158,14 @@ export function missionForecast(
     resource: mission.resource
       ? { slug: mission.resource, units: resourceUnits(state, mission, content, rules) }
       : null,
-    mods: { ryo: ryoMod.parts, rep: repMod.parts, resource: resMod.parts },
+    mods: {
+      ryo: ryoMod.parts,
+      rep: repMod.parts,
+      resource: resMod.parts,
+      duration: computeMod(mods, state, 'mission.duration', content).parts,
+      durationBySkill,
+    },
+    durationFloor: content.balance.K.mission.minFactor,
     ration,
     ryoPerHour: hours > 0 ? ryo / hours : 0,
     repPerHour: hours > 0 ? rep / hours : 0,
@@ -180,7 +207,7 @@ export interface BoardEntry {
 /** The missions of the board: every mission but the operation, with what blocks it and how it would go. */
 export function missionBoard(state: GameState, content: ContentDb, rules: Rules): BoardEntry[] {
   return content.missions
-    .filter((m) => m.rank !== 'OP')
+    .filter((m) => m.board)
     .map((m) => {
       const blocker = missionBlocker(state, m, content, rules);
       return {

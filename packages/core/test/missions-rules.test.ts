@@ -6,6 +6,11 @@ import {
   defaultRules,
   dispatch,
   gainMasteryXp,
+  newCombat,
+  rebalanceShares,
+  stopSlot,
+  deserialize,
+  serialize,
   masteryLevel,
   missionBoard,
   missionForecast,
@@ -307,7 +312,8 @@ describe('A5: rewards', () => {
       'missions.done.core:cat': 1,
       'missions.rank.D': 2,
       'missions.rank.V': 1,
-      'missions.village.elemental': 1,
+      'missions.elemental.V': 1,
+      'missions.elemental': 1,
     });
   });
 });
@@ -429,27 +435,27 @@ describe('A7: failures', () => {
     expect(stopped).toMatchObject({ reason: 'requirements', missing: 'core:antidote' });
   });
 
-  it('a lost combat stage costs a Wound and restarts that stage; the stages before it stand', () => {
+  it('a lost combat stage costs a Wound and restarts that stage until it has been lost too often; the stages before it stand', () => {
     // A player who cannot win: Scouting passes the first stage, the thief wins the second.
     const state = player({ natures: ['katon'], levels: { scout: 30, vit: 1, eva: 1, tai: 1 } });
     startMission(state, 'core:thief');
-    advance(state, 40 * MIN, content);
-    const events = state.events;
-    expect(events.filter((e) => e.type === 'playerDefeated').length).toBeGreaterThan(0);
+    const lost = (): number => state.events.filter((e) => e.type === 'playerDefeated').length;
+    // After the first defeat the stage has started over: the same stage, a new fight, a Wound.
+    for (let i = 0; i < 40 * 60 && lost() < 1; i++) advance(state, 1000, content);
+    expect(lost()).toBe(1);
     expect(state.wounds.stacks).toBeGreaterThan(0);
-    // The scouting stage was passed once and never repeated after the first fight started.
-    const stages = events.flatMap((e) => (e.type === 'missionStage' ? [e] : []));
-    const lastScout =
-      stages
-        .map((e, i) => (e.stage === 0 ? i : -1))
-        .filter((i) => i >= 0)
-        .at(-1) ?? -1;
-    const firstCombat = stages.findIndex((e) => e.stage === 1);
-    expect(firstCombat).toBeGreaterThan(lastScout);
-    expect(state.slots[0]?.action?.kind).toBe('mission');
-    expect(state.slots[0]?.data).toMatchObject({ s: 1 });
-    expect((state.slots[0]?.data as { a: number }).a).toBeGreaterThan(0);
+    expect(state.slots[0]?.data).toMatchObject({ s: 1, a: 1 });
     expect(state.combat).not.toBeNull();
+    // The scouting stage was passed once and never repeated.
+    const stages = state.events.flatMap((e) => (e.type === 'missionStage' ? [e] : []));
+    expect(stages.filter((e) => e.stage === 0)).toHaveLength(1);
+    // After as many lost fights in a row as the balance allows, the mission stops and says why.
+    advance(state, 6 * 60 * MIN, content);
+    expect(lost()).toBe(content.balance.K.mission.maxDefeats);
+    expect(state.slots[0]?.action).toBeNull();
+    expect(state.combat).toBeNull();
+    const stopped = state.events.filter((e) => e.type === 'actionStopped').at(-1);
+    expect(stopped).toMatchObject({ reason: 'requirements', cause: 'error.missionTooHard' });
     expect(state.counters['missions.done.core:thief'] ?? 0).toBe(0);
   });
 
@@ -464,59 +470,109 @@ describe('A7: failures', () => {
     expect(state.slots[0]?.progress).toBe(0);
   });
 
-  it('keeps one fight at a time, owned by one slot: a start in another slot is refused, in both orders', () => {
+  describe('one fight-capable action at a time', () => {
     const two = (id: string) => {
       const state = ableFor(mission(id));
       state.slots.push({ action: null, progress: 0, share: 0, data: null });
       return state;
     };
-    // A mission in its combat stage holds the fight; a zone fight and another mission are refused.
-    const first = two('core:thief');
-    startMission(first, 'core:thief');
-    advance(first, (first.slots[0]?.data as { p: { ms: number } }).p.ms + 2000, content);
-    expect(first.combat?.owner).toBe(0);
-    expect(
-      dispatch(first, { type: 'action.start', slot: 1, kind: 'fight', id: 'core:bandit' }, content),
-    ).toEqual({ ok: false, reason: 'error.fightBusy' });
-    expect(startMission(first, 'core:caravan', 1)).toEqual({
-      ok: false,
-      reason: 'error.fightBusy',
-    });
-    expect(first.slots[0]?.action?.kind).toBe('mission');
-    expect(first.combat?.enemy).toBe('core:thief');
-    // A mission with no fight in it starts anyway.
-    expect(startMission(first, 'core:weed', 1).ok).toBe(true);
-    expect(first.combat?.owner).toBe(0);
-    // Stopping the other slot does not end the fight; stopping the owner does.
-    dispatch(first, { type: 'action.stop', slot: 1 }, content);
-    expect(first.combat).not.toBeNull();
-    dispatch(first, { type: 'action.stop', slot: 0 }, content);
-    expect(first.combat).toBeNull();
+    const busy = { ok: false, reason: 'error.fightBusy' };
+    const fightIn = (state: GameState, slot: number) =>
+      dispatch(state, { type: 'action.start', slot, kind: 'fight', id: 'core:bandit' }, content);
 
-    // The other order: a zone fight holds the fight, and a mission's combat stage is refused at the start.
-    const second = two('core:thief');
-    expect(
-      dispatch(second, { type: 'action.start', slot: 1, kind: 'fight', id: 'core:bandit' }, content)
-        .ok,
-    ).toBe(true);
-    expect(second.combat?.owner).toBe(1);
-    expect(startMission(second, 'core:thief', 0)).toEqual({ ok: false, reason: 'error.fightBusy' });
-    expect(startMission(second, 'core:weed', 0).ok).toBe(true);
-    expect(second.combat?.owner).toBe(1);
-    expect(second.slots[1]?.action?.kind).toBe('fight');
-    // A mission that has begun and reaches its combat stage while the other slot fights stops, and the fight stays.
-    const third = two('core:thief');
-    startMission(third, 'core:thief', 0);
-    dispatch(third, { type: 'action.start', slot: 1, kind: 'fight', id: 'core:bandit' }, content);
-    advance(third, 10 * 60_000, content);
-    expect(third.slots[0]?.action).toBeNull();
-    expect(third.slots[1]?.action?.kind).toBe('fight');
-    expect(third.combat?.owner).toBe(1);
-    // The fight's owner can start a new fight in its own slot.
-    expect(
-      dispatch(third, { type: 'action.start', slot: 1, kind: 'fight', id: 'core:bandit' }, content)
-        .ok,
-    ).toBe(true);
+    it('refuses a fight while a mission with a combat stage runs, even on its skill stage (the reviewer scenario)', () => {
+      const state = two('core:thief');
+      startMission(state, 'core:thief', 0);
+      advance(state, 30_000, content);
+      expect(state.slots[0]?.data).toMatchObject({ s: 0 });
+      expect(fightIn(state, 1)).toEqual(busy);
+      expect(
+        dispatch(
+          state,
+          { type: 'action.start', slot: 1, kind: 'operation', id: 'core:op_hideout' },
+          content,
+        ),
+      ).toEqual(busy);
+      // The mission is not touched: it goes on to its combat stage and finishes.
+      runUntilDone(state, 'core:thief', 30 * MIN);
+      expect(state.counters['missions.done.core:thief']).toBe(1);
+      expect(state.events.filter((e) => e.type === 'actionStopped')).toEqual([]);
+    });
+
+    it('refuses a second mission with a combat stage, and the caravan in both slots', () => {
+      const state = two('core:caravan');
+      startMission(state, 'core:caravan', 0);
+      expect(startMission(state, 'core:caravan', 1).ok).toBe(false);
+      expect(startMission(state, 'core:thief', 1)).toEqual(busy);
+      expect(startMission(state, 'core:dig', 1)).toEqual(busy);
+      expect(state.slots[0]?.action?.kind).toBe('mission');
+    });
+
+    it('refuses a mission with a combat stage, or a fight, while a zone fight runs in the other slot', () => {
+      const state = two('core:thief');
+      expect(fightIn(state, 1).ok).toBe(true);
+      expect(startMission(state, 'core:thief', 0)).toEqual(busy);
+      expect(fightIn(state, 0)).toEqual(busy);
+      expect(state.combat?.owner).toBe(1);
+      // A mission with no fight in it goes beside the fight.
+      expect(startMission(state, 'core:weed', 0).ok).toBe(true);
+      expect(state.combat?.owner).toBe(1);
+      expect(state.slots[1]?.action?.kind).toBe('fight');
+    });
+
+    it('lets a fight-free mission run beside a mission with a fight, and the owner start again in its own slot', () => {
+      const state = two('core:thief');
+      startMission(state, 'core:thief', 0);
+      expect(startMission(state, 'core:weed', 1).ok).toBe(true);
+      // Replacing the slot that holds the fight is the owner's own business.
+      expect(startMission(state, 'core:thief', 0).ok).toBe(true);
+      dispatch(state, { type: 'action.stop', slot: 0 }, content);
+      expect(fightIn(state, 0).ok).toBe(true);
+    });
+
+    it('refuses the same mission in two slots', () => {
+      const state = two('core:weed');
+      expect(startMission(state, 'core:weed', 0).ok).toBe(true);
+      expect(startMission(state, 'core:weed', 1)).toEqual({
+        ok: false,
+        reason: 'error.missionRunning',
+      });
+      expect(state.slots[1]?.action).toBeNull();
+      // Starting it again in its own slot restarts it.
+      expect(startMission(state, 'core:weed', 0).ok).toBe(true);
+    });
+
+    it('never aborts a mission whose combat stage finds the fight busy: it waits, and resumes when the fight is free', () => {
+      const state = two('core:thief');
+      startMission(state, 'core:thief', 0);
+      // The first stage ends a little later; meanwhile a fight appears in the other slot (a state an old save can hold).
+      advance(state, (state.slots[0]?.data as { p: { ms: number } }).p.ms - 1000, content);
+      const bandit = content.enemies.find((e) => e.id === 'core:bandit');
+      if (!bandit) throw new Error('no bandit');
+      const other = state.slots[1];
+      if (!other) throw new Error('no slot');
+      other.action = { kind: 'fight', id: 'core:bandit' };
+      state.combat = newCombat(state, bandit, content, defaultRules, 1);
+      rebalanceShares(state);
+      advance(state, 20_000, content);
+      expect(state.slots[0]?.action?.kind).toBe('mission');
+      expect(state.slots[0]?.data).toMatchObject({ s: 1, q: 1, f: 0 });
+      expect(state.events.filter((e) => e.type === 'actionStopped')).toEqual([]);
+      // A save taken while it waits loads as it was, and goes on the same.
+      const copy = deserialize(serialize(state), content);
+      expect(copy.slots[0]?.data).toMatchObject({ s: 1, q: 1 });
+      expect(serialize(copy)).toBe(serialize(state));
+      // The fight is freed: the mission starts its fight and finishes.
+      stopSlot(state, 1, 'manual', content, defaultRules);
+      stopSlot(copy, 1, 'manual', content, defaultRules);
+      advance(state, 2500, content);
+      advance(copy, 2500, content);
+      expect(state.slots[0]?.data).toMatchObject({ s: 1, q: 0 });
+      expect(state.combat?.owner).toBe(0);
+      expect(serialize(copy)).toBe(serialize(state));
+      runUntilDone(state, 'core:thief', 30 * MIN);
+      expect(state.counters['missions.done.core:thief']).toBe(1);
+    });
   });
 
   it('refills the pouch from the bank for a combat stage, at its start and after a win', () => {
@@ -547,13 +603,15 @@ describe('A7: failures', () => {
     expect(state.combat).toBeNull();
   });
 
-  it('rolls on the world stream and leaves the loot stream alone', () => {
+  it('rolls on the action stream and leaves the loot and world streams alone', () => {
     const a = player({ levels: { herb: 5 } });
     const loot = [...(a.rng.loot ?? [])];
     const world = [...(a.rng.world ?? [])];
+    const action = [...(a.rng.action ?? [])];
     startMission(a, 'core:weed');
     advance(a, 30 * MIN, content);
     expect(a.rng.loot).toEqual(loot);
-    expect(a.rng.world).not.toEqual(world);
+    expect(a.rng.world).toEqual(world);
+    expect(a.rng.action).not.toEqual(action);
   });
 });

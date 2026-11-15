@@ -598,6 +598,12 @@
       "masteryTime": 0.003,
       "slowAlt": 2,
       "minFactor": 0.2,
+      "maxDefeats": 3,
+      "defaultStyle": "tai",
+      "fightSkills": [
+        "vit",
+        "eva"
+      ],
       "success": {
         "base": 0.9,
         "perLevel": 0.01,

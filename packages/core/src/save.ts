@@ -618,7 +618,10 @@ export function deserialize(
   const pending = isRecord(raw.missions) ? raw.missions.pending : undefined;
   state.missions = {
     pending: pick(pending, (key, n) =>
-      /^[a-z0-9_]+$/.test(key) && typeof n === 'number' && Number.isInteger(n) && n > 0
+      content.resources.some((r) => r.id === key) &&
+      typeof n === 'number' &&
+      Number.isInteger(n) &&
+      n > 0
         ? n
         : undefined,
     ),
