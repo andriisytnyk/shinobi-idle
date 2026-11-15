@@ -1,7 +1,8 @@
 <script lang="ts">
   import { entityName } from '../lib/entities.ts';
   import { t } from '../lib/i18n.ts';
-  import { markShown, MASK, revealHintKey, revealLevel } from '../lib/reveal.ts';
+  import { MASK, revealHintKey, revealLevel } from '../lib/reveal.ts';
+  import MarkShown from './MarkShown.svelte';
   import { hrefFor, type EntityKind } from '../lib/route.ts';
 
   interface Props {
@@ -13,20 +14,16 @@
 
   let { kind, id, offered = false }: Props = $props();
 
-  const ref = $derived({ kind, id });
-  const level = $derived(revealLevel(ref));
-  const hint = $derived(level === 'hidden' ? revealHintKey(ref) : null);
-
-  $effect(() => {
-    if (offered && level !== 'full') markShown([ref]);
-  });
+  const level = $derived(revealLevel({ kind, id }));
 </script>
 
 {#if level === 'hidden'}
+  {@const hint = revealHintKey({ kind, id })}
   <span class="entity-link masked" data-masked title={hint ? t(hint) : undefined}>{MASK}</span>
 {:else}
-  <a class="entity-link" href={hrefFor(ref)}>{entityName(ref)}</a>
+  <a class="entity-link" href={hrefFor({ kind, id })}>{entityName({ kind, id })}</a>
 {/if}
+{#if offered && level !== 'full'}<MarkShown {kind} {id} />{/if}
 
 <style>
   .entity-link {

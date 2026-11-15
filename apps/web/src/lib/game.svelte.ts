@@ -148,39 +148,50 @@ export function createGame(deps: GameDeps = {}) {
   // The reveal rule for the components: reading through `version` makes whatever uses it follow the game.
   // Many links on a page ask about the same few entities: answers are kept for one update of the game.
   // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a cache that no view reads
-  const levels = new Map<string, RevealLevel>();
-  let levelsAt = -1;
+  const levels = new Map<string, Map<string, RevealLevel>>();
   // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a cache that no view reads
-  const hints = new Map<string, string | null>();
-  let hintsAt = -1;
+  const hints = new Map<string, Map<string, string | null>>();
+  /** Bumped by whatever may change what is discovered at once: a command, a drained event, a new state. Between such moments answers are kept for a second of game time. */
+  let epoch = 0;
+  let cachedEpoch = -1;
+  let cachedSecond = -1;
+  /** Reads the update counter (so views follow the game) and drops the answers once they may be stale. */
+  const fresh = (): void => {
+    void version;
+    const second = Math.floor(state.now / 1000);
+    if (cachedEpoch !== epoch || cachedSecond !== second) {
+      levels.clear();
+      hints.clear();
+      cachedEpoch = epoch;
+      cachedSecond = second;
+    }
+  };
+  function remember<T>(
+    cache: Map<string, Map<string, T>>,
+    ref: { kind: string; id: string },
+    make: () => T,
+  ): T {
+    let byId = cache.get(ref.kind);
+    if (!byId) {
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a cache that no view reads
+      byId = new Map();
+      cache.set(ref.kind, byId);
+    }
+    let value = byId.get(ref.id);
+    if (value === undefined) {
+      value = make();
+      byId.set(ref.id, value);
+    }
+    return value;
+  }
   const reveal: RevealReader = {
     level(ref) {
-      const now = version;
-      if (levelsAt !== now) {
-        levels.clear();
-        levelsAt = now;
-      }
-      const key = `${ref.kind}\u0000${ref.id}`;
-      let level = levels.get(key);
-      if (level === undefined) {
-        level = revealOf(state, ref, content, rules);
-        levels.set(key, level);
-      }
-      return level;
+      fresh();
+      return remember(levels, ref, () => revealOf(state, ref, content, rules));
     },
     hint(ref) {
-      const now = version;
-      if (hintsAt !== now) {
-        hints.clear();
-        hintsAt = now;
-      }
-      const key = `${ref.kind}\u0000${ref.id}`;
-      let hint = hints.get(key);
-      if (hint === undefined) {
-        hint = revealHint(state, ref, content, rules);
-        hints.set(key, hint);
-      }
-      return hint;
+      fresh();
+      return remember(hints, ref, () => revealHint(state, ref, content, rules));
     },
     mark(refs) {
       let changed = false;
@@ -191,7 +202,10 @@ export function createGame(deps: GameDeps = {}) {
         if (coreDispatch(state, { type: 'reveal.mark', refs: [ref] }, content, rules).ok)
           changed = true;
       }
-      if (changed) touch();
+      if (changed) {
+        epoch++;
+        touch();
+      }
     },
   };
   setRevealReader(reveal);
@@ -221,6 +235,7 @@ export function createGame(deps: GameDeps = {}) {
   function drainEvents(): void {
     const events = state.events;
     if (events.length === 0) return;
+    epoch++;
     state.events = [];
     for (const listener of eventListeners) for (const event of events) listener(event);
     const lines: LogEntry[] = [];
@@ -340,6 +355,7 @@ export function createGame(deps: GameDeps = {}) {
 
   function replaceState(next: GameState): void {
     state = next;
+    epoch++;
     // The game that is given a state is the one that is played: the reveal rule reads from it.
     setRevealReader(reveal);
     log = [];
@@ -355,6 +371,7 @@ export function createGame(deps: GameDeps = {}) {
     loadError = null;
     if (!kv) {
       state = newGame(clock, content);
+      epoch++;
       phase = 'playing';
       begin();
       touch();
@@ -363,6 +380,7 @@ export function createGame(deps: GameDeps = {}) {
     try {
       const loaded = await loadGame(kv, clock, content, rules);
       state = loaded.state;
+      epoch++;
       rev = loaded.rev;
       report = loaded.report;
       await refreshBackupFlag();
@@ -462,6 +480,7 @@ export function createGame(deps: GameDeps = {}) {
 
     /** Sends a command to the core and refreshes the views. */
     dispatch(original: Command): CommandResult {
+      epoch++;
       let command = original;
       for (const hook of commandHooks) {
         const verdict = hook.before?.(command);
@@ -498,6 +517,7 @@ export function createGame(deps: GameDeps = {}) {
     },
     /** Developer tool: moves game time forward through `advance`, like waiting would. */
     devAdvance(ms: number): void {
+      epoch++;
       advance(state, ms, content, rules);
       drainEvents();
       touch();
@@ -532,6 +552,7 @@ export function createGame(deps: GameDeps = {}) {
       }
       loadError = null;
       state = newGame(clock, content);
+      epoch++;
       rev = 0;
       phase = 'playing';
       begin();
