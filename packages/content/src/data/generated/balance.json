@@ -591,13 +591,13 @@
       "seed": 7,
       "budgetMs": 5000,
       "hintOptions": 3,
-      "sessionMinutes": 120,
+      "sessionMinutes": 60,
       "sessionHours": {
-        "zone": 6,
-        "boss": 30,
-        "operation": 30
+        "zone": 4,
+        "boss": 20,
+        "operation": 20
       },
-      "minSessions": 3,
+      "minSessions": 4,
       "agree": 0.05,
       "stopFresh": 0.03,
       "batch": {

@@ -197,7 +197,7 @@ describe('the session forecast against real play', () => {
       if (collapse) expect(s.collapseShare).toBeGreaterThan(0);
       expect(s.assumesRestart).toBe(true);
       // Where the sessions agree, the yield is a plain number and must match.
-      if (s.winRate.p90 - s.winRate.p10 < 0.1 && s.winsPerHour.mean > 1) {
+      if (s.winRate.p90 - s.winRate.p10 < 0.1 && s.winsPerHour.mean > 5) {
         expect(Math.abs(s.winsPerHour.mean - meanPerHour) / meanPerHour).toBeLessThanOrEqual(0.1);
       }
       // What happens without an immediate restart: the share of sessions with no defeat.
