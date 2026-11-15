@@ -55,12 +55,12 @@
     margin: 0;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.5rem;
+    font-size: var(--text-xl);
     font-weight: 400;
   }
 
   p {
-    max-width: 36rem;
+    max-width: var(--modal-width);
     margin: 0;
     color: var(--fg-dim);
   }
@@ -69,7 +69,7 @@
     max-width: 100%;
     margin: 0;
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--danger);
+    border: var(--border-thin) solid var(--danger);
     border-radius: var(--radius-sm);
     white-space: pre-wrap;
     word-break: break-word;
@@ -83,9 +83,9 @@
   }
 
   button {
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     padding: var(--space-2) var(--space-4);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);
@@ -106,14 +106,15 @@
   }
 
   textarea {
-    width: min(40rem, 100%);
+    --_width: 40rem;
+    width: min(var(--_width), 100%);
     padding: var(--space-2);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface);
     color: var(--fg);
-    font-family: monospace;
-    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
   }
 
   .confirm {
@@ -122,7 +123,7 @@
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-3);
-    border: 1px solid var(--danger);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--danger);
+    border-radius: var(--radius-md);
   }
 </style>

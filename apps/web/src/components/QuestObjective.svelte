@@ -91,19 +91,19 @@
 
   .detail {
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
   }
 
   .count {
     grid-area: count;
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
     font-variant-numeric: tabular-nums;
   }
 
   .bar {
     grid-area: bar;
-    height: 3px;
-    border-radius: 2px;
+    height: var(--bar-thin);
+    border-radius: var(--radius-xs);
     background: var(--line);
     overflow: hidden;
   }

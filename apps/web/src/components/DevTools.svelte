@@ -40,18 +40,18 @@
     position: fixed;
     left: var(--space-2);
     bottom: calc(var(--now-height) + var(--space-2));
-    z-index: 20;
+    z-index: var(--z-toast);
     max-width: calc(100% - var(--space-4));
     max-height: 60dvh;
     overflow-y: auto;
     padding: var(--space-2) var(--space-3);
-    border: 1px dashed var(--danger);
-    border-radius: var(--radius);
+    border: var(--border-thin) dashed var(--danger);
+    border-radius: var(--radius-md);
     background: var(--surface);
   }
 
   .dev[open] {
-    width: min(22rem, calc(100% - var(--space-4)));
+    width: min(var(--toast-width), calc(100% - var(--space-4)));
   }
 
   @media (max-width: 768px) {
@@ -69,16 +69,16 @@
   .title {
     display: flex;
     align-items: center;
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     color: var(--danger);
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
     font-weight: 600;
     cursor: pointer;
   }
 
   .now {
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
   }
 
   .row {
@@ -89,9 +89,9 @@
   }
 
   button {
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);
@@ -102,10 +102,10 @@
   textarea {
     width: 100%;
     margin-top: var(--space-2);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     background: var(--bg);
     color: var(--fg);
-    font-family: monospace;
-    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
   }
 </style>

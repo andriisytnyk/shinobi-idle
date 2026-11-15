@@ -29,8 +29,8 @@
   .offer {
     margin-bottom: var(--space-3);
     padding: var(--space-3);
-    border: 1px dashed var(--accent);
-    border-radius: var(--radius);
+    border: var(--border-thin) dashed var(--accent);
+    border-radius: var(--radius-md);
   }
 
   p {
@@ -40,9 +40,9 @@
   .go {
     display: inline-flex;
     align-items: center;
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-4);
-    border: 1px solid var(--accent);
+    border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-sm);
     background: var(--accent);
     color: var(--ink-900);

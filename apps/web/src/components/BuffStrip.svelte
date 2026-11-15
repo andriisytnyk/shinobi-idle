@@ -42,10 +42,10 @@
     align-items: center;
     gap: var(--space-1);
     padding: 0 var(--space-2);
-    border: 1px solid var(--accent);
+    border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-sm);
     color: var(--accent);
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
     white-space: nowrap;
   }
 

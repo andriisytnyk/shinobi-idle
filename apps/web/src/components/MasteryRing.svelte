@@ -17,6 +17,7 @@
 
 <span
   class="ring"
+  data-ui="mastery-ring"
   role="img"
   aria-label={t('mastery.ring', { n: level, pct: Math.round(progress * 100) })}
   style:width="{size}px"
@@ -62,12 +63,12 @@
   .value {
     stroke: var(--accent);
     stroke-linecap: round;
-    transition: stroke-dasharray 0.2s;
+    transition: stroke-dasharray var(--duration-base);
   }
 
   .level {
     position: relative;
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
     font-weight: 600;
     font-variant-numeric: tabular-nums;
   }

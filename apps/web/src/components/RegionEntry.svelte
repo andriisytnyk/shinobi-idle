@@ -65,14 +65,14 @@
   .entry {
     margin: 0 0 var(--space-3);
     padding: var(--space-3);
-    border: 1px solid var(--accent);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--accent);
+    border-radius: var(--radius-md);
     background: var(--surface);
   }
 
   .where {
     margin: 0 0 var(--space-2);
-    font-size: 0.9rem;
+    font-size: var(--text-xs);
   }
 
   .where :global(a) {
@@ -86,10 +86,11 @@
   }
 
   button {
-    flex: 1 1 10rem;
-    min-height: 2.75rem;
+    --_flex: 10rem;
+    flex: 1 1 var(--_flex);
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--accent);
+    border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-sm);
     font: inherit;
     font-weight: 600;
@@ -116,6 +117,6 @@
   .why {
     margin: var(--space-1) 0 0;
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
   }
 </style>

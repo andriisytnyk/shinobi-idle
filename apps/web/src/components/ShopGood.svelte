@@ -46,7 +46,13 @@
   }
 </script>
 
-<li class="ct-row good" data-good={item} data-owned={owned}>
+<li
+  class="ct-row good"
+  data-good={item}
+  data-owned={owned}
+  data-ui="shop-good"
+  data-entity="item:{item}"
+>
   <span class="ct-icon"><Icon entity={{ kind: 'item', id: item }} size={28} /></span>
   <span class="grow"><EntityLink kind="item" id={item} /></span>
   <span class="ct-muted" data-price>{t('shop.price', { n: formatInt(price) })}</span>
@@ -92,7 +98,7 @@
 <style>
   .why-box {
     flex: 1 0 100%;
-    font-size: 0.9rem;
+    font-size: var(--text-xs);
   }
 
   .ct-why {

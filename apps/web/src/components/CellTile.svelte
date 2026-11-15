@@ -33,6 +33,8 @@
   class:locked={keyLocked || regionClosed}
   class:here={info.located}
   data-cell={info.id}
+  data-ui="world-cell"
+  data-entity="cell:{info.id}"
   data-level={info.level}
   data-located={info.located}
   data-maxed={maxed}
@@ -122,15 +124,16 @@
 
 <style>
   .tile {
+    --_min-height: 7rem;
     position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
     min-width: 0;
-    min-height: 7rem;
+    min-height: var(--_min-height);
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface-raised);
     list-style: none;
   }
@@ -141,7 +144,7 @@
   }
 
   .tile.here {
-    border-left: 4px solid var(--chakra);
+    border-left: var(--border-heavy) solid var(--chakra);
   }
 
   .tile.locked {
@@ -151,7 +154,7 @@
 
   .name {
     margin: 0;
-    font-size: 0.95rem;
+    font-size: var(--text-sm);
     font-weight: 600;
     line-height: 1.25;
     overflow-wrap: anywhere;
@@ -160,7 +163,7 @@
   /* The name link stretches over the tile, so a tap anywhere on it opens the cell. */
   .name :global(a) {
     color: var(--fg);
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     display: inline-flex;
     align-items: center;
   }
@@ -169,7 +172,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    border-radius: var(--radius);
+    border-radius: var(--radius-md);
   }
 
   .badges {
@@ -179,14 +182,15 @@
   }
 
   .badge {
+    --_line-height: 1.5rem;
     display: inline-flex;
     align-items: center;
-    gap: 0.2rem;
+    gap: var(--space-1);
     padding: 0 var(--space-2);
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    font-size: 0.75rem;
-    line-height: 1.5rem;
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-pill);
+    font-size: var(--text-2xs);
+    line-height: var(--_line-height);
   }
 
   .entry {
@@ -224,13 +228,15 @@
 
   .pips {
     display: flex;
-    gap: 0.25rem;
+    gap: var(--space-1);
   }
 
   .pip {
-    width: 0.7rem;
-    height: 0.7rem;
-    border: 1px solid var(--steel);
+    --_width: 0.7rem;
+    --_height: 0.7rem;
+    width: var(--_width);
+    height: var(--_height);
+    border: var(--border-thin) solid var(--steel);
     border-radius: 50%;
   }
 
@@ -241,8 +247,8 @@
 
   .bar {
     display: block;
-    height: 4px;
-    border-radius: 2px;
+    height: var(--bar-thin);
+    border-radius: var(--radius-xs);
     background: var(--line);
     overflow: hidden;
   }
@@ -255,14 +261,14 @@
 
   .max {
     color: var(--success);
-    font-size: 0.75rem;
+    font-size: var(--text-2xs);
     font-weight: 600;
   }
 
   .unexplored {
     margin: 0;
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
   }
 
   .pois {
@@ -281,8 +287,8 @@
 
   .need {
     position: relative;
-    z-index: 1;
+    z-index: var(--z-raised);
     margin: 0;
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
   }
 </style>

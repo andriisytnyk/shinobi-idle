@@ -45,7 +45,14 @@
   }
 </script>
 
-<li class="ct-tile" class:running data-herb={info.id} data-action={info.id}>
+<li
+  class="ct-tile"
+  class:running
+  data-herb={info.id}
+  data-action={info.id}
+  data-ui="action-tile"
+  data-entity="item:{info.id}"
+>
   <div class="ct-head">
     <h3 class="ct-name">
       <span class="ct-icon"><Icon entity={{ kind: 'item', id: info.id }} size={22} /></span>
@@ -59,7 +66,7 @@
       <dt>{t('tile.level')}</dt>
       <dd>{info.level}</dd>
     </div>
-    <div>
+    <div data-ui="action-interval">
       <dt>{t('tile.interval')}</dt>
       <dd>
         <ModBreakdown
@@ -69,7 +76,7 @@
         />
       </dd>
     </div>
-    <div>
+    <div data-ui="action-xp">
       <dt>{t('tile.xph')}</dt>
       <dd>
         <ModBreakdown
@@ -148,6 +155,6 @@
   }
 
   .req {
-    font-size: 0.9rem;
+    font-size: var(--text-xs);
   }
 </style>
