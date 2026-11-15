@@ -1,16 +1,17 @@
 <script lang="ts">
   import { content, localeKey, TRAIT_ANSWER } from '@shinobi/content';
   import { actionInfo, evalReq, type Req } from '@shinobi/core';
+  import ActionEmblem from '../components/ActionEmblem.svelte';
   import ActionTile from '../components/ActionTile.svelte';
   import EntityLink from '../components/EntityLink.svelte';
   import Icon from '../components/Icon.svelte';
-  import RankStamp from '../components/RankStamp.svelte';
   import ReqTree from '../components/ReqTree.svelte';
   import SealStrip from '../components/SealStrip.svelte';
   import { t } from '../lib/i18n.ts';
   import { techniqueGoal } from '../lib/goal.ts';
   import { techniqueRelations } from '../lib/technique-links.ts';
   import { game } from '../lib/store.ts';
+  import { practiceView } from '../lib/timing.ts';
   import { entityName } from '../lib/entities.ts';
 
   interface Props {
@@ -50,6 +51,15 @@
     ),
   );
 
+  /** The practice of this technique while it runs: the strip below shows its seals live. */
+  const view = $derived(
+    game.read((gs) => {
+      const slot = gs.slots.findIndex((s) => s.action?.kind === 'practice' && s.action.id === id);
+      const now = actionInfo(gs, { kind: 'practice', id }, game.content, game.rules);
+      return slot >= 0 && now ? practiceView(gs, slot, game.content, now.intervalMs) : null;
+    }),
+  );
+
   const goal = $derived(techniqueGoal(id, content));
   const pinned = $derived(game.read((gs) => gs.goal?.kind === 'technique' && gs.goal.id === id));
 
@@ -62,14 +72,13 @@
 {#if tech}
   <article class="technique" data-technique={id} data-ui="entity-page" data-entity="technique:{id}">
     <header class="scroll" data-ui="entity-header">
-      <span class="icon"><Icon entity={ref} size={40} /></span>
+      <ActionEmblem kind="technique" {id} rank={tech.rank ?? null} size="lg" />
       <div class="title">
         <p class="kind">
           {t('entity.kind.technique')} · <EntityLink kind="skill" id={tech.skill} />
         </p>
         <h1>{entityName(ref)}</h1>
       </div>
-      {#if tech.rank}<RankStamp rank={tech.rank} />{/if}
     </header>
 
     <dl class="facts">
@@ -109,7 +118,7 @@
     {#if tech.sealSeq.length > 0}
       <section data-ui="entity-section">
         <h2>{t('technique.seals')}</h2>
-        <SealStrip seals={tech.sealSeq} />
+        <SealStrip seals={tech.sealSeq} {view} />
       </section>
     {/if}
 
@@ -183,10 +192,6 @@
 
   .scroll :global(a) {
     color: var(--paper-ink);
-  }
-
-  .icon {
-    display: inline-flex;
   }
 
   .title {
