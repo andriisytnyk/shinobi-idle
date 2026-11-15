@@ -116,7 +116,7 @@ describe('listSkillActions', () => {
     expect(listSkillActions(state, 'cc', content).map((a) => a.kind)).toContain('drill');
     expect(listSkillActions(state, 'med', content).every((a) => a.kind === 'meditate')).toBe(true);
     expect(listSkillActions(state, 'ath', content).every((a) => a.kind === 'obstacle')).toBe(true);
-    expect(listSkillActions(state, 'herb', content)).toEqual([]);
+    expect(listSkillActions(state, 'scout', content)).toEqual([]);
     expect(listSkillActions(state, 'vit', content)).toEqual([]);
   });
 

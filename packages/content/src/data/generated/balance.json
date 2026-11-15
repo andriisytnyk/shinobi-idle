@@ -468,6 +468,39 @@
     },
     "academyCap": 10,
     "academySlow": 0.25,
+    "field": {
+      "stockBase": 5,
+      "regrowMs": 5000
+    },
+    "craftRules": {
+      "masteryTiers": [
+        1,
+        20,
+        50,
+        90
+      ],
+      "bonusPerTier": 0.25
+    },
+    "tonic": {
+      "capMult": 2
+    },
+    "shop": {
+      "craftSellFactor": 0.35,
+      "herbBase": 2,
+      "herbPerLevel": 0
+    },
+    "gearFx": {
+      "mannequin": 0.03,
+      "sickle": 0.05,
+      "alembic": 0.03,
+      "stations": 0.05,
+      "maps": 0.03
+    },
+    "itemFx": {
+      "sleep": {
+        "chance": 0.5
+      }
+    },
     "combat": {
       "xpTickMs": 1000,
       "regenMs": 1000,

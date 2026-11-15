@@ -11,7 +11,7 @@ import { combatUnits, FIGHT_KIND, newCombat } from './combat/system.ts';
 import type { CombatState } from './combat/types.ts';
 import type { EntityKind } from './entity.ts';
 import { emit } from './events.ts';
-import { MS_PER_HOUR, poolCapacity } from './formulas.ts';
+import { MS_PER_HOUR, MS_PER_SECOND, masteryLevel, poolCapacity } from './formulas.ts';
 import { indexOf } from './lookup.ts';
 import { RANK_ORDER } from './requirements.ts';
 import { STREAM_NAMES } from './rng.ts';
@@ -54,7 +54,12 @@ export const MIGRATIONS: readonly Migration[] = [
   }),
   // v3 -> v4: counters, quest progress, the running fight and the pinned goal.
   (state) => ({ ...state, counters: {}, quests: {}, combat: null, goal: null }),
+  // v4 -> v5: running tonics, owned training gear and herb bushes.
+  (state) => ({ ...state, buffs: {}, gear: {}, bushes: {} }),
 ];
+
+/** Deepest nesting a slot's data may have. */
+const JSON_DEPTH = 6;
 
 const isRecord = (x: unknown): x is Raw => typeof x === 'object' && x !== null && !Array.isArray(x);
 const nonNegative = (x: unknown): number =>
@@ -103,6 +108,15 @@ function pick<T>(
 }
 
 /** Cleans one saved slot. `lost` names an action that the rule set or content no longer has. */
+/** Whether a value is plain JSON of modest depth (what a slot may keep); anything else is dropped. */
+function isJson(x: unknown, depth: number): x is JsonValue {
+  if (x === null || typeof x === 'string' || typeof x === 'boolean') return true;
+  if (typeof x === 'number') return Number.isFinite(x);
+  if (depth >= JSON_DEPTH) return false;
+  if (Array.isArray(x)) return x.every((v) => isJson(v, depth + 1));
+  return isRecord(x) && Object.values(x).every((v) => isJson(v, depth + 1));
+}
+
 function sanitizeSlot(
   raw: unknown,
   content: ContentDb,
@@ -116,7 +130,7 @@ function sanitizeSlot(
     if (rules.actionKinds[action.kind]?.has(action.id, content)) {
       slot.action = { kind: action.kind, id: action.id };
       slot.progress = Math.floor(nonNegative(raw.progress));
-      slot.data = (raw.data ?? null) as JsonValue;
+      slot.data = isJson(raw.data, 0) ? raw.data : null;
     } else {
       lost = { kind: action.kind, id: action.id };
     }
@@ -265,6 +279,29 @@ export function deserialize(
     const step = Math.min(Math.floor(nonNegative(v.step)), quest.steps.length);
     return { step, base: Math.floor(nonNegative(v.base)), done: step >= quest.steps.length };
   });
+  state.buffs = pick(raw.buffs, (key, v) => {
+    const fx = index.items.get(key)?.fx;
+    if (fx?.kind !== 'tonic' || !isRecord(v)) return undefined;
+    const cap = fx.charges * content.balance.K.tonic.capMult;
+    const charges = Math.min(Math.floor(nonNegative(v.charges)), cap);
+    return charges >= 1 ? { skill: fx.skill, charges } : undefined;
+  });
+  state.gear = pick(raw.gear, (key, v) => {
+    const line = index.gear.get(key);
+    if (!line || typeof v !== 'number') return undefined;
+    const tiers = Math.min(Math.floor(nonNegative(v)), line.tiers.length);
+    return tiers >= 1 ? tiers : undefined;
+  });
+  state.bushes = pick(raw.bushes, (key, v) => {
+    if (!index.herbs.has(key) || !isRecord(v)) return undefined;
+    const K = content.balance.K;
+    const size = Math.floor(nonNegative(v.size));
+    if (size < 1 || size > K.field.stockBase + masteryLevel(state, key, content)) return undefined;
+    const stock = Math.min(Math.floor(nonNegative(v.stock)), size);
+    const room = (K.field.regrowMs + K.gather * MS_PER_SECOND) * SHARE_FULL;
+    const carry = stock === 0 ? Math.min(Math.floor(nonNegative(v.carry)), room) : 0;
+    return { stock, size, carry };
+  });
   const goal = raw.goal;
   state.goal =
     isRecord(goal) && typeof goal.kind === 'string' && typeof goal.id === 'string'
@@ -275,12 +312,12 @@ export function deserialize(
   // Shares are derived from which slots run, so they are recomputed rather than trusted; a
   // saved progress beyond one cycle is cut so a doctored save cannot make the loop spin.
   rebalanceShares(state);
-  for (const slot of state.slots) {
+  for (const [at, slot] of state.slots.entries()) {
     const kind = slot.action && rules.actionKinds[slot.action.kind];
     if (slot.action && kind) {
       slot.progress = Math.min(
         slot.progress,
-        kind.intervalMs(state, slot.action.id, content, rules) * SHARE_FULL,
+        kind.intervalMs(state, slot.action.id, content, rules, at) * SHARE_FULL,
       );
     }
   }

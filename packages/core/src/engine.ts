@@ -3,8 +3,10 @@ import { rebalanceShares, stopSlot } from './actions.ts';
 import type { EntityRef } from './entity.ts';
 import { emit } from './events.ts';
 import { examFor, SENSEI_TEST_KIND } from './exam.ts';
-import { useItem } from './items.ts';
+import { buyGear } from './gear.ts';
+import { coatItem, useItem } from './items.ts';
 import { indexOf } from './lookup.ts';
+import { shopBuy, shopSell } from './shop.ts';
 import { updateQuests } from './quests.ts';
 import { evalReq, RANK_ORDER } from './requirements.ts';
 import { defaultRules, type Rules } from './rules.ts';
@@ -18,7 +20,15 @@ export type Command =
   /** Starts the Genin exam's sensei test; the checklist must be met. `slot` defaults to 0. */
   | { type: 'exam.genin.start'; slot?: number }
   /** Uses a bank item on a target (for the graduate scroll, an academy technique id). */
-  | { type: 'item.use'; id: string; target: string }
+  | { type: 'item.use'; id: string; target?: string | undefined }
+  /** Coats a batch of `base` (senbon) with one `poison`. */
+  | { type: 'item.coat'; poison: string; base: string }
+  /** Buys `n` of a shop good or tool. */
+  | { type: 'shop.buy'; item: string; n: number }
+  /** Sells `n` of a trophy or craft product. */
+  | { type: 'shop.sell'; item: string; n: number }
+  /** Buys the next tier of a training-gear line. */
+  | { type: 'gear.buy'; line: string }
   /** Pins a goal for the meta panel; the entity must exist and be a kind that can be a goal. */
   | { type: 'goal.set'; ref: EntityRef }
   | { type: 'goal.clear' }
@@ -93,7 +103,9 @@ function startAction(
   }
   const req = kind.requirements(state, id, content, rules);
   if (req && !evalReq(state, req, content).met) {
-    return { ok: false, reason: 'error.requirementsNotMet' };
+    // An action that lacks an ingredient says so; anything else is a plain unmet requirement.
+    const lacking = kind.missing?.(state, id, content, rules);
+    return { ok: false, reason: lacking ? 'error.missingIngredient' : 'error.requirementsNotMet' };
   }
   stopSlot(state, slotIndex, 'replaced', content, rules);
   slot.action = { kind: kindName, id };
@@ -162,6 +174,14 @@ function apply(
     }
     case 'item.use':
       return useItem(state, command.id, command.target, content);
+    case 'item.coat':
+      return coatItem(state, command.poison, command.base, content);
+    case 'shop.buy':
+      return shopBuy(state, command.item, command.n, content);
+    case 'shop.sell':
+      return shopSell(state, command.item, command.n, content);
+    case 'gear.buy':
+      return buyGear(state, command.line, content);
     case 'goal.set': {
       if (!goalExists(command.ref, content)) return { ok: false, reason: 'error.invalidGoal' };
       state.goal = { kind: command.ref.kind, id: command.ref.id };

@@ -36,6 +36,8 @@ export interface ActionStoppedEvent extends EventBase {
   kind: string;
   id: string;
   reason: 'manual' | 'requirements' | 'replaced' | 'missing' | 'finished' | 'defeated';
+  /** Item id the action ran out of, when it stopped for lack of ingredients. */
+  missing?: string | undefined;
 }
 export interface EnemyDefeatedEvent extends EventBase {
   type: 'enemyDefeated';
