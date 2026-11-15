@@ -7,7 +7,7 @@ import {
 } from '@shinobi/content';
 import { rebalanceShares } from './actions.ts';
 import { playerMaxChakra, playerMaxHp, playerMaxStamina } from './combat/stats.ts';
-import { FIGHT_KIND, newCombat } from './combat/system.ts';
+import { combatUnits, FIGHT_KIND, newCombat } from './combat/system.ts';
 import type { CombatState } from './combat/types.ts';
 import type { EntityKind } from './entity.ts';
 import { emit } from './events.ts';
@@ -132,12 +132,14 @@ function sanitizeCombat(raw: unknown, state: GameState, content: ContentDb): Com
   const enemy = indexOf(content).enemies.get(raw.enemy);
   if (!enemy) return null;
   const fresh = newCombat(state, enemy, content);
-  const horizon = state.now + MS_PER_HOUR;
+  const clock = Math.floor(nonNegative(raw.clock));
+  const horizon = clock + combatUnits(MS_PER_HOUR);
   const time = (x: unknown, lowest: number): number =>
     Math.min(horizon, Math.max(lowest, Math.floor(nonNegative(x))));
   const combat: CombatState = {
     ...fresh,
     phase: raw.phase === 'respawn' ? 'respawn' : 'fight',
+    clock,
     enemyHp: finite(raw.enemyHp),
     hp: finite(raw.hp),
     chakra: nonNegative(raw.chakra),
@@ -149,14 +151,14 @@ function sanitizeCombat(raw: unknown, state: GameState, content: ContentDb): Com
     eAt: time(raw.eAt, 0),
     respawnAt: time(raw.respawnAt, 0),
     // Regeneration steps one second at a time, so a stale value must not mean millions of steps.
-    regenAt: time(raw.regenAt, state.now),
+    regenAt: time(raw.regenAt, clock),
     cd: pick(raw.cd, (key, v) =>
       indexOf(content).techniques.has(key) && typeof v === 'number' && Number.isFinite(v)
         ? Math.min(horizon, Math.floor(v))
         : undefined,
     ),
     style: SKILL_ID_SET.has(String(raw.style)) ? (raw.style as SkillId) : 'tai',
-    lastActionAt: Math.min(state.now, Math.floor(nonNegative(raw.lastActionAt))),
+    lastActionAt: Math.min(clock, Math.floor(nonNegative(raw.lastActionAt))),
     fx: { player: [], enemy: [] },
   };
   if (combat.pPhase === 'cast' && combat.cast === null) combat.pPhase = 'ready';

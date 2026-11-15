@@ -28,7 +28,6 @@ describe('A9: core source hygiene', () => {
   it('keeps numeric literals to unit conversions and structural constants', () => {
     // Anything else is a balance number and belongs in the content balance object.
     const allowed: Record<string, number[]> = {
-      'combat/stats.ts': [0.5],
       'events.ts': [200],
       'formulas.ts': [1000, 3600],
       'progression.ts': [100],

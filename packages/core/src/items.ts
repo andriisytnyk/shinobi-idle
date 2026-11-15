@@ -3,7 +3,7 @@ import { removeItem } from './bank.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
 import { indexOf } from './lookup.ts';
-import { gainMasteryXp } from './progression.ts';
+import { grantMastery } from './progression.ts';
 import type { GameState } from './state.ts';
 
 /**
@@ -28,7 +28,7 @@ export function useItem(
   }
   removeItem(state, id, 1);
   // One hour of practice, as the balance defines it.
-  gainMasteryXp(state, target, content.balance.K.masteryPerHour, content);
+  grantMastery(state, target, technique.skill, content.balance.K.masteryPerHour, content);
   emit(state, { type: 'itemUsed', id, target });
   return { ok: true };
 }

@@ -4,10 +4,10 @@ import { bump, killsKey } from '../counters.ts';
 import { emit } from '../events.ts';
 import { MS_PER_HOUR, MS_PER_SECOND } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
-import { gainMasteryXp } from '../progression.ts';
+import { grantMastery } from '../progression.ts';
 import { nextFloat } from '../rng.ts';
 import type { Rules } from '../rules.ts';
-import type { GameState } from '../state.ts';
+import { SHARE_FULL, type GameState } from '../state.ts';
 import type { System } from '../system.ts';
 import {
   basicAttack,
@@ -30,8 +30,12 @@ export const FIGHT_KIND = 'fight';
 /** The only RNG stream combat draws from. */
 const STREAM = 'combat';
 
-/** Pools regenerate once per second of game time. */
-const REGEN_MS = MS_PER_SECOND;
+/**
+ * Combat runs on its own clock, `clock`, counted in work units (ms x SHARE_FULL) like action
+ * progress: each real ms adds the fight slot's share. All deadlines are on this clock, so every
+ * part of combat slows with the share and integer accounting keeps it chunk-invariant.
+ */
+export const combatUnits = (ms: number): number => ms * SHARE_FULL;
 
 /** Index of the slot running a fight, or -1. */
 export function fightSlotIndex(state: GameState): number {
@@ -44,30 +48,28 @@ export function newCombat(state: GameState, enemy: Enemy, content: ContentDb): C
   return {
     enemy: enemy.id,
     phase: 'fight',
+    clock: 0,
     enemyHp: stats.maxHp,
     hp: playerMaxHp(state, content),
     chakra: playerMaxChakra(state, content),
     stamina: playerMaxStamina(state, content),
     pPhase: 'ready',
-    pAt: state.now,
+    pAt: 0,
     cast: null,
-    eAt: state.now + stats.intervalMs,
+    eAt: combatUnits(stats.intervalMs),
     respawnAt: 0,
-    regenAt: state.now + REGEN_MS,
+    regenAt: combatUnits(Math.round(content.balance.K.combat.regenMs)),
     cd: {},
     style: 'tai',
-    lastActionAt: state.now,
+    // Mastery is paid from the previous technique use, or from here at the start of a fight, so
+    // time before a fight's first technique is paid once and never carried over from another fight.
+    lastActionAt: 0,
     fx: { player: [], enemy: [] },
   };
 }
 
 function roll(state: GameState, chance: number): boolean {
   return nextFloat(state.rng, STREAM) < chance;
-}
-
-/** Techniques the player knows that can hurt, in content order. */
-function knownAttacks(state: GameState, content: ContentDb): Technique[] {
-  return content.techniques.filter((t) => state.known[t.id]);
 }
 
 /** Player AI v0: the strongest ready technique that can be paid for, else null (basic attack). */
@@ -79,8 +81,8 @@ function pickTechnique(
 ): Technique | null {
   let best: Technique | null = null;
   let bestDamage = 0;
-  for (const tech of knownAttacks(state, content)) {
-    if ((c.cd[tech.id] ?? 0) > state.now) continue;
+  for (const tech of content.techniques) {
+    if (!state.known[tech.id] || (c.cd[tech.id] ?? 0) > c.clock) continue;
     const n = techniqueNumbers(state, tech, content, rules);
     if (n.damage <= bestDamage) continue;
     if ((n.pool === 'chakra' ? c.chakra : c.stamina) < n.cost) continue;
@@ -88,13 +90,6 @@ function pickTechnique(
     bestDamage = n.damage;
   }
   return best;
-}
-
-/** Mastery XP is paid for the time since the previous action, per balance. */
-function noteAction(state: GameState, c: CombatState, content: ContentDb): number {
-  const gap = state.now - c.lastActionAt;
-  c.lastActionAt = state.now;
-  return (content.balance.K.masteryPerHour * gap) / MS_PER_HOUR;
 }
 
 function playerAct(
@@ -105,7 +100,6 @@ function playerAct(
   rules: Rules,
 ) {
   const tech = pickTechnique(state, c, content, rules);
-  const mastery = noteAction(state, c, content);
   if (tech) {
     const n = techniqueNumbers(state, tech, content, rules);
     if (n.pool === 'chakra') c.chakra -= n.cost;
@@ -113,14 +107,20 @@ function playerAct(
     c.style = tech.skill;
     c.cast = tech.id;
     c.pPhase = 'cast';
-    c.pAt = state.now + n.castMs;
-    gainMasteryXp(state, tech.id, mastery, content);
+    c.pAt = c.clock + combatUnits(n.castMs);
+    // Mastery XP is paid for the combat time since the previous technique use (or the fight's
+    // start). A basic attack does not move that timestamp, so the time it takes is paid with
+    // the next technique rather than lost.
+    const gapMs = (c.clock - c.lastActionAt) / SHARE_FULL;
+    c.lastActionAt = c.clock;
+    const amount = (content.balance.K.masteryPerHour * gapMs) / MS_PER_HOUR;
+    grantMastery(state, tech.id, tech.skill, amount, content);
     return;
   }
   const basic = basicAttack(state, content);
   c.style = 'tai';
   c.pPhase = 'recover';
-  c.pAt = state.now + basic.intervalMs;
+  c.pAt = c.clock + combatUnits(basic.intervalMs);
   const stats = enemyStats(enemy, content);
   if (roll(state, hitChance(basic.accuracy, stats.evasion, content))) c.enemyHp -= basic.damage;
 }
@@ -137,7 +137,7 @@ function resolveCast(
   c.pPhase = 'ready';
   if (!tech) return;
   const n = techniqueNumbers(state, tech, content, rules);
-  c.cd[tech.id] = state.now + n.cooldownMs;
+  c.cd[tech.id] = c.clock + combatUnits(n.cooldownMs);
   const stats = enemyStats(enemy, content);
   const chance = hitChance(playerAccuracy(state, tech.skill, content), stats.evasion, content);
   if (roll(state, chance)) c.enemyHp -= n.damage;
@@ -145,7 +145,7 @@ function resolveCast(
 
 function enemyAttack(state: GameState, c: CombatState, enemy: Enemy, content: ContentDb) {
   const stats = enemyStats(enemy, content);
-  c.eAt = state.now + stats.intervalMs;
+  c.eAt = c.clock + combatUnits(stats.intervalMs);
   const chance = hitChance(stats.accuracy, playerEvasion(state, content), content);
   if (roll(state, chance)) c.hp -= stats.damage;
 }
@@ -155,7 +155,7 @@ function enemyDown(state: GameState, c: CombatState, content: ContentDb) {
   const K = content.balance.K;
   c.enemyHp = 0;
   c.phase = 'respawn';
-  c.respawnAt = state.now + Math.round(K.respawn * MS_PER_SECOND);
+  c.respawnAt = c.clock + combatUnits(Math.round(K.respawn * MS_PER_SECOND));
   const maxHp = playerMaxHp(state, content);
   c.hp = Math.min(maxHp, c.hp + K.zoneHpRegen * maxHp);
   c.chakra = playerMaxChakra(state, content);
@@ -165,8 +165,9 @@ function enemyDown(state: GameState, c: CombatState, content: ContentDb) {
 }
 
 function regenerate(state: GameState, c: CombatState, content: ContentDb) {
-  while (c.regenAt <= state.now) {
-    c.regenAt += REGEN_MS;
+  const step = combatUnits(Math.round(content.balance.K.combat.regenMs));
+  while (c.regenAt <= c.clock) {
+    c.regenAt += step;
     c.chakra = Math.min(
       playerMaxChakra(state, content),
       c.chakra + playerChakraRegen(state, content),
@@ -179,19 +180,25 @@ function regenerate(state: GameState, c: CombatState, content: ContentDb) {
 }
 
 /**
- * Real-time combat. Every deadline in `state.combat` is an absolute time, so letting time pass
- * changes nothing and the system only wakes at deadlines: the end of a cast or recovery, the next
- * enemy attack, the next enemy appearing, the next regeneration.
+ * Real-time combat on the fight slot's own clock. The system only wakes at deadlines: the end of
+ * a cast or recovery, the next enemy attack, the next enemy appearing, the next regeneration.
  */
 export const combatSystem: System = {
   nextEventIn(state) {
     const c = state.combat;
-    if (!c) return null;
+    const slot = state.slots[fightSlotIndex(state)];
+    if (!c || !slot || slot.share <= 0) return null;
     const due = [c.regenAt];
     if (c.pPhase !== 'ready') due.push(c.pAt);
-    if (c.phase === 'fight') due.push(c.eAt, ...(c.pPhase === 'ready' ? [state.now] : []));
+    if (c.phase === 'fight') due.push(c.eAt, ...(c.pPhase === 'ready' ? [c.clock] : []));
     else due.push(c.respawnAt);
-    return Math.max(0, Math.min(...due) - state.now);
+    return Math.max(0, Math.ceil((Math.min(...due) - c.clock) / slot.share));
+  },
+
+  elapse(state, dt) {
+    const c = state.combat;
+    const slot = state.slots[fightSlotIndex(state)];
+    if (c && slot) c.clock += dt * slot.share;
   },
 
   run(state, content, rules) {
@@ -206,16 +213,16 @@ export const combatSystem: System = {
     if (!enemy) return stopSlot(state, index, 'missing', content, rules);
     regenerate(state, c, content);
     for (;;) {
-      if (c.pPhase === 'recover' && c.pAt <= state.now) c.pPhase = 'ready';
+      if (c.pPhase === 'recover' && c.pAt <= c.clock) c.pPhase = 'ready';
       if (c.phase === 'respawn') {
-        if (c.respawnAt > state.now) return;
+        if (c.respawnAt > c.clock) return;
         c.phase = 'fight';
         c.enemyHp = enemyStats(enemy, content).maxHp;
-        c.eAt = state.now + enemyStats(enemy, content).intervalMs;
+        c.eAt = c.clock + combatUnits(enemyStats(enemy, content).intervalMs);
       }
-      if (c.pPhase === 'cast' && c.pAt <= state.now) resolveCast(state, c, enemy, content, rules);
+      if (c.pPhase === 'cast' && c.pAt <= c.clock) resolveCast(state, c, enemy, content, rules);
       else if (c.pPhase === 'ready') playerAct(state, c, enemy, content, rules);
-      else if (c.eAt <= state.now) {
+      else if (c.eAt <= c.clock) {
         enemyAttack(state, c, enemy, content);
         if (c.hp <= 0) {
           emit(state, { type: 'playerDefeated', enemy: c.enemy });

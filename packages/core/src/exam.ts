@@ -29,7 +29,14 @@ export function senseiTestSeconds(state: GameState, exam: Exam, content: Content
  */
 export const senseiTestKind: ActionKind = {
   has: (id, content) => indexOf(content).exams.has(id),
-  requirements: (_state, id, content) => indexOf(content).exams.get(id)?.checklist ?? null,
+  // Only a player below the exam's rank can take it, and only with the checklist met. An `any`
+  // of nothing can never hold, which is how a rank already held blocks the action.
+  requirements(state, id, content) {
+    const exam = indexOf(content).exams.get(id);
+    if (!exam) return null;
+    const held = RANK_ORDER.indexOf(state.player.rank) >= RANK_ORDER.indexOf(exam.rank);
+    return held ? { t: 'any', of: [] } : exam.checklist;
+  },
 
   intervalMs(state, id, content) {
     const exam = indexOf(content).exams.get(id);
@@ -40,10 +47,10 @@ export const senseiTestKind: ActionKind = {
   complete(state, id, content) {
     const exam = indexOf(content).exams.get(id);
     if (!exam) return 'stop';
-    if (RANK_ORDER.indexOf(exam.rank) > RANK_ORDER.indexOf(state.player.rank)) {
-      state.player.rank = exam.rank;
-      emit(state, { type: 'rankUp', rank: exam.rank });
-    }
+    // Rewards come only with the rank itself, so repeating the exam can never pay twice.
+    if (RANK_ORDER.indexOf(exam.rank) <= RANK_ORDER.indexOf(state.player.rank)) return 'stop';
+    state.player.rank = exam.rank;
+    emit(state, { type: 'rankUp', rank: exam.rank });
     refreshUnlocks(state, content);
     for (const { item, n } of exam.rewards.items) {
       if (addItem(state, item, n)) emit(state, { type: 'itemGained', id: item, n });

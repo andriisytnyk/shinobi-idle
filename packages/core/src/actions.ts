@@ -6,14 +6,13 @@ import {
   SECONDS_PER_HOUR,
   masteryLevel,
   masteryXpPerAction,
-  poolGain,
   practiceIntervalSeconds,
   rate,
   techniqueCastSeconds,
 } from './formulas.ts';
 import { indexOf } from './lookup.ts';
 import { computeMod } from './modifiers.ts';
-import { gainMasteryXp, gainPoolXp, gainXp } from './progression.ts';
+import { gainXp, grantMastery } from './progression.ts';
 import { evalReq, type Req } from './requirements.ts';
 import type { Rules } from './rules.ts';
 import { SHARE_FULL, type GameState } from './state.ts';
@@ -92,8 +91,7 @@ function skillAction(resolve: Resolver): ActionKind {
       const xp = (rate(def.level, content) * seconds) / SECONDS_PER_HOUR;
       gainXp(state, def.skill, xp, content, rules);
       const mastery = masteryXpPerAction(seconds, content);
-      gainMasteryXp(state, def.masteryKey, mastery, content);
-      gainPoolXp(state, def.skill, poolGain(mastery, content), content);
+      grantMastery(state, def.masteryKey, def.skill, mastery, content);
     },
   };
 }

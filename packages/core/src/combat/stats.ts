@@ -5,14 +5,13 @@ import { skillLevel } from '../requirements.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 
-/** Share of the hit chance at equal ratings in the Melvor formula. */
-const EVEN_SHARE = 0.5;
-
 /** Melvor hit chance, clamped to the balance bounds. */
 export function hitChance(accuracy: number, evasion: number, content: ContentDb): number {
   const K = content.balance.K;
   const raw =
-    accuracy < evasion ? (EVEN_SHARE * accuracy) / evasion : 1 - (EVEN_SHARE * evasion) / accuracy;
+    accuracy < evasion
+      ? (K.combat.hitEven * accuracy) / evasion
+      : 1 - (K.combat.hitEven * evasion) / accuracy;
   return Math.min(K.hitMax, Math.max(K.hitMin, raw));
 }
 

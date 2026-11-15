@@ -8,7 +8,7 @@ import type { JsonValue } from '../state.ts';
  */
 export interface CombatEffect {
   kind: string;
-  /** Game time in ms at which the effect ends. */
+  /** Combat clock time at which the effect ends. */
   until: number;
   data: JsonValue;
 }
@@ -17,14 +17,17 @@ export interface CombatEffect {
 export type PlayerPhase = 'ready' | 'cast' | 'recover';
 
 /**
- * The running fight, as plain JSON. Every deadline is an absolute game time in whole ms, so
- * letting time pass changes nothing here and any chunking of `advance` gives identical saves.
+ * The running fight, as plain JSON. Combat has its own clock in work units (ms x the fight slot's
+ * share, like action progress) and every deadline below is a time on that clock, so combat of any
+ * speed share is exact in whole numbers and any chunking of `advance` gives identical saves.
  */
 export interface CombatState {
   /** Content id of the enemy being fought. */
   enemy: string;
   /** `fight`: an enemy is alive. `respawn`: the pause before the next one appears. */
   phase: 'fight' | 'respawn';
+  /** Combat time in work units; advances by the slot share per ms. */
+  clock: number;
   enemyHp: number;
   hp: number;
   chakra: number;
@@ -44,7 +47,7 @@ export interface CombatState {
   cd: Record<string, number>;
   /** Skill that earns combat style XP: that of the technique last used; basic attacks are Taijutsu. */
   style: SkillId;
-  /** Game time of the player's previous action; mastery XP is paid for the time since it. */
+  /** Clock time of the player's previous technique use, or the fight's start. */
   lastActionAt: number;
   fx: { player: CombatEffect[]; enemy: CombatEffect[] };
 }

@@ -11,6 +11,8 @@ export const BALANCE_EXT = {
   offlineCapHours: 12,
   /** The sensei test: 300 s, 1% shorter per level of the exam's skills, never under 120 s. */
   senseiTest: { base: 300, perLevel: 0.01, floor: 120 },
+  /** Combat timing: ms per combat XP tick, ms per pool regeneration step, hit share at equal ratings. */
+  combat: { xpTickMs: 1000, regenMs: 1000, hitEven: 0.5 },
   /** Mastery levels stop here. */
   masteryCap: 99,
 } as const;

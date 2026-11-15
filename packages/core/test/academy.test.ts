@@ -347,8 +347,8 @@ describe('A8: saves', () => {
     });
     const b = deserialize(JSON.stringify(parsed), content);
     expect(b.combat?.hp).toBeGreaterThan(0);
-    expect(b.combat?.regenAt).toBeGreaterThanOrEqual(b.now);
-    expect(b.combat?.pAt).toBeLessThanOrEqual(b.now + 3_600_000);
+    expect(b.combat?.regenAt).toBeGreaterThanOrEqual(b.combat?.clock ?? Infinity);
+    expect(b.combat?.pAt).toBeLessThanOrEqual((b.combat?.clock ?? 0) + 3_600_000 * 1000);
     expect(b.combat?.cast).toBeNull();
     advance(b, 10_000, content);
     // A save without a combat block but with a fight slot gets a fresh fight.

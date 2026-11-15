@@ -1,14 +1,8 @@
 import { stopSlot, type ActionKind } from '../actions.ts';
-import { MS_PER_HOUR, MS_PER_SECOND, rate } from '../formulas.ts';
+import { MS_PER_HOUR, rate } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
 import { gainXp } from '../progression.ts';
 import { FIGHT_KIND, newCombat } from './system.ts';
-
-/**
- * Combat XP is paid by time, once per this long, so it follows the slot's speed share and lands
- * at fixed moments whatever the chunking of `advance`.
- */
-export const COMBAT_XP_TICK_MS = MS_PER_SECOND;
 
 /**
  * Fighting an enemy. The slot holds the action; the fight itself lives in `state.combat` and is
@@ -17,13 +11,14 @@ export const COMBAT_XP_TICK_MS = MS_PER_SECOND;
 export const fightKind: ActionKind = {
   has: (id, content) => indexOf(content).enemies.has(id),
   requirements: () => null,
-  intervalMs: () => COMBAT_XP_TICK_MS,
+  // Combat XP is paid by time, once per tick, so it follows the slot share like all combat time.
+  intervalMs: (_state, _id, content) => content.balance.K.combat.xpTickMs,
 
   complete(state, id, content, rules) {
     const enemy = indexOf(content).enemies.get(id);
     if (!enemy) return;
     const K = content.balance.K;
-    const perTick = (rate(enemy.cl, content) * COMBAT_XP_TICK_MS) / MS_PER_HOUR;
+    const perTick = (rate(enemy.cl, content) * K.combat.xpTickMs) / MS_PER_HOUR;
     gainXp(state, state.combat?.style ?? 'tai', K.combatXp.style * perTick, content, rules);
     gainXp(state, 'vit', K.combatXp.vit * perTick, content, rules);
     gainXp(state, 'eva', K.combatXp.eva * perTick, content, rules);
