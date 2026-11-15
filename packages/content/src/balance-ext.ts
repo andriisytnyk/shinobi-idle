@@ -15,4 +15,46 @@ export const BALANCE_EXT = {
   combat: { xpTickMs: 1000, regenMs: 1000, hitEven: 0.5 },
   /** Mastery levels stop here. */
   masteryCap: 99,
+  /**
+   * Numbers of non-damaging technique effects (balance_tables.md, section 3, «Особливі ефекти»,
+   * and the slice amendments). Technique data names an entry by key; it never carries the number.
+   */
+  techFx: {
+    /** Absorbs power[rank] x mult x level scaling. */
+    shield: { mult: 1.3, durationMs: 6000 },
+    /** The next enemy hit misses. */
+    decoy: { charges: 1, durationMs: 8000 },
+    /** Multiplies the player's evasion. */
+    evasionBuff: { mult: 1.5, durationMs: 8000 },
+    /** Out of the loadout: cancels one hit now and then. */
+    passiveNegate: { everyMs: 20000 },
+    /** Stance of the First Gate: extra Taijutsu damage, stamina drain, Wounds after the fight. */
+    gateOpening: { taiDamage: 0.03, staminaPerSec: 2, woundsAfter: 1 },
+    /** Stance of the Second Gate. */
+    gateHealing: { taiDamage: 0.05, staminaPerSec: 3, woundsAfter: 1 },
+    /** Scales the cast time of the next technique. */
+    nextCast: { castMult: 0.5 },
+    /** Removes the Hidden trait for this long. */
+    reveal: { durationMs: 20000 },
+  },
+  /**
+   * Numbers of boss specials. Bind duration of the mist fugitive is `bind.dur`, and the hit
+   * counters of the rival are the generic `habituation` ones.
+   */
+  bossFx: {
+    wolfPack: { count: 4, everyMs: 20000 },
+    rivalDuel: { techniques: 1 },
+    rivalTournament: { techniques: 2, habituationMult: 2 },
+    drunkenEvasion: { maxMult: 3 },
+    heavyCast: { everyMs: 15000, castMs: 2500, damageMult: 4 },
+    twins: { count: 2 },
+    mistRehide: { everyMs: 25000 },
+    illusion: { everyMs: 8000, fleeAtHp: 0.3 },
+  },
+  /** Ryo dropped by an enemy per combat level: range of the multiplier. */
+  ryoDrop: [5, 8],
+  /** Chance of a trophy drop per kill. */
+  dropChance: { band: 0.25, pelt: 0.4, fang: 0.3, coin: 0.03, gem: 0.01 },
+  /** Sell price of a trophy in ryo. */
+  sell: { band: 15, pelt: 8, fang: 20, coin: 40, gem: 250 },
 } as const;

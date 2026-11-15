@@ -18,5 +18,12 @@ describe('slice size', () => {
     expect(content.enemies.length).toBe(24);
     expect(content.bosses.length).toBe(8);
     expect(content.buildings.length).toBe(16);
+    expect(content.items.filter((i) => i.scroll)).toHaveLength(15);
+    expect(content.items.filter((i) => i.part)).toHaveLength(5);
+    expect(content.zones).toHaveLength(31);
+    expect(content.operations).toHaveLength(2);
+    expect(content.statuses).toHaveLength(5);
+    expect(content.traits).toHaveLength(8);
+    expect(content.combos).toHaveLength(4);
   });
 });

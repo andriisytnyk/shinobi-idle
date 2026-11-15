@@ -386,9 +386,11 @@ describe('identity and localization', () => {
         }
       }
     };
-    const dir = new URL('../src/data/generated/', import.meta.url);
-    for (const file of readdirSync(dir)) {
-      visit(JSON.parse(readFileSync(new URL(file, dir), 'utf8')), file);
+    for (const folder of ['generated', 'hand']) {
+      const dir = new URL(`../src/data/${folder}/`, import.meta.url);
+      for (const file of readdirSync(dir)) {
+        visit(JSON.parse(readFileSync(new URL(file, dir), 'utf8')), `${folder}/${file}`);
+      }
     }
   });
 

@@ -1,0 +1,22 @@
+[
+  {
+    "id": "fanBurn",
+    "nature": "futon",
+    "onState": "burn"
+  },
+  {
+    "id": "shockWet",
+    "nature": "raiton",
+    "onState": "wet"
+  },
+  {
+    "id": "mudEva",
+    "nature": "doton",
+    "onState": "wet"
+  },
+  {
+    "id": "steam",
+    "nature": "katon",
+    "onState": "wet"
+  }
+]

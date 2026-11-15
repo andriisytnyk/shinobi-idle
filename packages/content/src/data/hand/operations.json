@@ -1,0 +1,49 @@
+[
+  {
+    "id": "core:op_hideout",
+    "unlock": {
+      "t": "flag",
+      "id": "op.hideout.unlocked"
+    },
+    "regen": "opRegen",
+    "stages": [
+      {
+        "t": "approach",
+        "shortenedBy": {
+          "t": "skill",
+          "skill": "scout",
+          "level": 20
+        }
+      },
+      {
+        "t": "fight",
+        "enemy": "core:guard_pack"
+      },
+      {
+        "t": "fight",
+        "enemy": "core:boss_twins"
+      },
+      {
+        "t": "fight",
+        "enemy": "core:boss_mist"
+      }
+    ]
+  },
+  {
+    "id": "core:op_forest_of_death",
+    "unlock": {
+      "t": "flag",
+      "id": "op.forest_of_death.unlocked"
+    },
+    "regen": "opRegen",
+    "stages": [
+      {
+        "t": "days",
+        "days": 5,
+        "fightsPerDay": 3,
+        "pool": ["core:serpent", "core:leech", "core:fake_genin"],
+        "finale": "core:boss_nameless"
+      }
+    ]
+  }
+]

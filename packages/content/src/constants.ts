@@ -118,3 +118,20 @@ export type TraitId = (typeof TRAIT_IDS)[number];
 export type StateId = (typeof STATE_IDS)[number];
 export type MissionRank = (typeof MISSION_RANKS)[number];
 export type CellKey = (typeof CELL_KEYS)[number];
+
+/** Statuses a fighter can carry. Burn, stun and wet are technique states; bind and poison come from other effects. */
+export const STATUS_IDS = ['burn', 'wet', 'stun', 'bind', 'poison'] as const;
+
+/** Combos of states: a nature hitting a fighter that already carries a state. */
+export const COMBO_IDS = ['fanBurn', 'shockWet', 'mudEva', 'steam'] as const;
+
+/** How an enemy attacks. */
+export const ATTACK_STYLES = ['melee', 'ranged'] as const;
+
+/** Where a fightable zone lies: a region of the map, the Academy yard, the exam forest or a boss. */
+export const ZONE_REGIONS = ['academy', 'forest', 'plains', 'valley', 'exam', 'boss'] as const;
+
+export type StatusId = (typeof STATUS_IDS)[number];
+export type ComboId = (typeof COMBO_IDS)[number];
+export type AttackStyle = (typeof ATTACK_STYLES)[number];
+export type ZoneRegion = (typeof ZONE_REGIONS)[number];

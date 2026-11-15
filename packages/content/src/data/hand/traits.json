@@ -1,0 +1,66 @@
+[
+  {
+    "id": "armor",
+    "answer": "pierce",
+    "numbers": {
+      "from": "trait",
+      "keys": ["armor", "armorOff"]
+    }
+  },
+  {
+    "id": "caster",
+    "answer": "interrupt",
+    "numbers": {
+      "from": "trait",
+      "keys": ["casterEvery", "casterCast", "casterMult"]
+    }
+  },
+  {
+    "id": "pack",
+    "answer": "area",
+    "numbers": {
+      "from": "pack",
+      "keys": ["n", "hp", "dmg"]
+    }
+  },
+  {
+    "id": "evasive",
+    "answer": "bind",
+    "numbers": {
+      "from": "trait",
+      "keys": ["evasive"]
+    }
+  },
+  {
+    "id": "regen",
+    "answer": "dot",
+    "numbers": {
+      "from": "trait",
+      "keys": ["regenPct"]
+    }
+  },
+  {
+    "id": "illusionist",
+    "answer": "dispel",
+    "numbers": {
+      "from": "trait",
+      "keys": ["illusionEvery", "illusionDur", "illusionAcc"]
+    }
+  },
+  {
+    "id": "hidden",
+    "answer": "reveal",
+    "numbers": {
+      "from": "trait",
+      "keys": ["hidden", "hiddenAcc", "hiddenFirst"]
+    }
+  },
+  {
+    "id": "poisoner",
+    "answer": "cleanse",
+    "numbers": {
+      "from": "trait",
+      "keys": ["poisonChance"]
+    }
+  }
+]
