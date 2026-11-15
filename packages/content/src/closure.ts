@@ -52,6 +52,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     techniques: ids(db.techniques),
     enemies: ids([...db.enemies, ...db.bosses]),
     buildings: ids(db.buildings),
+    stages: ids(db.villageStages),
     quests: ids(db.quests),
     zones: ids(db.zones),
     missions: ids(db.missions),
@@ -384,6 +385,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     at('buildings', b.id);
     for (const res of b.produces) ref('produces', res, 'resources');
     for (const res of Object.keys(b.tier6 ?? {})) ref('tier6', res, 'resources');
+    if (b.stage !== undefined) ref('stage', b.stage, 'stages');
   }
   for (const g of db.gear) {
     at('gear', g.id);

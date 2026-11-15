@@ -9,6 +9,7 @@ import {
   isSkillUnlocked,
   levelAt,
   shopTotal,
+  villageStage,
   skillLevel,
   xpAt,
 } from '../src/index.ts';
@@ -19,6 +20,7 @@ import {
   modGenin,
   modRules,
   plainContent,
+  plainGenin,
   plainRules,
   setSkill,
   skillsOf,
@@ -177,6 +179,43 @@ describe('a game composed with the test pack', () => {
     advance(quest, 0, modContent, modRules);
     expect(quest.quests['testmod:test_chain']?.done).toBe(true);
     expect(quest.currencies[TOKEN]).toBe(3);
+  });
+
+  it('opens the village stage of the pack by Reputation, and a building of that stage with it', () => {
+    const state = modGenin();
+    expect(villageStage(state, modContent).stage).toBe(1);
+    expect(villageStage(state, modContent).repNeeded).toBe(modContent.balance.K.rep.stage2);
+    const early = dispatch(
+      state,
+      { type: 'village.build', building: 'testmod:hut' },
+      modContent,
+      modRules,
+    );
+    expect(early).toEqual({ ok: false, reason: 'error.stageNotReached' });
+    state.currencies.rep = 500;
+    advance(state, 0, modContent, modRules);
+    expect(state.village?.stage).toBe(3);
+    expect(
+      state.events
+        .filter((e) => e.type === 'villageStage')
+        .map((e) => (e as { stage: number }).stage),
+    ).toEqual([2, 3]);
+    const info = villageStage(state, modContent);
+    expect(info).toMatchObject({ stage: 3, reached: true });
+    // The stage no longer holds the building back: whatever stops it now is the price.
+    const later = dispatch(
+      state,
+      { type: 'village.build', building: 'testmod:hut' },
+      modContent,
+      modRules,
+    );
+    expect(later).not.toEqual({ ok: false, reason: 'error.stageNotReached' });
+    // The core game has two stages, and Reputation beyond the second changes nothing.
+    const core = plainGenin();
+    core.currencies.rep = 500;
+    advance(core, 0, plainContent, plainRules);
+    expect(core.village?.stage).toBe(2);
+    expect(villageStage(core, plainContent)).toMatchObject({ stage: 2, reached: true });
   });
 
   it('runs the wrapped core action with the changed interval and leaves the core game alone', () => {

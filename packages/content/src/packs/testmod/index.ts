@@ -205,6 +205,8 @@ const data = {
       effects: [{ key: 'testmod:forge.bonus', op: 'add', value: 0.01 }],
       capstone: [],
       produces: [],
+      /** Can be built only from the village stage of the pack. */
+      stage: 'testmod:stage3',
     },
   ],
 

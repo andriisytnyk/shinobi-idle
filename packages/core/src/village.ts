@@ -223,6 +223,14 @@ export function buildCheck(
   const K = content.balance.K;
   const level = levelOf(village, building.id) + 1;
   const top = K.costMult.length;
+  // A building of a later stage waits for that stage.
+  const stageAt =
+    building.stage === undefined
+      ? 0
+      : content.villageStages.findIndex((s) => s.id === building.stage);
+  if (stageAt >= 0 && currentStage(state, content) < stageAt + 1) {
+    return { ok: false, reason: 'error.stageNotReached' };
+  }
   if (level > maxBuildingLevel(building, content)) {
     return {
       ok: false,

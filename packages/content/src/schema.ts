@@ -627,6 +627,8 @@ export const buildingFxSchema = z.strictObject({
   /** Civil resources the building produces: `K.prod` x level of each, per tick. */
   produces: z.array(resSlug),
   duty: z.enum(BUILDING_DUTIES).optional(),
+  /** The village stage (a `villageStages` id) from which the building can be built; omitted: from the first stage. */
+  stage: z.string().min(1).optional(),
 });
 
 export const buildingSchema = buildingBaseSchema.extend({
@@ -635,6 +637,7 @@ export const buildingSchema = buildingBaseSchema.extend({
   capstone: z.array(modSchema),
   produces: z.array(resSlug),
   duty: z.enum(BUILDING_DUTIES).optional(),
+  stage: z.string().min(1).optional(),
 });
 
 /** Village resources: civil ones fill the store and pay for construction, shinobi ones come from village missions. */
