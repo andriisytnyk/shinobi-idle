@@ -5,13 +5,14 @@ import {
   dispatch,
   masteryLevel,
   refreshRegions,
+  syncVillage,
   setFlag,
   unlockBoss,
   zoneCellOf,
   type GameState,
 } from '../src/index.ts';
 import { K } from './fight-helpers.ts';
-import { setLevel } from './helpers.ts';
+import { setLevel, withBuildings } from './helpers.ts';
 import { fighter, openWorld, startFight, stock } from './prep-state.ts';
 
 const PART = 'core:scrollpart_water_prison';
@@ -130,12 +131,16 @@ describe('the Library scrolls in the shop', () => {
     const item = library[0];
     if (!item?.scroll || item.scroll.source.t !== 'library') throw new Error('no scroll');
     const state = fighter(8, 20);
+    syncVillage(state, content);
+    withBuildings(state, { 'core:library': item.scroll.source.level });
     state.currencies.ryo = 10_000;
     const price = K.scroll[String(item.scroll.source.level)] ?? 0;
     expect(dispatch(state, { type: 'shop.buy', item: item.id, n: 1 }, content)).toEqual({
       ok: true,
     });
-    expect(state.currencies.ryo).toBe(10_000 - price);
+    // The village may shave the price, never raise it.
+    expect(state.currencies.ryo).toBeGreaterThanOrEqual(10_000 - price);
+    expect(state.currencies.ryo).toBeLessThan(10_000);
     expect(state.bank[item.id]).toBe(1);
   });
 });

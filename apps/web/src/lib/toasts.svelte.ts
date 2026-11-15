@@ -1,7 +1,7 @@
 import { content } from '@shinobi/content';
 import type { GameEvent } from '@shinobi/core';
 import { actionRef, masteryRef } from './entities.ts';
-import type { Params } from './i18n.ts';
+import { t, type Params } from './i18n.ts';
 import type { EntityRef } from './route.ts';
 
 export interface Toast {
@@ -90,6 +90,16 @@ export function toastFor(event: GameEvent): ToastSpec | null {
       };
     case 'travelled':
       return { key: 'toast.travelled', params: {}, ref: { kind: 'cell', id: event.cell } };
+    case 'buildingBuilt':
+      return {
+        key: 'toast.buildingBuilt',
+        params: { n: event.level },
+        ref: { kind: 'building', id: event.building },
+      };
+    case 'villageStage':
+      return { key: 'toast.villageStage', params: {} };
+    case 'storageFull':
+      return { key: 'toast.storageFull', params: { name: t(`resource.${event.resource}.name`) } };
     default:
       return null;
   }

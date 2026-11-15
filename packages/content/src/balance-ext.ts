@@ -71,6 +71,24 @@ export const BALANCE_EXT = {
     athPerLevel: 0.001,
     athCap: 0.1,
   },
+  /**
+   * The village: building levels a new Genin starts with (every building not named starts at 0;
+   * the Market starts at 1 because the first meals and rations come from it), the building level
+   * from which the `late` civil resource (iron) is needed, and its share of the base cost.
+   */
+  village: {
+    start: {
+      'core:tower': 1,
+      'core:bureau': 1,
+      'core:store': 1,
+      'core:sawmill': 1,
+      'core:mine': 1,
+      'core:farms': 1,
+      'core:market': 1,
+    },
+    lateFromLevel: 4,
+    lateShare: 0.5,
+  },
   /** Mastery levels stop here. */
   masteryCap: 99,
   /**
@@ -172,8 +190,8 @@ export const BALANCE_EXT = {
     seed: 7,
     budgetMs: 5000,
     hintOptions: 3,
-    sessionMinutes: 60,
-    sessionRuns: 3,
+    sessionMinutes: 240,
+    sessionRuns: { zone: 1, boss: 6, operation: 6 },
   },
   /** Battle report: the latest defeats it keeps. */
   report: { defeats: 5 },

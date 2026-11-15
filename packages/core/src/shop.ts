@@ -1,24 +1,52 @@
 import type { ContentDb } from '@shinobi/content';
 import { addItem, hasItem, removeCurrency, addCurrency, removeItem } from './bank.ts';
 import type { CommandResult } from './engine.ts';
-import { waiveBuildings } from './gate.ts';
 import { indexOf } from './lookup.ts';
+import { computeMod } from './modifiers.ts';
 import { evalReq } from './requirements.ts';
+import { defaultRules, type Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 
 const isCount = (n: unknown): n is number =>
   typeof n === 'number' && Number.isSafeInteger(n) && n >= 1;
 
-/** Buy price of one unit, or null when the item has no price (it is not for sale). */
+/**
+ * Base buy price of one unit, or null when the item has no price (it is not for sale). A library
+ * scroll costs `K.scroll[level]`, everything else `K.goods[key]`.
+ */
 export function buyPrice(itemId: string, content: ContentDb): number | null {
   const item = indexOf(content).items.get(itemId);
-  // A library scroll costs what its level in the scroll table says.
   if (item?.scroll?.source.t === 'library') {
     return content.balance.K.scroll[String(item.scroll.source.level)] ?? null;
   }
   const key = item?.buy;
   return key === undefined ? null : (content.balance.K.goods[key] ?? null);
 }
+
+/**
+ * What n units cost the player now: the base price times n with the shop-price modifiers (the
+ * Market) applied to the whole stack, so a small discount is not lost to rounding on a cheap good; at least 1.
+ */
+export function shopTotal(
+  state: GameState,
+  itemId: string,
+  n: number,
+  content: ContentDb,
+  rules: Rules = defaultRules,
+): number | null {
+  const base = buyPrice(itemId, content);
+  if (base === null) return null;
+  const mod = computeMod(rules.modifierProviders, state, 'shop.price', content).total;
+  return Math.max(1, Math.round(base * n * mod));
+}
+
+/** What one unit costs the player now (the total of a stack of one). */
+export const shopPrice = (
+  state: GameState,
+  itemId: string,
+  content: ContentDb,
+  rules: Rules = defaultRules,
+): number | null => shopTotal(state, itemId, 1, content, rules);
 
 /** What one unit of an item is worth for the sell formula: a herb by its level, a good by its price, else nothing. */
 function unitValue(itemId: string, content: ContentDb): number {
@@ -51,15 +79,15 @@ export function shopBuy(
   itemId: string,
   n: number,
   content: ContentDb,
+  rules: Rules = defaultRules,
 ): CommandResult {
   if (!isCount(n)) return { ok: false, reason: 'error.invalidAmount' };
   const entry = indexOf(content).shop.get(itemId);
-  const price = buyPrice(itemId, content);
-  if (!entry || price === null) return { ok: false, reason: 'error.notForSale' };
-  if (!evalReq(state, waiveBuildings(entry.req), content).met) {
+  const total = shopTotal(state, itemId, n, content, rules);
+  if (!entry || total === null) return { ok: false, reason: 'error.notForSale' };
+  if (!evalReq(state, entry.req, content).met) {
     return { ok: false, reason: 'error.requirementsNotMet' };
   }
-  const total = price * n;
   if (!Number.isSafeInteger(total) || !removeCurrency(state, 'ryo', total)) {
     return { ok: false, reason: 'error.notEnoughRyo' };
   }

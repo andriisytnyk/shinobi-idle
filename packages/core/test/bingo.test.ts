@@ -13,6 +13,7 @@ import {
   noteSighting,
   refreshUnlocks,
   serialize,
+  STATE_VERSION,
   simulateFights,
   snapshotPlayer,
   type GameState,
@@ -87,12 +88,15 @@ describe('bingo.study', () => {
     expect(study(state, ENEMY)).toEqual({ ok: true });
     expect(level(state, ENEMY)).toBe(1);
     expect(state.currencies.intel).toBe(cost * 4);
-    expect(study(state, ENEMY)).toEqual({ ok: true });
+    // The level between is earned by a fight, not bought.
+    expect(study(state, ENEMY)).toEqual({ ok: false, reason: 'error.bingoNeedsFight' });
+    expect(state.currencies.intel).toBe(cost * 4);
+    noteFight(state, ENEMY, 'win', content);
     expect(level(state, ENEMY)).toBe(2);
     expect(study(state, ENEMY)).toEqual({ ok: true });
     expect(level(state, ENEMY)).toBe(3);
     expect(study(state, ENEMY)).toEqual({ ok: false, reason: 'error.bingoMax' });
-    expect(state.currencies.intel).toBe(cost * 2);
+    expect(state.currencies.intel).toBe(cost * 3);
   });
 
   it('refuses without enough Intel and for an unknown id, changing nothing', () => {
@@ -112,10 +116,11 @@ describe('bingo.study', () => {
     openWorld(state);
     expect(study(state, ENEMY)).toEqual({ ok: true });
     expect(level(state, ENEMY)).toBe(1);
-    // A level beyond the first needs no cell.
+    // The studied level needs no cell.
     state.world.explores = {};
+    noteFight(state, ENEMY, 'win', content);
     expect(study(state, ENEMY)).toEqual({ ok: true });
-    expect(level(state, ENEMY)).toBe(2);
+    expect(level(state, ENEMY)).toBe(3);
   });
 
   it('shows what each level lets the player see', () => {
@@ -125,7 +130,7 @@ describe('bingo.study', () => {
     expect(bingoView(state, hidden, content)?.hiddenTraits).toBeNull();
     study(state, hidden);
     expect(bingoView(state, hidden, content)?.hiddenTraits).toBeNull();
-    study(state, hidden);
+    noteFight(state, hidden, 'win', content);
     expect(bingoView(state, hidden, content)?.hiddenTraits).toEqual(['hidden']);
     expect(bingoView(state, hidden, content)?.drops).toBeNull();
     study(state, hidden);
@@ -179,9 +184,8 @@ describe('the AI follows the level', () => {
     const state = fighter(10, 36);
     startFight(state, 'core:zone_kiri_hunter');
     expect(state.combat?.fight.knowledge['core:kiri_hunter']).toEqual([]);
-    state.currencies.intel = 4;
     run(state, { type: 'action.stop', slot: 0 });
-    run(state, { type: 'bingo.study', enemy: 'core:kiri_hunter' });
+    noteFight(state, 'core:kiri_hunter', 'win', content);
     startFight(state, 'core:zone_kiri_hunter');
     expect(state.combat?.fight.knowledge['core:kiri_hunter']).toContain('hidden');
   });
@@ -223,7 +227,7 @@ describe('the book in a save', () => {
     raw.state.seen = { [ENEMY]: true, 'core:bandit': true };
     raw.state.counters = { 'kills.core:bandit': 5, 'defeats.core:bandit': 1 };
     const loaded = deserialize(JSON.stringify(raw), content);
-    expect(loaded.v).toBe(11);
+    expect(loaded.v).toBe(STATE_VERSION);
     expect('seen' in loaded).toBe(false);
     expect(loaded.bingo[ENEMY]?.seen).toBe(1);
     expect(level(loaded, ENEMY)).toBe(1);

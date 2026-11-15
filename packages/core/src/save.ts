@@ -47,6 +47,8 @@ import {
 import { updateQuests } from './quests.ts';
 import { refreshRegions, regionFlag } from './regions.ts';
 import { refreshUnlocks } from './unlocks.ts';
+import { villageBuildCost, civilCap, maxBuildingLevel, shinobiCap, tickMs } from './village.ts';
+import { createVillage, type VillageState } from './village-state.ts';
 import { cellMaxExplores, levelForExplores } from './world.ts';
 import { createWorld } from './world-state.ts';
 import { xpAt } from './xp.ts';
@@ -125,7 +127,13 @@ export const MIGRATIONS: readonly Migration[] = [
       seen: {},
     };
   },
-  // v10 -> v11: the Bingo book replaces `seen`; battle reports start empty. An entry the old rule
+  // v10 -> v11: the village. A genin or chunin gets one with the starting buildings; a student has none.
+  (state, content) => {
+    const rank = isRecord(state.player) ? state.player.rank : undefined;
+    const village = rank === 'genin' || rank === 'chunin' ? createVillage(content) : null;
+    return { ...state, village };
+  },
+  // v11 -> v12: the Bingo book replaces `seen`; battle reports start empty. An entry the old rule
   // counted as beaten (a win, a defeat or a watched fight) keeps its knowledge as a bought level 2.
   (state) => {
     const seen = isRecord(state.seen) ? state.seen : {};
@@ -413,6 +421,53 @@ function sanitizeWorld(raw: unknown, content: ContentDb): GameState['world'] {
   return world;
 }
 
+/**
+ * A saved village. A student has none. Levels are clamped to what the building can reach and never
+ * fall below the starting level; stores are clamped to their caps; the job's cost is recomputed from
+ * the level it builds, never trusted; the stage follows Reputation.
+ */
+function sanitizeVillage(raw: unknown, state: GameState, content: ContentDb): VillageState | null {
+  if (state.player.rank === 'student') return null;
+  const village = createVillage(content);
+  if (!isRecord(raw)) return village;
+  const K = content.balance.K;
+  const whole = (x: unknown): number => Math.floor(nonNegative(x));
+  const savedLevels = isRecord(raw.levels) ? raw.levels : {};
+  for (const b of content.buildings) {
+    const level = Math.min(whole(savedLevels[b.id]), maxBuildingLevel(b, content));
+    village.levels[b.id] = Math.max(level, village.levels[b.id] ?? 0);
+    if (village.levels[b.id] === 0) delete village.levels[b.id];
+  }
+  village.stage = state.currencies.rep >= K.rep.stage2 ? 2 : 1;
+  const civil = civilCap(village, content);
+  const shinobi = shinobiCap(village, content);
+  const savedRes = isRecord(raw.res) ? raw.res : {};
+  for (const id of Object.keys(village.res)) village.res[id] = Math.min(whole(savedRes[id]), civil);
+  const savedShinobi = isRecord(raw.shinobi) ? raw.shinobi : {};
+  for (const id of Object.keys(village.shinobi)) {
+    village.shinobi[id] = Math.min(whole(savedShinobi[id]), shinobi);
+  }
+  village.workforce = Math.min(whole(raw.workforce), shinobi);
+  village.power = whole(raw.power);
+  village.treasury = whole(raw.treasury);
+  village.clock = Math.min(whole(raw.clock), tickMs(content) - 1);
+  const job = raw.job;
+  if (isRecord(job) && typeof job.building === 'string') {
+    const building = content.buildings.find((b) => b.id === job.building);
+    const level = building ? (village.levels[building.id] ?? 0) + 1 : 0;
+    if (building && level <= maxBuildingLevel(building, content)) {
+      const total = Math.max(1, K.buildTicks[level - 1] ?? 1);
+      village.job = {
+        building: building.id,
+        ticks: Math.max(1, Math.min(whole(job.ticks), total)),
+        total,
+        paid: villageBuildCost(building, level, content),
+      };
+    }
+  }
+  return village;
+}
+
 const SKILL_ID_SET: ReadonlySet<string> = new Set(SKILL_IDS);
 
 /**
@@ -593,6 +648,7 @@ export function deserialize(
     return { stock, size, carry };
   });
   state.world = sanitizeWorld(raw.world, content);
+  state.village = sanitizeVillage(raw.village, state, content);
   const goal = raw.goal;
   state.goal =
     isRecord(goal) && typeof goal.kind === 'string' && typeof goal.id === 'string'

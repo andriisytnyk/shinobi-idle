@@ -489,10 +489,43 @@ export const bossSchema = bossBaseSchema.extend({
   special: bossSpecialSchema,
 });
 
-export const buildingSchema = z.object({
+export const buildingBaseSchema = z.object({
   id: coreId,
   /** Resources needed for level 6, keyed by resource slug; `null` when the building has none. */
   tier6: z.record(resSlug, z.number()).nullable(),
+});
+
+/** What a building is for. */
+export const BUILDING_ROLES = ['producer', 'bonus', 'shop', 'storage', 'defence', 'admin'] as const;
+/** The one job of a building that the village rules themselves perform: the treasury, the stage cap, the store, the library scrolls. */
+export const BUILDING_DUTIES = ['treasury', 'stages', 'storage', 'scrolls'] as const;
+
+/** The hand-written part of a building: its role, what one level does, what it produces. */
+export const buildingFxSchema = z.strictObject({
+  role: z.enum(BUILDING_ROLES),
+  /** Modifiers of ONE level; the building's level multiplies each value. */
+  effects: z.array(modSchema),
+  /** Modifiers given once, at the highest level only (not multiplied by the level). */
+  capstone: z.array(modSchema).default([]),
+  /** Civil resources the building produces: `K.prod` x level of each, per tick. */
+  produces: z.array(resSlug),
+  duty: z.enum(BUILDING_DUTIES).optional(),
+});
+
+export const buildingSchema = buildingBaseSchema.extend({
+  role: z.enum(BUILDING_ROLES),
+  effects: z.array(modSchema),
+  capstone: z.array(modSchema),
+  produces: z.array(resSlug),
+  duty: z.enum(BUILDING_DUTIES).optional(),
+});
+
+/** Village resources: civil ones fill the store and pay for construction, shinobi ones come from village missions. */
+export const resourceSchema = z.strictObject({
+  id: resSlug,
+  kind: z.enum(['civil', 'shinobi', 'workforce', 'power']),
+  /** Civil resources only: `base` costs `K.costBase` x multiplier, `late` costs a share of it from a level on. */
+  cost: z.enum(['base', 'late']).optional(),
 });
 
 export const gearTierSchema = z.object({
@@ -942,6 +975,12 @@ export const balanceParamsSchema = z.object({
   partsPerScroll: z.number(),
   partDrop: z.object({ boss: z.number(), carrier: z.number(), mission: z.number() }),
   tickMin: z.number(),
+  /** The village: starting building levels by building id, the level from which the `late` resource is needed and its share of the base cost. */
+  village: z.object({
+    start: z.record(coreId, z.number().int().min(0)),
+    lateFromLevel: z.number().int(),
+    lateShare: z.number(),
+  }),
   prod: z.number(),
   costBase: z.number(),
   costMult: z.array(z.number()),
@@ -1013,9 +1052,13 @@ export const balanceParamsSchema = z.object({
     seed: z.number().int(),
     budgetMs: z.number().int(),
     hintOptions: z.number().int().min(1),
-    /** The session forecast: minutes of one session and how many are averaged. */
+    /** The session forecast: minutes of one session, and how many sessions are averaged for each kind of target. */
     sessionMinutes: z.number().int().min(1),
-    sessionRuns: z.number().int().min(1),
+    sessionRuns: z.object({
+      zone: z.number().int().min(1),
+      boss: z.number().int().min(1),
+      operation: z.number().int().min(1),
+    }),
   }),
   /** Battle report: how many of the latest defeats a report keeps. */
   report: z.object({ defeats: z.number().int().min(1) }),
@@ -1101,6 +1144,7 @@ export const contentDbSchema = z.object({
   enemies: z.array(enemySchema),
   bosses: z.array(bossSchema),
   buildings: z.array(buildingSchema),
+  resources: z.array(resourceSchema),
   gear: z.array(gearSchema),
   balance: balanceSchema,
   quests: z.array(questSchema),
@@ -1125,6 +1169,7 @@ export const generatedDbSchema = contentDbSchema
     coat: true,
     zones: true,
     cellKeys: true,
+    resources: true,
     operations: true,
     statuses: true,
     traits: true,
@@ -1132,6 +1177,7 @@ export const generatedDbSchema = contentDbSchema
     ai: true,
   })
   .extend({
+    buildings: z.array(buildingBaseSchema),
     cells: z.array(cellBaseSchema),
     techniques: z.array(techniqueBaseSchema),
     enemies: z.array(enemyBaseSchema),
@@ -1175,6 +1221,9 @@ export type Region = z.infer<typeof regionSchema>;
 export type Enemy = z.infer<typeof enemySchema>;
 export type Boss = z.infer<typeof bossSchema>;
 export type Building = z.infer<typeof buildingSchema>;
+export type BuildingBase = z.infer<typeof buildingBaseSchema>;
+export type BuildingFx = z.infer<typeof buildingFxSchema>;
+export type Resource = z.infer<typeof resourceSchema>;
 export type GearTier = z.infer<typeof gearTierSchema>;
 export type Gear = z.infer<typeof gearSchema>;
 export type Quest = z.infer<typeof questSchema>;

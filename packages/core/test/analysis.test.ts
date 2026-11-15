@@ -1,4 +1,4 @@
-/** A6, A7 and A10: battle analysis against 4 game hours of playing the same target. */
+/** A6, A7 and A10: battle analysis, the first fight and the session forecast against the game itself. */
 import { content } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
@@ -26,9 +26,10 @@ import {
   unlock,
 } from './prep-state.ts';
 
-const HOURS = 4;
 /** Units of every pouch good the player keeps in the bank. */
-const RESTOCK = 1000;
+const RESTOCK = 5000;
+/** A zone analysis must stay well under a second. */
+const ZONE_BUDGET_MS = 1000;
 const STEP = 1000;
 
 interface Scene {
@@ -60,7 +61,11 @@ function setup(scene: Scene, seed: number): GameState {
   return state;
 }
 
-/** Plays the target for `HOURS` game hours, restarting it after every defeat; returns wins and fights. */
+/**
+ * Plays the target the way the analysis does, but as the real game: for the session length of the
+ * balance object, restarting it after every defeat, with Wounds, the pouch and the levels as they
+ * come. Nothing is held fixed or restocked.
+ */
 function play(state: GameState, scene: Scene): { wins: number; fights: number; perHour: number } {
   const start = () => {
     const result =
@@ -69,35 +74,23 @@ function play(state: GameState, scene: Scene): { wins: number; fights: number; p
         : startFight(state, scene.target.id);
     if (!result.ok) throw new Error(`cannot start ${scene.target.id}: ${result.reason}`);
   };
-  // The analysis plays the player as they are now, so the player is kept as they are: levels,
-  // masteries and Wounds are put back after every step (they would otherwise drift over four hours).
-  const frozen = JSON.stringify([state.skills, state.mastery, state.pools]);
   start();
-  for (let t = 0; t < HOURS * 3_600_000; t += STEP) {
+  const win = scene.target.kind === 'operation' ? 'operationCleared' : 'enemyDefeated';
+  let wins = 0;
+  let fights = 0;
+  for (let t = 0; t < K.analysis.sessionMinutes * 60_000; t += STEP) {
     advance(state, STEP, content);
+    for (const e of state.events) {
+      if (e.type === win) {
+        wins++;
+        fights++;
+      } else if (e.type === 'playerDefeated') fights++;
+    }
     state.events = [];
-    const [skills, mastery, pools] = JSON.parse(frozen) as [
-      GameState['skills'],
-      GameState['mastery'],
-      GameState['pools'],
-    ];
-    state.skills = skills;
-    state.mastery = mastery;
-    state.pools = pools;
-    state.wounds = { stacks: 0, left: 0 };
-    // The bank is restocked, as a player who keeps buying would: the pouch is full at every start.
-    for (const id of Object.keys(scene.bank)) state.bank[id] = RESTOCK;
     if (!state.slots[0]?.action) start();
   }
-  const r = state.report[scene.key];
-  const wins =
-    scene.target.kind === 'operation'
-      ? (state.counters[`ops.${scene.target.id}`] ?? 0)
-      : (r?.wins ?? 0);
-  const losses = r?.losses ?? 0;
-  const timeouts = r?.timeouts ?? 0;
-  const fights = scene.target.kind === 'operation' ? wins + losses : wins + losses + timeouts;
-  return { wins, fights, perHour: wins / HOURS };
+  if (scene.target.kind !== 'operation') fights += state.report[scene.key]?.timeouts ?? 0;
+  return { wins, fights, perHour: (wins * 60) / K.analysis.sessionMinutes };
 }
 
 const scenes: Scene[] = [
@@ -127,18 +120,18 @@ const scenes: Scene[] = [
     knows: ['core:kiri_hunter'],
     prepare: (s) => run(s, { type: 'loadout.prepare', encounter: 'core:zone_kiri_hunter' }),
   },
-  {
-    name: 'the hunter boss',
+  ...[44, 50].map((level): Scene => ({
+    name: `the hunter boss at level ${level}`,
     target: { kind: 'boss', id: 'core:zone_boss_hunter' },
     key: 'core:zone_boss_hunter',
-    level: 44,
+    level,
     bank: { [ids.heal]: RESTOCK },
     knows: ['core:boss_hunter'],
     prepare: (s) => {
       unlockBoss(s, 'core:boss_hunter', content);
       run(s, { type: 'loadout.prepare', encounter: 'core:zone_boss_hunter' });
     },
-  },
+  })),
   {
     name: 'the hideout operation',
     target: { kind: 'operation', id: 'core:op_hideout' },
@@ -153,34 +146,70 @@ const scenes: Scene[] = [
   },
 ];
 
-describe('A6: the analysis against four hours of play', () => {
-  const rows: string[] = [];
+describe('A6: the session forecast against the same session played', () => {
+  /** Games played per scene and pooled: one session of a rare outcome is too noisy to judge a rate. */
+  const GAMES = 8;
   for (const [i, scene] of scenes.entries()) {
-    it(`predicts ${scene.name}`, () => {
+    it(`forecasts ${scene.name}, Wounds and all`, () => {
       const state = setup(scene, 20 + i);
       const before = serialize(state, 0);
       const a = analyze(state, scene.target);
       expect(serialize(state, 0), 'the analysis changes nothing').toBe(before);
-      // Six games of four hours each, pooled: a single game of a rare outcome is too noisy to judge a rate.
-      const games = [0, 1, 2, 3, 4, 5].map((g) => play(setup(scene, 20 + i + 10 * g), scene));
-      const played = {
-        wins: games.reduce((n, g) => n + g.wins, 0),
-        fights: games.reduce((n, g) => n + g.fights, 0),
-        perHour: games.reduce((n, g) => n + g.perHour, 0) / games.length,
-      };
-      const actual = played.fights === 0 ? 0 : played.wins / played.fights;
-      rows.push(
-        `| ${scene.name} | ${(100 * a.winRate).toFixed(1)}% / ${(100 * actual).toFixed(1)}% | ${a.winsPerHour.toFixed(0)} / ${played.perHour.toFixed(0)} |`,
+      const session = a.session;
+      if (!session) throw new Error('no session');
+      const games = Array.from({ length: GAMES }, (_, g) =>
+        play(setup(scene, 100 + 10 * i + g), scene),
       );
+      const wins = games.reduce((n, g) => n + g.wins, 0);
+      const fights = games.reduce((n, g) => n + g.fights, 0);
+      const perHour = games.reduce((n, g) => n + g.perHour, 0) / GAMES;
+      const actual = fights === 0 ? 0 : wins / fights;
       console.log(
-        `${scene.name}: predicted ${a.winRate.toFixed(3)} played ${actual.toFixed(3)}; wins/h ${a.winsPerHour.toFixed(1)} vs ${played.perHour.toFixed(1)}`,
+        `${scene.name}: first fight ${(100 * a.winRate).toFixed(1)}%, session ${(100 * session.winRate).toFixed(1)}% / played ${(100 * actual).toFixed(1)}%; wins/h ${session.winsPerHour.toFixed(1)} / ${perHour.toFixed(1)}; wounds mean ${session.woundStacks.mean.toFixed(2)}, max ${session.woundStacks.max}`,
       );
-      expect(Math.abs(a.winRate - actual)).toBeLessThanOrEqual(0.05);
-      expect(
-        Math.abs(a.winsPerHour - played.perHour) / Math.max(1, played.perHour),
-      ).toBeLessThanOrEqual(0.1);
+      // The tolerance of the card (5 points, 10%) plus two standard errors of the difference: a target
+      // that sits on the edge of the Wounds spiral ends one way or the other in each session, and the
+      // spread of the sessions (the forecast's own, and that of the games played here) is the noise.
+      const sd = (values: number[]): number => {
+        const mean = values.reduce((x, y) => x + y, 0) / values.length;
+        return Math.sqrt(values.reduce((x, y) => x + (y - mean) ** 2, 0) / (values.length - 1));
+      };
+      const playedRates = games.map((g) => (g.fights === 0 ? 0 : g.wins / g.fights));
+      const noise = (own: number, played: number[], runs: number): number =>
+        2 * Math.sqrt((own * own) / runs + (sd(played) * sd(played)) / played.length);
+      const rateTol = 0.05 + noise(session.spread.winRate, playedRates, session.runs);
+      const perHourTol =
+        0.1 * Math.max(1, perHour) +
+        noise(
+          session.spread.winsPerHour,
+          games.map((g) => g.perHour),
+          session.runs,
+        );
+      console.log(
+        `  tolerance: ${(100 * rateTol).toFixed(1)} points, ${perHourTol.toFixed(1)} wins/h`,
+      );
+      expect(Math.abs(session.winRate - actual)).toBeLessThanOrEqual(rateTol);
+      expect(Math.abs(session.winsPerHour - perHour)).toBeLessThanOrEqual(perHourTol);
     });
   }
+
+  it('shows the Wounds snowball: a marginal boss wins far less over a session than in a fresh first fight', () => {
+    const scene = scenes.find((s) => s.name.endsWith('level 44')) as Scene;
+    const a = analyze(setup(scene, 77), scene.target);
+    expect(a.session?.winRate ?? 1).toBeLessThan(a.winRate - 0.1);
+    expect(a.session?.woundStacks.max ?? 0).toBeGreaterThanOrEqual(K.wound.max);
+  });
+
+  it('repeats exactly for the same seed', () => {
+    const scene = scenes[2] as Scene;
+    const state = setup(scene, 78);
+    const first = JSON.stringify(
+      analyze(state, scene.target, { sessionRuns: 1, sessionMinutes: 10 }),
+    );
+    expect(
+      JSON.stringify(analyze(state, scene.target, { sessionRuns: 1, sessionMinutes: 10 })),
+    ).toBe(first);
+  });
 });
 
 describe('A6: coverage, hints and secrecy', () => {
@@ -308,11 +337,13 @@ describe('A6: coverage, hints and secrecy', () => {
 
   it('reports xp, ryo, wounds and mastery per hour, and nothing for a target that does not exist', () => {
     const state = setup(scenes[0] as Scene, 41);
+    know(state, 'core:wolfmask');
     const a = analyze(state, scenes[0]?.target as AnalysisTarget);
-    expect(a.xpPerHour.vit).toBeGreaterThan(0);
-    expect(a.xpPerHour.eva).toBeGreaterThan(0);
-    expect(Object.keys(a.masteryPerHour).length).toBeGreaterThan(0);
-    expect(a.ryoPerHour).toBeGreaterThan(0);
+    const session = a.session;
+    expect(session?.xpPerHour.vit).toBeGreaterThan(0);
+    expect(session?.xpPerHour.eva).toBeGreaterThan(0);
+    expect(Object.keys(session?.masteryPerHour ?? {}).length).toBeGreaterThan(0);
+    expect(session?.ryoPerHour).toBeGreaterThan(0);
     expect(a.woundsPerHour).toBeGreaterThanOrEqual(0);
     expect(
       analyzeFight(state, { kind: 'zone', id: 'core:nothing' }, {}, content, defaultRules),
@@ -354,7 +385,7 @@ describe('A7: comparing loadouts', () => {
 describe('A10: speed', () => {
   it('finishes an analysis with the default sample size within the budget, for a zone and a boss', () => {
     const budget = K.analysis.budgetMs;
-    for (const scene of [scenes[0], scenes[3], scenes[4]] as Scene[]) {
+    for (const scene of [scenes[0], scenes[3], scenes[5]] as Scene[]) {
       const state = setup(scene, 50);
       const t0 = performance.now();
       const a = analyze(state, scene.target);
@@ -362,7 +393,7 @@ describe('A10: speed', () => {
       console.log(
         `analysis of ${scene.name}: ${ms.toFixed(0)} ms for ${a.samples} samples (budget ${budget} ms)`,
       );
-      expect(ms).toBeLessThan(budget);
+      expect(ms).toBeLessThan(scene.target.kind === 'zone' ? ZONE_BUDGET_MS : budget);
       expect(a.samples).toBe(
         scene.target.kind === 'operation' ? K.analysis.opSamples : K.analysis.samples,
       );

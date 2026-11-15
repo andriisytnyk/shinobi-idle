@@ -47,7 +47,8 @@ export type Route =
   | { page: 'home' }
   | { page: 'skills' }
   | { page: 'entity'; ref: EntityRef }
-  | { page: 'tab'; tab: string }
+  /** A tab page; the village page may also name the building it should focus: `#/village/core:forge`. */
+  | { page: 'tab'; tab: string; focus?: string }
   | { page: PageName }
   /** The shop with its sell section brought into view: `#/shop/sell`. */
   | { page: 'shop'; section: 'sell' }
@@ -73,6 +74,13 @@ export function parseHash(hash: string): Route {
   }
   if (isPage(first) && rest.length === 0) return { page: first };
   if (TABS.includes(first) && rest.length === 0) return { page: 'tab', tab: first };
+  if (first === 'village' && rest.length > 0) {
+    try {
+      return { page: 'tab', tab: first, focus: decodeURIComponent(rest.join('/')) };
+    } catch {
+      return { page: 'notFound', hash };
+    }
+  }
   const id = rest.join('/');
   if (isKind(first) && id !== '') {
     try {

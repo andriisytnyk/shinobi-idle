@@ -1,5 +1,7 @@
 import type { ContentDb } from '@shinobi/content';
 import { MS_PER_MINUTE } from '../formulas.ts';
+import { computeMod } from '../modifiers.ts';
+import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 import type { System } from '../system.ts';
 
@@ -17,13 +19,19 @@ export const woundIntervalMs = (content: ContentDb): number =>
 export const woundFloorMs = (content: ContentDb): number =>
   Math.round(content.balance.K.wound.healFloorMin * MS_PER_MINUTE);
 
+/** Time the next stack takes to heal now: the base interval with the `wound.heal` modifiers (the Hospital) applied, at least 1 ms. */
+export function woundHealMs(state: GameState, content: ContentDb, rules?: Rules): number {
+  const mod = computeMod(rules?.modifierProviders ?? [], state, 'wound.heal', content).total;
+  return Math.max(1, Math.round(woundIntervalMs(content) * mod));
+}
+
 /** Adds `n` stacks, up to the cap; the first stack starts its heal clock. */
-export function addWounds(state: GameState, n: number, content: ContentDb): void {
+export function addWounds(state: GameState, n: number, content: ContentDb, rules?: Rules): void {
   if (!(n > 0)) return;
   const w = state.wounds;
   const had = w.stacks > 0;
   w.stacks = Math.min(content.balance.K.wound.max, w.stacks + Math.floor(n));
-  if (!had && w.stacks > 0) w.left = woundIntervalMs(content);
+  if (!had && w.stacks > 0) w.left = woundHealMs(state, content, rules);
 }
 
 /**
@@ -47,11 +55,11 @@ export const woundSystem: System = {
     if (state.wounds.stacks > 0) state.wounds.left = Math.max(0, state.wounds.left - dt);
   },
 
-  run(state, content) {
+  run(state, content, rules) {
     const w = state.wounds;
     while (w.stacks > 0 && w.left <= 0) {
       w.stacks--;
-      w.left = w.stacks > 0 ? woundIntervalMs(content) : 0;
+      w.left = w.stacks > 0 ? woundHealMs(state, content, rules) : 0;
     }
   },
 };

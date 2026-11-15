@@ -21,6 +21,13 @@
       </a>
     </li>
     <li>
+      <a href="#/village" data-more-village>
+        <Icon name="lucide:landmark" size={18} />
+        <span>{t('nav.village')}</span>
+        <Icon name="lucide:chevron-right" size={16} />
+      </a>
+    </li>
+    <li>
       <a href="#/rank">
         <Icon name="rank-3" size={18} />
         <span>{t('more.rank')}</span>

@@ -175,6 +175,23 @@ export interface TravelledEvent extends EventBase {
   cell: string;
 }
 
+/** A building reached a new level. */
+export interface BuildingBuiltEvent extends EventBase {
+  type: 'buildingBuilt';
+  building: string;
+  level: number;
+}
+/** The village reached a new stage (Reputation at the threshold). */
+export interface VillageStageEvent extends EventBase {
+  type: 'villageStage';
+  stage: number;
+}
+/** A civil resource filled the store; what the tick produced beyond it is lost. */
+export interface StorageFullEvent extends EventBase {
+  type: 'storageFull';
+  resource: string;
+}
+
 export type GameEvent =
   | LevelUpEvent
   | MasteryUpEvent
@@ -202,7 +219,10 @@ export type GameEvent =
   | CellLevelUpEvent
   | PoiFoundEvent
   | PoiClaimedEvent
-  | TravelledEvent;
+  | TravelledEvent
+  | BuildingBuiltEvent
+  | VillageStageEvent
+  | StorageFullEvent;
 
 type WithoutAt<T> = T extends unknown ? Omit<T, 'at'> : never;
 

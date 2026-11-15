@@ -159,13 +159,14 @@ function woundsAfter(
   state: GameState,
   c: CombatState,
   content: ContentDb,
+  rules: Rules,
   lost: boolean,
   key: string,
 ): void {
   const tally = c.fight.tally;
   const low = c.fight.player.data.low === 1 && !lost ? 1 : 0;
   const n = (lost ? 1 : 0) + low + tally.wounds;
-  addWounds(state, n, content);
+  addWounds(state, n, content, rules);
   recordWounds(state, key, n);
   if (tally.woundMin > 0) shortenWounds(state, tally.woundMin, content);
 }
@@ -209,7 +210,13 @@ function cleared(state: GameState, op: Operation, content: ContentDb): void {
  * share, the pouch is not refilled and the next step's enemy comes. Returns true when the
  * operation is over.
  */
-function victory(state: GameState, c: CombatState, content: ContentDb, key: string): boolean {
+function victory(
+  state: GameState,
+  c: CombatState,
+  content: ContentDb,
+  rules: Rules,
+  key: string,
+): boolean {
   const K = content.balance.K;
   const player = c.fight.player;
   c.phase = 'respawn';
@@ -229,7 +236,7 @@ function victory(state: GameState, c: CombatState, content: ContentDb, key: stri
   }
   noteFight(state, c.enemy, 'win', content);
   recordFight(state, key, c.fight, 'win', content);
-  woundsAfter(state, c, content, false, key);
+  woundsAfter(state, c, content, rules, false, key);
   if (!c.run) {
     player.hp = Math.min(player.maxHp, player.hp + K.zoneHpRegen * player.maxHp);
     player.chakra = player.maxChakra;
@@ -328,11 +335,11 @@ export const combatSystem: System = {
         noteFight(state, c.enemy, 'loss', content);
         recordFight(state, key, c.fight, 'loss', content);
         stampDefeat(state, key);
-        woundsAfter(state, c, content, true, key);
+        woundsAfter(state, c, content, rules, true, key);
         // A defeat ends an operation run with the action: nothing of it is kept.
         return stopSlot(state, index, 'defeated', content, rules);
       }
-      if (victory(state, c, content, key))
+      if (victory(state, c, content, rules, key))
         return stopSlot(state, index, 'finished', content, rules);
     }
   },

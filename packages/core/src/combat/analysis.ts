@@ -131,6 +131,8 @@ export interface Session {
   woundsPerHour: number;
   /** Pouch units used per hour, by item id. */
   itemsPerHour: Record<string, number>;
+  /** How much the sessions differed from one another (standard deviation over the runs; 0 for one run): a marginal target tips one way or the other. */
+  spread: { winRate: number; winsPerHour: number };
 }
 
 /** The difference of two analyses of one target: B minus A. */
@@ -671,7 +673,7 @@ function sessionOf(
 ): Session | null {
   const K = content.balance.K;
   const minutes = opts.sessionMinutes ?? K.analysis.sessionMinutes;
-  const runs = opts.sessionRuns ?? K.analysis.sessionRuns;
+  const runs = opts.sessionRuns ?? K.analysis.sessionRuns[target.kind];
   const played: SessionRun[] = [];
   for (let i = 0; i < runs; i++) {
     const run = playSession(state, target, found, minutes, opts.loadout, seed + i, content, rules);
@@ -679,8 +681,7 @@ function sessionOf(
     played.push(run);
   }
   const hours = (minutes * runs * MS_PER_MINUTE) / MS_PER_HOUR;
-  const sum = (pick: (r: SessionRun) => number): number =>
-    played.reduce((n, r) => n + pick(r), 0);
+  const sum = (pick: (r: SessionRun) => number): number => played.reduce((n, r) => n + pick(r), 0);
   const merge = (pick: (r: SessionRun) => Record<string, number>): Record<string, number> => {
     const out: Record<string, number> = {};
     for (const r of played) {
@@ -709,6 +710,11 @@ function sessionOf(
     if (!shown) lootUnknown++;
     else lootPerHour[item] = reveals.every((l) => l.chances) ? perHour : 'unknown';
   }
+  const spreadOf = (values: number[]): number => {
+    if (values.length < 2) return 0;
+    const mean = values.reduce((a, b) => a + b, 0) / values.length;
+    return Math.sqrt(values.reduce((a, b) => a + (b - mean) ** 2, 0) / (values.length - 1));
+  };
   return {
     minutes,
     runs,
@@ -725,6 +731,10 @@ function sessionOf(
     },
     woundsPerHour: sum((r) => r.wounds) / hours,
     itemsPerHour: merge((r) => r.used),
+    spread: {
+      winRate: spreadOf(played.map((r) => (r.fights === 0 ? 0 : r.wins / r.fights))),
+      winsPerHour: spreadOf(played.map((r) => (r.wins * MS_PER_HOUR) / (minutes * MS_PER_MINUTE))),
+    },
   };
 }
 

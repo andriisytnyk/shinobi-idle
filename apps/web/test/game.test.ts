@@ -165,6 +165,7 @@ describe('start, error and tab handling', () => {
     await s.game.start();
     expect(s.game.phase).toBe('playing');
     s.game.state.player.rank = 'genin';
+    s.game.devAdvance(0);
     s.game.state.currencies.ryo = 100;
     s.game.state.bank['core:pelt'] = 1;
     for (let i = 0; i < 4; i++) {

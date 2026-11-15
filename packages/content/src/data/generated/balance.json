@@ -451,6 +451,19 @@
       "mission": 0.15
     },
     "tickMin": 5,
+    "village": {
+      "start": {
+        "core:tower": 1,
+        "core:bureau": 1,
+        "core:store": 1,
+        "core:sawmill": 1,
+        "core:mine": 1,
+        "core:farms": 1,
+        "core:market": 1
+      },
+      "lateFromLevel": 4,
+      "lateShare": 0.5
+    },
     "prod": 20,
     "costBase": 20,
     "costMult": [
@@ -578,8 +591,12 @@
       "seed": 7,
       "budgetMs": 5000,
       "hintOptions": 3,
-      "sessionMinutes": 60,
-      "sessionRuns": 3
+      "sessionMinutes": 240,
+      "sessionRuns": {
+        "zone": 1,
+        "boss": 6,
+        "operation": 6
+      }
     },
     "report": {
       "defeats": 5

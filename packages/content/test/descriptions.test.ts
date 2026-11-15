@@ -23,6 +23,7 @@ const KINDS: [string, readonly { id: string }[]][] = [
   ['enemy', content.enemies],
   ['boss', content.bosses],
   ['building', content.buildings],
+  ['resource', content.resources],
   ['region', content.regions],
   ['seal', content.seals],
   ['status', content.statuses],

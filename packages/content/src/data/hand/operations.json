@@ -66,11 +66,7 @@
         "t": "days",
         "days": 5,
         "fightsPerDay": 3,
-        "pool": [
-          "core:serpent",
-          "core:leech",
-          "core:fake_genin"
-        ],
+        "pool": ["core:serpent", "core:leech", "core:fake_genin"],
         "finale": "core:boss_nameless"
       }
     ]
