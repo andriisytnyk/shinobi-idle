@@ -13,6 +13,18 @@ export const BALANCE_EXT = {
   senseiTest: { base: 300, perLevel: 0.01, floor: 120 },
   /** Combat timing: ms per combat XP tick, ms per pool regeneration step, hit share at equal ratings. */
   combat: { xpTickMs: 1000, regenMs: 1000, hitEven: 0.5 },
+  /** Herb bushes: stock is stockBase plus the herb's mastery level; an empty bush regrows for regrowMs. */
+  field: { stockBase: 5, regrowMs: 5000 },
+  /** Crafting mastery tiers (mastery levels 1 / 20 / 50 / 90): each tier above the first adds this chance of one bonus unit. */
+  craftRules: { masteryTiers: [1, 20, 50, 90], bonusPerTier: 0.25 },
+  /** A tonic holds at most this many times the charges of one tonic. */
+  tonic: { capMult: 2 },
+  /** Shop sell price of a craft product: this share of the value computed from its ingredients; herbs are worth herbBase + herbPerLevel x level. */
+  shop: { craftSellFactor: 0.4, herbBase: 2, herbPerLevel: 0.4 },
+  /** Size of one owned training-gear tier: XP share, time share, keep-ingredients chance, speed share, time share. */
+  gearFx: { mannequin: 0.03, sickle: 0.05, alembic: 0.03, stations: 0.05, maps: 0.03 },
+  /** Numbers of item effects that name them by key (the recipe text gives no number for the sleeping powder). */
+  itemFx: { sleep: { chance: 0.5 } },
   /** Mastery levels stop here. */
   masteryCap: 99,
   /**

@@ -12,6 +12,7 @@ import {
 } from './formulas.ts';
 import { indexOf } from './lookup.ts';
 import { computeMod } from './modifiers.ts';
+import { spendTonicCharges } from './buffs.ts';
 import { gainXp, grantMastery } from './progression.ts';
 import { evalReq, type Req } from './requirements.ts';
 import type { Rules } from './rules.ts';
@@ -26,15 +27,21 @@ export interface ActionKind {
   has(id: string, content: ContentDb): boolean;
   /** What must hold to start and keep going; null when nothing is needed. Re-checked after every cycle. */
   requirements(state: GameState, id: string, content: ContentDb, rules: Rules): Req | null;
-  /** Length of one cycle in ms at full speed, modifiers included. At least 1. */
-  intervalMs(state: GameState, id: string, content: ContentDb, rules: Rules): number;
+  /**
+   * Length of one cycle in ms at full speed, modifiers included. At least 1. `slot` is the slot
+   * that runs the action, when the caller knows it; kinds that keep state in the slot read it.
+   */
+  intervalMs(state: GameState, id: string, content: ContentDb, rules: Rules, slot?: number): number;
   /** Pays out one finished cycle. Returning 'stop' ends the action (one-shot actions). */
   complete(
     state: GameState,
     id: string,
     content: ContentDb,
     rules: Rules,
+    slot?: number,
   ): 'continue' | 'stop' | void;
+  /** The item the action lacks for its next cycle, if any; names the cause when it stops or is refused. */
+  missing?(state: GameState, id: string, content: ContentDb, rules: Rules): string | null;
   /** The skill the action trains, when it trains one; a locked skill refuses its actions. */
   skill?(id: string, content: ContentDb): SkillId | null;
   /** Called after the action is put in slot `slot` (its `data` is null). */
@@ -174,8 +181,17 @@ export function stopSlot(
   const slot = state.slots[index];
   if (!slot?.action) return;
   const { kind, id } = slot.action;
-  rules.actionKinds[kind]?.stop?.(state, index, id, content, rules, reason);
-  emit(state, { type: 'actionStopped', slot: index, kind, id, reason });
+  const impl = rules.actionKinds[kind];
+  impl?.stop?.(state, index, id, content, rules, reason);
+  const missing = reason === 'requirements' ? impl?.missing?.(state, id, content, rules) : null;
+  emit(state, {
+    type: 'actionStopped',
+    slot: index,
+    kind,
+    id,
+    reason,
+    ...(missing ? { missing } : {}),
+  });
   slot.action = null;
   slot.progress = 0;
   slot.data = null;
@@ -189,12 +205,12 @@ export function stopSlot(
 export const actionSystem: System = {
   nextEventIn(state, content, rules) {
     let best: number | null = null;
-    for (const slot of state.slots) {
+    for (const [index, slot] of state.slots.entries()) {
       if (!slot.action || slot.share <= 0) continue;
       const kind = rules.actionKinds[slot.action.kind];
       if (!kind) continue;
       const need =
-        kind.intervalMs(state, slot.action.id, content, rules) * SHARE_FULL - slot.progress;
+        kind.intervalMs(state, slot.action.id, content, rules, index) * SHARE_FULL - slot.progress;
       const wait = need <= 0 ? 0 : Math.ceil(need / slot.share);
       if (best === null || wait < best) best = wait;
     }
@@ -212,13 +228,18 @@ export const actionSystem: System = {
         const kind = rules.actionKinds[name];
         if (!kind || !kind.has(id, content))
           return stopSlot(state, index, 'missing', content, rules);
-        const need = kind.intervalMs(state, id, content, rules) * SHARE_FULL;
+        const need = kind.intervalMs(state, id, content, rules, index) * SHARE_FULL;
         if (slot.progress < need) return;
         slot.progress -= need;
-        const result = kind.complete(state, id, content, rules);
+        const result = kind.complete(state, id, content, rules, index);
+        const trained = kind.skill?.(id, content);
+        if (trained) spendTonicCharges(state, trained);
         state.stats.completed++;
         bump(state, actionsKey(name));
-        if (result === 'stop') return stopSlot(state, index, 'finished', content, rules);
+        if (result === 'stop') {
+          const lacking = kind.missing?.(state, id, content, rules);
+          return stopSlot(state, index, lacking ? 'requirements' : 'finished', content, rules);
+        }
         const req = kind.requirements(state, id, content, rules);
         if (req && !evalReq(state, req, content).met) {
           return stopSlot(state, index, 'requirements', content, rules);

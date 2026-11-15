@@ -54,6 +54,8 @@ export const MIGRATIONS: readonly Migration[] = [
   }),
   // v3 -> v4: counters, quest progress, the running fight and the pinned goal.
   (state) => ({ ...state, counters: {}, quests: {}, combat: null, goal: null }),
+  // v4 -> v5: running tonics and owned training gear.
+  (state) => ({ ...state, buffs: {}, gear: {} }),
 ];
 
 const isRecord = (x: unknown): x is Raw => typeof x === 'object' && x !== null && !Array.isArray(x);
@@ -265,6 +267,19 @@ export function deserialize(
     const step = Math.min(Math.floor(nonNegative(v.step)), quest.steps.length);
     return { step, base: Math.floor(nonNegative(v.base)), done: step >= quest.steps.length };
   });
+  state.buffs = pick(raw.buffs, (key, v) => {
+    const fx = index.items.get(key)?.fx;
+    if (fx?.kind !== 'tonic' || !isRecord(v)) return undefined;
+    const cap = fx.charges * content.balance.K.tonic.capMult;
+    const charges = Math.min(Math.floor(nonNegative(v.charges)), cap);
+    return charges >= 1 ? { skill: fx.skill, charges } : undefined;
+  });
+  state.gear = pick(raw.gear, (key, v) => {
+    const line = index.gear.get(key);
+    if (!line || typeof v !== 'number') return undefined;
+    const tiers = Math.min(Math.floor(nonNegative(v)), line.tiers.length);
+    return tiers >= 1 ? tiers : undefined;
+  });
   const goal = raw.goal;
   state.goal =
     isRecord(goal) && typeof goal.kind === 'string' && typeof goal.id === 'string'
@@ -275,12 +290,12 @@ export function deserialize(
   // Shares are derived from which slots run, so they are recomputed rather than trusted; a
   // saved progress beyond one cycle is cut so a doctored save cannot make the loop spin.
   rebalanceShares(state);
-  for (const slot of state.slots) {
+  for (const [at, slot] of state.slots.entries()) {
     const kind = slot.action && rules.actionKinds[slot.action.kind];
     if (slot.action && kind) {
       slot.progress = Math.min(
         slot.progress,
-        kind.intervalMs(state, slot.action.id, content, rules) * SHARE_FULL,
+        kind.intervalMs(state, slot.action.id, content, rules, at) * SHARE_FULL,
       );
     }
   }

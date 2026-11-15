@@ -59,13 +59,17 @@ export interface GameState {
   quests: Record<string, QuestProgress>;
   /** The running fight, if a fight action holds a slot; plain JSON. */
   combat: CombatState | null;
+  /** Running tonics by item id: the skill (or `allNatures`) they raise and the charges left. */
+  buffs: Record<string, { skill: string; charges: number }>;
+  /** Training gear owned: tiers bought, by gear line id. */
+  gear: Record<string, number>;
   /** The pinned goal shown in the meta panel. */
   goal: EntityRef | null;
   /** One-off notices for the UI, newest last. The UI drains it; it is never saved. */
   events: GameEvent[];
 }
 
-export const STATE_VERSION = 4;
+export const STATE_VERSION = 5;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
@@ -92,6 +96,8 @@ export function createState(seed: number, content: ContentDb): GameState {
     counters: {},
     quests: {},
     combat: null,
+    buffs: {},
+    gear: {},
     goal: null,
     events: [],
   };

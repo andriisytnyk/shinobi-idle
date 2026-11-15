@@ -3,11 +3,15 @@ import type {
   Enemy,
   Exam,
   Exercise,
+  Gear,
+  Herb,
   Item,
   Obstacle,
   PoolCheckpoint,
   Practice,
   Quest,
+  Recipe,
+  ShopEntry,
   Technique,
 } from '@shinobi/content';
 
@@ -19,6 +23,10 @@ export interface ContentIndex {
   obstacles: Map<string, Obstacle>;
   enemies: Map<string, Enemy>;
   items: Map<string, Item>;
+  herbs: Map<string, Herb>;
+  recipes: Map<string, Recipe>;
+  gear: Map<string, Gear>;
+  shop: Map<string, ShopEntry>;
   quests: Map<string, Quest>;
   exams: Map<string, Exam>;
   itemIds: Set<string>;
@@ -46,6 +54,8 @@ function build(content: ContentDb): ContentIndex {
     ...exercises.keys(),
     ...practices.keys(),
     ...obstacles.keys(),
+    ...content.herbs.map((h) => h.id),
+    ...content.recipes.map((r) => r.id),
   ]);
   const masteryCount = new Map<string, number>();
   const count = (skill: string, n: number) =>
@@ -65,6 +75,10 @@ function build(content: ContentDb): ContentIndex {
   return {
     enemies: byId(content.enemies),
     items: byId(content.items),
+    herbs: byId(content.herbs),
+    recipes: byId(content.recipes),
+    gear: byId(content.gear),
+    shop: new Map(content.shop.map((s) => [s.item, s])),
     quests: byId(content.quests),
     exams: byId(content.exams),
     techniques,
