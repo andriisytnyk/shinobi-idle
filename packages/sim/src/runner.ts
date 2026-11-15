@@ -102,10 +102,13 @@ export function runBot(bot: Bot, options: RunOptions): RunResult {
   let firstRejection: string | null = null;
   let goalAt: number | null = bot.goal.reached(state) ? state.now : null;
   let changed = true;
+  let lastDecision = -Infinity;
 
   while (goalAt === null && state.now < options.limitMs && rejected <= rejectLimit) {
-    if (changed || state.slots.some((slot) => !slot.action)) {
+    const due = bot.reviewMs !== undefined && state.now - lastDecision >= bot.reviewMs;
+    if (changed || due || state.slots.some((slot) => !slot.action)) {
       changed = false;
+      lastDecision = state.now;
       for (const command of bot.decide({ state, content, rules }) ?? []) {
         const result = dispatch(state, command, content, rules);
         if (!result.ok) {
