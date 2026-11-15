@@ -126,28 +126,35 @@ export function advance(
   updateQuests(state, content);
   let remaining = ms;
   let stalled = 0;
+  // Systems that a pack added are guarded (see guard.ts); with none, the loop is the plain one.
+  const guarded = rules.systems.some((system) => originOf(system) !== undefined);
   // Consecutive steps at +0 ms for each system of a pack other than core.
   const zeros = new Map<System, number>();
   for (;;) {
     let next: number | null = null;
     for (const system of rules.systems) {
-      if (isDisabled(state, system)) continue;
-      const wait = callSystem(
-        state,
-        system,
-        () => system.nextEventIn(state, content, rules),
-        null,
-        validWait,
-      );
-      const pack = originOf(system);
-      if (pack !== undefined) {
-        const streak = wait === 0 ? (zeros.get(system) ?? 0) + 1 : 0;
-        zeros.set(system, streak);
-        // A system of a pack that keeps asking for an event now, with no time passing, is switched off.
-        if (streak >= STALL_LIMIT) {
-          disableSystem(state, system, pack, new Error('asks for an event at +0 ms without end'));
-          continue;
+      let wait: number | null;
+      if (guarded) {
+        if (isDisabled(state, system)) continue;
+        wait = callSystem(
+          state,
+          system,
+          () => system.nextEventIn(state, content, rules),
+          null,
+          validWait,
+        );
+        const pack = originOf(system);
+        if (pack !== undefined) {
+          const streak = wait === 0 ? (zeros.get(system) ?? 0) + 1 : 0;
+          zeros.set(system, streak);
+          // A system of a pack that keeps asking for an event now, with no time passing, is switched off.
+          if (streak >= STALL_LIMIT) {
+            disableSystem(state, system, pack, new Error('asks for an event at +0 ms without end'));
+            continue;
+          }
         }
+      } else {
+        wait = system.nextEventIn(state, content, rules);
       }
       if (wait !== null && (next === null || wait < next)) next = wait;
     }
@@ -156,22 +163,32 @@ export function advance(
     if (stalled > STALL_LIMIT) {
       throw new Error('advance made no progress: a system keeps asking for time 0');
     }
-    if (next > 0) zeros.clear();
-    elapse(state, next, content, rules);
+    if (guarded && next > 0) zeros.clear();
+    elapse(state, next, content, rules, guarded);
     remaining -= next;
     for (const system of rules.systems) {
-      if (!isDisabled(state, system))
+      if (!guarded) system.run(state, content, rules);
+      else if (!isDisabled(state, system)) {
         callSystem(state, system, () => system.run(state, content, rules), undefined);
+      }
     }
   }
-  elapse(state, remaining, content, rules);
+  elapse(state, remaining, content, rules, guarded);
 }
 
-function elapse(state: GameState, dt: number, content: ContentDb, rules: Rules): void {
+function elapse(
+  state: GameState,
+  dt: number,
+  content: ContentDb,
+  rules: Rules,
+  guarded: boolean,
+): void {
   if (dt === 0) return;
   for (const system of rules.systems) {
-    if (isDisabled(state, system)) continue;
-    callSystem(state, system, () => system.elapse?.(state, dt, content, rules), undefined);
+    if (!guarded) system.elapse?.(state, dt, content, rules);
+    else if (!isDisabled(state, system)) {
+      callSystem(state, system, () => system.elapse?.(state, dt, content, rules), undefined);
+    }
   }
   state.now += dt;
 }
