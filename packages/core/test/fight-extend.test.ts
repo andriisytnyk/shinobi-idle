@@ -44,6 +44,7 @@ import {
   sec,
   tech,
   withAi,
+  fig,
 } from './fight-helpers.ts';
 import { fightingGenin as genin, setLevel } from './helpers.ts';
 
@@ -85,8 +86,8 @@ describe('Futon on Burning does not compound', () => {
       amounts.push(burn?.kind === 'periodic' ? burn.amount : -1);
     }
     expect(fight.tally.combos.fanBurn).toBeGreaterThanOrEqual(3);
-    for (const a of amounts) expect([10, 10 * K.combo.fanBurn]).toContain(a);
-    expect(amounts[amounts.length - 1]).toBe(10 * K.combo.fanBurn);
+    for (const a of amounts) expect([10, 10 * fig('combo.fanBurn')]).toContain(a);
+    expect(amounts[amounts.length - 1]).toBe(10 * fig('combo.fanBurn'));
     const burn = enemy.effects.find((e) => e.id === 'burn');
     expect(burn?.until).toBeGreaterThan(fight.t);
   });

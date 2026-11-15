@@ -264,7 +264,7 @@ describe('defence', () => {
 });
 
 describe('the rule list decides', () => {
-  const swapped = (rules: (id: 'genin' | 'chunin') => AiTier['rules']): ContentDb => ({
+  const swapped = (rules: (id: string) => AiTier['rules']): ContentDb => ({
     ...content,
     ai: { ...content.ai, tiers: content.ai.tiers.map((t) => ({ ...t, rules: rules(t.id) })) },
   });

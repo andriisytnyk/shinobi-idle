@@ -14,7 +14,7 @@ import {
 } from '../src/index.ts';
 import { bossNature } from '../src/index.ts';
 import { fighter, startFight, unlock } from './prep-state.ts';
-import { K, ctxOf, quiet, rules, scripted, sec, withAi } from './fight-helpers.ts';
+import { K, ctxOf, quiet, rules, scripted, sec, withAi, fig } from './fight-helpers.ts';
 
 const boss = (id: string): Boss => {
   const b = content.bosses.find((x) => x.id === id);
@@ -43,12 +43,12 @@ describe('the pack respawn of the wolf leader', () => {
     const f = watched('core:boss_wolf');
     const [lead, ...pack] = f.enemies;
     expect(lead?.specials).toContain('special:packRespawn');
-    expect(pack).toHaveLength(K.bossFx.wolfPack.count);
+    expect(pack).toHaveLength(fig('bossFx.wolfPack.count'));
     expect(lead?.maxHp).toBeCloseTo(
-      (K.eHp[0] + K.eHp[1] * 22) * K.boss.hp * K.bossFx.wolfPack.leaderHp,
+      (K.eHp[0] + K.eHp[1] * 22) * K.boss.hp * fig('bossFx.wolfPack.leaderHp'),
       6,
     );
-    expect(pack[0]?.maxHp).toBeCloseTo((K.eHp[0] + K.eHp[1] * 22) * K.bossFx.wolfPack.hp, 6);
+    expect(pack[0]?.maxHp).toBeCloseTo((K.eHp[0] + K.eHp[1] * 22) * fig('bossFx.wolfPack.hp'), 6);
   });
 
   it('calls the pack back at intervals while the leader lives, and stops when he falls', () => {
@@ -59,14 +59,14 @@ describe('the pack respawn of the wolf leader', () => {
       f.enemies.filter((e) => alive(e) && e.specials.includes('special:packMember'));
     for (const e of wolves()) e.hp = 0;
     expect(wolves()).toHaveLength(0);
-    advanceBy(f, K.bossFx.wolfPack.everyMs / 1000 + 1, wait);
-    expect(wolves()).toHaveLength(K.bossFx.wolfPack.count);
+    advanceBy(f, fig('bossFx.wolfPack.everyMs') / 1000 + 1, wait);
+    expect(wolves()).toHaveLength(fig('bossFx.wolfPack.count'));
     // The leader falls: no more wolves come back.
     const lead = f.enemies[0];
     if (!lead) throw new Error('no leader');
     for (const e of wolves()) e.hp = 0;
     lead.hp = 0;
-    advanceBy(f, (2 * K.bossFx.wolfPack.everyMs) / 1000, wait);
+    advanceBy(f, (2 * fig('bossFx.wolfPack.everyMs')) / 1000, wait);
     expect(wolves()).toHaveLength(0);
   });
 
@@ -105,13 +105,13 @@ describe('the rival', () => {
       Object.keys(duel.enemies[0]?.timers ?? {}).filter(
         (n) => n.startsWith('rival.') && n !== 'rival.sig',
       ),
-    ).toHaveLength(K.bossFx.rivalDuel.techniques);
+    ).toHaveLength(fig('bossFx.rivalDuel.techniques'));
     const tournament = watched('core:boss_ren2', { ...scripted([]), natures: [] });
     expect(
       Object.keys(tournament.enemies[0]?.timers ?? {}).filter(
         (n) => n.startsWith('rival.') && n !== 'rival.sig',
       ),
-    ).toHaveLength(K.bossFx.rivalTournament.techniques);
+    ).toHaveLength(fig('bossFx.rivalTournament.techniques'));
     const sig = duel.enemies[0]?.timers['rival.sig'];
     // The signature is ready soon after the start.
     expect((sig?.need ?? 0) - (sig?.progress ?? 0)).toBeLessThanOrEqual(2 * 1000 * 1000 * 1000);
@@ -157,9 +157,12 @@ describe('the drunken fighter: evasion grows with the health he has lost', () =>
       body.hp = body.maxHp * share;
       return stat(ctxOf(f), body, 'evasion', base) / base;
     };
-    expect(at(1)).toBeCloseTo(K.trait.evasive, 9);
-    expect(at(0.5)).toBeCloseTo((K.trait.evasive + K.bossFx.drunkenEvasion.maxMult) / 2, 9);
-    expect(at(0)).toBeCloseTo(K.bossFx.drunkenEvasion.maxMult, 9);
+    expect(at(1)).toBeCloseTo(fig('trait.evasive'), 9);
+    expect(at(0.5)).toBeCloseTo(
+      (fig('trait.evasive') + fig('bossFx.drunkenEvasion.maxMult')) / 2,
+      9,
+    );
+    expect(at(0)).toBeCloseTo(fig('bossFx.drunkenEvasion.maxMult'), 9);
     body.hp = body.maxHp * 0.5;
     body.effects.push({
       kind: 'modifier',
@@ -176,7 +179,12 @@ describe('the drunken fighter: evasion grows with the health he has lost', () =>
 });
 
 describe('the heavy cast of the hunter', () => {
-  const fx = K.bossFx.heavyCast;
+  const fx = {
+    everyMs: fig('bossFx.heavyCast.everyMs'),
+    castMs: fig('bossFx.heavyCast.castMs'),
+    damageMult: fig('bossFx.heavyCast.damageMult'),
+    stunMs: fig('bossFx.heavyCast.stunMs'),
+  };
 
   it('winds up for its time, hits for the multiple and stuns the player unless interrupted', () => {
     const f = watched('core:boss_hunter');
@@ -224,13 +232,13 @@ describe('the twins', () => {
       content,
       rules,
     );
-    expect(f.enemies).toHaveLength(K.bossFx.twins.count);
-    const hp = (K.eHp[0] + K.eHp[1] * 38) * K.boss.hp * K.bossFx.twins.hpEach;
+    expect(f.enemies).toHaveLength(fig('bossFx.twins.count'));
+    const hp = (K.eHp[0] + K.eHp[1] * 38) * K.boss.hp * fig('bossFx.twins.hpEach');
     expect(f.enemies[0]?.maxHp).toBeCloseTo(hp, 6);
     const mist = findEffect(f.player, 'twinMist');
     expect(mist).toMatchObject({ kind: 'periodic', mode: 'damage', until: null });
     expect(mist?.kind === 'periodic' ? mist.amount : 0).toBeCloseTo(
-      K.poison.pctPerSec * f.player.maxHp * K.bossFx.twins.mistMult,
+      K.poison.pctPerSec * f.player.maxHp * fig('bossFx.twins.mistMult'),
       6,
     );
     f.enemies.forEach((e) => (e.timer.need = 1e18));
@@ -272,15 +280,15 @@ describe('the mist fugitive', () => {
     f.player.hp = f.player.maxHp = 1e12;
     body.timer.need = 1e18;
     // The hide from the start wears off; the first re-hide comes at the configured time.
-    advanceBy(f, K.trait.hidden + 1, wait);
+    advanceBy(f, fig('trait.hidden') + 1, wait);
     expect(findEffect(f.player, 'hidden')).toBeUndefined();
     expect(findEffect(f.player, 'bind')).toBeUndefined();
-    advanceBy(f, K.bossFx.mistRehide.everyMs / 1000 - K.trait.hidden - 1 + 0.5, wait);
+    advanceBy(f, fig('bossFx.mistRehide.everyMs') / 1000 - fig('trait.hidden') - 1 + 0.5, wait);
     expect(findEffect(f.player, 'hidden')).toBeDefined();
     const bind = findEffect(f.player, 'bind');
     expect(bind?.kind === 'modifier' ? bind.value : 1).toBe(K.bindEva);
     // A sensed body does not hide, but the prison still closes.
-    advanceBy(f, K.bind.dur + K.trait.hidden + 1, wait);
+    advanceBy(f, K.bind.dur + fig('trait.hidden') + 1, wait);
     expect(findEffect(f.player, 'hidden')).toBeUndefined();
     body.effects.push({
       kind: 'modifier',
@@ -291,7 +299,7 @@ describe('the mist fugitive', () => {
       op: 'mul',
       value: 1,
     });
-    const next = 2 * sec(K.bossFx.mistRehide.everyMs / 1000);
+    const next = 2 * sec(fig('bossFx.mistRehide.everyMs') / 1000);
     advanceBy(f, (next - f.t) / sec(1) + 0.5, wait);
     expect(findEffect(f.player, 'hidden')).toBeUndefined();
     expect(findEffect(f.player, 'bind')).toBeDefined();
@@ -309,13 +317,13 @@ describe('the Nameless', () => {
     quiet(f);
     f.player.hp = f.player.maxHp = 1e12;
     body.timer.need = 1e18;
-    expect(body.fleeAt).toBe(K.bossFx.illusion.fleeAtHp);
-    expect(body.timers.illusionist?.need).toBe(workOf(K.bossFx.illusion.everyMs) * 1000);
-    advanceBy(f, K.bossFx.illusion.everyMs / 1000 + 0.1, wait);
+    expect(body.fleeAt).toBe(fig('bossFx.illusion.fleeAtHp'));
+    expect(body.timers.illusionist?.need).toBe(workOf(fig('bossFx.illusion.everyMs')) * 1000);
+    advanceBy(f, fig('bossFx.illusion.everyMs') / 1000 + 0.1, wait);
     expect(findEffect(f.player, 'illusion')).toBeDefined();
     expect(f.tally.statuses.illusion).toBe(1);
     // A hit that takes it to the threshold sends it away: the fight is over as a flight.
-    body.hp = body.maxHp * (K.bossFx.illusion.fleeAtHp + 0.001);
+    body.hp = body.maxHp * (fig('bossFx.illusion.fleeAtHp') + 0.001);
     body.effects.push({
       kind: 'periodic',
       id: 'burn',

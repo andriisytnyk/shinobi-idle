@@ -18,7 +18,18 @@ import {
   type FightState,
   type PlayerSnapshot,
 } from '../src/index.ts';
-import { K, enemyAt, pacify, quiet, rules, scripted, sec, withAi, ctxOf } from './fight-helpers.ts';
+import {
+  K,
+  enemyAt,
+  pacify,
+  quiet,
+  rules,
+  scripted,
+  sec,
+  withAi,
+  ctxOf,
+  fig,
+} from './fight-helpers.ts';
 import { addEffect } from '../src/index.ts';
 import { fighter, ids, run, startFight, startOperation, stock, unlock } from './prep-state.ts';
 
@@ -234,8 +245,8 @@ describe('what each tool does, and what it costs', () => {
       fightAdvance(fight, workOf(200), content, r);
       if (fight.enemies[0] && findEffect(fight.enemies[0], 'stun')) slept++;
     }
-    expect(slept / tries).toBeGreaterThan(K.itemFx.sleep.chance - 0.15);
-    expect(slept / tries).toBeLessThan(K.itemFx.sleep.chance + 0.15);
+    expect(slept / tries).toBeGreaterThan(fig('itemFx.sleep.chance') - 0.15);
+    expect(slept / tries).toBeLessThan(fig('itemFx.sleep.chance') + 0.15);
   });
 
   it('pills heal, and restore chakra', () => {

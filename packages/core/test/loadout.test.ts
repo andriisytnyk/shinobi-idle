@@ -1,5 +1,5 @@
 /** A3: the loadout: limits by rank, always-available techniques, the automatic loadout, the signature, `loadout.prepare`. */
-import { content, TRAIT_ANSWER, type NatureId, type TraitId } from '@shinobi/content';
+import { content, type NatureId, type TagId, type TraitId } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
   advance,
@@ -313,9 +313,15 @@ describe('loadout.prepare against a known trait', () => {
     poisoner: ids.antidote,
   };
 
+  const traitAnswer = (trait: string): TagId => {
+    const answer = content.traits.find((t) => t.id === trait)?.answer;
+    if (!answer) throw new Error(`no trait ${trait}`);
+    return answer;
+  };
+
   /** Whether the loadout or the pouch of the state answers the trait. */
   function answered(state: GameState, trait: TraitId): 'technique' | 'item' | null {
-    const answer = TRAIT_ANSWER[trait];
+    const answer = traitAnswer(trait);
     for (const id of state.loadouts.active) {
       const t = tech(id);
       if (t.tags.includes(answer) || (trait === 'regen' && t.state === 'burn')) return 'technique';
@@ -368,7 +374,7 @@ describe('loadout.prepare against a known trait', () => {
         const t = content.techniques.find((x) => x.id === id);
         if (
           t &&
-          (t.tags.includes(TRAIT_ANSWER[trait]) || (trait === 'regen' && t.state === 'burn'))
+          (t.tags.includes(traitAnswer(trait)) || (trait === 'regen' && t.state === 'burn'))
         ) {
           delete state.known[id];
         }
