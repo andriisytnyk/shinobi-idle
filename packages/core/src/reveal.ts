@@ -290,7 +290,9 @@ function termHolds(ctx: Ctx, term: RevealTerm, entry: Entry): boolean {
     case 'known':
       return state.known[id] === true;
     case 'owned':
-      return (state.bank[id] ?? 0) > 0 || (state.gear[id] ?? 0) > 0;
+      return (
+        (state.bank[id] ?? 0) > 0 || (state.gear[id] ?? 0) > 0 || state.buffs[id] !== undefined
+      );
     case 'seen':
       return keyOf(entry.ref) !== ctx.unmarked && state.shown[id] === true;
     case 'named':

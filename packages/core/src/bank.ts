@@ -12,7 +12,11 @@ export function hasItem(state: GameState, id: string, n = 1): boolean {
 /** Adds `n` items. Returns false, changing nothing, if `n` is not a whole non-negative number. */
 export function addItem(state: GameState, id: string, n: number): boolean {
   if (!isCount(n)) return false;
-  if (n > 0) state.bank[id] = (state.bank[id] ?? 0) + n;
+  if (n > 0) {
+    state.bank[id] = (state.bank[id] ?? 0) + n;
+    // Having held an item is remembered for the reveal rule: it stays shown after the last one is used up.
+    state.shown[id] = true;
+  }
   return true;
 }
 

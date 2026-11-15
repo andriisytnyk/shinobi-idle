@@ -22,6 +22,7 @@ export interface RevealReader {
 }
 
 let reader: RevealReader | null = null;
+let disabled = false;
 
 /** Called by `createGame`. */
 export function setRevealReader(next: RevealReader | null): void {
@@ -29,15 +30,22 @@ export function setRevealReader(next: RevealReader | null): void {
 }
 
 /** How much of an entity may be shown now. */
-export const revealLevel = (ref: EntityRef): RevealLevel => reader?.level(ref) ?? 'full';
+export const revealLevel = (ref: EntityRef): RevealLevel =>
+  disabled ? 'full' : (reader?.level(ref) ?? 'full');
 
 /** The hint text key for an entity that is not fully shown, or null. */
-export const revealHintKey = (ref: EntityRef): string | null => reader?.hint(ref) ?? null;
+export const revealHintKey = (ref: EntityRef): string | null =>
+  disabled ? null : (reader?.hint(ref) ?? null);
 
 /** Whether the name of the entity may be printed. */
 export const nameShown = (ref: EntityRef): boolean => revealLevel(ref) !== 'hidden';
 
 /** Records that the entities were shown legitimately (a shop row, a recipe list, a reward on a mission the player may take). */
 export function markShown(refs: readonly EntityRef[]): void {
-  if (refs.length > 0) reader?.mark(refs);
+  if (refs.length > 0 && !disabled) reader?.mark(refs);
+}
+
+/** Tests switch the rule off around a check that is about something else (every entity then counts as shown in full), and back on. */
+export function setRevealDisabled(value: boolean): void {
+  disabled = value;
 }

@@ -1,27 +1,9 @@
 <main class="main">
-  <div class="ui-page" data-page="core:entity" data-ui="page">
-    <article class="entity-page" data-entity="boss:core:boss_wolf" data-ui="entity-page">
-      <p class="kind">
-        Бос
+  <div class="ui-page" data-page="reveal-gate" data-ui="page">
+    <article class="gate" data-not-revealed="" data-ui="entity-page">
       <h1 data-ui="entity-header">
-        <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
-          <path d="#1102-dcytap" fill="currentColor">
-        Сірий Вовк
+        Ще не відкрито
       <p>
-        Ватажок вовчої зграї. Поки він живий, убиті вовки раз у раз повертаються до бою.
-      <section data-entity-links="" data-ui="entity-section">
-        <h2>
-          Пов'язане
-        <ul class="links">
-          <li>
-            <a class="entity-link" href="#/trait/pack">
-              Зграя
-          <li>
-            <a class="entity-link" href="#/skill/doton">
-              Дотон
-          <li>
-            <a class="entity-link" href="#/item/core:pelt">
-              Вовча шкура
-          <li>
-            <a class="entity-link" href="#/item/core:gem">
-              Коштовність
+        Ти ще нічого про це не знаєш. Шукай підказки в бою, на мапі й у дорученнях.
+      <p class="hint" data-reveal-hint="">
+        Як дізнатися більше: Зустрінь у бою.

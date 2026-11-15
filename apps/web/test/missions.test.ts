@@ -353,6 +353,8 @@ describe('the mission page', () => {
 
   it('marks the Intel way with its price when nothing else will do the stage', async () => {
     const state = player({ intel: 3 });
+    // The mission opens with its flag; a mission that is not open is shown by name only.
+    state.flags['missions.c.unlocked'] = true;
     booted = await bootApp([coreUi], state, '#/mission/core:caravan');
     const [row] = used(0);
     expect(used(0)).toHaveLength(1);

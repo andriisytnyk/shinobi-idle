@@ -24,8 +24,8 @@
               <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
                 <path d="#947-1r9i7kh" fill="currentColor">
             <span class="region-name">
-              <a class="entity-link" href="#/region/core:plains">
-                Південні рівнини Вогню
+              <span class="entity-link masked" data-masked="" title="Розвідай клітинку">
+                ???
             <span class="region-status">
               <svg aria-hidden="true" class="icon" height="12" viewBox="0 0 24 24" width="12">
                 <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
@@ -37,8 +37,8 @@
               <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
                 <path d="#852-cfskse" fill="currentColor">
             <span class="region-name">
-              <a class="entity-link" href="#/region/core:valley">
-                Долина Завершення
+              <span class="entity-link masked" data-masked="" title="Розвідай клітинку">
+                ???
             <span class="region-status">
               <svg aria-hidden="true" class="icon" height="12" viewBox="0 0 24 24" width="12">
                 <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">

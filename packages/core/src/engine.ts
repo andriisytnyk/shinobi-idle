@@ -304,7 +304,8 @@ export function dispatch(
   rules: Rules = defaultRules,
 ): CommandResult {
   const result = apply(state, command, content, rules);
-  if (result.ok) updateQuests(state, content);
+  // A mark is bookkeeping for the reveal rule: it changes nothing a quest or a village could read.
+  if (result.ok && command.type !== 'reveal.mark') updateQuests(state, content);
   return result;
 }
 

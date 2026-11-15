@@ -551,8 +551,8 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#1439-1x5ajs3" fill="currentColor">
                   <span>
-                    <a class="entity-link" href="#/item/core:crate">
-                      Ящик торговця
+                    <span class="entity-link masked" data-masked="" title="Здобудь це">
+                      ???
             <div class="why" data-why="error.requirementsNotMet" id="why-core:caravan">
               <div class="row" data-met="false" data-ui="req-row">
                 <span class="mark">
@@ -788,8 +788,8 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#1797-v7j9c3" fill="currentColor">
                   <span>
-                    <a class="entity-link" href="#/item/core:scrollpart_fire_dragon_flame_bullet">
-                      Частина сувою: Полум'яна куля вогняного дракона
+                    <span class="entity-link masked" data-masked="" title="Здобудь це">
+                      ???
                     <span class="chance">
                       шанс 15%
             <div class="why" data-why="error.requirementsNotMet" id="why-core:dig">

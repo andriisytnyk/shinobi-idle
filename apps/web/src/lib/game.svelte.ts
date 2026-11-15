@@ -8,6 +8,7 @@ import {
   revealHint,
   revealOf,
   type Command,
+  type RevealLevel,
   type CommandResult,
   type GameEvent,
   type GameState,
@@ -37,7 +38,7 @@ import { composeBoot } from './boot.ts';
 import { deepFreeze } from './freeze.ts';
 import { detach as detachData } from './read.ts';
 import { requestPersistentStorage } from './platform.ts';
-import { setRevealReader } from './reveal.ts';
+import { setRevealReader, type RevealReader } from './reveal.ts';
 import type { TabLock } from './tab-lock.ts';
 import { packsToasts, toastFor, toasts as defaultToasts } from './toasts.svelte.ts';
 
@@ -145,14 +146,39 @@ export function createGame(deps: GameDeps = {}) {
   let signals = $state.raw<Signals>({});
 
   // The reveal rule for the components: reading through `version` makes whatever uses it follow the game.
-  setRevealReader({
+  // Many links on a page ask about the same few entities: answers are kept for one update of the game.
+  const levels = new Map<string, RevealLevel>();
+  let levelsAt = -1;
+  const hints = new Map<string, string | null>();
+  let hintsAt = -1;
+  const reveal: RevealReader = {
     level(ref) {
-      void version;
-      return revealOf(state, ref, content, rules);
+      const now = version;
+      if (levelsAt !== now) {
+        levels.clear();
+        levelsAt = now;
+      }
+      const key = `${ref.kind}\u0000${ref.id}`;
+      let level = levels.get(key);
+      if (level === undefined) {
+        level = revealOf(state, ref, content, rules);
+        levels.set(key, level);
+      }
+      return level;
     },
     hint(ref) {
-      void version;
-      return revealHint(state, ref, content, rules);
+      const now = version;
+      if (hintsAt !== now) {
+        hints.clear();
+        hintsAt = now;
+      }
+      const key = `${ref.kind}\u0000${ref.id}`;
+      let hint = hints.get(key);
+      if (hint === undefined) {
+        hint = revealHint(state, ref, content, rules);
+        hints.set(key, hint);
+      }
+      return hint;
     },
     mark(refs) {
       let changed = false;
@@ -165,7 +191,8 @@ export function createGame(deps: GameDeps = {}) {
       }
       if (changed) touch();
     },
-  });
+  };
+  setRevealReader(reveal);
 
   /** Revision of the save this tab last read or wrote; a stored revision above it means a newer save exists. */
   let rev = 0;
@@ -311,6 +338,8 @@ export function createGame(deps: GameDeps = {}) {
 
   function replaceState(next: GameState): void {
     state = next;
+    // The game that is given a state is the one that is played: the reveal rule reads from it.
+    setRevealReader(reveal);
     log = [];
     graduation = false;
     signals = {};
