@@ -52,8 +52,29 @@ export const natureSchema = z.strictObject({
   ayaNature: vocabId,
 });
 
-/** A rank the player holds; the list order is the order of the ranks and `tier` the AI tier it runs. */
-export const playerRankSchema = z.strictObject({ id: vocabId, tier: z.number().int().min(0) });
+/**
+ * A rank the player holds; the list order is the order of the ranks and `tier` the AI tier it runs.
+ * `academy` marks a rank held while still at the Academy: such a player has no village, no pouch,
+ * no nature test and is slowed past the Academy cap; the first rank without it is the graduation.
+ */
+export const playerRankSchema = z.strictObject({
+  id: vocabId,
+  tier: z.number().int().min(0),
+  academy: z.boolean().optional(),
+});
+
+/** The jobs a currency does for the rules (a pack's own currencies have none and are plain counters). */
+export const CURRENCY_ROLES = ['money', 'reputation', 'intel'] as const;
+/**
+ * A currency of the game. `role` names the job the rules give it: `money` pays for shops, obstacles,
+ * travel and the village treasury and is what loot and missions pay; `reputation` opens the stages
+ * of the village; `intel` studies enemies and skips mission stages. Prices and rewards that name no
+ * currency use the one with the role `money`.
+ */
+export const currencySchema = z.strictObject({
+  id: vocabId,
+  role: z.enum(CURRENCY_ROLES).optional(),
+});
 
 /**
  * A stage of the village, in list order. `rep` is the key of `K.rep` that holds the reputation
@@ -345,6 +366,8 @@ export const marketEntrySchema = z.object({
 export const shopEntrySchema = z.strictObject({
   item: coreId,
   req: z.lazy(() => reqSchema),
+  /** The currency the price is paid in (a `currencies` id); omitted: the currency with the role `money`. */
+  currency: vocabId.optional(),
 });
 
 /** Coating: one `poison` and a batch of `base` make a batch of `product` (counts come from the product's `madeFrom`). */
@@ -705,6 +728,8 @@ export const questRewardsSchema = z.strictObject({
   items: z.array(ingredientRef),
   ryo: z.number().int().min(0),
   rep: z.number().int().min(0),
+  /** More currencies by id (a pack's own); `ryo` and `rep` are the `money` and `reputation` ones. */
+  currencies: z.record(vocabId, z.number().int().min(0)).optional(),
   flags: z.array(z.string().min(1)),
   rank: playerRankId.nullable(),
 });
@@ -1183,7 +1208,7 @@ export const contentDbSchema = z.object({
   attackStyles: z.array(vocabSchema),
   fightRegions: z.array(vocabSchema),
   itemKinds: z.array(vocabSchema),
-  currencies: z.array(vocabSchema),
+  currencies: z.array(currencySchema),
   entityKinds: z.array(entityKindSchema),
   trophies: z.array(vocabSchema),
   gearFx: z.array(vocabSchema),

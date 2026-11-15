@@ -59,6 +59,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     cells: ids(db.cells),
     regions: ids(db.regions),
     resources: ids(db.resources),
+    currencies: ids(db.currencies),
   };
   type SetName = keyof typeof set;
 
@@ -152,8 +153,18 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     ref('group', s.group, 'groups');
     req('unlockReq', s.unlockReq);
   }
+  const roleOwner = new Map<string, string>();
+  for (const c of db.currencies) {
+    at('currencies', c.id);
+    if (c.role === undefined) continue;
+    const other = roleOwner.get(c.role);
+    if (other !== undefined) problem('role', `the role "${c.role}" is already held by "${other}"`);
+    else roleOwner.set(c.role, c.id);
+  }
   for (const n of db.natures) {
     at('natures', n.id);
+    // A nature trains through the skill that has its id.
+    if (!set.skills.has(n.id)) problem('id', `the nature has no skill with its id`);
     refs('strongAgainst', n.strongAgainst, 'natures');
     refs('opens', n.opens, 'cellKeys');
     ref('ayaNature', n.ayaNature, 'natures');
@@ -282,6 +293,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
   }
   for (const s of db.shop) {
     at('shop', s.item);
+    if (s.currency !== undefined) ref('currency', s.currency, 'currencies');
     ref('item', s.item, 'items');
     req('req', s.req);
   }
@@ -391,6 +403,8 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     });
     q.rewards.items.forEach((x, n) => ref(`rewards.items[${n}].item`, x.item, 'items'));
     if (q.rewards.rank !== null) ref('rewards.rank', q.rewards.rank, 'ranks');
+    for (const id of Object.keys(q.rewards.currencies ?? {}))
+      ref('rewards.currencies', id, 'currencies');
   }
   for (const e of db.exams) {
     at('exams', e.id);
