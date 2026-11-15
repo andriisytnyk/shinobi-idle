@@ -2,12 +2,12 @@
 import { describe, expect, it } from 'vitest';
 import {
   MODIFIER_KEYS,
+  composeContent,
+  corePack,
+  type ContentPack,
   SKILL_IDS,
   content,
   isModifierKey,
-  modSchema,
-  obstacleSchema,
-  poolCheckpointSchema,
   ukLocale,
   type Mod,
 } from '../src/index.ts';
@@ -59,24 +59,25 @@ describe('modifier key registry', () => {
     }
   });
 
-  it('rejects a key that is not registered', () => {
-    expect(modSchema.safeParse({ key: 'xp.skill.nope', op: 'add', value: 0.1 }).success).toBe(
-      false,
-    );
-    expect(modSchema.safeParse({ key: 'xp.skill.tai', op: 'add', value: 0.1 }).success).toBe(true);
+  it('computes the valid keys from the composed skills', () => {
+    expect(Object.hasOwn(content.modifierKeys, 'xp.skill.nope')).toBe(false);
+    expect(Object.hasOwn(content.modifierKeys, 'xp.skill.tai')).toBe(true);
     expect(isModifierKey('toString')).toBe(false);
+    expect(Object.keys(content.modifierKeys).sort()).toEqual(Object.keys(MODIFIER_KEYS).sort());
   });
 
-  it('fails validation of content that carries an unknown key', () => {
+  it('fails composition of a pack whose content carries an unknown key', () => {
     const pool = content.pools[0];
-    const obstacle = content.obstacles[0];
-    if (!pool || !obstacle) throw new Error('no content');
-    const bad = { key: 'made.up.key', op: 'add', value: 1 } as const;
-    expect(poolCheckpointSchema.safeParse({ ...pool, mods: [bad] }).success).toBe(false);
-    expect(
-      obstacleSchema.safeParse({ ...obstacle, mods: [{ ...bad, side: 'bonus' }, ...obstacle.mods] })
-        .success,
-    ).toBe(false);
+    if (!pool) throw new Error('no content');
+    const bad = { key: 'made.up.key', op: 'add' as const, value: 1 };
+    const pack: ContentPack = {
+      ...corePack,
+      data: {
+        ...corePack.data,
+        pools: content.pools.map((p) => (p === pool ? { ...p, mods: [bad] } : p)),
+      },
+    };
+    expect(() => composeContent([pack])).toThrow(/pack "core".*unknown modifier key "made.up.key"/);
   });
 
   it('uses only registered keys in the content', () => {

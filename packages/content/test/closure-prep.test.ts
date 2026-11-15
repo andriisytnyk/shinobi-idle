@@ -1,6 +1,6 @@
 /** Closure of the combat preparation data: the AI tiers, the loadout and pouch numbers, the medic pouch, the operations' clear flags. */
 import { describe, expect, it } from 'vitest';
-import { BALANCE_OVERRIDE, withOverrides } from '../src/balance-ext.ts';
+import { BALANCE_OVERRIDE, withOverrides } from '../src/packs/core/balance-ext.ts';
 import { AI_RULE_IDS, content, TRAIT_IDS } from '../src/index.ts';
 
 const K = content.balance.K;
@@ -72,8 +72,8 @@ describe('the preparation numbers', () => {
 
   it('has the numbers every boss special needs, and no special without a hook or a marker', () => {
     for (const boss of content.bosses) expect(K.bossFx).toHaveProperty(boss.special.fx);
-    expect(K.bossFx.wolfPack.count).toBe(4);
-    expect(K.bossFx.illusion.fleeAtHp).toBe(0.3);
+    expect(K.bossFx.wolfPack?.count).toBe(4);
+    expect(K.bossFx.illusion?.fleeAtHp).toBe(0.3);
   });
 });
 

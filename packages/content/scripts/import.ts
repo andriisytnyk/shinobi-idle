@@ -1,7 +1,7 @@
 /**
  * Imports the MVP slice (docs/.../slice.json, balance.json) into normalized, typed content:
- *   src/data/generated/*.json   structured data, no display text
- *   src/locales/uk.json         every display string, keyed `<kind>.<id>.<field>`
+ *   src/packs/core/data/generated/*.json   structured data, no display text
+ *   src/packs/core/locales/uk.json       every display string, keyed `<kind>.<id>.<field>`
  * The import is idempotent: running it twice leaves the files byte-identical.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -24,7 +24,7 @@ import {
   type TagId,
   type TraitId,
 } from '../src/constants.ts';
-import { BALANCE_EXT, BALANCE_OVERRIDE, withOverrides } from '../src/balance-ext.ts';
+import { BALANCE_EXT, BALANCE_OVERRIDE, withOverrides } from '../src/packs/core/balance-ext.ts';
 import { localeKey, type LocaleKind } from '../src/keys.ts';
 import {
   balanceParamsSchema,
@@ -59,10 +59,10 @@ const root = resolve(here, '..');
 const docs = resolve(root, '..', '..', 'docs');
 const sliceDir = join(docs, 'Shinobi Idle — MVP — зріз і баланс');
 const mapPath = join(docs, 'Shinobi Idle — дані й скрипти', 'concept', 'map_data_v3.json');
-const outData = join(root, 'src', 'data', 'generated');
-const outLocale = join(root, 'src', 'locales', 'uk.json');
+const outData = join(root, 'src', 'packs', 'core', 'data', 'generated');
+const outLocale = join(root, 'src', 'packs', 'core', 'locales', 'uk.json');
 
-const registryPath = join(root, 'src', 'data', 'id-registry.json');
+const registryPath = join(root, 'src', 'packs', 'core', 'id-registry.json');
 const assignIds = process.argv.includes('--assign-ids');
 
 const readJson = (path: string): unknown => JSON.parse(readFileSync(path, 'utf8'));

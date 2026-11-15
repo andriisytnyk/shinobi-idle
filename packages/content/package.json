@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./testmod": "./src/packs/testmod/index.ts",
+    "./typing": "./src/typing/truth.ts"
   },
   "scripts": {
     "import": "tsx scripts/import.ts",

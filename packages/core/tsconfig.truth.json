@@ -1,0 +1,6 @@
+{
+  "//": "The normal type check of the package (src and test) without tsconfig.legacy-ids.json: against the truthful types of @shinobi/content. Run by `pnpm typecheck:open`; see open-typecheck.json.",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": { "types": ["node"] },
+  "include": ["src", "test"]
+}

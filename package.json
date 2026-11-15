@@ -10,9 +10,10 @@
   "scripts": {
     "dev": "pnpm --filter @shinobi/web run dev",
     "build": "pnpm -r --if-present build",
-    "test": "pnpm -r --workspace-concurrency=1 --if-present test",
+    "test": "pnpm -r --workspace-concurrency=1 --if-present test && vitest run --dir scripts",
     "lint": "eslint .",
-    "typecheck": "pnpm -r --if-present typecheck",
+    "typecheck": "pnpm -r --if-present typecheck && pnpm typecheck:open",
+    "typecheck:open": "node scripts/typecheck-open.ts",
     "format": "prettier --write .",
     "content:import": "pnpm --filter @shinobi/content run import",
     "icons:build": "pnpm --filter @shinobi/web run icons:build",

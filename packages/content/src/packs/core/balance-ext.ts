@@ -147,7 +147,6 @@ export const BALANCE_EXT = {
     },
     rivalTournament: {
       techniques: 2,
-      habituationMult: 2,
       everyMs: 9000,
       mult: 0.05,
       sigEveryMs: 16000,
@@ -155,6 +154,7 @@ export const BALANCE_EXT = {
       sigOpenMs: 2000,
       hp: 1,
       dmg: 1,
+      habituationMult: 2,
     },
     drunkenEvasion: { maxMult: 2, hp: 1, dmg: 1 },
     /** A heavy cast: `castMs` wind-up every `everyMs`, `damageMult` x damage, stuns the player for `stunMs` when it lands. */

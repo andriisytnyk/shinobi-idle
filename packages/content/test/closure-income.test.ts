@@ -61,7 +61,7 @@ describe('selling craft products is a modest side income', () => {
   }
 
   it('stays under the D mission income even at the highest crafting mastery tier', () => {
-    const missionPerHour = K.ryoPerMin.D * 60;
+    const missionPerHour = (K.ryoPerMin.D ?? 0) * 60;
     const bonus = (K.craftRules.masteryTiers.length - 1) * K.craftRules.bonusPerTier;
     for (const level of [10, 30, 50]) {
       expect(bestLoop(level, bonus).perHour).toBeLessThan(missionPerHour * 1.5);

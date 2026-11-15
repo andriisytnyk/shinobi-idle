@@ -2,7 +2,7 @@ node_modules
 dist
 docs
 pnpm-lock.yaml
-packages/content/src/data/generated
-packages/content/src/locales
+packages/content/src/packs/core/data/generated
+packages/content/src/packs/core/locales
 *.md
 apps/web/src/lib/icons.generated.ts
