@@ -94,15 +94,13 @@ describe('locked skills', () => {
 });
 
 describe('the first fight', () => {
-  it('sets the flag that opens Vitality and Evasion', () => {
+  it('sets the flag that opens Vitality', () => {
     const state = createState(1, content);
     expect(state.flags.firstFight).toBeUndefined();
     expect(isSkillUnlocked(state, 'vit', content)).toBe(false);
-    expect(isSkillUnlocked(state, 'eva', content)).toBe(false);
     expect(dispatch(state, start('fight', DUMMY), content).ok).toBe(true);
     expect(state.flags.firstFight).toBe(true);
     expect(isSkillUnlocked(state, 'vit', content)).toBe(true);
-    expect(isSkillUnlocked(state, 'eva', content)).toBe(true);
     expect(evalReq(state, { t: 'flag', id: 'firstFight' }, content).met).toBe(true);
   });
 });

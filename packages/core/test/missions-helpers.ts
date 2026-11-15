@@ -93,7 +93,6 @@ export function ableFor(
     cc: 30,
     med: 30,
     vit: 36,
-    eva: 36,
   };
   for (const n of NATURE_IDS) levels[n] = natures.includes(n) ? natureLevel : 1;
   const bank: Record<string, number> = { 'core:antidote': 50, 'core:wire': 50 };

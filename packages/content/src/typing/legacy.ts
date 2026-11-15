@@ -22,8 +22,7 @@ export type LegacySkillId =
   | 'scout'
   | 'prov'
   | 'alch'
-  | 'vit'
-  | 'eva';
+  | 'vit';
 export type LegacyNatureId = 'katon' | 'futon' | 'raiton' | 'doton' | 'suiton';
 export type LegacyTechSkillId = 'tai' | 'nin' | LegacyNatureId;
 export type LegacySkillGroup = 'train' | 'nin' | 'field' | 'craft' | 'combat';

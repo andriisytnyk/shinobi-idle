@@ -15,7 +15,7 @@ import {
   type BasicAttack,
   type TechniqueNumbers,
 } from './numbers.ts';
-import { levelsOf, snapshotPlayer } from './snapshot.ts';
+import { levelsOf, planningSnapshot, snapshotPlayer } from './snapshot.ts';
 
 /*
  * The player's combat numbers read straight from a game state. The formulas live in `numbers.ts`
@@ -38,7 +38,7 @@ export const playerStaminaRegen = (state: GameState, content: ContentDb): number
   staminaRegenOf(levelsOf(state, content), content);
 
 export const playerEvasion = (state: GameState, content: ContentDb): number =>
-  evasionOf(levelsOf(state, content), content);
+  evasionOf(planningSnapshot(state, content), content);
 
 /** Accuracy rating when attacking with a technique of `skill`. */
 export const playerAccuracy = (state: GameState, skill: SkillId, content: ContentDb): number =>

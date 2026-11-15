@@ -341,7 +341,7 @@ describe('coverage, hints and secrecy', () => {
     const a = analyze(state, zone(false).target, quick);
     const s = a.session;
     expect(s?.xpPerHour.vit).toBeGreaterThan(0);
-    expect(s?.xpPerHour.eva).toBeGreaterThan(0);
+    expect(Object.keys(s?.xpPerHour ?? {})).not.toContain('eva');
     expect(Object.keys(s?.masteryPerHour ?? {}).length).toBeGreaterThan(0);
     expect(s?.ryoPerHour).toBeGreaterThan(0);
     expect(

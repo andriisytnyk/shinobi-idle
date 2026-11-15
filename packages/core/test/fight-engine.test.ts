@@ -178,16 +178,7 @@ describe('A8: statistical sanity with simulateFights', () => {
 describe('A9: state is plain JSON and round-trips through a save', () => {
   function fighting(seed: number, enemy: string): GameState {
     const state = genin(seed);
-    for (const skill of [
-      'tai',
-      'nin',
-      'katon',
-      'futon',
-      'raiton',
-      'vit',
-      'eva',
-      'med',
-    ] as SkillId[]) {
+    for (const skill of ['tai', 'nin', 'katon', 'futon', 'raiton', 'vit', 'med'] as SkillId[]) {
       setLevel(state, skill, 36);
     }
     refreshUnlocks(state, content, true);
@@ -283,7 +274,6 @@ describe('A2: split invariance with fights running', () => {
       'doton',
       'suiton',
       'vit',
-      'eva',
       'med',
       'ath',
       'cc',
@@ -352,7 +342,7 @@ describe('A2: split invariance with fights running', () => {
 describe('the fight action wraps the fight engine', () => {
   function strong(seed: number): GameState {
     const state = genin(seed);
-    for (const skill of ['tai', 'nin', 'katon', 'vit', 'eva', 'med', 'ath'] as SkillId[]) {
+    for (const skill of ['tai', 'nin', 'katon', 'vit', 'med', 'ath'] as SkillId[]) {
       setLevel(state, skill, 30);
     }
     refreshUnlocks(state, content, true);

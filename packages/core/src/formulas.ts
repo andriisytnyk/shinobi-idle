@@ -38,22 +38,22 @@ export function nonNativeCastMult(skillLvl: number, content: ContentDb): number 
  * `nonNativeLevel` in natures.ts); it stretches the cast. Practice and fights both come through here.
  */
 export function techniqueCastSeconds(
-  sealCount: number,
+  tech: { cast: number },
   masteryLvl: number,
   content: ContentDb,
   nonNativeLevel?: number,
 ): number {
   const K = content.balance.K;
   const stretch = nonNativeLevel === undefined ? 1 : nonNativeCastMult(nonNativeLevel, content);
-  if (sealCount === 0) return K.castBase * stretch;
-  const trimmed = sealCount * (1 - (K.masteryCast * masteryLvl) / K.masteryCap);
-  return (K.castBase + K.castPerSeal * Math.max(1, trimmed)) * stretch;
+  // The cast is a number of the technique: mastery shortens it down to the floor, the seals do not count.
+  const trimmed = tech.cast * (1 - (K.masteryCast * masteryLvl) / K.masteryCap);
+  return Math.max(K.castFloor, trimmed) * stretch;
 }
 
 /** Seconds between completions of a practice with the given cast time. */
 export function practiceIntervalSeconds(castSeconds: number, content: ContentDb): number {
   const K = content.balance.K;
-  return Math.max(K.practiceMin, castSeconds + K.practiceRecovery);
+  return Math.max(K.practiceMin, castSeconds + K.practiceFocus);
 }
 
 /** Mastery XP earned by one completed action of `intervalSeconds`. */

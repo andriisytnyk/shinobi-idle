@@ -54,7 +54,7 @@ function noticed(view: FightView): { remaining: number; total: number; interrupt
   const out: { remaining: number; total: number; interruptible: boolean }[] = [];
   for (const e of view.enemies) {
     const c = e.cast;
-    if (!c || (view.ai.defends !== 'all' && !c.known)) continue;
+    if (!c || (!view.ai.tactical && !c.known)) continue;
     if (c.total - c.remaining < view.reactWork) continue;
     out.push(c);
   }

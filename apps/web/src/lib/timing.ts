@@ -83,12 +83,7 @@ function castSecondsOf(
     state.player.natures,
     skillLevel(state, tech.skill, content),
   );
-  return techniqueCastSeconds(
-    tech.sealSeq.length,
-    masteryLevel(state, tech.id, content),
-    content,
-    foreign,
-  );
+  return techniqueCastSeconds(tech, masteryLevel(state, tech.id, content), content, foreign);
 }
 
 /**

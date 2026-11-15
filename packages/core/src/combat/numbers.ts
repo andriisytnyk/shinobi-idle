@@ -77,9 +77,26 @@ export function staminaRegenOf(levels: Levels, content: ContentDb): number {
   return (base ?? 0) + (perLevel ?? 0) * (levels.ath ?? 1);
 }
 
-export function evasionOf(levels: Levels, content: ContentDb): number {
+/**
+ * The evasion rating of the player: the base, a term per rank tier and what the known defensive
+ * techniques add, scaled by their mastery (the share a technique gives for merely being known at
+ * mastery 1, all of it at the cap). There is no skill term.
+ */
+export function evasionOf(
+  snap: Pick<PlayerSnapshot, 'tier' | 'known' | 'mastery'>,
+  content: ContentDb,
+): number {
   const K = content.balance.K;
-  return K.evaBase + K.evaPerLevel * (levels.eva ?? 1);
+  let rating = K.evaBase + K.rating.evaTier * (snap.tier ?? 0);
+  const known = new Set(snap.known);
+  for (const tech of content.techniques) {
+    const fx = tech.combat?.passive?.fx;
+    if (fx === undefined || !known.has(tech.id)) continue;
+    const row = need(K.passiveFx[fx], `passiveFx.${fx}`);
+    const share = (Math.max(1, snap.mastery[tech.id] ?? 1) - 1) / (K.masteryCap - 1);
+    rating += row.evasion * (row.base + (1 - row.base) * Math.min(1, share));
+  }
+  return rating;
 }
 
 /** Accuracy rating when attacking with a technique of `skill`. */
@@ -157,14 +174,11 @@ export function techniqueFigures(
       need(K.tierMult[`${tech.tier}`], `tierMult.${tech.tier}`) *
       (1 + K.levelScale * skillLvl) *
       (1 + K.masteryDmg * masteryShare);
-  const cast = Math.max(
-    K.castFloor,
-    techniqueCastSeconds(
-      tech.sealSeq.length,
-      mastery,
-      content,
-      nonNativeLevel(tech.skill, snap.natures ?? [], skillLvl, content),
-    ),
+  const cast = techniqueCastSeconds(
+    tech,
+    mastery,
+    content,
+    nonNativeLevel(tech.skill, snap.natures ?? [], skillLvl, content),
   );
   const base =
     need(pool === 'stamina' ? K.staminaCost[rank] : K.chakraCost[rank], `cost.${rank}`) * role.c;

@@ -18,14 +18,13 @@ describe('the AI tiers', () => {
     }
   });
 
-  it('starts at the lowest player tier; only the genin needs a reaction delay', () => {
+  it('starts at the lowest player tier; a higher tier waits for the moment less', () => {
     const genin = content.ai.tiers.find((t) => t.id === 'genin');
     const chunin = content.ai.tiers.find((t) => t.id === 'chunin');
     expect(genin?.minTier).toBe(0);
     expect(chunin?.minTier).toBe(2);
-    expect(genin?.reaction).toBe(true);
-    expect(chunin?.reaction).toBe(false);
-    expect(K.ai.geninReactionMs).toBeGreaterThan(0);
+    expect(genin?.waitMs).toBeGreaterThan(chunin?.waitMs ?? Infinity);
+    expect(chunin?.waitMs).toBeGreaterThan(0);
   });
 
   it('names only real traits as visible', () => {

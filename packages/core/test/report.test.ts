@@ -33,7 +33,7 @@ function session(): GameState {
   stock(state, { [ids.heal]: 8 });
   startFight(state, BANDIT);
   advance(state, 5 * 60_000, content);
-  for (const skill of ['tai', 'nin', 'katon', 'vit', 'eva'] as const) setLevel(state, skill, 3);
+  for (const skill of ['tai', 'nin', 'katon', 'vit'] as const) setLevel(state, skill, 3);
   state.flags['region.exam.unlocked'] = true;
   startFight(state, HARD);
   advance(state, 10 * 60_000, content);

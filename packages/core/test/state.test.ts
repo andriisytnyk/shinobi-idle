@@ -5,9 +5,9 @@ import { createState } from '../src/index.ts';
 describe('createState', () => {
   const state = createState(123, content);
 
-  it('puts all 16 skills at 0 xp and creates one action slot', () => {
+  it('puts all 15 skills at 0 xp and creates one action slot', () => {
     expect(Object.keys(state.skills).sort()).toEqual([...SKILL_IDS].sort());
-    expect(SKILL_IDS.length).toBe(16);
+    expect(SKILL_IDS.length).toBe(15);
     for (const id of SKILL_IDS) expect(state.skills[id]).toEqual({ xp: 0 });
     expect(state.slots).toEqual([{ action: null, progress: 0, share: 1000, data: null }]);
   });

@@ -100,7 +100,7 @@ function factsOf(
       const t = index.techniques.get(id);
       if (!t) return null;
       const cast = techniqueCastSeconds(
-        t.sealSeq.length,
+        t,
         masteryLevel(state, id, content),
         content,
         nonNativeLevel(t.skill, state.player.natures, skillLevel(state, t.skill, content), content),

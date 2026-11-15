@@ -8,7 +8,7 @@
     "masteryPerHour": 10500,
     "poolShare": 0.25,
     "poolCapPerItem": 1500,
-    "practiceRecovery": 1.2,
+    "practiceFocus": 1.2,
     "practiceMin": 2,
     "drill": 3,
     "meditate": 3,
@@ -16,8 +16,24 @@
     "gather": 2.5,
     "craft": 2.5,
     "explore": 5,
-    "castBase": 0.4,
-    "castPerSeal": 0.15,
+    "castByRank": {
+      "E": 1,
+      "D": 1.2,
+      "C": 1.6,
+      "B": 2,
+      "A": 2.5,
+      "S": 3
+    },
+    "castByRole": {
+      "projectile": 1,
+      "series": 1.25,
+      "area": 1.2,
+      "control": 0.9,
+      "defense": 1,
+      "buff": 0.7,
+      "signature": 1.5,
+      "drill": 1
+    },
     "masteryCast": 0.5,
     "castFloor": 0.4,
     "nonNativeCast": 0.3,
@@ -265,10 +281,38 @@
     ],
     "accBase": 40,
     "accPerLevel": 5,
-    "evaBase": 30,
-    "evaPerLevel": 5,
+    "evaBase": 70,
+    "rating": {
+      "accTier": 50,
+      "evaTier": 80,
+      "knowledge": 10
+    },
+    "passiveFx": {
+      "shield": {
+        "evasion": 40,
+        "base": 0.25
+      },
+      "decoy": {
+        "evasion": 40,
+        "base": 0.25
+      },
+      "evasionBuff": {
+        "evasion": 50,
+        "base": 0.25
+      },
+      "passiveNegate": {
+        "evasion": 60,
+        "base": 0.25
+      }
+    },
     "hitMin": 0.05,
     "hitMax": 0.95,
+    "basicCast": 0.8,
+    "basicCost": 1,
+    "rest": {
+      "s": 1.5,
+      "share": 0.08
+    },
     "basicInterval": 2.4,
     "basicDmg": [
       8,
@@ -362,8 +406,7 @@
     },
     "combatXp": {
       "style": 0.7,
-      "vit": 0.35,
-      "eva": 0.3
+      "vit": 0.35
     },
     "ryoPerMin": {
       "D": 12,
@@ -585,7 +628,6 @@
       "vestRank": "chunin"
     },
     "ai": {
-      "geninReactionMs": 1000,
       "guardBelow": 0.6
     },
     "woundHp": 0.1,
@@ -643,8 +685,7 @@
       "maxDefeats": 3,
       "defaultStyle": "tai",
       "fightSkills": [
-        "vit",
-        "eva"
+        "vit"
       ],
       "success": {
         "base": 0.9,

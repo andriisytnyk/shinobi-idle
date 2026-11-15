@@ -97,7 +97,7 @@ describe('A8: team support', () => {
   function watchFight(id: string) {
     const state = player({
       natures: ['katon'],
-      levels: { scout: 20, ath: 25, tai: 25, vit: 20, eva: 20, katon: 20, doton: 1 },
+      levels: { scout: 20, ath: 25, tai: 25, vit: 20, katon: 20, doton: 1 },
       bank: { 'core:antidote': 5 },
     });
     startMission(state, id);
@@ -145,7 +145,7 @@ describe('A8: team support', () => {
   });
 
   it('follows the natures the team selector gives: the rival beats the first nature, Aya is Suiton or Raiton', () => {
-    const state = player({ natures: ['doton'], levels: { scout: 20, vit: 20, eva: 20 } });
+    const state = player({ natures: ['doton'], levels: { scout: 20, vit: 20 } });
     expect(state.team).toEqual({ rival: 'raiton', aya: 'suiton' });
     const katon = player({ natures: ['katon'] });
     expect(katon.team?.aya).toBe('raiton');

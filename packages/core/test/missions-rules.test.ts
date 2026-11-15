@@ -420,7 +420,7 @@ describe('A7: failures', () => {
   it('an items stage takes its items at its start and blocks the start when they are missing', () => {
     const state = player({
       natures: ['katon'],
-      levels: { scout: 15, tai: 36, vit: 36, eva: 36, med: 20, cc: 20, katon: 36 },
+      levels: { scout: 15, tai: 36, vit: 36, med: 20, cc: 20, katon: 36 },
       bank: { 'core:antidote': 12 },
     });
     expect(startMission(state, 'core:well')).toEqual({ ok: true });
@@ -437,7 +437,7 @@ describe('A7: failures', () => {
 
   it('a lost combat stage costs a Wound and restarts that stage until it has been lost too often; the stages before it stand', () => {
     // A player who cannot win: Scouting passes the first stage, the thief wins the second.
-    const state = player({ natures: ['katon'], levels: { scout: 30, vit: 1, eva: 1, tai: 1 } });
+    const state = player({ natures: ['katon'], levels: { scout: 30, vit: 1, tai: 1 } });
     startMission(state, 'core:thief');
     const lost = (): number => state.events.filter((e) => e.type === 'playerDefeated').length;
     // After the first defeat the stage has started over: the same stage, a new fight, a Wound.

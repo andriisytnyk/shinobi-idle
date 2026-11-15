@@ -22,8 +22,7 @@ const tier = (pack: string, minTier = 0) => ({
   id: `${pack}:t`,
   minTier,
   rules: ['basic'],
-  defends: 'all',
-  reaction: false,
+  waitMs: 800,
   tactical: false,
 });
 const K = (p: Loose) => p.balance.K as Record<string, Record<string, number>>;
@@ -178,8 +177,7 @@ describe('the closure validator catches more than references', () => {
               id: 'lateai:t',
               minTier: 9,
               rules: ['basic'],
-              defends: 'all',
-              reaction: false,
+              waitMs: 800,
               tactical: false,
             },
           ],

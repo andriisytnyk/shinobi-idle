@@ -119,6 +119,7 @@ const data = {
       sealsCanon: false,
       tier: 0,
       noDamage: false,
+      cast: 1.5,
       /** The combo fires whenever its rule is met (a chilled body), without a roll. */
       combat: { effect: { kind: 'damage' }, guaranteedCombo: 'testmod:frostburn' },
     },
@@ -138,6 +139,7 @@ const data = {
       sealsCanon: false,
       tier: 0,
       noDamage: false,
+      cast: 1.5,
       combat: { effect: { kind: 'damage' } },
     },
   ],

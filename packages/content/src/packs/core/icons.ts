@@ -16,7 +16,6 @@ export const CORE_ICONS: Readonly<Record<string, Readonly<Record<string, string>
     prov: 'cooking-pot',
     alch: 'erlenmeyer',
     vit: 'heart-beats',
-    eva: 'evasion',
   },
 
   technique: {

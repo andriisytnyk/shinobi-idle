@@ -9,7 +9,7 @@ const LEVELS_ABOVE = 5;
 
 /** A player at the natural level for `m`: five levels above what its stages ask, the techniques of the board known. */
 function natural(m: Mission, team: boolean) {
-  const levels: Partial<Record<SkillId, number>> = { tai: 20, vit: 20, eva: 20 };
+  const levels: Partial<Record<SkillId, number>> = { tai: 20, vit: 20 };
   for (const stage of m.stages) {
     if (stage.t === 'skill') levels[stage.skill] = stage.min + LEVELS_ABOVE;
     if (stage.t === 'tech') {

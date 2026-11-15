@@ -187,7 +187,7 @@ describe('fight action', () => {
     const player = state.combat?.fight.player;
     expect(player?.cast).toBe('core:leaf_whirlwind');
     expect(player?.stamina).toBeLessThan(playerMaxStamina(state, content));
-    advance(state, 1000, content);
+    advance(state, 4000, content);
     expect(state.combat?.fight.player.cd['core:leaf_whirlwind']).toBeGreaterThan(
       state.combat?.fight.t ?? Infinity,
     );
@@ -195,14 +195,12 @@ describe('fight action', () => {
 });
 
 describe('A4: combat XP follows the formula', () => {
-  it('pays style, Vitality and Evasion XP by the hour within 5%', () => {
+  it('pays style and Vitality XP by the hour within 5%', () => {
     const state = genin(8);
     setLevel(state, 'vit', 40);
-    setLevel(state, 'eva', 40);
     const before = {
       tai: state.skills.tai!.xp,
       vit: state.skills.vit!.xp,
-      eva: state.skills.eva!.xp,
     };
     dispatch(state, fight(), content);
     advance(state, HOUR, content);
@@ -214,8 +212,7 @@ describe('A4: combat XP follows the formula', () => {
     };
     // The dummy is beaten with Leaf Whirlwind (Taijutsu) and basic attacks (Taijutsu).
     near(state.skills.tai!.xp - before.tai, K.combatXp.style * r);
-    near(state.skills.vit!.xp - before.vit, K.combatXp.vit * r);
-    near(state.skills.eva!.xp - before.eva, K.combatXp.eva * r);
+    near(state.skills.vit!.xp - before.vit, (K.combatXp.vit ?? 0) * r);
   });
 
   it('pays mastery XP for time since the previous action, to techniques only', () => {

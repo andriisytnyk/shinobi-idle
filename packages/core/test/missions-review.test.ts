@@ -19,7 +19,7 @@ const K = content.balance.K;
 const caravan = mission('core:caravan');
 
 describe('a stage bought with Intel', () => {
-  const fit = { scout: 10, tai: 25, vit: 36, eva: 36, katon: 36 };
+  const fit = { scout: 10, tai: 25, vit: 36, katon: 36 };
 
   for (const seed of [4, 17, 20, 1, 2, 3]) {
     it(`seed ${seed}: five Intel buy five finished missions, with no second charge and no stop in between`, () => {
@@ -78,7 +78,7 @@ describe('a stage bought with Intel', () => {
   it('stops for missing items and names the item', () => {
     const state = player({
       natures: ['katon'],
-      levels: { scout: 15, tai: 36, vit: 36, eva: 36, katon: 36 },
+      levels: { scout: 15, tai: 36, vit: 36, katon: 36 },
       bank: { 'core:antidote': 5 },
     });
     startMission(state, 'core:well');

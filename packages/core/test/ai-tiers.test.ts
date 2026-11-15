@@ -114,7 +114,7 @@ function view(id: 'genin' | 'chunin', techs: KitTechnique[], enemies: ViewEnemy[
     medic: null,
     stance: null,
     hastened: false,
-    reactWork: ai.reaction ? workOf(K.ai.geninReactionMs) : 0,
+    reactWork: ai.tactical ? 0 : workOf(ai.waitMs),
     guardBelow: K.ai.guardBelow,
     itemWork: sec(K.pillAction),
   };
@@ -134,14 +134,11 @@ describe('the two tiers are data', () => {
     // Both interrupt and answer; the genin needs a reaction delay and does not reserve an interrupt.
     expect(genin.rules).toContain('interrupt');
     expect(chunin.rules).toContain('interrupt');
-    expect(genin.reaction).toBe(true);
-    expect(chunin.reaction).toBe(false);
-    expect(genin.defends).toBe('known');
-    expect(chunin.defends).toBe('all');
+    // A higher tier waits for the moment less.
+    expect(genin.waitMs).toBeGreaterThan(chunin.waitMs);
     expect(genin.tactical).toBe(false);
     expect(chunin.tactical).toBe(true);
     expect(content.ai.visibleTraits).toEqual(['armor', 'pack']);
-    expect(K.ai.geninReactionMs).toBeGreaterThan(0);
   });
 
   it('plays a student and a genin with the genin tier and a chunin with the other', () => {
@@ -162,7 +159,7 @@ describe('the two tiers are data', () => {
 
 describe('interrupts: a genin reacts after a delay to a cast it knows, a chunin at once to any', () => {
   const techs = [kt('int', ['interrupt'], 1), kt('big', [], 50)];
-  const react = workOf(K.ai.geninReactionMs);
+  const react = workOf(tierOf('genin').waitMs);
 
   it('does not interrupt before the genin reaction delay has passed, and does after', () => {
     expect(defaultCombatAi(view('genin', techs, [cast_(0, true)]))).toEqual(cast('big'));
@@ -249,7 +246,7 @@ describe('answers: every known trait, at either tier, and nothing else', () => {
 
 describe('defence', () => {
   const techs = [shield('guard'), kt('big', [], 50)];
-  const react = workOf(K.ai.geninReactionMs);
+  const react = workOf(tierOf('genin').waitMs);
 
   it('a chunin guards against every heavy cast, a genin only against the ones it knows to be heavy', () => {
     expect(defaultCombatAi(view('chunin', techs, [cast_(0, false)]))).toEqual(cast('guard'));

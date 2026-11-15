@@ -189,8 +189,8 @@ export const BALANCE_EXT = {
   signature: { minMastery: 25, xpBonus: 0.1 },
   /** Pouch slots: the base count and the extra slots the chunin vest gives. */
   pouch: { slots: 3, vest: 1, vestRank: 'chunin' },
-  /** The player's AI: the reaction delay (ms) of the genin tier to a cast it has to answer, and the health share below which a spare buff is cast. */
-  ai: { geninReactionMs: 1000, guardBelow: 0.6 },
+  /** The player's AI: the health share below which a spare buff is cast. */
+  ai: { guardBelow: 0.6 },
   /** Health share below which a won fight still costs a Wound. */
   woundHp: 0.1,
   /** The Bingo book: wins that fully study an ordinary enemy and a boss. */
@@ -224,7 +224,7 @@ export const BALANCE_EXT = {
     minFactor: 0.2,
     maxDefeats: 3,
     defaultStyle: 'tai',
-    fightSkills: ['vit', 'eva'],
+    fightSkills: ['vit'],
     success: { base: 0.9, perLevel: 0.01, perMastery: 0.002, cap: 0.99 },
   },
   /** The team: a teammate stands at 80% of the player's level, performs with mastery 10, and in a fight hits every 9 s for 60% of the player's basic damage with the state of its nature. */

@@ -196,14 +196,15 @@ describe('A3: locks, the native bonus and the non-native cast', () => {
       const s = withNatures(genin(), ...natures);
       s.known['core:nature_transformation_burn_a_leaf'] = true;
       dispatch(s, start('practice', 'core:nature_transformation_burn_a_leaf'), content);
-      advance(s, 60_000, content);
+      advance(s, 3_600_000, content);
       return s.skills.katon!.xp;
     };
-    // Same technique, same cast, same cycles: only the native bonus differs.
+    // Same technique: XP per hour does not depend on the interval, only the native bonus differs.
     const native = run(['katon']);
     const foreign = run(['futon', 'katon']);
     expect(foreign).toBeGreaterThan(0);
-    expect(native / foreign).toBeCloseTo(K.nativeXp, 9);
+    // A cycle that was cut off by the end of the hour is not paid, so the ratio is close, not exact.
+    expect(native / foreign).toBeCloseTo(K.nativeXp, 1);
   });
 
   it('stretches the cast of a non-native technique 1.30 at level 1, 1.15 at 25 and 1.00 at 50', () => {
@@ -212,9 +213,9 @@ describe('A3: locks, the native bonus and the non-native cast', () => {
     expect(nonNativeCastMult(50, content)).toBe(1);
     expect(nonNativeCastMult(80, content)).toBe(1);
     const fb = content.techniques.find((t) => t.id === 'core:great_fireball')!;
-    const base = techniqueCastSeconds(fb.sealSeq.length, 1, content);
-    expect(techniqueCastSeconds(fb.sealSeq.length, 1, content, 1)).toBeCloseTo(base * 1.3, 12);
-    expect(techniqueCastSeconds(fb.sealSeq.length, 1, content, 50)).toBeCloseTo(base, 12);
+    const base = techniqueCastSeconds(fb, 1, content);
+    expect(techniqueCastSeconds(fb, 1, content, 1)).toBeCloseTo(base * 1.3, 12);
+    expect(techniqueCastSeconds(fb, 1, content, 50)).toBeCloseTo(base, 12);
   });
 
   it('only a nature skill that is not the first nature is foreign', () => {
@@ -228,7 +229,7 @@ describe('A3: locks, the native bonus and the non-native cast', () => {
   it('applies to the practice interval at levels 1, 25 and 50', () => {
     const id = 'core:great_fireball';
     const t = content.techniques.find((x) => x.id === id)!;
-    const cast = techniqueCastSeconds(t.sealSeq.length, 1, content);
+    const cast = techniqueCastSeconds(t, 1, content);
     const intervalAt = (natures: NatureId[], level: number) => {
       const s = withNatures(genin(), ...natures);
       setLevel(s, 'katon', level);

@@ -104,7 +104,7 @@
   }
  },
  "meta": {
-  "built": "2026-11-14",
+  "built": "2026-11-15",
   "cap": 50,
   "skills": [
    "tai",
@@ -121,8 +121,7 @@
    "scout",
    "prov",
    "alch",
-   "vit",
-   "eva"
+   "vit"
   ],
   "wheel": {
    "katon": "futon",
@@ -229,7 +228,8 @@
    "seals": 0,
    "sealsCanon": true,
    "tier": 0,
-   "noDamage": false
+   "noDamage": false,
+   "castOverride": 0.8
   },
   {
    "skill": "tai",
@@ -252,7 +252,8 @@
    "seals": 0,
    "sealsCanon": true,
    "tier": 0,
-   "noDamage": false
+   "noDamage": false,
+   "castOverride": 0.8
   },
   {
    "skill": "tai",
@@ -681,7 +682,8 @@
    "seals": 1,
    "sealsCanon": true,
    "tier": 0,
-   "noDamage": false
+   "noDamage": false,
+   "castOverride": 1
   },
   {
    "skill": "katon",
@@ -1811,10 +1813,10 @@
   {
    "level": 10,
    "uk": "Медитація в русі",
-   "pair": "Тайдзюцу + Ухилення",
+   "pair": "Тайдзюцу + Живучість",
    "insight": [
     "+8% досвіду Тайдзюцу",
-    "+8% досвіду Ухилення",
+    "+8% досвіду Живучості",
     "+8% пулу витривалості"
    ],
    "enlight": [
@@ -1919,7 +1921,7 @@
    "level": 20,
    "uk": "Слот 3: Ухилення від кунаїв",
    "req": "",
-   "note": "+3% досвіду Ухилення / −1% точності"
+   "note": "+3% ухилення в бою / −1% точності"
   },
   {
    "level": 30,

@@ -15,9 +15,8 @@
         "filler",
         "basic"
       ],
-      "defends": "known",
       "tactical": false,
-      "reaction": true
+      "waitMs": 1000
     },
     {
       "id": "chunin",
@@ -33,9 +32,8 @@
         "filler",
         "basic"
       ],
-      "defends": "all",
       "tactical": true,
-      "reaction": false
+      "waitMs": 600
     }
   ]
 }

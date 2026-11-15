@@ -483,7 +483,7 @@ export function createFight(
     stamina: Math.min(maxStamina, snap.stamina ?? maxStamina),
     maxStamina,
     accuracy: basic.accuracy * wound,
-    evasion: evasionOf(levels, content) * wound,
+    evasion: evasionOf(snap, content) * wound,
     damage: basic.damage * wound,
     intervalMs: basic.intervalMs,
     nature: null,
@@ -1014,7 +1014,8 @@ function buildView(ctx: FightCtx): FightView {
         : null,
     stance,
     hastened: (player.data.hasten ?? 0) > 0,
-    reactWork: tier.reaction ? workOf(K.ai.geninReactionMs) : 0,
+    // Adapter until the loop is replaced: the tier's wait is the delay of the tier that does not plan ahead.
+    reactWork: tier.tactical ? 0 : workOf(tier.waitMs),
     guardBelow: K.ai.guardBelow,
     itemWork: secWork(K.pillAction),
   };

@@ -170,6 +170,8 @@ export const techniqueCombatSchema = z.strictObject({
   hitsAll: z.boolean().optional(),
   /** Works without a slot in the loadout. */
   outOfLoadout: z.boolean().optional(),
+  /** A defensive technique is passive: once known it adds to the evasion rating by the row `fx` of `K.passiveFx`, scaled by its mastery. */
+  passive: z.strictObject({ fx: z.string().min(1) }).optional(),
 });
 
 export const techniqueBaseSchema = z.strictObject({
@@ -193,6 +195,8 @@ export const techniqueBaseSchema = z.strictObject({
   sealsCanon: z.boolean(),
   tier: z.union([z.literal(-1), z.literal(0), z.literal(1)]),
   noDamage: z.boolean(),
+  /** Cast time in seconds: a number of the technique, from its rank and role or set by hand; never from the seals. */
+  cast: z.number().positive(),
 });
 
 export const techniqueSchema = techniqueBaseSchema.extend({
@@ -869,10 +873,8 @@ export const aiTierSchema = z.strictObject({
   /** The lowest player tier (0 student, 1 genin, 2 chunin) that runs this tier. */
   minTier: z.number().int().min(0),
   rules: z.array(z.enum(AI_RULE_IDS)).min(1),
-  /** `known`: defends against the casts it knows to be heavy; `all`: every cast. */
-  defends: z.enum(['known', 'all']),
-  /** Whether it needs the reaction delay before it answers a cast. */
-  reaction: z.boolean(),
+  /** How long a fighter of this tier waits for the moment before every action, in ms: shorter for higher tiers. Also the length of the wait of an enemy of this tier. */
+  waitMs: z.number().int().min(1),
   /** Whether the best attack counts the nature wheel and habituation, or only raw strength. */
   tactical: z.boolean(),
 });
@@ -1059,7 +1061,8 @@ export const balanceParamsSchema = z.object({
   masteryPerHour: z.number(),
   poolShare: z.number(),
   poolCapPerItem: z.number(),
-  practiceRecovery: z.number(),
+  /** Seconds of focus before the cast in a practice action; the interval is the focus plus the technique's cast. */
+  practiceFocus: z.number(),
   practiceMin: z.number(),
   drill: z.number(),
   meditate: z.number(),
@@ -1067,8 +1070,9 @@ export const balanceParamsSchema = z.object({
   gather: z.number(),
   craft: z.number(),
   explore: z.number(),
-  castBase: z.number(),
-  castPerSeal: z.number(),
+  /** Base cast time in seconds by technique rank and by role: the cast of a technique is their product unless its data says otherwise. */
+  castByRank: byRank,
+  castByRole: z.record(z.string(), z.number()),
   masteryCast: z.number(),
   castFloor: z.number(),
   nonNativeCast: z.number(),
@@ -1110,9 +1114,18 @@ export const balanceParamsSchema = z.object({
   accBase: z.number(),
   accPerLevel: z.number(),
   evaBase: z.number(),
-  evaPerLevel: z.number(),
+  /** Rating terms: what one player or enemy tier adds to accuracy and to evasion, and what one level of knowledge of an enemy adds to evasion against it. */
+  rating: z.object({ accTier: z.number(), evaTier: z.number(), knowledge: z.number() }),
+  /** What a known defensive technique adds to the evasion rating (`evasion` at full mastery, `base` of it for knowing it), by the row its data names. */
+  passiveFx: z.record(z.string(), z.object({ evasion: z.number(), base: z.number() })),
   hitMin: z.number(),
   hitMax: z.number(),
+  /** The basic strike is an action: its cast time (s) and its stamina cost. */
+  basicCast: z.number().positive(),
+  basicCost: z.number().min(0),
+  /** Resting when neither a technique nor the basic strike can be paid: how long (s) and the share of both pools it returns. */
+  rest: z.object({ s: z.number().positive(), share: z.number().min(0).max(1) }),
+  /** The interval of the basic attack of the loop before fight loop v2 (read only by it, removed with it). */
   basicInterval: z.number(),
   basicDmg: pair,
   dodgeStamina: z.number(),
@@ -1139,7 +1152,7 @@ export const balanceParamsSchema = z.object({
   boss: z.object({ hp: z.number(), dmg: z.number() }),
   pack: z.object({ n: z.number(), hp: z.number(), dmg: z.number() }),
   trait: shapeOf('trait', z.record(z.string(), z.number())),
-  combatXp: z.object({ style: z.number(), vit: z.number(), eva: z.number() }),
+  combatXp: z.object({ style: z.number() }).catchall(z.number()),
   ryoPerMin: shapeOf('ryoPerMin', z.record(z.string(), z.number())),
   repPerMission: shapeOf('repPerMission', z.record(z.string(), z.number())),
   missionXpShare: z.number(),
@@ -1237,7 +1250,7 @@ export const balanceParamsSchema = z.object({
   }),
   signature: z.object({ minMastery: z.number().int(), xpBonus: z.number() }),
   pouch: z.object({ slots: z.number().int(), vest: z.number().int(), vestRank: playerRankId }),
-  ai: z.object({ geninReactionMs: z.number().int(), guardBelow: z.number() }),
+  ai: z.object({ guardBelow: z.number() }),
   woundHp: z.number(),
   /**
    * The Bingo book: wins that study an enemy completely, for an ordinary enemy and for a boss.

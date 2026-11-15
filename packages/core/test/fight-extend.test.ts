@@ -247,7 +247,7 @@ describe('a saved fight is parsed strictly', () => {
 
   it('restarts the fight on load instead of throwing', () => {
     const state = genin(4);
-    for (const skill of ['tai', 'nin', 'katon', 'vit', 'eva'] as const) setLevel(state, skill, 20);
+    for (const skill of ['tai', 'nin', 'katon', 'vit'] as const) setLevel(state, skill, 20);
     refreshUnlocks(state, content, true);
     dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: 'core:bandit' }, content);
     advance(state, 5000, content);
@@ -488,8 +488,7 @@ describe('outcomes', () => {
 
   function fighting(seed: number) {
     const state = genin(seed);
-    for (const skill of ['tai', 'nin', 'katon', 'vit', 'eva', 'med'] as const)
-      setLevel(state, skill, 25);
+    for (const skill of ['tai', 'nin', 'katon', 'vit', 'med'] as const) setLevel(state, skill, 25);
     refreshUnlocks(state, content, true);
     dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: 'core:bandit' }, content);
     return state;
@@ -776,8 +775,7 @@ void createState;
 describe('a fight saved while it follows up an outcome', () => {
   function fighting(seed: number) {
     const state = genin(seed);
-    for (const skill of ['tai', 'nin', 'katon', 'vit', 'eva', 'med'] as const)
-      setLevel(state, skill, 25);
+    for (const skill of ['tai', 'nin', 'katon', 'vit', 'med'] as const) setLevel(state, skill, 25);
     refreshUnlocks(state, content, true);
     dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: 'core:bandit' }, content);
     return state;

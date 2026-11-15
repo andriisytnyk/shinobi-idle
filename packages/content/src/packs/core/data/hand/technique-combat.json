@@ -56,6 +56,9 @@
     "effect": {
       "kind": "decoy",
       "fx": "decoy"
+    },
+    "passive": {
+      "fx": "decoy"
     }
   },
   "core:transformation": {
@@ -68,7 +71,10 @@
       "kind": "passiveNegate",
       "fx": "passiveNegate"
     },
-    "outOfLoadout": true
+    "outOfLoadout": true,
+    "passive": {
+      "fx": "passiveNegate"
+    }
   },
   "core:body_flicker": {
     "effect": {
@@ -209,17 +215,26 @@
     "effect": {
       "kind": "shield",
       "fx": "shield"
+    },
+    "passive": {
+      "fx": "shield"
     }
   },
   "core:hiding_in_mist": {
     "effect": {
       "kind": "evasionBuff",
       "fx": "evasionBuff"
+    },
+    "passive": {
+      "fx": "evasionBuff"
     }
   },
   "core:water_clone": {
     "effect": {
       "kind": "decoy",
+      "fx": "decoy"
+    },
+    "passive": {
       "fx": "decoy"
     }
   },
@@ -246,6 +261,9 @@
   "core:water_formation_wall": {
     "effect": {
       "kind": "shield",
+      "fx": "shield"
+    },
+    "passive": {
       "fx": "shield"
     }
   }

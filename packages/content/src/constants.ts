@@ -121,7 +121,7 @@ export const KEY_NATURES = Object.fromEntries(
 export const OPEN_SKILL_IDS = ['tai', 'nin', 'cc', 'med', 'ath'] as const;
 
 /** Skills that open with the first fight; every other skill opens at the Genin rank. */
-export const FIGHT_SKILL_IDS = ['vit', 'eva'] as const;
+export const FIGHT_SKILL_IDS = ['vit'] as const;
 
 /** The flag the combat stage raises on the first fight. */
 export const FIRST_FIGHT_FLAG = 'firstFight';

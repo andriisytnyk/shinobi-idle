@@ -147,7 +147,7 @@ export const practiceKind = skillAction((state, id, content) => {
   const foreign = state
     ? nonNativeLevel(t.skill, state.player.natures, skillLevel(state, t.skill, content), content)
     : undefined;
-  const cast = techniqueCastSeconds(t.sealSeq.length, mastery, content, foreign);
+  const cast = techniqueCastSeconds(t, mastery, content, foreign);
   return {
     skill: t.skill,
     level: t.level,

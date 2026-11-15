@@ -58,7 +58,7 @@
       ],
       [
         {
-          "key": "xp.skill.eva",
+          "key": "xp.skill.vit",
           "op": "add",
           "value": 0.08
         }

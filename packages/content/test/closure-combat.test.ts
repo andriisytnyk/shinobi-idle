@@ -78,7 +78,15 @@ describe('technique combat data', () => {
     expect(effectOf('core:body_replacement')).toEqual({
       effect: { kind: 'passiveNegate', fx: 'passiveNegate' },
       outOfLoadout: true,
+      passive: { fx: 'passiveNegate' },
     });
+    // Every defensive technique is passive and names a row of the passive numbers that exists.
+    for (const t of techById.values()) {
+      const kind = t.combat?.effect.kind;
+      const defensive = ['shield', 'decoy', 'evasionBuff', 'passiveNegate'].includes(kind ?? '');
+      expect(t.combat?.passive !== undefined, t.id).toBe(defensive);
+      if (t.combat?.passive) expect(Object.keys(K.passiveFx)).toContain(t.combat.passive.fx);
+    }
   });
 
   it('matches the slice for the buffs and utility techniques', () => {
