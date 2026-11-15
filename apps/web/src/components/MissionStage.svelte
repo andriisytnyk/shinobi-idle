@@ -55,7 +55,9 @@
   <header class="head">
     <span class="num" aria-hidden="true">{stage.index + 1}</span>
     <h3 class="name">
-      {#if view.head.labelKey}<span data-stage-label>{t(view.head.labelKey)}</span>{:else}{t(`mission.stage.kind.${kind}`)}{/if}
+      {#if view.head.labelKey}<span data-stage-label>{t(view.head.labelKey)}</span>{:else}{t(
+          `mission.stage.kind.${kind}`,
+        )}{/if}
       {#if view.head.ref}
         <EntityLink kind={view.head.ref.kind} id={view.head.ref.id} />
       {/if}
