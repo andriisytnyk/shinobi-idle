@@ -133,6 +133,8 @@ export interface FightData {
   physical: Set<string>;
   /** Traits the player AI answers with its own priority rule, in order, split by what they do. */
   answerOrder: { status: TraitDef[]; trait: TraitDef[] };
+  /** Every name the report counts a status under: the ids of the statuses and the names their data gives. */
+  tallyNames: Set<string>;
   /** What the player AI knows of the traits. */
   ai: { inflicted: { trait: string; effects: string[] }[]; answered: string[]; casters: string[] };
 }
@@ -242,6 +244,10 @@ function build(content: ContentDb): FightData {
     status: all.filter((t) => t.inflicts.length > 0 && t.priority !== null).sort(byPriority),
     trait: all.filter((t) => t.inflicts.length === 0 && t.priority !== null).sort(byPriority),
   };
+  const tallyNames = new Set<string>();
+  for (const def of [...statuses.values(), ...[...tags.values()].flatMap((t) => [...t.onHit, ...t.onUse].flatMap((o) => (o.op === 'status' ? [o.def] : [])))]) {
+    if (def.tally) tallyNames.add(def.tally.as);
+  }
   const ai = {
     inflicted: answerOrder.status.map((t) => ({ trait: t.id, effects: [...t.inflicts] })),
     answered: answerOrder.trait.map((t) => t.id),
@@ -261,6 +267,7 @@ function build(content: ContentDb): FightData {
     basicSkill: content.skills.find((k) => k.fight?.basic === true)?.id ?? null,
     physical: new Set(content.skills.filter((k) => k.fight?.physical === true).map((k) => k.id)),
     answerOrder,
+    tallyNames,
     ai,
   };
 }

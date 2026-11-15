@@ -44,6 +44,8 @@ interface Vocab {
   states: ReadonlySet<string>;
   combos: ReadonlySet<string>;
   statuses: ReadonlySet<string>;
+  /** Every id a status, or an effect a tag defines, goes by in a fight, and every name the report counts one under. */
+  effects: ReadonlySet<string>;
   /** The hook ids the content names, and the ones of the engine. */
   specials: ReadonlySet<string>;
   basicSkill: SkillId | null;
@@ -55,6 +57,18 @@ function vocabOf(content: ContentDb): Vocab {
   let v = vocabs.get(content);
   if (!v) {
     const ids = (list: readonly { id: string }[]) => new Set(list.map((e) => e.id));
+    const effects = new Set<string>();
+    for (const st of content.statuses) {
+      effects.add(st.id);
+      if (st.tally) effects.add(st.tally.as);
+    }
+    for (const tag of content.tags) {
+      for (const op of [...(tag.onHit ?? []), ...(tag.onUse ?? [])]) {
+        if (op.op !== 'effect') continue;
+        effects.add(op.id);
+        if (op.tally) effects.add(op.tally.as);
+      }
+    }
     const specials = new Set<string>([PASSIVE_NEGATE_HOOK, TEAM_HOOK]);
     for (const t of content.traits) if (t.hook !== undefined) specials.add(t.hook);
     for (const b of content.bosses) {
@@ -71,6 +85,7 @@ function vocabOf(content: ContentDb): Vocab {
       states: ids(content.states),
       combos: ids(content.combos),
       statuses: ids(content.statuses),
+      effects,
       specials,
       basicSkill: fightData(content).basicSkill,
     };
@@ -82,7 +97,7 @@ function vocabOf(content: ContentDb): Vocab {
 /** An effect id of the engine or of the pack core is bare; one of another pack names a status, trait or special of its own. */
 function knownEffect(id: string, v: Vocab): boolean {
   const base = id.split('#')[0] ?? id;
-  return !base.includes(':') || v.statuses.has(base) || v.traits.has(base) || v.specials.has(base);
+  return !base.includes(':') || v.effects.has(base) || v.traits.has(base) || v.specials.has(base);
 }
 
 /** The ids of a list that the vocabulary knows; the rest are dropped. */

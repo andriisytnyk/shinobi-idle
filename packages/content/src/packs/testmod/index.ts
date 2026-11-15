@@ -114,7 +114,8 @@ const data = {
       sealsCanon: false,
       tier: 0,
       noDamage: false,
-      combat: { effect: { kind: 'damage' } },
+      /** The combo fires whenever its rule is met (a chilled body), without a roll. */
+      combat: { effect: { kind: 'damage' }, guaranteedCombo: 'testmod:frostburn' },
     },
   ],
 
@@ -211,6 +212,11 @@ const data = {
   ],
 
   // ----- world -----
+  /** The places where the pack's enemy and boss are fought. */
+  zones: [
+    { id: 'testmod:zone_shellback', enemy: 'testmod:shellback', region: 'academy', unlock: null },
+    { id: 'testmod:zone_boss_shell', enemy: 'testmod:boss_shell', region: 'boss', unlock: null },
+  ],
   regions: [{ id: 'testmod:grove', scout: 1, cells: ['testmod:grove_edge'] }],
   cells: [
     {
