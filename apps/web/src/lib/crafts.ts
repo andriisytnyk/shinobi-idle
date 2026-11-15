@@ -67,11 +67,12 @@ function buildingOf(req: Req): string | null {
   return null;
 }
 
-export type ShopSection = 'market' | 'forge';
+export type ShopSection = 'market' | 'forge' | 'library';
 
 /** Goods of the forge are the ones its building unlocks; everything else is the market's. */
 export function shopSection(entry: ShopEntry): ShopSection {
-  return buildingOf(entry.req) === 'core:forge' ? 'forge' : 'market';
+  const building = buildingOf(entry.req);
+  return building === 'core:forge' ? 'forge' : building === 'core:library' ? 'library' : 'market';
 }
 
 /** Every item a requirement tree asks for, once each, in tree order. */

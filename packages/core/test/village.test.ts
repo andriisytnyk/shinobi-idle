@@ -161,7 +161,8 @@ describe('A2: the tick', () => {
 describe('A3: building', () => {
   it('costs costBase x multiplier for levels 1-6, iron at half from level 4', () => {
     const wood = [20, 44, 96, 210, 460, 1000];
-    const ryo = [100, 220, 480, 1050, 2300, 5000];
+    const ryo = K.costMult.map((m) => Math.round(K.treasuryBase * m));
+    expect(ryo).toEqual([25, 55, 120, 263, 575, 1250]);
     const ticks = [1, 2, 3, 4, 5, 8];
     const s = genin();
     const grounds = villageBuildings(s, content).find((b) => b.id === id('grounds'));
@@ -295,6 +296,15 @@ describe('A5: bonuses', () => {
       expect(getMod(s, key, content).parts).toEqual([]);
     });
   }
+
+  it('doubles the sparring Shinobi Power only at Grounds level 6', () => {
+    const s = withBuildings(genin(), { 'core:grounds': 5 });
+    expect(getMod(s, 'power.sparring', content).total).toBe(1);
+    withBuildings(s, { 'core:grounds': 6 });
+    const mod = getMod(s, 'power.sparring', content);
+    expect(mod.total).toBe(2);
+    expect(mod.parts[0]?.source).toEqual({ kind: 'building', id: 'core:grounds' });
+  });
 
   it('lowers shop prices by 2% per Market level', () => {
     const s = withBuildings(genin(), { 'core:market': 5 });
@@ -437,8 +447,8 @@ describe('A9: pace report', () => {
   const slugs = (list: string[]): Group => list.map(id);
   const PRODUCERS = slugs(['sawmill', 'mine', 'farms', 'hunt']);
 
-  /** Plays 12 game hours with `dispatch` and `advance` only: always the cheapest affordable upgrade of the first group that has one. Nothing is donated. */
-  function play(groups: Group[]): string[] {
+  /** Plays 12 game hours with `dispatch` and `advance` only: always the cheapest affordable upgrade of the first group that has one. The variant lifts Reputation to the stage-2 threshold at hour 4 and donates 300 ryo an hour from hour 2; otherwise nothing is donated. */
+  function play(groups: Group[], variant = false): string[] {
     const s = genin();
     const when: Record<string, number> = {};
     const policy = (): void => {
@@ -456,6 +466,11 @@ describe('A9: pace report', () => {
     };
     const report: string[] = [];
     for (let minute = K.tickMin; minute <= 12 * 60; minute += K.tickMin) {
+      if (variant && minute === 4 * 60) s.currencies.rep = K.rep.stage2;
+      if (variant && minute >= 2 * 60 && minute % 60 === 0) {
+        s.currencies.ryo += 300;
+        dispatch(s, { type: 'village.donate', ryo: 300 }, content);
+      }
       policy();
       advance(s, TICK, content);
       policy();
@@ -489,6 +504,17 @@ describe('A9: pace report', () => {
       slugs(['market']),
       slugs(['grounds']),
     ]);
+    const variant = play(
+      [
+        PRODUCERS,
+        slugs(['store']),
+        slugs(['library']),
+        slugs(['forge']),
+        slugs(['market']),
+        slugs(['grounds']),
+      ],
+      true,
+    );
     const libraryFirst = play([
       slugs(['library']),
       slugs(['store']),
@@ -498,7 +524,14 @@ describe('A9: pace report', () => {
       slugs(['grounds']),
     ]);
     console.log(
-      `Policy as specified (producers first):\n${spec.join('\n')}\nVariant (Library first):\n${libraryFirst.join('\n')}`,
+      [
+        'Policy as specified (producers first):',
+        ...spec,
+        'Variant (Reputation at 4 h, 300 ryo donated per hour from 2 h):',
+        ...variant,
+        'Library first, no donations:',
+        ...libraryFirst,
+      ].join('\n'),
     );
     expect(spec.length).toBe(5);
   });

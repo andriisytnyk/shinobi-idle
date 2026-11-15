@@ -1,6 +1,6 @@
 <script lang="ts">
   import { content } from '@shinobi/content';
-  import { evalReq, sellPrice, shopPrice } from '@shinobi/core';
+  import { evalReq, sellPrice, shopEntries, shopPrice } from '@shinobi/core';
   import { onMount } from 'svelte';
   import GearLine from '../components/GearLine.svelte';
   import Hint from '../components/Hint.svelte';
@@ -22,7 +22,7 @@
   const ryo = $derived(game.read((gs) => gs.currencies.ryo));
   const goods = $derived(
     game.read((gs) =>
-      content.shop.flatMap((entry) => {
+      shopEntries(content).flatMap((entry) => {
         const price = shopPrice(gs, entry.item, content);
         if (price === null) return [];
         return [
@@ -52,7 +52,7 @@
     goods.length > 0 && goods.every((g) => !g.req.met && blockOf(g.req)?.kind === 'rank'),
   );
 
-  const SECTIONS: readonly ShopSection[] = ['market', 'forge'];
+  const SECTIONS: readonly ShopSection[] = ['market', 'forge', 'library'];
 
   let sellBox = $state<HTMLElement | null>(null);
   onMount(() => {

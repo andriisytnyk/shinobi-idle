@@ -84,6 +84,10 @@ add('clone.pool', 'The shared pool of shadow clones');
 // Missions and exploration.
 add('mission.duration', 'Duration of every mission');
 add('mission.ryo', 'Ryo paid by missions (0.01 is 1% more)');
+add(
+  'power.sparring',
+  'Shinobi Power gained from the sparring village mission (a multiplier: 2 doubles it)',
+);
 add('mission.duration.nin', 'Duration of the mission stages a Ninjutsu technique performs');
 add('shop.price', 'Prices of the shop goods, tools and scrolls (-0.02 is 2% cheaper)', {
   wired: true,

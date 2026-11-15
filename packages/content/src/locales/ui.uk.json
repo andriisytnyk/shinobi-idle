@@ -533,6 +533,7 @@
   "shop.purse": "У тебе {n} рьо.",
   "shop.section.market": "Ринок",
   "shop.section.forge": "Кузня",
+  "shop.section.library": "Бібліотека",
   "shop.section.sell": "Продаж",
   "shop.section.gear": "Тренувальне спорядження",
   "shop.price": "{n} рьо за штуку",

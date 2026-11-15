@@ -306,6 +306,16 @@ export const villageProvider: ModifierProvider = (state, content) => {
         source: { kind: 'building', id: b.id },
       });
     }
+    if (level < content.balance.K.costMult.length) continue;
+    for (const e of b.capstone) {
+      out.push({
+        key: e.key,
+        op: e.op,
+        value: e.value,
+        group: 'village',
+        source: { kind: 'building', id: b.id },
+      });
+    }
   }
   return out;
 };

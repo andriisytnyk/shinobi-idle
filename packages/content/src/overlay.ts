@@ -65,7 +65,13 @@ export function layerBuildings(
   return base.map((b) => {
     const own = fx[b.id];
     if (own === undefined) throw new Error(`No data for building ${b.id}`);
-    return { ...b, ...own, effects: [...own.effects], produces: [...own.produces] };
+    return {
+      ...b,
+      ...own,
+      effects: [...own.effects],
+      capstone: [...own.capstone],
+      produces: [...own.produces],
+    };
   });
 }
 

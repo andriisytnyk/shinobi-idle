@@ -504,6 +504,8 @@ export const buildingFxSchema = z.strictObject({
   role: z.enum(BUILDING_ROLES),
   /** Modifiers of ONE level; the building's level multiplies each value. */
   effects: z.array(modSchema),
+  /** Modifiers given once, at the highest level only (not multiplied by the level). */
+  capstone: z.array(modSchema).default([]),
   /** Civil resources the building produces: `K.prod` x level of each, per tick. */
   produces: z.array(resSlug),
   duty: z.enum(BUILDING_DUTIES).optional(),
@@ -512,6 +514,7 @@ export const buildingFxSchema = z.strictObject({
 export const buildingSchema = buildingBaseSchema.extend({
   role: z.enum(BUILDING_ROLES),
   effects: z.array(modSchema),
+  capstone: z.array(modSchema),
   produces: z.array(resSlug),
   duty: z.enum(BUILDING_DUTIES).optional(),
 });
