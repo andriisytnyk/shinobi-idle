@@ -60,8 +60,8 @@
 </script>
 
 {#if tech}
-  <article class="technique" data-technique={id}>
-    <header class="scroll">
+  <article class="technique" data-technique={id} data-ui="entity-page" data-entity="technique:{id}">
+    <header class="scroll" data-ui="entity-header">
       <span class="icon"><Icon entity={ref} size={40} /></span>
       <div class="title">
         <p class="kind">
@@ -107,13 +107,13 @@
     </dl>
 
     {#if tech.sealSeq.length > 0}
-      <section>
+      <section data-ui="entity-section">
         <h2>{t('technique.seals')}</h2>
         <SealStrip seals={tech.sealSeq} />
       </section>
     {/if}
 
-    <section>
+    <section data-ui="entity-section">
       <h2>{t('technique.source')}</h2>
       <p>{t(`technique.src.${tech.src}`)}</p>
       <ul class="links">
@@ -131,7 +131,7 @@
     </section>
 
     {#if relations.missions.length > 0}
-      <section data-missions>
+      <section data-ui="entity-section" data-missions>
         <h2>{t('technique.missions')}</h2>
         <ul class="links">
           {#each relations.missions as mission (mission)}
@@ -142,14 +142,14 @@
     {/if}
 
     {#if requirements}
-      <section>
+      <section data-ui="entity-section">
         <h2>{t('technique.requirements')}</h2>
         <ReqTree node={requirements} />
       </section>
     {/if}
 
     {#if info}
-      <section>
+      <section data-ui="entity-section">
         <h2>{t('technique.mastery')}</h2>
         <ul class="tile-host"><ActionTile {info} /></ul>
       </section>
@@ -167,13 +167,15 @@
 
 <style>
   .scroll {
+    --_border-top: 0.6rem;
+    --_border-bottom: 0.6rem;
     display: flex;
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
-    border: 1px solid var(--paper-ink);
-    border-top: 0.6rem solid var(--ink-600);
-    border-bottom: 0.6rem solid var(--ink-600);
+    border: var(--border-thin) solid var(--paper-ink);
+    border-top: var(--_border-top) solid var(--ink-600);
+    border-bottom: var(--_border-bottom) solid var(--ink-600);
     border-radius: var(--radius-sm);
     background: var(--paper);
     color: var(--paper-ink);
@@ -193,13 +195,13 @@
 
   .kind {
     margin: 0;
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
   }
 
   h1 {
     margin: 0;
     font-family: var(--font-heading);
-    font-size: 1.4rem;
+    font-size: var(--text-xl);
     font-weight: 400;
   }
 
@@ -207,7 +209,7 @@
     margin: var(--space-4) 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--text-md);
     font-weight: 400;
   }
 
@@ -217,15 +219,16 @@
   }
 
   .facts {
+    --_grid-template-columns: 11rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(var(--_grid-template-columns), 1fr));
     gap: var(--space-3);
     margin: var(--space-3) 0 0;
   }
 
   dt {
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
   }
 
   dd {
@@ -241,16 +244,17 @@
   }
 
   .tile-host {
-    max-width: 20rem;
+    --_max-width: 20rem;
+    max-width: var(--_max-width);
     margin: 0;
     padding: 0;
   }
 
   .pin {
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     margin-top: var(--space-4);
     padding: var(--space-2) var(--space-4);
-    border: 1px solid var(--accent);
+    border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-sm);
     background: none;
     color: var(--accent);

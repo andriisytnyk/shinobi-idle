@@ -8,6 +8,7 @@
   import { t } from '../lib/i18n.ts';
   import { nextStep } from '../lib/next-step.ts';
   import { game } from '../lib/store.ts';
+  import Slot from '../lib/ext/Slot.svelte';
   import EntityLink from './EntityLink.svelte';
   import Hint from './Hint.svelte';
   import NatureOffer from './NatureOffer.svelte';
@@ -38,7 +39,7 @@
   }
 </script>
 
-<aside id="meta-panel" class="meta" aria-label={t('meta.title')}>
+<aside id="meta-panel" class="meta" aria-label={t('meta.title')} data-ui="goal-panel">
   <div class="head">
     <h2>{t('meta.title')}</h2>
     <button type="button" class="close" onclick={onClose}>{t('meta.close')}</button>
@@ -57,9 +58,11 @@
   {#if goal}
     <div class="tree" data-goal>
       {#if result}
-        <ReqTree node={result} />
+        <ReqTree node={result} part="goal-row" />
       {:else if goalRef}
-        <p class="target"><EntityLink kind={goalRef.kind} id={goalRef.id} /></p>
+        <p class="target" data-ui="goal-row" data-entity="{goalRef.kind}:{goalRef.id}">
+          <EntityLink kind={goalRef.kind} id={goalRef.id} />
+        </p>
       {/if}
     </div>
     {#if result?.met}<p class="done">{t('meta.done')}</p>{/if}
@@ -78,6 +81,7 @@
       </div>
     {/if}
   {/if}
+  <Slot name="goal.panel" />
 </aside>
 
 <style>
@@ -96,9 +100,9 @@
 
   .close {
     display: none;
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);
@@ -114,7 +118,7 @@
     margin: 0;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1rem;
+    font-size: var(--text-sm);
     font-weight: 400;
   }
 
@@ -126,8 +130,8 @@
   .wait {
     margin: 0 0 var(--space-3);
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--accent);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--accent);
+    border-radius: var(--radius-md);
     font-weight: 600;
   }
 
@@ -139,8 +143,8 @@
 
   .suggest {
     padding: var(--space-3);
-    border: 1px dashed var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) dashed var(--line);
+    border-radius: var(--radius-md);
   }
 
   .suggest p {
@@ -154,10 +158,10 @@
 
   .pin,
   .unpin {
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     margin-top: var(--space-3);
     padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);

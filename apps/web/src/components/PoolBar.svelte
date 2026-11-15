@@ -22,7 +22,7 @@
 </script>
 
 {#if capacity > 0}
-  <section class="pool" aria-label={t('pool.title')}>
+  <section class="pool" aria-label={t('pool.title')} data-ui="pool-bar" data-entity="skill:{skill}">
     <h2>{t('pool.title')}</h2>
     <p class="amount">{formatInt(xp)} / {formatInt(capacity)}</p>
     <div
@@ -69,19 +69,20 @@
     margin: 0 0 var(--space-1);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--text-md);
     font-weight: 400;
   }
 
   .amount {
     margin: 0 0 var(--space-2);
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
   }
 
   .bar {
+    --_height: 0.75rem;
     position: relative;
-    height: 0.75rem;
+    height: var(--_height);
     border-radius: var(--radius-sm);
     background: var(--line);
   }
@@ -94,10 +95,13 @@
   }
 
   .tick {
+    --_top: 3px;
+    --_bottom: 3px;
+    --_width: 2px;
     position: absolute;
-    top: -3px;
-    bottom: -3px;
-    width: 2px;
+    top: calc(-1 * var(--_top));
+    bottom: calc(-1 * var(--_bottom));
+    width: var(--_width);
     background: var(--fg-dim);
   }
 
@@ -127,15 +131,16 @@
 
   .state {
     margin-left: auto;
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
   }
 
   .pct {
+    --_width: 4.5rem;
     display: inline-flex;
     flex: none;
     align-items: center;
     gap: var(--space-1);
-    width: 4.5rem;
+    width: var(--_width);
     font-weight: 600;
   }
 

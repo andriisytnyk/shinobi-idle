@@ -156,7 +156,13 @@
 
   <ul class="items">
     {#each rows as { item, n, sellable, coatable, tonic } (item.id)}
-      <li class="item" class:none={n < 1} data-item={item.id}>
+      <li
+        class="item"
+        class:none={n < 1}
+        data-item={item.id}
+        data-ui="bank-item"
+        data-entity="item:{item.id}"
+      >
         <span class="icon"><Icon entity={{ kind: 'item', id: item.id }} size={32} /></span>
         <span class="name"><EntityLink kind="item" id={item.id} /></span>
         <span class="qty" aria-label={t('bank.quantity')}>&times;{formatInt(n)}</span>
@@ -278,10 +284,10 @@
 
   .tab {
     flex: none;
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-3);
     border: 0;
-    border-bottom: 3px solid transparent;
+    border-bottom: var(--border-heavy) solid transparent;
     background: none;
     color: var(--fg-dim);
     font: inherit;
@@ -295,12 +301,12 @@
 
   .search {
     display: inline-flex;
-    flex: 1 1 12rem;
+    flex: 1 1 var(--card-min);
     align-items: center;
     gap: var(--space-2);
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     padding: 0 var(--space-2);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface);
     color: var(--fg-dim);
@@ -309,7 +315,7 @@
   .search input {
     flex: 1;
     min-width: 0;
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     border: 0;
     background: none;
     color: var(--fg);
@@ -320,13 +326,13 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     cursor: pointer;
   }
 
   .goal-filter input {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: var(--icon-md);
+    height: var(--icon-md);
   }
 
   .empty,
@@ -350,8 +356,8 @@
     gap: var(--space-2) var(--space-3);
     margin-bottom: var(--space-2);
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface);
   }
 
@@ -382,7 +388,7 @@
   }
 
   .name {
-    flex: 1 1 8rem;
+    flex: 1 1 var(--panel-min);
     min-width: 0;
     font-weight: 600;
   }
@@ -391,14 +397,14 @@
     .name :global(a) {
       display: inline-flex;
       align-items: center;
-      min-height: 2.75rem;
+      min-height: var(--control-md);
     }
   }
 
   .level {
     display: block;
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
     font-weight: 400;
   }
 
@@ -416,9 +422,9 @@
   .act {
     display: inline-flex;
     align-items: center;
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--accent);
+    border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);
@@ -436,7 +442,7 @@
   .why {
     margin: 0;
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
   }
 
   .why::before {

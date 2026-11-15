@@ -15,6 +15,7 @@ import { migrateLocalGoal } from '../src/lib/goal-migration.ts';
 import { HINTS, nextStateHint } from '../src/lib/hints.ts';
 import type { LogEntry } from '../src/lib/game.svelte.ts';
 import { markerOf } from '../src/lib/nav.ts';
+import { coreRegistry, inApp } from './helpers/core-registry.ts';
 import { nextStep, objectiveTarget, withoutRankRows } from '../src/lib/next-step.ts';
 import { hrefFor, type EntityRef } from '../src/lib/route.ts';
 import { SETTINGS_KEY, settings, type TextStorage } from '../src/lib/settings.svelte.ts';
@@ -247,28 +248,28 @@ describe('suggested next step', () => {
   });
 
   it('marks the destination in the tab bar, the sidebar menu and nowhere else', () => {
-    expect(markerOf('#/skill/tai')).toEqual({ nav: 'skills', skill: 'tai' });
-    expect(markerOf('#/combat').nav).toBe('combat');
-    expect(markerOf(null)).toEqual({ nav: null, skill: null });
+    expect(markerOf('#/skill/tai', coreRegistry)).toEqual({ nav: 'skills', skill: 'tai' });
+    expect(markerOf('#/combat', coreRegistry).nav).toBe('combat');
+    expect(markerOf(null, coreRegistry)).toEqual({ nav: null, skill: null });
 
     game.replaceState(atStepFour());
-    const tabs = html(TabBar, {});
+    const tabs = inApp(TabBar);
     expect(tabs.match(/data-marker/g)).toHaveLength(1);
     expect(tabs).toMatch(/data-tab="combat"[\s\S]*?data-marker/);
-    const nav = html(MainNav, {});
+    const nav = inApp(MainNav);
     expect(nav.match(/data-marker/g)).toHaveLength(1);
     expect(nav).toMatch(/data-nav="combat"[\s\S]*?data-marker/);
   });
 
   it('has the journal, the map and the fight on the tabs, and the bank in the side menu', () => {
-    for (const body of [html(TabBar, {}), html(MainNav, {})]) {
+    for (const body of [inApp(TabBar), inApp(MainNav)]) {
       expect(body).toContain('href="#/quests"');
       expect(body).toContain('href="#/combat"');
       expect(body).toContain('href="#/world"');
     }
     // On a phone the bank is reached from «Ще» and the top bar.
-    expect(html(MainNav, {})).toContain('href="#/bank"');
-    expect(html(TabBar, {})).not.toContain('href="#/bank"');
+    expect(inApp(MainNav)).toContain('href="#/bank"');
+    expect(inApp(TabBar)).not.toContain('href="#/bank"');
   });
 });
 
@@ -502,12 +503,12 @@ describe('waiting for the sensei test', () => {
 
 describe('navigation and the log', () => {
   it('has five tabs and no sections that do not exist yet', () => {
-    const body = html(TabBar, {});
+    const body = inApp(TabBar);
     expect(body.match(/data-tab=/g)).toHaveLength(5);
-    for (const text of [body, html(MainNav, {})]) expect(text).not.toContain('#/missions');
+    for (const text of [body, inApp(MainNav)]) expect(text).not.toContain('#/missions');
     // The village is a page of its own: in the sidebar menu, inside «Ще» on a phone, never a tab.
     expect(body).not.toContain('#/village');
-    expect(html(MainNav, {})).toContain('#/village');
+    expect(inApp(MainNav)).toContain('#/village');
   });
 
   it('says the fight continues when the log is empty mid-fight', () => {

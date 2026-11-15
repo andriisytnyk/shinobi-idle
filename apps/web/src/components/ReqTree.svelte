@@ -12,9 +12,11 @@
     node: ReqResult;
     /** Nesting level; the root of a tree prints no "all of" caption. */
     depth?: number;
+    /** The `data-ui` part of each row: the goal panel's rows are `goal-row`. */
+    part?: 'req-row' | 'goal-row';
   }
 
-  let { node, depth = 0 }: Props = $props();
+  let { node, depth = 0, part = 'req-row' }: Props = $props();
 
   const req = $derived(node.req);
   const ref = $derived(webRef(node.ref));
@@ -44,12 +46,18 @@
     {/if}
     <ul class="rows">
       {#each node.children as child, i (i)}
-        <li><ReqTree node={child} depth={depth + 1} /></li>
+        <li><ReqTree node={child} depth={depth + 1} {part} /></li>
       {/each}
     </ul>
   </div>
 {:else}
-  <div class="row" class:met={node.met} data-met={node.met}>
+  <div
+    class="row"
+    class:met={node.met}
+    data-met={node.met}
+    data-ui={part}
+    data-entity={ref ? `${ref.kind}:${ref.id}` : undefined}
+  >
     <span class="mark"><Icon name={node.met ? 'lucide:check' : 'lucide:minus'} size={14} /></span>
     <span class="label">
       {#if req.t === 'skill'}
@@ -98,13 +106,13 @@
   .rows :global(.group) {
     margin-left: var(--space-3);
     padding-left: var(--space-2);
-    border-left: 1px solid var(--line);
+    border-left: var(--border-thin) solid var(--line);
   }
 
   .caption {
     margin: var(--space-1) 0;
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
   }
 
   .row {
@@ -146,25 +154,25 @@
   .detail {
     margin-left: var(--space-1);
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
   }
 
   .detail-link {
     margin-left: var(--space-2);
     color: var(--accent);
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
   }
 
   .count {
     grid-area: count;
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
     font-variant-numeric: tabular-nums;
   }
 
   .bar {
     grid-area: bar;
-    height: 3px;
-    border-radius: 2px;
+    height: var(--bar-thin);
+    border-radius: var(--radius-xs);
     background: var(--line);
     overflow: hidden;
   }

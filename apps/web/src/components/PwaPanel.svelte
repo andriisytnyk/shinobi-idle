@@ -51,13 +51,13 @@
 
   .version {
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
   }
 
   button {
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--accent);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--accent);
+    border-radius: var(--radius-md);
     background: none;
     color: var(--accent);
     font-weight: 600;
@@ -70,13 +70,13 @@
   }
 
   button:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
+    outline: var(--border-thick) solid var(--accent);
+    outline-offset: var(--focus-offset);
   }
 
   @media (max-width: 768px) {
     button {
-      min-height: 2.75rem;
+      min-height: var(--control-md);
     }
   }
 </style>

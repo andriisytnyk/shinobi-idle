@@ -53,9 +53,9 @@
   }
 
   input {
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);
