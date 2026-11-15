@@ -113,3 +113,13 @@ export function runUntilDone(state: GameState, id: string, limitMs: number, time
   }
   return state.now - start;
 }
+
+/** The units of a village resource the player has: Shinobi Power, Workforce or a shinobi resource; 0 with no village. */
+export function villageUnits(state: GameState, slug: string): number {
+  const village = state.village;
+  if (!village) return 0;
+  const kind = content.resources.find((r) => r.id === slug)?.kind;
+  if (kind === 'power') return village.power;
+  if (kind === 'workforce') return village.workforce;
+  return village.shinobi[slug] ?? 0;
+}

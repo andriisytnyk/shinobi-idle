@@ -188,10 +188,16 @@ function report(state: GameState, c: CombatState): void {
 }
 
 /** The Wounds a finished fight costs: the stances it used, and falling low in a won fight; items then shorten the healing. */
-function woundsAfter(state: GameState, c: CombatState, content: ContentDb, lost: boolean): void {
+function woundsAfter(
+  state: GameState,
+  c: CombatState,
+  content: ContentDb,
+  rules: Rules,
+  lost: boolean,
+): void {
   const tally = c.fight.tally;
   const low = c.fight.player.data.low === 1 && !lost ? 1 : 0;
-  addWounds(state, (lost ? 1 : 0) + low + tally.wounds, content);
+  addWounds(state, (lost ? 1 : 0) + low + tally.wounds, content, rules);
   if (tally.woundMin > 0) shortenWounds(state, tally.woundMin, content);
 }
 
@@ -216,7 +222,7 @@ function cleared(state: GameState, op: Operation): void {
  * share, the pouch is not refilled and the next step's enemy comes. Returns true when the
  * operation is over.
  */
-function victory(state: GameState, c: CombatState, content: ContentDb): boolean {
+function victory(state: GameState, c: CombatState, content: ContentDb, rules: Rules): boolean {
   const K = content.balance.K;
   const player = c.fight.player;
   c.phase = 'respawn';
@@ -225,7 +231,7 @@ function victory(state: GameState, c: CombatState, content: ContentDb): boolean 
   c.carry += c.fight.t - c.fight.tally.lastUseAt + c.pause;
   bump(state, killsKey(c.enemy));
   emit(state, { type: 'enemyDefeated', enemy: c.enemy });
-  woundsAfter(state, c, content, false);
+  woundsAfter(state, c, content, rules, false);
   if (!c.run) {
     player.hp = Math.min(player.maxHp, player.hp + K.zoneHpRegen * player.maxHp);
     player.chakra = player.maxChakra;
@@ -326,11 +332,11 @@ export const combatSystem: System = {
         if (result === 'defeat') {
           emit(state, { type: 'playerDefeated', enemy: c.enemy });
           bump(state, defeatsKey(c.enemy));
-          woundsAfter(state, c, content, true);
+          woundsAfter(state, c, content, rules, true);
         } else {
           bump(state, killsKey(c.enemy));
           emit(state, { type: 'enemyDefeated', enemy: c.enemy });
-          woundsAfter(state, c, content, false);
+          woundsAfter(state, c, content, rules, false);
         }
         return owner.combatEnded(
           state,
@@ -343,11 +349,12 @@ export const combatSystem: System = {
       if (result === 'defeat') {
         emit(state, { type: 'playerDefeated', enemy: c.enemy });
         bump(state, defeatsKey(c.enemy));
-        woundsAfter(state, c, content, true);
+        woundsAfter(state, c, content, rules, true);
         // A defeat ends an operation run with the action: nothing of it is kept.
         return stopSlot(state, index, 'defeated', content, rules);
       }
-      if (victory(state, c, content)) return stopSlot(state, index, 'finished', content, rules);
+      if (victory(state, c, content, rules))
+        return stopSlot(state, index, 'finished', content, rules);
     }
   },
 };

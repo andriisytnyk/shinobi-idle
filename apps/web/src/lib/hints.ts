@@ -27,6 +27,7 @@ export const HINTS: readonly HintDef[] = [
   { id: 'crafting' },
   { id: 'shop' },
   { id: 'world' },
+  { id: 'village' },
   {
     id: 'worldKey',
     when: (state, content) => content.cells.some((c) => c.key && cellLevel(state, c, content) >= 1),

@@ -74,7 +74,7 @@ add('evasion.chance', 'Chance to dodge a hit');
 add('accuracy', 'Accuracy rating');
 add('defense', 'Defense rating against enemy hits');
 add('heal.food', 'HP restored by salves and food');
-add('wound.heal', 'Time to heal Wounds');
+add('wound.heal', 'Time to heal Wounds (-0.05 is 5% shorter)', { wired: true });
 add('wound.heal.gates', 'Time to heal Wounds taken from the Gates');
 add('pool.hp', 'Size of the HP pool');
 add('pool.chakra', 'Size of the chakra pool');
@@ -91,10 +91,17 @@ add(
   },
 );
 add('mission.ryo', 'Ryo paid by a finished mission (0.05 is 5% more)', { wired: true });
-add('power.sparring', 'Shinobi power units a finished sparring mission brings (1 is 100% more)', {
+add(
+  'power.sparring',
+  'Shinobi Power gained from the sparring village mission (a multiplier: 2 doubles it)',
+  {
+    wired: true,
+  },
+);
+add('mission.rep', 'Reputation paid by a finished team mission (0.05 is 5% more)', { wired: true });
+add('shop.price', 'Prices of the shop goods, tools and scrolls (-0.02 is 2% cheaper)', {
   wired: true,
 });
-add('mission.rep', 'Reputation paid by a finished team mission (0.05 is 5% more)', { wired: true });
 add('interval.explore', 'Time to explore a cell (-0.05 is 5% shorter)', { wired: true });
 add('interval.walk', 'Time of a walk to another cell (-0.05 is 5% shorter)', { wired: true });
 

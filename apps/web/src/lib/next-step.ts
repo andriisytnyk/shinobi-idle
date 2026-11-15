@@ -82,6 +82,8 @@ function pageFor(state: GameState, node: ReqResult, content: ContentDb): string 
     }
     case 'nature':
       return '#/nature';
+    case 'building':
+      return `#/village/${req.id}`;
     case 'item':
       return itemPlace(req.id, content) ?? '#/bank';
     case 'flag':

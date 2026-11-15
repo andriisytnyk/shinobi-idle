@@ -18,6 +18,7 @@ import { nextFloat } from '../rng.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState, JsonValue } from '../state.ts';
 import { entryOf } from '../combat/zones.ts';
+import { drainPendingResources } from '../village.ts';
 import { MISSION_KIND, fightBusy, fightBusyReason, newMissionCombat } from '../combat/system.ts';
 import { refillPouch } from '../combat/pouch.ts';
 import type { TeamSupport } from '../combat/fight-types.ts';
@@ -311,6 +312,8 @@ export function payMission(
     const pending = state.missions.pending;
     pending[mission.resource] =
       (pending[mission.resource] ?? 0) + resourceUnits(state, mission, content, rules);
+    // With a village the units go straight to it; without one they wait until it appears.
+    drainPendingResources(state, content);
   }
   // One finished mission is one completed action, however many stages it had.
   state.stats.completed++;

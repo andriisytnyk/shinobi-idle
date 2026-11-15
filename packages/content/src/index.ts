@@ -19,6 +19,7 @@ import skills from './data/generated/skills.json' with { type: 'json' };
 import techniques from './data/generated/techniques.json' with { type: 'json' };
 import handAi from './data/hand/ai.json' with { type: 'json' };
 import handBossSpecials from './data/hand/boss-specials.json' with { type: 'json' };
+import handBuildings from './data/hand/buildings.json' with { type: 'json' };
 import handCellKeys from './data/hand/cell-keys.json' with { type: 'json' };
 import handCellPois from './data/hand/cell-pois.json' with { type: 'json' };
 import handCombos from './data/hand/combos.json' with { type: 'json' };
@@ -34,6 +35,7 @@ import handModsObstacles from './data/hand/mods-obstacles.json' with { type: 'js
 import handModsPools from './data/hand/mods-pools.json' with { type: 'json' };
 import handModsPractices from './data/hand/mods-practices.json' with { type: 'json' };
 import handObstacleReqs from './data/hand/obstacle-reqs.json' with { type: 'json' };
+import handResources from './data/hand/resources.json' with { type: 'json' };
 import handShopTools from './data/hand/shop-tools.json' with { type: 'json' };
 import handMissions from './data/hand/missions.json' with { type: 'json' };
 import handTeam from './data/hand/team.json' with { type: 'json' };
@@ -50,6 +52,7 @@ import uiUk from './locales/ui.uk.json' with { type: 'json' };
 import { z } from 'zod';
 import {
   bossSpecialMapSchema,
+  buildingFxMapSchema,
   cellPoiMapSchema,
   coatListSchema,
   enemyCombatMapSchema,
@@ -62,6 +65,7 @@ import {
   poolModMapSchema,
   practiceModMapSchema,
   layerBosses,
+  layerBuildings,
   layerCells,
   layerEnemies,
   layerGear,
@@ -78,6 +82,7 @@ import { layerMissions, missionExtraMapSchema } from './overlay-missions.ts';
 import {
   balanceSchema,
   bossBaseSchema,
+  buildingBaseSchema,
   cellBaseSchema,
   contentDbSchema,
   enemyBaseSchema,
@@ -144,7 +149,11 @@ export const content: ContentDb = contentDbSchema.parse({
     bossSpecialMapSchema.parse(handBossSpecials),
     bal.K,
   ),
-  buildings,
+  buildings: layerBuildings(
+    z.array(buildingBaseSchema).parse(buildings),
+    buildingFxMapSchema.parse(handBuildings),
+  ),
+  resources: handResources,
   gear: layerGear(z.array(gearBaseSchema).parse(gear), gearFxMapSchema.parse(handGearFx)),
   balance,
   quests: handQuests,

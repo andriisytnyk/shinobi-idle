@@ -105,6 +105,10 @@
       <Icon name="lucide:package" size={18} />
       <span>{t('nav.bank')}</span>
     </a>
+    <a class="meta-toggle shop-link" href="#/village" data-village-link>
+      <Icon name="lucide:landmark" size={18} />
+      <span>{t('nav.village')}</span>
+    </a>
     <a class="meta-toggle shop-link" href="#/shop" data-shop-link>
       <Icon name="lucide:store" size={18} />
       <span>{t('nav.shop')}</span>

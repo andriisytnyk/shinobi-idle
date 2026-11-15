@@ -67,6 +67,30 @@ function byId<T extends { id: string }>(list: readonly T[]): Map<string, T> {
   return new Map(list.map((e) => [e.id, e]));
 }
 
+/**
+ * Everything the shops sell: the market goods and tools of the content, and the scrolls of the
+ * Library, each opened by the Library level its source names.
+ */
+export function shopEntries(content: ContentDb): ShopEntry[] {
+  const library = content.buildings.find((b) => b.duty === 'scrolls');
+  const scrolls: ShopEntry[] = [];
+  for (const item of content.items) {
+    const source = item.scroll?.source;
+    if (!library || source?.t !== 'library') continue;
+    scrolls.push({
+      item: item.id,
+      req: {
+        t: 'all',
+        of: [
+          { t: 'rank', rank: 'genin' },
+          { t: 'building', id: library.id, level: source.level },
+        ],
+      },
+    });
+  }
+  return [...content.shop, ...scrolls];
+}
+
 function build(content: ContentDb): ContentIndex {
   const techniques = byId(content.techniques);
   const exercises = byId(content.exercises);
@@ -122,7 +146,7 @@ function build(content: ContentDb): ContentIndex {
     recipes: byId(content.recipes),
     recipeByOutput: new Map(content.recipes.map((r) => [r.output.item, r])),
     gear: byId(content.gear),
-    shop: new Map(content.shop.map((s) => [s.item, s])),
+    shop: new Map(shopEntries(content).map((s) => [s.item, s])),
     quests: byId(content.quests),
     exams: byId(content.exams),
     techniques,

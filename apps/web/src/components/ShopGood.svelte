@@ -1,11 +1,13 @@
 <script lang="ts">
-  import type { ReqResult } from '@shinobi/core';
+  import { shopTotal, type ReqResult } from '@shinobi/core';
+  import { content } from '@shinobi/content';
   import { blockOf, blockText } from '../lib/crafts.ts';
   import { entityName } from '../lib/entities.ts';
   import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import { toasts } from '../lib/toasts.svelte.ts';
+  import BuildingNeed from './BuildingNeed.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ReqTree from './ReqTree.svelte';
@@ -27,7 +29,10 @@
 
   let qty = $state(1);
   const ryo = $derived(game.read((gs) => gs.currencies.ryo));
-  const total = $derived(price * qty);
+  /** What the stack costs now: the Market's discount comes off the whole stack. */
+  const total = $derived(
+    game.read((gs) => shopTotal(gs, item, Math.max(1, qty), content, game.rules) ?? price * qty),
+  );
   const block = $derived(req.met ? null : blockOf(req));
   const invalid = $derived(qty < 1);
   const poor = $derived(!invalid && ryo < total);
@@ -66,8 +71,14 @@
     <!-- the notice above the list explains it -->
   {:else if block}
     <div class="why-box">
-      <p class="ct-why" id={whyId} data-why={block.kind}>{blockText(block)}</p>
-      {#if block.kind === 'locked'}<ReqTree node={req} />{/if}
+      {#if block.kind === 'building'}
+        <p class="ct-why" id={whyId} data-why="building">
+          <BuildingNeed id={block.id} level={block.n} />
+        </p>
+      {:else}
+        <p class="ct-why" id={whyId} data-why={block.kind}>{blockText(block)}</p>
+      {/if}
+      {#if block.kind === 'locked' || block.kind === 'building'}<ReqTree node={req} />{/if}
     </div>
   {:else if invalid}
     <p class="ct-why" id={whyId} data-why="qty">{t('qty.invalid')}</p>

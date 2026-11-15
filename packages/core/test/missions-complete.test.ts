@@ -10,7 +10,15 @@ import {
   teammates,
   type GameState,
 } from '../src/index.ts';
-import { BOARD, ableFor, mission, player, runUntilDone, startMission } from './missions-helpers.ts';
+import {
+  BOARD,
+  ableFor,
+  mission,
+  player,
+  runUntilDone,
+  startMission,
+  villageUnits,
+} from './missions-helpers.ts';
 
 const MIN = 60_000;
 const K = content.balance.K;
@@ -217,11 +225,12 @@ describe('the board', () => {
 });
 
 describe('village missions', () => {
-  it('pay shinobi resource units into a provisional store until the village exists', () => {
+  it('pay shinobi resource units to the village', () => {
     const state = ableFor(mission('core:v_spar'));
     startMission(state, 'core:v_spar');
     runUntilDone(state, 'core:v_spar', 30 * MIN, 2);
-    expect(state.missions.pending.syla_shynobi).toBe(2 * K.shinobiResPerMission);
+    expect(villageUnits(state, 'syla_shynobi')).toBe(2 * K.shinobiResPerMission);
+    expect(state.missions.pending).toEqual({});
     expect(state.currencies.rep).toBe(2 * mission('core:v_spar').rep);
     expect(state.currencies.ryo).toBe(0);
     expect(state.counters['missions.rank.V']).toBe(2);

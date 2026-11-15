@@ -29,6 +29,7 @@ import {
   player,
   runUntilDone,
   startMission,
+  villageUnits,
 } from './missions-helpers.ts';
 
 const MIN = 60_000;
@@ -235,12 +236,13 @@ describe('A5: rewards', () => {
     };
     for (const m of BOARD) {
       const state = genin();
-      payMission(state, m, [], content, defaultRules);
+      // Without the village's bonuses: exactly the data.
+      payMission(state, m, [], content, plainRules);
       expect(state.currencies.ryo, m.id).toBe(m.ryo);
       expect(state.currencies.rep, m.id).toBe(m.team ? m.rep : 0);
       expect(state.bank, m.id).toMatchObject(expected[m.id] ?? {});
       expect(state.currencies.intel, m.id).toBe(m.id === 'core:mail' ? 2 : 0);
-      expect(state.missions.pending[m.resource ?? ''] ?? 0, m.id).toBe(m.resource ? 3 : 0);
+      expect(villageUnits(state, m.resource ?? ''), m.id).toBe(m.resource ? 3 : 0);
     }
     expect(mission('core:cat').rep).toBe(K.repPerMission.D);
     expect(mission('core:caravan').rep).toBe(K.repPerMission.C);
