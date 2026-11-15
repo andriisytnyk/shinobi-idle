@@ -17,7 +17,11 @@ describe('A10: recipe outputs', () => {
 
   it('every effect is used by an item and every effect belongs to a recipe output or a product', () => {
     const outputs = new Set(content.recipes.map((r) => r.output.item));
-    for (const i of content.items) if (i.fx) expect(outputs.has(i.id), i.id).toBe(true);
+    // The crate and the notes come from missions, not from a recipe.
+    const fromMissions = new Set(['crate', 'bingoNote']);
+    for (const i of content.items) {
+      if (i.fx && !fromMissions.has(i.fx.kind)) expect(outputs.has(i.id), i.id).toBe(true);
+    }
   });
 
   it('tonics follow the design: +5% for 40 actions, one per skill and one for the natures', () => {

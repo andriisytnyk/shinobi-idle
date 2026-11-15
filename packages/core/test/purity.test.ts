@@ -38,7 +38,7 @@ describe('A9: core source hygiene', () => {
       'combat/loadout.ts': [24], // longest name of a saved loadout
       'save.ts': [4, 6], // four words of an rng stream; nesting depth of slot data
       'combat/report.ts': [1000, 100, 64], // three decimals of a multiplier, percent of a pool, longest id read from a save
-      'state.ts': [1000, 4, 12], // share scale, rng words, save version
+      'state.ts': [1000, 4, 13], // share scale, rng words, save version
       'xp.ts': [4, 7, 300], // the fixed Melvor level curve
     };
     const offenders: string[] = [];

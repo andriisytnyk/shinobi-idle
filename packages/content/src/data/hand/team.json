@@ -1,0 +1,12 @@
+[
+  {
+    "id": "core:ren",
+    "natureOf": "rival",
+    "skills": ["tai"]
+  },
+  {
+    "id": "core:aya",
+    "natureOf": "aya",
+    "skills": ["scout", "nin"]
+  }
+]

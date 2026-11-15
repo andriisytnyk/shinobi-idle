@@ -6,6 +6,8 @@ export * from './fight-hooks.ts';
 export * from './fight-parse.ts';
 export * from './fight-effects.ts';
 export * from './fight-sim.ts';
+export * from './fight-team.ts';
+export * from './fight-team-id.ts';
 export * from './fight-types.ts';
 export * from './fight.ts';
 export * from './analysis.ts';

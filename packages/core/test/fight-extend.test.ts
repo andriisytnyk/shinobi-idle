@@ -717,6 +717,7 @@ describe('fight hooks', () => {
       'special:rehide',
       'special:rival.duel',
       'special:rival.tournament',
+      'special:team',
       'special:twins',
     ]);
   });

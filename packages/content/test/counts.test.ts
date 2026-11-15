@@ -19,7 +19,8 @@ describe('slice size', () => {
     expect(content.bosses.length).toBe(8);
     expect(content.buildings.length).toBe(16);
     expect(content.items.filter((i) => i.scroll)).toHaveLength(15);
-    expect(content.items.filter((i) => i.part)).toHaveLength(5);
+    // Five scrolls carried by enemies, and the one the dig of the missions pays in parts.
+    expect(content.items.filter((i) => i.part)).toHaveLength(6);
     expect(content.zones).toHaveLength(31);
     expect(content.operations).toHaveLength(2);
     expect(content.statuses).toHaveLength(5);

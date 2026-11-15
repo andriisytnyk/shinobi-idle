@@ -82,13 +82,23 @@ add('pool.stamina', 'Size of the stamina pool');
 add('clone.pool', 'The shared pool of shadow clones');
 
 // Missions and exploration.
-add('mission.duration', 'Duration of every mission');
-add('mission.ryo', 'Ryo paid by missions (0.01 is 1% more)');
+add('mission.duration', 'Duration of every mission (-0.05 is 5% shorter)', { wired: true });
+add(
+  'mission.duration.nin',
+  'Duration of the mission stages Ninjutsu performs (-0.05 is 5% shorter)',
+  {
+    wired: true,
+  },
+);
+add('mission.ryo', 'Ryo paid by a finished mission (0.05 is 5% more)', { wired: true });
 add(
   'power.sparring',
   'Shinobi Power gained from the sparring village mission (a multiplier: 2 doubles it)',
+  {
+    wired: true,
+  },
 );
-add('mission.duration.nin', 'Duration of the mission stages a Ninjutsu technique performs');
+add('mission.rep', 'Reputation paid by a finished team mission (0.05 is 5% more)', { wired: true });
 add('shop.price', 'Prices of the shop goods, tools and scrolls (-0.02 is 2% cheaper)', {
   wired: true,
 });

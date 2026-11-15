@@ -1,0 +1,263 @@
+{
+  "core:cat": {
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
+    "shares": [1, 2],
+    "pay": [],
+    "slow": [[], []],
+    "skip": [0, 0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:weed": {
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
+    "shares": [1],
+    "pay": [6],
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:fire": {
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
+    "shares": [2, 2, 2],
+    "pay": [6],
+    "slow": [[], [1], []],
+    "skip": [0, 0, 0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:drought": {
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
+    "shares": [1],
+    "pay": [6, 2],
+    "slow": [[1]],
+    "skip": [0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:courier": {
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
+    "shares": [1],
+    "pay": [],
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:rockfall": {
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
+    "shares": [1],
+    "pay": [6],
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:thief": {
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
+    "shares": [3, 5],
+    "pay": [1],
+    "slow": [[], []],
+    "skip": [0, 0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:caravan": {
+    "unlock": {
+      "t": "flag",
+      "id": "missions.c.unlocked"
+    },
+    "shares": [8, 9, 8],
+    "pay": [1],
+    "slow": [[], [], []],
+    "skip": [1, 0, 0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:sealed": {
+    "unlock": {
+      "t": "flag",
+      "id": "missions.c.unlocked"
+    },
+    "shares": [1, 2],
+    "pay": [],
+    "slow": [[], []],
+    "skip": [0, 0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:mail": {
+    "unlock": {
+      "t": "flag",
+      "id": "missions.c.unlocked"
+    },
+    "shares": [1],
+    "pay": [2],
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:well": {
+    "unlock": {
+      "t": "flag",
+      "id": "missions.c.unlocked"
+    },
+    "shares": [8, 2, 12],
+    "pay": [2],
+    "slow": [[], [], []],
+    "skip": [0, 0, 0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:dig": {
+    "unlock": {
+      "t": "flag",
+      "id": "missions.c.unlocked"
+    },
+    "shares": [8, 9, 11],
+    "pay": [1],
+    "slow": [[], [], []],
+    "skip": [0, 0, 0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:v_spar": {
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
+    "shares": [1],
+    "pay": [],
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": "power.sparring",
+    "board": true
+  },
+  "core:v_walls": {
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
+    "shares": [1],
+    "pay": [],
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:v_fence": {
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
+    "shares": [3, 1],
+    "pay": [],
+    "slow": [[], []],
+    "skip": [0, 0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:v_clear": {
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
+    "shares": [1],
+    "pay": [],
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:v_water": {
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
+    "shares": [1],
+    "pay": [],
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:v_sanit": {
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
+    "shares": [1],
+    "pay": [],
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:v_rubble": {
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
+    "shares": [1],
+    "pay": [],
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:v_clones": {
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
+    "shares": [1],
+    "pay": [],
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:v_seal": {
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
+    "shares": [1],
+    "pay": [],
+    "slow": [[]],
+    "skip": [0],
+    "resourceMod": null,
+    "board": true
+  },
+  "core:op_hideout": {
+    "unlock": null,
+    "shares": [1, 1, 1, 1],
+    "pay": [1],
+    "slow": [[], [], [], []],
+    "skip": [0, 0, 0, 0],
+    "resourceMod": null,
+    "board": false
+  }
+}

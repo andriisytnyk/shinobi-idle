@@ -29,6 +29,7 @@ import type {
   PlayerKit,
   PouchSlot,
   Spawn,
+  TeamSupport,
   Timer,
 } from './fight-types.ts';
 import { needOf, WORK_PER_MS, workOf } from './units.ts';
@@ -353,7 +354,18 @@ function parseEncounter(raw: unknown, most: number): Encounter | null {
       specials: s.specials as string[],
     });
   }
-  return { id: raw.id, spawns, specials: raw.specials as string[] };
+  const encounter: Encounter = { id: raw.id, spawns, specials: raw.specials as string[] };
+  if (raw.support !== undefined) {
+    if (!Array.isArray(raw.support) || raw.support.length > 2) return null;
+    const support: TeamSupport[] = [];
+    for (const s of raw.support) {
+      if (!isRecord(s) || !oneOf(NATURE_IDS, s.nature)) return null;
+      if (!isInt(s.everyMs) || s.everyMs < 1 || !isNum(s.damage) || s.damage < 0) return null;
+      support.push({ nature: s.nature as NatureId, everyMs: s.everyMs, damage: s.damage });
+    }
+    encounter.support = support;
+  }
+  return encounter;
 }
 
 /** The battle log lines still to be read; lines that do not fit are dropped, an absent log is empty. */

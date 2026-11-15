@@ -38,6 +38,8 @@ export interface ActionStoppedEvent extends EventBase {
   reason: 'manual' | 'requirements' | 'replaced' | 'missing' | 'finished' | 'defeated';
   /** Item id the action ran out of, when it stopped for lack of ingredients. */
   missing?: string | undefined;
+  /** A localization key that says why the action could not go on, when it stopped for a cause of its own. */
+  cause?: string | undefined;
 }
 export interface EnemyDefeatedEvent extends EventBase {
   type: 'enemyDefeated';
@@ -175,6 +177,20 @@ export interface TravelledEvent extends EventBase {
   cell: string;
 }
 
+/** One attempt at a mission stage ended; `ok` is false when it must be repeated. */
+export interface MissionStageEvent extends EventBase {
+  type: 'missionStage';
+  mission: string;
+  stage: number;
+  ok: boolean;
+}
+/** A mission was finished and paid. */
+export interface MissionDoneEvent extends EventBase {
+  type: 'missionDone';
+  mission: string;
+  ryo: number;
+  rep: number;
+}
 /** A building reached a new level. */
 export interface BuildingBuiltEvent extends EventBase {
   type: 'buildingBuilt';
@@ -220,6 +236,8 @@ export type GameEvent =
   | PoiFoundEvent
   | PoiClaimedEvent
   | TravelledEvent
+  | MissionStageEvent
+  | MissionDoneEvent
   | BuildingBuiltEvent
   | VillageStageEvent
   | StorageFullEvent;

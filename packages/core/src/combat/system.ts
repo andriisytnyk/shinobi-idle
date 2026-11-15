@@ -15,9 +15,10 @@ import { noteBounty, noteFight, noteSighting } from './bingo.ts';
 import { grantLoot, rollLoot } from './loot.ts';
 import { recordFight, recordItems, recordLoot, recordWounds, stampDefeat } from './report.ts';
 import { payOperation } from './rewards.ts';
+import type { TeamSupport } from './fight-types.ts';
 import { createFight, fightAdvance, fightNextEventIn, fightOutcome } from './fight.ts';
 import { secMs } from './numbers.ts';
-import { refillPouch, syncPouch } from './pouch.ts';
+import { ensurePouch, refillPouch, syncPouch } from './pouch.ts';
 import { snapshotPlayer } from './snapshot.ts';
 import type { CombatState, RunState } from './types.ts';
 import { WORK_PER_MS, workOf } from './units.ts';
@@ -32,13 +33,49 @@ export const OPERATION_KIND = 'operation';
 export const isCombatKind = (kind: string): boolean =>
   kind === FIGHT_KIND || kind === OPERATION_KIND;
 
+/** The action kind of a mission; its slot holds a fight only while one of its combat stages runs. */
+export const MISSION_KIND = 'mission';
+
 /** The slot's work units for `ms` of game time. Fights run on work units, like action progress. */
 export const combatUnits = (ms: number): number => workOf(ms);
 
 /** Index of the slot running a fight or an operation, or -1. */
 export function fightSlotIndex(state: GameState): number {
-  return state.slots.findIndex((s) => s.action !== null && isCombatKind(s.action.kind));
+  const owner = state.combat?.owner ?? -1;
+  const kind = state.slots[owner]?.action?.kind;
+  return kind !== undefined && (isCombatKind(kind) || kind === MISSION_KIND) ? owner : -1;
 }
+
+/** Whether a fight is going that another slot owns: a slot that wants to fight must wait or be refused. */
+export function fightBusy(state: GameState, slot: number): boolean {
+  const owner = state.combat?.owner;
+  return owner !== undefined && owner !== slot && state.slots[owner]?.action != null;
+}
+
+/**
+ * Whether another slot runs an action that can hold the fight: a fight, an operation, or a
+ * mission that has a combat stage. Only one such action runs at a time.
+ */
+export function fightCapableElsewhere(state: GameState, slot: number, content: ContentDb): boolean {
+  const missions = indexOf(content).missions;
+  return state.slots.some((other, index) => {
+    const action = other.action;
+    if (index === slot || !action) return false;
+    if (isCombatKind(action.kind)) return true;
+    return (
+      action.kind === MISSION_KIND &&
+      (missions.get(action.id)?.stages.some((st) => st.t === 'combat') ?? false)
+    );
+  });
+}
+
+/** The reason a fight-capable action cannot start in `slot` now (a localization key), or null. */
+export const fightBusyReason = (
+  state: GameState,
+  slot: number | undefined,
+  content: ContentDb,
+): string | null =>
+  slot !== undefined && fightCapableElsewhere(state, slot, content) ? 'error.fightBusy' : null;
 
 type Pools = { hp: number; chakra: number; stamina: number };
 
@@ -53,13 +90,14 @@ function startFight(
   content: ContentDb,
   rules: Rules,
   pools?: Pools,
+  support: readonly TeamSupport[] = [],
 ): CombatState['fight'] {
   noteSighting(state, entry.id, content);
   const snapshot = snapshotPlayer(state, content, rules, pools, [entry.id]);
   // The fight gets its own seed from the game's combat stream and runs on a stream of its own.
   return createFight(
     snapshot,
-    encounterFor(entry, content, [], 'special' in entry ? bossNature(state, entry) : null),
+    encounterFor(entry, content, [], 'special' in entry ? bossNature(state, entry) : null, support),
     nextSeed(state.rng, 'combat'),
     content,
     rules,
@@ -70,6 +108,7 @@ function blank(
   entry: Enemy | Boss,
   fight: CombatState['fight'],
   run: RunState | null,
+  owner: number,
 ): CombatState {
   return {
     enemy: entry.id,
@@ -80,6 +119,7 @@ function blank(
     paid: {},
     carry: 0,
     style: 'tai',
+    owner,
     run,
   };
 }
@@ -90,8 +130,25 @@ export function newCombat(
   entry: Enemy | Boss,
   content: ContentDb,
   rules: Rules,
+  owner: number,
 ): CombatState {
-  return blank(entry, startFight(state, entry, content, rules), null);
+  return blank(entry, startFight(state, entry, content, rules), null, owner);
+}
+
+/** A fight of a mission's combat stage: full pools, the current loadout and pouch (no refill), and the teammates' support. */
+export function newMissionCombat(
+  state: GameState,
+  entry: Enemy | Boss,
+  support: readonly TeamSupport[],
+  content: ContentDb,
+  rules: Rules,
+  owner: number,
+): CombatState {
+  state.flags.firstFight = true;
+  // The pouch is topped up from the bank on the way into the fight, as for any fight.
+  ensurePouch(state, content);
+  refillPouch(state, content);
+  return blank(entry, startFight(state, entry, content, rules, undefined, support), null, owner);
 }
 
 /** The enemy of an operation step; a step that draws from a pool draws on the combat stream. */
@@ -107,6 +164,7 @@ export function newOperation(
   op: Operation,
   content: ContentDb,
   rules: Rules,
+  owner: number,
 ): CombatState | null {
   const steps = opSteps(op);
   const approach = steps[0]?.t === 'approach';
@@ -114,7 +172,7 @@ export function newOperation(
   const enemy = enemyOfStep(state, steps[at]);
   const entry = enemy ? entryOf(content, enemy) : undefined;
   if (!entry) return null;
-  const c = blank(entry, startFight(state, entry, content, rules), { op: op.id, step: at });
+  const c = blank(entry, startFight(state, entry, content, rules), { op: op.id, step: at }, owner);
   if (approach) {
     c.phase = 'approach';
     c.pause = workOf(approachMs(state, op, content));
@@ -321,13 +379,42 @@ export const combatSystem: System = {
         recordFight(state, key, c.fight, 'timeout', content);
         c.carry += c.fight.t - c.fight.tally.lastUseAt;
         const p = c.fight.player;
-        c.fight = startFight(state, entry, content, rules, {
-          hp: p.hp,
-          chakra: p.chakra,
-          stamina: p.stamina,
-        });
+        c.fight = startFight(
+          state,
+          entry,
+          content,
+          rules,
+          { hp: p.hp, chakra: p.chakra, stamina: p.stamina },
+          c.fight.encounter.support,
+        );
         c.paid = {};
         continue;
+      }
+      const owner = rules.actionKinds[state.slots[index]?.action?.kind ?? ''];
+      if (owner?.combatEnded) {
+        // The action that started the fight decides what follows (a mission's combat stage).
+        if (result === 'defeat') {
+          emit(state, { type: 'playerDefeated', enemy: c.enemy });
+          bump(state, defeatsKey(c.enemy));
+          noteFight(state, c.enemy, 'loss', content);
+          recordFight(state, key, c.fight, 'loss', content);
+          stampDefeat(state, key);
+          woundsAfter(state, c, content, rules, true, key);
+        } else {
+          bump(state, killsKey(c.enemy));
+          emit(state, { type: 'enemyDefeated', enemy: c.enemy });
+          // A mission pays its own rewards; the book and the report still count the fight.
+          noteFight(state, c.enemy, 'win', content);
+          recordFight(state, key, c.fight, 'win', content);
+          woundsAfter(state, c, content, rules, false, key);
+        }
+        return owner.combatEnded(
+          state,
+          index,
+          result === 'defeat' ? 'defeat' : 'victory',
+          content,
+          rules,
+        );
       }
       if (result === 'defeat') {
         emit(state, { type: 'playerDefeated', enemy: c.enemy });

@@ -262,5 +262,15 @@
         "level": 4
       }
     }
+  },
+  {
+    "id": "core:scrollpart_fire_dragon_flame_bullet",
+    "kind": "misc",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": [],
+    "part": {
+      "technique": "core:fire_dragon_flame_bullet"
+    }
   }
 ]

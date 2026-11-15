@@ -3,6 +3,7 @@ import type { ComboId, ContentDb, NatureId, Rank, SkillId, Technique } from '@sh
 import { createStream, nextFloatFrom } from '../rng.ts';
 import { addEffect, findEffect, isSuppressed, removeEffect, statOf } from './fight-effects.ts';
 import { applyItem, itemView } from './fight-items.ts';
+import { TEAM_HOOK } from './fight-team-id.ts';
 import type {
   Combatant,
   Decision,
@@ -373,6 +374,8 @@ export function createFight(
       player.specials.push('passiveNegate');
     }
   }
+  // Teammates of a team mission support the player through a hook of the player's own.
+  if (fight.encounter.support?.length) player.specials.push(TEAM_HOOK);
   for (const hook of hooksOf(ctx, player)) hook.init?.(ctx, player);
   for (const spawn of fight.encounter.spawns) addBodies(ctx, spawn, spawn.count, spawn.count > 1);
   return fight;

@@ -327,7 +327,8 @@ describe('scrolls, parts and tools', () => {
       ).toBe(true);
       expect(scrollOf(t)?.scroll?.source).toEqual({ t: 'parts' });
     }
-    expect(content.items.filter((i) => i.part)).toHaveLength(carried.length);
+    // Plus the part of the fire dragon scroll that the dig mission pays.
+    expect(content.items.filter((i) => i.part)).toHaveLength(carried.length + 1);
   });
 
   it('has the generic notes item', () => {

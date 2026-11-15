@@ -160,7 +160,7 @@ function startAction(
   if (skill && !isSkillUnlocked(state, skill, content)) {
     return { ok: false, reason: 'error.skillLocked' };
   }
-  const blocked = kind.blocked?.(state, id, content, rules);
+  const blocked = kind.blocked?.(state, id, content, rules, slotIndex);
   if (blocked) return { ok: false, reason: blocked };
   const req = kind.requirements(state, id, content, rules);
   if (req && !evalReq(state, req, content).met) {

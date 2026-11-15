@@ -202,6 +202,30 @@ export const BALANCE_EXT = {
   report: { defeats: 5 },
   /** Operations: ms of the approach stage, and its share when the shortening requirement holds. */
   operation: { approachMs: 30000, approachShort: 0.5 },
+  /** Missions: -1% time per level above a stage's requirement (never under half), -0.3% per mastery level of the technique used, a slower fallback takes twice the time; a stage attempt succeeds with 90% plus 1% per level and 0.2% per mastery level, at most 99%. */
+  mission: {
+    perLevel: 0.01,
+    floor: 0.5,
+    masteryTime: 0.003,
+    slowAlt: 2,
+    minFactor: 0.2,
+    maxDefeats: 3,
+    defaultStyle: 'tai',
+    fightSkills: ['vit', 'eva'],
+    success: { base: 0.9, perLevel: 0.01, perMastery: 0.002, cap: 0.99 },
+  },
+  /** The team: a teammate stands at 80% of the player's level, performs with mastery 10, and in a fight hits every 9 s for 60% of the player's basic damage with the state of its nature. */
+  team: {
+    levelShare: 0.8,
+    mastery: 10,
+    support: { everyMs: 9000, damage: 0.6 },
+    states: { katon: 'burn', suiton: 'wet', raiton: 'stun', futon: null, doton: null },
+  },
+  /** A merchant crate: oil, salt and spices, and a gem now and then. */
+  crate: {
+    goods: { 'core:oil': [2, 4], 'core:salt': [2, 4], 'core:spice': [1, 2] },
+    gem: { item: 'core:gem', chance: 0.05 },
+  },
   /** Numbers of tools that the item data does not carry: the poisoned senbon's damage over time (share of maximum health per second, seconds), and the damage multiplier of a burn ointment against the nature it names. */
   toolFx: { dot: { pct: 0.012, durS: 10 }, resist: 0.6 },
   /** Ryo dropped by an enemy per combat level: range of the multiplier. */
