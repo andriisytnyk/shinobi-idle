@@ -3,6 +3,7 @@
   import { webRef } from '../lib/entities.ts';
   import { formatInt } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
+  import { flagEntity } from '../lib/world.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ReqTree from './ReqTree.svelte';
@@ -29,6 +30,8 @@
   const fraction = $derived(
     node.target > 0 ? Math.min(1, Math.max(0, node.current / node.target)) : node.met ? 1 : 0,
   );
+  /** A map flag (a point found, a region open) names the place it is about. */
+  const flagRef = $derived(req.t === 'flag' ? flagEntity(req.id) : null);
   const flagText = $derived(
     req.t === 'flag' ? (hasKey(`req.flag.${req.id}`) ? t(`req.flag.${req.id}`) : req.id) : '',
   );
@@ -63,6 +66,9 @@
         {#if ref}<EntityLink kind={ref.kind} id={ref.id} />{/if}
       {:else if req.t === 'rank'}
         {t('req.rank', { rank: t(`rank.${req.rank}`) })}
+      {:else if req.t === 'flag' && flagRef}
+        <EntityLink kind={flagRef.kind} id={flagRef.id} />
+        <span class="detail">{t(flagRef.kind === 'poi' ? 'req.poiFound' : 'req.regionOpen')}</span>
       {:else if req.t === 'flag'}
         {flagText}
       {:else if ref}

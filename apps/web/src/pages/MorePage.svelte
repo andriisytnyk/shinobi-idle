@@ -7,6 +7,13 @@
 <SimplePage title={t('nav.more')}>
   <ul class="menu">
     <li>
+      <a href="#/world" data-more-world>
+        <Icon name="lucide:map" size={18} />
+        <span>{t('nav.world')}</span>
+        <Icon name="lucide:chevron-right" size={16} />
+      </a>
+    </li>
+    <li>
       <a href="#/shop" data-more-shop>
         <Icon name="lucide:store" size={18} />
         <span>{t('nav.shop')}</span>

@@ -33,6 +33,14 @@ export const NAV: readonly NavItem[] = [
     tab: true,
     side: true,
   },
+  {
+    id: 'world',
+    href: '#/world',
+    label: 'nav.world',
+    icon: 'lucide:map',
+    tab: false,
+    side: true,
+  },
   { id: 'bank', href: '#/bank', label: 'nav.bank', icon: 'lucide:package', tab: true, side: true },
   {
     id: 'shop',
@@ -61,6 +69,9 @@ export const NAV: readonly NavItem[] = [
   },
 ];
 
+/** Nav items that have no tab of their own on a phone: they are reached from «Ще» and keep that tab lit. */
+export const MORE_PAGES: readonly string[] = ['help', 'rank', 'shop', 'world'];
+
 /** The nav item a route belongs to, or null when none does. */
 export function activeNav(route: Route): string | null {
   switch (route.page) {
@@ -74,6 +85,8 @@ export function activeNav(route: Route): string | null {
       return 'bank';
     case 'shop':
       return 'shop';
+    case 'world':
+      return 'world';
     case 'rank':
       return 'rank';
     case 'tab':
@@ -91,6 +104,7 @@ export function activeNav(route: Route): string | null {
       if (route.ref.kind === 'exam') return 'rank';
       if (route.ref.kind === 'recipe') return 'skills';
       if (route.ref.kind === 'gear') return 'shop';
+      if (['cell', 'region', 'poi'].includes(route.ref.kind)) return 'world';
       return null;
     default:
       return null;

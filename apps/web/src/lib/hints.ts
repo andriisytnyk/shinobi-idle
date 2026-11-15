@@ -1,5 +1,5 @@
 import type { ContentDb, SkillId } from '@shinobi/content';
-import { evalReq, examFor, levelAt, skillLevel, type GameState } from '@shinobi/core';
+import { cellLevel, evalReq, examFor, levelAt, skillLevel, type GameState } from '@shinobi/core';
 
 /** A one-time tutorial hint. Its text is `hint.<id>` and its title `hint.title.<id>`. */
 export interface HintDef {
@@ -26,6 +26,19 @@ export const HINTS: readonly HintDef[] = [
   { id: 'herbalism' },
   { id: 'crafting' },
   { id: 'shop' },
+  { id: 'world' },
+  {
+    id: 'worldKey',
+    when: (state, content) => content.cells.some((c) => c.key && cellLevel(state, c, content) >= 1),
+  },
+  {
+    id: 'worldTraining',
+    when: (state, content) =>
+      content.cells.some((c) =>
+        c.pois.some((p) => p.kind === 'training' && state.world.pois[p.id]),
+      ),
+  },
+  { id: 'worldTravel', when: (_state, _content, signals) => signals.travelled === true },
   { id: 'craftStopped', when: (_state, _content, signals) => signals.craftStopped === true },
   { id: 'tonicUsed', when: (state) => Object.keys(state.buffs).length > 0 },
   {

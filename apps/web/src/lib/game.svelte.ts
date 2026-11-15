@@ -136,6 +136,9 @@ export function createGame(deps: GameDeps = {}) {
       if (event.type === 'actionStopped' && event.missing && !signals.craftStopped) {
         signals = { ...signals, craftStopped: true };
       }
+      if (event.type === 'travelled' && !signals.travelled) {
+        signals = { ...signals, travelled: true };
+      }
       if (
         event.type === 'combatLog' ||
         event.type === 'enemyDefeated' ||

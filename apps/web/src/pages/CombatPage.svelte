@@ -6,6 +6,7 @@
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
   import StatBar from '../components/StatBar.svelte';
+  import ZoneWhere from '../components/ZoneWhere.svelte';
   import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
@@ -13,6 +14,9 @@
 
   /** Enemies of the Academy yard are open to everyone; the other regions arrive with missions. */
   const enemies = $derived(content.enemies.filter((e) => e.region === 'academy'));
+
+  /** Fight zones of the regions; each sits in a map cell. */
+  const zones = $derived(content.zones.filter((z) => z.region !== 'academy'));
 
   const fight = $derived.by(() =>
     game.read((gs) => {
@@ -166,6 +170,25 @@
       {/each}
     </ul>
     <p class="idle">{t('combat.idle')}</p>
+
+    {#if zones.length > 0}
+      <h2>{t('combat.zones')}</h2>
+      <p class="idle">{t('combat.zonesNote')}</p>
+      <ul class="cards" data-zones>
+        {#each zones as zone (zone.id)}
+          <li class="card" data-zone={zone.id}>
+            <span class="icon"><Icon entity={{ kind: 'enemy', id: zone.enemy }} size={36} /></span>
+            <div class="info">
+              <p class="name"><EntityLink kind="enemy" id={zone.enemy} /></p>
+              <ZoneWhere zone={zone.id} />
+            </div>
+            <button type="button" class="start" onclick={() => start(zone.enemy)}
+              >{t('combat.zoneStart')}</button
+            >
+          </li>
+        {/each}
+      </ul>
+    {/if}
   {/if}
 
   <h2>{t('combat.log')}</h2>

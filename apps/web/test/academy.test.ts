@@ -145,7 +145,9 @@ describe('A4: combat screen', () => {
     expect(body).toContain('data-enemy="core:dummy"');
     expect(body).toContain('Бойовий рівень');
     expect(body).toContain('Почати бій');
-    expect(body).not.toContain('core:bandit');
+    // Region enemies are listed apart, as fight zones that each name their map cell.
+    expect(body).not.toContain('data-enemy="core:bandit"');
+    expect(body).toContain('data-zone="core:zone_bandit"');
   });
 
   it('shows bars, what each side does and the kills while fighting', () => {

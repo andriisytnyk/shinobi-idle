@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { content, NATURE_IDS, SKILL_IDS, ukLocale } from '@shinobi/content';
+import { CELL_KEYS, content, NATURE_IDS, SKILL_IDS, ukLocale } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import { BANK_TABS } from '../src/lib/crafts.ts';
 import { HINTS } from '../src/lib/hints.ts';
@@ -70,9 +70,21 @@ describe('interface strings', () => {
         'status',
         'trait',
         'cell',
+        'poi',
         'combo',
       ],
       'nature.character.': NATURE_IDS,
+      'world.key.': CELL_KEYS,
+      'world.poi.kind.': [
+        'outpost',
+        'training',
+        'zone',
+        'story',
+        'deposit',
+        'cache',
+        'vault',
+        'mission',
+      ],
       'shop.section.': ['market', 'forge', 'sell', 'gear'],
       'bank.tab.': BANK_TABS,
       'craft.src.': ['herb', 'shop', 'craft', 'item'],

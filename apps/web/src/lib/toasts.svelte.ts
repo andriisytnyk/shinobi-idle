@@ -1,3 +1,4 @@
+import { content } from '@shinobi/content';
 import type { GameEvent } from '@shinobi/core';
 import { actionRef, masteryRef } from './entities.ts';
 import type { Params } from './i18n.ts';
@@ -9,6 +10,8 @@ export interface Toast {
   key: string;
   params: Params;
   ref?: EntityRef;
+  /** What a claimed cache or vault gave: ryo and items, the items as links. */
+  gains?: { ryo: number; items: { id: string; n: number }[] };
 }
 
 export type ToastSpec = Omit<Toast, 'id'>;
@@ -68,13 +71,46 @@ export function toastFor(event: GameEvent): ToastSpec | null {
         params: {},
         ref: actionRef(event),
       };
+    case 'regionOpened':
+      return { key: 'toast.regionOpened', params: {}, ref: { kind: 'region', id: event.region } };
+    case 'cellLevelUp':
+      return {
+        key: event.max ? 'toast.cellMax' : 'toast.cellLevelUp',
+        params: { n: event.level, intel: content.balance.K.intel.perCellLevel },
+        ref: { kind: 'cell', id: event.cell },
+      };
+    case 'poiFound':
+      return { key: 'toast.poiFound', params: {}, ref: { kind: 'poi', id: event.poi } };
+    case 'poiClaimed':
+      return {
+        key: 'toast.poiClaimed',
+        params: {},
+        ref: { kind: 'poi', id: event.poi },
+        gains: claimGains(event.poi),
+      };
+    case 'travelled':
+      return { key: 'toast.travelled', params: {}, ref: { kind: 'cell', id: event.cell } };
     default:
       return null;
   }
 }
 
+/** What claiming a cache or a vault gives. */
+function claimGains(poiId: string): { ryo: number; items: { id: string; n: number }[] } {
+  for (const cell of content.cells) {
+    for (const poi of cell.pois) {
+      if (poi.id !== poiId) continue;
+      if (poi.kind === 'cache') {
+        return { ryo: poi.ryo, items: poi.items.map((i) => ({ id: i.item, n: i.n })) };
+      }
+      if (poi.kind === 'vault') return { ryo: 0, items: [{ id: poi.item, n: 1 }] };
+    }
+  }
+  return { ryo: 0, items: [] };
+}
+
 /** Most toasts on screen at once; older ones make way. */
-export const MAX_TOASTS = 4;
+export const MAX_TOASTS = 6;
 const LIFETIME_MS = 5000;
 
 export function createToasts() {

@@ -11,6 +11,14 @@
       <span>
         {t(toast.key, toast.params)}
         {#if toast.ref}<EntityLink kind={toast.ref.kind} id={toast.ref.id} />{/if}
+        {#if toast.gains}
+          <span class="gains" data-gains>
+            {#if toast.gains.ryo > 0}<span>{t('toast.gainRyo', { n: toast.gains.ryo })}</span>{/if}
+            {#each toast.gains.items as item (item.id)}
+              <span><EntityLink kind="item" id={item.id} /> ×{item.n}</span>
+            {/each}
+          </span>
+        {/if}
       </span>
       <button type="button" aria-label={t('modal.close')} onclick={() => toasts.dismiss(toast.id)}>
         <Icon name="lucide:x" size={14} />
@@ -20,6 +28,14 @@
 </div>
 
 <style>
+  .gains {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    color: var(--fg-dim);
+    font-size: 0.85rem;
+  }
+
   .toasts {
     position: fixed;
     right: var(--space-4);
