@@ -11,6 +11,7 @@
   import Icon from './Icon.svelte';
   import MissionRankStamp from './MissionRankStamp.svelte';
   import MissionReward from './MissionReward.svelte';
+  import PinGoal from './PinGoal.svelte';
   import ReqTree from './ReqTree.svelte';
 
   interface Props {
@@ -64,6 +65,7 @@
       <Icon name="lucide:users" size={14} />
       {t(mission.team ? 'mission.team.yes' : 'mission.team.no')}
     </span>
+    <PinGoal kind="mission" id={mission.id} always />
   </div>
   {#if hasKey(clientKey)}<p class="ct-note client">{t(clientKey)}</p>{/if}
 

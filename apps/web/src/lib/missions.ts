@@ -2,14 +2,9 @@ import type { ContentDb, Mission } from '@shinobi/content';
 import {
   MISSION_KIND,
   MS_PER_HOUR,
-  buildingLevel,
-  effectiveLoadout,
-  masteryLevel,
   missionEntry,
   missionStageWays,
-  rationItems,
   readRun,
-  skillLevel,
   type BoardEntry,
   type GameState,
   type MissionForecast,
@@ -21,7 +16,6 @@ import {
   type StageWays,
 } from '@shinobi/core';
 import { hasKey } from './i18n.ts';
-import { currencyOf, held } from './vocab.ts';
 import type { EntityRef } from './route.ts';
 
 /*
@@ -263,31 +257,4 @@ export function hourChain(
 ): { base: number; total: number; perMission: number; runs: number; perHour: number } {
   const runs = expectedMs > 0 ? MS_PER_HOUR / expectedMs : 0;
   return { base, total: combineParts(parts), perMission, runs, perHour: perMission * runs };
-}
-
-// ---------- when a forecast is stale ----------
-
-/**
- * A cheap signature of what a mission forecast and its blocker depend on: the levels of the
- * skills, the Mastery of the techniques known, the rank, the team, the loadout, the natures, the
- * flags, the levels of the buildings, Intel, the items the stages take and the rations, and the
- * armed ration. A forecast is recomputed when this changes (a level-up, a finished building, a
- * bought item), not on a timer. Slots are not in it: whether a slot is free is read live.
- */
-export function inputsSignature(state: GameState, content: ContentDb): string {
-  const parts: (string | number)[] = [
-    state.player.rank,
-    held(state, currencyOf(content, 'study') ?? ''),
-  ];
-  for (const skill of content.skills) parts.push(skillLevel(state, skill.id, content));
-  for (const id of Object.keys(state.known)) parts.push(masteryLevel(state, id, content));
-  parts.push(state.player.natures.join(','), JSON.stringify(state.team));
-  parts.push(effectiveLoadout(state, content).join(','), JSON.stringify(state.flags));
-  for (const b of content.buildings) parts.push(buildingLevel(state, b.id));
-  const items = new Set<string>(rationItems(state, content).map((r) => r.id));
-  for (const m of content.missions) {
-    for (const stage of m.stages) if (stage.t === 'items') items.add(stage.item);
-  }
-  for (const id of items) parts.push(state.bank[id] ?? 0, state.buffs[id]?.charges ?? 0);
-  return parts.join('|');
 }

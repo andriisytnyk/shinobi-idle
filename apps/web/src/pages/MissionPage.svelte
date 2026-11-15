@@ -6,6 +6,7 @@
   import MissionRankStamp from '../components/MissionRankStamp.svelte';
   import MissionRation from '../components/MissionRation.svelte';
   import MissionReward from '../components/MissionReward.svelte';
+  import PinGoal from '../components/PinGoal.svelte';
   import MissionStage from '../components/MissionStage.svelte';
   import ModParts from '../components/ModParts.svelte';
   import ReqTree from '../components/ReqTree.svelte';
@@ -45,14 +46,11 @@
     }),
   );
   const rewards = $derived(forecast ? rewardRows(forecast.rewards) : []);
-  /** Something blocks the mission: it can be pinned as the goal, and the goal panel shows what to do. */
-  const pinnable = $derived(view !== null && view.blocker !== null);
-  const pinned = $derived(game.read((gs) => gs.goal?.kind === 'mission' && gs.goal.id === id));
   const desc = $derived(entityDesc({ kind: 'mission', id }));
   const clientKey = $derived(`mission.${id}.client`);
   /** XP per hour of the skills core is sure of, biggest first; the fights' whole XP is a line of its own (its style skill is not known beforehand). */
   const xpRows = $derived(
-    Object.entries(forecast?.xpPerHour ?? {})
+    Object.entries(forecast?.doable ? forecast.xpPerHour : {})
       .filter(([, v]) => v > 0)
       .sort((x, y) => y[1] - x[1]),
   );
@@ -105,12 +103,6 @@
         });
     if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
-
-  function pinGoal(): void {
-    if (!mission) return;
-    const result = game.dispatch({ type: 'goal.set', ref: { kind: 'mission', id: mission.id } });
-    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
-  }
 </script>
 
 {#if !mission || !forecast || !status}
@@ -152,11 +144,7 @@
         >
           {t(running ? 'tile.stop' : 'tile.start')}
         </button>
-        {#if pinnable}
-          <button type="button" class="ct-button" data-pin disabled={pinned} onclick={pinGoal}>
-            {t(pinned ? 'mission.pinned' : 'mission.pin')}
-          </button>
-        {/if}
+        <PinGoal kind="mission" id={mission.id} variant="button" />
       </div>
       {#if running}
         <p class="ct-note" data-running>
@@ -214,27 +202,36 @@
         <div data-total="time" data-ms={forecast.nominalMs}>
           <dt>{t('mission.duration')}</dt>
           <dd>
-            {formatDuration(forecast.nominalMs)}
-            <span class="dim" data-expected data-ms={forecast.expectedMs}>
-              {t('mission.expected', { time: formatDuration(forecast.expectedMs) })}
-            </span>
+            {#if !forecast.doable}
+              {t('mission.unknown')}
+            {:else}
+              {formatDuration(forecast.nominalMs)}
+              <!-- The expectation with repeats is shown only where it reads differently. -->
+              {#if formatDuration(forecast.expectedMs) !== formatDuration(forecast.nominalMs)}
+                <span class="dim" data-expected data-ms={forecast.expectedMs}>
+                  {t('mission.expected', { time: formatDuration(forecast.expectedMs) })}
+                </span>
+              {/if}
+            {/if}
           </dd>
         </div>
         <div data-total="chance" data-value={forecast.cleanChance}>
           <dt>{t('mission.chance.title')}</dt>
-          <dd>{Math.round(forecast.cleanChance * 100)}%</dd>
+          <dd>
+            {forecast.doable ? `${Math.round(forecast.cleanChance * 100)}%` : t('mission.unknown')}
+          </dd>
         </div>
         {#if forecast.ryo > 0}
           <div data-total="money" data-value={forecast.ryoPerHour}>
             <dt>{t('mission.ryoHour')}</dt>
             <dd>
-              <ModParts
-                display={formatInt(Math.round(forecast.ryoPerHour))}
-                parts={forecast.mods.ryo}
-                base={formatInt(mission.ryo)}
-                baseRaw={mission.ryo}
-                notes={chainNotes(ryoChain)}
-              />
+              {#if !forecast.doable}{t('mission.unknown')}{:else}<ModParts
+                  display={formatInt(Math.round(forecast.ryoPerHour))}
+                  parts={forecast.mods.ryo}
+                  base={formatInt(mission.ryo)}
+                  baseRaw={mission.ryo}
+                  notes={chainNotes(ryoChain)}
+                />{/if}
             </dd>
           </div>
         {/if}
@@ -242,13 +239,13 @@
           <div data-total="renown" data-value={forecast.repPerHour}>
             <dt>{t('mission.repHour')}</dt>
             <dd>
-              <ModParts
-                display={formatXp(forecast.repPerHour)}
-                parts={forecast.mods.rep}
-                base={formatInt(mission.rep)}
-                baseRaw={mission.rep}
-                notes={chainNotes(repChain)}
-              />
+              {#if !forecast.doable}{t('mission.unknown')}{:else}<ModParts
+                  display={formatXp(forecast.repPerHour)}
+                  parts={forecast.mods.rep}
+                  base={formatInt(mission.rep)}
+                  baseRaw={mission.rep}
+                  notes={chainNotes(repChain)}
+                />{/if}
             </dd>
           </div>
         {/if}
@@ -277,12 +274,13 @@
                 <EntityLink kind="skill" id={skill} />
               </span>
             {:else}
-              {#if forecast.fightXpPerHour === 0}<span class="dim">{t('mission.unknown')}</span
+              {#if !forecast.doable || forecast.fightXpPerHour === 0}<span class="dim"
+                  >{t('mission.unknown')}</span
                 >{/if}
             {/each}
           </dd>
         </div>
-        {#if forecast.fightXpPerHour > 0}
+        {#if forecast.doable && forecast.fightXpPerHour > 0}
           <div data-total="fight-xp" data-value={forecast.fightXpPerHour}>
             <dt>{t('mission.fightXpHour')}</dt>
             <dd>
@@ -298,6 +296,9 @@
           </div>
         {/if}
       </dl>
+      {#if !forecast.doable}
+        <p class="ct-why" data-no-way>{t('mission.totals.noWay')}</p>
+      {/if}
       <ul class="rewards" aria-label={t('mission.rewards')}>
         {#each rewards as reward (`${reward.t}:${reward.id}`)}
           <li><MissionReward {reward} /></li>

@@ -2,6 +2,7 @@
   import type { ActionInfo } from '@shinobi/core';
   import { actionRef } from '../lib/entities.ts';
   import { formatSeconds, formatXp } from '../lib/format.ts';
+  import { canPin } from '../lib/goal.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import { practiceView, slotTiming } from '../lib/timing.ts';
@@ -11,6 +12,7 @@
   import Icon from './Icon.svelte';
   import MasteryRing from './MasteryRing.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
+  import PinGoal from './PinGoal.svelte';
   import ReqTree from './ReqTree.svelte';
   import SealStrip from './SealStrip.svelte';
   import TimeBar from './TimeBar.svelte';
@@ -73,7 +75,14 @@
     <div class="main">
       <div class="head">
         <h3 class="name"><EntityLink kind={ref.kind} id={ref.id} /></h3>
-        <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
+        <span class="corner">
+          <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
+          {#if canPin(ref.kind)}<PinGoal
+              kind={ref.kind}
+              id={ref.id}
+              always={!info.available}
+            />{/if}
+        </span>
       </div>
       {#if stripSeals.length > 0}
         <SealStrip seals={stripSeals} {view} compact />
@@ -112,6 +121,9 @@
     <div class="req">
       <p class="locked-label"><Icon name="lucide:lock" size={14} /> {t('tile.locked')}</p>
       <ReqTree node={info.req} />
+      {#if canPin(ref.kind)}
+        <p class="pin-caption"><PinGoal kind={ref.kind} id={ref.id} variant="link" /></p>
+      {/if}
     </div>
   {/if}
   <Slot name="action.tile" ctx={{ action: { kind: info.kind, id: info.id } }} />
@@ -153,6 +165,17 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
+  }
+
+  .corner {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .pin-caption {
+    margin: var(--space-1) 0 0;
   }
 
   .name {

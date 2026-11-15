@@ -1,5 +1,6 @@
 import { untrack } from 'svelte';
 import {
+  missionInputs,
   missionStartSlot,
   missionStatus,
   type GameState,
@@ -9,7 +10,6 @@ import {
 } from '@shinobi/core';
 import type { Mission } from '@shinobi/content';
 import {
-  inputsSignature,
   missionView,
   rankGroups,
   stageViews,
@@ -21,7 +21,7 @@ import { game } from './store.ts';
 /**
  * How the mission screens get their numbers without recounting the whole board on every store
  * update. A forecast depends on almost everything in the state, so it is recomputed when the
- * inputs change: a cheap signature of them (`inputsSignature`: skill levels, Mastery, rank, team,
+ * inputs change: a cheap signature of them (`missionInputs` of core: skill levels, Mastery, rank, team,
  * loadout, buildings, the items the stages take, the armed ration, Intel) is read on every update,
  * and a command (a started mission, a used ration, a bought item) forces a recompute at once.
  * As a safety net for what the signature does not cover, the forecasts are also recomputed once per
@@ -40,7 +40,7 @@ export const bumpForecasts = (): void => {
 /** The signature of the inputs now; one computation per store update, shared by every reader. */
 const signature = $derived.by(() => {
   void game.version;
-  return untrack(() => inputsSignature(game.state, game.content));
+  return untrack(() => missionInputs(game.state, game.content, game.rules));
 });
 
 /**

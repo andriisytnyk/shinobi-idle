@@ -3,7 +3,7 @@
   import { webRef } from '../lib/entities.ts';
   import { senseiTestInfo } from '../lib/exam-test.ts';
   import { formatDuration } from '../lib/format.ts';
-  import { goalReq, suggestGoal } from '../lib/goal.ts';
+  import { goalTree, suggestGoal } from '../lib/goal.ts';
   import { t } from '../lib/i18n.ts';
   import { nextStep } from '../lib/next-step.ts';
   import { game } from '../lib/store.ts';
@@ -28,7 +28,7 @@
   const goalRef = $derived(webRef(goal));
   const result = $derived(
     game.read((gs) => {
-      const req = gs.goal ? goalReq(gs, gs.goal, content, game.rules) : null;
+      const req = goal ? goalTree(gs, goal, content, game.rules) : null;
       return req ? evalReq(gs, req, content) : null;
     }),
   );

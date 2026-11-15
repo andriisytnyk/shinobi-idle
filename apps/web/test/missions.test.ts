@@ -15,6 +15,7 @@ import { flushSync } from 'svelte';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { coreUi } from '../src/lib/ext/core-ui.ts';
 import { entityName } from '../src/lib/entities.ts';
+import { formatDuration } from '../src/lib/format.ts';
 import { t } from '../src/lib/i18n.ts';
 import { missionToast } from '../src/lib/mission-toasts.ts';
 import { missionView, rankGroups, stageViews } from '../src/lib/missions.ts';
@@ -390,7 +391,10 @@ describe('the mission page', () => {
     const mission = content.missions.find((m) => m.id === 'core:dig')!;
     const forecast = missionForecast(state, mission, content, rules());
     expect(Number(q('[data-total="time"]')?.dataset.ms)).toBe(forecast.nominalMs);
-    expect(Number(q('[data-expected]')?.dataset.ms)).toBe(forecast.expectedMs);
+    // The expectation with repeats is shown only where it reads differently from the nominal time.
+    const shown = q('[data-expected]');
+    if (shown) expect(Number(shown.dataset.ms)).toBe(forecast.expectedMs);
+    else expect(formatDuration(forecast.expectedMs)).toBe(formatDuration(forecast.nominalMs));
     expect(Number(q('[data-total="chance"]')?.dataset.value)).toBeCloseTo(forecast.cleanChance, 10);
     expect(Number(q('[data-total="money"]')?.dataset.value)).toBeCloseTo(forecast.ryoPerHour, 6);
     expect(Number(q('[data-total="renown"]')?.dataset.value)).toBeCloseTo(forecast.repPerHour, 6);
@@ -440,18 +444,38 @@ describe('the mission page', () => {
     expect(q('[data-why="error.noItem"]')).not.toBeNull();
   });
 
-  it('pins the mission itself as the goal, and the goal panel shows what it needs', async () => {
-    // A mission that can be started has nothing to pin.
-    booted = await bootApp([coreUi], able(), '#/mission/core:cat');
-    expect(q('[data-pin]')).toBeNull();
+  it('pins the mission itself as the goal through the shared control, on the card and the page', async () => {
+    // Always offered, a startable mission too: the goal is the mission, and core builds its tree.
+    booted = await bootApp([coreUi], able(), '#/missions');
+    expect(
+      q('[data-mission="core:cat"] [data-ui="pin-goal"][data-entity="mission:core:cat"]'),
+    ).not.toBeNull();
+    (q('[data-mission="core:mail"] [data-ui="pin-goal"]') as HTMLButtonElement).click();
+    flushSync();
+    expect(game.state.goal).toEqual({ kind: 'mission', id: 'core:mail' });
+    expect(q('[data-mission="core:mail"] [data-ui="pin-goal"]')?.getAttribute('data-pinned')).toBe(
+      'true',
+    );
     booted.destroy();
+    game.dispatch({ type: 'goal.clear' });
     booted = await bootApp([coreUi], player({ rankC: true }), '#/mission/core:mail');
-    const pin = q('[data-pin]') as HTMLButtonElement;
-    expect(pin).not.toBeNull();
+    const pin = q('[data-ui="entity-page"] [data-ui="pin-goal"]') as HTMLButtonElement;
+    expect(pin.getAttribute('data-entity')).toBe('mission:core:mail');
     pin.click();
     flushSync();
     expect(game.state.goal).toEqual({ kind: 'mission', id: 'core:mail' });
-    expect(pin.disabled).toBe(true);
+    expect(pin.getAttribute('data-pinned')).toBe('true');
+  });
+
+  it('shows no totals for a mission with a stage that has no way, as the card does', async () => {
+    booted = await bootApp([coreUi], player(), '#/mission/core:sealed');
+    expect(q('[data-total="time"] dd')?.textContent?.trim()).toBe(t('mission.unknown'));
+    expect(q('[data-total="chance"] dd')?.textContent?.trim()).toBe(t('mission.unknown'));
+    expect(q('[data-no-way]')).not.toBeNull();
+    expect(q('[data-total="money"] [aria-expanded]')).toBeNull();
+    booted.destroy();
+    booted = await bootApp([coreUi], able(), '#/mission/core:cat');
+    expect(q('[data-no-way]')).toBeNull();
   });
 
   it('falls back to the generic page for a mission that does not exist', async () => {

@@ -19,7 +19,7 @@
           <button class="start" type="button">
             Почати бій
       <p class="idle">
-        Бій не йде. Оберіть супротивника.
+        Бій не йде. Обери супротивника.
       <h2>
         Журнал бою
       <div aria-label="Журнал бою" aria-live="off" class="log" data-log="" role="log">

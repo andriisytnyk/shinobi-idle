@@ -45,6 +45,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:cat" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Дружина даймьо
             <dl class="ct-facts">
@@ -109,6 +112,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Сольна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:weed" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Селяни околиць
             <dl class="ct-facts">
@@ -157,6 +163,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:fire" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Купці околиць
             <dl class="ct-facts">
@@ -229,6 +238,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Сольна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:drought" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Селяни околиць
             <dl class="ct-facts">
@@ -301,6 +313,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Сольна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:courier" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Гільдія купців
             <dl class="ct-facts">
@@ -357,6 +372,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Сольна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:rockfall" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Солевари
             <dl class="ct-facts">
@@ -421,6 +439,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Сольна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:thief" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Містечко
             <dl class="ct-facts">
@@ -507,6 +528,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:caravan" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Гільдія купців
             <dl class="ct-facts">
@@ -571,6 +595,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Сольна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:sealed" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Гільдія купців
             <dl class="ct-facts">
@@ -620,6 +647,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Сольна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:mail" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Вежа Каґе
             <dl class="ct-facts">
@@ -675,6 +705,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:well" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Містечко на Південних рівнинах
             <dl class="ct-facts">
@@ -740,6 +773,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:dig" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Храм Вогню
             <dl class="ct-facts">
@@ -816,6 +852,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:v_spar" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <dl class="ct-facts">
@@ -882,6 +921,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:v_walls" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <dl class="ct-facts">
@@ -944,6 +986,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:v_fence" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <dl class="ct-facts">
@@ -1006,6 +1051,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:v_clear" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <dl class="ct-facts">
@@ -1068,6 +1116,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:v_water" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <dl class="ct-facts">
@@ -1134,6 +1185,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:v_sanit" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <dl class="ct-facts">
@@ -1196,6 +1250,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:v_rubble" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <dl class="ct-facts">
@@ -1262,6 +1319,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:v_clones" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <dl class="ct-facts">
@@ -1324,6 +1384,9 @@
                     <path d="#94-lwm9pk">
                     <circle cx="9" cy="7" r="4">
                 Командна місія
+              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:v_seal" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <dl class="ct-facts">

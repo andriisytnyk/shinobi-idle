@@ -2,15 +2,17 @@ import type { ContentDb, Mission, MissionPay } from '@shinobi/content';
 import { scrollPartId } from '@shinobi/content';
 import { hasItem } from '../bank.ts';
 import { fightBusyReason, isCombatKind } from '../combat/system.ts';
-import { MS_PER_HOUR } from '../formulas.ts';
+import { effectiveLoadout } from '../combat/loadout.ts';
+import { MS_PER_HOUR, masteryLevel } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
 import { computeMod, type Modifier } from '../modifiers.ts';
 import { xpGain } from '../progression.ts';
-import { evalReq, type Req, type ReqResult } from '../requirements.ts';
+import { evalReq, skillLevel, type Req, type ReqResult } from '../requirements.ts';
 import type { Rules } from '../rules.ts';
 import { startRefusal } from '../start-check.ts';
 import type { GameState } from '../state.ts';
 import { currencyOf } from '../vocab.ts';
+import { buildingLevel } from '../village-state.ts';
 import { planStage, planStageParts, stageReq, type DurationParts, type StagePlan } from './plan.ts';
 import { armedRation, rationItems, type RationItem } from './ration.ts';
 import {
@@ -26,8 +28,9 @@ import {
  * What one attempt at a stage gives the player. `lines` are the XP by skill: a skill stage pays its
  * skill, a fight pays the skills it always pays (as the grant adds it, bonuses counted, `certain`)
  * and its style share, whose skill depends on the techniques used and is known only when the fight
- * is over (`skill` null, `certain` false, the amount before bonuses). `fight` is the whole of a
- * fight's XP before bonuses. A stage a teammate does pays the player nothing.
+ * is over (`skill` null, `certain` false). Every amount has the bonuses that hold for any skill
+ * (`xp.all`) and the fixed skills their own too; the style share cannot have the bonus of a skill
+ * it does not know yet. `fight` is the whole of a fight's XP counted the same way. A stage a teammate does pays the player nothing.
  */
 export interface StageXpForecast {
   lines: { skill: string | null; amount: number; certain: boolean }[];
@@ -105,7 +108,7 @@ export interface MissionForecast {
   ryoPerHour: number;
   repPerHour: number;
   xpPerHour: Record<string, number>;
-  /** Per hour: the whole XP of the fights before bonuses, the style share included, whichever skill it goes to. */
+  /** Per hour: the whole XP of the fights, the style share included (with the bonuses common to every skill), whichever skill it goes to. */
   fightXpPerHour: number;
   /** Every stage has a way now. */
   doable: boolean;
@@ -122,14 +125,16 @@ function stageXpForecast(
 ): StageXpForecast {
   const fight = fightXpShares(mission, index, plan, content);
   if (fight) {
-    const lines: StageXpForecast['lines'] = [{ skill: null, amount: fight.style, certain: false }];
+    const common = computeMod(rules.modifierProviders, state, 'xp.all', content).total;
+    const style = fight.style * common;
+    const lines: StageXpForecast['lines'] = [{ skill: null, amount: style, certain: false }];
     for (const [skill, amount] of fight.others) {
       lines.push({ skill, amount: xpGain(state, skill, amount, content, rules), certain: true });
     }
     return {
       lines,
       fight: {
-        total: fight.style + fight.others.reduce((sum, [, amount]) => sum + amount, 0),
+        total: lines.reduce((sum, l) => sum + l.amount, 0),
         skills: fight.others.map(([skill]) => skill),
       },
       mastery: null,
@@ -347,9 +352,11 @@ export function firstUnmetLeaf(node: ReqResult): ReqResult | null {
 }
 
 /**
- * The tree a mission pinned as the goal shows: what opens it (its unlock), and the first stage
- * that has no way yet, with every way that would do (the technique conditions of a nature
- * included), or the items an items stage takes. Everything met is left out.
+ * The tree a mission pinned as the goal shows: its own unlock (when it has one, met or not, so
+ * the tree reads as a whole), then the first stage whose requirement is not met: with every way
+ * that would do, the technique conditions of a nature included, or the items an items stage
+ * takes. Later stages are left out until this one is done. A missing team is not a requirement
+ * of the tree (the start refusal `error.missionNeedsTeam` says it).
  */
 export function missionGoalReq(
   state: GameState,
@@ -367,6 +374,36 @@ export function missionGoalReq(
     }
   }
   return { t: 'all', of };
+}
+
+// ---------- when a forecast is stale ----------
+
+/**
+ * A cheap digest of everything a mission forecast and its blocker read, for a caller that keeps
+ * forecasts and recomputes them when this changes: every modifier the rule set's providers give
+ * now (so gear, tonics, the village, the world and any pack's modifiers are in it without being
+ * named), the levels of the skills, the Mastery of the techniques known, the rank, the natures,
+ * the team, the loadout, the flags, the levels of the buildings, every currency, and the items
+ * the stages take and the rations, with the armed ration. Slots are not in it: a caller reads
+ * the slot rules live.
+ */
+export function missionInputs(state: GameState, content: ContentDb, rules: Rules): string {
+  const parts: (string | number)[] = [state.player.rank];
+  for (const m of rules.modifierProviders.flatMap((p) => p(state, content))) {
+    parts.push(`${m.key}${m.op}${m.value}${m.group}`);
+  }
+  for (const skill of content.skills) parts.push(skillLevel(state, skill.id, content));
+  for (const id of Object.keys(state.known)) parts.push(masteryLevel(state, id, content));
+  parts.push(state.player.natures.join(','), JSON.stringify(state.team));
+  parts.push(effectiveLoadout(state, content).join(','), JSON.stringify(state.flags));
+  for (const b of content.buildings) parts.push(buildingLevel(state, b.id));
+  for (const c of content.currencies) parts.push(state.currencies[c.id] ?? 0);
+  const items = new Set<string>(rationItems(state, content).map((r) => r.id));
+  for (const m of content.missions) {
+    for (const stage of m.stages) if (stage.t === 'items') items.add(stage.item);
+  }
+  for (const id of items) parts.push(state.bank[id] ?? 0, state.buffs[id]?.charges ?? 0);
+  return parts.join('|');
 }
 
 // ---------- can it be started ----------

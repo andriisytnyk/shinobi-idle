@@ -237,7 +237,7 @@
         })}
       </p>
     {/if}
-    {#if stage.chance < 1}
+    {#if stage.chance < 1 && formatDuration(stage.expectedMs) !== formatDuration(stage.ms)}
       <p class="dim" data-stage-expected>
         {t('mission.stage.expected', { time: formatDuration(stage.expectedMs) })}
       </p>

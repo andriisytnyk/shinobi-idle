@@ -13,6 +13,7 @@ import {
   dispatch,
   evalReq,
   fightXpShares,
+  getMod,
   missionBoard,
   missionForecast,
   missionGoalReq,
@@ -29,6 +30,7 @@ import {
   type MissionDoneEvent,
   type Rules,
 } from '../src/index.ts';
+import { openWorld } from './helpers.ts';
 import { ableFor, player } from './missions-helpers.ts';
 import { BOARD, STATES, STATUS_STATES } from './missions-states.ts';
 
@@ -388,6 +390,31 @@ describe('missionStatus', () => {
     }
   });
 
+  it('names a zone fight and an operation as the holder of the fight', () => {
+    const combat = BOARD.find((m) => m.stages.some((st) => st.t === 'combat')) as Mission;
+    const zone = STATUS_STATES.zoneFightRuns?.(combat) as { state: GameState; slot: number };
+    expect(zone.state.slots[0]?.action?.kind).toBe('fight');
+    const byFight = missionStatus(zone.state, combat.id, 1, content, defaultRules).refusal;
+    expect(byFight?.reason).toBe('error.fightBusy');
+    expect(byFight?.by).toEqual({ slot: 0, kind: 'fight', id: zone.state.slots[0]?.action?.id });
+    // An operation holds the fight too; it is set in the slot directly so the test is about the holder, not the operation's requirements.
+    const op = content.operations[0];
+    expect(op).toBeDefined();
+    const state = ableFor(combat);
+    openWorld(state);
+    state.slots.push({ action: null, progress: 0, share: 0, data: null });
+    const slot = state.slots[0];
+    if (slot) slot.action = { kind: 'operation', id: op?.id ?? '' };
+    const byOp = missionStatus(state, combat.id, 1, content, defaultRules).refusal;
+    expect(byOp?.reason).toBe('error.fightBusy');
+    expect(byOp?.by).toEqual({ slot: 0, kind: 'operation', id: op?.id });
+    // A mission with no fight in it is not refused by either.
+    const quiet = BOARD.find(
+      (m) => !m.team && m.stages.every((st) => st.t !== 'combat'),
+    ) as Mission;
+    expect(missionStatus(state, quiet.id, 1, content, defaultRules).refusal?.by ?? null).toBeNull();
+  });
+
   it('names the action that holds the fight or runs the mission, and the missing items', () => {
     const thief = BOARD.find((m) => m.stages.some((s) => s.t === 'combat')) as Mission;
     const other = BOARD.find(
@@ -545,11 +572,14 @@ describe('the forecast lists everything a mission can give', () => {
           fights++;
           expect(shares, label).not.toBeNull();
           const style = stage.xp.lines.filter((l) => !l.certain);
-          expect(style, label).toEqual([{ skill: null, amount: shares?.style, certain: false }]);
+          const common = getMod(state, 'xp.all', content, defaultRules).total;
+          expect(style, label).toEqual([
+            { skill: null, amount: (shares?.style ?? 0) * common, certain: false },
+          ]);
           const sure = stage.xp.lines.filter((l) => l.certain).map((l) => l.skill);
           expect(sure, label).toEqual(shares?.others.map(([skill]) => skill));
           expect(stage.xp.fight?.total, label).toBeCloseTo(
-            stageXp(state, m, stage.index, plan, 'any', content).xp.reduce((s, [, a]) => s + a, 0),
+            stage.xp.lines.reduce((s, l) => s + l.amount, 0),
             9,
           );
           expect(stage.xp.fight?.skills, label).toEqual(sure);

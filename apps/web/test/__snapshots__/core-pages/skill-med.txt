@@ -27,12 +27,16 @@
                   <h3 class="name">
                     <a class="entity-link" href="#/practice/core:tykha_kimnata">
                       Тиха кімната
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
+                  <span class="corner">
+                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                        <circle class="track" cx="22" cy="22" r="18">
+                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                      <span class="level">
+                        1
+                    <button aria-label="Закріпити як мету" class="pin" data-entity="practice:core:tykha_kimnata" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="facts">
               <div>
                 <dt>
@@ -63,12 +67,16 @@
                   <h3 class="name">
                     <a class="entity-link" href="#/practice/core:medytatsiia_v_rusi">
                       Медитація в русі
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
+                  <span class="corner">
+                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                        <circle class="track" cx="22" cy="22" r="18">
+                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                      <span class="level">
+                        1
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="practice:core:medytatsiia_v_rusi" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="facts">
               <div>
                 <dt>
@@ -110,6 +118,9 @@
                         1/10
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 10%;">
+              <p class="pin-caption">
+                <button class="link" data-entity="practice:core:medytatsiia_v_rusi" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
           <li class="tile locked" data-action="core:lisove_sviatylyshche" data-entity="practice:core:lisove_sviatylyshche" data-ui="action-tile">
             <div class="top">
               <span class="emblem md" data-emblem-icon="temple-gate" data-emblem-kind="practice" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
@@ -120,12 +131,16 @@
                   <h3 class="name">
                     <a class="entity-link" href="#/practice/core:lisove_sviatylyshche">
                       Лісове святилище
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
+                  <span class="corner">
+                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                        <circle class="track" cx="22" cy="22" r="18">
+                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                      <span class="level">
+                        1
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="practice:core:lisove_sviatylyshche" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="facts">
               <div>
                 <dt>
@@ -167,6 +182,9 @@
                         1/20
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 5%;">
+              <p class="pin-caption">
+                <button class="link" data-entity="practice:core:lisove_sviatylyshche" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
           <li class="tile locked" data-action="core:bilia_vohnyshcha" data-entity="practice:core:bilia_vohnyshcha" data-ui="action-tile">
             <div class="top">
               <span class="emblem md" data-emblem-icon="campfire" data-emblem-kind="practice" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
@@ -177,12 +195,16 @@
                   <h3 class="name">
                     <a class="entity-link" href="#/practice/core:bilia_vohnyshcha">
                       Біля вогнища
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
+                  <span class="corner">
+                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                        <circle class="track" cx="22" cy="22" r="18">
+                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                      <span class="level">
+                        1
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="practice:core:bilia_vohnyshcha" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="facts">
               <div>
                 <dt>
@@ -224,6 +246,9 @@
                         1/30
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 3.3333333333333335%;">
+              <p class="pin-caption">
+                <button class="link" data-entity="practice:core:bilia_vohnyshcha" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
           <li class="tile locked" data-action="core:pid_vodospadom" data-entity="practice:core:pid_vodospadom" data-ui="action-tile">
             <div class="top">
               <span class="emblem md" data-emblem-icon="waterfall" data-emblem-kind="practice" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
@@ -234,12 +259,16 @@
                   <h3 class="name">
                     <a class="entity-link" href="#/practice/core:pid_vodospadom">
                       Під водоспадом
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
+                  <span class="corner">
+                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                        <circle class="track" cx="22" cy="22" r="18">
+                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                      <span class="level">
+                        1
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="practice:core:pid_vodospadom" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="facts">
               <div>
                 <dt>
@@ -281,6 +310,9 @@
                         1/40
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 2.5%;">
+              <p class="pin-caption">
+                <button class="link" data-entity="practice:core:pid_vodospadom" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
           <li class="tile locked" data-action="core:sad_kameniv" data-entity="practice:core:sad_kameniv" data-ui="action-tile">
             <div class="top">
               <span class="emblem md" data-emblem-icon="stone-stack" data-emblem-kind="practice" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
@@ -291,12 +323,16 @@
                   <h3 class="name">
                     <a class="entity-link" href="#/practice/core:sad_kameniv">
                       Сад каменів
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
+                  <span class="corner">
+                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                        <circle class="track" cx="22" cy="22" r="18">
+                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                      <span class="level">
+                        1
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="practice:core:sad_kameniv" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="facts">
               <div>
                 <dt>
@@ -338,6 +374,9 @@
                         1/50
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 2%;">
+              <p class="pin-caption">
+                <button class="link" data-entity="practice:core:sad_kameniv" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
       <section aria-label="Практики: Прозріння й Просвітлення" class="meditation" data-meditation="">
         <h2>
           Практики: Прозріння й Просвітлення
@@ -346,6 +385,10 @@
             <h3>
               <a class="entity-link" href="#/practice/core:tykha_kimnata">
                 Тиха кімната
+              <span class="pin-end">
+                <button aria-label="Закріпити як мету" class="pin" data-entity="practice:core:tykha_kimnata" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="counts">
               <span data-insight="">
                 Прозріння: 0
@@ -440,6 +483,10 @@
             <h3>
               <a class="entity-link" href="#/practice/core:medytatsiia_v_rusi">
                 Медитація в русі
+              <span class="pin-end">
+                <button aria-label="Закріпити як мету" class="pin" data-entity="practice:core:medytatsiia_v_rusi" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="counts">
               <span data-insight="">
                 Прозріння: 0
@@ -534,6 +581,10 @@
             <h3>
               <a class="entity-link" href="#/practice/core:lisove_sviatylyshche">
                 Лісове святилище
+              <span class="pin-end">
+                <button aria-label="Закріпити як мету" class="pin" data-entity="practice:core:lisove_sviatylyshche" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="counts">
               <span data-insight="">
                 Прозріння: 0
@@ -628,6 +679,10 @@
             <h3>
               <a class="entity-link" href="#/practice/core:bilia_vohnyshcha">
                 Біля вогнища
+              <span class="pin-end">
+                <button aria-label="Закріпити як мету" class="pin" data-entity="practice:core:bilia_vohnyshcha" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="counts">
               <span data-insight="">
                 Прозріння: 0
@@ -738,6 +793,10 @@
             <h3>
               <a class="entity-link" href="#/practice/core:pid_vodospadom">
                 Під водоспадом
+              <span class="pin-end">
+                <button aria-label="Закріпити як мету" class="pin" data-entity="practice:core:pid_vodospadom" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="counts">
               <span data-insight="">
                 Прозріння: 0
@@ -848,6 +907,10 @@
             <h3>
               <a class="entity-link" href="#/practice/core:sad_kameniv">
                 Сад каменів
+              <span class="pin-end">
+                <button aria-label="Закріпити як мету" class="pin" data-entity="practice:core:sad_kameniv" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="counts">
               <span data-insight="">
                 Прозріння: 0
