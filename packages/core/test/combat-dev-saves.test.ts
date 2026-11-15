@@ -37,7 +37,10 @@ function strip(value: unknown): unknown {
 }
 
 const digest = (text: string): string =>
-  createHash('sha256').update(JSON.stringify(strip(JSON.parse(text)))).digest('hex').slice(0, 32);
+  createHash('sha256')
+    .update(JSON.stringify(strip(JSON.parse(text))))
+    .digest('hex')
+    .slice(0, 32);
 
 function targets(): { name: string; zone: string; level: number; boss: string | null }[] {
   const list: { name: string; zone: string; level: number; boss: string | null }[] = [];
@@ -49,7 +52,8 @@ function targets(): { name: string; zone: string; level: number; boss: string | 
   for (const trait of content.traits) {
     const e = content.enemies.find((x) => x.traits.includes(trait.id) && zoneOf(x.id));
     const zone = e ? zoneOf(e.id) : undefined;
-    if (e && zone) list.push({ name: `trait ${trait.id}`, zone, level: Math.min(K.cap, e.cl), boss: null });
+    if (e && zone)
+      list.push({ name: `trait ${trait.id}`, zone, level: Math.min(K.cap, e.cl), boss: null });
   }
   return list;
 }

@@ -37,7 +37,14 @@ export const BALANCE_EXT = {
   /** The sensei test: 300 s, 1% shorter per level of the exam's skills, never under 120 s. */
   senseiTest: { base: 300, perLevel: 0.01, floor: 120 },
   /** Combat timing: ms per combat XP tick, ms per pool regeneration step, hit share at equal ratings, the longest fight (ms) before it ends as a timeout, the most enemies one fight holds, and the most times one hook timer may fire within one moment before the hook is treated as failed. */
-  combat: { xpTickMs: 1000, regenMs: 1000, hitEven: 0.5, fightCapMs: 240000, maxEnemies: 8, timerFires: 1000 },
+  combat: {
+    xpTickMs: 1000,
+    regenMs: 1000,
+    hitEven: 0.5,
+    fightCapMs: 240000,
+    maxEnemies: 8,
+    timerFires: 1000,
+  },
   /** Evasion multiplier of a bound enemy (the balance tables: Сковування, ухилення ×0.3). */
   bindEva: 0.3,
   /** Chance to resist an Illusionist's illusion per Meditation level (Медитація ÷ 200). */

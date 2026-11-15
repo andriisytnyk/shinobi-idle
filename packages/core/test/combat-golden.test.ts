@@ -21,7 +21,6 @@ import {
   workOf,
   type AnalysisTarget,
   type GameState,
-  type PlayerSnapshot,
 } from '../src/index.ts';
 import { HOUR, setLevel } from './helpers.ts';
 import { NATURES, yardstick } from './combat-golden-lib.ts';

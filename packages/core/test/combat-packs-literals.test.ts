@@ -88,7 +88,8 @@ function literals(source: string): string[] {
  */
 const FX_KIND =
   'the kind of a technique or item effect (a closed union of the content schema), not a tag';
-const RANK = 'a player rank compared by its place in the rank list; goes with `rankIndex` of the open-state task';
+const RANK =
+  'a player rank compared by its place in the rank list; goes with `rankIndex` of the open-state task';
 const ALLOWED: Record<string, string> = {
   'loadout.ts: chunin': RANK,
   'loadout.ts: genin': RANK,

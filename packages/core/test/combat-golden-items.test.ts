@@ -48,7 +48,10 @@ function record(pouch: Pouch, entries: readonly { id: string; cl: number }[], po
     const rows: unknown[] = [];
     for (let seed = 1; seed <= 6; seed++) {
       const snap: PlayerSnapshot = {
-        ...yardstick(Math.max(1, Math.min(K.cap, entry.cl)), NATURES[seed % NATURES.length] ?? 'katon'),
+        ...yardstick(
+          Math.max(1, Math.min(K.cap, entry.cl)),
+          NATURES[seed % NATURES.length] ?? 'katon',
+        ),
         pouch: pouch.map((s) => ({ ...s })),
       };
       const rules = { ...defaultRules, combatAi: powder ? powderAi() : defaultCombatAi };
@@ -110,26 +113,34 @@ const poison = () =>
   record(bank(['core:bulion_ramenu', 'core:maz_vid_opikiv', 'core:antidote']), poisoners, false);
 
 describe('the golden record of items and enemy-applied effects', () => {
-  it('stays byte-identical, and the poison answer is the intended one', { timeout: 300_000 }, () => {
-    const now = { items: items(), poison: poison() };
-    if (process.env.UPDATE_GOLDEN === '1') {
-      // Recorded on dev: both poison records are what dev did.
-      const text = JSON.stringify({ items: now.items, dev: now.poison, poison: now.poison }, null, 1);
-      writeFileSync(FIXTURE, `${text}\n`);
-      return;
-    }
-    if (process.env.UPDATE_GOLDEN === 'poison') {
-      // The declared change: only the intended poison answer is rewritten; `dev` and `items` stay as dev recorded them.
-      const old = JSON.parse(readFileSync(FIXTURE, 'utf8')) as Record<string, unknown>;
-      writeFileSync(FIXTURE, `${JSON.stringify({ ...old, poison: now.poison }, null, 1)}\n`);
-      return;
-    }
-    const fixture = JSON.parse(readFileSync(FIXTURE, 'utf8')) as {
-      items: unknown;
-      dev: unknown;
-      poison: unknown;
-    };
-    expect(JSON.stringify(now.items)).toBe(JSON.stringify(fixture.items));
-    expect(JSON.stringify(now.poison)).toBe(JSON.stringify(fixture.poison));
-  });
+  it(
+    'stays byte-identical, and the poison answer is the intended one',
+    { timeout: 300_000 },
+    () => {
+      const now = { items: items(), poison: poison() };
+      if (process.env.UPDATE_GOLDEN === '1') {
+        // Recorded on dev: both poison records are what dev did.
+        const text = JSON.stringify(
+          { items: now.items, dev: now.poison, poison: now.poison },
+          null,
+          1,
+        );
+        writeFileSync(FIXTURE, `${text}\n`);
+        return;
+      }
+      if (process.env.UPDATE_GOLDEN === 'poison') {
+        // The declared change: only the intended poison answer is rewritten; `dev` and `items` stay as dev recorded them.
+        const old = JSON.parse(readFileSync(FIXTURE, 'utf8')) as Record<string, unknown>;
+        writeFileSync(FIXTURE, `${JSON.stringify({ ...old, poison: now.poison }, null, 1)}\n`);
+        return;
+      }
+      const fixture = JSON.parse(readFileSync(FIXTURE, 'utf8')) as {
+        items: unknown;
+        dev: unknown;
+        poison: unknown;
+      };
+      expect(JSON.stringify(now.items)).toBe(JSON.stringify(fixture.items));
+      expect(JSON.stringify(now.poison)).toBe(JSON.stringify(fixture.poison));
+    },
+  );
 });

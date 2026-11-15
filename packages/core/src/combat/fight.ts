@@ -1351,7 +1351,9 @@ function runTimers(ctx: FightCtx, c: Combatant): void {
       // the hook that owns it: of another pack it is contained, of the core it is a bug.
       const broken = after !== undefined && !(Number.isFinite(after.need) && after.need >= 1);
       if (broken || ++fires > cap) {
-        const culprit = hooks.find((h) => !trusted(h) && h.onTimer !== undefined);
+        const culprit =
+          hooks.find((h) => !trusted(h) && h.onTimer !== undefined) ??
+          hooks.find((h) => !trusted(h));
         if (culprit) {
           fault(ctx, culprit);
           return;
