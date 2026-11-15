@@ -76,7 +76,7 @@ describe('A10: save', () => {
     const state = deserialize(JSON.stringify(old), content);
     expect(state.v).toBe(STATE_VERSION);
     expect(state.stats).toEqual({ completed: 0 });
-    expect(state.skills.tai.xp).toBe(played().skills.tai.xp);
+    expect(state.skills.tai!.xp).toBe(played().skills.tai!.xp);
     expect(state.slots[0]?.action).toEqual({ kind: 'practice', id: 'core:leaf_whirlwind' });
   });
 
@@ -99,8 +99,8 @@ describe('A10: save', () => {
     s.slots = [{ action: { kind: 'practice', id: 'core:ghost' }, progress: 5, share: -1 }, 7];
     const state = deserialize(JSON.stringify(raw), content);
     expect(Object.keys(state.skills)).toHaveLength(16);
-    expect(state.skills.tai.xp).toBe(xpAt(content.balance.K.cap));
-    expect(state.pools.tai.xp).toBeLessThan(1e15);
+    expect(state.skills.tai!.xp).toBe(xpAt(content.balance.K.cap));
+    expect(state.pools.tai!.xp).toBeLessThan(1e15);
     expect(Object.keys(state.pools)).toHaveLength(16);
     expect(state.mastery['core:clone']).toEqual({ xp: 0 });
     expect(state.mastery['core:ghost']).toBeUndefined();
@@ -140,7 +140,7 @@ describe('advanceOffline', () => {
     expect(summary.simulatedMs).toBe(12 * HOUR);
     expect(summary.capped).toBe(true);
     expect(state.now).toBe(12 * HOUR);
-    expect(summary.skillXp.tai).toBe(state.skills.tai.xp);
+    expect(summary.skillXp.tai).toBe(state.skills.tai!.xp);
     expect(summary.levelsGained.tai).toBeGreaterThan(10);
     expect(summary.masteryLevelsGained['core:leaf_whirlwind']).toBeGreaterThan(20);
     expect(Object.keys(summary.skillXp)).toEqual(['tai']);

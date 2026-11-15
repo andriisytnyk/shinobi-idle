@@ -26,7 +26,7 @@
     game.read((gs) => {
       const owned = ownedTiers(gs, line.id);
       const next = line.tiers[owned];
-      const req = nextTierReq(gs, line);
+      const req = nextTierReq(gs, line, content);
       return {
         owned,
         next: next ? { tier: next.tier } : null,

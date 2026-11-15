@@ -217,10 +217,10 @@ describe('A4: exploration XP and Intel', () => {
     setLevel(state, 'scout', level);
     setup(state);
     ok(state, explore(id));
-    const before = state.skills.scout.xp;
+    const before = state.skills.scout!.xp;
     const ms = 10 * cycle(state);
     advance(state, ms, content);
-    const perHour = ((state.skills.scout.xp - before) * 3_600_000) / ms;
+    const perHour = ((state.skills.scout!.xp - before) * 3_600_000) / ms;
     const reg = content.regions.find((r) => r.id === region);
     const effective = (reg?.scout ?? 0) + K.cellLevelStep * (target - 1);
     return { perHour, expected: rate(effective, content) };
@@ -431,7 +431,7 @@ describe('A6: training spots', () => {
       id: 'core:poi_khram_vohniu_training',
     });
     expect(getMod(state, 'xp.skill.tai', content).total).toBe(1);
-    const gained = state.skills.katon.xp;
+    const gained = state.skills.katon!.xp;
     // The bonus is real XP, not only a number.
     const away = genin();
     spot(away);

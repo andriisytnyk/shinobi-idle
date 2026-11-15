@@ -43,7 +43,7 @@ export function fighterReport(o: {
   const run = runHourly(createFighterBot(), {
     seed: o.seed,
     hours: o.hours,
-    initialState: buildGeninStart(content, o.seed, FIGHTER_START_RYO, [defaultNature()]),
+    initialState: buildGeninStart(content, o.seed, FIGHTER_START_RYO, [defaultNature(content)]),
     content,
     rules,
   });

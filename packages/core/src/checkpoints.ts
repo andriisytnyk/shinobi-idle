@@ -1,7 +1,8 @@
-import type { ContentDb, PoolCheckpoint, SkillId } from '@shinobi/content';
+import type { ContentDb, PoolCheckpoint } from '@shinobi/content';
 import { poolCapacity } from './formulas.ts';
 import type { Modifier, ModifierProvider } from './modifiers.ts';
 import type { GameState } from './state.ts';
+import { poolEntry } from './vocab.ts';
 
 /** Whether the pool of the checkpoint's skill holds at least its share of the capacity. */
 export function checkpointReached(
@@ -12,12 +13,12 @@ export function checkpointReached(
   const capacity = poolCapacity(checkpoint.skill, content);
   if (capacity <= 0) return false;
   // The same threshold `gainPoolXp` crosses when it announces the checkpoint.
-  return state.pools[checkpoint.skill].xp >= (capacity * checkpoint.pct) / 100;
+  return (poolEntry(state, checkpoint.skill)?.xp ?? 0) >= (capacity * checkpoint.pct) / 100;
 }
 
 /** The checkpoints of one skill that carry modifiers, lowest threshold first. */
 interface Group {
-  skill: SkillId;
+  skill: string;
   /** Thresholds and ready-made modifiers, parallel arrays. */
   thresholds: number[];
   modifiers: Modifier[][];
@@ -59,11 +60,12 @@ const NONE: Modifier[] = [];
  */
 export const checkpointProvider: ModifierProvider = (state, content) => {
   const table = tableOf(content);
+  const pools: Record<string, { xp: number }> = state.pools;
   let out: Modifier[] | null = null;
   for (let i = 0; i < table.length; i++) {
     const group = table[i];
     if (!group) continue;
-    const xp = state.pools[group.skill].xp;
+    const xp = pools[group.skill]?.xp ?? 0;
     // Most pools have not reached even their first checkpoint.
     if (xp < (group.thresholds[0] ?? Infinity)) continue;
     for (let j = 0; j < group.thresholds.length; j++) {

@@ -1,4 +1,5 @@
 import type { Recipe, SkillId } from '@shinobi/content';
+import { moneyOf } from '@shinobi/core';
 import {
   buyPrice,
   evalReq,
@@ -41,7 +42,7 @@ export function createCraftsBot(): Bot {
 
       // Sell every craft product the bank holds.
       const products = new Set(content.recipes.map((r) => r.output.item));
-      let ryo = state.currencies.ryo;
+      let ryo = state.currencies[moneyOf(content)] ?? 0;
       for (const [item, n] of Object.entries(state.bank)) {
         if (n < 1 || !products.has(item)) continue;
         const price = sellPrice(item, content);

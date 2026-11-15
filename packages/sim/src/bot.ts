@@ -13,7 +13,7 @@ export interface BotContext {
 export interface BotGoal {
   /** Ukrainian name shown in reports, for example «Генін». */
   label: string;
-  reached(state: Readonly<GameState>): boolean;
+  reached(state: Readonly<GameState>, content: ContentDb): boolean;
 }
 
 /**

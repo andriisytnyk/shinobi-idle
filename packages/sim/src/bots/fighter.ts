@@ -1,4 +1,5 @@
 import type { Boss, Enemy, SkillId, Zone } from '@shinobi/content';
+import { moneyOf } from '@shinobi/core';
 import {
   COURSE_KIND,
   defeatsKey,
@@ -186,7 +187,7 @@ export function createFighterBot(): Bot {
         },
         content,
       );
-      let ryo = state.currencies.ryo;
+      let ryo = state.currencies[moneyOf(content)] ?? 0;
       const buys: Command[] = [];
       const bought = new Set<string>();
       for (const { id } of plan) {

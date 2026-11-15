@@ -8,6 +8,8 @@ import type { GameState } from './state.ts';
  * All time maths must be in whole numbers so the result does not depend on how time is chunked.
  */
 export interface System {
+  /** A name for the system, so that a pack can wrap it (`wrapRule`); a system a pack adds names itself `<pack>:<name>`. */
+  id?: string;
   /** Whole ms until this system next needs `run`, or null when it has nothing pending. */
   nextEventIn(state: GameState, content: ContentDb, rules: Rules): number | null;
   /** Lets time pass without an event: progress counters move by `dt` ms. */

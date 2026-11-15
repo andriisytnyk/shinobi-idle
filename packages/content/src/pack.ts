@@ -64,12 +64,14 @@ export interface BalancePatch {
 export type Patch = EntityPatch | BalancePatch;
 
 /**
- * The behaviour of a pack: a function that receives the base rules object and returns the extended
- * one (systems, action kinds, fight hooks, modifier providers, the AI). The type of the rules is
- * defined by `packages/core`; the content package only carries the function.
- * Declared here and not run: the core task implements it.
+ * The behaviour of a pack: a function that receives the rules built so far (and the composed
+ * content) and returns the extended rules (systems, action kinds, fight hooks, modifier providers,
+ * the AI). The type of the rules is defined by `packages/core`, which cannot be imported here, so
+ * the function is typed there and this type only carries it; `composeRules` of the core package
+ * runs it. It must be deterministic: no wall-clock time, no `Math.random`, no state of its own
+ * beyond what it puts in the rules; the engine cannot enforce that.
  */
-export type PackRules = (base: Record<string, unknown>) => Record<string, unknown>;
+export type PackRules = (base: never, content: ContentDb) => unknown;
 
 export interface ContentPack {
   manifest: PackManifest;
@@ -82,7 +84,7 @@ export interface ContentPack {
   patches: Patch[];
   /** Modifier keys the pack declares; each must start with `<pack id>:` unless the pack is `core`. */
   modifierKeys?: Readonly<Record<string, ModifierKeyInfo>>;
-  /** Behaviour, see `PackRules`. Not run by `composeContent`. */
+  /** Behaviour, see `PackRules`. Not run by `composeContent`; `composeRules` of the core package runs it. */
   rules?: PackRules;
   /** The id of a UI pack (in `apps/web`) that goes with this pack. Not read by `composeContent`. */
   ui?: string;

@@ -32,6 +32,35 @@ describe('the filter of the open type check', () => {
     expect(isInMigrated('packages/core/src/combat/fight.ts', [])).toBe(false);
   });
 
+  it('leaves out the excluded parts of an entry and takes single files', () => {
+    const entries = [
+      { path: 'packages/core/src', exclude: ['combat'] },
+      'packages/core/test/save.test.ts',
+    ];
+    expect(isInMigrated('packages/core/src/natures.ts', entries)).toBe(true);
+    expect(isInMigrated('packages/core/src/missions/run.ts', entries)).toBe(true);
+    expect(isInMigrated('packages/core/src/combat/fight.ts', entries)).toBe(false);
+    expect(isInMigrated('packages/core/src/combat', entries)).toBe(false);
+    expect(isInMigrated('packages/core/src/combat-extra/x.ts', entries)).toBe(true);
+    expect(isInMigrated('packages/core/test/save.test.ts', entries)).toBe(true);
+    expect(isInMigrated('packages/core/test/other.test.ts', entries)).toBe(false);
+    expect(isInMigrated('packages\\core\\src\\combat\\fight.ts', entries)).toBe(false);
+    // The two tasks that split a folder list one entry each.
+    const split = [{ path: 'packages/core/src', exclude: ['combat'] }, 'packages/core/src/combat'];
+    expect(isInMigrated('packages/core/src/combat/fight.ts', split)).toBe(true);
+  });
+
+  it('judges an excluded part that does not exist', () => {
+    const verdict = judge(
+      [diag('a.ts')],
+      [{ path: 'packages/core/src', exclude: ['gone'] }],
+      true,
+      (folder) => folder !== 'packages/core/src/gone',
+    );
+    expect(verdict.ok).toBe(false);
+    expect(verdict.messages.join('\n')).toContain('excludes');
+  });
+
   it('treats Windows and POSIX paths alike', () => {
     expect(isInMigrated('packages\\core\\src\\combat\\fight.ts', migrated)).toBe(true);
     expect(isInMigrated('packages/core/src/combat/fight.ts', ['packages\\core\\src\\combat'])).toBe(

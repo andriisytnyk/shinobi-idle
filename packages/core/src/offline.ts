@@ -1,4 +1,6 @@
-import type { ContentDb, SkillId } from '@shinobi/content';
+import type { ContentDb } from '@shinobi/content';
+import type { RuleDisabledEvent } from './events.ts';
+import { skillEntry } from './vocab.ts';
 import { mergeReports, type TargetReport } from './combat/report.ts';
 import { advance } from './engine.ts';
 import type { ActionStoppedEvent } from './events.ts';
@@ -13,13 +15,15 @@ export interface OfflineSummary {
   simulatedMs: number;
   capped: boolean;
   /** XP gained per skill, as it landed after modifiers, slowdown and the level cap. */
-  skillXp: Partial<Record<SkillId, number>>;
-  levelsGained: Partial<Record<SkillId, number>>;
+  skillXp: Partial<Record<string, number>>;
+  levelsGained: Partial<Record<string, number>>;
   /** Mastery levels gained per mastery key. */
   masteryLevelsGained: Record<string, number>;
   /** Techniques learned and actions stopped while away, so the UI can explain what changed. */
   techniquesLearned: string[];
   actionsStopped: ActionStoppedEvent[];
+  /** Rules of packs that failed and were switched off during the time away. */
+  rulesDisabled?: RuleDisabledEvent[];
   /** The battle report of the time away, by target. */
   reports: Record<string, TargetReport>;
 }
@@ -38,9 +42,11 @@ export function advanceOffline(
   const requestedMs = Math.max(0, Math.floor(elapsedMs));
   const simulatedMs = Math.min(requestedMs, K.offlineCapHours * MS_PER_HOUR);
 
-  const skills = Object.keys(state.skills) as SkillId[];
-  const xpBefore = new Map(skills.map((s) => [s, state.skills[s].xp]));
-  const levelBefore = new Map(skills.map((s) => [s, levelAt(state.skills[s].xp, K.cap)]));
+  const skills = Object.keys(state.skills) as string[];
+  const xpBefore = new Map(skills.map((s) => [s, skillEntry(state, s)?.xp ?? 0]));
+  const levelBefore = new Map(
+    skills.map((s) => [s, levelAt(skillEntry(state, s)?.xp ?? 0, K.cap)]),
+  );
   const masteryBefore = new Map(
     Object.keys(state.mastery).map((key) => [key, masteryLevel(state, key, content)]),
   );
@@ -66,16 +72,19 @@ export function advanceOffline(
     masteryLevelsGained: {},
     techniquesLearned: [],
     actionsStopped: [],
+    rulesDisabled: [],
     reports,
   };
   for (const e of away) {
     if (e.type === 'techniqueLearned') summary.techniquesLearned.push(e.id);
     else if (e.type === 'actionStopped') summary.actionsStopped.push(e);
+    else if (e.type === 'ruleDisabled') summary.rulesDisabled?.push(e);
   }
   for (const skill of skills) {
-    const xp = state.skills[skill].xp - (xpBefore.get(skill) ?? 0);
+    const xp = (skillEntry(state, skill)?.xp ?? 0) - (xpBefore.get(skill) ?? 0);
     if (xp > 0) summary.skillXp[skill] = xp;
-    const levels = levelAt(state.skills[skill].xp, K.cap) - (levelBefore.get(skill) ?? 1);
+    const levels =
+      levelAt(skillEntry(state, skill)?.xp ?? 0, K.cap) - (levelBefore.get(skill) ?? 1);
     if (levels > 0) summary.levelsGained[skill] = levels;
   }
   for (const key of Object.keys(state.mastery)) {

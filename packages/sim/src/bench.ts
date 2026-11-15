@@ -1,5 +1,5 @@
-import { content } from '@shinobi/content';
 import { advance, createState, dispatch, type Command } from '@shinobi/core';
+import { buildEnvironment, type Environment } from './env.ts';
 
 const HOUR_MS = 3_600_000;
 const GAME_HOURS = 12;
@@ -15,17 +15,17 @@ export interface BenchResult {
 }
 
 /** Wall time to advance 12 game hours with `command` kept running (restarted if it ends). */
-function measure(label: string, command: Command): BenchResult {
+function measure(label: string, command: Command, { content, rules }: Environment): BenchResult {
   const state = createState(1, content);
   let elapsed = 0;
   let restarts = 0;
   for (let hour = 0; hour < GAME_HOURS; hour++) {
     if (!state.slots[0]?.action) {
       if (hour > 0) restarts++;
-      dispatch(state, command, content);
+      dispatch(state, command, content, rules);
     }
     const t0 = performance.now();
-    advance(state, HOUR_MS, content);
+    advance(state, HOUR_MS, content, rules);
     elapsed += performance.now() - t0;
   }
   return {
@@ -39,14 +39,13 @@ function measure(label: string, command: Command): BenchResult {
 }
 
 /** Measures `advance` over 12 game hours of practice and of a running fight. */
-export function runBench(): BenchResult[] {
+export function runBench(env: Environment = buildEnvironment()): BenchResult[] {
   return [
-    measure('практика', {
-      type: 'action.start',
-      slot: 0,
-      kind: 'practice',
-      id: 'core:leaf_whirlwind',
-    }),
-    measure('бій', { type: 'action.start', slot: 0, kind: 'fight', id: 'core:dummy' }),
+    measure(
+      'практика',
+      { type: 'action.start', slot: 0, kind: 'practice', id: 'core:leaf_whirlwind' },
+      env,
+    ),
+    measure('бій', { type: 'action.start', slot: 0, kind: 'fight', id: 'core:dummy' }, env),
   ];
 }

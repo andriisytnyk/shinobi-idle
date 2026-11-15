@@ -22,6 +22,7 @@ import {
   walkMs,
 } from './world.ts';
 import { regionOpenReq } from './regions.ts';
+import { moneyOf } from './vocab.ts';
 
 /*
  * Read-only views of the map for the UI and bots. Nothing here changes the state.
@@ -57,7 +58,7 @@ export function listRegions(state: GameState, content: ContentDb): RegionInfo[] 
   return content.regions.map((region) => ({
     id: region.id,
     open: isRegionOpen(state, region, content),
-    req: evalReq(state, regionOpenReq(region), content),
+    req: evalReq(state, regionOpenReq(region, content), content),
     cells: region.cells,
     explored: region.cells.filter((id) => {
       const cell = index.cells.get(id);
@@ -225,7 +226,7 @@ export function travelOptions(
         region: cell.region,
         outpost: cell.pois.some((p) => p.kind === 'outpost'),
         instantCost: cost,
-        canAffordInstant: state.currencies.ryo >= cost,
+        canAffordInstant: (state.currencies[moneyOf(content)] ?? 0) >= cost,
         walkMs: walkMs(state, cell, content, rules),
       },
     ];

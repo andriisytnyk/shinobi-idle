@@ -1,5 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
-import { rebalanceShares, stopSlot } from './actions.ts';
+import { actionKindOf, rebalanceShares, stopSlot } from './actions.ts';
 import {
   deleteSavedLoadout,
   loadSavedLoadout,
@@ -16,6 +16,7 @@ import { combineParts } from './scrolls.ts';
 import type { EntityRef } from './entity.ts';
 import { emit } from './events.ts';
 import { examFor, SENSEI_TEST_KIND } from './exam.ts';
+import { rankIndex } from './vocab.ts';
 import { buyGear } from './gear.ts';
 import { coatItem, useItem } from './items.ts';
 import { indexOf } from './lookup.ts';
@@ -23,8 +24,18 @@ import { buyMeditationLevel } from './meditation.ts';
 import { addNature, chooseNature, type NatureChoice } from './natures.ts';
 import { shopBuy, shopSell } from './shop.ts';
 import { updateQuests } from './quests.ts';
-import { evalReq, RANK_ORDER, type ReqResult } from './requirements.ts';
+import { evalReq, type ReqResult } from './requirements.ts';
+import {
+  callSystem,
+  chargeEvent,
+  disableSystem,
+  isDisabled,
+  originOf,
+  takeNotices,
+  validWait,
+} from './guard.ts';
 import { defaultRules, type Rules } from './rules.ts';
+import type { System } from './system.ts';
 import { isSkillUnlocked } from './selectors.ts';
 import type { GameState } from './state.ts';
 import { cancelBuild, donateToTreasury, spendWorkforce, startBuild } from './village.ts';
@@ -34,7 +45,9 @@ import { claimPoi, travelInstant, WALK_KIND } from './world.ts';
 export type Command =
   | { type: 'action.start'; slot: number; kind: string; id: string }
   | { type: 'action.stop'; slot: number }
-  /** Starts the Genin exam's sensei test; the checklist must be met. `slot` defaults to 0. */
+  /** Starts the sensei test of the exam that grants `rank`; the checklist must be met. `slot` defaults to 0. */
+  | { type: 'exam.start'; rank: string; slot?: number }
+  /** The exam that grants the first rank after the Academy; kept for the code that began with it. Same as `exam.start` for that rank. */
   | { type: 'exam.genin.start'; slot?: number }
   /** Uses a bank item on a target (for the graduate scroll, an academy technique id). */
   | { type: 'item.use'; id: string; target?: string | undefined }
@@ -97,7 +110,10 @@ export type Command =
 export const PLAYER_NAME_MAX = 24;
 
 /** A refusal carries the requirement tree that was not met when the command was a learning one. */
-export type CommandResult = { ok: true } | { ok: false; reason: string; req?: ReqResult };
+/** A refusal: a localization key, with the values the text names in `params` (the currency a player lacks, for one). */
+export type CommandResult =
+  | { ok: true }
+  | { ok: false; reason: string; req?: ReqResult; params?: Record<string, string | number> };
 
 /** Consecutive zero-length steps tolerated before the loop is declared stuck. */
 const STALL_LIMIT = 10_000;
@@ -118,27 +134,92 @@ export function advance(
   updateQuests(state, content);
   let remaining = ms;
   let stalled = 0;
+  // Systems that a pack added are guarded (see guard.ts); with none, the loop is the plain one.
+  const guarded = rules.systems.some((system) => originOf(system) !== undefined);
+  // Consecutive steps at +0 ms for each system of a pack other than core.
+  const zeros = new Map<System, number>();
   for (;;) {
     let next: number | null = null;
+    // Guarded runs only: the waits of the systems of packs, and whether a core system asked for +0 ms.
+    const packWaits = new Map<System, number>();
+    let coreZero = false;
     for (const system of rules.systems) {
-      const wait = system.nextEventIn(state, content, rules);
+      let wait: number | null;
+      if (guarded) {
+        if (isDisabled(state, system)) continue;
+        wait = callSystem(
+          state,
+          system,
+          () => system.nextEventIn(state, content, rules),
+          null,
+          validWait,
+        );
+        const pack = originOf(system);
+        if (pack === undefined) {
+          if (wait === 0) coreZero = true;
+        } else {
+          if (wait !== null) packWaits.set(system, wait);
+          const streak = wait === 0 ? (zeros.get(system) ?? 0) + 1 : 0;
+          zeros.set(system, streak);
+          // A system of a pack that keeps asking for an event now, with no time passing, is switched off.
+          if (streak >= STALL_LIMIT) {
+            disableSystem(state, system, pack, new Error('asks for an event at +0 ms without end'));
+            continue;
+          }
+        }
+      } else {
+        wait = system.nextEventIn(state, content, rules);
+      }
       if (wait !== null && (next === null || wait < next)) next = wait;
     }
     if (next === null || next > remaining) break;
-    stalled = next === 0 ? stalled + 1 : 0;
+    if (guarded) {
+      // Each event of a system of a pack is charged to it; one over its hourly budget is switched off.
+      let dropped = false;
+      const limit = content.balance.K.engine.packEventsPerHour;
+      for (const [system, wait] of packWaits) {
+        const pack = originOf(system);
+        if (wait === next && pack !== undefined && chargeEvent(state, system, pack, limit)) {
+          dropped = true;
+        }
+      }
+      if (dropped) continue;
+    }
+    // Only steps that core systems asked for at +0 ms count as a stall; a system of a pack has its own limit.
+    stalled = (guarded ? coreZero : next === 0) ? stalled + 1 : 0;
     if (stalled > STALL_LIMIT) {
       throw new Error('advance made no progress: a system keeps asking for time 0');
     }
-    elapse(state, next, content, rules);
+    if (guarded && next > 0) zeros.clear();
+    elapse(state, next, content, rules, guarded);
     remaining -= next;
-    for (const system of rules.systems) system.run(state, content, rules);
+    for (const system of rules.systems) {
+      if (!guarded) system.run(state, content, rules);
+      else if (!isDisabled(state, system)) {
+        callSystem(state, system, () => system.run(state, content, rules), undefined);
+      }
+    }
   }
-  elapse(state, remaining, content, rules);
+  elapse(state, remaining, content, rules, guarded);
+  if (guarded) {
+    for (const notice of takeNotices()) emit(state, { type: 'ruleDisabled', ...notice });
+  }
 }
 
-function elapse(state: GameState, dt: number, content: ContentDb, rules: Rules): void {
+function elapse(
+  state: GameState,
+  dt: number,
+  content: ContentDb,
+  rules: Rules,
+  guarded: boolean,
+): void {
   if (dt === 0) return;
-  for (const system of rules.systems) system.elapse?.(state, dt, content, rules);
+  for (const system of rules.systems) {
+    if (!guarded) system.elapse?.(state, dt, content, rules);
+    else if (!isDisabled(state, system)) {
+      callSystem(state, system, () => system.elapse?.(state, dt, content, rules), undefined);
+    }
+  }
   state.now += dt;
 }
 
@@ -152,7 +233,7 @@ function startAction(
 ): CommandResult {
   const slot = state.slots[slotIndex];
   if (!slot) return { ok: false, reason: 'error.invalidSlot' };
-  const kind = Object.hasOwn(rules.actionKinds, kindName) ? rules.actionKinds[kindName] : undefined;
+  const kind = actionKindOf(rules, kindName);
   if (!kind) return { ok: false, reason: 'error.unknownActionKind' };
   if (!kind.has(id, content)) return { ok: false, reason: 'error.unknownAction' };
   // A skill that is still shut refuses every action it would train, whatever else holds.
@@ -180,21 +261,36 @@ function startAction(
 /** Whether a goal reference names an entity the content has, of a kind that can be pinned. */
 function goalExists(ref: EntityRef, content: ContentDb): boolean {
   if (typeof ref !== 'object' || ref === null || typeof ref.id !== 'string') return false;
-  const index = indexOf(content);
-  switch (ref.kind) {
-    case 'technique':
-      return index.techniques.has(ref.id);
-    case 'skill':
-      return content.skills.some((s) => s.id === ref.id);
-    case 'item':
-      return index.items.has(ref.id);
-    case 'enemy':
-      return index.enemies.has(ref.id);
-    case 'quest':
-      return index.quests.has(ref.id);
-    default:
-      return false;
+  // The kinds that can be pinned are the kinds of the content that have a list to look the id up in.
+  const list = content.entityKinds.find((k) => k.id === ref.kind)?.list;
+  if (list === null || list === undefined || !PINNABLE.has(list)) return false;
+  const entities = (content as unknown as Record<string, readonly { id: string }[]>)[list];
+  return Array.isArray(entities) && entities.some((e) => e.id === ref.id);
+}
+
+/** The lists of entities that a goal may point at. */
+const PINNABLE: ReadonlySet<string> = new Set([
+  'techniques',
+  'skills',
+  'items',
+  'enemies',
+  'quests',
+]);
+
+/** Starts the sensei test of the exam that grants `rank`. */
+function startExam(
+  state: GameState,
+  rank: unknown,
+  slot: number | undefined,
+  content: ContentDb,
+  rules: Rules,
+): CommandResult {
+  const exam = typeof rank === 'string' ? examFor(content, rank) : undefined;
+  if (!exam) return { ok: false, reason: 'error.examNotAvailable' };
+  if (rankIndex(content, state.player.rank) >= rankIndex(content, exam.rank)) {
+    return { ok: false, reason: 'error.examPassed' };
   }
+  return startAction(state, slot ?? 0, SENSEI_TEST_KIND, exam.id, content, rules);
 }
 
 /** Applies a command to the state. Failures carry a localization key. */
@@ -225,13 +321,12 @@ function apply(
       stopSlot(state, command.slot, 'manual', content, rules);
       return { ok: true };
     }
+    case 'exam.start':
+      return startExam(state, command.rank, command.slot, content, rules);
     case 'exam.genin.start': {
-      const exam = examFor(content, 'genin');
-      if (!exam) return { ok: false, reason: 'error.examNotAvailable' };
-      if (RANK_ORDER.indexOf(state.player.rank) >= RANK_ORDER.indexOf(exam.rank)) {
-        return { ok: false, reason: 'error.examPassed' };
-      }
-      return startAction(state, command.slot ?? 0, SENSEI_TEST_KIND, exam.id, content, rules);
+      const graduation = indexOf(content).graduateRank;
+      if (graduation === null) return { ok: false, reason: 'error.examNotAvailable' };
+      return startExam(state, graduation, command.slot, content, rules);
     }
     case 'item.use':
       return useItem(state, command.id, command.target, content, rules);
@@ -290,7 +385,7 @@ function apply(
     case 'pouch.medic':
       return setMedicSlot(state, command.slot, content);
     case 'nature.choose':
-      return chooseNature(state, command.nature);
+      return chooseNature(state, command.nature, content);
     case 'nature.add':
       return addNature(state, command.nature, content);
     case 'world.travel':
@@ -306,7 +401,7 @@ function apply(
     case 'village.workforce':
       return spendWorkforce(state);
     case 'village.donate':
-      return donateToTreasury(state, command.ryo);
+      return donateToTreasury(state, command.ryo, content);
     default:
       return { ok: false, reason: 'error.unknownCommand' };
   }

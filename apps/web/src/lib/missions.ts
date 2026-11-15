@@ -234,6 +234,7 @@ export function rewardsOf(forecast: MissionForecast, content: ContentDb): Reward
   for (const pay of forecast.pay) {
     if (pay.kind === 'item') items2.push({ t: 'item', id: pay.item, n: pay.n, chance: 1 });
     else if (pay.kind === 'intel') amounts.intel = (amounts.intel ?? 0) + pay.n;
+    else if (pay.kind === 'currency') amounts[pay.currency] = (amounts[pay.currency] ?? 0) + pay.n;
     else {
       const part = scrollPartId(pay.technique);
       if (items.has(part)) {

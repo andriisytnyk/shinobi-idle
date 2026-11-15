@@ -32,7 +32,7 @@ export function player(opts: PlayerOptions = {}): GameState {
   const natures = opts.natures ?? [];
   state.player.natures = natures;
   const [native] = natures;
-  state.team = native && opts.team !== false ? teamFor(native) : null;
+  state.team = native && opts.team !== false ? teamFor(content, native) : null;
   for (const skill of content.skills) {
     state.skills[skill.id].xp = xpAt(opts.levels?.[skill.id] ?? opts.base ?? 1);
   }

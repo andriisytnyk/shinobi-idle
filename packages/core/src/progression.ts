@@ -1,4 +1,4 @@
-import type { ContentDb, SkillId } from '@shinobi/content';
+import type { ContentDb } from '@shinobi/content';
 import { emit } from './events.ts';
 import { masteryLevel, poolCapacity, poolGain } from './formulas.ts';
 import { indexOf } from './lookup.ts';
@@ -6,6 +6,7 @@ import { computeMod } from './modifiers.ts';
 import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 import { refreshUnlocks } from './unlocks.ts';
+import { isAcademyRank, poolEntry, skillEntry } from './vocab.ts';
 import { levelAt, xpAt } from './xp.ts';
 
 /**
@@ -16,21 +17,22 @@ import { levelAt, xpAt } from './xp.ts';
  */
 export function xpGain(
   state: GameState,
-  skill: SkillId,
+  skill: string,
   amount: number,
   content: ContentDb,
   rules: Rules,
 ): number {
   if (!(amount > 0)) return 0;
   const K = content.balance.K;
-  const entry = state.skills[skill];
+  const entry = skillEntry(state, skill);
+  if (!entry) return 0;
   const mods = rules.modifierProviders;
   const raw =
     amount *
     computeMod(mods, state, 'xp.all', content).total *
     computeMod(mods, state, `xp.skill.${skill}`, content).total;
   let gained = raw;
-  if (state.player.rank === 'student') {
+  if (isAcademyRank(content, state.player.rank)) {
     const room = Math.max(0, xpAt(K.academyCap) - entry.xp);
     gained = raw <= room ? raw : room + (raw - room) * K.academySlow;
   }
@@ -42,14 +44,15 @@ export function xpGain(
  */
 export function gainXp(
   state: GameState,
-  skill: SkillId,
+  skill: string,
   amount: number,
   content: ContentDb,
   rules: Rules,
 ): void {
   if (!(amount > 0)) return;
   const cap = content.balance.K.cap;
-  const entry = state.skills[skill];
+  const entry = skillEntry(state, skill);
+  if (!entry) return;
   const before = levelAt(entry.xp, cap);
   entry.xp = Math.min(entry.xp + xpGain(state, skill, amount, content, rules), xpAt(cap));
   const after = levelAt(entry.xp, cap);
@@ -80,13 +83,14 @@ export function gainMasteryXp(
 /** Adds pool XP, clamped to the skill's capacity. Emits `poolCheckpoint` for each threshold crossed. */
 export function gainPoolXp(
   state: GameState,
-  skill: SkillId,
+  skill: string,
   amount: number,
   content: ContentDb,
 ): void {
   const capacity = poolCapacity(skill, content);
   if (!(amount > 0) || capacity <= 0) return;
-  const pool = state.pools[skill];
+  const pool = poolEntry(state, skill);
+  if (!pool) return;
   const before = pool.xp;
   pool.xp = Math.min(before + amount, capacity);
   for (const checkpoint of indexOf(content).poolCheckpoints.get(skill) ?? []) {
@@ -105,7 +109,7 @@ export function gainPoolXp(
 export function grantMastery(
   state: GameState,
   key: string,
-  skill: SkillId,
+  skill: string,
   amount: number,
   content: ContentDb,
   rules?: Rules,

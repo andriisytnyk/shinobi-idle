@@ -75,6 +75,6 @@ describe('A9: getMod', () => {
       mod({ key: 'xp.all', value: 1, group: 'village' }),
     ]);
     gainXp(s, 'tai', 100, content, rules);
-    expect(s.skills.tai.xp).toBe(300);
+    expect(s.skills.tai!.xp).toBe(300);
   });
 });
