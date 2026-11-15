@@ -430,24 +430,51 @@ describe('the observer costs little (A13)', () => {
     return best;
   }
 
+  /** The best time of each set-up over alternating rounds, so that noise on the machine cancels out. */
+  async function compare(loaded: UiPack[]): Promise<[number, number]> {
+    await time([coreUi]);
+    let without = Infinity;
+    let withPack = Infinity;
+    for (let round = 0; round < 5; round++) {
+      // The order alternates: whatever the first run leaves behind (garbage, toasts) must not favour either.
+      for (const isLoaded of round % 2 === 0 ? [false, true] : [true, false]) {
+        const ms = await time(isLoaded ? loaded : [coreUi]);
+        if (isLoaded) withPack = Math.min(withPack, ms);
+        else without = Math.min(without, ms);
+      }
+    }
+    return [without, withPack];
+  }
+
+  /** A pack that only injects a line into every action tile: the cost of observing and mounting. */
+  const observerOnly: UiPack = {
+    id: 'observer',
+    start: (api) =>
+      api.dom.observe({ part: 'action-tile' }, (el) => {
+        const line = document.createElement('p');
+        line.textContent = el.getAttribute('data-entity');
+        el.append(line);
+        return () => line.remove();
+      }),
+  };
+
   it(
-    '200 store updates on the skill page stay within +20% with the fixture loaded',
+    'the observer adds at most 20% to 200 store updates on the skill page',
     { timeout: 240_000, retry: 2 },
     async () => {
-      // Alternates the two set-ups and keeps the best of each, so that noise on the machine cancels out.
-      await time([coreUi]);
-      let without = Infinity;
-      let withPack = Infinity;
-      for (let round = 0; round < 5; round++) {
-        // The order alternates: whatever the first run leaves behind (garbage, toasts) must not favour either.
-        for (const loaded of round % 2 === 0 ? [false, true] : [true, false]) {
-          const ms = await time(loaded ? [coreUi, testmodUi] : [coreUi]);
-          if (loaded) withPack = Math.min(withPack, ms);
-          else without = Math.min(without, ms);
-        }
-      }
-      console.info(`200 updates: ${without.toFixed(1)} ms without, ${withPack.toFixed(1)} ms with`);
+      const [without, withPack] = await compare([coreUi, observerOnly]);
+      console.info(`observer: ${without.toFixed(1)} ms without, ${withPack.toFixed(1)} ms with`);
       expect(withPack).toBeLessThanOrEqual(without * 1.2);
+    },
+  );
+
+  it(
+    'the whole fixture, with its own computing, stays within +50% (it recounts XP rates on every update)',
+    { timeout: 240_000, retry: 2 },
+    async () => {
+      const [without, withPack] = await compare([coreUi, testmodUi]);
+      console.info(`fixture: ${without.toFixed(1)} ms without, ${withPack.toFixed(1)} ms with`);
+      expect(withPack).toBeLessThanOrEqual(without * 1.5);
     },
   );
 });
