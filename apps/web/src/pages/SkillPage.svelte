@@ -11,6 +11,7 @@
   import PoolBar from '../components/PoolBar.svelte';
   import RecipeTile from '../components/RecipeTile.svelte';
   import ReqTree from '../components/ReqTree.svelte';
+  import ScoutPanel from '../components/ScoutPanel.svelte';
   import { entityDesc, entityName } from '../lib/entities.ts';
   import { hasKey, t } from '../lib/i18n.ts';
   import { skillProgress } from '../lib/progress.ts';
@@ -95,7 +96,9 @@
       </section>
     {/if}
 
-    {#if id === 'ath'}
+    {#if id === 'scout'}
+      <ScoutPanel />
+    {:else if id === 'ath'}
       <CoursePanel />
     {:else if actions.length > 0}
       <section>

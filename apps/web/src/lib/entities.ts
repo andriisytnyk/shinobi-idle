@@ -40,6 +40,8 @@ const ACTION_ENTITY: Readonly<Record<string, EntityKind>> = {
   craft: 'recipe',
   fight: 'enemy',
   senseiTest: 'exam',
+  explore: 'cell',
+  walk: 'cell',
 };
 
 export function actionRef(action: { kind: string; id: string }): EntityRef {

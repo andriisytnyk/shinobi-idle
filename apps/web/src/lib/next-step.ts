@@ -47,6 +47,22 @@ function firstUnmet(node: ReqResult): ReqResult | null {
   return node;
 }
 
+/** The world page focused on what a map flag is about: a point of interest, a deposit or a region; null for other flags. */
+export function flagPage(id: string, content: ContentDb): string | null {
+  if (id.startsWith('poi.')) {
+    const poi = id.slice('poi.'.length);
+    const cell = content.cells.find((c) => c.pois.some((p) => p.id === poi));
+    return cell ? hrefFor({ kind: 'cell', id: cell.id }) : '#/world';
+  }
+  const region = /^region.([^.]+).unlocked$/.exec(id);
+  if (region) {
+    const found = content.regions.find((r) => r.id === `core:${region[1]}`);
+    return found ? hrefFor({ kind: 'region', id: found.id }) : '#/world';
+  }
+  if (id.startsWith('deposit.')) return '#/world';
+  return null;
+}
+
 /** The page where an unmet requirement row is worked on. */
 function pageFor(state: GameState, node: ReqResult, content: ContentDb): string {
   const req = node.req;
@@ -69,7 +85,7 @@ function pageFor(state: GameState, node: ReqResult, content: ContentDb): string 
     case 'item':
       return itemPlace(req.id, content) ?? '#/bank';
     case 'flag':
-      return req.id === 'firstFight' ? '#/combat' : '#/quests';
+      return flagPage(req.id, content) ?? (req.id === 'firstFight' ? '#/combat' : '#/quests');
     default:
       return '#/quests';
   }
@@ -82,7 +98,12 @@ export function objectiveTarget(
   content: ContentDb,
 ): string {
   if (objective.t === 'counter') {
-    return counterEnemy(objective.counter) !== null ? '#/combat' : '#/quests';
+    if (counterEnemy(objective.counter) !== null) return '#/combat';
+    // Cells of a region explored: the world page on that region.
+    if (objective.counter.startsWith('explored.')) {
+      return hrefFor({ kind: 'region', id: objective.counter.slice('explored.'.length) });
+    }
+    return '#/quests';
   }
   const open = firstUnmet(evalReq(state, objective.req, content));
   return open ? pageFor(state, open, content) : '#/quests';
@@ -118,6 +139,8 @@ export function nextStep(state: GameState, content: ContentDb): NextStep | null 
 export function navTarget(hash: string): { nav: string; skill: string | null } {
   const [, first = '', id = ''] = hash.split('/');
   if (first === 'skill') return { nav: 'skills', skill: decodeURIComponent(id) };
+  if (first === 'cell' || first === 'region' || first === 'poi')
+    return { nav: 'world', skill: null };
   return { nav: first, skill: null };
 }
 
