@@ -42,33 +42,40 @@ export function layerTechniques(base: TechniqueBase[], combat: CombatMap) {
   return base.map((t) => ({ ...t, combat: combat[t.id] ?? null }));
 }
 
-function loot(e: EnemyBase | BossBase, data: EnemyMap[string] | undefined, k: K, boss: boolean) {
+function loot(e: EnemyBase | BossBase, data: EnemyMap[string] | undefined, k: K) {
   if (data === undefined) throw new Error(`No combat data for ${e.id}`);
   const first = k.bounty[slug(e.id)];
   return {
     style: data.style,
     drops: data.drops.map((d) => ({ item: d.item, chance: k.dropChance[d.chance] })),
     ryo: [Math.round(e.cl * k.ryoDrop[0]), Math.round(e.cl * k.ryoDrop[1])] as [number, number],
-    scrollPart:
-      e.carries === null
-        ? null
-        : {
-            item: scrollPartId(e.carries),
-            technique: e.carries,
-            ...(boss ? { count: k.partDrop.boss } : { chance: k.partDrop.carrier }),
-          },
     bounty: first === undefined ? null : { first, repeatShare: k.bountyRepeat },
   };
 }
 
 export function layerEnemies(base: EnemyBase[], data: EnemyMap, k: K) {
-  return base.map((e) => ({ ...e, ...loot(e, data[e.id], k, false) }));
+  return base.map((e) => ({
+    ...e,
+    ...loot(e, data[e.id], k),
+    scrollPart:
+      e.carries === null
+        ? null
+        : { item: scrollPartId(e.carries), technique: e.carries, chance: k.partDrop.carrier },
+  }));
 }
 
 export function layerBosses(base: BossBase[], data: EnemyMap, specials: SpecialMap, k: K) {
   return base.map((b) => {
     const special = specials[b.id];
     if (special === undefined) throw new Error(`No special for boss ${b.id}`);
-    return { ...b, ...loot(b, data[b.id], k, true), special };
+    return {
+      ...b,
+      ...loot(b, data[b.id], k),
+      scrollPart:
+        b.carries === null
+          ? null
+          : { item: scrollPartId(b.carries), technique: b.carries, count: k.partDrop.boss },
+      special,
+    };
   });
 }

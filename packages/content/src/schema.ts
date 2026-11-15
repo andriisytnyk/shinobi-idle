@@ -306,26 +306,22 @@ export const enemyCombatDataSchema = z.strictObject({
   drops: z.array(z.strictObject({ item: coreId, chance: z.enum(TROPHY_KEYS) })),
 });
 
-/** What an enemy leaves behind. Everything here is derived from the balance object at load. */
-const enemyLootSchema = z.strictObject({
+/** What an enemy leaves behind, apart from the scroll part. Everything here is derived from the balance object at load. */
+const enemyLootShape = {
   style: z.enum(ATTACK_STYLES),
   drops: z.array(z.strictObject({ item: coreId, chance: z.number().gt(0).lt(1) })),
   /** Ryo range of one kill: combat level times the `K.ryoDrop` range. */
   ryo: z.tuple([z.number().int().min(1), z.number().int().min(1)]),
-  /** A scroll part of the carried technique: by chance for an enemy, by count for a boss. */
-  scrollPart: z
-    .strictObject({
-      item: coreId,
-      technique: coreId,
-      chance: z.number().gt(0).lt(1).optional(),
-      count: z.number().int().min(1).optional(),
-    })
-    .nullable(),
   /** First-kill bounty of a boss and the share paid for repeats; `null` without a bounty. */
   bounty: z.strictObject({ first: z.number().int().min(1), repeatShare: z.number() }).nullable(),
-});
+};
+const partBase = { item: coreId, technique: coreId };
 
-export const enemySchema = enemyBaseSchema.extend(enemyLootSchema.shape);
+export const enemySchema = enemyBaseSchema.extend({
+  ...enemyLootShape,
+  /** A scroll part of the carried technique, dropped by chance. */
+  scrollPart: z.strictObject({ ...partBase, chance: z.number().gt(0).lt(1) }).nullable(),
+});
 
 /** A boss special: the structure is data, the numbers come from `K.bossFx` by `fx`. */
 export const bossSpecialSchema = z.discriminatedUnion('kind', [
@@ -350,7 +346,10 @@ export const bossSpecialSchema = z.discriminatedUnion('kind', [
   z.strictObject({ kind: z.literal('illusion'), fx: z.literal('illusion') }),
 ]);
 
-export const bossSchema = bossBaseSchema.extend(enemyLootSchema.shape).extend({
+export const bossSchema = bossBaseSchema.extend({
+  ...enemyLootShape,
+  /** A scroll part of the carried technique, dropped in a fixed count. */
+  scrollPart: z.strictObject({ ...partBase, count: z.number().int().min(1) }).nullable(),
   special: bossSpecialSchema,
 });
 
@@ -470,7 +469,10 @@ export const examSchema = z.strictObject({
 
 // ---------- combat world: zones, operations, statuses, traits, combos ----------
 
-/** A place where one enemy is fought over and over. */
+/**
+ * A place where one enemy is fought over and over. A zone has no name or description of its own:
+ * it shows the name and description of its enemy.
+ */
 export const zoneSchema = z.strictObject({
   id: coreId,
   enemy: coreId,

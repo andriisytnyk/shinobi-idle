@@ -8,6 +8,8 @@ function descProblems(text: string | undefined): string[] {
   const problems: string[] = [];
   if (text.trim().length < 20) problems.push('shorter than 20 characters');
   if (/todo|tbd|lorem|fixme|xxx/i.test(text)) problems.push('placeholder');
+  if (/[0-9]/.test(text)) problems.push('contains a number');
+  if (/[A-Za-z]{3,}/.test(text)) problems.push('contains Latin words');
   if (!/[а-яіїєґ]/i.test(text)) problems.push('no Ukrainian letters');
   const sentences = text.split(/[.!?…]+(?=\s|$)/).filter((s) => s.trim() !== '');
   if (sentences.length > 2) problems.push(`${sentences.length} sentences`);
@@ -29,6 +31,8 @@ const KINDS: [string, readonly { id: string }[]][] = [
   ['operation', content.operations],
 ];
 
+/** A zone is exempt from own texts: it shows the name and description of its enemy. */
+
 describe('description rules', () => {
   it('reject empty, short, placeholder, Latin-only and long texts', () => {
     expect(descProblems(undefined)).toContain('empty');
@@ -39,6 +43,10 @@ describe('description rules', () => {
       'no Ukrainian letters',
     );
     expect(descProblems('Перше речення. Друге речення. Третє речення.')).toContain('3 sentences');
+    expect(descProblems('Станеться через 5 секунд після удару.')).toContain('contains a number');
+    expect(descProblems('Blood Increasing Pill для відновлення сил.')).toContain(
+      'contains Latin words',
+    );
     expect(descProblems('Одне речення про щось корисне. І ще одне речення.')).toEqual([]);
   });
 });
@@ -68,4 +76,16 @@ describe('descriptions of content entities', () => {
       }
     });
   }
+
+  it('lets a zone borrow the name and description of its enemy', () => {
+    const all = new Map([...content.enemies, ...content.bosses].map((e) => [e.id, e.id]));
+    const kindOf = (id: string) => (content.bosses.some((b) => b.id === id) ? 'boss' : 'enemy');
+    for (const z of content.zones) {
+      expect(all.has(z.enemy), `zone ${z.id}: enemy ${z.enemy}`).toBe(true);
+      const kind = kindOf(z.enemy);
+      expect(descProblems(ukLocale[`${kind}.${z.enemy}.desc`]), z.id).toEqual([]);
+      expect(ukLocale[`${kind}.${z.enemy}.name`], z.id).toBeTruthy();
+      expect(ukLocale[`zone.${z.id}.name`], z.id).toBeUndefined();
+    }
+  });
 });

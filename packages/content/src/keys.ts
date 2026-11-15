@@ -23,7 +23,6 @@ export type LocaleKind =
   | 'state'
   | 'status'
   | 'combo'
-  | 'zone'
   | 'operation'
   | 'exam'
   | 'quest'

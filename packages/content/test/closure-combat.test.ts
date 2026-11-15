@@ -3,6 +3,10 @@
  * scrolls, statuses, traits and combos. A failing test names the offending entity.
  */
 import { describe, expect, it } from 'vitest';
+import handBossSpecials from '../src/data/hand/boss-specials.json' with { type: 'json' };
+import handEnemyCombat from '../src/data/hand/enemy-combat.json' with { type: 'json' };
+import handItemEcon from '../src/data/hand/item-econ.json' with { type: 'json' };
+import handTechniqueCombat from '../src/data/hand/technique-combat.json' with { type: 'json' };
 import idRegistry from '../src/data/id-registry.json' with { type: 'json' };
 import {
   COMBO_IDS,
@@ -375,5 +379,24 @@ describe('statuses, traits and combos', () => {
   it('lists the four combos with their numbers in the balance object', () => {
     expect(content.combos.map((c) => c.id)).toEqual([...COMBO_IDS]);
     for (const c of content.combos) expect(K.combo, c.id).toHaveProperty(c.id);
+  });
+});
+
+describe('hand-written maps', () => {
+  const orphans = (map: object, known: Iterable<string>) => {
+    const set = new Set(known);
+    return Object.keys(map).filter((id) => !set.has(id));
+  };
+
+  it('refer only to existing entities', () => {
+    expect(orphans(handTechniqueCombat, techById.keys())).toEqual([]);
+    expect(orphans(handEnemyCombat, enemyIds)).toEqual([]);
+    expect(
+      orphans(
+        handBossSpecials,
+        content.bosses.map((b) => b.id),
+      ),
+    ).toEqual([]);
+    expect(orphans(handItemEcon, itemById.keys())).toEqual([]);
   });
 });
