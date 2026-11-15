@@ -1,5 +1,5 @@
 /** Structured modifiers: pool checkpoints switch on at their share, and every wired key changes its mechanic by exactly the modifier. */
-import { MODIFIER_KEYS, content } from '@shinobi/content';
+import { MODIFIER_KEYS, content, type SkillId } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
   advance,
@@ -40,7 +40,7 @@ const ONIGIRI = 'core:onihiri';
 const CLEAR_MIND = 'core:tonik_iasnoho_rozumu';
 
 /** Fills a skill's pool to exactly `pct` percent of its capacity, the threshold a checkpoint names. */
-function reach(state: GameState, skill: Parameters<typeof poolCapacity>[0], pct: number): void {
+function reach(state: GameState, skill: SkillId, pct: number): void {
   state.pools[skill].xp = (poolCapacity(skill, content) * pct) / 100;
 }
 

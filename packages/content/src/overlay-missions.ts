@@ -34,7 +34,8 @@ export function layerMissions(
       stages: m.stages.map((s) => (s.t === 'skill' || s.t === 'tech' ? { ...s, label: true } : s)),
       pay: m.pay.map((p, i) => {
         const n = x.pay[i] ?? 1;
-        return p.kind === 'scrollPart' ? p : { ...p, n };
+        // A part of a scroll drops by the chance `K.partDrop.mission`.
+        return p.kind === 'scrollPart' ? { ...p, chance: 'mission' } : { ...p, n };
       }),
       unlock: x.unlock,
       shares: x.shares,

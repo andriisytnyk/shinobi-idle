@@ -1,5 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
-import { rebalanceShares, stopSlot } from './actions.ts';
+import { actionKindOf, rebalanceShares, stopSlot } from './actions.ts';
 import {
   deleteSavedLoadout,
   loadSavedLoadout,
@@ -16,6 +16,7 @@ import { combineParts } from './scrolls.ts';
 import type { EntityRef } from './entity.ts';
 import { emit } from './events.ts';
 import { examFor, SENSEI_TEST_KIND } from './exam.ts';
+import { rankIndex } from './vocab.ts';
 import { buyGear } from './gear.ts';
 import { coatItem, useItem } from './items.ts';
 import { indexOf } from './lookup.ts';
@@ -23,7 +24,7 @@ import { buyMeditationLevel } from './meditation.ts';
 import { addNature, chooseNature, type NatureChoice } from './natures.ts';
 import { shopBuy, shopSell } from './shop.ts';
 import { updateQuests } from './quests.ts';
-import { evalReq, RANK_ORDER, type ReqResult } from './requirements.ts';
+import { evalReq, type ReqResult } from './requirements.ts';
 import { defaultRules, type Rules } from './rules.ts';
 import { isSkillUnlocked } from './selectors.ts';
 import type { GameState } from './state.ts';
@@ -34,7 +35,9 @@ import { claimPoi, travelInstant, WALK_KIND } from './world.ts';
 export type Command =
   | { type: 'action.start'; slot: number; kind: string; id: string }
   | { type: 'action.stop'; slot: number }
-  /** Starts the Genin exam's sensei test; the checklist must be met. `slot` defaults to 0. */
+  /** Starts the sensei test of the exam that grants `rank`; the checklist must be met. `slot` defaults to 0. */
+  | { type: 'exam.start'; rank: string; slot?: number }
+  /** The exam that grants the first rank after the Academy; kept for the code that began with it. Same as `exam.start` for that rank. */
   | { type: 'exam.genin.start'; slot?: number }
   /** Uses a bank item on a target (for the graduate scroll, an academy technique id). */
   | { type: 'item.use'; id: string; target?: string | undefined }
@@ -152,7 +155,7 @@ function startAction(
 ): CommandResult {
   const slot = state.slots[slotIndex];
   if (!slot) return { ok: false, reason: 'error.invalidSlot' };
-  const kind = Object.hasOwn(rules.actionKinds, kindName) ? rules.actionKinds[kindName] : undefined;
+  const kind = actionKindOf(rules, kindName);
   if (!kind) return { ok: false, reason: 'error.unknownActionKind' };
   if (!kind.has(id, content)) return { ok: false, reason: 'error.unknownAction' };
   // A skill that is still shut refuses every action it would train, whatever else holds.
@@ -180,21 +183,36 @@ function startAction(
 /** Whether a goal reference names an entity the content has, of a kind that can be pinned. */
 function goalExists(ref: EntityRef, content: ContentDb): boolean {
   if (typeof ref !== 'object' || ref === null || typeof ref.id !== 'string') return false;
-  const index = indexOf(content);
-  switch (ref.kind) {
-    case 'technique':
-      return index.techniques.has(ref.id);
-    case 'skill':
-      return content.skills.some((s) => s.id === ref.id);
-    case 'item':
-      return index.items.has(ref.id);
-    case 'enemy':
-      return index.enemies.has(ref.id);
-    case 'quest':
-      return index.quests.has(ref.id);
-    default:
-      return false;
+  // The kinds that can be pinned are the kinds of the content that have a list to look the id up in.
+  const list = content.entityKinds.find((k) => k.id === ref.kind)?.list;
+  if (list === null || list === undefined || !PINNABLE.has(list)) return false;
+  const entities = (content as unknown as Record<string, readonly { id: string }[]>)[list];
+  return Array.isArray(entities) && entities.some((e) => e.id === ref.id);
+}
+
+/** The lists of entities that a goal may point at. */
+const PINNABLE: ReadonlySet<string> = new Set([
+  'techniques',
+  'skills',
+  'items',
+  'enemies',
+  'quests',
+]);
+
+/** Starts the sensei test of the exam that grants `rank`. */
+function startExam(
+  state: GameState,
+  rank: unknown,
+  slot: number | undefined,
+  content: ContentDb,
+  rules: Rules,
+): CommandResult {
+  const exam = typeof rank === 'string' ? examFor(content, rank) : undefined;
+  if (!exam) return { ok: false, reason: 'error.examNotAvailable' };
+  if (rankIndex(content, state.player.rank) >= rankIndex(content, exam.rank)) {
+    return { ok: false, reason: 'error.examPassed' };
   }
+  return startAction(state, slot ?? 0, SENSEI_TEST_KIND, exam.id, content, rules);
 }
 
 /** Applies a command to the state. Failures carry a localization key. */
@@ -225,13 +243,12 @@ function apply(
       stopSlot(state, command.slot, 'manual', content, rules);
       return { ok: true };
     }
+    case 'exam.start':
+      return startExam(state, command.rank, command.slot, content, rules);
     case 'exam.genin.start': {
-      const exam = examFor(content, 'genin');
-      if (!exam) return { ok: false, reason: 'error.examNotAvailable' };
-      if (RANK_ORDER.indexOf(state.player.rank) >= RANK_ORDER.indexOf(exam.rank)) {
-        return { ok: false, reason: 'error.examPassed' };
-      }
-      return startAction(state, command.slot ?? 0, SENSEI_TEST_KIND, exam.id, content, rules);
+      const graduation = indexOf(content).graduateRank;
+      if (graduation === null) return { ok: false, reason: 'error.examNotAvailable' };
+      return startExam(state, graduation, command.slot, content, rules);
     }
     case 'item.use':
       return useItem(state, command.id, command.target, content, rules);
@@ -290,7 +307,7 @@ function apply(
     case 'pouch.medic':
       return setMedicSlot(state, command.slot, content);
     case 'nature.choose':
-      return chooseNature(state, command.nature);
+      return chooseNature(state, command.nature, content);
     case 'nature.add':
       return addNature(state, command.nature, content);
     case 'world.travel':
@@ -306,7 +323,7 @@ function apply(
     case 'village.workforce':
       return spendWorkforce(state);
     case 'village.donate':
-      return donateToTreasury(state, command.ryo);
+      return donateToTreasury(state, command.ryo, content);
     default:
       return { ok: false, reason: 'error.unknownCommand' };
   }

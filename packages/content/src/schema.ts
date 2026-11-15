@@ -406,11 +406,11 @@ export const missionBasePaySchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('scrollPart'), technique: coreId }),
 ]);
 
-/** A payment in kind with its amount; a scroll part is a chance (`K.partDrop.mission`) of one part. */
+/** A payment in kind with its amount; a scroll part is a chance (the `K.partDrop` entry `chance` names) of one part. */
 export const missionPaySchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('item'), item: coreId, n: z.number().int().min(1) }),
   z.object({ kind: z.literal('intel'), n: z.number().int().min(1) }),
-  z.object({ kind: z.literal('scrollPart'), technique: coreId }),
+  z.object({ kind: z.literal('scrollPart'), technique: coreId, chance: idOf('partChance') }),
 ]);
 
 /** The mission as the importer generates it. */
@@ -1299,6 +1299,11 @@ export const generatedDbSchema = contentDbSchema
 export type GeneratedDb = z.infer<typeof generatedDbSchema>;
 
 export type Skill = z.infer<typeof skillSchema>;
+export type Nature = z.infer<typeof natureSchema>;
+export type PlayerRankData = z.infer<typeof playerRankSchema>;
+export type CurrencyData = z.infer<typeof currencySchema>;
+export type VillageStageData = z.infer<typeof villageStageSchema>;
+export type EntityKindData = z.infer<typeof entityKindSchema>;
 export type Seal = z.infer<typeof sealSchema>;
 export type Technique = z.infer<typeof techniqueSchema>;
 export type TechniqueBase = z.infer<typeof techniqueBaseSchema>;

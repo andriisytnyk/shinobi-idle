@@ -276,8 +276,8 @@ describe('A4: the team natures', () => {
   ];
   for (const [native, rival, aya] of rules) {
     it(`for a native ${native}: rival ${rival}, Aya ${aya}`, () => {
-      expect(rivalNatureFor(native)).toBe(rival);
-      expect(ayaNatureFor(native)).toBe(aya);
+      expect(rivalNatureFor(content, native)).toBe(rival);
+      expect(ayaNatureFor(content, native)).toBe(aya);
       const s = genin();
       expect(rivalNature(s)).toBeNull();
       expect(ayaNature(s)).toBeNull();

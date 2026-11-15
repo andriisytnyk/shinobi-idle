@@ -1,10 +1,11 @@
 import type { ContentDb, Gear } from '@shinobi/content';
 import { removeCurrency } from './bank.ts';
 import type { CommandResult } from './engine.ts';
-import { indexOf } from './lookup.ts';
+import { graduateReq, indexOf } from './lookup.ts';
 import type { Modifier, ModifierProvider } from './modifiers.ts';
 import { evalReq, type Req } from './requirements.ts';
 import type { GameState } from './state.ts';
+import { moneyOf } from './vocab.ts';
 
 /** Tiers of a gear line the player owns. */
 export function ownedTiers(state: GameState, line: string): number {
@@ -12,16 +13,13 @@ export function ownedTiers(state: GameState, line: string): number {
 }
 
 /**
- * What the next tier of a line needs: the rank of Genin, the tier's skill level, and its building level when it has
- * one.
+ * What the next tier of a line needs: graduation from the Academy, the tier's skill level, and its building level
+ * when it has one.
  */
-export function nextTierReq(state: GameState, gear: Gear): Req | null {
+export function nextTierReq(state: GameState, gear: Gear, content: ContentDb): Req | null {
   const tier = gear.tiers[ownedTiers(state, gear.id)];
   if (!tier) return null;
-  const parts: Req[] = [
-    { t: 'rank', rank: 'genin' },
-    { t: 'skill', skill: gear.skill, level: tier.level },
-  ];
+  const parts: Req[] = [graduateReq(content), { t: 'skill', skill: gear.skill, level: tier.level }];
   if (tier.building)
     parts.push({ t: 'building', id: tier.building.id, level: tier.building.level });
   return { t: 'all', of: parts };
@@ -39,7 +37,7 @@ export const gearProvider: ModifierProvider = (state, content) => {
   for (const [id, tiers] of Object.entries(state.gear)) {
     const line = index.gear.get(id);
     if (!line || tiers < 1) continue;
-    const size = content.balance.K.gearFx[line.fx.perTier] * tiers;
+    const size = (content.balance.K.gearFx[line.fx.perTier] ?? 0) * tiers;
     const base = { key: line.fx.key, group: 'items', source: { kind: 'gear', id } } as const;
     switch (line.fx.effect) {
       case 'bonus':
@@ -60,11 +58,12 @@ export const gearProvider: ModifierProvider = (state, content) => {
 export function buyGear(state: GameState, lineId: string, content: ContentDb): CommandResult {
   const line = indexOf(content).gear.get(lineId);
   if (!line) return { ok: false, reason: 'error.unknownGear' };
-  const req = nextTierReq(state, line);
+  const req = nextTierReq(state, line, content);
   const price = nextTierPrice(state, line, content);
   if (!req || price === null) return { ok: false, reason: 'error.gearMaxed' };
   if (!evalReq(state, req, content).met) return { ok: false, reason: 'error.requirementsNotMet' };
-  if (!removeCurrency(state, 'ryo', price)) return { ok: false, reason: 'error.notEnoughRyo' };
+  if (!removeCurrency(state, moneyOf(content), price))
+    return { ok: false, reason: 'error.notEnoughRyo' };
   state.gear[lineId] = ownedTiers(state, lineId) + 1;
   return { ok: true };
 }

@@ -80,7 +80,7 @@ export function buildCharacter(content: ContentDb, o: CharacterOptions): GameSta
   state.player.rank = o.rank;
   state.player.natures = [...o.natures];
   const native = o.natures[0];
-  if (native) state.team = teamFor(native);
+  if (native) state.team = teamFor(content, native);
   const level = Math.min(K.cap, Math.max(1, o.level));
   for (const skill of content.skills) {
     if (isNature(skill.id) && !o.natures.includes(skill.id as NatureId)) continue;
@@ -120,7 +120,7 @@ export function buildGeninStart(
   state.player.rank = RANK_GENIN;
   state.player.natures = [...natures];
   const native = natures[0];
-  if (native) state.team = teamFor(native);
+  if (native) state.team = teamFor(content, native);
   for (const [skill, level] of Object.entries(needs) as [SkillId, number][]) {
     state.skills[skill] = { xp: xpAt(level) };
   }

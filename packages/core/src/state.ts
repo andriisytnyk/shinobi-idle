@@ -12,7 +12,8 @@ import { ensurePouch } from './combat/pouch.ts';
 import { createWorld, type WorldState } from './world-state.ts';
 import { refreshUnlocks } from './unlocks.ts';
 
-export type Rank = 'student' | 'genin' | 'chunin';
+/** A player rank id; the ranks and their order come from `content.playerRanks`. */
+export type Rank = string;
 
 export type JsonValue =
   string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
@@ -48,9 +49,44 @@ export interface MeditationEntry {
   bought: Record<string, number>;
 }
 
+/** @deprecated The built-in currencies by name, for the fight code; read `currencyOf(content, role)` instead. */
+export interface LegacyCurrencies {
+  ryo: number;
+  rep: number;
+  intel: number;
+}
+
+/** A content pack that the game was played with: its id and the version of its manifest. */
+export interface PackRef {
+  id: string;
+  version: string;
+}
+
+/**
+ * What the save keeps for a pack that the content no longer has (see `save.ts`): its data by
+ * field of the state and by key, the rank and the natures the player had from it. Adding the pack
+ * back restores them; the loader never reads them otherwise.
+ */
+export interface DormantPack {
+  /** The version of the pack when it left. */
+  version: string;
+  /** The rank id the player held when it belongs to the pack, else null. */
+  rank: string | null;
+  /** The natures the player owned, in order, when any belonged to the pack; else empty. */
+  natures: string[];
+  /** The pack's entries of the keyed branches of the state: field name, then key, then value. */
+  data: Record<string, Record<string, JsonValue>>;
+}
+
 export interface GameState {
   /** Save format version. */
   v: number;
+  /** The packs the state was made with, in load order. Written on create and on every load. */
+  packs: PackRef[];
+  /** The order of the player ranks when the state was made: a rank a later content lacks falls back along it. */
+  rankOrder: string[];
+  /** Data of packs that are missing now, by pack id. */
+  dormant: Record<string, DormantPack>;
   /** Game time in whole milliseconds. */
   now: number;
   rng: RngStreams;
@@ -60,7 +96,12 @@ export interface GameState {
   mastery: Record<string, { xp: number }>;
   pools: Record<SkillId, { xp: number }>;
   bank: Record<string, number>;
-  currencies: { ryo: number; rep: number; intel: number };
+  /**
+   * Balances by currency id; every currency of the content has an entry. The three currencies of
+   * the built-in pack are named in the type only so that the fight code, which still reads them by
+   * name, compiles; the pack `core` is always present, so they are always there.
+   */
+  currencies: Record<string, number> & LegacyCurrencies;
   /** Unlocked techniques, recipes and so on. */
   known: Record<string, true>;
   slots: ActionSlot[];
@@ -106,26 +147,33 @@ export interface GameState {
   events: GameEvent[];
 }
 
-export const STATE_VERSION = 13;
+export const STATE_VERSION = 14;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
-  const skills = {} as Record<SkillId, { xp: number }>;
-  const pools = {} as Record<SkillId, { xp: number }>;
+  const skills: Record<string, { xp: number }> = {};
+  const pools: Record<string, { xp: number }> = {};
   for (const skill of content.skills) {
     skills[skill.id] = { xp: 0 };
     pools[skill.id] = { xp: 0 };
   }
+  const currencies: Record<string, number> = {};
+  for (const currency of content.currencies) currencies[currency.id] = 0;
+  // The pack core is always composed, so its currencies exist; see `LegacyCurrencies`.
+  const bridged = currencies as Record<string, number> & LegacyCurrencies;
   const state: GameState = {
     v: STATE_VERSION,
+    packs: content.packs.map((p) => ({ id: p.id, version: p.version })),
+    rankOrder: content.playerRanks.map((r) => r.id),
+    dormant: {},
     now: 0,
     rng: createStreams(seed),
-    player: { name: '', rank: 'student', natures: [] },
+    player: { name: '', rank: content.playerRanks[0]?.id ?? '', natures: [] },
     skills,
     mastery: {},
     pools,
     bank: {},
-    currencies: { ryo: 0, rep: 0, intel: 0 },
+    currencies: bridged,
     known: {},
     slots: [{ action: null, progress: 0, share: SHARE_FULL, data: null }],
     flags: {},

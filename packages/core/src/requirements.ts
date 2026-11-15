@@ -1,15 +1,17 @@
-import type { ContentDb, NatureId, SkillId } from '@shinobi/content';
+import { PLAYER_RANK_IDS, type ContentDb } from '@shinobi/content';
 import type { EntityRef } from './entity.ts';
 import { indexOf } from './lookup.ts';
-import type { GameState, Rank } from './state.ts';
+import type { GameState } from './state.ts';
 import { buildingLevel } from './village-state.ts';
+import { ownsNature, rankIndex, skillEntry } from './vocab.ts';
 import { levelAt, levelCap } from './xp.ts';
 
+/** The condition tree; the ids in it are open strings (the ids of the content type are narrower while the legacy mapping is on). */
 export type Req =
-  | { t: 'skill'; skill: SkillId; level: number }
+  | { t: 'skill'; skill: string; level: number }
   | { t: 'technique'; id: string }
-  | { t: 'rank'; rank: Rank }
-  | { t: 'nature'; nature: NatureId }
+  | { t: 'rank'; rank: string }
+  | { t: 'nature'; nature: string }
   | { t: 'item'; id: string; n: number }
   | { t: 'quest'; id: string; step?: number | undefined }
   | { t: 'building'; id: string; level: number }
@@ -28,10 +30,16 @@ export interface ReqResult {
   children: ReqResult[];
 }
 
-export const RANK_ORDER: readonly Rank[] = ['student', 'genin', 'chunin'];
+/**
+ * The player ranks of the built-in pack in order.
+ * @deprecated A game has the ranks of its composed packs: use `rankIndex(content, rank)` and
+ * `content.playerRanks`. Kept for the fight code, which still reads it.
+ */
+export const RANK_ORDER: readonly string[] = PLAYER_RANK_IDS;
 
-export function skillLevel(state: GameState, skill: SkillId, content: ContentDb): number {
-  return levelAt(state.skills[skill].xp, levelCap(content));
+/** The level of a skill; a skill the state does not have (a pack that is missing) is at level 1. */
+export function skillLevel(state: GameState, skill: string, content: ContentDb): number {
+  return levelAt(skillEntry(state, skill)?.xp ?? 0, levelCap(content));
 }
 
 const flagValue = (state: GameState, id: string): number => {
@@ -53,10 +61,18 @@ export function evalReq(state: GameState, req: Req, content: ContentDb): ReqResu
       });
     case 'technique':
       return leaf(req, state.known[req.id] ? 1 : 0, 1, { kind: 'technique', id: req.id });
-    case 'rank':
-      return leaf(req, RANK_ORDER.indexOf(state.player.rank), RANK_ORDER.indexOf(req.rank), null);
+    case 'rank': {
+      // A rank the content does not know can never be held.
+      const target = rankIndex(content, req.rank);
+      return leaf(
+        req,
+        rankIndex(content, state.player.rank),
+        target < 0 ? content.playerRanks.length : target,
+        null,
+      );
+    }
     case 'nature':
-      return leaf(req, state.player.natures.includes(req.nature) ? 1 : 0, 1, {
+      return leaf(req, ownsNature(state, req.nature) ? 1 : 0, 1, {
         kind: 'skill',
         id: req.nature,
       });

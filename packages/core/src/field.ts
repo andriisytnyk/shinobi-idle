@@ -1,4 +1,4 @@
-import type { ContentDb, SkillId } from '@shinobi/content';
+import type { ContentDb } from '@shinobi/content';
 import type { ActionKind } from './actions.ts';
 import { addItem, hasItem, removeItem } from './bank.ts';
 import {
@@ -15,6 +15,10 @@ import type { Req } from './requirements.ts';
 import { nextFloat } from './rng.ts';
 import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
+import { activitySkill } from './vocab.ts';
+
+/** The skill that gathers herbs: the one whose activity is `patch` (Herbalism). */
+export const gatherSkill = (content: ContentDb): string | null => activitySkill(content, 'patch');
 
 /** One herb's bush: herbs left, how many it held when it last filled, and work kept while it regrows. */
 export interface Bush {
@@ -58,17 +62,18 @@ export function gatherAverageSeconds(size: number, content: ContentDb): number {
 }
 
 export const gatherKind: ActionKind = {
-  has: (id, content) => indexOf(content).herbs.has(id),
-  skill: () => 'herb',
+  has: (id, content) => indexOf(content).herbs.has(id) && gatherSkill(content) !== null,
+  skill: (_id, content) => gatherSkill(content),
   requirements(_state, id, content) {
     const herb = indexOf(content).herbs.get(id);
-    if (!herb) return null;
+    const skill = gatherSkill(content);
+    if (!herb || skill === null) return null;
     const extra: Req[] = herb.req ? [herb.req] : [];
-    return { t: 'all', of: [...extra, { t: 'skill', skill: 'herb', level: herb.level }] };
+    return { t: 'all', of: [...extra, { t: 'skill', skill, level: herb.level }] };
   },
   intervalMs(state, id, content, rules) {
     const K = content.balance.K;
-    const mod = cycleFactor(rules.modifierProviders, state, 'herb', content);
+    const mod = cycleFactor(rules.modifierProviders, state, gatherSkill(content) ?? '', content);
     const cycle = Math.max(1, Math.round(K.gather * MS_PER_SECOND * mod));
     // An empty bush regrows before the next herb: the pause is part of that cycle.
     return bushOf(state, id)?.stock === 0 ? cycle + regrowMs(state, content, rules) : cycle;
@@ -90,7 +95,8 @@ export const gatherKind: ActionKind = {
   },
   complete(state, id, content, rules) {
     const herb = indexOf(content).herbs.get(id);
-    if (!herb) return;
+    const skill = gatherSkill(content);
+    if (!herb || skill === null) return;
     const held = bushOf(state, id);
     // A bush found empty has regrown by now and is full again, to the size its mastery gives now.
     const fresh = bushSize(state, id, content, rules);
@@ -101,8 +107,8 @@ export const gatherKind: ActionKind = {
     const doubled = doubleChance > 0 && nextFloat(state.rng, 'action') < doubleChance;
     addItem(state, id, doubled ? 2 : 1);
     const seconds = gatherAverageSeconds(bush.size, content);
-    gainXp(state, 'herb', (rate(herb.level, content) * seconds) / SECONDS_PER_HOUR, content, rules);
-    grantMastery(state, id, 'herb', masteryXpPerAction(seconds, content), content, rules);
+    gainXp(state, skill, (rate(herb.level, content) * seconds) / SECONDS_PER_HOUR, content, rules);
+    grantMastery(state, id, skill, masteryXpPerAction(seconds, content), content, rules);
   },
 };
 
@@ -128,7 +134,7 @@ export function craftBonusChance(
 /** Chance that a craft keeps its ingredients: the general and the per-skill `craft.keep` modifiers. */
 export function craftKeepChance(
   state: GameState,
-  skill: SkillId,
+  skill: string,
   content: ContentDb,
   rules: Rules,
 ): number {

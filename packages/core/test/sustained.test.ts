@@ -34,7 +34,7 @@ function grind(
   state.player.rank = 'genin';
   openWorld(state);
   state.player.natures = [nature];
-  state.team = teamFor(nature);
+  state.team = teamFor(content, nature);
   const levels = levelsFor(enemy.cl, nature);
   for (const skill of Object.keys(levels) as (keyof typeof levels)[])
     setLevel(state, skill, levels[skill]);

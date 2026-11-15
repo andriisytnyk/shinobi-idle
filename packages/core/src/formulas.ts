@@ -1,4 +1,4 @@
-import type { ContentDb, SkillId } from '@shinobi/content';
+import type { ContentDb } from '@shinobi/content';
 import { indexOf } from './lookup.ts';
 import type { GameState } from './state.ts';
 import { levelAt } from './xp.ts';
@@ -67,6 +67,6 @@ export function poolGain(masteryXp: number, content: ContentDb): number {
 }
 
 /** Pool capacity of a skill: a fixed amount per mastery the skill owns. */
-export function poolCapacity(skill: SkillId, content: ContentDb): number {
+export function poolCapacity(skill: string, content: ContentDb): number {
   return content.balance.K.poolCapPerItem * (indexOf(content).masteryCount.get(skill) ?? 0);
 }

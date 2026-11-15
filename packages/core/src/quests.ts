@@ -2,7 +2,8 @@ import type { ContentDb, Quest, QuestRewards } from '@shinobi/content';
 import { addCurrency, addItem } from './bank.ts';
 import { counterValue } from './counters.ts';
 import { emit } from './events.ts';
-import { evalReq, RANK_ORDER } from './requirements.ts';
+import { evalReq } from './requirements.ts';
+import { currencyOf, rankIndex } from './vocab.ts';
 import type { System } from './system.ts';
 import type { GameState } from './state.ts';
 import { refreshRegions } from './regions.ts';
@@ -29,11 +30,16 @@ function applyRewards(state: GameState, rewards: QuestRewards, content: ContentD
   for (const { item, n } of rewards.items) {
     if (addItem(state, item, n)) emit(state, { type: 'itemGained', id: item, n });
   }
-  addCurrency(state, 'ryo', rewards.ryo);
-  addCurrency(state, 'rep', rewards.rep);
+  const money = currencyOf(content, 'money');
+  const reputation = currencyOf(content, 'reputation');
+  if (money !== null) addCurrency(state, money, rewards.ryo);
+  if (reputation !== null) addCurrency(state, reputation, rewards.rep);
+  for (const [currency, n] of Object.entries(rewards.currencies ?? {})) {
+    addCurrency(state, currency, n);
+  }
   for (const flag of rewards.flags) state.flags[flag] = true;
   const rank = rewards.rank;
-  if (rank && RANK_ORDER.indexOf(rank) > RANK_ORDER.indexOf(state.player.rank)) {
+  if (rank && rankIndex(content, rank) > rankIndex(content, state.player.rank)) {
     state.player.rank = rank;
     emit(state, { type: 'rankUp', rank });
     refreshUnlocks(state, content);

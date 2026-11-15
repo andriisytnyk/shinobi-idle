@@ -1,5 +1,6 @@
 import type { Building, ContentDb } from '@shinobi/content';
 import { removeCurrency } from './bank.ts';
+import { currencyOf, isAcademyRank, moneyOf } from './vocab.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
 import { MS_PER_MINUTE } from './formulas.ts';
@@ -68,15 +69,37 @@ export function maxBuildingLevel(building: Building, content: ContentDb): number
   return building.tier6 ? rows : rows - 1;
 }
 
-/** The stage now: stage 2 as soon as Reputation reaches the threshold, even before the next village sync. */
-export function currentStage(state: GameState, content: ContentDb): 1 | 2 {
-  const stage = state.village?.stage ?? 1;
-  return stage === 2 || state.currencies.rep >= content.balance.K.rep.stage2 ? 2 : 1;
+/** The Reputation a village stage (counted from 1) needs: the `K.rep` entry its data names; 0 for the first stage. */
+export function stageRep(content: ContentDb, stage: number): number {
+  const key = content.villageStages[stage - 1]?.rep;
+  const rep: Record<string, number> = content.balance.K.rep;
+  return key === null || key === undefined ? 0 : (rep[key] ?? Infinity);
 }
 
-/** Highest building level the stage allows. */
+/** The highest stage (counted from 1) that `rep` reaches. */
+export function stageForRep(content: ContentDb, rep: number): number {
+  let stage = 1;
+  for (let i = 2; i <= content.villageStages.length; i++)
+    if (rep >= stageRep(content, i)) stage = i;
+  return stage;
+}
+
+/** The Reputation of the player: the balance of the currency with the role `reputation`. */
+export function reputationOf(state: GameState, content: ContentDb): number {
+  const currency = currencyOf(content, 'reputation');
+  return currency === null ? 0 : (state.currencies[currency] ?? 0);
+}
+
+/** The stage now: it follows Reputation as soon as it is reached, even before the next village sync, and never falls. */
+export function currentStage(state: GameState, content: ContentDb): number {
+  const stage = state.village?.stage ?? 1;
+  return Math.max(stage, stageForRep(content, reputationOf(state, content)));
+}
+
+/** Highest building level the stage allows; a stage beyond the table keeps the last cap. */
 export function stageCap(state: GameState, content: ContentDb): number {
-  return content.balance.K.towerStageMax[currentStage(state, content) - 1] ?? 0;
+  const caps: readonly number[] = content.balance.K.towerStageMax;
+  return caps[currentStage(state, content) - 1] ?? caps[caps.length - 1] ?? 0;
 }
 
 /** What building `level` costs: civil resources, treasury ryo and, for the last level, the shinobi resources. */
@@ -108,11 +131,12 @@ export function villageBuildCost(
  * Called after anything that may have changed the rank or the Reputation.
  */
 export function syncVillage(state: GameState, content: ContentDb): void {
-  if (state.player.rank === 'student') return;
+  if (isAcademyRank(content, state.player.rank)) return;
   const village = (state.village ??= createVillage(content));
-  if (village.stage < 2 && state.currencies.rep >= content.balance.K.rep.stage2) {
-    village.stage = 2;
-    emit(state, { type: 'villageStage', stage: 2 });
+  const stage = stageForRep(content, reputationOf(state, content));
+  while (village.stage < stage) {
+    village.stage += 1;
+    emit(state, { type: 'villageStage', stage: village.stage });
   }
   drainPendingResources(state, content);
 }
@@ -268,11 +292,13 @@ export function spendWorkforce(state: GameState): CommandResult {
 }
 
 /** Moves ryo from the player's purse to the treasury. */
-export function donateToTreasury(state: GameState, ryo: number): CommandResult {
+export function donateToTreasury(state: GameState, ryo: number, content: ContentDb): CommandResult {
   const village = state.village;
   if (!village) return { ok: false, reason: 'error.noVillage' };
   if (!isCount(ryo)) return { ok: false, reason: 'error.invalidAmount' };
-  if (!removeCurrency(state, 'ryo', ryo)) return { ok: false, reason: 'error.notEnoughRyo' };
+  if (!removeCurrency(state, moneyOf(content), ryo)) {
+    return { ok: false, reason: 'error.notEnoughRyo' };
+  }
   village.treasury += ryo;
   return { ok: true };
 }

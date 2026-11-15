@@ -161,6 +161,9 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     if (other !== undefined) problem('role', `the role "${c.role}" is already held by "${other}"`);
     else roleOwner.set(c.role, c.id);
   }
+  for (const role of ['money', 'reputation'] as const)
+    if (!roleOwner.has(role))
+      problems.push({ pack: 'core', message: `no currency has the role "${role}"` });
   for (const n of db.natures) {
     at('natures', n.id);
     // A nature trains through the skill that has its id.
@@ -405,6 +408,12 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     if (q.rewards.rank !== null) ref('rewards.rank', q.rewards.rank, 'ranks');
     for (const id of Object.keys(q.rewards.currencies ?? {}))
       ref('rewards.currencies', id, 'currencies');
+  }
+  for (const m of db.missions) {
+    at('missions', m.id);
+    m.pay.forEach((p, n) => {
+      if (p.kind === 'scrollPart') needNumber(`pay[${n}].chance`, `partDrop.${p.chance}`);
+    });
   }
   for (const e of db.exams) {
     at('exams', e.id);

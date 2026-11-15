@@ -1,11 +1,5 @@
-import {
-  NATURE_IDS,
-  SKILL_IDS,
-  type ContentDb,
-  type NatureId,
-  type SkillId,
-} from '@shinobi/content';
-import { rebalanceShares } from './actions.ts';
+import type { ContentDb, NatureId, SkillId } from '@shinobi/content';
+import { actionKindOf, rebalanceShares } from './actions.ts';
 import { COURSE_ID, COURSE_KIND } from './athletics.ts';
 import { tonicCharges } from './buffs.ts';
 import { BINGO_MAX } from './combat/bingo.ts';
@@ -31,12 +25,22 @@ import { woundIntervalMs } from './combat/wounds.ts';
 import { entryOf, fightTarget, opSteps } from './combat/zones.ts';
 import type { EntityKind } from './entity.ts';
 import { emit } from './events.ts';
+import {
+  balanceOf,
+  packDiff,
+  restoreDormant,
+  safeKey,
+  sanitizeDormant,
+  sanitizePacks,
+  sanitizeRankOrder,
+  settlePlayer,
+  stashMissing,
+} from './pack-data.ts';
 import { bushSize } from './field.ts';
 import { MS_PER_HOUR, MS_PER_SECOND, poolCapacity } from './formulas.ts';
 import { maxLevels, parseModRef } from './meditation.ts';
 import { indexOf } from './lookup.ts';
 import { teamFor } from './natures.ts';
-import { RANK_ORDER } from './requirements.ts';
 import { STREAM_NAMES } from './rng.ts';
 import { defaultRules, type Rules } from './rules.ts';
 import {
@@ -50,8 +54,17 @@ import {
 import { updateQuests } from './quests.ts';
 import { refreshRegions, regionFlag } from './regions.ts';
 import { refreshUnlocks } from './unlocks.ts';
-import { villageBuildCost, civilCap, maxBuildingLevel, shinobiCap, tickMs } from './village.ts';
+import {
+  villageBuildCost,
+  civilCap,
+  maxBuildingLevel,
+  reputationOf,
+  shinobiCap,
+  stageForRep,
+  tickMs,
+} from './village.ts';
 import { createVillage, type VillageState } from './village-state.ts';
+import { isAcademyRank, isNature, packOfId, poolEntry, rankIndex, skillEntry } from './vocab.ts';
 import { cellMaxExplores, levelForExplores } from './world.ts';
 import { createWorld } from './world-state.ts';
 import { xpAt } from './xp.ts';
@@ -104,11 +117,12 @@ export const MIGRATIONS: readonly Migration[] = [
   },
   // v7 -> v8: the team's natures follow from the native nature; a save that has one gets them,
   // every other genin has none yet and is led to the nature test.
-  (state) => {
+  (state, content) => {
     const natures =
       isRecord(state.player) && Array.isArray(state.player.natures) ? state.player.natures : [];
-    const native = NATURE_IDS.find((n) => n === natures[0]);
-    return { ...state, team: native ? teamFor(native) : null };
+    const first: unknown = natures[0];
+    const native = typeof first === 'string' && isNature(content, first) ? first : undefined;
+    return { ...state, team: native ? teamFor(content, native) : null };
   },
   // v8 -> v9: exploration. Nothing explored yet; the player stands in the first cell of the world.
   (state, content) => ({ ...state, world: createWorld(content) }),
@@ -116,10 +130,12 @@ export const MIGRATIONS: readonly Migration[] = [
   // technique effects and boss hooks now, so a fight in progress restarts; the loadout rebuilds itself.
   // A genin of an older save gets the medic pouch the graduation now gives.
   (state, content) => {
-    const rank = isRecord(state.player) ? state.player.rank : 'student';
+    const rank = isRecord(state.player) ? state.player.rank : undefined;
     const bank = isRecord(state.bank) ? { ...state.bank } : {};
     const medic = content.items.find((i) => i.medic !== undefined);
-    if (medic && rank !== 'student' && typeof bank[medic.id] !== 'number') bank[medic.id] = 1;
+    const graduate =
+      typeof rank === 'string' && rankIndex(content, rank) >= 0 && !isAcademyRank(content, rank);
+    if (medic && graduate && typeof bank[medic.id] !== 'number') bank[medic.id] = 1;
     return {
       ...state,
       bank,
@@ -133,7 +149,10 @@ export const MIGRATIONS: readonly Migration[] = [
   // v10 -> v11: the village. A genin or chunin gets one with the starting buildings; a student has none.
   (state, content) => {
     const rank = isRecord(state.player) ? state.player.rank : undefined;
-    const village = rank === 'genin' || rank === 'chunin' ? createVillage(content) : null;
+    const village =
+      typeof rank === 'string' && rankIndex(content, rank) >= 0 && !isAcademyRank(content, rank)
+        ? createVillage(content)
+        : null;
     return { ...state, village };
   },
   // v11 -> v12: missions. Village resource units earned by missions wait here until a village takes them.
@@ -165,6 +184,17 @@ export const MIGRATIONS: readonly Migration[] = [
     const { seen: _seen, ...rest } = state;
     void _seen;
     return { ...rest, bingo, report: {} };
+  },
+  // v13 -> v14: the save keeps the packs it was made with, the rank order and the dormant data of
+  // missing packs. A v13 save was made with the built-in pack alone, so its ranks are that pack's.
+  (state, content) => {
+    const core = content.packs.find((p) => p.id === 'core');
+    return {
+      ...state,
+      packs: [{ id: 'core', version: core?.version ?? '' }],
+      rankOrder: content.playerRanks.filter((r) => packOfId(r.id) === 'core').map((r) => r.id),
+      dormant: {},
+    };
   },
 ];
 
@@ -211,6 +241,7 @@ function pick<T>(
   const out: Record<string, T> = {};
   if (!isRecord(source)) return out;
   for (const [key, value] of Object.entries(source)) {
+    if (!safeKey(key)) continue;
     const checked = valid(key, value);
     if (checked !== undefined) out[key] = checked;
   }
@@ -237,7 +268,7 @@ function sanitizeSlot(
   if (!isRecord(raw)) return { slot, lost };
   const action = raw.action;
   if (isRecord(action) && typeof action.kind === 'string' && typeof action.id === 'string') {
-    if (rules.actionKinds[action.kind]?.has(action.id, content)) {
+    if (actionKindOf(rules, action.kind)?.has(action.id, content)) {
       slot.action = { kind: action.kind, id: action.id };
       slot.progress = Math.floor(nonNegative(raw.progress));
       slot.data = isJson(raw.data, 0) ? raw.data : null;
@@ -298,6 +329,7 @@ function sanitizeCombat(
   if (phase !== 'respawn' && fight.enemy !== enemy.id) return null;
   if (phase === 'approach' && (!run || fight.t !== 0)) return null;
   const K = content.balance.K;
+  const index = indexOf(content);
   const horizon = workOf(MS_PER_HOUR);
   const paid = pick(raw.paid, (key, v) =>
     indexOf(content).techniques.has(key) && typeof v === 'number' && Number.isFinite(v) && v >= 0
@@ -316,7 +348,7 @@ function sanitizeCombat(
     ),
     paid,
     carry: Math.min(horizon, Math.floor(nonNegative(raw.carry))),
-    style: SKILL_ID_SET.has(String(raw.style)) ? (raw.style as SkillId) : style,
+    style: index.skills.has(String(raw.style)) ? (raw.style as SkillId) : style,
     owner,
     run,
   };
@@ -327,11 +359,13 @@ function sanitizeLoadouts(raw: unknown, state: GameState, content: ContentDb): L
   const out: LoadoutState = { active: [], auto: true, signature: null, basis: '', saved: {} };
   if (!isRecord(raw)) return out;
   const index = indexOf(content);
-  const limits = loadoutLimits(RANK_ORDER.indexOf(state.player.rank), content);
+  const limits = loadoutLimits(rankIndex(content, state.player.rank), content);
   const natureOf = (id: string): string | null => {
     const skill = index.techniques.get(id)?.skill ?? '';
-    return (NATURE_IDS as readonly string[]).includes(skill) ? skill : null;
+    return isNature(content, skill) ? skill : null;
   };
+  /** The most slots any rank of the content gives. */
+  const mostSlots = Math.max(0, ...Object.values(content.balance.K.loadout.slots));
   /** The techniques the player knows, none out of the loadout, as many as the rank's slots and natures allow. */
   const ids = (list: unknown): string[] => {
     if (!Array.isArray(list)) return [];
@@ -350,7 +384,7 @@ function sanitizeLoadouts(raw: unknown, state: GameState, content: ContentDb): L
       if (nature) natures.add(nature);
       out.push(id);
     }
-    return out.slice(0, content.balance.K.loadout.slots.chunin);
+    return out.slice(0, mostSlots);
   };
   out.auto = raw.auto !== false;
   out.active = ids(raw.active);
@@ -434,7 +468,7 @@ function sanitizeWorld(raw: unknown, content: ContentDb): GameState['world'] {
  * the level it builds, never trusted; the stage follows Reputation.
  */
 function sanitizeVillage(raw: unknown, state: GameState, content: ContentDb): VillageState | null {
-  if (state.player.rank === 'student') return null;
+  if (isAcademyRank(content, state.player.rank)) return null;
   const village = createVillage(content);
   if (!isRecord(raw)) return village;
   const K = content.balance.K;
@@ -445,7 +479,7 @@ function sanitizeVillage(raw: unknown, state: GameState, content: ContentDb): Vi
     village.levels[b.id] = Math.max(level, village.levels[b.id] ?? 0);
     if (village.levels[b.id] === 0) delete village.levels[b.id];
   }
-  village.stage = state.currencies.rep >= K.rep.stage2 ? 2 : 1;
+  village.stage = stageForRep(content, reputationOf(state, content));
   const civil = civilCap(village, content);
   const shinobi = shinobiCap(village, content);
   const savedRes = isRecord(raw.res) ? raw.res : {};
@@ -475,8 +509,6 @@ function sanitizeVillage(raw: unknown, state: GameState, content: ContentDb): Vi
   return village;
 }
 
-const SKILL_ID_SET: ReadonlySet<string> = new Set(SKILL_IDS);
-
 /**
  * Reads a save text, migrating old versions. Ids that the content no longer knows are dropped
  * and numbers are clamped to what the rules allow; only a text that is not a save at all throws.
@@ -498,6 +530,26 @@ export function deserialize(
   const index = indexOf(content);
   const cap = content.balance.K.cap;
 
+  // The packs the save was made with against the packs of the content: what a pack that is missing
+  // owned goes to its dormant bucket, and what a pack that came back kept is returned.
+  const savedPacks = sanitizePacks(raw.packs);
+  const savedVersions = new Map(savedPacks.map((p) => [p.id, p.version]));
+  const dormant = sanitizeDormant(raw.dormant);
+  raw = stashMissing(raw, content, dormant, savedVersions);
+  const back = restoreDormant(raw, content, dormant);
+  raw = back.raw;
+  const settled = isRecord(raw.player)
+    ? settlePlayer(
+        raw.player,
+        content,
+        sanitizeRankOrder(raw.rankOrder),
+        back.restored,
+        dormant,
+        savedVersions,
+      )
+    : null;
+  state.dormant = dormant;
+
   if (Number.isInteger(raw.now) && (raw.now as number) >= 0) state.now = raw.now as number;
 
   const streams = isRecord(raw.rng) ? raw.rng : {};
@@ -512,27 +564,27 @@ export function deserialize(
   const player = raw.player;
   if (isRecord(player)) {
     if (typeof player.name === 'string') state.player.name = player.name;
-    const rank = RANK_ORDER.find((r) => r === player.rank);
-    if (rank) state.player.rank = rank;
-    const natures: unknown[] = Array.isArray(player.natures) ? player.natures : [];
-    state.player.natures = natures.filter(
-      (n, i): n is NatureId =>
-        (NATURE_IDS as readonly unknown[]).includes(n) && natures.indexOf(n) === i,
-    );
-    state.player.natures = state.player.natures.slice(0, content.balance.K.natures.max);
+    if (settled?.rank) state.player.rank = settled.rank;
+    state.player.natures = (settled?.natures ?? []).slice(
+      0,
+      content.balance.K.natures.max,
+    ) as NatureId[];
     // The team's natures follow from the native nature alone, so they are recomputed, never trusted.
     const native = state.player.natures[0];
-    state.team = native ? teamFor(native) : null;
+    state.team = native ? teamFor(content, native) : null;
   }
 
   const skillXp = isRecord(raw.skills) ? raw.skills : {};
   const poolXp = isRecord(raw.pools) ? raw.pools : {};
-  for (const id of Object.keys(state.skills) as SkillId[]) {
-    const skill = skillXp[id];
-    if (isRecord(skill)) state.skills[id].xp = Math.min(nonNegative(skill.xp), xpAt(cap));
-    const pool = poolXp[id];
-    if (isRecord(pool))
-      state.pools[id].xp = Math.min(nonNegative(pool.xp), poolCapacity(id, content));
+  for (const id of Object.keys(state.skills)) {
+    const skill = Object.hasOwn(skillXp, id) ? skillXp[id] : undefined;
+    const entry = skillEntry(state, id);
+    if (isRecord(skill) && entry) entry.xp = Math.min(nonNegative(skill.xp), xpAt(cap));
+    const pool = Object.hasOwn(poolXp, id) ? poolXp[id] : undefined;
+    const poolRecord = poolEntry(state, id);
+    if (isRecord(pool) && poolRecord) {
+      poolRecord.xp = Math.min(nonNegative(pool.xp), poolCapacity(id, content));
+    }
   }
 
   state.mastery = pick(raw.mastery, (key, v) =>
@@ -542,11 +594,9 @@ export function deserialize(
     index.itemIds.has(key) && typeof v === 'number' && Number.isInteger(v) && v > 0 ? v : undefined,
   );
   if (isRecord(raw.currencies)) {
-    state.currencies = {
-      ryo: nonNegative(raw.currencies.ryo),
-      rep: nonNegative(raw.currencies.rep),
-      intel: nonNegative(raw.currencies.intel),
-    };
+    for (const id of Object.keys(state.currencies)) {
+      if (Object.hasOwn(raw.currencies, id)) state.currencies[id] = balanceOf(raw.currencies[id]);
+    }
   }
   state.known = pick(raw.known, (key) =>
     index.techniques.has(key) || index.recipeIds.has(key) ? (true as const) : undefined,
@@ -680,11 +730,16 @@ export function deserialize(
   const goal = raw.goal;
   state.goal =
     isRecord(goal) && typeof goal.kind === 'string' && typeof goal.id === 'string'
-      ? (goal as { kind: EntityKind; id: string })
+      ? { kind: goal.kind as EntityKind, id: goal.id }
       : null;
 
   refreshUnlocks(state, content, true);
   refreshRegions(state, content, true);
+  const changed = packDiff(savedPacks, content);
+  // A save with no pack list (a hand-made one) says nothing about which packs it was made with.
+  if (Array.isArray(raw.packs) && (changed.added.length > 0 || changed.removed.length > 0)) {
+    emit(state, { type: 'packsChanged', added: changed.added, removed: changed.removed });
+  }
   // Shares are derived from which slots run, so they are recomputed rather than trusted; a
   // saved progress beyond one cycle is cut so a doctored save cannot make the loop spin.
   rebalanceShares(state);

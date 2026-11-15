@@ -1,4 +1,4 @@
-import type { ContentDb, SkillId } from '@shinobi/content';
+import type { ContentDb } from '@shinobi/content';
 import { actionsKey, bump } from './counters.ts';
 import { emit, type ActionStoppedEvent } from './events.ts';
 import {
@@ -11,6 +11,7 @@ import {
   techniqueCastSeconds,
 } from './formulas.ts';
 import { indexOf } from './lookup.ts';
+import { activitySkill } from './vocab.ts';
 import { nonNativeLevel } from './natures.ts';
 import { cycleFactor } from './modifiers.ts';
 import { spendTonicCharges } from './buffs.ts';
@@ -58,7 +59,7 @@ export interface ActionKind {
   /** The item the action lacks for its next cycle, if any; names the cause when it stops or is refused. */
   missing?(state: GameState, id: string, content: ContentDb, rules: Rules): string | null;
   /** The skill the action trains, when it trains one; a locked skill refuses its actions. */
-  skill?(id: string, content: ContentDb): SkillId | null;
+  skill?(id: string, content: ContentDb): string | null;
   /**
    * The fight the action started (it put `state.combat` there) has ended in `result`; the combat
    * system has counted the Wounds and the kill. The kind decides what follows: it may leave the
@@ -84,9 +85,14 @@ export interface ActionKind {
   ): void;
 }
 
+/** The action kind a rule set has under `name`; a name of the object prototype (`constructor`) is no kind. */
+export function actionKindOf(rules: Rules, name: string): ActionKind | undefined {
+  return Object.hasOwn(rules.actionKinds, name) ? rules.actionKinds[name] : undefined;
+}
+
 /** The facts a skill-training action is built from. */
 export interface SkillActionDef {
-  skill: SkillId;
+  skill: string;
   /** Level at which the action unlocks; sets its XP rate. */
   level: number;
   masteryKey: string;
@@ -139,7 +145,7 @@ export const practiceKind = skillAction((state, id, content) => {
   if (!t) return null;
   const mastery = state ? masteryLevel(state, id, content) : 1;
   const foreign = state
-    ? nonNativeLevel(t.skill, state.player.natures, skillLevel(state, t.skill, content))
+    ? nonNativeLevel(t.skill, state.player.natures, skillLevel(state, t.skill, content), content)
     : undefined;
   const cast = techniqueCastSeconds(t.sealSeq.length, mastery, content, foreign);
   return {
@@ -154,9 +160,10 @@ export const practiceKind = skillAction((state, id, content) => {
 
 export const drillKind = skillAction((_state, id, content) => {
   const e = indexOf(content).exercises.get(id);
-  if (!e) return null;
+  const skill = activitySkill(content, 'drill');
+  if (!e || skill === null) return null;
   return {
-    skill: 'cc',
+    skill,
     level: e.level,
     masteryKey: id,
     baseSeconds: content.balance.K.drill,
@@ -190,7 +197,7 @@ export function stopSlot(
   const slot = state.slots[index];
   if (!slot?.action) return;
   const { kind, id } = slot.action;
-  const impl = rules.actionKinds[kind];
+  const impl = actionKindOf(rules, kind);
   impl?.stop?.(state, index, id, content, rules, reason);
   const missing = reason === 'requirements' ? impl?.missing?.(state, id, content, rules) : null;
   emit(state, {
@@ -217,7 +224,7 @@ export const actionSystem: System = {
     let best: number | null = null;
     for (const [index, slot] of state.slots.entries()) {
       if (!slot.action || slot.share <= 0) continue;
-      const kind = rules.actionKinds[slot.action.kind];
+      const kind = actionKindOf(rules, slot.action.kind);
       if (!kind) continue;
       const need =
         kind.intervalMs(state, slot.action.id, content, rules, index) * SHARE_FULL - slot.progress;
@@ -235,7 +242,7 @@ export const actionSystem: System = {
     state.slots.forEach((slot, index) => {
       while (slot.action) {
         const { kind: name, id } = slot.action;
-        const kind = rules.actionKinds[name];
+        const kind = actionKindOf(rules, name);
         if (!kind || !kind.has(id, content))
           return stopSlot(state, index, 'missing', content, rules);
         const need = kind.intervalMs(state, id, content, rules, index) * SHARE_FULL;
@@ -257,7 +264,7 @@ export const actionSystem: System = {
           continue;
         }
         const trained = kind.skill?.(id, content);
-        if (trained) spendTonicCharges(state, trained);
+        if (trained) spendTonicCharges(state, trained, content);
         state.stats.completed++;
         bump(state, actionsKey(name));
         if (result === 'stop') {

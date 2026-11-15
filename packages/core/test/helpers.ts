@@ -67,7 +67,7 @@ export function fightingGenin(seed = 1): GameState {
 export function withNatures(state: GameState, ...natures: NatureId[]): GameState {
   state.player.natures = natures;
   const [native] = natures;
-  state.team = native ? teamFor(native) : null;
+  state.team = native ? teamFor(content, native) : null;
   return state;
 }
 

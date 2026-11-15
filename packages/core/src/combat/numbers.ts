@@ -161,7 +161,7 @@ export function techniqueFigures(
       tech.sealSeq.length,
       mastery,
       content,
-      nonNativeLevel(tech.skill, snap.natures ?? [], skillLvl),
+      nonNativeLevel(tech.skill, snap.natures ?? [], skillLvl, content),
     ),
   );
   const base = (pool === 'stamina' ? K.staminaCost[rank] : K.chakraCost[rank]) * role.c;

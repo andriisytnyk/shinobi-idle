@@ -1,18 +1,4 @@
-import {
-  KEY_NATURES,
-  NATURE_IDS,
-  NATURE_WHEEL,
-  TRAIT_ANSWER,
-  type Boss,
-  type Cell,
-  type ComboId,
-  type ContentDb,
-  type Mission,
-  type MissionStage,
-  type NatureId,
-  type SkillId,
-  type TraitId,
-} from '@shinobi/content';
+import type { Boss, Cell, ContentDb, Mission, MissionStage, NatureId } from '@shinobi/content';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
 import { indexOf } from './lookup.ts';
@@ -20,6 +6,7 @@ import type { Modifier, ModifierProvider } from './modifiers.ts';
 import { skillLevel } from './requirements.ts';
 import { nextInt } from './rng.ts';
 import type { GameState } from './state.ts';
+import { activitySkill, isAcademyRank, isNature, ownsNature } from './vocab.ts';
 
 /** The player's team mates' natures, fixed when the native nature is chosen. */
 export interface TeamNatures {
@@ -27,28 +14,31 @@ export interface TeamNatures {
   aya: NatureId;
 }
 
-/** A choice of nature: a given one, or `'random'` (the chakra paper decides). */
-export type NatureChoice = NatureId | 'random';
+/** A choice of nature: the id of a nature, or `'random'` (the chakra paper decides). */
+export type NatureChoice = string;
 
-const isNature = (x: unknown): x is NatureId => (NATURE_IDS as readonly unknown[]).includes(x);
+/** The nature that beats `nature` on the wheel: the first nature of the content that is strong against it. */
+export function natureBeating(content: ContentDb, nature: string): NatureId {
+  return (content.natures.find((n) => n.strongAgainst.includes(nature))?.id ?? nature) as NatureId;
+}
 
-/** The nature that beats `nature` on the wheel. */
-export function natureBeating(nature: NatureId): NatureId {
-  return NATURE_IDS.find((n) => NATURE_WHEEL[n] === nature) ?? nature;
+/** The nature `nature` beats on the wheel; itself when it beats none. */
+export function natureBeaten(content: ContentDb, nature: string): NatureId {
+  return (indexOf(content).natures.get(nature)?.strongAgainst[0] ?? nature) as NatureId;
 }
 
 /** The rival's nature: the one that beats the player's native nature. */
-export function rivalNatureFor(native: NatureId): NatureId {
-  return natureBeating(native);
+export function rivalNatureFor(content: ContentDb, native: string): NatureId {
+  return natureBeating(content, native);
 }
 
-/** Aya's nature: Suiton when the native nature is Raiton or Doton, otherwise Raiton. */
-export function ayaNatureFor(native: NatureId): NatureId {
-  return native === 'raiton' || native === 'doton' ? 'suiton' : 'raiton';
+/** Aya's nature: the `ayaNature` of the native nature. */
+export function ayaNatureFor(content: ContentDb, native: string): NatureId {
+  return (indexOf(content).natures.get(native)?.ayaNature ?? native) as NatureId;
 }
 
-export function teamFor(native: NatureId): TeamNatures {
-  return { rival: rivalNatureFor(native), aya: ayaNatureFor(native) };
+export function teamFor(content: ContentDb, native: string): TeamNatures {
+  return { rival: rivalNatureFor(content, native), aya: ayaNatureFor(content, native) };
 }
 
 /** The first, native nature; null before the nature test. */
@@ -67,17 +57,15 @@ export function ayaNature(state: GameState): NatureId | null {
 }
 
 /**
- * Resolves the rival boss rule `beatsPlayerFirst` to a nature: the one that beats the player's
- * first nature. Null while the player has no nature.
+ * Resolves the rival boss rule `beatsPlayerFirst` (and the plain `wheel`) to a nature: the one that
+ * beats the player's first nature, which the state keeps as the rival's nature. Null while the
+ * player has no nature.
  */
 export function resolveBossNature(
   state: GameState,
-  rule: 'beatsPlayerFirst' | 'wheel',
+  _rule: 'beatsPlayerFirst' | 'wheel',
 ): NatureId | null {
-  const team = state.team;
-  if (rule === 'beatsPlayerFirst' && team) return team.rival;
-  const native = nativeNature(state);
-  return native ? natureBeating(native) : null;
+  return state.team?.rival ?? null;
 }
 
 /** The nature a boss fights with for this player, resolving the rival's rule through the state. */
@@ -93,12 +81,15 @@ export function bossNature(state: GameState, boss: Boss): NatureId | null {
  * with no nature yet (no native nature, nothing to be foreign to).
  */
 export function nonNativeLevel(
-  skill: SkillId,
-  natures: readonly NatureId[],
+  skill: string,
+  natures: readonly string[],
   level: number,
+  content?: ContentDb,
 ): number | undefined {
-  if (!isNature(skill) || natures.length === 0 || natures[0] === skill) return undefined;
-  return level;
+  if (natures.length === 0 || natures[0] === skill) return undefined;
+  // Without the content (the fight code has not been given it yet) a nature is one the player owns.
+  const nature = content ? isNature(content, skill) : natures.includes(skill);
+  return nature ? level : undefined;
 }
 
 /** The native nature trains with extra XP; the modifier names the nature as its visible source. */
@@ -136,10 +127,11 @@ export interface NatureStatus {
 /** Where the player stands: not yet a genin, at the test, or choosing extra natures. */
 export function natureStatus(state: GameState, content: ContentDb): NatureStatus {
   const K = content.balance.K.natures;
-  const owned = state.player.natures;
-  const cc = skillLevel(state, 'cc', content);
-  const free = NATURE_IDS.filter((n) => !owned.includes(n));
-  if (state.player.rank === 'student')
+  const owned: readonly string[] = state.player.natures;
+  const control = activitySkill(content, 'drill');
+  const cc = control === null ? 0 : skillLevel(state, control, content);
+  const free = indexOf(content).natureIds.filter((n) => !owned.includes(n)) as NatureId[];
+  if (isAcademyRank(content, state.player.rank))
     return { stage: 'locked', canChoose: false, needCc: null, cc, free };
   if (owned.length === 0) return { stage: 'test', canChoose: true, needCc: null, cc, free };
   if (owned.length >= K.max) return { stage: 'full', canChoose: false, needCc: null, cc, free };
@@ -153,20 +145,29 @@ export function natureStatus(state: GameState, content: ContentDb): NatureStatus
   };
 }
 
-function pick(state: GameState, choice: NatureChoice, free: readonly NatureId[]): NatureId | null {
-  if (choice === 'random') return free[nextInt(state.rng, 'world', free.length)] ?? null;
-  return free.includes(choice) ? choice : null;
+function pick(state: GameState, choice: NatureChoice, free: readonly string[]): NatureId | null {
+  if (choice === 'random')
+    return (free[nextInt(state.rng, 'world', free.length)] ?? null) as NatureId | null;
+  return free.includes(choice) ? (choice as NatureId) : null;
 }
 
 /** `nature.choose`: the chakra paper test, once, as a genin. Sets the native nature and the team's. */
-export function chooseNature(state: GameState, choice: NatureChoice): CommandResult {
-  if (choice !== 'random' && !isNature(choice)) return { ok: false, reason: 'error.invalidNature' };
-  if (state.player.rank === 'student') return { ok: false, reason: 'error.natureNotGenin' };
+export function chooseNature(
+  state: GameState,
+  choice: NatureChoice,
+  content: ContentDb,
+): CommandResult {
+  if (typeof choice !== 'string' || (choice !== 'random' && !isNature(content, choice))) {
+    return { ok: false, reason: 'error.invalidNature' };
+  }
+  if (isAcademyRank(content, state.player.rank)) {
+    return { ok: false, reason: 'error.natureNotGenin' };
+  }
   if (state.player.natures.length > 0) return { ok: false, reason: 'error.natureChosen' };
-  const nature = pick(state, choice, NATURE_IDS);
+  const nature = pick(state, choice, indexOf(content).natureIds);
   if (!nature) return { ok: false, reason: 'error.invalidNature' };
   state.player.natures = [nature];
-  state.team = teamFor(nature);
+  state.team = teamFor(content, nature);
   emit(state, { type: 'natureGained', nature, first: true });
   return { ok: true };
 }
@@ -177,13 +178,15 @@ export function addNature(
   choice: NatureChoice,
   content: ContentDb,
 ): CommandResult {
-  if (choice !== 'random' && !isNature(choice)) return { ok: false, reason: 'error.invalidNature' };
+  if (typeof choice !== 'string' || (choice !== 'random' && !isNature(content, choice))) {
+    return { ok: false, reason: 'error.invalidNature' };
+  }
   const status = natureStatus(state, content);
   if (status.stage === 'locked' || status.stage === 'test') {
     return { ok: false, reason: 'error.natureNeedsNative' };
   }
   if (status.stage === 'full') return { ok: false, reason: 'error.natureMax' };
-  if (choice !== 'random' && state.player.natures.includes(choice)) {
+  if (choice !== 'random' && ownsNature(state, choice)) {
     return { ok: false, reason: 'error.natureOwned' };
   }
   if (!status.canChoose) return { ok: false, reason: 'error.natureControlLow' };
@@ -202,7 +205,7 @@ function stageDoable(
   natures: ReadonlySet<string>,
   content: ContentDb,
 ): boolean {
-  const open = (skill: string): boolean => !isNature(skill) || natures.has(skill);
+  const open = (skill: string): boolean => !isNature(content, skill) || natures.has(skill);
   switch (stage.t) {
     case 'skill':
       return open(stage.skill);
@@ -222,13 +225,13 @@ function stageDoable(
 
 /** The village missions of the slice: the ones that bring a resource to the village. */
 export function villageMissions(content: ContentDb): Mission[] {
-  return content.missions.filter((m) => m.rank === 'V');
+  return content.missions.filter((m) => m.resource !== null);
 }
 
 /** Whether a mission can be done by someone who owns exactly `natures`. */
 export function missionDoable(
   mission: Mission,
-  natures: readonly NatureId[],
+  natures: readonly string[],
   content: ContentDb,
 ): boolean {
   const set = new Set<string>(natures);
@@ -237,14 +240,16 @@ export function missionDoable(
 
 /** Key cells that need a nature (rock and water cells need none). */
 export function natureKeyCells(content: ContentDb): Cell[] {
-  return content.cells.filter((c) => c.key !== null && KEY_NATURES[c.key].length > 0);
+  const keyNatures = indexOf(content).keyNatures;
+  return content.cells.filter((c) => c.key !== null && (keyNatures.get(c.key)?.length ?? 0) > 0);
 }
 
-const cellOpen = (cell: Cell, natures: readonly NatureId[]): boolean =>
-  cell.key !== null && KEY_NATURES[cell.key].some((n) => natures.some((o) => o === n));
+const cellOpen = (cell: Cell, natures: readonly string[], content: ContentDb): boolean =>
+  cell.key !== null &&
+  (indexOf(content).keyNatures.get(cell.key) ?? []).some((n) => natures.some((o) => o === n));
 
 /** Resources the village missions doable with `natures` bring in. */
-function reachableResources(natures: readonly NatureId[], content: ContentDb): Set<string> {
+function reachableResources(natures: readonly string[], content: ContentDb): Set<string> {
   const out = new Set<string>();
   for (const m of villageMissions(content)) {
     if (m.resource && missionDoable(m, natures, content)) out.add(m.resource);
@@ -253,7 +258,7 @@ function reachableResources(natures: readonly NatureId[], content: ContentDb): S
 }
 
 /** Level-6 buildings (those that need resources) whose every resource can be brought in. */
-function reachableBuildings(natures: readonly NatureId[], content: ContentDb): string[] {
+function reachableBuildings(natures: readonly string[], content: ContentDb): string[] {
   const have = reachableResources(natures, content);
   return content.buildings
     .filter((b) => b.tier6 !== null && Object.keys(b.tier6).every((r) => have.has(r)))
@@ -267,10 +272,7 @@ export interface NatureSetSummary {
 }
 
 /** What a set of natures lets the player do: village missions, level-6 buildings and key cells. */
-export function natureSetSummary(
-  natures: readonly NatureId[],
-  content: ContentDb,
-): NatureSetSummary {
+export function natureSetSummary(natures: readonly string[], content: ContentDb): NatureSetSummary {
   const missions = villageMissions(content);
   const cells = natureKeyCells(content);
   return {
@@ -283,14 +285,14 @@ export function natureSetSummary(
       total: content.buildings.filter((b) => b.tier6 !== null).length,
     },
     cells: {
-      ids: cells.filter((c) => cellOpen(c, natures)).map((c) => c.id),
+      ids: cells.filter((c) => cellOpen(c, natures, content)).map((c) => c.id),
       total: cells.length,
     },
   };
 }
 
 export interface NatureConsequences {
-  nature: NatureId;
+  nature: string;
   /** The player owns the nature / it is the native one. */
   owned: boolean;
   native: boolean;
@@ -301,14 +303,14 @@ export interface NatureConsequences {
   /** Key cells of the map this nature opens. */
   cells: string[];
   /** Enemy traits answered by tags of this nature's techniques. */
-  traits: TraitId[];
-  strongAgainst: NatureId;
-  weakAgainst: NatureId;
+  traits: string[];
+  strongAgainst: string;
+  weakAgainst: string;
   /** The rival's and Aya's natures if this one were the native nature. */
-  rival: NatureId;
-  aya: NatureId;
+  rival: string;
+  aya: string;
   /** Status combos this nature takes part in: it triggers them or applies the state they need. */
-  combos: ComboId[];
+  combos: string[];
 }
 
 /**
@@ -317,12 +319,12 @@ export interface NatureConsequences {
  * natures that follow from it as the native nature, and its status combos.
  */
 export function natureConsequences(
-  nature: NatureId,
+  nature: string,
   state: GameState,
   content: ContentDb,
 ): NatureConsequences {
-  const none: readonly NatureId[] = [];
-  const alone: readonly NatureId[] = [nature];
+  const none: readonly string[] = [];
+  const alone: readonly string[] = [nature];
   const baseMissions = new Set(
     villageMissions(content)
       .filter((m) => missionDoable(m, none, content))
@@ -347,23 +349,21 @@ export function natureConsequences(
     for (const tag of t.tags) tags.add(tag);
     if (t.state) states.add(t.state);
   }
-  const traits = (Object.keys(TRAIT_ANSWER) as TraitId[]).filter((id) =>
-    tags.has(TRAIT_ANSWER[id]),
-  );
+  const traits = content.traits.filter((t) => tags.has(t.answer)).map((t) => t.id);
   return {
     nature,
-    owned: state.player.natures.includes(nature),
+    owned: ownsNature(state, nature),
     native: nativeNature(state) === nature,
     missions,
     buildings,
     cells: natureKeyCells(content)
-      .filter((c) => cellOpen(c, alone))
+      .filter((c) => cellOpen(c, alone, content))
       .map((c) => c.id),
     traits,
-    strongAgainst: NATURE_WHEEL[nature],
-    weakAgainst: natureBeating(nature),
-    rival: rivalNatureFor(nature),
-    aya: ayaNatureFor(nature),
+    strongAgainst: natureBeaten(content, nature),
+    weakAgainst: natureBeating(content, nature),
+    rival: rivalNatureFor(content, nature),
+    aya: ayaNatureFor(content, nature),
     // A combo is joined by the nature that triggers it and by the nature whose techniques apply its state.
     combos: content.combos
       .filter((c) => c.nature === nature || states.has(c.onState))

@@ -137,7 +137,7 @@ describe('the non-native cast penalty applies in fights', () => {
   it('stretches the cast of a technique of a nature that is not the native one', () => {
     const native = figures(['katon'], 'core:great_fireball').castMs;
     const foreign = figures(['futon'], 'core:great_fireball').castMs;
-    expect(nonNativeLevel('katon', ['futon'], 20)).toBe(20);
+    expect(nonNativeLevel('katon', ['futon'], 20, content)).toBe(20);
     expect(foreign).toBeGreaterThan(native);
     // Taijutsu and Ninjutsu are no nature: no stretch whoever the native one is.
     expect(figures(['futon'], 'core:leaf_whirlwind').castMs).toBe(

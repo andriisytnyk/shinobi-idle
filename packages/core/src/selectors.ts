@@ -1,4 +1,5 @@
-import type { ContentDb, SkillId } from '@shinobi/content';
+import type { ContentDb } from '@shinobi/content';
+import { actionKindOf } from './actions.ts';
 import { indexOf } from './lookup.ts';
 import {
   MS_PER_HOUR,
@@ -8,11 +9,13 @@ import {
   rate,
   techniqueCastSeconds,
 } from './formulas.ts';
-import { builtObstacles, COURSE_ID, COURSE_KIND, lapXp } from './athletics.ts';
-import { bushOf, bushSize, gatherAverageSeconds, regrowMs } from './field.ts';
+import { builtObstacles, COURSE_KIND, courseSkill, lapXp } from './athletics.ts';
+import { bushOf, bushSize, gatherAverageSeconds, gatherSkill, regrowMs } from './field.ts';
+import { meditationSkill } from './meditation.ts';
 import { getMod } from './mod.ts';
 import { nonNativeLevel } from './natures.ts';
 import { evalReq, skillLevel, type Req, type ReqResult } from './requirements.ts';
+import { activitySkill, isAcademyRank, skillEntry } from './vocab.ts';
 import { defaultRules, type Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 import { levelAt, xpAt } from './xp.ts';
@@ -22,14 +25,14 @@ import { levelAt, xpAt } from './xp.ts';
  */
 
 /** The requirement that opens a skill, or null when it is open from the first day. */
-export function skillUnlockReq(skill: SkillId, content: ContentDb): Req | null {
+export function skillUnlockReq(skill: string, content: ContentDb): Req | null {
   return content.skills.find((s) => s.id === skill)?.unlockReq ?? null;
 }
 
 /** Evaluated unlock requirement of a skill; null when the skill has none. */
 export function skillUnlockStatus(
   state: GameState,
-  skill: SkillId,
+  skill: string,
   content: ContentDb,
 ): ReqResult | null {
   const req = skillUnlockReq(skill, content);
@@ -37,7 +40,7 @@ export function skillUnlockStatus(
 }
 
 /** Whether the skill can be trained yet. */
-export function isSkillUnlocked(state: GameState, skill: SkillId, content: ContentDb): boolean {
+export function isSkillUnlocked(state: GameState, skill: string, content: ContentDb): boolean {
   return skillUnlockStatus(state, skill, content)?.met ?? true;
 }
 
@@ -45,7 +48,7 @@ export function isSkillUnlocked(state: GameState, skill: SkillId, content: Conte
 export interface ActionInfo {
   kind: string;
   id: string;
-  skill: SkillId;
+  skill: string;
   /** Skill level at which the action unlocks. */
   level: number;
   /** Whether the action can be started now: skill open and every requirement met. */
@@ -68,7 +71,7 @@ export interface ActionInfo {
 }
 
 interface Facts {
-  skill: SkillId;
+  skill: string;
   level: number;
   /** Cycle length in ms before modifiers. */
   baseMs: number;
@@ -101,7 +104,7 @@ function factsOf(
         t.sealSeq.length,
         masteryLevel(state, id, content),
         content,
-        nonNativeLevel(t.skill, state.player.natures, skillLevel(state, t.skill, content)),
+        nonNativeLevel(t.skill, state.player.natures, skillLevel(state, t.skill, content), content),
       );
       return {
         skill: t.skill,
@@ -111,17 +114,20 @@ function factsOf(
     }
     case 'drill': {
       const e = index.exercises.get(id);
-      return e ? { skill: 'cc', level: e.level, baseMs: ms(K.drill) } : null;
+      const skill = activitySkill(content, 'drill');
+      return e && skill !== null ? { skill, level: e.level, baseMs: ms(K.drill) } : null;
     }
     case 'meditate': {
       const p = index.practices.get(id);
-      return p ? { skill: 'med', level: p.level, baseMs: ms(K.meditate) } : null;
+      const skill = meditationSkill(content);
+      return p && skill !== null ? { skill, level: p.level, baseMs: ms(K.meditate) } : null;
     }
     case COURSE_KIND: {
-      if (id !== COURSE_ID) return null;
+      const skill = courseSkill(content);
+      if (id !== skill || skill === null) return null;
       const laps = Math.max(1, builtObstacles(state, content).length);
       return {
-        skill: 'ath',
+        skill,
         level: 1,
         baseMs: laps * ms(K.obstacle),
         rewardXp: lapXp(state, content),
@@ -129,11 +135,12 @@ function factsOf(
     }
     case 'gather': {
       const h = index.herbs.get(id);
-      if (!h) return null;
+      const skill = gatherSkill(content);
+      if (!h || skill === null) return null;
       const bush = bushOf(state, id);
       const size = bush?.size ?? bushSize(state, id, content, rules);
       return {
-        skill: 'herb',
+        skill,
         level: h.level,
         baseMs: ms(K.gather),
         rewardMs: gatherAverageSeconds(size, content) * MS_PER_SECOND,
@@ -173,7 +180,7 @@ export function actionInfo(
   content: ContentDb,
   rules: Rules = defaultRules,
 ): ActionInfo | null {
-  const kind = rules.actionKinds[action.kind];
+  const kind = actionKindOf(rules, action.kind);
   if (!kind || !kind.has(action.id, content)) return null;
   const facts = factsOf(state, action.kind, action.id, content, rules);
   if (!facts) return null;
@@ -200,7 +207,10 @@ export function actionInfo(
       : (facts.rewardXp * MS_PER_HOUR) / intervalMs;
   xpPerHour *= getMod(state, 'xp.all', content, rules).total;
   xpPerHour *= getMod(state, `xp.skill.${skill}`, content, rules).total;
-  if (state.player.rank === 'student' && state.skills[skill].xp >= xpAt(K.academyCap)) {
+  if (
+    isAcademyRank(content, state.player.rank) &&
+    (skillEntry(state, skill)?.xp ?? 0) >= xpAt(K.academyCap)
+  ) {
     xpPerHour *= K.academySlow;
   }
 
@@ -223,31 +233,28 @@ export function actionInfo(
 }
 
 /** The action kind and ids a skill trains through; empty for skills with no actions yet. */
-function skillActionIds(skill: SkillId, content: ContentDb): { kind: string; id: string }[] {
+function skillActionIds(skill: string, content: ContentDb): { kind: string; id: string }[] {
   const by = <T extends { id: string; level: number }>(kind: string, list: readonly T[]) =>
     [...list].sort((a, b) => a.level - b.level).map((e) => ({ kind, id: e.id }));
-  switch (skill) {
-    case 'tai':
-    case 'nin':
-    case 'katon':
-    case 'futon':
-    case 'raiton':
-    case 'doton':
-    case 'suiton':
+  const data = indexOf(content).skills.get(skill);
+  // What a skill trains follows from its activity; the list-based activities belong to the first skill that has them.
+  const owns = (activity: string): boolean => activitySkill(content, activity) === skill;
+  switch (data?.activity) {
+    case 'tech':
       return by(
         'practice',
         content.techniques.filter((t) => t.skill === skill),
       );
-    case 'cc':
-      return by('drill', content.exercises);
-    case 'med':
-      return by('meditate', content.practices);
-    case 'ath':
-      return [{ kind: COURSE_KIND, id: COURSE_ID }];
-    case 'herb':
-      return by('gather', content.herbs);
-    case 'alch':
-    case 'prov':
+    case 'drill':
+      return owns('drill') ? by('drill', content.exercises) : [];
+    case 'insight':
+      return owns('insight') ? by('meditate', content.practices) : [];
+    case 'course':
+      return owns('course') ? [{ kind: COURSE_KIND, id: skill }] : [];
+    case 'patch':
+      return owns('patch') ? by('gather', content.herbs) : [];
+    case 'recipe':
+    case 'station':
       return by(
         'craft',
         content.recipes.filter((r) => r.skill === skill),
@@ -260,7 +267,7 @@ function skillActionIds(skill: SkillId, content: ContentDb): { kind: string; id:
 /** Every action of a skill with its tile data, lowest unlock level first. */
 export function listSkillActions(
   state: GameState,
-  skill: SkillId,
+  skill: string,
   content: ContentDb,
   rules: Rules = defaultRules,
 ): ActionInfo[] {

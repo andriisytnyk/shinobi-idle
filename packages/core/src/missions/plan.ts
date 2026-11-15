@@ -1,26 +1,14 @@
-import {
-  NATURE_IDS,
-  isModifierKey,
-  TECH_SKILL_IDS,
-  type ContentDb,
-  type Mission,
-  type MissionStage,
-  type NatureId,
-  type SkillId,
-  type Teammate,
-} from '@shinobi/content';
+import type { ContentDb, Mission, MissionStage, NatureId, Teammate } from '@shinobi/content';
 import { MS_PER_MINUTE, masteryLevel } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
 import { computeMod } from '../modifiers.ts';
 import { skillLevel, type Req } from '../requirements.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
+import { currencyOf, isNature, isTechSkill } from '../vocab.ts';
 
 /** The performer of a stage when the player does it. */
 export const SELF = 'self';
-
-const isNature = (s: string): s is NatureId => (NATURE_IDS as readonly string[]).includes(s);
-const isTechSkill = (s: string): boolean => (TECH_SKILL_IDS as readonly string[]).includes(s);
 
 /**
  * How one stage is done: who does it (the player or a teammate), with which skill and technique,
@@ -88,9 +76,9 @@ export function teammateLevel(
 ): number | null {
   const share = content.balance.K.team.levelShare;
   if (member.tm.skills.some((s) => s === skill)) {
-    return Math.max(1, Math.floor(share * skillLevel(state, skill as SkillId, content)));
+    return Math.max(1, Math.floor(share * skillLevel(state, skill, content)));
   }
-  if (isNature(skill) && member.nature === skill) {
+  if (isNature(content, skill) && member.nature === skill) {
     return Math.max(1, Math.floor(share * bestNatureLevel(state, content)));
   }
   return null;
@@ -123,11 +111,11 @@ function candidates(
   const K = content.balance.K;
   const self = (c: Omit<Candidate, 'who' | 'intel'>): void =>
     void out.push({ who: SELF, intel: 0, ...c });
-  const level = (skill: string): number => skillLevel(state, skill as SkillId, content);
+  const level = (skill: string): number => skillLevel(state, skill, content);
 
   /** One requirement `skill >= min`, done by the player, then by each teammate who can. */
   const alternative = (skill: string, min: number, slow: boolean): void => {
-    if (!isTechSkill(skill)) {
+    if (!isTechSkill(content, skill)) {
       if (level(skill) >= min) {
         self({ skill, tech: '', level: level(skill), min, mastery: 1, slow });
       }
@@ -136,7 +124,7 @@ function candidates(
       const lvl = level(skill);
       if (tech && lvl >= min) {
         self({ skill, tech: tech.id, level: lvl, min, mastery: tech.mastery, slow });
-      } else if (!isNature(skill) && lvl >= min) {
+      } else if (!isNature(content, skill) && lvl >= min) {
         // Taijutsu and Ninjutsu stand on the skill alone when no technique of the level is known.
         self({ skill, tech: '', level: lvl, min, mastery: 1, slow });
       }
@@ -190,7 +178,8 @@ function candidates(
   }
   // Intel can stand in for a stage's skill: it is the way of last resort.
   const cost = mission.skip[index] ?? 0;
-  if (cost > 0 && state.currencies.intel >= cost) {
+  const intel = currencyOf(content, 'intel');
+  if (cost > 0 && intel !== null && (state.currencies[intel] ?? 0) >= cost) {
     out.push({
       who: SELF,
       skill: '',
@@ -217,7 +206,7 @@ function durationFactor(
   let factor = computeMod(rules.modifierProviders, state, 'mission.duration', content).total;
   // A stage a technique of a skill performs may be shortened by a key of that skill (`mission.duration.<skill>`).
   const key = `mission.duration.${skill}`;
-  if (tech !== '' && isModifierKey(key)) {
+  if (tech !== '' && Object.hasOwn(content.modifierKeys, key)) {
     factor *= computeMod(rules.modifierProviders, state, key, content).total;
   }
   return Math.max(content.balance.K.mission.minFactor, factor * (1 + ration));
@@ -318,7 +307,7 @@ function staticReq(stage: MissionStage, content: ContentDb): Req {
         t: 'any',
         of: stage.any.map((alt): Req => {
           const leaf: Req = { t: 'skill', skill: alt.skill, level: alt.min };
-          return isNature(alt.skill)
+          return isNature(content, alt.skill)
             ? { t: 'all', of: [leaf, techniquesOf(alt.skill, alt.min)] }
             : leaf;
         }),
