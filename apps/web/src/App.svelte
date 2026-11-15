@@ -22,11 +22,14 @@
   import CombatPage from './pages/CombatPage.svelte';
   import CreditsPage from './pages/CreditsPage.svelte';
   import EntityPage from './pages/EntityPage.svelte';
+  import GearPage from './pages/GearPage.svelte';
   import HelpPage from './pages/HelpPage.svelte';
   import MorePage from './pages/MorePage.svelte';
   import NaturePage from './pages/NaturePage.svelte';
   import QuestsPage from './pages/QuestsPage.svelte';
   import RankPage from './pages/RankPage.svelte';
+  import RecipePage from './pages/RecipePage.svelte';
+  import ShopPage from './pages/ShopPage.svelte';
   import SimplePage from './pages/SimplePage.svelte';
   import ItemPage from './pages/ItemPage.svelte';
   import SettingsPage from './pages/SettingsPage.svelte';
@@ -80,6 +83,8 @@
         <CombatPage />
       {:else if route.page === 'bank'}
         <BankPage />
+      {:else if route.page === 'shop'}
+        <ShopPage section={'section' in route ? route.section : undefined} />
       {:else if route.page === 'nature'}
         <NaturePage />
       {:else if route.page === 'help'}
@@ -100,6 +105,10 @@
         <SkillPage id={route.ref.id} />
       {:else if route.page === 'entity' && route.ref.kind === 'technique'}
         <TechniquePage id={route.ref.id} />
+      {:else if route.page === 'entity' && route.ref.kind === 'recipe'}
+        <RecipePage id={route.ref.id} />
+      {:else if route.page === 'entity' && route.ref.kind === 'gear'}
+        <GearPage id={route.ref.id} />
       {:else if route.page === 'entity' && route.ref.kind === 'item'}
         <ItemPage id={route.ref.id} />
       {:else if route.page === 'entity'}

@@ -3,6 +3,7 @@ import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { content, NATURE_IDS, SKILL_IDS, ukLocale } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
+import { BANK_TABS } from '../src/lib/crafts.ts';
 import { HINTS } from '../src/lib/hints.ts';
 
 const src = fileURLToPath(new URL('../src', import.meta.url));
@@ -72,6 +73,9 @@ describe('interface strings', () => {
         'combo',
       ],
       'nature.character.': NATURE_IDS,
+      'shop.section.': ['market', 'forge', 'sell', 'gear'],
+      'bank.tab.': BANK_TABS,
+      'craft.src.': ['herb', 'shop', 'craft', 'item'],
     };
     const missing: string[] = [];
     for (const [prefix, ids] of Object.entries(families)) {

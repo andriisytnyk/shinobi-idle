@@ -34,6 +34,14 @@ export const NAV: readonly NavItem[] = [
     side: true,
   },
   { id: 'bank', href: '#/bank', label: 'nav.bank', icon: 'lucide:package', tab: true, side: true },
+  {
+    id: 'shop',
+    href: '#/shop',
+    label: 'nav.shop',
+    icon: 'lucide:store',
+    tab: false,
+    side: true,
+  },
   { id: 'rank', href: '#/rank', label: 'nav.rank', icon: 'rank-3', tab: false, side: true },
   {
     id: 'help',
@@ -64,6 +72,8 @@ export function activeNav(route: Route): string | null {
       return 'combat';
     case 'bank':
       return 'bank';
+    case 'shop':
+      return 'shop';
     case 'rank':
       return 'rank';
     case 'tab':
@@ -79,6 +89,8 @@ export function activeNav(route: Route): string | null {
       if (route.ref.kind === 'skill') return 'skills';
       if (route.ref.kind === 'quest') return 'quests';
       if (route.ref.kind === 'exam') return 'rank';
+      if (route.ref.kind === 'recipe') return 'skills';
+      if (route.ref.kind === 'gear') return 'shop';
       return null;
     default:
       return null;

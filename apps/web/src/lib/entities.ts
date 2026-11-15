@@ -36,6 +36,8 @@ const ACTION_ENTITY: Readonly<Record<string, EntityKind>> = {
   drill: 'exercise',
   meditate: 'practice',
   course: 'skill',
+  gather: 'item',
+  craft: 'recipe',
   fight: 'enemy',
   senseiTest: 'exam',
 };

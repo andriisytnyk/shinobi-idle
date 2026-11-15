@@ -7,6 +7,7 @@ import { game } from './lib/store.ts';
 import './fonts.css';
 import './tokens.css';
 import './app.css';
+import './tiles.css';
 
 const target = document.getElementById('app');
 if (!target) throw new Error('Missing #app element');

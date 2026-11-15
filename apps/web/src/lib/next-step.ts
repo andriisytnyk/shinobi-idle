@@ -1,5 +1,6 @@
 import type { ContentDb, Quest, QuestObjective } from '@shinobi/content';
 import { counterValue, evalReq, examFor, type GameState, type ReqResult } from '@shinobi/core';
+import { itemPlace } from './crafts.ts';
 import { hrefFor } from './route.ts';
 
 export type StepStatus = 'done' | 'current' | 'pending';
@@ -66,7 +67,7 @@ function pageFor(state: GameState, node: ReqResult, content: ContentDb): string 
     case 'nature':
       return '#/nature';
     case 'item':
-      return '#/bank';
+      return itemPlace(req.id, content) ?? '#/bank';
     case 'flag':
       return req.id === 'firstFight' ? '#/combat' : '#/quests';
     default:
