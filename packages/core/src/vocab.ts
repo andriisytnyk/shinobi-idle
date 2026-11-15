@@ -50,17 +50,17 @@ export function isTechSkill(content: ContentDb, id: string): boolean {
 
 /**
  * The XP record of a skill in the state; undefined for a skill the state does not have (the pack
- * of the skill is missing). The widening keeps the narrow legacy keys of the state type out of the way.
+ * of the skill is missing). Skill ids come from the content, whose ids are never names of `Object`. The widening keeps the narrow legacy keys of the state type out of the way.
  */
 export function skillEntry(state: GameState, id: string): { xp: number } | undefined {
   const skills: Record<string, { xp: number }> = state.skills;
-  return Object.hasOwn(skills, id) ? skills[id] : undefined;
+  return skills[id];
 }
 
 /** The pool record of a skill in the state; see `skillEntry`. */
 export function poolEntry(state: GameState, id: string): { xp: number } | undefined {
   const pools: Record<string, { xp: number }> = state.pools;
-  return Object.hasOwn(pools, id) ? pools[id] : undefined;
+  return pools[id];
 }
 
 /** Whether the player owns the nature. */
