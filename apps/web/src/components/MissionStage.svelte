@@ -16,17 +16,26 @@
     floor: number;
     /** The stage under way in a running mission. */
     current?: boolean;
+    /** How many times longer a slow fallback takes, and the skills every fight pays besides its style skill. */
+    slowK: number;
+    fightSkills: string[];
   }
 
-  let { missionId, view, kind, ration, floor, current = false }: Props = $props();
+  let {
+    missionId,
+    view,
+    kind,
+    ration,
+    floor,
+    current = false,
+    slowK,
+    fightSkills,
+  }: Props = $props();
 
   const stage = $derived(view.forecast);
   const path = $derived(stage.path);
   const self = $derived(path?.who === 'self');
   /** Why a teammate does the stage: the player has no normal way of their own. */
-  const reasonKey = $derived(
-    path && !self ? (path.slow ? 'mission.who.reasonSlow' : 'mission.who.reason') : '',
-  );
   const notes = $derived.by(() => {
     const out: { label: string; value: string }[] = [];
     if (Math.abs(view.residual - 1) > 0.005) {
@@ -58,9 +67,9 @@
       {#if view.head.labelKey}<span data-stage-label>{t(view.head.labelKey)}</span>{:else}{t(
           `mission.stage.kind.${kind}`,
         )}{/if}
-      {#if view.head.ref}
-        <EntityLink kind={view.head.ref.kind} id={view.head.ref.id} />
-      {/if}
+      {#each view.head.refs as ref (`${ref.kind}:${ref.id}`)}
+        <span class="chip" data-stage-chip><EntityLink kind={ref.kind} id={ref.id} /></span>
+      {/each}
     </h3>
     {#if view.head.combat}
       <a class="to-combat" href="#/combat">{t('mission.stage.toCombat')}</a>
@@ -77,10 +86,20 @@
           data-used={way.used}
           data-slow={way.alt.slow}
           data-intel={way.alt.intel > 0}
+          data-met={way.met}
         >
           <div class="what">
             {#if way.result}
               <ReqTree node={way.result} />
+              {#if way.alt.techNeeded}
+                <div class="need" class:met={way.techMet} data-need-tech data-met={way.techMet}>
+                  <Icon name={way.techMet ? 'lucide:check' : 'lucide:minus'} size={14} />
+                  <EntityLink kind="skill" id={way.alt.techNeeded.skill} />
+                  <span class="dim"
+                    >{t('mission.stage.needTech', { min: way.alt.techNeeded.min })}</span
+                  >
+                </div>
+              {/if}
             {:else}
               <span class="intel">
                 <Icon entity={{ kind: 'currency', id: 'intel' }} size={16} />
@@ -94,7 +113,11 @@
           <span class="tags">
             {#if way.used}<span class="tag used-tag" data-tag="used">{t('mission.stage.used')}</span
               >{/if}
-            {#if way.alt.slow}<span class="tag" data-tag="slow">{t('mission.stage.slow')}</span
+            {#if way.alt.slow}<span class="tag" data-tag="slow"
+                >{t('mission.stage.slow', { k: slowK })}</span
+              >{/if}
+            {#if !way.met && way.alt.intel === 0}<span class="tag" data-tag="unmet"
+                >{t('mission.stage.altUnmet')}</span
               >{/if}
           </span>
         </li>
@@ -128,7 +151,7 @@
             <span data-entity="teammate:{path.who}">
               {t('mission.who.mate', { name: t(`teammate.${path.who}.name`) })}
             </span>
-            <span class="dim" data-who-reason>{t(reasonKey)}</span>
+            <span class="dim" data-who-reason>{t('mission.who.reason')}</span>
           {/if}
         </dd>
       </div>
@@ -149,11 +172,26 @@
           <dd>{Math.round(stage.chance * 100)}%</dd>
         </div>
       {/if}
-      {#if view.reward.xp.length > 0}
+      {#if view.reward.fight !== null}
+        <div data-stage-fight-xp data-value={view.reward.fight}>
+          <dt>{t('mission.stage.fightXp')}</dt>
+          <dd>
+            {t('mission.stage.fightXpValue', { n: formatXp(view.reward.fight) })}
+            <span class="dim">
+              {t('mission.stage.fightXpWhere')}
+              {#each fightSkills as skill, i (skill)}<EntityLink
+                  kind="skill"
+                  id={skill}
+                />{#if i < fightSkills.length - 1}<span>, </span>{/if}{/each}
+            </span>
+          </dd>
+        </div>
+      {/if}
+      {#if view.reward.skills.length > 0}
         <div data-stage-xp>
           <dt>{t('mission.stage.xp')}</dt>
           <dd>
-            {#each view.reward.xp as xp, i (xp.skill)}
+            {#each view.reward.skills as xp, i (xp.skill)}
               {#if i > 0},
               {/if}
               {t('mission.stage.xpValue', { n: formatXp(xp.amount) })}
@@ -232,6 +270,22 @@
 
   .name :global(a) {
     color: var(--heading);
+  }
+
+  .chip {
+    font-weight: 400;
+  }
+
+  .need {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+    color: var(--fg-dim);
+  }
+
+  .need.met {
+    color: var(--fg);
   }
 
   .to-combat {
@@ -328,5 +382,20 @@
 
   p {
     margin: 0;
+  }
+  @media (max-width: 768px) {
+    .stage {
+      gap: var(--space-1);
+      padding: var(--space-2);
+    }
+
+    .facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-1) var(--space-3);
+    }
+
+    .alt {
+      padding: 0 var(--space-2);
+    }
   }
 </style>

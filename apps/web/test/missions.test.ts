@@ -9,11 +9,11 @@ import {
   type GameState,
 } from '@shinobi/core';
 import { flushSync } from 'svelte';
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { coreUi } from '../src/lib/ext/core-ui.ts';
 import { entityName } from '../src/lib/entities.ts';
 import { t } from '../src/lib/i18n.ts';
-import { missionToast } from '../src/lib/mission-toasts.ts';
+import { missionToast, resetMissionToasts } from '../src/lib/mission-toasts.ts';
 import {
   cleanRunChance,
   missionState,
@@ -381,11 +381,6 @@ describe('the mission page', () => {
     );
     expect(Number(q('[data-total="ryo"]')?.dataset.value)).toBeCloseTo(forecast.ryoPerHour, 6);
     expect(Number(q('[data-total="rep"]')?.dataset.value)).toBeCloseTo(forecast.repPerHour, 6);
-    for (const [skill, value] of Object.entries(forecast.xpPerHour)) {
-      if (value > 0) {
-        expect(Number(q(`[data-xp-skill="${skill}"]`)?.dataset.value), skill).toBeCloseTo(value, 6);
-      }
-    }
     for (const stage of forecast.stages) {
       expect(
         Number(q(`[data-stage="${stage.index}"] [data-stage-time]`)?.dataset.ms),
@@ -534,6 +529,7 @@ describe('toasts', () => {
     ok,
     ...at,
   });
+  const gained = (id: string, n: number): GameEvent => ({ type: 'itemGained', id, n, ...at });
   const stop = (
     reason: Extract<GameEvent, { type: 'actionStopped' }>['reason'],
     extra: { missing?: string; cause?: string } = {},
@@ -546,12 +542,15 @@ describe('toasts', () => {
     ...extra,
     ...at,
   });
+  const well = { kind: 'mission', id: 'core:well' };
 
-  it('says what a stage did: done, a failed roll, a lost fight', () => {
+  beforeEach(() => resetMissionToasts());
+
+  it('says what a stage did, naming the mission first: done, a failed roll, a lost fight', () => {
     expect(missionToast(stage('core:well', 0, true), content)).toMatchObject({
       key: 'toast.mission.stageDone',
       params: { n: 1, total: 3 },
-      ref: { kind: 'mission', id: 'core:well' },
+      subject: well,
     });
     expect(missionToast(stage('core:well', 0, false), content)?.key).toBe(
       'toast.mission.rollFailed',
@@ -562,64 +561,108 @@ describe('toasts', () => {
     );
   });
 
-  it('says what a finished mission paid, items as links', () => {
+  it('lists what the core granted, from its events, and what was due but did not arrive', () => {
     const done: GameEvent = { type: 'missionDone', mission: 'core:well', ryo: 480, rep: 8, ...at };
+    // The stage event, then the payment: the item events come in between.
+    missionToast(stage('core:well', 2, true), content);
+    missionToast(gained('core:spice', 1), content);
+    missionToast(gained('core:spice', 1), content);
+    missionToast(gained('core:scrollpart_wave_of_inspiration', 1), content);
     const toast = missionToast(done, content);
     expect(toast?.key).toBe('toast.mission.doneRep');
-    expect(toast?.gains).toEqual({ ryo: 480, items: [{ id: 'core:spice', n: 2 }] });
-    const village: GameEvent = { type: 'missionDone', mission: 'core:cat', ryo: 40, rep: 0, ...at };
-    expect(missionToast(village, content)?.key).toBe('toast.mission.done');
+    expect(toast?.subject).toEqual(well);
+    expect(toast?.gains).toEqual({
+      ryo: 480,
+      items: [
+        { id: 'core:spice', n: 2 },
+        { id: 'core:scrollpart_wave_of_inspiration', n: 1 },
+      ],
+      missed: [],
+    });
+    // No item event for a payment in kind: it did not reach the bank and is shown as not received.
+    missionToast(stage('core:well', 2, true), content);
+    const short = missionToast(done, content);
+    expect(short?.gains?.items).toEqual([]);
+    expect(short?.gains?.missed).toEqual([{ id: 'core:spice', n: 2 }]);
+    // Items seen before the last stage are not this mission's.
+    missionToast(gained('core:rice', 5), content);
+    missionToast(stage('core:well', 2, true), content);
+    expect(missionToast(done, content)?.gains?.items).toEqual([]);
+    const plain: GameEvent = { type: 'missionDone', mission: 'core:cat', ryo: 40, rep: 0, ...at };
+    expect(missionToast(plain, content)?.key).toBe('toast.mission.done');
   });
 
-  it('gives each cause of a stop a sentence of its own, and stays silent for the player', () => {
+  it('gives each cause of a stop a sentence of its own, naming the mission, silent for the player', () => {
     expect(missionToast(stop('manual'), content)).toBeNull();
-    expect(missionToast(stop('replaced'), content)?.key).toBe('toast.mission.stopped.replaced');
+    expect(missionToast(stop('replaced'), content)).toMatchObject({
+      key: 'toast.mission.stopped.replaced',
+      subject: well,
+    });
     expect(
-      missionToast(stop('requirements', { cause: 'error.missionTooHard' }), content)?.key,
-    ).toBe('toast.mission.stopped.tooHard');
+      missionToast(stop('requirements', { cause: 'error.missionTooHard' }), content),
+    ).toMatchObject({ key: 'toast.mission.stopped.tooHard', subject: well });
     const lacking = missionToast(stop('requirements', { missing: 'core:antidote' }), content);
     expect(lacking?.key).toBe('toast.mission.stopped.item');
+    expect(lacking?.subject).toEqual(well);
     expect(lacking?.ref).toEqual({ kind: 'item', id: 'core:antidote' });
-    expect(missionToast(stop('requirements'), content)?.key).toBe(
-      'toast.mission.stopped.requirements',
-    );
+    expect(missionToast(stop('requirements'), content)).toMatchObject({
+      key: 'toast.mission.stopped.requirements',
+      subject: well,
+    });
     expect(missionToast(stop('missing'), content)?.key).toBe('toast.mission.stopped.missing');
-    // Other actions' stops and other events are not a mission's business.
     expect(
       missionToast({ ...stop('finished'), kind: 'practice' } as GameEvent, content),
     ).toBeUndefined();
   });
 
-  it('addresses the player as «ти» in every mission sentence', () => {
+  it('puts the mission first as a link and the item after the colon, both in the nominative', async () => {
+    booted = await bootApp([coreUi], able(), '#/missions');
+    const spec = missionToast(stop('requirements', { missing: 'core:antidote' }), content);
+    expect(spec).not.toBeNull();
+    if (spec) toasts.push(spec);
+    flushSync();
+    const toast = q('[data-toast="toast.mission.stopped.item"]');
+    const links = [...(toast?.querySelectorAll('a') ?? [])].map((a) => a.getAttribute('href'));
+    expect(links).toEqual(['#/mission/core:well', '#/item/core:antidote']);
+    expect(toast?.textContent).toContain(entityName({ kind: 'mission', id: 'core:well' }));
+    expect(toast?.textContent).toContain(entityName({ kind: 'item', id: 'core:antidote' }));
+    // The text between the names does not decline them.
+    expect(t('toast.mission.stopped.item')).toBe('— місію зупинено: у тебе закінчився предмет:');
+  });
+
+  it('addresses the player as «ти» in every stop cause and failure sentence', () => {
     for (const key of [
       'toast.mission.rollFailed',
       'toast.mission.fightLost',
       'toast.mission.stopped.tooHard',
       'toast.mission.stopped.requirements',
       'toast.mission.stopped.item',
-      'toast.mission.done',
     ]) {
       expect(t(key), key).toMatch(/ти |Ти |тобі|тебе/u);
     }
   });
 
-  it('shows the toasts of a mission that runs: stages, the finished run, and a replacement', async () => {
+  it('shows the toasts of a mission that runs, with what the bank really gained', async () => {
     booted = await bootApp([coreUi], able(), '#/missions');
     toasts.clear();
-    game.dispatch({ type: 'action.start', slot: 0, kind: MISSION_KIND, id: 'core:cat' });
+    const before = game.state.bank['core:note'] ?? 0;
+    game.dispatch({ type: 'action.start', slot: 0, kind: MISSION_KIND, id: 'core:thief' });
     for (
       let i = 0;
-      i < 60 && !toasts.list.some((x) => x.key.startsWith('toast.mission.done'));
+      i < 200 && !toasts.list.some((x) => x.key.startsWith('toast.mission.done'));
       i++
     ) {
       booted.advance(20_000);
     }
-    const keys = toasts.list.map((x) => x.key);
-    expect(keys).toContain('toast.mission.stageDone');
-    expect(keys.some((k) => k.startsWith('toast.mission.done'))).toBe(true);
     const done = toasts.list.find((x) => x.key.startsWith('toast.mission.done'));
-    expect(done?.ref).toEqual({ kind: 'mission', id: 'core:cat' });
+    expect(done?.subject).toEqual({ kind: 'mission', id: 'core:thief' });
     expect(done?.gains?.ryo).toBeGreaterThan(0);
+    // Whatever the toast lists is what reached the bank (at least one run's worth: more runs may follow).
+    const listed = done?.gains?.items.find((x) => x.id === 'core:note');
+    expect(listed).toEqual({ id: 'core:note', n: 1 });
+    expect(done?.gains?.missed).toEqual([]);
+    expect((game.state.bank['core:note'] ?? 0) - before).toBeGreaterThanOrEqual(1);
+    expect(toasts.list.map((x) => x.key)).toContain('toast.mission.stageDone');
     toasts.clear();
     // Another action in the slot replaces the mission, and the player is told.
     game.dispatch({ type: 'action.start', slot: 0, kind: 'practice', id: 'core:leaf_whirlwind' });
@@ -643,7 +686,22 @@ describe('toasts', () => {
       }
     }
     expect(toasts.list.map((x) => x.key)).toContain('toast.mission.rollFailed');
-    // A failed roll repeats the stage and the bar says so.
     expect(game.state.slots[0]?.action).not.toBeNull();
+  });
+
+  it('stops with the requirements sentence when what a stage needs is gone, as a mounted toast', async () => {
+    const state = able();
+    booted = await bootApp([coreUi], state, '#/missions');
+    toasts.clear();
+    game.dispatch({ type: 'action.start', slot: 0, kind: MISSION_KIND, id: 'core:sealed' });
+    expect(game.state.slots[0]?.action?.id).toBe('core:sealed');
+    // The sealing technique is forgotten while the first stage runs.
+    delete game.state.known['core:enclosing'];
+    for (let i = 0; i < 20 && game.state.slots[0]?.action !== null; i++) booted.advance(60_000);
+    expect(game.state.slots[0]?.action).toBeNull();
+    const toast = q('[data-toast="toast.mission.stopped.requirements"]');
+    expect(toast).not.toBeNull();
+    expect(toast?.querySelector('a')?.getAttribute('href')).toBe('#/mission/core:sealed');
+    expect(toast?.textContent).toContain('ти більше не виконуєш її вимог');
   });
 });

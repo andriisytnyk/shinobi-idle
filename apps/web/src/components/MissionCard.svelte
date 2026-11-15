@@ -24,7 +24,7 @@
   /** Whether a team goes with the player, for a mission that asks for one. */
   const hasTeam = $derived(game.read((gs) => gs.team !== null));
   const state = $derived(cardState(mission, view.blocker));
-  const rewards = $derived(rewardsOf(mission, forecast, game.content));
+  const rewards = $derived(rewardsOf(forecast, game.content));
   const chance = $derived(cleanRunChance(forecast));
   const clientKey = $derived(`mission.${mission.id}.client`);
 
@@ -105,7 +105,7 @@
       {t('mission.running', { n: state.slot + 1 })}
     </p>
   {:else if state.kind === 'blocked'}
-    <div class="why" data-why={state.reason}>
+    <div class="why" id="why-{mission.id}" data-why={state.reason}>
       {#if state.blocker}
         <ReqTree node={state.blocker} />
       {/if}
@@ -131,6 +131,7 @@
     class:stop={state.kind === 'running'}
     disabled={state.kind === 'blocked'}
     data-start
+    aria-describedby={state.kind === 'blocked' ? `why-${mission.id}` : undefined}
     onclick={start}
   >
     {t(state.kind === 'running' ? 'tile.stop' : 'tile.start')}
@@ -156,8 +157,9 @@
   }
 
   .ct-name {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .rewards {
@@ -176,5 +178,21 @@
   .why .ct-why :global(a),
   .ct-note :global(a) {
     color: var(--accent);
+  }
+  /* On a phone the card is tighter: spacing one step down, the rewards on one wrapping line. */
+  @media (max-width: 768px) {
+    .card {
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+    }
+
+    .rewards {
+      align-items: center;
+      gap: var(--space-1) var(--space-2);
+    }
+
+    .team {
+      font-size: var(--text-2xs);
+    }
   }
 </style>

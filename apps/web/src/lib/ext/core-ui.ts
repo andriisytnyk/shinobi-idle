@@ -222,6 +222,7 @@ export const coreUi: UiPack = {
       order: 15,
       // The phone bar keeps five tabs: missions are the second section of the journal there.
       tabOrder: 45,
+      tab: 'quests',
     });
     ui.addNavItem({
       id: 'combat',

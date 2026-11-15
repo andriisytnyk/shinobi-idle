@@ -10,9 +10,15 @@ export interface Toast {
   /** Message key; the text ends where the entity link begins. */
   key: string;
   params: Params;
+  /** An entity the toast is about, as a link before the text (the sentence goes on after the name). */
+  subject?: EntityRef;
   ref?: EntityRef;
-  /** What a claimed cache or vault gave: ryo and items, the items as links. */
-  gains?: { ryo: number; items: { id: string; n: number }[] };
+  /** What a claimed cache or vault gave: ryo and items, the items as links; `missed` is what was due but not received. */
+  gains?: {
+    ryo: number;
+    items: { id: string; n: number }[];
+    missed?: { id: string; n: number }[];
+  };
   /**
    * A button on the toast; pressing it runs `run` and closes the toast, unless `run` returns (or
    * resolves to) `false`: then the toast stays so the player can try again.

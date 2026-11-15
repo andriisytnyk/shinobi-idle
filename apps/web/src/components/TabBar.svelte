@@ -2,7 +2,7 @@
   import { content } from '@shinobi/content';
   import { useUi } from '../lib/ext/runtime.svelte.ts';
   import { t } from '../lib/i18n.ts';
-  import { activeNav, markerOf, morePages, tabItems } from '../lib/nav.ts';
+  import { activeNav, markerOf, morePages, tabItems, tabOf } from '../lib/nav.ts';
   import { nextStep } from '../lib/next-step.ts';
   import { currentHash } from '../lib/router.svelte.ts';
   import { game } from '../lib/store.ts';
@@ -17,12 +17,15 @@
   ]);
   // Pages reached from the "More" tab keep it lit.
   const activeTab = $derived.by(() => {
-    const id = activeNav(currentHash(), ui.registry);
+    const id = tabOf(ui.registry, activeNav(currentHash(), ui.registry));
     return id !== null && more.includes(id) ? 'more' : id;
   });
   const marker = $derived(
     game.read((gs) => {
-      const nav = markerOf(nextStep(gs, content)?.target ?? null, ui.registry).nav;
+      const nav = tabOf(
+        ui.registry,
+        markerOf(nextStep(gs, content)?.target ?? null, ui.registry).nav,
+      );
       return nav !== null && more.includes(nav) ? 'more' : nav;
     }),
   );

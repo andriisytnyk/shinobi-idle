@@ -12,11 +12,13 @@
     parts: Modifier[];
     /** What the figure is before any bonus, as text. */
     base?: string;
-    /** Extra lines after the parts (a ration, a floor), already as text. */
-    notes?: { label: string; value: string }[];
+    /** The base as a number, for the machine-readable line. */
+    baseRaw?: number;
+    /** Extra lines after the parts (a ration, a floor, the runs per hour), already as text; `raw` is the number behind the text. */
+    notes?: { label: string; value: string; key?: string; raw?: number }[];
   }
 
-  let { display, parts, base, notes = [] }: Props = $props();
+  let { display, parts, base, baseRaw, notes = [] }: Props = $props();
 
   let open = $state(false);
 
@@ -31,10 +33,18 @@
   {#if open}
     <span class="list" role="group" aria-label={t('mod.title')}>
       {#if base !== undefined}
-        <span class="line"><span>{t('mod.base')}</span><span>{base}</span></span>
+        <span class="line" data-line="base" data-raw={baseRaw}
+          ><span>{t('mod.base')}</span><span>{base}</span></span
+        >
       {/if}
       {#each parts as part, i (i)}
-        <span class="line">
+        <span
+          class="line"
+          data-line="part"
+          data-op={part.op}
+          data-group={part.group}
+          data-raw={part.value}
+        >
           <span class="source">
             {#if typeof part.source !== 'string' && isEntityKind(part.source.kind)}
               <EntityLink kind={part.source.kind} id={part.source.id} />
@@ -46,7 +56,9 @@
         </span>
       {/each}
       {#each notes as note (note.label)}
-        <span class="line"><span>{note.label}</span><span>{note.value}</span></span>
+        <span class="line" data-line="note" data-key={note.key} data-raw={note.raw}
+          ><span>{note.label}</span><span>{note.value}</span></span
+        >
       {/each}
       {#if parts.length === 0 && notes.length === 0}
         <span class="line none">{t('mod.none')}</span>

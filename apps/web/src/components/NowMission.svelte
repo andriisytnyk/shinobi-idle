@@ -24,9 +24,9 @@
     {:else if now.head.labelKey}
       {t(now.head.labelKey)}
     {/if}
-    {#if now.head.ref}
-      <EntityLink kind={now.head.ref.kind} id={now.head.ref.id} />
-    {/if}
+    {#each now.head.refs as ref (`${ref.kind}:${ref.id}`)}
+      <EntityLink kind={ref.kind} id={ref.id} />
+    {/each}
   </span>
   <span class="who" data-now-who={now.who}>
     {#if self}{t('mission.who.self')}{:else}{t('mission.who.mate', {

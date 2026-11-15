@@ -1,11 +1,14 @@
-import { scrollPartId, type ContentDb, type Mission } from '@shinobi/content';
+import { scrollPartId, type ContentDb, type Mission, type SkillId } from '@shinobi/content';
 import {
   MISSION_KIND,
-  SELF,
+  buildingLevel,
   effectiveLoadout,
   evalReq,
+  masteryLevel,
+  skillLevel,
   getMod,
   isCombatKind,
+  MS_PER_HOUR,
   missionBlocker,
   missionForecast,
   readRun,
@@ -223,11 +226,7 @@ export type Reward =
  * `content.currencies` (Reputation only when the forecast gives some), the payment in kind with
  * its chance, and the village resource.
  */
-export function rewardsOf(
-  mission: Mission,
-  forecast: MissionForecast,
-  content: ContentDb,
-): Reward[] {
+export function rewardsOf(forecast: MissionForecast, content: ContentDb): Reward[] {
   const amounts: Record<string, number> = { ryo: forecast.ryo, rep: forecast.rep };
   const out: Reward[] = [];
   const items = new Set(content.items.map((i) => i.id));
@@ -250,16 +249,16 @@ export function rewardsOf(
   if (forecast.resource) {
     out.push({ t: 'resource', id: forecast.resource.slug, n: forecast.resource.units });
   }
-  void mission;
   return out;
 }
 
 // ---------- stages ----------
 
-/** The name of a stage: its label when the data has one, else the entity it is about. */
+/** The name of a stage: its label when the data has one, and the entities the stage is about, as chips. */
 export interface StageHead {
   labelKey: string | null;
-  ref: EntityRef | null;
+  /** Every skill, technique, enemy or item the stage data names: shown as links beside the label. */
+  refs: EntityRef[];
   /** A combat stage points at the combat page. */
   combat: boolean;
 }
@@ -268,23 +267,35 @@ export function stageHead(mission: Mission, index: number, content: ContentDb): 
   const stage = mission.stages[index];
   const key = `mission.${mission.id}.stage.${index}.label`;
   const labelKey = hasKey(key) ? key : null;
-  if (!stage) return { labelKey, ref: null, combat: false };
+  if (!stage) return { labelKey, refs: [], combat: false };
   switch (stage.t) {
     case 'combat':
       return {
         labelKey,
-        ref: {
-          kind: content.bosses.some((b) => b.id === stage.enemy) ? 'boss' : 'enemy',
-          id: stage.enemy,
-        },
+        refs: [
+          {
+            kind: content.bosses.some((b) => b.id === stage.enemy) ? 'boss' : 'enemy',
+            id: stage.enemy,
+          },
+        ],
         combat: true,
       };
     case 'items':
-      return { labelKey, ref: { kind: 'item', id: stage.item }, combat: false };
+      return { labelKey, refs: [{ kind: 'item', id: stage.item }], combat: false };
     case 'named':
-      return { labelKey, ref: { kind: 'technique', id: stage.technique }, combat: false };
-    default:
-      return { labelKey, ref: null, combat: false };
+      return {
+        labelKey,
+        refs: [stage.technique, ...stage.alts].map((id) => ({ kind: 'technique', id })),
+        combat: false,
+      };
+    case 'skill':
+      return { labelKey, refs: [{ kind: 'skill', id: stage.skill }], combat: false };
+    case 'tech':
+      return {
+        labelKey,
+        refs: [...new Set(stage.any.map((a) => a.skill))].map((id) => ({ kind: 'skill', id })),
+        combat: false,
+      };
   }
 }
 
@@ -299,38 +310,36 @@ export interface StageAlt {
   tech: string;
   /** Intel the way costs; 0 for the others. */
   intel: number;
+  /** For a nature, core also asks for a known technique of that skill of at least this level. */
+  techNeeded: { skill: string; min: number } | null;
 }
 
 /**
  * Every way to do stage `index`: what each needs, which are slow fallbacks, and the Intel way when
  * the data has a price for it. A fight and an item stage have no alternatives (the items are
- * listed apart as what the stage takes).
+ * listed apart as what the stage takes). A nature's way carries the technique condition core
+ * applies besides the skill level.
  */
 export function stageAlts(mission: Mission, index: number, content: ContentDb): StageAlt[] {
   const stage = mission.stages[index];
   if (!stage) return [];
   const out: StageAlt[] = [];
   const slow = new Set(mission.slow[index] ?? []);
+  const isNature = (skill: string): boolean => content.natures.some((n) => n.id === skill);
+  const skillWay = (skill: string, min: number, isSlow: boolean): StageAlt => ({
+    req: { t: 'skill', skill: skill as SkillId, level: min },
+    slow: isSlow,
+    skill,
+    tech: '',
+    intel: 0,
+    techNeeded: isNature(skill) ? { skill, min } : null,
+  });
   switch (stage.t) {
     case 'skill':
-      out.push({
-        req: { t: 'skill', skill: stage.skill, level: stage.min },
-        slow: false,
-        skill: stage.skill,
-        tech: '',
-        intel: 0,
-      });
+      out.push(skillWay(stage.skill, stage.min, false));
       break;
     case 'tech':
-      stage.any.forEach((alt, i) =>
-        out.push({
-          req: { t: 'skill', skill: alt.skill, level: alt.min },
-          slow: slow.has(i),
-          skill: alt.skill,
-          tech: '',
-          intel: 0,
-        }),
-      );
+      stage.any.forEach((alt, i) => out.push(skillWay(alt.skill, alt.min, slow.has(i))));
       break;
     case 'named':
       for (const id of [stage.technique, ...stage.alts]) {
@@ -340,6 +349,7 @@ export function stageAlts(mission: Mission, index: number, content: ContentDb): 
           skill: content.techniques.find((t) => t.id === id)?.skill ?? '',
           tech: id,
           intel: 0,
+          techNeeded: null,
         });
       }
       break;
@@ -348,7 +358,7 @@ export function stageAlts(mission: Mission, index: number, content: ContentDb): 
   }
   const cost = mission.skip[index] ?? 0;
   if (cost > 0 && stage.t !== 'items' && stage.t !== 'combat') {
-    out.push({ req: null, slow: false, skill: '', tech: '', intel: cost });
+    out.push({ req: null, slow: false, skill: '', tech: '', intel: cost, techNeeded: null });
   }
   return out;
 }
@@ -367,9 +377,6 @@ export function usedAlt(alts: StageAlt[], path: StageForecast['path']): number {
     : alts.findIndex((a) => a.intel === 0 && a.tech === '' && a.skill === path.skill);
 }
 
-/** What the forecast calls who does a stage: the player, or the teammate of this id. */
-export const isSelf = (who: string): boolean => who === SELF;
-
 /** The items a stage takes when it begins, with what the player has. */
 export function stageTakes(
   state: GameState,
@@ -382,24 +389,29 @@ export function stageTakes(
     : null;
 }
 
-/** The skill a fight's style XP goes to, as far as it can be told now: the first technique of the loadout, else the balance's default. */
-export function styleGuess(state: GameState, content: ContentDb): string {
-  const first = effectiveLoadout(state, content)[0];
-  return (
-    (first && content.techniques.find((t) => t.id === first)?.skill) ||
-    content.balance.K.mission.defaultStyle
-  );
+/**
+ * What one attempt of a stage the player does gives. The skill gets its XP (as it would be added)
+ * only where the performer and the skill are certain: a stage checked by a skill. A fight pays its
+ * style XP to the skill of the technique last used in it, which nothing tells beforehand, so a
+ * fight is given as one total before bonuses (the style share and the fixed Vitality and Evasion
+ * shares together), with no split by skill.
+ */
+export interface StageXpView {
+  skills: { skill: string; amount: number }[];
+  /** The whole XP of one attempt at a fight stage, before bonuses; null for other stages. */
+  fight: number | null;
+  /** The technique whose Mastery grows. */
+  mastery: string | null;
 }
 
-/** The XP one attempt of a stage the player does gives (as it would be added), and the technique whose Mastery grows. */
 export function stageReward(
   state: GameState,
   mission: Mission,
   stage: StageForecast,
   content: ContentDb,
   rules: Rules,
-): { xp: { skill: string; amount: number }[]; mastery: string | null } {
-  if (!stage.path) return { xp: [], mastery: null };
+): StageXpView {
+  if (!stage.path) return { skills: [], fight: null, mastery: null };
   const plan: StagePlan = {
     ...stage.path,
     level: 0,
@@ -408,17 +420,43 @@ export function stageReward(
     ms: stage.ms,
     chance: stage.chance,
   };
-  const earned = stageXp(state, mission, stage.index, plan, styleGuess(state, content), content);
+  const fight = mission.stages[stage.index]?.t === 'combat';
+  const style = content.balance.K.mission.defaultStyle;
+  const earned = stageXp(state, mission, stage.index, plan, style, content);
+  if (fight) {
+    return {
+      skills: [],
+      fight: earned.xp.reduce((sum, [, amount]) => sum + amount, 0),
+      mastery: null,
+    };
+  }
   return {
-    xp: earned.xp
+    skills: earned.xp
       .map(([skill, amount]) => ({ skill, amount: xpGain(state, skill, amount, content, rules) }))
       .filter((x) => x.amount > 0),
+    fight: null,
     mastery: earned.mastery?.id ?? null,
   };
 }
 
-/** The base length of a stage in ms, before any modifier. */
-export const stageBase = (mission: Mission, index: number): number => stageBaseMs(mission, index);
+/** Per hour of running the mission over and over: the XP of the skills a stage fixes, and the fights' total (before bonuses). */
+export function xpTotals(
+  stages: StageView[],
+  forecast: MissionForecast,
+): { skills: Record<string, number>; fight: number } {
+  const hours = forecast.expectedMs / MS_PER_HOUR;
+  const skills: Record<string, number> = {};
+  let fight = 0;
+  if (!(hours > 0)) return { skills, fight };
+  for (const view of stages) {
+    const attempts = 1 / Math.max(view.forecast.chance, Number.EPSILON);
+    for (const x of view.reward.skills) {
+      skills[x.skill] = (skills[x.skill] ?? 0) + (x.amount * attempts) / hours;
+    }
+    if (view.reward.fight !== null) fight += (view.reward.fight * attempts) / hours;
+  }
+  return { skills, fight };
+}
 
 // ---------- a running mission ----------
 
@@ -487,12 +525,22 @@ export interface StageView {
   index: number;
   head: StageHead;
   forecast: StageForecast;
-  /** Every way to do the stage, each with its evaluated requirement and whether it is the way that will be used. */
-  alts: { alt: StageAlt; result: ReqResult | null; used: boolean; have: number }[];
+  /**
+   * Every way to do the stage with its evaluated requirement. `met` is every condition core applies
+   * for the player to do it by this way (the skill level and, for a nature, a known technique);
+   * `used` is the way the forecast says will be used.
+   */
+  alts: {
+    alt: StageAlt;
+    result: ReqResult | null;
+    techMet: boolean;
+    met: boolean;
+    used: boolean;
+    have: number;
+  }[];
   /** The items the stage takes, with what the player has. */
   takes: { item: string; need: number; have: number } | null;
-  /** XP of one attempt by skill, and the technique whose Mastery grows. */
-  reward: { xp: { skill: string; amount: number }[]; mastery: string | null };
+  reward: StageXpView;
   /** The base length of the stage, ms, and the modifiers that shorten or lengthen it. */
   base: number;
   parts: Modifier[];
@@ -524,12 +572,24 @@ export function stageViews(
       index: stage.index,
       head: stageHead(mission, stage.index, content),
       forecast: stage,
-      alts: alts.map((alt, i) => ({
-        alt,
-        result: alt.req ? evalReq(state, alt.req, content) : null,
-        used: i === used,
-        have: alt.intel > 0 ? state.currencies.intel : 0,
-      })),
+      alts: alts.map((alt, i) => {
+        const result = alt.req ? evalReq(state, alt.req, content) : null;
+        const need = alt.techNeeded;
+        const techMet =
+          need === null ||
+          content.techniques.some(
+            (t) => t.skill === need.skill && t.level >= need.min && state.known[t.id],
+          );
+        return {
+          alt,
+          result,
+          techMet,
+          met:
+            alt.intel > 0 ? state.currencies.intel >= alt.intel : (result?.met ?? false) && techMet,
+          used: i === used,
+          have: alt.intel > 0 ? state.currencies.intel : 0,
+        };
+      }),
       takes: stageTakes(state, mission, stage.index),
       reward: stageReward(state, mission, stage, content, rules),
       base,
@@ -537,6 +597,35 @@ export function stageViews(
       residual: stage.path && Number.isFinite(raw) ? raw : 1,
     };
   });
+}
+
+/** The total of a list of modifiers as core combines them: inside a group the `add` values sum, the `mul` values multiply, and the groups multiply. */
+export function combineParts(parts: Modifier[]): number {
+  const groups = new Map<string, { add: number; mul: number }>();
+  for (const m of parts) {
+    const g = groups.get(m.group) ?? { add: 0, mul: 1 };
+    if (m.op === 'add') g.add += m.value;
+    else g.mul *= m.value;
+    groups.set(m.group, g);
+  }
+  let total = 1;
+  for (const g of groups.values()) total *= (1 + g.add) * g.mul;
+  return total;
+}
+
+/**
+ * The chain behind a per-hour figure: the base of one mission, the modifiers (each with its
+ * source) that make it `perMission`, how many runs fit in an hour at the expected length, and the
+ * figure per hour.
+ */
+export function hourChain(
+  base: number,
+  parts: Modifier[],
+  perMission: number,
+  expectedMs: number,
+): { base: number; total: number; perMission: number; runs: number; perHour: number } {
+  const runs = expectedMs > 0 ? MS_PER_HOUR / expectedMs : 0;
+  return { base, total: combineParts(parts), perMission, runs, perHour: perMission * runs };
 }
 
 /** The items that shorten a mission when used, with what each does. */
@@ -548,14 +637,6 @@ export function rationItems(
   );
 }
 
-/** The ration item that is armed for the next mission, or null. */
-export function armedRationItem(state: GameState, content: ContentDb): string | null {
-  for (const item of rationItems(content)) {
-    if ((state.buffs[item.id]?.charges ?? 0) >= 1) return item.id;
-  }
-  return null;
-}
-
 /** The entity kinds the core accepts as a goal. */
 export const PINNABLE = ['technique', 'skill', 'item', 'enemy', 'quest'] as const;
 
@@ -564,4 +645,28 @@ export function pinTarget(blocker: ReqResult | null): CoreEntityRef | null {
   if (!blocker) return null;
   const ref = firstUnmet(blocker)?.ref;
   return ref && (PINNABLE as readonly string[]).includes(ref.kind) ? ref : null;
+}
+
+// ---------- when a forecast is stale ----------
+
+/**
+ * A cheap signature of what a mission forecast and its blocker depend on: the levels of the
+ * skills, the Mastery of the techniques known, the rank, the team, the loadout, the natures, the
+ * flags, the levels of the buildings, Intel, the items the stages take and the rations, and the
+ * armed ration. A forecast is recomputed when this changes (a level-up, a finished building, a
+ * bought item), not on a timer. Slots are not in it: whether a slot is free is read live.
+ */
+export function inputsSignature(state: GameState, content: ContentDb): string {
+  const parts: (string | number)[] = [state.player.rank, state.currencies.intel];
+  for (const skill of content.skills) parts.push(skillLevel(state, skill.id, content));
+  for (const id of Object.keys(state.known)) parts.push(masteryLevel(state, id, content));
+  parts.push(state.player.natures.join(','), JSON.stringify(state.team));
+  parts.push(effectiveLoadout(state, content).join(','), JSON.stringify(state.flags));
+  for (const b of content.buildings) parts.push(buildingLevel(state, b.id));
+  const items = new Set<string>(rationItems(content).map((r) => r.id));
+  for (const m of content.missions) {
+    for (const stage of m.stages) if (stage.t === 'items') items.add(stage.item);
+  }
+  for (const id of items) parts.push(state.bank[id] ?? 0, state.buffs[id]?.charges ?? 0);
+  return parts.join('|');
 }

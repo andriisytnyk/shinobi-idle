@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MISSION_KIND } from '@shinobi/core';
+  import { MISSION_KIND, type MissionForecast } from '@shinobi/core';
   import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
@@ -14,7 +14,14 @@
   import { formatDuration, formatInt, formatXp } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
   import { cardState, followCommands, stagesOf, viewOf } from '../lib/mission-feed.svelte.ts';
-  import { cleanRunChance, missionNow, pinTarget, rewardsOf } from '../lib/missions.ts';
+  import {
+    cleanRunChance,
+    hourChain,
+    missionNow,
+    pinTarget,
+    rewardsOf,
+    xpTotals,
+  } from '../lib/missions.ts';
   import { game } from '../lib/store.ts';
   import { toasts } from '../lib/toasts.svelte.ts';
   import EntityPage from './EntityPage.svelte';
@@ -24,6 +31,8 @@
   }
 
   let { id }: Props = $props();
+
+  const EMPTY = { expectedMs: 0 } as unknown as MissionForecast;
 
   $effect(() => followCommands());
 
@@ -39,7 +48,7 @@
       return slot >= 0 ? (missionNow(gs, slot, game.content)?.stage ?? null) : null;
     }),
   );
-  const rewards = $derived(mission && forecast ? rewardsOf(mission, forecast, game.content) : []);
+  const rewards = $derived(mission && forecast ? rewardsOf(forecast, game.content) : []);
   const chance = $derived(forecast ? cleanRunChance(forecast) : 0);
   const pin = $derived(pinTarget(view?.blocker?.result ?? null));
   const pinned = $derived(
@@ -47,12 +56,48 @@
   );
   const desc = $derived(entityDesc({ kind: 'mission', id }));
   const clientKey = $derived(`mission.${id}.client`);
+  /** XP per hour of the skills the stages fix, and the fights' total: a fight's style skill is not known beforehand. */
+  const totals = $derived(xpTotals(stages, forecast ?? EMPTY));
   const xpRows = $derived(
-    Object.entries(forecast?.xpPerHour ?? {})
+    Object.entries(totals.skills)
       .filter(([, v]) => v > 0)
-      .sort((a, b) => b[1] - a[1]),
+      .sort((x, y) => y[1] - x[1]),
   );
+  const ryoChain = $derived(
+    mission && forecast
+      ? hourChain(mission.ryo, forecast.mods.ryo, forecast.ryo, forecast.expectedMs)
+      : null,
+  );
+  const repChain = $derived(
+    mission && forecast
+      ? hourChain(mission.rep, forecast.mods.rep, forecast.rep, forecast.expectedMs)
+      : null,
+  );
+  const fightSkills = $derived([...game.content.balance.K.mission.fightSkills]);
+  const slowK = $derived(game.content.balance.K.mission.slowAlt);
+
   const hasTeam = $derived(game.read((gs) => gs.team !== null));
+
+  const runsFormat = new Intl.NumberFormat('uk', { maximumFractionDigits: 2 });
+
+  /** The lines after the modifiers of a per-hour figure: what one mission pays, and how many runs fit in an hour. */
+  function chainNotes(chain: ReturnType<typeof hourChain> | null) {
+    if (!chain) return [];
+    return [
+      {
+        key: 'perMission',
+        label: t('mission.chain.perMission'),
+        value: formatXp(chain.perMission),
+        raw: chain.perMission,
+      },
+      {
+        key: 'runs',
+        label: t('mission.chain.runs'),
+        value: `×${runsFormat.format(chain.runs)}`,
+        raw: chain.runs,
+      },
+    ];
+  }
 
   function toggle(): void {
     if (!state || !mission) return;
@@ -161,6 +206,8 @@
             ration={forecast.ration}
             floor={forecast.durationFloor}
             current={current === stage.index}
+            {slowK}
+            {fightSkills}
           />
         {/each}
       </ol>
@@ -194,6 +241,8 @@
                 display={formatInt(Math.round(forecast.ryoPerHour))}
                 parts={forecast.mods.ryo}
                 base={formatInt(mission.ryo)}
+                baseRaw={mission.ryo}
+                notes={chainNotes(ryoChain)}
               />
             </dd>
           </div>
@@ -206,6 +255,8 @@
                 display={formatXp(forecast.repPerHour)}
                 parts={forecast.mods.rep}
                 base={formatInt(mission.rep)}
+                baseRaw={mission.rep}
+                notes={chainNotes(repChain)}
               />
             </dd>
           </div>
@@ -235,10 +286,25 @@
                 <EntityLink kind="skill" id={skill} />
               </span>
             {:else}
-              <span class="dim">{t('mission.unknown')}</span>
+              {#if totals.fight === 0}<span class="dim">{t('mission.unknown')}</span>{/if}
             {/each}
           </dd>
         </div>
+        {#if totals.fight > 0}
+          <div data-total="fight-xp" data-value={totals.fight}>
+            <dt>{t('mission.fightXpHour')}</dt>
+            <dd>
+              {t('mission.stage.fightXpValue', { n: formatXp(totals.fight) })}
+              <span class="dim">
+                {t('mission.stage.fightXpWhere')}
+                {#each fightSkills as skill, i (skill)}<EntityLink
+                    kind="skill"
+                    id={skill}
+                  />{#if i < fightSkills.length - 1}<span>, </span>{/if}{/each}
+              </span>
+            </dd>
+          </div>
+        {/if}
       </dl>
       <ul class="rewards" aria-label={t('mission.rewards')}>
         {#each rewards as reward (`${reward.t}:${reward.id}`)}

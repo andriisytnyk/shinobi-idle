@@ -42,6 +42,7 @@
   .reward {
     display: inline-flex;
     align-items: center;
+    line-height: var(--leading-tight);
     gap: var(--space-1);
   }
 

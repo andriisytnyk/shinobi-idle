@@ -2,6 +2,7 @@ import { untrack } from 'svelte';
 import type { GameState, MissionForecast, ReqResult } from '@shinobi/core';
 import type { Mission } from '@shinobi/content';
 import {
+  inputsSignature,
   missionState,
   missionView,
   rankGroups,
@@ -15,13 +16,15 @@ import { game } from './store.ts';
 
 /**
  * How the mission screens get their numbers without recounting the whole board on every store
- * update. A forecast depends on almost everything in the state (levels, Mastery, items, buffs,
- * the village), so instead of tracking those it is recomputed at a coarse rate: once per
- * `FORECAST_EVERY` store updates, and at once after any command (a started mission, a used ration,
- * a bought item). Each mission's view is computed when a card or the page first asks for it after
- * the inputs changed, and is shared by everything that asks until they change again.
+ * update. A forecast depends on almost everything in the state, so it is recomputed when the
+ * inputs change: a cheap signature of them (`inputsSignature`: skill levels, Mastery, rank, team,
+ * loadout, buildings, the items the stages take, the armed ration, Intel) is read on every update,
+ * and a command (a started mission, a used ration, a bought item) forces a recompute at once.
+ * As a safety net for what the signature does not cover, the forecasts are also recomputed once per
+ * `SAFETY_EVERY` store updates. Each mission's view is computed when a card or the page first asks
+ * for it after the inputs changed, and is shared by everything that asks until they change again.
  */
-export const FORECAST_EVERY = 20;
+export const SAFETY_EVERY = 100;
 
 /** Bumped by every command, so that what a command changed shows at once. */
 let commands = $state(0);
@@ -30,17 +33,23 @@ export const bumpForecasts = (): void => {
   commands++;
 };
 
+/** The signature of the inputs now; one computation per store update, shared by every reader. */
+const signature = $derived.by(() => {
+  void game.version;
+  return untrack(() => inputsSignature(game.state, game.content));
+});
+
 /**
- * A number that changes when the forecasts are due. Reading it inside a `$derived` makes that
- * derived recompute at the coarse rate only: it re-runs on every store update but passes on only
- * when the number changes.
+ * A value that changes when the forecasts are due. Reading it inside a `$derived` makes that
+ * derived re-run on every store update but pass on only when the value changes.
  */
-export const forecastRevision = (): number => Math.floor(game.version / FORECAST_EVERY) + commands;
+export const forecastRevision = (): string =>
+  `${signature}#${commands}#${Math.floor(game.version / SAFETY_EVERY)}`;
 
 /** Follows every command of the game; returns the function that stops following. Call it in an effect. */
 export const followCommands = (): (() => void) => game.addCommandHook({ after: bumpForecasts });
 
-let cached: { rev: number; state: GameState | null } = { rev: -1, state: null };
+let cached: { rev: string; state: GameState | null } = { rev: '', state: null };
 // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a plain cache that no view reads
 const cache = new Map<string, MissionView>();
 
