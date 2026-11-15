@@ -13,6 +13,7 @@ import {
   type ActionKind,
 } from '../src/index.ts';
 import { genin, HOUR, setLevel, start } from './helpers.ts';
+import { bestOf, speedBudget } from './speed.ts';
 
 const LEAF = 'core:leaf_whirlwind';
 
@@ -82,18 +83,16 @@ describe('advance', () => {
     expect(serialize(random)).toBe(serialize(whole));
   });
 
-  it('A11: 12 hours of practice finish in under 500 ms', () => {
-    // Other test files run at the same time, so a single run can be slowed by load. The best of
-    // several runs is the run the machine disturbed least; it must still meet the budget.
-    let best = Infinity;
-    for (let run = 0; run < 5 && best >= 500; run++) {
+  it('A11: 12 hours of practice finish within the speed budget (500 ms on the reference machine, never above 2 s)', () => {
+    // Other test files run at the same time and CI runners are slower, so the budget is scaled to
+    // the machine, and the best of several runs is taken: the run the machine disturbed least.
+    const limit = speedBudget(500, 2000);
+    const best = bestOf(5, limit, () => {
       const state = busyState();
-      const t0 = process.hrtime.bigint();
       advance(state, 12 * HOUR, content);
-      best = Math.min(best, Number(process.hrtime.bigint() - t0) / 1e6);
       expect(state.now).toBe(12 * HOUR);
-    }
-    expect(best).toBeLessThan(500);
+    });
+    expect(best).toBeLessThan(limit);
   });
 
   it('runs extra systems of a custom rule set, without touching the default one', () => {

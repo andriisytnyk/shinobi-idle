@@ -47,7 +47,10 @@ export default defineConfig(
   },
   {
     files: ['apps/web/**/*.{ts,svelte}'],
-    languageOptions: { globals: { ...globals.browser } },
+    languageOptions: {
+      // `__APP_VERSION__` and `__BUILD_DATE__` are injected by Vite `define`.
+      globals: { ...globals.browser, __APP_VERSION__: 'readonly', __BUILD_DATE__: 'readonly' },
+    },
   },
   {
     // Architecture rule 1: the core is deterministic and knows nothing about the platform.

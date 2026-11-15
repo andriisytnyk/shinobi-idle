@@ -16,14 +16,41 @@
     return () => query.removeEventListener('change', update);
   });
   const cap = $derived(phone ? 3 : 6);
-  const shown = $derived(toasts.list.slice(-cap));
+  // Persistent toasts (an update waiting) are always shown; the newest ordinary ones fill the rest.
+  const shown = $derived.by(() => {
+    const ordinary = toasts.list.filter((toast) => !toast.persistent);
+    const room = Math.max(0, cap - (toasts.list.length - ordinary.length));
+    const keep = new Set(ordinary.slice(Math.max(0, ordinary.length - room)).map((x) => x.id));
+    return toasts.list.filter((toast) => toast.persistent || keep.has(toast.id));
+  });
   const hidden = $derived(toasts.list.length - shown.length);
+
+  // The host is last in the page, far from the start of the tab order. A toast with an action
+  // takes the focus when it appears, unless the player is typing in a field.
+  let host: HTMLElement | undefined = $state();
+  let focused = 0;
+  $effect(() => {
+    const toast = shown.find((x) => x.persistent && x.action);
+    if (!toast || toast.id === focused || !host) return;
+    focused = toast.id;
+    const active = document.activeElement;
+    const typing =
+      active instanceof HTMLElement &&
+      (active.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName));
+    if (typing) return;
+    host.querySelector<HTMLElement>(`[data-toast-id="${toast.id}"] [data-toast-action]`)?.focus();
+  });
 </script>
 
-<div class="toasts" role="status" aria-live="polite">
+<div class="toasts" role="status" aria-live="polite" bind:this={host}>
   {#if hidden > 0}<p class="more" data-toasts-more>{t('toast.more', { n: hidden })}</p>{/if}
   {#each shown as toast (toast.id)}
-    <div class="toast" data-toast={toast.key}>
+    <div
+      class="toast"
+      data-toast={toast.key}
+      data-toast-id={toast.id}
+      role={toast.persistent ? 'alert' : undefined}
+    >
       <span>
         {t(toast.key, toast.params)}
         {#if toast.ref}<EntityLink kind={toast.ref.kind} id={toast.ref.id} />{/if}
@@ -36,6 +63,20 @@
           </span>
         {/if}
       </span>
+      {#if toast.action}
+        {@const action = toast.action}
+        <button
+          type="button"
+          class="action"
+          data-toast-action
+          onclick={async () => {
+            // `false` means the action was refused: the toast stays for another try.
+            if ((await action.run()) !== false) toasts.dismiss(toast.id);
+          }}
+        >
+          {t(action.labelKey)}
+        </button>
+      {/if}
       <button type="button" aria-label={t('modal.close')} onclick={() => toasts.dismiss(toast.id)}>
         <Icon name="lucide:x" size={14} />
       </button>
@@ -93,6 +134,30 @@
     font-weight: 600;
   }
 
+  /* The control height of PwaPanel's buttons; tokens.css has no variable for it yet. */
+  .toast {
+    --control-height: 2.75rem;
+  }
+
+  button.action {
+    flex: none;
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  button.action:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
   button {
     display: inline-flex;
     padding: var(--space-1);
@@ -103,6 +168,10 @@
   }
 
   @media (max-width: 768px) {
+    button.action {
+      min-height: var(--control-height);
+    }
+
     button {
       align-items: center;
       justify-content: center;

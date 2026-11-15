@@ -2,6 +2,7 @@ import { mount } from 'svelte';
 import App from './App.svelte';
 import { isDevMode } from './lib/dev.ts';
 import { migrateLocalGoal } from './lib/goal-migration.ts';
+import { pwa } from './lib/pwa.svelte.ts';
 import { browserStorage } from './lib/settings.svelte.ts';
 import { game } from './lib/store.ts';
 import './fonts.css';
@@ -17,6 +18,9 @@ if (!target) throw new Error('Missing #app element');
 void game.start().then(() => {
   if (game.ready) migrateLocalGoal(browserStorage(), game);
 });
+
+// Offline support and installation; the service worker is registered in the production build only.
+pwa.init();
 
 // With ?dev=1 the game is reachable from the console for debugging.
 if (isDevMode()) Object.assign(window, { __shinobi: game });
