@@ -1,0 +1,118 @@
+<script lang="ts">
+  import { content } from '@shinobi/content';
+  import { getMod, type Modifier } from '@shinobi/core';
+  import { isEntityKind } from '../lib/entities.ts';
+  import { formatBonus } from '../lib/format.ts';
+  import { hasKey, t } from '../lib/i18n.ts';
+  import { game } from '../lib/store.ts';
+  import EntityLink from './EntityLink.svelte';
+
+  interface Props {
+    /** Modifier keys that feed the figure, e.g. `xp.all` and `xp.skill.tai`. */
+    keys: string[];
+    /** The figure as shown; clicking it opens the list of its parts. */
+    display: string;
+    /** What the figure is before any bonus, as text. */
+    base?: string;
+  }
+
+  let { keys, display, base }: Props = $props();
+
+  let open = $state(false);
+
+  const parts = $derived.by((): Modifier[] =>
+    keys.flatMap((key) => getMod(game.state, key, content, game.rules).parts),
+  );
+  const total = $derived(
+    keys.reduce((acc, key) => acc * getMod(game.state, key, content, game.rules).total, 1),
+  );
+
+  const valueText = (m: Modifier) => (m.op === 'add' ? formatBonus(1 + m.value) : `×${m.value}`);
+  const sourceKey = (m: Modifier) => (typeof m.source === 'string' ? m.source : null);
+</script>
+
+<span class="mod">
+  <button type="button" class="figure" aria-expanded={open} onclick={() => (open = !open)}>
+    {display}
+  </button>
+  {#if open}
+    <span class="list" role="group" aria-label={t('mod.title')}>
+      {#if base !== undefined}
+        <span class="line"><span>{t('mod.base')}</span><span>{base}</span></span>
+      {/if}
+      {#each parts as part, i (i)}
+        <span class="line">
+          <span class="source">
+            {#if typeof part.source !== 'string' && isEntityKind(part.source.kind)}
+              <EntityLink kind={part.source.kind} id={part.source.id} />
+            {:else}
+              {@const key = sourceKey(part)}
+              {key !== null && hasKey(key) ? t(key) : key}
+            {/if}
+          </span>
+          <span>{valueText(part)}</span>
+        </span>
+      {:else}
+        <span class="line none">{t('mod.none')}</span>
+      {/each}
+      {#if parts.length > 0}
+        <span class="line total"
+          ><span>{t('mod.total')}</span><span>{formatBonus(total)}</span></span
+        >
+      {/if}
+    </span>
+  {/if}
+</span>
+
+<style>
+  .mod {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .figure {
+    padding: 0;
+    border: 0;
+    border-bottom: 1px dotted var(--fg-dim);
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .figure:hover,
+  .figure[aria-expanded='true'] {
+    border-bottom-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 12rem;
+    margin-top: var(--space-1);
+    padding: var(--space-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    font-size: 0.85rem;
+  }
+
+  .line {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .none {
+    color: var(--fg-dim);
+  }
+
+  .total {
+    padding-top: var(--space-1);
+    border-top: 1px solid var(--line);
+    font-weight: 600;
+  }
+</style>

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { ICON_KINDS, type IconKind } from '@shinobi/content';
+  import Icon from '../components/Icon.svelte';
   import { entityDesc, entityName } from '../lib/entities.ts';
   import { t } from '../lib/i18n.ts';
   import type { EntityRef } from '../lib/route.ts';
@@ -10,13 +12,19 @@
   let { entity }: Props = $props();
 
   const desc = $derived(entityDesc(entity));
+  /** Only kinds in the icon registry have an icon; the rest show the name alone. */
+  const iconKind = $derived(
+    (ICON_KINDS as readonly string[]).includes(entity.kind) ? (entity.kind as IconKind) : null,
+  );
 </script>
 
-<article class="entity-page">
+<article class="entity-page" data-entity={entity.id}>
   <p class="kind">{t(`entity.kind.${entity.kind}`)}</p>
-  <h1>{entityName(entity)}</h1>
-  {#if desc}<p>{desc}</p>{/if}
-  <p class="placeholder">{t('entity.placeholder')}</p>
+  <h1>
+    {#if iconKind}<Icon entity={{ kind: iconKind, id: entity.id }} size={32} />{/if}
+    {entityName(entity)}
+  </h1>
+  {#if desc}<p>{desc}</p>{:else}<p class="placeholder">{t('entity.placeholder')}</p>{/if}
 </article>
 
 <style>
@@ -27,6 +35,9 @@
   }
 
   h1 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
     margin: var(--space-1) 0 var(--space-3);
     color: var(--heading);
     font-family: var(--font-heading);

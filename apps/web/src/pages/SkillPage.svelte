@@ -1,9 +1,15 @@
 <script lang="ts">
-  import Icon from '../components/Icon.svelte';
-  import { entityDesc, entityName } from '../lib/entities.ts';
-  import { skillProgress } from '../lib/game.ts';
-  import { t } from '../lib/i18n.ts';
   import { content, localeKey, NATURE_IDS, type SkillId } from '@shinobi/content';
+  import { listSkillActions, skillUnlockStatus } from '@shinobi/core';
+  import ActionTile from '../components/ActionTile.svelte';
+  import Hint from '../components/Hint.svelte';
+  import Icon from '../components/Icon.svelte';
+  import PoolBar from '../components/PoolBar.svelte';
+  import ReqTree from '../components/ReqTree.svelte';
+  import { entityDesc, entityName } from '../lib/entities.ts';
+  import { hasKey, t } from '../lib/i18n.ts';
+  import { skillProgress } from '../lib/progress.ts';
+  import { game } from '../lib/store.ts';
 
   interface Props {
     id: string;
@@ -15,11 +21,15 @@
   const ref = $derived({ kind: 'skill', id } as const);
   const desc = $derived(entityDesc(ref));
   const unlockKey = $derived(localeKey('skill', id, 'unlock'));
-  const progress = $derived(skill ? skillProgress(skill.id as SkillId) : null);
+  const progress = $derived(skill ? skillProgress(game.state, skill.id as SkillId) : null);
+  const lock = $derived(skill ? skillUnlockStatus(game.state, skill.id, content) : null);
+  const actions = $derived(
+    skill ? listSkillActions(game.state, skill.id as SkillId, content, game.rules) : [],
+  );
 </script>
 
 {#if skill && progress}
-  <article class="skill-page">
+  <article class="skill-page" data-skill={skill.id}>
     <header class="plate">
       <h1>
         <span
@@ -32,9 +42,33 @@
       </h1>
       <span class="level">{t('level.short', { n: progress.level })}</span>
     </header>
+
     {#if desc}<p class="lore">{desc}</p>{/if}
-    <p class="unlock">{t(unlockKey)}</p>
-    <p class="placeholder">{t('skill.page.empty')}</p>
+    {#if hasKey(unlockKey)}<p class="unlock">{t(unlockKey)}</p>{/if}
+
+    <Hint id="skillPage" text="hint.skillPage" />
+
+    {#if lock && !lock.met}
+      <section class="locked" data-locked>
+        <h2><Icon name="lucide:lock" size={18} /> {t('skill.locked')}</h2>
+        <ReqTree node={lock} />
+      </section>
+    {/if}
+
+    {#if actions.length > 0}
+      <section>
+        <h2>{t('skill.actions')}</h2>
+        <ul class="tiles">
+          {#each actions as info (info.kind + info.id)}
+            <ActionTile {info} />
+          {/each}
+        </ul>
+      </section>
+    {:else}
+      <p class="placeholder">{t('skill.page.empty')}</p>
+    {/if}
+
+    <PoolBar skill={skill.id} />
   </article>
 {:else}
   <p>{t('route.notFound')}</p>
@@ -63,6 +97,17 @@
     font-weight: 400;
   }
 
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: var(--space-4) 0 var(--space-2);
+    color: var(--heading);
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 400;
+  }
+
   .plate-icon {
     display: inline-flex;
   }
@@ -79,5 +124,23 @@
   .unlock,
   .placeholder {
     color: var(--fg-dim);
+  }
+
+  .locked {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .locked h2 {
+    margin-top: var(--space-1);
+  }
+
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
   }
 </style>

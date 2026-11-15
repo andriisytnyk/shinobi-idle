@@ -1,0 +1,216 @@
+<script lang="ts">
+  import Icon from '../components/Icon.svelte';
+  import Modal from '../components/Modal.svelte';
+  import { t } from '../lib/i18n.ts';
+  import { settings } from '../lib/settings.svelte.ts';
+  import { game } from '../lib/store.ts';
+  import SimplePage from './SimplePage.svelte';
+
+  let exported = $state('');
+  let importText = $state('');
+  let message = $state<{ ok: boolean; key: string } | null>(null);
+  let confirmReset = $state(false);
+
+  function doExport(): void {
+    exported = game.exportText();
+    message = null;
+  }
+
+  async function copy(): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(exported);
+      message = { ok: true, key: 'settings.copied' };
+    } catch {
+      message = { ok: false, key: 'settings.copyFailed' };
+    }
+  }
+
+  async function doImport(): Promise<void> {
+    try {
+      await game.importText(importText.trim());
+      importText = '';
+      message = { ok: true, key: 'settings.imported' };
+    } catch {
+      message = { ok: false, key: 'settings.importFailed' };
+    }
+  }
+
+  async function doReset(): Promise<void> {
+    confirmReset = false;
+    await game.reset();
+    exported = '';
+    message = { ok: true, key: 'settings.resetDone' };
+  }
+</script>
+
+<SimplePage title={t('settings.title')}>
+  <section>
+    <h2>{t('settings.interface')}</h2>
+    <label class="check">
+      <input
+        type="checkbox"
+        checked={settings.hideLocked}
+        onchange={(e) => (settings.hideLocked = e.currentTarget.checked)}
+      />
+      {t('settings.hideLocked')}
+    </label>
+    <label class="check">
+      <input
+        type="checkbox"
+        checked={settings.hints}
+        onchange={(e) => (settings.hints = e.currentTarget.checked)}
+      />
+      {t('settings.hints')}
+    </label>
+    <button type="button" onclick={() => settings.resetHints()}>{t('settings.resetHints')}</button>
+  </section>
+
+  <section>
+    <h2>{t('settings.save')}</h2>
+    <p class="dim">{t('settings.saveHelp')}</p>
+    <div class="row">
+      <button type="button" onclick={doExport}>{t('settings.export')}</button>
+      {#if exported}<button type="button" onclick={copy}>{t('settings.copy')}</button>{/if}
+    </div>
+    {#if exported}
+      <textarea readonly rows="4" aria-label={t('settings.export')} value={exported}></textarea>
+    {/if}
+
+    <textarea
+      rows="4"
+      aria-label={t('settings.import')}
+      placeholder={t('settings.importPlaceholder')}
+      bind:value={importText}></textarea>
+    <div class="row">
+      <button type="button" disabled={importText.trim() === ''} onclick={doImport}>
+        {t('settings.import')}
+      </button>
+    </div>
+    {#if message}
+      <p class="message" class:bad={!message.ok} role="status">{t(message.key)}</p>
+    {/if}
+  </section>
+
+  <section>
+    <h2>{t('settings.danger')}</h2>
+    <button type="button" class="danger" onclick={() => (confirmReset = true)}>
+      {t('settings.reset')}
+    </button>
+  </section>
+
+  <section>
+    <a class="link" href="#/credits">
+      <Icon name="lucide:info" size={18} />
+      <span>{t('more.credits')}</span>
+      <Icon name="lucide:chevron-right" size={16} />
+    </a>
+  </section>
+</SimplePage>
+
+{#if confirmReset}
+  <Modal title={t('settings.resetConfirmTitle')} onClose={() => (confirmReset = false)}>
+    <p>{t('settings.resetConfirm')}</p>
+    {#snippet actions()}
+      <button type="button" onclick={() => (confirmReset = false)}>{t('settings.cancel')}</button>
+      <button type="button" class="danger" onclick={doReset}>{t('settings.reset')}</button>
+    {/snippet}
+  </Modal>
+{/if}
+
+<style>
+  section {
+    margin-bottom: var(--space-6);
+  }
+
+  h2 {
+    margin: 0 0 var(--space-2);
+    color: var(--heading);
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 400;
+  }
+
+  .check {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 2.75rem;
+  }
+
+  .check input {
+    width: 1.25rem;
+    height: 1.25rem;
+    accent-color: var(--accent);
+  }
+
+  .dim {
+    margin: 0 0 var(--space-3);
+    color: var(--fg-dim);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: var(--space-2) 0;
+  }
+
+  button {
+    min-height: 2.75rem;
+    padding: var(--space-1) var(--space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface-raised);
+    color: var(--fg);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  button.danger {
+    border-color: var(--danger);
+  }
+
+  textarea {
+    display: block;
+    width: 100%;
+    margin-top: var(--space-2);
+    padding: var(--space-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--fg);
+    font-family: monospace;
+    font-size: 0.8rem;
+    word-break: break-all;
+  }
+
+  .message {
+    margin: var(--space-2) 0 0;
+    color: var(--success);
+  }
+
+  .message.bad {
+    color: var(--danger);
+  }
+
+  .link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface-raised);
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  .link span {
+    flex: 1;
+  }
+</style>

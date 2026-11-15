@@ -7,6 +7,13 @@
 <SimplePage title={t('nav.more')}>
   <ul class="menu">
     <li>
+      <a href="#/settings">
+        <Icon name="lucide:settings" size={18} />
+        <span>{t('settings.title')}</span>
+        <Icon name="lucide:chevron-right" size={16} />
+      </a>
+    </li>
+    <li>
       <a href="#/credits">
         <Icon name="lucide:info" size={18} />
         <span>{t('more.credits')}</span>
@@ -21,6 +28,10 @@
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+
+  li + li {
+    margin-top: var(--space-2);
   }
 
   a {

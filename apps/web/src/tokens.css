@@ -70,4 +70,8 @@
   --meta-width: 18rem;
   --topbar-height: 3.25rem;
   --tabbar-height: 3.5rem;
+  --now-height: 3.25rem;
+
+  /* Dim layer behind dialogs */
+  --scrim: rgb(0 0 0 / 0.6);
 }

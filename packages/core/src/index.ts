@@ -12,6 +12,7 @@ export * from './requirements.ts';
 export * from './rng.ts';
 export * from './rules.ts';
 export * from './save.ts';
+export * from './selectors.ts';
 export * from './state.ts';
 export * from './system.ts';
 export * from './unlocks.ts';

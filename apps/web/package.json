@@ -16,7 +16,8 @@
     "@fontsource/noto-serif-jp": "^5.0.0",
     "@fontsource/onest": "^5.0.0",
     "@shinobi/content": "workspace:*",
-    "@shinobi/core": "workspace:*"
+    "@shinobi/core": "workspace:*",
+    "idb-keyval": "^6.3.0"
   },
   "devDependencies": {
     "@iconify/types": "^2.0.0",

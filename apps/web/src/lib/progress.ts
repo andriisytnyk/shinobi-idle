@@ -1,8 +1,5 @@
-import { content } from '@shinobi/content';
-import { createState, levelAt, levelCap, xpAt } from '@shinobi/core';
-
-/** Placeholder game state for the app shell. The reactive store arrives with the stage 1 core. */
-export const state = createState(1, content);
+import { content, type SkillId } from '@shinobi/content';
+import { levelAt, levelCap, xpAt, type GameState } from '@shinobi/core';
 
 export interface SkillProgress {
   level: number;
@@ -10,7 +7,8 @@ export interface SkillProgress {
   fraction: number;
 }
 
-export function skillProgress(skill: keyof typeof state.skills): SkillProgress {
+/** Level and progress to the next level of a skill. */
+export function skillProgress(state: GameState, skill: SkillId): SkillProgress {
   const xp = state.skills[skill].xp;
   const cap = levelCap(content);
   const level = levelAt(xp, cap);
