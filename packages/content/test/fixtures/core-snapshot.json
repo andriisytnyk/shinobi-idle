@@ -3755,7 +3755,15 @@
       "entity.notFound": "fde673fef1ba",
       "entity.requirements": "ef13efbfffd0",
       "entity.links": "0a08afe9eb3d",
-      "shop.reason.money": "4060e0842945"
+      "shop.reason.money": "4060e0842945",
+      "toast.packsRemoved": "55559cbc6550",
+      "toast.packsAdded": "1a1c97990d7a",
+      "toast.packsUpdated": "0ba75b4f53f7",
+      "toast.ruleDisabled": "832110ec83c7",
+      "settings.rulesDisabled": "69daf9e918ee",
+      "settings.ruleDisabled": "e79ec655dc91",
+      "settings.failedPacks": "d2f9627e7c55",
+      "settings.packFailed": "48f61e246828"
     },
     "en": {
       "technique.core:body_flicker.name": "026242b01872",
