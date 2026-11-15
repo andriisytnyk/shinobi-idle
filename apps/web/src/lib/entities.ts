@@ -34,7 +34,7 @@ const ACTION_ENTITY: Readonly<Record<string, EntityKind>> = {
   practice: 'technique',
   drill: 'exercise',
   meditate: 'practice',
-  obstacle: 'obstacle',
+  course: 'skill',
   fight: 'enemy',
   senseiTest: 'exam',
 };

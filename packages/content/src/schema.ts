@@ -21,6 +21,7 @@ import {
   type PlayerRank,
   type SkillId,
 } from './constants.ts';
+import { modSchema, obstacleModSchema } from './modifiers.ts';
 
 // ---------- identifiers ----------
 
@@ -144,7 +145,8 @@ export const techniqueSchema = techniqueBaseSchema.extend({
 
 export const exerciseSchema = z.object({ id: coreId, level });
 
-export const practiceSchema = z.strictObject({
+/** The part of a practice that the importer generates; modifiers are layered on at load. */
+export const practiceBaseSchema = z.strictObject({
   id: coreId,
   level,
   /** The two skills the practice trains together. */
@@ -154,7 +156,25 @@ export const practiceSchema = z.strictObject({
   enlight: z.number().int(),
 });
 
-export const obstacleSchema = z.object({ id: coreId, level, slot: z.number().int().min(1) });
+export const practiceSchema = practiceBaseSchema.extend({
+  /** The modifiers of each Insight modifier, by index; the text says what they do. */
+  insightMods: z.array(z.array(modSchema).min(1)),
+  /** The modifiers of each Enlightenment modifier, by index. */
+  enlightMods: z.array(z.array(modSchema).min(1)),
+});
+
+export const obstacleBaseSchema = z.object({
+  id: coreId,
+  level,
+  slot: z.number().int().min(1),
+});
+
+export const obstacleSchema = obstacleBaseSchema.extend({
+  /** What the obstacle needs besides the Athletics level of its slot (a Chakra Control level for walking on trees and water); `null` for none. */
+  req: z.lazy(() => reqSchema).nullable(),
+  /** The permanent bonus and penalty of the obstacle while it is built. */
+  mods: z.array(obstacleModSchema).min(2),
+});
 
 /** The part of a herb that the importer generates; the extra requirement is layered on at load. */
 export const herbBaseSchema = z.object({ id: coreId, level });
@@ -164,10 +184,15 @@ export const herbSchema = herbBaseSchema.extend({
   req: z.lazy(() => reqSchema).nullable(),
 });
 
-export const poolCheckpointSchema = z.object({
+export const poolCheckpointBaseSchema = z.object({
   id: coreId,
   skill: skillId,
   pct: z.number().int(),
+});
+
+export const poolCheckpointSchema = poolCheckpointBaseSchema.extend({
+  /** What the checkpoint gives once the pool holds `pct` percent of its capacity; empty for the text-only 95% ones. */
+  mods: z.array(modSchema),
 });
 
 // ---------- items and recipes ----------
@@ -846,6 +871,28 @@ export const balanceParamsSchema = z.object({
   senseiTest: z.object({ base: z.number(), perLevel: z.number(), floor: z.number() }),
   offlineCapHours: z.number(),
   masteryCap: z.number().int(),
+  /**
+   * Meditation: chance per finished cycle of an Insight and of an Enlightenment, the levels a
+   * modifier of each kind can be bought up to, and the practice mastery that opens each of the
+   * three modifiers of a kind.
+   */
+  meditation: z.object({
+    insightChance: z.number(),
+    enlightChance: z.number(),
+    insightLevels: z.number().int(),
+    enlightLevels: z.number().int(),
+    insightGates: z.array(z.number().int()),
+    enlightGates: z.array(z.number().int()),
+  }),
+  /**
+   * Athletics course: the slot that costs nothing to build the first time, the number of built
+   * obstacles that raises the pillar, and the Athletics XP share the pillar adds.
+   */
+  athletics: z.object({
+    freeSlot: z.number().int(),
+    pillarCount: z.number().int(),
+    pillarXp: z.number(),
+  }),
 });
 
 /** The balance parameter object, referred to as `K` in the formulas. */
@@ -914,6 +961,9 @@ export const generatedDbSchema = contentDbSchema
     bosses: z.array(bossBaseSchema),
     herbs: z.array(herbBaseSchema),
     gear: z.array(gearBaseSchema),
+    practices: z.array(practiceBaseSchema),
+    obstacles: z.array(obstacleBaseSchema),
+    pools: z.array(poolCheckpointBaseSchema),
   });
 export type GeneratedDb = z.infer<typeof generatedDbSchema>;
 
@@ -933,6 +983,9 @@ export type ShopEntry = z.infer<typeof shopEntrySchema>;
 export type Coat = z.infer<typeof coatSchema>;
 export type GearFx = z.infer<typeof gearFxSchema>;
 export type GearBase = z.infer<typeof gearBaseSchema>;
+export type PoolCheckpointBase = z.infer<typeof poolCheckpointBaseSchema>;
+export type PracticeBase = z.infer<typeof practiceBaseSchema>;
+export type ObstacleBase = z.infer<typeof obstacleBaseSchema>;
 export type PoolCheckpoint = z.infer<typeof poolCheckpointSchema>;
 export type Item = z.infer<typeof itemSchema>;
 export type MarketEntry = z.infer<typeof marketEntrySchema>;

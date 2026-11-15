@@ -111,11 +111,11 @@ describe('listSkillActions', () => {
     expect(first?.req?.children[0]?.req).toEqual({ t: 'rank', rank: 'genin' });
   });
 
-  it('lists drills, practices and obstacles for cc, med and ath, and nothing for skills with no actions yet', () => {
+  it('lists drills, practices and the course for cc, med and ath, and nothing for skills with no actions yet', () => {
     const state = createState(1, content);
     expect(listSkillActions(state, 'cc', content).map((a) => a.kind)).toContain('drill');
     expect(listSkillActions(state, 'med', content).every((a) => a.kind === 'meditate')).toBe(true);
-    expect(listSkillActions(state, 'ath', content).every((a) => a.kind === 'obstacle')).toBe(true);
+    expect(listSkillActions(state, 'ath', content).every((a) => a.kind === 'course')).toBe(true);
     expect(listSkillActions(state, 'scout', content)).toEqual([]);
     expect(listSkillActions(state, 'vit', content)).toEqual([]);
   });

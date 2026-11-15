@@ -5,6 +5,7 @@
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import Icon from './Icon.svelte';
+  import ModBreakdown from './ModBreakdown.svelte';
 
   interface Props {
     skill: SkillId;
@@ -44,6 +45,15 @@
             ><Icon name={reached ? 'lucide:check' : 'lucide:lock'} size={14} /> {cp.pct}%</span
           >
           <span class="text">{t(localeKey('pool', cp.id, 'desc'))}</span>
+          {#if cp.mods.length > 0}
+            <span class="state" data-active={reached}>
+              {#if reached}
+                <ModBreakdown keys={cp.mods.map((m) => m.key)} display={t('pool.active')} />
+              {:else}
+                {t('pool.inactive')}
+              {/if}
+            </span>
+          {/if}
         </li>
       {/each}
     </ul>
@@ -106,12 +116,18 @@
 
   li {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--space-3);
     color: var(--fg-dim);
   }
 
   li.reached {
     color: var(--fg);
+  }
+
+  .state {
+    margin-left: auto;
+    font-size: 0.85rem;
   }
 
   .pct {

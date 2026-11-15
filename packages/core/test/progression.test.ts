@@ -20,7 +20,7 @@ import {
   type GameEvent,
   type Rules,
 } from '../src/index.ts';
-import { genin, HOUR, setLevel, start } from './helpers.ts';
+import { genin, HOUR, plainRules, setLevel, start } from './helpers.ts';
 
 const K = content.balance.K;
 
@@ -77,21 +77,22 @@ describe('A4: XP per hour follows the rate formula', () => {
     });
   }
 
-  it('drill, meditate and obstacle pay the same rate at their level', () => {
-    const cases2: [string, string, 'cc' | 'med' | 'ath', number][] = [
-      ['drill', 'core:kunai_na_doloni', 'cc', 5],
-      ['meditate', 'core:medytatsiia_v_rusi', 'med', 10],
-      ['obstacle', 'core:obtiazhuvachi', 'ath', 10],
+  it('drill, meditate and a one-obstacle course pay the same rate at their level', () => {
+    const cases2: [string, string, 'cc' | 'med' | 'ath', number, string][] = [
+      ['drill', 'core:kunai_na_doloni', 'cc', 5, 'core:kunai_na_doloni'],
+      ['meditate', 'core:medytatsiia_v_rusi', 'med', 10, 'core:medytatsiia_v_rusi'],
+      ['course', 'ath', 'ath', 10, 'core:obtiazhuvachi'],
     ];
-    for (const [kind, id, skill, level] of cases2) {
+    for (const [kind, id, skill, level, masteryKey] of cases2) {
       const state = genin();
       setLevel(state, skill, level);
-      expect(dispatch(state, start(kind, id), content)).toEqual({ ok: true });
+      if (kind === 'course') state.course = { '2': masteryKey };
+      expect(dispatch(state, start(kind, id), content, plainRules)).toEqual({ ok: true });
       const before = state.skills[skill].xp;
-      advance(state, HOUR, content);
+      advance(state, HOUR, content, plainRules);
       const perHour = state.skills[skill].xp - before;
       expect(Math.abs(perHour / rate(level, content) - 1)).toBeLessThan(0.02);
-      expect(state.mastery[id]?.xp).toBeGreaterThan(0);
+      expect(state.mastery[masteryKey]?.xp).toBeGreaterThan(0);
     }
   });
 

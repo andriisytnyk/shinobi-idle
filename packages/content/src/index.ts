@@ -27,6 +27,10 @@ import handHerbReqs from './data/hand/herb-reqs.json' with { type: 'json' };
 import handItemEcon from './data/hand/item-econ.json' with { type: 'json' };
 import handItemFx from './data/hand/item-fx.json' with { type: 'json' };
 import handItems from './data/hand/items.json' with { type: 'json' };
+import handModsObstacles from './data/hand/mods-obstacles.json' with { type: 'json' };
+import handModsPools from './data/hand/mods-pools.json' with { type: 'json' };
+import handModsPractices from './data/hand/mods-practices.json' with { type: 'json' };
+import handObstacleReqs from './data/hand/obstacle-reqs.json' with { type: 'json' };
 import handShopTools from './data/hand/shop-tools.json' with { type: 'json' };
 import handOperations from './data/hand/operations.json' with { type: 'json' };
 import handQuests from './data/hand/quests.json' with { type: 'json' };
@@ -47,9 +51,16 @@ import {
   herbReqMapSchema,
   itemEconMapSchema,
   itemFxMapSchema,
+  obstacleModMapSchema,
+  obstacleReqMapSchema,
+  poolModMapSchema,
+  practiceModMapSchema,
   layerBosses,
   layerEnemies,
   layerGear,
+  layerObstacles,
+  layerPools,
+  layerPractices,
   layerHerbs,
   layerShop,
   layerTechniques,
@@ -62,6 +73,9 @@ import {
   contentDbSchema,
   enemyBaseSchema,
   gearBaseSchema,
+  obstacleBaseSchema,
+  poolCheckpointBaseSchema,
+  practiceBaseSchema,
   herbBaseSchema,
   marketEntrySchema,
   techniqueBaseSchema,
@@ -82,10 +96,20 @@ export const content: ContentDb = contentDbSchema.parse({
     techniqueCombatMapSchema.parse(handTechniqueCombat),
   ),
   exercises,
-  practices,
-  obstacles,
+  practices: layerPractices(
+    z.array(practiceBaseSchema).parse(practices),
+    practiceModMapSchema.parse(handModsPractices),
+  ),
+  obstacles: layerObstacles(
+    z.array(obstacleBaseSchema).parse(obstacles),
+    obstacleModMapSchema.parse(handModsObstacles),
+    obstacleReqMapSchema.parse(handObstacleReqs),
+  ),
   herbs: layerHerbs(z.array(herbBaseSchema).parse(herbs), herbReqMapSchema.parse(handHerbReqs)),
-  pools,
+  pools: layerPools(
+    z.array(poolCheckpointBaseSchema).parse(pools),
+    poolModMapSchema.parse(handModsPools),
+  ),
   items: [...items, ...handItems].map((i) => ({
     ...i,
     ...itemEcon[i.id],
@@ -126,5 +150,6 @@ export const enLocale: Readonly<Record<string, string>> = enGenerated;
 export * from './constants.ts';
 export * from './icons.ts';
 export * from './keys.ts';
+export * from './modifiers.ts';
 export * from './overlay.ts';
 export * from './schema.ts';

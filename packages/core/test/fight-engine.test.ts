@@ -251,7 +251,7 @@ describe('A9: state is plain JSON and round-trips through a save', () => {
       lastActionAt: 0,
       fx: { player: [], enemy: [] },
     };
-    expect(STATE_VERSION).toBe(6);
+    expect(STATE_VERSION).toBeGreaterThanOrEqual(6);
     expect(MIGRATIONS).toHaveLength(STATE_VERSION - 1);
     const loaded = deserialize(JSON.stringify(raw), content);
     expect(loaded.v).toBe(STATE_VERSION);

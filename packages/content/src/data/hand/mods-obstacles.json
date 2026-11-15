@@ -1,0 +1,170 @@
+{
+  "core:strybky_po_dakhakh": [
+    {
+      "key": "xp.skill.ath",
+      "op": "add",
+      "value": 0.02,
+      "side": "bonus"
+    },
+    {
+      "key": "speed.skill.herb",
+      "op": "add",
+      "value": -0.01,
+      "side": "penalty"
+    }
+  ],
+  "core:bih_navkolo_sela": [
+    {
+      "key": "mission.duration",
+      "op": "add",
+      "value": -0.02,
+      "side": "bonus"
+    },
+    {
+      "key": "xp.skill.med",
+      "op": "add",
+      "value": -0.01,
+      "side": "penalty"
+    }
+  ],
+  "core:obtiazhuvachi": [
+    {
+      "key": "xp.skill.tai",
+      "op": "add",
+      "value": 0.03,
+      "side": "bonus"
+    },
+    {
+      "key": "speed.skill.ath",
+      "op": "add",
+      "value": -0.02,
+      "side": "penalty"
+    }
+  ],
+  "core:vidzhymannia_na_paltsiakh": [
+    {
+      "key": "pool.stamina",
+      "op": "add",
+      "value": 0.02,
+      "side": "bonus"
+    },
+    {
+      "key": "speed.skill.alch",
+      "op": "add",
+      "value": -0.01,
+      "side": "penalty"
+    }
+  ],
+  "core:koloda_nad_prirvoiu": [
+    {
+      "key": "evasion",
+      "op": "add",
+      "value": 0.02,
+      "side": "bonus"
+    },
+    {
+      "key": "xp.skill.ath",
+      "op": "add",
+      "value": -0.02,
+      "side": "penalty"
+    }
+  ],
+  "core:ukhylennia_vid_kunaiv": [
+    {
+      "key": "xp.skill.eva",
+      "op": "add",
+      "value": 0.03,
+      "side": "bonus"
+    },
+    {
+      "key": "accuracy",
+      "op": "add",
+      "value": -0.01,
+      "side": "penalty"
+    }
+  ],
+  "core:bih_po_derevakh": [
+    {
+      "key": "interval.explore",
+      "op": "add",
+      "value": -0.03,
+      "side": "bonus"
+    },
+    {
+      "key": "xp.skill.tai",
+      "op": "add",
+      "value": -0.01,
+      "side": "penalty"
+    }
+  ],
+  "core:lazinnia_po_skeli": [
+    {
+      "key": "xp.skill.ath",
+      "op": "add",
+      "value": 0.03,
+      "side": "bonus"
+    },
+    {
+      "key": "speed.skill.prov",
+      "op": "add",
+      "value": -0.02,
+      "side": "penalty"
+    }
+  ],
+  "core:perehony_z_supernykom": [
+    {
+      "key": "xp.skill.tai",
+      "op": "add",
+      "value": 0.03,
+      "side": "bonus"
+    },
+    {
+      "key": "xp.skill.med",
+      "op": "add",
+      "value": -0.02,
+      "side": "penalty"
+    }
+  ],
+  "core:strybky_cherez_stovpy": [
+    {
+      "key": "speed.skill.ath",
+      "op": "add",
+      "value": 0.02,
+      "side": "bonus"
+    },
+    {
+      "key": "pool.chakra",
+      "op": "add",
+      "value": -0.01,
+      "side": "penalty"
+    }
+  ],
+  "core:bih_po_vodi": [
+    {
+      "key": "xp.skill.cc",
+      "op": "add",
+      "value": 0.03,
+      "side": "bonus"
+    },
+    {
+      "key": "pool.stamina",
+      "op": "add",
+      "value": -0.02,
+      "side": "penalty"
+    }
+  ],
+  "core:plavannia_proty_techii": [
+    {
+      "key": "pool.stamina",
+      "op": "add",
+      "value": 0.03,
+      "side": "bonus"
+    },
+    {
+      "key": "speed.skill.herb",
+      "op": "add",
+      "value": -0.02,
+      "side": "penalty"
+    }
+  ]
+}

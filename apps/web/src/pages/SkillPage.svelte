@@ -2,8 +2,10 @@
   import { content, localeKey, NATURE_IDS, type SkillId } from '@shinobi/content';
   import { listSkillActions, skillUnlockStatus } from '@shinobi/core';
   import ActionTile from '../components/ActionTile.svelte';
+  import CoursePanel from '../components/CoursePanel.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
+  import MeditationPanel from '../components/MeditationPanel.svelte';
   import PoolBar from '../components/PoolBar.svelte';
   import ReqTree from '../components/ReqTree.svelte';
   import { entityDesc, entityName } from '../lib/entities.ts';
@@ -55,7 +57,9 @@
       </section>
     {/if}
 
-    {#if actions.length > 0}
+    {#if id === 'ath'}
+      <CoursePanel />
+    {:else if actions.length > 0}
       <section>
         <h2>{t('skill.actions')}</h2>
         <ul class="tiles">
@@ -66,6 +70,10 @@
       </section>
     {:else}
       <p class="placeholder">{t('skill.page.empty')}</p>
+    {/if}
+
+    {#if id === 'med'}
+      <MeditationPanel />
     {/if}
 
     <PoolBar skill={skill.id} />

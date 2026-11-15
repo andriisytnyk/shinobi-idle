@@ -3,7 +3,8 @@ import { removeItem } from './bank.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
 import { indexOf } from './lookup.ts';
-import type { Modifier, ModifierProvider } from './modifiers.ts';
+import { bonusOf, type Modifier, type ModifierProvider } from './modifiers.ts';
+import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 
 /** The skills a tonic's `skill` field covers. */
@@ -43,19 +44,36 @@ export function spendTonicCharges(state: GameState, skill: string): void {
   }
 }
 
+/** Charges one tonic gives: its own count after the `tonic.charges` modifiers, at least one. */
+export function tonicCharges(
+  state: GameState,
+  base: number,
+  content: ContentDb,
+  rules: Rules,
+): number {
+  const bonus = bonusOf(rules.modifierProviders, state, 'tonic.charges', content);
+  return Math.max(1, Math.round(base * (1 + bonus)));
+}
+
 /**
  * Drinks one tonic from the bank: starts its buff, or adds its charges to a running one up to
  * `K.tonic.capMult` times the charges of one tonic. A tonic that is already at the cap is refused
  * and kept.
  */
-export function useTonic(state: GameState, id: string, content: ContentDb): CommandResult {
+export function useTonic(
+  state: GameState,
+  id: string,
+  content: ContentDb,
+  rules: Rules,
+): CommandResult {
   const fx = indexOf(content).items.get(id)?.fx;
   if (fx?.kind !== 'tonic') return { ok: false, reason: 'error.itemNotUsable' };
-  const cap = fx.charges * content.balance.K.tonic.capMult;
+  const per = tonicCharges(state, fx.charges, content, rules);
+  const cap = per * content.balance.K.tonic.capMult;
   const current = state.buffs[id]?.charges ?? 0;
   if (current >= cap) return { ok: false, reason: 'error.tonicFull' };
   if (!removeItem(state, id, 1)) return { ok: false, reason: 'error.noItem' };
-  state.buffs[id] = { skill: fx.skill, charges: Math.min(cap, current + fx.charges) };
+  state.buffs[id] = { skill: fx.skill, charges: Math.min(cap, current + per) };
   emit(state, { type: 'itemUsed', id, target: fx.skill });
   return { ok: true };
 }

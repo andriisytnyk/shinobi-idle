@@ -82,8 +82,9 @@ export function gainPoolXp(
 }
 
 /**
- * The one way mastery is earned: `amount` goes to the mastery key and the pool share of it to
- * the skill's pool. Practice, combat and item use all call this.
+ * The one way mastery is earned: `amount`, with the mastery XP modifiers `mastery.xp.all` and
+ * `mastery.xp.skill.<skill>` applied, goes to the mastery key, and the pool share of the unmodified
+ * amount to the skill's pool. Practice, combat and item use all call this.
  */
 export function grantMastery(
   state: GameState,
@@ -91,7 +92,13 @@ export function grantMastery(
   skill: SkillId,
   amount: number,
   content: ContentDb,
+  rules?: Rules,
 ): void {
-  gainMasteryXp(state, key, amount, content);
+  const mods = rules?.modifierProviders ?? [];
+  const earned =
+    amount *
+    computeMod(mods, state, 'mastery.xp.all', content).total *
+    computeMod(mods, state, `mastery.xp.skill.${skill}`, content).total;
+  gainMasteryXp(state, key, earned, content);
   gainPoolXp(state, skill, poolGain(amount, content), content);
 }
