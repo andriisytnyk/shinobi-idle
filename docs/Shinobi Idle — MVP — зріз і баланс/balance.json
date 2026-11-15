@@ -197,7 +197,7 @@
    8,
    0.4
   ],
-  "zoneHpRegen": 0.35,
+  "zoneHpRegen": 0.8,
   "opRegen": 0.25,
   "respawn": 3,
   "wound": {
@@ -349,7 +349,7 @@
    23,
    50
   ],
-  "treasuryBase": 100,
+  "treasuryBase": 25,
   "buildTicks": [
    1,
    2,

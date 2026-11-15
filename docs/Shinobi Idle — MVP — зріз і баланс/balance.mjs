@@ -40,7 +40,7 @@ export const K = {
   pillAction: 0.5, pouchStack: 4, pillAt: 0.45,   // пілюля — дія 0,5 с; у слоті підсумка до 10 штук; автовживання нижче 45% HP
   food: [[1,30],[5,40],[20,50],[30,80],[35,100],[45,120]], // рівень ремесла → HP за одну страву чи мазь (із рецептів)
   toolTag: [8,0.4],
-  zoneHpRegen: 0.35, opRegen: 0.25, respawn: 3,
+  zoneHpRegen: 0.8, opRegen: 0.25, respawn: 3,
   wound: { stat:0.05, max:4, healMin:10, healFloorMin:2.5 },
   // --- вороги ---
   eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [40,4.5], eEva: [30,4.2],
@@ -60,7 +60,7 @@ export const K = {
   intel: { perCellLevel:1, mail:2, track:[3,5], caravanSkip:1, bingoLevel:2, writtenTestPerIntel:0.10, writtenTestMaxIntel:5 },
   partsPerScroll: 10, partDrop: { boss:2.0, carrier:0.12, mission:0.15 },
   // --- село ---
-  tickMin: 5, prod: 10, costBase: 20, costMult: [1,2.2,4.8,10.5,23,50], treasuryBase: 100, buildTicks: [1,2,3,4,5,8],
+  tickMin: 5, prod: 10, costBase: 20, costMult: [1,2.2,4.8,10.5,23,50], treasuryBase: 25, buildTicks: [1,2,3,4,5,8],
   bureauIncome: 20, storeCap: [200,200], shinobiCap: [30,10], shinobiT6: 30, towerStageMax: [3,6],
   // --- розвідка ---
   cellExplores: [24,84,156,240,360], cellLevelStep: 10,
