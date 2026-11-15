@@ -52,14 +52,16 @@ export interface PlayerDefeatedEvent extends EventBase {
 export interface CombatLogEvent extends EventBase {
   type: 'combatLog';
   side: 'player' | 'enemy';
-  /** `cast`: the player began a technique; `hit` and `miss`: an attack landed or not. */
-  act: 'cast' | 'hit' | 'miss';
+  /** `cast`: an action began; `resolve` and `interrupted`: it ended with its effect or was broken off; `hit` and `miss`: an attack landed or not. */
+  act: 'cast' | 'resolve' | 'interrupted' | 'hit' | 'miss';
   /** Technique id; null for a basic attack and for every enemy attack. */
   tech: string | null;
   /** Content id of the enemy in the fight. */
   enemy: string;
   /** Damage dealt by a hit; 0 otherwise. */
   dmg: number;
+  /** The id of the combatant whose action it is (on `cast`, `resolve` and `interrupted`). */
+  by?: string;
 }
 /** What a win paid: ryo, the bounty of a boss, trophies and scroll parts. */
 export interface LootEvent extends EventBase {

@@ -96,11 +96,19 @@
         let fight: Row['fight'] = null;
         const player = state.combat?.fight.player;
         if (slot.action.kind === 'fight' && player) {
+          const doing = player.act;
           fight =
-            player.phase === 'cast' && player.cast
-              ? { key: 'combat.doing.cast', tech: player.cast }
+            doing?.kind === 'technique' && doing.id
+              ? { key: 'combat.doing.cast', tech: doing.id }
               : {
-                  key: player.phase === 'recover' ? 'combat.doing.recover' : 'combat.doing.ready',
+                  key:
+                    player.phase === 'rest'
+                      ? 'combat.doing.rest'
+                      : doing?.kind === 'item'
+                        ? 'combat.doing.item'
+                        : doing?.kind === 'basic'
+                          ? 'combat.doing.basic'
+                          : 'combat.doing.wait',
                   tech: null,
                 };
         }

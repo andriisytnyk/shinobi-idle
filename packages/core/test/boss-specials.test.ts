@@ -133,7 +133,7 @@ describe('the rival', () => {
       let expected = 0;
       advanceBy(
         f,
-        0.1,
+        1.1,
         withAi((view) => {
           expected = view.techniques[0]?.expected ?? 0;
           return { type: 'wait' };

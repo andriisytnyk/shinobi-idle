@@ -30,7 +30,7 @@ function fightWith(supports: TeamSupport[], known: string[] = [], seed = 1): Fig
 }
 
 const teamHits = (fight: FightState, nature: string): number =>
-  fight.tally.damage[`team:${nature}`] ?? 0;
+  fight.tally.damage[`team.${nature}`] ?? 0;
 
 describe('A8: team support', () => {
   it('hits at its interval: the first teammate at each period, the second half a period later', () => {
@@ -109,7 +109,7 @@ describe('A8: team support', () => {
       seen.fight = true;
       seen.support = (c.fight.encounter.support ?? []).map((x) => x.nature);
       seen.special ||= c.fight.player.specials.includes('special:team');
-      seen.teamDamage ||= Object.keys(c.fight.tally.damage).some((k) => k.startsWith('team:'));
+      seen.teamDamage ||= Object.keys(c.fight.tally.damage).some((k) => k.startsWith('team.'));
       if (seen.teamDamage) break;
     }
     return { seen, state };

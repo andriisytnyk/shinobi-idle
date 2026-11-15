@@ -19,6 +19,19 @@ const data = {
     },
   ],
   playerRanks: [{ id: 'testmod:adept', tier: 3 }],
+  /** An AI tier with its own wait: the adept (and the test boss, by its `aiTier`) wait for the moment 300 ms, shorter than any tier of the core. */
+  ai: {
+    visibleTraits: [],
+    tiers: [
+      {
+        id: 'testmod:keen',
+        minTier: 3,
+        rules: ['heal', 'answer', 'best', 'basic'],
+        waitMs: 300,
+        tactical: true,
+      },
+    ],
+  },
   missionRanks: [{ id: 'testmod:trial' }],
   currencies: [{ id: 'testmod:token' }],
   villageStages: [{ id: 'testmod:stage3', rep: 'testmod:stage3', cap: 6 }],
@@ -219,6 +232,7 @@ const data = {
     {
       id: 'testmod:boss_shell',
       cl: 8,
+      aiTier: 'testmod:keen',
       traits: ['testmod:shelled'],
       nature: 'testmod:aether',
       carries: 'testmod:ember_pulse',

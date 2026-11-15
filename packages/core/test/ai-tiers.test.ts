@@ -114,7 +114,6 @@ function view(id: 'genin' | 'chunin', techs: KitTechnique[], enemies: ViewEnemy[
     medic: null,
     stance: null,
     hastened: false,
-    reactWork: ai.tactical ? 0 : workOf(ai.waitMs),
     guardBelow: K.ai.guardBelow,
     itemWork: sec(K.pillAction),
   };
@@ -157,12 +156,12 @@ describe('the two tiers are data', () => {
   });
 });
 
-describe('interrupts: a genin reacts after a delay to a cast it knows, a chunin at once to any', () => {
+describe('interrupts: a genin answers a cast it knows, a chunin any (both when their wait ends)', () => {
   const techs = [kt('int', ['interrupt'], 1), kt('big', [], 50)];
-  const react = workOf(tierOf('genin').waitMs);
+  const react = 1;
 
-  it('does not interrupt before the genin reaction delay has passed, and does after', () => {
-    expect(defaultCombatAi(view('genin', techs, [cast_(0, true)]))).toEqual(cast('big'));
+  it('interrupts a cast it knows to be heavy as soon as it decides: the wait is its reaction', () => {
+    expect(defaultCombatAi(view('genin', techs, [cast_(0, true)]))).toEqual(cast('int'));
     expect(defaultCombatAi(view('genin', techs, [cast_(react + 1, true)]))).toEqual(cast('int'));
   });
 
@@ -246,7 +245,7 @@ describe('answers: every known trait, at either tier, and nothing else', () => {
 
 describe('defence', () => {
   const techs = [shield('guard'), kt('big', [], 50)];
-  const react = workOf(tierOf('genin').waitMs);
+  const react = 1;
 
   it('a chunin guards against every heavy cast, a genin only against the ones it knows to be heavy', () => {
     expect(defaultCombatAi(view('chunin', techs, [cast_(0, false)]))).toEqual(cast('guard'));
@@ -254,8 +253,8 @@ describe('defence', () => {
     expect(defaultCombatAi(view('genin', techs, [cast_(react + 1, true)]))).toEqual(cast('guard'));
   });
 
-  it('a genin guards only after the reaction delay', () => {
-    expect(defaultCombatAi(view('genin', techs, [cast_(0, true)]))).toEqual(cast('big'));
+  it('a genin guards against a heavy cast it knows as soon as it decides', () => {
+    expect(defaultCombatAi(view('genin', techs, [cast_(0, true)]))).toEqual(cast('guard'));
     expect(defaultCombatAi(view('genin', techs, [cast_(react + 1, true)]))).toEqual(cast('guard'));
   });
 });

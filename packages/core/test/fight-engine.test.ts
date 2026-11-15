@@ -17,6 +17,7 @@ import {
   fightAdvance,
   fightNextEventIn,
   fightOutcome,
+  workOf,
   refreshUnlocks,
   serialize,
   simulateFights,
@@ -430,7 +431,10 @@ describe('the fight action wraps the fight engine', () => {
 describe('fight engine basics', () => {
   it('reports its next event, and none once decided', () => {
     const fight = createFight(playerFor(34, 'katon'), enemyAt(34), 1, content, rules);
-    expect(fightNextEventIn(fight, content, rules)).toBe(0);
+    // The player waits for the moment before anything happens: the next event is that wait or the regeneration step, whichever comes first.
+    expect(fightNextEventIn(fight, content, rules)).toBe(
+      Math.min(workOf(fight.player.waitMs), workOf(K.combat.regenMs)),
+    );
     fightAdvance(fight, 0, content, rules);
     expect(fightNextEventIn(fight, content, rules)).toBeGreaterThan(0);
     fightAdvance(fight, sec(K.combat.fightCapMs / 1000), content, rules);

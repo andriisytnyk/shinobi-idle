@@ -108,7 +108,10 @@ export function accuracyOf(levels: Levels, skill: SkillId, content: ContentDb): 
 export interface BasicAttack {
   accuracy: number;
   damage: number;
-  intervalMs: number;
+  /** How long the plain strike takes, in ms: it is an action of its own. */
+  castMs: number;
+  /** The stamina it costs. */
+  cost: number;
 }
 
 /** The basic attack uses the higher of the Taijutsu and Ninjutsu levels. */
@@ -118,7 +121,8 @@ export function basicAttackOf(levels: Levels, content: ContentDb): BasicAttack {
   return {
     accuracy: K.accBase + K.accPerLevel * lvl,
     damage: K.basicDmg[0] + K.basicDmg[1] * lvl,
-    intervalMs: secMs(K.basicInterval),
+    castMs: secMs(K.basicCast),
+    cost: K.basicCost,
   };
 }
 

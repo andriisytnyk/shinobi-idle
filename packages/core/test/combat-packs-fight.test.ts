@@ -257,7 +257,7 @@ describe('a boss special that a pack adds, implemented by a hook of the pack', (
     if (chunk === undefined) fightAdvance(fight, total, mod, modRules);
     else for (let t = 0; t < total; t += chunk) fightAdvance(fight, chunk, mod, modRules);
     return (fight.log ?? [])
-      .filter((l) => l.side === 'enemy')
+      .filter((l) => l.side === 'enemy' && (l.act === 'hit' || l.act === 'miss'))
       .map((l) => (l.act === 'hit' ? l.dmg : null));
   }
 

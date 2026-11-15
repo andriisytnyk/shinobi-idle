@@ -264,7 +264,7 @@ describe('named loadouts and the signature', () => {
     );
     // It is cast first, although another technique would hit harder against this enemy.
     fightAdvance(fight, workOf(3000), content, defaultRules);
-    expect(fight.log?.find((l) => l.act === 'cast')?.tech).toBe(sig);
+    expect(fight.log?.find((l) => l.side === 'player' && l.act === 'cast')?.tech).toBe(sig);
   });
 
   it('pays a tenth more Mastery XP for the same time spent on the signature', () => {

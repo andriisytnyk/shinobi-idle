@@ -48,14 +48,13 @@ const statusOf = (effect: string): string => effect.split('#')[0] ?? effect;
 
 /**
  * The casts under way that the tier answers: those it knows to be heavy (or every cast, at the
- * tier that sees them all), once the reaction delay since the cast began has passed.
+ * tier that sees them all). The tier decides only when its wait ends, which is its reaction.
  */
 function noticed(view: FightView): { remaining: number; total: number; interruptible: boolean }[] {
   const out: { remaining: number; total: number; interruptible: boolean }[] = [];
   for (const e of view.enemies) {
     const c = e.cast;
     if (!c || (!view.ai.tactical && !c.known)) continue;
-    if (c.total - c.remaining < view.reactWork) continue;
     out.push(c);
   }
   return out;

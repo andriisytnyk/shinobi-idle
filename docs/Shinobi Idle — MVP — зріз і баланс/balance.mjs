@@ -46,7 +46,7 @@ export const K = {
   passiveFx: { shield:{ evasion:40, base:0.25 }, decoy:{ evasion:40, base:0.25 }, evasionBuff:{ evasion:50, base:0.25 }, passiveNegate:{ evasion:60, base:0.25 } },
   // Звичайний удар — дія зі своїм кастом і малою вартістю витривалості; «переводить подих», коли не вистачає ні на техніку, ні на удар: rest.s секунд і частка rest.share від обох пулів.
   basicCast: 0.8, basicCost: 1, rest: { s:1.5, share:0.08 },
-  basicInterval: 2.4, // застаріле: читає лише старий цикл бою до етапу 2 завдання C1, тоді його буде прибрано
+  modelWait: 1.0, // лише для спрощеного симулятора нижче: вичікування гравця між діями; має дорівнювати waitMs тіру genin з ai.json
   basicDmg: [8,0.45], dodgeStamina: 2, ccCostPerLevel: 0.0015,
   pillAction: 0.5, pouchStack: 4, pillAt: 0.45,   // пілюля — дія 0,5 с; у слоті підсумка до 10 штук; автовживання нижче 45% HP
   food: [[1,30],[5,40],[20,50],[30,80],[35,100],[45,120]], // рівень ремесла → HP за одну страву чи мазь (із рецептів)
@@ -177,7 +177,7 @@ export function fight(b, nature, en, opts={}) {
     if(done) continue;
     const best=ready.filter(k=>k.dmg>0&&!(k===reserve&&casterAt<k.cd+k.cast+0.5)).sort((x,y)=>{ const s=k=>k.dmg*(k.aoe?alive().length:1)*(1-Math.min(K.habituationCap,K.habituation*(uses.get(k.name)||0))); return s(y)-s(x); })[0];
     if(best){ use(best); continue; }
-    if(t>=basicAt){ basicAt=t+K.basicInterval; const f=alive().sort((a,b)=>a.hp-b.hp)[0]; let accM=1; if(hidden>0)accM*=K.trait.hiddenAcc; if(illusion>0)accM*=K.trait.illusionAcc;
+    if(t>=basicAt){ basicAt=t+K.basicCast+K.modelWait; const f=alive().sort((a,b)=>a.hp-b.hp)[0]; let accM=1; if(hidden>0)accM*=K.trait.hiddenAcc; if(illusion>0)accM*=K.trait.illusionAcc;
       const eva=en.evaR*(en.traits.includes("Ухильний")&&f.bind<=0?K.trait.evasive:1)*(f.bind>0?0.3:1); if(R()<hit(P.acc*accM,eva)) dealTo(f,P.basic,false); }
   }
   return {win:false,t,hpLost:lost/P.hp,load:load.map(x=>x.name),timeout:true};
@@ -238,7 +238,7 @@ row("HP",`${K.hpBase} + ${K.hpPerVit} × Живучість`); row("Чакра",
 row("Витривалість",`${K.staminaBase} × (1 + ${K.staminaPerAth} × Атлетика); відновлення ${K.staminaRegen[0]} + ${K.staminaRegen[1]} × Атлетика за с`);
 row("Точність",`${K.accBase} + ${K.accPerLevel} × рівень навички техніки`); row("Ухилення",`рейтинг = ${K.evaBase} + ${K.rating.evaTier} × ранг гравця + внески вивчених захисних технік (до ${K.passiveFx.shield.evasion}–${K.passiveFx.passiveNegate.evasion} за техніку, від ${K.passiveFx.shield.base*100}% внеску за саме знання до повного на стелі Майстерності) + спорядження й бонуси + ${K.rating.knowledge} за рівень знань про ворога; вдале ухилення нічого не коштує`);
 row("Шанс влучити","як у Melvor: якщо точність ≥ ухилення, то 1 − ухилення ÷ (2 × точність), інакше точність ÷ (2 × ухилення); у межах 5–95%");
-row("Базова атака",`кожні ${K.basicInterval} с, ${K.basicDmg[0]} + ${K.basicDmg[1]} × більший із рівнів Тайдзюцу й Ніндзюцу`);
+row("Базова атака",`дія: вичікування рангу й каст ${K.basicCast} с, ${K.basicCost} витривалості, ${K.basicDmg[0]} + ${K.basicDmg[1]} × більший із рівнів Тайдзюцу й Ніндзюцу`);
 row("Вартість технік",`−${K.ccCostPerLevel*100}% за рівень Контролю чакри`);
 row("Між боями",`зона: HP +${K.zoneHpRegen*100}% максимуму, чакра й витривалість повністю; операція: усе +${K.opRegen*100}%`);
 row("Рани",`−${K.wound.stat*100}% бойових характеристик за стак, до ${K.wound.max}; стак гоїться ${K.wound.healMin} хв, не швидше ${K.wound.healFloorMin} хв`);

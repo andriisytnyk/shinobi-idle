@@ -44,7 +44,8 @@ describe('combat formulas', () => {
     expect(playerMaxStamina(state, content)).toBeCloseTo(K.staminaBase * (1 + K.staminaPerAth));
     const basic = basicAttack(state, content);
     expect(basic.damage).toBeCloseTo(K.basicDmg[0] + K.basicDmg[1]);
-    expect(basic.intervalMs).toBe(Math.round(K.basicInterval * 1000));
+    expect(basic.castMs).toBe(Math.round(K.basicCast * 1000));
+    expect(basic.cost).toBe(K.basicCost);
   });
 
   it('uses the higher of Taijutsu and Ninjutsu for a basic attack', () => {
@@ -183,9 +184,10 @@ describe('fight action', () => {
   it('casts the technique, pays its cost and puts it on cooldown', () => {
     const state = createState(7, content);
     dispatch(state, fight(), content);
-    advance(state, 1, content);
+    // The player waits for the moment first, then casts.
+    advance(state, 1100, content);
     const player = state.combat?.fight.player;
-    expect(player?.cast).toBe('core:leaf_whirlwind');
+    expect(player?.act?.id).toBe('core:leaf_whirlwind');
     expect(player?.stamina).toBeLessThan(playerMaxStamina(state, content));
     advance(state, 4000, content);
     expect(state.combat?.fight.player.cd['core:leaf_whirlwind']).toBeGreaterThan(

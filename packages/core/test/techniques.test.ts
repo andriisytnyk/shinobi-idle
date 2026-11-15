@@ -134,7 +134,7 @@ describe('next-cast modifier', () => {
     const next = 'core:dynamic_entry';
     const { fight, ai } = scene([flicker, next]);
     // The player starts the next cast the moment the flicker ends, and that cast is the short one.
-    runUntil(fight, (f) => f.player.phase === 'cast' && f.player.cast === next, ai);
+    runUntil(fight, (f) => f.player.phase === 'act' && f.player.act?.id === next, ai);
     expect(fight.player.timer.need).toBe(
       needOf(Math.round(tech(fight, next).castMs * fig('techFx.nextCast.castMult'))),
     );
@@ -198,10 +198,10 @@ describe('stances', () => {
     const start = fight.player.stamina;
     const at = fight.t;
     runUntil(fight, (f) => f.t >= at + sec(5), ai);
-    expect(start - fight.player.stamina).toBeCloseTo(
-      5 * fig('techFx.gateOpening.staminaPerSec'),
-      6,
-    );
+    // The stance drains by the second; every plain strike struck meanwhile costs its own stamina.
+    const extra = start - fight.player.stamina - 5 * fig('techFx.gateOpening.staminaPerSec');
+    expect(extra).toBeGreaterThanOrEqual(0);
+    expect(extra % K.basicCost).toBeCloseTo(0, 6);
     fight.player.stamina = fig('techFx.gateOpening.staminaPerSec');
     runUntil(fight, (f) => !findEffect(f.player, 'stance'), ai);
     expect(fight.player.stamina).toBe(0);

@@ -147,7 +147,8 @@ describe('what each tool does, and what it costs', () => {
       ids.heal,
     ]) {
       const { fight } = used(item);
-      expect(fight.player.phase, item).toBe('recover');
+      expect(fight.player.phase, item).toBe('act');
+      expect(fight.player.act?.kind, item).toBe('item');
       expect(fight.player.timer.need, item).toBe(action);
     }
   });
@@ -157,7 +158,7 @@ describe('what each tool does, and what it costs', () => {
       let damage = 0;
       for (let seed = 1; seed < 40 && damage === 0; seed++) {
         const { fight, r } = itemFight(item, 3, [], undefined, seed);
-        fightAdvance(fight, workOf(200), content, r);
+        fightAdvance(fight, workOf(1500), content, r);
         damage = fight.tally.damage[item] ?? 0;
         if (damage > 0) expect(damage).toBeCloseTo(fight.kit.toolDamage, 9);
       }
@@ -215,14 +216,14 @@ describe('what each tool does, and what it costs', () => {
       op: 'mul',
       value: 0.25,
     });
-    fightAdvance(salt.fight, workOf(200), content, salt.r);
+    fightAdvance(salt.fight, workOf(1500), content, salt.r);
     expect(findEffect(salt.fight.player, 'illusion')).toBeUndefined();
     expect(salt.fight.pouch[0]?.n).toBe(2);
 
     const cure = itemFight(ids.antidote);
     applyStatusById(ctxOf(cure.fight), cure.fight.player, 'poison', 'x');
     expect(findEffect(cure.fight.player, 'poison')).toBeDefined();
-    fightAdvance(cure.fight, workOf(200), content, cure.r);
+    fightAdvance(cure.fight, workOf(1500), content, cure.r);
     expect(findEffect(cure.fight.player, 'poison')).toBeUndefined();
   });
 
@@ -231,7 +232,7 @@ describe('what each tool does, and what it costs', () => {
     const tries = 200;
     for (let seed = 1; seed <= tries; seed++) {
       const { fight, r } = itemFight(ids.sleep, 3, [], undefined, seed);
-      fightAdvance(fight, workOf(200), content, r);
+      fightAdvance(fight, workOf(1500), content, r);
       if (fight.enemies[0] && findEffect(fight.enemies[0], 'stun')) slept++;
     }
     expect(slept / tries).toBeGreaterThan(K.itemFx.sleep!.chance! - 0.15);
@@ -241,13 +242,13 @@ describe('what each tool does, and what it costs', () => {
   it('pills heal, and restore chakra', () => {
     const heal = itemFight(ids.heal);
     heal.fight.player.hp = 10;
-    fightAdvance(heal.fight, workOf(200), content, heal.r);
+    fightAdvance(heal.fight, workOf(1500), content, heal.r);
     const item = content.items.find((i) => i.id === ids.heal);
     expect(heal.fight.player.hp).toBeCloseTo(10 + (item?.fx?.kind === 'heal' ? item.fx.hp : 0), 6);
 
     const pill = itemFight(ids.chakraPill);
     pill.fight.player.chakra = 0;
-    fightAdvance(pill.fight, workOf(200), content, pill.r);
+    fightAdvance(pill.fight, workOf(1500), content, pill.r);
     expect(pill.fight.player.chakra).toBeGreaterThan(0);
   });
 

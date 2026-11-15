@@ -1,5 +1,6 @@
 import type { Boss, ContentDb, Enemy, NatureId } from '@shinobi/content';
 import {
+  aiTierOf,
   encounterFor,
   evasionOf,
   isNature,
@@ -127,7 +128,9 @@ export function modelExpectation(
     best.reduce((s, f) => s + f.cast / f.cycle, 0),
   );
   const basic = K.basicDmg[0] + K.basicDmg[1] * style;
-  const playerDps = hitRate * (bestScore + ((1 - busy) * basic) / K.basicInterval);
+  // A plain strike is an action after a wait of the player's tier: that is its whole cycle.
+  const strikeEvery = K.basicCast + aiTierOf(content, snap.tier ?? 0).waitMs / 1000;
+  const playerDps = hitRate * (bestScore + ((1 - busy) * basic) / strikeEvery);
   if (!(playerDps > 0)) return null;
   const ttkSec = hpTotal / playerDps;
 

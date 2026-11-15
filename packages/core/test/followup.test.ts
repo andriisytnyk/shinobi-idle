@@ -70,9 +70,10 @@ describe('the burn ointment', () => {
     );
     quiet(fight);
     fight.player.hp = fight.player.maxHp = 1e9;
+    // The wait, then the item's own action time, then the effect.
     fightAdvance(
       fight,
-      sec(1),
+      sec(2),
       content,
       withAi(() => ({ type: 'item', id: ids.burnOintment })),
     );
@@ -155,15 +156,15 @@ describe('the non-native cast penalty applies in fights', () => {
   });
 });
 
-describe('the basic attack is an auto-attack on its own timer', () => {
-  it('lands every interval and never delays a cast', () => {
+describe('the basic strike is an action of its own', () => {
+  it('is struck only when the player decides, and never while a technique is cast', () => {
     const tech = 'core:dynamic_entry';
     const starts: number[] = [];
-    const basics: number[] = [];
+    const decisions: number[] = [];
     const ai = withAi((view: FightView) => {
       const d = defaultCombatAi(view);
+      decisions.push(view.t);
       if (d.type === 'technique') starts.push(view.t);
-      if (d.type === 'basic') basics.push(view.t);
       return d;
     }, rules);
     const fight = createFight(scripted([tech]), enemyAt(20), 2, content, ai);
@@ -172,18 +173,15 @@ describe('the basic attack is an auto-attack on its own timer', () => {
     fightAdvance(fight, sec(100), content, ai);
     const t = fight.kit.techniques[0];
     if (!t) throw new Error('no technique');
-    // Casts are exactly one cast plus one cooldown apart: the basic attacks never held one back.
+    // A technique is cast again no sooner than one cast plus one cooldown after it began.
     const gaps = starts.slice(1).map((s, i) => s - (starts[i] ?? 0));
-    expect(gaps.length).toBeGreaterThan(5);
-    for (const gap of gaps) expect(gap).toBe(sec((t.castMs + t.cooldownMs) / 1000));
-    // The attacks that landed are one interval apart, casts or no casts in between.
-    const landed = basics.filter(
-      (_, i) => i === 0 || (basics[i] ?? 0) - (basics[i - 1] ?? 0) >= sec(K.basicInterval),
-    );
-    const spacing = landed.slice(1).map((b, i) => b - (landed[i] ?? 0));
-    for (const gap of spacing) expect(gap).toBeGreaterThanOrEqual(sec(K.basicInterval));
-    expect(fight.tally.basic).toBeGreaterThanOrEqual(Math.floor(100 / K.basicInterval) - 8);
-    expect(fight.tally.basic).toBeLessThanOrEqual(Math.ceil(100 / K.basicInterval));
+    expect(gaps.length).toBeGreaterThan(3);
+    for (const gap of gaps)
+      expect(gap).toBeGreaterThanOrEqual(sec((t.castMs + t.cooldownMs) / 1000));
+    // Every decision comes at the end of a wait: one wait at least apart, since an action fills the time between.
+    const apart = decisions.slice(1).map((d, i) => d - (decisions[i] ?? 0));
+    for (const gap of apart) expect(gap).toBeGreaterThanOrEqual(sec(fight.player.waitMs / 1000));
+    expect(fight.tally.basic).toBeGreaterThan(5);
   });
 });
 

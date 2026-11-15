@@ -571,6 +571,8 @@ export const enemyBaseSchema = z.strictObject({
   carries: coreId.nullable(),
   hp: z.number(),
   dmg: z.number(),
+  /** The AI tier whose wait the body waits for the moment by; absent or `null`: the tier its combat level gives (`K.ai.enemyTier`). */
+  aiTier: z.string().min(1).nullable().optional(),
 });
 
 /** A boss has no region field: its place is a localized string. */
@@ -1125,8 +1127,6 @@ export const balanceParamsSchema = z.object({
   basicCost: z.number().min(0),
   /** Resting when neither a technique nor the basic strike can be paid: how long (s) and the share of both pools it returns. */
   rest: z.object({ s: z.number().positive(), share: z.number().min(0).max(1) }),
-  /** The interval of the basic attack of the loop before fight loop v2 (read only by it, removed with it). */
-  basicInterval: z.number(),
   basicDmg: pair,
   dodgeStamina: z.number(),
   ccCostPerLevel: z.number(),
@@ -1239,6 +1239,8 @@ export const balanceParamsSchema = z.object({
     timerMinMs: z.number().int(),
     hookEventsPerSec: z.number().int(),
     hookStatMax: z.number(),
+    /** The share of a pool spent on a cast that is lost when the cast is broken; the rest is returned. */
+    interruptLost: z.number().min(0).max(1),
   }),
   bindEva: z.number(),
   loadout: z.object({
@@ -1250,7 +1252,11 @@ export const balanceParamsSchema = z.object({
   }),
   signature: z.object({ minMastery: z.number().int(), xpBonus: z.number() }),
   pouch: z.object({ slots: z.number().int(), vest: z.number().int(), vestRank: playerRankId }),
-  ai: z.object({ guardBelow: z.number() }),
+  /** `guardBelow`: the health share below which a spare buff is cast; `enemyTier`: the lowest combat level of an enemy that waits by each AI tier (the lowest tier needs none). */
+  ai: z.object({
+    guardBelow: z.number(),
+    enemyTier: z.record(z.string(), z.number().int().min(0)),
+  }),
   woundHp: z.number(),
   /**
    * The Bingo book: wins that study an enemy completely, for an ordinary enemy and for a boss.

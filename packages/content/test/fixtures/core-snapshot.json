@@ -898,7 +898,6 @@
     "K.basicCost": 1,
     "K.rest.s": 1.5,
     "K.rest.share": 0.08,
-    "K.basicInterval": 2.4,
     "K.basicDmg": [
       8,
       0.45
@@ -1137,6 +1136,7 @@
     "K.combat.timerMinMs": 100,
     "K.combat.hookEventsPerSec": 500,
     "K.combat.hookStatMax": 10,
+    "K.combat.interruptLost": 0.5,
     "K.bindEva": 0.3,
     "K.loadout.slots.genin": 4,
     "K.loadout.slots.chunin": 5,
@@ -1151,6 +1151,7 @@
     "K.pouch.vest": 1,
     "K.pouch.vestRank": "chunin",
     "K.ai.guardBelow": 0.6,
+    "K.ai.enemyTier.chunin": 30,
     "K.woundHp": 0.1,
     "K.bingo.studiedWins.enemy": 25,
     "K.bingo.studiedWins.boss": 3,
@@ -3525,9 +3526,11 @@
       "combat.staminaBar": "b3c27c77b3d2",
       "combat.kills": "b0c69a15d3a4",
       "combat.doing": "a28d8eb9b41f",
-      "combat.doing.ready": "142240ae2481",
+      "combat.doing.wait": "a3ff552b11c3",
       "combat.doing.cast": "65125f43dc24",
-      "combat.doing.recover": "9aefa220a082",
+      "combat.doing.basic": "f3b403d6f84b",
+      "combat.doing.item": "246691e38c74",
+      "combat.doing.rest": "2b631f20b803",
       "combat.doing.attack": "2f9d135b3cbf",
       "combat.doing.respawn": "c7e0b488e435",
       "combat.log": "a1606b9a4521",
@@ -4683,7 +4686,6 @@
       "basicCast",
       "basicCost",
       "rest",
-      "basicInterval",
       "basicDmg",
       "dodgeStamina",
       "ccCostPerLevel",
@@ -5223,7 +5225,8 @@
       "timerFires",
       "timerMinMs",
       "hookEventsPerSec",
-      "hookStatMax"
+      "hookStatMax",
+      "interruptLost"
     ],
     "K.loadout": [
       "slots",
@@ -5250,7 +5253,11 @@
       "vestRank"
     ],
     "K.ai": [
-      "guardBelow"
+      "guardBelow",
+      "enemyTier"
+    ],
+    "K.ai.enemyTier": [
+      "chunin"
     ],
     "K.bingo": [
       "studiedWins",

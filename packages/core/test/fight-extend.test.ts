@@ -416,10 +416,12 @@ describe('encounters', () => {
     expect(added).toHaveLength(2);
     expect(fight.enemies).toHaveLength(K.pack.n + 2);
     expect(new Set(fight.enemies.map((e) => e.id)).size).toBe(fight.enemies.length);
-    // A new body counts a full attack interval from its arrival.
+    // A new body waits for the moment first, and its attack comes a full attack interval after its arrival.
     const body = added[0];
+    expect(body?.phase).toBe('wait');
     expect(body?.timer.progress).toBe(0);
-    expect(body?.timer.need).toBe(sec(K.eInterval) * 1000);
+    expect(body?.timer.need).toBe(sec((body?.waitMs ?? 0) / 1000) * 1000);
+    expect((body?.waitMs ?? 0) + (body?.strikeMs ?? 0)).toBe(Math.round(K.eInterval * 1000));
     // Dead bodies make room.
     for (const e of fight.enemies.slice(0, 3)) e.hp = 0;
     const more = spawnEnemies(fight, 0, content, rules, 7);
@@ -575,9 +577,9 @@ describe('the incoming-damage pipeline', () => {
     const fight = fresh();
     const p = fight.player;
     fightAdvance(fight, 0, content, rules);
-    grantWard(p, 50, fight.t + sec(0.77));
-    expect(fightNextEventIn(fight, content, rules)).toBe(sec(0.77));
-    fightAdvance(fight, sec(0.77), content, rules);
+    grantWard(p, 50, fight.t + sec(0.3));
+    expect(fightNextEventIn(fight, content, rules)).toBe(sec(0.3));
+    fightAdvance(fight, sec(0.3), content, rules);
     expect(p.ward).toBe(0);
     expect(p.wardUntil).toBeNull();
   });

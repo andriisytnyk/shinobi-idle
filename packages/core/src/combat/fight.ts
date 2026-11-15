@@ -1,4 +1,4 @@
-import type { ContentDb, SkillId, Technique } from '@shinobi/content';
+import type { AiTier, ContentDb, SkillId, Technique } from '@shinobi/content';
 import { createStream, nextFloatFrom } from '../rng.ts';
 import { addEffect, findEffect, isSuppressed, removeEffect, statOf } from './fight-effects.ts';
 import { figure, need } from './need.ts';
@@ -28,8 +28,10 @@ import {
 import { TEAM_HOOK } from './fight-team-id.ts';
 import type {
   Combatant,
+  AttackPlan,
   Decision,
   Encounter,
+  FightAct,
   FightCtx,
   FightHook,
   FightRules,
@@ -360,6 +362,36 @@ function natureOf(spawn: Spawn, natures: readonly string[], content: ContentDb):
 
 const idleTimer = (): Timer => ({ progress: 0, need: 0 });
 
+/** The AI tier an enemy body waits by: the tier its data names, else the highest tier whose combat level it reaches. */
+function enemyTierOf(content: ContentDb, spawn: Spawn): AiTier {
+  const named = enemyEntryOf(content, spawn.enemy)?.aiTier;
+  const tiers = content.ai.tiers;
+  const byName = named ? tiers.find((t) => t.id === named) : undefined;
+  if (byName) return byName;
+  const from: Record<string, number> = content.balance.K.ai.enemyTier;
+  let chosen = tiers[0];
+  let at = -1;
+  for (const t of tiers) {
+    const level = from[t.id];
+    if (level !== undefined && spawn.cl >= level && level > at) [chosen, at] = [t, level];
+  }
+  if (!chosen) throw new Error('the content has no AI tier');
+  return chosen;
+}
+
+const entryIndexes = new WeakMap<ContentDb, Map<string, { aiTier?: string | null | undefined }>>();
+function enemyEntryOf(
+  content: ContentDb,
+  id: string,
+): { aiTier?: string | null | undefined } | undefined {
+  let index = entryIndexes.get(content);
+  if (!index) {
+    index = new Map([...content.enemies, ...content.bosses].map((e) => [e.id, e]));
+    entryIndexes.set(content, index);
+  }
+  return index.get(id);
+}
+
 /**
  * Puts `n` more bodies of `fight.encounter.spawns[spawnIndex]` into a running fight, as far as
  * the cap on living enemies allows (dead bodies are dropped first). Returns the new bodies.
@@ -405,6 +437,9 @@ function addBodies(ctx: FightCtx, spawn: Spawn, n: number, staggered: boolean): 
   const stats = enemyStats(spawn, content);
   const maxHp = stats.maxHp * spawn.hpMult;
   const added: Combatant[] = [];
+  // An enemy waits for the moment as long as its AI tier says, then winds its attack up for the rest of its cycle.
+  const waitMs = enemyTierOf(content, spawn).waitMs;
+  const strikeMs = Math.max(secMs(K.castFloor), stats.intervalMs - waitMs);
   for (let i = 0; i < bodies; i++) {
     const c: Combatant = {
       id: `${spawn.enemy}#${fight.spawned++}`,
@@ -419,20 +454,22 @@ function addBodies(ctx: FightCtx, spawn: Spawn, n: number, staggered: boolean): 
       accuracy: stats.accuracy,
       evasion: stats.evasion,
       damage: stats.damage * spawn.dmgMult,
-      intervalMs: stats.intervalMs,
+      waitMs,
+      strikeMs,
       nature: natureOf(spawn, fight.natures, content),
       traits: [...spawn.traits],
       specials: [...fight.encounter.specials, ...spawn.specials],
       effects: [],
       cd: {},
-      phase: 'attack',
-      cast: null,
+      phase: 'wait',
+      act: null,
+      phaseAt: fight.t,
+      last: null,
       // Bodies that start together are staggered so they do not all strike at once.
       timer: {
         progress: 0,
-        need: staggered
-          ? Math.round((needOf(stats.intervalMs) * (bodies + i)) / bodies)
-          : needOf(stats.intervalMs),
+        need:
+          needOf(waitMs) + (staggered ? Math.round((needOf(stats.intervalMs) * i) / bodies) : 0),
       },
       timers: {},
       data: {},
@@ -485,14 +522,17 @@ export function createFight(
     accuracy: basic.accuracy * wound,
     evasion: evasionOf(snap, content) * wound,
     damage: basic.damage * wound,
-    intervalMs: basic.intervalMs,
+    waitMs: aiTierOf(content, snap.tier ?? 0).waitMs,
+    strikeMs: basic.castMs,
     nature: null,
     traits: [],
     specials: [],
     effects: [],
     cd: {},
-    phase: 'idle',
-    cast: null,
+    phase: 'wait',
+    act: null,
+    phaseAt: 0,
+    last: null,
     timer: idleTimer(),
     timers: {},
     data: {},
@@ -525,6 +565,7 @@ export function createFight(
     tally: emptyTally(data.basicSkill ?? data.techSkills[0] ?? ('' as SkillId)),
     log: [],
   };
+  player.timer = { progress: 0, need: needOf(player.waitMs) };
   const ctx = makeCtx(fight, content, rules);
   // Passive techniques out of the loadout work through a hook of the player's own.
   for (const tech of fight.kit.techniques) {
@@ -562,7 +603,6 @@ export function fightNextEventIn(
 ): number | null {
   if (fight.result !== 'ongoing') return null;
   const player = fight.player;
-  if (player.phase === 'idle') return 0;
   const ctx = makeCtx(fight, content, rules);
   let best = Math.min(fight.poolAt, fight.cap) - fight.t;
   const take = (n: number | null): void => {
@@ -580,7 +620,7 @@ export function fightNextEventIn(
       const timer = c.timers[name];
       if (timer) take(timeTo(timer, rate));
     }
-    if (c.phase !== 'idle') take(timeTo(c.timer, rate));
+    take(timeTo(c.timer, rate));
   };
   dueOf(player);
   for (const e of fight.enemies) if (alive(e)) dueOf(e);
@@ -591,7 +631,7 @@ function fill(ctx: FightCtx, c: Combatant, dt: number): void {
   const rate = speed(ctx, c);
   if (rate === 0) return;
   const add = dt * rate;
-  if (c.phase !== 'idle') c.timer.progress += add;
+  c.timer.progress += add;
   for (const name in c.timers) {
     const timer = c.timers[name];
     if (timer) timer.progress += add;
@@ -621,6 +661,8 @@ export function fightAdvance(
   const ctx = makeCtx(fight, content, rules);
   let left = work;
   let stalled = 0;
+  // Whatever was done to the bodies since the last call (damage dealt from outside) is settled first.
+  if (checkResult(fight)) return left;
   while (fight.result === 'ongoing') {
     const next = fightNextEventIn(fight, content, rules);
     if (next === null || next > left) {
@@ -667,14 +709,73 @@ function checkResult(fight: FightState): boolean {
   return fight.result !== 'ongoing';
 }
 
+/** What the action that is being resolved did, collected from the notes of its hits. */
+interface ActRecord {
+  hit: boolean;
+  miss: boolean;
+  damage: number;
+  statuses: Record<string, number>;
+  combos: Record<string, number>;
+}
+let resolving: ActRecord | null = null;
+
 function note(
   fight: FightState,
   side: 'player' | 'enemy',
-  act: 'cast' | 'hit' | 'miss',
+  act: 'cast' | 'resolve' | 'interrupted' | 'hit' | 'miss',
   tech: string | null,
   dmg: number,
+  by?: string,
 ): void {
-  fight.log?.push({ side, act, tech, dmg });
+  if (resolving) {
+    if (act === 'hit') {
+      resolving.hit = true;
+      resolving.damage += dmg;
+    } else if (act === 'miss') resolving.miss = true;
+  }
+  fight.log?.push(by === undefined ? { side, act, tech, dmg } : { side, act, tech, dmg, by });
+}
+
+/** What of `after` is more than in `before`, by key. */
+const grown = (before: Record<string, number>, after: Record<string, number>): string[] =>
+  Object.keys(after)
+    .filter((k) => (after[k] ?? 0) > (before[k] ?? 0))
+    .sort();
+
+/** Runs the effect of an action and records how it went as the combatant's last action. */
+function resolveAs(
+  ctx: FightCtx,
+  c: Combatant,
+  act: FightAct,
+  run: () => void,
+  log = true,
+): ActRecord {
+  const { fight } = ctx;
+  const was = resolving;
+  const rec: ActRecord = {
+    hit: false,
+    miss: false,
+    damage: 0,
+    statuses: { ...fight.tally.statuses },
+    combos: { ...fight.tally.combos },
+  };
+  resolving = rec;
+  try {
+    run();
+  } finally {
+    resolving = was;
+  }
+  c.last = {
+    kind: act.kind,
+    id: act.id,
+    outcome: rec.hit ? 'hit' : rec.miss ? 'miss' : 'none',
+    damage: rec.damage,
+    statuses: grown(rec.statuses, fight.tally.statuses),
+    combos: grown(rec.combos, fight.tally.combos),
+    at: fight.t,
+  };
+  if (log) note(fight, c.side, 'resolve', act.id, rec.damage, c.id);
+  return rec;
 }
 
 /**
@@ -787,7 +888,55 @@ export function cancelCasts(ctx: FightCtx, target: Combatant, interruptible = fa
       any = true;
     }
   }
+  // A fighter that is casting loses its cast too; the plain attack of an enemy only waits while it is stopped.
+  if (breakAct(ctx, target)) any = true;
   return any;
+}
+
+/**
+ * Breaks off the action a fighter is casting: it ends without effect, no cooldown starts, the share
+ * of the pools it spent that `K.combat.interruptLost` names is lost and the rest returns, and the
+ * fighter goes back to waiting. The plain attack of an enemy is not a cast and cannot be broken.
+ */
+export function breakAct(ctx: FightCtx, c: Combatant): boolean {
+  const { fight } = ctx;
+  const act = c.act;
+  // The plain attack of an enemy and the use of an item (whose effect has happened) are not casts.
+  if (c.phase !== 'act' || act === null || act.kind === 'attack' || act.kind === 'item')
+    return false;
+  const keep = 1 - ctx.content.balance.K.combat.interruptLost;
+  c.chakra = Math.min(c.maxChakra, c.chakra + keep * (c.data['act.chakra'] ?? 0));
+  c.stamina = Math.min(c.maxStamina, c.stamina + keep * (c.data['act.stamina'] ?? 0));
+  delete c.data['act.chakra'];
+  delete c.data['act.stamina'];
+  c.last = {
+    kind: act.kind,
+    id: act.id,
+    outcome: 'interrupted',
+    damage: 0,
+    statuses: [],
+    combos: [],
+    at: fight.t,
+  };
+  note(fight, c.side, 'interrupted', act.id, 0, c.id);
+  if (c === fight.player) fight.target = null;
+  enter(fight, c, 'wait', null, needOf(c.waitMs), 0);
+  return true;
+}
+
+/** Puts a fighter into a phase: its action, and the timer that ends it (`carry` is the progress already made). */
+function enter(
+  fight: FightState,
+  c: Combatant,
+  phase: Combatant['phase'],
+  act: FightAct | null,
+  need: number,
+  carry: number,
+): void {
+  c.phase = phase;
+  c.act = act;
+  c.phaseAt = fight.t;
+  c.timer = { progress: carry, need: Math.max(1, need) };
 }
 
 /** The nature wheel: +wheel against a nature the technique beats, -wheel against one that beats it. */
@@ -1014,15 +1163,14 @@ function buildView(ctx: FightCtx): FightView {
         : null,
     stance,
     hastened: (player.data.hasten ?? 0) > 0,
-    // Adapter until the loop is replaced: the tier's wait is the delay of the tier that does not plan ahead.
-    reactWork: tier.tactical ? 0 : workOf(tier.waitMs),
+
     guardBelow: K.ai.guardBelow,
     itemWork: secWork(K.pillAction),
   };
 }
 
 /** The AI tier that plays a player of this tier: the highest one whose minimum the tier meets. */
-function aiTierOf(content: ContentDb, tier: number) {
+export function aiTierOf(content: ContentDb, tier: number) {
   let chosen = content.ai.tiers[0];
   for (const t of content.ai.tiers) {
     if (t.minTier <= tier && (!chosen || t.minTier >= chosen.minTier)) chosen = t;
@@ -1031,89 +1179,152 @@ function aiTierOf(content: ContentDb, tier: number) {
   return chosen;
 }
 
-function act(ctx: FightCtx): void {
-  const fight = ctx.fight;
+/** The player has waited long enough: the AI chooses, and the player begins what it chose, or waits again, or catches its breath. */
+function decide(ctx: FightCtx): void {
+  const { fight, content } = ctx;
+  const player = fight.player;
   const view = buildView(ctx);
   const decision: Decision = ctx.rules.combatAi(view);
   if (decision.type === 'technique') {
     const chosen = view.techniques.find((r) => r.tech.id === decision.id && r.ready);
     const tech = chosen && fight.kit.techniques.find((t) => t.id === chosen.tech.id);
-    if (tech) return startCast(fight, tech, decision.target);
+    if (tech) return startTechnique(ctx, tech, decision.target);
+  } else if (decision.type === 'item') {
+    if (startItem(ctx, decision.id, decision.target)) return;
   }
-  if (decision.type === 'item' && useFromPouch(ctx, decision.id, decision.target)) return;
-  if (decision.type === 'wait') {
-    fight.player.phase = 'recover';
-    fight.player.timer.need = needOf(TICK_MS);
-    return;
+  if (decision.type === 'wait') return beginWait(ctx);
+  const cost = content.balance.K.basicCost;
+  if (player.stamina >= cost) {
+    return startBasic(ctx, decision.type === 'basic' ? decision.target : undefined, cost);
   }
-  basicAttack(ctx, decision.type === 'basic' ? decision.target : undefined);
+  // Rest only when neither the plain strike nor any technique can be paid for.
+  const canPay = fight.kit.techniques.some(
+    (t) => (t.pool === 'chakra' ? player.chakra : player.stamina) >= t.cost,
+  );
+  if (canPay) return beginWait(ctx);
+  enter(
+    fight,
+    player,
+    'rest',
+    { kind: 'rest', id: null, target: null },
+    needOf(secMs(content.balance.K.rest.s)),
+    player.timer.progress,
+  );
 }
 
-/** Takes one unit of `id` from the pouch, uses it (it takes the item's action time) and reports whether it could. */
-function useFromPouch(ctx: FightCtx, id: string, target: string | undefined): boolean {
+function beginWait(ctx: FightCtx): void {
+  const player = ctx.fight.player;
+  enter(ctx.fight, player, 'wait', null, needOf(player.waitMs), player.timer.progress);
+}
+
+/** The rest ends: a share of both pools comes back. */
+function finishRest(ctx: FightCtx): void {
+  const { fight, content } = ctx;
+  const player = fight.player;
+  const share = content.balance.K.rest.share;
+  player.chakra = Math.min(player.maxChakra, player.chakra + share * player.maxChakra);
+  player.stamina = Math.min(player.maxStamina, player.stamina + share * player.maxStamina);
+  player.last = {
+    kind: 'rest',
+    id: null,
+    outcome: 'none',
+    damage: 0,
+    statuses: [],
+    combos: [],
+    at: fight.t,
+  };
+  note(fight, 'player', 'resolve', null, 0, player.id);
+}
+
+/**
+ * Takes one unit of `id` from the pouch and uses it (its effect is at once) and reports whether it could.
+ * Using it is an action that takes the item's action time, during which the player does nothing else.
+ */
+function startItem(ctx: FightCtx, id: string, target: string | undefined): boolean {
   const { fight, content } = ctx;
   const slot = fight.pouch.find((s) => s.id === id && s.n > 0);
   if (!slot) return false;
-  fight.target = target ?? null;
-  const used = applyItem(ctx, id);
-  fight.target = null;
-  if (!used) return false;
+  const player = fight.player;
+  const act: FightAct = { kind: 'item', id, target: target ?? null };
+  let used = false;
+  const before = player.last;
+  const rec = resolveAs(
+    ctx,
+    player,
+    act,
+    () => {
+      fight.target = target ?? null;
+      used = applyItem(ctx, id);
+      fight.target = null;
+    },
+    false,
+  );
+  if (!used) {
+    // Nothing happened: no unit is spent and the player decides again.
+    player.last = before;
+    return false;
+  }
+  note(fight, 'player', 'cast', id, 0, player.id);
+  note(fight, 'player', 'resolve', id, rec.damage, player.id);
   slot.n--;
   count(fight.tally.uses, id);
-  fight.player.phase = 'recover';
-  fight.player.timer.need = needOf(secMs(content.balance.K.pillAction));
+  enter(
+    fight,
+    player,
+    'act',
+    act,
+    needOf(secMs(content.balance.K.pillAction)),
+    player.timer.progress,
+  );
   return true;
 }
 
-function startCast(fight: FightState, tech: KitTechnique, target: string | undefined): void {
+function startTechnique(ctx: FightCtx, tech: KitTechnique, target: string | undefined): void {
+  const fight = ctx.fight;
   const player = fight.player;
   if (tech.pool === 'chakra') player.chakra -= tech.cost;
   else player.stamina -= tech.cost;
-  player.phase = 'cast';
-  player.cast = tech.id;
+  player.data[tech.pool === 'chakra' ? 'act.chakra' : 'act.stamina'] = tech.cost;
   // A hastened cast is shortened once.
   const hasten = player.data.hasten ?? 0;
   player.data.hasten = 0;
-  player.timer.need = needOf(
-    hasten > 0 ? Math.max(1, Math.round(tech.castMs * hasten)) : tech.castMs,
+  enter(
+    fight,
+    player,
+    'act',
+    { kind: 'technique', id: tech.id, target: target ?? null },
+    needOf(hasten > 0 ? Math.max(1, Math.round(tech.castMs * hasten)) : tech.castMs),
+    player.timer.progress,
   );
   fight.target = target ?? null;
   // Mastery is paid for the fight time since the previous technique use (or the fight's start).
   count(fight.tally.masteryWork, tech.id, fight.t - fight.tally.lastUseAt);
   fight.tally.lastUseAt = fight.t;
   fight.tally.style = tech.skill;
-  note(fight, 'player', 'cast', tech.id, 0);
+  note(fight, 'player', 'cast', tech.id, 0, player.id);
 }
 
-/**
- * The basic attack is an auto-attack: it lands the moment it is chosen and is next allowed an
- * interval later, but it does not stop the player from casting in the meantime. Chosen before it
- * is allowed again, the player waits for the next moment anything can happen: the attack, a
- * technique coming off cooldown, or the next regeneration step.
- */
-function basicAttack(ctx: FightCtx, targetId: string | undefined): void {
+/** The plain strike is an action: it costs a little stamina, takes its own time and lands when it ends. */
+function startBasic(ctx: FightCtx, targetId: string | undefined, cost: number): void {
   const fight = ctx.fight;
   const player = fight.player;
-  const due = player.data.basicAt ?? 0;
-  if (fight.t < due) {
-    let wait = due - fight.t;
-    for (const id of Object.keys(player.cd)) {
-      const left = (player.cd[id] ?? 0) - fight.t;
-      if (left > 0 && left < wait) wait = left;
-    }
-    // A technique short of chakra or stamina can come within reach at the next regeneration step.
-    const short = fight.kit.techniques.some(
-      (t) =>
-        (player.cd[t.id] ?? 0) <= fight.t &&
-        (t.pool === 'chakra' ? player.chakra : player.stamina) < t.cost,
-    );
-    if (short && fight.poolAt > fight.t) wait = Math.min(wait, fight.poolAt - fight.t);
-    player.phase = 'recover';
-    player.timer.need = Math.max(1, wait) * RATE_FULL;
-    return;
-  }
-  player.data.basicAt = fight.t + workOf(player.intervalMs);
+  player.stamina -= cost;
+  player.data['act.stamina'] = cost;
+  enter(
+    fight,
+    player,
+    'act',
+    { kind: 'basic', id: null, target: targetId ?? null },
+    needOf(player.strikeMs),
+    player.timer.progress,
+  );
   fight.tally.style = fightData(ctx.content).basicSkill ?? fight.tally.style;
+  note(fight, 'player', 'cast', null, 0, player.id);
+}
+
+function finishBasic(ctx: FightCtx, targetId: string | null): void {
+  const fight = ctx.fight;
+  const player = fight.player;
   fight.tally.basic++;
   const target = pickTarget(fight, targetId);
   if (!target) return;
@@ -1128,11 +1339,27 @@ function basicAttack(ctx: FightCtx, targetId: string | undefined): void {
   } else note(fight, 'player', 'miss', null, 0);
 }
 
-function resolveCast(ctx: FightCtx): void {
+/** The player's action ends: its effect happens now, then the player waits again. */
+function finishAct(ctx: FightCtx): void {
+  const player = ctx.fight.player;
+  const act = player.act;
+  delete player.data['act.chakra'];
+  delete player.data['act.stamina'];
+  if (act) {
+    resolveAs(ctx, player, act, () => {
+      if (act.kind === 'technique') resolveCast(ctx, act.id);
+      else if (act.kind === 'basic') finishBasic(ctx, act.target);
+    });
+  }
+  if (ctx.fight.result === 'ongoing') {
+    enter(ctx.fight, player, 'wait', null, needOf(player.waitMs), player.timer.progress);
+  }
+}
+
+function resolveCast(ctx: FightCtx, id: string | null): void {
   const { fight, content } = ctx;
   const player = fight.player;
-  const tech = fight.kit.techniques.find((t) => t.id === player.cast);
-  player.cast = null;
+  const tech = fight.kit.techniques.find((t) => t.id === id);
   if (!tech) return;
   player.cd[tech.id] = fight.t + workOf(tech.cooldownMs);
   const previous = fight.uses[tech.id] ?? 0;
@@ -1285,7 +1512,7 @@ function applyHit(ctx: FightCtx, tech: KitTechnique, target: Combatant, hab: num
 function enemyAttack(ctx: FightCtx, enemy: Combatant): void {
   const fight = ctx.fight;
   const player = fight.player;
-  const plan = {
+  const plan: AttackPlan = {
     chance: hitChance(
       stat(ctx, enemy, 'accuracy', enemy.accuracy),
       stat(ctx, player, 'evasion', player.evasion),
@@ -1302,7 +1529,8 @@ function enemyAttack(ctx: FightCtx, enemy: Combatant): void {
         plan.damage >= 0 &&
         Number.isFinite(plan.chance) &&
         plan.chance >= 0 &&
-        plan.chance <= 1,
+        plan.chance <= 1 &&
+        (plan.interrupts === undefined || typeof plan.interrupts === 'boolean'),
     });
   }
   const resist = findEffect(player, 'resist');
@@ -1315,6 +1543,8 @@ function enemyAttack(ctx: FightCtx, enemy: Combatant): void {
   }
   const dealt = dealDamage(ctx, player, plan.damage, enemy.id);
   note(fight, 'enemy', 'hit', null, dealt);
+  // An attack that carries the interrupt breaks the cast of whoever it hits.
+  if (plan.interrupts === true && alive(player)) breakAct(ctx, player);
   for (const hook of hooks) {
     guard(
       ctx,
@@ -1435,8 +1665,22 @@ function handle(ctx: FightCtx): void {
     if (!alive(e)) continue;
     while (e.timer.progress >= e.timer.need && alive(player)) {
       e.timer.progress -= e.timer.need;
-      e.timer.need = needOf(e.intervalMs);
-      enemyAttack(ctx, e);
+      if (e.phase === 'wait') {
+        // The wait is over: the wind-up of the attack begins, and can be seen.
+        enter(
+          fight,
+          e,
+          'act',
+          { kind: 'attack', id: null, target: player.id },
+          needOf(e.strikeMs),
+          e.timer.progress,
+        );
+        note(fight, 'enemy', 'cast', null, 0, e.id);
+      } else {
+        const act: FightAct = e.act ?? { kind: 'attack', id: null, target: player.id };
+        resolveAs(ctx, e, act, () => enemyAttack(ctx, e));
+        enter(fight, e, 'wait', null, needOf(e.waitMs), e.timer.progress);
+      }
     }
     runTimers(ctx, e);
   }
@@ -1451,23 +1695,20 @@ function handle(ctx: FightCtx): void {
     player.stamina = Math.min(player.maxStamina, player.stamina + fight.kit.staminaRegen * scale);
   }
 
-  if (player.timer.progress >= player.timer.need) {
-    if (player.phase === 'cast') {
-      player.timer.progress -= player.timer.need;
-      resolveCast(ctx);
-      player.phase = 'idle';
-    } else if (player.phase === 'recover') {
-      player.timer.progress -= player.timer.need;
-      player.phase = 'idle';
-    }
-  }
   if (checkResult(fight)) return;
   if (fight.t >= fight.cap) {
     fight.result = 'timeout';
     return;
   }
-  while (player.phase === 'idle' && fight.result === 'ongoing') {
-    act(ctx);
+  // The player's phase ends: the wait (the AI chooses), the action (it takes effect) or the rest.
+  while (fight.result === 'ongoing' && player.timer.progress >= player.timer.need) {
+    player.timer.progress -= player.timer.need;
+    if (player.phase === 'wait') decide(ctx);
+    else if (player.phase === 'act') finishAct(ctx);
+    else {
+      finishRest(ctx);
+      beginWait(ctx);
+    }
     checkResult(fight);
   }
 }

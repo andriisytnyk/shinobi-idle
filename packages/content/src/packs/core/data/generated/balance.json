@@ -313,7 +313,6 @@
       "s": 1.5,
       "share": 0.08
     },
-    "basicInterval": 2.4,
     "basicDmg": [
       8,
       0.45
@@ -602,7 +601,8 @@
       "timerFires": 1000,
       "timerMinMs": 100,
       "hookEventsPerSec": 500,
-      "hookStatMax": 10
+      "hookStatMax": 10,
+      "interruptLost": 0.5
     },
     "bindEva": 0.3,
     "loadout": {
@@ -628,7 +628,10 @@
       "vestRank": "chunin"
     },
     "ai": {
-      "guardBelow": 0.6
+      "guardBelow": 0.6,
+      "enemyTier": {
+        "chunin": 30
+      }
     },
     "woundHp": 0.1,
     "bingo": {

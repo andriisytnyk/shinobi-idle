@@ -196,8 +196,9 @@ export const MIGRATIONS: readonly Migration[] = [
       dormant: {},
     };
   },
-  // v14 -> v15: the Evasion skill is gone (evasion is a rating now): its XP and pool entries are dropped.
-  // Nothing else of a save changes here.
+  // v14 -> v15: the Evasion skill is gone (evasion is a rating now): its XP and pool entries are dropped. The fight
+  // loop is another one (waiting and acting): a fight in progress cannot go on in it and is dropped, so the fight
+  // action starts a fresh one without a reward, a Wound or a lost item. Nothing else of a save changes here.
   (state) => {
     const without = (branch: unknown): unknown => {
       if (!isRecord(branch)) return branch;
@@ -205,7 +206,7 @@ export const MIGRATIONS: readonly Migration[] = [
       void _eva;
       return rest;
     };
-    return { ...state, skills: without(state.skills), pools: without(state.pools) };
+    return { ...state, skills: without(state.skills), pools: without(state.pools), combat: null };
   },
 ];
 

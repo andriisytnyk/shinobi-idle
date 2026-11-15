@@ -414,8 +414,9 @@ describe('Poisoner (answer: cleanse)', () => {
     const fight = poisonFight(3);
     fight.player.hp = fight.player.maxHp = 1e15;
     for (const e of fight.enemies) {
-      e.intervalMs = 400;
-      e.timer.need = needOf(400);
+      e.waitMs = 100;
+      e.strikeMs = 300;
+      e.timer.need = needOf(100);
     }
     let seen = 0;
     while (fight.t < sec(20)) {
@@ -568,7 +569,6 @@ describe('the default AI decision rules, on hand-made views', () => {
     medic: null,
     stance: null,
     hastened: false,
-    reactWork: 0,
     guardBelow: K.ai.guardBelow,
     itemWork: sec(K.pillAction),
   });
@@ -651,13 +651,14 @@ describe('the view the AI gets', () => {
       knowledge: { 'core:test': ['armor'] },
     };
     const fight = createFight(snap, enemyAt(LEVEL, ['armor', 'regen']), 1, content, spy);
-    fight.player.cd['core:great_fireball'] = sec(3);
-    fightAdvance(fight, 0, content, spy);
+    fight.player.cd['core:great_fireball'] = sec(10);
+    // The AI decides when the first wait ends.
+    fightAdvance(fight, sec(1), content, spy);
     const view = seen as FightView | null;
     expect(view?.tier).toBe(2);
     expect(view?.techniques.map((t) => t.tech.id)).toEqual(['core:great_fireball']);
     const t0 = view?.techniques[0];
-    expect(t0?.cooldownLeft).toBe(sec(3));
+    expect(t0?.cooldownLeft).toBe(sec(10) - (view?.t ?? 0));
     expect(t0?.ready).toBe(false);
     expect(t0?.affordable).toBe(true);
     expect(view?.enemies[0]?.knownTraits).toEqual(['armor']);

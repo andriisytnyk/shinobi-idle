@@ -49,6 +49,7 @@ export const BALANCE_EXT = {
     timerMinMs: 100,
     hookEventsPerSec: 500,
     hookStatMax: 10,
+    interruptLost: 0.5,
   },
   /** Evasion multiplier of a bound enemy (the balance tables: Сковування, ухилення ×0.3). */
   bindEva: 0.3,
@@ -189,8 +190,8 @@ export const BALANCE_EXT = {
   signature: { minMastery: 25, xpBonus: 0.1 },
   /** Pouch slots: the base count and the extra slots the chunin vest gives. */
   pouch: { slots: 3, vest: 1, vestRank: 'chunin' },
-  /** The player's AI: the health share below which a spare buff is cast. */
-  ai: { guardBelow: 0.6 },
+  /** The player's AI: the health share below which a spare buff is cast; the combat level from which an enemy waits by a higher AI tier. */
+  ai: { guardBelow: 0.6, enemyTier: { chunin: 30 } },
   /** Health share below which a won fight still costs a Wound. */
   woundHp: 0.1,
   /** The Bingo book: wins that fully study an ordinary enemy and a boss. */
