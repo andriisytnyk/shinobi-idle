@@ -11,6 +11,7 @@ import {
   zoneCellOf,
   type GameState,
 } from '../src/index.ts';
+import { indexOf } from '../src/lookup.ts';
 import { K } from './fight-helpers.ts';
 import { setLevel, withBuildings } from './helpers.ts';
 import { fighter, openWorld, startFight, stock } from './prep-state.ts';
@@ -124,7 +125,7 @@ describe('the Library scrolls in the shop', () => {
   it('are sold at the price of their level in the scroll table, behind the Library level', () => {
     expect(library.length).toBe(8);
     for (const item of library) {
-      const entry = content.shop.find((s) => s.item === item.id);
+      const entry = indexOf(content).shop.get(item.id);
       expect(entry, item.id).toBeDefined();
       expect(JSON.stringify(entry?.req)).toContain('core:library');
     }
