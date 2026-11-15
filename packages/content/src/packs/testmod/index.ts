@@ -21,7 +21,7 @@ const data = {
   playerRanks: [{ id: 'testmod:adept', tier: 3 }],
   missionRanks: [{ id: 'testmod:trial' }],
   currencies: [{ id: 'testmod:token' }],
-  villageStages: [{ id: 'testmod:stage3', rep: 'testmod:stage3' }],
+  villageStages: [{ id: 'testmod:stage3', rep: 'testmod:stage3', cap: 6 }],
   states: [{ id: 'testmod:chilled' }],
   statuses: [{ id: 'testmod:chill' }],
   combos: [{ id: 'testmod:frostburn', nature: 'testmod:aether', onState: 'testmod:chilled' }],
@@ -194,7 +194,17 @@ const data = {
       index: 0,
       key: null,
       story: false,
-      pois: [{ id: 'testmod:poi_grove_edge_outpost', kind: 'outpost' }],
+      pois: [
+        { id: 'testmod:poi_grove_edge_outpost', kind: 'outpost' },
+        {
+          id: 'testmod:poi_grove_cache',
+          kind: 'cache',
+          items: [],
+          ryo: 0,
+          /** A cache that pays tokens. */
+          currencies: { 'testmod:token': 3 },
+        },
+      ],
     },
   ],
   buildings: [
@@ -218,7 +228,7 @@ const data = {
       team: false,
       minutes: 2,
       stages: [{ t: 'skill', skill: 'testmod:forge', min: 1, label: true }],
-      pay: [],
+      pay: [{ kind: 'currency', currency: 'testmod:token', n: 2 }],
       resource: null,
       ryo: 10,
       rep: 0,
@@ -366,6 +376,8 @@ export const testmodPack: ContentPack = {
       'region.testmod:grove.desc': 'Тестовий регіон мода з однією клітинкою, до якої можна дійти.',
       'cell.testmod:grove_edge.name': 'Край тестового гаю',
       'cell.testmod:grove_edge.note': 'Єдина клітинка тестового регіону.',
+      'poi.testmod:poi_grove_cache.name': 'Тестовий тайник',
+      'poi.testmod:poi_grove_cache.desc': 'Тестова схованка, що платить тестовими жетонами.',
       'poi.testmod:poi_grove_edge_outpost.name': 'Тестова застава',
       'poi.testmod:poi_grove_edge_outpost.desc':
         'Тестова точка інтересу відомого виду: вільна ціль подорожі.',

@@ -43,6 +43,15 @@ export function activitySkill(content: ContentDb, activity: string): string | nu
   return indexOf(content).activitySkill.get(activity) ?? null;
 }
 
+/** The skill that trains an entity of a list-based activity: the one it names, else the first skill with the activity. */
+export function entitySkill(
+  content: ContentDb,
+  activity: string,
+  entity: { skill?: string | undefined },
+): string | null {
+  return entity.skill ?? activitySkill(content, activity);
+}
+
 /** Whether `id` is a chakra nature of the content. */
 export function isNature(content: ContentDb, id: string): boolean {
   return indexOf(content).natures.has(id);

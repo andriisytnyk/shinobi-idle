@@ -60,6 +60,8 @@ export interface LegacyCurrencies {
 export interface PackRef {
   id: string;
   version: string;
+  /** Game time at which the pack was attached (a pack added to a save starts here); systems of the pack count from it. */
+  since: number;
 }
 
 /**
@@ -163,7 +165,7 @@ export function createState(seed: number, content: ContentDb): GameState {
   const bridged = currencies as Record<string, number> & LegacyCurrencies;
   const state: GameState = {
     v: STATE_VERSION,
-    packs: content.packs.map((p) => ({ id: p.id, version: p.version })),
+    packs: content.packs.map((p) => ({ id: p.id, version: p.version, since: 0 })),
     rankOrder: content.playerRanks.map((r) => r.id),
     dormant: {},
     now: 0,

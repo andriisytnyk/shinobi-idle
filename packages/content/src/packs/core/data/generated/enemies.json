@@ -33,9 +33,7 @@
     "id": "core:wolf",
     "region": "forest",
     "cl": 10,
-    "traits": [
-      "pack"
-    ],
+    "traits": ["pack"],
     "nature": null,
     "carries": null,
     "hp": 118,
@@ -55,9 +53,7 @@
     "id": "core:centipede",
     "region": "forest",
     "cl": 15,
-    "traits": [
-      "regen"
-    ],
+    "traits": ["regen"],
     "nature": null,
     "carries": null,
     "hp": 167,
@@ -67,9 +63,7 @@
     "id": "core:tiger",
     "region": "forest",
     "cl": 20,
-    "traits": [
-      "regen"
-    ],
+    "traits": ["regen"],
     "nature": null,
     "carries": null,
     "hp": 216,
@@ -79,9 +73,7 @@
     "id": "core:thief",
     "region": "mission",
     "cl": 16,
-    "traits": [
-      "evasive"
-    ],
+    "traits": ["evasive"],
     "nature": null,
     "carries": null,
     "hp": 177,
@@ -91,9 +83,7 @@
     "id": "core:merc_pack",
     "region": "plains",
     "cl": 19,
-    "traits": [
-      "pack"
-    ],
+    "traits": ["pack"],
     "nature": null,
     "carries": null,
     "hp": 206,
@@ -103,9 +93,7 @@
     "id": "core:heavy",
     "region": "plains",
     "cl": 24,
-    "traits": [
-      "armor"
-    ],
+    "traits": ["armor"],
     "nature": "doton",
     "carries": null,
     "hp": 255,
@@ -115,9 +103,7 @@
     "id": "core:marauder",
     "region": "plains",
     "cl": 22,
-    "traits": [
-      "evasive"
-    ],
+    "traits": ["evasive"],
     "nature": null,
     "carries": null,
     "hp": 236,
@@ -127,9 +113,7 @@
     "id": "core:poisoner",
     "region": "plains",
     "cl": 24,
-    "traits": [
-      "poisoner"
-    ],
+    "traits": ["poisoner"],
     "nature": null,
     "carries": null,
     "hp": 255,
@@ -139,9 +123,7 @@
     "id": "core:kumo",
     "region": "plains",
     "cl": 28,
-    "traits": [
-      "caster"
-    ],
+    "traits": ["caster"],
     "nature": "raiton",
     "carries": "core:wave_of_inspiration",
     "hp": 294,
@@ -161,9 +143,7 @@
     "id": "core:hunter",
     "region": "valley",
     "cl": 30,
-    "traits": [
-      "evasive"
-    ],
+    "traits": ["evasive"],
     "nature": null,
     "carries": null,
     "hp": 314,
@@ -173,9 +153,7 @@
     "id": "core:hunter_caster",
     "region": "valley",
     "cl": 32,
-    "traits": [
-      "caster"
-    ],
+    "traits": ["caster"],
     "nature": "katon",
     "carries": null,
     "hp": 334,
@@ -185,9 +163,7 @@
     "id": "core:kiri_hunter",
     "region": "valley",
     "cl": 34,
-    "traits": [
-      "hidden"
-    ],
+    "traits": ["hidden"],
     "nature": "suiton",
     "carries": null,
     "hp": 353,
@@ -197,10 +173,7 @@
     "id": "core:guard_pack",
     "region": "valley",
     "cl": 33,
-    "traits": [
-      "pack",
-      "armor"
-    ],
+    "traits": ["pack", "armor"],
     "nature": null,
     "carries": null,
     "hp": 343,
@@ -210,9 +183,7 @@
     "id": "core:veteran",
     "region": "valley",
     "cl": 36,
-    "traits": [
-      "armor"
-    ],
+    "traits": ["armor"],
     "nature": "doton",
     "carries": null,
     "hp": 373,
@@ -222,9 +193,7 @@
     "id": "core:oro_aide",
     "region": "valley",
     "cl": 36,
-    "traits": [
-      "poisoner"
-    ],
+    "traits": ["poisoner"],
     "nature": null,
     "carries": "core:hidden_shadow_snake_hands",
     "hp": 373,
@@ -234,9 +203,7 @@
     "id": "core:serpent",
     "region": "exam",
     "cl": 38,
-    "traits": [
-      "regen"
-    ],
+    "traits": ["regen"],
     "nature": null,
     "carries": null,
     "hp": 392,
@@ -246,10 +213,7 @@
     "id": "core:leech",
     "region": "exam",
     "cl": 36,
-    "traits": [
-      "pack",
-      "poisoner"
-    ],
+    "traits": ["pack", "poisoner"],
     "nature": null,
     "carries": null,
     "hp": 373,
@@ -259,9 +223,7 @@
     "id": "core:fake_genin",
     "region": "exam",
     "cl": 39,
-    "traits": [
-      "illusionist"
-    ],
+    "traits": ["illusionist"],
     "nature": null,
     "carries": null,
     "hp": 402,

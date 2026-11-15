@@ -293,6 +293,7 @@
   "error.invalidAmount": "Кількість має бути цілим числом від 1.",
   "error.notForSale": "Цього товару тут не продають.",
   "error.notSellable": "Торговець цього не купує.",
+  "error.notEnoughCurrency": "Недостатньо: {currency}",
   "error.notEnoughRyo": "Не вистачає рьо.",
   "error.unknownGear": "Такого спорядження немає.",
   "error.gearMaxed": "Усі рівні цього спорядження вже куплено.",

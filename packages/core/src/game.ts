@@ -17,7 +17,7 @@ export interface Game {
 /** The packs that depend, directly or not, on `gone`, and `gone` itself. */
 function withDependents(packs: readonly ContentPack[], gone: string): Set<string> {
   const out = new Set([gone]);
-  for (let grew = true; grew; ) {
+  for (let grew = true; grew;) {
     grew = false;
     for (const p of packs) {
       if (out.has(p.manifest.id)) continue;
@@ -57,8 +57,7 @@ export function composeGame(packs: readonly ContentPack[], base: Rules = default
       return { content, rules: composeRules(base, current, content), failed };
     } catch (error) {
       message = error instanceof Error ? error.message : String(error);
-      culprit =
-        error instanceof PackRulesError ? error.pack : packNamedIn(message, current);
+      culprit = error instanceof PackRulesError ? error.pack : packNamedIn(message, current);
       if (culprit === undefined || culprit === 'core') throw error;
     }
     const gone = withDependents(current, culprit);

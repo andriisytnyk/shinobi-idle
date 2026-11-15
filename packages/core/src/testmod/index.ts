@@ -9,6 +9,7 @@
 import { testmodPack as data } from '@shinobi/content/testmod';
 import type { ContentPack } from '@shinobi/content';
 import { addRule, wrapRule, type Rules } from '../rules.ts';
+import type { GameState } from '../state.ts';
 import type { System } from '../system.ts';
 
 /** The currency the pack adds and its system pays. */
@@ -21,6 +22,10 @@ export const TOKEN_PERIOD_MS = 600_000;
 /** The length the wrapped drill keeps, as a factor of its cycle. */
 export const DRILL_FACTOR = 1.1;
 
+/** The game time at which the pack was attached to the state. */
+const attachedAt = (state: GameState): number =>
+  state.packs.find((p) => p.id === 'testmod')?.since ?? 0;
+
 /**
  * Pays one token per period of game time. The payments are counted in `state.counters`, never from
  * the clock alone, so a run that is split anywhere pays the same and a system that fires twice at one
@@ -30,15 +35,18 @@ const tokenSystem: System = {
   id: 'testmod:tokens',
   nextEventIn(state) {
     if (!Object.hasOwn(state.currencies, TOKEN)) return null;
+    const since = attachedAt(state);
     const paid = state.counters[TOKEN_TICKS];
     if (paid === undefined) return 0;
-    return Math.max(0, (paid + 1) * TOKEN_PERIOD_MS - state.now);
+    const due = Math.floor((state.now - since) / TOKEN_PERIOD_MS);
+    return Math.max(0, since + (Math.min(paid, due) + 1) * TOKEN_PERIOD_MS - state.now);
   },
   run(state) {
     if (!Object.hasOwn(state.currencies, TOKEN)) return;
-    const due = Math.floor(state.now / TOKEN_PERIOD_MS);
+    // Payments count from the moment the pack was attached; a count kept from an earlier stay is cut.
+    const due = Math.floor((state.now - attachedAt(state)) / TOKEN_PERIOD_MS);
     const paid = state.counters[TOKEN_TICKS];
-    if (paid === undefined) {
+    if (paid === undefined || paid > due) {
       state.counters[TOKEN_TICKS] = due;
       return;
     }

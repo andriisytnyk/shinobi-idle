@@ -112,16 +112,17 @@ export function sanitizeDormant(raw: unknown): Record<string, DormantPack> {
 }
 
 /** The pack list of a save: valid ids with their versions, no repeats. */
-export function sanitizePacks(raw: unknown): { id: string; version: string }[] {
+export function sanitizePacks(raw: unknown): { id: string; version: string; since: number }[] {
   if (!Array.isArray(raw)) return [];
   const seen = new Set<string>();
-  const out: { id: string; version: string }[] = [];
+  const out: { id: string; version: string; since: number }[] = [];
   for (const entry of raw.slice(0, MAX_PACKS)) {
     if (!isRecord(entry) || !validPackId(entry.id) || seen.has(entry.id)) continue;
     seen.add(entry.id);
     out.push({
       id: entry.id,
       version: typeof entry.version === 'string' ? entry.version.slice(0, 64) : '',
+      since: balanceOf(entry.since),
     });
   }
   return out;
@@ -492,14 +493,20 @@ export function settlePlayer(
 
 /** The ids of the packs of a save that the content does not have and of the content's that the save lacks. */
 export function packDiff(
-  saved: readonly { id: string }[],
+  saved: readonly { id: string; version: string }[],
   content: ContentDb,
-): { added: string[]; removed: string[] } {
+): { added: string[]; removed: string[]; updated: { id: string; from: string; to: string }[] } {
   const before = new Set(saved.map((p) => p.id));
   const after = new Set(content.packs.map((p) => p.id));
   return {
     added: [...after].filter((id) => !before.has(id)),
     removed: [...before].filter((id) => !after.has(id)),
+    updated: content.packs.flatMap((p) => {
+      const was = saved.find((s) => s.id === p.id);
+      return was && was.version !== p.version
+        ? [{ id: p.id, from: was.version, to: p.version }]
+        : [];
+    }),
   };
 }
 

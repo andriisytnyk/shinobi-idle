@@ -339,6 +339,8 @@ export function payMission(
       if (addItem(state, pay.item, pay.n)) {
         emit(state, { type: 'itemGained', id: pay.item, n: pay.n });
       }
+    } else if (pay.kind === 'currency') {
+      addCurrency(state, pay.currency, pay.n);
     } else if (pay.kind === 'intel') {
       if (intel !== null) addCurrency(state, intel, pay.n);
     } else {

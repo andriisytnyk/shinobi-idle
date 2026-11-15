@@ -69,15 +69,23 @@ export const natureSchema = z.strictObject({
  */
 export const playerRankSchema = z.strictObject({
   id: vocabId,
+  /** The AI tier the rank runs; `composeContent` sets it to the position of the rank, so a pack may give any number. */
   tier: z.number().int().min(0),
   academy: z.boolean().optional(),
+  /** The id of the rank this one comes right after; omitted: after the last rank of the packs loaded before. Ties go by pack load order. */
+  after: z.string().optional(),
 });
 
 /**
  * A stage of the village, in list order. `rep` is the key of `K.rep` that holds the reputation
  * needed to reach the stage (`null` for the first stage).
  */
-export const villageStageSchema = z.strictObject({ id: vocabId, rep: z.string().nullable() });
+export const villageStageSchema = z.strictObject({
+  id: vocabId,
+  rep: z.string().nullable(),
+  /** The highest building level the stage allows; omitted: the entry of `K.towerStageMax` for its position, or the last one. */
+  cap: z.number().int().min(0).optional(),
+});
 
 /** The id of an entity kind that has a page and the `ContentDb` list its entities live in (`null`: nested in another list). */
 export const entityKindSchema = z.strictObject({ id: vocabId, list: z.string().nullable() });
@@ -188,7 +196,12 @@ export const techniqueSchema = techniqueBaseSchema.extend({
   combat: techniqueCombatSchema.nullable(),
 });
 
-export const exerciseSchema = z.object({ id: coreId, level });
+export const exerciseSchema = z.object({
+  id: coreId,
+  level,
+  /** The skill the exercise trains; omitted: the first skill with the activity `drill`. */
+  skill: skillId.optional(),
+});
 
 /** The part of a practice that the importer generates; modifiers are layered on at load. */
 export const practiceBaseSchema = z.strictObject({
@@ -196,6 +209,8 @@ export const practiceBaseSchema = z.strictObject({
   level,
   /** The two skills the practice trains together. */
   pair: z.array(skillId).length(2),
+  /** The skill the practice trains; omitted: the first skill with the activity `insight`. */
+  skill: skillId.optional(),
   /** Count of insight and enlightenment modifiers (texts are locale keys by index). */
   insight: z.number().int(),
   enlight: z.number().int(),
@@ -222,7 +237,12 @@ export const obstacleSchema = obstacleBaseSchema.extend({
 });
 
 /** The part of a herb that the importer generates; the extra requirement is layered on at load. */
-export const herbBaseSchema = z.object({ id: coreId, level });
+export const herbBaseSchema = z.object({
+  id: coreId,
+  level,
+  /** The skill that gathers the herb; omitted: the first skill with the activity `patch`. */
+  skill: skillId.optional(),
+});
 
 export const herbSchema = herbBaseSchema.extend({
   /** What the herb needs besides its Herbalism level (a Chakra Control level for rare herbs); `null` for none. */
@@ -408,6 +428,8 @@ export const missionPaySchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('item'), item: coreId, n: z.number().int().min(1) }),
   z.object({ kind: z.literal('intel'), n: z.number().int().min(1) }),
   z.object({ kind: z.literal('scrollPart'), technique: coreId, chance: idOf('partChance') }),
+  /** A payment in a currency (a `currencies` id), for the currencies of a pack. */
+  z.object({ kind: z.literal('currency'), currency: vocabId, n: z.number().int().min(1) }),
 ]);
 
 /** The mission as the importer generates it. */
@@ -492,6 +514,8 @@ export const poiSchema = z.discriminatedUnion('kind', [
     kind: z.literal('cache'),
     items: z.array(ingredientRef),
     ryo: z.number().int().min(0),
+    /** More currencies by id (a pack's own). */
+    currencies: z.record(vocabId, z.number().int().min(0)).optional(),
   }),
   z.strictObject({ id: coreId, kind: z.literal('vault'), item: coreId }),
   z.strictObject({ id: coreId, kind: z.literal('mission'), mission: coreId }),

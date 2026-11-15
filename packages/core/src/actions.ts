@@ -11,7 +11,7 @@ import {
   techniqueCastSeconds,
 } from './formulas.ts';
 import { indexOf } from './lookup.ts';
-import { activitySkill } from './vocab.ts';
+import { entitySkill } from './vocab.ts';
 import { nonNativeLevel } from './natures.ts';
 import { cycleFactor } from './modifiers.ts';
 import { spendTonicCharges } from './buffs.ts';
@@ -160,7 +160,7 @@ export const practiceKind = skillAction((state, id, content) => {
 
 export const drillKind = skillAction((_state, id, content) => {
   const e = indexOf(content).exercises.get(id);
-  const skill = activitySkill(content, 'drill');
+  const skill = e ? entitySkill(content, 'drill', e) : null;
   if (!e || skill === null) return null;
   return {
     skill,

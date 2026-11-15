@@ -10,12 +10,11 @@ import {
   techniqueCastSeconds,
 } from './formulas.ts';
 import { builtObstacles, COURSE_KIND, courseSkill, lapXp } from './athletics.ts';
-import { bushOf, bushSize, gatherAverageSeconds, gatherSkill, regrowMs } from './field.ts';
-import { meditationSkill } from './meditation.ts';
+import { bushOf, bushSize, gatherAverageSeconds, herbSkill, regrowMs } from './field.ts';
 import { getMod } from './mod.ts';
 import { nonNativeLevel } from './natures.ts';
 import { evalReq, skillLevel, type Req, type ReqResult } from './requirements.ts';
-import { activitySkill, isAcademyRank, skillEntry } from './vocab.ts';
+import { activitySkill, entitySkill, isAcademyRank, skillEntry } from './vocab.ts';
 import { defaultRules, type Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 import { levelAt, xpAt } from './xp.ts';
@@ -114,12 +113,12 @@ function factsOf(
     }
     case 'drill': {
       const e = index.exercises.get(id);
-      const skill = activitySkill(content, 'drill');
+      const skill = e ? entitySkill(content, 'drill', e) : null;
       return e && skill !== null ? { skill, level: e.level, baseMs: ms(K.drill) } : null;
     }
     case 'meditate': {
       const p = index.practices.get(id);
-      const skill = meditationSkill(content);
+      const skill = p ? entitySkill(content, 'insight', p) : null;
       return p && skill !== null ? { skill, level: p.level, baseMs: ms(K.meditate) } : null;
     }
     case COURSE_KIND: {
@@ -135,7 +134,7 @@ function factsOf(
     }
     case 'gather': {
       const h = index.herbs.get(id);
-      const skill = gatherSkill(content);
+      const skill = h ? herbSkill(content, h) : null;
       if (!h || skill === null) return null;
       const bush = bushOf(state, id);
       const size = bush?.size ?? bushSize(state, id, content, rules);
@@ -246,13 +245,22 @@ function skillActionIds(skill: string, content: ContentDb): { kind: string; id: 
         content.techniques.filter((t) => t.skill === skill),
       );
     case 'drill':
-      return owns('drill') ? by('drill', content.exercises) : [];
+      return by(
+        'drill',
+        content.exercises.filter((e) => entitySkill(content, 'drill', e) === skill),
+      );
     case 'insight':
-      return owns('insight') ? by('meditate', content.practices) : [];
+      return by(
+        'meditate',
+        content.practices.filter((p) => entitySkill(content, 'insight', p) === skill),
+      );
     case 'course':
       return owns('course') ? [{ kind: COURSE_KIND, id: skill }] : [];
     case 'patch':
-      return owns('patch') ? by('gather', content.herbs) : [];
+      return by(
+        'gather',
+        content.herbs.filter((h) => entitySkill(content, 'patch', h) === skill),
+      );
     case 'recipe':
     case 'station':
       return by(

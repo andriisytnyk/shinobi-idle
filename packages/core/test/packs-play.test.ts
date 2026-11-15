@@ -161,7 +161,8 @@ describe('a game composed with the test pack', () => {
       dispatch(state, { type: 'shop.buy', item: 'testmod:charm', n: 1 }, modContent, modRules),
     ).toEqual({
       ok: false,
-      reason: 'error.notEnoughRyo',
+      reason: 'error.notEnoughCurrency',
+      params: { currency: TOKEN },
     });
     advance(state, 2 * HOUR, modContent, modRules);
     expect(state.currencies[TOKEN]).toBe(18);

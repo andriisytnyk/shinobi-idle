@@ -74,7 +74,7 @@ export interface ContentIndex {
   rankIndex: Map<string, number>;
   /** The first rank that is not an Academy rank (the graduation), if any. */
   graduateRank: string | null;
-  /** The currency that has each role (`money`, `reputation`, `intel`). */
+  /** The currency that has each role (`money`, `renown`, `study`). */
   currencyByRole: Map<string, string>;
   currencyIds: Set<string>;
   /** The first skill of each activity (`drill`, `insight`, `course`, `patch`, `map`): the skill that the action kind of that activity trains. */
@@ -138,10 +138,10 @@ function build(content: ContentDb): ContentIndex {
   const count = (skill: string, n: number) =>
     masteryCount.set(skill, (masteryCount.get(skill) ?? 0) + n);
   for (const t of content.techniques) count(t.skill, 1);
-  count(trainer('drill'), content.exercises.length);
-  count(trainer('insight'), content.practices.length);
+  for (const e of content.exercises) count(e.skill ?? trainer('drill'), 1);
+  for (const p of content.practices) count(p.skill ?? trainer('insight'), 1);
   count(trainer('course'), content.obstacles.length);
-  count(trainer('patch'), content.herbs.length);
+  for (const h of content.herbs) count(h.skill ?? trainer('patch'), 1);
   for (const r of content.recipes) count(r.skill, 1);
   const poolCheckpoints = new Map<string, PoolCheckpoint[]>();
   for (const p of content.pools) {

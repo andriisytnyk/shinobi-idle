@@ -3619,7 +3619,8 @@
       "error.cancelledByMod": "df6af2635279",
       "credits.appIcon.heading": "eeea3ce190e2",
       "credits.appIcon.body": "491f650bd715",
-      "credits.appIcon.link": "841d6a417ea6"
+      "credits.appIcon.link": "841d6a417ea6",
+      "error.notEnoughCurrency": "dc671808af5b"
     },
     "en": {
       "technique.core:body_flicker.name": "026242b01872",

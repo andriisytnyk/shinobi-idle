@@ -551,6 +551,17 @@ export function composeContent(packs: readonly ContentPack[]): ContentDb {
       keyOwners.set(key, pack);
     }
 
+  // The player ranks are ordered by `after` (ties by load order) and their tiers are their positions.
+  const rankList = (lists.get('playerRanks') ?? []) as {
+    id: string;
+    after?: string;
+    tier: number;
+  }[];
+  lists.set(
+    'playerRanks',
+    orderRanks(rankList, (id) => owners.get(`playerRanks:${id}`) ?? 'core', fail),
+  );
+
   const raw: Plain = {
     ...Object.fromEntries(ENTITY_LISTS.map((l) => [l, lists.get(l) ?? []])),
     market: keyed.get('market'),
@@ -608,4 +619,37 @@ export function composeContent(packs: readonly ContentPack[]): ContentDb {
         .join('\n')}`,
     );
   return db;
+}
+
+/**
+ * Orders the player ranks: a rank with `after` goes right behind that rank (behind the ones already
+ * placed there, so ties keep load order); the others keep their order. The tier of each rank is its position.
+ */
+function orderRanks<T extends { id: string; after?: string; tier: number }>(
+  list: readonly T[],
+  owner: (id: string) => string,
+  fail: (pack: string, message: string) => never,
+): T[] {
+  const placed: T[] = list.filter((r) => r.after === undefined);
+  const pending = list.filter((r) => r.after !== undefined);
+  for (let progress = true; pending.length > 0 && progress;) {
+    progress = false;
+    for (const rank of [...pending]) {
+      const anchor = placed.findIndex((r) => r.id === rank.after);
+      if (anchor < 0) continue;
+      let at = anchor + 1;
+      while (at < placed.length && placed[at]?.after === rank.after) at++;
+      placed.splice(at, 0, rank);
+      pending.splice(pending.indexOf(rank), 1);
+      progress = true;
+    }
+  }
+  const stuck = pending[0];
+  if (stuck) {
+    return fail(
+      owner(stuck.id),
+      `player rank "${stuck.id}" comes after "${stuck.after}", which is no rank`,
+    );
+  }
+  return placed.map((r, tier) => ({ ...r, tier }));
 }

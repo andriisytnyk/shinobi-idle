@@ -140,11 +140,35 @@ describe('the closure validator catches more than references', () => {
   });
 
   it('keeps the player ranks in tier order and the AI tiers within them', () => {
-    throwsFor(
-      [corePack, tm((p) => (p.data.playerRanks![0]!.tier = 99))],
-      'testmod',
-      /playerRanks "testmod:adept" field tier: 99 must be the position 3/,
-    );
+    // The tier of a rank is its position, whatever number the pack gives.
+    const odd = composeContent([corePack, tm((p) => (p.data.playerRanks![0]!.tier = 99))]);
+    expect(odd.playerRanks.map((r) => [r.id, r.tier])).toContainEqual(['testmod:adept', 3]);
+    // Two packs that each add a rank compose; ranks go behind the rank they name, ties by load order.
+    const rankPack = (id: string, after?: string) =>
+      mod(id, { data: { playerRanks: [{ id: `${id}:r`, tier: 0, ...(after ? { after } : {}) }] } });
+    const both = composeContent([corePack, rankPack('aaa'), rankPack('bbb')]);
+    expect(both.playerRanks.map((r) => r.id)).toEqual([
+      'student',
+      'genin',
+      'chunin',
+      'aaa:r',
+      'bbb:r',
+    ]);
+    const placed = composeContent([
+      corePack,
+      rankPack('aaa'),
+      rankPack('bbb', 'genin'),
+      rankPack('ccc', 'genin'),
+    ]);
+    expect(placed.playerRanks.map((r) => [r.id, r.tier])).toEqual([
+      ['student', 0],
+      ['genin', 1],
+      ['bbb:r', 2],
+      ['ccc:r', 3],
+      ['chunin', 4],
+      ['aaa:r', 5],
+    ]);
+    throwsFor([corePack, rankPack('zzz', 'nobody')], 'zzz', /comes after "nobody"/);
     const lateAi = mod('lateai', {
       data: {
         ai: {

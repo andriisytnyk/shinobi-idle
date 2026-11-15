@@ -34,7 +34,9 @@ for (const name of ['saves-v10', 'saves-v11', 'saves-v12', 'saves-v13']) {
       it(`${who}: loads with the core pack, written as the current version with the pack list`, () => {
         const state = deserialize(text, plainContent, plainRules);
         expect(state.v).toBe(STATE_VERSION);
-        expect(state.packs).toEqual([{ id: 'core', version: plainContent.packs[0]?.version }]);
+        expect(state.packs).toEqual([
+          { id: 'core', version: plainContent.packs[0]?.version, since: 0 },
+        ]);
         expect(state.rankOrder).toEqual(['student', 'genin', 'chunin']);
         expect(state.dormant).toEqual({});
         expect(state.events.filter((e) => e.type === 'packsChanged')).toEqual([]);

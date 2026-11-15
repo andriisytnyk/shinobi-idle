@@ -15,10 +15,16 @@ import type { Req } from './requirements.ts';
 import { nextFloat } from './rng.ts';
 import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
-import { activitySkill } from './vocab.ts';
+import { activitySkill, entitySkill } from './vocab.ts';
 
 /** The skill that gathers herbs: the one whose activity is `patch` (Herbalism). */
 export const gatherSkill = (content: ContentDb): string | null => activitySkill(content, 'patch');
+
+/** The skill that gathers a herb: the one it names, else the first with the activity `patch`. */
+export const herbSkill = (
+  content: ContentDb,
+  herb: { skill?: string | undefined },
+): string | null => entitySkill(content, 'patch', herb);
 
 /** One herb's bush: herbs left, how many it held when it last filled, and work kept while it regrows. */
 export interface Bush {
@@ -62,18 +68,30 @@ export function gatherAverageSeconds(size: number, content: ContentDb): number {
 }
 
 export const gatherKind: ActionKind = {
-  has: (id, content) => indexOf(content).herbs.has(id) && gatherSkill(content) !== null,
-  skill: (_id, content) => gatherSkill(content),
+  has: (id, content) => {
+    const herb = indexOf(content).herbs.get(id);
+    return herb !== undefined && herbSkill(content, herb) !== null;
+  },
+  skill: (id, content) => {
+    const herb = indexOf(content).herbs.get(id);
+    return herb ? herbSkill(content, herb) : null;
+  },
   requirements(_state, id, content) {
     const herb = indexOf(content).herbs.get(id);
-    const skill = gatherSkill(content);
+    const skill = herb ? herbSkill(content, herb) : null;
     if (!herb || skill === null) return null;
     const extra: Req[] = herb.req ? [herb.req] : [];
     return { t: 'all', of: [...extra, { t: 'skill', skill, level: herb.level }] };
   },
   intervalMs(state, id, content, rules) {
     const K = content.balance.K;
-    const mod = cycleFactor(rules.modifierProviders, state, gatherSkill(content) ?? '', content);
+    const herb = indexOf(content).herbs.get(id);
+    const mod = cycleFactor(
+      rules.modifierProviders,
+      state,
+      (herb && herbSkill(content, herb)) ?? '',
+      content,
+    );
     const cycle = Math.max(1, Math.round(K.gather * MS_PER_SECOND * mod));
     // An empty bush regrows before the next herb: the pause is part of that cycle.
     return bushOf(state, id)?.stock === 0 ? cycle + regrowMs(state, content, rules) : cycle;
@@ -95,7 +113,7 @@ export const gatherKind: ActionKind = {
   },
   complete(state, id, content, rules) {
     const herb = indexOf(content).herbs.get(id);
-    const skill = gatherSkill(content);
+    const skill = herb ? herbSkill(content, herb) : null;
     if (!herb || skill === null) return;
     const held = bushOf(state, id);
     // A bush found empty has regrown by now and is full again, to the size its mastery gives now.

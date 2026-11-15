@@ -271,7 +271,11 @@ export function claimPoi(state: GameState, poiId: string, content: ContentDb): C
   for (const { item, n } of loot) {
     if (addItem(state, item, n)) emit(state, { type: 'itemGained', id: item, n });
   }
-  if (poi.kind === 'cache') addCurrency(state, moneyOf(content), poi.ryo);
+  if (poi.kind === 'cache') {
+    addCurrency(state, moneyOf(content), poi.ryo);
+    for (const [currency, n] of Object.entries(poi.currencies ?? {}))
+      addCurrency(state, currency, n);
+  }
   state.world.claimed[poiId] = true;
   emit(state, { type: 'poiClaimed', poi: poiId });
   return { ok: true };

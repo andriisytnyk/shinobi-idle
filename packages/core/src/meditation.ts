@@ -8,7 +8,7 @@ import { bonusOf, type Modifier, type ModifierProvider } from './modifiers.ts';
 import { nextFloat } from './rng.ts';
 import type { Rules } from './rules.ts';
 import type { GameState, MeditationEntry } from './state.ts';
-import { activitySkill, ownsNature } from './vocab.ts';
+import { activitySkill, entitySkill, ownsNature } from './vocab.ts';
 
 /** The skill that meditation trains: the one whose activity is `insight` (Meditation). */
 export const meditationSkill = (content: ContentDb): string | null =>
@@ -68,7 +68,7 @@ export function meditationChances(
 /** Meditation: the plain training action, then a roll for an Insight and one for an Enlightenment. */
 const meditationBase = skillAction((_state, id, content) => {
   const p = indexOf(content).practices.get(id);
-  const skill = meditationSkill(content);
+  const skill = p ? entitySkill(content, 'insight', p) : null;
   if (!p || skill === null) return null;
   return {
     skill,

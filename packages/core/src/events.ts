@@ -212,6 +212,8 @@ export interface PacksChangedEvent extends EventBase {
   type: 'packsChanged';
   added: string[];
   removed: string[];
+  /** Packs present both times whose version changed. */
+  updated: { id: string; from: string; to: string }[];
 }
 
 /** A rule that a pack added failed and was switched off for this session: its pack, the rule and why. */

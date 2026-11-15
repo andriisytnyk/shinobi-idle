@@ -92,7 +92,10 @@ export function shopBuy(
   // The price is paid in the currency the shop entry names, by default the money of the game.
   const currency = entry.currency ?? moneyOf(content);
   if (!Number.isSafeInteger(total) || !removeCurrency(state, currency, total)) {
-    return { ok: false, reason: 'error.notEnoughRyo' };
+    // The old key still says it for the money of the game; any other currency is named in the params.
+    return currency === moneyOf(content)
+      ? { ok: false, reason: 'error.notEnoughRyo' }
+      : { ok: false, reason: 'error.notEnoughCurrency', params: { currency } };
   }
   addItem(state, itemId, n);
   return { ok: true };

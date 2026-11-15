@@ -102,7 +102,10 @@ export type Command =
 export const PLAYER_NAME_MAX = 24;
 
 /** A refusal carries the requirement tree that was not met when the command was a learning one. */
-export type CommandResult = { ok: true } | { ok: false; reason: string; req?: ReqResult };
+/** A refusal: a localization key, with the values the text names in `params` (the currency a player lacks, for one). */
+export type CommandResult =
+  | { ok: true }
+  | { ok: false; reason: string; req?: ReqResult; params?: Record<string, string | number> };
 
 /** Consecutive zero-length steps tolerated before the loop is declared stuck. */
 const STALL_LIMIT = 10_000;

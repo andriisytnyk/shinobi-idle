@@ -382,6 +382,14 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     for (const res of Object.keys(b.tier6 ?? {})) ref('tier6', res, 'resources');
     if (b.stage !== undefined) ref('stage', b.stage, 'stages');
   }
+  for (const cell of db.cells) {
+    at('cells', cell.id);
+    for (const poi of cell.pois) {
+      if (poi.kind === 'cache')
+        for (const id of Object.keys(poi.currencies ?? {}))
+          ref('pois.currencies', id, 'currencies');
+    }
+  }
   for (const g of db.gear) {
     at('gear', g.id);
     ref('skill', g.skill, 'skills');
@@ -410,6 +418,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     at('missions', m.id);
     m.pay.forEach((p, n) => {
       if (p.kind === 'scrollPart') needNumber(`pay[${n}].chance`, `partDrop.${p.chance}`);
+      if (p.kind === 'currency') ref(`pay[${n}].currency`, p.currency, 'currencies');
     });
   }
   for (const e of db.exams) {

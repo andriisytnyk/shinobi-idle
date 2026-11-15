@@ -84,7 +84,7 @@ export function stageForRep(content: ContentDb, rep: number): number {
   return stage;
 }
 
-/** The Reputation of the player: the balance of the currency with the role `reputation`. */
+/** The Reputation of the player: the balance of the currency with the role `renown`. */
 export function reputationOf(state: GameState, content: ContentDb): number {
   const currency = currencyOf(content, 'renown');
   return currency === null ? 0 : (state.currencies[currency] ?? 0);
@@ -96,10 +96,11 @@ export function currentStage(state: GameState, content: ContentDb): number {
   return Math.max(stage, stageForRep(content, reputationOf(state, content)));
 }
 
-/** Highest building level the stage allows; a stage beyond the table keeps the last cap. */
+/** Highest building level the stage allows: the cap its entity names, else the entry of the table for its position, else the last one. */
 export function stageCap(state: GameState, content: ContentDb): number {
   const caps: readonly number[] = content.balance.K.towerStageMax;
-  return caps[currentStage(state, content) - 1] ?? caps[caps.length - 1] ?? 0;
+  const stage = currentStage(state, content);
+  return content.villageStages[stage - 1]?.cap ?? caps[stage - 1] ?? caps[caps.length - 1] ?? 0;
 }
 
 /** What building `level` costs: civil resources, treasury ryo and, for the last level, the shinobi resources. */

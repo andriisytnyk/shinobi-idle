@@ -433,10 +433,7 @@
       {
         "t": "named",
         "technique": "core:running_fire",
-        "alts": [
-          "core:vacuum_wave",
-          "core:tearing_earth_turning_palm"
-        ]
+        "alts": ["core:vacuum_wave", "core:tearing_earth_turning_palm"]
       }
     ],
     "pay": [],

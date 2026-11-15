@@ -79,7 +79,9 @@ describe('a save made with the pack, loaded without it', () => {
 
   it('loads, tells the UI which pack vanished and plays on', () => {
     const state = deserialize(saved, plainContent, plainRules);
-    expect(state.packs).toEqual([{ id: 'core', version: plainContent.packs[0]?.version }]);
+    expect(state.packs).toEqual([
+      { id: 'core', version: plainContent.packs[0]?.version, since: 0 },
+    ]);
     expect(eventsOf(state, 'packsChanged')).toEqual([
       expect.objectContaining({ added: [], removed: ['testmod'] }),
     ]);
@@ -144,7 +146,7 @@ describe('a save made with the pack, loaded without it', () => {
     // The whole state is what the original was: a round trip through the core game changed nothing.
     // Two branches are left out: the automatic loadout and the pouch are derived from the rank by the
     // fight code, which still orders the ranks by its own list and does not know the rank of the pack.
-    const derived = ['loadouts', 'pouch'];
+    const derived = ['loadouts', 'pouch', 'packs'];
     const strip = (state: GameState) => {
       const copy = JSON.parse(serialize(state)).state as Record<string, unknown>;
       for (const key of derived) delete copy[key];

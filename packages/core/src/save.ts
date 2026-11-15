@@ -735,10 +735,26 @@ export function deserialize(
 
   refreshUnlocks(state, content, true);
   refreshRegions(state, content, true);
+  // The pack list is written from the content. A pack that was in the save keeps its attach time;
+  // one that is new here (or came back) is attached now, so its systems do not back-pay for the time away.
+  const hasList = Array.isArray(raw.packs);
+  state.packs = content.packs.map((p) => {
+    const was = savedPacks.find((s) => s.id === p.id);
+    const since = was ? Math.min(was.since, state.now) : hasList || p.id !== 'core' ? state.now : 0;
+    return { id: p.id, version: p.version, since };
+  });
   const changed = packDiff(savedPacks, content);
   // A save with no pack list (a hand-made one) says nothing about which packs it was made with.
-  if (Array.isArray(raw.packs) && (changed.added.length > 0 || changed.removed.length > 0)) {
-    emit(state, { type: 'packsChanged', added: changed.added, removed: changed.removed });
+  if (
+    hasList &&
+    (changed.added.length > 0 || changed.removed.length > 0 || changed.updated.length > 0)
+  ) {
+    emit(state, {
+      type: 'packsChanged',
+      added: changed.added,
+      removed: changed.removed,
+      updated: changed.updated,
+    });
   }
   // Shares are derived from which slots run, so they are recomputed rather than trusted; a
   // saved progress beyond one cycle is cut so a doctored save cannot make the loop spin.
