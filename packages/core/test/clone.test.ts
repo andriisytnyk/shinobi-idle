@@ -1,0 +1,436 @@
+/** Shadow clones: a second action slot, the speed pool, the link bonus, the refusal of fights, telemetry and saving. */
+import { content, type ContentDb } from '@shinobi/content';
+import { describe, expect, it } from 'vitest';
+import {
+  actionInfo,
+  advance,
+  cloneSlots,
+  cloneTelemetry,
+  createState,
+  deserialize,
+  dispatch,
+  getMod,
+  growSlots,
+  isCloneSlot,
+  linked,
+  serialize,
+  slotCount,
+  xpAt,
+  type GameState,
+} from '../src/index.ts';
+import { openWorld } from './helpers.ts';
+import { player } from './missions-helpers.ts';
+
+const CLONE = 'core:shadow_clone';
+const SCROLL = 'core:scroll_shadow_clone';
+const HOUR = 3_600_000;
+
+/** A genin at level 50 in the skills the tests use, who knows the clone technique (the second slot is open). */
+function cloner(seed = 1, extra: Record<string, number> = {}): GameState {
+  const state = player({
+    seed,
+    natures: ['katon'],
+    levels: { nin: 50, med: 40, cc: 40, herb: 20, alch: 20, prov: 20, katon: 20 },
+    known: [CLONE],
+    bank: { 'core:mint': 5000, 'core:water': 5000, 'core:rice': 5000, 'core:salt': 5000, ...extra },
+  });
+  growSlots(state, content);
+  state.events = [];
+  return state;
+}
+
+const drill = (): string => content.exercises.find((e) => e.level <= 30)?.id ?? '';
+const start = (state: GameState, slot: number, kind: string, id: string) =>
+  dispatch(state, { type: 'action.start', slot, kind, id }, content);
+const xpSum = (state: GameState): number =>
+  Object.values(state.skills).reduce((sum, s) => sum + s.xp, 0);
+
+/** Every XP point gained over `ms` by running `a` in slot 0 and `b` in slot 1 (either may be null). */
+function gained(
+  a: [string, string] | null,
+  b: [string, string] | null,
+  ms: number,
+  c: ContentDb = content,
+): number {
+  const state = cloner();
+  const before = xpSum(state);
+  if (a)
+    expect(dispatch(state, { type: 'action.start', slot: 0, kind: a[0], id: a[1] }, c).ok).toBe(
+      true,
+    );
+  if (b)
+    expect(dispatch(state, { type: 'action.start', slot: 1, kind: b[0], id: b[1] }, c).ok).toBe(
+      true,
+    );
+  advance(state, ms, c);
+  return xpSum(state) - before;
+}
+
+/** An action of a skill from the content: the first available one at or below `level`. */
+function actionOf(skill: string, level = 1): [string, string] {
+  const found = content.techniques.find((t) => t.skill === skill && t.level === level);
+  if (!found) throw new Error();
+  return ['practice', found.id];
+}
+
+describe('the clone slot', () => {
+  it('opens when the player learns the technique, by the data of the technique', () => {
+    const state = player({ seed: 3, base: 50, natures: ['katon'], known: [] });
+    delete state.known[CLONE];
+    state.bank[SCROLL] = 1;
+    expect(state.slots.length).toBe(1);
+    expect(slotCount(state, content)).toBe(1);
+    expect(dispatch(state, { type: 'item.use', id: SCROLL }, content)).toEqual({ ok: true });
+    expect(state.known[CLONE]).toBe(true);
+    expect(state.slots.length).toBe(2);
+    expect(cloneSlots(state, content)).toEqual([{ slot: 1, technique: CLONE }]);
+    expect(isCloneSlot(state, content, 1)).toBe(true);
+    expect(isCloneSlot(state, content, 0)).toBe(false);
+  });
+
+  it('stays shut where the data does not open it', () => {
+    // The same content without the data on the technique: knowing it opens nothing.
+    const shut: ContentDb = {
+      ...content,
+      techniques: content.techniques.map((t) => {
+        const { opensSlot: _unused, ...rest } = t;
+        void _unused;
+        return rest;
+      }),
+    };
+    const state = player({ seed: 3, base: 50, natures: ['katon'], known: [CLONE] });
+    expect(slotCount(state, shut)).toBe(1);
+    expect(
+      dispatch(state, { type: 'action.start', slot: 1, kind: 'drill', id: drill() }, shut),
+    ).toEqual({
+      ok: false,
+      reason: 'error.invalidSlot',
+    });
+    expect(state.slots.length).toBe(1);
+    // With the data, the same state opens the slot on the first start there.
+    expect(start(state, 1, 'drill', drill())).toEqual({ ok: true });
+    expect(state.slots.length).toBe(2);
+  });
+
+  it('shares speed 50/50 between two running actions and gives it all back on dispel', () => {
+    const state = cloner();
+    start(state, 0, 'drill', drill());
+    expect(state.slots.map((s) => s.share)).toEqual([1000, 0]);
+    start(state, 1, 'drill', drill());
+    expect(state.slots.map((s) => s.share)).toEqual([500, 500]);
+    expect(dispatch(state, { type: 'clone.dispel' }, content)).toEqual({ ok: true });
+    expect(state.slots.map((s) => s.share)).toEqual([1000, 0]);
+    expect(state.slots[1]?.action).toBeNull();
+    expect(state.events.some((e) => e.type === 'actionStopped' && e.reason === 'dispelled')).toBe(
+      true,
+    );
+    // Nothing left to dispel.
+    expect(dispatch(state, { type: 'clone.dispel' }, content)).toEqual({
+      ok: false,
+      reason: 'error.noAction',
+    });
+  });
+
+  it('gives the whole speed to a clone that works alone', () => {
+    const state = cloner();
+    start(state, 1, 'drill', drill());
+    expect(state.slots.map((s) => s.share)).toEqual([0, 1000]);
+  });
+
+  it('takes the pool from the balance (the spare lever: 110%)', () => {
+    const lever: ContentDb = {
+      ...content,
+      balance: {
+        ...content.balance,
+        K: { ...content.balance.K, clone: { ...content.balance.K.clone, pool: 1.1 } },
+      },
+    };
+    const state = cloner();
+    expect(
+      dispatch(state, { type: 'action.start', slot: 0, kind: 'drill', id: drill() }, lever).ok,
+    ).toBe(true);
+    expect(
+      dispatch(state, { type: 'action.start', slot: 1, kind: 'drill', id: drill() }, lever).ok,
+    ).toBe(true);
+    expect(state.slots.map((s) => s.share)).toEqual([550, 550]);
+  });
+});
+
+describe('XP per hour with a clone', () => {
+  const drillAction: [string, string] = ['drill', drill()];
+  const katonPractice = actionOf('katon', 1);
+  const ninPractice = actionOf('nin', 10);
+  const pairs: [string, [string, string], [string, string]][] = [
+    ['two drills', drillAction, drillAction],
+    ['a drill and a katon technique', drillAction, katonPractice],
+    ['a katon and a ninjutsu technique', katonPractice, ninPractice],
+  ];
+
+  for (const [name, a, b] of pairs) {
+    it(`without a link, two actions at half speed earn what half of each alone earns: ${name}`, () => {
+      expect(linked({ kind: a[0], id: a[1] }, { kind: b[0], id: b[1] }, content)).toBe(false);
+      const soloA = gained(a, null, 2 * HOUR);
+      const soloB = gained(b, null, 2 * HOUR);
+      const both = gained(a, b, 2 * HOUR);
+      expect(both).toBeGreaterThan(0);
+      expect(Math.abs(both - (soloA + soloB) / 2) / ((soloA + soloB) / 2)).toBeLessThan(0.01);
+    });
+  }
+
+  it('equals one action in two slots to that action alone', () => {
+    const solo = gained(drillAction, null, 2 * HOUR);
+    const both = gained(drillAction, drillAction, 2 * HOUR);
+    expect(Math.abs(both - solo) / solo).toBeLessThan(0.01);
+  });
+
+  it('is the same for a clone working alone while the player is idle', () => {
+    const player0 = gained(drillAction, null, 2 * HOUR);
+    const clone = gained(null, drillAction, 2 * HOUR);
+    expect(clone).toBe(player0);
+    const technique = gained(null, katonPractice, 2 * HOUR);
+    expect(technique).toBe(gained(katonPractice, null, 2 * HOUR));
+  });
+});
+
+describe('the link bonus', () => {
+  const gather: [string, string] = ['gather', 'core:mint'];
+  const feeds: [string, string] = ['craft', 'core:antidote'];
+  const apart: [string, string] = ['craft', 'core:onihiri'];
+  const feedsTonic: [string, string] = ['craft', 'core:tonik_iasnoho_rozumu'];
+
+  it('links an action that makes an item to one that uses it, in either slot', () => {
+    const a = { kind: gather[0], id: gather[1] };
+    expect(linked(a, { kind: feeds[0], id: feeds[1] }, content)).toBe(true);
+    expect(linked({ kind: feeds[0], id: feeds[1] }, a, content)).toBe(true);
+    expect(linked(a, { kind: feedsTonic[0], id: feedsTonic[1] }, content)).toBe(true);
+    expect(linked(a, { kind: apart[0], id: apart[1] }, content)).toBe(false);
+    expect(linked(a, a, content)).toBe(false);
+    expect(linked(a, { kind: 'drill', id: drill() }, content)).toBe(false);
+  });
+
+  it('adds K.clone.link to both actions, shown in the breakdown with the technique as its source', () => {
+    const state = cloner();
+    start(state, 0, gather[0], gather[1]);
+    expect(getMod(state, 'speed.skill.alch', content).total).toBe(1);
+    start(state, 1, feeds[0], feeds[1]);
+    const link = content.balance.K.clone.link;
+    for (const key of ['speed.skill.herb', 'speed.skill.alch']) {
+      const mod = getMod(state, key, content);
+      expect(mod.total).toBeCloseTo(1 + link, 9);
+      expect(mod.parts).toContainEqual({
+        key,
+        op: 'add',
+        value: link,
+        group: 'character',
+        source: { kind: 'technique', id: CLONE },
+      });
+    }
+    // The cycle of the craft is shorter by the bonus, and the forecast says so.
+    const info = actionInfo(state, { kind: feeds[0], id: feeds[1] }, content);
+    start(state, 0, apart[0], apart[1]);
+    const plain = actionInfo(state, { kind: apart[0], id: apart[1] }, content);
+    expect(info && plain).toBeTruthy();
+    // Dispelling the clone ends the bonus.
+    dispatch(state, { type: 'clone.dispel' }, content);
+    expect(getMod(state, 'speed.skill.alch', content).total).toBe(1);
+  });
+
+  it('gives no bonus to an unlinked pair', () => {
+    const state = cloner();
+    start(state, 0, gather[0], gather[1]);
+    start(state, 1, apart[0], apart[1]);
+    expect(getMod(state, 'speed.skill.herb', content).total).toBe(1);
+    expect(getMod(state, 'speed.skill.prov', content).total).toBe(1);
+  });
+
+  it('makes the linked pair earn 10% more: the craft exactly, the gathering more than before', () => {
+    const run = (b: [string, string] | null, a: [string, string] | null = gather) => {
+      const state = cloner();
+      if (a) start(state, 0, a[0], a[1]);
+      if (b) start(state, 1, b[0], b[1]);
+      const before = {
+        ...Object.fromEntries(Object.entries(state.skills).map(([k, v]) => [k, v.xp])),
+      };
+      advance(state, HOUR, content);
+      return (skill: string): number => (state.skills[skill]?.xp ?? 0) - (before[skill] ?? 0);
+    };
+    const together = run(feeds);
+    const craftAlone = run(feeds, null);
+    const gatherAlone = run(null);
+    const link = content.balance.K.clone.link;
+    // Half of each alone, and +link on both: the craft cycle is shorter by that factor.
+    expect(together('alch') / (craftAlone('alch') / 2)).toBeGreaterThan(1 + link - 0.04);
+    expect(together('alch') / (craftAlone('alch') / 2)).toBeLessThan(1 + link + 0.04);
+    expect(together('herb')).toBeGreaterThan(gatherAlone('herb') / 2);
+  });
+});
+
+describe('what a clone may do', () => {
+  it('takes missions without a combat stage, village missions among them', () => {
+    const state = cloner();
+    for (const m of content.missions) {
+      if (m.stages.some((s) => s.t === 'combat') || m.rank === 'OP') continue;
+      const result = start(state, 1, 'mission', m.id);
+      if (!result.ok) expect(result.reason).not.toBe('error.cloneNoFight');
+    }
+    expect(start(state, 1, 'mission', 'core:v_clones')).toEqual({ ok: true });
+  });
+
+  it('refuses a fight, an operation and a mission with a combat stage, each with its own reason', () => {
+    const state = cloner();
+    openWorld(state);
+    const refused = { ok: false, reason: 'error.cloneNoFight' };
+    expect(start(state, 1, 'fight', 'core:bandit')).toEqual(refused);
+    expect(start(state, 1, 'operation', content.operations[0]?.id ?? '')).toEqual(refused);
+    for (const m of content.missions.filter(
+      (x) => x.board && x.stages.some((s) => s.t === 'combat'),
+    )) {
+      expect(start(state, 1, 'mission', m.id), m.id).toEqual(refused);
+    }
+    expect(state.slots[1]?.action).toBeNull();
+    // The player's own slot is not refused for the same.
+    expect(start(state, 0, 'fight', 'core:bandit').ok).toBe(true);
+  });
+
+  it('runs a village mission to its end in the clone slot and pays the Workforce', () => {
+    const state = cloner();
+    const before = state.village?.workforce ?? 0;
+    expect(start(state, 1, 'mission', 'core:v_clones')).toEqual({ ok: true });
+    advance(state, 40 * 60_000, content);
+    expect(state.counters['missions.done.core:v_clones'] ?? 0).toBeGreaterThan(0);
+    expect(
+      (state.village?.workforce ?? 0) + (state.missions.pending['robocha_syla'] ?? 0),
+    ).toBeGreaterThan(before);
+  });
+
+  it('lets the player and a clone work on a mission each', () => {
+    const state = cloner();
+    const own = content.missions.find(
+      (m) =>
+        m.board &&
+        m.id !== 'core:v_clones' &&
+        !m.stages.some((st) => st.t === 'combat') &&
+        start(state, 0, 'mission', m.id).ok,
+    );
+    expect(own).toBeDefined();
+    expect(start(state, 1, 'mission', 'core:v_clones')).toEqual({ ok: true });
+    expect(state.slots.map((s) => s.share)).toEqual([500, 500]);
+    advance(state, 30 * 60_000, content);
+    expect(state.counters[`missions.done.${own?.id}`] ?? 0).toBeGreaterThan(0);
+  });
+});
+
+describe('time with two slots', () => {
+  const setup = (): GameState => {
+    const state = cloner(5);
+    start(state, 0, 'gather', 'core:mint');
+    start(state, 1, 'craft', 'core:antidote');
+    return state;
+  };
+
+  it('repeats exactly for the same seed and commands', () => {
+    const a = setup();
+    const b = setup();
+    advance(a, 3 * HOUR, content);
+    advance(b, 3 * HOUR, content);
+    expect(JSON.stringify(a)).toBe(JSON.stringify(b));
+  });
+
+  it('gives the same state however the time is cut', () => {
+    const whole = setup();
+    advance(whole, 2 * HOUR, content);
+    for (const chunks of [[1], [999, 5003], [60_000, 1, 33_333]]) {
+      const cut = setup();
+      let left = 2 * HOUR;
+      for (let i = 0; left > 0; i++) {
+        const step = Math.min(left, chunks[i % chunks.length] ?? 1);
+        advance(cut, step, content);
+        left -= step;
+        // The first chunk list steps by 1 ms: only enough of it to keep the test quick.
+        if (chunks.length === 1 && i > 20_000) {
+          advance(cut, left, content);
+          left = 0;
+        }
+      }
+      expect(JSON.stringify(cut.slots)).toBe(JSON.stringify(whole.slots));
+      expect(cut.counters).toEqual(whole.counters);
+      expect(cut.bank).toEqual(whole.bank);
+      expect(cut.now).toBe(whole.now);
+    }
+  });
+
+  it('keeps its work across a save with a clone running', () => {
+    const state = setup();
+    advance(state, 30 * 60_000 + 123, content);
+    const loaded = deserialize(serialize(state, 7), content);
+    expect(loaded.slots.map((s) => s.action)).toEqual(state.slots.map((s) => s.action));
+    expect(loaded.slots.map((s) => s.share)).toEqual([500, 500]);
+    expect(isCloneSlot(loaded, content, 1)).toBe(true);
+    advance(state, HOUR, content);
+    advance(loaded, HOUR, content);
+    expect(loaded.skills).toEqual(state.skills);
+    expect(loaded.counters).toEqual(state.counters);
+  });
+});
+
+describe('clone telemetry', () => {
+  it('counts the time a clone runs and the pairs that ran together', () => {
+    const state = cloner();
+    expect(cloneTelemetry(state, content)).toEqual({ openMs: 0, runMs: 0, share: 0, pairs: [] });
+    start(state, 0, 'gather', 'core:mint');
+    advance(state, 600_000, content);
+    expect(cloneTelemetry(state, content).share).toBe(0);
+    start(state, 1, 'craft', 'core:antidote');
+    advance(state, 600_000, content);
+    dispatch(state, { type: 'clone.dispel' }, content);
+    advance(state, 600_000, content);
+    const t = cloneTelemetry(state, content);
+    expect(t.openMs).toBe(1_800_000);
+    expect(t.runMs).toBe(600_000);
+    expect(t.share).toBeCloseTo(1 / 3, 9);
+    expect(t.pairs.length).toBe(1);
+    expect(t.pairs[0]).toMatchObject({ ms: 600_000, linked: true });
+    expect([t.pairs[0]?.a.kind, t.pairs[0]?.b.kind].sort()).toEqual(['craft', 'gather']);
+  });
+
+  it('counts nothing for a player without a clone', () => {
+    const state = createState(1, content);
+    state.skills.nin!.xp = xpAt(5);
+    advance(state, 10_000, content);
+    expect(cloneTelemetry(state, content).openMs).toBe(0);
+  });
+});
+
+describe('the chain «Тіньові клони»', () => {
+  it('runs its five steps, hands the scroll at the last one and ends with a clone', () => {
+    const state = player({ seed: 9, natures: ['katon'], base: 1 });
+    delete state.known[CLONE];
+    state.loadouts.active = state.loadouts.active.filter((id) => id !== CLONE);
+    const quest = (): { step: number; done: boolean } | undefined =>
+      state.quests['core:shadow_clones'];
+    const tick = () => advance(state, 1, content);
+    tick();
+    expect(quest()?.step).toBe(0);
+    state.skills.nin!.xp = xpAt(30);
+    state.skills.med!.xp = xpAt(20);
+    tick();
+    expect(quest()?.step).toBe(1);
+    // Ten village missions count from the moment the step began.
+    state.counters['missions.rank.V'] = (state.counters['missions.rank.V'] ?? 0) + 10;
+    tick();
+    expect(quest()?.step).toBe(2);
+    state.skills.med!.xp = xpAt(40);
+    tick();
+    expect(quest()?.step).toBe(3);
+    expect(state.bank[SCROLL] ?? 0).toBe(0);
+    state.skills.nin!.xp = xpAt(50);
+    tick();
+    expect(quest()?.step).toBe(4);
+    expect(state.bank[SCROLL]).toBe(1);
+    expect(dispatch(state, { type: 'item.use', id: SCROLL }, content)).toEqual({ ok: true });
+    tick();
+    expect(quest()).toMatchObject({ step: 5, done: true });
+    expect(state.slots.length).toBe(2);
+    expect(start(state, 1, 'mission', 'core:v_clones')).toEqual({ ok: true });
+  });
+});
