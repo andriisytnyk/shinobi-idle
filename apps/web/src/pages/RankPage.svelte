@@ -56,8 +56,8 @@
   );
   /** What the rank of the shown exam gives besides what it unlocks. */
   const perks = $derived(exam ? perksOf(content, exam.rank) : []);
-  /** The last rank of the content ends the slice: its final screen can be read again. */
-  const last = $derived(exam ? content.playerRanks.at(-1)?.id === exam.rank : false);
+  /** An exam that ends the story has a final screen that can be read again. */
+  const last = $derived(exam?.finale === true);
   const ready = $derived(written ? (rest?.met ?? false) : (checklist?.met ?? false));
   const takeKey = $derived(
     !exam?.then ? 'rank.take' : written ? 'rank.confer' : 'rank.takeWritten',

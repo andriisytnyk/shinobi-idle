@@ -876,6 +876,8 @@ export const examSchema = z.strictObject({
    * the same command confers the rank. Without it, passing the test confers the rank.
    */
   then: reqSchema.optional(),
+  /** The exam ends the story of the pack: passing it opens the final screen. */
+  finale: z.boolean().optional(),
   /** Skills whose levels shorten the test. */
   reduceBy: z.array(skillId).min(1),
   rewards: z.strictObject({
