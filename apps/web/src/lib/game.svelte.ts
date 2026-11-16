@@ -7,6 +7,7 @@ import {
   dispatch as coreDispatch,
   revealHint,
   revealOf,
+  shownKey,
   type Command,
   type RevealLevel,
   type CommandResult,
@@ -196,7 +197,7 @@ export function createGame(deps: GameDeps = {}) {
     mark(refs) {
       let changed = false;
       for (const ref of refs) {
-        if (state.shown[ref.id] === true || revealOf(state, ref, content, rules) === 'full')
+        if (state.shown[shownKey(ref)] === true || revealOf(state, ref, content, rules) === 'full')
           continue;
         // Straight to the core, past the hooks of the packs: the mark is bookkeeping, not a player's command.
         if (coreDispatch(state, { type: 'reveal.mark', refs: [ref] }, content, rules).ok)
@@ -480,7 +481,6 @@ export function createGame(deps: GameDeps = {}) {
 
     /** Sends a command to the core and refreshes the views. */
     dispatch(original: Command): CommandResult {
-      epoch++;
       let command = original;
       for (const hook of commandHooks) {
         const verdict = hook.before?.(command);
@@ -492,6 +492,8 @@ export function createGame(deps: GameDeps = {}) {
         if (verdict) command = verdict;
       }
       const result = coreDispatch(state, command, content, rules);
+      // After the command: a reveal it caused must not wait for the next update.
+      epoch++;
       if (result.ok && command.type === 'action.start' && command.kind === 'fight') log = [];
       drainEvents();
       touch();

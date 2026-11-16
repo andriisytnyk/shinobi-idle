@@ -180,7 +180,8 @@ export const coreUi: UiPack = {
         ...(reveal ? { reveal } : {}),
       });
     entity('quest', { svelte: QuestsPage }, 'quests');
-    entity('mission', byId(MissionPage), 'missions');
+    // A mission is shown by name before its rank opens; the page then shows what the board card shows.
+    entity('mission', byId(MissionPage), 'missions', 'self');
     entity('exam', { svelte: RankPage }, 'rank');
     entity('skill', byId(SkillPage), 'skills');
     entity('technique', byId(TechniquePage));

@@ -139,6 +139,8 @@ describe('A3: the map follows the core', () => {
 
   it('a region that opens is shown as open', () => {
     const state = genin();
+    // A cell of the forest is explored, so that the next region is shown by name.
+    explored(state, HOME);
     state.skills.scout!.xp = xpAt(9);
     game.replaceState(state);
     show({ cell: null, region: PLAINS });
@@ -580,6 +582,8 @@ describe('R1: places the player has not discovered stay hidden on the map', () =
     expect(q(`nav ${link('region', FOREST)}`)?.textContent).toBe(name(`region.${FOREST}.name`));
     for (const id of [PLAINS, VALLEY]) {
       expect(q(`nav ${link('region', id)}`), id).toBeNull();
+      expect(q(`[data-region="${id}"]`), id).toBeNull();
+      expect(target.innerHTML).not.toContain(id);
       expect(target.textContent).not.toContain(name(`region.${id}.name`));
     }
     expect(target.querySelectorAll('nav [data-masked]')).toHaveLength(2);

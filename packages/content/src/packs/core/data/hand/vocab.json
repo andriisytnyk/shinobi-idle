@@ -354,7 +354,7 @@
       "id": "region",
       "list": "regions",
       "reveal": {
-        "name": ["adjacent", "named", "seen"],
+        "name": ["adjacent", "actionable", "named", "seen"],
         "full": ["explored"]
       }
     },

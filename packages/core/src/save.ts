@@ -53,7 +53,7 @@ import {
 } from './state.ts';
 import { updateQuests } from './quests.ts';
 import { refreshRegions, regionFlag } from './regions.ts';
-import { isEntityId, seenLimit } from './reveal.ts';
+import { isShownKey, seenLimit } from './reveal.ts';
 import { refreshUnlocks } from './unlocks.ts';
 import {
   villageBuildCost,
@@ -198,7 +198,45 @@ export const MIGRATIONS: readonly Migration[] = [
     };
   },
   // v14 -> v15: the set of entities the interface has shown (the reveal rule), empty at first.
-  (state) => ({ ...state, shown: {} }),
+  // The set starts from what the old save proves the player has met: what is in the bank, the pouch
+  // and the gear, what the battle reports and mastery records name, the recipes known, the enemies
+  // of the Bingo book and the reports. A player who reached the same state on this version has them.
+  (state, content) => {
+    const items = new Set(content.items.map((i) => i.id));
+    const recipes = new Set(content.recipes.map((r) => r.id));
+    const gear = new Set(content.gear.map((g) => g.id));
+    const enemies = new Set(content.enemies.map((e) => e.id));
+    const bosses = new Set(content.bosses.map((b) => b.id));
+    const shown: Record<string, true> = {};
+    const mark = (set: Set<string>, kind: string, id: unknown): void => {
+      if (typeof id === 'string' && set.has(id)) shown[`${id}@${kind}`] = true;
+    };
+    const keys = (x: unknown): string[] => (isRecord(x) ? Object.keys(x) : []);
+    for (const id of keys(state.bank)) mark(items, 'item', id);
+    const slots =
+      isRecord(state.pouch) && Array.isArray(state.pouch.slots) ? state.pouch.slots : [];
+    for (const slot of slots) mark(items, 'item', isRecord(slot) ? slot.id : undefined);
+    for (const id of keys(state.gear)) mark(gear, 'gear', id);
+    for (const id of keys(state.known)) mark(recipes, 'recipe', id);
+    for (const id of keys(state.mastery)) {
+      mark(recipes, 'recipe', id);
+      mark(items, 'item', id);
+    }
+    for (const id of keys(state.buffs)) mark(items, 'item', id);
+    const report = isRecord(state.report) ? state.report : {};
+    for (const [target, entry] of Object.entries(report)) {
+      mark(enemies, 'enemy', target);
+      mark(bosses, 'boss', target);
+      if (!isRecord(entry)) continue;
+      if (isRecord(entry.loot)) for (const id of keys(entry.loot.items)) mark(items, 'item', id);
+      for (const id of keys(entry.items)) mark(items, 'item', id);
+    }
+    for (const id of keys(state.bingo)) {
+      mark(enemies, 'enemy', id);
+      mark(bosses, 'boss', id);
+    }
+    return { ...state, shown };
+  },
 ];
 
 /** Deepest nesting a slot's data may have. */
@@ -642,7 +680,11 @@ export function deserialize(
   });
   // The set of shown entities is trusted only as far as the ids go: each must be an entity of the content, and the set is bounded.
   state.shown = Object.fromEntries(
-    Object.keys(pick(raw.shown, (key) => (isEntityId(content, key) ? (true as const) : undefined)))
+    Object.keys(
+      pick(raw.shown, (key, v) =>
+        v === true && isShownKey(content, key) ? (true as const) : undefined,
+      ),
+    )
       .slice(0, seenLimit(content))
       .map((key) => [key, true as const]),
   );

@@ -136,7 +136,7 @@ export interface GameState {
   bingo: Record<string, BingoEntry>;
   /** Battle reports by target (zone, enemy or operation id): what the fights against it added up to. */
   report: Record<string, TargetReport>;
-  /** Entities the interface showed legitimately and `reveal.mark` recorded, by id (the reveal rule's `seen` term). Written only by that command. */
+  /** Entities the interface showed legitimately and `reveal.mark` recorded, by id (the reveal rule's `seen` term). Written only through `addShown` (shown.ts): by that command and when an item is gained. Keys are `<id>@<kind>`. */
   shown: Record<string, true>;
   /** Missions: village resource units earned that no village has taken yet, by resource slug (the village stage consumes them). */
   missions: { pending: Record<string, number> };

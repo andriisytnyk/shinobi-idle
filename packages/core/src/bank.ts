@@ -16,7 +16,7 @@ export function addItem(state: GameState, id: string, n: number): boolean {
   if (n > 0) {
     state.bank[id] = (state.bank[id] ?? 0) + n;
     // Having held an item is remembered for the reveal rule: it stays shown after the last one is used up.
-    addShown(state, id, SHOWN_CEILING);
+    addShown(state, `${id}@item`, SHOWN_CEILING);
   }
   return true;
 }

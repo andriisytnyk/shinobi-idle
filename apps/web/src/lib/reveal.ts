@@ -49,3 +49,11 @@ export function markShown(refs: readonly EntityRef[]): void {
 export function setRevealDisabled(value: boolean): void {
   disabled = value;
 }
+
+/** The `kind:id` text of an entity for a `data-entity` attribute, or undefined for an entity the player has not discovered: nothing derived from it reaches the DOM. */
+export const entityAttr = (ref: EntityRef): string | undefined =>
+  nameShown(ref) ? `${ref.kind}:${ref.id}` : undefined;
+
+/** An id for a data attribute (`data-input`, `data-buy`, ...) of an entity of this kind, or undefined while it is hidden. */
+export const idAttr = (kind: string, id: string): string | undefined =>
+  nameShown({ kind, id }) ? id : undefined;

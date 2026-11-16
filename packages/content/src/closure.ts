@@ -618,6 +618,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
       case 'explored':
         return list === 'cells' || list === 'regions' || kind === 'poi';
       case 'adjacent':
+      case 'actionable':
         return list === 'regions';
       case 'parent':
         return list === 'cells' || kind === 'poi';

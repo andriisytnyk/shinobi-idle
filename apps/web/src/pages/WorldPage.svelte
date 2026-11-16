@@ -8,6 +8,7 @@
   import RegionEntry from '../components/RegionEntry.svelte';
   import ReqTree from '../components/ReqTree.svelte';
   import { t } from '../lib/i18n.ts';
+  import { idAttr } from '../lib/reveal.ts';
   import { navigate } from '../lib/router.svelte.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
@@ -110,7 +111,7 @@
           class="region"
           class:active={region.id === activeId}
           class:closed={!region.open}
-          data-region={region.id}
+          data-region={idAttr('region', region.id)}
           data-open={region.open}
           aria-current={region.id === activeId ? 'true' : undefined}
         >

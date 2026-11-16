@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { entityAttr, idAttr } from '../lib/reveal.ts';
   import type { ActionInfo } from '@shinobi/core';
   import { blockOf, blockText, tierView } from '../lib/crafts.ts';
   import { formatInt, formatSeconds, formatXp } from '../lib/format.ts';
@@ -45,10 +46,10 @@
 <li
   class="ct-tile"
   class:running
-  data-recipe={info.id}
+  data-recipe={idAttr('recipe', info.id)}
   data-action={info.id}
   data-ui="action-tile"
-  data-entity="recipe:{info.id}"
+  data-entity={entityAttr({ kind: 'recipe', id: info.id })}
 >
   <div class="ct-top">
     <ActionEmblem kind="recipe" id={info.id} skill={info.skill} />

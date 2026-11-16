@@ -96,11 +96,16 @@ describe('the default rule of each kind, on a fresh save', () => {
     expect(revealHint(state, { kind: 'boss', id: FINAL_BOSS }, content)).toBe(
       'reveal.hint.encountered',
     );
+    // A region that is not shown is brought to a name by the one next to it; a name, by exploring.
     expect(revealHint(state, { kind: 'region', id: 'core:valley' }, content)).toBe(
+      'reveal.hint.adjacent',
+    );
+    state.world.explores['core:okolytsi_sela'] = 0;
+    expect(revealHint(state, { kind: 'region', id: 'core:forest' }, content)).toBe(
       'reveal.hint.explored',
     );
     expect(revealHint(state, { kind: 'quest', id: 'core:mission_board' }, content)).toBe(
-      'reveal.hint.quest',
+      'reveal.hint.unlocked',
     );
     expect(revealHint(state, { kind: 'skill', id: 'tai' }, content)).toBeNull();
   });
@@ -185,7 +190,7 @@ describe('the command reveal.mark', () => {
     const state = createState(1, content);
     expect(level(state, 'item', shop)).not.toBe('full');
     expect(mark(state, { kind: 'item', id: shop })).toEqual({ ok: true });
-    expect(state.shown[shop]).toBe(true);
+    expect(state.shown[`${shop}@item`]).toBe(true);
     expect(level(state, 'item', shop)).toBe('full');
   });
 
@@ -248,9 +253,11 @@ describe('the command reveal.mark', () => {
     for (const kind of ['item', 'recipe', 'gear', 'cell']) {
       for (const id of idsOf(kind)) mark(state, { kind, id });
     }
-    const entities = new Set(content.entityKinds.flatMap((k) => idsOf(k.id)));
+    const entities = new Set(
+      content.entityKinds.flatMap((k) => idsOf(k.id).map((id) => `${id}@${k.id}`)),
+    );
     expect(Object.keys(state.shown).length).toBeLessThanOrEqual(entities.size);
-    expect(Object.keys(state.shown).every((id) => entities.has(id))).toBe(true);
+    expect(Object.keys(state.shown).every((key) => entities.has(key))).toBe(true);
   });
 
   it('is deterministic: the same commands give the same bytes, whatever time passes between', () => {
@@ -277,19 +284,20 @@ describe('the command reveal.mark', () => {
   it('sanitises a tampered set on load: unknown ids, other values and a swollen set are dropped', () => {
     const state = createState(1, content);
     const raw = JSON.parse(serialize(state)) as { state: { shown: Record<string, unknown> } };
-    const entities = [...new Set(content.entityKinds.flatMap((k) => idsOf(k.id)))];
-    raw.state.shown = {
-      [shop]: true,
-      'core:no_such_thing': true,
-      __proto__: true,
-      constructor: true,
-      [FINAL_BOSS]: 'yes',
-    };
-    for (let i = 0; i < 5000; i++) raw.state.shown[`junk:${i}`] = true;
-    const loaded = deserialize(JSON.stringify(raw), content);
-    expect(Object.keys(loaded.shown).sort()).toEqual([FINAL_BOSS, shop].sort());
-    expect(Object.keys(loaded.shown).length).toBeLessThanOrEqual(entities.length);
+    const entities = content.entityKinds.reduce((n, k) => n + idsOf(k.id).length, 0);
+    // Written as JSON text so that `__proto__` really is a key of the object that is read.
+    const junk = Array.from({ length: 5000 }, (_, i) => `"junk:${i}@item":true`).join(',');
+    const shownText =
+      `{"${shop}@item":true,"${shop}":true,"core:no_such_thing@item":true,"__proto__":true,` +
+      `"constructor@item":true,"${FINAL_BOSS}@boss":false,"${FINAL_BOSS}@enemy":true,"core:tiger@seal":"yes",${junk}}`;
+    const text = JSON.stringify(raw).replace('"shown":{}', `"shown":${shownText}`);
+    expect(text).toContain('"__proto__":true');
+    const loaded = deserialize(text, content);
+    // Only a value of exactly true, under a key that names an entity of that very kind.
+    expect(Object.keys(loaded.shown)).toEqual([`${shop}@item`]);
+    expect(Object.keys(loaded.shown).length).toBeLessThanOrEqual(entities);
     expect(Object.getPrototypeOf(loaded.shown)).toBe(Object.prototype);
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
   });
 
   it('migrates an older save with an empty set', () => {
@@ -298,6 +306,34 @@ describe('the command reveal.mark', () => {
     raw.v = 14;
     delete raw.state.shown;
     expect(deserialize(JSON.stringify(raw), content).shown).toEqual({});
+  });
+
+  it('keeps a mark to its kind: marking a seal or a mission shows no enemy of the same id', () => {
+    // Every pair of kinds of the core pack that share an id.
+    const byId = new Map<string, string[]>();
+    for (const kind of content.entityKinds) {
+      for (const id of idsOf(kind.id)) byId.set(id, [...(byId.get(id) ?? []), kind.id]);
+    }
+    const shared = [...byId].filter(([, kinds]) => kinds.length > 1);
+    expect(shared.map(([id]) => id)).toEqual(expect.arrayContaining(['core:tiger', 'core:thief']));
+    for (const [id, kinds] of shared) {
+      for (const kind of kinds) {
+        const state = createState(1, content);
+        state.shown[`${id}@${kind}`] = true;
+        // A recipe that is shown names its product by the rule (an item), which is not a mix-up of keys.
+        for (const other of kinds.filter(
+          (k) => k !== kind && !(kind === 'recipe' && k === 'item'),
+        )) {
+          const alone = createState(1, content);
+          expect(level(state, other, id), `${other} ${id} after marking ${kind}`).toBe(
+            level(alone, other, id),
+          );
+        }
+      }
+    }
+    const state = createState(1, content);
+    expect(mark(state, { kind: 'seal', id: 'core:tiger' }).ok).toBe(true);
+    expect(level(state, 'enemy', 'core:tiger')).toBe('hidden');
   });
 });
 

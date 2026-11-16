@@ -15,6 +15,7 @@ import { flushSync } from 'svelte';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { coreUi } from '../src/lib/ext/core-ui.ts';
 import { entityName } from '../src/lib/entities.ts';
+import { nameShown } from '../src/lib/reveal.ts';
 import { formatDuration } from '../src/lib/format.ts';
 import { t } from '../src/lib/i18n.ts';
 import { missionToast } from '../src/lib/mission-toasts.ts';
@@ -135,7 +136,12 @@ describe('the board', () => {
         [...(card?.querySelectorAll('[data-reward="item"]') ?? [])].map((e) =>
           e.getAttribute('data-entity'),
         ),
-      ).toEqual(forecast.rewards.items.map((i) => `item:${i.item}`));
+        // An item the player has not discovered carries no id in the page.
+      ).toEqual(
+        forecast.rewards.items.map((i) =>
+          nameShown({ kind: 'item', id: i.item }) ? `item:${i.item}` : null,
+        ),
+      );
       expect(card?.querySelector('[data-reward="resource"]') !== null).toBe(
         forecast.resource !== null,
       );
@@ -484,7 +490,9 @@ describe('the mission page', () => {
 
   it('falls back to the generic page for a mission that does not exist', async () => {
     booted = await bootApp([coreUi], player(), '#/mission/core:nothing');
-    expect(q('[data-ui="entity-page"]')?.getAttribute('data-entity')).toBe('mission:core:nothing');
+    // An id that does not exist reads like one that is not discovered: typing addresses tells nothing.
+    expect(q('[data-not-revealed]')).not.toBeNull();
+    expect(q('[data-not-found]')).toBeNull();
   });
 });
 
@@ -649,7 +657,7 @@ describe('toasts', () => {
   it('shows Intel, the village resource, a lost share and a scroll part in the mounted toast', async () => {
     // The part was gained by the mission, so the player holds it (the bank remembers what has been held).
     const holder = able();
-    holder.shown['core:scrollpart_wave_of_inspiration'] = true;
+    holder.shown['core:scrollpart_wave_of_inspiration@item'] = true;
     booted = await bootApp([coreUi], holder, '#/missions');
     const push = (event: MissionDoneEvent) => {
       toasts.clear();

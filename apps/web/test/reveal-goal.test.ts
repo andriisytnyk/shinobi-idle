@@ -2,6 +2,7 @@ import { content } from '@shinobi/content';
 import { createState } from '@shinobi/core';
 import { render } from 'svelte/server';
 import { describe, expect, it } from 'vitest';
+import EntityLink from '../src/components/EntityLink.svelte';
 import GoalPanel from '../src/components/GoalPanel.svelte';
 import PinGoal from '../src/components/PinGoal.svelte';
 import { game } from '../src/lib/store.ts';
@@ -17,6 +18,26 @@ const textsOf = ({ kind, id }: { kind: string; id: string }) => ({
 });
 
 describe('goals and pins (R1)', () => {
+  it('keeps the tree of a goal that is shown by name (what opens it is no spoiler)', () => {
+    const state = freshState();
+    state.goal = { kind: 'mission', id: 'core:cat' };
+    game.replaceState(state);
+    const body = render(GoalPanel, { props: { onClose: () => {} }, context: coreContext() }).body;
+    expect(body).not.toContain('data-goal-unrevealed');
+    expect(body).toContain('data-ui="goal-row"');
+  });
+
+  it('puts no space after a link: «(Ліси Країни Вогню)», «Атлетика, Розвідка»', () => {
+    for (const ref of [
+      { kind: 'skill', id: 'tai' },
+      { kind: 'boss', id: 'core:boss_ren2' },
+    ]) {
+      const body = render(EntityLink, { props: ref }).body;
+      expect(body).not.toMatch(/<\/(a|span)>\s/);
+      expect(body).not.toMatch(/\s<\/(a|span)>/);
+    }
+  });
+
   it('prints a hidden pinned goal as «???» with its hint, never its name or tree', () => {
     const state = freshState();
     state.goal = { kind: 'boss', id: 'core:boss_ren2' };

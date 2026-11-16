@@ -1,8 +1,7 @@
 <script lang="ts">
   import { entityName } from '../lib/entities.ts';
   import { t } from '../lib/i18n.ts';
-  import { MASK, revealHintKey, revealLevel } from '../lib/reveal.ts';
-  import MarkShown from './MarkShown.svelte';
+  import { markShown, MASK, revealHintKey, revealLevel } from '../lib/reveal.ts';
   import { hrefFor, type EntityKind } from '../lib/route.ts';
 
   interface Props {
@@ -15,15 +14,21 @@
   let { kind, id, offered = false }: Props = $props();
 
   const level = $derived(revealLevel({ kind, id }));
+
+  /** Runs again when the level changes: a link the place offers tells the core while it is not yet shown in full. */
+  const offer = (): void => {
+    if (offered && level !== 'full') markShown([{ kind, id }]);
+  };
 </script>
 
-{#if level === 'hidden'}
-  {@const hint = revealHintKey({ kind, id })}
-  <span class="entity-link masked" data-masked title={hint ? t(hint) : undefined}>{MASK}</span>
-{:else}
-  <a class="entity-link" href={hrefFor({ kind, id })}>{entityName({ kind, id })}</a>
-{/if}
-{#if offered && level !== 'full'}<MarkShown {kind} {id} />{/if}
+{#if level === 'hidden'}{@const hint = revealHintKey({ kind, id })}<span
+    class="entity-link masked"
+    data-masked
+    title={hint ? t(hint) : undefined}
+    {@attach offer}>{MASK}</span
+  >{:else}<a class="entity-link" href={hrefFor({ kind, id })} {@attach offer}
+    >{entityName({ kind, id })}</a
+  >{/if}
 
 <style>
   .entity-link {

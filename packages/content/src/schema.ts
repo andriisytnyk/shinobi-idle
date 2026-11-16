@@ -41,7 +41,7 @@ const resSlug = z.string().regex(/^[a-z0-9_]+(:[a-z0-9_]+)?$/);
  * `encountered`: an enemy or boss that was fought or has a Bingo level of 1 or more.
  * `explored`: a cell explored to level 1, a region with such a cell, a point of interest found.
  * `adjacent`: a region the player stands in or next to one with an explored cell. `parent`: the
- * region of a cell or the cell of a point of interest is shown by name. `questStarted`: the chain
+ * region of a cell or the cell of a point of interest is shown by name. `actionable`: a region that is open (the player may go there). `questStarted`: the chain
  * has begun. `unlocked`: the entity's own `unlockReq`, `unlock` or `req` holds (none: holds).
  */
 export const REVEAL_TERMS = [
@@ -56,6 +56,7 @@ export const REVEAL_TERMS = [
   'parent',
   'questStarted',
   'unlocked',
+  'actionable',
 ] as const;
 export type RevealTermId = (typeof REVEAL_TERMS)[number];
 

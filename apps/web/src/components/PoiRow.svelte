@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { entityAttr, idAttr } from '../lib/reveal.ts';
   import { entityDesc } from '../lib/entities.ts';
   import { t } from '../lib/i18n.ts';
   import { GENERIC_POI_ICON, poiKindKey, poiLinks } from '../lib/world.ts';
@@ -24,10 +25,10 @@
 
 <li
   class="poi"
-  data-poi={poi.id}
+  data-poi={idAttr('poi', poi.id)}
   data-poi-kind={poi.kind}
   data-ui="poi-row"
-  data-entity="poi:{poi.id}"
+  data-entity={entityAttr({ kind: 'poi', id: poi.id })}
 >
   <p class="poi-name">
     <Icon name={renderer?.icon ?? GENERIC_POI_ICON} size={18} />

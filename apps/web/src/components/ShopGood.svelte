@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { entityAttr, idAttr } from '../lib/reveal.ts';
   import { shopTotal, type ReqResult } from '@shinobi/core';
   import { blockOf, blockText } from '../lib/crafts.ts';
   import { entityName } from '../lib/entities.ts';
@@ -57,7 +58,7 @@
   data-good={item}
   data-owned={owned}
   data-ui="shop-good"
-  data-entity="item:{item}"
+  data-entity={entityAttr({ kind: 'item', id: item })}
 >
   <span class="ct-icon"><Icon entity={{ kind: 'item', id: item }} size={28} /></span>
   <span class="grow"><EntityLink kind="item" id={item} offered /></span>
@@ -73,7 +74,7 @@
   <button
     type="button"
     class="ct-button"
-    data-buy={item}
+    data-buy={idAttr('item', item)}
     disabled={off}
     aria-describedby={off ? whyId : undefined}
     onclick={buy}

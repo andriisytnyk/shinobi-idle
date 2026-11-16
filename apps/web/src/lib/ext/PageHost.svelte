@@ -2,7 +2,9 @@
   import RevealGate from '../../components/RevealGate.svelte';
   import SimplePage from '../../pages/SimplePage.svelte';
   import { t } from '../i18n.ts';
+  import { findEntity } from '../entity-data.ts';
   import { revealLevel } from '../reveal.ts';
+  import { game } from '../store.ts';
   import { parseHash } from '../route.ts';
   import type { EntityRef } from '../route.ts';
   import { drawPage, isComposed } from './page-compose.ts';
@@ -24,7 +26,8 @@
   const route = $derived(parseHash(hash));
   const gate = $derived.by((): { entity: EntityRef; level: 'hidden' | 'name' } | null => {
     if (route.page !== 'entity') return null;
-    const level = revealLevel(route.ref);
+    // An id the content does not have reads like one that is not discovered: typing addresses tells nothing.
+    const level = findEntity(game.content, route.ref) === null ? 'hidden' : revealLevel(route.ref);
     if (level === 'hidden' || (level === 'name' && match?.page.reveal !== 'self')) {
       return { entity: route.ref, level };
     }

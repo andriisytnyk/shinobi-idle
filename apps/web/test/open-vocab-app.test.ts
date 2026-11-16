@@ -280,7 +280,7 @@ describe('the app booted with core and testmod (T1)', () => {
   it('links the pages to each other', async () => {
     // What the pages link to is shown to a player who has been through them: the recipe was listed, the enemy met, the forge trained.
     const gs = state();
-    gs.shown['testmod:elixir_brew'] = true;
+    gs.shown['testmod:elixir_brew@recipe'] = true;
     noteSighting(gs, 'testmod:shellback', game.content);
     (gs.skills as Record<string, { xp: number }>)[SKILL] = { xp: xpAt(2) };
     booted = await boot('#/item/testmod:pellet', gs);
@@ -298,10 +298,10 @@ describe('the app booted with core and testmod (T1)', () => {
 
   it('says that an unknown entity is not found, and does not crash', async () => {
     booted = await boot('#/enemy/testmod:nothing');
-    expect(q('[data-not-found]')).not.toBeNull();
-    expect(text('[data-not-found]')).toContain('Не знайдено');
+    expect(q('[data-not-revealed]')).not.toBeNull();
+    expect(q('[data-not-found]')).toBeNull();
     await booted.go('#/exercise/testmod:nothing');
-    expect(q('[data-not-found]')).not.toBeNull();
+    expect(q('[data-not-revealed]')).not.toBeNull();
   });
 
   it('keeps a log of the texts it had to stand in for, and shows none as a key', async () => {

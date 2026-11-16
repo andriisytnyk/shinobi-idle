@@ -4,7 +4,7 @@
   import { senseiTestInfo } from '../lib/exam-test.ts';
   import { formatDuration } from '../lib/format.ts';
   import { goalTree, suggestGoal } from '../lib/goal.ts';
-  import { revealHintKey, revealLevel } from '../lib/reveal.ts';
+  import { entityAttr, revealHintKey, revealLevel } from '../lib/reveal.ts';
   import { t } from '../lib/i18n.ts';
   import { nextStep } from '../lib/next-step.ts';
   import { game } from '../lib/store.ts';
@@ -27,8 +27,8 @@
   const wait = $derived(game.read((gs) => senseiTestInfo(gs, game.rules, content)));
   const goal = $derived(game.read((gs) => gs.goal));
   const goalRef = $derived(webRef(goal));
-  /** A pinned goal the player has not fully discovered shows as a bare row with its hint: no tree, no name when hidden. */
-  const goalFull = $derived(goalRef === null || revealLevel(goalRef) === 'full');
+  /** A pinned goal that is hidden shows as a bare row with its hint. What opens something is no spoiler, so a goal shown by name keeps its tree. */
+  const goalFull = $derived(goalRef === null || revealLevel(goalRef) !== 'hidden');
   const goalHint = $derived(goalRef && !goalFull ? revealHintKey(goalRef) : null);
   const result = $derived(
     game.read((gs) => {
@@ -74,14 +74,18 @@
         </p>
       {:else}
         {#if goal.kind === 'mission'}
-          <p class="target" data-goal-mission data-entity="mission:{goal.id}">
+          <p
+            class="target"
+            data-goal-mission
+            data-entity={entityAttr({ kind: 'mission', id: goal.id })}
+          >
             <EntityLink kind="mission" id={goal.id} />
           </p>
         {/if}
         {#if result}
           <ReqTree node={result} part="goal-row" />
         {:else if goalRef}
-          <p class="target" data-ui="goal-row" data-entity="{goalRef.kind}:{goalRef.id}">
+          <p class="target" data-ui="goal-row" data-entity={entityAttr(goalRef)}>
             <EntityLink kind={goalRef.kind} id={goalRef.id} />
           </p>
         {/if}

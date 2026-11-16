@@ -12,6 +12,8 @@ import {
 } from '@shinobi/core';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { coreUi } from '../src/lib/ext/core-ui.ts';
+import { resolveIcon } from '../src/lib/icons.ts';
+import { revealLevel } from '../src/lib/reveal.ts';
 import { game } from '../src/lib/store.ts';
 import { bootApp, type BootedApp } from './helpers/boot-app.ts';
 
@@ -191,12 +193,47 @@ describe('every route of every core entity (R1, T2)', () => {
   }, 300_000);
 });
 
-describe('a name-only page still says what opens the entity', () => {
-  it('shows the requirement of a mission the rank does not allow yet, and no description', async () => {
+describe('typed addresses and fresh answers (R1)', () => {
+  it('renders an id that does not exist exactly as one that is not discovered', async () => {
+    booted = await bootApp([coreUi], freshState(), '#/boss/core:boss_ren2');
+    const words = (): string | undefined =>
+      booted?.target.querySelector('main')?.textContent?.replace(/s+/g, ' ').trim();
+    const real = words();
+    await booted.go('#/boss/core:no_such_boss');
+    expect(booted.target.querySelector('[data-not-found]')).toBeNull();
+    expect(words()).toBe(real);
+  });
+
+  it('shows at once what a command has just revealed, without waiting for the next update', async () => {
+    booted = await bootApp([coreUi], freshState(), '#/');
+    expect(revealLevel({ kind: 'enemy', id: 'core:dummy' })).toBe('name');
+    game.dispatch({ type: 'action.start', slot: 0, kind: 'fight', id: 'core:zone_dummy' });
+    game.devAdvance(60_000);
+    expect(revealLevel({ kind: 'enemy', id: 'core:dummy' })).toBe('full');
+  });
+});
+
+describe('api.link for a pack (R1)', () => {
+  it('gives the name and the address of a discovered entity, and «???» with a hint for a hidden one', async () => {
+    booted = await bootApp([coreUi], freshState(), '#/');
+    const api = booted.ui.createApi('core');
+    const shown = api.link({ kind: 'skill', id: 'tai' });
+    expect(shown.href).toBe('#/skill/tai');
+    expect(shown.text).not.toBe('???');
+    const hidden = api.link({ kind: 'boss', id: 'core:boss_ren2' });
+    expect(hidden).toEqual({ text: '???', href: null, hint: expect.stringContaining('') });
+    expect(hidden.hint).not.toBeNull();
+    expect(JSON.stringify(hidden)).not.toContain('boss_ren2');
+  });
+});
+
+describe('the page of a mission that is shown by name', () => {
+  it('shows what its board card shows (the gate and the figures), and no description', async () => {
     booted = await bootApp([coreUi], freshState(), '#/mission/core:cat');
-    const page = booted.target.querySelector('[data-name-only]');
+    expect(booted.target.querySelector('[data-name-only], [data-not-revealed]')).toBeNull();
+    const page = booted.target.querySelector('[data-mission="core:cat"]');
     expect(page).not.toBeNull();
-    expect(page?.querySelector('[data-entity-req]')).not.toBeNull();
+    expect(page?.querySelector('[data-total]')).not.toBeNull();
     expect(page?.textContent).not.toContain(textsOf({ kind: 'mission', id: 'core:cat' }).desc);
   });
 });
@@ -208,9 +245,11 @@ describe('what the app prints during a run (R1, T3)', () => {
     const app = booted;
     let toastsSeen = 0;
     const seen: { at: string; text: string }[] = [];
+    const htmls: { at: string; html: string }[] = [];
     const collect = () => {
       const at = location.hash;
       seen.push({ at, text: app.target.textContent ?? '' });
+      htmls.push({ at, html: app.target.innerHTML });
       toastsSeen += app.target.querySelectorAll('[data-ui="toast"]').length;
       for (const el of app.target.querySelectorAll('[title], [aria-label]')) {
         seen.push({ at, text: el.getAttribute('title') ?? '' });
@@ -275,6 +314,30 @@ describe('what the app prints during a run (R1, T3)', () => {
       (e) => revealOf(game.state, e, content, game.rules) === 'hidden',
     );
     expect(hidden.length).toBeGreaterThan(40);
+    // Nothing derived from a hidden entity reaches the DOM: no id in any attribute, no icon of its own.
+    const neutral = resolveIcon('').body;
+    const notHidden = allEntities().filter(
+      (e) => revealOf(game.state, e, content, game.rules) !== 'hidden',
+    );
+    const shownIds = new Set(notHidden.map((e) => e.id));
+    const shownIcons = new Set(
+      notHidden.map((e) => resolveIcon({ kind: e.kind, id: e.id } as never).body),
+    );
+    const escape = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    for (const entity of hidden) {
+      const own = resolveIcon({ kind: entity.kind, id: entity.id } as never).body;
+      const idPattern = new RegExp(`(?<![A-Za-z0-9_:])${escape(entity.id)}(?![A-Za-z0-9_])`);
+      for (const { at, html } of htmls) {
+        if (!shownIds.has(entity.id)) {
+          expect(idPattern.test(html), `id ${entity.kind}:${entity.id} on ${at}`).toBe(false);
+        }
+        if (own !== neutral && !shownIcons.has(own)) {
+          expect(html.includes(own), `own icon of ${entity.kind}:${entity.id} on ${at}`).toBe(
+            false,
+          );
+        }
+      }
+    }
     for (const entity of hidden) {
       const { name, desc } = textsOf(entity);
       // A name that a shown entity also bears (or a word of the chrome) is not told apart here.

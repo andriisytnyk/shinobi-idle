@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { entityAttr } from '../lib/reveal.ts';
   import type { ActionInfo } from '@shinobi/core';
   import { blockOf, blockText, bushView } from '../lib/crafts.ts';
   import { formatDuration, formatInt, formatSeconds, formatXp } from '../lib/format.ts';
@@ -54,7 +55,7 @@
   data-herb={info.id}
   data-action={info.id}
   data-ui="action-tile"
-  data-entity="item:{info.id}"
+  data-entity={entityAttr({ kind: 'item', id: info.id })}
 >
   <div class="ct-top">
     <ActionEmblem kind="item" id={info.id} skill={info.skill} />

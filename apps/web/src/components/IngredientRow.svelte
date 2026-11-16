@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { entityAttr, idAttr } from '../lib/reveal.ts';
   import { evalReq, shopEntries } from '@shinobi/core';
   import { blockOf, itemSource } from '../lib/crafts.ts';
   import { formatInt } from '../lib/format.ts';
@@ -33,10 +34,10 @@
 <li
   class="input"
   class:missing
-  data-input={item}
+  data-input={idAttr('item', item)}
   data-missing={missing}
   data-ui="ingredient-row"
-  data-entity="item:{item}"
+  data-entity={entityAttr({ kind: 'item', id: item })}
 >
   <Icon entity={{ kind: 'item', id: item }} size={18} />
   <span class="name"><EntityLink kind="item" id={item} offered /></span>

@@ -1,4 +1,4 @@
-import type { ContentDb, RevealRule, RevealTerm } from '@shinobi/content';
+import type { ContentDb, Region, RevealRule, RevealTerm } from '@shinobi/content';
 import { bingoLevel } from './combat/bingo.ts';
 import type { CommandResult } from './engine.ts';
 import type { EntityRef } from './entity.ts';
@@ -8,7 +8,7 @@ import { defaultRules, type Rules } from './rules.ts';
 import { buyPrice } from './shop.ts';
 import { addShown } from './shown.ts';
 import type { GameState } from './state.ts';
-import { cellLevel } from './world.ts';
+import { cellLevel, isRegionOpen } from './world.ts';
 
 /*
  * The reveal rule: how much of an entity the player may see. `full`: everything. `name`: the name
@@ -43,6 +43,8 @@ type Owner =
   | { t: 'zone'; id: string }
   | { t: 'operation'; id: string }
   | { t: 'shop'; item: string }
+  /** A record of the content that is no entity (a coat, with its poison, base and product) and names several; one of the others that is fully shown names this one. */
+  | { t: 'group'; others: string[] }
   /** The mission board, which offers every mission that is on it. */
   | { t: 'board' };
 
@@ -58,6 +60,12 @@ interface Catalog {
 }
 
 const keyOf = (ref: EntityRef): string => `${ref.kind}:${ref.id}`;
+
+/**
+ * The key of an entity in `state.shown`: its id and its kind, so that a seal and an enemy that
+ * share an id are two entries. The id comes first, so that the pack prefix still tells the owner.
+ */
+export const shownKey = (ref: EntityRef): string => `${ref.id}@${ref.kind}`;
 const packOf = (id: string): string => (id.includes(':') ? id.slice(0, id.indexOf(':')) : 'core');
 
 const catalogs = new WeakMap<ContentDb, Catalog>();
@@ -109,24 +117,22 @@ function catalogOf(content: ContentDb): Catalog {
       owners.set(key, list);
     }
   };
-  /** Every id inside the data that is an entity of the content, once each, with the name of the field that holds it. */
+  /** Every id inside the data that is an entity of the content, once each, with the name of the field that holds it. The `id` of the record itself is not a mention; a nested `id` (a requirement node `{ t: 'item', id }`) is, and its `t` names the kind. */
   const idsIn = (value: unknown, skip: string): [string, string][] => {
     const found = new Map<string, string>();
     const walk = (v: unknown, depth: number, field: string): void => {
       if (typeof v === 'string') {
-        if (
-          field !== 'id' &&
-          kindsOf.has(v) &&
-          !found.has(v) &&
-          (v !== skip || (kindsOf.get(v)?.length ?? 0) > 1)
-        ) {
+        if (kindsOf.has(v) && !found.has(v) && (v !== skip || (kindsOf.get(v)?.length ?? 0) > 1)) {
           found.set(v, field);
         }
       } else if (depth > 0 && Array.isArray(v)) {
         for (const item of v) walk(item, depth - 1, field);
       } else if (depth > 0 && v !== null && typeof v === 'object') {
-        for (const [k, item] of Object.entries(v)) {
-          if (k !== 'reveal') walk(item, depth - 1, k);
+        const node = v as Record<string, unknown>;
+        const kindName = typeof node.t === 'string' ? node.t : null;
+        for (const [k, item] of Object.entries(node)) {
+          if (k === 'reveal' || (k === 'id' && depth === WALK_DEPTH)) continue;
+          walk(item, depth - 1, k === 'id' && kindName !== null ? kindName : k);
         }
       }
     };
@@ -164,6 +170,24 @@ function catalogOf(content: ContentDb): Catalog {
       link(herb.id, { t: 'entity', ref: { kind: 'skill', id: skill }, gate: 0 }, 'item');
     }
   }
+  // Records that are no entities (the coats of poisons, the market) name entities together: each is named by the others.
+  const entityLists = new Set(content.entityKinds.map((k) => k.list));
+  const handled = new Set(['zones', 'operations', 'shop', 'packs']);
+  for (const [name, value] of Object.entries(content)) {
+    if (!Array.isArray(value) || entityLists.has(name) || handled.has(name)) continue;
+    for (const record of value as unknown[]) {
+      const ids = idsIn(record, '').map(([id]) => id);
+      if (ids.length < 2) continue;
+      for (const id of ids) {
+        for (const kind of kindsOf.get(id) ?? []) {
+          const key = `${kind}:${id}`;
+          const list = owners.get(key) ?? [];
+          list.push({ t: 'group', others: ids.filter((other) => other !== id) });
+          owners.set(key, list);
+        }
+      }
+    }
+  }
   for (const zone of content.zones) link(zone.enemy, { t: 'zone', id: zone.id }, 'enemy');
   for (const op of content.operations) {
     // An operation is on the missions list under its own id; its stages name the fights it holds.
@@ -174,7 +198,10 @@ function catalogOf(content: ContentDb): Catalog {
     if (mission.board) link(mission.id, { t: 'board' }, 'mission');
   }
   for (const entry of shopEntries(content)) {
-    link(entry.item, { t: 'shop', item: entry.item }, 'item');
+    // The row names its good and what opens it (a building level).
+    for (const [id, field] of idsIn(entry, '')) {
+      link(id, { t: 'shop', item: entry.item }, field);
+    }
   }
 
   const made: Catalog = {
@@ -255,6 +282,19 @@ function ownerShows(ctx: Ctx, owner: Owner): boolean {
       return buyPrice(owner.item, ctx.content) !== null;
     case 'board':
       return true;
+    case 'group': {
+      const outer = ctx.inOwner;
+      ctx.inOwner = true;
+      try {
+        return owner.others.some((id) =>
+          (ctx.catalog.kindsOf.get(id) ?? []).some(
+            (kind) => !ctx.visiting.has(`${kind}:${id}`) && levelIn(ctx, { kind, id }) === 'full',
+          ),
+        );
+      } finally {
+        ctx.inOwner = outer;
+      }
+    }
     case 'entity': {
       const key = keyOf(owner.ref);
       if (ctx.visiting.has(key)) return false;
@@ -295,7 +335,7 @@ function termHolds(ctx: Ctx, term: RevealTerm, entry: Entry): boolean {
         (state.bank[id] ?? 0) > 0 || (state.gear[id] ?? 0) > 0 || state.buffs[id] !== undefined
       );
     case 'seen':
-      return keyOf(entry.ref) !== ctx.unmarked && state.shown[id] === true;
+      return keyOf(entry.ref) !== ctx.unmarked && state.shown[shownKey(entry.ref)] === true;
     case 'named':
       return !ctx.inOwner && named(ctx, entry.ref);
     case 'encountered':
@@ -327,6 +367,11 @@ function termHolds(ctx: Ctx, term: RevealTerm, entry: Entry): boolean {
             : null;
       return parent !== null && levelIn(ctx, parent) !== 'hidden';
     }
+    case 'actionable':
+      return (
+        entry.list === 'regions' &&
+        isRegionOpen(state, content.regions.find((r) => r.id === id) as Region, content)
+      );
     case 'questStarted':
       return entry.list === 'quests' && state.quests[id] !== undefined;
     case 'unlocked': {
@@ -388,6 +433,7 @@ const HINTS: Readonly<Record<string, string>> = {
   named: 'reveal.hint.named',
   encountered: 'reveal.hint.encountered',
   explored: 'reveal.hint.explored',
+  actionable: 'reveal.hint.adjacent',
   adjacent: 'reveal.hint.adjacent',
   parent: 'reveal.hint.explored',
   questStarted: 'reveal.hint.quest',
@@ -405,16 +451,26 @@ export function revealHint(
   content: ContentDb,
   rules: Rules = defaultRules,
 ): string | null {
-  if (revealOf(state, ref, content, rules) === 'full') return null;
   const catalog = catalogOf(content);
   const entry = catalog.entries.get(keyOf(ref));
-  const rule = entry ? ruleOf(entry, catalog) : null;
+  // An id the content does not have is told like one not discovered yet, by the rule of its kind: an address says nothing.
+  const level = entry ? revealOf(state, ref, content, rules) : 'hidden';
+  if (level === 'full') return null;
+  const rule = entry ? ruleOf(entry, catalog) : (catalog.kindRule.get(ref.kind) ?? null);
   if (!rule) return null;
-  const terms = rule.full.map((t) => (typeof t === 'string' ? t : 'req'));
+  const names = (list: readonly RevealTerm[]): string[] =>
+    list.map((t) => (typeof t === 'string' ? t : 'req'));
+  const specific = (terms: string[]): string | undefined =>
+    terms.find(
+      (t) => t !== 'seen' && t !== 'named' && t !== 'always' && t !== 'parent' && t !== 'req',
+    );
+  // What is hidden is first brought to a name (a region by the one next to it); a name is brought to full.
+  const fullTerms = names(rule.full);
   const pick =
-    terms.find((t) => t !== 'seen' && t !== 'named' && t !== 'always' && t !== 'req') ??
-    terms.find((t) => t === 'req') ??
-    terms[0];
+    (level === 'hidden' ? specific(names(rule.name ?? [])) : undefined) ??
+    specific(fullTerms) ??
+    fullTerms.find((t) => t === 'req') ??
+    fullTerms[0];
   if (pick === undefined) return null;
   return pick === 'req' ? 'reveal.hint.unlocked' : (HINTS[pick] ?? null);
 }
@@ -428,14 +484,22 @@ export function canMark(state: GameState, ref: EntityRef, content: ContentDb): b
   return ctx.catalog.entries.has(keyOf(ref)) && levelIn(ctx, ref) !== 'hidden';
 }
 
-/** Most ids the `seen` set holds: the entities the content has (an id of any kind). */
+/** Most entries the `shown` set holds: the entities the content has. */
 export function seenLimit(content: ContentDb): number {
-  return catalogOf(content).kindsOf.size;
+  return catalogOf(content).entries.size;
 }
 
-/** Whether an id is an entity of the content (of any kind that has a page). */
-export function isEntityId(content: ContentDb, id: string): boolean {
-  return catalogOf(content).kindsOf.has(id);
+/** Whether a key of `state.shown` (`<id>@<kind>`) names an entity of the content. */
+export function isShownKey(content: ContentDb, key: string): boolean {
+  const at = key.lastIndexOf('@');
+  return at > 0 && catalogOf(content).entries.has(`${key.slice(at + 1)}:${key.slice(0, at)}`);
+}
+
+/** Who names whom, for the tests: the owners of an entity as a list of short descriptions. */
+export function revealOwnersOf(content: ContentDb, ref: EntityRef): string[] {
+  return (catalogOf(content).owners.get(keyOf(ref)) ?? []).map((o) =>
+    o.t === 'entity' ? `entity:${keyOf(o.ref)}` : o.t,
+  );
 }
 
 /**
@@ -461,7 +525,7 @@ export function markSeen(state: GameState, refs: unknown, content: ContentDb): C
     }
     const checked = { kind: ref.kind, id: ref.id };
     if (!canMark(state, checked, content)) return { ok: false, reason: 'error.revealRefused' };
-    if (state.shown[checked.id] !== true) fresh.push(checked.id);
+    if (state.shown[shownKey(checked)] !== true) fresh.push(shownKey(checked));
   }
   const room = seenLimit(content) - Object.keys(state.shown).length;
   const unique = [...new Set(fresh)];
