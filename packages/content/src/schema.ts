@@ -261,9 +261,7 @@ export const techniqueSchema = techniqueBaseSchema.extend({
    * `from` that makes an item an action of the kind `to` uses feeds it, and while the two run in two
    * slots the consumer (`to`) gets `K.clone.link` speed.
    */
-  slotLinks: z
-    .array(z.strictObject({ from: z.string().min(1), to: z.string().min(1) }))
-    .optional(),
+  slotLinks: z.array(z.strictObject({ from: z.string().min(1), to: z.string().min(1) })).optional(),
   /** Combat behaviour; `null` for training drills, which are never cast. */
   combat: techniqueCombatSchema.nullable(),
 });
