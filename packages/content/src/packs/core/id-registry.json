@@ -112,10 +112,17 @@
   },
   "quest": {
     "Випуск": "graduation",
-    "Дошка місій": "mission_board"
+    "Дошка місій": "mission_board",
+    "Вовки Прикордонного лісу": "border_wolves",
+    "Сірі пов'язки": "grey_bands",
+    "Ім'я на камені": "name_on_stone",
+    "Вічне суперництво": "eternal_rivalry",
+    "Околиці": "outskirts",
+    "Суперник": "rival"
   },
   "exam": {
-    "Іспит на Геніна": "genin_exam"
+    "Іспит на Геніна": "genin_exam",
+    "Іспит на Чуніна": "chunin_exam"
   },
   "item": {
     "Сувій випускника": "graduate_scroll",
@@ -139,7 +146,9 @@
     "Частина сувою: Техніка водяної в'язниці": "scrollpart_water_prison",
     "Сувій: Постріл": "scroll_gunshot",
     "Сувій: Поле липкого сиропу": "scroll_starch_syrup_capturing_field",
-    "Частина сувою: Полум'яна куля вогняного дракона": "scrollpart_fire_dragon_flame_bullet"
+    "Частина сувою: Полум'яна куля вогняного дракона": "scrollpart_fire_dragon_flame_bullet",
+    "Жилет Чуніна": "chunin_vest",
+    "Заняття Ґая": "gai_lesson"
   },
   "zone": {
     "core:dummy": "zone_dummy",
@@ -176,7 +185,8 @@
   },
   "operation": {
     "Сховок у Долині": "op_hideout",
-    "Ліс смерті": "op_forest_of_death"
+    "Ліс смерті": "op_forest_of_death",
+    "Турнір іспиту": "op_tournament"
   },
   "poi": {
     "Застава: Околиці села": "poi_okolytsi_sela_outpost",

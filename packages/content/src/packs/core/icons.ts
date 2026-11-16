@@ -132,6 +132,8 @@ export const CORE_ICONS: Readonly<Record<string, Readonly<Record<string, string>
     'core:scrollpart': 'scroll-unfurled',
     'core:notes': 'notebook',
     'core:graduate_scroll': 'tied-scroll',
+    'core:chunin_vest': 'kevlar-vest',
+    'core:gai_lesson': 'muscle-up',
     // Technique scrolls and their parts
     'core:scroll_lion_combo': 'tied-scroll',
     'core:scroll_drunken_fist': 'tied-scroll',

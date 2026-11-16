@@ -272,5 +272,25 @@
     "part": {
       "technique": "core:fire_dragon_flame_bullet"
     }
+  },
+  {
+    "id": "core:chunin_vest",
+    "kind": "misc",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:gai_lesson",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": [],
+    "fx": {
+      "kind": "tonic",
+      "skill": "tai",
+      "xpBonus": 0.2,
+      "charges": 200
+    }
   }
 ]

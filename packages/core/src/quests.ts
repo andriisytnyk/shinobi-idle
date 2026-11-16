@@ -1,6 +1,6 @@
 import type { ContentDb, Quest, QuestRewards } from '@shinobi/content';
-import { addCurrency, addItem } from './bank.ts';
-import { counterValue } from './counters.ts';
+import { addCurrency, addItem, removeCurrency } from './bank.ts';
+import { bump, counterValue } from './counters.ts';
 import { emit } from './events.ts';
 import { evalReq } from './requirements.ts';
 import { currencyOf, rankIndex } from './vocab.ts';
@@ -10,20 +10,62 @@ import { refreshRegions } from './regions.ts';
 import { refreshUnlocks } from './unlocks.ts';
 import { syncVillage } from './village.ts';
 
-/** Counter value a step is measured from: its counter right now, or 0 for a requirement step. */
+/** Counter that records that the player paid for a `pay` step of a quest. */
+export const payKey = (quest: string, step: number): string => `pay.${quest}.${step}`;
+
+/** What a counter objective counts right now: its counter and the others it adds up. */
+function counted(
+  state: GameState,
+  objective: { counter: string; also?: string[] | undefined },
+): number {
+  let total = counterValue(state, objective.counter);
+  for (const key of objective.also ?? []) total += counterValue(state, key);
+  return total;
+}
+
+/** Counter value a step is measured from: its counter right now, or 0 for any other step. */
 function baselineFor(state: GameState, quest: Quest, step: number): number {
   const objective = quest.steps[step]?.objective;
-  return objective?.t === 'counter' ? counterValue(state, objective.counter) : 0;
+  return objective?.t === 'counter' ? counted(state, objective) : 0;
 }
 
 function stepMet(state: GameState, quest: Quest, step: number, content: ContentDb): boolean {
   const progress = state.quests[quest.id];
   const objective = quest.steps[step]?.objective;
   if (!progress || !objective) return false;
-  if (objective.t === 'counter') {
-    return counterValue(state, objective.counter) - progress.base >= objective.n;
-  }
+  if (objective.t === 'counter') return counted(state, objective) - progress.base >= objective.n;
+  if (objective.t === 'pay') return counterValue(state, payKey(quest.id, step)) >= 1;
   return evalReq(state, objective.req, content).met;
+}
+
+/** Raises the flags the steps up to and including `step` open; a flag is never taken back. */
+function raiseOpens(state: GameState, quest: Quest, step: number): void {
+  for (let i = 0; i <= step && i < quest.steps.length; i++) {
+    for (const flag of quest.steps[i]?.opens ?? []) state.flags[flag] ??= true;
+  }
+}
+
+/**
+ * Pays for the active step of a chain when its objective is a payment: the currency with the
+ * objective's role is spent and the step counts as done at the next update.
+ */
+export function payStep(
+  state: GameState,
+  questId: unknown,
+  content: ContentDb,
+): { ok: true } | { ok: false; reason: string } {
+  const quest =
+    typeof questId === 'string' ? content.quests.find((q) => q.id === questId) : undefined;
+  const progress = quest ? state.quests[quest.id] : undefined;
+  if (!quest || !progress || progress.done) return { ok: false, reason: 'error.questNotActive' };
+  const objective = quest.steps[progress.step]?.objective;
+  if (objective?.t !== 'pay') return { ok: false, reason: 'error.questNoPayment' };
+  const currency = currencyOf(content, objective.role);
+  if (currency === null || !removeCurrency(state, currency, objective.n)) {
+    return { ok: false, reason: 'error.questCannotPay' };
+  }
+  bump(state, payKey(quest.id, progress.step));
+  return { ok: true };
 }
 
 function applyRewards(state: GameState, rewards: QuestRewards, content: ContentDb): void {
@@ -38,6 +80,10 @@ function applyRewards(state: GameState, rewards: QuestRewards, content: ContentD
     addCurrency(state, currency, n);
   }
   for (const flag of rewards.flags) state.flags[flag] = true;
+  if (rewards.goal) {
+    state.goal = { kind: rewards.goal.kind, id: rewards.goal.id };
+    emit(state, { type: 'goalSet', kind: rewards.goal.kind, id: rewards.goal.id });
+  }
   const rank = rewards.rank;
   if (rank && rankIndex(content, rank) > rankIndex(content, state.player.rank)) {
     state.player.rank = rank;
@@ -66,6 +112,8 @@ export function updateQuests(state: GameState, content: ContentDb): void {
         state.quests[quest.id] = progress;
         changed = true;
       }
+      // A chain under way keeps what its active step opens raised, also in a save made before the step existed.
+      if (!progress.done) raiseOpens(state, quest, progress.step);
       if (progress.done || !stepMet(state, quest, progress.step, content)) continue;
       progress.step++;
       emit(state, { type: 'questStep', quest: quest.id, step: progress.step });
@@ -77,6 +125,7 @@ export function updateQuests(state: GameState, content: ContentDb): void {
         applyRewards(state, quest.rewards, content);
       } else {
         progress.base = baselineFor(state, quest, progress.step);
+        raiseOpens(state, quest, progress.step);
       }
     }
   }

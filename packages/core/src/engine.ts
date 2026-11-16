@@ -25,7 +25,7 @@ import { buyMeditationLevel } from './meditation.ts';
 import { addNature, chooseNature, type NatureChoice } from './natures.ts';
 import { markSeen, revealOf } from './reveal.ts';
 import { shopBuy, shopSell } from './shop.ts';
-import { updateQuests } from './quests.ts';
+import { payStep, updateQuests } from './quests.ts';
 import type { ReqResult } from './requirements.ts';
 import {
   callSystem,
@@ -48,6 +48,8 @@ export type Command =
   | { type: 'action.stop'; slot: number }
   /** Starts the sensei test of the exam that grants `rank`; the checklist must be met. `slot` defaults to 0. */
   | { type: 'exam.start'; rank: string; slot?: number }
+  /** Pays for the active step of a chain whose objective is a payment (Intel for tracking someone down). */
+  | { type: 'quest.pay'; quest: string }
   /** The exam that grants the first rank after the Academy; kept for the code that began with it. Same as `exam.start` for that rank. */
   | { type: 'exam.genin.start'; slot?: number }
   /** Uses a bank item on a target (for the graduate scroll, an academy technique id). */
@@ -323,6 +325,8 @@ function apply(
       stopSlot(state, command.slot, 'manual', content, rules);
       return { ok: true };
     }
+    case 'quest.pay':
+      return payStep(state, command.quest, content);
     case 'exam.start':
       return startExam(state, command.rank, command.slot, content, rules);
     case 'exam.genin.start': {

@@ -789,6 +789,7 @@ export type Req =
   | { t: 'quest'; id: string; step?: number | undefined }
   | { t: 'building'; id: string; level: number }
   | { t: 'flag'; id: string; n?: number | undefined }
+  | { t: 'currency'; role: string; n: number }
   | { t: 'all'; of: Req[] }
   | { t: 'any'; of: Req[] };
 
@@ -802,6 +803,8 @@ export const reqSchema: z.ZodType<Req> = z.lazy(() =>
     z.strictObject({ t: z.literal('quest'), id: coreId, step: z.number().int().min(1).optional() }),
     z.strictObject({ t: z.literal('building'), id: coreId, level: z.number().int().min(1) }),
     z.strictObject({ t: z.literal('flag'), id: z.string(), n: z.number().int().optional() }),
+    /** The balance of the currency that has this role (`renown` for Reputation, `study` for Intel). */
+    z.strictObject({ t: z.literal('currency'), role: z.string().min(1), n: z.number().int().min(1) }),
     z.strictObject({ t: z.literal('all'), of: z.array(reqSchema).min(1) }),
     z.strictObject({ t: z.literal('any'), of: z.array(reqSchema).min(1) }),
   ]),
@@ -813,20 +816,28 @@ export const entityRefSchema = z.strictObject({
   id: z.string(),
 });
 
-/** A quest step is done when a requirement holds or a state counter grew by `n` since the step began. */
+/**
+ * A quest step is done when a requirement holds, when a state counter grew by `n` since the step
+ * began (`also` names more counters whose growth is added to it), or when the player has paid
+ * `n` of the currency with the role `role` for it (the `quest.pay` command: Intel for tracking).
+ */
 export const questObjectiveSchema = z.discriminatedUnion('t', [
   z.strictObject({ t: z.literal('req'), req: reqSchema }),
   z.strictObject({
     t: z.literal('counter'),
     counter: z.string().min(1),
+    also: z.array(z.string().min(1)).optional(),
     n: z.number().int().min(1),
   }),
+  z.strictObject({ t: z.literal('pay'), role: z.string().min(1), n: z.number().int().min(1) }),
 ]);
 
 export const questStepSchema = z.strictObject({
   /** Localization key of the step's one-line text. */
   textKey: z.string().min(1),
   objective: questObjectiveSchema,
+  /** Flags raised the moment the step becomes the active one (the zone, boss or operation it asks for opens). */
+  opens: z.array(z.string().min(1)).optional(),
 });
 
 export const questRewardsSchema = z.strictObject({
@@ -837,6 +848,8 @@ export const questRewardsSchema = z.strictObject({
   currencies: z.record(vocabId, z.number().int().min(0)).optional(),
   flags: z.array(z.string().min(1)),
   rank: playerRankId.nullable(),
+  /** The goal pinned when the chain is done. */
+  goal: entityRefSchema.optional(),
 });
 
 export const questSchema = z.strictObject({
@@ -857,6 +870,12 @@ export const examSchema = z.strictObject({
   /** Rank the player holds after passing. */
   rank: playerRankId,
   checklist: reqSchema,
+  /**
+   * What must hold, after the written test is passed, before the rank is conferred. An exam with
+   * this field is taken in two parts: the checklist opens the written test, and once `then` holds
+   * the same command confers the rank. Without it, passing the test confers the rank.
+   */
+  then: reqSchema.optional(),
   /** Skills whose levels shorten the test. */
   reduceBy: z.array(skillId).min(1),
   rewards: z.strictObject({

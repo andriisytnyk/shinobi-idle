@@ -19,13 +19,20 @@ describe('A10: recipe outputs', () => {
     const outputs = new Set(content.recipes.map((r) => r.output.item));
     // The crate and the notes come from missions, not from a recipe.
     const fromMissions = new Set(['crate', 'bingoNote']);
+    // A quest chain hands out its own rewards, such as a lesson of a legendary sensei.
+    const fromQuests = new Set(content.quests.flatMap((q) => q.rewards.items.map((r) => r.item)));
     for (const i of content.items) {
-      if (i.fx && !fromMissions.has(i.fx.kind)) expect(outputs.has(i.id), i.id).toBe(true);
+      if (i.fx && !fromMissions.has(i.fx.kind) && !fromQuests.has(i.id))
+        expect(outputs.has(i.id), i.id).toBe(true);
     }
   });
 
   it('tonics follow the design: +5% for 40 actions, one per skill and one for the natures', () => {
-    const tonics = content.items.flatMap((i) => (i.fx?.kind === 'tonic' ? [i.fx] : []));
+    // The recipe tonics; a lesson given by a quest chain has its own numbers.
+    const fromQuests = new Set(content.quests.flatMap((q) => q.rewards.items.map((r) => r.item)));
+    const tonics = content.items.flatMap((i) =>
+      i.fx?.kind === 'tonic' && !fromQuests.has(i.id) ? [i.fx] : [],
+    );
     expect(tonics.map((t) => t.skill).sort()).toEqual(['allNatures', 'ath', 'cc', 'med']);
     for (const t of tonics) {
       expect(t.xpBonus).toBe(0.05);

@@ -403,7 +403,9 @@
       "core:scrollpart_water_prison": "749292a03819",
       "core:scroll_gunshot": "bf49be1b3464",
       "core:scroll_starch_syrup_capturing_field": "2ed026831dd0",
-      "core:scrollpart_fire_dragon_flame_bullet": "37d393b5afa3"
+      "core:scrollpart_fire_dragon_flame_bullet": "37d393b5afa3",
+      "core:chunin_vest": "8e1ee1c6ce30",
+      "core:gai_lesson": "7c69f7e61771"
     },
     "market": {
       "core:water": "e3f682cbd50f",
@@ -614,10 +616,17 @@
     },
     "quests": {
       "core:graduation": "f106180a60cb",
-      "core:mission_board": "707e194c7ad2"
+      "core:mission_board": "b252154fbf9d",
+      "core:border_wolves": "9aefc3231090",
+      "core:grey_bands": "6b69d60512f5",
+      "core:name_on_stone": "8f678bfdd591",
+      "core:eternal_rivalry": "2b9cae932570",
+      "core:outskirts": "10b113e037a8",
+      "core:rival": "f7a3524a2b0f"
     },
     "exams": {
-      "core:genin_exam": "846cbe2ae25c"
+      "core:genin_exam": "846cbe2ae25c",
+      "core:chunin_exam": "87bb4f32a197"
     },
     "zones": {
       "core:zone_dummy": "c79ce14108a8",
@@ -654,7 +663,8 @@
     },
     "operations": {
       "core:op_hideout": "128260622ce8",
-      "core:op_forest_of_death": "9781d1996b59"
+      "core:op_forest_of_death": "9781d1996b59",
+      "core:op_tournament": "fd901c0713f0"
     },
     "statuses": {
       "burn": "d68718519e4b",
@@ -1737,7 +1747,9 @@
       "core:scrollpart_water_prison",
       "core:scroll_gunshot",
       "core:scroll_starch_syrup_capturing_field",
-      "core:scrollpart_fire_dragon_flame_bullet"
+      "core:scrollpart_fire_dragon_flame_bullet",
+      "core:chunin_vest",
+      "core:gai_lesson"
     ],
     "market": [
       "core:water",
@@ -1948,10 +1960,17 @@
     ],
     "quests": [
       "core:graduation",
-      "core:mission_board"
+      "core:mission_board",
+      "core:border_wolves",
+      "core:grey_bands",
+      "core:name_on_stone",
+      "core:eternal_rivalry",
+      "core:outskirts",
+      "core:rival"
     ],
     "exams": [
-      "core:genin_exam"
+      "core:genin_exam",
+      "core:chunin_exam"
     ],
     "zones": [
       "core:zone_dummy",
@@ -1988,7 +2007,8 @@
     ],
     "operations": [
       "core:op_hideout",
-      "core:op_forest_of_death"
+      "core:op_forest_of_death",
+      "core:op_tournament"
     ],
     "statuses": [
       "burn",
@@ -3623,9 +3643,6 @@
       "error.natureOwned": "d00ae0611c56",
       "error.natureControlLow": "0cae9af0b91e",
       "mod.source.nativeNature": "34e56e810ce4",
-      "quest.core:mission_board.name": "af4417b192d1",
-      "quest.core:mission_board.desc": "a3fcb8a7953f",
-      "quest.core:mission_board.step.1": "593de4403a2b",
       "entity.kind.cell": "d605986fed06",
       "entity.kind.combo": "b4d8d43c3be8",
       "nature.title": "700ad06cd757",
@@ -4121,7 +4138,74 @@
       "reveal.hint.named": "3307040e70c2",
       "reveal.hint.known": "ae1cbcad5203",
       "reveal.hint.owned": "dc139c2ecfe9",
-      "reveal.hint.unlocked": "fb4d3ccb6d6d"
+      "reveal.hint.unlocked": "fb4d3ccb6d6d",
+      "quest.core:mission_board.name": "af4417b192d1",
+      "quest.core:mission_board.desc": "aeb0ccbb29a3",
+      "quest.core:mission_board.step.1": "593de4403a2b",
+      "quest.core:mission_board.step.2": "318023c1cf1f",
+      "quest.core:mission_board.step.3": "4685fe733958",
+      "quest.core:mission_board.step.4": "1e3a06225f1e",
+      "quest.core:mission_board.step.5": "016a56b29ebc",
+      "quest.core:mission_board.final": "1a19c6a49ab1",
+      "quest.core:border_wolves.name": "5fcb575ada7e",
+      "quest.core:border_wolves.desc": "34a37933e15c",
+      "quest.core:border_wolves.step.1": "e39d03ee9562",
+      "quest.core:border_wolves.step.2": "871aa02d9965",
+      "quest.core:border_wolves.step.3": "8e192c590d46",
+      "quest.core:border_wolves.step.4": "0bfdb0e2eedd",
+      "quest.core:border_wolves.step.5": "835ecc2293c7",
+      "quest.core:border_wolves.step.6": "708bc0766916",
+      "quest.core:border_wolves.final": "6e281182e43d",
+      "quest.core:grey_bands.name": "3041d1184190",
+      "quest.core:grey_bands.desc": "e880ff991052",
+      "quest.core:grey_bands.step.1": "21531940967e",
+      "quest.core:grey_bands.step.2": "feffbf3f25eb",
+      "quest.core:grey_bands.step.3": "37ca448742f8",
+      "quest.core:grey_bands.step.4": "e020f9c6c6fd",
+      "quest.core:grey_bands.step.5": "13899e51283a",
+      "quest.core:grey_bands.step.6": "a324e98ec586",
+      "quest.core:grey_bands.step.7": "b4fdb7417465",
+      "quest.core:grey_bands.step.8": "cf7166c7b698",
+      "quest.core:grey_bands.final": "96ea89667425",
+      "quest.core:name_on_stone.name": "31d4d8363ca5",
+      "quest.core:name_on_stone.desc": "413d5cec7ea3",
+      "quest.core:name_on_stone.step.1": "7e7a460a7af8",
+      "quest.core:name_on_stone.step.2": "4e4810534afc",
+      "quest.core:name_on_stone.step.3": "80501538ccbd",
+      "quest.core:name_on_stone.step.4": "a08d3c4d516f",
+      "quest.core:name_on_stone.step.5": "52659e96a72b",
+      "quest.core:name_on_stone.step.6": "ea51841b616d",
+      "quest.core:name_on_stone.final": "dfe51a9e8969",
+      "quest.core:eternal_rivalry.name": "d52a74c27345",
+      "quest.core:eternal_rivalry.desc": "bdb7daf680f9",
+      "quest.core:eternal_rivalry.step.1": "96d0d54a3a17",
+      "quest.core:eternal_rivalry.step.2": "2e4df335e315",
+      "quest.core:eternal_rivalry.step.3": "fdfa1db9a8b1",
+      "quest.core:eternal_rivalry.step.4": "c2dc8f0d6026",
+      "quest.core:eternal_rivalry.final": "a956778c9ec6",
+      "quest.core:outskirts.name": "8f879b84761d",
+      "quest.core:outskirts.desc": "6234cd0ec1ff",
+      "quest.core:outskirts.step.1": "55d90a2694ee",
+      "quest.core:outskirts.step.2": "49cfad244929",
+      "quest.core:outskirts.step.3": "f4ca9e720dea",
+      "quest.core:outskirts.step.4": "ca08718524a2",
+      "quest.core:outskirts.step.5": "b0447d3a0c29",
+      "quest.core:outskirts.final": "05c4c60906db",
+      "quest.core:rival.name": "2be0c0fa7aba",
+      "quest.core:rival.desc": "7977de166f75",
+      "quest.core:rival.step.1": "e9edf3f985b7",
+      "quest.core:rival.step.2": "61bf6d6d18fa",
+      "quest.core:rival.step.3": "69aa69832925",
+      "quest.core:rival.step.4": "fd618536495b",
+      "quest.core:rival.final": "6e397b048384",
+      "exam.core:chunin_exam.name": "06ba2a2ebfa4",
+      "exam.core:chunin_exam.desc": "4f72f135323c",
+      "operation.core:op_tournament.name": "30410d80fbbd",
+      "operation.core:op_tournament.desc": "037d178ae5e0",
+      "item.core:chunin_vest.name": "3a3f2f3cb199",
+      "item.core:chunin_vest.desc": "6fb20895f804",
+      "item.core:gai_lesson.name": "21097b6131e2",
+      "item.core:gai_lesson.desc": "6937bf56a173"
     },
     "en": {
       "technique.core:body_flicker.name": "026242b01872",
@@ -4306,6 +4390,8 @@
       "core:scrollpart": "scroll-unfurled",
       "core:notes": "notebook",
       "core:graduate_scroll": "tied-scroll",
+      "core:chunin_vest": "kevlar-vest",
+      "core:gai_lesson": "muscle-up",
       "core:scroll_lion_combo": "tied-scroll",
       "core:scroll_drunken_fist": "tied-scroll",
       "core:scrollpart_drunken_fist": "scroll-unfurled",

@@ -22,7 +22,8 @@ describe('slice size', () => {
     // Five scrolls carried by enemies, and the one the dig of the missions pays in parts.
     expect(content.items.filter((i) => i.part)).toHaveLength(6);
     expect(content.zones).toHaveLength(31);
-    expect(content.operations).toHaveLength(2);
+    // The Hideout, the Forest of Death and the exam tournament.
+    expect(content.operations).toHaveLength(3);
     expect(content.statuses).toHaveLength(5);
     expect(content.traits).toHaveLength(8);
     expect(content.combos).toHaveLength(4);
