@@ -2,6 +2,7 @@
   import { localeKey } from '@shinobi/content';
   import { listMeditationMods, type MeditationModInfo } from '@shinobi/core';
   import { t } from '../lib/i18n.ts';
+  import { entityAttr } from '../lib/reveal.ts';
   import { game } from '../lib/store.ts';
   import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import EntityLink from './EntityLink.svelte';
@@ -28,7 +29,8 @@
   <ul class="practices">
     {#each practices as practice (practice.id)}
       {@const entry = game.state.meditation[practice.id]}
-      <li class="practice" data-practice={practice.id}>
+      {@const ref = { kind: 'practice', id: practice.id }}
+      <li class="practice" data-practice={practice.id} data-entity={entityAttr(ref)}>
         <h3>
           <EntityLink kind="practice" id={practice.id} />
           <span class="pin-end"><PinGoal kind="practice" id={practice.id} /></span>

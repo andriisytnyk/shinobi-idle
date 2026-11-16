@@ -15,7 +15,7 @@ import { settings } from '../src/lib/settings.svelte.ts';
 import { game } from '../src/lib/store.ts';
 import { toastFor as toastForIn } from '../src/lib/toasts.svelte.ts';
 import BankPage from '../src/pages/BankPage.svelte';
-import RecipePage from '../src/pages/RecipePage.svelte';
+import RecipeSheet from '../src/sheets/RecipeSheet.svelte';
 import ShopPage from '../src/pages/ShopPage.svelte';
 import SkillPage from '../src/pages/SkillPage.svelte';
 import { coreContext } from './helpers/core-registry.ts';
@@ -209,14 +209,15 @@ describe('A4: names are entity links', () => {
     );
   });
 
-  it('the recipe page shows the same tile as the skill page', () => {
-    app = mount(RecipePage, { target, props: { id: OINTMENT } });
+  it('the recipe sheet shows the ingredients, the output and the tier of the tile', () => {
+    app = mount(RecipeSheet, { target, props: { id: OINTMENT } });
     flushSync();
     expect(target.querySelector('[data-recipe-page]')).not.toBeNull();
     expect(
-      target.querySelector(`[data-recipe="${OINTMENT}"] [data-inputs] [data-input]`),
+      target.querySelector(`[data-recipe-page="${OINTMENT}"] [data-inputs] [data-input]`),
     ).not.toBeNull();
-    expect(target.querySelector('[data-recipe] [data-tier]')).not.toBeNull();
+    expect(target.querySelector('[data-recipe-page] [data-outputs] li')).not.toBeNull();
+    expect(target.querySelector('[data-recipe-page] [data-tier]')).not.toBeNull();
   });
 });
 

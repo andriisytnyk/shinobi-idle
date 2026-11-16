@@ -25,9 +25,9 @@ import { hrefFor, parseHash, type EntityRef } from '../src/lib/route.ts';
 import { settings } from '../src/lib/settings.svelte.ts';
 import { game } from '../src/lib/store.ts';
 import EntityPage from '../src/pages/EntityPage.svelte';
-import ItemPage from '../src/pages/ItemPage.svelte';
+import ItemSheet from '../src/sheets/ItemSheet.svelte';
 import SkillPage from '../src/pages/SkillPage.svelte';
-import TechniquePage from '../src/pages/TechniquePage.svelte';
+import TechniqueSheet from '../src/sheets/TechniqueSheet.svelte';
 
 // The components are rendered to HTML on the server side of Svelte: no browser is needed, and the
 // markup shows exactly which names are links and where they point.
@@ -185,7 +185,7 @@ describe('technique page', () => {
   const id = 'core:great_fireball';
 
   it('A8: shows the seal strip with glyphs and Ukrainian names in order', () => {
-    const body = html(TechniquePage, { id });
+    const body = html(TechniqueSheet, { id });
     const glyphs = [...body.matchAll(/class="glyph[^"]*" lang="ja">([^<]+)</g)].map((m) => m[1]);
     // The strip of the page comes first; the tile below it repeats the seals in compact form.
     expect(glyphs.slice(0, 6)).toEqual(['巳', '未', '申', '亥', '午', '寅']);
@@ -199,7 +199,7 @@ describe('technique page', () => {
   });
 
   it('links the mission that asks for it and prints no mission name as plain text', () => {
-    const body = html(TechniquePage, { id });
+    const body = html(TechniqueSheet, { id });
     const mission = { kind: 'mission', id: 'core:v_sanit' } as const;
     expect(name(mission)).toBe('Санітарна варта');
     expect(body).toMatch(anchor(mission));
@@ -208,18 +208,18 @@ describe('technique page', () => {
   });
 
   it('links the status it applies and the traits its tags answer', () => {
-    const body = html(TechniquePage, { id });
+    const body = html(TechniqueSheet, { id });
     expect(body).toContain('href="#/status/burn"');
     expect(body).toContain('href="#/trait/');
   });
 
   it('links its source building', () => {
-    const body = html(TechniquePage, { id: 'core:leaf_whirlwind' });
+    const body = html(TechniqueSheet, { id: 'core:leaf_whirlwind' });
     expect(body).toMatch(anchor({ kind: 'building', id: 'core:academy' }));
   });
 
   it('shows name, rank stamp, role, status, requirements and the pin button', () => {
-    const body = html(TechniquePage, { id });
+    const body = html(TechniqueSheet, { id });
     expect(body).toContain('Техніка великої вогняної кулі');
     expect(body).toContain('Ранг техніки');
     expect(body).toContain(
@@ -233,7 +233,7 @@ describe('technique page', () => {
 
 describe('item page', () => {
   it('links the skill that grows it and the recipes that use it', () => {
-    const body = html(ItemPage, { id: 'core:mint' });
+    const body = html(ItemSheet, { id: 'core:mint' });
     expect(body).toMatch(anchor({ kind: 'skill', id: 'herb' }));
     const used = content.recipes.find((r) => r.ingredients.some((i) => i.item === 'core:mint'));
     if (!used) throw new Error('no recipe uses mint');
