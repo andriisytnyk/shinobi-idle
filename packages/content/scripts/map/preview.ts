@@ -79,7 +79,28 @@ interface PlaceRec {
   country: string;
 }
 
+interface FirePlaceRec {
+  id: string;
+  hex: [number, number];
+  role: string;
+  invented: boolean;
+  previewLabel: string;
+  labelled: boolean;
+  placeRef: string | null;
+  absorbsCell: string | null;
+}
+interface CellRec {
+  cell: string;
+  hex: [number, number];
+}
+
 const world = read<{ hexes: HexRec[] }>('world-hex.json');
+const firePlaces = read<FirePlaceRec[]>('fire-places.json');
+const sliceCells = read<CellRec[]>('slice-cells.json');
+// Places drawn by the generic role markers: everything not already drawn from places.json.
+const roleMarked = firePlaces.filter((p) => p.placeRef === null);
+const withRecord = new Set(firePlaces.filter((p) => p.absorbsCell).map((p) => p.absorbsCell));
+const cellOnly = sliceCells.filter((c) => !withRecord.has(c.cell));
 const countries = read<CountryRec[]>('countries.json');
 const places = read<PlaceRec[]>('places.json');
 
@@ -243,6 +264,16 @@ for (const p of places) {
   const [x, y] = placeXY(p);
   boxes.push({ id: `marker ${p.id}`, x0: x - 10, y0: y - 10, x1: x + 10, y1: y + 10 });
 }
+const axialXY = (hex: [number, number]): [number, number] =>
+  hexCenter(hex[0] + (hex[1] - (hex[1] & 1)) / 2, hex[1]);
+for (const p of roleMarked) {
+  const [x, y] = axialXY(p.hex);
+  boxes.push({ id: `marker ${p.id}`, x0: x - 10, y0: y - 10, x1: x + 10, y1: y + 10 });
+}
+for (const c of cellOnly) {
+  const [x, y] = axialXY(c.hex);
+  boxes.push({ id: `cell ${c.cell}`, x0: x - 6, y0: y - 6, x1: x + 6, y1: y + 6 });
+}
 const COMPASS = { cx: 1830, cy: 930, R: 46 };
 boxes.push({
   id: 'compass',
@@ -253,6 +284,8 @@ boxes.push({
 });
 const LEGEND = { x0: 1168, y0: 1012, x1: 1830, y1: 1052 };
 boxes.push({ id: 'legend', ...LEGEND });
+const LEGEND2 = { x0: 960, y0: 8, x1: 1226, y1: 120 };
+boxes.push({ id: 'legend roles', ...LEGEND2 });
 
 // Country labels at the centroid of the largest connected group of hexes; move off collisions.
 function largestGroup(id: string): [number, number][] {
@@ -360,11 +393,82 @@ for (const p of places) {
   else
     marks += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5" fill="${markerInk}" ${s}/>`;
 }
-const placeLabelBoxes: { p: PlaceRec; x: number; y: number; anchor: string; box: Box }[] = [];
-for (const p of places) {
-  if (p.kind === 'country') continue;
-  const [x, y] = placeXY(p);
-  const w = textWidth(p.name, PLACE_SIZE, 0) + 4;
+/** Generic marker of a role (no franchise symbols): invented places are hollow, canonical ones solid. */
+function roleMarker(role: string, x: number, y: number, invented: boolean): string {
+  const fill = invented ? markerPaper : markerInk;
+  const line = invented ? markerInk : markerPaper;
+  const sw = invented ? 2 : 1.6;
+  const st = `fill="${fill}" stroke="${line}" stroke-width="${sw}"`;
+  const X = x.toFixed(1);
+  const Y = y.toFixed(1);
+  switch (role) {
+    case 'settlement':
+      return `<rect x="${(x - 6).toFixed(1)}" y="${(y - 6).toFixed(1)}" width="12" height="12" ${st}/>`;
+    case 'outpost':
+      return `<polygon points="${pts([
+        [x, y - 8],
+        [x + 8, y],
+        [x, y + 8],
+        [x - 8, y],
+      ])}" ${st}/>`;
+    case 'training':
+      return `<circle cx="${X}" cy="${Y}" r="7" ${st}/><circle cx="${X}" cy="${Y}" r="2.2" fill="${line}"/>`;
+    case 'deposit':
+      return `<polygon points="${pts([
+        [x - 7, y - 6],
+        [x + 7, y - 6],
+        [x, y + 7],
+      ])}" ${st}/>`;
+    case 'cache':
+    case 'vault':
+      return `<polygon points="${pts([
+        [x, y - 7],
+        [x + 7, y + 6],
+        [x - 7, y + 6],
+      ])}" ${st}/>`;
+    case 'zone':
+      return `<circle cx="${X}" cy="${Y}" r="7" ${st}/><path d="M${(x - 3.5).toFixed(1)} ${(y - 3.5).toFixed(1)}L${(x + 3.5).toFixed(1)} ${(y + 3.5).toFixed(1)}M${(x + 3.5).toFixed(1)} ${(y - 3.5).toFixed(1)}L${(x - 3.5).toFixed(1)} ${(y + 3.5).toFixed(1)}" stroke="${line}" stroke-width="1.8"/>`;
+    default:
+      return `<circle cx="${X}" cy="${Y}" r="4.5" ${st}/>`;
+  }
+}
+// Slice cells without a place record: a small dot, so the density of the exploration is visible.
+let cellDots = '';
+for (const c of cellOnly) {
+  const [x, y] = axialXY(c.hex);
+  cellDots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="${markerInk}" fill-opacity="0.8" stroke="${markerPaper}" stroke-width="0.8"/>`;
+}
+for (const p of roleMarked) {
+  const [x, y] = axialXY(p.hex);
+  marks += roleMarker(p.role, x, y, p.invented);
+}
+const placeLabelBoxes: { item: LabelItem; x: number; y: number; anchor: string; box: Box }[] = [];
+interface LabelItem {
+  id: string;
+  text: string;
+  x: number;
+  y: number;
+  optional: boolean;
+  onSea: boolean;
+}
+const labelItems: LabelItem[] = [
+  ...places
+    .filter((p) => p.kind !== 'country')
+    .map((p) => {
+      const [x, y] = placeXY(p);
+      return { id: p.id, text: p.name, x, y, optional: false, onSea: p.country === 'sea' };
+    }),
+  ...roleMarked
+    .filter((p) => p.labelled)
+    .map((p) => {
+      const [x, y] = axialXY(p.hex);
+      return { id: p.id, text: p.previewLabel, x, y, optional: true, onSea: false };
+    }),
+];
+const omittedLabels: string[] = [];
+for (const item of labelItems) {
+  const { x, y } = item;
+  const w = textWidth(item.text, PLACE_SIZE, 0) + 4;
   const cands: { ax: number; ay: number; anchor: string; b: [number, number, number, number] }[] =
     [];
   for (const lift of [0, -14, 14, -28, 28, -44, 44]) {
@@ -383,11 +487,10 @@ for (const p of places) {
   }
   cands.push({ ax: x, ay: y - 14, anchor: 'middle', b: [x - w / 2, y - 27, x + w / 2, y - 11] });
   cands.push({ ax: x, ay: y + 24, anchor: 'middle', b: [x - w / 2, y + 11, x + w / 2, y + 27] });
-  const ownMarker = boxes.findIndex((b) => b.id === `marker ${p.id}`);
   let chosen = false;
   for (const cand of cands) {
     const box: Box = {
-      id: `place ${p.id}`,
+      id: `place ${item.id}`,
       x0: cand.b[0],
       y0: cand.b[1],
       x1: cand.b[2],
@@ -396,21 +499,23 @@ for (const p of places) {
     // the own marker box is only ±10 around the centre, so labels starting at ±11 never touch it
     if (!fits(box)) continue;
     boxes.push(box);
-    placeLabelBoxes.push({ p, x: cand.ax, y: cand.ay, anchor: cand.anchor, box });
+    placeLabelBoxes.push({ item, x: cand.ax, y: cand.ay, anchor: cand.anchor, box });
     chosen = true;
     break;
   }
-  void ownMarker;
-  if (!chosen) throw new Error(`no free position for the label of ${p.id}`);
+  if (!chosen) {
+    if (!item.optional) throw new Error(`no free position for the label of ${item.id}`);
+    omittedLabels.push(item.id);
+  }
 }
-for (const { p, x, y, anchor } of placeLabelBoxes) {
-  const onSea = p.country === 'sea';
-  names += `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}" font-size="${PLACE_SIZE}" font-weight="600" fill="${onSea ? tok('paper') : markerInk}" stroke="${onSea ? coastInk : markerPaper}" stroke-opacity="0.85" stroke-width="3" paint-order="stroke">${p.name}</text>`;
+for (const { item, x, y, anchor } of placeLabelBoxes) {
+  const onSea = item.onSea;
+  names += `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}" font-size="${PLACE_SIZE}" font-weight="600" fill="${onSea ? tok('paper') : markerInk}" stroke="${onSea ? coastInk : markerPaper}" stroke-opacity="0.85" stroke-width="3" paint-order="stroke">${item.text}</text>`;
 }
 assertNoOverlap(boxes);
 
 svg += `<g stroke="${borderInk}" stroke-width="1" stroke-opacity="0.6" stroke-dasharray="3 3">${leaders}</g>\n`;
-svg += `<g>${labels}</g>\n<g>${marks}</g>\n<g>${names}</g>\n`;
+svg += `<g>${labels}</g>\n<g>${cellDots}</g>\n<g>${marks}</g>\n<g>${names}</g>\n`;
 
 // Our own compass, bottom right (sea).
 {
@@ -469,6 +574,45 @@ svg += `<g>${labels}</g>\n<g>${marks}</g>\n<g>${names}</g>\n`;
   );
   svg += `<g>${l}</g>\n`;
 }
+{
+  const items: [string, string][] = [
+    ['settlement', 'селище'],
+    ['outpost', 'застава'],
+    ['training', 'тренування'],
+    ['deposit', 'родовище'],
+    ['cache', 'сховок'],
+    ['zone', 'ворожа зона'],
+    ['landmark', 'пам’ятне місце'],
+  ];
+  let l = `<rect x="${LEGEND2.x0}" y="${LEGEND2.y0}" width="${LEGEND2.x1 - LEGEND2.x0}" height="${LEGEND2.y1 - LEGEND2.y0}" rx="4" fill="${tok('ink-800')}" fill-opacity="0.88" stroke="${tok('ink-600')}"/>`;
+  const txt = (x: number, y: number, t: string) =>
+    `<text x="${x}" y="${y + 4}" font-size="12" fill="${tok('text')}">${t}</text>`;
+  items.forEach(([role, label], i) => {
+    const x = LEGEND2.x0 + 18 + (i < 5 ? 0 : 128);
+    const y = LEGEND2.y0 + 16 + (i % 5) * 20;
+    l += roleMarker(role, x, y, false) + txt(x + 13, y, label);
+  });
+  {
+    const x1 = LEGEND2.x0 + 18 + 128;
+    l +=
+      roleMarker('landmark', x1, LEGEND2.y0 + 56, true) +
+      txt(x1 + 13, LEGEND2.y0 + 56, 'вигадане: світлий');
+    const x2 = x1;
+    const y = LEGEND2.y0 + 76;
+    l +=
+      '<circle cx="' +
+      x2 +
+      '" cy="' +
+      y +
+      '" r="3.5" fill="' +
+      markerInk +
+      '" fill-opacity="0.8" stroke="' +
+      markerPaper +
+      '" stroke-width="0.8"/>' +
+      txt(x2 + 13, y, 'клітинка зрізу');
+  }
+  svg += `<g>${l}</g>\n`;
+}
 svg += `</svg>\n`;
 
 writeFileSync(join(dir, 'preview.svg'), svg);
@@ -477,5 +621,6 @@ await sharp(Buffer.from(svg), { density: 96 })
   .png({ compressionLevel: 9 })
   .toFile(join(dir, 'preview.png'));
 console.log('label boxes:', boxes.length, '- no intersections');
+console.log('labels omitted (marker only):', omittedLabels.join(', ') || 'none');
 console.log('colours used:');
 for (const [c, why] of [...used].sort()) console.log(c, why);
