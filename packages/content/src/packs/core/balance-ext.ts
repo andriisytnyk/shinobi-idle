@@ -171,8 +171,8 @@ export const BALANCE_EXT = {
   },
   /** Loadout: slots and distinct natures by rank (a student has no limit), and the number of saved loadouts. */
   loadout: {
-    slots: { genin: 4, chunin: 5 },
-    natures: { genin: 1, chunin: 2 },
+    slots: { genin: 8, chunin: 35 },
+    natures: { genin: 8, chunin: 35 },
     saved: 5,
     nameMax: 24,
     /** An area technique counts as hitting this many bodies when loadouts are scored. */
@@ -183,7 +183,7 @@ export const BALANCE_EXT = {
   /** Pouch slots: the base count and the extra slots the chunin vest gives. */
   pouch: { slots: 3, vest: 1, vestRank: 'chunin' },
   /** The player's AI: the combat level from which an enemy waits by a higher AI tier. */
-  ai: { enemyTier: { genin: 5, chunin: 20 } },
+  ai: { enemyTier: { genin: 8, chunin: 35 } },
   /** Health share below which a won fight still costs a Wound. */
   woundHp: 0.1,
   /** The Bingo book: wins that fully study an ordinary enemy and a boss. */

@@ -269,29 +269,29 @@
     ],
     "accBase": 40,
     "accPerLevel": 5,
-    "evaBase": 166.2,
+    "evaBase": 43.9,
     "rating": {
-      "accTier": 233.3,
-      "evaTier": 0.7,
+      "accTier": 89.8,
+      "evaTier": 3.9,
       "knowledge": 32.3,
-      "enemyAccTier": 26.3,
-      "enemyEvaTier": 0.2
+      "enemyAccTier": 17.9,
+      "enemyEvaTier": 0.05
     },
     "passiveFx": {
       "shield": {
-        "evasion": 17.3,
+        "evasion": 78.2,
         "base": 0.25
       },
       "decoy": {
-        "evasion": 17.3,
+        "evasion": 78.2,
         "base": 0.25
       },
       "evasionBuff": {
-        "evasion": 21.6,
+        "evasion": 78.2,
         "base": 0.25
       },
       "passiveNegate": {
-        "evasion": 25.8,
+        "evasion": 78.2,
         "base": 0.25
       }
     },
@@ -361,12 +361,12 @@
     ],
     "eInterval": 2.6,
     "eAcc": [
-      40,
-      4.5
+      114.6,
+      0.33
     ],
     "eEva": [
-      30,
-      4.2
+      8.6,
+      3.09
     ],
     "boss": {
       "hp": 3.2,
@@ -619,8 +619,8 @@
     },
     "ai": {
       "enemyTier": {
-        "genin": 5,
-        "chunin": 20
+        "genin": 2,
+        "chunin": 43
       }
     },
     "woundHp": 0.1,

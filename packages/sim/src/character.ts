@@ -11,6 +11,8 @@ import {
   pouchUse,
   refreshUnlocks,
   syncVillage,
+  levelAt,
+  rate,
   teamFor,
   xpAt,
   type GameState,
@@ -21,6 +23,38 @@ import { CHUNIN_FROM_LEVEL, chuninRank, geninRank, studentRank } from './constan
 
 /** Mastery level of every known technique of a yardstick character (the balance model uses 20). */
 export const TYPICAL_MASTERY = 20;
+/** The share of its practice time a typical player gives to the defensive techniques it knows (all of them together). */
+export const DEFENCE_PRACTICE_SHARE = 0.15;
+/** How many skills a typical player trains at once: its hours to reach a level are this many times the hours of one skill. */
+export const TRAINED_SKILLS = 10;
+
+/** Hours of one skill at its best action to reach `level` (the balance model's hours-to-level). */
+export function hoursToLevel(level: number, content: ContentDb): number {
+  let h = 0;
+  for (let l = 1; l < Math.min(level, content.balance.K.cap); l++) {
+    h += (xpAt(l + 1) - xpAt(l)) / rate(l, content);
+  }
+  return h;
+}
+
+/**
+ * The mastery a typical player has of a defensive technique at `level`: it learns the technique when the
+ * skill level unlocks it, gives `DEFENCE_PRACTICE_SHARE` of the hours it has played since to the defensive
+ * techniques it knows (`known` of them, shared equally) and earns `masteryPerHour` of mastery XP per hour.
+ */
+export function typicalDefenceMastery(
+  level: number,
+  unlockLevel: number,
+  known: number,
+  content: ContentDb,
+): number {
+  const K = content.balance.K;
+  const played =
+    TRAINED_SKILLS * Math.max(0, hoursToLevel(level, content) - hoursToLevel(unlockLevel, content));
+  const xp = (K.masteryPerHour * DEFENCE_PRACTICE_SHARE * played) / Math.max(1, known);
+  return Math.max(1, levelAt(xp, K.masteryCap));
+}
+
 /** Ryo a yardstick character is given to buy the shop's pouch items with. */
 const SHOPPING_RYO = 1_000_000;
 
@@ -92,6 +126,14 @@ export function buildCharacter(content: ContentDb, o: CharacterOptions): GameSta
   const mastery = Math.min(K.masteryCap, Math.max(1, o.mastery ?? TYPICAL_MASTERY));
   for (const tech of content.techniques) {
     if (state.known[tech.id] && tech.rank !== null) state.mastery[tech.id] = { xp: xpAt(mastery) };
+  }
+  if (o.mastery === undefined) {
+    const passive = content.techniques.filter((tech) => tech.combat?.passive !== undefined && state.known[tech.id]);
+    for (const tech of passive) {
+      state.mastery[tech.id] = {
+        xp: xpAt(typicalDefenceMastery(level, tech.level, passive.length, content)),
+      };
+    }
   }
   state.currencies[moneyOf(content)] = o.ryo ?? 0;
   state.events = [];
