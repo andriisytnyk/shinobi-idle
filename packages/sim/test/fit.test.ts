@@ -50,7 +50,7 @@ describe.each(YARDSTICKS)('yardstick %s', (name, options) => {
     for (const r of recorded) {
       const b = baseline.find((x) => x.enemy === r.enemy) as Row;
       const n = now.find((x) => x.enemy === r.enemy) as Row;
-      const met = targetsMet(b, n);
+      const met = targetsMet(b, n, name);
       const was = status[name]?.[r.enemy];
       for (const target of ['time', 'win', 'basic'] as const) {
         if (was?.[target]) expect(met[target], `${r.enemy} ${target}`).toBe(true);

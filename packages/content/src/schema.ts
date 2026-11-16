@@ -1052,6 +1052,8 @@ export const balanceParamsSchema = z.object({
   poolCapPerItem: z.number(),
   /** Seconds of focus before the cast in a practice action: `base` at level 1 and `perLevel` more for each level the technique requires; the interval is the focus plus the technique's cast. */
   practiceFocus: z.object({ base: z.number(), perLevel: z.number() }),
+  /** The share of a technique's fight cast that its practice cycle spends on the cast. */
+  practiceCast: z.number().positive(),
   practiceMin: z.number(),
   drill: z.number(),
   meditate: z.number(),

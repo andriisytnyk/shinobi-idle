@@ -6,6 +6,7 @@ import { createFight, defaultRules, encounterFor, fightAdvance, snapshotPlayer }
 import { boss as bossCase, build } from '../../../core/test/analysis-helpers.ts';
 import { curves } from '../hit-curves.ts';
 import { bossScore } from './boss.ts';
+import { sustainedScore } from './sustained.ts';
 import { entryOf } from '../../../core/src/combat/zones.ts';
 
 const TIP: [number, number][] = [[38, 0.107], [40, 0.273], [42, 0.557], [44, 0.77], [46, 0.922], [48, 0.973], [50, 1]];
@@ -48,7 +49,7 @@ const baseline: Record<string, any[]> = {};
 for (const y of ['A', 'B', 'C', 'D']) baseline[y] = JSON.parse(readFileSync(new URL(`baseline-dev-3f559af-${y}.json`, BASE), 'utf8'));
 
 const K: any = content.balance.K;
-const orig = {
+export const orig = {
   cast: new Map(content.techniques.map((t) => [t.id, t.cast])),
   cd: Object.fromEntries(Object.entries(K.role).map(([r, v]: any) => [r, v.cd])),
   wait: content.ai.tiers.map((t) => t.waitMs),
@@ -141,6 +142,9 @@ export function evaluate(runs: number, entries?: string[]) {
   const bs = bossScore(Math.max(30, runs));
   lines.push(...bs.lines);
   penalty += bs.penalty * 2;
+  const su = sustainedScore();
+  lines.push(...su.lines);
+  penalty += su.penalty;
   const tip = tipping(Math.max(20, Math.floor(runs / 2)));
   lines.push('TIP ' + tip.line + ' err ' + tip.err.toFixed(2));
   penalty += tip.err * 8;

@@ -171,8 +171,8 @@ export const BALANCE_EXT = {
   },
   /** Loadout: slots and distinct natures by rank (a student has no limit), and the number of saved loadouts. */
   loadout: {
-    slots: { genin: 8, chunin: 35 },
-    natures: { genin: 8, chunin: 35 },
+    slots: { genin: 4, chunin: 5 },
+    natures: { genin: 1, chunin: 2 },
     saved: 5,
     nameMax: 24,
     /** An area technique counts as hitting this many bodies when loadouts are scored. */

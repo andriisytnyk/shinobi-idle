@@ -1,5 +1,5 @@
 import { writeFileSync } from 'node:fs';
-import { DEFAULTS, apply, evaluate, type Knobs } from './fit.ts';
+import { DEFAULTS, apply, evaluate, orig, type Knobs } from './fit.ts';
 
 const BOUNDS: Record<string, [number, number]> = {
   cs: [0.85, 1.4], wg: [0.15, 1.5], cds: [0.2, 2], w0: [0.15, 1.5], w1: [0.1, 1.5], bc: [0.3, 2], bd: [0.2, 1.5], bcost: [0, 3],
@@ -9,7 +9,9 @@ const runs = Number(process.argv[2] ?? 40);
 const rounds = Number(process.argv[3] ?? 6);
 let best: Knobs = { ...DEFAULTS, ...(process.argv[4] ? JSON.parse(process.argv[4]) : {}) };
 const score = (k: Knobs) => {
-  if (k.w1! * 480 > k.wg! * 860 || k.wg! * 860 > k.w0! * 1260) return Infinity;
+  // The tiers keep their order and sane waits: student >= 800 ms, genin >= 400, chunin >= 250.
+  const w = [k.w0! * orig.wait[0]!, k.wg! * orig.wait[1]!, k.w1! * orig.wait[2]!];
+  if (w[0]! < 800 || w[1]! < 400 || w[2]! < 250 || w[2]! > w[1]! || w[1]! > w[0]!) return Infinity;
   apply(k);
   return evaluate(runs).penalty;
 };

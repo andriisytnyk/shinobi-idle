@@ -17,17 +17,17 @@ export const K = {
   masteryPerHour: 10500,                     // досвід Майстерності за годину дії (стала)
   poolShare: 0.25, poolCapPerItem: 1500,     // частка в пул; місткість пулу на одну майстерність зрізу
   // --- інтервали дій, с ---
-  practiceFocus: { base:0.8, perLevel:0.06 }, practiceMin: 2.0, drill: 3.0, meditate: 3.0, obstacle: 2.5, gather: 2.5, craft: 2.5, explore: 5.0,
+  practiceFocus: { base:0.8, perLevel:0.06 }, practiceCast: 0.7, practiceMin: 2.0, drill: 3.0, meditate: 3.0, obstacle: 2.5, gather: 2.5, craft: 2.5, explore: 5.0,
   // --- техніки ---
   // Каст — число самої техніки й не залежить від печаток (рішення автора 15.11): базовий каст рангу × множник ролі, для окремих технік — вручну (patch.mjs, TECH.cast).
-  castByRank: { E:0.894, D:1.073, C:0.897, B:1.656, A:2.07, S:2.484 },
+  castByRank: { E:1.118, D:1.341, C:1.121, B:2.588, A:2.07, S:3.105 },
   castByRole: { "Снаряд":1.0, "Серія":1.25, "Площа":1.2, "Контроль":0.9, "Захист":1.0, "Посилення":0.7, "Сигнатурна":1.5, "Тренування":1.0 },
   masteryCast: 0.5, castFloor: 0.4, nonNativeCast: 0.30,
   power: { E:10, D:10, C:17, B:27, A:42, S:65 },
   tierMult: { "-1":0.88, "0":1, "1":1.12 },
   role: { // множник шкоди, перезарядка (с), множник вартості
-    "Снаряд":{m:1.0,cd:4.55,c:1.0}, "Серія":{m:1.15,cd:8.14,c:1.1}, "Площа":{m:0.75,cd:22.89,c:1.2}, "Контроль":{m:0.30,cd:15.45,c:0.9},
-    "Захист":{m:0,cd:14.13,c:0.9}, "Посилення":{m:0,cd:29.44,c:1.0}, "Сигнатурна":{m:1.7,cd:17.66,c:1.3}, "Тренування":{m:0,cd:0,c:0} },
+    "Снаряд":{m:1.0,cd:4.91,c:1.0}, "Серія":{m:1.15,cd:8.79,c:1.1}, "Площа":{m:0.75,cd:22.74,c:1.2}, "Контроль":{m:0.30,cd:10.68,c:0.9},
+    "Захист":{m:0,cd:15.26,c:0.9}, "Посилення":{m:0,cd:31.8,c:1.0}, "Сигнатурна":{m:1.7,cd:19.07,c:1.3}, "Тренування":{m:0,cd:0,c:0} },
   rankCd: { E:0.9, D:1.0, C:1.1, B:1.25, A:1.4, S:1.6 },
   chakraCost: { E:5, D:6, C:12, B:22, A:38, S:60 }, staminaCost: { E:5, D:6, C:10, B:16, A:26, S:40 },
   levelScale: 0.035,                         // шкода техніки × (1 + levelScale × рівень навички)
@@ -38,23 +38,23 @@ export const K = {
   wheel: 0.30, habituation: 0.15, habituationCap: 0.60, signatureHabituation: 0.5,
   // --- гравець ---
   hpBase: 90, hpPerVit: 8, chakraBase: 120, chakraPerMed: 0.005, chakraRegen: [0.6,0.02], staminaBase: 100, staminaPerAth: 0.01, staminaRegen: [1.0,0.02],
-  accBase: 40, accPerLevel: 5, evaBase: 43.9, hitMin: 0.05, hitMax: 0.95,
+  accBase: 40, accPerLevel: 5, evaBase: 47.4, hitMin: 0.05, hitMax: 0.95,
   // Ухилення — один автоматичний кидок (правки зрізу, розд. 5, рядки 11–13). Рейтинг ухилення = evaBase + внесок рангу + захисні техніки + спорядження й бонуси + знання з Бінґо-книги; навички «Ухилення» немає.
   // rating: внесок одного рангу гравця (тіру ШІ) в точність і ухилення, і рейтинг за рівень знань про ворога. Числа тимчасові до підгонки (етап 4 завдання C1): evaTier підібрано так, щоб типовий персонаж ухилявся приблизно як раніше.
-  rating: { accTier:89.8, evaTier:3.9, knowledge:32.3, enemyAccTier:17.9, enemyEvaTier:0.05 },
+  rating: { accTier:93.2, evaTier:1.9, knowledge:32.3, enemyAccTier:16.5, enemyEvaTier:0 },
   // passiveFx: захисна техніка пасивна; вивчена, дає частку base свого внеску evasion, а до повного внеску росте з Майстерністю від 1 до стелі. Числа тимчасові до підгонки (етап 4).
-  passiveFx: { shield:{ evasion:78.2, base:0.25 }, decoy:{ evasion:78.2, base:0.25 }, evasionBuff:{ evasion:78.2, base:0.25 }, passiveNegate:{ evasion:78.2, base:0.25 } },
+  passiveFx: { shield:{ evasion:62.6, base:0.25 }, decoy:{ evasion:62.6, base:0.25 }, evasionBuff:{ evasion:62.6, base:0.25 }, passiveNegate:{ evasion:62.6, base:0.25 } },
   // Звичайний удар — дія зі своїм кастом і малою вартістю витривалості; «переводить подих», коли не вистачає ні на техніку, ні на удар: rest.s секунд і частка rest.share від обох пулів.
-  basicCast: 0.898, basicCost: 1, rest: { s:1.5, share:0.08 },
+  basicCast: 1.437, basicCost: 1.01, rest: { s:1.5, share:0.08 },
   modelWait: 0.6, // лише для спрощеного симулятора нижче: вичікування гравця між діями; має дорівнювати waitMs тіру genin з ai.json
-  basicDmg: [8.53,0.48], dodgeStamina: 2, ccCostPerLevel: 0.0015,
+  basicDmg: [11.44,0.644], dodgeStamina: 2, ccCostPerLevel: 0.0015,
   pillAction: 0.5, pouchStack: 4, pillAt: 0.45,   // пілюля — дія 0,5 с; у слоті підсумка до 10 штук; автовживання нижче 45% HP
   food: [[1,30],[5,40],[20,50],[30,80],[35,100],[45,120]], // рівень ремесла → HP за одну страву чи мазь (із рецептів)
   toolTag: [8,0.4],
   zoneHpRegen: 0.8, opRegen: 0.25, respawn: 3,
   wound: { stat:0.05, max:4, healMin:10, healFloorMin:2.5 },
   // --- вороги ---
-  eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [114.6,0.33], eEva: [8.6,3.09],
+  eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [114.6,0.36], eEva: [12.6,3.09],
   boss: { hp:3.2, dmg:1.5 }, pack: { n:3, hp:0.4, dmg:0.4 },
   trait: { armor:0.30, armorOff:6, casterEvery:12, casterCast:3, casterMult:3, evasive:1.6, regenPct:0.01, illusionEvery:10, illusionDur:6, illusionAcc:0.25,
     hidden:8, hiddenAcc:0.4, hiddenFirst:2.0, poisonChance:0.35 },

@@ -63,7 +63,7 @@ export function practiceIntervalSeconds(
   level = 1,
 ): number {
   const K = content.balance.K;
-  return Math.max(K.practiceMin, castSeconds + practiceFocusSeconds(level, content));
+  return Math.max(K.practiceMin, castSeconds * K.practiceCast + practiceFocusSeconds(level, content));
 }
 
 /** Mastery XP earned by one completed action of `intervalSeconds`. */
