@@ -8,7 +8,8 @@ import {
 } from '@shinobi/core';
 import type { Component } from 'svelte';
 import { render } from 'svelte/server';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { revealOffHooks } from './helpers/reveal.ts';
 import GraduationModal from '../src/components/GraduationModal.svelte';
 import NatureCard from '../src/components/NatureCard.svelte';
 import NatureOffer from '../src/components/NatureOffer.svelte';
@@ -44,6 +45,9 @@ describe('the nature route', () => {
 });
 
 describe('S4-3: the nature screen', () => {
+  // The screen lists what each nature opens, whatever the player has discovered: its links are what is checked here.
+  revealOffHooks({ beforeEach, afterEach });
+
   it('shows five cards with a colour token, the character line and a choose button', () => {
     const body = html(NaturePage, {});
     for (const nature of NATURE_IDS) {

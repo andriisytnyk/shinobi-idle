@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { entityAttr, idAttr } from '../lib/reveal.ts';
   import type { ActionInfo } from '@shinobi/core';
   import { blockOf, blockText, bushView } from '../lib/crafts.ts';
   import { formatDuration, formatInt, formatSeconds, formatXp } from '../lib/format.ts';
@@ -51,15 +52,15 @@
 <li
   class="ct-tile"
   class:running
-  data-herb={info.id}
-  data-action={info.id}
+  data-herb={idAttr('item', info.id)}
+  data-action={idAttr('item', info.id)}
   data-ui="action-tile"
-  data-entity="item:{info.id}"
+  data-entity={entityAttr({ kind: 'item', id: info.id })}
 >
   <div class="ct-top">
     <ActionEmblem kind="item" id={info.id} skill={info.skill} />
     <div class="ct-head">
-      <h3 class="ct-name"><EntityLink kind="item" id={info.id} /></h3>
+      <h3 class="ct-name"><EntityLink kind="item" id={info.id} offered /></h3>
       <span class="ct-corner">
         <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
         <PinGoal kind="item" id={info.id} always={!info.available} />

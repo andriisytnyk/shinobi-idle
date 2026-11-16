@@ -977,5 +977,19 @@
   "mission.stage.fightXpWhere": "Він іде в навичку техніки, якою ти бив у бою, і в навички:",
   "mission.fightXpHour": "Бойовий досвід за годину",
   "mission.chain.perMission": "За одну місію",
-  "mission.chain.runs": "Запусків за годину"
+  "mission.chain.runs": "Запусків за годину",
+  "error.invalidReveal": "Некоректний запит на відкриття.",
+  "error.revealRefused": "Про це ти ще нічого не знаєш.",
+  "reveal.hidden.title": "Ще не відкрито",
+  "reveal.hidden.body": "Ти ще нічого про це не знаєш. Шукай підказки в бою, на мапі й у дорученнях.",
+  "reveal.name.body": "Ти лише чув про це. Подробиці відкриються, коли дізнаєшся більше.",
+  "reveal.howTo": "Як дізнатися більше:",
+  "reveal.hint.encountered": "Зустрінь у бою",
+  "reveal.hint.explored": "Розвідай клітинку",
+  "reveal.hint.adjacent": "Розвідай сусідній край",
+  "reveal.hint.quest": "Дійди до цього кроку доручення",
+  "reveal.hint.named": "Знайди, де про це згадують: у крамниці, дорученнях чи на мапі",
+  "reveal.hint.known": "Вивчи це",
+  "reveal.hint.owned": "Здобудь це",
+  "reveal.hint.unlocked": "Виконай умови відкриття"
 }

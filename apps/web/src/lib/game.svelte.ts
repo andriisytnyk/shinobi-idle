@@ -5,7 +5,11 @@ import {
   createState,
   defaultRules,
   dispatch as coreDispatch,
+  revealHint,
+  revealOf,
+  shownKey,
   type Command,
+  type RevealLevel,
   type CommandResult,
   type GameEvent,
   type GameState,
@@ -35,6 +39,7 @@ import { composeBoot } from './boot.ts';
 import { deepFreeze } from './freeze.ts';
 import { detach as detachData } from './read.ts';
 import { requestPersistentStorage } from './platform.ts';
+import { setRevealReader, type RevealReader } from './reveal.ts';
 import type { TabLock } from './tab-lock.ts';
 import { packsToasts, toastFor, toasts as defaultToasts } from './toasts.svelte.ts';
 
@@ -141,6 +146,80 @@ export function createGame(deps: GameDeps = {}) {
   /** One-off happenings of this session that hints wait for (a craft that ran out of ingredients). */
   let signals = $state.raw<Signals>({});
 
+  // The reveal rule for the components: whatever reads it follows the stamp below.
+  // Many links on a page ask about the same few entities: answers are kept until the stamp moves.
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a cache that no view reads
+  const levels = new Map<string, Map<string, RevealLevel>>();
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a cache that no view reads
+  const hints = new Map<string, Map<string, string | null>>();
+  /** Bumped by whatever may change what is discovered at once: a command, a drained event, a new state. Between such moments answers are kept for a second of game time. */
+  let epoch = 0;
+  /**
+   * What views of the reveal rule subscribe to: it moves only when answers may have changed (a command,
+   * a drained event, a new state, a new game second), not on every tick, so a page full of links does
+   * not recompute them ten times a second.
+   */
+  let revealStamp = $state(0);
+  let stampedEpoch = -1;
+  let stampedSecond = -1;
+  /** Called with every update of the game: moves the stamp when the answers may be stale. */
+  const restamp = (): void => {
+    const second = Math.floor(state.now / 1000);
+    if (stampedEpoch !== epoch || stampedSecond !== second) {
+      stampedEpoch = epoch;
+      stampedSecond = second;
+      levels.clear();
+      hints.clear();
+      revealStamp++;
+    }
+  };
+  const fresh = (): void => {
+    void revealStamp;
+  };
+  function remember<T>(
+    cache: Map<string, Map<string, T>>,
+    ref: { kind: string; id: string },
+    make: () => T,
+  ): T {
+    let byId = cache.get(ref.kind);
+    if (!byId) {
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a cache that no view reads
+      byId = new Map();
+      cache.set(ref.kind, byId);
+    }
+    let value = byId.get(ref.id);
+    if (value === undefined) {
+      value = make();
+      byId.set(ref.id, value);
+    }
+    return value;
+  }
+  const reveal: RevealReader = {
+    level(ref) {
+      fresh();
+      return remember(levels, ref, () => revealOf(state, ref, content, rules));
+    },
+    hint(ref) {
+      fresh();
+      return remember(hints, ref, () => revealHint(state, ref, content, rules));
+    },
+    mark(refs) {
+      let changed = false;
+      for (const ref of refs) {
+        if (state.shown[shownKey(ref)] === true || revealOf(state, ref, content, rules) === 'full')
+          continue;
+        // Straight to the core, past the hooks of the packs: the mark is bookkeeping, not a player's command.
+        if (coreDispatch(state, { type: 'reveal.mark', refs: [ref] }, content, rules).ok)
+          changed = true;
+      }
+      if (changed) {
+        epoch++;
+        touch();
+      }
+    },
+  };
+  setRevealReader(reveal);
+
   /** Revision of the save this tab last read or wrote; a stored revision above it means a newer save exists. */
   let rev = 0;
   let lastWall = clock.now();
@@ -152,6 +231,7 @@ export function createGame(deps: GameDeps = {}) {
 
   const touch = () => {
     version++;
+    restamp();
   };
 
   /** A rule of a pack that the core switched off: listed for the session, told once. */
@@ -166,6 +246,9 @@ export function createGame(deps: GameDeps = {}) {
   function drainEvents(): void {
     const events = state.events;
     if (events.length === 0) return;
+    // The listeners below may ask the reveal rule about what the event brought: the answers are dropped first.
+    epoch++;
+    restamp();
     state.events = [];
     for (const listener of eventListeners) for (const event of events) listener(event);
     const lines: LogEntry[] = [];
@@ -285,6 +368,9 @@ export function createGame(deps: GameDeps = {}) {
 
   function replaceState(next: GameState): void {
     state = next;
+    epoch++;
+    // The game that is given a state is the one that is played: the reveal rule reads from it.
+    setRevealReader(reveal);
     log = [];
     graduation = false;
     signals = {};
@@ -298,6 +384,7 @@ export function createGame(deps: GameDeps = {}) {
     loadError = null;
     if (!kv) {
       state = newGame(clock, content);
+      epoch++;
       phase = 'playing';
       begin();
       touch();
@@ -306,6 +393,7 @@ export function createGame(deps: GameDeps = {}) {
     try {
       const loaded = await loadGame(kv, clock, content, rules);
       state = loaded.state;
+      epoch++;
       rev = loaded.rev;
       report = loaded.report;
       await refreshBackupFlag();
@@ -416,6 +504,9 @@ export function createGame(deps: GameDeps = {}) {
         if (verdict) command = verdict;
       }
       const result = coreDispatch(state, command, content, rules);
+      // After the command: a reveal it caused must not wait for the next update.
+      epoch++;
+      restamp();
       if (result.ok && command.type === 'action.start' && command.kind === 'fight') log = [];
       drainEvents();
       touch();
@@ -441,6 +532,8 @@ export function createGame(deps: GameDeps = {}) {
     },
     /** Developer tool: moves game time forward through `advance`, like waiting would. */
     devAdvance(ms: number): void {
+      // Time that moves on changes the answers by itself (events, a new second); no time at all is how tests flush what they set by hand.
+      if (ms === 0) epoch++;
       advance(state, ms, content, rules);
       drainEvents();
       touch();
@@ -475,6 +568,7 @@ export function createGame(deps: GameDeps = {}) {
       }
       loadError = null;
       state = newGame(clock, content);
+      epoch++;
       rev = 0;
       phase = 'playing';
       begin();

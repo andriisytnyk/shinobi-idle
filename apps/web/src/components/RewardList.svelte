@@ -30,5 +30,5 @@
   >
 {/each}
 {#each items as item (item.id)}
-  <span data-reward="item"><EntityLink kind="item" id={item.id} /> ×{item.n}</span>
+  <span data-reward="item"><EntityLink kind="item" id={item.id} offered /> ×{item.n}</span>
 {/each}

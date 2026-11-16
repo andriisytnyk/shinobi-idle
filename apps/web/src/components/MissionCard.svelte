@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { entityAttr } from '../lib/reveal.ts';
   import type { Mission } from '@shinobi/content';
   import { MISSION_KIND, NEEDS_TEAM } from '@shinobi/core';
   import { formatDuration, formatInt } from '../lib/format.ts';
@@ -52,7 +53,7 @@
   class:running
   class:closed={!view.open}
   data-ui="mission-card"
-  data-entity="mission:{mission.id}"
+  data-entity={entityAttr({ kind: 'mission', id: mission.id })}
   data-mission={mission.id}
   data-state={shown}
 >

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { entityAttr } from '../lib/reveal.ts';
   import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { currencyName, resourceName } from '../lib/vocab.ts';
@@ -19,7 +20,7 @@
 <span
   class="reward"
   data-ui="mission-reward"
-  data-entity="{reward.t}:{reward.id}"
+  data-entity={entityAttr({ kind: reward.t, id: reward.id })}
   data-reward={reward.t}
 >
   {#if reward.t === 'currency'}
@@ -30,7 +31,7 @@
   {:else if reward.t === 'item'}
     <Icon entity={{ kind: 'item', id: reward.id }} size={16} />
     <span>
-      <EntityLink kind="item" id={reward.id} />
+      <EntityLink kind="item" id={reward.id} offered />
       {#if reward.n > 1}×{formatInt(reward.n)}{/if}
       {#if percent < 100}<span class="chance">{t('mission.chance', { pct: percent })}</span>{/if}
     </span>

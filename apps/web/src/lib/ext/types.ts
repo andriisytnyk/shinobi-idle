@@ -58,6 +58,16 @@ export interface UiApi {
   t(key: string, params?: Record<string, string | number>): string;
   /** The hash that opens an entity's page. */
   href(ref: { kind: string; id: string }): string;
+  /**
+   * What a link to an entity may show, by the reveal rule: its name and `href`, or, for an entity the
+   * player has not discovered, «???» with no `href` and a hint (a text, or null) on how to learn more.
+   * A pack that prints an entity name uses this, so it never prints a hidden one.
+   */
+  link(ref: { kind: string; id: string }): {
+    text: string;
+    href: string | null;
+    hint: string | null;
+  };
   /** Goes to a hash route such as `#/x/<pack>/<page>`. */
   navigate(route: string): void;
   /** The only way to change the game: the same commands the interface sends. */
@@ -134,6 +144,12 @@ export interface PageSpec {
   nav?: string;
   /** Extra condition on the matched params (the generic entity page uses it). */
   guard?: (params: Record<string, string>) => boolean;
+  /**
+   * For the page of an entity kind: `self` says the page copes with an entity that is shown by name
+   * only (the map does). Without it the app shows the name-only state in place of the page; an entity
+   * that is not shown at all never reaches any page.
+   */
+  reveal?: 'self';
 }
 
 /**

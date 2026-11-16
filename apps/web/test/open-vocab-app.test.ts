@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { createState, syncVillage, type GameState } from '@shinobi/core';
+import { createState, noteSighting, syncVillage, xpAt, type GameState } from '@shinobi/core';
 import { flushSync, mount, unmount } from 'svelte';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import PoiRow from '../src/components/PoiRow.svelte';
@@ -158,7 +158,10 @@ describe('the app booted with core and testmod (T1)', () => {
   });
 
   it('shows the requirement of the rank by its name on the mission page', async () => {
-    booted = await boot('#/mission/testmod:test_run');
+    const gs = state();
+    // The mission asks for the test rank; with it the page is open in full.
+    gs.player.rank = RANK;
+    booted = await boot('#/mission/testmod:test_run', gs);
     expect(text('[data-ui="entity-page"] h1')).toContain('Тестове доручення');
     expect(texts().some((x) => x.includes('Тестовий адепт'))).toBe(true);
     expect(texts().some((x) => x.includes('Тестовий жетон'))).toBe(true);
@@ -185,6 +188,8 @@ describe('the app booted with core and testmod (T1)', () => {
   it('prices a shop good in the currency of the pack and shows how much of it the player holds', async () => {
     const gs = state();
     gs.player.rank = 'testmod:adept';
+    // The pack shows its items only once held, so the player holds the good (a hidden row writes no id).
+    gs.bank['testmod:charm'] = 1;
     booted = await boot('#/shop', gs);
     const good = q('[data-good="testmod:charm"]');
     expect(good?.querySelector('[data-price]')?.textContent).toContain('жетон');
@@ -275,7 +280,12 @@ describe('the app booted with core and testmod (T1)', () => {
   }
 
   it('links the pages to each other', async () => {
-    booted = await boot('#/item/testmod:pellet');
+    // What the pages link to is shown to a player who has been through them: the recipe was listed, the enemy met, the forge trained.
+    const gs = state();
+    gs.shown['testmod:elixir_brew@recipe'] = true;
+    noteSighting(gs, 'testmod:shellback', game.content);
+    (gs.skills as Record<string, { xp: number }>)[SKILL] = { xp: xpAt(2) };
+    booted = await boot('#/item/testmod:pellet', gs);
     const hrefs = (root: string) => qa(`${root} a`).map((a) => a.getAttribute('href') ?? '');
     expect(hrefs('main')).toContain('#/recipe/testmod:elixir_brew');
     await booted.go('#/recipe/testmod:elixir_brew');
@@ -290,10 +300,10 @@ describe('the app booted with core and testmod (T1)', () => {
 
   it('says that an unknown entity is not found, and does not crash', async () => {
     booted = await boot('#/enemy/testmod:nothing');
-    expect(q('[data-not-found]')).not.toBeNull();
-    expect(text('[data-not-found]')).toContain('Не знайдено');
+    expect(q('[data-not-revealed]')).not.toBeNull();
+    expect(q('[data-not-found]')).toBeNull();
     await booted.go('#/exercise/testmod:nothing');
-    expect(q('[data-not-found]')).not.toBeNull();
+    expect(q('[data-not-revealed]')).not.toBeNull();
   });
 
   it('keeps a log of the texts it had to stand in for, and shows none as a key', async () => {
@@ -357,5 +367,46 @@ describe('what a player sees with a mod (fix iteration)', () => {
       }
     }
     expect(missing.filter((k) => !k.startsWith('boss.') || true)).toEqual([]);
+  });
+});
+
+describe('R1 (T4): the entities of the pack follow their reveal rules', () => {
+  const noPellets = (): GameState => {
+    const gs = state();
+    delete gs.bank['testmod:pellet'];
+    return gs;
+  };
+
+  it('hides an item by the default of its pack until the player holds one, and shows it then', async () => {
+    booted = await boot('#/item/testmod:pellet', noPellets());
+    expect(q('[data-not-revealed]')).not.toBeNull();
+    expect(booted.target.textContent).not.toContain('Тестова кулька');
+    expect(booted.target.innerHTML).not.toContain('testmod:pellet');
+    game.state.bank['testmod:pellet'] = 1;
+    game.devAdvance(0);
+    flushSync();
+    expect(q('[data-not-revealed]')).toBeNull();
+    expect(text('[data-ui="entity-header"]')).toContain('Тестова кулька');
+  });
+
+  it('hides an item by its own rule until the test skill reaches level 2', async () => {
+    booted = await boot('#/item/testmod:elixir', noPellets());
+    expect(q('[data-not-revealed]')).not.toBeNull();
+    expect(booted.target.textContent).not.toContain('Тестовий еліксир');
+    (game.state.skills as Record<string, { xp: number }>)[SKILL] = { xp: xpAt(2) };
+    game.devAdvance(0);
+    flushSync();
+    expect(q('[data-not-revealed]')).toBeNull();
+    expect(text('[data-ui="entity-header"]')).toContain('Тестовий еліксир');
+  });
+
+  it('keeps the core items on the rule of their kind', async () => {
+    // A mint leaf is named by a technique, so by name; held, it is shown in full.
+    booted = await boot('#/item/core:mint', noPellets());
+    expect(q('[data-name-only]')).not.toBeNull();
+    game.state.bank['core:mint'] = 1;
+    game.devAdvance(0);
+    flushSync();
+    expect(q('[data-name-only]')).toBeNull();
   });
 });

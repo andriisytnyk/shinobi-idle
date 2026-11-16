@@ -30,6 +30,56 @@ const level = z.number().int().min(1).max(99);
 /** A slug for resources such as `plots` or `masonry`; names live in the locale. */
 const resSlug = z.string().regex(/^[a-z0-9_]+(:[a-z0-9_]+)?$/);
 
+// ---------- reveal rules ----------
+
+/**
+ * The terms a reveal rule is made of; each is a check the engine knows how to make (a closed
+ * vocabulary, like the requirement nodes). `always`: true. `known`: the id is in `state.known`.
+ * `owned`: the item is in the bank or the gear line has a tier. `seen`: the interface displayed it
+ * legitimately and `reveal.mark` recorded it. `named`: an entity that is itself fully shown names it
+ * (a zone that is open, a shop row, a started quest step, a mission the player may take).
+ * `encountered`: an enemy or boss that was fought or has a Bingo level of 1 or more.
+ * `explored`: a cell explored to level 1, a region with such a cell, a point of interest found.
+ * `adjacent`: a region the player stands in or next to one with an explored cell. `parent`: the
+ * region of a cell or the cell of a point of interest is shown by name. `actionable`: a region that is open (the player may go there). `questStarted`: the chain
+ * has begun. `unlocked`: the entity's own `unlockReq`, `unlock` or `req` holds (none: holds).
+ */
+export const REVEAL_TERMS = [
+  'always',
+  'known',
+  'owned',
+  'seen',
+  'named',
+  'encountered',
+  'explored',
+  'adjacent',
+  'parent',
+  'questStarted',
+  'unlocked',
+  'actionable',
+] as const;
+export type RevealTermId = (typeof REVEAL_TERMS)[number];
+
+export const revealTermSchema = z.union([
+  z.enum(REVEAL_TERMS),
+  z.strictObject({ req: z.lazy(() => reqSchema) }),
+]);
+export type RevealTerm = z.infer<typeof revealTermSchema>;
+
+/**
+ * What lets the player see an entity: `full` (everything) when any term of `full` holds, else
+ * `name` (the name and icon, no description, numbers or links) when any term of `name` holds, else
+ * nothing (`hidden`). An empty list never holds.
+ */
+export const revealSchema = z.strictObject({
+  name: z.array(revealTermSchema).optional(),
+  full: z.array(revealTermSchema),
+});
+export type RevealRule = z.infer<typeof revealSchema>;
+
+/** The optional field every entity schema carries: its own rule, over the default of its pack and kind. */
+const revealField = { reveal: revealSchema.optional() };
+
 // ---------- vocabularies ----------
 
 /** A vocabulary member with nothing but an id (names and descriptions live in the locale). */
@@ -88,11 +138,17 @@ export const villageStageSchema = z.strictObject({
 });
 
 /** The id of an entity kind that has a page and the `ContentDb` list its entities live in (`null`: nested in another list). */
-export const entityKindSchema = z.strictObject({ id: vocabId, list: z.string().nullable() });
+export const entityKindSchema = z.strictObject({
+  id: vocabId,
+  list: z.string().nullable(),
+  /** The default reveal rule of the entities of this kind; omitted: they are always shown. */
+  reveal: revealSchema.optional(),
+});
 
 // ---------- skills and techniques ----------
 
 export const skillSchema = z.strictObject({
+  ...revealField,
   id: skillId,
   group: idOf('skillGroup'),
   /** How the skill is trained: tech, course, drill, insight, patch, map, recipe, station, none. */
@@ -106,6 +162,7 @@ export const skillSchema = z.strictObject({
 });
 
 export const sealSchema = z.object({
+  ...revealField,
   id: coreId,
   glyph: z.string().min(1),
   romaji: z.string(),
@@ -196,11 +253,13 @@ export const techniqueBaseSchema = z.strictObject({
 });
 
 export const techniqueSchema = techniqueBaseSchema.extend({
+  ...revealField,
   /** Combat behaviour; `null` for training drills, which are never cast. */
   combat: techniqueCombatSchema.nullable(),
 });
 
 export const exerciseSchema = z.object({
+  ...revealField,
   id: coreId,
   level,
   /** The skill the exercise trains; omitted: the first skill with the activity `drill`. */
@@ -221,6 +280,7 @@ export const practiceBaseSchema = z.strictObject({
 });
 
 export const practiceSchema = practiceBaseSchema.extend({
+  ...revealField,
   /** The modifiers of each Insight modifier, by index; the text says what they do. */
   insightMods: z.array(z.array(modSchema).min(1)),
   /** The modifiers of each Enlightenment modifier, by index. */
@@ -234,6 +294,7 @@ export const obstacleBaseSchema = z.object({
 });
 
 export const obstacleSchema = obstacleBaseSchema.extend({
+  ...revealField,
   /** What the obstacle needs besides the Athletics level of its slot (a Chakra Control level for walking on trees and water); `null` for none. */
   req: z.lazy(() => reqSchema).nullable(),
   /** The permanent bonus and penalty of the obstacle while it is built. */
@@ -344,6 +405,7 @@ export const itemFxSchema = z.discriminatedUnion('kind', [
 ]);
 
 export const itemSchema = z.strictObject({
+  ...revealField,
   id: coreId,
   kind: idOf('itemKind'),
   /** Tags the item carries (tools answer enemy traits). */
@@ -403,6 +465,7 @@ export const shopEntrySchema = z.strictObject({
 export const coatSchema = z.strictObject({ poison: coreId, base: coreId, product: coreId });
 
 export const recipeSchema = z.object({
+  ...revealField,
   id: coreId,
   skill: idOf('recipeSkill'),
   level,
@@ -477,6 +540,7 @@ export const missionExtraSchema = z.strictObject({
 });
 
 export const missionSchema = missionBaseSchema.extend({
+  ...revealField,
   pay: z.array(missionPaySchema),
   unlock: z.lazy(() => reqSchema).nullable(),
   shares: z.array(z.number().int().min(1)).min(1),
@@ -510,18 +574,20 @@ export const teammateSchema = z.strictObject({
  * `mission` (a mission is on offer). Names and descriptions are localized under `poi.<id>`.
  */
 export const poiSchema = z.discriminatedUnion('kind', [
-  z.strictObject({ id: coreId, kind: z.literal('outpost') }),
+  z.strictObject({ ...revealField, id: coreId, kind: z.literal('outpost') }),
   z.strictObject({
+    ...revealField,
     id: coreId,
     kind: z.literal('training'),
     skill: skillId,
     /** Share of extra XP of the skill (0.1 is +10%). */
     bonus: z.number().gt(0),
   }),
-  z.strictObject({ id: coreId, kind: z.literal('zone'), zone: coreId }),
-  z.strictObject({ id: coreId, kind: z.literal('story') }),
-  z.strictObject({ id: coreId, kind: z.literal('deposit'), building: coreId }),
+  z.strictObject({ ...revealField, id: coreId, kind: z.literal('zone'), zone: coreId }),
+  z.strictObject({ ...revealField, id: coreId, kind: z.literal('story') }),
+  z.strictObject({ ...revealField, id: coreId, kind: z.literal('deposit'), building: coreId }),
   z.strictObject({
+    ...revealField,
     id: coreId,
     kind: z.literal('cache'),
     items: z.array(ingredientRef),
@@ -529,8 +595,8 @@ export const poiSchema = z.discriminatedUnion('kind', [
     /** More currencies by id (a pack's own). */
     currencies: z.record(vocabId, z.number().int().min(0)).optional(),
   }),
-  z.strictObject({ id: coreId, kind: z.literal('vault'), item: coreId }),
-  z.strictObject({ id: coreId, kind: z.literal('mission'), mission: coreId }),
+  z.strictObject({ ...revealField, id: coreId, kind: z.literal('vault'), item: coreId }),
+  z.strictObject({ ...revealField, id: coreId, kind: z.literal('mission'), mission: coreId }),
 ]);
 export type Poi = z.infer<typeof poiSchema>;
 export type PoiKind = Poi['kind'];
@@ -545,10 +611,11 @@ export const cellBaseSchema = z.object({
   story: z.boolean(),
 });
 
-export const cellSchema = cellBaseSchema.extend({ pois: z.array(poiSchema) });
+export const cellSchema = cellBaseSchema.extend({ ...revealField, pois: z.array(poiSchema) });
 export type CellBase = z.infer<typeof cellBaseSchema>;
 
 export const regionSchema = z.object({
+  ...revealField,
   id: coreId,
   /** Scouting level that opens the region. */
   scout: z.number().int(),
@@ -595,6 +662,7 @@ const enemyLootShape = {
 const partBase = { item: coreId, technique: coreId };
 
 export const enemySchema = enemyBaseSchema.extend({
+  ...revealField,
   ...enemyLootShape,
   /** A scroll part of the carried technique, dropped by chance. */
   scrollPart: z.strictObject({ ...partBase, chance: z.number().gt(0).lt(1) }).nullable(),
@@ -630,6 +698,7 @@ export const bossSpecialSchema = z.strictObject({
 });
 
 export const bossSchema = bossBaseSchema.extend({
+  ...revealField,
   ...enemyLootShape,
   /** A scroll part of the carried technique, dropped in a fixed count. */
   scrollPart: z.strictObject({ ...partBase, count: z.number().int().min(1) }).nullable(),
@@ -662,6 +731,7 @@ export const buildingFxSchema = z.strictObject({
 });
 
 export const buildingSchema = buildingBaseSchema.extend({
+  ...revealField,
   role: z.enum(BUILDING_ROLES),
   effects: z.array(modSchema),
   capstone: z.array(modSchema),
@@ -705,7 +775,7 @@ export const gearFxSchema = z.strictObject({
   effect: z.enum(['bonus', 'reduction', 'speed']),
 });
 
-export const gearSchema = gearBaseSchema.extend({ fx: gearFxSchema });
+export const gearSchema = gearBaseSchema.extend({ ...revealField, fx: gearFxSchema });
 
 // ---------- requirements, quests, exams ----------
 
@@ -770,6 +840,7 @@ export const questRewardsSchema = z.strictObject({
 });
 
 export const questSchema = z.strictObject({
+  ...revealField,
   id: coreId,
   /** Chain this quest belongs to; the chain id is the quest id in this slice. */
   chain: coreId,
@@ -781,6 +852,7 @@ export const questSchema = z.strictObject({
 
 /** A rank exam: a checklist plus a timed test that grants the rank. */
 export const examSchema = z.strictObject({
+  ...revealField,
   id: coreId,
   /** Rank the player holds after passing. */
   rank: playerRankId,
@@ -960,6 +1032,7 @@ const statusFields = {
 };
 
 export const statusSchema = z.strictObject({
+  ...revealField,
   id: statusId,
   /** The technique state that puts this status on the body a technique hits. */
   state: stateId.optional(),
@@ -1011,6 +1084,7 @@ export const roleSchema = z.strictObject({
  * suppresses the trait; `regen`: heals a share of health every second) and a fight hook otherwise.
  */
 export const traitSchema = z.strictObject({
+  ...revealField,
   id: traitId,
   answer: tagId,
   numbers: z.strictObject({
@@ -1039,6 +1113,7 @@ export const traitSchema = z.strictObject({
  * `burst` ends the status in a blow of that many times the hit.
  */
 export const comboSchema = z.strictObject({
+  ...revealField,
   id: comboId,
   nature: natureId.optional(),
   tag: tagId.optional(),
@@ -1581,6 +1656,8 @@ export const packManifestSchema = z.strictObject({
   version: z.string().min(1),
   dependsOn: z.array(z.string()),
   loadAfter: z.array(z.string()),
+  /** The pack's default reveal rule by entity kind; it stands over the default of the kind and under the entity's own. */
+  reveal: z.record(z.string(), revealSchema).optional(),
 });
 export type PackManifest = z.infer<typeof packManifestSchema>;
 

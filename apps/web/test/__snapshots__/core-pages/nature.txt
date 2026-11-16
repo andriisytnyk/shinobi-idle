@@ -45,8 +45,8 @@
               <dd>
                 <a class="entity-link" href="#/cell/core:ternovi_zarosti">
                   Тернові зарості
-                <a class="entity-link" href="#/cell/core:stepovi_zarosti">
-                  Степові зарості
+                <span class="entity-link masked" data-masked="" title="Розвідай клітинку">
+                  ???
             <div class="row" data-row="traits">
               <dt>
                 Відповідає на риси ворогів
@@ -121,10 +121,10 @@
               <dd>
                 <a class="entity-link" href="#/cell/core:ternovi_zarosti">
                   Тернові зарості
-                <a class="entity-link" href="#/cell/core:stepovi_zarosti">
-                  Степові зарості
-                <a class="entity-link" href="#/cell/core:tumannyi_iar">
-                  Туманний яр
+                <span class="entity-link masked" data-masked="" title="Розвідай клітинку">
+                  ???
+                <span class="entity-link masked" data-masked="" title="Розвідай клітинку">
+                  ???
             <div class="row" data-row="traits">
               <dt>
                 Відповідає на риси ворогів
@@ -273,10 +273,10 @@
               <dt>
                 Відкриває ключові клітинки мапи
               <dd>
-                <a class="entity-link" href="#/cell/core:skhovyshche_fortetsi">
-                  Сховище фортеці
-                <a class="entity-link" href="#/cell/core:zavalena_pechera">
-                  Завалена печера
+                <span class="entity-link masked" data-masked="" title="Розвідай клітинку">
+                  ???
+                <span class="entity-link masked" data-masked="" title="Розвідай клітинку">
+                  ???
             <div class="row" data-row="traits">
               <dt>
                 Відповідає на риси ворогів

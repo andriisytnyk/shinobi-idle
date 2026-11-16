@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { entityAttr, idAttr } from '../lib/reveal.ts';
   import type { ActionInfo } from '@shinobi/core';
   import { blockOf, blockText, tierView } from '../lib/crafts.ts';
   import { formatInt, formatSeconds, formatXp } from '../lib/format.ts';
@@ -45,15 +46,15 @@
 <li
   class="ct-tile"
   class:running
-  data-recipe={info.id}
-  data-action={info.id}
+  data-recipe={idAttr('recipe', info.id)}
+  data-action={idAttr('recipe', info.id)}
   data-ui="action-tile"
-  data-entity="recipe:{info.id}"
+  data-entity={entityAttr({ kind: 'recipe', id: info.id })}
 >
   <div class="ct-top">
     <ActionEmblem kind="recipe" id={info.id} skill={info.skill} />
     <div class="ct-head">
-      <h3 class="ct-name"><EntityLink kind="recipe" id={info.id} /></h3>
+      <h3 class="ct-name"><EntityLink kind="recipe" id={info.id} offered /></h3>
       <span class="ct-corner">
         <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
         <PinGoal kind="recipe" id={info.id} always={!info.available} />
@@ -100,10 +101,10 @@
     <p class="ct-caption">{t('craft.makes')}</p>
     <ul class="ct-list" data-outputs>
       {#each info.outputs as out (out.item)}
-        <li class="output" data-output={out.item}>
+        <li class="output" data-output={idAttr('item', out.item)}>
           <Icon entity={{ kind: 'item', id: out.item }} size={18} />
           <span class="qty">&times;{formatInt(out.n)}</span>
-          <EntityLink kind="item" id={out.item} />
+          <EntityLink kind="item" id={out.item} offered />
           <span class="ct-muted"
             >{t('craft.owned', { n: formatInt(game.read((gs) => gs.bank[out.item] ?? 0)) })}</span
           >
