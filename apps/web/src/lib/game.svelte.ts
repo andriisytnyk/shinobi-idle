@@ -154,18 +154,27 @@ export function createGame(deps: GameDeps = {}) {
   const hints = new Map<string, Map<string, string | null>>();
   /** Bumped by whatever may change what is discovered at once: a command, a drained event, a new state. Between such moments answers are kept for a second of game time. */
   let epoch = 0;
-  let cachedEpoch = -1;
-  let cachedSecond = -1;
-  /** Reads the update counter (so views follow the game) and drops the answers once they may be stale. */
-  const fresh = (): void => {
-    void version;
+  /**
+   * What views of the reveal rule subscribe to: it moves only when answers may have changed (a command,
+   * a drained event, a new state, a new game second), not on every tick, so a page full of links does
+   * not recompute them ten times a second.
+   */
+  let revealStamp = $state(0);
+  let stampedEpoch = -1;
+  let stampedSecond = -1;
+  /** Called with every update of the game: moves the stamp when the answers may be stale. */
+  const restamp = (): void => {
     const second = Math.floor(state.now / 1000);
-    if (cachedEpoch !== epoch || cachedSecond !== second) {
+    if (stampedEpoch !== epoch || stampedSecond !== second) {
+      stampedEpoch = epoch;
+      stampedSecond = second;
       levels.clear();
       hints.clear();
-      cachedEpoch = epoch;
-      cachedSecond = second;
+      revealStamp++;
     }
+  };
+  const fresh = (): void => {
+    void revealStamp;
   };
   function remember<T>(
     cache: Map<string, Map<string, T>>,
@@ -222,6 +231,7 @@ export function createGame(deps: GameDeps = {}) {
 
   const touch = () => {
     version++;
+    restamp();
   };
 
   /** A rule of a pack that the core switched off: listed for the session, told once. */
@@ -519,7 +529,8 @@ export function createGame(deps: GameDeps = {}) {
     },
     /** Developer tool: moves game time forward through `advance`, like waiting would. */
     devAdvance(ms: number): void {
-      epoch++;
+      // Time that moves on changes the answers by itself (events, a new second); no time at all is how tests flush what they set by hand.
+      if (ms === 0) epoch++;
       advance(state, ms, content, rules);
       drainEvents();
       touch();
