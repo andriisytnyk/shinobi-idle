@@ -249,11 +249,18 @@ const data = {
     { id: 'testmod:zone_shellback', enemy: 'testmod:shellback', region: 'academy', unlock: null },
     { id: 'testmod:zone_boss_shell', enemy: 'testmod:boss_shell', region: 'boss', unlock: null },
   ],
+  /** A two-hex island far outside the world grid: the grid is full, so a pack's land is an island of its own. */
+  countries: [{ id: 'testmod:isle' }],
+  hexes: [
+    { q: 100, r: 100, country: 'testmod:isle', terrain: 'forest' },
+    { q: 101, r: 100, country: 'testmod:isle', terrain: 'plains' },
+  ],
   regions: [{ id: 'testmod:grove', scout: 1, cells: ['testmod:grove_edge'] }],
   cells: [
     {
       id: 'testmod:grove_edge',
       region: 'testmod:grove',
+      hex: [100, 100],
       index: 0,
       key: null,
       story: false,
@@ -442,6 +449,7 @@ export const testmodPack: ContentPack = {
       'boss.testmod:boss_shell.desc':
         'Тестовий бос мода зі своїм особливим ударом і власними числами.',
       'boss.testmod:boss_shell.place': 'Тестовий гай',
+      'country.testmod:isle.name': 'Тестовий острів',
       'region.testmod:grove.name': 'Тестовий гай',
       'region.testmod:grove.desc': 'Тестовий регіон мода з однією клітинкою, до якої можна дійти.',
       'cell.testmod:grove_edge.name': 'Край тестового гаю',

@@ -51,6 +51,7 @@ import {
   type Skill,
   type TechniqueBase,
 } from '../src/schema.ts';
+import { z } from 'zod';
 import { rawBalance, rawMap, rawSlice } from './raw.ts';
 import { IdRegistry, type IdTable } from './translit.ts';
 
@@ -58,6 +59,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
 const docs = resolve(root, '..', '..', 'docs');
 const sliceDir = join(docs, 'Shinobi Idle — MVP — зріз і баланс');
+const mapDir = join(sliceDir, 'map');
 const mapPath = join(docs, 'Shinobi Idle — дані й скрипти', 'concept', 'map_data_v3.json');
 const outData = join(root, 'src', 'packs', 'core', 'data', 'generated');
 const outLocale = join(root, 'src', 'packs', 'core', 'locales', 'uk.json');
@@ -501,6 +503,13 @@ const missions: MissionBase[] = slice.missions.map((m) => {
 
 // ---------- regions and cells ----------
 
+// The map data of the docs: where each cell of the slice stands, the grid and the named places.
+const hexPair = z.tuple([z.number().int(), z.number().int()]);
+const sliceCells = z
+  .array(z.object({ cell: z.string(), hex: hexPair }))
+  .parse(readJson(join(mapDir, 'slice-cells.json')));
+const cellHex = new Map(sliceCells.map((c) => [c.cell, c.hex]));
+
 const cellSlugs = { take: (k: string) => ids.take('cell', k) };
 const cells: CellBase[] = [];
 const regions: Region[] = slice.regions.map((r) => {
@@ -513,6 +522,7 @@ const regions: Region[] = slice.regions.map((r) => {
     cells.push({
       id: cid,
       region: id,
+      hex: need(cellHex.get(`${r.id}#${index + 1}`), `no hex for the cell ${r.id}#${index + 1}`),
       index,
       key: key as CellBase['key'],
       story: /^Сюжет/.test(note ?? ''),
@@ -521,6 +531,57 @@ const regions: Region[] = slice.regions.map((r) => {
   });
   return { id, scout: r.scout, cells: cellIds };
 });
+
+// ---------- the hex grid, countries and places ----------
+
+/** Ids of the map data have hyphens (core:far-east); ids of the content use underscores. */
+const slugId = (id: string): string => id.replace(/-/g, '_');
+const worldHex = z
+  .object({
+    hexes: z.array(
+      z.object({
+        q: z.number().int(),
+        r: z.number().int(),
+        country: z.string(),
+        playable: z.boolean().optional(),
+        terrain: z.string().optional(),
+      }),
+    ),
+  })
+  .parse(readJson(join(mapDir, 'world-hex.json')));
+/** The docs call open sea a country; the content leaves it out. */
+const hexes = worldHex.hexes.map((h) => ({
+  q: h.q,
+  r: h.r,
+  ...(h.country === 'sea' ? {} : { country: slugId(h.country) }),
+  ...(h.playable === true
+    ? { terrain: need(h.terrain, `the playable hex ${h.q},${h.r} has no terrain`) }
+    : {}),
+}));
+const countries = z
+  .array(z.object({ id: z.string(), name: z.string(), token: z.string() }))
+  .parse(readJson(join(mapDir, 'countries.json')))
+  .map((c) => {
+    text('country', slugId(c.id), 'name', c.name);
+    return { id: slugId(c.id), token: c.token };
+  });
+const places = z
+  .array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      kind: z.string(),
+      role: z.string(),
+      hex: hexPair,
+      description: z.string(),
+    }),
+  )
+  .parse(readJson(join(mapDir, 'fire-places.json')))
+  .map((p) => {
+    text('place', slugId(p.id), 'name', p.name);
+    text('place', slugId(p.id), 'desc', p.description);
+    return { id: slugId(p.id), hex: p.hex, kind: p.kind, role: p.role };
+  });
 
 // ---------- balance ----------
 
@@ -552,6 +613,9 @@ const db: GeneratedDb = generatedDbSchema.parse({
   missions,
   regions,
   cells,
+  hexes,
+  countries,
+  places,
   enemies,
   bosses,
   buildings,
@@ -564,7 +628,13 @@ if (ids.dirty) writeFileSync(registryPath, json(ids.table));
 mkdirSync(outData, { recursive: true });
 mkdirSync(dirname(outLocale), { recursive: true });
 for (const [name, value] of Object.entries(db))
-  writeFileSync(join(outData, `${name}.json`), json(value));
+  writeFileSync(
+    join(outData, `${name}.json`),
+    // The grid has over a thousand entries: one line each keeps the file readable and small.
+    name === 'hexes'
+      ? `[\n${(value as unknown[]).map((h) => `  ${JSON.stringify(h)}`).join(',\n')}\n]\n`
+      : json(value),
+  );
 const sorted = Object.fromEntries(
   Object.entries(locale).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)),
 );

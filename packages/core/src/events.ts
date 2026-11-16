@@ -170,10 +170,24 @@ export interface PoiClaimedEvent extends EventBase {
   type: 'poiClaimed';
   poi: string;
 }
-/** The player now stands in a new cell after a walk or an instant trip. */
+/** The player arrived where a walk was going; `cell` is the address of the hex (a cell id, or the hex key). */
 export interface TravelledEvent extends EventBase {
   type: 'travelled';
   cell: string;
+}
+/** The player entered a hex, one step of a walk: `hex` is its key, `by` how the player got there. */
+export interface HexEnteredEvent extends EventBase {
+  type: 'hexEntered';
+  hex: string;
+  terrain: string;
+  by: 'walk';
+}
+/** A hex that is no cell reached a new survey level; `max` marks the last level. */
+export interface HexSurveyedEvent extends EventBase {
+  type: 'hexSurveyed';
+  hex: string;
+  level: number;
+  max: boolean;
 }
 
 /** One attempt at a mission stage ended; `ok` is false when it must be repeated. */
@@ -261,6 +275,8 @@ export type GameEvent =
   | PoiFoundEvent
   | PoiClaimedEvent
   | TravelledEvent
+  | HexEnteredEvent
+  | HexSurveyedEvent
   | MissionStageEvent
   | MissionDoneEvent
   | BuildingBuiltEvent

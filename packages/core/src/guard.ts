@@ -3,6 +3,7 @@ import type { ActionKind } from './actions.ts';
 import type { CombatAi } from './combat/fight-types.ts';
 import { emit } from './events.ts';
 import type { Modifier, ModifierProvider } from './modifiers.ts';
+import type { HexEnteredHook } from './hex-hooks.ts';
 import type { Req } from './requirements.ts';
 import type { GameState } from './state.ts';
 import type { System } from './system.ts';
@@ -286,6 +287,20 @@ export function guardProvider(provider: ModifierProvider, pack: string): Modifie
       return Array.isArray(out) ? out.filter(validModifier) : [];
     } catch {
       return [];
+    }
+  };
+  return tagOrigin(guarded, pack);
+}
+
+/** A handler of a pack for the hex the player enters, guarded: when it throws, the pack is told and the walk goes on. */
+export function guardHexHook(hook: HexEnteredHook, pack: string): HexEnteredHook {
+  const guarded: HexEnteredHook = (state, ctx, content, rules) => {
+    const now = state.now;
+    try {
+      hook(state, ctx, content, rules);
+    } catch (error) {
+      state.now = now;
+      emit(state, { type: 'ruleDisabled', pack, rule: 'hexEntered', reason: text(error) });
     }
   };
   return tagOrigin(guarded, pack);

@@ -15,7 +15,7 @@ import {
   type GameState,
 } from '../src/index.ts';
 import { evalReq } from '../src/requirements.ts';
-import { genin } from './helpers.ts';
+import { genin, teleport } from './helpers.ts';
 
 const MINUTE = 60_000;
 
@@ -51,14 +51,7 @@ function explorerMinutes(targets: number[]): number[] {
       if (!cellId)
         throw new Error(`no cell to explore at Scouting ${skillLevel(state, 'scout', content)}`);
       const cell = content.cells.find((c) => c.id === cellId);
-      const here = content.cells.find((c) => c.id === state.world.location);
-      if (cell && here?.region !== cell.region) {
-        const outpost = content.cells.find(
-          (c) => c.region === cell.region && c.pois.some((p) => p.kind === 'outpost'),
-        );
-        if (outpost)
-          dispatch(state, { type: 'world.travel', cell: outpost.id, mode: 'instant' }, content);
-      }
+      if (cell && state.world.location !== cell.id) teleport(state, cell.id);
       const running = state.slots[0]?.action;
       if (running?.id !== cellId) {
         const r = dispatch(

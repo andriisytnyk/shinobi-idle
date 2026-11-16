@@ -18,6 +18,7 @@ export const skillId = idOf('skill');
 export const natureId = idOf('nature');
 export const techSkillId = idOf('techSkill');
 export const rankId = idOf('techRank');
+export const terrainId = idOf('terrain');
 export const playerRankId = idOf('playerRank');
 export const roleId = idOf('role');
 export const tagId = idOf('tag');
@@ -605,6 +606,8 @@ export type PoiKind = Poi['kind'];
 export const cellBaseSchema = z.object({
   id: coreId,
   region: coreId,
+  /** The hex the cell stands on: axial . A cell is a significant hex. */
+  hex: z.tuple([z.number().int(), z.number().int()]),
   index: z.number().int().min(0),
   key: idOf('cellKey').nullable(),
   /** Whether the cell hosts a story event. */
@@ -613,6 +616,44 @@ export const cellBaseSchema = z.object({
 
 export const cellSchema = cellBaseSchema.extend({ ...revealField, pois: z.array(poiSchema) });
 export type CellBase = z.infer<typeof cellBaseSchema>;
+
+/** A country of the map: a name (locale) and the palette token its hexes are drawn in. */
+export const countrySchema = z.strictObject({ id: coreId, token: z.string().optional() });
+
+/**
+ * A kind of terrain. The numbers (minutes to cross, survey time factor) are `K.map.terrain[id]`.
+ * A blocked terrain cannot be entered: it can be seen and surveyed from a neighbour.
+ */
+export const terrainSchema = z.strictObject({
+  id: vocabId,
+  token: z.string().optional(),
+  blocked: z.boolean().optional(),
+});
+
+/**
+ * One hex of the world grid (pointy-top, axial `q`, `r`). A hex with a terrain is playable: the
+ * player can walk on it and survey it. A hex with no terrain is only drawn (sea, foreign land), and
+ * with no country it is open sea. Packs add hexes of their own; a coordinate has one owner.
+ */
+export const hexSchema = z.strictObject({
+  q: z.number().int(),
+  r: z.number().int(),
+  country: coreId.optional(),
+  terrain: terrainId.optional(),
+});
+export type Hex = z.infer<typeof hexSchema>;
+
+/**
+ * A named place on a hex: a settlement, a landmark, a camp. It gives the hex a name and a story
+ * (`place.<id>.name` and `.desc`); what can be done there lives in the points of interest of the
+ * hex's cell. `kind` and `role` only choose the mark that is drawn.
+ */
+export const placeSchema = z.strictObject({
+  id: coreId,
+  hex: z.tuple([z.number().int(), z.number().int()]),
+  kind: z.string().min(1),
+  role: z.string().min(1),
+});
 
 export const regionSchema = z.object({
   ...revealField,
@@ -1426,10 +1467,32 @@ export const balanceParamsSchema = z.object({
    */
   scouting: z.object({
     plainMaxLevel: z.number().int(),
-    walkWithinMin: z.number(),
-    walkBetweenMin: z.number(),
     athPerLevel: z.number(),
     athCap: z.number(),
+  }),
+  /**
+   * The hex map. `terrain`: minutes to cross a hex of the terrain and the factor of the survey
+   * time. `range`: how far (in hexes) from its position the player can survey, by Scouting level,
+   * ascending; `outpostRange`: extra range while standing on a found outpost. `startRadius`: the
+   * hexes within this many steps of the first cell are surveyed in a new game. `plainSurvey`:
+   * surveys that reach each level of a hex that is not a cell (the levels are its length).
+   * `plainScout`: the pace level (as a region's `scout`) that XP of surveying such a hex follows.
+   */
+  map: z.object({
+    terrain: shapeOf(
+      'terrainFx',
+      z.record(
+        z.string(),
+        z.object({ walkMin: z.number().positive(), survey: z.number().positive() }),
+      ),
+    ),
+    range: z
+      .array(z.object({ scout: z.number().int().min(0), range: z.number().int().min(1) }))
+      .min(1),
+    outpostRange: z.number().int().min(0),
+    startRadius: z.number().int().min(0),
+    plainSurvey: z.array(z.number().int().min(1)).min(1),
+    plainScout: z.number().int().min(1),
   }),
   masteryCap: z.number().int(),
   /**
@@ -1487,6 +1550,8 @@ export const contentDbSchema = z.object({
   entityKinds: z.array(entityKindSchema),
   trophies: z.array(vocabSchema),
   gearFx: z.array(vocabSchema),
+  terrains: z.array(terrainSchema),
+  countries: z.array(countrySchema),
   skills: z.array(skillSchema),
   seals: z.array(sealSchema),
   techniques: z.array(techniqueSchema),
@@ -1504,6 +1569,9 @@ export const contentDbSchema = z.object({
   team: z.array(teammateSchema),
   regions: z.array(regionSchema),
   cells: z.array(cellSchema),
+  /** The world grid; a hex is keyed by its coordinates. */
+  hexes: z.array(hexSchema),
+  places: z.array(placeSchema),
   /** What each kind of key cell needs. */
   cellKeys: open<Record<IdTypes['cellKey'], Req>>(z.record(z.string(), reqSchema)),
   enemies: z.array(enemySchema),
@@ -1557,6 +1625,7 @@ export const generatedDbSchema = contentDbSchema
     entityKinds: true,
     trophies: true,
     gearFx: true,
+    terrains: true,
   })
   .extend({
     missions: z.array(missionBaseSchema),
@@ -1609,6 +1678,9 @@ export type MissionExtra = z.infer<typeof missionExtraSchema>;
 export type Teammate = z.infer<typeof teammateSchema>;
 export type Mission = z.infer<typeof missionSchema>;
 export type Cell = z.infer<typeof cellSchema>;
+export type Country = z.infer<typeof countrySchema>;
+export type Terrain = z.infer<typeof terrainSchema>;
+export type Place = z.infer<typeof placeSchema>;
 export type Region = z.infer<typeof regionSchema>;
 export type Enemy = z.infer<typeof enemySchema>;
 export type Boss = z.infer<typeof bossSchema>;

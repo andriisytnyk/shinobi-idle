@@ -20,7 +20,8 @@ import {
   regionFlag,
   serialize,
   STATE_VERSION,
-  travelOptions,
+  travelPlan,
+  hexKey,
   WALK_KIND,
   walkMs,
   zoneAvailable,
@@ -30,7 +31,7 @@ import {
   type Modifier,
   type Rules,
 } from '../src/index.ts';
-import { genin, setLevel } from './helpers.ts';
+import { genin, setLevel, teleport } from './helpers.ts';
 
 const K = content.balance.K;
 const S = K.scouting;
@@ -50,11 +51,16 @@ const explore = (id: string): Command => ({
   kind: EXPLORE_KIND,
   id: `core:${id}`,
 });
-const travel = (id: string, mode: 'instant' | 'walk' = 'instant'): Command => ({
+const travel = (id: string): Command => ({
   type: 'world.travel',
   cell: `core:${id}`,
-  mode,
+  mode: 'walk',
 });
+/** Puts the player on a cell and starts surveying it. */
+function survey(state: GameState, id: string, rules: Rules = defaultRules): void {
+  teleport(state, id);
+  ok(state, explore(id), rules);
+}
 const ok = (state: GameState, command: Command, rules: Rules = defaultRules) => {
   const result = dispatch(state, command, content, rules);
   expect(result, JSON.stringify(command)).toEqual({ ok: true });
@@ -73,7 +79,7 @@ function setExplores(state: GameState, id: string, n: number): void {
 function inPlains(level = 10): GameState {
   const state = genin();
   setLevel(state, 'scout', level);
-  ok(state, travel('pivdennyi_trakt'));
+  teleport(state, 'pivdennyi_trakt');
   return state;
 }
 const cycle = (state: GameState) => exploreIntervalMs(state, content, defaultRules);
@@ -116,18 +122,19 @@ describe('A3: gating of keys and levels', () => {
     ['rock', 'skelia_nad_vodospadom', () => {}],
     ['water', 'lisove_ozero', () => {}],
     ['brush', 'ternovi_zarosti', () => {}],
-    ['rubble', 'skhovyshche_fortetsi', (s) => ok(s, travel('pivdennyi_trakt'))],
-    ['mist', 'tumannyi_iar', (s) => ok(s, travel('pivnichnyi_trakt'))],
+    ['rubble', 'skhovyshche_fortetsi', (s) => teleport(s, 'pivdennyi_trakt')],
+    ['mist', 'tumannyi_iar', (s) => teleport(s, 'pivnichnyi_trakt')],
   ];
   for (const [key, id, go] of spots) {
     it(`refuses a ${key} cell without its requirement and starts it with it`, () => {
       const state = genin();
       setLevel(state, 'scout', 20);
       go(state);
+      teleport(state, id);
       expect(cell(id).key).toBe(key);
       expect(reason(state, explore(id))).toBe('error.requirementsNotMet');
       meet[key]?.(state);
-      ok(state, explore(id));
+      survey(state, id);
     });
   }
 
@@ -135,12 +142,12 @@ describe('A3: gating of keys and levels', () => {
     const state = genin();
     setLevel(state, 'scout', 20);
     state.known['core:sickle_weasel'] = true;
-    ok(state, explore('ternovi_zarosti'));
-    ok(state, travel('pivnichnyi_trakt'));
-    ok(state, explore('tumannyi_iar'));
+    survey(state, 'ternovi_zarosti');
+    teleport(state, 'pivnichnyi_trakt');
+    survey(state, 'tumannyi_iar');
     const other = genin();
     other.known['core:running_fire'] = true;
-    ok(other, explore('ternovi_zarosti'));
+    survey(other, 'ternovi_zarosti');
   });
 
   it('needs the Scouting level of the formula for each cell level', () => {
@@ -150,14 +157,14 @@ describe('A3: gating of keys and levels', () => {
     setLevel(state, 'scout', 10);
     expect(reason(state, explore('okolytsi_sela'))).toBe('error.requirementsNotMet');
     setLevel(state, 'scout', 11);
-    ok(state, explore('okolytsi_sela'));
+    survey(state, 'okolytsi_sela');
     const far = genin();
     setLevel(far, 'scout', 29);
-    ok(far, travel('pivdennyi_trakt'));
+    teleport(far, 'pivdennyi_trakt');
     setExplores(far, 'pivdennyi_trakt', K.cellExplores[1] ?? 0);
     expect(reason(far, explore('pivdennyi_trakt'))).toBe('error.requirementsNotMet');
     setLevel(far, 'scout', 30);
-    ok(far, explore('pivdennyi_trakt'));
+    survey(far, 'pivdennyi_trakt');
   });
 
   it('caps the need at the skill cap', () => {
@@ -177,9 +184,6 @@ describe('A3: gating of keys and levels', () => {
     const student = createState(1, content);
     expect(reason(student, explore('okolytsi_sela'))).toBe('error.skillLocked');
     const state = genin();
-    expect(
-      reason(state, { type: 'world.travel', cell: 'core:pivdennyi_trakt', mode: 'instant' }),
-    ).toBe('error.cellNotReachable');
     expect(cellInfo(state, 'core:pivdennyi_trakt', content)?.why).toBe('error.regionClosed');
   });
 
@@ -192,7 +196,7 @@ describe('A3: gating of keys and levels', () => {
     setLevel(state, 'scout', 30);
     const last = (K.cellExplores[S.plainMaxLevel - 1] ?? 0) - 1;
     setExplores(state, 'rysovi_polia', last);
-    ok(state, explore('rysovi_polia'));
+    survey(state, 'rysovi_polia');
     state.events = [];
     advance(state, cycle(state), content);
     expect(cellLevel(state, plain, content)).toBe(S.plainMaxLevel);
@@ -216,7 +220,7 @@ describe('A4: exploration XP and Intel', () => {
     const state = genin();
     setLevel(state, 'scout', level);
     setup(state);
-    ok(state, explore(id));
+    survey(state, id);
     const before = state.skills.scout!.xp;
     const ms = 10 * cycle(state);
     advance(state, ms, content);
@@ -233,7 +237,7 @@ describe('A4: exploration XP and Intel', () => {
       [VALLEY, 'pivnichnyi_trakt', 'pivnichnyi_trakt'],
     ];
     for (const [region, id, go] of cases) {
-      const { perHour, expected } = measure((s) => go && ok(s, travel(go)), region, 1, id);
+      const { perHour, expected } = measure((s) => go && teleport(s, go), region, 1, id);
       expect(perHour / expected, region).toBeGreaterThan(0.98);
       expect(perHour / expected, region).toBeLessThan(1.02);
     }
@@ -253,7 +257,7 @@ describe('A4: exploration XP and Intel', () => {
 
   it('grants no mastery for exploring', () => {
     const state = genin();
-    ok(state, explore('okolytsi_sela'));
+    survey(state, 'okolytsi_sela');
     advance(state, 5 * cycle(state), content);
     expect(state.mastery).toEqual({});
   });
@@ -263,7 +267,7 @@ describe('A4: exploration XP and Intel', () => {
     setLevel(state, 'scout', 50);
     const id = 'okolytsi_sela';
     const total = K.cellExplores[K.cellExplores.length - 1] ?? 0;
-    ok(state, explore(id));
+    survey(state, id);
     let intel = 0;
     for (let n = 1; n <= total; n++) {
       advance(state, cycle(state), content);
@@ -280,7 +284,7 @@ describe('A4: exploration XP and Intel', () => {
   it('finds the points of a cell at level 1: flags, links, deposits', () => {
     const state = genin();
     setLevel(state, 'scout', 30);
-    ok(state, explore('uzlissia'));
+    survey(state, 'uzlissia');
     expect(zoneAvailable(state, 'core:zone_bandit', content)).toBe(false);
     advance(state, (K.cellExplores[0] ?? 0) * cycle(state), content);
     expect(zoneAvailable(state, 'core:zone_bandit', content)).toBe(true);
@@ -291,8 +295,8 @@ describe('A4: exploration XP and Intel', () => {
     // A deposit raises the village flag of its building, one per deposit.
     const mine = genin();
     setLevel(mine, 'scout', 30);
-    ok(mine, travel('pivdennyi_trakt'));
-    ok(mine, explore('soliani_kopalni'));
+    teleport(mine, 'pivdennyi_trakt');
+    survey(mine, 'soliani_kopalni');
     advance(mine, (K.cellExplores[0] ?? 0) * cycle(mine), content);
     expect(mine.flags['deposit.core:mine']).toBe(1);
   });
@@ -307,108 +311,90 @@ describe('A4: exploration XP and Intel', () => {
 });
 
 describe('A5: travel', () => {
-  it('costs ryo by region for instant trips, nothing to an outpost', () => {
-    const state = genin();
-    setLevel(state, 'scout', 20);
-    state.currencies.ryo = 1000;
-    ok(state, travel('pivdennyi_trakt')); // outpost
-    ok(state, travel('pivnichnyi_trakt')); // outpost
-    expect(state.currencies.ryo).toBe(1000);
-    setExplores(state, 'statui_zasnovnykiv', 24);
-    ok(state, travel('statui_zasnovnykiv'));
-    expect(state.currencies.ryo).toBe(1000 - (K.travel[2] ?? 0));
-    setExplores(state, 'khram_vohniu', 24);
-    ok(state, travel('khram_vohniu'));
-    expect(state.currencies.ryo).toBe(1000 - (K.travel[2] ?? 0) - (K.travel[1] ?? 0));
-    setExplores(state, 'rysovi_polia', 24);
-    ok(state, travel('rysovi_polia'));
-    expect(state.currencies.ryo).toBe(
-      1000 - (K.travel[2] ?? 0) - (K.travel[1] ?? 0) - (K.travel[0] ?? 0),
-    );
-  });
+  /** Minutes of a hex of a cell on the map. */
+  const here = (id: string) => hexKey(cell(id).hex[0], cell(id).hex[1]);
 
-  it('refuses unexplored cells, a missing fee and the cell the player stands in', () => {
+  it('refuses a hex that is not known, an unknown address and the hex the player stands on', () => {
     const state = genin();
     setLevel(state, 'scout', 20);
-    expect(reason(state, travel('rysovi_polia'))).toBe('error.cellNotReachable');
+    expect(reason(state, travel('pivnichnyi_trakt'))).toBe('error.cellNotReachable');
     expect(reason(state, travel('okolytsi_sela'))).toBe('error.alreadyThere');
-    expect(reason(state, { type: 'world.travel', cell: 'core:nowhere', mode: 'instant' })).toBe(
-      'error.unknownCell',
+    expect(reason(state, { type: 'world.travel', cell: 'core:nowhere', mode: 'walk' })).toBe(
+      'error.unknownAction',
     );
-    setExplores(state, 'rysovi_polia', 24);
-    state.currencies.ryo = (K.travel[0] ?? 0) - 1;
-    expect(reason(state, travel('rysovi_polia'))).toBe('error.notEnoughRyo');
-    expect(state.world.location).toBe('core:okolytsi_sela');
-    expect(reason(state, travel('rysovi_polia', 'walk'))).toBeNull();
+    // A hex of the sea can be seen but never entered.
+    const sea = content.hexes.find((h) => h.terrain === undefined && h.country === undefined);
+    expect(sea).toBeDefined();
+    expect(
+      reason(state, { type: 'world.travel', cell: hexKey(sea!.q, sea!.r), mode: 'walk' }),
+    ).toBe('error.cellNotReachable');
   });
 
-  it('walks for the configured time, shorter with Athletics, and arrives only at the end', () => {
+  it('walks hex by hex for the time of the terrain, shorter with Athletics, and arrives only at the end', () => {
     const state = genin();
     setLevel(state, 'scout', 20);
-    setExplores(state, 'rysovi_polia', 24);
     const at = state.world.location;
-    ok(state, travel('rysovi_polia', 'walk'));
+    const plan = travelPlan(state, 'core:rysovi_polia', content);
+    expect(plan.blocked).toBeNull();
+    expect(plan.hexes.at(-1)).toBe(here('rysovi_polia'));
+    ok(state, travel('rysovi_polia'));
     expect(state.slots[0]?.action).toEqual({ kind: WALK_KIND, id: 'core:rysovi_polia' });
     const need = walkMs(state, cell('rysovi_polia'), content, defaultRules);
-    expect(need).toBe(Math.round(S.walkWithinMin * MIN * (1 - S.athPerLevel)));
+    expect(need).toBe(plan.ms);
+    const minutes = plan.hexes.map((key) => {
+      const terrain = content.hexes.find((h) => hexKey(h.q, h.r) === key)?.terrain ?? '';
+      return K.map.terrain[terrain]?.walkMin ?? 0;
+    });
+    expect(need).toBe(
+      minutes.reduce((sum, m) => sum + Math.round(m * MIN * (1 - S.athPerLevel)), 0),
+    );
     advance(state, need - 1, content);
-    expect(state.world.location).toBe(at);
+    expect(state.world.location).not.toBe(at);
+    expect(state.world.location).not.toBe('core:rysovi_polia');
+    expect(state.slots[0]?.action).not.toBeNull();
     advance(state, 1, content);
     expect(state.world.location).toBe('core:rysovi_polia');
     expect(state.slots[0]?.action).toBeNull();
 
     const fit = genin();
     setLevel(fit, 'ath', 50);
-    setExplores(fit, 'rysovi_polia', 24);
     const quick = walkMs(fit, cell('rysovi_polia'), content, defaultRules);
-    expect(quick).toBe(Math.round(S.walkWithinMin * MIN * (1 - 50 * S.athPerLevel)));
     expect(quick).toBeLessThan(need);
-
-    // Between regions the walk is the long one.
-    setLevel(fit, 'scout', 10);
-    setExplores(fit, 'khram_vohniu', 24);
-    expect(walkMs(fit, cell('khram_vohniu'), content, defaultRules)).toBe(
-      Math.round(S.walkBetweenMin * MIN * (1 - 50 * S.athPerLevel)),
-    );
   });
 
-  it('refuses to explore in another region until the player has travelled there', () => {
+  it('refuses to survey a hex beyond the range of the survey', () => {
     const state = genin();
-    setLevel(state, 'scout', 10);
-    expect(reason(state, explore('pivdennyi_trakt'))).toBe('error.notInRegion');
-    expect(cellInfo(state, 'core:pivdennyi_trakt', content)?.why).toBe('error.notInRegion');
-    ok(state, travel('pivdennyi_trakt'));
-    ok(state, explore('pivdennyi_trakt'));
-    expect(reason(state, explore('okolytsi_sela'))).toBe('error.notInRegion');
+    setLevel(state, 'scout', 25);
+    expect(reason(state, explore('stezhka_myslyvtsia'))).toBe('error.outOfRange');
+    expect(cellInfo(state, 'core:stezhka_myslyvtsia', content)?.why).toBe('error.outOfRange');
+    teleport(state, 'stezhka_myslyvtsia');
+    ok(state, explore('stezhka_myslyvtsia'));
+    expect(reason(state, explore('okolytsi_sela'))).toBe('error.outOfRange');
   });
 
-  it('stops exploring and walking that no longer fit after an instant trip', () => {
+  it('stops a survey that no longer fits after the player is moved away', () => {
     const state = genin();
     setLevel(state, 'scout', 10);
     ok(state, explore('okolytsi_sela'));
-    ok(state, travel('pivdennyi_trakt'));
+    teleport(state, 'stezhka_myslyvtsia');
+    advance(state, 2 * cycle(state), content);
     expect(state.slots[0]?.action).toBeNull();
-    setExplores(state, 'khram_vohniu', 24);
-    ok(state, travel('khram_vohniu', 'walk'));
-    expect(state.slots[0]?.action?.kind).toBe(WALK_KIND);
-    ok(state, travel('okolytsi_sela'));
-    expect(state.slots[0]?.action).toBeNull();
-    expect(state.world.location).toBe('core:okolytsi_sela');
-    advance(state, 40 * MIN, content);
-    expect(state.world.location).toBe('core:okolytsi_sela');
+    expect(state.world.explores['core:okolytsi_sela'] ?? 0).toBe(0);
   });
 
-  it('lists the options with their cost', () => {
+  it('leaves the player on the last hex reached when the walk is stopped', () => {
     const state = genin();
-    setLevel(state, 'scout', 10);
-    setExplores(state, 'rysovi_polia', 24);
-    const options = travelOptions(state, content);
-    expect(options.map((o) => o.cell).sort()).toEqual([
-      'core:pivdennyi_trakt',
-      'core:rysovi_polia',
-    ]);
-    expect(options.find((o) => o.cell === 'core:pivdennyi_trakt')?.instantCost).toBe(0);
-    expect(options.find((o) => o.cell === 'core:rysovi_polia')?.instantCost).toBe(K.travel[0]);
+    setLevel(state, 'scout', 20);
+    ok(state, travel('rysovi_polia'));
+    const plan = travelPlan(state, 'core:rysovi_polia', content);
+    expect(plan.hexes.length).toBeGreaterThan(1);
+    const first = state.world.location;
+    advance(state, walkMs(state, cell('rysovi_polia'), content, defaultRules) - 1, content);
+    const mid = state.world.location;
+    expect(mid).not.toBe(first);
+    ok(state, { type: 'action.stop', slot: 0 });
+    advance(state, 40 * MIN, content);
+    expect(state.world.location).toBe(mid);
   });
 });
 
@@ -435,7 +421,7 @@ describe('A6: training spots', () => {
     // The bonus is real XP, not only a number.
     const away = genin();
     spot(away);
-    dispatch(away, { type: 'world.travel', cell: 'core:okolytsi_sela', mode: 'instant' }, content);
+    teleport(away, 'okolytsi_sela');
     expect(away.world.location).toBe('core:okolytsi_sela');
     expect(getMod(away, 'xp.skill.katon', content).total).toBe(1);
     expect(gained).toBe(0);
@@ -492,11 +478,11 @@ describe('A7: caches and vaults', () => {
   it('gives the whole scroll of the Fire Dragon Flame Bullet from the fortress vault', () => {
     const state = inPlains();
     state.known['core:hiding_like_a_mole'] = true;
-    ok(state, explore('skhovyshche_fortetsi'));
+    survey(state, 'skhovyshche_fortetsi');
     advance(state, (K.cellExplores[0] ?? 0) * cycle(state), content);
     expect(cellLevel(state, cell('skhovyshche_fortetsi'), content)).toBe(1);
     state.currencies.ryo = 100;
-    ok(state, travel('skhovyshche_fortetsi'));
+    teleport(state, 'skhovyshche_fortetsi');
     ok(state, claim('poi_skhovyshche_fortetsi_vault'));
     expect(state.bank['core:scroll_fire_dragon_flame_bullet']).toBe(1);
     expect(reason(state, claim('poi_skhovyshche_fortetsi_vault'))).toBe('error.alreadyClaimed');
@@ -538,15 +524,15 @@ describe('A8: quest objectives for the map', () => {
     expect(state.quests[quest.id]?.step).toBe(1);
     advance(state, 0, world);
     expect(state.quests[quest.id]?.step).toBe(1);
-    ok(state, travel('pivdennyi_trakt'));
-    ok(state, explore('pivdennyi_trakt'));
+    teleport(state, 'pivdennyi_trakt');
+    survey(state, 'pivdennyi_trakt');
     advance(state, (K.cellExplores[0] ?? 0) * cycle(state), world);
     expect(state.quests[quest.id]?.step).toBe(1);
-    ok(state, explore('mistechko_na_rivnynakh'));
+    survey(state, 'mistechko_na_rivnynakh');
     advance(state, (K.cellExplores[0] ?? 0) * cycle(state), world);
     expect(state.quests[quest.id]?.step).toBe(2);
     expect(state.counters[exploredKey(PLAINS)]).toBe(7);
-    ok(state, explore('khram_vohniu'));
+    survey(state, 'khram_vohniu');
     advance(state, (K.cellExplores[0] ?? 0) * cycle(state), world);
     expect(state.quests[quest.id]?.done).toBe(true);
     expect(state.flags['test.done']).toBe(true);
@@ -567,13 +553,16 @@ describe('A9: determinism and split invariance', () => {
   function scenario(two: boolean): GameState {
     const state = genin(7);
     setLevel(state, 'scout', 5);
-    setExplores(state, 'rysovi_polia', 24);
     setExplores(state, 'okolytsi_sela', (K.cellExplores[0] ?? 0) - 3);
     state.world.location = 'core:okolytsi_sela';
-    ok(state, explore('okolytsi_sela'), fast);
+    survey(state, 'okolytsi_sela', fast);
     if (two) {
       state.slots.push({ action: null, progress: 0, share: 0, data: null });
-      ok(state, { type: 'world.travel', cell: 'core:rysovi_polia', mode: 'walk', slot: 1 }, fast);
+      ok(
+        state,
+        { type: 'world.travel', cell: 'core:polihon_44_lis_smerti', mode: 'walk', slot: 1 },
+        fast,
+      );
     }
     return state;
   }
@@ -585,7 +574,7 @@ describe('A9: determinism and split invariance', () => {
       advance(whole, total, content, fast);
       // The cell went up a level during the run.
       expect(cellLevel(whole, cell('okolytsi_sela'), content)).toBeGreaterThanOrEqual(1);
-      if (two) expect(whole.world.location).toBe('core:rysovi_polia');
+      if (two) expect(whole.world.location).toBe('core:polihon_44_lis_smerti');
       for (const chunk of [1, 7, 999, 3600]) {
         const parts = scenario(two);
         for (let done = 0; done < total; done += chunk) {
@@ -609,7 +598,7 @@ describe('A11: save', () => {
   it('round-trips the world', () => {
     const state = inPlains(11);
     state.known['core:hiding_like_a_mole'] = true;
-    ok(state, explore('khram_vohniu'));
+    survey(state, 'khram_vohniu');
     advance(state, (K.cellExplores[0] ?? 0) * cycle(state) + 777, content);
     state.world.location = 'core:khram_vohniu';
     const loaded = deserialize(serialize(state), content);
@@ -628,12 +617,8 @@ describe('A11: save', () => {
     delete parsed.state.world;
     const old = deserialize(JSON.stringify(parsed), content);
     expect(old.v).toBe(STATE_VERSION);
-    expect(old.world).toEqual({
-      location: content.regions[0]?.cells[0],
-      explores: {},
-      pois: {},
-      claimed: {},
-    });
+    expect(old.world).toEqual(createState(1, content).world);
+    expect(old.world.location).toBe(content.regions[0]?.cells[0]);
   });
 
   it('cleans a doctored world: unknown cells, huge counts, loot that cannot be taken', () => {

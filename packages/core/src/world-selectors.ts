@@ -13,16 +13,21 @@ import {
   exploreReq,
   exploreXp,
   exploresOf,
-  inRegionOf,
-  instantCost,
   isRegionOpen,
   keyReq,
   levelNeed,
+  regionHere,
+  routeMs,
+  stepMs,
+  subjectOf,
+  surveyBlocked,
+  surveyLevel,
+  surveyMaxLevel,
+  surveyReq,
   travelBlocked,
-  walkMs,
 } from './world.ts';
+import { hexKey, isSurveyed, positionHex, routeTo, surveyAccess, surveyRange } from './hex.ts';
 import { regionOpenReq } from './regions.ts';
-import { moneyOf } from './vocab.ts';
 
 /*
  * Read-only views of the map for the UI and bots. Nothing here changes the state.
@@ -54,7 +59,7 @@ export interface RegionInfo {
 /** The regions with their open state and the requirement tree that opens them. */
 export function listRegions(state: GameState, content: ContentDb): RegionInfo[] {
   const index = indexOf(content);
-  const at = index.cells.get(state.world.location)?.region ?? null;
+  const at = regionHere(state, content);
   return content.regions.map((region) => ({
     id: region.id,
     open: isRegionOpen(state, region, content),
@@ -96,8 +101,8 @@ export interface CellInfo {
   /** Scouting level the next level needs; null at the top. */
   nextLevelNeed: number | null;
   located: boolean;
-  /** Whether the player stands in the cell's region (exploring needs it). */
-  inRegion: boolean;
+  /** Whether the cell's hex can be surveyed from where the player stands (in range, not behind fog). */
+  near: boolean;
   /** Whether exploring can start now. */
   explorable: boolean;
   /** Why not (a localization key); null when explorable. */
@@ -148,8 +153,8 @@ export function cellInfo(
         ? 'error.keyMissing'
         : 'error.scoutLevelLow';
   }
-  // A closed region reads better than "not in region" for a cell the player cannot reach anyway.
-  if (blocked === 'error.notInRegion' && !isRegionOpen(state, region, content)) {
+  // A closed region reads better than "too far" for a cell the player cannot reach anyway.
+  if (blocked === 'error.outOfRange' && !isRegionOpen(state, region, content)) {
     why = 'error.regionClosed';
   }
   return {
@@ -165,8 +170,8 @@ export function cellInfo(
     keyReq: keyResult,
     req: reqResult,
     nextLevelNeed: top ? null : levelNeed(region, level + 1, content),
-    located: state.world.location === cell.id,
-    inRegion: inRegionOf(state, cell, content),
+    located: locationHexKey(state, content) === hexKey(cell.hex[0], cell.hex[1]),
+    near: surveyAccess(state, content, { q: cell.hex[0], r: cell.hex[1] }) === 'ok',
     explorable: why === null,
     why,
     intervalMs,
@@ -183,10 +188,12 @@ export function cellInfo(
           found &&
           !claimed &&
           (p.kind === 'cache' || p.kind === 'vault') &&
-          state.world.location === cell.id,
+          locationHexKey(state, content) === hexKey(cell.hex[0], cell.hex[1]),
       };
     }),
-    reachable: travelBlocked(state, cell.id, content) === null || state.world.location === cell.id,
+    reachable:
+      travelBlocked(state, cell.id, content) === null ||
+      locationHexKey(state, content) === hexKey(cell.hex[0], cell.hex[1]),
   };
 }
 
@@ -199,36 +206,128 @@ export function listCells(
   return content.cells.flatMap((c) => cellInfo(state, c.id, content, rules) ?? []);
 }
 
-export interface TravelOption {
-  cell: string;
-  region: string;
-  /** Whether the target is an outpost (instant trips there are free). */
-  outpost: boolean;
-  /** Ryo of an instant trip; 0 for an outpost. */
-  instantCost: number;
-  canAffordInstant: boolean;
-  /** Length of a walk in ms at full speed, modifiers included. */
-  walkMs: number;
+/** The key of the hex the player stands on, or null when the world has no hex. */
+function locationHexKey(state: GameState, content: ContentDb): string | null {
+  const here = positionHex(state, content);
+  return here ? hexKey(here.q, here.r) : null;
 }
 
-/** Where the player can go from here, with what each way costs. */
-export function travelOptions(
+export interface TravelPlan {
+  /** Why the trip cannot be made (a localization key); null when it can. */
+  blocked: string | null;
+  /** Keys of the hexes the route enters in order, the start excluded; empty when there is no route. */
+  hexes: string[];
+  /** Length of the whole route in ms at full speed, modifiers included; 0 when there is no route. */
+  ms: number;
+}
+
+/** The route to the hex that `address` names with its length, for showing before the player goes. */
+export function travelPlan(
+  state: GameState,
+  address: string,
+  content: ContentDb,
+  rules: Rules = defaultRules,
+): TravelPlan {
+  const blocked = travelBlocked(state, address, content);
+  const hex = indexOf(content).cells.get(address)
+    ? subjectOf(content, address)?.hex
+    : indexOf(content).hexes.get(address);
+  const route = blocked === null && hex ? routeTo(state, content, hex) : null;
+  return {
+    blocked,
+    hexes: route?.hexes ?? [],
+    ms: hex && route ? (routeMs(state, content, rules, hex) ?? 0) : 0,
+  };
+}
+
+/** What one hex looks like to the player: what is known, what can be done. */
+export interface HexInfo {
+  key: string;
+  q: number;
+  r: number;
+  /** The address of the hex (a cell id, or the key); what actions and commands call it. */
+  address: string;
+  /** The country, known once the hex is surveyed. */
+  country: string | null;
+  /** The terrain, known once the hex is surveyed; null in fog and for a hex that can only be drawn. */
+  terrain: string | null;
+  playable: boolean;
+  /** Surveyed to its first level (or marked so): the player can walk on it. Fog otherwise. */
+  surveyed: boolean;
+  /** The player stands here. */
+  here: boolean;
+  /** Can be surveyed from where the player stands: in range and not behind fog. */
+  inRange: boolean;
+  /** The id of the cell on the hex, known once the hex is surveyed. */
+  cell: string | null;
+  /** The ids of the named places on the hex, once it has been surveyed at least once. */
+  places: string[];
+  level: number;
+  maxLevel: number;
+  explores: number;
+  /** Why the hex cannot be surveyed now; null when it can. */
+  surveyWhy: string | null;
+  /** Length of one survey and Scouting XP per hour at full speed, modifiers included; 0 when the hex cannot be surveyed. */
+  surveyMs: number;
+}
+
+/** The view of one hex of the grid, or null for a coordinate that is no hex. */
+export function hexInfo(
+  state: GameState,
+  key: string,
+  content: ContentDb,
+  rules: Rules = defaultRules,
+): HexInfo | null {
+  const index = indexOf(content);
+  const hex = index.hexes.get(key);
+  if (!hex) return null;
+  const surveyed = isSurveyed(state, content, key);
+  const subject = subjectOf(content, key);
+  const here = locationHexKey(state, content) === key;
+  const level = subject ? surveyLevel(state, subject, content) : 0;
+  const req = subject ? surveyReq(state, subject.address, content) : null;
+  const blocked = subject ? surveyBlocked(state, subject.address, content) : 'error.unknownCell';
+  let why = blocked;
+  if (!why && req && !evalReq(state, req, content).met) why = 'error.scoutLevelLow';
+  return {
+    key,
+    q: hex.q,
+    r: hex.r,
+    address: subject?.address ?? key,
+    country: surveyed ? (hex.country ?? null) : null,
+    terrain: surveyed ? (hex.terrain ?? null) : null,
+    playable: hex.terrain !== undefined,
+    surveyed,
+    here,
+    inRange: surveyAccess(state, content, hex) === 'ok',
+    cell: surveyed ? (subject?.cell?.id ?? null) : null,
+    places: surveyed && level >= 1 ? (index.placesByHex.get(key) ?? []).map((p) => p.id) : [],
+    level,
+    maxLevel: subject ? surveyMaxLevel(subject, content) : 0,
+    explores: subject ? exploresOf(state, subject.address) : 0,
+    surveyWhy: why,
+    surveyMs:
+      subject && why === null ? exploreIntervalMs(state, content, rules, subject.address) : 0,
+  };
+}
+
+/** Every hex of the grid. */
+export function listHexes(
   state: GameState,
   content: ContentDb,
   rules: Rules = defaultRules,
-): TravelOption[] {
-  return content.cells.flatMap((cell) => {
-    if (travelBlocked(state, cell.id, content) !== null) return [];
-    const cost = instantCost(cell, content);
-    return [
-      {
-        cell: cell.id,
-        region: cell.region,
-        outpost: cell.pois.some((p) => p.kind === 'outpost'),
-        instantCost: cost,
-        canAffordInstant: (state.currencies[moneyOf(content)] ?? 0) >= cost,
-        walkMs: walkMs(state, cell, content, rules),
-      },
-    ];
-  });
+): HexInfo[] {
+  return content.hexes.flatMap((h) => hexInfo(state, hexKey(h.q, h.r), content, rules) ?? []);
 }
+
+/** How far the player can survey from here now, for drawing the reach. */
+export const rangeNow = (state: GameState, content: ContentDb): number =>
+  surveyRange(state, content);
+
+/** Length of one step onto a hex of `terrain`, for showing a route before it is walked. */
+export const stepTime = (
+  state: GameState,
+  terrain: string,
+  content: ContentDb,
+  rules: Rules = defaultRules,
+): number => stepMs(state, content, rules, terrain);

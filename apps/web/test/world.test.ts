@@ -110,9 +110,8 @@ describe('A3: the map follows the core', () => {
     expect(tile(HOME)?.querySelector('[data-here]')).not.toBeNull();
     expect(tile(PLAIN_CELL)?.querySelector('[data-here]')).toBeNull();
 
-    expect(game.dispatch({ type: 'world.travel', cell: PLAIN_CELL, mode: 'instant' }).ok).toBe(
-      true,
-    );
+    expect(game.dispatch({ type: 'world.travel', cell: PLAIN_CELL, mode: 'walk' }).ok).toBe(true);
+    game.devAdvance(2 * 60 * 60_000);
     flushSync();
 
     expect(tile(HOME)?.querySelector('[data-here]')).toBeNull();
@@ -249,6 +248,9 @@ describe('A5: a disabled control says why', () => {
   });
 
   it('key missing', () => {
+    const state = genin();
+    state.world.location = KEYED;
+    game.replaceState(state);
     show({ cell: KEYED, region: FOREST });
     expect(q('[data-explore]')?.hasAttribute('disabled')).toBe(true);
     expect(reason('explore')).toBe(name('error.keyMissing'));
@@ -270,26 +272,14 @@ describe('A5: a disabled control says why', () => {
     game.replaceState(state);
     show({ cell: CACHE_CELL, region: VALLEY });
     expect(q('[data-explore]')?.hasAttribute('disabled')).toBe(true);
-    expect(reason('explore')).toBe(name('error.notInRegion'));
+    expect(reason('explore')).toBe(name('error.outOfRange'));
     expect(q('[data-claim]')?.hasAttribute('disabled')).toBe(true);
     expect(reason('claim')).toBe(name('error.notHere'));
   });
 
-  it('not enough ryo for an instant trip, while the walk stays open', () => {
-    const state = genin();
-    explored(state, PLAIN_CELL);
-    state.currencies.ryo = 0;
-    game.replaceState(state);
-    show({ cell: PLAIN_CELL, region: FOREST });
-    expect(q('[data-travel-instant]')?.hasAttribute('disabled')).toBe(true);
-    expect(reason('instant')).toBe(name('error.notEnoughRyo'));
-    expect(q('[data-travel-walk]')?.hasAttribute('disabled')).toBe(false);
-  });
-
   it('a cell that cannot be reached yet', () => {
-    show({ cell: 'core:uzlissia', region: FOREST });
-    expect(q('[data-travel-instant]')?.hasAttribute('disabled')).toBe(true);
-    expect(reason('instant')).toBe(name('error.cellNotReachable'));
+    show({ cell: 'core:stezhka_myslyvtsia', region: VALLEY });
+    expect(q('[data-travel-walk]')?.hasAttribute('disabled')).toBe(true);
     expect(reason('walk')).toBe(name('error.cellNotReachable'));
   });
 
@@ -300,16 +290,6 @@ describe('A5: a disabled control says why', () => {
     show({ cell: PLAIN_CELL, region: FOREST });
     expect(q('[data-explore]')?.hasAttribute('disabled')).toBe(true);
     expect(reason('explore')).toBe(name('error.cellMaxed'));
-  });
-
-  it('an outpost trip is free and shows it', () => {
-    const state = genin();
-    state.skills.scout!.xp = xpAt(10);
-    game.replaceState(state);
-    game.devAdvance(1000);
-    show({ cell: 'core:pivdennyi_trakt', region: PLAINS });
-    expect(q('[data-travel-instant]')?.hasAttribute('disabled')).toBe(false);
-    expect(q('[data-travel-instant]')?.textContent).toContain(name('world.travel.free'));
   });
 });
 
@@ -372,20 +352,15 @@ describe('entering a newly opened region', () => {
 
     unmount(app!);
     app = null;
-    show({ cell: 'core:mistechko_na_rivnynakh', region: PLAINS });
-    // Not there yet: exploring says why and names the action that fixes it.
-    expect(reason('explore')).toBe(name('error.notInRegion'));
-    expect(name('error.notInRegion')).toContain(name('world.entry.go'));
+    show({ cell: 'core:pokynutyi_khutir', region: PLAINS });
+    // Too far for the survey from here: it says why.
+    expect(reason('explore')).toBe(name('error.outOfRange'));
     expect(q('[data-explore]')?.hasAttribute('disabled')).toBe(true);
 
-    q('[data-region-enter]')?.click();
+    q('[data-region-walk]')?.click();
+    game.devAdvance(2 * 60 * 60_000);
     flushSync();
     expect(game.state.world.location).toBe('core:pivdennyi_trakt');
-    expect(q('[data-explore]')?.hasAttribute('disabled')).toBe(false);
-    q('[data-explore]')?.click();
-    game.devAdvance((FIRST_LEVEL + 2) * 5000);
-    flushSync();
-    expect(tile('core:mistechko_na_rivnynakh')?.getAttribute('data-level')).toBe('1');
   });
 });
 
@@ -535,7 +510,8 @@ describe('toasts', () => {
     explored(state, PLAIN_CELL);
     state.currencies.ryo = 50;
     own.replaceState(state);
-    own.dispatch({ type: 'world.travel', cell: PLAIN_CELL, mode: 'instant' });
+    own.dispatch({ type: 'world.travel', cell: PLAIN_CELL, mode: 'walk' });
+    own.devAdvance(2 * 60 * 60_000);
     expect(pushed.map((p) => (p as { key: string }).key)).toContain('toast.travelled');
     expect(own.signals.travelled).toBe(true);
   });

@@ -1,17 +1,10 @@
 <script lang="ts">
-  import {
-    cellInfo,
-    instantCost,
-    travelBlocked,
-    travelOptions,
-    walkMs,
-    type CellInfo,
-  } from '@shinobi/core';
+  import { cellInfo, travelBlocked, walkMs, type CellInfo } from '@shinobi/core';
   import { entityDesc } from '../lib/entities.ts';
   import { formatDuration, formatInt, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
-  import { currencyName, moneyOf, skillByActivity } from '../lib/vocab.ts';
+  import { skillByActivity } from '../lib/vocab.ts';
   import { keyIcon, keyNameKey, uniqueReq } from '../lib/world.ts';
   import { IDLE_TIMING, slotTiming } from '../lib/timing.ts';
   import PoiRow from './PoiRow.svelte';
@@ -48,14 +41,8 @@
     game.read((gs) => {
       const target = content.cells.find((c) => c.id === id);
       if (!target) return null;
-      const cost = instantCost(target, content);
       return {
         blocked: travelBlocked(gs, id, content),
-        cost,
-        // The core says whether the trip can be paid; a cell it cannot reach is refused by `blocked`.
-        canAfford:
-          travelOptions(gs, content, game.rules).find((o) => o.cell === id)?.canAffordInstant ??
-          true,
         walkMs: walkMs(gs, target, content, game.rules),
       };
     }),
@@ -83,15 +70,11 @@
   );
 
   const reasonExplore = $derived(busy.explore >= 0 ? null : (info?.why ?? null));
-  const reasonInstant = $derived(
-    travel === null ? null : (travel.blocked ?? (travel.canAfford ? null : 'error.notEnoughRyo')),
-  );
   const reasonWalk = $derived(travel?.blocked ?? null);
 
   const explore = () => void game.dispatch({ type: 'action.start', slot: 0, kind: 'explore', id });
   const stop = (slot: number) => void game.dispatch({ type: 'action.stop', slot });
-  const go = (mode: 'instant' | 'walk') =>
-    void game.dispatch({ type: 'world.travel', cell: id, mode, slot: 0 });
+  const go = () => void game.dispatch({ type: 'world.travel', cell: id, slot: 0 });
   const claim = (poi: string) => void game.dispatch({ type: 'world.claim', poi });
 </script>
 
@@ -130,7 +113,7 @@
           {t('world.panel.unexplored')}
         </p>{/if}
 
-      {#if info.why === 'error.notInRegion'}<RegionEntry region={cell.region} />{/if}
+      {#if info.why === 'error.outOfRange'}<RegionEntry region={cell.region} />{/if}
 
       <section class="block" data-level-block>
         {#if info.nextAt !== null}
@@ -229,23 +212,6 @@
           </button>
         {/if}
         {#if travel}
-          <button
-            type="button"
-            class="action"
-            data-travel-instant
-            disabled={reasonInstant !== null}
-            aria-describedby={reasonInstant ? `why-instant-${id}` : undefined}
-            title={t('world.travel.instant')}
-            onclick={() => go('instant')}
-          >
-            {t('world.travel.instantShort')} ·
-            {travel.cost === 0
-              ? t('world.travel.free')
-              : t('world.travel.cost', {
-                  n: formatInt(travel.cost),
-                  currency: currencyName(moneyOf(content)),
-                })}
-          </button>
           {#if busy.walk >= 0}
             <button
               type="button"
@@ -263,7 +229,7 @@
               disabled={reasonWalk !== null}
               aria-describedby={reasonWalk ? `why-walk-${id}` : undefined}
               title={t('world.travel.walk')}
-              onclick={() => go('walk')}
+              onclick={go}
             >
               {t('world.travel.walkShort')} · {formatDuration(travel.walkMs)}
             </button>
@@ -285,9 +251,6 @@
       <ul class="reasons">
         {#if reasonExplore}<li class="why" id="why-explore-{id}" data-why="explore">
             {t(reasonExplore)}
-          </li>{/if}
-        {#if reasonInstant}<li class="why" id="why-instant-{id}" data-why="instant">
-            {t(reasonInstant)}
           </li>{/if}
         {#if reasonWalk}<li class="why" id="why-walk-{id}" data-why="walk">{t(reasonWalk)}</li>{/if}
         {#if !info.located}

@@ -29,6 +29,8 @@ export type PackData = {
   market?: ContentDb['market'];
   shop?: ContentDb['shop'];
   coat?: ContentDb['coat'];
+  /** The world grid: hexes keyed by their coordinates. */
+  hexes?: ContentDb['hexes'];
 };
 
 /** A balance fragment: the same shape as `ContentDb['balance']`, with only the leaves the pack sets. */

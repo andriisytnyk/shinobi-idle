@@ -710,10 +710,69 @@
     "offlineCapHours": 12,
     "scouting": {
       "plainMaxLevel": 3,
-      "walkWithinMin": 10,
-      "walkBetweenMin": 30,
       "athPerLevel": 0.001,
       "athCap": 0.1
+    },
+    "map": {
+      "terrain": {
+        "road": {
+          "walkMin": 2,
+          "survey": 0.6
+        },
+        "settlement": {
+          "walkMin": 2,
+          "survey": 0.8
+        },
+        "plains": {
+          "walkMin": 3,
+          "survey": 0.8
+        },
+        "coast": {
+          "walkMin": 3,
+          "survey": 1
+        },
+        "forest": {
+          "walkMin": 4,
+          "survey": 1.2
+        },
+        "river": {
+          "walkMin": 4,
+          "survey": 1.2
+        },
+        "hills": {
+          "walkMin": 5,
+          "survey": 1.4
+        },
+        "lake": {
+          "walkMin": 6,
+          "survey": 1
+        }
+      },
+      "range": [
+        {
+          "scout": 0,
+          "range": 2
+        },
+        {
+          "scout": 10,
+          "range": 3
+        },
+        {
+          "scout": 25,
+          "range": 4
+        },
+        {
+          "scout": 40,
+          "range": 5
+        }
+      ],
+      "outpostRange": 1,
+      "startRadius": 2,
+      "plainSurvey": [
+        6,
+        18
+      ],
+      "plainScout": 1
     },
     "masteryCap": 99,
     "meditation": {

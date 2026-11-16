@@ -1,0 +1,227 @@
+[
+  {
+    "id": "core:hidden_leaf",
+    "hex": [
+      10,
+      17
+    ],
+    "kind": "hidden-village",
+    "role": "settlement"
+  },
+  {
+    "id": "core:tanzaku",
+    "hex": [
+      6,
+      16
+    ],
+    "kind": "town",
+    "role": "settlement"
+  },
+  {
+    "id": "core:shukuba",
+    "hex": [
+      7,
+      17
+    ],
+    "kind": "town",
+    "role": "settlement"
+  },
+  {
+    "id": "core:valley_of_the_end",
+    "hex": [
+      12,
+      11
+    ],
+    "kind": "valley",
+    "role": "training"
+  },
+  {
+    "id": "core:fire_temple",
+    "hex": [
+      12,
+      18
+    ],
+    "kind": "temple",
+    "role": "training"
+  },
+  {
+    "id": "core:training_ground_44",
+    "hex": [
+      10,
+      16
+    ],
+    "kind": "training-ground",
+    "role": "training"
+  },
+  {
+    "id": "core:nara_forest",
+    "hex": [
+      9,
+      16
+    ],
+    "kind": "forest",
+    "role": "landmark"
+  },
+  {
+    "id": "core:kikyo_pass",
+    "hex": [
+      12,
+      13
+    ],
+    "kind": "castle-pass",
+    "role": "landmark"
+  },
+  {
+    "id": "core:jofuku_forest",
+    "hex": [
+      9,
+      12
+    ],
+    "kind": "forest-haunted",
+    "role": "landmark"
+  },
+  {
+    "id": "core:bamboo_village",
+    "hex": [
+      16,
+      12
+    ],
+    "kind": "village",
+    "role": "settlement"
+  },
+  {
+    "id": "core:hell_valley",
+    "hex": [
+      17,
+      13
+    ],
+    "kind": "valley",
+    "role": "landmark"
+  },
+  {
+    "id": "core:west_gate_post",
+    "hex": [
+      9,
+      17
+    ],
+    "kind": "outpost",
+    "role": "outpost"
+  },
+  {
+    "id": "core:rice_hamlet",
+    "hex": [
+      11,
+      17
+    ],
+    "kind": "hamlet",
+    "role": "landmark"
+  },
+  {
+    "id": "core:charcoal_camp",
+    "hex": [
+      8,
+      14
+    ],
+    "kind": "camp",
+    "role": "deposit"
+  },
+  {
+    "id": "core:fishers_camp",
+    "hex": [
+      7,
+      14
+    ],
+    "kind": "camp",
+    "role": "deposit"
+  },
+  {
+    "id": "core:caravan_yard",
+    "hex": [
+      10,
+      19
+    ],
+    "kind": "camp",
+    "role": "zone"
+  },
+  {
+    "id": "core:mercenary_den",
+    "hex": [
+      9,
+      19
+    ],
+    "kind": "lair",
+    "role": "zone"
+  },
+  {
+    "id": "core:war_fort_ruins",
+    "hex": [
+      6,
+      20
+    ],
+    "kind": "ruins",
+    "role": "landmark"
+  },
+  {
+    "id": "core:fort_cellar",
+    "hex": [
+      7,
+      19
+    ],
+    "kind": "cellar",
+    "role": "vault"
+  },
+  {
+    "id": "core:salt_pans",
+    "hex": [
+      12,
+      20
+    ],
+    "kind": "saltworks",
+    "role": "deposit"
+  },
+  {
+    "id": "core:deserted_farm",
+    "hex": [
+      7,
+      21
+    ],
+    "kind": "house",
+    "role": "landmark"
+  },
+  {
+    "id": "core:hunter_lodge",
+    "hex": [
+      10,
+      12
+    ],
+    "kind": "house",
+    "role": "landmark"
+  },
+  {
+    "id": "core:waterfall_shrine",
+    "hex": [
+      11,
+      11
+    ],
+    "kind": "shrine",
+    "role": "training"
+  },
+  {
+    "id": "core:wayside_teahouse",
+    "hex": [
+      14,
+      15
+    ],
+    "kind": "tea-house",
+    "role": "settlement"
+  },
+  {
+    "id": "core:fishing_village",
+    "hex": [
+      15,
+      17
+    ],
+    "kind": "village",
+    "role": "settlement"
+  }
+]

@@ -38,6 +38,8 @@ export { shopEntries } from './lookup.ts';
 export * from './village.ts';
 export * from './village-selectors.ts';
 export * from './village-state.ts';
+export * from './hex.ts';
+export * from './hex-hooks.ts';
 export * from './world.ts';
 export * from './world-selectors.ts';
 export * from './world-state.ts';

@@ -459,5 +459,39 @@
     {
       "id": "maps"
     }
+  ],
+  "terrains": [
+    {
+      "id": "forest",
+      "token": "--terrain-forest"
+    },
+    {
+      "id": "plains",
+      "token": "--terrain-plains"
+    },
+    {
+      "id": "hills",
+      "token": "--terrain-hills"
+    },
+    {
+      "id": "coast",
+      "token": "--terrain-coast"
+    },
+    {
+      "id": "river",
+      "token": "--terrain-river"
+    },
+    {
+      "id": "road",
+      "token": "--terrain-road"
+    },
+    {
+      "id": "settlement",
+      "token": "--terrain-settlement"
+    },
+    {
+      "id": "lake",
+      "token": "--terrain-lake"
+    }
   ]
 }

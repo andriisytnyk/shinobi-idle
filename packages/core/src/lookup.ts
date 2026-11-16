@@ -7,10 +7,13 @@ import type {
   Exercise,
   Gear,
   Herb,
+  Hex,
   Item,
   Mission,
   Nature,
   PlayerRankData,
+  Place,
+  Terrain,
   Skill,
   Obstacle,
   Operation,
@@ -58,6 +61,13 @@ export interface ContentIndex {
   masteryCount: Map<string, number>;
   poolCheckpoints: Map<string, PoolCheckpoint[]>;
   cells: Map<string, Cell>;
+  /** The hexes of the world grid by key (`q,r`). */
+  hexes: Map<string, Hex>;
+  terrains: Map<string, Terrain>;
+  /** The cell that stands on each hex, by hex key. */
+  cellByHex: Map<string, Cell>;
+  /** The named places on each hex, by hex key. */
+  placesByHex: Map<string, Place[]>;
   regions: Map<string, Region>;
   /** Every point of interest with the cell it lies in. */
   pois: Map<string, { poi: Poi; cell: Cell }>;
@@ -156,8 +166,19 @@ function build(content: ContentDb): ContentIndex {
       if (poi.kind === 'zone') zoneCell.set(poi.zone, cell);
     }
   }
+  const cellByHex = new Map<string, Cell>();
+  for (const cell of content.cells) cellByHex.set(`${cell.hex[0]},${cell.hex[1]}`, cell);
+  const placesByHex = new Map<string, Place[]>();
+  for (const place of content.places) {
+    const key = `${place.hex[0]},${place.hex[1]}`;
+    placesByHex.set(key, [...(placesByHex.get(key) ?? []), place]);
+  }
   return {
     cells: byId(content.cells),
+    hexes: new Map(content.hexes.map((h) => [`${h.q},${h.r}`, h])),
+    terrains: byId(content.terrains),
+    cellByHex,
+    placesByHex,
     regions: byId(content.regions),
     pois,
     zoneCell,

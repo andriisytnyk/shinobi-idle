@@ -1,5 +1,5 @@
 import { PackError, type ContentDb, type ContentPack } from '@shinobi/content';
-import { guardAi, guardKind, guardProvider, tagOrigin } from './guard.ts';
+import { guardAi, guardHexHook, guardKind, guardProvider, tagOrigin } from './guard.ts';
 import { actionSystem, drillKind, practiceKind, type ActionKind } from './actions.ts';
 import { COURSE_KIND, courseKind, obstacleProvider } from './athletics.ts';
 import { defaultCombatAi } from './combat/fight-ai.ts';
@@ -20,7 +20,16 @@ import { natureProvider } from './natures.ts';
 import { missionKind, MISSION_KIND } from './missions/index.ts';
 import { questSystem } from './quests.ts';
 import { villageProvider, villageSystem } from './village.ts';
-import { EXPLORE_KIND, WALK_KIND, exploreKind, walkKind, worldProvider } from './world.ts';
+import type { HexEnteredHook } from './hex-hooks.ts';
+import {
+  AUTOSURVEY_KIND,
+  EXPLORE_KIND,
+  WALK_KIND,
+  autoSurveyKind,
+  exploreKind,
+  walkKind,
+  worldProvider,
+} from './world.ts';
 import type { System } from './system.ts';
 
 /**
@@ -34,6 +43,8 @@ export interface Rules extends FightRules {
   modifierProviders: readonly ModifierProvider[];
   /** Decides what the player does whenever the fight needs a choice. */
   combatAi: CombatAi;
+  /** Handlers that run on every hex the player enters, in order (see `HexEnteredHook`). Absent means none. */
+  hexEntered?: readonly HexEnteredHook[];
 }
 
 /** The fight hooks of the engine and of the pack `core`; another pack adds its own to a copy of the rules. */
@@ -64,6 +75,7 @@ export const defaultRules: Rules = {
     senseiTest: senseiTestKind,
     [EXPLORE_KIND]: exploreKind,
     [WALK_KIND]: walkKind,
+    [AUTOSURVEY_KIND]: autoSurveyKind,
   },
   modifierProviders: [
     tonicProvider,
@@ -77,12 +89,13 @@ export const defaultRules: Rules = {
   ],
   combatAi: defaultCombatAi,
   fightHooks: defaultFightHooks,
+  hexEntered: [],
 };
 
 // ---------- rules from packs ----------
 
 /** The families of the rules a pack can add to or wrap an entry of. */
-export type RuleFamily = 'systems' | 'actionKinds' | 'modifierProviders';
+export type RuleFamily = 'systems' | 'actionKinds' | 'modifierProviders' | 'hexEntered';
 
 /**
  * Adds an entry to the rules and returns the extended rules; the rules given are not changed.
@@ -92,13 +105,16 @@ export type RuleFamily = 'systems' | 'actionKinds' | 'modifierProviders';
  */
 export function addRule(rules: Rules, family: 'systems', entry: System): Rules;
 export function addRule(rules: Rules, family: 'modifierProviders', entry: ModifierProvider): Rules;
+export function addRule(rules: Rules, family: 'hexEntered', entry: HexEnteredHook): Rules;
 export function addRule(rules: Rules, family: 'actionKinds', key: string, entry: ActionKind): Rules;
 export function addRule(
   rules: Rules,
   family: RuleFamily,
-  keyOrEntry: string | System | ModifierProvider,
+  keyOrEntry: string | System | ModifierProvider | HexEnteredHook,
   kind?: ActionKind,
 ): Rules {
+  if (family === 'hexEntered')
+    return { ...rules, hexEntered: [...(rules.hexEntered ?? []), keyOrEntry as HexEnteredHook] };
   if (family === 'systems') return { ...rules, systems: [...rules.systems, keyOrEntry as System] };
   if (family === 'modifierProviders') {
     return {
@@ -283,5 +299,9 @@ function adopt(before: Rules, after: Rules, pack: string): Rules {
   const fightHooks = after.fightHooks.map((h) =>
     before.fightHooks.includes(h) ? h : tagOrigin(h, pack),
   );
-  return { ...after, systems, actionKinds, modifierProviders, combatAi, fightHooks };
+  // A handler of a pack that throws is skipped for that hex, never allowed to stop a walk.
+  const hexEntered = (after.hexEntered ?? []).map((h) =>
+    (before.hexEntered ?? []).includes(h) ? h : guardHexHook(h, pack),
+  );
+  return { ...after, systems, actionKinds, modifierProviders, combatAi, fightHooks, hexEntered };
 }

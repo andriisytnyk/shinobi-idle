@@ -40,7 +40,7 @@ import { defaultRules, type Rules } from './rules.ts';
 import type { System } from './system.ts';
 import type { GameState } from './state.ts';
 import { cancelBuild, donateToTreasury, spendWorkforce, startBuild } from './village.ts';
-import { claimPoi, travelInstant, WALK_KIND } from './world.ts';
+import { claimPoi, WALK_KIND } from './world.ts';
 
 /** A player or bot command. Concrete command types arrive with the stages that need them. */
 export type Command =
@@ -94,8 +94,8 @@ export type Command =
   | { type: 'nature.choose'; nature: NatureChoice }
   /** Adds a second nature (Chakra Control 20) or a third (40); only natures not owned. */
   | { type: 'nature.add'; nature: NatureChoice }
-  /** Goes to a cell explored to level 1, or to an outpost of an open region: `instant` pays ryo by region (free to an outpost), `walk` is free and takes time. `slot` defaults to 0. */
-  | { type: 'world.travel'; cell: string; mode: 'instant' | 'walk'; slot?: number }
+  /** Walks to a hex, step by step over the hexes the player knows; the walk takes a slot (`slot` defaults to 0) and costs time. `cell` is the address of the target: a cell id, or the key `q,r` of a hex. */
+  | { type: 'world.travel'; cell: string; mode?: 'walk'; slot?: number }
   /** Takes the one-time loot of a cache or vault the player has found and stands next to. */
   | { type: 'world.claim'; poi: string }
   /** Starts the next level of a building: costs are taken now, the job runs in village ticks. */
@@ -395,8 +395,8 @@ function apply(
     case 'nature.add':
       return addNature(state, command.nature, content);
     case 'world.travel':
-      if (command.mode === 'instant') return travelInstant(state, command.cell, content, rules);
-      if (command.mode !== 'walk') return { ok: false, reason: 'error.unknownCommand' };
+      if (command.mode !== undefined && command.mode !== 'walk')
+        return { ok: false, reason: 'error.unknownCommand' };
       return startAction(state, command.slot ?? 0, WALK_KIND, command.cell, content, rules);
     case 'world.claim':
       return claimPoi(state, command.poi, content);

@@ -2,14 +2,17 @@ import balance from './data/generated/balance.json' with { type: 'json' };
 import bosses from './data/generated/bosses.json' with { type: 'json' };
 import buildings from './data/generated/buildings.json' with { type: 'json' };
 import cells from './data/generated/cells.json' with { type: 'json' };
+import countries from './data/generated/countries.json' with { type: 'json' };
 import enemies from './data/generated/enemies.json' with { type: 'json' };
 import exercises from './data/generated/exercises.json' with { type: 'json' };
 import gear from './data/generated/gear.json' with { type: 'json' };
 import herbs from './data/generated/herbs.json' with { type: 'json' };
+import hexes from './data/generated/hexes.json' with { type: 'json' };
 import items from './data/generated/items.json' with { type: 'json' };
 import market from './data/generated/market.json' with { type: 'json' };
 import missions from './data/generated/missions.json' with { type: 'json' };
 import obstacles from './data/generated/obstacles.json' with { type: 'json' };
+import places from './data/generated/places.json' with { type: 'json' };
 import pools from './data/generated/pools.json' with { type: 'json' };
 import practices from './data/generated/practices.json' with { type: 'json' };
 import recipes from './data/generated/recipes.json' with { type: 'json' };
@@ -153,6 +156,9 @@ const data: Record<string, unknown> = {
   team: handTeam,
   regions,
   cells: layerCells(z.array(cellBaseSchema).parse(cells), cellPoiMapSchema.parse(handCellPois)),
+  hexes,
+  countries,
+  places,
   cellKeys: handCellKeys,
   enemies: layerEnemies(z.array(enemyBaseSchema).parse(enemies), enemyCombat, bal.K),
   bosses: layerBosses(

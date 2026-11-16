@@ -28,8 +28,7 @@
     }),
   );
 
-  const go = (mode: 'instant' | 'walk') =>
-    void game.dispatch({ type: 'world.travel', cell: entry ?? '', mode, slot: 0 });
+  const go = () => void game.dispatch({ type: 'world.travel', cell: entry ?? '', slot: 0 });
 </script>
 
 {#if data && entry}
@@ -42,20 +41,11 @@
       <button
         type="button"
         class="primary"
-        data-region-enter
-        disabled={data.blocked !== null}
-        onclick={() => go('instant')}
-      >
-        {t('world.entry.go')} · {t('world.travel.free')}
-      </button>
-      <button
-        type="button"
-        class="secondary"
         data-region-walk
         disabled={data.blocked !== null}
-        onclick={() => go('walk')}
+        onclick={go}
       >
-        {t('world.travel.walk')} · {formatDuration(data.walkMs)}
+        {t('world.entry.go')} · {formatDuration(data.walkMs)}
       </button>
     </div>
     {#if data.blocked}<p class="why" data-why="entry">{t(data.blocked)}</p>{/if}
