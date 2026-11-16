@@ -1,0 +1,114 @@
+[
+  {
+    "id": "core:fire",
+    "name": "Країна Вогню",
+    "token": "hanko",
+    "nameSource": "документи проєкту",
+    "hexes": 133
+  },
+  {
+    "id": "core:earth",
+    "name": "Країна Землі",
+    "token": "doton",
+    "nameSource": "документи проєкту",
+    "hexes": 141
+  },
+  {
+    "id": "core:wind",
+    "name": "Країна Вітру",
+    "token": "futon",
+    "nameSource": "документи проєкту",
+    "hexes": 151
+  },
+  {
+    "id": "core:lightning",
+    "name": "Країна Блискавки",
+    "token": "raiton",
+    "nameSource": "документи проєкту",
+    "hexes": 83
+  },
+  {
+    "id": "core:water",
+    "name": "Країна Води",
+    "token": "suiton",
+    "nameSource": "документи проєкту",
+    "hexes": 31
+  },
+  {
+    "id": "core:waves",
+    "name": "Країна Хвиль",
+    "token": "chakra",
+    "nameSource": "документи проєкту",
+    "hexes": 6
+  },
+  {
+    "id": "core:forests",
+    "name": "Країна Лісів",
+    "token": "leaf",
+    "nameSource": "переклад",
+    "hexes": 12
+  },
+  {
+    "id": "core:rivers",
+    "name": "Країна Річок",
+    "token": "steel",
+    "nameSource": "переклад",
+    "hexes": 29
+  },
+  {
+    "id": "core:rain",
+    "name": "Країна Дощу",
+    "token": "steel",
+    "nameSource": "документи проєкту",
+    "hexes": 11
+  },
+  {
+    "id": "core:waterfall",
+    "name": "Країна Водоспадів",
+    "token": "chakra",
+    "nameSource": "документи проєкту",
+    "hexes": 15
+  },
+  {
+    "id": "core:disputed",
+    "name": "Спірні землі",
+    "token": "text-dim",
+    "nameSource": "переклад",
+    "hexes": 10
+  },
+  {
+    "id": "core:sound",
+    "name": "Країна Звуку",
+    "token": "orange",
+    "nameSource": "документи проєкту",
+    "hexes": 16
+  },
+  {
+    "id": "core:steam",
+    "name": "Країна Пари",
+    "token": "katon",
+    "nameSource": "переклад",
+    "hexes": 8
+  },
+  {
+    "id": "core:frost",
+    "name": "Країна Морозу",
+    "token": "steel",
+    "nameSource": "переклад",
+    "hexes": 5
+  },
+  {
+    "id": "core:rock",
+    "name": "Країна Скелі",
+    "token": "ink-600",
+    "nameSource": "переклад",
+    "hexes": 20
+  },
+  {
+    "id": "core:far-east",
+    "name": "Східні землі",
+    "token": "ink-600",
+    "nameSource": "умовна назва: на мапі-орієнтирі земля без підпису",
+    "hexes": 46
+  }
+]

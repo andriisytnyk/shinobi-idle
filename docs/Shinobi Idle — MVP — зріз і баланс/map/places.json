@@ -1,0 +1,578 @@
+[
+  {
+    "id": "core:hidden-leaf",
+    "name": "Коноха (Село Прихованого Листя)",
+    "kind": "hidden-village",
+    "hex": [
+      10,
+      17
+    ],
+    "country": "core:fire",
+    "referencePx": [
+      848,
+      682
+    ],
+    "referenceLabel": "Скрытый лист",
+    "nameSource": "uk.wikipedia.org/wiki/Наруто (форма «Прихованого …» за зразком статті); у документах — «Листя»"
+  },
+  {
+    "id": "core:tanzaku",
+    "name": "Місто Танзаку",
+    "kind": "town",
+    "hex": [
+      6,
+      16
+    ],
+    "country": "core:fire",
+    "referencePx": [
+      651,
+      643
+    ],
+    "referenceLabel": "Город Танзаку",
+    "nameSource": "переклад: транслітерація (Tanzaku-gai, «Танзаку»)"
+  },
+  {
+    "id": "core:shukuba",
+    "name": "Місто Сюкуба",
+    "kind": "town",
+    "hex": [
+      7,
+      17
+    ],
+    "country": "core:fire",
+    "referencePx": [
+      741,
+      703
+    ],
+    "referenceLabel": "Город Шукуба",
+    "nameSource": "переклад: 宿場 (Shukuba, «станційне містечко»), транслітерація"
+  },
+  {
+    "id": "core:valley-of-the-end",
+    "name": "Долина Завершення",
+    "kind": "landmark",
+    "hex": [
+      12,
+      11
+    ],
+    "country": "core:fire",
+    "referencePx": [
+      835,
+      467
+    ],
+    "referenceLabel": "Долина завершения",
+    "nameSource": "документи проєкту"
+  },
+  {
+    "id": "core:bamboo-village",
+    "name": "Бамбукове село",
+    "kind": "village",
+    "hex": [
+      16,
+      12
+    ],
+    "country": "core:fire",
+    "referencePx": [
+      1023,
+      497
+    ],
+    "referenceLabel": "Бамбуковая деревня",
+    "nameSource": "переклад: за написом на мапі (Бамбуковая деревня)"
+  },
+  {
+    "id": "core:hell-valley",
+    "name": "Пекельна долина",
+    "kind": "landmark",
+    "hex": [
+      17,
+      13
+    ],
+    "country": "core:fire",
+    "referencePx": [
+      1074,
+      543
+    ],
+    "referenceLabel": "Адская долина",
+    "nameSource": "переклад: 地獄谷 (Jigokudani, «пекельна долина»)"
+  },
+  {
+    "id": "core:hidden-stone",
+    "name": "Село Прихованого Каменю",
+    "kind": "hidden-village",
+    "hex": [
+      4,
+      8
+    ],
+    "country": "core:earth",
+    "referencePx": [
+      385,
+      335
+    ],
+    "referenceLabel": "Скрытый камень",
+    "nameSource": "uk.wikipedia.org/wiki/Наруто (форма «Прихованого …» за зразком статті): «Прихованого в Камені»"
+  },
+  {
+    "id": "core:hidden-sand",
+    "name": "Село Прихованого Піску",
+    "kind": "hidden-village",
+    "hex": [
+      -5,
+      22
+    ],
+    "country": "core:wind",
+    "referencePx": [
+      302,
+      895
+    ],
+    "referenceLabel": "Скрытый песок",
+    "nameSource": "uk.wikipedia.org/wiki/Наруто (форма «Прихованого …» за зразком статті): «Прихованого в Піску»"
+  },
+  {
+    "id": "core:pottery-village",
+    "name": "Село кераміки",
+    "kind": "village",
+    "hex": [
+      1,
+      19
+    ],
+    "country": "core:wind",
+    "referencePx": [
+      510,
+      758
+    ],
+    "referenceLabel": "Деревня керамики",
+    "nameSource": "переклад: за написом на мапі (Деревня керамики)"
+  },
+  {
+    "id": "core:akatsuki-hideout",
+    "name": "Сховок Акацукі",
+    "kind": "hideout",
+    "hex": [
+      3,
+      19
+    ],
+    "country": "core:rivers",
+    "referencePx": [
+      603,
+      775
+    ],
+    "referenceLabel": "Убежище Акацуки",
+    "nameSource": "переклад: за написом на мапі (Убежище Акацуки); «Акацукі» — написання з виданих українських перекладів"
+  },
+  {
+    "id": "core:hidden-valley-village",
+    "name": "Село, сховане в долині",
+    "kind": "hidden-village",
+    "hex": [
+      3,
+      21
+    ],
+    "country": "core:rivers",
+    "referencePx": [
+      632,
+      838
+    ],
+    "referenceLabel": "Деревня скрытая в долине",
+    "nameSource": "переклад: за написом на мапі (Деревня скрытая в долине)"
+  },
+  {
+    "id": "core:hidden-rain",
+    "name": "Село Прихованого Дощу",
+    "kind": "hidden-village",
+    "hex": [
+      3,
+      14
+    ],
+    "country": "core:rain",
+    "referencePx": [
+      470,
+      552
+    ],
+    "referenceLabel": "Скрытый дождь",
+    "nameSource": "переклад: за зразком форми «Прихованого …» (uk.wikipedia.org/wiki/Наруто (форма «Прихованого …» за зразком статті)); 雨隠れ"
+  },
+  {
+    "id": "core:tenchi-bridge",
+    "name": "Міст Тенчі",
+    "kind": "landmark",
+    "hex": [
+      5,
+      13
+    ],
+    "country": "core:rain",
+    "referencePx": [
+      522,
+      533
+    ],
+    "referenceLabel": "Мост Тенчи",
+    "nameSource": "переклад: транслітерація (天地橋, «міст неба й землі»)"
+  },
+  {
+    "id": "core:hidden-rock-village",
+    "name": "Село Прихованої Скелі",
+    "kind": "hidden-village",
+    "hex": [
+      1,
+      13
+    ],
+    "country": "core:rock",
+    "referencePx": [
+      349,
+      535
+    ],
+    "referenceLabel": "Скрытая скала",
+    "nameSource": "переклад: за написом на мапі (Скрытая скала)"
+  },
+  {
+    "id": "core:hidden-waterfall",
+    "name": "Село Прихованого Водоспаду",
+    "kind": "hidden-village",
+    "hex": [
+      9,
+      8
+    ],
+    "country": "core:waterfall",
+    "referencePx": [
+      613,
+      335
+    ],
+    "referenceLabel": "Скрытый водопад",
+    "nameSource": "uk.wikipedia.org/wiki/Наруто (форма «Прихованого …» за зразком статті): «Прихованого Водоспаду»"
+  },
+  {
+    "id": "core:hidden-sound",
+    "name": "Село Прихованого Звуку",
+    "kind": "hidden-village",
+    "hex": [
+      13,
+      9
+    ],
+    "country": "core:sound",
+    "referencePx": [
+      820,
+      396
+    ],
+    "referenceLabel": "Скрытый звук",
+    "nameSource": "документи проєкту: «Село Звуку»; форма за зразком uk.wikipedia.org/wiki/Наруто (форма «Прихованого …» за зразком статті)"
+  },
+  {
+    "id": "core:mountains-graveyard",
+    "name": "Цвинтар Гір",
+    "kind": "landmark",
+    "hex": [
+      18,
+      3
+    ],
+    "country": "core:sound",
+    "referencePx": [
+      901,
+      143
+    ],
+    "referenceLabel": "Кладбище гор",
+    "nameSource": "переклад: за написом на мапі (Кладбище гор)"
+  },
+  {
+    "id": "core:hidden-hot-spring",
+    "name": "Село Прихованого Гарячого Джерела",
+    "kind": "hidden-village",
+    "hex": [
+      15,
+      10
+    ],
+    "country": "core:steam",
+    "referencePx": [
+      945,
+      413
+    ],
+    "referenceLabel": "Страна пара",
+    "nameSource": "переклад: за написом на мапі (деревня скрытого горячего источника); 湯隠れ"
+  },
+  {
+    "id": "core:hidden-frost",
+    "name": "Село Прихованого Морозу",
+    "kind": "hidden-village",
+    "hex": [
+      17,
+      9
+    ],
+    "country": "core:frost",
+    "referencePx": [
+      1003,
+      358
+    ],
+    "referenceLabel": "Страна мороза",
+    "nameSource": "переклад: за написом на мапі (деревня скрытого мороза); 霜隠れ"
+  },
+  {
+    "id": "core:hidden-cloud",
+    "name": "Село Прихованої Хмари",
+    "kind": "hidden-village",
+    "hex": [
+      24,
+      7
+    ],
+    "country": "core:lightning",
+    "referencePx": [
+      1265,
+      275
+    ],
+    "referenceLabel": "Скрытое облако",
+    "nameSource": "документи проєкту: «Хмари»; форма за зразком uk.wikipedia.org/wiki/Наруто (форма «Прихованого …» за зразком статті)"
+  },
+  {
+    "id": "core:alliance-hq",
+    "name": "Штаб Альянсу шінобі",
+    "kind": "landmark",
+    "hex": [
+      27,
+      7
+    ],
+    "country": "core:lightning",
+    "referencePx": [
+      1405,
+      317
+    ],
+    "referenceLabel": "Штаб квартира альянса шиноби",
+    "nameSource": "переклад: за написом на мапі (Штаб-квартира альянса шиноби)"
+  },
+  {
+    "id": "core:turtle-island",
+    "name": "Черепашачий острів",
+    "kind": "island",
+    "hex": [
+      27,
+      9
+    ],
+    "country": "core:lightning",
+    "referencePx": [
+      1430,
+      368
+    ],
+    "referenceLabel": "Черепаший остров",
+    "nameSource": "переклад: за написом на мапі (Черепаший остров); 亀の島"
+  },
+  {
+    "id": "core:colosseum",
+    "name": "Колізей",
+    "kind": "landmark",
+    "hex": [
+      27,
+      11
+    ],
+    "country": "sea",
+    "referencePx": [
+      1495,
+      465
+    ],
+    "referenceLabel": "Коллизей",
+    "nameSource": "переклад: за написом на мапі (Коллизей); у морі на мапі"
+  },
+  {
+    "id": "core:hidden-mist",
+    "name": "Село Прихованого Туману",
+    "kind": "hidden-village",
+    "hex": [
+      25,
+      18
+    ],
+    "country": "core:water",
+    "referencePx": [
+      1558,
+      727
+    ],
+    "referenceLabel": "Скрытый туман",
+    "nameSource": "документи проєкту: «Туман»; форма за зразком uk.wikipedia.org/wiki/Наруто (форма «Прихованого …» за зразком статті)"
+  },
+  {
+    "id": "core:land-of-fire",
+    "name": "Країна Вогню",
+    "kind": "country",
+    "hex": [
+      8,
+      14
+    ],
+    "country": "core:fire",
+    "referencePx": [
+      700,
+      560
+    ],
+    "referenceLabel": "Страна огня",
+    "nameSource": "документи проєкту"
+  },
+  {
+    "id": "core:land-of-earth",
+    "name": "Країна Землі",
+    "kind": "country",
+    "hex": [
+      2,
+      2
+    ],
+    "country": "core:earth",
+    "referencePx": [
+      150,
+      100
+    ],
+    "referenceLabel": "Страна земли",
+    "nameSource": "документи проєкту"
+  },
+  {
+    "id": "core:land-of-wind",
+    "name": "Країна Вітру",
+    "kind": "country",
+    "hex": [
+      -6,
+      18
+    ],
+    "country": "core:wind",
+    "referencePx": [
+      150,
+      750
+    ],
+    "referenceLabel": "Страна ветра",
+    "nameSource": "документи проєкту"
+  },
+  {
+    "id": "core:land-of-lightning",
+    "name": "Країна Блискавки",
+    "kind": "country",
+    "hex": [
+      30,
+      1
+    ],
+    "country": "core:lightning",
+    "referencePx": [
+      1400,
+      80
+    ],
+    "referenceLabel": "Страна молнии",
+    "nameSource": "документи проєкту"
+  },
+  {
+    "id": "core:land-of-water",
+    "name": "Країна Води",
+    "kind": "country",
+    "hex": [
+      24,
+      15
+    ],
+    "country": "core:water",
+    "referencePx": [
+      1500,
+      570
+    ],
+    "referenceLabel": "Страна воды",
+    "nameSource": "документи проєкту"
+  },
+  {
+    "id": "core:land-of-waves",
+    "name": "Країна Хвиль",
+    "kind": "country",
+    "hex": [
+      16,
+      18
+    ],
+    "country": "core:waves",
+    "referencePx": [
+      1150,
+      707
+    ],
+    "referenceLabel": "Страна волн",
+    "nameSource": "документи проєкту; uk.wikipedia.org/wiki/Наруто (форма «Прихованого …» за зразком статті)"
+  },
+  {
+    "id": "core:land-of-forests",
+    "name": "Країна Лісів",
+    "kind": "country",
+    "hex": [
+      16,
+      20
+    ],
+    "country": "core:forests",
+    "referencePx": [
+      1190,
+      822
+    ],
+    "referenceLabel": "Страна лесов",
+    "nameSource": "переклад: за написом на мапі (Страна лесов)"
+  },
+  {
+    "id": "core:land-of-rivers",
+    "name": "Країна Річок",
+    "kind": "country",
+    "hex": [
+      4,
+      17
+    ],
+    "country": "core:rivers",
+    "referencePx": [
+      575,
+      700
+    ],
+    "referenceLabel": "Страна рек",
+    "nameSource": "переклад: за написом на мапі (Страна рек)"
+  },
+  {
+    "id": "core:disputed-lands",
+    "name": "Спірні землі",
+    "kind": "country",
+    "hex": [
+      13,
+      7
+    ],
+    "country": "core:disputed",
+    "referencePx": [
+      765,
+      322
+    ],
+    "referenceLabel": "Спорные земли",
+    "nameSource": "переклад: за написом на мапі (Спорные земли)"
+  },
+  {
+    "id": "core:land-of-sound",
+    "name": "Країна Звуку",
+    "kind": "country",
+    "hex": [
+      17,
+      4
+    ],
+    "country": "core:sound",
+    "referencePx": [
+      860,
+      190
+    ],
+    "referenceLabel": "Страна звука",
+    "nameSource": "документи проєкту; у минулому — Країна Рисових Полів (uk.wikipedia.org/wiki/Наруто (форма «Прихованого …» за зразком статті))"
+  },
+  {
+    "id": "core:land-of-steam",
+    "name": "Країна Пари",
+    "kind": "country",
+    "hex": [
+      15,
+      9
+    ],
+    "country": "core:steam",
+    "referencePx": [
+      925,
+      380
+    ],
+    "referenceLabel": "Страна пара",
+    "nameSource": "переклад: за написом на мапі (Страна пара)"
+  },
+  {
+    "id": "core:land-of-frost",
+    "name": "Країна Морозу",
+    "kind": "country",
+    "hex": [
+      18,
+      8
+    ],
+    "country": "core:frost",
+    "referencePx": [
+      1040,
+      330
+    ],
+    "referenceLabel": "Страна мороза",
+    "nameSource": "переклад: за написом на мапі (Страна мороза)"
+  }
+]

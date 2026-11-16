@@ -12,13 +12,14 @@
     "import": "tsx scripts/import.ts",
     "check": "tsx scripts/counts.ts && vitest run",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit -p ."
+    "typecheck": "tsc --noEmit -p . && tsc --noEmit -p scripts/map"
   },
   "dependencies": {
     "zod": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
+    "sharp": "^0.35.5",
     "tsx": "^4.20.0",
     "typescript": "~5.9.3",
     "vitest": "^3.2.0"
