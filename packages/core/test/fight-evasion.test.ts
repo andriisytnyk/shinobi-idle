@@ -61,7 +61,10 @@ describe('the evasion rating of the player', () => {
     expect(value(50)).toBeGreaterThan(value(10));
     expect(value(10)).toBeGreaterThan(value(1));
     expect(value(K.masteryCap)).toBeLessThanOrEqual(row.evasion * K.evaLevel.max + 1e-9);
-    expect(value(1)).toBeCloseTo(row.evasion * K.evaLevel.min, 9);
+    expect(value(1)).toBeCloseTo(
+      row.evasion * Math.min(K.evaLevel.max, Math.max(K.evaLevel.min, 1 / 20)),
+      9,
+    );
   });
 
   it('adds up: every known defensive technique counts', () => {

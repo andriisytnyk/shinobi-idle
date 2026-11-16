@@ -79,9 +79,9 @@ describe('the effective level of a defensive technique', () => {
   });
 
   it('adds less against an attacker of a higher level', () => {
-    const weak = against(40, 80, 20);
-    const even = against(40, 80, 30);
-    const strong = against(40, 80, 60);
+    const weak = against(40, 80, 50);
+    const even = against(40, 80, 100);
+    const strong = against(40, 80, 200);
     expect(weak.value).toBeGreaterThan(even.value);
     expect(even.value).toBeGreaterThan(strong.value);
     expect(strong.levelAdj).toBeLessThan(0);

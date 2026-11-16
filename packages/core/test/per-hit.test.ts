@@ -106,8 +106,15 @@ describe('one hit does what it did', () => {
   });
   it('gives the same damage, effects, statuses and combos per hit', () => {
     // A burn that was already there ticks while a longer cast is under way: the health left is compared only without a prior state.
+    // The one declared change since the recording: a hit of the interrupting tag leaves the `interrupt` status (a slower rhythm); taken out, the rest is what dev gave.
+    const without = (row: Row | null | undefined) => {
+      if (!row) return row;
+      const { interrupt: _s, ...statuses } = row.statuses;
+      void _s;
+      return { ...row, effects: row.effects.filter(([id]) => id !== 'interrupt'), statuses };
+    };
     const plain = (key: string, row: Row | null | undefined) =>
-      row && key.includes('|prior-') ? { ...row, hp: 0 } : row;
+      row && key.includes('|prior-') ? { ...without(row), hp: 0 } : without(row);
     for (const [key, row] of Object.entries(recorded))
       expect(plain(key, now[key]), key).toEqual(plain(key, row));
   });

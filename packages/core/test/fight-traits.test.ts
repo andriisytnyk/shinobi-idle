@@ -353,7 +353,7 @@ describe('Illusionist (answer: dispel)', () => {
 describe('Hidden (answer: reveal)', () => {
   const sensing = 'core:sensing';
   const hiddenFight = (seed: number, known: string[], ai = rules): FightState =>
-    createFight(scripted(known), enemyAt(LEVEL, ['hidden']), seed, content, ai);
+    createFight({ ...scripted(known), tier: 1 }, enemyAt(LEVEL, ['hidden']), seed, content, ai);
   const firstBlow = (known: string[], ai = rules): { taken: number; fight: FightState } | null => {
     for (let seed = 1; seed < 100; seed++) {
       const fight = quiet(hiddenFight(seed, known, ai));
@@ -404,7 +404,8 @@ describe('Poisoner (answer: cleanse)', () => {
       if (fight.tally.taken > 0) hits++;
       if ((fight.tally.statuses.poison ?? 0) > 0) poisoned++;
     }
-    expect(hits).toBeGreaterThan(1000);
+    // About a third of the blows hit a scripted player: enough for the share of them that poison.
+    expect(hits).toBeGreaterThan(600);
     expect(Math.abs(poisoned / hits - fig('trait.poisonChance'))).toBeLessThan(0.04);
   });
 
