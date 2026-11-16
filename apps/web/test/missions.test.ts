@@ -5,22 +5,20 @@ import {
   dispatch,
   missionBoard,
   missionForecast,
+  missionStartSlot,
+  missionStatus,
   type GameEvent,
   type GameState,
+  type MissionDoneEvent,
 } from '@shinobi/core';
 import { flushSync } from 'svelte';
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { coreUi } from '../src/lib/ext/core-ui.ts';
 import { entityName } from '../src/lib/entities.ts';
+import { formatDuration } from '../src/lib/format.ts';
 import { t } from '../src/lib/i18n.ts';
-import { missionToast, resetMissionToasts } from '../src/lib/mission-toasts.ts';
-import {
-  cleanRunChance,
-  missionState,
-  missionView,
-  rankGroups,
-  stageViews,
-} from '../src/lib/missions.ts';
+import { missionToast } from '../src/lib/mission-toasts.ts';
+import { missionView, rankGroups, stageViews } from '../src/lib/missions.ts';
 import { settings } from '../src/lib/settings.svelte.ts';
 import { game } from '../src/lib/store.ts';
 import { toasts } from '../src/lib/toasts.svelte.ts';
@@ -36,6 +34,13 @@ let booted: BootedApp | null = null;
 const q = (sel: string) => booted?.target.querySelector<HTMLElement>(sel) ?? null;
 const qa = (sel: string) => [...(booted?.target.querySelectorAll<HTMLElement>(sel) ?? [])];
 const rules = () => game.rules;
+
+/** What `dispatch` would answer to starting a mission now, from core, with the board's blocker. */
+function statusOf(state: GameState, id: string) {
+  const mission = content.missions.find((m) => m.id === id)!;
+  const view = missionView(state, mission, content, rules());
+  return missionStatus(state, id, missionStartSlot(state), content, rules(), view.blocker);
+}
 
 beforeAll(async () => {
   await game.start();
@@ -115,21 +120,22 @@ describe('the board', () => {
         forecast.expectedMs,
       );
       expect(Number(card?.querySelector('[data-chance]')?.getAttribute('data-value'))).toBeCloseTo(
-        cleanRunChance(forecast),
+        forecast.cleanChance,
         10,
       );
       expect(
         Number(card?.querySelector('[data-ryo-hour]')?.getAttribute('data-value')),
       ).toBeCloseTo(forecast.ryoPerHour, 6);
-      // Reputation only when the forecast gives some; ryo only when it pays any.
+      // Exactly what core lists as the rewards: currencies, items, the village resource.
       const currencies = [...(card?.querySelectorAll('[data-reward="currency"]') ?? [])].map((e) =>
         e.getAttribute('data-entity'),
       );
-      expect(currencies.includes('currency:rep')).toBe(forecast.rep > 0);
-      expect(currencies.includes('currency:ryo')).toBe(forecast.ryo > 0);
-      expect(card?.querySelectorAll('[data-reward="item"]').length).toBe(
-        forecast.pay.filter((p) => p.kind === 'item' || p.kind === 'scrollPart').length,
-      );
+      expect(currencies).toEqual(forecast.rewards.currencies.map((c) => `currency:${c.currency}`));
+      expect(
+        [...(card?.querySelectorAll('[data-reward="item"]') ?? [])].map((e) =>
+          e.getAttribute('data-entity'),
+        ),
+      ).toEqual(forecast.rewards.items.map((i) => `item:${i.item}`));
       expect(card?.querySelector('[data-reward="resource"]') !== null).toBe(
         forecast.resource !== null,
       );
@@ -147,12 +153,8 @@ describe('the board', () => {
     const shown = cardIds();
     expect(shown.length).toBeLessThan(all);
     for (const id of shown) {
-      const mission = content.missions.find((m) => m.id === id);
-      expect(mission).toBeDefined();
-      const view = missionView(state, mission!, content, rules());
-      expect(missionState(state, mission!, view.blocker, content, rules()).kind).not.toBe(
-        'blocked',
-      );
+      const status = statusOf(state, id ?? '');
+      expect(status.runningAt >= 0 || status.startable, id).toBe(true);
     }
     expect(settings.ext('core:missions.onlyAvailable')).toBe(true);
   });
@@ -219,21 +221,20 @@ describe('starting a mission', () => {
 function agree(state: GameState): Set<string> {
   const reasons = new Set<string>();
   for (const mission of content.missions.filter((m) => m.board)) {
-    const view = missionView(state, mission, content, rules());
-    const shown = missionState(state, mission, view.blocker, content, rules());
-    if (shown.kind === 'running') continue;
+    const shown = statusOf(state, mission.id);
+    if (shown.runningAt >= 0) continue;
     const result = dispatch(
       structuredClone(state),
       { type: 'action.start', slot: shown.slot, kind: MISSION_KIND, id: mission.id },
       content,
       rules(),
     );
-    if (shown.kind === 'startable') {
+    if (shown.startable) {
       expect(result.ok, `${mission.id} startable`).toBe(true);
     } else {
       expect(result.ok, `${mission.id} blocked`).toBe(false);
-      if (!result.ok) expect(shown.reason, mission.id).toBe(result.reason);
-      reasons.add(shown.reason);
+      if (!result.ok) expect(shown.refusal?.reason, mission.id).toBe(result.reason);
+      reasons.add(shown.refusal?.reason ?? '');
     }
   }
   return reasons;
@@ -255,8 +256,10 @@ describe('a blocked mission shows the reason dispatch gives', () => {
     const reasons = agree(state);
     expect(reasons).toContain('error.fightBusy');
     // A mission with no fight is refused for nothing.
-    const quiet = content.missions.find((m) => m.board && !m.stages.some((s) => s.t === 'combat'));
-    expect(quiet && missionState(state, quiet, null, content, rules()).kind).toBe('startable');
+    const quiet = content.missions.find(
+      (m) => m.board && !m.team && !m.stages.some((s) => s.t === 'combat'),
+    );
+    expect(quiet && statusOf(state, quiet.id).startable).toBe(true);
     // The same mission in two slots: the second is refused, and the board says it is running.
     const twice = able();
     twice.slots.push({ action: null, progress: 0, share: 0, data: null });
@@ -267,32 +270,46 @@ describe('a blocked mission shows the reason dispatch gives', () => {
       content,
     );
     expect(refused).toEqual({ ok: false, reason: 'error.missionRunning' });
-    const cat = content.missions.find((m) => m.id === 'core:cat')!;
-    expect(missionState(twice, cat, null, content, rules())).toEqual({ kind: 'running', slot: 0 });
+    expect(statusOf(twice, 'core:cat')).toMatchObject({ runningAt: 0, startable: false });
+    expect(statusOf(twice, 'core:cat').refusal).toMatchObject({
+      reason: 'error.missionRunning',
+      by: { slot: 0, kind: MISSION_KIND, id: 'core:cat' },
+    });
   });
 
   it('on a card and on the page, with the first reason as a link', async () => {
     const state = player();
     booted = await bootApp([coreUi], state, '#/missions');
     for (const mission of content.missions.filter((m) => m.board)) {
-      const view = missionView(state, mission, content, rules());
-      const shown = missionState(state, mission, view.blocker, content, rules());
+      const shown = statusOf(state, mission.id);
       const card = q(`[data-mission="${mission.id}"]`);
-      if (shown.kind === 'blocked') {
+      if (!shown.startable && shown.runningAt < 0) {
         expect(card?.querySelector('[data-why]')?.getAttribute('data-why'), mission.id).toBe(
-          shown.reason,
+          shown.refusal?.reason,
         );
         expect((card?.querySelector('[data-start]') as HTMLButtonElement).disabled).toBe(true);
-        // The first unmet row names something to go and do, as a link.
-        expect(card?.querySelector('[data-ui="req-row"] a, [data-ui="req-row"]')).not.toBeNull();
+        if (shown.refusal?.blocker) {
+          // The first unmet row names something to go and do, as a link.
+          expect(card?.querySelector('[data-ui="req-row"] a, [data-ui="req-row"]')).not.toBeNull();
+        }
+        if (shown.refusal?.reason === 'error.missionNeedsTeam') {
+          // No team yet: the sentence says so and points at the nature test.
+          expect(card?.querySelector('[data-needs-team] a')?.getAttribute('href')).toBe('#/nature');
+        }
       } else {
         expect(card?.querySelector('[data-why]')).toBeNull();
       }
     }
     // The page says the same, in place.
+    // With no team a team mission says so, with the way to get one; with a team it names the unmet requirement.
     await booted.go('#/mission/core:fire');
-    expect(q('[data-why]')?.getAttribute('data-why')).toBe('error.requirementsNotMet');
+    expect(q('[data-why]')?.getAttribute('data-why')).toBe('error.missionNeedsTeam');
+    expect(q('[data-needs-team] a')?.getAttribute('href')).toBe('#/nature');
     expect(q('[data-start]')).not.toBeNull();
+    booted.destroy();
+    booted = await bootApp([coreUi], player({ natures: ['katon'] }), '#/mission/core:fire');
+    expect(q('[data-why]')?.getAttribute('data-why')).toBe('error.requirementsNotMet');
+    expect(q('[data-ui="req-row"]')).not.toBeNull();
   });
 
   it('names the action that holds the fight, as a link, and says it must be stopped first', async () => {
@@ -374,11 +391,11 @@ describe('the mission page', () => {
     const mission = content.missions.find((m) => m.id === 'core:dig')!;
     const forecast = missionForecast(state, mission, content, rules());
     expect(Number(q('[data-total="time"]')?.dataset.ms)).toBe(forecast.nominalMs);
-    expect(Number(q('[data-expected]')?.dataset.ms)).toBe(forecast.expectedMs);
-    expect(Number(q('[data-total="chance"]')?.dataset.value)).toBeCloseTo(
-      cleanRunChance(forecast),
-      10,
-    );
+    // The expectation with repeats is shown only where it reads differently from the nominal time.
+    const shown = q('[data-expected]');
+    if (shown) expect(Number(shown.dataset.ms)).toBe(forecast.expectedMs);
+    else expect(formatDuration(forecast.expectedMs)).toBe(formatDuration(forecast.nominalMs));
+    expect(Number(q('[data-total="chance"]')?.dataset.value)).toBeCloseTo(forecast.cleanChance, 10);
     expect(Number(q('[data-total="money"]')?.dataset.value)).toBeCloseTo(forecast.ryoPerHour, 6);
     expect(Number(q('[data-total="renown"]')?.dataset.value)).toBeCloseTo(forecast.repPerHour, 6);
     for (const stage of forecast.stages) {
@@ -403,7 +420,7 @@ describe('the mission page', () => {
       content,
       rules(),
     );
-    expect(views.some((v) => v.reward.mastery !== null)).toBe(true);
+    expect(views.some((v) => v.forecast.xp.mastery !== null)).toBe(true);
   });
 
   it('shows the ration control: arm it, and it shortens the stages', async () => {
@@ -427,17 +444,38 @@ describe('the mission page', () => {
     expect(q('[data-why="error.noItem"]')).not.toBeNull();
   });
 
-  it('pins the first thing that blocks the mission as the goal', async () => {
-    // A mission that can be started has nothing to pin.
-    booted = await bootApp([coreUi], able(), '#/mission/core:cat');
-    expect(q('[data-pin]')).toBeNull();
+  it('pins the mission itself as the goal through the shared control, on the card and the page', async () => {
+    // Always offered, a startable mission too: the goal is the mission, and core builds its tree.
+    booted = await bootApp([coreUi], able(), '#/missions');
+    expect(
+      q('[data-mission="core:cat"] [data-ui="pin-goal"][data-entity="mission:core:cat"]'),
+    ).not.toBeNull();
+    (q('[data-mission="core:mail"] [data-ui="pin-goal"]') as HTMLButtonElement).click();
+    flushSync();
+    expect(game.state.goal).toEqual({ kind: 'mission', id: 'core:mail' });
+    expect(q('[data-mission="core:mail"] [data-ui="pin-goal"]')?.getAttribute('data-pinned')).toBe(
+      'true',
+    );
     booted.destroy();
+    game.dispatch({ type: 'goal.clear' });
     booted = await bootApp([coreUi], player({ rankC: true }), '#/mission/core:mail');
-    const pin = q('[data-pin]') as HTMLButtonElement;
-    expect(pin).not.toBeNull();
+    const pin = q('[data-ui="entity-page"] [data-ui="pin-goal"]') as HTMLButtonElement;
+    expect(pin.getAttribute('data-entity')).toBe('mission:core:mail');
     pin.click();
     flushSync();
-    expect(game.state.goal).toEqual({ kind: 'skill', id: 'ath' });
+    expect(game.state.goal).toEqual({ kind: 'mission', id: 'core:mail' });
+    expect(pin.getAttribute('data-pinned')).toBe('true');
+  });
+
+  it('shows no totals for a mission with a stage that has no way, as the card does', async () => {
+    booted = await bootApp([coreUi], player(), '#/mission/core:sealed');
+    expect(q('[data-total="time"] dd')?.textContent?.trim()).toBe(t('mission.unknown'));
+    expect(q('[data-total="chance"] dd')?.textContent?.trim()).toBe(t('mission.unknown'));
+    expect(q('[data-no-way]')).not.toBeNull();
+    expect(q('[data-total="money"] [aria-expanded]')).toBeNull();
+    booted.destroy();
+    booted = await bootApp([coreUi], able(), '#/mission/core:cat');
+    expect(q('[data-no-way]')).toBeNull();
   });
 
   it('falls back to the generic page for a mission that does not exist', async () => {
@@ -529,7 +567,6 @@ describe('toasts', () => {
     ok,
     ...at,
   });
-  const gained = (id: string, n: number): GameEvent => ({ type: 'itemGained', id, n, ...at });
   const stop = (
     reason: Extract<GameEvent, { type: 'actionStopped' }>['reason'],
     extra: { missing?: string; cause?: string } = {},
@@ -543,8 +580,6 @@ describe('toasts', () => {
     ...at,
   });
   const well = { kind: 'mission', id: 'core:well' };
-
-  beforeEach(() => resetMissionToasts());
 
   it('says what a stage did, naming the mission first: done, a failed roll, a lost fight', () => {
     expect(missionToast(stage('core:well', 0, true), content)).toMatchObject({
@@ -561,35 +596,91 @@ describe('toasts', () => {
     );
   });
 
-  it('lists what the core granted, from its events, and what was due but did not arrive', () => {
-    const done: GameEvent = { type: 'missionDone', mission: 'core:well', ryo: 480, rep: 8, ...at };
-    // The stage event, then the payment: the item events come in between.
-    missionToast(stage('core:well', 2, true), content);
-    missionToast(gained('core:spice', 1), content);
-    missionToast(gained('core:spice', 1), content);
-    missionToast(gained('core:scrollpart_wave_of_inspiration', 1), content);
-    const toast = missionToast(done, content);
-    expect(toast?.key).toBe('toast.mission.doneRep');
-    expect(toast?.subject).toEqual(well);
-    expect(toast?.gains).toEqual({
+  /** A completion event as core emits it; the fields not named are empty. */
+  const done = (over: Partial<MissionDoneEvent> = {}): MissionDoneEvent => ({
+    type: 'missionDone',
+    mission: 'core:well',
+    ryo: 0,
+    rep: 0,
+    currencies: [],
+    items: [],
+    resource: null,
+    ...at,
+    ...over,
+  });
+
+  it('is built from the completion event alone: money, Intel, items, a scroll part, the resource', () => {
+    const event = done({
       ryo: 480,
+      rep: 8,
+      currencies: [
+        { currency: 'ryo', n: 480 },
+        { currency: 'rep', n: 8 },
+        { currency: 'intel', n: 2 },
+      ],
       items: [
         { id: 'core:spice', n: 2 },
         { id: 'core:scrollpart_wave_of_inspiration', n: 1 },
       ],
-      missed: [],
+      resource: { slug: 'zroshennia', units: 5, added: 5, lost: 0, waiting: 0 },
     });
-    // No item event for a payment in kind: it did not reach the bank and is shown as not received.
-    missionToast(stage('core:well', 2, true), content);
-    const short = missionToast(done, content);
-    expect(short?.gains?.items).toEqual([]);
-    expect(short?.gains?.missed).toEqual([{ id: 'core:spice', n: 2 }]);
-    // Items seen before the last stage are not this mission's.
-    missionToast(gained('core:rice', 5), content);
-    missionToast(stage('core:well', 2, true), content);
-    expect(missionToast(done, content)?.gains?.items).toEqual([]);
-    const plain: GameEvent = { type: 'missionDone', mission: 'core:cat', ryo: 40, rep: 0, ...at };
-    expect(missionToast(plain, content)?.key).toBe('toast.mission.done');
+    const toast = missionToast(event, content);
+    expect(toast?.key).toBe('toast.mission.doneRep');
+    expect(toast?.params).toEqual({ rep: 8 });
+    expect(toast?.subject).toEqual(well);
+    expect(toast?.gains).toEqual({
+      ryo: 480,
+      currencies: { intel: 2 },
+      items: [
+        { id: 'core:spice', n: 2 },
+        { id: 'core:scrollpart_wave_of_inspiration', n: 1 },
+      ],
+      resource: { slug: 'zroshennia', units: 5, added: 5, lost: 0, waiting: 0 },
+    });
+    // Nothing else is read: no earlier event changes what the toast says.
+    expect(missionToast(done({ ryo: 40 }), content)?.key).toBe('toast.mission.done');
+    expect(missionToast(done({ ryo: 40 }), content)?.gains?.items).toEqual([]);
+  });
+
+  it('shows Intel, the village resource, a lost share and a scroll part in the mounted toast', async () => {
+    booted = await bootApp([coreUi], able(), '#/missions');
+    const push = (event: MissionDoneEvent) => {
+      toasts.clear();
+      const spec = missionToast(event, content);
+      expect(spec).not.toBeNull();
+      if (spec) toasts.push(spec);
+      flushSync();
+      return q('[data-toast^="toast.mission.done"]');
+    };
+    const rich = push(
+      done({
+        ryo: 120,
+        currencies: [
+          { currency: 'ryo', n: 120 },
+          { currency: 'intel', n: 3 },
+        ],
+        items: [{ id: 'core:scrollpart_wave_of_inspiration', n: 1 }],
+        resource: { slug: 'zroshennia', units: 5, added: 3, lost: 2, waiting: 0 },
+      }),
+    );
+    expect(rich?.querySelector('[data-currency="intel"]')?.textContent).toContain('3');
+    expect(
+      rich?.querySelector('[data-reward="item"] a')?.getAttribute('href'),
+      'the scroll part is a link',
+    ).toBe('#/item/core:scrollpart_wave_of_inspiration');
+    expect(rich?.querySelector('[data-resource="added"]')?.textContent).toBe(
+      t('toast.mission.resourceAdded', { name: t('resource.zroshennia.name'), n: 3 }),
+    );
+    // A share a full store could not take is said so.
+    expect(rich?.querySelector('[data-resource="lost"]')?.textContent).toBe(
+      t('toast.mission.resourceLost', { name: t('resource.zroshennia.name'), n: 2 }),
+    );
+    expect(rich?.querySelector('[data-resource="waiting"]')).toBeNull();
+    const waiting = push(
+      done({ resource: { slug: 'zroshennia', units: 5, added: 0, lost: 0, waiting: 5 } }),
+    );
+    expect(waiting?.querySelector('[data-resource="waiting"]')).not.toBeNull();
+    expect(waiting?.querySelector('[data-resource="added"]')).toBeNull();
   });
 
   it('gives each cause of a stop a sentence of its own, naming the mission, silent for the player', () => {
@@ -654,13 +745,12 @@ describe('toasts', () => {
     ) {
       booted.advance(20_000);
     }
-    const done = toasts.list.find((x) => x.key.startsWith('toast.mission.done'));
-    expect(done?.subject).toEqual({ kind: 'mission', id: 'core:thief' });
-    expect(done?.gains?.ryo).toBeGreaterThan(0);
+    const shown = toasts.list.find((x) => x.key.startsWith('toast.mission.done'));
+    expect(shown?.subject).toEqual({ kind: 'mission', id: 'core:thief' });
+    expect(shown?.gains?.ryo).toBeGreaterThan(0);
     // Whatever the toast lists is what reached the bank (at least one run's worth: more runs may follow).
-    const listed = done?.gains?.items.find((x) => x.id === 'core:note');
+    const listed = shown?.gains?.items.find((x) => x.id === 'core:note');
     expect(listed).toEqual({ id: 'core:note', n: 1 });
-    expect(done?.gains?.missed).toEqual([]);
     expect((game.state.bank['core:note'] ?? 0) - before).toBeGreaterThanOrEqual(1);
     expect(toasts.list.map((x) => x.key)).toContain('toast.mission.stageDone');
     toasts.clear();

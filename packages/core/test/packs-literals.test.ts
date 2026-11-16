@@ -42,8 +42,6 @@ const ALLOWED: Record<string, string> = {
   // `intel` is also a word of the engine: the field of a stage plan that holds the Intel spent to skip
   // a stage, and the kind of a mission payment (`missionPaySchema`). Neither names the currency, which
   // is found by its role (`currencyOf(content, 'study')`).
-  'missions/plan.ts: intel':
-    'the field intel of a stage plan, an engine word that is not a currency id',
   'missions/run.ts: intel': 'the kind of a mission payment in Intel, an engine word of the schema',
   'missions/select.ts: intel': 'the field intel of a stage plan, an engine word',
 };

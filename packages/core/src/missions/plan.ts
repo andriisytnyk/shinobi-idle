@@ -1,11 +1,12 @@
 import type { ContentDb, Mission, MissionStage, NatureId, Teammate } from '@shinobi/content';
 import { MS_PER_MINUTE, masteryLevel } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
-import { computeMod } from '../modifiers.ts';
-import { skillLevel, type Req } from '../requirements.ts';
+import { computeMod, type Modifier } from '../modifiers.ts';
+import { evalReq, skillLevel, type Req, type ReqResult } from '../requirements.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 import { currencyOf, isNature, isTechSkill } from '../vocab.ts';
+import { armedRation } from './ration.ts';
 
 /** The performer of a stage when the player does it. */
 export const SELF = 'self';
@@ -39,6 +40,58 @@ export interface StagePlan {
 /** A way to do a stage before its numbers are worked out. */
 type Candidate = Omit<StagePlan, 'ms' | 'chance'>;
 
+/**
+ * One way to do a stage, met or not: what the planner chooses from, and what the interface lists.
+ * `self` is the player by a skill or a named technique, `mate` a teammate, `skip` the Intel that
+ * stands in for the skill, `free` a stage that asks for nothing (a fight, an items stage).
+ */
+export interface StageWay extends Candidate {
+  kind: 'self' | 'mate' | 'skip' | 'free';
+  /** Whether the way can be used now. */
+  met: boolean;
+  /** What the player needs for this way, with the known-technique condition of a nature; null for a teammate, Intel and a free way. */
+  req: Req | null;
+  /** `req` evaluated for the player; null where `req` is. */
+  result: ReqResult | null;
+  /** The Intel the player holds (an Intel way only; 0 otherwise); the price is `intel`. */
+  have: number;
+  /** This is the way the game will use. */
+  used: boolean;
+}
+
+/** The ways of one stage, the one used (index into `ways`, -1 for none) and what the stage takes. */
+export interface StageWays {
+  ways: StageWay[];
+  used: number;
+  /** The items the stage takes when it begins, with what the player holds; null for any other stage. */
+  takes: { item: string; need: number; have: number } | null;
+}
+
+/**
+ * How the length of one attempt is made, as factors whose product is the time:
+ * `ms = max(1, round(baseMs * level * mastery * slow * factor))`, where `factor` is the product
+ * of the modifiers and the ration, never below `floor`.
+ */
+export interface DurationParts {
+  /** The stage's share of the mission's base minutes, ms. */
+  baseMs: number;
+  /** The shortening by levels above the requirement, and by the Mastery of the technique (1 for a fight and an items stage). */
+  level: number;
+  mastery: number;
+  /** `K.mission.slowAlt` on a slow fallback, else 1. */
+  slow: number;
+  /** The modifiers that went in, each key with its total and its sources: every mission's duration, and the key of the skill whose technique does the stage. */
+  modifiers: { key: string; total: number; parts: Modifier[] }[];
+  /** The product of the modifiers' totals, and the ration's `1 + share`. */
+  modifiersTotal: number;
+  ration: number;
+  /** The share of its base time a stage cannot go below, and whether it binds here. */
+  floor: number;
+  floored: boolean;
+  /** The duration factor that applies: `max(floor, modifiersTotal * ration)`. */
+  factor: number;
+  ms: number;
+}
 /** The time one attempt of a stage takes by its share of the mission's minutes, ms; the shares add up to the whole mission. */
 export function stageBaseMs(mission: Mission, index: number): number {
   const total = mission.minutes * MS_PER_MINUTE;
@@ -97,52 +150,81 @@ function bestTechnique(state: GameState, skill: string, min: number, content: Co
   return best;
 }
 
-/** Every way the player or a teammate can do `stage` now. */
-function candidates(
-  state: GameState,
-  mission: Mission,
-  index: number,
-  content: ContentDb,
-): Candidate[] {
+/** The known techniques of `skill` at or above `min` as requirement leaves, of which one is enough. */
+const techniquesOf = (skill: string, min: number, content: ContentDb): Req => ({
+  t: 'any',
+  of: content.techniques
+    .filter((t) => t.skill === skill && t.level >= min)
+    .map((t): Req => ({ t: 'technique', id: t.id })),
+});
+
+type RawWay = Omit<StageWay, 'used' | 'result'>;
+
+/** Every way the player or a teammate can do the stage, met or not, in the order the planner prefers on a tie. */
+function waysOf(state: GameState, mission: Mission, index: number, content: ContentDb): RawWay[] {
   const stage = mission.stages[index];
   if (!stage) return [];
-  const out: Candidate[] = [];
+  const out: RawWay[] = [];
   const team = mission.team ? teammates(state, content) : [];
   const K = content.balance.K;
-  const self = (c: Omit<Candidate, 'who' | 'intel'>): void =>
-    void out.push({ who: SELF, intel: 0, ...c });
   const level = (skill: string): number => skillLevel(state, skill, content);
 
-  /** One requirement `skill >= min`, done by the player, then by each teammate who can. */
+  /** One requirement `skill >= min`, done by the player, then by each teammate who has business with the skill. */
   const alternative = (skill: string, min: number, slow: boolean): void => {
+    const lvl = level(skill);
+    const base: Req = { t: 'skill', skill, level: min };
+    const nature = isNature(content, skill);
     if (!isTechSkill(content, skill)) {
-      if (level(skill) >= min) {
-        self({ skill, tech: '', level: level(skill), min, mastery: 1, slow });
-      }
+      out.push({
+        kind: 'self',
+        who: SELF,
+        skill,
+        tech: '',
+        level: lvl,
+        min,
+        mastery: 1,
+        slow,
+        intel: 0,
+        met: lvl >= min,
+        req: base,
+        have: 0,
+      });
     } else {
+      // A nature needs a known technique of the level; Taijutsu and Ninjutsu stand on the skill alone when none is known.
       const tech = bestTechnique(state, skill, min, content);
-      const lvl = level(skill);
-      if (tech && lvl >= min) {
-        self({ skill, tech: tech.id, level: lvl, min, mastery: tech.mastery, slow });
-      } else if (!isNature(content, skill) && lvl >= min) {
-        // Taijutsu and Ninjutsu stand on the skill alone when no technique of the level is known.
-        self({ skill, tech: '', level: lvl, min, mastery: 1, slow });
-      }
+      const met = lvl >= min && (tech !== null || !nature);
+      out.push({
+        kind: 'self',
+        who: SELF,
+        skill,
+        tech: met && tech ? tech.id : '',
+        level: lvl,
+        min,
+        mastery: met && tech ? tech.mastery : 1,
+        slow,
+        intel: 0,
+        met,
+        req: nature ? { t: 'all', of: [base, techniquesOf(skill, min, content)] } : base,
+        have: 0,
+      });
     }
     for (const member of team) {
-      const lvl = teammateLevel(state, member, skill, content);
-      if (lvl !== null && lvl >= min) {
-        out.push({
-          who: member.tm.id,
-          skill,
-          tech: '',
-          level: lvl,
-          min,
-          mastery: K.team.mastery,
-          slow,
-          intel: 0,
-        });
-      }
+      const mate = teammateLevel(state, member, skill, content);
+      if (mate === null) continue;
+      out.push({
+        kind: 'mate',
+        who: member.tm.id,
+        skill,
+        tech: '',
+        level: mate,
+        min,
+        mastery: K.team.mastery,
+        slow,
+        intel: 0,
+        met: mate >= min,
+        req: null,
+        have: 0,
+      });
     }
   };
 
@@ -159,28 +241,50 @@ function candidates(
       const techniques = indexOf(content).techniques;
       for (const id of [stage.technique, ...stage.alts]) {
         const t = techniques.get(id);
-        if (!t || !state.known[id]) continue;
-        self({
+        if (!t) continue;
+        const known = state.known[id] === true;
+        out.push({
+          kind: 'self',
+          who: SELF,
           skill: t.skill,
           tech: id,
           level: level(t.skill),
           min: t.level,
-          mastery: masteryLevel(state, id, content),
+          mastery: known ? masteryLevel(state, id, content) : 1,
           slow: false,
+          intel: 0,
+          met: known,
+          req: { t: 'technique', id },
+          have: 0,
         });
       }
       break;
     }
     case 'combat':
     case 'items':
-      self({ skill: '', tech: '', level: 0, min: 0, mastery: 1, slow: false });
+      out.push({
+        kind: 'free',
+        who: SELF,
+        skill: '',
+        tech: '',
+        level: 0,
+        min: 0,
+        mastery: 1,
+        slow: false,
+        intel: 0,
+        met: true,
+        req: null,
+        have: 0,
+      });
       break;
   }
   // Intel can stand in for a stage's skill: it is the way of last resort.
   const cost = mission.skip[index] ?? 0;
   const intel = currencyOf(content, 'study');
-  if (cost > 0 && intel !== null && (state.currencies[intel] ?? 0) >= cost) {
+  if (cost > 0 && intel !== null) {
+    const have = state.currencies[intel] ?? 0;
     out.push({
+      kind: 'skip',
       who: SELF,
       skill: '',
       tech: '',
@@ -189,12 +293,15 @@ function candidates(
       mastery: 1,
       slow: false,
       intel: cost,
+      met: have >= cost,
+      req: null,
+      have,
     });
   }
   return out;
 }
 
-/** What `ration` (a share, negative) and the mission duration modifiers do to a stage of `skill`, never below the floor of the balance. */
+/** What the modifiers and `ration` (a share, negative) do to a stage of `skill`, never below the floor of the balance. */
 function durationFactor(
   state: GameState,
   skill: string,
@@ -202,17 +309,30 @@ function durationFactor(
   ration: number,
   content: ContentDb,
   rules: Rules,
-): number {
-  let factor = computeMod(rules.modifierProviders, state, 'mission.duration', content).total;
+): Pick<DurationParts, 'modifiers' | 'modifiersTotal' | 'ration' | 'floor' | 'floored' | 'factor'> {
+  const all = computeMod(rules.modifierProviders, state, 'mission.duration', content);
+  const modifiers = [{ key: 'mission.duration', total: all.total, parts: all.parts }];
+  let factor = all.total;
   // A stage a technique of a skill performs may be shortened by a key of that skill (`mission.duration.<skill>`).
   const key = `mission.duration.${skill}`;
   if (tech !== '' && Object.hasOwn(content.modifierKeys, key)) {
-    factor *= computeMod(rules.modifierProviders, state, key, content).total;
+    const own = computeMod(rules.modifierProviders, state, key, content);
+    modifiers.push({ key, total: own.total, parts: own.parts });
+    factor *= own.total;
   }
-  return Math.max(content.balance.K.mission.minFactor, factor * (1 + ration));
+  const floor = content.balance.K.mission.minFactor;
+  const unfloored = factor * (1 + ration);
+  return {
+    modifiers,
+    modifiersTotal: factor,
+    ration: 1 + ration,
+    floor,
+    floored: floor > unfloored,
+    factor: Math.max(floor, unfloored),
+  };
 }
 
-/** The numbers of an attempt of `c`: its length in ms and its chance. */
+/** The numbers of an attempt of `c`: its length in ms with the parts it is made of, and its chance. */
 function figures(
   state: GameState,
   mission: Mission,
@@ -222,7 +342,7 @@ function figures(
   extraMastery: number,
   content: ContentDb,
   rules: Rules,
-): StagePlan {
+): { plan: StagePlan; parts: DurationParts } {
   const M = content.balance.K.mission;
   const above = Math.max(0, c.level - c.min);
   const mastery = c.mastery + extraMastery;
@@ -231,27 +351,78 @@ function figures(
   const fixed = stage?.t === 'combat' || stage?.t === 'items';
   const byLevel = fixed ? 1 : Math.max(M.floor, 1 - M.perLevel * above);
   const byMastery = fixed ? 1 : Math.max(0, 1 - M.masteryTime * (mastery - 1));
-  const ms = Math.max(
-    1,
-    Math.round(
-      stageBaseMs(mission, index) *
-        byLevel *
-        byMastery *
-        (c.slow ? M.slowAlt : 1) *
-        durationFactor(state, c.skill, c.tech, ration, content, rules),
-    ),
-  );
+  const slow = c.slow ? M.slowAlt : 1;
+  const baseMs = stageBaseMs(mission, index);
+  const duration = durationFactor(state, c.skill, c.tech, ration, content, rules);
+  const ms = Math.max(1, Math.round(baseMs * byLevel * byMastery * slow * duration.factor));
   const chance = fixed
     ? 1
     : Math.min(
         M.success.cap,
         M.success.base + M.success.perLevel * above + M.success.perMastery * (mastery - 1),
       );
-  return { ...c, ms, chance };
+  return {
+    // Only the plan's own fields are kept: the plan is saved in the slot.
+    plan: {
+      who: c.who,
+      skill: c.skill,
+      tech: c.tech,
+      level: c.level,
+      min: c.min,
+      mastery: c.mastery,
+      slow: c.slow,
+      intel: c.intel,
+      ms,
+      chance,
+    },
+    parts: { baseMs, level: byLevel, mastery: byMastery, slow, ...duration, ms },
+  };
 }
 
 /** Which way is preferred: the player's own normal way first, then a teammate or a slow fallback, then Intel. */
 const tierOf = (c: Candidate): number => (c.intel > 0 ? 2 : c.who === SELF && !c.slow ? 0 : 1);
+
+/** What the planner works out for a stage: every way, the one chosen with its numbers and the parts of its length. */
+interface Resolved {
+  ways: RawWay[];
+  used: number;
+  plan: StagePlan | null;
+  parts: DurationParts | null;
+}
+
+function resolve(
+  state: GameState,
+  mission: Mission,
+  index: number,
+  content: ContentDb,
+  rules: Rules,
+  ration: number,
+  extraMastery: number,
+): Resolved {
+  const ways = waysOf(state, mission, index, content);
+  const tier = Math.min(...ways.filter((w) => w.met).map(tierOf));
+  let best: { plan: StagePlan; parts: DurationParts } | null = null;
+  let used = -1;
+  ways.forEach((c, i) => {
+    if (!c.met || tierOf(c) !== tier) return;
+    const found = figures(
+      state,
+      mission,
+      index,
+      c,
+      ration,
+      c.tech ? extraMastery : 0,
+      content,
+      rules,
+    );
+    if (best === null || found.plan.ms < best.plan.ms) {
+      best = found;
+      used = i;
+    }
+  });
+  const chosen = best as { plan: StagePlan; parts: DurationParts } | null;
+  return { ways, used, plan: chosen?.plan ?? null, parts: chosen?.parts ?? null };
+}
 
 /**
  * The way the game would do a stage now. The player does it whenever they meet it by a normal
@@ -269,36 +440,66 @@ export function planStage(
   ration = 0,
   extraMastery = 0,
 ): StagePlan | null {
-  const all = candidates(state, mission, index, content);
-  const tier = Math.min(...all.map(tierOf));
-  let best: StagePlan | null = null;
-  for (const c of all) {
-    if (tierOf(c) !== tier) continue;
-    const plan = figures(
-      state,
-      mission,
-      index,
-      c,
-      ration,
-      c.tech ? extraMastery : 0,
-      content,
-      rules,
-    );
-    if (!best || plan.ms < best.ms) best = plan;
-  }
-  return best;
+  return resolve(state, mission, index, content, rules, ration, extraMastery).plan;
+}
+
+/** `planStage` with the parts the length of the chosen attempt is made of (for the forecast). */
+export function planStageParts(
+  state: GameState,
+  mission: Mission,
+  index: number,
+  content: ContentDb,
+  rules: Rules,
+  ration = 0,
+  extraMastery = 0,
+): { plan: StagePlan; parts: DurationParts } | null {
+  const r = resolve(state, mission, index, content, rules, ration, extraMastery);
+  return r.plan && r.parts ? { plan: r.plan, parts: r.parts } : null;
+}
+
+/**
+ * Every way to do stage `stageIndex` of a mission, each with what it needs, whether it is met now,
+ * its price where it has one (Intel), and which one the game will use (with the armed ration, as a
+ * run that begins now would). The same resolution drives `planStage`, so the forecast, the run
+ * and a page that lists the ways cannot disagree. Empty for a mission or stage the content lacks.
+ */
+export function missionStageWays(
+  state: GameState,
+  missionId: string,
+  stageIndex: number,
+  content: ContentDb,
+  rules: Rules,
+): StageWays {
+  const mission = indexOf(content).missions.get(missionId);
+  const stage = mission?.stages[stageIndex];
+  if (!mission || !stage) return { ways: [], used: -1, takes: null };
+  const { ways, used } = resolve(
+    state,
+    mission,
+    stageIndex,
+    content,
+    rules,
+    armedRation(state, content),
+    0,
+  );
+  return {
+    ways: ways.map((w, i) => ({
+      ...w,
+      result: w.req ? evalReq(state, w.req, content) : null,
+      used: i === used,
+    })),
+    used,
+    takes:
+      stage.t === 'items'
+        ? { item: stage.item, need: stage.n, have: state.bank[stage.item] ?? 0 }
+        : null,
+  };
 }
 
 const ALL_MET: Req = { t: 'all', of: [] };
 
 /** What a stage needs, as a requirement tree: the technique leaves are the ones that would do. */
 function staticReq(stage: MissionStage, content: ContentDb): Req {
-  const techniquesOf = (skill: string, min: number): Req => ({
-    t: 'any',
-    of: content.techniques
-      .filter((t) => t.skill === skill && t.level >= min)
-      .map((t) => ({ t: 'technique', id: t.id })),
-  });
   switch (stage.t) {
     case 'skill':
       return { t: 'skill', skill: stage.skill, level: stage.min };
@@ -308,7 +509,7 @@ function staticReq(stage: MissionStage, content: ContentDb): Req {
         of: stage.any.map((alt): Req => {
           const leaf: Req = { t: 'skill', skill: alt.skill, level: alt.min };
           return isNature(content, alt.skill)
-            ? { t: 'all', of: [leaf, techniquesOf(alt.skill, alt.min)] }
+            ? { t: 'all', of: [leaf, techniquesOf(alt.skill, alt.min, content)] }
             : leaf;
         }),
       };

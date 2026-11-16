@@ -14,13 +14,14 @@ export interface Toast {
   /** An entity the toast is about, as a link before the text (the sentence goes on after the name). */
   subject?: EntityRef;
   ref?: EntityRef;
-  /** What a claimed cache or vault gave: ryo and items, the items as links; `missed` is what was due but not received. */
+  /** What a claimed cache, a vault or a finished mission gave: ryo, other currencies and items (the items as links), and the village resource a mission brought. */
   gains?: {
     ryo: number;
     /** Other currencies, by id. */
     currencies?: Record<string, number>;
     items: { id: string; n: number }[];
-    missed?: { id: string; n: number }[];
+    /** Village resource units: `units` earned, `added` to the village, `lost` to a full store, `waiting` for a village that does not exist yet. */
+    resource?: { slug: string; units: number; added: number; lost: number; waiting: number };
   };
   /**
    * A button on the toast; pressing it runs `run` and closes the toast, unless `run` returns (or

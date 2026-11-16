@@ -81,10 +81,11 @@ describe('each alternative of a stage is exercised', () => {
   it('fire, the whole mission, by the bucket chain', () => {
     const state = player({
       natures: ['katon'],
-      team: false,
       levels: { ath: 25, scout: 1, tai: 20, katon: 1 },
     });
     expect(startMission(state, 'core:fire')).toEqual({ ok: true });
+    // The player does it by their own way: the team plays no part in this check.
+    state.team = null;
     runUntilDone(state, 'core:fire', 3 * 60 * MIN);
     expect(state.counters['missions.done.core:fire']).toBe(1);
   });

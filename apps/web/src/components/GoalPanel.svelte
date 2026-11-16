@@ -63,6 +63,11 @@
 
   {#if goal}
     <div class="tree" data-goal>
+      {#if goal.kind === 'mission'}
+        <p class="target" data-goal-mission data-entity="mission:{goal.id}">
+          <EntityLink kind="mission" id={goal.id} />
+        </p>
+      {/if}
       {#if result}
         <ReqTree node={result} part="goal-row" />
       {:else if goalRef}

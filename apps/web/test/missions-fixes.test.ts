@@ -46,18 +46,36 @@ describe('the XP of a fight is not split by a guessed skill', () => {
   it('shows a combat stage as one total, with the skills it goes to, and no per-skill number', async () => {
     const state = able();
     booted = await bootApp([coreUi], state, '#/mission/core:dig');
+    const dig = content.missions.find((m) => m.id === 'core:dig')!;
+    const forecast = missionForecast(state, dig, content, rules());
+    const stage = forecast.stages[2]!;
     const fight = q('[data-stage="2"] [data-stage-fight-xp]');
-    expect(Number(fight?.dataset.value)).toBeGreaterThan(0);
-    expect(q('[data-stage="2"] [data-stage-xp]')).toBeNull();
-    for (const skill of game.content.balance.K.mission.fightSkills) {
-      expect(fight?.querySelector(`a[href="#/skill/${skill}"]`)).not.toBeNull();
+    expect(Number(fight?.dataset.value)).toBeCloseTo(stage.xp.fight?.total ?? -1, 9);
+    // The style share is said to depend on the techniques used: no skill is named for it.
+    const style = q('[data-stage="2"] [data-stage-style-xp]');
+    expect(Number(style?.dataset.value)).toBeGreaterThan(0);
+    expect(style?.querySelector('a')).toBeNull();
+    expect(stage.xp.lines.find((l) => !l.certain)?.skill).toBeNull();
+    // The skills that are always paid are listed with their own amount, each as core computed it.
+    const sure = qa('[data-stage="2"] [data-stage-xp-skill]');
+    expect(sure.map((e) => e.dataset.stageXpSkill)).toEqual(stage.xp.fight?.skills);
+    for (const row of sure) {
+      const line = stage.xp.lines.find((l) => l.skill === row.dataset.stageXpSkill);
+      expect(Number(row.dataset.value)).toBeCloseTo(line?.amount ?? -1, 9);
+      expect(row.querySelector(`a[href="#/skill/${row.dataset.stageXpSkill}"]`)).not.toBeNull();
     }
-    // The totals list only the skills that stages 1 and 2 fix, and the fights apart.
-    const skills = qa('[data-xp-skill]').map((e) => e.dataset.xpSkill);
-    const fixed = ['ath', 'doton', 'tai'];
-    expect(skills.every((x) => fixed.includes(x ?? ''))).toBe(true);
-    expect(skills).not.toContain('vit');
-    expect(Number(q('[data-total="fight-xp"]')?.dataset.value)).toBeGreaterThan(0);
+    // Per hour: the skills core is sure of, and the fights' whole XP as a line of its own.
+    const perHour = qa('[data-total="xp"] [data-xp-skill]').map((e) => e.dataset.xpSkill);
+    expect(perHour.sort()).toEqual(
+      Object.entries(forecast.xpPerHour)
+        .filter(([, v]) => v > 0)
+        .map(([k]) => k)
+        .sort(),
+    );
+    expect(Number(q('[data-total="fight-xp"]')?.dataset.value)).toBeCloseTo(
+      forecast.fightXpPerHour,
+      6,
+    );
   });
 
   it('keeps per-skill XP equal to the forecast where nothing is guessed', async () => {
@@ -152,21 +170,25 @@ describe('an alternative is met only when the forecast can use it', () => {
       for (const mission of board) {
         const forecast = missionForecast(state, mission, content, rules());
         for (const view of stageViews(state, mission, forecast, content, rules())) {
-          if (view.alts.length === 0) continue;
+          const ways = view.ways.ways.filter((w) => w.kind !== 'free');
+          if (ways.length === 0) continue;
           const path = view.forecast.path;
-          const anyMet = view.alts.some((a) => a.met);
           const where = `${name}: ${mission.id} stage ${view.index}`;
-          alternatives += view.alts.length;
-          if (state.team === null) {
-            // Alone, a way exists exactly when one of the ways is met.
-            expect(anyMet, where).toBe(path !== null);
-          } else {
-            if (anyMet) expect(path, where).not.toBeNull();
-            if (path !== null && !anyMet) expect(path.who, where).not.toBe('self');
-          }
-          for (const way of view.alts) {
-            // The way marked as used is one the player meets, unless a teammate does the stage.
-            if (way.used && path?.who === 'self') expect(way.met, where).toBe(true);
+          alternatives += ways.length;
+          // A way exists exactly when one of the ways is met (a teammate's and Intel included).
+          expect(
+            ways.some((w) => w.met),
+            where,
+          ).toBe(path !== null);
+          const used = ways.filter((w) => w.used);
+          expect(used, where).toHaveLength(path === null ? 0 : 1);
+          if (path !== null) {
+            // The way marked as used is a met one, and the forecast's path is that way.
+            expect(used[0]?.met, where).toBe(true);
+            expect(
+              [used[0]?.who, used[0]?.skill, used[0]?.tech, used[0]?.slow, used[0]?.intel],
+              where,
+            ).toEqual([path.who, path.skill, path.tech, path.slow, path.intel]);
           }
         }
       }
@@ -181,8 +203,13 @@ describe('an alternative is met only when the forecast can use it', () => {
       a.querySelector('[data-entity="skill:suiton"]'),
     );
     expect(way?.dataset.met).toBe('false');
-    expect(way?.querySelector('[data-need-tech]')?.getAttribute('data-met')).toBe('false');
-    expect(way?.querySelector('[data-need-tech] a')?.getAttribute('href')).toBe('#/skill/suiton');
+    // The tree core gives names the condition: a known technique of the skill, none of which is known.
+    const techniques = [
+      ...(way?.querySelectorAll('[data-ui="req-row"][data-entity^="technique:"]') ?? []),
+    ];
+    expect(techniques.length).toBeGreaterThan(0);
+    expect(techniques.every((row) => row.getAttribute('data-met') === 'false')).toBe(true);
+    expect(way?.querySelector('a[href="#/skill/suiton"]')).not.toBeNull();
     expect(way?.querySelector('[data-tag="unmet"]')).not.toBeNull();
     expect(qa('[data-stage="1"] [data-used="true"]')).toHaveLength(0);
     expect(q('[data-stage="1"] [data-no-path]')).not.toBeNull();

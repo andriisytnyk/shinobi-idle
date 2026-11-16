@@ -1,17 +1,17 @@
 <script lang="ts">
   import type { Mission } from '@shinobi/content';
-  import { MISSION_KIND } from '@shinobi/core';
+  import { MISSION_KIND, NEEDS_TEAM } from '@shinobi/core';
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
   import { cardState, viewOf } from '../lib/mission-feed.svelte.ts';
-  import { cleanRunChance, pinTarget, rewardsOf } from '../lib/missions.ts';
+  import { holderRef, rewardRows } from '../lib/missions.ts';
   import { game } from '../lib/store.ts';
   import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import MissionRankStamp from './MissionRankStamp.svelte';
-  import PinGoal from './PinGoal.svelte';
   import MissionReward from './MissionReward.svelte';
+  import PinGoal from './PinGoal.svelte';
   import ReqTree from './ReqTree.svelte';
 
   interface Props {
@@ -22,24 +22,24 @@
 
   const view = $derived(viewOf(mission));
   const forecast = $derived(view.forecast);
-  /** Whether a team goes with the player, for a mission that asks for one. */
-  const hasTeam = $derived(game.read((gs) => gs.team !== null));
-  const state = $derived(cardState(mission, view.blocker));
-  const rewards = $derived(rewardsOf(forecast, game.content));
-  const chance = $derived(cleanRunChance(forecast));
-  /** A blocked mission pins the first unmet entity of its blocker, the same target as the mission page. */
-  const pin = $derived(state.kind === 'blocked' ? pinTarget(state.blocker) : null);
+  /** What `dispatch` would answer to starting it now, from core. */
+  const status = $derived(cardState(mission, view));
+  const running = $derived(status.runningAt >= 0);
+  const refusal = $derived(running ? null : status.refusal);
+  const shown = $derived(running ? 'running' : status.startable ? 'startable' : 'blocked');
+  const by = $derived(refusal?.by ? holderRef(refusal.by) : null);
+  const rewards = $derived(rewardRows(forecast.rewards));
   const clientKey = $derived(`mission.${mission.id}.client`);
 
   function start(): void {
-    if (state.kind === 'running') {
-      const result = game.dispatch({ type: 'action.stop', slot: state.slot });
+    if (running) {
+      const result = game.dispatch({ type: 'action.stop', slot: status.runningAt });
       if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
       return;
     }
     const result = game.dispatch({
       type: 'action.start',
-      slot: state.slot,
+      slot: status.slot,
       kind: MISSION_KIND,
       id: mission.id,
     });
@@ -49,12 +49,12 @@
 
 <li
   class="ct-tile card"
-  class:running={state.kind === 'running'}
+  class:running
   class:closed={!view.open}
   data-ui="mission-card"
   data-entity="mission:{mission.id}"
   data-mission={mission.id}
-  data-state={state.kind}
+  data-state={shown}
 >
   <div class="ct-head">
     <h3 class="ct-name">
@@ -65,14 +65,9 @@
       <Icon name="lucide:users" size={14} />
       {t(mission.team ? 'mission.team.yes' : 'mission.team.no')}
     </span>
-    {#if pin}<PinGoal kind={pin.kind} id={pin.id} always />{/if}
+    <PinGoal kind="mission" id={mission.id} always />
   </div>
   {#if hasKey(clientKey)}<p class="ct-note client">{t(clientKey)}</p>{/if}
-  {#if mission.team && !hasTeam}
-    <p class="ct-note" data-no-team>
-      {t('mission.team.none')} <a href="#/nature">{t('req.natureLink')}</a>
-    </p>
-  {/if}
 
   <dl class="ct-facts">
     <div>
@@ -83,8 +78,8 @@
     </div>
     <div>
       <dt>{t('mission.chance.title')}</dt>
-      <dd data-chance data-value={chance}>
-        {forecast.doable ? `${Math.round(chance * 100)}%` : t('mission.unknown')}
+      <dd data-chance data-value={forecast.cleanChance}>
+        {forecast.doable ? `${Math.round(forecast.cleanChance * 100)}%` : t('mission.unknown')}
       </dd>
     </div>
     <div>
@@ -103,31 +98,32 @@
     {/each}
   </ul>
 
-  {#if state.kind === 'running'}
+  {#if running}
     <p class="ct-note" data-running>
       <Icon name="lucide:hourglass" size={14} />
-      {t('mission.running', { n: state.slot + 1 })}
+      {t('mission.running', { n: status.runningAt + 1 })}
     </p>
-  {:else if state.kind === 'blocked'}
-    <div class="why" id="why-{mission.id}" data-why={state.reason}>
-      {#if state.blocker}
-        <ReqTree node={state.blocker} />
-        {#if pin}
-          <p class="ct-pin-caption"><PinGoal kind={pin.kind} id={pin.id} variant="link" /></p>
-        {/if}
+  {:else if refusal}
+    <div class="why" id="why-{mission.id}" data-why={refusal.reason}>
+      {#if refusal.blocker}
+        <ReqTree node={refusal.blocker.first ?? refusal.blocker.result} />
       {/if}
-      {#if state.by}
+      {#if by}
         <p class="ct-why" data-by>
-          {t(state.reason)}
+          {t(refusal.reason)}
           {t('mission.busyBy')}
-          {#if state.by.ref}
-            <EntityLink kind={state.by.ref.kind} id={state.by.ref.id} />
+          {#if by.ref}
+            <EntityLink kind={by.ref.kind} id={by.ref.id} />
           {:else}
             <a href="#/combat">{t('mission.busyCombat')}</a>
           {/if}
         </p>
+      {:else if refusal.reason === NEEDS_TEAM}
+        <p class="ct-why" data-needs-team>
+          {t(refusal.reason)} <a href="#/nature">{t('req.natureLink')}</a>
+        </p>
       {:else}
-        <p class="ct-why">{t(state.reason)}</p>
+        <p class="ct-why">{t(refusal.reason)}</p>
       {/if}
     </div>
   {/if}
@@ -135,13 +131,13 @@
   <button
     type="button"
     class="ct-action"
-    class:stop={state.kind === 'running'}
-    disabled={state.kind === 'blocked'}
+    class:stop={running}
+    disabled={shown === 'blocked'}
     data-start
-    aria-describedby={state.kind === 'blocked' ? `why-${mission.id}` : undefined}
+    aria-describedby={shown === 'blocked' ? `why-${mission.id}` : undefined}
     onclick={start}
   >
-    {t(state.kind === 'running' ? 'tile.stop' : 'tile.start')}
+    {t(running ? 'tile.stop' : 'tile.start')}
   </button>
 </li>
 

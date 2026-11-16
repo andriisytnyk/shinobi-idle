@@ -3,6 +3,7 @@ import {
   COURSE_ID,
   COURSE_KIND,
   isSkillUnlocked,
+  missionGoalReq,
   skillLevel,
   type GameState,
   type Req,
@@ -88,6 +89,11 @@ export function goalTree(
   content: ContentDb,
   rules: Rules,
 ): Req | null {
+  // A mission's tree is core's: what opens it and the first stage that has no way yet.
+  if (ref.kind === 'mission') {
+    const mission = content.missions.find((m) => m.id === ref.id);
+    return mission ? missionGoalReq(state, mission, content, rules) : null;
+  }
   const own = goalReq(ref, content);
   const actionKind = GOAL_ACTION[ref.kind] ?? (ref.kind === 'item' ? GATHER : undefined);
   const kind = actionKind ? rules.actionKinds[actionKind] : undefined;
@@ -113,8 +119,8 @@ export function goalTree(
  * The requirement tree the goal panel shows now: the pinned goal's tree; with nothing pinned, the
  * objective of the quest step under way; with no quest, the suggested technique. Null when none.
  */
-export function shownGoalReq(state: GameState, content: ContentDb): Req | null {
-  if (state.goal) return goalReq(state.goal, content);
+export function shownGoalReq(state: GameState, content: ContentDb, rules: Rules): Req | null {
+  if (state.goal) return goalTree(state, state.goal, content, rules);
   const step = nextStep(state, content);
   if (step) return step.objective.t === 'req' ? step.objective.req : null;
   const suggestion = suggestGoal(state, content);
@@ -122,8 +128,8 @@ export function shownGoalReq(state: GameState, content: ContentDb): Req | null {
 }
 
 /** Ids of the items the shown goal's requirement tree asks for. */
-export function goalItemIds(state: GameState, content: ContentDb): string[] {
-  return reqItemIds(shownGoalReq(state, content));
+export function goalItemIds(state: GameState, content: ContentDb, rules: Rules): string[] {
+  return reqItemIds(shownGoalReq(state, content, rules));
 }
 
 /** The technique a goal pinned by an older version of the app pointed at: its first technique row. */

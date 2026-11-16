@@ -1,7 +1,7 @@
 <script lang="ts">
   import { formatBonus, formatInt } from '../lib/format.ts';
+  import { rationItems } from '@shinobi/core';
   import { t } from '../lib/i18n.ts';
-  import { rationItems } from '../lib/missions.ts';
   import { game } from '../lib/store.ts';
   import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import EntityLink from './EntityLink.svelte';
@@ -9,13 +9,7 @@
 
   /** Every ration of the content with what the player holds of it and whether it is armed. */
   const rations = $derived(
-    game.read((gs) =>
-      rationItems(game.content).map((r) => ({
-        ...r,
-        have: gs.bank[r.id] ?? 0,
-        armed: (gs.buffs[r.id]?.charges ?? 0) >= 1,
-      })),
-    ),
+    game.read((gs) => rationItems(gs, game.content).map((r) => ({ ...r, armed: r.charges >= 1 }))),
   );
 
   function arm(id: string): void {

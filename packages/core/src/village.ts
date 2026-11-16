@@ -145,14 +145,20 @@ export function syncVillage(state: GameState, content: ContentDb): void {
 /**
  * Hands the resource units that missions earned before the village existed to the village, through
  * `addShinobiResource` (so the stores' limits apply). Nothing happens while there is no village.
+ * Returns the units added, by resource slug.
  */
-export function drainPendingResources(state: GameState, content: ContentDb): void {
-  if (!state.village) return;
+export function drainPendingResources(
+  state: GameState,
+  content: ContentDb,
+): Record<string, number> {
+  const added: Record<string, number> = {};
+  if (!state.village) return added;
   const pending = state.missions.pending;
   for (const [kind, n] of Object.entries(pending)) {
-    addShinobiResource(state, kind, n, content);
+    added[kind] = addShinobiResource(state, kind, n, content);
     delete pending[kind];
   }
+  return added;
 }
 
 // ---------- the tick ----------
