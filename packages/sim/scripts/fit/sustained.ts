@@ -58,7 +58,7 @@ export function sustainedScore(hours = 2): { penalty: number; lines: string[] } 
   for (const e of regular) {
     const d = (['katon', 'doton'] as NatureId[]).map((n) => grind(e.id, n, hours));
     const excess = d.reduce((s, x) => s + Math.max(0, x - 2), 0);
-    penalty += Math.min(excess, 30) * 0.05;
+    penalty += Math.min(excess, 30) * 0.2;
     lines.push(
       `SUSTAINED ${e.id.replace('core:', '').padEnd(14)} defeats katon ${d[0]} doton ${d[1]} ${excess > 0 ? '<<<' : ''}`,
     );
