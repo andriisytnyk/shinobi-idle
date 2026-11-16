@@ -24,6 +24,7 @@ import {
   type PlayerSnapshot,
 } from '../src/index.ts';
 import { applyStatusById } from '../src/combat/fight-status.ts';
+import { findEffect } from '../src/combat/fight-effects.ts';
 import { K, castSeq, enemyAt, quiet, rules, scripted, sec, withAi } from './fight-helpers.ts';
 import { fighter, startFight } from './prep-state.ts';
 import { modContent, modRules } from './packs-helpers.ts';
@@ -309,6 +310,28 @@ describe('breaking an action off', () => {
     const broken = (fight.log ?? []).filter((l) => l.act === 'interrupted' && l.side === 'player');
     expect(broken.length).toBeGreaterThan(0);
     expect(fight.tally.uses[FIREBALL]).toBeUndefined();
+  });
+
+  it('leaves the status that breaks the rhythm when the interrupting attack hits a fighter that is not casting, for enemy and player alike', () => {
+    const striker: FightHook = {
+      id: 'test:interrupting2',
+      onAttack: (_ctx, _c, plan) => {
+        plan.interrupts = true;
+        plan.chance = 1;
+      },
+    };
+    const custom = { ...rules, fightHooks: [...rules.fightHooks, striker] };
+    const encounter = enemyAt(20);
+    encounter.specials = ['test:interrupting2'];
+    const fight = quiet(createFight(scripted([]), encounter, 4, content, custom));
+    fight.player.hp = fight.player.maxHp = 1e9;
+    fightAdvance(fight, sec(6), content, custom);
+    const slow = findEffect(fight.player, 'off_beat');
+    expect(slow, 'the player has the status').toBeDefined();
+    expect(slow?.kind).toBe('modifier');
+    // The same status is what a hit of the interrupting tag leaves on an enemy.
+    const tag = content.tags.find((t) => t.id === 'interrupt');
+    expect(tag?.onHit?.some((o) => o.op === 'status' && o.status === 'off_beat')).toBe(true);
   });
 
   it('is never done to the wind-up of an enemy or to an item already used', () => {

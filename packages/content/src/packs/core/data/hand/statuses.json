@@ -74,5 +74,21 @@
     ],
     "duration": "poison.dur",
     "suppresses": "regen"
+  },
+  {
+    "id": "off_beat",
+    "effects": [
+      {
+        "kind": "modifier",
+        "stat": "speed",
+        "op": "mul",
+        "value": {
+          "path": "rhythm.slow",
+          "oneMinus": true
+        }
+      }
+    ],
+    "duration": "rhythm.dur",
+    "refresh": "longest"
   }
 ]

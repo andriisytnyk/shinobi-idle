@@ -1081,6 +1081,8 @@ export const balanceParamsSchema = z.object({
   masteryCost: z.number(),
   burn: z.object({ share: z.number(), dur: z.number() }),
   wet: z.object({ slow: z.number(), dur: z.number() }),
+  /** The status an interrupting hit leaves: the share of speed lost and the seconds it lasts. */
+  rhythm: z.object({ slow: z.number(), dur: z.number() }),
   stun: shapeOf('stun', z.record(z.string(), z.number())),
   bind: z.object({ dur: z.number() }),
   poison: z.object({ pctPerSec: z.number(), dur: z.number() }),

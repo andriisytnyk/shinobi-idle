@@ -1563,8 +1563,13 @@ function enemyAttack(ctx: FightCtx, enemy: Combatant): void {
   }
   const dealt = dealDamage(ctx, player, plan.damage, enemy.id);
   note(fight, 'enemy', 'hit', null, dealt);
-  // An attack that carries the interrupt breaks the cast of whoever it hits.
-  if (plan.interrupts === true && alive(player)) breakAct(ctx, player);
+  // An attack that carries the interrupt does what the interrupting tags of the content do to whoever it hits:
+  // breaks the cast under way, and leaves the status that follows.
+  if (plan.interrupts === true && alive(player)) {
+    for (const tag of fightData(ctx.content).tags.values()) {
+      if (tag.interrupts) runTagOps(ctx, player, tag.onHit, enemy.id);
+    }
+  }
   for (const hook of hooks) {
     guard(
       ctx,
