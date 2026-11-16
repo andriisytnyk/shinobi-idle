@@ -5,8 +5,13 @@ const SECRET = ['core:boss_hunter', 'core:boss_twins', 'core:boss_mist', 'core:b
 export function bossScore(n: number): { penalty: number; lines: string[] } {
   let penalty = 0;
   const lines: string[] = [];
-  const win = (boss: Boss, nature: NatureId, prep: 'prepared' | 'empty', knowledge: 'full' | 'none' = 'full', below = 0) =>
-    simulate(boss, playerFor(boss, nature, { prep, below, tier: 1, knowledge }), n, 1).winRate;
+  const win = (
+    boss: Boss,
+    nature: NatureId,
+    prep: 'prepared' | 'empty',
+    knowledge: 'full' | 'none' = 'full',
+    below = 0,
+  ) => simulate(boss, playerFor(boss, nature, { prep, below, tier: 1, knowledge }), n, 1).winRate;
   const by: Record<string, number> = {};
   const rows: { boss: Boss; full: number }[] = [];
   for (const boss of content.bosses) {
@@ -15,7 +20,9 @@ export function bossScore(n: number): { penalty: number; lines: string[] } {
       fav = beater(boss.nature);
       unfav = beaten(boss.nature);
     } else {
-      const r = NATURE_IDS.map((nn) => ({ nn, w: win(boss, nn, 'prepared') })).sort((a, b) => b.w - a.w);
+      const r = NATURE_IDS.map((nn) => ({ nn, w: win(boss, nn, 'prepared') })).sort(
+        (a, b) => b.w - a.w,
+      );
       fav = r[0]!.nn;
       unfav = r[r.length - 1]!.nn;
     }
@@ -32,9 +39,12 @@ export function bossScore(n: number): { penalty: number; lines: string[] } {
     if (boss.cl >= 32) p += Math.max(0, 0.25 - (full - empty)) * 2;
     if (SECRET.includes(boss.id)) p += Math.max(0, 0.2 - (full - none)) * 2;
     const special = ['core:boss_wolf', 'core:boss_hunter', 'core:boss_mist'].includes(boss.id);
-    if (boss.nature !== null && boss.nature !== 'wheel' && !special) p += Math.max(0, 0.2 - (full - unf)) * 2;
+    if (boss.nature !== null && boss.nature !== 'wheel' && !special)
+      p += Math.max(0, 0.2 - (full - unf)) * 2;
     penalty += p;
-    lines.push(`${boss.id.replace('core:', '').padEnd(14)} cl${boss.cl} full ${full.toFixed(2)} none ${none.toFixed(2)} unfav ${unf.toFixed(2)} empty ${empty.toFixed(2)} below ${below.toFixed(2)} ${p > 0.001 ? '<<<' : ''}`);
+    lines.push(
+      `${boss.id.replace('core:', '').padEnd(14)} cl${boss.cl} full ${full.toFixed(2)} none ${none.toFixed(2)} unfav ${unf.toFixed(2)} empty ${empty.toFixed(2)} below ${below.toFixed(2)} ${p > 0.001 ? '<<<' : ''}`,
+    );
   }
   const nameless = by['core:boss_nameless'] ?? 1;
   for (const r of rows) penalty += Math.max(0, nameless - r.full);

@@ -185,7 +185,7 @@ describe('fight action', () => {
     const state = createState(7, content);
     dispatch(state, fight(), content);
     // The player waits for the moment first, then casts.
-    advance(state, 1100, content);
+    advance(state, (content.ai.tiers[0]?.waitMs ?? 0) + 100, content);
     const player = state.combat?.fight.player;
     expect(player?.act?.id).toBe('core:leaf_whirlwind');
     expect(player?.stamina).toBeLessThan(playerMaxStamina(state, content));

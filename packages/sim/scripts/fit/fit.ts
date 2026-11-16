@@ -1,15 +1,30 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 /* Throwaway fit harness: mutates the content's numbers in place and scores the three yardsticks against the baseline. */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { content } from '@shinobi/content';
 import { allEntries, fightRow } from '../../src/fightReport.ts';
-import { createFight, defaultRules, encounterFor, fightAdvance, snapshotPlayer } from '@shinobi/core';
+import {
+  createFight,
+  defaultRules,
+  encounterFor,
+  fightAdvance,
+  snapshotPlayer,
+} from '@shinobi/core';
 import { boss as bossCase, build } from '../../../core/test/analysis-helpers.ts';
 import { curves } from '../hit-curves.ts';
 import { bossScore } from './boss.ts';
 import { sustainedScore } from './sustained.ts';
 import { entryOf } from '../../../core/src/combat/zones.ts';
 
-const TIP: [number, number][] = [[38, 0.107], [40, 0.273], [42, 0.557], [44, 0.77], [46, 0.922], [48, 0.973], [50, 1]];
+const TIP: [number, number][] = [
+  [38, 0.107],
+  [40, 0.273],
+  [42, 0.557],
+  [44, 0.77],
+  [46, 0.922],
+  [48, 0.973],
+  [50, 1],
+];
 const baseAt = (lvl: number): number => {
   if (lvl <= TIP[0]![0]) return TIP[0]![1];
   for (let i = 1; i < TIP.length; i++) {
@@ -46,7 +61,8 @@ export function tipping(runs: number): { err: number; line: string } {
 
 const BASE = new URL('../../../../docs/balance-evidence/', import.meta.url);
 const baseline: Record<string, any[]> = {};
-for (const y of ['A', 'B', 'C', 'D']) baseline[y] = JSON.parse(readFileSync(new URL(`baseline-dev-3f559af-${y}.json`, BASE), 'utf8'));
+for (const y of ['A', 'B', 'C', 'D'])
+  baseline[y] = JSON.parse(readFileSync(new URL(`baseline-dev-3f559af-${y}.json`, BASE), 'utf8'));
 
 const K: any = content.balance.K;
 export const orig = {
@@ -70,16 +86,66 @@ export const orig = {
   role: Object.fromEntries(content.techniques.map((t) => [t.id, t.role])),
 };
 export type Knobs = Record<string, number>;
-export const DEFAULTS: Knobs = { cs: 1, cds: 1, w0: 1, w1: 1, bc: 1, bd: 1, bcost: 1, evaBase: 1, evaTier: 1, accTier: 1, ps: 1, rest: 1, wg: 1, kn: 1, etA: 1, etE: 1, eA0: 1, eAL: 1, eE0: 1, eEL: 1, crD: 1, crC: 1, crB: 1, cdProjectile: 1, cdSeries: 1, cdArea: 1, cdControl: 1, cdSignature: 1 };
+export const DEFAULTS: Knobs = {
+  cs: 1,
+  cds: 1,
+  w0: 1,
+  w1: 1,
+  bc: 1,
+  bd: 1,
+  bcost: 1,
+  evaBase: 1,
+  evaTier: 1,
+  accTier: 1,
+  ps: 1,
+  rest: 1,
+  wg: 1,
+  kn: 1,
+  etA: 1,
+  etE: 1,
+  eA0: 1,
+  eAL: 1,
+  eE0: 1,
+  eEL: 1,
+  crD: 1,
+  crC: 1,
+  crB: 1,
+  cdProjectile: 1,
+  cdSeries: 1,
+  cdArea: 1,
+  cdControl: 1,
+  cdSignature: 1,
+};
 export function apply(k: Knobs): void {
-  const rankScale: Record<string, number> = { D: k.crD!, E: k.crD!, C: k.crC!, B: k.crB!, A: k.crB!, S: k.crB! };
-  for (const t of content.techniques as any[]) t.cast = (orig.cast.get(t.id) ?? t.cast) * k.cs! * (rankScale[orig.rank[t.id] as string] ?? 1);
-  const roleScale: Record<string, number> = { projectile: k.cdProjectile!, series: k.cdSeries!, area: k.cdArea!, control: k.cdControl!, signature: k.cdSignature! };
-  for (const [r, v] of Object.entries(K.role) as any) v.cd = orig.cd[r] * k.cds! * (roleScale[r] ?? 1);
+  const rankScale: Record<string, number> = {
+    D: k.crD!,
+    E: k.crD!,
+    C: k.crC!,
+    B: k.crB!,
+    A: k.crB!,
+    S: k.crB!,
+  };
+  for (const t of content.techniques as any[])
+    t.cast = (orig.cast.get(t.id) ?? t.cast) * k.cs! * (rankScale[orig.rank[t.id] as string] ?? 1);
+  const roleScale: Record<string, number> = {
+    projectile: k.cdProjectile!,
+    series: k.cdSeries!,
+    area: k.cdArea!,
+    control: k.cdControl!,
+    signature: k.cdSignature!,
+  };
+  for (const [r, v] of Object.entries(K.role) as any)
+    v.cd = orig.cd[r] * k.cds! * (roleScale[r] ?? 1);
   K.rating.knowledge = orig.kn * k.kn!;
   K.rating.enemyAccTier = orig.etA * k.etA!;
   K.rating.enemyEvaTier = orig.etE * k.etE!;
-  (content.ai.tiers as any[]).forEach((t, i) => (t.waitMs = Math.max(50, Math.round(orig.wait[i]! * (i === 0 ? k.w0! : i === 1 ? k.wg! : k.w1!)))));
+  (content.ai.tiers as any[]).forEach(
+    (t, i) =>
+      (t.waitMs = Math.max(
+        50,
+        Math.round(orig.wait[i]! * (i === 0 ? k.w0! : i === 1 ? k.wg! : k.w1!)),
+      )),
+  );
   K.basicCast = orig.basicCast * k.bc!;
   K.basicCost = orig.basicCost * k.bcost!;
   K.basicDmg[0] = orig.basicDmg[0] * k.bd!;
@@ -125,16 +191,24 @@ export function evaluate(runs: number, entries?: string[]) {
       if (regular) p += Math.max(0, wmin - s.winRate) * 4;
       if (full) p += Math.max(0, basic - 0.4);
       penalty += p;
-      const bad = (dt !== null && Math.abs(dt - 1) > tb) || (regular && s.winRate < wmin) || (full && basic > 0.4);
+      const bad =
+        (dt !== null && Math.abs(dt - 1) > tb) ||
+        (regular && s.winRate < wmin) ||
+        (full && basic > 0.4);
       if (bad) outside++;
-      lines.push(`${y} ${e.id.padEnd(22)} win ${(b.winRate * 100).toFixed(0)}->${(s.winRate * 100).toFixed(0)} t ${b.timeSec?.mean.toFixed(1) ?? '-'}->${s.timeSec?.mean.toFixed(1) ?? '-'} x${dt?.toFixed(2) ?? '-'} basic ${(basic * 100).toFixed(0)}%${full ? '' : '(not full)'} ${bad ? '<<<' : ''}`);
+      lines.push(
+        `${y} ${e.id.padEnd(22)} win ${(b.winRate * 100).toFixed(0)}->${(s.winRate * 100).toFixed(0)} t ${b.timeSec?.mean.toFixed(1) ?? '-'}->${s.timeSec?.mean.toFixed(1) ?? '-'} x${dt?.toFixed(2) ?? '-'} basic ${(basic * 100).toFixed(0)}%${full ? '' : '(not full)'} ${bad ? '<<<' : ''}`,
+      );
     }
   }
   const out = (x: number, lo: number, hi: number): number => Math.max(0, lo - x, x - hi);
   let cl = 0;
   for (const c of curves()) {
     cl += out(c.enemyHits.typical, 0.52, 0.68) * 3 + out(c.playerHits, 0.77, 0.89) * 3;
-    if (c.level >= 30) cl += Math.max(0, 0.03 - (c.enemyHits.neglect - c.enemyHits.typical)) + Math.max(0, 0.1 - (c.enemyHits.typical - c.enemyHits.max));
+    if (c.level >= 30)
+      cl +=
+        Math.max(0, 0.03 - (c.enemyHits.neglect - c.enemyHits.typical)) +
+        Math.max(0, 0.1 - (c.enemyHits.typical - c.enemyHits.max));
     cl += Math.max(0, 0.4 - c.allNatures.typical) * 2;
   }
   penalty += cl * 3;
@@ -158,6 +232,15 @@ if (process.argv[1]?.endsWith('fit.ts')) {
   const t0 = Date.now();
   const r = evaluate(Number(process.argv[3] ?? 30));
   console.log(r.lines.join('\n'));
-  console.log('penalty', r.penalty.toFixed(2), 'outside', r.outside, 'of', r.lines.length, 'ms', Date.now() - t0);
+  console.log(
+    'penalty',
+    r.penalty.toFixed(2),
+    'outside',
+    r.outside,
+    'of',
+    r.lines.length,
+    'ms',
+    Date.now() - t0,
+  );
   writeFileSync(new URL('./out-last.txt', import.meta.url), r.lines.join('\n'));
 }

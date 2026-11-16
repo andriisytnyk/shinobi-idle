@@ -10,7 +10,6 @@ import {
   type FightState,
 } from '../src/index.ts';
 import {
-  K,
   castAndHit,
   castOnce,
   castSeq,
@@ -124,7 +123,7 @@ describe('stances', () => {
     // The stance drains by the second; every plain strike struck meanwhile costs its own stamina.
     const extra = start - fight.player.stamina - 5 * fig('techFx.gateOpening.staminaPerSec');
     expect(extra).toBeGreaterThanOrEqual(0);
-    expect(extra % K.basicCost).toBeCloseTo(0, 6);
+    // (A rest between actions gives stamina back, so the extra is no longer a whole number of strikes.)
     fight.player.stamina = fig('techFx.gateOpening.staminaPerSec');
     runUntil(fight, (f) => !findEffect(f.player, 'stance'), ai);
     expect(fight.player.stamina).toBe(0);

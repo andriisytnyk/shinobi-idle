@@ -2,8 +2,33 @@ import { writeFileSync } from 'node:fs';
 import { DEFAULTS, apply, evaluate, orig, type Knobs } from './fit.ts';
 
 const BOUNDS: Record<string, [number, number]> = {
-  cs: [0.85, 1.4], wg: [0.15, 1.5], cds: [0.2, 2], w0: [0.15, 1.5], w1: [0.1, 1.5], bc: [0.3, 2], bd: [0.2, 1.5], bcost: [0, 3],
-  evaBase: [0.5, 2], evaTier: [0, 4], ps: [0.3, 2], accTier: [0.3, 2], etA: [0, 3], etE: [0, 5], eA0: [0.5, 1.8], eAL: [0, 8], eE0: [0.3, 3], eEL: [0.3, 2.5], rest: [0.3, 3], crD: [0.6, 1.5], crC: [0.6, 1.5], crB: [0.6, 1.5], cdProjectile: [0.3, 2.5], cdSeries: [0.3, 2.5], cdArea: [0.3, 2.5], cdControl: [0.3, 2.5], cdSignature: [0.3, 2.5],
+  cs: [0.85, 1.4],
+  wg: [0.15, 1.5],
+  cds: [0.2, 2],
+  w0: [0.15, 1.5],
+  w1: [0.1, 1.5],
+  bc: [0.3, 2],
+  bd: [0.2, 1.5],
+  bcost: [0, 3],
+  evaBase: [0.5, 2],
+  evaTier: [0, 4],
+  ps: [0.3, 2],
+  accTier: [0.3, 2],
+  etA: [0, 3],
+  etE: [0, 5],
+  eA0: [0.5, 1.8],
+  eAL: [0, 8],
+  eE0: [0.3, 3],
+  eEL: [0.3, 2.5],
+  rest: [0.3, 3],
+  crD: [0.6, 1.5],
+  crC: [0.6, 1.5],
+  crB: [0.6, 1.5],
+  cdProjectile: [0.3, 2.5],
+  cdSeries: [0.3, 2.5],
+  cdArea: [0.3, 2.5],
+  cdControl: [0.3, 2.5],
+  cdSignature: [0.3, 2.5],
 };
 const runs = Number(process.argv[2] ?? 40);
 const rounds = Number(process.argv[3] ?? 6);
@@ -25,9 +50,17 @@ for (let r = 0; r < rounds; r++) {
       if (v === best[name]) continue;
       const cand = { ...best, [name]: v };
       const s = score(cand);
-      if (s < bestScore) { best = cand; bestScore = s; }
+      if (s < bestScore) {
+        best = cand;
+        bestScore = s;
+      }
     }
   }
-  console.log('round', r, bestScore.toFixed(2), JSON.stringify(best, (_, v) => (typeof v === 'number' ? Math.round(v * 1000) / 1000 : v)));
+  console.log(
+    'round',
+    r,
+    bestScore.toFixed(2),
+    JSON.stringify(best, (_, v) => (typeof v === 'number' ? Math.round(v * 1000) / 1000 : v)),
+  );
   writeFileSync(new URL('./opt-best.json', import.meta.url), JSON.stringify(best));
 }

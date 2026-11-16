@@ -577,9 +577,9 @@ describe('the incoming-damage pipeline', () => {
     const fight = fresh();
     const p = fight.player;
     fightAdvance(fight, 0, content, rules);
-    grantWard(p, 50, fight.t + sec(0.3));
-    expect(fightNextEventIn(fight, content, rules)).toBe(sec(0.3));
-    fightAdvance(fight, sec(0.3), content, rules);
+    grantWard(p, 50, fight.t + sec(0.1));
+    expect(fightNextEventIn(fight, content, rules)).toBe(sec(0.1));
+    fightAdvance(fight, sec(0.1), content, rules);
     expect(p.ward).toBe(0);
     expect(p.wardUntil).toBeNull();
   });

@@ -614,8 +614,10 @@ function soonest(ctx: FightCtx, fight: FightState, c: Combatant, start: number):
       if (n < best) best = n;
     }
   }
-  if (c.ward > 0 && c.wardUntil !== null && c.wardUntil - fight.t < best) best = c.wardUntil - fight.t;
-  if (c.decoys > 0 && c.decoyUntil !== null && c.decoyUntil - fight.t < best) best = c.decoyUntil - fight.t;
+  if (c.ward > 0 && c.wardUntil !== null && c.wardUntil - fight.t < best)
+    best = c.wardUntil - fight.t;
+  if (c.decoys > 0 && c.decoyUntil !== null && c.decoyUntil - fight.t < best)
+    best = c.decoyUntil - fight.t;
   const rate = speed(ctx, c);
   for (const name in c.timers) {
     const timer = c.timers[name];

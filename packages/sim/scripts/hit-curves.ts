@@ -30,7 +30,9 @@ export interface CurvePoint {
 }
 
 const NATURES = ['katon', 'futon', 'raiton', 'doton', 'suiton'] as never[];
-export const LEVELS = [1, 2, 3, 5, 8, 10, 12, 15, 18, 20, 22, 25, 28, 30, 33, 36, 39, 40, 42, 45, 48, 50];
+export const LEVELS = [
+  1, 2, 3, 5, 8, 10, 12, 15, 18, 20, 22, 25, 28, 30, 33, 36, 39, 40, 42, 45, 48, 50,
+];
 
 /** The AI tier index a regular enemy of this combat level gets (the thresholds of `K.ai.enemyTier`). */
 function enemyTierIndex(level: number, content: ContentDb): number {
@@ -64,7 +66,8 @@ export function curves(content: ContentDb = defaultContent): CurvePoint[] {
     const eEva = enemy.evasion + evasionTierTerm(et, content, true);
     const typical = at(undefined);
     const tier = typical.tier ?? 0;
-    const hits = (snap: ReturnType<typeof at>) => hitChance(eAcc, evasionOf(snap, content), content);
+    const hits = (snap: ReturnType<typeof at>) =>
+      hitChance(eAcc, evasionOf(snap, content), content);
     const pAcc = accuracyOf(typical.levels, 'tai', content) + accuracyTierTerm(tier, content);
     return {
       level,
@@ -85,7 +88,9 @@ export const BANDS = { enemyHits: [0.5, 0.7], playerHits: [0.75, 0.9] } as const
 
 if (process.argv[1]?.endsWith('hit-curves.ts')) {
   const pct = (x: number): string => `${Math.round(x * 100)}%`;
-  console.log('| Рівень | Ранг (тір) | Ворог (тір ШІ) | Ворог влучає: без захисних технік / типово / повна Майстерність | Гравець влучає | Усі п\'ять природ: типово / повна |');
+  console.log(
+    "| Рівень | Ранг (тір) | Ворог (тір ШІ) | Ворог влучає: без захисних технік / типово / повна Майстерність | Гравець влучає | Усі п'ять природ: типово / повна |",
+  );
   console.log('| --- | --- | --- | --- | --- | --- |');
   for (const p of curves()) {
     console.log(

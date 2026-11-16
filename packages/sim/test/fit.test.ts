@@ -1,17 +1,18 @@
 /**
- * The fit of the fight loop v2 to the balance of dev at 3f559af, kept as a test. The three yardstick
- * characters fight every enemy and boss entry (`pnpm sim fight --all --seed 1 --runs 200`, the options
- * of the committed baseline). The result must equal the committed table, and every target a row met when
- * the table was recorded (`fit-status.json`: fight time within 10%, win rate within 3 points, the plain
- * strike at most 40% of a full hand's damage) must still be met. A change that moves the fights
- * re-records the table knowingly (`pnpm --filter @shinobi/sim exec tsx scripts/fit-record.ts`); the
- * rows that miss a target are listed in the pull request and in `docs/balance-evidence/fit-misses.md`.
+ * The fit of the fight loop v2 to the balance of dev at 3f559af, kept as a test. The yardstick characters fight every
+ * enemy and boss entry (pnpm sim fight --all --seed 1 --runs 200). The result must equal the committed table, and
+ * every band a row met when the table was recorded (fit-status.json: fight time within 20% of the baseline (C: 25%),
+ * a regular enemy won at least 97% of the time (C: 95%), the plain strike at most 40% of a full hand's damage) must
+ * still be met. The hit chances of a typical character against a regular enemy of its level stay in their bands at
+ * every level. A change that moves the fights re-records the table knowingly (scripts/fit-record.ts, then
+ * scripts/fit/table.ts); the rows that miss a band are listed in docs/balance-evidence/fit-table.md.
  */
 import { readFileSync } from 'node:fs';
 import { content } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import { allEntries, fightRow, rowJson } from '../src/fightReport.ts';
 import { targetsMet, YARDSTICKS } from '../scripts/fit-record.ts';
+import { curves } from '../scripts/hit-curves.ts';
 
 const DIR = new URL('../../../docs/balance-evidence/', import.meta.url);
 const read = <T>(name: string): T => JSON.parse(readFileSync(new URL(name, DIR), 'utf8')) as T;
@@ -62,5 +63,25 @@ describe.each(YARDSTICKS)('yardstick %s', (name, options) => {
     const rows = Object.values(status[name] ?? {});
     expect(rows.length).toBe(baseline.length);
     expect(rows.filter((r) => r.win).length).toBeGreaterThan(rows.length * 0.7);
+  });
+});
+
+describe('hit chances of a typical character against a regular enemy of its level', () => {
+  const points = curves();
+
+  it('has the enemy hit it 50-70% of the time and it hit the enemy 75-90%, at every level', () => {
+    for (const p of points) {
+      expect(p.enemyHits.typical, `level ${p.level} enemy`).toBeGreaterThanOrEqual(0.5);
+      expect(p.enemyHits.typical, `level ${p.level} enemy`).toBeLessThanOrEqual(0.7);
+      expect(p.playerHits, `level ${p.level} player`).toBeGreaterThanOrEqual(0.75);
+      expect(p.playerHits, `level ${p.level} player`).toBeLessThanOrEqual(0.9);
+    }
+  });
+
+  it('is hit more often by one who neglects the defensive techniques and clearly less often by one who maxes them', () => {
+    for (const p of points) {
+      expect(p.enemyHits.neglect, `level ${p.level}`).toBeGreaterThanOrEqual(p.enemyHits.typical);
+      expect(p.enemyHits.max, `level ${p.level}`).toBeLessThanOrEqual(p.enemyHits.typical - 0.1);
+    }
   });
 });

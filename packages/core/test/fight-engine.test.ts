@@ -450,19 +450,21 @@ describe('fight engine basics', () => {
     pacify(fight);
     fightAdvance(fight, 0, content, rules);
     const quietNext = fightNextEventIn(fight, content, rules) ?? 0;
-    expect(quietNext).toBeGreaterThanOrEqual(sec(0.4));
+    expect(quietNext).toBeGreaterThanOrEqual(
+      sec(Math.min(...content.ai.tiers.map((t) => t.waitMs)) / 1000),
+    );
     const enemy = fight.enemies[0];
     if (!enemy) throw new Error('no enemy');
     enemy.effects.push({
       kind: 'modifier',
       id: 'm',
       src: 'test',
-      until: fight.t + sec(0.37),
+      until: fight.t + sec(0.17),
       stat: 'evasion',
       op: 'mul',
       value: 2,
     });
-    expect(fightNextEventIn(fight, content, rules)).toBe(sec(0.37));
+    expect(fightNextEventIn(fight, content, rules)).toBe(sec(0.17));
     enemy.effects.push({
       kind: 'periodic',
       id: 'p',
@@ -471,10 +473,10 @@ describe('fight engine basics', () => {
       mode: 'heal',
       amount: 1,
       every: sec(1),
-      next: fight.t + sec(0.21),
+      next: fight.t + sec(0.11),
     });
-    expect(fightNextEventIn(fight, content, rules)).toBe(sec(0.21));
-    fightAdvance(fight, sec(0.37), content, rules);
+    expect(fightNextEventIn(fight, content, rules)).toBe(sec(0.11));
+    fightAdvance(fight, sec(0.17), content, rules);
     expect(enemy.effects.some((e) => e.id === 'm')).toBe(false);
     expect(enemy.effects.some((e) => e.id === 'p')).toBe(true);
   });

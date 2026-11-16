@@ -189,7 +189,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  3,4 с
+                  3,3 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід

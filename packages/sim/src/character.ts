@@ -128,7 +128,9 @@ export function buildCharacter(content: ContentDb, o: CharacterOptions): GameSta
     if (state.known[tech.id] && tech.rank !== null) state.mastery[tech.id] = { xp: xpAt(mastery) };
   }
   if (o.mastery === undefined) {
-    const passive = content.techniques.filter((tech) => tech.combat?.passive !== undefined && state.known[tech.id]);
+    const passive = content.techniques.filter(
+      (tech) => tech.combat?.passive !== undefined && state.known[tech.id],
+    );
     for (const tech of passive) {
       state.mastery[tech.id] = {
         xp: xpAt(typicalDefenceMastery(level, tech.level, passive.length, content)),
