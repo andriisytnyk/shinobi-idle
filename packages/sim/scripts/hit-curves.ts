@@ -27,7 +27,18 @@ export interface CurvePoint {
   /** A character of all five natures, who knows every defensive technique, at typical and full mastery. */
   allNatures: { typical: number; max: number };
   playerHits: number;
+  /** The same two chances on dev at 3f559af: a typical character with the Evasion skill at its level. */
+  baseline: { enemyHits: number; playerHits: number };
 }
+
+/** The hit roll of dev at 3f559af: accuracy against evasion, as in Melvor, clamped to 5-95%. */
+const oldHit = (acc: number, eva: number): number =>
+  Math.min(0.95, Math.max(0.05, acc < eva ? (0.5 * acc) / eva : 1 - (0.5 * eva) / acc));
+/** What dev at 3f559af gave a character of this level against an enemy of its level (Evasion skill 30 + 5 x level; enemy 40 + 4.5 x level and 30 + 4.2 x level; accuracy 40 + 5 x level). */
+export const baselineAt = (level: number): { enemyHits: number; playerHits: number } => ({
+  enemyHits: oldHit(40 + 4.5 * level, 30 + 5 * level),
+  playerHits: oldHit(40 + 5 * level, 30 + 4.2 * level),
+});
 
 const NATURES = ['katon', 'futon', 'raiton', 'doton', 'suiton'] as never[];
 export const LEVELS = [
@@ -80,21 +91,34 @@ export function curves(content: ContentDb = defaultContent): CurvePoint[] {
       },
       allNatures: { typical: hits(at(undefined, true)), max: hits(at(K.masteryCap, true)) },
       playerHits: hitChance(pAcc, eEva, content),
+      baseline: baselineAt(level),
     };
   });
 }
 
-export const BANDS = { enemyHits: [0.5, 0.7], playerHits: [0.75, 0.9] } as const;
-
+const out = (x: number, lo: number, hi: number): number => Math.max(0, lo - x, x - hi);
+const TOL = 0.04;
+/** The typical character's two curves stay within TOL of dev's; neglecting the defence is worse, maxing it clearly better. */
+export function curveLoss(): number {
+  let l = 0;
+  for (const c of curves()) {
+    l += out(c.enemyHits.typical, c.baseline.enemyHits - TOL, c.baseline.enemyHits + TOL) * 4;
+    l += out(c.playerHits, c.baseline.playerHits - TOL, c.baseline.playerHits + TOL) * 4;
+    if (c.level >= 8) l += Math.max(0, 0.1 - (c.enemyHits.typical - c.enemyHits.max));
+    l += Math.max(0, c.enemyHits.typical - c.enemyHits.neglect);
+    l += Math.max(0, 0.3 - c.allNatures.typical);
+  }
+  return l;
+}
 if (process.argv[1]?.endsWith('hit-curves.ts')) {
   const pct = (x: number): string => `${Math.round(x * 100)}%`;
   console.log(
-    "| Рівень | Ранг (тір) | Ворог (тір ШІ) | Ворог влучає: без захисних технік / типово / повна Майстерність | Гравець влучає | Усі п'ять природ: типово / повна |",
+    "| Рівень | Ранг (тір) | Ворог (тір ШІ) | Ворог влучає: без захисних технік / типово / повна Майстерність (було) | Гравець влучає (було) | Усі п'ять природ: типово / повна |",
   );
   console.log('| --- | --- | --- | --- | --- | --- |');
   for (const p of curves()) {
     console.log(
-      `| ${p.level} | ${p.tier} | ${p.enemyTier} | ${pct(p.enemyHits.neglect)} / ${pct(p.enemyHits.typical)} / ${pct(p.enemyHits.max)} | ${pct(p.playerHits)} | ${pct(p.allNatures.typical)} / ${pct(p.allNatures.max)} |`,
+      `| ${p.level} | ${p.tier} | ${p.enemyTier} | ${pct(p.enemyHits.neglect)} / ${pct(p.enemyHits.typical)} / ${pct(p.enemyHits.max)} (${pct(p.baseline.enemyHits)}) | ${pct(p.playerHits)} (${pct(p.baseline.playerHits)}) | ${pct(p.allNatures.typical)} / ${pct(p.allNatures.max)} |`,
     );
   }
 }

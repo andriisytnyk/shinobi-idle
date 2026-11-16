@@ -38,12 +38,12 @@ export const K = {
   wheel: 0.30, habituation: 0.15, habituationCap: 0.60, signatureHabituation: 0.5,
   // --- гравець ---
   hpBase: 90, hpPerVit: 8, chakraBase: 120, chakraPerMed: 0.005, chakraRegen: [0.6,0.02], staminaBase: 100, staminaPerAth: 0.01, staminaRegen: [1.0,0.02],
-  accBase: 40, accPerLevel: 5, evaBase: 47.4, hitMin: 0.05, hitMax: 0.95,
+  accBase: 40, accPerLevel: 5, evaBase: 58.2, hitMin: 0.05, hitMax: 0.95,
   // Ухилення — один автоматичний кидок (правки зрізу, розд. 5, рядки 11–13). Рейтинг ухилення = evaBase + внесок рангу + захисні техніки + спорядження й бонуси + знання з Бінґо-книги; навички «Ухилення» немає.
   // rating: внесок одного рангу гравця (тіру ШІ) в точність і ухилення, і рейтинг за рівень знань про ворога. Числа тимчасові до підгонки (етап 4 завдання C1): evaTier підібрано так, щоб типовий персонаж ухилявся приблизно як раніше.
-  rating: { accTier:93.2, evaTier:1.9, knowledge:32.3, enemyAccTier:16.5, enemyEvaTier:0 },
+  rating: { accTier:21.9, evaTier:6.1, knowledge:32.3, enemyAccTier:13.1, enemyEvaTier:0 },
   // passiveFx: захисна техніка пасивна; вивчена, дає частку base свого внеску evasion, а до повного внеску росте з Майстерністю від 1 до стелі. Числа тимчасові до підгонки (етап 4).
-  passiveFx: { shield:{ evasion:62.6, base:0.25 }, decoy:{ evasion:62.6, base:0.25 }, evasionBuff:{ evasion:62.6, base:0.25 }, passiveNegate:{ evasion:62.6, base:0.25 } },
+  passiveFx: { shield:{ evasion:92.2, base:0.25 }, decoy:{ evasion:92.2, base:0.25 }, evasionBuff:{ evasion:92.2, base:0.25 }, passiveNegate:{ evasion:92.2, base:0.25 } },
   // Звичайний удар — дія зі своїм кастом і малою вартістю витривалості; «переводить подих», коли не вистачає ні на техніку, ні на удар: rest.s секунд і частка rest.share від обох пулів.
   basicCast: 1.437, basicCost: 1.01, rest: { s:1.5, share:0.08 },
   modelWait: 0.6, // лише для спрощеного симулятора нижче: вичікування гравця між діями; має дорівнювати waitMs тіру genin з ai.json
@@ -54,7 +54,7 @@ export const K = {
   zoneHpRegen: 0.8, opRegen: 0.25, respawn: 3,
   wound: { stat:0.05, max:4, healMin:10, healFloorMin:2.5 },
   // --- вороги ---
-  eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [114.6,0.36], eEva: [12.6,3.09],
+  eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [118,0.1], eEva: [26.5,5.16],
   boss: { hp:3.2, dmg:1.5 }, pack: { n:3, hp:0.4, dmg:0.4 },
   trait: { armor:0.30, armorOff:6, casterEvery:12, casterCast:3, casterMult:3, evasive:1.6, regenPct:0.01, illusionEvery:10, illusionDur:6, illusionAcc:0.25,
     hidden:8, hiddenAcc:0.4, hiddenFirst:2.0, poisonChance:0.35 },

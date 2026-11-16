@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 import { writeFileSync } from 'node:fs';
 import { content } from '@shinobi/content';
-import { curves } from '../hit-curves.ts';
+import { curveLoss, curves } from '../hit-curves.ts';
 
 const K: any = content.balance.K;
 type P = Record<string, number>;
@@ -29,27 +29,26 @@ function apply(p: P): void {
   K.eEva[1] = p.eEvaL;
   K.rating.enemyEvaTier = p.enemyEvaTier;
 }
-const out = (x: number, lo: number, hi: number): number => Math.max(0, lo - x, x - hi);
 function loss(p: P): number {
   apply(p);
-  let l = 0;
-  for (const c of curves()) {
-    l += out(c.enemyHits.typical, 0.54, 0.66) * 3;
-    l += out(c.playerHits, 0.78, 0.88) * 3;
-    if (c.level >= 12) {
-      l += Math.max(0, 0.08 - (c.enemyHits.neglect - c.enemyHits.typical));
-      l += Math.max(0, 0.1 - (c.enemyHits.typical - c.enemyHits.max));
-    }
-    l += Math.max(0, c.enemyHits.neglect - 0.85);
-    l += Math.max(0, 0.4 - c.allNatures.typical) * 2;
-    l += Math.max(0, 0.12 - c.allNatures.max);
-  }
-  return l;
+  return curveLoss();
 }
+const orig = {
+  evaBase: K.evaBase,
+  evaTier: K.rating.evaTier,
+  ps: Object.values(K.passiveFx).map((v: any) => v.evasion)[0] as number,
+  accTier: K.rating.accTier,
+  etA: K.rating.enemyAccTier,
+  etE: K.rating.enemyEvaTier,
+  eA0: K.eAcc[0],
+  eAL: K.eAcc[1],
+  eE0: K.eEva[0],
+  eEL: K.eEva[1],
+};
 let best: P = {
   E0: K.evaBase,
   evaTier: K.rating.evaTier,
-  E: 40,
+  E: orig.ps,
   accTier: K.rating.accTier,
   eAcc0: K.eAcc[0],
   eAccL: K.eAcc[1],
@@ -84,6 +83,23 @@ console.log(
   JSON.stringify(best, (_, v) => (typeof v === 'number' ? Math.round(v * 100) / 100 : v)),
 );
 writeFileSync(new URL('./curves-best.json', import.meta.url), JSON.stringify(best));
+// The same result as knobs for apply.mjs (multipliers of the numbers the content has now).
+const r = (x: number, o: number): number => (o === 0 ? 1 : x / o);
+writeFileSync(
+  new URL('./opt-best.json', import.meta.url),
+  JSON.stringify({
+    evaBase: r(best.E0!, orig.evaBase),
+    evaTier: r(best.evaTier!, orig.evaTier),
+    ps: r(best.E!, orig.ps),
+    accTier: r(best.accTier!, orig.accTier),
+    etA: r(best.enemyAccTier!, orig.etA),
+    etE: r(best.enemyEvaTier!, orig.etE),
+    eA0: r(best.eAcc0!, orig.eA0),
+    eAL: r(best.eAccL!, orig.eAL),
+    eE0: r(best.eEva0!, orig.eE0),
+    eEL: r(best.eEvaL!, orig.eEL),
+  }),
+);
 apply(best);
 console.table(
   curves().map((c) => ({
