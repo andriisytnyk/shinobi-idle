@@ -69,12 +69,12 @@ describe.each(YARDSTICKS)('yardstick %s', (name, options) => {
 describe('hit chances of a typical character against a regular enemy of its level', () => {
   const points = curves();
 
-  it('stay within 5 points of what dev at 3f559af gave from level 10 (9 points below it: the student years)', () => {
+  it('stay within 5 points of what dev at 3f559af gave', () => {
     for (const p of points) {
       expect(
         Math.abs(p.enemyHits.typical - p.baseline.enemyHits),
         'enemy, level ' + p.level,
-      ).toBeLessThanOrEqual(p.level < 10 ? 0.09 : 0.05);
+      ).toBeLessThanOrEqual(0.05);
       expect(
         Math.abs(p.playerHits - p.baseline.playerHits),
         'player, level ' + p.level,
@@ -85,8 +85,8 @@ describe('hit chances of a typical character against a regular enemy of its leve
   it('are worse for one who neglects the defensive techniques and clearly better for one who maxes them', () => {
     for (const p of points) {
       expect(p.enemyHits.neglect, 'level ' + p.level).toBeGreaterThanOrEqual(p.enemyHits.typical);
-      if (p.level >= 12)
-        expect(p.enemyHits.max, 'level ' + p.level).toBeLessThanOrEqual(p.enemyHits.typical - 0.05);
+      if (p.level >= 1)
+        expect(p.enemyHits.max, 'level ' + p.level).toBeLessThanOrEqual(p.enemyHits.typical - 0.07);
     }
   });
 });

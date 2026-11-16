@@ -132,8 +132,8 @@
       "dur": 8
     },
     "evaLevel": {
-      "min": 0.05,
-      "max": 1.25
+      "min": 0.023,
+      "max": 1.014
     },
     "rhythm": {
       "slow": 0.32,
@@ -278,26 +278,26 @@
     ],
     "accBase": 40,
     "accPerLevel": 5,
-    "evaBase": 139.8,
+    "evaBase": 188.4,
     "rating": {
-      "accTier": 22.7,
-      "evaTier": 38.2,
+      "accTier": 15.4,
+      "evaTier": 16.2,
       "knowledge": 32.3,
       "enemyAccTier": 0,
       "enemyEvaTier": 0
     },
     "passiveFx": {
       "shield": {
-        "evasion": 24.7
+        "evasion": 28
       },
       "decoy": {
-        "evasion": 24.7
+        "evasion": 28
       },
       "evasionBuff": {
-        "evasion": 24.7
+        "evasion": 28
       },
       "passiveNegate": {
-        "evasion": 24.7
+        "evasion": 28
       }
     },
     "hitMin": 0.05,
@@ -366,12 +366,12 @@
     ],
     "eInterval": 2.6,
     "eAcc": [
-      198.6,
+      219.3,
       0
     ],
     "eEva": [
-      25.6,
-      5.23
+      32.4,
+      4.3
     ],
     "boss": {
       "hp": 3.46,

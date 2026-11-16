@@ -33,17 +33,17 @@ export const K = {
   levelScale: 0.035,                         // шкода техніки × (1 + levelScale × рівень навички)
   masteryDmg: 0.10, masteryCost: 0.25,
   // --- стани ---
-  burn: { share:0.30, dur:6 }, wet: { slow:0.15, dur:8 }, evaLevel: { min:0.05, max:1.25 }, rhythm: { slow:0.32, dur:5 }, stun: { C:1.0, B:1.5, D:0.7 }, bind: { dur:3.68 }, poison: { pctPerSec:0.02, dur:8 },
+  burn: { share:0.30, dur:6 }, wet: { slow:0.15, dur:8 }, evaLevel: { min:0.023, max:1.014 }, rhythm: { slow:0.32, dur:5 }, stun: { C:1.0, B:1.5, D:0.7 }, bind: { dur:3.68 }, poison: { pctPerSec:0.02, dur:8 },
   combo: { base:0.15, perLevel:0.004, perMastery:0.001, cap:0.60, fanBurn:1.5, shockWet:2.0, mudEva:0.5, steam:0.40 },
   wheel: 0.30, habituation: 0.15, habituationCap: 0.60, signatureHabituation: 0.5,
   // --- гравець ---
   hpBase: 90, hpPerVit: 8, chakraBase: 120, chakraPerMed: 0.005, chakraRegen: [0.6,0.02], staminaBase: 100, staminaPerAth: 0.01, staminaRegen: [1.0,0.02],
-  accBase: 40, accPerLevel: 5, evaBase: 139.8, hitMin: 0.05, hitMax: 0.95,
+  accBase: 40, accPerLevel: 5, evaBase: 188.4, hitMin: 0.05, hitMax: 0.95,
   // Ухилення — один автоматичний кидок (правки зрізу, розд. 5, рядки 11–13). Рейтинг ухилення = evaBase + внесок рангу + захисні техніки + спорядження й бонуси + знання з Бінґо-книги; навички «Ухилення» немає.
   // rating: внесок одного рангу гравця (тіру ШІ) в точність і ухилення, і рейтинг за рівень знань про ворога. Числа тимчасові до підгонки (етап 4 завдання C1): evaTier підібрано так, щоб типовий персонаж ухилявся приблизно як раніше.
-  rating: { accTier:22.7, evaTier:38.2, knowledge:32.3, enemyAccTier:0, enemyEvaTier:0 },
+  rating: { accTier:15.4, evaTier:16.2, knowledge:32.3, enemyAccTier:0, enemyEvaTier:0 },
   // passiveFx: захисна техніка пасивна; evasion — внесок, коли її ефективний рівень дорівнює бойовому рівню нападника (див. defence).
-  passiveFx: { shield:{ evasion:24.7 }, decoy:{ evasion:24.7 }, evasionBuff:{ evasion:24.7 }, passiveNegate:{ evasion:24.7 } },
+  passiveFx: { shield:{ evasion:28 }, decoy:{ evasion:28 }, evasionBuff:{ evasion:28 }, passiveNegate:{ evasion:28 } },
   // evaLevel: захисна техніка працює на дієвому рівні = рівень її навички × Майстерність ÷ masteryCap; внесок = evasion × межі(дієвий рівень ÷ бойовий рівень нападника; min; max).
   // Звичайний удар — дія зі своїм кастом і малою вартістю витривалості; «переводить подих», коли не вистачає ні на техніку, ні на удар: rest.s секунд і частка rest.share від обох пулів.
   basicCast: 1.242, basicCost: 1.26, rest: { s:1.5, share:0.08 },
@@ -55,7 +55,7 @@ export const K = {
   zoneHpRegen: 0.8, opRegen: 0.25, respawn: 3,
   wound: { stat:0.05, max:4, healMin:10, healFloorMin:2.5 },
   // --- вороги ---
-  eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [198.6,0], eEva: [25.6,5.23],
+  eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [219.3,0], eEva: [32.4,4.3],
   boss: { hp:3.46, dmg:1.49 }, pack: { n:3, hp:0.4, dmg:0.4 },
   trait: { armor:0.30, armorOff:6, casterEvery:12, casterCast:3, casterMult:3, evasive:1.47, regenPct:0.01, illusionEvery:10, illusionDur:6, illusionAcc:0.25,
     hidden:8, hiddenAcc:0.16, hiddenFirst:2.0, poisonChance:0.35 },
