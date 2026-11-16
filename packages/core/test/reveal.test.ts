@@ -301,6 +301,26 @@ describe('the command reveal.mark', () => {
   });
 });
 
+describe('goal.set and the reveal rule', () => {
+  it('refuses to pin an entity that is hidden, accepts one that is shown by name or more', () => {
+    const state = createState(1, content);
+    expect(
+      dispatch(state, { type: 'goal.set', ref: { kind: 'enemy', id: WOLF } }, content),
+    ).toEqual({
+      ok: false,
+      reason: 'error.invalidGoal',
+    });
+    expect(state.goal).toBeNull();
+    expect(
+      dispatch(state, { type: 'goal.set', ref: { kind: 'enemy', id: 'core:dummy' } }, content).ok,
+    ).toBe(true);
+    noteSighting(state, WOLF, content);
+    expect(
+      dispatch(state, { type: 'goal.set', ref: { kind: 'enemy', id: WOLF } }, content).ok,
+    ).toBe(true);
+  });
+});
+
 describe('a pack: its own rule over the default of its pack and its kind', () => {
   const state = createState(1, modContent);
   const at = (s: GameState, kind: string, id: string) =>

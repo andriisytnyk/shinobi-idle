@@ -5,6 +5,7 @@
   import ActionTile from '../components/ActionTile.svelte';
   import EntityLink from '../components/EntityLink.svelte';
   import Icon from '../components/Icon.svelte';
+  import PinGoal from '../components/PinGoal.svelte';
   import ReqTree from '../components/ReqTree.svelte';
   import SealStrip from '../components/SealStrip.svelte';
   import { t, textOf } from '../lib/i18n.ts';
@@ -64,12 +65,6 @@
 
   const stateStatus = $derived(content.statuses.find((x) => x.state === tech?.state));
   const goal = $derived(techniqueGoal(id, content));
-  const pinned = $derived(game.read((gs) => gs.goal?.kind === 'technique' && gs.goal.id === id));
-
-  function togglePin(): void {
-    if (pinned) game.dispatch({ type: 'goal.clear' });
-    else if (goal) game.dispatch({ type: 'goal.set', ref: { kind: 'technique', id } });
-  }
 </script>
 
 {#if tech}
@@ -82,6 +77,7 @@
         </p>
         <h1>{entityName(ref)}</h1>
       </div>
+      {#if goal}<PinGoal kind="technique" {id} variant="button" />{/if}
     </header>
 
     <dl class="facts">
@@ -162,6 +158,7 @@
       <section data-ui="entity-section">
         <h2>{t('technique.requirements')}</h2>
         <ReqTree node={requirements} />
+        {#if goal}<p class="pin-caption"><PinGoal kind="technique" {id} variant="link" /></p>{/if}
       </section>
     {/if}
 
@@ -170,12 +167,6 @@
         <h2>{t('technique.mastery')}</h2>
         <ul class="tile-host"><ActionTile {info} /></ul>
       </section>
-    {/if}
-
-    {#if goal}
-      <button type="button" class="pin" aria-pressed={pinned} onclick={togglePin}>
-        {t(pinned ? 'technique.unpin' : 'technique.pin')}
-      </button>
     {/if}
   </article>
 {:else}
@@ -188,6 +179,7 @@
     --_border-bottom: 0.6rem;
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
     border: var(--border-thin) solid var(--paper-ink);
@@ -263,20 +255,7 @@
     padding: 0;
   }
 
-  .pin {
-    min-height: var(--control-md);
-    margin-top: var(--space-4);
-    padding: var(--space-2) var(--space-4);
-    border: var(--border-thin) solid var(--accent);
-    border-radius: var(--radius-sm);
-    background: none;
-    color: var(--accent);
-    font: inherit;
-    cursor: pointer;
-  }
-
-  .pin[aria-pressed='true'] {
-    background: var(--accent);
-    color: var(--ink-900);
+  .pin-caption {
+    margin: var(--space-2) 0 0;
   }
 </style>

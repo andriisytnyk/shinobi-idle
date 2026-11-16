@@ -12,6 +12,7 @@
   import IngredientRow from './IngredientRow.svelte';
   import MasteryRing from './MasteryRing.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
+  import PinGoal from './PinGoal.svelte';
   import ReqTree from './ReqTree.svelte';
   import TimeBar from './TimeBar.svelte';
 
@@ -53,7 +54,10 @@
     <ActionEmblem kind="recipe" id={info.id} skill={info.skill} />
     <div class="ct-head">
       <h3 class="ct-name"><EntityLink kind="recipe" id={info.id} offered /></h3>
-      <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
+      <span class="ct-corner">
+        <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
+        <PinGoal kind="recipe" id={info.id} always={!info.available} />
+      </span>
     </div>
   </div>
 
@@ -134,7 +138,10 @@
   {#if block && !running}
     <p class="ct-why" id="why-{info.id}" data-why={block.kind}>{blockText(block)}</p>
     {#if info.req && block.kind !== 'missing'}
-      <div class="req"><ReqTree node={info.req} /></div>
+      <div class="req">
+        <ReqTree node={info.req} />
+        <p class="ct-pin-caption"><PinGoal kind="recipe" id={info.id} variant="link" /></p>
+      </div>
     {/if}
   {/if}
 </li>

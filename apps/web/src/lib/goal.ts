@@ -1,8 +1,30 @@
 import type { ContentDb } from '@shinobi/content';
-import { isSkillUnlocked, skillLevel, type GameState, type Req } from '@shinobi/core';
+import {
+  COURSE_ID,
+  COURSE_KIND,
+  isSkillUnlocked,
+  missionGoalReq,
+  skillLevel,
+  type GameState,
+  type Req,
+  type Rules,
+} from '@shinobi/core';
 import { reqItemIds } from './crafts.ts';
 import { nextStep } from './next-step.ts';
 import { graduateRank, isAcademyRank } from './vocab.ts';
+
+/** The entity kinds a tile can pin as the goal: the kinds the core accepts that a tile stands for. */
+const PINNABLE_TILE_KINDS: ReadonlySet<string> = new Set([
+  'technique',
+  'exercise',
+  'practice',
+  'obstacle',
+  'recipe',
+  'item',
+]);
+
+/** Whether a tile of this entity kind has a pin. */
+export const canPin = (kind: string): boolean => PINNABLE_TILE_KINDS.has(kind);
 
 /** The requirement tree of the goal "learn this technique": the technique, its level and its rank. */
 export function techniqueGoal(id: string, content: ContentDb): Req | null {
@@ -45,12 +67,60 @@ export function goalReq(ref: { kind: string; id: string }, content: ContentDb): 
   return null;
 }
 
+/** The action kind that does a goal of this entity kind: its requirements are the goal's tree. */
+const GOAL_ACTION: Readonly<Record<string, string>> = {
+  recipe: 'craft',
+  exercise: 'drill',
+  practice: 'meditate',
+};
+
+/** The action kind that gathers a herb, which is an item. */
+const GATHER = 'gather';
+
+/**
+ * The requirement tree of a pinned goal, for the goal panel: what the entity asks for. A technique
+ * and an item have their own trees; a recipe, an exercise and a practice ask what their action
+ * asks; an obstacle asks the Athletics level of its slot and its own requirement; a herb asks what
+ * gathering it asks, then having one. Null for a goal that is only a link.
+ */
+export function goalTree(
+  state: GameState,
+  ref: { kind: string; id: string },
+  content: ContentDb,
+  rules: Rules,
+): Req | null {
+  // A mission's tree is core's: what opens it and the first stage that has no way yet.
+  if (ref.kind === 'mission') {
+    const mission = content.missions.find((m) => m.id === ref.id);
+    return mission ? missionGoalReq(state, mission, content, rules) : null;
+  }
+  const own = goalReq(ref, content);
+  const actionKind = GOAL_ACTION[ref.kind] ?? (ref.kind === 'item' ? GATHER : undefined);
+  const kind = actionKind ? rules.actionKinds[actionKind] : undefined;
+  if (kind) {
+    const asked = kind.has(ref.id, content)
+      ? kind.requirements(state, ref.id, content, rules)
+      : null;
+    if (!asked) return own;
+    return own ? { t: 'all', of: [asked, own] } : asked;
+  }
+  if (ref.kind === 'obstacle') {
+    const obstacle = content.obstacles.find((o) => o.id === ref.id);
+    const skill = rules.actionKinds[COURSE_KIND]?.skill?.(COURSE_ID, content);
+    if (!obstacle || !skill) return null;
+    const of: Req[] = [{ t: 'skill', skill, level: obstacle.level }];
+    if (obstacle.req) of.push(obstacle.req);
+    return { t: 'all', of };
+  }
+  return own;
+}
+
 /**
  * The requirement tree the goal panel shows now: the pinned goal's tree; with nothing pinned, the
  * objective of the quest step under way; with no quest, the suggested technique. Null when none.
  */
-export function shownGoalReq(state: GameState, content: ContentDb): Req | null {
-  if (state.goal) return goalReq(state.goal, content);
+export function shownGoalReq(state: GameState, content: ContentDb, rules: Rules): Req | null {
+  if (state.goal) return goalTree(state, state.goal, content, rules);
   const step = nextStep(state, content);
   if (step) return step.objective.t === 'req' ? step.objective.req : null;
   const suggestion = suggestGoal(state, content);
@@ -58,8 +128,8 @@ export function shownGoalReq(state: GameState, content: ContentDb): Req | null {
 }
 
 /** Ids of the items the shown goal's requirement tree asks for. */
-export function goalItemIds(state: GameState, content: ContentDb): string[] {
-  return reqItemIds(shownGoalReq(state, content));
+export function goalItemIds(state: GameState, content: ContentDb, rules: Rules): string[] {
+  return reqItemIds(shownGoalReq(state, content, rules));
 }
 
 /** The technique a goal pinned by an older version of the app pointed at: its first technique row. */

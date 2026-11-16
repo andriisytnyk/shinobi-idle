@@ -22,6 +22,33 @@ export function armedRation(state: GameState, content: ContentDb): number {
   return 0;
 }
 
+/** A ration of the content: the share (negative) it takes off a mission, the missions it lasts, what the player holds and the missions left of it when armed. */
+export interface RationItem {
+  id: string;
+  duration: number;
+  missions: number;
+  have: number;
+  /** Missions left of the armed ration; 0 when it is not armed. */
+  charges: number;
+}
+
+/** Every ration the content has, with what the player holds of it and whether it is armed. */
+export function rationItems(state: GameState, content: ContentDb): RationItem[] {
+  return content.items.flatMap((i) =>
+    i.fx?.kind === 'ration'
+      ? [
+          {
+            id: i.id,
+            duration: i.fx.duration,
+            missions: i.fx.missions,
+            have: state.bank[i.id] ?? 0,
+            charges: state.buffs[i.id]?.charges ?? 0,
+          },
+        ]
+      : [],
+  );
+}
+
 /** Uses a ration from the bank: it is armed for the next mission, and one already armed is not doubled. */
 export function useRation(state: GameState, id: string, content: ContentDb): CommandResult {
   const fx = indexOf(content).items.get(id)?.fx;

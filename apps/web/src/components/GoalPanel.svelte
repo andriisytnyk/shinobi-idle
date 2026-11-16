@@ -3,7 +3,8 @@
   import { webRef } from '../lib/entities.ts';
   import { senseiTestInfo } from '../lib/exam-test.ts';
   import { formatDuration } from '../lib/format.ts';
-  import { goalReq, suggestGoal } from '../lib/goal.ts';
+  import { goalTree, suggestGoal } from '../lib/goal.ts';
+  import { revealHintKey, revealLevel } from '../lib/reveal.ts';
   import { t } from '../lib/i18n.ts';
   import { nextStep } from '../lib/next-step.ts';
   import { game } from '../lib/store.ts';
@@ -26,8 +27,15 @@
   const wait = $derived(game.read((gs) => senseiTestInfo(gs, game.rules, content)));
   const goal = $derived(game.read((gs) => gs.goal));
   const goalRef = $derived(webRef(goal));
-  const req = $derived(goal ? goalReq(goal, content) : null);
-  const result = $derived(game.read((gs) => (req ? evalReq(gs, req, content) : null)));
+  /** A pinned goal the player has not fully discovered shows as a bare row with its hint: no tree, no name when hidden. */
+  const goalFull = $derived(goalRef === null || revealLevel(goalRef) === 'full');
+  const goalHint = $derived(goalRef && !goalFull ? revealHintKey(goalRef) : null);
+  const result = $derived(
+    game.read((gs) => {
+      const req = goal ? goalTree(gs, goal, content, game.rules) : null;
+      return req ? evalReq(gs, req, content) : null;
+    }),
+  );
   const quest = $derived(game.read((gs) => (goal ? null : nextStep(gs, content))));
   /** With nothing pinned and no quest under way, the nearest technique is suggested. */
   const suggestion = $derived(game.read((gs) => (goal || quest ? null : suggestGoal(gs, content))));
@@ -59,16 +67,28 @@
 
   {#if goal}
     <div class="tree" data-goal>
-      {#if result}
-        <ReqTree node={result} part="goal-row" />
-      {:else if goalRef}
-        <p class="target" data-ui="goal-row" data-entity="{goalRef.kind}:{goalRef.id}">
+      {#if !goalFull && goalRef}
+        <p class="target" data-ui="goal-row" data-goal-unrevealed>
           <EntityLink kind={goalRef.kind} id={goalRef.id} />
+          {#if goalHint}<span class="hint">{t(goalHint)}</span>{/if}
         </p>
+      {:else}
+        {#if goal.kind === 'mission'}
+          <p class="target" data-goal-mission data-entity="mission:{goal.id}">
+            <EntityLink kind="mission" id={goal.id} />
+          </p>
+        {/if}
+        {#if result}
+          <ReqTree node={result} part="goal-row" />
+        {:else if goalRef}
+          <p class="target" data-ui="goal-row" data-entity="{goalRef.kind}:{goalRef.id}">
+            <EntityLink kind={goalRef.kind} id={goalRef.id} />
+          </p>
+        {/if}
       {/if}
     </div>
-    {#if goal.kind === 'item'}<GoalMissions item={goal.id} />{/if}
-    {#if result?.met}<p class="done">{t('meta.done')}</p>{/if}
+    {#if goalFull && goal.kind === 'item'}<GoalMissions item={goal.id} />{/if}
+    {#if goalFull && result?.met}<p class="done">{t('meta.done')}</p>{/if}
     <button type="button" class="unpin" onclick={() => game.dispatch({ type: 'goal.clear' })}>
       {t('meta.unpin')}
     </button>
@@ -152,6 +172,12 @@
 
   .suggest p {
     margin: 0 0 var(--space-2);
+  }
+
+  .hint {
+    margin-left: var(--space-2);
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
   }
 
   .target :global(a) {

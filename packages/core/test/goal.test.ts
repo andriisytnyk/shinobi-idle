@@ -49,6 +49,20 @@ describe('goal commands', () => {
     expect(state.goal).toBeNull();
   });
 
+  it('goal.set accepts the entities a tile stands for: recipe, exercise, practice, obstacle', () => {
+    const state = createState(1, content);
+    const refs = [
+      { kind: 'recipe', id: content.recipes[0]?.id ?? '' },
+      { kind: 'exercise', id: content.exercises[0]?.id ?? '' },
+      { kind: 'practice', id: content.practices[0]?.id ?? '' },
+      { kind: 'obstacle', id: content.obstacles[0]?.id ?? '' },
+    ] as const;
+    for (const ref of refs) {
+      expect(dispatch(state, { type: 'goal.set', ref }, content)).toEqual({ ok: true });
+      expect(state.goal).toEqual(ref);
+    }
+  });
+
   it('keeps the pinned goal through a save and load', () => {
     const state = createState(1, content);
     dispatch(state, { type: 'goal.set', ref: { kind: 'technique', id: CLONE } }, content);

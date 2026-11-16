@@ -11,6 +11,7 @@
   import Icon from './Icon.svelte';
   import MasteryRing from './MasteryRing.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
+  import PinGoal from './PinGoal.svelte';
   import ReqTree from './ReqTree.svelte';
   import TimeBar from './TimeBar.svelte';
 
@@ -59,7 +60,10 @@
     <ActionEmblem kind="item" id={info.id} skill={info.skill} />
     <div class="ct-head">
       <h3 class="ct-name"><EntityLink kind="item" id={info.id} offered /></h3>
-      <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
+      <span class="ct-corner">
+        <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
+        <PinGoal kind="item" id={info.id} always={!info.available} />
+      </span>
     </div>
   </div>
 
@@ -122,6 +126,7 @@
     <div class="req">
       <p class="ct-locked"><Icon name="lucide:lock" size={14} /> {t('tile.locked')}</p>
       <ReqTree node={info.req} />
+      <p class="ct-pin-caption"><PinGoal kind="item" id={info.id} variant="link" /></p>
     </div>
   {/if}
 

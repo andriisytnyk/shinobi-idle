@@ -127,7 +127,13 @@ export const CORE_API = {
   ],
   forecasts: [
     'missionBoard',
+    'missionEntry',
     'missionForecast',
+    'missionStageWays',
+    'missionStatus',
+    'missionStartSlot',
+    'missionGoalReq',
+    'rationItems',
     'missionBlocker',
     'missionDoable',
     'missionRequirements',

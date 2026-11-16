@@ -2,7 +2,7 @@ import { scrollPartId, type ContentDb, type Mission } from '@shinobi/content';
 import { stopSlot, type ActionKind } from '../actions.ts';
 import { addCurrency, addItem, hasItem, removeCurrency, removeItem } from '../bank.ts';
 import { actionsKey, bump } from '../counters.ts';
-import { emit } from '../events.ts';
+import { emit, type MissionDoneEvent } from '../events.ts';
 import { MS_PER_HOUR, MS_PER_SECOND, SECONDS_PER_HOUR, rate } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
 import { computeMod } from '../modifiers.ts';
@@ -38,6 +38,7 @@ export const MISSIONS_ELEMENTAL = 'missions.elemental';
 const TOO_HARD = 'error.missionTooHard';
 const CANNOT_GO_ON = 'error.requirementsNotMet';
 const RUNNING_ELSEWHERE = 'error.missionRunning';
+export const NEEDS_TEAM = 'error.missionNeedsTeam';
 
 /**
  * The state of the mission in a slot, plain JSON: `s` the stage under way, `a` the failed
@@ -261,20 +262,37 @@ export function stageXp(
         : null,
     };
   }
+  const shares = fightXpShares(mission, index, plan, content);
+  if (!shares) return none;
+  return { xp: [[style, shares.style], ...shares.others], mastery: null };
+}
+
+/**
+ * The XP of one attempt at a combat stage, before modifiers, split as a fight splits its own: the
+ * style share, whose skill depends on the techniques the player uses (it is known only when the
+ * fight is over), and the shares of the skills that are paid whatever the techniques are. Null
+ * for any other stage, and for a teammate's.
+ */
+export function fightXpShares(
+  mission: Mission,
+  index: number,
+  plan: StagePlan,
+  content: ContentDb,
+): { style: number; others: [string, number][] } | null {
+  if (plan.who !== SELF) return null;
+  const K = content.balance.K;
   const stage = mission.stages[index];
   const entry = stage?.t === 'combat' ? entryOf(content, stage.enemy) : undefined;
-  if (!entry) return none;
+  if (!entry || plan.skill !== '') return null;
+  const hours = plan.ms / MS_PER_SECOND / SECONDS_PER_HOUR;
   // The weights are those of the fight's own XP: the style skill and each of the other fight skills.
   const weights: Record<string, number> = K.combatXp;
   const others = K.mission.fightSkills.filter((s) => Object.hasOwn(weights, s));
   const total = K.combatXp.style + others.reduce((sum, s) => sum + (weights[s] ?? 0), 0);
   const pool = K.missionXpShare * rate(Math.min(entry.cl, mission.rateCap), content) * hours;
   return {
-    xp: [
-      [style, (pool * K.combatXp.style) / total],
-      ...others.map((s): [string, number] => [s, (pool * (weights[s] ?? 0)) / total]),
-    ],
-    mastery: null,
+    style: (pool * K.combatXp.style) / total,
+    others: others.map((s): [string, number] => [s, (pool * (weights[s] ?? 0)) / total]),
   };
 }
 
@@ -331,32 +349,45 @@ export function payMission(
   const money = currencyOf(content, 'money');
   const reputation = currencyOf(content, 'renown');
   const intel = currencyOf(content, 'study');
-  if (money !== null) addCurrency(state, money, ryo);
-  if (reputation !== null) addCurrency(state, reputation, rep);
+  // What is really granted, for the event.
+  const granted = new Map<string, number>();
+  const gotItems = new Map<string, number>();
+  const credit = (currency: string, n: number): void => {
+    if (addCurrency(state, currency, n) && n > 0) {
+      granted.set(currency, (granted.get(currency) ?? 0) + n);
+    }
+  };
+  if (money !== null) credit(money, ryo);
+  if (reputation !== null) credit(reputation, rep);
   const items = indexOf(content).items;
   for (const pay of mission.pay) {
     if (pay.kind === 'item') {
       if (addItem(state, pay.item, pay.n)) {
+        gotItems.set(pay.item, (gotItems.get(pay.item) ?? 0) + pay.n);
         emit(state, { type: 'itemGained', id: pay.item, n: pay.n });
       }
     } else if (pay.kind === 'currency') {
-      addCurrency(state, pay.currency, pay.n);
+      credit(pay.currency, pay.n);
     } else if (pay.kind === 'intel') {
-      if (intel !== null) addCurrency(state, intel, pay.n);
+      if (intel !== null) credit(intel, pay.n);
     } else {
       const part = scrollPartId(pay.technique);
       if (items.has(part) && nextFloat(state.rng, 'loot') < (K.partDrop[pay.chance] ?? 0)) {
         addItem(state, part, 1);
+        gotItems.set(part, (gotItems.get(part) ?? 0) + 1);
         emit(state, { type: 'itemGained', id: part, n: 1 });
       }
     }
   }
+  let resource: MissionDoneEvent['resource'] = null;
   if (mission.resource) {
+    const units = resourceUnits(state, mission, content, rules);
     const pending = state.missions.pending;
-    pending[mission.resource] =
-      (pending[mission.resource] ?? 0) + resourceUnits(state, mission, content, rules);
+    pending[mission.resource] = (pending[mission.resource] ?? 0) + units;
     // With a village the units go straight to it; without one they wait until it appears.
-    drainPendingResources(state, content);
+    const added = drainPendingResources(state, content)[mission.resource] ?? 0;
+    const waiting = state.village ? 0 : units;
+    resource = { slug: mission.resource, units, added, lost: units - added - waiting, waiting };
   }
   // One finished mission is one completed action, however many stages it had.
   state.stats.completed++;
@@ -370,7 +401,15 @@ export function payMission(
     bump(state, MISSIONS_ELEMENTAL);
     bump(state, missionElementalKey(mission.rank));
   }
-  emit(state, { type: 'missionDone', mission: mission.id, ryo, rep });
+  emit(state, {
+    type: 'missionDone',
+    mission: mission.id,
+    ryo,
+    rep,
+    currencies: [...granted].map(([currency, n]) => ({ currency, n })),
+    items: [...gotItems].map(([id, n]) => ({ id, n })),
+    resource,
+  });
 }
 
 // ---------- requirements ----------
@@ -427,6 +466,8 @@ export const missionKind: ActionKind = {
       (s, i) => i !== slot && s.action?.kind === MISSION_KIND && s.action.id === id,
     );
     if (other >= 0) return RUNNING_ELSEWHERE;
+    // A team mission goes with the team, which exists once the nature test is passed.
+    if (mission.team && state.team === null) return NEEDS_TEAM;
     // A mission with a combat stage ahead needs the fight to be free, so only one such action runs.
     return mission.stages.some((s) => s.t === 'combat')
       ? fightBusyReason(state, slot, content)

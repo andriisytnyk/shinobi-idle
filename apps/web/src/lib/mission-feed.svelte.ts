@@ -1,14 +1,18 @@
 import { untrack } from 'svelte';
-import type { GameState, MissionForecast, ReqResult } from '@shinobi/core';
+import {
+  missionInputs,
+  missionStartSlot,
+  missionStatus,
+  type GameState,
+  type MissionForecast,
+  type MissionStatus,
+  type ReqResult,
+} from '@shinobi/core';
 import type { Mission } from '@shinobi/content';
 import {
-  inputsSignature,
-  missionState,
   missionView,
   rankGroups,
-  rankUnlock,
   stageViews,
-  type MissionState,
   type MissionView,
   type StageView,
 } from './missions.ts';
@@ -17,7 +21,7 @@ import { game } from './store.ts';
 /**
  * How the mission screens get their numbers without recounting the whole board on every store
  * update. A forecast depends on almost everything in the state, so it is recomputed when the
- * inputs change: a cheap signature of them (`inputsSignature`: skill levels, Mastery, rank, team,
+ * inputs change: a cheap signature of them (`missionInputs` of core: skill levels, Mastery, rank, team,
  * loadout, buildings, the items the stages take, the armed ration, Intel) is read on every update,
  * and a command (a started mission, a used ration, a bought item) forces a recompute at once.
  * As a safety net for what the signature does not cover, the forecasts are also recomputed once per
@@ -36,7 +40,7 @@ export const bumpForecasts = (): void => {
 /** The signature of the inputs now; one computation per store update, shared by every reader. */
 const signature = $derived.by(() => {
   void game.version;
-  return untrack(() => inputsSignature(game.state, game.content));
+  return untrack(() => missionInputs(game.state, game.content, game.rules));
 });
 
 /**
@@ -71,21 +75,30 @@ export function viewOf(mission: Mission): MissionView {
   });
 }
 
-/** How a mission stands now: startable, blocked and why, or running. It follows every store update (the slot rules are cheap); the blocker comes from the view. */
-export function cardState(mission: Mission, blocker: MissionView['blocker']): MissionState {
+/**
+ * The answer `dispatch` would give to starting a mission now, from core. It follows every store
+ * update (the slot rules are cheap); the blocker is the view's, computed at the coarse rate.
+ */
+export function cardState(mission: Mission, view: MissionView): MissionStatus {
   void game.version;
-  return untrack(() => missionState(game.state, mission, blocker, game.content, game.rules));
+  return untrack(() =>
+    missionStatus(
+      game.state,
+      mission.id,
+      missionStartSlot(game.state),
+      game.content,
+      game.rules,
+      view.blocker,
+    ),
+  );
 }
 
 /** The missions of the list that can be started or are running now (what the filter «лише доступні» keeps). */
 export function availableOf(list: Mission[]): Mission[] {
   void game.version;
   return list.filter((m) => {
-    const blocker = viewOf(m).blocker;
-    return (
-      untrack(() => missionState(game.state, m, blocker, game.content, game.rules)).kind !==
-      'blocked'
-    );
+    const status = cardState(m, viewOf(m));
+    return status.runningAt >= 0 || status.startable;
   });
 }
 
@@ -94,13 +107,25 @@ export function stagesOf(mission: Mission, forecast: MissionForecast): StageView
   return untrack(() => stageViews(game.state, mission, forecast, game.content, game.rules));
 }
 
-/** What each rank asks to open, evaluated at the coarse rate like the forecasts. */
+/**
+ * What each rank asks to open, from the unlock each mission carries in the data: shown once for
+ * the rank when all its missions have the same, evaluated at the coarse rate like the forecasts.
+ * A rank whose missions differ shows no gate of its own (each card shows what blocks it).
+ */
 export function gatesOf(): { rank: string; result: ReqResult | null; open: boolean }[] {
   void forecastRevision();
   return untrack(() =>
-    rankGroups(game.content).map((g) => ({
-      rank: g.rank,
-      ...rankUnlock(game.state, g.rank, game.content),
-    })),
+    rankGroups(game.content).map((g) => {
+      const unlocks = g.missions.map((m) => viewOf(m).unlock);
+      const first = unlocks[0] ?? null;
+      const shared =
+        first !== null &&
+        unlocks.every((u) => u !== null && JSON.stringify(u.req) === JSON.stringify(first.req));
+      return {
+        rank: g.rank,
+        result: shared ? first : null,
+        open: unlocks.every((u) => u === null || u.met),
+      };
+    }),
   );
 }

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { t } from '../lib/i18n.ts';
   import { toasts } from '../lib/toasts.svelte.ts';
+  import { resourceName } from '../lib/vocab.ts';
   import EntityLink from './EntityLink.svelte';
   import RewardList from './RewardList.svelte';
   import Icon from './Icon.svelte';
@@ -64,12 +65,33 @@
               currencies={toast.gains.currencies}
               items={toast.gains.items}
             />
-            {#each toast.gains.missed ?? [] as item (item.id)}
-              <span data-missed>
-                {t('toast.mission.missed')}
-                <EntityLink kind="item" id={item.id} /> ×{item.n}
-              </span>
-            {/each}
+            {#if toast.gains.resource}
+              {@const res = toast.gains.resource}
+              {#if res.added > 0}
+                <span data-resource="added"
+                  >{t('toast.mission.resourceAdded', {
+                    name: resourceName(res.slug),
+                    n: res.added,
+                  })}</span
+                >
+              {/if}
+              {#if res.lost > 0}
+                <span data-resource="lost"
+                  >{t('toast.mission.resourceLost', {
+                    name: resourceName(res.slug),
+                    n: res.lost,
+                  })}</span
+                >
+              {/if}
+              {#if res.waiting > 0}
+                <span data-resource="waiting"
+                  >{t('toast.mission.resourceWaiting', {
+                    name: resourceName(res.slug),
+                    n: res.waiting,
+                  })}</span
+                >
+              {/if}
+            {/if}
           </span>
         {/if}
       </span>
