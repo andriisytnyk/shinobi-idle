@@ -8,6 +8,7 @@ import {
   cloneTelemetry,
   createState,
   deserialize,
+  feeds as feedsLink,
   dispatch,
   getMod,
   growSlots,
@@ -197,42 +198,55 @@ describe('the link bonus', () => {
   const feeds: [string, string] = ['craft', 'core:antidote'];
   const apart: [string, string] = ['craft', 'core:onihiri'];
   const feedsTonic: [string, string] = ['craft', 'core:tonik_iasnoho_rozumu'];
+  const act = (x: [string, string]) => ({ kind: x[0], id: x[1] });
 
-  it('links an action that makes an item to one that uses it, in either slot', () => {
-    const a = { kind: gather[0], id: gather[1] };
-    expect(linked(a, { kind: feeds[0], id: feeds[1] }, content)).toBe(true);
-    expect(linked({ kind: feeds[0], id: feeds[1] }, a, content)).toBe(true);
-    expect(linked(a, { kind: feedsTonic[0], id: feedsTonic[1] }, content)).toBe(true);
-    expect(linked(a, { kind: apart[0], id: apart[1] }, content)).toBe(false);
-    expect(linked(a, a, content)).toBe(false);
-    expect(linked(a, { kind: 'drill', id: drill() }, content)).toBe(false);
+  it('links an action that makes an item to the one that uses it: the feeder is the herb, the fed is the craft', () => {
+    expect(feedsLink(act(gather), act(feeds), content)).toBe(true);
+    expect(feedsLink(act(feeds), act(gather), content)).toBe(false);
+    expect(feedsLink(act(gather), act(feedsTonic), content)).toBe(true);
+    expect(feedsLink(act(gather), act(apart), content)).toBe(false);
+    expect(feedsLink(act(gather), act(gather), content)).toBe(false);
+    expect(linked(act(gather), act(feeds), content)).toBe(true);
+    expect(linked(act(feeds), act(gather), content)).toBe(true);
+    expect(linked(act(gather), { kind: 'drill', id: drill() }, content)).toBe(false);
   });
 
-  it('adds K.clone.link to both actions, shown in the breakdown with the technique as its source', () => {
+  it('adds K.clone.link to the fed action only, shown in the breakdown with the technique as its source', () => {
     const state = cloner();
     start(state, 0, gather[0], gather[1]);
     expect(getMod(state, 'speed.skill.alch', content).total).toBe(1);
     start(state, 1, feeds[0], feeds[1]);
     const link = content.balance.K.clone.link;
-    for (const key of ['speed.skill.herb', 'speed.skill.alch']) {
-      const mod = getMod(state, key, content);
-      expect(mod.total).toBeCloseTo(1 + link, 9);
-      expect(mod.parts).toContainEqual({
-        key,
-        op: 'add',
-        value: link,
-        group: 'character',
-        source: { kind: 'technique', id: CLONE },
-      });
-    }
-    // The cycle of the craft is shorter by the bonus, and the forecast says so.
-    const info = actionInfo(state, { kind: feeds[0], id: feeds[1] }, content);
-    start(state, 0, apart[0], apart[1]);
-    const plain = actionInfo(state, { kind: apart[0], id: apart[1] }, content);
-    expect(info && plain).toBeTruthy();
+    const mod = getMod(state, 'speed.skill.alch', content);
+    expect(mod.total).toBeCloseTo(1 + link, 9);
+    expect(mod.parts).toContainEqual({
+      key: 'speed.skill.alch',
+      op: 'add',
+      value: link,
+      group: 'character',
+      source: { kind: 'technique', id: CLONE },
+    });
+    // The herb feeds and is not sped up.
+    expect(getMod(state, 'speed.skill.herb', content).total).toBe(1);
+    // The same craft in the player's slot and the herb in the clone's: the craft is fed all the same.
+    const swapped = cloner();
+    start(swapped, 1, gather[0], gather[1]);
+    start(swapped, 0, feeds[0], feeds[1]);
+    expect(getMod(swapped, 'speed.skill.alch', content).total).toBeCloseTo(1 + link, 9);
     // Dispelling the clone ends the bonus.
     dispatch(state, { type: 'clone.dispel' }, content);
     expect(getMod(state, 'speed.skill.alch', content).total).toBe(1);
+  });
+
+  it('shortens the cycle of the fed action in its forecast', () => {
+    const state = cloner();
+    start(state, 0, gather[0], gather[1]);
+    const alone = actionInfo(state, act(feeds), content);
+    start(state, 1, feeds[0], feeds[1]);
+    const fed = actionInfo(state, act(feeds), content);
+    expect(alone && fed).toBeTruthy();
+    const link = content.balance.K.clone.link;
+    expect((fed?.intervalMs ?? 0) * (1 + link)).toBeCloseTo(alone?.intervalMs ?? 0, -1);
   });
 
   it('gives no bonus to an unlinked pair', () => {
@@ -243,14 +257,28 @@ describe('the link bonus', () => {
     expect(getMod(state, 'speed.skill.prov', content).total).toBe(1);
   });
 
-  it('makes the linked pair earn 10% more: the craft exactly, the gathering more than before', () => {
+  it('is data: without the links on the technique there is none', () => {
+    const bare: ContentDb = {
+      ...content,
+      techniques: content.techniques.map((t) => {
+        const { slotLinks: _unused, ...rest } = t;
+        void _unused;
+        return rest;
+      }),
+    };
+    const state = cloner();
+    start(state, 0, gather[0], gather[1]);
+    start(state, 1, feeds[0], feeds[1]);
+    expect(getMod(state, 'speed.skill.alch', bare).total).toBe(1);
+    expect(linked(act(gather), act(feeds), bare)).toBe(false);
+  });
+
+  it('makes the fed craft earn 10% more, and leaves the gathering at its half', () => {
     const run = (b: [string, string] | null, a: [string, string] | null = gather) => {
       const state = cloner();
       if (a) start(state, 0, a[0], a[1]);
       if (b) start(state, 1, b[0], b[1]);
-      const before = {
-        ...Object.fromEntries(Object.entries(state.skills).map(([k, v]) => [k, v.xp])),
-      };
+      const before = Object.fromEntries(Object.entries(state.skills).map(([k, v]) => [k, v.xp]));
       advance(state, HOUR, content);
       return (skill: string): number => (state.skills[skill]?.xp ?? 0) - (before[skill] ?? 0);
     };
@@ -258,10 +286,12 @@ describe('the link bonus', () => {
     const craftAlone = run(feeds, null);
     const gatherAlone = run(null);
     const link = content.balance.K.clone.link;
-    // Half of each alone, and +link on both: the craft cycle is shorter by that factor.
-    expect(together('alch') / (craftAlone('alch') / 2)).toBeGreaterThan(1 + link - 0.04);
-    expect(together('alch') / (craftAlone('alch') / 2)).toBeLessThan(1 + link + 0.04);
-    expect(together('herb')).toBeGreaterThan(gatherAlone('herb') / 2);
+    const craft = together('alch') / (craftAlone('alch') / 2);
+    expect(craft).toBeGreaterThan(1 + link - 0.04);
+    expect(craft).toBeLessThan(1 + link + 0.04);
+    const herb = together('herb') / (gatherAlone('herb') / 2);
+    expect(herb).toBeGreaterThan(0.97);
+    expect(herb).toBeLessThan(1.03);
   });
 });
 

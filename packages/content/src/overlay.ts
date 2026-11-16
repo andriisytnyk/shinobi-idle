@@ -96,13 +96,19 @@ export const scrollPartId = (technique: string): string =>
   `${technique.slice(0, technique.indexOf(':'))}:scrollpart_${slug(technique)}`;
 
 /** Adds `combat` to each technique; training drills have none. */
-/** The action slot a technique opens, by technique id (see `techniqueSchema.opensSlot`). */
-export const techniqueSlotMapSchema = z.record(coreId, z.number().int().min(1));
+/** The action slot a technique opens and the links of the actions it runs, by technique id (see `techniqueSchema.opensSlot`). */
+export const techniqueSlotMapSchema = z.record(
+  coreId,
+  z.strictObject({
+    slot: z.number().int().min(1),
+    links: z.array(z.strictObject({ from: z.string().min(1), to: z.string().min(1) })),
+  }),
+);
 
 export function layerTechniques(
   base: TechniqueBase[],
   combat: CombatMap,
-  slots: Readonly<Record<string, number>> = {},
+  slots: Readonly<Record<string, { slot: number; links: { from: string; to: string }[] }>> = {},
 ) {
   for (const id of Object.keys(slots)) {
     if (!base.some((t) => t.id === id)) throw new Error(`A slot opened by unknown technique ${id}`);
@@ -110,7 +116,9 @@ export function layerTechniques(
   return base.map((t) => ({
     ...t,
     combat: combat[t.id] ?? null,
-    ...(slots[t.id] === undefined ? {} : { opensSlot: slots[t.id] as number }),
+    ...(slots[t.id] === undefined
+      ? {}
+      : { opensSlot: slots[t.id]!.slot, slotLinks: slots[t.id]!.links }),
   }));
 }
 

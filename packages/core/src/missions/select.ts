@@ -1,6 +1,7 @@
 import type { ContentDb, Mission, MissionPay } from '@shinobi/content';
 import { scrollPartId } from '@shinobi/content';
 import { hasItem } from '../bank.ts';
+import { isCloneSlot } from '../clone.ts';
 import { fightBusyReason, isCombatKind } from '../combat/system.ts';
 import { effectiveLoadout } from '../combat/loadout.ts';
 import { MS_PER_HOUR, masteryLevel } from '../formulas.ts';
@@ -409,8 +410,11 @@ export function missionInputs(state: GameState, content: ContentDb, rules: Rules
 // ---------- can it be started ----------
 
 /** The slot a mission is started in: the first one with nothing in it, else the first slot. */
-export function missionStartSlot(state: GameState): number {
-  const free = state.slots.findIndex((s) => s.action === null);
+export function missionStartSlot(state: GameState, content?: ContentDb): number {
+  // With the content, a clone's slot is not the player's: it is asked for on its own.
+  const free = state.slots.findIndex(
+    (s, i) => s.action === null && !(content && isCloneSlot(state, content, i)),
+  );
   return free >= 0 ? free : 0;
 }
 
@@ -549,7 +553,14 @@ export function missionEntry(
 ): BoardEntry {
   const blocker = missionBlocker(state, mission, content, rules);
   const unlock = mission.unlock ? evalReq(state, mission.unlock, content) : null;
-  const status = missionStatus(state, mission.id, missionStartSlot(state), content, rules, blocker);
+  const status = missionStatus(
+    state,
+    mission.id,
+    missionStartSlot(state, content),
+    content,
+    rules,
+    blocker,
+  );
   return {
     id: mission.id,
     rank: mission.rank,

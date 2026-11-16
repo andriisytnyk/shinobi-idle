@@ -4,7 +4,7 @@
   import { MISSION_KIND, NEEDS_TEAM } from '@shinobi/core';
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
-  import { cardState, viewOf } from '../lib/mission-feed.svelte.ts';
+  import { cardState, cloneCardState, viewOf } from '../lib/mission-feed.svelte.ts';
   import { holderRef, rewardRows } from '../lib/missions.ts';
   import { game } from '../lib/store.ts';
   import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
@@ -26,11 +26,27 @@
   /** What `dispatch` would answer to starting it now, from core. */
   const status = $derived(cardState(mission, view));
   const running = $derived(status.runningAt >= 0);
+  /** What a start in the clone's slot would answer; null before the player has a clone. */
+  const clone = $derived(cloneCardState(mission, view));
+  const cloneRuns = $derived(running && clone !== null && status.runningAt === clone.slot);
+  /** Why the clone cannot take the mission (when the mission itself is startable). */
+  const cloneRefusal = $derived(clone?.refusal?.reason ?? null);
   const refusal = $derived(running ? null : status.refusal);
   const shown = $derived(running ? 'running' : status.startable ? 'startable' : 'blocked');
   const by = $derived(refusal?.by ? holderRef(refusal.by) : null);
   const rewards = $derived(rewardRows(forecast.rewards));
   const clientKey = $derived(`mission.${mission.id}.client`);
+
+  function startClone(): void {
+    if (!clone) return;
+    const result = game.dispatch({
+      type: 'action.start',
+      slot: clone.slot,
+      kind: MISSION_KIND,
+      id: mission.id,
+    });
+    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
+  }
 
   function start(): void {
     if (running) {
@@ -102,7 +118,7 @@
   {#if running}
     <p class="ct-note" data-running>
       <Icon name="lucide:hourglass" size={14} />
-      {t('mission.running', { n: status.runningAt + 1 })}
+      {cloneRuns ? t('mission.runningClone') : t('mission.running', { n: status.runningAt + 1 })}
     </p>
   {:else if refusal}
     <div class="why" id="why-{mission.id}" data-why={refusal.reason}>
@@ -140,6 +156,21 @@
   >
     {t(running ? 'tile.stop' : 'tile.start')}
   </button>
+  {#if clone && !running}
+    <button
+      type="button"
+      class="ct-action clone"
+      data-ui="clone-start"
+      disabled={!clone.startable}
+      aria-describedby={clone.startable ? undefined : `why-clone-${mission.id}`}
+      onclick={startClone}
+    >
+      {t('tile.clone')}
+    </button>
+    {#if cloneRefusal === 'error.cloneNoFight'}
+      <p class="ct-why" id="why-clone-{mission.id}" data-clone-why>{t(cloneRefusal)}</p>
+    {/if}
+  {/if}
 </li>
 
 <style>

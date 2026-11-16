@@ -9,8 +9,8 @@ import { SHARE_FULL, type ActionSlot, type GameState } from './state.ts';
 /**
  * Action slots opened by techniques (the clone). A technique with `opensSlot: n` gives the player
  * slot `n` once it is known; slot 0 is always there. Two running slots share one speed pool
- * (`K.clone.pool`), and a pair of running actions of which one makes what the other uses is linked:
- * both get `K.clone.link` speed.
+ * (`K.clone.pool`), and in a pair of running actions of which one makes what the other uses (the
+ * kinds linked by the technique's `slotLinks`) the one that uses gets `K.clone.link` speed.
  */
 
 /** A slot that a known technique opened. */
@@ -111,7 +111,7 @@ export function cloneRefusal(
 
 // ---------- the link ----------
 
-/** What an action makes and uses, and the speed key a link raises for it. */
+/** What an action makes and uses, and the speed key a link raises for the one that uses. */
 interface Flow {
   makes: string[];
   uses: string[];
@@ -120,8 +120,9 @@ interface Flow {
 
 /**
  * The actions of the built-in kinds that make or use items: gathering makes a herb, a craft uses
- * its ingredients and makes its product. The links are read from this flow, so a new recipe or
- * herb is linked to what it feeds without any entry of its own.
+ * its ingredients and makes its product. Which pairs of kinds are linked is the data of the clone
+ * technique (`slotLinks`); this flow says whether two actions of such kinds really feed each
+ * other, so a new recipe or herb is linked to what it feeds without any entry of its own.
  */
 const FLOWS: Readonly<Record<string, (id: string, content: ContentDb) => Flow | null>> = {
   gather(id, content) {
@@ -144,48 +145,87 @@ const FLOWS: Readonly<Record<string, (id: string, content: ContentDb) => Flow | 
 const flowOf = (action: { kind: string; id: string }, content: ContentDb): Flow | null =>
   Object.hasOwn(FLOWS, action.kind) ? (FLOWS[action.kind]?.(action.id, content) ?? null) : null;
 
-/** Whether one of two actions makes an item the other uses. */
+/** A pair of action kinds a technique links: the one that feeds and the one that is fed. */
+interface KindLink {
+  technique: string;
+  from: string;
+  to: string;
+}
+
+const linkLists = new WeakMap<ContentDb, KindLink[]>();
+
+/** The links of every technique of the content, in the order of the techniques. */
+function linksOf(content: ContentDb): KindLink[] {
+  let list = linkLists.get(content);
+  if (!list) {
+    list = content.techniques.flatMap((t) =>
+      (t.slotLinks ?? []).map((l) => ({ technique: t.id, from: l.from, to: l.to })),
+    );
+    linkLists.set(content, list);
+  }
+  return list;
+}
+
+/** The link (a pair of kinds of a technique's data) by which `producer` feeds `consumer`, or null. */
+function feedingLink(
+  producer: { kind: string; id: string },
+  consumer: { kind: string; id: string },
+  content: ContentDb,
+  known?: GameState,
+): KindLink | null {
+  const link = linksOf(content).find(
+    (l) =>
+      l.from === producer.kind &&
+      l.to === consumer.kind &&
+      (known === undefined || known.known[l.technique] === true),
+  );
+  if (!link) return null;
+  const made = flowOf(producer, content)?.makes ?? [];
+  const used = flowOf(consumer, content)?.uses ?? [];
+  return made.some((item) => used.includes(item)) ? link : null;
+}
+
+/** Whether `producer` makes an item `consumer` uses, and the data of the clone links the two kinds. */
+export function feeds(
+  producer: { kind: string; id: string },
+  consumer: { kind: string; id: string },
+  content: ContentDb,
+): boolean {
+  return feedingLink(producer, consumer, content) !== null;
+}
+
+/** Whether one of two actions feeds the other. */
 export function linked(
   a: { kind: string; id: string },
   b: { kind: string; id: string },
   content: ContentDb,
 ): boolean {
-  const fa = flowOf(a, content);
-  const fb = flowOf(b, content);
-  if (!fa || !fb) return false;
-  return (
-    fa.makes.some((item) => fb.uses.includes(item)) ||
-    fb.makes.some((item) => fa.uses.includes(item))
-  );
+  return feeds(a, b, content) || feeds(b, a, content);
 }
 
 /**
- * The link bonus: while two slots run a linked pair, each action's speed rises by `K.clone.link`
- * (one entry per speed key, so two recipes of one skill do not add it twice). The source is the
- * technique that opened the clone's slot.
+ * The link bonus: while two slots run a pair in which one action feeds the other, the one that is
+ * fed (the consumer) gets `K.clone.link` speed (one entry per speed key, so two recipes of one
+ * skill do not add it twice). The source is the technique whose data links the pair.
  */
 export const cloneLinkProvider: ModifierProvider = (state, content) => {
   if (state.slots.length < 2) return [];
-  const link = content.balance.K.clone.link;
-  const source = cloneSlots(state, content)[0]?.technique;
-  if (link <= 0 || source === undefined) return [];
+  const bonus = content.balance.K.clone.link;
+  if (bonus <= 0) return [];
   const running = state.slots.flatMap((slot) => (slot.action ? [slot.action] : []));
   if (running.length < 2) return [];
-  const keys = new Set<string>();
-  for (const [i, a] of running.entries()) {
-    for (const b of running.slice(i + 1)) {
-      if (!linked(a, b, content)) continue;
-      const fa = flowOf(a, content);
-      const fb = flowOf(b, content);
-      if (fa) keys.add(fa.speed);
-      if (fb) keys.add(fb.speed);
+  const parts = new Map<string, Modifier>();
+  for (const producer of running) {
+    for (const consumer of running) {
+      if (producer === consumer) continue;
+      const link = feedingLink(producer, consumer, content, state);
+      const speed = link ? flowOf(consumer, content)?.speed : undefined;
+      if (!link || speed === undefined || parts.has(speed)) continue;
+      const source: EntityRef = { kind: 'technique', id: link.technique };
+      parts.set(speed, { key: speed, op: 'add', value: bonus, group: 'character', source });
     }
   }
-  const ref: EntityRef = { kind: 'technique', id: source };
-  const parts: Modifier[] = [];
-  for (const key of keys)
-    parts.push({ key, op: 'add', value: link, group: 'character', source: ref });
-  return parts;
+  return [...parts.values()];
 };
 
 // ---------- telemetry ----------

@@ -15,7 +15,13 @@
   import { resourceName } from '../lib/vocab.ts';
   import { formatDuration, formatInt, formatXp } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
-  import { cardState, followCommands, stagesOf, viewOf } from '../lib/mission-feed.svelte.ts';
+  import {
+    cardState,
+    cloneCardState,
+    followCommands,
+    stagesOf,
+    viewOf,
+  } from '../lib/mission-feed.svelte.ts';
   import { holderRef, hourChain, missionNow, rewardRows } from '../lib/missions.ts';
   import { game } from '../lib/store.ts';
   import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
@@ -36,6 +42,9 @@
   /** What `dispatch` would answer to starting the mission now, from core. */
   const status = $derived(mission && view ? cardState(mission, view) : null);
   const running = $derived(status !== null && status.runningAt >= 0);
+  /** What a start in the clone's slot would answer; null before the player has a clone. */
+  const clone = $derived(mission && view ? cloneCardState(mission, view) : null);
+  const cloneRuns = $derived(running && clone !== null && status?.runningAt === clone.slot);
   const refusal = $derived(running ? null : (status?.refusal ?? null));
   const by = $derived(refusal?.by ? holderRef(refusal.by) : null);
   /** The stage under way when this mission runs. */
@@ -91,6 +100,17 @@
     ];
   }
 
+  function startClone(): void {
+    if (!clone || !mission) return;
+    const result = game.dispatch({
+      type: 'action.start',
+      slot: clone.slot,
+      kind: MISSION_KIND,
+      id: mission.id,
+    });
+    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
+  }
+
   function toggle(): void {
     if (!status || !mission) return;
     const result = running
@@ -144,12 +164,26 @@
         >
           {t(running ? 'tile.stop' : 'tile.start')}
         </button>
+        {#if clone && !running}
+          <button
+            type="button"
+            class="ct-action clone"
+            data-ui="clone-start"
+            disabled={!clone.startable}
+            aria-describedby={clone.startable ? undefined : 'why-clone'}
+            onclick={startClone}
+          >
+            {t('tile.clone')}
+          </button>
+        {/if}
         <PinGoal kind="mission" id={mission.id} variant="button" />
       </div>
       {#if running}
         <p class="ct-note" data-running>
           <Icon name="lucide:hourglass" size={14} />
-          {t('mission.running', { n: status.runningAt + 1 })}
+          {cloneRuns
+            ? t('mission.runningClone')
+            : t('mission.running', { n: status.runningAt + 1 })}
         </p>
       {:else if refusal}
         <div class="why" id="why-mission" data-why={refusal.reason}>
@@ -174,6 +208,9 @@
             <p class="ct-why">{t(refusal.reason)}</p>
           {/if}
         </div>
+      {/if}
+      {#if clone && !running && clone.refusal?.reason === 'error.cloneNoFight'}
+        <p class="ct-why" id="why-clone" data-clone-why>{t(clone.refusal.reason)}</p>
       {/if}
     </section>
 

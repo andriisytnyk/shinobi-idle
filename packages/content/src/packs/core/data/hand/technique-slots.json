@@ -1,3 +1,11 @@
 {
-  "core:shadow_clone": 1
+  "core:shadow_clone": {
+    "slot": 1,
+    "links": [
+      {
+        "from": "gather",
+        "to": "craft"
+      }
+    ]
+  }
 }
