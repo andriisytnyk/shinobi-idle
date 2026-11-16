@@ -375,13 +375,15 @@ function parseKit(raw: unknown, content: ContentDb, v: Vocab): PlayerKit | null 
   for (const p of raw.evasion) {
     if (!isRecord(p) || !oneOf(EVASION_SOURCES, p.source) || !nonNeg(p.value)) return null;
     if (p.id !== null && !(isStr(p.id) && known.has(p.id))) return null;
-    if (p.skillLevel !== undefined && !nonNeg(p.skillLevel)) return null;
-    evasion.push({
-      source: p.source,
-      id: p.id,
-      value: p.value,
-      ...(p.skillLevel === undefined ? {} : { skillLevel: p.skillLevel as number }),
-    });
+    const optional = ['full', 'skillLevel', 'masteryLevel', 'effectiveLevel'] as const;
+    if (optional.some((k) => p[k] !== undefined && !nonNeg(p[k]))) return null;
+    if (p.levelAdj !== undefined && !Number.isFinite(p.levelAdj)) return null;
+    if (p.limit !== undefined && p.limit !== 'skill' && p.limit !== 'mastery') return null;
+    const part: EvasionPart = { source: p.source, id: p.id, value: p.value };
+    for (const k of optional) if (p[k] !== undefined) part[k] = p[k] as number;
+    if (p.levelAdj !== undefined) part.levelAdj = p.levelAdj as number;
+    if (p.limit !== undefined) part.limit = p.limit;
+    evasion.push(part);
   }
   const techniques: KitTechnique[] = [];
   for (const t of raw.techniques) {

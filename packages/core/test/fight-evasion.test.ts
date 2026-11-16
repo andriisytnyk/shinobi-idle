@@ -18,6 +18,7 @@ import {
   playerEvasionParts,
   serialize,
   type PlayerSnapshot,
+  levelScale,
 } from '../src/index.ts';
 import { K, castSeq, enemyAt, quiet, rules, scripted, sec, withAi } from './fight-helpers.ts';
 import { modContent, modRules } from './packs-helpers.ts';
@@ -38,25 +39,32 @@ describe('the evasion rating of the player', () => {
     expect(parts[0]?.value).toBe(K.evaBase);
     expect(parts[1]?.value).toBe(K.rating.evaTier);
     expect(parts.filter((p) => p.source === 'technique').map((p) => p.id)).toEqual([CLONE, WALL]);
-    // Skill levels change nothing: the same rating at level 1 and at level 50.
+    // The level of a skill enters only through the effective level of its techniques: more skill never lowers the rating
+    // of a technique at mastery 1 (its mastery is the limit), and never raises it above what the mastery allows.
     const low = evasionOf({ ...snap([CLONE]) }, content);
     const high = evasionOf(
       { ...snap([CLONE]), levels: { ...scripted([]).levels, tai: 50, nin: 50 } } as PlayerSnapshot,
       content,
+      30,
     );
-    expect(high).toBe(low);
+    expect(high).toBeLessThanOrEqual(low + K.passiveFx.decoy!.evasion);
   });
 
-  it('grows with the mastery of each technique: the share for knowing it at mastery 1, all of it at the cap', () => {
+  it('grows with the mastery of each technique while the mastery is the limit, and no further than the clamp', () => {
+    const full = { ...scripted([]).levels, nin: 99 } as PlayerSnapshot['levels'];
     const value = (mastery: number) =>
-      evasionParts(snap([CLONE], { [CLONE]: mastery }), content).find((p) => p.id === CLONE)
-        ?.value ?? 0;
+      evasionParts({ ...snap([CLONE], { [CLONE]: mastery }), levels: full }, content, 20).find(
+        (p) => p.id === CLONE,
+      )?.value ?? 0;
     const row = K.passiveFx.decoy;
     if (!row) throw new Error('no row');
-    expect(value(1)).toBeCloseTo(row.evasion * row.base, 9);
-    expect(value(K.masteryCap)).toBeCloseTo(row.evasion, 9);
     expect(value(50)).toBeGreaterThan(value(10));
     expect(value(10)).toBeGreaterThan(value(1));
+    expect(value(K.masteryCap)).toBeLessThanOrEqual(row.evasion * K.evaLevel.max + 1e-9);
+    expect(value(1)).toBeCloseTo(
+      row.evasion * Math.max(K.evaLevel.min, 1 + K.evaLevel.k * (K.defence.masteryToLevel - 20)),
+      9,
+    );
   });
 
   it('adds up: every known defensive technique counts', () => {
@@ -222,8 +230,11 @@ describe('a pack in the new loop: a passive technique, a cast of its own, an int
   it('adds the evasion its own row names, scaled by mastery, and is never in the kit', () => {
     const parts = evasionParts(modSnap([veil]), modContent);
     const row = modContent.balance.K.passiveFx['testmod:veil'];
-    expect(parts.find((p) => p.id === veil)?.value).toBeCloseTo(
-      (row?.evasion ?? 0) * (row?.base ?? 0),
+    const part = parts.find((p) => p.id === veil);
+    expect(part?.full).toBe(row?.evasion);
+    expect(part?.value).toBeCloseTo(
+      (row?.evasion ?? 0) *
+        levelScale((part?.effectiveLevel ?? 0) - (part?.skillLevel ?? 0), modContent),
       9,
     );
     const fight = createFight(modSnap([veil, touch]), enemyAt(5), 1, modContent, modRules);

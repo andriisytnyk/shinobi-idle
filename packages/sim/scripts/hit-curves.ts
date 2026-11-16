@@ -78,7 +78,7 @@ export function curves(content: ContentDb = defaultContent): CurvePoint[] {
     const typical = at(undefined);
     const tier = typical.tier ?? 0;
     const hits = (snap: ReturnType<typeof at>) =>
-      hitChance(eAcc, evasionOf(snap, content), content);
+      hitChance(eAcc, evasionOf(snap, content, level), content);
     const pAcc = accuracyOf(typical.levels, 'tai', content) + accuracyTierTerm(tier, content);
     return {
       level,
@@ -104,7 +104,7 @@ export function curveLoss(): number {
   for (const c of curves()) {
     l += out(c.enemyHits.typical, c.baseline.enemyHits - TOL, c.baseline.enemyHits + TOL) * 4;
     l += out(c.playerHits, c.baseline.playerHits - TOL, c.baseline.playerHits + TOL) * 4;
-    if (c.level >= 8) l += Math.max(0, 0.1 - (c.enemyHits.typical - c.enemyHits.max));
+    if (c.level >= 12) l += Math.max(0, 0.07 - (c.enemyHits.typical - c.enemyHits.max)) * 2;
     l += Math.max(0, c.enemyHits.typical - c.enemyHits.neglect);
     l += Math.max(0, 0.3 - c.allNatures.typical);
   }

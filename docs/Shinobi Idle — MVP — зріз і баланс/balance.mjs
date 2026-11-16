@@ -33,17 +33,19 @@ export const K = {
   levelScale: 0.035,                         // шкода техніки × (1 + levelScale × рівень навички)
   masteryDmg: 0.10, masteryCost: 0.25,
   // --- стани ---
-  burn: { share:0.30, dur:6 }, wet: { slow:0.15, dur:8 }, evaLevel: { k:0.04, min:0.4, max:1.3 }, rhythm: { slow:0.6, dur:5 }, stun: { C:1.0, B:1.5, D:0.7 }, bind: { dur:4 }, poison: { pctPerSec:0.02, dur:8 },
+  burn: { share:0.30, dur:6 }, wet: { slow:0.15, dur:8 }, evaLevel: { k:0.083, min:0.223, max:1.6 }, rhythm: { slow:0.6, dur:5 }, stun: { C:1.0, B:1.5, D:0.7 }, bind: { dur:4 }, poison: { pctPerSec:0.02, dur:8 },
   combo: { base:0.15, perLevel:0.004, perMastery:0.001, cap:0.60, fanBurn:1.5, shockWet:2.0, mudEva:0.5, steam:0.40 },
   wheel: 0.30, habituation: 0.15, habituationCap: 0.60, signatureHabituation: 0.5,
   // --- гравець ---
   hpBase: 90, hpPerVit: 8, chakraBase: 120, chakraPerMed: 0.005, chakraRegen: [0.6,0.02], staminaBase: 100, staminaPerAth: 0.01, staminaRegen: [1.0,0.02],
-  accBase: 40, accPerLevel: 5, evaBase: 58.2, hitMin: 0.05, hitMax: 0.95,
+  accBase: 40, accPerLevel: 5, evaBase: 139.8, hitMin: 0.05, hitMax: 0.95,
   // Ухилення — один автоматичний кидок (правки зрізу, розд. 5, рядки 11–13). Рейтинг ухилення = evaBase + внесок рангу + захисні техніки + спорядження й бонуси + знання з Бінґо-книги; навички «Ухилення» немає.
   // rating: внесок одного рангу гравця (тіру ШІ) в точність і ухилення, і рейтинг за рівень знань про ворога. Числа тимчасові до підгонки (етап 4 завдання C1): evaTier підібрано так, щоб типовий персонаж ухилявся приблизно як раніше.
-  rating: { accTier:21.9, evaTier:6.1, knowledge:32.3, enemyAccTier:13.1, enemyEvaTier:0 },
-  // passiveFx: захисна техніка пасивна; вивчена, дає частку base свого внеску evasion, а до повного внеску росте з Майстерністю від 1 до стелі. Числа тимчасові до підгонки (етап 4).
-  passiveFx: { shield:{ evasion:92.2, base:0.25 }, decoy:{ evasion:92.2, base:0.25 }, evasionBuff:{ evasion:92.2, base:0.25 }, passiveNegate:{ evasion:92.2, base:0.25 } },
+  rating: { accTier:21, evaTier:38.2, knowledge:32.3, enemyAccTier:0, enemyEvaTier:0 },
+  // passiveFx: захисна техніка пасивна; evasion — внесок, коли її ефективний рівень дорівнює бойовому рівню нападника (див. defence).
+  passiveFx: { shield:{ evasion:24.7 }, decoy:{ evasion:24.7 }, evasionBuff:{ evasion:24.7 }, passiveNegate:{ evasion:24.7 } },
+  // defence: захисна техніка працює на ефективному рівні = min(рівень її навички, Майстерність × masteryToLevel); внесок = evasion × межі(1 + k × (ефективний рівень − бойовий рівень нападника); min; max), k, min, max — K.evaLevel.
+  defence: { masteryToLevel:0.5 },
   // Звичайний удар — дія зі своїм кастом і малою вартістю витривалості; «переводить подих», коли не вистачає ні на техніку, ні на удар: rest.s секунд і частка rest.share від обох пулів.
   basicCast: 1.437, basicCost: 1.01, rest: { s:1.5, share:0.08 },
   modelWait: 0.6, // лише для спрощеного симулятора нижче: вичікування гравця між діями; має дорівнювати waitMs тіру genin з ai.json
@@ -54,7 +56,7 @@ export const K = {
   zoneHpRegen: 0.8, opRegen: 0.25, respawn: 3,
   wound: { stat:0.05, max:4, healMin:10, healFloorMin:2.5 },
   // --- вороги ---
-  eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [118,0.1], eEva: [26.5,5.16],
+  eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [198.6,0], eEva: [25.6,5.23],
   boss: { hp:3.2, dmg:1.5 }, pack: { n:3, hp:0.4, dmg:0.4 },
   trait: { armor:0.30, armorOff:6, casterEvery:12, casterCast:3, casterMult:3, evasive:1.6, regenPct:0.01, illusionEvery:10, illusionDur:6, illusionAcc:0.25,
     hidden:8, hiddenAcc:0.4, hiddenFirst:2.0, poisonChance:0.35 },
@@ -100,7 +102,7 @@ export function tech(t, skillLevel, mastery=20, native=true) {
 export const player = ({style,tai,nin,vit,tier=1,med,ath=25,cc=25}) => ({
   hp:K.hpBase+K.hpPerVit*vit, chakra:K.chakraBase*(1+K.chakraPerMed*med), chakraRegen:K.chakraRegen[0]+K.chakraRegen[1]*med,
   stamina:K.staminaBase*(1+K.staminaPerAth*ath), staminaRegen:K.staminaRegen[0]+K.staminaRegen[1]*ath,
-  acc:K.accBase+K.accPerLevel*style, evaR:K.evaBase+K.rating.evaTier*tier+K.passiveFx.shield.evasion*(0.25+0.75*0.2), basic:K.basicDmg[0]+K.basicDmg[1]*Math.max(tai,nin), costMult:1-K.ccCostPerLevel*cc, med });
+  acc:K.accBase+K.accPerLevel*style, evaR:K.evaBase+K.rating.evaTier*tier+K.passiveFx.shield.evasion*0.3, basic:K.basicDmg[0]+K.basicDmg[1]*Math.max(tai,nin), costMult:1-K.ccCostPerLevel*cc, med });
 export const enemy = (cl,traits=[],nature=null,boss=false) => ({ cl, traits, nature, boss,
   hp:(K.eHp[0]+K.eHp[1]*cl)*(boss?K.boss.hp:1), dmg:(K.eDmg[0]+K.eDmg[1]*cl)*(boss?K.boss.dmg:1), interval:K.eInterval, acc:K.eAcc[0]+K.eAcc[1]*cl, evaR:K.eEva[0]+K.eEva[1]*cl });
 const hit = (acc,eva) => Math.min(K.hitMax,Math.max(K.hitMin, acc>=eva ? 1-0.5*eva/acc : 0.5*acc/eva));

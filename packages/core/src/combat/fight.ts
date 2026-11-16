@@ -57,7 +57,7 @@ import {
   enemyStats,
   evasionOf,
   evasionParts,
-  partsAgainst,
+  shiftAgainst,
   evasionTierTerm,
   KNOWLEDGE_MAX,
   knowledgeTerm,
@@ -360,15 +360,12 @@ export function evasionAgainst(ctx: FightCtx, target: Combatant, attacker: Comba
   if (target.side === 'player' && attacker.side === 'enemy') {
     const level = target.data[knowKey(attacker.entry)] ?? KNOWLEDGE_MAX;
     base += knowledgeTerm(level, ctx.content);
-    // The defensive techniques count for more or less by the level of their skill against the level of the attacker.
+    // The defensive techniques count by their effective level against the level of the attacker.
     const attackerLevel = attacker.data[LEVEL_KEY];
     if (attackerLevel !== undefined) {
       const parts = ctx.fight.kit.evasion;
       const raw = parts.reduce((n, p) => n + p.value, 0);
-      const adj = partsAgainst(parts, attackerLevel, ctx.content).reduce(
-        (n, p) => n + (p.levelAdj ?? 0),
-        0,
-      );
+      const adj = shiftAgainst(parts, attackerLevel, ctx.content);
       // Wounds weaken the whole rating; they weaken the adjustment the same way.
       base += raw > 0 ? adj * (target.evasion / raw) : adj;
     }

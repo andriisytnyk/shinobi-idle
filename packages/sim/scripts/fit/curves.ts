@@ -8,14 +8,17 @@ type P = Record<string, number>;
 const BOUNDS: Record<string, [number, number]> = {
   E0: [0, 300],
   evaTier: [0, 150],
-  E: [0, 100],
+  E: [0, 300],
   accTier: [0, 300],
   eAcc0: [0, 300],
-  eAccL: [0, 6],
+  eAccL: [-1.5, 6],
   enemyAccTier: [0, 120],
   eEva0: [0, 150],
   eEvaL: [0, 6],
   enemyEvaTier: [0, 120],
+  evaK: [0.01, 0.2],
+  evaMin: [0.02, 0.6],
+  evaMax: [1, 1.6],
 };
 function apply(p: P): void {
   K.evaBase = p.E0;
@@ -28,6 +31,9 @@ function apply(p: P): void {
   K.eEva[0] = p.eEva0;
   K.eEva[1] = p.eEvaL;
   K.rating.enemyEvaTier = p.enemyEvaTier;
+  K.evaLevel.k = p.evaK;
+  K.evaLevel.min = p.evaMin;
+  K.evaLevel.max = p.evaMax;
 }
 function loss(p: P): number {
   apply(p);
@@ -40,6 +46,9 @@ const orig = {
   accTier: K.rating.accTier,
   etA: K.rating.enemyAccTier,
   etE: K.rating.enemyEvaTier,
+  evaK: K.evaLevel.k,
+  evaMin: K.evaLevel.min,
+  evaMax: K.evaLevel.max,
   eA0: K.eAcc[0],
   eAL: K.eAcc[1],
   eE0: K.eEva[0],
@@ -56,26 +65,53 @@ let best: P = {
   eEva0: K.eEva[0],
   eEvaL: K.eEva[1],
   enemyEvaTier: K.rating.enemyEvaTier,
+  evaK: K.evaLevel.k,
+  evaMin: K.evaLevel.min,
+  evaMax: K.evaLevel.max,
 };
 let bl = loss(best);
 console.log('start', bl.toFixed(3));
-for (let r = 0; r < 40; r++) {
-  let moved = false;
-  for (const n of Object.keys(BOUNDS)) {
-    const [lo, hi] = BOUNDS[n]!;
-    for (const d of [-0.3, -0.1, -0.03, 0.03, 0.1, 0.3]) {
-      const v = Math.min(hi, Math.max(lo, best[n]! * (1 + d) + (best[n]! === 0 ? d * 5 : 0)));
-      if (v === best[n]) continue;
-      const c = { ...best, [n]: v };
-      const s = loss(c);
-      if (s < bl - 1e-9) {
-        best = c;
-        bl = s;
-        moved = true;
+function descend(startP: P): { p: P; l: number } {
+  let cur = startP;
+  let cl = loss(cur);
+  for (let r = 0; r < 40; r++) {
+    let moved = false;
+    for (const n of Object.keys(BOUNDS)) {
+      const [lo, hi] = BOUNDS[n]!;
+      for (const d of [-0.3, -0.1, -0.03, 0.03, 0.1, 0.3]) {
+        const v = Math.min(hi, Math.max(lo, cur[n]! * (1 + d) + (cur[n]! === 0 ? d * 5 : 0)));
+        if (v === cur[n]) continue;
+        const c = { ...cur, [n]: v };
+        const s = loss(c);
+        if (s < cl - 1e-9) {
+          cur = c;
+          cl = s;
+          moved = true;
+        }
       }
     }
+    if (!moved) break;
   }
-  if (!moved) break;
+  return { p: cur, l: cl };
+}
+// Restarts from perturbed starts (a seeded generator): the loss has local minima.
+let seed = 12345;
+const rnd = (): number => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
+{
+  const first = descend(best);
+  best = first.p;
+  bl = first.l;
+  for (let i = 0; i < 25; i++) {
+    const start: P = {};
+    for (const [n, [lo, hi]] of Object.entries(BOUNDS)) {
+      start[n] = Math.min(hi, Math.max(lo, best[n]! * (0.5 + rnd()) + (best[n]! === 0 ? rnd() : 0)));
+    }
+    const got = descend(start);
+    if (got.l < bl) {
+      best = got.p;
+      bl = got.l;
+    }
+  }
 }
 console.log(
   'loss',
@@ -94,6 +130,9 @@ writeFileSync(
     accTier: r(best.accTier!, orig.accTier),
     etA: r(best.enemyAccTier!, orig.etA),
     etE: r(best.enemyEvaTier!, orig.etE),
+    evaK: r(best.evaK!, orig.evaK),
+    evaMin: r(best.evaMin!, orig.evaMin),
+    evaMax: r(best.evaMax!, orig.evaMax),
     eA0: r(best.eAcc0!, orig.eA0),
     eAL: r(best.eAccL!, orig.eAL),
     eE0: r(best.eEva0!, orig.eE0),

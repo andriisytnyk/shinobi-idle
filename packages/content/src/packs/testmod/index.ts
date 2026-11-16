@@ -415,7 +415,7 @@ export const testmodPack: ContentPack = {
       role: { 'testmod:sapper': { m: 0.5, cd: 8, c: 1 } },
       combo: { 'testmod:frostburn': 0.3 },
       bossFx: { 'testmod:third': { mult: 2.5, hp: 1, dmg: 1 } },
-      passiveFx: { 'testmod:veil': { evasion: 25, base: 0.5 } },
+      passiveFx: { 'testmod:veil': { evasion: 25 } },
       rep: { 'testmod:stage3': 500 },
       goods: { 'testmod:charm': 10 },
       ext: {

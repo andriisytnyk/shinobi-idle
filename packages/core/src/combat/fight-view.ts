@@ -1,7 +1,7 @@
 import type { ContentDb } from '@shinobi/content';
 import { makeCtx, speed } from './fight.ts';
 import type { Combatant, FightAct, FightRules, FightState, LastAct } from './fight-types.ts';
-import { partsAgainst, type EvasionPart } from './numbers.ts';
+import { partsAgainst, shiftAgainst, type EvasionPart } from './numbers.ts';
 import { WORK_PER_MS } from './units.ts';
 
 /*
@@ -84,8 +84,8 @@ function evasionView(
     return { total: fight.player.evasion, parts: fight.kit.evasion.map((p) => ({ ...p })) };
   }
   const parts = partsAgainst(fight.kit.evasion, level, content);
+  const adj = shiftAgainst(fight.kit.evasion, level, content);
   const raw = fight.kit.evasion.reduce((n, p) => n + p.value, 0);
-  const adj = parts.reduce((n, p) => n + (p.levelAdj ?? 0), 0);
   const total = fight.player.evasion + (raw > 0 ? adj * (fight.player.evasion / raw) : adj);
   return { total, parts };
 }

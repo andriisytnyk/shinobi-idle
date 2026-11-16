@@ -90,6 +90,9 @@ export const orig = {
   hiddenAcc: K.trait.hiddenAcc,
   bindDur: K.bind.dur,
   evaK: K.evaLevel.k,
+  evaMin: K.evaLevel.min,
+  evaMax: K.evaLevel.max,
+  mtl: K.defence.masteryToLevel,
   eEva: [...K.eEva],
   rank: Object.fromEntries(content.techniques.map((t) => [t.id, t.rank])),
   role: Object.fromEntries(content.techniques.map((t) => [t.id, t.role])),
@@ -105,6 +108,9 @@ export const DEFAULTS: Knobs = {
   hiddenAcc: 1,
   bindDur: 1,
   evaK: 1,
+  evaMin: 1,
+  evaMax: 1,
+  mtl: 1,
   cds: 1,
   w0: 1,
   w1: 1,
@@ -180,6 +186,9 @@ export function apply(k: Knobs): void {
   K.trait.hiddenAcc = orig.hiddenAcc * k.hiddenAcc!;
   K.bind.dur = orig.bindDur * k.bindDur!;
   K.evaLevel.k = orig.evaK * k.evaK!;
+  K.evaLevel.min = orig.evaMin * k.evaMin!;
+  K.evaLevel.max = orig.evaMax * k.evaMax!;
+  K.defence.masteryToLevel = orig.mtl * k.mtl!;
   K.eAcc[0] = orig.eAcc[0] * k.eA0!;
   K.eAcc[1] = orig.eAcc[1] * k.eAL!;
   K.eEva[0] = orig.eEva[0] * k.eE0!;

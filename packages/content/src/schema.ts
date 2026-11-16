@@ -154,7 +154,7 @@ export const techniqueCombatSchema = z.strictObject({
   hitsAll: z.boolean().optional(),
   /** Works without a slot in the loadout. */
   outOfLoadout: z.boolean().optional(),
-  /** A defensive technique is passive: once known it adds to the evasion rating by the row `fx` of `K.passiveFx`, scaled by its mastery. */
+  /** A defensive technique is passive: once known it adds to the evasion rating by the row `fx` of `K.passiveFx`, scaled by its effective level against the level of the attacker. */
   passive: z.strictObject({ fx: z.string().min(1) }).optional(),
 });
 
@@ -1119,7 +1119,9 @@ export const balanceParamsSchema = z.object({
     enemyEvaTier: z.number(),
   }),
   /** What a known defensive technique adds to the evasion rating (`evasion` at full mastery, `base` of it for knowing it), by the row its data names. */
-  passiveFx: z.record(z.string(), z.object({ evasion: z.number(), base: z.number() })),
+  passiveFx: z.record(z.string(), z.object({ evasion: z.number() })),
+  /** A defensive technique works at its effective level, the lower of the level of its skill and its mastery times this. */
+  defence: z.object({ masteryToLevel: z.number().positive() }),
   hitMin: z.number(),
   hitMax: z.number(),
   /** The basic strike is an action: its cast time (s) and its stamina cost. */
