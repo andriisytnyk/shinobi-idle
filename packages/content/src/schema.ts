@@ -254,6 +254,8 @@ export const techniqueBaseSchema = z.strictObject({
 
 export const techniqueSchema = techniqueBaseSchema.extend({
   ...revealField,
+  /** The action slot (index from 1) that knowing the technique opens, for a technique that sends a clone to work; absent for every other. */
+  opensSlot: z.number().int().min(1).optional(),
   /** Combat behaviour; `null` for training drills, which are never cast. */
   combat: techniqueCombatSchema.nullable(),
 });
@@ -827,6 +829,8 @@ export const questStepSchema = z.strictObject({
   /** Localization key of the step's one-line text. */
   textKey: z.string().min(1),
   objective: questObjectiveSchema,
+  /** Items handed over once, when the step becomes the active one (the step before it was finished). */
+  grants: z.array(ingredientRef).optional(),
 });
 
 export const questRewardsSchema = z.strictObject({

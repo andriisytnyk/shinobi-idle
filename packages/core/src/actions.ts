@@ -12,6 +12,7 @@ import {
 } from './formulas.ts';
 import { indexOf } from './lookup.ts';
 import { actionFloor, entitySkill } from './vocab.ts';
+import { trackClone } from './clone.ts';
 import { nonNativeLevel } from './natures.ts';
 import { cycleFactor } from './modifiers.ts';
 import { spendTonicCharges } from './buffs.ts';
@@ -172,17 +173,22 @@ export const drillKind = skillAction((_state, id, content) => {
 });
 
 /**
- * Splits the speed budget: active slots share SHARE_FULL equally, the remainder goes to the first
- * active slot, idle slots get 0 (slot 0 keeps the full budget when nothing runs).
+ * Splits the speed budget: active slots share it equally, the remainder goes to the first active
+ * slot, idle slots get 0 (slot 0 keeps the full budget when nothing runs). One running slot has
+ * SHARE_FULL; two or more share the pool of the content (K.clone.pool, SHARE_FULL by default).
  */
-export function rebalanceShares(state: GameState): void {
+export function rebalanceShares(state: GameState, content?: ContentDb): void {
   const active = state.slots.filter((s) => s.action);
   const takers = active.length > 0 ? active : state.slots.slice(0, 1);
+  const total =
+    takers.length > 1 && content
+      ? Math.round(SHARE_FULL * content.balance.K.clone.pool)
+      : SHARE_FULL;
   for (const slot of state.slots) slot.share = 0;
-  const each = Math.floor(SHARE_FULL / Math.max(1, takers.length));
+  const each = Math.floor(total / Math.max(1, takers.length));
   for (const slot of takers) slot.share = each;
   const [first] = takers;
-  if (first) first.share += SHARE_FULL - each * takers.length;
+  if (first) first.share += total - each * takers.length;
 }
 
 /** Clears a slot, calls the kind's stop hook, tells the UI why and re-splits the speed budget. */
@@ -212,7 +218,7 @@ export function stopSlot(
   slot.action = null;
   slot.progress = 0;
   slot.data = null;
-  rebalanceShares(state);
+  rebalanceShares(state, content);
 }
 
 /**
@@ -234,7 +240,8 @@ export const actionSystem: System = {
     return best;
   },
 
-  elapse(state, dt) {
+  elapse(state, dt, content) {
+    trackClone(state, dt, content);
     for (const slot of state.slots) if (slot.action) slot.progress += dt * slot.share;
   },
 

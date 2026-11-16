@@ -92,5 +92,43 @@
       }
     ],
     "rewards": { "items": [], "ryo": 0, "rep": 0, "flags": [], "rank": null }
+  },
+  {
+    "id": "core:shadow_clones",
+    "chain": "core:shadow_clones",
+    "unlock": { "t": "rank", "rank": "genin" },
+    "steps": [
+      {
+        "textKey": "quest.core:shadow_clones.step.1",
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "all",
+            "of": [
+              { "t": "skill", "skill": "nin", "level": 30 },
+              { "t": "skill", "skill": "med", "level": 20 }
+            ]
+          }
+        }
+      },
+      {
+        "textKey": "quest.core:shadow_clones.step.2",
+        "objective": { "t": "counter", "counter": "missions.rank.V", "n": 10 }
+      },
+      {
+        "textKey": "quest.core:shadow_clones.step.3",
+        "objective": { "t": "req", "req": { "t": "skill", "skill": "med", "level": 40 } }
+      },
+      {
+        "textKey": "quest.core:shadow_clones.step.4",
+        "objective": { "t": "req", "req": { "t": "skill", "skill": "nin", "level": 50 } }
+      },
+      {
+        "textKey": "quest.core:shadow_clones.step.5",
+        "objective": { "t": "req", "req": { "t": "technique", "id": "core:shadow_clone" } },
+        "grants": [{ "item": "core:scroll_shadow_clone", "n": 1 }]
+      }
+    ],
+    "rewards": { "items": [], "ryo": 0, "rep": 0, "flags": [], "rank": null }
   }
 ]

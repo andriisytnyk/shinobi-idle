@@ -8,6 +8,7 @@ import type { CombatAi, FightHook, FightRules } from './combat/fight-types.ts';
 import { coreFightHooks } from './corepack/fight-hooks.ts';
 import { tonicProvider } from './buffs.ts';
 import { checkpointProvider } from './checkpoints.ts';
+import { cloneLinkProvider } from './clone.ts';
 import { fightKind, operationKind } from './combat/kind.ts';
 import { combatSystem } from './combat/system.ts';
 import { woundSystem } from './combat/wounds.ts';
@@ -74,6 +75,7 @@ export const defaultRules: Rules = {
     natureProvider,
     worldProvider,
     villageProvider,
+    cloneLinkProvider,
   ],
   combatAi: defaultCombatAi,
   fightHooks: defaultFightHooks,

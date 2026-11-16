@@ -1,6 +1,8 @@
 import type { ContentDb, Technique } from '@shinobi/content';
 import { addItem, removeItem } from './bank.ts';
+import { growSlots } from './clone.ts';
 import type { CommandResult } from './engine.ts';
+import { rebalanceShares } from './actions.ts';
 import { emit } from './events.ts';
 import { indexOf } from './lookup.ts';
 import { grantMastery } from './progression.ts';
@@ -74,6 +76,9 @@ export function readScroll(
   emit(state, { type: 'techniqueLearned', id: tech.id });
   emit(state, { type: 'itemUsed', id: itemId, target: tech.id });
   refreshUnlocks(state, content, true);
+  // The technique may open an action slot (the clone).
+  growSlots(state, content);
+  rebalanceShares(state, content);
   return { ok: true };
 }
 

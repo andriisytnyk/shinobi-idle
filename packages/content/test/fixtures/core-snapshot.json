@@ -183,7 +183,7 @@
       "core:temporary_paralysis": "ca211460797f",
       "core:hidden_shadow_snake_hands": "6a76b99970da",
       "core:chakra_halving_drill": "bedea827610c",
-      "core:shadow_clone": "8271e5c0c811",
+      "core:shadow_clone": "38d1f1af1047",
       "core:nature_transformation_burn_a_leaf": "100a67d677da",
       "core:fire_breath_control_drill": "094bf9e5e111",
       "core:running_fire": "dca03c14e705",
@@ -614,7 +614,8 @@
     },
     "quests": {
       "core:graduation": "f106180a60cb",
-      "core:mission_board": "707e194c7ad2"
+      "core:mission_board": "707e194c7ad2",
+      "core:shadow_clones": "471f041bc935"
     },
     "exams": {
       "core:genin_exam": "846cbe2ae25c"
@@ -1948,7 +1949,8 @@
     ],
     "quests": [
       "core:graduation",
-      "core:mission_board"
+      "core:mission_board",
+      "core:shadow_clones"
     ],
     "exams": [
       "core:genin_exam"
@@ -3626,6 +3628,14 @@
       "quest.core:mission_board.name": "af4417b192d1",
       "quest.core:mission_board.desc": "a3fcb8a7953f",
       "quest.core:mission_board.step.1": "593de4403a2b",
+      "quest.core:shadow_clones.name": "09bb105119a8",
+      "quest.core:shadow_clones.desc": "aca164646b9a",
+      "quest.core:shadow_clones.step.1": "d71a826e58af",
+      "quest.core:shadow_clones.step.2": "844c06e49067",
+      "quest.core:shadow_clones.step.3": "d02a20cde23c",
+      "quest.core:shadow_clones.step.4": "ae2bce5944ac",
+      "quest.core:shadow_clones.step.5": "aa1edac6868b",
+      "quest.core:shadow_clones.final": "de3f0d986cb8",
       "entity.kind.cell": "d605986fed06",
       "entity.kind.combo": "b4d8d43c3be8",
       "nature.title": "700ad06cd757",

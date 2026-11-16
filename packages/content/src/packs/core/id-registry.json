@@ -112,7 +112,8 @@
   },
   "quest": {
     "Випуск": "graduation",
-    "Дошка місій": "mission_board"
+    "Дошка місій": "mission_board",
+    "Тіньові клони": "shadow_clones"
   },
   "exam": {
     "Іспит на Геніна": "genin_exam"
