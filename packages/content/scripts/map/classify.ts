@@ -11,8 +11,9 @@ import {
   measurePalette,
   neighbourPass,
   outlierPass,
+  cellAt,
 } from './classify-core.ts';
-import { COLS, HEX_S, HEX_W, IMAGE_W, ROWS, hexAt, hexCenter, hexOfPixel } from './grid.ts';
+import { at, COLS, HEX_S, HEX_W, IMAGE_W, ROWS, hexAt, hexCenter, hexOfPixel } from './grid.ts';
 import { COUNTRIES } from './world-data.ts';
 import { PLACES } from './places.ts';
 import { buildPlayable } from './mvp.ts';
@@ -79,14 +80,14 @@ async function main() {
       name: p.name,
       kind: p.kind,
       hex: [hex.q, hex.r] as [number, number],
-      country: grid[hex.row][hex.col].country,
+      country: cellAt(grid, hex.col, hex.row).country,
       referencePx: p.px,
       referenceLabel: p.refLabel,
       nameSource: p.source,
     };
   });
 
-  const play = buildPlayable((c, r) => grid[r][c].country, COLS);
+  const play = buildPlayable((c, r) => cellAt(grid, c, r).country, COLS);
   const mvp = new Set(play.hexes);
   const TERRAIN = play.terrain;
   const slice = JSON.parse(readFileSync(join(outDir, '../slice.json'), 'utf8')) as {
@@ -124,7 +125,7 @@ async function main() {
       play.cells.map((c) => ({
         cell: `${c.region}#${c.index}`,
         region: c.region,
-        name: slice.regions.find((x) => x.id === c.region)!.cells[c.index - 1][0],
+        name: at(at(slice.regions.find((x) => x.id === c.region)!.cells, c.index - 1), 0),
         hex: [c.q, c.r],
         why: c.why,
       })),

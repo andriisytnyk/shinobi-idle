@@ -1,7 +1,7 @@
 [
   {
     "id": "core:hidden-leaf",
-    "name": "Коноха (Село Прихованого Листя)",
+    "name": "Селище Прихованого Листя (Коноха)",
     "kind": "hidden-village",
     "hex": [
       10,
@@ -97,7 +97,7 @@
   },
   {
     "id": "core:hidden-stone",
-    "name": "Село Прихованого Каменю",
+    "name": "Селище Прихованого Каменю",
     "kind": "hidden-village",
     "hex": [
       4,
@@ -113,7 +113,7 @@
   },
   {
     "id": "core:hidden-sand",
-    "name": "Село Прихованого Піску",
+    "name": "Селище Прихованого Піску",
     "kind": "hidden-village",
     "hex": [
       -5,
@@ -161,7 +161,7 @@
   },
   {
     "id": "core:hidden-valley-village",
-    "name": "Село, сховане в долині",
+    "name": "Селище Прихованої Долини",
     "kind": "hidden-village",
     "hex": [
       3,
@@ -177,7 +177,7 @@
   },
   {
     "id": "core:hidden-rain",
-    "name": "Село Прихованого Дощу",
+    "name": "Селище Прихованого Дощу",
     "kind": "hidden-village",
     "hex": [
       3,
@@ -209,7 +209,7 @@
   },
   {
     "id": "core:hidden-rock-village",
-    "name": "Село Прихованої Скелі",
+    "name": "Селище Прихованої Скелі",
     "kind": "hidden-village",
     "hex": [
       1,
@@ -225,7 +225,7 @@
   },
   {
     "id": "core:hidden-waterfall",
-    "name": "Село Прихованого Водоспаду",
+    "name": "Селище Прихованого Водоспаду",
     "kind": "hidden-village",
     "hex": [
       9,
@@ -241,7 +241,7 @@
   },
   {
     "id": "core:hidden-sound",
-    "name": "Село Прихованого Звуку",
+    "name": "Селище Прихованого Звуку",
     "kind": "hidden-village",
     "hex": [
       13,
@@ -253,7 +253,7 @@
       396
     ],
     "referenceLabel": "Скрытый звук",
-    "nameSource": "документи проєкту: «Село Звуку»; форма за зразком uk.wikipedia.org/wiki/Наруто (форма «Прихованого …» за зразком статті)"
+    "nameSource": "документи проєкту: «Село Звуку» (як у документах); назва за зразком; форма за зразком uk.wikipedia.org/wiki/Наруто (форма «Прихованого …» за зразком статті)"
   },
   {
     "id": "core:mountains-graveyard",
@@ -273,7 +273,7 @@
   },
   {
     "id": "core:hidden-hot-spring",
-    "name": "Село Прихованого Гарячого Джерела",
+    "name": "Селище Прихованого Гарячого Джерела",
     "kind": "hidden-village",
     "hex": [
       15,
@@ -289,7 +289,7 @@
   },
   {
     "id": "core:hidden-frost",
-    "name": "Село Прихованого Морозу",
+    "name": "Селище Прихованого Морозу",
     "kind": "hidden-village",
     "hex": [
       17,
@@ -305,7 +305,7 @@
   },
   {
     "id": "core:hidden-cloud",
-    "name": "Село Прихованої Хмари",
+    "name": "Селище Прихованої Хмари",
     "kind": "hidden-village",
     "hex": [
       24,
@@ -369,7 +369,7 @@
   },
   {
     "id": "core:hidden-mist",
-    "name": "Село Прихованого Туману",
+    "name": "Селище Прихованого Туману",
     "kind": "hidden-village",
     "hex": [
       25,

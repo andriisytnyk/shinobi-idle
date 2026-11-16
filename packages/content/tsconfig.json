@@ -4,6 +4,5 @@
     "types": ["node"],
     "paths": { "@shinobi/content/typing": ["./src/typing/truth.ts"] }
   },
-  "include": ["src", "scripts", "test"],
-  "exclude": ["scripts/map"]
+  "include": ["src", "scripts", "test"]
 }

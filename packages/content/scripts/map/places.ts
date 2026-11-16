@@ -23,7 +23,7 @@ export const PLACES: PlaceDef[] = [
   // Land of Fire
   {
     id: 'core:hidden-leaf',
-    name: 'Коноха (Село Прихованого Листя)',
+    name: 'Селище Прихованого Листя (Коноха)',
     kind: 'hidden-village',
     px: [848, 682],
     source: `${WIKI}; у документах — «Листя»`,
@@ -72,7 +72,7 @@ export const PLACES: PlaceDef[] = [
   // Land of Earth
   {
     id: 'core:hidden-stone',
-    name: 'Село Прихованого Каменю',
+    name: 'Селище Прихованого Каменю',
     kind: 'hidden-village',
     px: [385, 335],
     source: `${WIKI}: «Прихованого в Камені»`,
@@ -81,7 +81,7 @@ export const PLACES: PlaceDef[] = [
   // Land of Wind
   {
     id: 'core:hidden-sand',
-    name: 'Село Прихованого Піску',
+    name: 'Селище Прихованого Піску',
     kind: 'hidden-village',
     px: [302, 895],
     source: `${WIKI}: «Прихованого в Піску»`,
@@ -106,7 +106,7 @@ export const PLACES: PlaceDef[] = [
   },
   {
     id: 'core:hidden-valley-village',
-    name: 'Село, сховане в долині',
+    name: 'Селище Прихованої Долини',
     kind: 'hidden-village',
     px: [632, 838],
     source: `${TR}: за написом на мапі (Деревня скрытая в долине)`,
@@ -115,7 +115,7 @@ export const PLACES: PlaceDef[] = [
   // Small lands between Earth, Wind and Fire
   {
     id: 'core:hidden-rain',
-    name: 'Село Прихованого Дощу',
+    name: 'Селище Прихованого Дощу',
     kind: 'hidden-village',
     px: [470, 552],
     source: `${TR}: за зразком форми «Прихованого …» (${WIKI}); 雨隠れ`,
@@ -131,7 +131,7 @@ export const PLACES: PlaceDef[] = [
   },
   {
     id: 'core:hidden-rock-village',
-    name: 'Село Прихованої Скелі',
+    name: 'Селище Прихованої Скелі',
     kind: 'hidden-village',
     px: [349, 535],
     source: `${TR}: за написом на мапі (Скрытая скала)`,
@@ -139,7 +139,7 @@ export const PLACES: PlaceDef[] = [
   },
   {
     id: 'core:hidden-waterfall',
-    name: 'Село Прихованого Водоспаду',
+    name: 'Селище Прихованого Водоспаду',
     kind: 'hidden-village',
     px: [613, 335],
     source: `${WIKI}: «Прихованого Водоспаду»`,
@@ -148,10 +148,10 @@ export const PLACES: PlaceDef[] = [
   // North of Fire
   {
     id: 'core:hidden-sound',
-    name: 'Село Прихованого Звуку',
+    name: 'Селище Прихованого Звуку',
     kind: 'hidden-village',
     px: [820, 396],
-    source: `${DOCS}: «Село Звуку»; форма за зразком ${WIKI}`,
+    source: `${DOCS}: «Село Звуку» (як у документах); назва за зразком; форма за зразком ${WIKI}`,
     refLabel: 'Скрытый звук',
   },
   {
@@ -164,7 +164,7 @@ export const PLACES: PlaceDef[] = [
   },
   {
     id: 'core:hidden-hot-spring',
-    name: 'Село Прихованого Гарячого Джерела',
+    name: 'Селище Прихованого Гарячого Джерела',
     kind: 'hidden-village',
     px: [945, 413],
     source: `${TR}: за написом на мапі (деревня скрытого горячего источника); 湯隠れ`,
@@ -172,7 +172,7 @@ export const PLACES: PlaceDef[] = [
   },
   {
     id: 'core:hidden-frost',
-    name: 'Село Прихованого Морозу',
+    name: 'Селище Прихованого Морозу',
     kind: 'hidden-village',
     px: [1003, 358],
     source: `${TR}: за написом на мапі (деревня скрытого мороза); 霜隠れ`,
@@ -181,7 +181,7 @@ export const PLACES: PlaceDef[] = [
   // Land of Lightning
   {
     id: 'core:hidden-cloud',
-    name: 'Село Прихованої Хмари',
+    name: 'Селище Прихованої Хмари',
     kind: 'hidden-village',
     px: [1265, 275],
     source: `${DOCS}: «Хмари»; форма за зразком ${WIKI}`,
@@ -214,7 +214,7 @@ export const PLACES: PlaceDef[] = [
   // Land of Water
   {
     id: 'core:hidden-mist',
-    name: 'Село Прихованого Туману',
+    name: 'Селище Прихованого Туману',
     kind: 'hidden-village',
     px: [1558, 727],
     source: `${DOCS}: «Туман»; форма за зразком ${WIKI}`,

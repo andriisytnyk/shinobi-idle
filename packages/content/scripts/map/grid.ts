@@ -84,3 +84,10 @@ export function hexCorners(col: number, row: number, scale = 1): [number, number
   }
   return pts;
 }
+
+/** Indexed read that fails loudly instead of returning undefined (strict index checks). */
+export function at<T>(a: readonly T[], i: number): T {
+  const v = a[i];
+  if (v === undefined) throw new Error(`index ${i} out of range (length ${a.length})`);
+  return v;
+}

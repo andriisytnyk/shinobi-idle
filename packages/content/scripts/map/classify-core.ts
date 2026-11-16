@@ -12,7 +12,7 @@ import {
   type Pt,
   type RGB,
 } from './world-data.ts';
-import { COLS, HEX_S, ROWS, hexCenter, hexOfPixel, neighbours } from './grid.ts';
+import { at, COLS, HEX_S, ROWS, hexCenter, hexOfPixel, neighbours } from './grid.ts';
 
 export interface Image {
   w: number;
@@ -34,7 +34,7 @@ export async function loadImage(path: string): Promise<Image> {
       const xi = Math.min(w - 1, Math.max(0, Math.round(x)));
       const yi = Math.min(h - 1, Math.max(0, Math.round(y)));
       const i = (yi * w + xi) * 3;
-      return [data[i], data[i + 1], data[i + 2]];
+      return [data[i] ?? 0, data[i + 1] ?? 0, data[i + 2] ?? 0];
     },
   };
 }
@@ -42,7 +42,7 @@ export async function loadImage(path: string): Promise<Image> {
 const median = (a: number[]) => {
   const s = [...a].sort((x, y) => x - y);
   const m = s.length >> 1;
-  return s.length % 2 ? s[m] : Math.round((s[m - 1] + s[m]) / 2);
+  return s.length % 2 ? at(s, m) : Math.round((at(s, m - 1) + at(s, m)) / 2);
 };
 
 export function medianColour(img: Image, rects: [number, number, number, number][]): RGB {
@@ -91,8 +91,8 @@ function isNotTerrain(c: RGB): boolean {
 export function inPoly(p: Pt, poly: Pt[]): boolean {
   let inside = false;
   for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
-    const [xi, yi] = poly[i];
-    const [xj, yj] = poly[j];
+    const [xi, yi] = at(poly, i);
+    const [xj, yj] = at(poly, j);
     if (yi > p[1] !== yj > p[1] && p[0] < ((xj - xi) * (p[1] - yi)) / (yj - yi) + xi)
       inside = !inside;
   }
@@ -111,7 +111,7 @@ export function distToPoly(p: Pt, poly: Pt[]): number {
   if (inPoly(p, poly)) return 0;
   let d = Infinity;
   for (let i = 0; i < poly.length; i++)
-    d = Math.min(d, distToSeg(p, poly[i], poly[(i + 1) % poly.length]));
+    d = Math.min(d, distToSeg(p, at(poly, i), at(poly, (i + 1) % poly.length)));
   return d;
 }
 
@@ -201,7 +201,7 @@ export function neighbourPass(grid: HexResult[][]): number {
         const votes = new Map<string, number>();
         for (const n of neighbours(h.col, h.row)) {
           if (!n) continue;
-          const c = grid[n[1]][n[0]].cls;
+          const c = cellAt(grid, n[0], n[1]).cls;
           if (c !== 'unknown') votes.set(c, (votes.get(c) ?? 0) + 1);
         }
         if (votes.size === 0) continue;
@@ -218,8 +218,8 @@ export function neighbourPass(grid: HexResult[][]): number {
     }
     if (updates.length === 0) break;
     for (const [c, r, cls] of updates) {
-      grid[r][c].cls = cls;
-      grid[r][c].filled = true;
+      cellAt(grid, c, r).cls = cls;
+      cellAt(grid, c, r).filled = true;
       filled++;
     }
   }
@@ -241,7 +241,7 @@ export function outlierPass(grid: HexResult[][]): number {
       let same = 0;
       for (const n of neighbours(h.col, h.row)) {
         if (!n) continue;
-        const c = grid[n[1]][n[0]].cls;
+        const c = cellAt(grid, n[0], n[1]).cls;
         if (c === h.cls) same++;
         else votes.set(c, (votes.get(c) ?? 0) + 1);
       }
@@ -258,8 +258,8 @@ export function outlierPass(grid: HexResult[][]): number {
     }
   }
   for (const [c, r, cls] of updates) {
-    grid[r][c].cls = cls;
-    grid[r][c].filled = true;
+    cellAt(grid, c, r).cls = cls;
+    cellAt(grid, c, r).filled = true;
     changed++;
   }
   return changed;
@@ -279,7 +279,7 @@ export function assignCountries(grid: HexResult[][]): string[] {
       if (h.cls === SEA) {
         h.country = 'sea';
       } else if (DIRECT_CLASS_COUNTRY[h.cls]) {
-        h.country = DIRECT_CLASS_COUNTRY[h.cls];
+        h.country = DIRECT_CLASS_COUNTRY[h.cls] ?? '';
       } else {
         let best = '';
         let bd = Infinity;
@@ -300,7 +300,11 @@ export function assignCountries(grid: HexResult[][]): string[] {
   }
   for (const isl of ISLETS) {
     const h = hexOfPixel(isl.at[0], isl.at[1]);
-    if (h) grid[h.row][h.col].country = isl.id;
+    if (h) cellAt(grid, h.col, h.row).country = isl.id;
   }
   return warnings;
+}
+
+export function cellAt(grid: HexResult[][], col: number, row: number): HexResult {
+  return at(at(grid, row), col);
 }
