@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { idAttr } from '../lib/reveal.ts';
   import { formatBonus, formatInt } from '../lib/format.ts';
   import { rationItems } from '@shinobi/core';
   import { t } from '../lib/i18n.ts';
@@ -22,7 +23,7 @@
   <section class="ration" data-ration aria-label={t('mission.ration.title')}>
     <h2>{t('mission.ration.title')}</h2>
     {#each rations as r (r.id)}
-      <div class="row" data-ration-item={r.id} data-armed={r.armed}>
+      <div class="row" data-ration-item={idAttr('item', r.id)} data-armed={r.armed}>
         <Icon entity={{ kind: 'item', id: r.id }} size={18} />
         <span class="what">
           <EntityLink kind="item" id={r.id} />

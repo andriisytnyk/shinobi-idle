@@ -224,9 +224,8 @@ export const MIGRATIONS: readonly Migration[] = [
     }
     for (const id of keys(state.buffs)) mark(items, 'item', id);
     const report = isRecord(state.report) ? state.report : {};
-    for (const [target, entry] of Object.entries(report)) {
-      mark(enemies, 'enemy', target);
-      mark(bosses, 'boss', target);
+    for (const entry of Object.values(report)) {
+      // A report is kept by the id of a zone, an enemy, an operation or a mission, so its key says nothing of what was met: the book and the kill counters do.
       if (!isRecord(entry)) continue;
       if (isRecord(entry.loot)) for (const id of keys(entry.loot.items)) mark(items, 'item', id);
       for (const id of keys(entry.items)) mark(items, 'item', id);
@@ -234,6 +233,35 @@ export const MIGRATIONS: readonly Migration[] = [
     for (const id of keys(state.bingo)) {
       mark(enemies, 'enemy', id);
       mark(bosses, 'boss', id);
+    }
+    // What left no trace in the bank: rewards of the missions completed, the scrolls and parts of the
+    // techniques learned from scrolls, the products of the recipes practised.
+    const counters = isRecord(state.counters) ? state.counters : {};
+    const done = (id: string): boolean => {
+      const n = counters[`missions.done.${id}`];
+      return typeof n === 'number' && n > 0;
+    };
+    const known = isRecord(state.known) ? state.known : {};
+    for (const mission of content.missions) {
+      if (!done(mission.id)) continue;
+      for (const pay of mission.pay) {
+        if (pay.kind === 'item') mark(items, 'item', pay.item);
+        if (pay.kind === 'scrollPart') {
+          for (const item of content.items) {
+            if (item.part?.technique === pay.technique) mark(items, 'item', item.id);
+          }
+        }
+      }
+    }
+    for (const item of content.items) {
+      const technique = item.scroll?.technique ?? item.part?.technique;
+      if (technique !== undefined && known[technique] === true) mark(items, 'item', item.id);
+    }
+    const practised = new Set(keys(state.mastery));
+    for (const recipe of content.recipes) {
+      if (known[recipe.id] === true || practised.has(recipe.id)) {
+        mark(items, 'item', recipe.output.item);
+      }
     }
     return { ...state, shown };
   },

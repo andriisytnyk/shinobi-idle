@@ -146,8 +146,8 @@ export function createGame(deps: GameDeps = {}) {
   /** One-off happenings of this session that hints wait for (a craft that ran out of ingredients). */
   let signals = $state.raw<Signals>({});
 
-  // The reveal rule for the components: reading through `version` makes whatever uses it follow the game.
-  // Many links on a page ask about the same few entities: answers are kept for one update of the game.
+  // The reveal rule for the components: whatever reads it follows the stamp below.
+  // Many links on a page ask about the same few entities: answers are kept until the stamp moves.
   // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a cache that no view reads
   const levels = new Map<string, Map<string, RevealLevel>>();
   // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a cache that no view reads
@@ -246,7 +246,9 @@ export function createGame(deps: GameDeps = {}) {
   function drainEvents(): void {
     const events = state.events;
     if (events.length === 0) return;
+    // The listeners below may ask the reveal rule about what the event brought: the answers are dropped first.
     epoch++;
+    restamp();
     state.events = [];
     for (const listener of eventListeners) for (const event of events) listener(event);
     const lines: LogEntry[] = [];
@@ -504,6 +506,7 @@ export function createGame(deps: GameDeps = {}) {
       const result = coreDispatch(state, command, content, rules);
       // After the command: a reveal it caused must not wait for the next update.
       epoch++;
+      restamp();
       if (result.ok && command.type === 'action.start' && command.kind === 'fight') log = [];
       drainEvents();
       touch();

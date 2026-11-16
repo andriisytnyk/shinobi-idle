@@ -47,7 +47,7 @@
   class="ct-tile"
   class:running
   data-recipe={idAttr('recipe', info.id)}
-  data-action={info.id}
+  data-action={idAttr('recipe', info.id)}
   data-ui="action-tile"
   data-entity={entityAttr({ kind: 'recipe', id: info.id })}
 >
@@ -101,7 +101,7 @@
     <p class="ct-caption">{t('craft.makes')}</p>
     <ul class="ct-list" data-outputs>
       {#each info.outputs as out (out.item)}
-        <li class="output" data-output={out.item}>
+        <li class="output" data-output={idAttr('item', out.item)}>
           <Icon entity={{ kind: 'item', id: out.item }} size={18} />
           <span class="qty">&times;{formatInt(out.n)}</span>
           <EntityLink kind="item" id={out.item} offered />

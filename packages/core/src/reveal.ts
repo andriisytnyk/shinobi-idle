@@ -70,9 +70,6 @@ const packOf = (id: string): string => (id.includes(':') ? id.slice(0, id.indexO
 
 const catalogs = new WeakMap<ContentDb, Catalog>();
 
-/** How deep the data of an entity is searched for the ids it names. */
-const WALK_DEPTH = 6;
-
 function catalogOf(content: ContentDb): Catalog {
   const cached = catalogs.get(content);
   if (cached) return cached;
@@ -120,23 +117,29 @@ function catalogOf(content: ContentDb): Catalog {
   /** Every id inside the data that is an entity of the content, once each, with the name of the field that holds it. The `id` of the record itself is not a mention; a nested `id` (a requirement node `{ t: 'item', id }`) is, and its `t` names the kind. */
   const idsIn = (value: unknown, skip: string): [string, string][] => {
     const found = new Map<string, string>();
-    const walk = (v: unknown, depth: number, field: string): void => {
+    // The whole record is walked, however deep a requirement tree goes; a node met twice is not entered again.
+    const entered = new Set<object>();
+    const walk = (v: unknown, atRoot: boolean, field: string): void => {
       if (typeof v === 'string') {
         if (kindsOf.has(v) && !found.has(v) && (v !== skip || (kindsOf.get(v)?.length ?? 0) > 1)) {
           found.set(v, field);
         }
-      } else if (depth > 0 && Array.isArray(v)) {
-        for (const item of v) walk(item, depth - 1, field);
-      } else if (depth > 0 && v !== null && typeof v === 'object') {
+      } else if (Array.isArray(v)) {
+        if (entered.has(v)) return;
+        entered.add(v);
+        for (const item of v) walk(item, false, field);
+      } else if (v !== null && typeof v === 'object') {
+        if (entered.has(v)) return;
+        entered.add(v);
         const node = v as Record<string, unknown>;
         const kindName = typeof node.t === 'string' ? node.t : null;
         for (const [k, item] of Object.entries(node)) {
-          if (k === 'reveal' || (k === 'id' && depth === WALK_DEPTH)) continue;
-          walk(item, depth - 1, k === 'id' && kindName !== null ? kindName : k);
+          if (k === 'reveal' || (k === 'id' && atRoot)) continue;
+          walk(item, false, k === 'id' && kindName !== null ? kindName : k);
         }
       }
     };
-    walk(value, WALK_DEPTH, '');
+    walk(value, true, '');
     return [...found];
   };
   for (const entry of entries.values()) {
@@ -160,6 +163,17 @@ function catalogOf(content: ContentDb): Catalog {
         { t: 'entity', ref: { kind: 'skill', id: skill }, gate: 0 },
         entry.ref.kind,
       );
+    }
+  }
+  // The scroll of a technique and its parts name the technique; the page of the technique lists them.
+  for (const entry of entries.values()) {
+    if (entry.ref.kind !== 'item') continue;
+    for (const [id] of idsIn(entry.data, entry.ref.id)) {
+      for (const kind of kindsOf.get(id) ?? []) {
+        if (kind === 'technique') {
+          link(entry.ref.id, { t: 'entity', ref: { kind, id }, gate: 0 }, 'item');
+        }
+      }
     }
   }
   // The herbs are items that the patch skill gathers; its page lists them.

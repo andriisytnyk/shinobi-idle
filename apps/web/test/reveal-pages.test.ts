@@ -204,12 +204,34 @@ describe('typed addresses and fresh answers (R1)', () => {
     expect(words()).toBe(real);
   });
 
-  it('shows at once what a command has just revealed, without waiting for the next update', async () => {
+  it('shows at once what a command has just revealed, without waiting for an update or a new second', async () => {
+    const state = freshState();
+    booted = await bootApp([coreUi], state, '#/');
+    // The answer is cached: ask first, then let a command change it.
+    expect(revealLevel({ kind: 'item', id: 'core:water' })).toBe('name');
+    // A command that raises no event: only the epoch of the store can tell the cache that it is stale.
+    const water = { kind: 'item', id: 'core:water' };
+    expect(game.dispatch({ type: 'reveal.mark', refs: [water] }).ok).toBe(true);
+    expect(revealLevel({ kind: 'item', id: 'core:water' })).toBe('full');
+  });
+});
+
+describe('api.link inside a pack listener (R1)', () => {
+  it('answers with what the event has just brought, not with the answer of the update before', async () => {
     booted = await bootApp([coreUi], freshState(), '#/');
-    expect(revealLevel({ kind: 'enemy', id: 'core:dummy' })).toBe('name');
-    game.dispatch({ type: 'action.start', slot: 0, kind: 'fight', id: 'core:zone_dummy' });
-    game.devAdvance(60_000);
-    expect(revealLevel({ kind: 'enemy', id: 'core:dummy' })).toBe('full');
+    const api = booted.ui.createApi('core');
+    const crate = { kind: 'item', id: 'core:crate' };
+    let told: string | null = null;
+    api.on('event', (event) => {
+      if (event.type === 'itemGained') told = api.link(crate).text;
+    });
+    // The answer for the crate is cached as hidden; then the player gets one.
+    expect(api.link(crate).text).toBe('???');
+    game.state.bank['core:crate'] = 1;
+    game.state.events.push({ type: 'itemGained', id: 'core:crate', n: 1, at: 0 });
+    game.devAdvance(0);
+    expect(told).not.toBeNull();
+    expect(told).not.toBe('???');
   });
 });
 
@@ -326,7 +348,7 @@ describe('what the app prints during a run (R1, T3)', () => {
     const escape = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     for (const entity of hidden) {
       const own = resolveIcon({ kind: entity.kind, id: entity.id } as never).body;
-      const idPattern = new RegExp(`(?<![A-Za-z0-9_:])${escape(entity.id)}(?![A-Za-z0-9_])`);
+      const idPattern = new RegExp(`(?<![A-Za-z0-9_])${escape(entity.id)}(?![A-Za-z0-9_])`);
       for (const { at, html } of htmls) {
         if (!shownIds.has(entity.id)) {
           expect(idPattern.test(html), `id ${entity.kind}:${entity.id} on ${at}`).toBe(false);
@@ -341,7 +363,13 @@ describe('what the app prints during a run (R1, T3)', () => {
     for (const entity of hidden) {
       const { name, desc } = textsOf(entity);
       // A name that a shown entity also bears (or a word of the chrome) is not told apart here.
-      if (name.length < 4 || shownNames.has(name) || bornElsewhere(name, entity)) continue;
+      if (
+        name.length < 4 ||
+        shownNames.has(name) ||
+        [...shownNames].some((shown) => shown.includes(name)) ||
+        bornElsewhere(name, entity)
+      )
+        continue;
       for (const { at, text } of seen) {
         expect(
           text.includes(name) ? snippet(text, name) : '',

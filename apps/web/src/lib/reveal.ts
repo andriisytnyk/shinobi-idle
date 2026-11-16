@@ -5,15 +5,16 @@ import type { EntityRef } from './route.ts';
  * The reveal rule as the interface uses it. The core decides (`revealOf`); this module is the one
  * door the components and the name helpers go through, so nothing prints the name of an entity the
  * player has not discovered. `createGame` installs the reader that is tied to the running game and
- * its update counter, so a value read inside `$derived` follows the game; before a game exists
- * (and in tests that mount a component alone) everything counts as shown.
+ * a coarse stamp (it moves on a command, a drained event, a new state or a new game second), so a
+ * value read inside `$derived` follows the game without being recomputed on every tick; before a
+ * game exists (and in tests that mount a component alone) everything counts as shown.
  */
 
 /** What the interface prints in place of a name it may not show. */
 export const MASK = '???';
 
 export interface RevealReader {
-  /** How much of the entity may be shown; reactive through the game's update counter. */
+  /** How much of the entity may be shown; reactive through the stamp of the game. */
   level(ref: EntityRef): RevealLevel;
   /** The text key that says how to learn more, or null. */
   hint(ref: EntityRef): string | null;

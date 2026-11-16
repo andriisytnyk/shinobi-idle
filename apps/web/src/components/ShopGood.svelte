@@ -44,7 +44,9 @@
   const invalid = $derived(qty < 1);
   const poor = $derived(!invalid && ryo < total);
   const off = $derived(block !== null || invalid || poor);
-  const whyId = $derived(quiet ? 'shop-locked' : `why-good-${item}`);
+  const whyId = $derived(
+    quiet ? 'shop-locked' : `why-good-${idAttr('item', item) ?? 'undiscovered'}`,
+  );
 
   function buy(): void {
     if (off) return;
@@ -55,7 +57,7 @@
 
 <li
   class="ct-row good"
-  data-good={item}
+  data-good={idAttr('item', item)}
   data-owned={owned}
   data-ui="shop-good"
   data-entity={entityAttr({ kind: 'item', id: item })}

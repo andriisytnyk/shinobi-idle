@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { entityAttr } from '../lib/reveal.ts';
+  import { entityAttr, idAttr } from '../lib/reveal.ts';
   import type { ActionInfo } from '@shinobi/core';
   import { blockOf, blockText, bushView } from '../lib/crafts.ts';
   import { formatDuration, formatInt, formatSeconds, formatXp } from '../lib/format.ts';
@@ -52,8 +52,8 @@
 <li
   class="ct-tile"
   class:running
-  data-herb={info.id}
-  data-action={info.id}
+  data-herb={idAttr('item', info.id)}
+  data-action={idAttr('item', info.id)}
   data-ui="action-tile"
   data-entity={entityAttr({ kind: 'item', id: info.id })}
 >

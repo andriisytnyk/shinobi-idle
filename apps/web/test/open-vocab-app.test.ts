@@ -188,6 +188,8 @@ describe('the app booted with core and testmod (T1)', () => {
   it('prices a shop good in the currency of the pack and shows how much of it the player holds', async () => {
     const gs = state();
     gs.player.rank = 'testmod:adept';
+    // The pack shows its items only once held, so the player holds the good (a hidden row writes no id).
+    gs.bank['testmod:charm'] = 1;
     booted = await boot('#/shop', gs);
     const good = q('[data-good="testmod:charm"]');
     expect(good?.querySelector('[data-price]')?.textContent).toContain('жетон');

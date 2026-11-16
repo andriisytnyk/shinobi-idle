@@ -810,14 +810,12 @@
                   <span>
                     Репутація: 8
               <li>
-                <span class="reward" data-reward="item" data-ui="mission-reward">
-                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <circle cx="12" cy="12" r="1">
-                      <circle cx="12" cy="12" r="10">
+                <span class="reward" data-entity="item:core:scrollpart_fire_dragon_flame_bullet" data-reward="item" data-ui="mission-reward">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                    <path d="#1797-v7j9c3" fill="currentColor">
                   <span>
-                    <span class="entity-link masked" data-masked="" title="Здобудь це">
-                      ???
+                    <a class="entity-link" href="#/item/core:scrollpart_fire_dragon_flame_bullet">
+                      Частина сувою: Полум'яна куля вогняного дракона
                     <span class="chance">
                       шанс 15%
             <div class="why" data-why="error.missionNeedsTeam" id="why-core:dig">
