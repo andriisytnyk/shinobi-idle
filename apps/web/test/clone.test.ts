@@ -50,6 +50,20 @@ const drill = () => content.exercises.find((e) => e.level <= 20)?.id ?? '';
 const start = (state: GameState, slot: number, kind: string, id: string) =>
   dispatch(state, { type: 'action.start', slot, kind, id }, content);
 
+describe('learning the clone', () => {
+  it('reads the scroll from the Bank and opens the slot', async () => {
+    const state = player({ natures: ['katon'], levels: { nin: 50, med: 40 } });
+    state.bank['core:scroll_shadow_clone'] = 1;
+    booted = await bootApp([coreUi], state, '#/bank');
+    const button = q('[data-read="core:scroll_shadow_clone"]') as HTMLButtonElement | null;
+    expect(button?.textContent?.trim()).toBe(t('bank.read'));
+    button?.click();
+    flushSync();
+    expect(game.state.known[CLONE]).toBe(true);
+    expect(game.state.slots.length).toBe(2);
+  });
+});
+
 describe('the clone in the Now bar', () => {
   it('marks the clone slot with the tag «Клон:» and gives it «Розвіяти» in place of «Зупинити»', async () => {
     const state = cloner();
