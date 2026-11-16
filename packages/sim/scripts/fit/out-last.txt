@@ -1,142 +1,142 @@
-A core:dummy             win 100->100 t 12.5->16.5 x1.32 basic 70%(not full) <<<
-A core:bandit            win 100->100 t 21.4->27.1 x1.27 basic 74%(not full) <<<
-A core:arsonist          win 100->100 t 26.8->31.6 x1.18 basic 77%(not full) 
-A core:wolf              win 100->100 t 38.1->47.7 x1.25 basic 77%(not full) <<<
-A core:wolfmask          win 100->100 t 21.7->29.3 x1.35 basic 46%(not full) <<<
-A core:centipede         win 100->100 t 28.4->47.0 x1.66 basic 44% <<<
-A core:tiger             win 100->100 t 32.4->65.8 x2.03 basic 51% <<<
-A core:thief             win 100->100 t 38.0->55.7 x1.46 basic 47% <<<
-A core:merc_pack         win 100->100 t 32.4->52.9 x1.63 basic 45% <<<
-A core:heavy             win 100->100 t 43.8->65.5 x1.50 basic 51% <<<
-A core:marauder          win 100->100 t 46.7->70.3 x1.51 basic 49% <<<
-A core:poisoner          win 100->100 t 28.2->44.2 x1.56 basic 46% <<<
-A core:kumo              win 100->100 t 30.6->45.2 x1.48 basic 46% <<<
-A core:suna              win 100->100 t 28.5->43.3 x1.52 basic 46% <<<
-A core:hunter            win 100->100 t 48.8->91.6 x1.88 basic 22% <<<
-A core:hunter_caster     win 100->100 t 29.3->46.8 x1.59 basic 22% <<<
-A core:kiri_hunter       win 100->100 t 37.0->53.4 x1.44 basic 41% <<<
-A core:guard_pack        win 100->100 t 53.7->89.7 x1.67 basic 30% <<<
-A core:veteran           win 100->100 t 45.4->71.3 x1.57 basic 24% <<<
-A core:oro_aide          win 99->100 t 29.6->46.2 x1.56 basic 14% <<<
-A core:serpent           win 100->100 t 33.4->60.3 x1.81 basic 23% <<<
-A core:leech             win 97->85 t 30.5->46.0 x1.51 basic 36% <<<
-A core:fake_genin        win 100->100 t 53.1->63.4 x1.19 basic 21% 
-A core:foreign_genin     win 100->100 t 31.6->42.7 x1.35 basic 31% <<<
-A core:boss_wolf         win 1->30 t 96.2->159.8 x1.66 basic 47% <<<
-A core:boss_ren1         win 15->75 t 95.5->154.7 x1.62 basic 56% <<<
-A core:boss_fighter      win 0->0 t -->- x- basic 28% 
-A core:boss_hunter       win 0->0 t -->- x- basic 41% <<<
-A core:boss_twins        win 0->0 t -->- x- basic 43% <<<
-A core:boss_mist         win 1->0 t 125.5->- x- basic 57% <<<
-A core:boss_nameless     win 0->10 t -->151.1 x- basic 40% <<<
-A core:boss_ren2         win 1->25 t 118.3->164.5 x1.39 basic 51% <<<
-B core:dummy             win 100->100 t 12.5->16.5 x1.32 basic 70%(not full) <<<
-B core:bandit            win 100->100 t 21.4->27.1 x1.27 basic 74%(not full) <<<
-B core:arsonist          win 100->100 t 26.8->31.6 x1.18 basic 77%(not full) 
-B core:wolf              win 100->100 t 38.1->47.7 x1.25 basic 77%(not full) <<<
-B core:wolfmask          win 100->100 t 19.1->33.1 x1.73 basic 32% <<<
-B core:centipede         win 100->100 t 28.4->47.0 x1.66 basic 44% <<<
-B core:tiger             win 100->100 t 32.4->63.8 x1.97 basic 51% <<<
-B core:thief             win 100->100 t 32.3->56.3 x1.74 basic 41% <<<
-B core:merc_pack         win 100->100 t 32.4->53.9 x1.66 basic 45% <<<
-B core:heavy             win 100->100 t 43.8->62.7 x1.43 basic 52% <<<
-B core:marauder          win 100->100 t 38.9->69.8 x1.79 basic 43% <<<
-B core:poisoner          win 100->100 t 28.2->44.2 x1.56 basic 46% <<<
-B core:kumo              win 100->100 t 30.6->44.6 x1.46 basic 47% <<<
-B core:suna              win 100->100 t 28.5->42.3 x1.48 basic 46% <<<
-B core:hunter            win 100->100 t 48.8->88.5 x1.81 basic 26% <<<
-B core:hunter_caster     win 100->100 t 29.3->48.7 x1.66 basic 23% <<<
-B core:kiri_hunter       win 100->100 t 35.5->53.6 x1.51 basic 40% <<<
-B core:guard_pack        win 100->100 t 53.7->94.0 x1.75 basic 28% <<<
-B core:veteran           win 100->100 t 40.4->74.2 x1.84 basic 26% <<<
-B core:oro_aide          win 99->100 t 29.6->46.2 x1.56 basic 14% <<<
-B core:serpent           win 100->100 t 33.4->62.4 x1.87 basic 23% <<<
-B core:leech             win 97->95 t 30.5->47.6 x1.56 basic 36% <<<
-B core:fake_genin        win 100->100 t 53.1->62.7 x1.18 basic 20% 
-B core:foreign_genin     win 100->100 t 30.4->39.3 x1.29 basic 17% <<<
-B core:boss_wolf         win 1->50 t 96.2->176.7 x1.84 basic 47% <<<
-B core:boss_ren1         win 15->70 t 95.5->153.7 x1.61 basic 57% <<<
-B core:boss_fighter      win 0->0 t -->- x- basic 35% 
-B core:boss_hunter       win 0->5 t -->187.9 x- basic 46% <<<
-B core:boss_twins        win 0->0 t -->- x- basic 44% <<<
-B core:boss_mist         win 0->40 t -->138.4 x- basic 57% <<<
-B core:boss_nameless     win 0->20 t -->133.5 x- basic 49% <<<
-B core:boss_ren2         win 0->80 t -->151.5 x- basic 59% <<<
-C core:dummy             win 100->100 t 7.0->6.4 x0.91 basic 16%(not full) 
-C core:bandit            win 100->100 t 16.1->11.5 x0.72 basic 47%(not full) <<<
-C core:arsonist          win 100->100 t 21.4->15.0 x0.70 basic 55%(not full) <<<
+A core:dummy             win 100->100 t 12.5->10.0 x0.80 basic 77%(not full) 
+A core:bandit            win 100->100 t 21.4->20.2 x0.94 basic 84%(not full) 
+A core:arsonist          win 100->100 t 26.8->24.3 x0.91 basic 85%(not full) 
+A core:wolf              win 100->100 t 38.1->32.7 x0.86 basic 85%(not full) 
+A core:wolfmask          win 100->100 t 21.7->22.5 x1.04 basic 55%(not full) 
+A core:centipede         win 100->100 t 28.4->34.6 x1.22 basic 50% <<<
+A core:tiger             win 100->100 t 32.4->38.6 x1.19 basic 59% <<<
+A core:thief             win 100->100 t 38.0->38.5 x1.01 basic 54% <<<
+A core:merc_pack         win 100->100 t 32.4->39.0 x1.21 basic 51% <<<
+A core:heavy             win 100->100 t 43.8->49.1 x1.12 basic 57% <<<
+A core:marauder          win 100->100 t 46.7->50.5 x1.08 basic 57% <<<
+A core:poisoner          win 100->100 t 28.2->34.3 x1.21 basic 51% <<<
+A core:kumo              win 100->100 t 30.6->36.1 x1.18 basic 52% <<<
+A core:suna              win 100->100 t 28.5->34.8 x1.22 basic 52% <<<
+A core:hunter            win 100->100 t 48.8->53.4 x1.09 basic 51% <<<
+A core:hunter_caster     win 100->100 t 29.3->32.9 x1.12 basic 44% <<<
+A core:kiri_hunter       win 100->100 t 37.0->35.8 x0.97 basic 60% <<<
+A core:guard_pack        win 100->100 t 53.7->61.9 x1.15 basic 55% <<<
+A core:veteran           win 100->100 t 45.4->45.7 x1.01 basic 45% <<<
+A core:oro_aide          win 99->97 t 29.6->30.7 x1.04 basic 43% <<<
+A core:serpent           win 100->100 t 33.4->37.0 x1.11 basic 44% <<<
+A core:leech             win 97->100 t 30.5->38.9 x1.27 basic 50% <<<
+A core:fake_genin        win 100->100 t 53.1->46.8 x0.88 basic 45% <<<
+A core:foreign_genin     win 100->100 t 31.6->32.3 x1.02 basic 44% <<<
+A core:boss_wolf         win 1->17 t 96.2->118.5 x1.23 basic 61% <<<
+A core:boss_ren1         win 15->33 t 95.5->122.3 x1.28 basic 64% <<<
+A core:boss_fighter      win 0->0 t -->- x- basic 56% <<<
+A core:boss_hunter       win 0->0 t -->- x- basic 57% <<<
+A core:boss_twins        win 0->0 t -->- x- basic 59% <<<
+A core:boss_mist         win 1->3 t 125.5->109.2 x0.87 basic 66% <<<
+A core:boss_nameless     win 0->0 t -->- x- basic 50% <<<
+A core:boss_ren2         win 1->33 t 118.3->128.8 x1.09 basic 62% <<<
+B core:dummy             win 100->100 t 12.5->10.0 x0.80 basic 77%(not full) 
+B core:bandit            win 100->100 t 21.4->20.2 x0.94 basic 84%(not full) 
+B core:arsonist          win 100->100 t 26.8->24.3 x0.91 basic 85%(not full) 
+B core:wolf              win 100->100 t 38.1->32.7 x0.86 basic 85%(not full) 
+B core:wolfmask          win 100->100 t 19.1->23.5 x1.23 basic 51% <<<
+B core:centipede         win 100->100 t 28.4->34.7 x1.22 basic 50% <<<
+B core:tiger             win 100->100 t 32.4->38.7 x1.19 basic 58% <<<
+B core:thief             win 100->100 t 32.3->40.8 x1.26 basic 50% <<<
+B core:merc_pack         win 100->100 t 32.4->38.0 x1.17 basic 51% <<<
+B core:heavy             win 100->100 t 43.8->49.2 x1.12 basic 57% <<<
+B core:marauder          win 100->100 t 38.9->50.4 x1.30 basic 54% <<<
+B core:poisoner          win 100->100 t 28.2->34.3 x1.21 basic 51% <<<
+B core:kumo              win 100->100 t 30.6->35.9 x1.17 basic 52% <<<
+B core:suna              win 100->100 t 28.5->34.8 x1.22 basic 52% <<<
+B core:hunter            win 100->100 t 48.8->53.8 x1.10 basic 50% <<<
+B core:hunter_caster     win 100->100 t 29.3->32.5 x1.11 basic 44% <<<
+B core:kiri_hunter       win 100->100 t 35.5->36.2 x1.02 basic 60% <<<
+B core:guard_pack        win 100->100 t 53.7->61.0 x1.14 basic 56% <<<
+B core:veteran           win 100->100 t 40.4->49.1 x1.22 basic 50% <<<
+B core:oro_aide          win 99->97 t 29.6->30.7 x1.04 basic 43% <<<
+B core:serpent           win 100->100 t 33.4->37.0 x1.11 basic 45% <<<
+B core:leech             win 97->100 t 30.5->38.9 x1.27 basic 50% <<<
+B core:fake_genin        win 100->100 t 53.1->46.2 x0.87 basic 46% <<<
+B core:foreign_genin     win 100->100 t 30.4->30.1 x0.99 basic 42% <<<
+B core:boss_wolf         win 1->20 t 96.2->120.8 x1.26 basic 61% <<<
+B core:boss_ren1         win 15->37 t 95.5->124.3 x1.30 basic 64% <<<
+B core:boss_fighter      win 0->0 t -->- x- basic 56% <<<
+B core:boss_hunter       win 0->0 t -->- x- basic 57% <<<
+B core:boss_twins        win 0->0 t -->- x- basic 59% <<<
+B core:boss_mist         win 0->10 t -->117.4 x- basic 62% <<<
+B core:boss_nameless     win 0->7 t -->132.2 x- basic 52% <<<
+B core:boss_ren2         win 0->63 t -->121.4 x- basic 67% <<<
+C core:dummy             win 100->100 t 7.0->5.4 x0.76 basic 8%(not full) 
+C core:bandit            win 100->100 t 16.1->10.0 x0.62 basic 45%(not full) <<<
+C core:arsonist          win 100->100 t 21.4->12.6 x0.59 basic 57%(not full) <<<
 C core:wolf              win 100->100 t 1.5->2.5 x1.67 basic 0%(not full) <<<
-C core:wolfmask          win 100->100 t 17.4->20.4 x1.18 basic 30%(not full) 
-C core:centipede         win 100->100 t 22.8->29.1 x1.27 basic 26% <<<
-C core:tiger             win 100->100 t 22.5->37.6 x1.67 basic 26% <<<
-C core:thief             win 100->100 t 11.3->27.3 x2.41 basic 20% <<<
-C core:merc_pack         win 100->100 t 7.8->14.0 x1.79 basic 2% <<<
-C core:heavy             win 100->100 t 34.3->49.8 x1.45 basic 32% <<<
-C core:marauder          win 100->100 t 13.8->43.1 x3.13 basic 14% <<<
-C core:poisoner          win 100->100 t 20.7->30.1 x1.45 basic 24% <<<
-C core:kumo              win 100->100 t 32.6->42.0 x1.29 basic 34% <<<
-C core:suna              win 100->100 t 21.4->32.8 x1.54 basic 26% <<<
-C core:hunter            win 100->100 t 16.1->37.2 x2.31 basic 2% <<<
-C core:hunter_caster     win 100->100 t 29.5->33.6 x1.14 basic 28% 
-C core:kiri_hunter       win 100->100 t 27.1->39.5 x1.46 basic 23% <<<
-C core:guard_pack        win 100->100 t 23.5->37.2 x1.58 basic 7% <<<
-C core:veteran           win 100->100 t 36.2->48.2 x1.33 basic 19% <<<
-C core:oro_aide          win 100->100 t 22.9->32.3 x1.41 basic 13% <<<
-C core:serpent           win 100->100 t 25.7->37.0 x1.44 basic 14% <<<
-C core:leech             win 100->100 t 9.4->14.9 x1.58 basic 0% <<<
-C core:fake_genin        win 100->100 t 38.5->43.0 x1.12 basic 17% 
-C core:foreign_genin     win 100->100 t 27.6->40.2 x1.46 basic 17% <<<
-C core:boss_wolf         win 26->95 t 86.8->144.4 x1.66 basic 27% <<<
-C core:boss_ren1         win 23->100 t 85.7->139.6 x1.63 basic 41% <<<
-C core:boss_fighter      win 3->5 t 129.2->209.5 x1.62 basic 21% <<<
-C core:boss_hunter       win 7->5 t 100.1->133.6 x1.33 basic 35% <<<
-C core:boss_twins        win 0->0 t -->- x- basic 27% 
-C core:boss_mist         win 1->25 t 130.6->141.4 x1.08 basic 52% <<<
-C core:boss_nameless     win 1->0 t 119.5->- x- basic 32% 
-C core:boss_ren2         win 1->20 t 115.9->162.5 x1.40 basic 46% <<<
-D core:dummy             win 100->100 t 12.5->10.3 x0.83 basic 79%(not full) 
-D core:bandit            win 100->100 t 21.4->16.9 x0.79 basic 78%(not full) <<<
-D core:arsonist          win 100->100 t 26.8->20.5 x0.76 basic 82%(not full) <<<
-D core:wolf              win 100->100 t 25.9->34.7 x1.34 basic 43%(not full) <<<
-D core:wolfmask          win 100->100 t 21.7->29.3 x1.35 basic 46%(not full) <<<
-D core:centipede         win 100->100 t 28.4->47.0 x1.66 basic 44% <<<
-D core:tiger             win 100->100 t 32.4->65.8 x2.03 basic 51% <<<
-D core:thief             win 100->100 t 38.0->55.7 x1.46 basic 47% <<<
-D core:merc_pack         win 100->100 t 32.4->52.9 x1.63 basic 45% <<<
-D core:heavy             win 100->100 t 43.8->65.5 x1.50 basic 51% <<<
-D core:marauder          win 100->100 t 46.7->70.3 x1.51 basic 49% <<<
-D core:poisoner          win 100->100 t 28.2->44.2 x1.56 basic 46% <<<
-D core:kumo              win 100->100 t 30.6->45.2 x1.48 basic 46% <<<
-D core:suna              win 100->100 t 28.5->43.3 x1.52 basic 46% <<<
-D core:hunter            win 100->100 t 48.8->91.6 x1.88 basic 22% <<<
-D core:hunter_caster     win 100->100 t 29.3->46.8 x1.59 basic 22% <<<
-D core:kiri_hunter       win 100->100 t 37.0->53.4 x1.44 basic 41% <<<
-D core:guard_pack        win 100->100 t 53.7->89.7 x1.67 basic 30% <<<
-D core:veteran           win 100->100 t 45.4->71.3 x1.57 basic 24% <<<
-D core:oro_aide          win 99->100 t 29.6->46.2 x1.56 basic 14% <<<
-D core:serpent           win 100->100 t 33.4->60.3 x1.81 basic 23% <<<
-D core:leech             win 97->85 t 30.5->46.0 x1.51 basic 36% <<<
-D core:fake_genin        win 100->100 t 53.1->63.4 x1.19 basic 21% 
-D core:foreign_genin     win 100->100 t 34.5->62.7 x1.82 basic 24% <<<
-D core:boss_wolf         win 1->30 t 96.2->159.8 x1.66 basic 47% <<<
-D core:boss_ren1         win 15->75 t 95.5->154.7 x1.62 basic 56% <<<
-D core:boss_fighter      win 0->0 t -->- x- basic 28% 
-D core:boss_hunter       win 0->0 t -->- x- basic 41% <<<
-D core:boss_twins        win 0->0 t -->- x- basic 43% <<<
-D core:boss_mist         win 1->0 t 128.0->- x- basic 44% <<<
-D core:boss_nameless     win 0->0 t -->- x- basic 33% 
-D core:boss_ren2         win 1->5 t 130.4->182.2 x1.40 basic 50% <<<
-CURVES 0.040
-boss_wolf      cl22 full 0.93 none 0.93 unfav 0.90 empty 0.33 below 0.20 <<<
-boss_ren1      cl26 full 1.00 none 1.00 unfav 0.97 empty 0.53 below 0.83 <<<
-boss_fighter   cl32 full 0.77 none 0.00 unfav 0.13 empty 0.00 below 0.00 
-boss_hunter    cl36 full 0.73 none 0.23 unfav 0.47 empty 0.00 below 0.20 
-boss_twins     cl38 full 0.90 none 0.30 unfav 0.47 empty 0.00 below 0.13 <<<
-boss_mist      cl40 full 0.67 none 0.23 unfav 0.30 empty 0.00 below 0.33 
-boss_nameless  cl44 full 0.77 none 0.40 unfav 0.03 empty 0.00 below 0.33 
-boss_ren2      cl42 full 1.00 none 1.00 unfav 0.73 empty 0.43 below 0.43 <<<
-ANSWER evasive  with/without 0.95 <<<
-ANSWER regen    with/without 0.38 
+C core:wolfmask          win 100->100 t 17.4->17.1 x0.99 basic 38%(not full) 
+C core:centipede         win 100->100 t 22.8->23.0 x1.01 basic 33% 
+C core:tiger             win 100->100 t 22.5->28.1 x1.25 basic 39% <<<
+C core:thief             win 100->100 t 11.3->21.4 x1.89 basic 20% <<<
+C core:merc_pack         win 100->100 t 7.8->13.2 x1.69 basic 4% <<<
+C core:heavy             win 100->100 t 34.3->37.5 x1.09 basic 45% <<<
+C core:marauder          win 100->100 t 13.8->28.1 x2.04 basic 25% <<<
+C core:poisoner          win 100->100 t 20.7->26.5 x1.28 basic 34% <<<
+C core:kumo              win 100->100 t 32.6->28.3 x0.87 basic 52% <<<
+C core:suna              win 100->100 t 21.4->27.3 x1.28 basic 35% <<<
+C core:hunter            win 100->100 t 16.1->25.9 x1.61 basic 9% <<<
+C core:hunter_caster     win 100->100 t 29.5->28.9 x0.98 basic 36% 
+C core:kiri_hunter       win 100->100 t 27.1->31.4 x1.16 basic 37% 
+C core:guard_pack        win 100->100 t 23.5->28.9 x1.23 basic 13% 
+C core:veteran           win 100->100 t 36.2->39.1 x1.08 basic 32% 
+C core:oro_aide          win 100->100 t 22.9->26.9 x1.17 basic 23% 
+C core:serpent           win 100->100 t 25.7->32.1 x1.25 basic 28% <<<
+C core:leech             win 100->100 t 9.4->14.1 x1.49 basic 4% <<<
+C core:fake_genin        win 100->100 t 38.5->37.4 x0.97 basic 26% 
+C core:foreign_genin     win 100->100 t 27.6->32.2 x1.17 basic 31% 
+C core:boss_wolf         win 26->90 t 86.8->107.2 x1.23 basic 41% <<<
+C core:boss_ren1         win 23->83 t 85.7->98.1 x1.14 basic 61% <<<
+C core:boss_fighter      win 3->3 t 129.2->183.0 x1.42 basic 41% <<<
+C core:boss_hunter       win 7->30 t 100.1->114.7 x1.15 basic 46% <<<
+C core:boss_twins        win 0->0 t -->- x- basic 50% <<<
+C core:boss_mist         win 1->0 t 130.6->- x- basic 60% <<<
+C core:boss_nameless     win 1->0 t 119.5->- x- basic 46% <<<
+C core:boss_ren2         win 1->20 t 115.9->134.2 x1.16 basic 58% <<<
+D core:dummy             win 100->100 t 12.5->6.6 x0.53 basic 77%(not full) <<<
+D core:bandit            win 100->100 t 21.4->11.9 x0.56 basic 86%(not full) <<<
+D core:arsonist          win 100->100 t 26.8->16.1 x0.60 basic 85%(not full) <<<
+D core:wolf              win 100->100 t 25.9->26.5 x1.02 basic 52%(not full) 
+D core:wolfmask          win 100->100 t 21.7->22.5 x1.04 basic 55%(not full) 
+D core:centipede         win 100->100 t 28.4->34.6 x1.22 basic 50% <<<
+D core:tiger             win 100->100 t 32.4->38.6 x1.19 basic 59% <<<
+D core:thief             win 100->100 t 38.0->38.5 x1.01 basic 54% <<<
+D core:merc_pack         win 100->100 t 32.4->39.0 x1.21 basic 51% <<<
+D core:heavy             win 100->100 t 43.8->49.1 x1.12 basic 57% <<<
+D core:marauder          win 100->100 t 46.7->50.5 x1.08 basic 57% <<<
+D core:poisoner          win 100->100 t 28.2->34.3 x1.21 basic 51% <<<
+D core:kumo              win 100->100 t 30.6->36.1 x1.18 basic 52% <<<
+D core:suna              win 100->100 t 28.5->34.8 x1.22 basic 52% <<<
+D core:hunter            win 100->100 t 48.8->53.4 x1.09 basic 51% <<<
+D core:hunter_caster     win 100->100 t 29.3->32.9 x1.12 basic 44% <<<
+D core:kiri_hunter       win 100->100 t 37.0->35.8 x0.97 basic 60% <<<
+D core:guard_pack        win 100->100 t 53.7->61.9 x1.15 basic 55% <<<
+D core:veteran           win 100->100 t 45.4->45.7 x1.01 basic 45% <<<
+D core:oro_aide          win 99->97 t 29.6->30.7 x1.04 basic 43% <<<
+D core:serpent           win 100->100 t 33.4->37.0 x1.11 basic 44% <<<
+D core:leech             win 97->100 t 30.5->38.9 x1.27 basic 50% <<<
+D core:fake_genin        win 100->100 t 53.1->46.8 x0.88 basic 45% <<<
+D core:foreign_genin     win 100->100 t 34.5->36.8 x1.07 basic 50% <<<
+D core:boss_wolf         win 1->17 t 96.2->118.5 x1.23 basic 61% <<<
+D core:boss_ren1         win 15->33 t 95.5->122.3 x1.28 basic 64% <<<
+D core:boss_fighter      win 0->0 t -->- x- basic 56% <<<
+D core:boss_hunter       win 0->0 t -->- x- basic 57% <<<
+D core:boss_twins        win 0->0 t -->- x- basic 59% <<<
+D core:boss_mist         win 1->0 t 128.0->- x- basic 68% <<<
+D core:boss_nameless     win 0->0 t -->- x- basic 48% <<<
+D core:boss_ren2         win 1->7 t 130.4->139.8 x1.07 basic 67% <<<
+CURVES 0.388
+boss_wolf      cl22 full 0.97 none 0.97 unfav 1.00 empty 0.10 below 0.47 <<<
+boss_ren1      cl26 full 1.00 none 1.00 unfav 0.97 empty 0.40 below 0.57 <<<
+boss_fighter   cl32 full 0.80 none 0.33 unfav 0.30 empty 0.00 below 0.00 
+boss_hunter    cl36 full 0.90 none 0.43 unfav 0.67 empty 0.00 below 0.43 <<<
+boss_twins     cl38 full 0.77 none 0.20 unfav 0.43 empty 0.00 below 0.13 
+boss_mist      cl40 full 0.77 none 0.07 unfav 0.57 empty 0.00 below 0.20 
+boss_nameless  cl44 full 0.53 none 0.27 unfav 0.20 empty 0.00 below 0.17 <<<
+boss_ren2      cl42 full 1.00 none 1.00 unfav 0.80 empty 0.13 below 0.87 <<<
+ANSWER evasive  with/without 0.86 <<<
+ANSWER regen    with/without 0.63 
 ANSWER hidden   with/without 0.79 
 SUSTAINED bandit         defeats katon 0 doton 0 
 SUSTAINED arsonist       defeats katon 0 doton 0 
@@ -150,14 +150,14 @@ SUSTAINED marauder       defeats katon 0 doton 0
 SUSTAINED poisoner       defeats katon 0 doton 0 
 SUSTAINED kumo           defeats katon 0 doton 0 
 SUSTAINED suna           defeats katon 0 doton 0 
-SUSTAINED hunter         defeats katon 0 doton 0 
+SUSTAINED hunter         defeats katon 0 doton 1 
 SUSTAINED hunter_caster  defeats katon 0 doton 0 
 SUSTAINED kiri_hunter    defeats katon 0 doton 0 
 SUSTAINED guard_pack     defeats katon 0 doton 0 
 SUSTAINED veteran        defeats katon 0 doton 0 
-SUSTAINED oro_aide       defeats katon 20 doton 36 <<<
-SUSTAINED serpent        defeats katon 0 doton 47 <<<
-SUSTAINED leech          defeats katon 90 doton 110 <<<
+SUSTAINED oro_aide       defeats katon 0 doton 1 
+SUSTAINED serpent        defeats katon 0 doton 0 
+SUSTAINED leech          defeats katon 40 doton 83 <<<
 SUSTAINED fake_genin     defeats katon 0 doton 1 
 SUSTAINED foreign_genin  defeats katon 0 doton 0 
-TIP 36:0.00 38:0.10 40:0.20 42:0.30 44:0.45 46:0.50 48:0.65 50:0.85 err 1.41
+TIP 36:0.10 38:0.40 40:0.30 42:0.70 44:0.80 46:0.95 48:1.00 50:1.00 err 0.43

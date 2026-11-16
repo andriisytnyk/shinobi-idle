@@ -85,10 +85,8 @@ set(/rhythm: { slow:([0-9.]+),/, (v) => r2(Math.min(0.95, v * (k.rhSlow ?? 1)), 
 set(/rhythm: { slow:[0-9.]+, dur:([0-9.]+)/, (v) => r2(v * (k.rhDur ?? 1), 2));
 set(/evasive:([0-9.]+),/, (v) => r2(v * (k.evasive ?? 1), 2));
 set(/hiddenAcc:([0-9.]+),/, (v) => r2(v * (k.hiddenAcc ?? 1), 2));
-set(/evaLevel: { k:([0-9.]+)/, (v) => r2(v * (k.evaK ?? 1), 3));
-set(/evaLevel: { k:[0-9.]+, min:([0-9.]+)/, (v) => r2(v * (k.evaMin ?? 1), 3));
-set(/evaLevel: { k:[0-9.]+, min:[0-9.]+, max:([0-9.]+)/, (v) => r2(v * (k.evaMax ?? 1), 3));
-set(/defence: { masteryToLevel:([0-9.]+)/, (v) => r2(v * (k.mtl ?? 1), 3));
+set(/evaLevel: { min:([0-9.]+)/, (v) => r2(v * (k.evaMin ?? 1), 3));
+set(/evaLevel: { min:[0-9.]+, max:([0-9.]+)/, (v) => r2(v * (k.evaMax ?? 1), 3));
 set(/bind: { dur:([0-9.]+)/, (v) => r2(v * (k.bindDur ?? 1), 2));
 fs.writeFileSync(bp, b);
 const pp = root + 'docs/Shinobi Idle — MVP — зріз і баланс/patch.mjs';

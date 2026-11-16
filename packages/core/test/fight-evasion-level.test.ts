@@ -1,7 +1,6 @@
 /**
- * A defensive technique works at its effective level, the lower of the level of its skill and its mastery times
- * K.defence.masteryToLevel; it adds its row of K.passiveFx times clamp(1 + k x (effective level - attacker level), min,
- * max). Enemies are unchanged.
+ * A defensive technique works at its effective level, its skill level times its mastery over the mastery cap, and adds
+ * its row of K.passiveFx times clamp(effective level / attacker combat level, min, max). Enemies are unchanged.
  */
 import { content } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
@@ -33,55 +32,63 @@ const against = (skill: number, mastery: number, attacker: number) =>
   clone(partsAgainst(evasionParts(snapWith(skill, mastery), content), attacker, content));
 
 describe('the factor of an effective level against the level of the attacker', () => {
-  it('is 1 at equal levels, 1 + k per level, and clamped between min and max', () => {
-    expect(levelScale(0, content)).toBe(1);
-    expect(levelScale(5, content)).toBeCloseTo(1 + 5 * L.k, 9);
-    expect(levelScale(-5, content)).toBeCloseTo(1 - 5 * L.k, 9);
-    expect(levelScale(1000, content)).toBe(L.max);
-    expect(levelScale(-1000, content)).toBe(L.min);
+  it('is their ratio, clamped between min and max', () => {
+    expect(levelScale(20, 40, content)).toBeCloseTo(0.5, 9);
+    expect(levelScale(40, 40, content)).toBe(1);
+    expect(levelScale(0.001, 40, content)).toBe(L.min);
+    expect(levelScale(1000, 40, content)).toBe(L.max);
   });
 });
 
 describe('the effective level of a defensive technique', () => {
-  it('is the lower of its skill level and its mastery times masteryToLevel, and names the one that limits it', () => {
-    const m = K.defence.masteryToLevel;
-    const lowMastery = clone(evasionParts(snapWith(45, 12), content));
-    expect(lowMastery.effectiveLevel).toBeCloseTo(12 * m, 9);
-    expect(lowMastery.limit).toBe('mastery');
-    const lowSkill = clone(evasionParts(snapWith(20, 99), content));
-    expect(lowSkill.effectiveLevel).toBe(20);
-    expect(lowSkill.limit).toBe('skill');
-    expect(lowSkill.skillLevel).toBe(20);
-    expect(lowSkill.masteryLevel).toBe(99);
+  it('is the share of its skill that its mastery realises', () => {
+    expect(clone(evasionParts(snapWith(20, K.masteryCap), content)).effectiveLevel).toBeCloseTo(
+      20,
+      9,
+    );
+    expect(clone(evasionParts(snapWith(80, 80), content)).effectiveLevel).toBeCloseTo(
+      (80 * 80) / K.masteryCap,
+      9,
+    );
+    expect(clone(evasionParts(snapWith(45, 1), content)).effectiveLevel).toBeCloseTo(
+      45 / K.masteryCap,
+      9,
+    );
   });
 
-  it('gives as little at mastery 1 with skill 45 as with skill 5: a high skill does not defend an untrained technique', () => {
-    const high = against(45, 1, 30);
-    const low = against(5, 1, 30);
-    expect(high.effectiveLevel).toBeCloseTo(low.effectiveLevel ?? 0, 0);
-    expect(Math.abs(high.value - low.value)).toBeLessThan(0.1 * (high.full ?? 1));
-    expect(high.value).toBeLessThan(0.3 * (high.full ?? 1));
+  it('carries the skill, the mastery, the effective level, the ratio and the adjustment on the part', () => {
+    const part = against(40, 50, 60);
+    expect(part.skillLevel).toBe(40);
+    expect(part.masteryLevel).toBe(50);
+    expect(part.effectiveLevel).toBeCloseTo((40 * 50) / K.masteryCap, 9);
+    expect(part.ratio).toBeCloseTo(part.effectiveLevel! / 60, 9);
+    expect(part.levelAdj).toBeCloseTo(part.value - part.full!, 9);
   });
 
-  it('is held by the skill when the mastery is high: mastery 99 with skill 20 is no better than mastery 40 with skill 20', () => {
-    const maxed = against(20, 99, 20);
-    const mid = against(20, 40, 20);
-    expect(maxed.limit).toBe('skill');
-    expect(maxed.value).toBeCloseTo(mid.value, 9);
+  it('grows with the skill and with the mastery', () => {
+    expect(against(40, 60, 40).value).toBeGreaterThan(against(20, 60, 40).value);
+    expect(against(40, 80, 40).value).toBeGreaterThan(against(40, 30, 40).value);
   });
 
-  it('adds more with more mastery while the mastery is the limit', () => {
-    expect(against(45, 60, 30).value).toBeGreaterThan(against(45, 20, 30).value);
+  it('adds almost nothing at mastery 1, at any skill', () => {
+    for (const skill of [5, 25, 45, 80]) {
+      expect(against(skill, 1, 40).value).toBeLessThan(
+        0.05 * 40 * (against(skill, 1, 40).full ?? 1),
+      );
+    }
   });
 
-  it('adds less against an attacker of a higher level, and names the adjustment on the part', () => {
+  it('adds less against an attacker of a higher level', () => {
     const weak = against(40, 80, 20);
-    const even = against(40, 80, 40);
+    const even = against(40, 80, 30);
     const strong = against(40, 80, 60);
     expect(weak.value).toBeGreaterThan(even.value);
     expect(even.value).toBeGreaterThan(strong.value);
-    expect(strong.levelAdj).toBeCloseTo(strong.value - (strong.full ?? 0), 9);
     expect(strong.levelAdj).toBeLessThan(0);
+  });
+
+  it('keeps its contribution when the skill and the attacker level both double', () => {
+    expect(against(20, 60, 25).value).toBeCloseTo(against(40, 60, 50).value, 9);
   });
 
   it('stops at the clamp however far apart the levels are', () => {
@@ -115,14 +122,14 @@ describe('in the fight', () => {
     expect(weak.enemies[0]!.evasion).toBe(strong.enemies[0]!.evasion);
   });
 
-  it('shows each technique with its effective level, what limits it and its adjustment', () => {
-    const parts = fightStatus(rating(50).fight, content, rules).player.evasion?.parts ?? [];
+  it('shows each technique with its effective level, the ratio and the adjustment', () => {
+    const view = fightStatus(rating(50).fight, content, rules).player.evasion;
+    const parts = view?.parts ?? [];
     const part = parts.find((p) => p.id === CLONE);
     expect(part?.effectiveLevel).toBeDefined();
-    expect(['skill', 'mastery']).toContain(part?.limit);
+    expect(part?.ratio).toBeDefined();
     expect(part?.levelAdj).toBeDefined();
-    const total = fightStatus(rating(50).fight, content, rules).player.evasion?.total ?? 0;
-    expect(total).toBeCloseTo(
+    expect(view?.total ?? 0).toBeCloseTo(
       parts.reduce((n, p) => n + p.value, 0),
       6,
     );

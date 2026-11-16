@@ -17,23 +17,23 @@ export const K = {
   masteryPerHour: 10500,                     // досвід Майстерності за годину дії (стала)
   poolShare: 0.25, poolCapPerItem: 1500,     // частка в пул; місткість пулу на одну майстерність зрізу
   // --- інтервали дій, с ---
-  practiceFocus: { base:0.8, perLevel:0.06 }, practiceCast: 0.7, practiceMin: 2.0, drill: 3.0, meditate: 3.0, obstacle: 2.5, gather: 2.5, craft: 2.5, explore: 5.0,
+  practiceFocus: { base:0.8, perLevel:0.06 }, practiceCast: 0.82, practiceMin: 2.0, drill: 3.0, meditate: 3.0, obstacle: 2.5, gather: 2.5, craft: 2.5, explore: 5.0,
   // --- техніки ---
   // Каст — число самої техніки й не залежить від печаток (рішення автора 15.11): базовий каст рангу × множник ролі, для окремих технік — вручну (patch.mjs, TECH.cast).
-  castByRank: { E:1.118, D:1.341, C:1.121, B:2.588, A:2.07, S:3.105 },
+  castByRank: { E:0.95, D:1.14, C:0.953, B:2.2, A:1.759, S:2.639 },
   castByRole: { "Снаряд":1.0, "Серія":1.25, "Площа":1.2, "Контроль":0.9, "Захист":1.0, "Посилення":0.7, "Сигнатурна":1.5, "Тренування":1.0 },
   masteryCast: 0.5, castFloor: 0.4, nonNativeCast: 0.30,
   power: { E:10, D:10, C:17, B:27, A:42, S:65 },
   tierMult: { "-1":0.88, "0":1, "1":1.12 },
   role: { // множник шкоди, перезарядка (с), множник вартості
-    "Снаряд":{m:1.0,cd:4.91,c:1.0}, "Серія":{m:1.15,cd:8.79,c:1.1}, "Площа":{m:0.75,cd:22.74,c:1.2}, "Контроль":{m:0.30,cd:10.68,c:0.9},
-    "Захист":{m:0,cd:15.26,c:0.9}, "Посилення":{m:0,cd:31.8,c:1.0}, "Сигнатурна":{m:1.7,cd:19.07,c:1.3}, "Тренування":{m:0,cd:0,c:0} },
+    "Снаряд":{m:1.0,cd:6.63,c:1.0}, "Серія":{m:1.15,cd:11.87,c:1.1}, "Площа":{m:0.75,cd:33.15,c:1.2}, "Контроль":{m:0.30,cd:14.42,c:0.9},
+    "Захист":{m:0,cd:20.6,c:0.9}, "Посилення":{m:0,cd:42.93,c:1.0}, "Сигнатурна":{m:1.7,cd:25.74,c:1.3}, "Тренування":{m:0,cd:0,c:0} },
   rankCd: { E:0.9, D:1.0, C:1.1, B:1.25, A:1.4, S:1.6 },
   chakraCost: { E:5, D:6, C:12, B:22, A:38, S:60 }, staminaCost: { E:5, D:6, C:10, B:16, A:26, S:40 },
   levelScale: 0.035,                         // шкода техніки × (1 + levelScale × рівень навички)
   masteryDmg: 0.10, masteryCost: 0.25,
   // --- стани ---
-  burn: { share:0.30, dur:6 }, wet: { slow:0.15, dur:8 }, evaLevel: { k:0.083, min:0.223, max:1.6 }, rhythm: { slow:0.6, dur:5 }, stun: { C:1.0, B:1.5, D:0.7 }, bind: { dur:4 }, poison: { pctPerSec:0.02, dur:8 },
+  burn: { share:0.30, dur:6 }, wet: { slow:0.15, dur:8 }, evaLevel: { min:0.05, max:1.25 }, rhythm: { slow:0.32, dur:5 }, stun: { C:1.0, B:1.5, D:0.7 }, bind: { dur:3.68 }, poison: { pctPerSec:0.02, dur:8 },
   combo: { base:0.15, perLevel:0.004, perMastery:0.001, cap:0.60, fanBurn:1.5, shockWet:2.0, mudEva:0.5, steam:0.40 },
   wheel: 0.30, habituation: 0.15, habituationCap: 0.60, signatureHabituation: 0.5,
   // --- гравець ---
@@ -41,15 +41,14 @@ export const K = {
   accBase: 40, accPerLevel: 5, evaBase: 139.8, hitMin: 0.05, hitMax: 0.95,
   // Ухилення — один автоматичний кидок (правки зрізу, розд. 5, рядки 11–13). Рейтинг ухилення = evaBase + внесок рангу + захисні техніки + спорядження й бонуси + знання з Бінґо-книги; навички «Ухилення» немає.
   // rating: внесок одного рангу гравця (тіру ШІ) в точність і ухилення, і рейтинг за рівень знань про ворога. Числа тимчасові до підгонки (етап 4 завдання C1): evaTier підібрано так, щоб типовий персонаж ухилявся приблизно як раніше.
-  rating: { accTier:21, evaTier:38.2, knowledge:32.3, enemyAccTier:0, enemyEvaTier:0 },
+  rating: { accTier:22.7, evaTier:38.2, knowledge:32.3, enemyAccTier:0, enemyEvaTier:0 },
   // passiveFx: захисна техніка пасивна; evasion — внесок, коли її ефективний рівень дорівнює бойовому рівню нападника (див. defence).
   passiveFx: { shield:{ evasion:24.7 }, decoy:{ evasion:24.7 }, evasionBuff:{ evasion:24.7 }, passiveNegate:{ evasion:24.7 } },
-  // defence: захисна техніка працює на ефективному рівні = min(рівень її навички, Майстерність × masteryToLevel); внесок = evasion × межі(1 + k × (ефективний рівень − бойовий рівень нападника); min; max), k, min, max — K.evaLevel.
-  defence: { masteryToLevel:0.5 },
+  // evaLevel: захисна техніка працює на дієвому рівні = рівень її навички × Майстерність ÷ masteryCap; внесок = evasion × межі(дієвий рівень ÷ бойовий рівень нападника; min; max).
   // Звичайний удар — дія зі своїм кастом і малою вартістю витривалості; «переводить подих», коли не вистачає ні на техніку, ні на удар: rest.s секунд і частка rest.share від обох пулів.
-  basicCast: 1.437, basicCost: 1.01, rest: { s:1.5, share:0.08 },
+  basicCast: 1.242, basicCost: 1.26, rest: { s:1.5, share:0.08 },
   modelWait: 0.6, // лише для спрощеного симулятора нижче: вичікування гравця між діями; має дорівнювати waitMs тіру genin з ai.json
-  basicDmg: [11.44,0.644], dodgeStamina: 2, ccCostPerLevel: 0.0015,
+  basicDmg: [12.36,0.696], dodgeStamina: 2, ccCostPerLevel: 0.0015,
   pillAction: 0.5, pouchStack: 4, pillAt: 0.45,   // пілюля — дія 0,5 с; у слоті підсумка до 10 штук; автовживання нижче 45% HP
   food: [[1,30],[5,40],[20,50],[30,80],[35,100],[45,120]], // рівень ремесла → HP за одну страву чи мазь (із рецептів)
   toolTag: [8,0.4],
@@ -57,9 +56,9 @@ export const K = {
   wound: { stat:0.05, max:4, healMin:10, healFloorMin:2.5 },
   // --- вороги ---
   eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [198.6,0], eEva: [25.6,5.23],
-  boss: { hp:3.2, dmg:1.5 }, pack: { n:3, hp:0.4, dmg:0.4 },
-  trait: { armor:0.30, armorOff:6, casterEvery:12, casterCast:3, casterMult:3, evasive:1.6, regenPct:0.01, illusionEvery:10, illusionDur:6, illusionAcc:0.25,
-    hidden:8, hiddenAcc:0.4, hiddenFirst:2.0, poisonChance:0.35 },
+  boss: { hp:3.46, dmg:1.49 }, pack: { n:3, hp:0.4, dmg:0.4 },
+  trait: { armor:0.30, armorOff:6, casterEvery:12, casterCast:3, casterMult:3, evasive:1.47, regenPct:0.01, illusionEvery:10, illusionDur:6, illusionAcc:0.25,
+    hidden:8, hiddenAcc:0.16, hiddenFirst:2.0, poisonChance:0.35 },
   // --- бій: досвід за годину бою в зоні рівня Z, частки від rate(Z) ---
   combatXp: { style:0.70, vit:0.35 },
   // --- місії ---

@@ -16,7 +16,6 @@ const BOUNDS: Record<string, [number, number]> = {
   eEva0: [0, 150],
   eEvaL: [0, 6],
   enemyEvaTier: [0, 120],
-  evaK: [0.01, 0.2],
   evaMin: [0.02, 0.6],
   evaMax: [1, 1.6],
 };
@@ -31,7 +30,6 @@ function apply(p: P): void {
   K.eEva[0] = p.eEva0;
   K.eEva[1] = p.eEvaL;
   K.rating.enemyEvaTier = p.enemyEvaTier;
-  K.evaLevel.k = p.evaK;
   K.evaLevel.min = p.evaMin;
   K.evaLevel.max = p.evaMax;
 }
@@ -46,7 +44,6 @@ const orig = {
   accTier: K.rating.accTier,
   etA: K.rating.enemyAccTier,
   etE: K.rating.enemyEvaTier,
-  evaK: K.evaLevel.k,
   evaMin: K.evaLevel.min,
   evaMax: K.evaLevel.max,
   eA0: K.eAcc[0],
@@ -65,7 +62,6 @@ let best: P = {
   eEva0: K.eEva[0],
   eEvaL: K.eEva[1],
   enemyEvaTier: K.rating.enemyEvaTier,
-  evaK: K.evaLevel.k,
   evaMin: K.evaLevel.min,
   evaMax: K.evaLevel.max,
 };
@@ -130,7 +126,6 @@ writeFileSync(
     accTier: r(best.accTier!, orig.accTier),
     etA: r(best.enemyAccTier!, orig.etA),
     etE: r(best.enemyEvaTier!, orig.etE),
-    evaK: r(best.evaK!, orig.evaK),
     evaMin: r(best.evaMin!, orig.evaMin),
     evaMax: r(best.evaMax!, orig.evaMax),
     eA0: r(best.eAcc0!, orig.eA0),

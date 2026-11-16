@@ -1081,8 +1081,8 @@ export const balanceParamsSchema = z.object({
   masteryCost: z.number(),
   burn: z.object({ share: z.number(), dur: z.number() }),
   wet: z.object({ slow: z.number(), dur: z.number() }),
-  /** What the level of a defensive technique's skill against the combat level of the attacker puts on its evasion: 1 + k x difference, kept between min and max. */
-  evaLevel: z.object({ k: z.number(), min: z.number(), max: z.number() }),
+  /** A defensive technique adds its evasion times the ratio of its effective level (skill level x mastery / mastery cap) to the combat level of the attacker, kept between min and max. */
+  evaLevel: z.object({ min: z.number(), max: z.number() }),
   /** The status an interrupting hit leaves: the share of speed lost and the seconds it lasts. */
   rhythm: z.object({ slow: z.number(), dur: z.number() }),
   stun: shapeOf('stun', z.record(z.string(), z.number())),
@@ -1120,8 +1120,6 @@ export const balanceParamsSchema = z.object({
   }),
   /** What a known defensive technique adds to the evasion rating (`evasion` at full mastery, `base` of it for knowing it), by the row its data names. */
   passiveFx: z.record(z.string(), z.object({ evasion: z.number() })),
-  /** A defensive technique works at its effective level, the lower of the level of its skill and its mastery times this. */
-  defence: z.object({ masteryToLevel: z.number().positive() }),
   hitMin: z.number(),
   hitMax: z.number(),
   /** The basic strike is an action: its cast time (s) and its stamina cost. */

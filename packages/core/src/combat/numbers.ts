@@ -56,10 +56,11 @@ export interface EvasionPart {
   /** A technique: the player's level in the skill it belongs to, and its own mastery. */
   skillLevel?: number;
   masteryLevel?: number;
-  /** A technique: the level it works at, the lower of its skill level and its mastery times `K.defence.masteryToLevel`, and which of the two that is. */
+  /** A technique: the level it works at, the share of its skill that its mastery realises (skill level x mastery / mastery cap). */
   effectiveLevel?: number;
-  limit?: 'skill' | 'mastery';
-  /** A technique: what its effective level against the level of the attacker added to `full` (negative: took away). */
+  /** A technique: its effective level over the combat level of the attacker, kept between `min` and `max` of `K.evaLevel`. */
+  ratio?: number;
+  /** A technique: what that ratio added to `full` (negative: took away). */
   levelAdj?: number;
 }
 
@@ -106,9 +107,9 @@ export function staminaRegenOf(levels: Levels, content: ContentDb): number {
 /**
  * The parts of the evasion rating of the player, each with its source: the base, a term per rank tier, what every
  * known defensive technique adds, and the evasion modifiers of gear and the like over the sum. A technique works at
- * its effective level, the lower of the level of its skill and its mastery times , and adds its
- * row of `K.passiveFx` times `levelScale` of that level against the combat level of the attacker (`attackerLevel`;
- * without one, an attacker at the level of the technique's skill). There is no skill term of the player's own.
+ * its effective level, its skill level times its mastery over the mastery cap, and adds its row of `K.passiveFx` times the
+ * ratio of that level to the combat level of the attacker (`attackerLevel`; without one, an attacker at the level of the
+ * technique's skill), kept between `K.evaLevel.min` and `max`. There is no skill term of the player's own.
  * What knowing the attacker adds comes per enemy, in the fight.
  */
 export function evasionParts(
@@ -128,8 +129,7 @@ export function evasionParts(
     const row = need(K.passiveFx[fx], `passiveFx.${fx}`);
     const skillLevel = snap.levels?.[tech.skill] ?? 1;
     const masteryLevel = Math.max(1, snap.mastery[tech.id] ?? 1);
-    const byMastery = masteryLevel * K.defence.masteryToLevel;
-    const effectiveLevel = Math.min(skillLevel, byMastery);
+    const effectiveLevel = (skillLevel * masteryLevel) / K.masteryCap;
     const part: EvasionPart = {
       source: 'technique',
       id: tech.id,
@@ -138,7 +138,6 @@ export function evasionParts(
       skillLevel,
       masteryLevel,
       effectiveLevel,
-      limit: byMastery < skillLevel ? 'mastery' : 'skill',
     };
     parts.push(part);
   }
@@ -150,16 +149,22 @@ export function evasionParts(
   return parts;
 }
 
-/** The factor the effective level of a defensive technique against the combat level of the attacker puts on what the technique adds: 1 + k x difference, kept between min and max. */
-export function levelScale(difference: number, content: ContentDb): number {
+/** The factor a defensive technique's effective level puts on what it adds against an attacker: the ratio of the two levels, kept between min and max. */
+export function levelScale(
+  effectiveLevel: number,
+  attackerLevel: number,
+  content: ContentDb,
+): number {
   const L = content.balance.K.evaLevel;
-  return Math.min(L.max, Math.max(L.min, 1 + L.k * difference));
+  return Math.min(L.max, Math.max(L.min, effectiveLevel / Math.max(1, attackerLevel)));
 }
 
 /** Works a technique part out against an attacker of that combat level. */
 function worked(p: EvasionPart, attackerLevel: number, content: ContentDb): void {
   const full = p.full ?? 0;
-  p.value = full * levelScale((p.effectiveLevel ?? 0) - attackerLevel, content);
+  const ratio = levelScale(p.effectiveLevel ?? 0, attackerLevel, content);
+  p.ratio = ratio;
+  p.value = full * ratio;
   p.levelAdj = p.value - full;
 }
 
