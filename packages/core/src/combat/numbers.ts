@@ -49,7 +49,12 @@ export interface EvasionPart {
   /** `base`; `tier` (the rank of the player); `technique` (a known defensive technique, `id` names it); `modifiers` (gear and the like). */
   source: 'base' | 'tier' | 'technique' | 'modifiers';
   id: string | null;
+  /** What the part adds against the attacker it was worked out for: the level adjustment is inside it. */
   value: number;
+  /** A technique: the player's level in the skill the technique belongs to. */
+  skillLevel?: number;
+  /** A technique: what the level of its skill against the level of the attacker added to `value` (negative: took away). */
+  levelAdj?: number;
 }
 
 export type Levels = PlayerSnapshot['levels'];
@@ -100,7 +105,7 @@ export function staminaRegenOf(levels: Levels, content: ContentDb): number {
  * adds comes per enemy, in the fight.
  */
 export function evasionParts(
-  snap: Pick<PlayerSnapshot, 'tier' | 'known' | 'mastery' | 'evasionMod'>,
+  snap: Pick<PlayerSnapshot, 'tier' | 'known' | 'mastery' | 'evasionMod' | 'levels'>,
   content: ContentDb,
 ): EvasionPart[] {
   const K = content.balance.K;
@@ -118,6 +123,7 @@ export function evasionParts(
       source: 'technique',
       id: tech.id,
       value: row.evasion * (row.base + (1 - row.base) * Math.min(1, share)),
+      skillLevel: snap.levels?.[tech.skill] ?? 1,
     });
   }
   const sum = parts.reduce((n, p) => n + p.value, 0);
@@ -126,9 +132,28 @@ export function evasionParts(
   return parts;
 }
 
+/** The factor the level of a defensive technique's skill against the combat level of the attacker puts on what the technique adds: 1 + k x difference, kept between min and max. */
+export function levelScale(difference: number, content: ContentDb): number {
+  const L = content.balance.K.evaLevel;
+  return Math.min(L.max, Math.max(L.min, 1 + L.k * difference));
+}
+
+/** The parts of the evasion rating against an attacker of combat level `attackerLevel`: every technique part scaled by its skill level against it, the adjustment named on the part. */
+export function partsAgainst(
+  parts: readonly EvasionPart[],
+  attackerLevel: number,
+  content: ContentDb,
+): EvasionPart[] {
+  return parts.map((p) => {
+    if (p.source !== 'technique' || p.skillLevel === undefined) return { ...p };
+    const adj = p.value * (levelScale(p.skillLevel - attackerLevel, content) - 1);
+    return { ...p, value: p.value + adj, levelAdj: adj };
+  });
+}
+
 /** The evasion rating of the player: the sum of its parts. */
 export function evasionOf(
-  snap: Pick<PlayerSnapshot, 'tier' | 'known' | 'mastery' | 'evasionMod'>,
+  snap: Pick<PlayerSnapshot, 'tier' | 'known' | 'mastery' | 'evasionMod' | 'levels'>,
   content: ContentDb,
 ): number {
   return evasionParts(snap, content).reduce((n, p) => n + p.value, 0);

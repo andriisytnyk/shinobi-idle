@@ -75,7 +75,10 @@ describe('the evasion rating of the player', () => {
   it('reaches the fight as the evasion of the player, parts and total, in the fight view', () => {
     const fight = createFight(snap([CLONE]), enemyAt(10), 1, content, rules);
     const view = fightStatus(fight, content, rules).player.evasion;
-    expect(view?.total).toBeCloseTo(fight.player.evasion, 9);
+    // Against the first enemy: the rating of the player with every defensive technique weighed by its skill level against the enemy's level.
+    const sum = (view?.parts ?? []).reduce((n, p) => n + p.value, 0);
+    expect(view?.total).toBeCloseTo(sum, 9);
+    expect(view?.parts.find((p) => p.source === 'technique')?.levelAdj).toBeDefined();
     expect(view?.parts.map((p) => p.source)).toEqual(['base', 'tier', 'technique']);
   });
 

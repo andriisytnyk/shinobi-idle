@@ -34,8 +34,8 @@ export function bossScore(n: number): { penalty: number; lines: string[] } {
     by[boss.id] = full;
     rows.push({ boss, full });
     let p = 0;
-    p += Math.max(0, 0.55 - full) * 3 + Math.max(0, full - 0.9) * 3;
-    p += Math.max(0, below - 0.6 * full) * 3;
+    p += Math.max(0, 0.6 - full) * 3 + Math.max(0, full - 0.85) * 3;
+    p += Math.max(0, below - 0.7 * full) * 3;
     if (boss.cl >= 32) p += Math.max(0, 0.25 - (full - empty)) * 2;
     if (SECRET.includes(boss.id)) p += Math.max(0, 0.2 - (full - none)) * 2;
     const special = ['core:boss_wolf', 'core:boss_hunter', 'core:boss_mist'].includes(boss.id);

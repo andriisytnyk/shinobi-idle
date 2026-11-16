@@ -375,7 +375,13 @@ function parseKit(raw: unknown, content: ContentDb, v: Vocab): PlayerKit | null 
   for (const p of raw.evasion) {
     if (!isRecord(p) || !oneOf(EVASION_SOURCES, p.source) || !nonNeg(p.value)) return null;
     if (p.id !== null && !(isStr(p.id) && known.has(p.id))) return null;
-    evasion.push({ source: p.source, id: p.id, value: p.value });
+    if (p.skillLevel !== undefined && !nonNeg(p.skillLevel)) return null;
+    evasion.push({
+      source: p.source,
+      id: p.id,
+      value: p.value,
+      ...(p.skillLevel === undefined ? {} : { skillLevel: p.skillLevel as number }),
+    });
   }
   const techniques: KitTechnique[] = [];
   for (const t of raw.techniques) {

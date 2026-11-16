@@ -1081,6 +1081,8 @@ export const balanceParamsSchema = z.object({
   masteryCost: z.number(),
   burn: z.object({ share: z.number(), dur: z.number() }),
   wet: z.object({ slow: z.number(), dur: z.number() }),
+  /** What the level of a defensive technique's skill against the combat level of the attacker puts on its evasion: 1 + k x difference, kept between min and max. */
+  evaLevel: z.object({ k: z.number(), min: z.number(), max: z.number() }),
   /** The status an interrupting hit leaves: the share of speed lost and the seconds it lasts. */
   rhythm: z.object({ slow: z.number(), dur: z.number() }),
   stun: shapeOf('stun', z.record(z.string(), z.number())),

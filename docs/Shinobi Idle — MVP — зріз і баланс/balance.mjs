@@ -33,7 +33,7 @@ export const K = {
   levelScale: 0.035,                         // шкода техніки × (1 + levelScale × рівень навички)
   masteryDmg: 0.10, masteryCost: 0.25,
   // --- стани ---
-  burn: { share:0.30, dur:6 }, wet: { slow:0.15, dur:8 }, rhythm: { slow:0.6, dur:5 }, stun: { C:1.0, B:1.5, D:0.7 }, bind: { dur:4 }, poison: { pctPerSec:0.02, dur:8 },
+  burn: { share:0.30, dur:6 }, wet: { slow:0.15, dur:8 }, evaLevel: { k:0.04, min:0.4, max:1.3 }, rhythm: { slow:0.6, dur:5 }, stun: { C:1.0, B:1.5, D:0.7 }, bind: { dur:4 }, poison: { pctPerSec:0.02, dur:8 },
   combo: { base:0.15, perLevel:0.004, perMastery:0.001, cap:0.60, fanBurn:1.5, shockWet:2.0, mudEva:0.5, steam:0.40 },
   wheel: 0.30, habituation: 0.15, habituationCap: 0.60, signatureHabituation: 0.5,
   // --- гравець ---

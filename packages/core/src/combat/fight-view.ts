@@ -1,7 +1,7 @@
 import type { ContentDb } from '@shinobi/content';
 import { makeCtx, speed } from './fight.ts';
 import type { Combatant, FightAct, FightRules, FightState, LastAct } from './fight-types.ts';
-import type { EvasionPart } from './numbers.ts';
+import { partsAgainst, type EvasionPart } from './numbers.ts';
 import { WORK_PER_MS } from './units.ts';
 
 /*
@@ -66,10 +66,28 @@ export function combatantStatus(
             atMs: Math.floor(c.last.at / WORK_PER_MS),
             avoidedBy: c.last.avoidedBy,
           },
-    ...(c === fight.player
-      ? { evasion: { total: c.evasion, parts: fight.kit.evasion.map((p) => ({ ...p })) } }
-      : {}),
+    ...(c === fight.player ? { evasion: evasionView(fight, content) } : {}),
   };
+}
+
+/**
+ * The player's evasion rating and its parts, against the first living enemy (the level of its skills against the level of the
+ * attacker adjusts every defensive technique; the adjustment is named on the part as `levelAdj`).
+ */
+function evasionView(
+  fight: FightState,
+  content: ContentDb,
+): { total: number; parts: EvasionPart[] } {
+  const attacker = fight.enemies.find((e) => e.hp > 0);
+  const level = attacker?.data['combat.level'];
+  if (level === undefined) {
+    return { total: fight.player.evasion, parts: fight.kit.evasion.map((p) => ({ ...p })) };
+  }
+  const parts = partsAgainst(fight.kit.evasion, level, content);
+  const raw = fight.kit.evasion.reduce((n, p) => n + p.value, 0);
+  const adj = parts.reduce((n, p) => n + (p.levelAdj ?? 0), 0);
+  const total = fight.player.evasion + (raw > 0 ? adj * (fight.player.evasion / raw) : adj);
+  return { total, parts };
 }
 
 /** The status of the player and of every living enemy. */

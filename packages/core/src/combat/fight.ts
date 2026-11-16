@@ -57,6 +57,7 @@ import {
   enemyStats,
   evasionOf,
   evasionParts,
+  partsAgainst,
   evasionTierTerm,
   KNOWLEDGE_MAX,
   knowledgeTerm,
@@ -350,12 +351,27 @@ const idleTimer = (): Timer => ({ progress: 0, need: 0 });
 /** The key of the player's data that holds how well the player knows an enemy entry. */
 const knowKey = (entry: string): string => `know.${entry}`;
 
+/** The key of an enemy's data that holds its combat level, which the defensive techniques of the player are weighed against. */
+const LEVEL_KEY = 'combat.level';
+
 /** The rating a target defends with against `attacker`: its evasion, and for the player what knowing the attacker adds, then the stat modifiers. */
 export function evasionAgainst(ctx: FightCtx, target: Combatant, attacker: Combatant): number {
   let base = target.evasion;
   if (target.side === 'player' && attacker.side === 'enemy') {
     const level = target.data[knowKey(attacker.entry)] ?? KNOWLEDGE_MAX;
     base += knowledgeTerm(level, ctx.content);
+    // The defensive techniques count for more or less by the level of their skill against the level of the attacker.
+    const attackerLevel = attacker.data[LEVEL_KEY];
+    if (attackerLevel !== undefined) {
+      const parts = ctx.fight.kit.evasion;
+      const raw = parts.reduce((n, p) => n + p.value, 0);
+      const adj = partsAgainst(parts, attackerLevel, ctx.content).reduce(
+        (n, p) => n + (p.levelAdj ?? 0),
+        0,
+      );
+      // Wounds weaken the whole rating; they weaken the adjustment the same way.
+      base += raw > 0 ? adj * (target.evasion / raw) : adj;
+    }
   }
   return stat(ctx, target, 'evasion', base);
 }
@@ -484,7 +500,7 @@ function addBodies(ctx: FightCtx, spawn: Spawn, n: number, staggered: boolean): 
           needOf(waitMs) + (staggered ? Math.round((needOf(stats.intervalMs) * i) / bodies) : 0),
       },
       timers: {},
-      data: {},
+      data: { [LEVEL_KEY]: spawn.cl },
       ward: 0,
       wardUntil: null,
       decoys: 0,

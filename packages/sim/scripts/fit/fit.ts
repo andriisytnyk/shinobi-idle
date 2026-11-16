@@ -11,7 +11,8 @@ import {
   snapshotPlayer,
 } from '@shinobi/core';
 import { boss as bossCase, build } from '../../../core/test/analysis-helpers.ts';
-import { curves } from '../hit-curves.ts';
+import { curveLoss } from '../hit-curves.ts';
+import { answersScore } from './answers.ts';
 import { bossScore } from './boss.ts';
 import { sustainedScore } from './sustained.ts';
 import { entryOf } from '../../../core/src/combat/zones.ts';
@@ -81,6 +82,14 @@ export const orig = {
   etA: K.rating.enemyAccTier,
   etE: K.rating.enemyEvaTier,
   eAcc: [...K.eAcc],
+  bossHp: K.boss.hp,
+  bossDmg: K.boss.dmg,
+  rhSlow: K.rhythm.slow,
+  rhDur: K.rhythm.dur,
+  evasive: K.trait.evasive,
+  hiddenAcc: K.trait.hiddenAcc,
+  bindDur: K.bind.dur,
+  evaK: K.evaLevel.k,
   eEva: [...K.eEva],
   rank: Object.fromEntries(content.techniques.map((t) => [t.id, t.rank])),
   role: Object.fromEntries(content.techniques.map((t) => [t.id, t.role])),
@@ -88,6 +97,14 @@ export const orig = {
 export type Knobs = Record<string, number>;
 export const DEFAULTS: Knobs = {
   cs: 1,
+  bossHp: 1,
+  bossDmg: 1,
+  rhSlow: 1,
+  rhDur: 1,
+  evasive: 1,
+  hiddenAcc: 1,
+  bindDur: 1,
+  evaK: 1,
   cds: 1,
   w0: 1,
   w1: 1,
@@ -155,6 +172,14 @@ export function apply(k: Knobs): void {
   K.rating.accTier = orig.accTier * k.accTier!;
   for (const [n, v] of Object.entries(K.passiveFx) as any) v.evasion = orig.passive[n]! * k.ps!;
   K.rest.s = orig.restS * k.rest!;
+  K.boss.hp = orig.bossHp * k.bossHp!;
+  K.boss.dmg = orig.bossDmg * k.bossDmg!;
+  K.rhythm.slow = Math.min(0.95, orig.rhSlow * k.rhSlow!);
+  K.rhythm.dur = orig.rhDur * k.rhDur!;
+  K.trait.evasive = orig.evasive * k.evasive!;
+  K.trait.hiddenAcc = orig.hiddenAcc * k.hiddenAcc!;
+  K.bind.dur = orig.bindDur * k.bindDur!;
+  K.evaLevel.k = orig.evaK * k.evaK!;
   K.eAcc[0] = orig.eAcc[0] * k.eA0!;
   K.eAcc[1] = orig.eAcc[1] * k.eAL!;
   K.eEva[0] = orig.eEva[0] * k.eE0!;
@@ -201,21 +226,15 @@ export function evaluate(runs: number, entries?: string[]) {
       );
     }
   }
-  const out = (x: number, lo: number, hi: number): number => Math.max(0, lo - x, x - hi);
-  let cl = 0;
-  for (const c of curves()) {
-    cl += out(c.enemyHits.typical, 0.52, 0.68) * 3 + out(c.playerHits, 0.77, 0.89) * 3;
-    if (c.level >= 30)
-      cl +=
-        Math.max(0, 0.03 - (c.enemyHits.neglect - c.enemyHits.typical)) +
-        Math.max(0, 0.1 - (c.enemyHits.typical - c.enemyHits.max));
-    cl += Math.max(0, 0.4 - c.allNatures.typical) * 2;
-  }
+  const cl = curveLoss();
   penalty += cl * 3;
   lines.push('CURVES ' + cl.toFixed(3));
   const bs = bossScore(Math.max(30, runs));
   lines.push(...bs.lines);
   penalty += bs.penalty * 2;
+  const an = answersScore();
+  lines.push(...an.lines);
+  penalty += an.penalty * 4;
   const su = sustainedScore();
   lines.push(...su.lines);
   penalty += su.penalty;
