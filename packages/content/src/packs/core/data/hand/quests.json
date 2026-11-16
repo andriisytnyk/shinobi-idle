@@ -389,7 +389,7 @@
       "items": [],
       "ryo": 2000,
       "rep": 30,
-      "flags": [],
+      "flags": ["boss.twins.unlocked", "boss.mist.unlocked"],
       "rank": null,
       "goal": {
         "kind": "exam",
@@ -529,7 +529,7 @@
       "items": [],
       "ryo": 3000,
       "rep": 30,
-      "flags": [],
+      "flags": ["boss.ren2.unlocked"],
       "rank": null
     }
   },

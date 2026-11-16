@@ -9,6 +9,7 @@ export * from './args.ts';
 export * from './character.ts';
 export * from './bots/fighter.ts';
 export * from './bots/crafts.ts';
+export * from './story.ts';
 export * from './cliSim.ts';
 export * from './craftsReport.ts';
 export * from './fightReport.ts';
