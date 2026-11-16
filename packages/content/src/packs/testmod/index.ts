@@ -222,6 +222,8 @@ const data = {
       tags: [],
       extraSources: [],
       madeFrom: [],
+      /** An explicit rule of its own: shown fully only once the test skill reaches level 2. */
+      reveal: { full: [{ req: { t: 'skill', skill: 'testmod:forge', level: 2 } }] },
       /** Removes the test status: the status is referenced, so the closure validator checks it. */
       fx: { kind: 'cleanse', statuses: ['testmod:chill'] },
     },
@@ -405,7 +407,14 @@ const data = {
 } satisfies Record<string, unknown>;
 
 export const testmodPack: ContentPack = {
-  manifest: { id: 'testmod', version: '0.1.0', dependsOn: ['core'], loadAfter: [] },
+  manifest: {
+    id: 'testmod',
+    version: '0.1.0',
+    dependsOn: ['core'],
+    loadAfter: [],
+    /** The pack's own default for its items: shown only once the player holds one (no name stage, no marking). */
+    reveal: { item: { full: ['owned'] } },
+  },
   data: data as unknown as PackData,
   balance: {
     K: {

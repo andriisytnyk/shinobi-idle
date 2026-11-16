@@ -85,6 +85,7 @@ describe('one round trip per place', () => {
     buffs: { [ghost('b')]: { skill: 'tai', charges: 2 } },
     bingo: { [ghost('e')]: { seen: 1, wins: 0, losses: 0, timeouts: 0, bought: 0, bounty: 0 } },
     report: { [ghost('e')]: { fights: 1 } },
+    shown: { [ghost('e')]: true },
     course: { '1': 'core:obstacle', '2': ghost('o') },
     world: {
       location: 'core:cell',

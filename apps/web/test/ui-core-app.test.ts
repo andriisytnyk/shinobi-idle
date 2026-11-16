@@ -10,6 +10,7 @@ import { toasts } from '../src/lib/toasts.svelte.ts';
 import { game } from '../src/lib/store.ts';
 import { bootApp, genin, type BootedApp } from './helpers/boot-app.ts';
 import { coreRegistry } from './helpers/core-registry.ts';
+import { setRevealDisabled } from '../src/lib/reveal.ts';
 
 vi.mock('../src/lib/store.ts', async () => {
   const { createGame } = await import('../src/lib/game.svelte.ts');
@@ -142,6 +143,8 @@ describe('the built-in game through the registries', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation((...args) => void errors.push(args));
     const warn = vi.spyOn(console, 'warn').mockImplementation((...args) => void errors.push(args));
     errors.length = 0;
+    // Every page of the registry opens, whatever the player has discovered: the reveal rule is switched off here.
+    setRevealDisabled(true);
     booted = await bootApp([coreUi]);
     for (const page of coreRegistry.pages) {
       const hash = sampleOf(page.key, page.route);
@@ -152,6 +155,7 @@ describe('the built-in game through the registries', () => {
       expect(root?.getAttribute('data-page'), hash).toBe(page.key);
       expect(root?.children.length, `${hash} drew nothing`).toBeGreaterThan(0);
     }
+    setRevealDisabled(false);
     spy.mockRestore();
     warn.mockRestore();
     expect(errors).toEqual([]);

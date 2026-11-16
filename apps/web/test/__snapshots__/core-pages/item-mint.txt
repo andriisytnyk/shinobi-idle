@@ -1,46 +1,13 @@
 <main class="main">
-  <div class="ui-page" data-page="core:entity.item" data-ui="page">
-    <article class="item-page" data-entity="item:core:mint" data-item="core:mint" data-ui="entity-page">
+  <div class="ui-page" data-page="reveal-gate" data-ui="page">
+    <article class="gate" data-entity="item:core:mint" data-name-only="" data-ui="entity-page">
       <p class="kind">
-        Предмет · інгредієнт
+        Предмет
       <h1 data-ui="entity-header">
         <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
           <path d="#342-1nbqtma" fill="currentColor">
         Цілюща м'ята
       <p>
-        Найпоширеніша лікарська трава: заспокоює й знезаражує. База простих ліків і тоніків для розуму.
-      <p class="owned">
-        У банку: 0
-      <button class="text" data-entity="item:core:mint" data-pinned="false" data-ui="pin-goal" type="button">
-        <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-          <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-        Закріпити як мету
-      <section data-ui="entity-section">
-        <h2>
-          Звідки береться
-        <ul>
-          <li>
-            <a class="entity-link" href="#/skill/herb">
-              Травництво
-      <section data-ui="entity-section">
-        <h2>
-          Де використовується
-        <ul>
-          <li>
-            <a class="entity-link" href="#/recipe/core:antidote">
-              Протиотрута
-            <span class="n">
-              ×2
-          <li>
-            <a class="entity-link" href="#/recipe/core:paralitychna_otruta">
-              Паралітична отрута
-          <li>
-            <a class="entity-link" href="#/recipe/core:niukhalna_sil">
-              Нюхальна сіль
-            <span class="n">
-              ×2
-          <li>
-            <a class="entity-link" href="#/recipe/core:tonik_iasnoho_rozumu">
-              Тонік ясного розуму
-            <span class="n">
-              ×2
+        Ти лише чув про це. Подробиці відкриються, коли дізнаєшся більше.
+      <p class="hint" data-reveal-hint="">
+        Як дізнатися більше: Здобудь це.

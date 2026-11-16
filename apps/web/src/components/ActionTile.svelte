@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { entityAttr, idAttr } from '../lib/reveal.ts';
   import type { ActionInfo } from '@shinobi/core';
   import { actionRef } from '../lib/entities.ts';
   import { formatSeconds, formatXp } from '../lib/format.ts';
@@ -60,9 +61,9 @@
   class="tile"
   class:locked={!info.available}
   class:running
-  data-action={info.id}
+  data-action={idAttr(ref.kind, ref.id)}
   data-ui="action-tile"
-  data-entity="{ref.kind}:{ref.id}"
+  data-entity={entityAttr(ref)}
 >
   <div class="top">
     <ActionEmblem

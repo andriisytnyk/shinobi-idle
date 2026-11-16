@@ -1,5 +1,6 @@
 <script lang="ts">
   import { t } from '../lib/i18n.ts';
+  import { nameShown } from '../lib/reveal.ts';
   import { game } from '../lib/store.ts';
   import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import Icon from './Icon.svelte';
@@ -17,6 +18,8 @@
   let { kind, id, variant = 'icon', always = false }: Props = $props();
 
   const pinned = $derived(game.read((gs) => gs.goal?.kind === kind && gs.goal.id === id));
+  /** A goal is never offered for an entity the player has not discovered. */
+  const offered = $derived(nameShown({ kind, id }));
   const label = $derived(t(pinned ? 'meta.unpin' : 'meta.pin'));
 
   /** Pinning another entity replaces the goal; pinning the pinned one lets it go. */
@@ -28,7 +31,9 @@
   }
 </script>
 
-{#if variant === 'button'}
+{#if !offered}
+  <!-- hidden: nothing to pin yet -->
+{:else if variant === 'button'}
   <button
     type="button"
     class="text"

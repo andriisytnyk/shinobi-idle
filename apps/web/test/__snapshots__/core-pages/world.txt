@@ -19,26 +19,30 @@
               ·
               <span data-region-here="">
                 Ти тут
-          <div class="region closed" data-open="false" data-region="core:plains">
+          <div class="region closed" data-open="false">
             <span class="region-icon">
-              <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
-                <path d="#947-1r9i7kh" fill="currentColor">
+              <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 24 24" width="22">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <circle cx="12" cy="12" r="1">
+                  <circle cx="12" cy="12" r="10">
             <span class="region-name">
-              <a class="entity-link" href="#/region/core:plains">
-                Південні рівнини Вогню
+              <span class="entity-link masked" data-masked="" title="Розвідай сусідній край">
+                ???
             <span class="region-status">
               <svg aria-hidden="true" class="icon" height="12" viewBox="0 0 24 24" width="12">
                 <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                   <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
                   <path d="#24-1tb3nx8">
               Закрито
-          <div class="region closed" data-open="false" data-region="core:valley">
+          <div class="region closed" data-open="false">
             <span class="region-icon">
-              <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 512 512" width="22">
-                <path d="#852-cfskse" fill="currentColor">
+              <svg aria-hidden="true" class="icon" height="22" viewBox="0 0 24 24" width="22">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <circle cx="12" cy="12" r="1">
+                  <circle cx="12" cy="12" r="10">
             <span class="region-name">
-              <a class="entity-link" href="#/region/core:valley">
-                Долина Завершення
+              <span class="entity-link masked" data-masked="" title="Розвідай сусідній край">
+                ???
             <span class="region-status">
               <svg aria-hidden="true" class="icon" height="12" viewBox="0 0 24 24" width="12">
                 <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">

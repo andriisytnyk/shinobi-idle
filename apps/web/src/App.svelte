@@ -24,6 +24,7 @@
   import type { UiPack } from './lib/ext/types.ts';
   import { t } from './lib/i18n.ts';
   import { currentHash, currentRoute, setBeforeRoute } from './lib/router.svelte.ts';
+  import { revealLevel } from './lib/reveal.ts';
   import { settings } from './lib/settings.svelte.ts';
   import { game } from './lib/store.ts';
 
@@ -114,7 +115,9 @@
     <main class="main" class:dev>
       <HintHost />
       <PageHost {hash} />
-      {#if route.page === 'entity'}<EntityExtras entity={route.ref} />{/if}
+      {#if route.page === 'entity' && revealLevel(route.ref) === 'full'}
+        <EntityExtras entity={route.ref} />
+      {/if}
       <Slot name="page.footer" ctx={{ route: hash }} />
     </main>
 

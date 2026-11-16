@@ -326,12 +326,12 @@ describe('breaking an action off', () => {
     const fight = quiet(createFight(scripted([]), encounter, 4, content, custom));
     fight.player.hp = fight.player.maxHp = 1e9;
     fightAdvance(fight, sec(6), content, custom);
-    const slow = findEffect(fight.player, 'off_beat');
+    const slow = findEffect(fight.player, 'interrupt');
     expect(slow, 'the player has the status').toBeDefined();
     expect(slow?.kind).toBe('modifier');
     // The same status is what a hit of the interrupting tag leaves on an enemy.
     const tag = content.tags.find((t) => t.id === 'interrupt');
-    expect(tag?.onHit?.some((o) => o.op === 'status' && o.status === 'off_beat')).toBe(true);
+    expect(tag?.onHit?.some((o) => o.op === 'status' && o.status === 'interrupt')).toBe(true);
   });
 
   it('is never done to the wind-up of an enemy or to an item already used', () => {

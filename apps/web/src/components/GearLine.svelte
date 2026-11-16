@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { idAttr } from '../lib/reveal.ts';
   import { type Gear } from '@shinobi/content';
   import { evalReq, nextTierPrice, nextTierReq, ownedTiers } from '@shinobi/core';
   import { blockOf, blockText } from '../lib/crafts.ts';
@@ -49,10 +50,10 @@
   }
 </script>
 
-<section class="gear" data-gear={line.id} data-owned={view.owned}>
+<section class="gear" data-gear={idAttr('gear', line.id)} data-owned={view.owned}>
   <h3 class="name">
     <span class="icon"><Icon entity={ref} size={24} /></span>
-    <EntityLink kind="gear" id={line.id} />
+    <EntityLink kind="gear" id={line.id} offered />
     <span class="tiers" data-tiers>{t('gear.tiers', { n: view.owned, of: line.tiers.length })}</span
     >
   </h3>
@@ -73,7 +74,7 @@
       <button
         type="button"
         class="ct-button"
-        data-buy-gear={line.id}
+        data-buy-gear={idAttr('gear', line.id)}
         disabled={block !== null || poor}
         aria-describedby={block !== null || poor ? `why-gear-${line.id}` : undefined}
         onclick={buy}

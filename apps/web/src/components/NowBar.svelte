@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { entityAttr } from '../lib/reveal.ts';
   import { actionInfo, cellInfo, locationCell, SHARE_FULL } from '@shinobi/core';
   import { actionRef } from '../lib/entities.ts';
   import { senseiTestInfo } from '../lib/exam-test.ts';
@@ -182,7 +183,7 @@
           data-slot={row.slot}
           data-ui="now-slot"
           data-slot-index={row.slot}
-          data-entity="{row.ref.kind}:{row.ref.id}"
+          data-entity={entityAttr(row.ref)}
           class:with-mission={row.mission}
         >
           <span class="emblem">

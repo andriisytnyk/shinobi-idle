@@ -1,9 +1,9 @@
-/** Save version 15: the Evasion skill is gone from the game, and a v14 save loses its entries and keeps the rest. */
+/** Save version 16: the Evasion skill is gone from the game, and a v15 save loses its entries and keeps the rest. */
 import { content } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import { createState, deserialize, serialize, STATE_VERSION } from '../src/index.ts';
 
-describe('migration v14 -> v15', () => {
+describe('migration v15 -> v16', () => {
   it('drops the XP and pool entries of the removed Evasion skill and nothing else', () => {
     const state = createState(1, content);
     state.skills.tai = { xp: 1234 };
@@ -12,8 +12,8 @@ describe('migration v14 -> v15', () => {
       v: number;
       state: { v: number; skills: Record<string, unknown>; pools: Record<string, unknown> };
     };
-    raw.v = 14;
-    raw.state.v = 14;
+    raw.v = 15;
+    raw.state.v = 15;
     raw.state.skills.eva = { xp: 999 };
     raw.state.pools.eva = { xp: 50 };
     const loaded = deserialize(JSON.stringify(raw), content);

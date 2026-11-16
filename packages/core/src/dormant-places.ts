@@ -47,6 +47,7 @@ export const PLACES: readonly Place[] = [
   { path: 'buffs', rule: 'keys' },
   { path: 'bingo', rule: 'keys' },
   { path: 'report', rule: 'keys' },
+  { path: 'shown', rule: 'keys' },
   { path: 'course', rule: 'values' },
   { path: 'world.explores', rule: 'keys' },
   { path: 'world.pois', rule: 'keys' },
@@ -111,6 +112,7 @@ export const STATE_IDS: Record<keyof GameState, StateIdRule> = {
   wounds: 'none',
   bingo: 'place',
   report: 'place',
+  shown: 'place',
   missions: 'places',
   events: 'none',
 };

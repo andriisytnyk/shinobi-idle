@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { entityAttr, idAttr, nameShown, revealHintKey } from '../lib/reveal.ts';
   import { evalReq, shopEntries } from '@shinobi/core';
   import { blockOf, itemSource } from '../lib/crafts.ts';
   import { formatInt } from '../lib/format.ts';
@@ -33,18 +34,24 @@
 <li
   class="input"
   class:missing
-  data-input={item}
+  data-input={idAttr('item', item)}
   data-missing={missing}
   data-ui="ingredient-row"
-  data-entity="item:{item}"
+  data-entity={entityAttr({ kind: 'item', id: item })}
 >
   <Icon entity={{ kind: 'item', id: item }} size={18} />
-  <span class="name"><EntityLink kind="item" id={item} /></span>
+  <span class="name"><EntityLink kind="item" id={item} offered /></span>
   <span class="count" aria-label={t('craft.haveNeed', { have, need })}
     >{formatInt(have)}/{formatInt(need)}</span
   >
   {#if missing}
-    <a class="source" href={source.href} data-source={source.kind}>{t(source.labelKey)}</a>
+    {#if nameShown({ kind: 'item', id: item })}
+      <a class="source" href={source.href} data-source={source.kind}>{t(source.labelKey)}</a>
+    {:else}
+      <!-- Where to get what the player has not discovered would name it: the hint stands in. -->
+      {@const hint = revealHintKey({ kind: 'item', id: item })}
+      {#if hint}<span class="source" data-source="hidden">{t(hint)}</span>{/if}
+    {/if}
     {#if locked}<span class="locked" data-input-locked
         ><BuildingNeed id={locked.id} level={locked.n} /></span
       >{/if}

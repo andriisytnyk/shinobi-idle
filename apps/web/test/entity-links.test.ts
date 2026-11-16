@@ -1,5 +1,6 @@
 import { composeBoot } from '../src/lib/boot.ts';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { setRevealDisabled } from '../src/lib/reveal.ts';
 import { render } from 'svelte/server';
 import { findEntity, entityRefsIn } from '../src/lib/entity-data.ts';
 import { hrefFor, parseHash } from '../src/lib/route.ts';
@@ -28,6 +29,9 @@ const GENERIC = [
 const lists = content as unknown as Record<string, readonly { id: string }[] | undefined>;
 
 describe('the generic entity page, over every core entity of its kinds', () => {
+  // The test is about the links a page shows, so every entity counts as discovered here (R1 has its own tests).
+  beforeAll(() => setRevealDisabled(true));
+
   for (const kind of GENERIC) {
     const list = content.entityKinds.find((k) => k.id === kind)?.list;
     const entities = (list ? lists[list] : undefined) ?? [];

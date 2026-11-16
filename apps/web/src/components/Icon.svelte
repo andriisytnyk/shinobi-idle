@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { IconRef } from '@shinobi/content';
   import { iconTint, resolveIcon } from '../lib/icons.ts';
+  import { nameShown } from '../lib/reveal.ts';
 
   interface Props {
     /** An entity (`kind` + `id`); its icon and tint come from the registry. */
@@ -13,8 +14,10 @@
   let { entity, name, size = 20 }: Props = $props();
 
   // Bodies are bundled at build time from the icon packages, so injecting them is safe.
-  const icon = $derived(resolveIcon(entity ?? name ?? ''));
-  const tint = $derived(entity ? iconTint(entity) : undefined);
+  // An entity the player has not discovered gets the neutral glyph: its own icon would give it away.
+  const hidden = $derived(entity !== undefined && !nameShown(entity));
+  const icon = $derived(resolveIcon(hidden ? '' : (entity ?? name ?? '')));
+  const tint = $derived(entity && !hidden ? iconTint(entity) : undefined);
 </script>
 
 <svg

@@ -23,6 +23,7 @@ import { coatItem, useItem } from './items.ts';
 import { indexOf } from './lookup.ts';
 import { buyMeditationLevel } from './meditation.ts';
 import { addNature, chooseNature, type NatureChoice } from './natures.ts';
+import { markSeen, revealOf } from './reveal.ts';
 import { shopBuy, shopSell } from './shop.ts';
 import { updateQuests } from './quests.ts';
 import type { ReqResult } from './requirements.ts';
@@ -104,7 +105,9 @@ export type Command =
   /** Spends one workforce charge to take one tick off the construction job. */
   | { type: 'village.workforce' }
   /** Moves ryo from the player's purse to the village treasury. */
-  | { type: 'village.donate'; ryo: number };
+  | { type: 'village.donate'; ryo: number }
+  /** The interface says it showed these entities legitimately; idempotent, refused for a ref the reveal rule does not already allow by name. */
+  | { type: 'reveal.mark'; refs: EntityRef[] };
 
 /** Longest player name. */
 export const PLAYER_NAME_MAX = 24;
@@ -299,7 +302,8 @@ export function dispatch(
   rules: Rules = defaultRules,
 ): CommandResult {
   const result = apply(state, command, content, rules);
-  if (result.ok) updateQuests(state, content);
+  // A mark is bookkeeping for the reveal rule: it changes nothing a quest or a village could read.
+  if (result.ok && command.type !== 'reveal.mark') updateQuests(state, content);
   return result;
 }
 
@@ -346,6 +350,10 @@ function apply(
       return buyMeditationLevel(state, command.practice, command.mod, content);
     case 'goal.set': {
       if (!goalExists(command.ref, content)) return { ok: false, reason: 'error.invalidGoal' };
+      // A typed id must not let the goal panel print what the player has not discovered.
+      if (revealOf(state, command.ref, content, rules) === 'hidden') {
+        return { ok: false, reason: 'error.invalidGoal' };
+      }
       state.goal = { kind: command.ref.kind, id: command.ref.id };
       emit(state, { type: 'goalSet', kind: command.ref.kind, id: command.ref.id });
       return { ok: true };
@@ -400,6 +408,8 @@ function apply(
       return spendWorkforce(state);
     case 'village.donate':
       return donateToTreasury(state, command.ryo, content);
+    case 'reveal.mark':
+      return markSeen(state, command.refs, content);
     default:
       return { ok: false, reason: 'error.unknownCommand' };
   }

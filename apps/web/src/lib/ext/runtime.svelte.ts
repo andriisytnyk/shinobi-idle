@@ -5,6 +5,8 @@ import { getContext, setContext, untrack } from 'svelte';
 import type { Game } from '../game.svelte.ts';
 import { deepFreeze } from '../freeze.ts';
 import { createTranslator, t as baseT, type Params } from '../i18n.ts';
+import { entityName } from '../entities.ts';
+import { revealHintKey, revealLevel } from '../reveal.ts';
 import { hrefFor, type EntityRef } from '../route.ts';
 import { navigate } from '../router.svelte.ts';
 import { browserStorage, type createSettings, type TextStorage } from '../settings.svelte.ts';
@@ -230,6 +232,15 @@ export function createUi(packs: readonly UiPack[], deps: UiDeps) {
       getMod: (key) => core.getMod(snapshot(), key, game.content, game.rules),
       t,
       href: (ref) => hrefFor(ref as EntityRef),
+      link(ref) {
+        const shown = revealLevel(ref as EntityRef) !== 'hidden';
+        const hint = shown ? null : revealHintKey(ref as EntityRef);
+        return {
+          text: entityName(ref as EntityRef),
+          href: shown ? hrefFor(ref as EntityRef) : null,
+          hint: hint === null ? null : t(hint),
+        };
+      },
       navigate(route) {
         if (!route.startsWith('#/')) throw new Error(`Not a route: "${route}"`);
         navigate(route);

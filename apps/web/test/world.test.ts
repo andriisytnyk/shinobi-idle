@@ -20,6 +20,7 @@ import SkillPage from '../src/pages/SkillPage.svelte';
 import CombatPage from '../src/pages/CombatPage.svelte';
 import WorldPage from '../src/pages/WorldPage.svelte';
 import { coreContext } from './helpers/core-registry.ts';
+import { revealOffHooks } from './helpers/reveal.ts';
 
 /** The toast of an event, for the content of the game under test. */
 const toastFor = (event: Parameters<typeof toastForIn>[0]) => toastForIn(event, content);
@@ -138,6 +139,8 @@ describe('A3: the map follows the core', () => {
 
   it('a region that opens is shown as open', () => {
     const state = genin();
+    // A cell of the forest is explored, so that the next region is shown by name.
+    explored(state, HOME);
     state.skills.scout!.xp = xpAt(9);
     game.replaceState(state);
     show({ cell: null, region: PLAINS });
@@ -163,6 +166,9 @@ describe('A3: the map follows the core', () => {
 });
 
 describe('A4: names are entity links', () => {
+  // The links of the map are checked with everything discovered; what stays hidden has its own test below.
+  revealOffHooks({ beforeEach, afterEach });
+
   const href = (kind: string, id: string) => `a[href="#/${kind}/${id}"]`;
 
   it('links the regions and the cells of the map', () => {
@@ -565,5 +571,34 @@ describe('CellPanel on its own', () => {
     app = mount(CellPanel, { target, context: coreContext(), props: { id: 'core:nowhere' } });
     flushSync();
     expect(q('[data-cell-panel]')).toBeNull();
+  });
+});
+
+describe('R1: places the player has not discovered stay hidden on the map', () => {
+  const link = (kind: string, id: string) => `a[href="#/${kind}/${id}"]`;
+
+  it('names the region the player stands in and masks the farther ones, without their ids', () => {
+    show();
+    expect(q(`nav ${link('region', FOREST)}`)?.textContent).toBe(name(`region.${FOREST}.name`));
+    for (const id of [PLAINS, VALLEY]) {
+      expect(q(`nav ${link('region', id)}`), id).toBeNull();
+      expect(q(`[data-region="${id}"]`), id).toBeNull();
+      expect(target.innerHTML).not.toContain(id);
+      expect(target.textContent).not.toContain(name(`region.${id}.name`));
+    }
+    expect(target.querySelectorAll('nav [data-masked]')).toHaveLength(2);
+    // The tiles of the region in view keep their names: the player may explore them.
+    expect(tile(HOME)?.querySelector(link('cell', HOME))?.textContent).toBe(
+      name(`cell.${HOME}.name`),
+    );
+  });
+
+  it('opens the next region by name once a cell of this one is explored', () => {
+    const state = genin();
+    explored(state, HOME);
+    game.replaceState(state);
+    show();
+    expect(q(`nav ${link('region', PLAINS)}`)?.textContent).toBe(name(`region.${PLAINS}.name`));
+    expect(q(`nav ${link('region', VALLEY)}`)).toBeNull();
   });
 });

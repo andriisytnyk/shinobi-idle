@@ -43,7 +43,7 @@
       "wet": "defd047fd6a2"
     },
     "tags": {
-      "interrupt": "0d1357f5e738",
+      "interrupt": "efabc12feb45",
       "area": "af3755e51300",
       "guard": "d19ecf02dc46",
       "reveal": "6af2b77eb699",
@@ -90,24 +90,24 @@
     "entityKinds": {
       "skill": "3447140e943e",
       "technique": "67bec4bfe02e",
-      "item": "c60e03cac2e0",
-      "recipe": "c2e8d3dd5f66",
-      "mission": "07f3a6df4e54",
-      "enemy": "417e27a31ad4",
-      "boss": "e56918f86b6f",
-      "region": "755b6079cc27",
+      "item": "12ada2cf517d",
+      "recipe": "3a3012f5b91e",
+      "mission": "918e3f11e217",
+      "enemy": "a6aaac091418",
+      "boss": "84419ef552c9",
+      "region": "55df32163bfa",
       "building": "66374dd77cc6",
-      "gear": "1d1b2f316a08",
+      "gear": "155970270da4",
       "seal": "8de6ca1415d6",
       "exercise": "23e627438b95",
       "practice": "10726c26ca28",
       "obstacle": "390afae7d383",
       "status": "5eb676418ffb",
       "trait": "617d3f39999f",
-      "quest": "52f93b2329a9",
+      "quest": "b425753bdbf1",
       "exam": "e04b7cbd4832",
-      "cell": "d43aa0f87e02",
-      "poi": "4f49700fc708",
+      "cell": "4dafbb951648",
+      "poi": "16c6d73dbb1d",
       "combo": "b4270f7129ed"
     },
     "trophies": {
@@ -661,7 +661,7 @@
       "stun": "8f56ddbe96b3",
       "bind": "ffd6aa55e99a",
       "poison": "12772fb0ef6b",
-      "off_beat": "0f4524e7b7f5"
+      "interrupt": "b6a8f2cae81d"
     },
     "traits": {
       "armor": "3c9833026e2f",
@@ -777,9 +777,8 @@
     "K.burn.dur": 6,
     "K.wet.slow": 0.15,
     "K.wet.dur": 8,
-    "K.evaLevel.k": 0.09,
-    "K.evaLevel.min": 0.223,
-    "K.evaLevel.max": 1.6,
+    "K.evaLevel.min": 0.023,
+    "K.evaLevel.max": 1.014,
     "K.rhythm.slow": 0.32,
     "K.rhythm.dur": 5,
     "K.stun.C": 1,
@@ -881,17 +880,16 @@
     ],
     "K.accBase": 40,
     "K.accPerLevel": 5,
-    "K.evaBase": 139.8,
-    "K.rating.accTier": 22.7,
-    "K.rating.evaTier": 38.2,
+    "K.evaBase": 188.4,
+    "K.rating.accTier": 15.4,
+    "K.rating.evaTier": 16.2,
     "K.rating.knowledge": 32.3,
     "K.rating.enemyAccTier": 0,
     "K.rating.enemyEvaTier": 0,
-    "K.passiveFx.shield.evasion": 24.7,
-    "K.passiveFx.decoy.evasion": 24.7,
-    "K.passiveFx.evasionBuff.evasion": 24.7,
-    "K.passiveFx.passiveNegate.evasion": 24.7,
-    "K.defence.masteryToLevel": 0.54,
+    "K.passiveFx.shield.evasion": 28,
+    "K.passiveFx.decoy.evasion": 28,
+    "K.passiveFx.evasionBuff.evasion": 28,
+    "K.passiveFx.passiveNegate.evasion": 28,
     "K.hitMin": 0.05,
     "K.hitMax": 0.95,
     "K.basicCast": 1.242,
@@ -954,12 +952,12 @@
     ],
     "K.eInterval": 2.6,
     "K.eAcc": [
-      198.6,
+      219.3,
       0
     ],
     "K.eEva": [
-      25.6,
-      5.23
+      32.4,
+      4.3
     ],
     "K.boss.hp": 3.46,
     "K.boss.dmg": 1.49,
@@ -2018,7 +2016,7 @@
       "stun",
       "bind",
       "poison",
-      "off_beat"
+      "interrupt"
     ],
     "traits": [
       "armor",
@@ -3054,8 +3052,8 @@
       "seal.core:snake.desc": "766f3e1604b6",
       "seal.core:tiger.desc": "e0b7d699189d",
       "seal.core:unique.desc": "a9cd54451a24",
-      "status.off_beat.desc": "c23e71c3e8bf",
-      "status.off_beat.name": "ae3cdb5c613b",
+      "status.interrupt.desc": "c23e71c3e8bf",
+      "status.interrupt.name": "ae3cdb5c613b",
       "status.bind.desc": "87fbdb251f18",
       "status.bind.name": "9031b375b86d",
       "status.burn.desc": "de97bf68fa2e",
@@ -4132,7 +4130,21 @@
       "mission.stage.fightXpWhere": "cd06d30c03ea",
       "mission.fightXpHour": "d6c314495d44",
       "mission.chain.perMission": "b4dc7f4b7c30",
-      "mission.chain.runs": "9c5dd52f161e"
+      "mission.chain.runs": "9c5dd52f161e",
+      "error.invalidReveal": "191799736903",
+      "error.revealRefused": "3775018a3309",
+      "reveal.hidden.title": "e443307be22c",
+      "reveal.hidden.body": "6ea1ae4c7a22",
+      "reveal.name.body": "8f465123e4c4",
+      "reveal.howTo": "f3e81723aba0",
+      "reveal.hint.encountered": "31b669211306",
+      "reveal.hint.explored": "66daab51286e",
+      "reveal.hint.adjacent": "0b8c1d0840c9",
+      "reveal.hint.quest": "d6eb1ef68a7e",
+      "reveal.hint.named": "3307040e70c2",
+      "reveal.hint.known": "ae1cbcad5203",
+      "reveal.hint.owned": "dc139c2ecfe9",
+      "reveal.hint.unlocked": "fb4d3ccb6d6d"
     },
     "en": {
       "technique.core:body_flicker.name": "026242b01872",
@@ -4718,7 +4730,6 @@
       "evaBase",
       "rating",
       "passiveFx",
-      "defence",
       "hitMin",
       "hitMax",
       "basicCast",
@@ -4927,7 +4938,6 @@
       "dur"
     ],
     "K.evaLevel": [
-      "k",
       "min",
       "max"
     ],
@@ -5086,9 +5096,6 @@
     ],
     "K.passiveFx.passiveNegate": [
       "evasion"
-    ],
-    "K.defence": [
-      "masteryToLevel"
     ],
     "K.rest": [
       "s",

@@ -76,7 +76,7 @@
     "suppresses": "regen"
   },
   {
-    "id": "off_beat",
+    "id": "interrupt",
     "effects": [
       {
         "kind": "modifier",

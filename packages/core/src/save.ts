@@ -53,6 +53,7 @@ import {
 } from './state.ts';
 import { updateQuests } from './quests.ts';
 import { refreshRegions, regionFlag } from './regions.ts';
+import { isShownKey, seenLimit } from './reveal.ts';
 import { refreshUnlocks } from './unlocks.ts';
 import {
   villageBuildCost,
@@ -196,7 +197,75 @@ export const MIGRATIONS: readonly Migration[] = [
       dormant: {},
     };
   },
-  // v14 -> v15: the Evasion skill is gone (evasion is a rating now): its XP and pool entries are dropped. The fight
+  // v14 -> v15: the set of entities the interface has shown (the reveal rule), empty at first.
+  // The set starts from what the old save proves the player has met: what is in the bank, the pouch
+  // and the gear, what the battle reports and mastery records name, the recipes known, the enemies
+  // of the Bingo book and the reports. A player who reached the same state on this version has them.
+  (state, content) => {
+    const items = new Set(content.items.map((i) => i.id));
+    const recipes = new Set(content.recipes.map((r) => r.id));
+    const gear = new Set(content.gear.map((g) => g.id));
+    const enemies = new Set(content.enemies.map((e) => e.id));
+    const bosses = new Set(content.bosses.map((b) => b.id));
+    const shown: Record<string, true> = {};
+    const mark = (set: Set<string>, kind: string, id: unknown): void => {
+      if (typeof id === 'string' && set.has(id)) shown[`${id}@${kind}`] = true;
+    };
+    const keys = (x: unknown): string[] => (isRecord(x) ? Object.keys(x) : []);
+    for (const id of keys(state.bank)) mark(items, 'item', id);
+    const slots =
+      isRecord(state.pouch) && Array.isArray(state.pouch.slots) ? state.pouch.slots : [];
+    for (const slot of slots) mark(items, 'item', isRecord(slot) ? slot.id : undefined);
+    for (const id of keys(state.gear)) mark(gear, 'gear', id);
+    for (const id of keys(state.known)) mark(recipes, 'recipe', id);
+    for (const id of keys(state.mastery)) {
+      mark(recipes, 'recipe', id);
+      mark(items, 'item', id);
+    }
+    for (const id of keys(state.buffs)) mark(items, 'item', id);
+    const report = isRecord(state.report) ? state.report : {};
+    for (const entry of Object.values(report)) {
+      // A report is kept by the id of a zone, an enemy, an operation or a mission, so its key says nothing of what was met: the book and the kill counters do.
+      if (!isRecord(entry)) continue;
+      if (isRecord(entry.loot)) for (const id of keys(entry.loot.items)) mark(items, 'item', id);
+      for (const id of keys(entry.items)) mark(items, 'item', id);
+    }
+    for (const id of keys(state.bingo)) {
+      mark(enemies, 'enemy', id);
+      mark(bosses, 'boss', id);
+    }
+    // What left no trace in the bank: rewards of the missions completed, the scrolls and parts of the
+    // techniques learned from scrolls, the products of the recipes practised.
+    const counters = isRecord(state.counters) ? state.counters : {};
+    const done = (id: string): boolean => {
+      const n = counters[`missions.done.${id}`];
+      return typeof n === 'number' && n > 0;
+    };
+    const known = isRecord(state.known) ? state.known : {};
+    for (const mission of content.missions) {
+      if (!done(mission.id)) continue;
+      for (const pay of mission.pay) {
+        if (pay.kind === 'item') mark(items, 'item', pay.item);
+        if (pay.kind === 'scrollPart') {
+          for (const item of content.items) {
+            if (item.part?.technique === pay.technique) mark(items, 'item', item.id);
+          }
+        }
+      }
+    }
+    for (const item of content.items) {
+      const technique = item.scroll?.technique ?? item.part?.technique;
+      if (technique !== undefined && known[technique] === true) mark(items, 'item', item.id);
+    }
+    const practised = new Set(keys(state.mastery));
+    for (const recipe of content.recipes) {
+      if (known[recipe.id] === true || practised.has(recipe.id)) {
+        mark(items, 'item', recipe.output.item);
+      }
+    }
+    return { ...state, shown };
+  },
+  // v15 -> v16: the Evasion skill is gone (evasion is a rating now): its XP and pool entries are dropped. The fight
   // loop is another one (waiting and acting): a fight in progress cannot go on in it and is dropped, so the fight
   // action starts a fresh one without a reward, a Wound or a lost item. Nothing else of a save changes here.
   (state) => {
@@ -656,6 +725,16 @@ export function deserialize(
       bounty: Math.min(ceiling, n(v.bounty)),
     };
   });
+  // The set of shown entities is trusted only as far as the ids go: each must be an entity of the content, and the set is bounded.
+  state.shown = Object.fromEntries(
+    Object.keys(
+      pick(raw.shown, (key, v) =>
+        v === true && isShownKey(content, key) ? (true as const) : undefined,
+      ),
+    )
+      .slice(0, seenLimit(content))
+      .map((key) => [key, true as const]),
+  );
   state.report = pick(raw.report, (key, v) =>
     entryOf(content, key) || Object.values(rules.actionKinds).some((kind) => kind.has(key, content))
       ? (parseReport(v, content) ?? undefined)
