@@ -41,7 +41,12 @@ describe('formulas', () => {
 
   it('practice interval is cast plus focus, at least the minimum', () => {
     expect(practiceIntervalSeconds(0.4, content)).toBe(K.practiceMin);
-    expect(practiceIntervalSeconds(5, content)).toBeCloseTo(5 + K.practiceFocus, 9);
+    expect(practiceIntervalSeconds(5, content)).toBeCloseTo(5 + K.practiceFocus.base, 9);
+    // A technique that needs more asks for more focus.
+    expect(practiceIntervalSeconds(5, content, 41)).toBeCloseTo(
+      5 + K.practiceFocus.base + 40 * K.practiceFocus.perLevel,
+      9,
+    );
   });
 
   it('mastery XP per action and pool numbers come from the balance parameters', () => {

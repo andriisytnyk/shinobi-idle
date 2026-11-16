@@ -14,7 +14,6 @@ const ENGINE_EFFECTS: ReadonlySet<string> = new Set([
   'twinMist',
   'stance',
   'stanceDrain',
-  'evasionBuff',
   'resist',
 ]);
 

@@ -19,7 +19,7 @@ import { fighter, know, startFight } from './prep-state.ts';
 import { aiVocab, viewTechnique } from './view-helpers.ts';
 import { advance } from '../src/index.ts';
 
-const tierOf = (id: 'genin' | 'chunin'): AiTier => {
+const tierOf = (id: 'student' | 'genin' | 'chunin'): AiTier => {
   const t = content.ai.tiers.find((x) => x.id === id);
   if (!t) throw new Error(`no ${id} tier`);
   return t;
@@ -125,7 +125,7 @@ describe('the two tiers are data', () => {
     expect(content.ai.visibleTraits).toEqual(['armor', 'pack']);
   });
 
-  it('plays a student and a genin with the genin tier and a chunin with the other', () => {
+  it('plays a student, a genin and a chunin each with the tier of its rank', () => {
     const run = (tier: number) => {
       const fight = createFight(
         { ...scripted(['core:leaf_whirlwind']), tier },

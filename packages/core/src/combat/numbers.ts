@@ -135,12 +135,12 @@ export function evasionOf(
 }
 
 /** What a rank tier adds to the accuracy rating of whoever attacks. */
-export const accuracyTierTerm = (tier: number, content: ContentDb): number =>
-  content.balance.K.rating.accTier * tier;
+export const accuracyTierTerm = (tier: number, content: ContentDb, enemy = false): number =>
+  (enemy ? content.balance.K.rating.enemyAccTier : content.balance.K.rating.accTier) * tier;
 
 /** What a rank tier adds to the evasion rating of whoever defends. */
-export const evasionTierTerm = (tier: number, content: ContentDb): number =>
-  content.balance.K.rating.evaTier * tier;
+export const evasionTierTerm = (tier: number, content: ContentDb, enemy = false): number =>
+  (enemy ? content.balance.K.rating.enemyEvaTier : content.balance.K.rating.evaTier) * tier;
 
 /** What knowing an enemy at `level` adds to the evasion rating of the player against it. */
 export const knowledgeTerm = (level: number, content: ContentDb): number =>

@@ -137,17 +137,7 @@ export interface Combatant {
 /** What a technique does besides damage, with its numbers resolved for this player. */
 export interface KitEffect {
   /** `damage` for a plain attack, else the kind named by the technique's combat data. */
-  kind:
-    | 'damage'
-    | 'none'
-    | 'shield'
-    | 'decoy'
-    | 'evasionBuff'
-    | 'cleanse'
-    | 'passiveNegate'
-    | 'stance'
-    | 'nextCast'
-    | 'reveal';
+  kind: 'damage' | 'none' | 'cleanse' | 'stance' | 'nextCast' | 'reveal';
   /** Shield strength, decoy charges. */
   amount: number;
   /** Evasion multiplier, Taijutsu damage share of a stance, cast time scale of the next cast. */
@@ -380,6 +370,8 @@ export interface ViewPouch {
   answers: readonly string[];
   interrupts: boolean;
   guard: boolean;
+  /** The effect the item leaves on the player (a timed bonus); null for none. */
+  selfBonus: string | null;
 }
 
 /** What the player AI knows of the traits of the content. */

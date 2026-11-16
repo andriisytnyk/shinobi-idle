@@ -242,11 +242,11 @@ describe('A3: locks, the native bonus and the non-native cast', () => {
       [25, 1 + K.nonNativeCast * (25 / 49)],
       [50, 1],
     ] as const) {
-      const expected = Math.round(practiceIntervalSeconds(cast * mult, content) * 1000);
+      const expected = Math.round(practiceIntervalSeconds(cast * mult, content, t.level) * 1000);
       expect(intervalAt(['futon', 'katon'], level)).toBe(expected);
       // The native player never pays it.
       expect(intervalAt(['katon', 'futon'], level)).toBe(
-        Math.round(practiceIntervalSeconds(cast, content) * 1000),
+        Math.round(practiceIntervalSeconds(cast, content, t.level) * 1000),
       );
     }
   });

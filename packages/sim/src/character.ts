@@ -68,6 +68,12 @@ export function grantShopBuildings(state: GameState, content: ContentDb): void {
  * A yardstick character at `level`: every skill at the same level, mastery 20 on every known
  * technique, a village with the shop's buildings. It is a fixed measuring stick, not a state a
  * player reaches. Techniques are learned through `refreshUnlocks`; only plain state is written.
+ *
+ * Defence follows the passive rule: every defensive technique that the character's levels and
+ * natures unlock is known, at the same mastery 20 as everything else (a player who keeps training
+ * the techniques of a skill trains its defensive ones too, since practising is now all they are
+ * for), and none is in the hand. The rank gives its evasion term, and the Bingo knowledge of the
+ * entry fought (`equipFor`) gives the rest. There is no Evasion skill to level.
  */
 export function buildCharacter(content: ContentDb, o: CharacterOptions): GameState {
   const K = content.balance.K;

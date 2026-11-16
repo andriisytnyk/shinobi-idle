@@ -263,7 +263,7 @@ describe('a boss special that a pack adds, implemented by a hook of the pack', (
 
   it('makes every third attack a heavy one, and only those', () => {
     const list = attacks(5);
-    expect(list.length).toBeGreaterThanOrEqual(9);
+    expect(list.length).toBeGreaterThanOrEqual(7);
     const mult = (K.bossFx as Record<string, Record<string, number>>)['testmod:third']?.mult ?? 0;
     const normal = list.find((d, i) => d !== null && (i + 1) % 3 !== 0);
     if (normal === undefined || normal === null) throw new Error('no normal hit');

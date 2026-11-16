@@ -463,8 +463,8 @@ function addBodies(ctx: FightCtx, spawn: Spawn, n: number, staggered: boolean): 
       maxChakra: 0,
       stamina: 0,
       maxStamina: 0,
-      accuracy: stats.accuracy + accuracyTierTerm(tier.minTier, content),
-      evasion: stats.evasion + evasionTierTerm(tier.minTier, content),
+      accuracy: stats.accuracy + accuracyTierTerm(tier.minTier, content, true),
+      evasion: stats.evasion + evasionTierTerm(tier.minTier, content, true),
       damage: stats.damage * spawn.dmgMult,
       waitMs,
       strikeMs,
@@ -1175,6 +1175,7 @@ function buildView(ctx: FightCtx): FightView {
               answers: view.answers,
               interrupts: view.interrupts,
               guard: view.guard,
+              selfBonus: view.selfBonus,
             },
           ]
         : [];
@@ -1571,11 +1572,12 @@ export function hitChanceOf(ctx: FightCtx, attacker: Combatant, target: Combatan
   );
 }
 
-/** A heavy blow that always lands (unless a decoy takes it), for hooks such as the caster's. */
+/** A heavy blow, for hooks such as the caster's: like every incoming strike it rolls once, its accuracy against the player's evasion. */
 export function heavyBlow(ctx: FightCtx, enemy: Combatant, damage: number): boolean {
   const player = ctx.fight.player;
-  if (!rollHit(ctx, player, null)) {
-    note(ctx.fight, 'enemy', 'miss', null, 0);
+  if (!rollHit(ctx, player, hitChanceOf(ctx, enemy, player))) {
+    const via = avoidedBy(ctx);
+    note(ctx.fight, 'enemy', 'miss', null, 0, undefined, via ?? undefined);
     return false;
   }
   note(ctx.fight, 'enemy', 'hit', null, dealDamage(ctx, player, damage, enemy.id));

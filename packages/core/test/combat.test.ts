@@ -73,7 +73,7 @@ describe('combat formulas', () => {
   });
 
   it('matches the documented technique numbers', () => {
-    // Dynamic Entry at level 10 (no mastery): 13.5 damage, 0.4 s cast, 6 s cooldown.
+    // Dynamic Entry at level 10 (no mastery): its damage, the cooldown of its role and rank.
     const s = genin();
     setLevel(s, 'tai', 10);
     const entry = content.techniques.find(
@@ -85,7 +85,7 @@ describe('combat formulas', () => {
     expect(n.damage).toBeCloseTo(
       K.power.D! * (1 + K.levelScale * 10) * (1 + K.masteryDmg / K.masteryCap),
     );
-    expect(n.cooldownMs).toBe(6000);
+    expect(n.cooldownMs).toBe(Math.round((K.role.projectile?.cd ?? 0) * (K.rankCd.D ?? 1) * 1000));
     expect(n.pool).toBe('stamina');
     // Mastery 99 raises damage by the full masteryDmg and cuts cost by masteryCost.
     s.mastery[entry.id] = { xp: xpAt(K.masteryCap) };

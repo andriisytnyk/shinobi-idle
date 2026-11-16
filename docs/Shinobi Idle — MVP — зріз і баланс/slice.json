@@ -104,7 +104,7 @@
   }
  },
  "meta": {
-  "built": "2026-11-15",
+  "built": "2026-11-16",
   "cap": 50,
   "skills": [
    "tai",
@@ -229,7 +229,7 @@
    "sealsCanon": true,
    "tier": 0,
    "noDamage": false,
-   "castOverride": 0.8
+   "castOverride": 1.34
   },
   {
    "skill": "tai",
@@ -253,7 +253,7 @@
    "sealsCanon": true,
    "tier": 0,
    "noDamage": false,
-   "castOverride": 0.8
+   "castOverride": 1.34
   },
   {
    "skill": "tai",
@@ -683,7 +683,7 @@
    "sealsCanon": true,
    "tier": 0,
    "noDamage": false,
-   "castOverride": 1
+   "castOverride": 1.08
   },
   {
    "skill": "katon",
@@ -854,7 +854,8 @@
    "seals": 4,
    "sealsCanon": true,
    "tier": 1,
-   "noDamage": false
+   "noDamage": false,
+   "castOverride": 1.12
   },
   {
    "skill": "katon",
@@ -1435,7 +1436,8 @@
    "seals": 1,
    "sealsCanon": true,
    "tier": 0,
-   "noDamage": false
+   "noDamage": false,
+   "castOverride": 1.12
   },
   {
    "skill": "doton",
@@ -1462,7 +1464,8 @@
    "seals": 3,
    "sealsCanon": true,
    "tier": 1,
-   "noDamage": false
+   "noDamage": false,
+   "castOverride": 1.18
   },
   {
    "skill": "doton",
@@ -1710,7 +1713,8 @@
    "seals": 2,
    "sealsCanon": true,
    "tier": 0,
-   "noDamage": false
+   "noDamage": false,
+   "castOverride": 1.24
   },
   {
    "skill": "suiton",
@@ -1820,7 +1824,7 @@
     "+8% пулу витривалості"
    ],
    "enlight": [
-    "+2,5% шансу ухилитися",
+    "+2,5% рейтингу ухилення",
     "−5% витрат витривалості на тайдзюцу",
     "−10% часу загоєння Ран від брам"
    ]

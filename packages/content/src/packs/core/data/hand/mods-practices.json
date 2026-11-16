@@ -74,7 +74,7 @@
     "enlight": [
       [
         {
-          "key": "evasion.chance",
+          "key": "evasion",
           "op": "add",
           "value": 0.025
         }

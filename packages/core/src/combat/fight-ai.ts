@@ -131,6 +131,9 @@ const maintain: Rule = (view) => {
       if (stance) return stance;
     }
   }
+  // A timed bonus the pouch carries for the player (a smoke bomb's evasion) is thrown when it is not active and there is something to be hit by.
+  const bonus = item(view, (p) => p.selfBonus !== null && !status(view, p.selfBonus));
+  if (bonus) return bonus;
   // A hastened cast is worth it only when it saves more time than the buff takes.
   if (!view.hastened) {
     const hasten = best(view, (r) => r.tech.fx.kind === 'nextCast');

@@ -1,11 +1,3 @@
-
-> shinobi-idle@0.0.0 sim D:\Work\ShinobiIdle\.claude\worktrees\agent-aee4f1417a7f06db8
-> pnpm --filter @shinobi/sim run sim "fight" "--all" "--seed" "1" "--runs" "200" "--rank" "chunin" "--pouch" "shop" "--food" "model" "--json"
-
-
-> @shinobi/sim@0.0.0 sim D:\Work\ShinobiIdle\.claude\worktrees\agent-aee4f1417a7f06db8\packages\sim
-> tsx src/cli.ts "fight" "--all" "--seed" "1" "--runs" "200" "--rank" "chunin" "--pouch" "shop" "--food" "model" "--json"
-
 [
   {
     "enemy": "core:dummy",

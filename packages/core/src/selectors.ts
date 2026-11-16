@@ -112,7 +112,7 @@ export function practiceSplit(
     nonNativeLevel(t.skill, state.player.natures, skillLevel(state, t.skill, content), content),
   );
   const castMs = Math.round(cast * MS_PER_SECOND);
-  const intervalMs = Math.round(practiceIntervalSeconds(cast, content) * MS_PER_SECOND);
+  const intervalMs = Math.round(practiceIntervalSeconds(cast, content, t.level) * MS_PER_SECOND);
   return { focusMs: intervalMs - castMs, castMs, intervalMs };
 }
 
@@ -140,7 +140,7 @@ function factsOf(
       return {
         skill: t.skill,
         level: t.level,
-        baseMs: ms(practiceIntervalSeconds(cast, content)),
+        baseMs: ms(practiceIntervalSeconds(cast, content, t.level)),
       };
     }
     case 'drill': {

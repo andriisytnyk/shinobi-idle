@@ -152,7 +152,7 @@ export const practiceKind = skillAction((state, id, content) => {
     skill: t.skill,
     level: t.level,
     masteryKey: id,
-    baseSeconds: practiceIntervalSeconds(cast, content),
+    baseSeconds: practiceIntervalSeconds(cast, content, t.level),
     extra: [{ t: 'technique', id }],
     extraSpeed: 'speed.practice',
   };

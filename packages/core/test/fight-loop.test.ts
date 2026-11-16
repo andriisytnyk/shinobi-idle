@@ -74,7 +74,8 @@ describe('the loop: wait, act, wait', () => {
     const waitOf = (tier: number) =>
       createFight({ ...scripted([DYNAMIC]), tier }, enemyAt(5), 1, content, rules).player.waitMs;
     expect(waitOf(1)).toBeGreaterThan(waitOf(2));
-    expect(waitOf(0)).toBe(waitOf(1));
+    // A student waits longest, then a genin, then a chunin.
+    expect(waitOf(0)).toBeGreaterThanOrEqual(waitOf(1));
     const enemyWait = (cl: number) =>
       createFight(scripted([DYNAMIC]), enemyAt(cl), 1, content, rules).enemies[0]?.waitMs ?? 0;
     const from = K.ai.enemyTier.chunin ?? 0;
@@ -207,7 +208,7 @@ describe('the cast of a technique is its own number', () => {
     expect(figures(withSeals(1), 20).castMs).toBe(figures(withSeals(12), 20).castMs);
     // Two techniques of one rank and role cast as long as each other, whatever their seals.
     const a = content.techniques.find((t) => t.id === 'core:gale_palm');
-    const b = content.techniques.find((t) => t.id === 'core:dragon_fire');
+    const b = content.techniques.find((t) => t.id === 'core:lightning_beast_tracking_fang');
     expect(a && b && a.rank === b.rank && a.role === b.role && a.cast === b.cast).toBe(true);
     expect(a?.sealSeq.length).not.toBe(b?.sealSeq.length);
   });

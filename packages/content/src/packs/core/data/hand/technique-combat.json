@@ -54,8 +54,7 @@
   },
   "core:clone": {
     "effect": {
-      "kind": "decoy",
-      "fx": "decoy"
+      "kind": "none"
     },
     "passive": {
       "fx": "decoy"
@@ -68,8 +67,7 @@
   },
   "core:body_replacement": {
     "effect": {
-      "kind": "passiveNegate",
-      "fx": "passiveNegate"
+      "kind": "none"
     },
     "passive": {
       "fx": "passiveNegate"
@@ -212,8 +210,7 @@
   },
   "core:earth_style_wall": {
     "effect": {
-      "kind": "shield",
-      "fx": "shield"
+      "kind": "none"
     },
     "passive": {
       "fx": "shield"
@@ -221,8 +218,7 @@
   },
   "core:hiding_in_mist": {
     "effect": {
-      "kind": "evasionBuff",
-      "fx": "evasionBuff"
+      "kind": "none"
     },
     "passive": {
       "fx": "evasionBuff"
@@ -230,8 +226,7 @@
   },
   "core:water_clone": {
     "effect": {
-      "kind": "decoy",
-      "fx": "decoy"
+      "kind": "none"
     },
     "passive": {
       "fx": "decoy"
@@ -259,8 +254,7 @@
   },
   "core:water_formation_wall": {
     "effect": {
-      "kind": "shield",
-      "fx": "shield"
+      "kind": "none"
     },
     "passive": {
       "fx": "shield"

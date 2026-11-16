@@ -20,6 +20,9 @@ const HARD = 'core:zone_foreign_genin';
 function grind(state: GameState, zone: string, ms: number): void {
   startFight(state, zone);
   for (let t = 0; t < ms; t += 60_000) {
+    // The player is kept at the edge of defeat: under the new rules a character of this level no longer loses on its own.
+    const me = state.combat?.fight.player;
+    if (me) me.hp = Math.min(me.hp, 3);
     advance(state, 60_000, content);
     state.events = [];
     state.bank[ids.heal] = 400;

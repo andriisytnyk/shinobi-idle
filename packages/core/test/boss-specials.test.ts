@@ -191,6 +191,9 @@ describe('the heavy cast of the hunter', () => {
     if (!body) throw new Error('no body');
     quiet(f);
     f.player.hp = f.player.maxHp = 1e12;
+    // The heavy blow rolls like every strike: here it always lands.
+    body.accuracy = 1e9;
+    f.player.evasion = 0;
     body.timer.need = 1e18;
     // Not casting yet: the view shows no cast, but the timer is waiting.
     advanceBy(f, fx.everyMs / 1000 - 0.1, wait);

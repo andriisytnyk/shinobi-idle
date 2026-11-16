@@ -50,10 +50,20 @@ export function techniqueCastSeconds(
   return Math.max(K.castFloor, trimmed) * stretch;
 }
 
-/** Seconds between completions of a practice with the given cast time. */
-export function practiceIntervalSeconds(castSeconds: number, content: ContentDb): number {
+/** Seconds of focus before the cast when practising a technique that needs `level`: later techniques ask for more. */
+export function practiceFocusSeconds(level: number, content: ContentDb): number {
+  const f = content.balance.K.practiceFocus;
+  return f.base + f.perLevel * Math.max(0, level - 1);
+}
+
+/** Seconds between completions of a practice with the given cast time, of a technique that needs `level`. */
+export function practiceIntervalSeconds(
+  castSeconds: number,
+  content: ContentDb,
+  level = 1,
+): number {
   const K = content.balance.K;
-  return Math.max(K.practiceMin, castSeconds + K.practiceFocus);
+  return Math.max(K.practiceMin, castSeconds + practiceFocusSeconds(level, content));
 }
 
 /** Mastery XP earned by one completed action of `intervalSeconds`. */

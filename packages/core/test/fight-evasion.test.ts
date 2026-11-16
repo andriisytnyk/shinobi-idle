@@ -96,9 +96,10 @@ describe('one roll: accuracy against evasion, with a term per rank tier', () => 
     const enemy = (cl: number) =>
       createFight(scripted([]), enemyAt(cl), 1, content, rules).enemies[0];
     const chunin = content.ai.tiers.find((t) => t.id === 'chunin');
+    const genin = content.ai.tiers.find((t) => t.id === 'genin');
     const from = K.ai.enemyTier.chunin ?? 0;
     expect((enemy(from)?.accuracy ?? 0) - (enemy(from - 1)?.accuracy ?? 0)).toBeCloseTo(
-      K.eAcc[1] + (chunin?.minTier ?? 0) * K.rating.accTier,
+      K.eAcc[1] + ((chunin?.minTier ?? 0) - (genin?.minTier ?? 0)) * K.rating.enemyAccTier,
       9,
     );
   });
@@ -270,5 +271,32 @@ describe('a pack in the new loop: a passive technique, a cast of its own, an int
     fightAdvance(fight, sec(2.5), content, r);
     expect(fight.tally.interrupts).toBe(1);
     expect(body.data['caster.cast']).toBe(0);
+  });
+});
+
+describe('a bonus the pouch carries for the evasion', () => {
+  const smoke = 'core:dymova_bomba';
+
+  it('is thrown by the AI when it is not active and something can hit, and renewed when it ends', () => {
+    const fight = quiet(
+      createFight(
+        { ...scripted([]), pouch: [{ id: smoke, n: 10 }] },
+        enemyAt(20),
+        1,
+        content,
+        rules,
+      ),
+    );
+    fight.player.hp = fight.player.maxHp = 1e12;
+    let seen = 0;
+    for (let i = 0; i < 400 && fight.result === 'ongoing'; i++) {
+      fightAdvance(fight, sec(0.1), content, rules);
+      if (fight.player.effects.some((e) => e.id === 'bomb.evasion')) seen++;
+    }
+    const used = 10 - (fight.pouch[0]?.n ?? 10);
+    expect(used).toBeGreaterThan(3);
+    // Never thrown on top of itself: one throw covers its own three seconds.
+    expect(used).toBeLessThanOrEqual(Math.ceil(40 / 3) + 1);
+    expect(seen).toBeGreaterThan(100);
   });
 });

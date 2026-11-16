@@ -113,16 +113,7 @@ export const sealSchema = z.object({
 });
 
 /** Keys of the technique effect numbers in `K.techFx`. */
-export const TECH_FX_KEYS = [
-  'shield',
-  'decoy',
-  'evasionBuff',
-  'passiveNegate',
-  'gateOpening',
-  'gateHealing',
-  'nextCast',
-  'reveal',
-] as const;
+export const TECH_FX_KEYS = ['gateOpening', 'gateHealing', 'nextCast', 'reveal'] as const;
 /** Keys of the boss special numbers in `K.bossFx`. */
 export const BOSS_FX_KEYS = [
   'wolfPack',
@@ -144,14 +135,7 @@ export const TROPHY_KEYS = ['band', 'pelt', 'fang', 'coin', 'gem'] as const;
 export const techniqueEffectSchema = z.discriminatedUnion('kind', [
   z.strictObject({ kind: z.literal('damage') }),
   z.strictObject({ kind: z.literal('none') }),
-  z.strictObject({ kind: z.literal('shield'), fx: idOf('fxShield') }),
-  z.strictObject({ kind: z.literal('decoy'), fx: idOf('fxDecoy') }),
-  z.strictObject({ kind: z.literal('evasionBuff'), fx: idOf('fxEvasionBuff') }),
   z.strictObject({ kind: z.literal('cleanse'), statuses: z.array(statusId).min(1) }),
-  z.strictObject({
-    kind: z.literal('passiveNegate'),
-    fx: idOf('fxPassiveNegate'),
-  }),
   z.strictObject({
     kind: z.literal('stance'),
     fx: idOf('fxStance'),
@@ -1066,8 +1050,8 @@ export const balanceParamsSchema = z.object({
   masteryPerHour: z.number(),
   poolShare: z.number(),
   poolCapPerItem: z.number(),
-  /** Seconds of focus before the cast in a practice action; the interval is the focus plus the technique's cast. */
-  practiceFocus: z.number(),
+  /** Seconds of focus before the cast in a practice action: `base` at level 1 and `perLevel` more for each level the technique requires; the interval is the focus plus the technique's cast. */
+  practiceFocus: z.object({ base: z.number(), perLevel: z.number() }),
   practiceMin: z.number(),
   drill: z.number(),
   meditate: z.number(),
@@ -1120,7 +1104,14 @@ export const balanceParamsSchema = z.object({
   accPerLevel: z.number(),
   evaBase: z.number(),
   /** Rating terms: what one player or enemy tier adds to accuracy and to evasion, and what one level of knowledge of an enemy adds to evasion against it. */
-  rating: z.object({ accTier: z.number(), evaTier: z.number(), knowledge: z.number() }),
+  rating: z.object({
+    accTier: z.number(),
+    evaTier: z.number(),
+    knowledge: z.number(),
+    /** The same terms for an enemy, by the tier of the AI it waits by. */
+    enemyAccTier: z.number(),
+    enemyEvaTier: z.number(),
+  }),
   /** What a known defensive technique adds to the evasion rating (`evasion` at full mastery, `base` of it for knowing it), by the row its data names. */
   passiveFx: z.record(z.string(), z.object({ evasion: z.number(), base: z.number() })),
   hitMin: z.number(),

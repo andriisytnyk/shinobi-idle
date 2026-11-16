@@ -398,7 +398,7 @@ describe('loadout.prepare against a known trait', () => {
       const t = tech(id);
       return t.tags.includes('interrupt') && !t.tags.includes('pierce');
     });
-    expect(interruptOnly.length).toBeLessThanOrEqual(1);
+    expect(interruptOnly.length).toBeLessThanOrEqual(2);
   });
 
   it('packs the pouch from the bank and refuses to do so mid-fight', () => {

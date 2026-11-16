@@ -123,14 +123,6 @@ export const BALANCE_EXT = {
    * and the slice amendments). Technique data names an entry by key; it never carries the number.
    */
   techFx: {
-    /** Absorbs power[rank] x mult x level scaling. */
-    shield: { mult: 1.3, durationMs: 6000 },
-    /** The next enemy hit misses. */
-    decoy: { charges: 1, durationMs: 8000 },
-    /** Multiplies the player's evasion. */
-    evasionBuff: { mult: 1.5, durationMs: 8000 },
-    /** Out of the loadout: cancels one hit now and then. */
-    passiveNegate: { everyMs: 20000 },
     /** Stance of the First Gate: extra Taijutsu damage, stamina drain, Wounds after the fight. */
     gateOpening: { taiDamage: 0.03, staminaPerSec: 2, woundsAfter: 1 },
     /** Stance of the Second Gate. */
@@ -191,7 +183,7 @@ export const BALANCE_EXT = {
   /** Pouch slots: the base count and the extra slots the chunin vest gives. */
   pouch: { slots: 3, vest: 1, vestRank: 'chunin' },
   /** The player's AI: the combat level from which an enemy waits by a higher AI tier. */
-  ai: { enemyTier: { chunin: 30 } },
+  ai: { enemyTier: { genin: 5, chunin: 20 } },
   /** Health share below which a won fight still costs a Wound. */
   woundHp: 0.1,
   /** The Bingo book: wins that fully study an ordinary enemy and a boss. */

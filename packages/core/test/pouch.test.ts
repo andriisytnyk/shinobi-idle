@@ -232,8 +232,9 @@ describe('what each tool does, and what it costs', () => {
     const tries = 200;
     for (let seed = 1; seed <= tries; seed++) {
       const { fight, r } = itemFight(ids.sleep, 3, [], undefined, seed);
-      fightAdvance(fight, workOf(1500), content, r);
-      if (fight.enemies[0] && findEffect(fight.enemies[0], 'stun')) slept++;
+      fightAdvance(fight, workOf(3000), content, r);
+      // The stun is short: it is the count of stuns, not an effect that is still there, that tells.
+      if ((fight.tally.statuses.stun ?? 0) > 0) slept++;
     }
     expect(slept / tries).toBeGreaterThan(K.itemFx.sleep!.chance! - 0.15);
     expect(slept / tries).toBeLessThan(K.itemFx.sleep!.chance! + 0.15);

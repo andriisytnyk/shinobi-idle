@@ -133,11 +133,7 @@ const MOD_STATS: readonly ModStat[] = [
 const KIT_EFFECTS: readonly KitEffect['kind'][] = [
   'damage',
   'none',
-  'shield',
-  'decoy',
-  'evasionBuff',
   'cleanse',
-  'passiveNegate',
   'stance',
   'nextCast',
   'reveal',

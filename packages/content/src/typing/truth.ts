@@ -24,10 +24,6 @@ export interface IdTypes {
   attackStyle: string;
   zoneRegion: string;
   skillGroup: string;
-  fxShield: string;
-  fxDecoy: string;
-  fxEvasionBuff: string;
-  fxPassiveNegate: string;
   fxNextCast: string;
   fxReveal: string;
   fxSleep: string;

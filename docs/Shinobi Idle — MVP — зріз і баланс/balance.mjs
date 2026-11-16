@@ -17,17 +17,17 @@ export const K = {
   masteryPerHour: 10500,                     // досвід Майстерності за годину дії (стала)
   poolShare: 0.25, poolCapPerItem: 1500,     // частка в пул; місткість пулу на одну майстерність зрізу
   // --- інтервали дій, с ---
-  practiceFocus: 1.2, practiceMin: 2.0, drill: 3.0, meditate: 3.0, obstacle: 2.5, gather: 2.5, craft: 2.5, explore: 5.0,
+  practiceFocus: { base:0.8, perLevel:0.06 }, practiceMin: 2.0, drill: 3.0, meditate: 3.0, obstacle: 2.5, gather: 2.5, craft: 2.5, explore: 5.0,
   // --- техніки ---
   // Каст — число самої техніки й не залежить від печаток (рішення автора 15.11): базовий каст рангу × множник ролі, для окремих технік — вручну (patch.mjs, TECH.cast).
-  castByRank: { E:1.0, D:1.2, C:1.6, B:2.0, A:2.5, S:3.0 },
+  castByRank: { E:0.894, D:1.073, C:0.897, B:1.656, A:2.07, S:2.484 },
   castByRole: { "Снаряд":1.0, "Серія":1.25, "Площа":1.2, "Контроль":0.9, "Захист":1.0, "Посилення":0.7, "Сигнатурна":1.5, "Тренування":1.0 },
   masteryCast: 0.5, castFloor: 0.4, nonNativeCast: 0.30,
   power: { E:10, D:10, C:17, B:27, A:42, S:65 },
   tierMult: { "-1":0.88, "0":1, "1":1.12 },
   role: { // множник шкоди, перезарядка (с), множник вартості
-    "Снаряд":{m:1.0,cd:6,c:1.0}, "Серія":{m:1.15,cd:8,c:1.1}, "Площа":{m:0.75,cd:9,c:1.2}, "Контроль":{m:0.30,cd:11,c:0.9},
-    "Захист":{m:0,cd:12,c:0.9}, "Посилення":{m:0,cd:25,c:1.0}, "Сигнатурна":{m:1.7,cd:15,c:1.3}, "Тренування":{m:0,cd:0,c:0} },
+    "Снаряд":{m:1.0,cd:4.55,c:1.0}, "Серія":{m:1.15,cd:8.14,c:1.1}, "Площа":{m:0.75,cd:22.89,c:1.2}, "Контроль":{m:0.30,cd:15.45,c:0.9},
+    "Захист":{m:0,cd:14.13,c:0.9}, "Посилення":{m:0,cd:29.44,c:1.0}, "Сигнатурна":{m:1.7,cd:17.66,c:1.3}, "Тренування":{m:0,cd:0,c:0} },
   rankCd: { E:0.9, D:1.0, C:1.1, B:1.25, A:1.4, S:1.6 },
   chakraCost: { E:5, D:6, C:12, B:22, A:38, S:60 }, staminaCost: { E:5, D:6, C:10, B:16, A:26, S:40 },
   levelScale: 0.035,                         // шкода техніки × (1 + levelScale × рівень навички)
@@ -38,16 +38,16 @@ export const K = {
   wheel: 0.30, habituation: 0.15, habituationCap: 0.60, signatureHabituation: 0.5,
   // --- гравець ---
   hpBase: 90, hpPerVit: 8, chakraBase: 120, chakraPerMed: 0.005, chakraRegen: [0.6,0.02], staminaBase: 100, staminaPerAth: 0.01, staminaRegen: [1.0,0.02],
-  accBase: 40, accPerLevel: 5, evaBase: 70, hitMin: 0.05, hitMax: 0.95,
+  accBase: 40, accPerLevel: 5, evaBase: 166.2, hitMin: 0.05, hitMax: 0.95,
   // Ухилення — один автоматичний кидок (правки зрізу, розд. 5, рядки 11–13). Рейтинг ухилення = evaBase + внесок рангу + захисні техніки + спорядження й бонуси + знання з Бінґо-книги; навички «Ухилення» немає.
   // rating: внесок одного рангу гравця (тіру ШІ) в точність і ухилення, і рейтинг за рівень знань про ворога. Числа тимчасові до підгонки (етап 4 завдання C1): evaTier підібрано так, щоб типовий персонаж ухилявся приблизно як раніше.
-  rating: { accTier:50, evaTier:80, knowledge:10 },
+  rating: { accTier:233.3, evaTier:0.7, knowledge:32.3, enemyAccTier:26.3, enemyEvaTier:0.2 },
   // passiveFx: захисна техніка пасивна; вивчена, дає частку base свого внеску evasion, а до повного внеску росте з Майстерністю від 1 до стелі. Числа тимчасові до підгонки (етап 4).
-  passiveFx: { shield:{ evasion:40, base:0.25 }, decoy:{ evasion:40, base:0.25 }, evasionBuff:{ evasion:50, base:0.25 }, passiveNegate:{ evasion:60, base:0.25 } },
+  passiveFx: { shield:{ evasion:17.3, base:0.25 }, decoy:{ evasion:17.3, base:0.25 }, evasionBuff:{ evasion:21.6, base:0.25 }, passiveNegate:{ evasion:25.8, base:0.25 } },
   // Звичайний удар — дія зі своїм кастом і малою вартістю витривалості; «переводить подих», коли не вистачає ні на техніку, ні на удар: rest.s секунд і частка rest.share від обох пулів.
-  basicCast: 0.8, basicCost: 1, rest: { s:1.5, share:0.08 },
-  modelWait: 1.0, // лише для спрощеного симулятора нижче: вичікування гравця між діями; має дорівнювати waitMs тіру genin з ai.json
-  basicDmg: [8,0.45], dodgeStamina: 2, ccCostPerLevel: 0.0015,
+  basicCast: 0.898, basicCost: 1, rest: { s:1.5, share:0.08 },
+  modelWait: 0.6, // лише для спрощеного симулятора нижче: вичікування гравця між діями; має дорівнювати waitMs тіру genin з ai.json
+  basicDmg: [8.53,0.48], dodgeStamina: 2, ccCostPerLevel: 0.0015,
   pillAction: 0.5, pouchStack: 4, pillAt: 0.45,   // пілюля — дія 0,5 с; у слоті підсумка до 10 штук; автовживання нижче 45% HP
   food: [[1,30],[5,40],[20,50],[30,80],[35,100],[45,120]], // рівень ремесла → HP за одну страву чи мазь (із рецептів)
   toolTag: [8,0.4],
@@ -158,7 +158,7 @@ export function fight(b, nature, en, opts={}) {
       continue; }
     // вибір дії
     const ready=load.filter(k=>(cds.get(k.name)||0)<=0&&(k.res==="chakra"?ch:st)>=k.cost*P.costMult);
-    const use=k=>{ pending=k; busy=k.cast; cds.set(k.name,k.cd+k.cast); if(k.res==="chakra") ch-=k.cost*P.costMult; else st-=k.cost; };
+    const use=k=>{ pending=k; busy=k.cast+K.modelWait; cds.set(k.name,k.cd+k.cast); if(k.res==="chakra") ch-=k.cost*P.costMult; else st-=k.cost; };
     const tool=(tag)=>{ if(!toolTags.includes(tag)) return false; busy=0.5; const f=alive()[0];
       if(tag==="Переривання"){ casting=0; casterAt=K.trait.casterEvery; } if(tag==="Сковування") alive().forEach(x=>x.bind=K.bind.dur); if(tag==="Виявлення") hidden=0;
       if(tag==="Розсіювання") illusion=0; if(tag==="Очищення") poison=0; if(tag==="Тривала шкода"){ f.burn=10; f.burnDps=en.hp*0.012; }
@@ -177,7 +177,7 @@ export function fight(b, nature, en, opts={}) {
     if(done) continue;
     const best=ready.filter(k=>k.dmg>0&&!(k===reserve&&casterAt<k.cd+k.cast+0.5)).sort((x,y)=>{ const s=k=>k.dmg*(k.aoe?alive().length:1)*(1-Math.min(K.habituationCap,K.habituation*(uses.get(k.name)||0))); return s(y)-s(x); })[0];
     if(best){ use(best); continue; }
-    if(t>=basicAt){ basicAt=t+K.basicCast+K.modelWait; const f=alive().sort((a,b)=>a.hp-b.hp)[0]; let accM=1; if(hidden>0)accM*=K.trait.hiddenAcc; if(illusion>0)accM*=K.trait.illusionAcc;
+    if(t>=basicAt){ basicAt=t+K.basicCast+K.modelWait; busy=K.basicCast+K.modelWait; const f=alive().sort((a,b)=>a.hp-b.hp)[0]; let accM=1; if(hidden>0)accM*=K.trait.hiddenAcc; if(illusion>0)accM*=K.trait.illusionAcc;
       const eva=en.evaR*(en.traits.includes("Ухильний")&&f.bind<=0?K.trait.evasive:1)*(f.bind>0?0.3:1); if(R()<hit(P.acc*accM,eva)) dealTo(f,P.basic,false); }
   }
   return {win:false,t,hpLost:lost/P.hp,load:load.map(x=>x.name),timeout:true};

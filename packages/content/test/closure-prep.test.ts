@@ -6,8 +6,8 @@ import { AI_RULE_IDS, content, TRAIT_IDS } from '../src/index.ts';
 const K = content.balance.K;
 
 describe('the AI tiers', () => {
-  it('has a genin and a chunin tier, each with numbers in the balance object', () => {
-    expect(content.ai.tiers.map((t) => t.id).sort()).toEqual(['chunin', 'genin']);
+  it('has a student, a genin and a chunin tier, each with numbers in the balance object', () => {
+    expect(content.ai.tiers.map((t) => t.id).sort()).toEqual(['chunin', 'genin', 'student']);
     for (const tier of content.ai.tiers) {
       expect(
         tier.rules.every((r) => AI_RULE_IDS.includes(r)),
@@ -19,10 +19,13 @@ describe('the AI tiers', () => {
   });
 
   it('starts at the lowest player tier; a higher tier waits for the moment less', () => {
+    const student = content.ai.tiers.find((t) => t.id === 'student');
     const genin = content.ai.tiers.find((t) => t.id === 'genin');
     const chunin = content.ai.tiers.find((t) => t.id === 'chunin');
-    expect(genin?.minTier).toBe(0);
+    expect(student?.minTier).toBe(0);
+    expect(genin?.minTier).toBe(1);
     expect(chunin?.minTier).toBe(2);
+    expect(student?.waitMs).toBeGreaterThanOrEqual(genin?.waitMs ?? Infinity);
     expect(genin?.waitMs).toBeGreaterThan(chunin?.waitMs ?? Infinity);
     expect(chunin?.waitMs).toBeGreaterThan(0);
   });
