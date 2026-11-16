@@ -1,4 +1,5 @@
 import type { Boss, Cell, ContentDb, Mission, MissionStage, NatureId } from '@shinobi/content';
+import { bump } from './counters.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
 import { indexOf } from './lookup.ts';
@@ -170,9 +171,13 @@ export function chooseNature(
   if (!nature) return { ok: false, reason: 'error.invalidNature' };
   state.player.natures = [nature];
   state.team = teamFor(content, nature);
+  bump(state, NATURES_GAINED);
   emit(state, { type: 'natureGained', nature, first: true });
   return { ok: true };
 }
+
+/** Counter of the natures the player has taken, the native one included: what a chain that asks for another nature counts. */
+export const NATURES_GAINED = 'natures.gained';
 
 /** `nature.add`: a second nature at Chakra Control 20, a third at 40; only natures not owned. */
 export function addNature(
@@ -195,6 +200,7 @@ export function addNature(
   const nature = pick(state, choice, status.free);
   if (!nature) return { ok: false, reason: 'error.invalidNature' };
   state.player.natures.push(nature);
+  bump(state, NATURES_GAINED);
   emit(state, { type: 'natureGained', nature, first: false });
   return { ok: true };
 }

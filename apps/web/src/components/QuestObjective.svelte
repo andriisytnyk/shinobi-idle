@@ -7,6 +7,7 @@
   import { t } from '../lib/i18n.ts';
   import {
     counterEnemy,
+    counterLabel,
     counterMission,
     counterProgress,
     withoutRankRows,
@@ -27,9 +28,12 @@
   let { quest, index }: Props = $props();
 
   const objective = $derived(quest.steps[index]?.objective);
+  /** A finished step shows no live tree: what it asked may have been spent since (the items of an errand), and it was done. */
   const result = $derived(
     game.read((gs) =>
-      objective?.t === 'req' ? withoutRankRows(evalReq(gs, objective.req, content)) : null,
+      objective?.t === 'req' && stepStatus(gs, quest, index) !== 'done'
+        ? withoutRankRows(evalReq(gs, objective.req, content))
+        : null,
     ),
   );
   const counted = $derived(
@@ -40,6 +44,7 @@
   const enemy = $derived(objective?.t === 'counter' ? counterEnemy(objective.counter) : null);
   const mission = $derived(objective?.t === 'counter' ? counterMission(objective.counter) : null);
   /** The region an `explored.<region>` counter counts cells of. */
+  const label = $derived(objective?.t === 'counter' ? counterLabel(objective.counter) : null);
   const region = $derived(
     objective?.t === 'counter' && objective.counter.startsWith('explored.')
       ? objective.counter.slice('explored.'.length)
@@ -53,8 +58,9 @@
       const status = stepStatus(gs, quest, index);
       return {
         n: objective.n,
+        // A paid step counts as paid in full, whatever the purse holds now.
+        have: status === 'done' ? objective.n : id === null ? 0 : held(gs, id),
         name: id === null ? '' : currencyName(id),
-        have: id === null ? 0 : held(gs, id),
         done: status === 'done',
         active: status === 'current',
       };
@@ -81,9 +87,18 @@
       {:else if region}
         <span class="detail">{t('quests.explored')}</span> <EntityLink kind="region" id={region} />
       {:else if enemy}
-        <span class="detail">{t('quests.kill')}</span> <EntityLink kind="enemy" id={enemy} />
+        <span class="detail">{t('quests.kill')}</span>
+        <EntityLink
+          kind={content.bosses.some((b) => b.id === enemy) ? 'boss' : 'enemy'}
+          id={enemy}
+        />
       {:else if mission}
         <span class="detail">{t('quests.mission')}</span> <EntityLink kind="mission" id={mission} />
+      {:else if label}
+        <span class="detail">{t(label.key, label.params)}</span>
+        {#if objective?.t === 'counter' && objective.counter === 'natures.gained'}
+          <a href="#/nature">{t('req.natureLink')}</a>
+        {/if}
       {:else}
         <span class="detail">{t('quests.counter')}</span>
       {/if}
@@ -95,12 +110,16 @@
   </div>
 {:else if payment}
   <div class="row" class:met={payment.done} data-met={payment.done} data-pay>
-    <span class="mark"><Icon name={payment.done ? 'lucide:check' : 'lucide:minus'} size={14} /></span>
+    <span class="mark"
+      ><Icon name={payment.done ? 'lucide:check' : 'lucide:minus'} size={14} /></span
+    >
     <span class="label">
       <span class="detail">{t('quests.pay')}</span>
       {payment.name}
     </span>
-    <span class="count">{formatInt(Math.min(payment.have, payment.n))} / {formatInt(payment.n)}</span>
+    <span class="count"
+      >{formatInt(Math.min(payment.have, payment.n))} / {formatInt(payment.n)}</span
+    >
     {#if payment.active}
       <button type="button" class="pay" disabled={payment.have < payment.n} onclick={pay}>
         {t('quests.payButton')}

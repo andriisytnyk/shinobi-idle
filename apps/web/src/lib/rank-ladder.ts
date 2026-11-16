@@ -60,7 +60,8 @@ export function perksOf(content: ContentDb, rank: string): RankPerk[] {
   };
   const perks: RankPerk[] = [];
   const slots = K.loadout.slots[rank];
-  if (slots !== undefined && slots > before(K.loadout.slots)) perks.push({ kind: 'slots', n: slots });
+  if (slots !== undefined && slots > before(K.loadout.slots))
+    perks.push({ kind: 'slots', n: slots });
   const natures = K.loadout.natures[rank];
   if (natures !== undefined && natures > before(K.loadout.natures))
     perks.push({ kind: 'natures', n: natures });

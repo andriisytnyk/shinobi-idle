@@ -59,7 +59,9 @@
   /** The last rank of the content ends the slice: its final screen can be read again. */
   const last = $derived(exam ? content.playerRanks.at(-1)?.id === exam.rank : false);
   const ready = $derived(written ? (rest?.met ?? false) : (checklist?.met ?? false));
-  const takeKey = $derived(!exam?.then ? 'rank.take' : written ? 'rank.confer' : 'rank.takeWritten');
+  const takeKey = $derived(
+    !exam?.then ? 'rank.take' : written ? 'rank.confer' : 'rank.takeWritten',
+  );
 
   let error = $state<string | null>(null);
 
@@ -138,7 +140,10 @@
             <h3>{t('rank.stages')}</h3>
             <ul class="stages" data-stages>
               {#each stages as stage (stage.id)}
-                <li data-stage={stage.id} data-state={stage.cleared ? 'cleared' : stage.open ? 'open' : 'locked'}>
+                <li
+                  data-stage={stage.id}
+                  data-state={stage.cleared ? 'cleared' : stage.open ? 'open' : 'locked'}
+                >
                   <span class="stage-name">{t(`operation.${stage.id}.name`)}</span>
                   <span class="stage-state"
                     >{t(
@@ -164,8 +169,18 @@
 
         {#if test}
           <div class="test" data-test>
-            <h3>{t(written ? 'rank.conferring' : 'rank.test')}</h3>
-            <p>{t(written ? 'rank.conferRunning' : 'rank.testRunning')}</p>
+            <h3>
+              {t(written ? 'rank.conferring' : exam?.then ? 'rank.writtenTest' : 'rank.test')}
+            </h3>
+            <p>
+              {t(
+                written
+                  ? 'rank.conferRunning'
+                  : exam?.then
+                    ? 'rank.writtenRunning'
+                    : 'rank.testRunning',
+              )}
+            </p>
             <div
               class="bar"
               role="progressbar"
@@ -183,7 +198,9 @@
           <button type="button" class="take" disabled={!ready} onclick={take}>
             {t(takeKey)}
           </button>
-          {#if !ready}<p class="blocked">{t(written ? 'rank.conferBlocked' : 'rank.takeBlocked')}</p>{/if}
+          {#if !ready}<p class="blocked">
+              {t(written ? 'rank.conferBlocked' : 'rank.takeBlocked')}
+            </p>{/if}
           {#if error}<p class="error" role="alert">{t(error)}</p>{/if}
         {/if}
       {/if}

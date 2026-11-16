@@ -622,7 +622,7 @@
       "core:name_on_stone": "7c6f0735041f",
       "core:eternal_rivalry": "2b9cae932570",
       "core:outskirts": "10b113e037a8",
-      "core:rival": "f7a3524a2b0f"
+      "core:rival": "f508ee141c18"
     },
     "exams": {
       "core:genin_exam": "846cbe2ae25c",
@@ -4199,6 +4199,11 @@
       "hint.chuninReady": "f4f3ed880896",
       "hint.title.examStages": "c2f7125ed77d",
       "hint.examStages": "76195dde7b8e",
+      "quests.missionsRank": "f89ed8bfb022",
+      "quests.missionsElemental": "288f503beb08",
+      "quests.natureGained": "d914f96a8dd5",
+      "rank.writtenTest": "53b3b2c52a2c",
+      "rank.writtenRunning": "311f30436e54",
       "quest.core:mission_board.name": "af4417b192d1",
       "quest.core:mission_board.desc": "aeb0ccbb29a3",
       "quest.core:mission_board.step.1": "593de4403a2b",

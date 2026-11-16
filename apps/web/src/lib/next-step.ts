@@ -23,6 +23,18 @@ export function counterMission(counter: string): string | null {
   return counter.startsWith(prefix) ? counter.slice(prefix.length) : null;
 }
 
+/** A label for the counters that name no entity: missions of a rank, village missions with an element stage, natures taken. Null for the rest. */
+export function counterLabel(
+  counter: string,
+): { key: string; params: Record<string, string> } | null {
+  const rank = counter.match(/^missions.rank.(.+)$/);
+  if (rank) return { key: 'quests.missionsRank', params: { rank: rank[1] ?? '' } };
+  if (counter.startsWith('missions.elemental.'))
+    return { key: 'quests.missionsElemental', params: {} };
+  if (counter === 'natures.gained') return { key: 'quests.natureGained', params: {} };
+  return null;
+}
+
 /** Where a step stands: finished steps, the active one, and those still to come. */
 export function stepStatus(state: GameState, quest: Quest, index: number): StepStatus {
   const progress = state.quests[quest.id];
@@ -45,11 +57,7 @@ export function counterProgress(
     0,
   );
   const raw =
-    status === 'done'
-      ? objective.n
-      : status === 'pending' || !progress
-        ? 0
-        : total - progress.base;
+    status === 'done' ? objective.n : status === 'pending' || !progress ? 0 : total - progress.base;
   return { n: Math.max(0, Math.min(objective.n, raw)), of: objective.n };
 }
 
@@ -133,6 +141,7 @@ export function objectiveTarget(
     if (counterEnemy(objective.counter) !== null) return '#/combat';
     const mission = counterMission(objective.counter);
     if (mission !== null) return hrefFor({ kind: 'mission', id: mission });
+    if (objective.counter === 'natures.gained') return '#/nature';
     // The other mission counters (by rank, in total) are worked on the board.
     if (objective.counter.startsWith('missions.')) return '#/missions';
     // Cells of a region explored: the world page on that region.

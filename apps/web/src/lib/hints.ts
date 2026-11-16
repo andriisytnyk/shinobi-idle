@@ -83,7 +83,9 @@ export const HINTS: readonly HintDef[] = [
     when: (state, content) =>
       content.quests.some((q) => {
         const progress = state.quests[q.id];
-        return progress !== undefined && !progress.done && q.steps[progress.step]?.objective.t === 'pay';
+        return (
+          progress !== undefined && !progress.done && q.steps[progress.step]?.objective.t === 'pay'
+        );
       }),
   },
   {
