@@ -13,26 +13,13 @@
     missionId: string;
     view: StageView;
     kind: string;
-    /** The share (negative) the armed ration takes off, and the share of its base time a stage cannot go below. */
-    ration: number;
-    floor: number;
     /** The stage under way in a running mission. */
     current?: boolean;
-    /** How many times longer a slow fallback takes, and the skills every fight pays besides its style skill. */
+    /** How many times longer a slow fallback takes. */
     slowK: number;
-    fightSkills: string[];
   }
 
-  let {
-    missionId,
-    view,
-    kind,
-    ration,
-    floor,
-    current = false,
-    slowK,
-    fightSkills,
-  }: Props = $props();
+  let { missionId, view, kind, current = false, slowK }: Props = $props();
 
   /** The currency that alternative stages pay: the one with the role study. */
   const study = currencyOf(game.content, 'study') ?? '';
@@ -40,20 +27,41 @@
   const stage = $derived(view.forecast);
   const path = $derived(stage.path);
   const self = $derived(path?.who === 'self');
-  /** Why a teammate does the stage: the player has no normal way of their own. */
+  /** The ways to list: a fight and an items stage ask for nothing, so they have none to show. */
+  const ways = $derived(view.ways.ways.filter((w) => w.kind !== 'free'));
+  /** The XP the player is sure of by skill, and the style share of a fight, whose skill is not known beforehand. */
+  const sure = $derived(stage.xp.lines.filter((l) => l.certain && l.skill !== null));
+  const style = $derived(stage.xp.lines.find((l) => !l.certain) ?? null);
+  /** The factors the length is made of, as core worked them out: they multiply out to the time shown. */
   const notes = $derived.by(() => {
-    const out: { label: string; value: string }[] = [];
-    if (Math.abs(view.residual - 1) > 0.005) {
+    const d = stage.duration;
+    const out: { label: string; value: string; id: string; raw: number }[] = [];
+    if (!d) return out;
+    const factor = (id: string, label: string, raw: number): void => {
+      if (Math.abs(raw - 1) > 0.0005) {
+        out.push({ id, label, value: `×${Math.round(raw * 1000) / 1000}`, raw });
+      }
+    };
+    factor('level', t('mission.stage.partLevel'), d.level);
+    factor('mastery', t('mission.stage.partMastery'), d.mastery);
+    factor('slow', t('mission.stage.partSlow'), d.slow);
+    if (d.ration !== 1) {
       out.push({
-        label: t('mission.stage.levelFactor'),
-        value: `×${Math.round(view.residual * 100) / 100}`,
+        id: 'ration',
+        label: t('mission.ration.label'),
+        value: formatBonus(d.ration),
+        raw: d.ration,
       });
     }
-    if (ration !== 0)
-      out.push({ label: t('mission.ration.label'), value: formatBonus(1 + ration) });
-    out.push({ label: t('mission.stage.floor'), value: `${Math.round(floor * 100)}%` });
+    out.push({
+      id: 'floor',
+      label: t(d.floored ? 'mission.stage.floorBinds' : 'mission.stage.floor'),
+      value: `${Math.round(d.floor * 100)}%`,
+      raw: d.floor,
+    });
     return out;
   });
+  const modifierParts = $derived((stage.duration?.modifiers ?? []).flatMap((m) => m.parts));
 </script>
 
 <li
@@ -81,47 +89,48 @@
     {/if}
   </header>
 
-  {#if view.alts.length > 0}
+  {#if ways.length > 0}
     <ul class="alts" aria-label={t('mission.stage.ways')} data-alts>
-      {#each view.alts as way, i (i)}
+      {#each ways as way, i (i)}
         <li
           class="alt"
           class:used={way.used}
           data-alt={i}
           data-used={way.used}
-          data-slow={way.alt.slow}
-          data-intel={way.alt.intel > 0}
+          data-slow={way.slow}
+          data-kind={way.kind}
+          data-intel={way.kind === 'skip'}
           data-met={way.met}
         >
-          <div class="what">
-            {#if way.result}
-              <ReqTree node={way.result} />
-              {#if way.alt.techNeeded}
-                <div class="need" class:met={way.techMet} data-need-tech data-met={way.techMet}>
-                  <Icon name={way.techMet ? 'lucide:check' : 'lucide:minus'} size={14} />
-                  <EntityLink kind="skill" id={way.alt.techNeeded.skill} />
-                  <span class="dim"
-                    >{t('mission.stage.needTech', { min: way.alt.techNeeded.min })}</span
-                  >
-                </div>
-              {/if}
-            {:else}
+          <div class="what" class:tree={(way.result?.children.length ?? 0) > 0}>
+            {#if way.kind === 'skip'}
               <span class="study">
                 <Icon entity={{ kind: 'currency', id: study }} size={16} />
-                {t('mission.stage.intel', { n: way.alt.intel })}
+                {t('mission.stage.intel', { n: way.intel })}
                 <span class="dim"
                   >{t('mission.stage.intelHave', { have: formatInt(way.have) })}</span
                 >
               </span>
+            {:else if way.kind === 'mate'}
+              <span class="mate" data-mate-way data-entity="teammate:{way.who}">
+                {t('mission.stage.mateWay', {
+                  name: teammateName(way.who),
+                  level: way.level,
+                  min: way.min,
+                })}
+                <EntityLink kind="skill" id={way.skill} />
+              </span>
+            {:else if way.result}
+              <ReqTree node={way.result} />
             {/if}
           </div>
           <span class="tags">
             {#if way.used}<span class="tag used-tag" data-tag="used">{t('mission.stage.used')}</span
               >{/if}
-            {#if way.alt.slow}<span class="tag" data-tag="slow"
+            {#if way.slow}<span class="tag" data-tag="slow"
                 >{t('mission.stage.slow', { k: slowK })}</span
               >{/if}
-            {#if !way.met && way.alt.intel === 0}<span class="tag" data-tag="unmet"
+            {#if !way.met && way.kind !== 'skip'}<span class="tag" data-tag="unmet"
                 >{t('mission.stage.altUnmet')}</span
               >{/if}
           </span>
@@ -130,14 +139,15 @@
     </ul>
   {/if}
 
-  {#if view.takes}
+  {#if view.ways.takes}
+    {@const takes = view.ways.takes}
     <p class="takes" data-takes>
       {t('mission.stage.takes')}
-      <EntityLink kind="item" id={view.takes.item} />
-      <span class:short={view.takes.have < view.takes.need}>
+      <EntityLink kind="item" id={takes.item} />
+      <span class:short={takes.have < takes.need}>
         {t('mission.stage.haveNeed', {
-          have: formatInt(view.takes.have),
-          need: formatInt(view.takes.need),
+          have: formatInt(takes.have),
+          need: formatInt(takes.need),
         })}
       </span>
     </p>
@@ -165,8 +175,8 @@
         <dd>
           <ModParts
             display={formatDuration(stage.ms)}
-            parts={view.parts}
-            base={formatDuration(view.base)}
+            parts={modifierParts}
+            base={stage.duration ? formatDuration(stage.duration.baseMs) : undefined}
             {notes}
           />
         </dd>
@@ -177,38 +187,45 @@
           <dd>{Math.round(stage.chance * 100)}%</dd>
         </div>
       {/if}
-      {#if view.reward.fight !== null}
-        <div data-stage-fight-xp data-value={view.reward.fight}>
+      {#if stage.xp.fight}
+        <div data-stage-fight-xp data-value={stage.xp.fight.total}>
           <dt>{t('mission.stage.fightXp')}</dt>
           <dd>
-            {t('mission.stage.fightXpValue', { n: formatXp(view.reward.fight) })}
+            {t('mission.stage.fightXpValue', { n: formatXp(stage.xp.fight.total) })}
             <span class="dim">
               {t('mission.stage.fightXpWhere')}
-              {#each fightSkills as skill, i (skill)}<EntityLink
+              {#each stage.xp.fight.skills as skill, i (skill)}<EntityLink
                   kind="skill"
                   id={skill}
-                />{#if i < fightSkills.length - 1}<span>, </span>{/if}{/each}
+                />{#if i < stage.xp.fight.skills.length - 1}<span>, </span>{/if}{/each}
             </span>
+            {#if style}
+              <span class="dim" data-stage-style-xp data-value={style.amount}>
+                {t('mission.stage.styleXp', { n: formatXp(style.amount) })}
+              </span>
+            {/if}
           </dd>
         </div>
       {/if}
-      {#if view.reward.skills.length > 0}
+      {#if sure.length > 0}
         <div data-stage-xp>
           <dt>{t('mission.stage.xp')}</dt>
           <dd>
-            {#each view.reward.skills as xp, i (xp.skill)}
+            {#each sure as xp, i (xp.skill)}
               {#if i > 0},
               {/if}
-              {t('mission.stage.xpValue', { n: formatXp(xp.amount) })}
-              <EntityLink kind="skill" id={xp.skill} />
+              <span data-stage-xp-skill={xp.skill} data-value={xp.amount}>
+                {t('mission.stage.xpValue', { n: formatXp(xp.amount) })}
+                <EntityLink kind="skill" id={xp.skill ?? ''} />
+              </span>
             {/each}
           </dd>
         </div>
       {/if}
-      {#if view.reward.mastery}
+      {#if stage.xp.mastery}
         <div data-stage-mastery>
           <dt>{t('mission.stage.mastery')}</dt>
-          <dd><EntityLink kind="technique" id={view.reward.mastery} /></dd>
+          <dd><EntityLink kind="technique" id={stage.xp.mastery} /></dd>
         </div>
       {/if}
     </dl>
@@ -220,7 +237,7 @@
         })}
       </p>
     {/if}
-    {#if stage.chance < 1}
+    {#if stage.chance < 1 && formatDuration(stage.expectedMs) !== formatDuration(stage.ms)}
       <p class="dim" data-stage-expected>
         {t('mission.stage.expected', { time: formatDuration(stage.expectedMs) })}
       </p>
@@ -281,18 +298,6 @@
     font-weight: 400;
   }
 
-  .need {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-1) var(--space-2);
-    color: var(--fg-dim);
-  }
-
-  .need.met {
-    color: var(--fg);
-  }
-
   .to-combat {
     color: var(--accent);
   }
@@ -325,6 +330,11 @@
   .what {
     flex: 1 1 var(--panel-min);
     min-width: 0;
+  }
+
+  /* A way with a tree of conditions takes the whole line, so that the tree is not squeezed beside its tags. */
+  .what.tree {
+    flex-basis: 100%;
   }
 
   .tags {

@@ -73,7 +73,11 @@ describe('A3: the trios and a player with no nature', () => {
       for (const team of [false, true]) {
         const state = maxed(natures, team);
         const board = missionBoard(state, content, defaultRules);
-        const startable = (id: string) => board.find((e) => e.id === id)?.startable ?? false;
+        // A mission is within reach when nothing blocks it (the player's own ways); the team is not asked here.
+        const startable = (id: string) => {
+          const entry = board.find((e) => e.id === id);
+          return entry !== undefined && entry.blocker === null;
+        };
         expect(DC.filter((m) => startable(m.id)).length, `${label} team=${team}`).toBe(12);
         // The table counts what the player's own natures open; a teammate can open more.
         if (!team) {
@@ -90,9 +94,9 @@ describe('A3: the trios and a player with no nature', () => {
   it('with no nature at all the 12 D/C missions are startable', () => {
     const state = maxed([], false);
     const board = missionBoard(state, content, defaultRules);
-    expect(DC.filter((m) => board.find((e) => e.id === m.id)?.startable).length).toBe(12);
+    expect(DC.filter((m) => board.find((e) => e.id === m.id)?.blocker === null).length).toBe(12);
     // Some village missions need no nature: Sparring, Fence needs Raiton, Rubble goes by Taijutsu, Clones, Seal.
-    const open = VILLAGE.filter((m) => board.find((e) => e.id === m.id)?.startable).map(
+    const open = VILLAGE.filter((m) => board.find((e) => e.id === m.id)?.blocker === null).map(
       (m) => m.id,
     );
     expect(open).toEqual(
@@ -397,7 +401,7 @@ describe('A7: failures', () => {
     // Find a game in which an attempt fails (one in ten does at the requirement), and read what follows.
     let found = false;
     for (let seed = 1; seed <= 80 && !found; seed++) {
-      const state = player({ seed, natures: ['katon'], levels: { scout: 1, ath: 5 }, team: false });
+      const state = player({ seed, natures: ['katon'], levels: { scout: 1, ath: 5 } });
       startMission(state, m.id);
       for (let i = 0; i < 1200 && !found; i++) {
         advance(state, 1000, content);
@@ -471,7 +475,7 @@ describe('A7: failures', () => {
   });
 
   it('stopping a mission and starting it again begins from the first stage', () => {
-    const state = player({ natures: ['katon'], levels: { scout: 30, ath: 10 }, team: false });
+    const state = player({ natures: ['katon'], levels: { scout: 30, ath: 10 } });
     startMission(state, 'core:cat');
     advance(state, 90_000, content);
     expect(state.slots[0]?.data).toMatchObject({ s: 1 });

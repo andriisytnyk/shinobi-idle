@@ -244,7 +244,7 @@ describe('A5: the bank filter «потрібне для мети»', () => {
     game.state.bank[MINT] = 3;
     game.state.bank[NETTLE] = 2;
     game.dispatch({ type: 'goal.set', ref: { kind: 'item', id: OIL } });
-    expect(goalItemIds(game.state, content)).toEqual([OIL]);
+    expect(goalItemIds(game.state, content, game.rules)).toEqual([OIL]);
     app = mount(BankPage, { target });
     flushSync();
     const ids = () =>

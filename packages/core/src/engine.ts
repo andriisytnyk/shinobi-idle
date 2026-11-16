@@ -1,5 +1,6 @@
 import type { ContentDb } from '@shinobi/content';
 import { actionKindOf, rebalanceShares, stopSlot } from './actions.ts';
+import { startRefusal } from './start-check.ts';
 import {
   deleteSavedLoadout,
   loadSavedLoadout,
@@ -24,7 +25,7 @@ import { buyMeditationLevel } from './meditation.ts';
 import { addNature, chooseNature, type NatureChoice } from './natures.ts';
 import { shopBuy, shopSell } from './shop.ts';
 import { updateQuests } from './quests.ts';
-import { evalReq, type ReqResult } from './requirements.ts';
+import type { ReqResult } from './requirements.ts';
 import {
   callSystem,
   chargeEvent,
@@ -36,7 +37,6 @@ import {
 } from './guard.ts';
 import { defaultRules, type Rules } from './rules.ts';
 import type { System } from './system.ts';
-import { isSkillUnlocked } from './selectors.ts';
 import type { GameState } from './state.ts';
 import { cancelBuild, donateToTreasury, spendWorkforce, startBuild } from './village.ts';
 import { claimPoi, travelInstant, WALK_KIND } from './world.ts';
@@ -231,24 +231,11 @@ function startAction(
   content: ContentDb,
   rules: Rules,
 ): CommandResult {
+  const refusal = startRefusal(state, slotIndex, kindName, id, content, rules);
+  if (refusal) return { ok: false, reason: refusal.reason };
   const slot = state.slots[slotIndex];
-  if (!slot) return { ok: false, reason: 'error.invalidSlot' };
   const kind = actionKindOf(rules, kindName);
-  if (!kind) return { ok: false, reason: 'error.unknownActionKind' };
-  if (!kind.has(id, content)) return { ok: false, reason: 'error.unknownAction' };
-  // A skill that is still shut refuses every action it would train, whatever else holds.
-  const skill = kind.skill?.(id, content);
-  if (skill && !isSkillUnlocked(state, skill, content)) {
-    return { ok: false, reason: 'error.skillLocked' };
-  }
-  const blocked = kind.blocked?.(state, id, content, rules, slotIndex);
-  if (blocked) return { ok: false, reason: blocked };
-  const req = kind.requirements(state, id, content, rules);
-  if (req && !evalReq(state, req, content).met) {
-    // An action that lacks an ingredient says so; anything else is a plain unmet requirement.
-    const lacking = kind.missing?.(state, id, content, rules);
-    return { ok: false, reason: lacking ? 'error.missingIngredient' : 'error.requirementsNotMet' };
-  }
+  if (!slot || !kind) return { ok: false, reason: 'error.invalidSlot' };
   stopSlot(state, slotIndex, 'replaced', content, rules);
   slot.action = { kind: kindName, id };
   slot.progress = 0;
@@ -264,8 +251,14 @@ function goalExists(ref: EntityRef, content: ContentDb): boolean {
   // The kinds that can be pinned are the kinds of the content that have a list to look the id up in.
   const list = content.entityKinds.find((k) => k.id === ref.kind)?.list;
   if (list === null || list === undefined || !PINNABLE.has(list)) return false;
-  const entities = (content as unknown as Record<string, readonly { id: string }[]>)[list];
-  return Array.isArray(entities) && entities.some((e) => e.id === ref.id);
+  const entities = (
+    content as unknown as Record<string, readonly { id: string; board?: boolean }[]>
+  )[list];
+  // A mission can be pinned when it is on the board.
+  return (
+    Array.isArray(entities) &&
+    entities.some((e) => e.id === ref.id && (list !== 'missions' || e.board === true))
+  );
 }
 
 /** The lists of entities that a goal may point at. */
@@ -275,6 +268,11 @@ const PINNABLE: ReadonlySet<string> = new Set([
   'items',
   'enemies',
   'quests',
+  'missions',
+  'recipes',
+  'exercises',
+  'practices',
+  'obstacles',
 ]);
 
 /** Starts the sensei test of the exam that grants `rank`. */

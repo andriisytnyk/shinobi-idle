@@ -1,20 +1,10 @@
 import type { ContentDb } from '@shinobi/content';
 import { MISSION_KIND, type GameEvent } from '@shinobi/core';
 import type { ToastSpec } from './toasts.svelte.ts';
+import { currencyOf } from './vocab.ts';
 
 /** The error that stops a mission whose fight was lost too many times in a row. */
 const TOO_HARD = 'error.missionTooHard';
-
-/**
- * Items the core granted since the last finished stage, from its `itemGained` events: the payment
- * of a finished mission is paid right after its last stage, and the events come in that order.
- */
-let granted: { id: string; n: number }[] = [];
-
-/** Forgets the items seen so far (tests). */
-export const resetMissionToasts = (): void => {
-  granted = [];
-};
 
 /**
  * The toast of a mission event, or `undefined` for an event that is not a mission's (the caller
@@ -23,17 +13,14 @@ export const resetMissionToasts = (): void => {
  * after the name).
  * - a finished stage: its number out of the total; a failed one: a failed roll, or for a fight a
  *   lost fight with the Wound it left, and the stage starts over;
- * - a finished mission: what the core really granted (its events), items as links, and what the
- *   mission pays in kind but the events did not show as granted;
+ * - a finished mission: what the core really granted, read from the event alone: the money, the
+ *   other currencies (Intel and any a pack pays), the items as links, and the village resource,
+ *   with the units a full store lost said so;
  * - a stop: its cause as a sentence, with the item it concerns as the link.
  */
 export function missionToast(event: GameEvent, content: ContentDb): ToastSpec | null | undefined {
   switch (event.type) {
-    case 'itemGained':
-      granted.push({ id: event.id, n: event.n });
-      return undefined;
     case 'missionStage': {
-      granted = [];
       const mission = content.missions.find((m) => m.id === event.mission);
       if (!mission) return undefined;
       const stage = mission.stages[event.stage];
@@ -47,25 +34,24 @@ export function missionToast(event: GameEvent, content: ContentDb): ToastSpec | 
       };
     }
     case 'missionDone': {
-      const items = new Map<string, number>();
-      for (const g of granted) items.set(g.id, (items.get(g.id) ?? 0) + g.n);
-      granted = [];
       const mission = content.missions.find((m) => m.id === event.mission);
       if (!mission) return undefined;
-      // The payment in kind that the events do not show as granted did not reach the bank.
-      const missed = mission.pay.flatMap((p) =>
-        p.kind === 'item' && (items.get(p.item) ?? 0) < p.n
-          ? [{ id: p.item, n: p.n - (items.get(p.item) ?? 0) }]
-          : [],
-      );
+      // The money and Reputation have a place of their own (the field and the sentence); the rest is listed.
+      const money = currencyOf(content, 'money');
+      const renown = currencyOf(content, 'renown');
+      const currencies: Record<string, number> = {};
+      for (const c of event.currencies) {
+        if (c.currency !== money && c.currency !== renown) currencies[c.currency] = c.n;
+      }
       return {
         key: event.rep > 0 ? 'toast.mission.doneRep' : 'toast.mission.done',
         params: { rep: event.rep },
         subject: { kind: 'mission', id: mission.id },
         gains: {
           ryo: event.ryo,
-          items: [...items].map(([id, n]) => ({ id, n })),
-          missed,
+          currencies,
+          items: event.items.map((i) => ({ id: i.id, n: i.n })),
+          resource: event.resource ?? undefined,
         },
       };
     }

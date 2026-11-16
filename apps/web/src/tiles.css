@@ -44,6 +44,17 @@
   min-width: 0;
 }
 
+.ct-corner {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.ct-pin-caption {
+  margin: var(--space-1) 0 0;
+}
+
 .ct-name {
   display: flex;
   align-items: center;

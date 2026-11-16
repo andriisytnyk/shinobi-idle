@@ -19,6 +19,7 @@
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
+  import PinGoal from './PinGoal.svelte';
   import ReqTree from './ReqTree.svelte';
 
   const content = game.content;
@@ -146,6 +147,9 @@
               <p class="name">
                 <ActionEmblem kind="obstacle" id={option.id} {skill} size="sm" />
                 <EntityLink kind="obstacle" id={option.id} />
+                <span class="pin-end"
+                  ><PinGoal kind="obstacle" id={option.id} always={missing !== null} /></span
+                >
                 {#if option.built}
                   <span class="mark"
                     ><Icon name="lucide:check" size={14} /> {t('course.builtMark')}</span
@@ -161,6 +165,9 @@
                     {t('tile.locked')}
                   </p>
                   <ReqTree node={missing} />
+                  <p class="pin-caption">
+                    <PinGoal kind="obstacle" id={option.id} variant="link" />
+                  </p>
                 </div>
               {/if}
               {#if !option.built}
@@ -305,6 +312,14 @@
     align-items: center;
     gap: var(--space-2);
     font-weight: 600;
+  }
+
+  .pin-end {
+    margin-left: auto;
+  }
+
+  .pin-caption {
+    margin: var(--space-1) 0 0;
   }
 
   .mark {

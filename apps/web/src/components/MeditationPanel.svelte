@@ -7,6 +7,7 @@
   import EntityLink from './EntityLink.svelte';
   import NatureLink from './NatureLink.svelte';
   import Icon from './Icon.svelte';
+  import PinGoal from './PinGoal.svelte';
 
   const content = game.content;
 
@@ -28,7 +29,10 @@
     {#each practices as practice (practice.id)}
       {@const entry = game.state.meditation[practice.id]}
       <li class="practice" data-practice={practice.id}>
-        <h3><EntityLink kind="practice" id={practice.id} /></h3>
+        <h3>
+          <EntityLink kind="practice" id={practice.id} />
+          <span class="pin-end"><PinGoal kind="practice" id={practice.id} /></span>
+        </h3>
         <p class="counts">
           <span data-insight>{t('meditation.insight')}: {entry?.insight ?? 0}</span>
           <span data-enlight>{t('meditation.enlight')}: {entry?.enlight ?? 0}</span>
@@ -85,8 +89,14 @@
   }
 
   h3 {
+    display: flex;
+    align-items: center;
     margin: 0;
     font-size: var(--text-sm);
+  }
+
+  .pin-end {
+    margin-left: auto;
   }
 
   ul {

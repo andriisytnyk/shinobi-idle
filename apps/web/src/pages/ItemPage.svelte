@@ -1,6 +1,7 @@
 <script lang="ts">
   import EntityLink from '../components/EntityLink.svelte';
   import Icon from '../components/Icon.svelte';
+  import PinGoal from '../components/PinGoal.svelte';
   import { entityDesc, entityName, isEntityKind } from '../lib/entities.ts';
   import { itemKindName } from '../lib/vocab.ts';
   import { formatInt } from '../lib/format.ts';
@@ -21,13 +22,6 @@
   const desc = $derived(entityDesc(ref));
   const relations = $derived(itemRelations(id, content));
   const owned = $derived(game.read((gs) => gs.bank[id] ?? 0));
-  const pinned = $derived(game.read((gs) => gs.goal?.kind === 'item' && gs.goal.id === id));
-
-  function togglePin(): void {
-    game.dispatch(
-      pinned ? { type: 'goal.clear' } : { type: 'goal.set', ref: { kind: 'item', id } },
-    );
-  }
 </script>
 
 {#snippet line(rel: ItemRelation)}
@@ -47,9 +41,7 @@
     <h1 data-ui="entity-header"><Icon entity={ref} size={32} /> {entityName(ref)}</h1>
     {#if desc}<p>{desc}</p>{/if}
     <p class="owned">{t('item.owned', { n: formatInt(owned) })}</p>
-    <button type="button" class="pin" data-pin aria-pressed={pinned} onclick={togglePin}>
-      {t(pinned ? 'technique.unpin' : 'technique.pin')}
-    </button>
+    <PinGoal kind="item" {id} variant="button" />
 
     <section data-ui="entity-section">
       <h2>{t('item.sources')}</h2>
@@ -110,22 +102,6 @@
 
   li {
     padding: var(--space-1) 0;
-  }
-
-  .pin {
-    min-height: var(--control-md);
-    padding: var(--space-1) var(--space-3);
-    border: var(--border-thin) solid var(--accent);
-    border-radius: var(--radius-sm);
-    background: var(--surface-raised);
-    color: var(--fg);
-    font: inherit;
-    cursor: pointer;
-  }
-
-  .pin[aria-pressed='true'] {
-    background: none;
-    color: var(--accent);
   }
 
   .n,

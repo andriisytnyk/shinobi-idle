@@ -185,12 +185,21 @@ export interface MissionStageEvent extends EventBase {
   stage: number;
   ok: boolean;
 }
-/** A mission was finished and paid. */
+/**
+ * A mission was finished and paid. It carries what was really granted, so that nothing else is
+ * needed to describe the completion: `ryo` and `rep` (the money and Reputation), every currency
+ * that was added (those two, Intel and any currency a pack pays), the items that reached the bank
+ * (a scroll part only when it dropped), and the village resource units.
+ */
 export interface MissionDoneEvent extends EventBase {
   type: 'missionDone';
   mission: string;
   ryo: number;
   rep: number;
+  currencies: { currency: string; n: number }[];
+  items: { id: string; n: number }[];
+  /** The village resource the mission brought: `units` earned, `added` to the village, `lost` to a full store; `waiting` when there is no village yet and the units wait for it. Null when the mission brings none. */
+  resource: { slug: string; units: number; added: number; lost: number; waiting: number } | null;
 }
 /** A building reached a new level. */
 export interface BuildingBuiltEvent extends EventBase {

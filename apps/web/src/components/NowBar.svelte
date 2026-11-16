@@ -185,16 +185,20 @@
           data-entity="{row.ref.kind}:{row.ref.id}"
           class:with-mission={row.mission}
         >
-          <ActionEmblem
-            size="sm"
-            kind={row.ref.kind}
-            id={row.ref.id}
-            skill={row.skill}
-            icon={FALLBACK_ICON[row.ref.kind]}
-          />
+          <span class="emblem">
+            <ActionEmblem
+              size="sm"
+              kind={row.ref.kind}
+              id={row.ref.id}
+              skill={row.skill}
+              icon={FALLBACK_ICON[row.ref.kind]}
+            />
+          </span>
           <span class="what" data-now-what>
-            {#if VERB[row.kind]}<span class="verb">{t(VERB[row.kind] ?? '')}</span>{/if}
-            <span class="name"><EntityLink kind={row.ref.kind} id={row.ref.id} /></span>
+            <span class="line">
+              {#if VERB[row.kind]}<span class="verb">{t(VERB[row.kind] ?? '')}</span>{/if}
+              <span class="name"><EntityLink kind={row.ref.kind} id={row.ref.id} /></span>
+            </span>
             {#if row.practice}
               <span class="phrase" data-now-phase={row.practice.phase}>
                 {#if row.practice.phase === 'seal' && row.practice.seal}
@@ -227,7 +231,16 @@
               >{t('rank.testLeft', { time: formatDuration(wait.left) })}</span
             >
           {/if}
-          <button type="button" class="stop" onclick={() => stop(row.slot)}>{t('now.stop')}</button>
+          <button
+            type="button"
+            class="stop"
+            aria-label={t('now.stop')}
+            title={t('now.stop')}
+            onclick={() => stop(row.slot)}
+          >
+            <span class="stop-icon"><Icon name="lucide:square" size={16} /></span>
+            <span class="stop-label">{t('now.stop')}</span>
+          </button>
           {#if row.mission}<NowMission now={row.mission} />{/if}
           <Slot name="now.bar" ctx={{ slot: row.slot }} />
         </li>
@@ -345,6 +358,20 @@
     white-space: nowrap;
   }
 
+  .emblem {
+    display: inline-flex;
+    flex: none;
+  }
+
+  /* The verb and the name read as one phrase; the name gives way first. */
+  .line {
+    display: flex;
+    flex: 0 8 auto;
+    align-items: baseline;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
   .verb {
     flex: none;
   }
@@ -357,7 +384,7 @@
   }
 
   .name {
-    flex: 0 8 auto;
+    flex: 0 1 auto;
     font-weight: 600;
   }
 
@@ -404,6 +431,10 @@
     white-space: nowrap;
   }
 
+  .stop-icon {
+    display: none;
+  }
+
   .stop,
   .more {
     min-height: var(--control-xs);
@@ -441,11 +472,6 @@
       display: none;
     }
 
-    .name {
-      --_max-width: 6rem;
-      max-width: var(--_max-width);
-    }
-
     .title,
     .xph,
     .place-label {
@@ -465,6 +491,68 @@
 
     .chip {
       flex: 1 0 100%;
+    }
+
+    /*
+     * One slot takes two lines: the emblem and the whole action name on the first, the live phrase
+     * on the second, and the stop control as an icon at the end. The name wraps rather than being cut.
+     */
+    .slot {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--space-1) var(--space-2);
+    }
+
+    .slot > :global(*) {
+      grid-column: 1 / -1;
+    }
+
+    .slot > .emblem {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+    }
+
+    .slot > .what {
+      display: contents;
+    }
+
+    .line {
+      grid-column: 2;
+      grid-row: 1;
+      flex-wrap: wrap;
+    }
+
+    .name {
+      overflow: visible;
+      text-overflow: clip;
+      overflow-wrap: anywhere;
+      white-space: normal;
+    }
+
+    .phrase {
+      grid-column: 2;
+      grid-row: 2;
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+    }
+
+    .slot > .wait {
+      grid-column: 2;
+    }
+
+    .slot > .stop {
+      grid-column: 3;
+      grid-row: 1 / span 2;
+    }
+
+    .stop-label {
+      display: none;
+    }
+
+    .stop-icon {
+      display: inline-flex;
     }
 
     /* Whole-tap targets of at least 44 px on a phone. */
