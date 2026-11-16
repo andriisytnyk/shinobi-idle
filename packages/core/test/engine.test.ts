@@ -171,7 +171,11 @@ describe('integer time accounting', () => {
     const half = make(500);
     advance(full, 600_000, content);
     advance(half, 600_000, content);
-    expect(Math.abs(half.stats.completed - full.stats.completed / 2)).toBeLessThanOrEqual(1);
+    // The cast part of the cycle shortens with the mastery the practice itself earns (2087 ms at half the
+    // mastery against 2060 ms at full), so the halves differ by that drift, about 1%, not by rounding.
+    expect(Math.abs(half.stats.completed - full.stats.completed / 2)).toBeLessThanOrEqual(
+      full.stats.completed * 0.01 + 1,
+    );
   });
 
   it('rounds the next event up: a cycle ends at the first whole ms with enough work', () => {

@@ -601,6 +601,34 @@ function timeTo(timer: Timer, rate: number): number | null {
   return rest <= 0 ? 0 : Math.ceil(rest / rate);
 }
 
+/** The nearest due time of one combatant, if it is nearer than `start`. */
+function soonest(ctx: FightCtx, fight: FightState, c: Combatant, start: number): number {
+  let best = start;
+  for (const e of c.effects) {
+    if (e.kind === 'periodic' && (e.until === null || e.next <= e.until)) {
+      const n = e.next - fight.t;
+      if (n < best) best = n;
+    }
+    if (e.until !== null) {
+      const n = e.until - fight.t;
+      if (n < best) best = n;
+    }
+  }
+  if (c.ward > 0 && c.wardUntil !== null && c.wardUntil - fight.t < best) best = c.wardUntil - fight.t;
+  if (c.decoys > 0 && c.decoyUntil !== null && c.decoyUntil - fight.t < best) best = c.decoyUntil - fight.t;
+  const rate = speed(ctx, c);
+  for (const name in c.timers) {
+    const timer = c.timers[name];
+    if (timer) {
+      const n = timeTo(timer, rate);
+      if (n !== null && n < best) best = n;
+    }
+  }
+  const own = timeTo(c.timer, rate);
+  if (own !== null && own < best) best = own;
+  return best;
+}
+
 /**
  * Work units until something happens in the fight: a combatant's timer fills, an effect ticks or
  * ends, a ward lapses, pools regenerate, the time cap comes. Zero when the player is free to act.
@@ -615,25 +643,8 @@ export function fightNextEventIn(
   const player = fight.player;
   const ctx = makeCtx(fight, content, rules);
   let best = Math.min(fight.poolAt, fight.cap) - fight.t;
-  const take = (n: number | null): void => {
-    if (n !== null && n < best) best = n;
-  };
-  const dueOf = (c: Combatant): void => {
-    for (const e of c.effects) {
-      if (e.kind === 'periodic' && (e.until === null || e.next <= e.until)) take(e.next - fight.t);
-      if (e.until !== null) take(e.until - fight.t);
-    }
-    if (c.ward > 0 && c.wardUntil !== null) take(c.wardUntil - fight.t);
-    if (c.decoys > 0 && c.decoyUntil !== null) take(c.decoyUntil - fight.t);
-    const rate = speed(ctx, c);
-    for (const name in c.timers) {
-      const timer = c.timers[name];
-      if (timer) take(timeTo(timer, rate));
-    }
-    take(timeTo(c.timer, rate));
-  };
-  dueOf(player);
-  for (const e of fight.enemies) if (alive(e)) dueOf(e);
+  best = soonest(ctx, fight, player, best);
+  for (const e of fight.enemies) if (alive(e)) best = soonest(ctx, fight, e, best);
   return Math.max(0, best);
 }
 
