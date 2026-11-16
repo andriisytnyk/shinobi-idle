@@ -11,18 +11,186 @@
             Поточний ранг
           <p class="rank">
             Генін
-      <section class="exam" data-exam="core:genin_exam">
+      <section class="exam" data-exam="core:chunin_exam">
         <h2>
-          <a class="entity-link" href="#/exam/core:genin_exam">
-            Іспит на Геніна
+          <a class="entity-link" href="#/exam/core:chunin_exam">
+            Іспит на Чуніна
         <p class="desc">
-          Тайдзюцу 10, Ніндзюцу 10, Контроль чакри 10 і три академічні техніки. Далі — тест сенсея з дзвіночками.
-        <p class="done" data-passed="">
-          <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-            <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-          Іспит на Геніна складено.
-        <p class="later">
-          Іспит на Чуніна з'явиться в наступних оновленнях.
+          Чекліст: бойовий рівень 40, Розвідка 20, Атлетика 25 і Репутація. Далі — письмовий тест, Ліс смерті, турнір і, нарешті, жилет. Письмовий тест іде швидше від Розвідки й Intel.
+        <h3>
+          Що дає ранг
+        <ul class="perks" data-perks="">
+          <li>
+            Слотів у наборі технік: 5
+          <li>
+            Природ у наборі: 2
+          <li>
+            Слотів підсумка: +1
+        <h3>
+          Вимоги іспиту
+        <div class="checklist" data-checklist="">
+          <div class="group" data-met="false">
+            <ul class="rows">
+              <li>
+                <div class="row" data-entity="skill:vit" data-met="false" data-ui="req-row">
+                  <span class="mark">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <span class="label">
+                    <a class="entity-link" href="#/skill/vit">
+                      Живучість
+                    <span class="detail">
+                      рів. 40
+                  <span class="count">
+                    1/40
+                  <span aria-hidden="true" class="bar">
+                    <span class="fill" style="width: 2.5%;">
+              <li>
+                <div class="group" data-met="false">
+                  <p class="caption">
+                    Достатньо одного:
+                  <ul class="rows">
+                    <li>
+                      <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/skill/tai">
+                            Тайдзюцу
+                          <span class="detail">
+                            рів. 40
+                        <span class="count">
+                          1/40
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 2.5%;">
+                    <li>
+                      <div class="row" data-entity="skill:nin" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/skill/nin">
+                            Ніндзюцу
+                          <span class="detail">
+                            рів. 40
+                        <span class="count">
+                          1/40
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 2.5%;">
+                    <li>
+                      <div class="row" data-entity="skill:katon" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/skill/katon">
+                            Катон
+                          <span class="detail">
+                            рів. 40
+                        <span class="count">
+                          1/40
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 2.5%;">
+                    <li>
+                      <div class="row" data-entity="skill:futon" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/skill/futon">
+                            Футон
+                          <span class="detail">
+                            рів. 40
+                        <span class="count">
+                          1/40
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 2.5%;">
+                    <li>
+                      <div class="row" data-entity="skill:raiton" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/skill/raiton">
+                            Райтон
+                          <span class="detail">
+                            рів. 40
+                        <span class="count">
+                          1/40
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 2.5%;">
+                    <li>
+                      <div class="row" data-entity="skill:doton" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/skill/doton">
+                            Дотон
+                          <span class="detail">
+                            рів. 40
+                        <span class="count">
+                          1/40
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 2.5%;">
+                    <li>
+                      <div class="row" data-entity="skill:suiton" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/skill/suiton">
+                            Суйтон
+                          <span class="detail">
+                            рів. 40
+                        <span class="count">
+                          1/40
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 2.5%;">
+              <li>
+                <div class="row" data-entity="skill:scout" data-met="false" data-ui="req-row">
+                  <span class="mark">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <span class="label">
+                    <a class="entity-link" href="#/skill/scout">
+                      Розвідка
+                    <span class="detail">
+                      рів. 20
+                  <span class="count">
+                    1/20
+                  <span aria-hidden="true" class="bar">
+                    <span class="fill" style="width: 5%;">
+              <li>
+                <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                  <span class="mark">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <span class="label">
+                    <a class="entity-link" href="#/skill/ath">
+                      Атлетика
+                    <span class="detail">
+                      рів. 25
+                  <span class="count">
+                    1/25
+                  <span aria-hidden="true" class="bar">
+                    <span class="fill" style="width: 4%;">
+              <li>
+                <div class="row" data-met="false" data-ui="req-row">
+                  <span class="mark">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <span class="label">
+                    Репутація
+                  <span class="count">
+                    0/300
+                  <span aria-hidden="true" class="bar">
+                    <span class="fill" style="width: 0%;">
+        <button class="take" disabled="" type="button">
+          Скласти письмовий тест
+        <p class="blocked">
+          Спершу виконай усі вимоги.
       <section class="ladder" data-ranks="">
         <h2>
           Ранги
@@ -113,3 +281,6 @@
               Чунін
             <span class="state">
               Попереду
+            <span class="opens">
+              <a class="entity-link" href="#/exam/core:chunin_exam">
+                Іспит на Чуніна

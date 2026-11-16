@@ -28,12 +28,9 @@
   let { quest, index }: Props = $props();
 
   const objective = $derived(quest.steps[index]?.objective);
-  /** A finished step shows no live tree: what it asked may have been spent since (the items of an errand), and it was done. */
   const result = $derived(
     game.read((gs) =>
-      objective?.t === 'req' && stepStatus(gs, quest, index) !== 'done'
-        ? withoutRankRows(evalReq(gs, objective.req, content))
-        : null,
+      objective?.t === 'req' ? withoutRankRows(evalReq(gs, objective.req, content)) : null,
     ),
   );
   const counted = $derived(
