@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { evalReq, examFor } from '@shinobi/core';
+  import { evalReq, examFor, writtenPassed } from '@shinobi/core';
   import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
@@ -7,7 +7,7 @@
   import { entityDesc } from '../lib/entities.ts';
   import { formatDuration } from '../lib/format.ts';
   import { senseiTestInfo } from '../lib/exam-test.ts';
-  import { rankEntries } from '../lib/rank-ladder.ts';
+  import { examOperations, perksOf, rankEntries } from '../lib/rank-ladder.ts';
   import { t } from '../lib/i18n.ts';
   import { nextExamRank, rankIndex, rankName } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
@@ -36,7 +36,40 @@
   /** The sensei test, while it runs, as a progress action. */
   const test = $derived(game.read((gs) => senseiTestInfo(gs, game.rules, content)));
 
+  /** A two-part exam (the Chunin one): the written test, then the rest of the exam, then the rank. */
+  const written = $derived(game.read((gs) => (exam ? writtenPassed(gs, exam) : false)));
+  const rest = $derived(
+    game.read((gs) => (exam?.then && written ? evalReq(gs, exam.then, content) : null)),
+  );
+  /** The operations that are the rest of the exam, with where each stands. */
+  const stages = $derived(
+    game.read((gs) =>
+      exam
+        ? examOperations(content, exam).map((op) => ({
+            id: op.id,
+            open: op.unlock ? evalReq(gs, op.unlock, content).met : true,
+            cleared: gs.flags[op.clearFlag] !== undefined,
+            running: gs.slots.some((s) => s.action?.id === op.id),
+          }))
+        : [],
+    ),
+  );
+  /** What the rank of the shown exam gives besides what it unlocks. */
+  const perks = $derived(exam ? perksOf(content, exam.rank) : []);
+  /** The last rank of the content ends the slice: its final screen can be read again. */
+  const last = $derived(exam ? content.playerRanks.at(-1)?.id === exam.rank : false);
+  const ready = $derived(written ? (rest?.met ?? false) : (checklist?.met ?? false));
+  const takeKey = $derived(!exam?.then ? 'rank.take' : written ? 'rank.confer' : 'rank.takeWritten');
+
   let error = $state<string | null>(null);
+
+  /** Starts an operation of the exam: the action kind that holds it is looked up in the rules. */
+  function runStage(id: string): void {
+    const kind = Object.entries(game.rules.actionKinds).find(([, k]) => k.has(id, content))?.[0];
+    if (kind === undefined) return;
+    const result = game.dispatch({ type: 'action.start', slot: 0, kind, id });
+    error = result.ok ? null : result.reason;
+  }
 
   function take(): void {
     const result = game.dispatch({ type: 'exam.start', rank: exam?.rank ?? '' });
@@ -66,22 +99,73 @@
         <p class="desc">{entityDesc({ kind: 'exam', id: exam.id })}</p>
       {/if}
 
+      {#if perks.length > 0}
+        <h3>{t('rank.gives')}</h3>
+        <ul class="perks" data-perks>
+          {#each perks as perk (perk.kind)}
+            <li>{t(`rank.perk.${perk.kind}`, { n: perk.n })}</li>
+          {/each}
+        </ul>
+      {/if}
+
       {#if passed}
         <p class="done" data-passed>
           <Icon name="lucide:check" size={16} />
           {t('rank.passed')}
         </p>
-        <p class="later">{t('rank.later')}</p>
+        <p class="later">{t(last ? 'rank.lastDone' : 'rank.later')}</p>
+        {#if last}
+          <button type="button" class="take" data-finale-open onclick={() => game.showFinale()}>
+            {t('rank.finale')}
+          </button>
+        {/if}
       {:else}
         <h3>{t('rank.checklist')}</h3>
         {#if checklist}
           <div class="checklist" data-checklist><ReqTree node={checklist} /></div>
         {/if}
 
+        {#if written}
+          <p class="done" data-written>
+            <Icon name="lucide:check" size={16} />
+            {t('rank.writtenDone')}
+          </p>
+          <h3>{t('rank.then')}</h3>
+          {#if rest}
+            <div class="checklist" data-then><ReqTree node={rest} /></div>
+          {/if}
+          {#if stages.length > 0}
+            <h3>{t('rank.stages')}</h3>
+            <ul class="stages" data-stages>
+              {#each stages as stage (stage.id)}
+                <li data-stage={stage.id} data-state={stage.cleared ? 'cleared' : stage.open ? 'open' : 'locked'}>
+                  <span class="stage-name">{t(`operation.${stage.id}.name`)}</span>
+                  <span class="stage-state"
+                    >{t(
+                      stage.cleared
+                        ? 'rank.stageCleared'
+                        : stage.running
+                          ? 'rank.stageRunning'
+                          : stage.open
+                            ? 'rank.stageOpen'
+                            : 'rank.stageLocked',
+                    )}</span
+                  >
+                  {#if stage.open && !stage.running}
+                    <button type="button" class="secondary" onclick={() => runStage(stage.id)}>
+                      {t(stage.cleared ? 'rank.stageAgain' : 'rank.stageStart')}
+                    </button>
+                  {/if}
+                </li>
+              {/each}
+            </ul>
+          {/if}
+        {/if}
+
         {#if test}
           <div class="test" data-test>
-            <h3>{t('rank.test')}</h3>
-            <p>{t('rank.testRunning')}</p>
+            <h3>{t(written ? 'rank.conferring' : 'rank.test')}</h3>
+            <p>{t(written ? 'rank.conferRunning' : 'rank.testRunning')}</p>
             <div
               class="bar"
               role="progressbar"
@@ -96,10 +180,10 @@
             <button type="button" class="secondary" onclick={stop}>{t('rank.testStop')}</button>
           </div>
         {:else}
-          <button type="button" class="take" disabled={!checklist?.met} onclick={take}>
-            {t('rank.take')}
+          <button type="button" class="take" disabled={!ready} onclick={take}>
+            {t(takeKey)}
           </button>
-          {#if !checklist?.met}<p class="blocked">{t('rank.takeBlocked')}</p>{/if}
+          {#if !ready}<p class="blocked">{t(written ? 'rank.conferBlocked' : 'rank.takeBlocked')}</p>{/if}
           {#if error}<p class="error" role="alert">{t(error)}</p>{/if}
         {/if}
       {/if}
@@ -264,6 +348,48 @@
     border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-md);
     background: var(--surface);
+  }
+
+  .perks {
+    margin: 0;
+    padding-left: var(--space-4);
+  }
+
+  .stages {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .stages li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
+  }
+
+  .stages li[data-state='cleared'] {
+    border-color: var(--success);
+  }
+
+  .stage-name {
+    font-weight: 600;
+  }
+
+  .stage-state {
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
+  }
+
+  .stages .secondary {
+    margin-top: 0;
+    margin-left: auto;
   }
 
   .done {

@@ -68,6 +68,8 @@ export function toastFor(event: GameEvent, content: ContentDb): ToastSpec | null
       return { key: 'toast.questStep', params: {}, ref: { kind: 'quest', id: event.quest } };
     case 'questDone':
       return { key: 'toast.questDone', params: {}, ref: { kind: 'quest', id: event.quest } };
+    case 'examPassed':
+      return { key: 'toast.examPassed', params: {}, ref: { kind: 'exam', id: event.exam } };
     case 'itemUsed':
       // A tonic names a skill (or the group of natures), not a technique: the toast links to the tonic.
       if (!content.techniques.some((x) => x.id === event.target)) {

@@ -88,7 +88,8 @@ describe('A2: nature.choose', () => {
     expect(s.events).toContainEqual(
       expect.objectContaining({ type: 'natureGained', nature: 'doton', first: true }),
     );
-    expect(s.quests['core:mission_board']?.done).toBe(true);
+    // Choosing the nature is the first step of the chain; the rest of it is still to do.
+    expect(s.quests['core:mission_board']?.step).toBe(1);
   });
 });
 
@@ -410,7 +411,7 @@ describe('A8: save and determinism', () => {
     text.state.player.natures = ['doton'];
     const withNature = deserialize(JSON.stringify(text), content);
     expect(withNature.team).toEqual({ rival: 'raiton', aya: 'suiton' });
-    expect(withNature.quests['core:mission_board']?.done).toBe(true);
+    expect(withNature.quests['core:mission_board']?.step).toBe(1);
   });
 
   it('round-trips the team', () => {

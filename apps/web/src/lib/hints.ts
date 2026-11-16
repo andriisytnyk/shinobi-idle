@@ -1,6 +1,14 @@
 import type { ContentDb, SkillId } from '@shinobi/content';
 import { isAcademyRank, nextExamRank } from './vocab.ts';
-import { cellLevel, evalReq, examFor, levelAt, skillLevel, type GameState } from '@shinobi/core';
+import {
+  cellLevel,
+  evalReq,
+  examFor,
+  levelAt,
+  skillLevel,
+  writtenPassed,
+  type GameState,
+} from '@shinobi/core';
 
 /** A one-time tutorial hint. Its text is `hint.<id>` and its title `hint.title.<id>`. */
 export interface HintDef {
@@ -69,6 +77,46 @@ export const HINTS: readonly HintDef[] = [
     },
   },
   { id: 'graduation', when: (state, content) => !isAcademyRank(content, state.player.rank) },
+  // Turning points of the story: a chain asks for payment, a boss opens, the C rank opens, the second exam.
+  {
+    id: 'tracking',
+    when: (state, content) =>
+      content.quests.some((q) => {
+        const progress = state.quests[q.id];
+        return progress !== undefined && !progress.done && q.steps[progress.step]?.objective.t === 'pay';
+      }),
+  },
+  {
+    id: 'boss',
+    when: (state, content) =>
+      content.zones.some(
+        (z) => z.region === 'boss' && z.unlock !== null && evalReq(state, z.unlock, content).met,
+      ),
+  },
+  { id: 'cMissions', when: (state) => state.flags['missions.c.unlocked'] !== undefined },
+  {
+    id: 'chuninReady',
+    when: (state, content) => {
+      const next = nextExamRank(content, state.player.rank);
+      const exam = next === null ? undefined : examFor(content, next);
+      // The first exam has its own hint; a later one is ready when the checklist holds and the written test is still to take.
+      return (
+        !isAcademyRank(content, state.player.rank) &&
+        exam !== undefined &&
+        exam.then !== undefined &&
+        !writtenPassed(state, exam) &&
+        evalReq(state, exam.checklist, content).met
+      );
+    },
+  },
+  {
+    id: 'examStages',
+    when: (state, content) => {
+      const next = nextExamRank(content, state.player.rank);
+      const exam = next === null ? undefined : examFor(content, next);
+      return exam !== undefined && writtenPassed(state, exam);
+    },
+  },
 ];
 
 export const hintTextKey = (id: string): string => `hint.${id}`;

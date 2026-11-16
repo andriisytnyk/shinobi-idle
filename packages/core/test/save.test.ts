@@ -106,7 +106,8 @@ describe('A10: save', () => {
     expect(state.mastery['core:ghost']).toBeUndefined();
     expect(state.known['core:ghost']).toBeUndefined();
     expect(state.bank).toEqual({});
-    expect(state.flags).toEqual({ gate: true });
+    // A second nature starts the Rival chain, whose duel step opens the first duel's zone.
+    expect(state.flags).toEqual({ gate: true, 'boss.ren1.unlocked': true });
     expect(state.player.rank).toBe('student');
     expect(state.player.natures).toEqual(['katon']);
     expect(state.rng.combat).toEqual(createState(0, content).rng.combat);

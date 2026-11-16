@@ -143,6 +143,8 @@ export function createGame(deps: GameDeps = {}) {
   let logId = 0;
   /** Set when the player has just graduated; the graduation modal clears it. */
   let graduation = $state(false);
+  /** Set when the player has reached the last rank of the content; the final screen clears it. */
+  let finale = $state(false);
   /** One-off happenings of this session that hints wait for (a craft that ran out of ingredients). */
   let signals = $state.raw<Signals>({});
 
@@ -269,7 +271,9 @@ export function createGame(deps: GameDeps = {}) {
       ) {
         lines.push({ id: ++logId, event });
       } else if (event.type === 'rankUp' && content.exams.some((e) => e.rank === event.rank)) {
-        graduation = true;
+        // The last rank of the content ends the slice: its own screen tells it, not the promotion dialog.
+        if (content.playerRanks.at(-1)?.id === event.rank) finale = true;
+        else graduation = true;
       }
       if (event.type === 'ruleDisabled' && !noteRule(event.pack, event.rule, event.reason))
         continue;
@@ -373,6 +377,7 @@ export function createGame(deps: GameDeps = {}) {
     setRevealReader(reveal);
     log = [];
     graduation = false;
+    finale = false;
     signals = {};
     lastWall = clock.now();
     touch();
@@ -463,6 +468,10 @@ export function createGame(deps: GameDeps = {}) {
     get graduation(): boolean {
       return graduation;
     },
+    /** Whether the final screen of the slice is due (the last rank was just reached, or the player asked for it again). */
+    get finale(): boolean {
+      return finale;
+    },
     get phase(): Phase {
       return phase;
     },
@@ -529,6 +538,13 @@ export function createGame(deps: GameDeps = {}) {
     },
     dismissGraduation(): void {
       graduation = false;
+    },
+    dismissFinale(): void {
+      finale = false;
+    },
+    /** Opens the final screen again, from the rank page; only once the last rank is held. */
+    showFinale(): void {
+      if (content.playerRanks.at(-1)?.id === state.player.rank) finale = true;
     },
     /** Developer tool: moves game time forward through `advance`, like waiting would. */
     devAdvance(ms: number): void {

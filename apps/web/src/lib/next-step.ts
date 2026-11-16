@@ -40,12 +40,16 @@ export function counterProgress(
 ): { n: number; of: number } {
   const status = stepStatus(state, quest, index);
   const progress = state.quests[quest.id];
+  const total = [objective.counter, ...(objective.also ?? [])].reduce(
+    (sum, key) => sum + counterValue(state, key),
+    0,
+  );
   const raw =
     status === 'done'
       ? objective.n
       : status === 'pending' || !progress
         ? 0
-        : counterValue(state, objective.counter) - progress.base;
+        : total - progress.base;
   return { n: Math.max(0, Math.min(objective.n, raw)), of: objective.n };
 }
 
@@ -73,6 +77,14 @@ export function flagPage(id: string, content: ContentDb): string | null {
     return found ? hrefFor({ kind: 'region', id: found.id }) : '#/world';
   }
   if (id.startsWith('deposit.')) return '#/world';
+  // An operation that is a mission of the board or of a place is read on the mission's page; the exam's own parts on the rank page.
+  const op = content.operations.find((o) => o.clearFlag === id);
+  if (op) {
+    return content.missions.some((m) => m.id === op.id)
+      ? hrefFor({ kind: 'mission', id: op.id })
+      : '#/rank';
+  }
+  if (id.startsWith('exam.')) return '#/rank';
   return null;
 }
 
@@ -99,6 +111,9 @@ function pageFor(state: GameState, node: ReqResult, content: ContentDb): string 
       return `#/village/${req.id}`;
     case 'item':
       return itemPlace(req.id, content) ?? '#/bank';
+    case 'currency':
+      // Reputation and Intel come from missions and from exploring.
+      return req.role === 'study' ? '#/world' : '#/missions';
     case 'flag':
       return flagPage(req.id, content) ?? (req.id === 'firstFight' ? '#/combat' : '#/quests');
     default:
@@ -112,6 +127,8 @@ export function objectiveTarget(
   objective: QuestObjective,
   content: ContentDb,
 ): string {
+  // A payment is made on the journal page, from the step's own button.
+  if (objective.t === 'pay') return '#/quests';
   if (objective.t === 'counter') {
     if (counterEnemy(objective.counter) !== null) return '#/combat';
     const mission = counterMission(objective.counter);
