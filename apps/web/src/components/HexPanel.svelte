@@ -6,6 +6,8 @@
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import { skillByActivity } from '../lib/vocab.ts';
+  import { modLine, payoutLine } from '../lib/points.ts';
+  import { moneyName } from '../lib/vocab.ts';
   import { keyIcon, keyNameKey, uniqueReq } from '../lib/world.ts';
   import Slot from '../lib/ext/Slot.svelte';
   import AutoSurveyButton from './AutoSurveyButton.svelte';
@@ -37,7 +39,17 @@
   interface View {
     info: HexInfo;
     cell: CellInfo | null;
-    travel: { blocked: string | null; hexes: number; ms: number };
+    travel: {
+      blocked: string | null;
+      hexes: number;
+      ms: number;
+      /** The price of the same trip made at once, in ryo; null when there is no route. */
+      price: number | null;
+      /** Why the trip for ryo cannot be made; null when it can. */
+      paidBlocked: string | null;
+      /** Whether the trip is free and at once: the performer stands on a found outpost and the target is one of its group. */
+      free: boolean;
+    };
     exploreSlot: number;
     walkSlot: number;
     timing: ReturnType<typeof slotTiming>;
@@ -60,7 +72,14 @@
       return {
         info,
         cell,
-        travel: { blocked: plan.blocked, hexes: plan.hexes.length, ms: plan.ms },
+        travel: {
+          blocked: plan.blocked,
+          hexes: plan.hexes.length,
+          ms: plan.ms,
+          price: plan.price,
+          paidBlocked: plan.paidBlocked,
+          free: plan.free,
+        },
         exploreSlot,
         walkSlot: gs.slots.findIndex(
           (s) => s.action?.kind === 'walk' && s.action.id === info.address,
@@ -122,7 +141,21 @@
   const survey = () =>
     void game.dispatch({ type: 'action.start', slot: 0, kind: 'explore', id: info?.address ?? '' });
   const stop = (slot: number) => void game.dispatch({ type: 'action.stop', slot });
-  const go = () => void game.dispatch({ type: 'world.travel', cell: info?.address ?? '', slot: 0 });
+  const go = () =>
+    void game.dispatch({ type: 'world.travel', cell: info?.address ?? '', mode: 'walk', slot: 0 });
+  const goPaid = () =>
+    void game.dispatch({ type: 'world.travel', cell: info?.address ?? '', mode: 'paid', slot: 0 });
+  const goFree = () =>
+    void game.dispatch({
+      type: 'world.travel',
+      cell: info?.address ?? '',
+      mode: 'outpost',
+      slot: 0,
+    });
+  /** Why the trip for ryo cannot be made, when the trip on foot can: it is said beside the button. */
+  const reasonPaid = $derived(
+    view && view.travel.blocked === null && !info?.here ? view.travel.paidBlocked : null,
+  );
   const claim = (poi: string) => void game.dispatch({ type: 'world.claim', poi });
 
   const title = $derived.by(() => {
@@ -217,6 +250,69 @@
                   {t(`place.${place}.name`)}
                 </p>
                 <p class="small dim">{t(`place.${place}.desc`)}</p>
+              </li>
+            {/each}
+          </ul>
+        </section>
+      {/if}
+
+      {#if info.points.length > 0}
+        <section class="block" data-points>
+          <h3>{t('map.points')}</h3>
+          <ul class="points">
+            {#each info.points as point, i (i)}
+              <li
+                class="point"
+                class:active={point.active}
+                data-ui="point-row"
+                data-point-status={point.status}
+                data-point={point.place ?? undefined}
+              >
+                {#if point.status === 'veiled'}
+                  <p class="place-name">
+                    <Icon name="lucide:circle-help" size={16} />
+                    {t('map.point.veiled')}
+                  </p>
+                  {#if point.hint}<p class="small dim" data-point-hint>{t(point.hint)}</p>{/if}
+                {:else}
+                  <p class="place-name">
+                    <Icon
+                      name={point.travel !== null ? 'lucide:footprints' : 'lucide:landmark'}
+                      size={16}
+                    />
+                    {point.place ? t(`place.${point.place}.name`) : ''}
+                  </p>
+                  <p class="badges">
+                    <span class="badge" data-point-state>{t(`map.point.${point.status}`)}</span>
+                    {#if point.travel !== null}
+                      <span class="badge" data-point-outpost>{t('map.point.outpost')}</span>
+                    {/if}
+                    {#if point.power.length > 0}
+                      <span class="badge" data-point-power>{t('map.point.power')}</span>
+                    {/if}
+                    {#if point.active}
+                      <span class="badge here" data-point-active>{t('map.point.active')}</span>
+                    {/if}
+                  </p>
+                  {#if point.power.length > 0}
+                    <p class="small dim">{t('map.point.bonus')}</p>
+                    <ul class="mods">
+                      {#each point.power as mod, j (j)}
+                        <li class="small" data-point-mod>{modLine(mod)}</li>
+                      {/each}
+                    </ul>
+                  {/if}
+                  {#if point.travel !== null}
+                    <p class="small dim">{t('map.point.outpostHint')}</p>
+                  {/if}
+                  {#if point.reward}
+                    <p class="small" data-point-reward>
+                      {t('map.point.reward', { text: payoutLine(point.reward, content) })}
+                    </p>
+                  {:else}
+                    <p class="small dim">{t('map.point.rewardUnknown')}</p>
+                  {/if}
+                {/if}
               </li>
             {/each}
           </ul>
@@ -342,8 +438,25 @@
             aria-describedby={reasonGo ? 'why-walk' : undefined}
             onclick={go}
           >
-            {t('map.act.go')}{view.travel.ms > 0 ? ` · ${formatDuration(view.travel.ms)}` : ''}
+            {t('map.act.walk')}{view.travel.ms > 0 ? ` · ${formatDuration(view.travel.ms)}` : ''}
           </button>
+          <button
+            type="button"
+            class="action"
+            data-travel-paid
+            disabled={view.travel.paidBlocked !== null}
+            aria-describedby={reasonPaid ? 'why-paid' : undefined}
+            onclick={goPaid}
+          >
+            {t('map.act.paid')}{view.travel.price !== null
+              ? ` · ${formatInt(view.travel.price)} ${moneyName(content)}`
+              : ''}
+          </button>
+          {#if view.travel.free}
+            <button type="button" class="action" data-travel-free onclick={goFree}>
+              {t('map.act.free')}
+            </button>
+          {/if}
         {/if}
         <AutoSurveyButton whyId="why-auto" />
         {#each claimable as poi (poi.id)}
@@ -365,6 +478,14 @@
           </li>{/if}
         {#if reasonGo && !info.here}<li class="why" id="why-walk" data-why="walk">
             {t(reasonGo)}
+          </li>{/if}
+        {#if reasonPaid}<li class="why" id="why-paid" data-why="paid">
+            {t(reasonPaid, { price: view.travel.price ?? 0 })}
+          </li>{/if}
+        {#if view.travel.hexes > 0 && !info.here}<li class="route-line" data-route-line>
+            {t('map.route', { n: view.travel.hexes, time: formatDuration(view.travel.ms) })}
+            {#if view.travel.free}
+              · {t('map.route.free')}{/if}
           </li>{/if}
         {#if view.autoWhy}<li class="why" id="why-auto" data-why="auto">{t(view.autoWhy)}</li>{/if}
         {#if !info.here}
@@ -632,6 +753,32 @@
     margin: var(--space-1) 0 0;
     color: var(--fg-dim);
     font-size: var(--text-xs);
+  }
+
+  .points {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .point.active {
+    padding-left: var(--space-2);
+    border-left: var(--border-thick) solid var(--chakra);
+  }
+
+  .mods {
+    margin: 0;
+    padding: 0 0 0 var(--space-4);
+  }
+
+  .route-line {
+    margin: var(--space-1) 0 0;
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
+    list-style: none;
   }
 
   .poi-list {

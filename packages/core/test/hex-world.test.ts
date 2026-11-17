@@ -381,9 +381,11 @@ describe('travel is hex by hex', () => {
     expect(eventsOf(state, 'travelled')).toHaveLength(1);
   });
 
-  it('has no handlers in the built-in rules', () => {
-    expect(defaultRules.hexEntered).toEqual([]);
-    expect(composeRules(defaultRules, [corePack], content).hexEntered).toEqual([]);
+  it('has one handler in the built-in rules: the one that pays a step of a walk', () => {
+    expect(defaultRules.hexEntered).toHaveLength(1);
+    expect(composeRules(defaultRules, [corePack], content).hexEntered).toEqual(
+      defaultRules.hexEntered,
+    );
   });
 
   it('keeps walking when a handler of a pack throws', () => {

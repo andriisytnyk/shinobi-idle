@@ -1,7 +1,8 @@
 import type { ContentDb } from '@shinobi/content';
 import type { GameEvent } from '@shinobi/core';
 import { actionRef, masteryRef } from './entities.ts';
-import type { Params } from './i18n.ts';
+import { t, type Params } from './i18n.ts';
+import { localeKey } from '@shinobi/content';
 import { missionToast } from './mission-toasts.ts';
 import { currencyName, resourceName } from './vocab.ts';
 import type { EntityRef } from './route.ts';
@@ -115,6 +116,28 @@ export function toastFor(event: GameEvent, content: ContentDb): ToastSpec | null
         params: {},
         ref: { kind: 'poi', id: event.poi },
         gains: claimGains(event.poi, content),
+      };
+    case 'pointFound':
+      return {
+        key: 'toast.pointFound',
+        params: { name: t(`place.${event.place}.name`) },
+        gains: {
+          ryo: event.reward.ryo,
+          currencies: event.reward.currencies,
+          items: event.reward.items,
+        },
+      };
+    case 'wayFound':
+      // The small finds of the terrain are many and go quietly into the bank; a rare find of a place is told.
+      if (event.place === '') return null;
+      return {
+        key: 'toast.wayFound',
+        params: {
+          text: [
+            ...event.items.map((i) => `${t(localeKey('item', i.id, 'name'))} ×${i.n}`),
+            ...Object.entries(event.currencies).map(([id, n]) => `${n} ${currencyName(id)}`),
+          ].join(', '),
+        },
       };
     case 'travelled':
       return {

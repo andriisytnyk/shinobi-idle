@@ -54,6 +54,27 @@
             <dd data-scout-current="">
               <span class="dim">
                 Розвідка зараз не йде.
+        <section class="mastery" data-map-mastery="" data-ui="map-mastery">
+          <h3>
+            Майстерність мапи
+          <p class="small">
+            Розвідано до кінця: 0 із 118 гексів.
+          <ul class="tiers">
+            <li class="tier" data-tier-reached="false">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <span>
+                30 гексів: Досвід: Розвідка +5%
+            <li class="tier" data-tier-reached="false">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <span>
+                60 гексів: Ціна проїзду за рьо −10%
+            <li class="tier" data-tier-reached="false">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <span>
+                Усі гекси: Час розвідки −5%
         <p class="small dim">
           Здобувається за кожен новий рівень клітинки.
         <a class="open" data-open-world="" href="#/world">

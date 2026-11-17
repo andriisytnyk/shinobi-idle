@@ -34,6 +34,7 @@
     explore: 'now.doing.explore',
     walk: 'now.doing.walk',
     autosurvey: 'now.doing.autosurvey',
+    stand: 'now.doing.stand',
     fight: 'now.doing.fight',
     mission: 'now.doing.mission',
     senseiTest: 'now.doing.exam',

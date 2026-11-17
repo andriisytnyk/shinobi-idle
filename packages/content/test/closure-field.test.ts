@@ -144,11 +144,25 @@ describe('coating', () => {
 });
 
 describe('herbs and gear', () => {
-  it('rare herbs ask for Chakra Control', () => {
+  it('rare herbs ask for Chakra Control and for the place where they grow (a point of interest found)', () => {
     const req = (id: string) => content.herbs.find((h) => h.id === id)?.req;
-    expect(req('core:edelweiss')).toEqual({ t: 'skill', skill: 'cc', level: 15 });
-    expect(req('core:lotus')).toEqual({ t: 'skill', skill: 'cc', level: 30 });
-    expect(content.herbs.filter((h) => h.req)).toHaveLength(2);
+    expect(req('core:edelweiss')).toEqual({
+      t: 'all',
+      of: [
+        { t: 'skill', skill: 'cc', level: 15 },
+        { t: 'flag', id: 'point.core:jofuku_forest' },
+      ],
+    });
+    expect(req('core:lotus')).toEqual({
+      t: 'all',
+      of: [
+        { t: 'skill', skill: 'cc', level: 30 },
+        { t: 'flag', id: 'point.core:waterfall_shrine' },
+      ],
+    });
+    // The fire flower grows only in the Hell Valley.
+    expect(req('core:fireflower')).toEqual({ t: 'flag', id: 'point.core:hell_valley' });
+    expect(content.herbs.filter((h) => h.req)).toHaveLength(3);
   });
 
   it('every gear line has an effect whose per-tier size is in the balance', () => {

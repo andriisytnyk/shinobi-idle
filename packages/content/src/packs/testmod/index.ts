@@ -311,6 +311,30 @@ const data = {
    */
   countries: [{ id: 'testmod:isle' }],
   links: [{ id: 'testmod:ferry', a: [15, 17], b: [18, 17], minutes: 5, kind: 'ferry' }],
+  /**
+   * The pack's own points of interest, as data on its places: a beacon that gives a bonus of a key the
+   * pack declares while a performer stands there, and a watch that joins it in a travel group of the pack.
+   */
+  places: [
+    {
+      id: 'testmod:isle_beacon',
+      hex: [17, 17],
+      kind: 'beacon',
+      role: 'landmark',
+      point: {
+        reward: { currencies: { 'testmod:token': 2 } },
+        power: [{ key: 'testmod:forge.bonus', op: 'add', value: 0.1 }],
+        travel: 'testmod:beacons',
+      },
+    },
+    {
+      id: 'testmod:isle_watch',
+      hex: [18, 17],
+      kind: 'tower',
+      role: 'landmark',
+      point: { reward: { ryo: 7 }, travel: 'testmod:beacons' },
+    },
+  ],
   regions: [{ id: 'testmod:grove', scout: 1, cells: ['testmod:grove_edge'] }],
   cells: [
     {
@@ -516,6 +540,12 @@ export const testmodPack: ContentPack = {
       'region.testmod:grove.name': 'Тестовий гай',
       'region.testmod:grove.desc':
         'Тестовий регіон мода з однією клітинкою на острові: до неї йде переправа з узбережжя.',
+      'place.testmod:isle_beacon.name': 'Тестовий маяк',
+      'place.testmod:isle_beacon.desc':
+        'Маяк тестового острова: дає тестовий бонус, поки біля нього хтось стоїть.',
+      'place.testmod:isle_watch.name': 'Тестова вартова вежа',
+      'place.testmod:isle_watch.desc':
+        'Вежа на другому гексі острова; сполучена з маяком вільною дорогою.',
       'cell.testmod:grove_edge.name': 'Край тестового гаю',
       'cell.testmod:grove_edge.note': 'Єдина клітинка тестового регіону.',
       'poi.testmod:poi_grove_cache.name': 'Тестовий тайник',

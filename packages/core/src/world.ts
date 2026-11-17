@@ -4,7 +4,7 @@ import { addCurrency, addItem } from './bank.ts';
 import { bump } from './counters.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
-import { MS_PER_MINUTE, MS_PER_SECOND, SECONDS_PER_HOUR, rate } from './formulas.ts';
+import { MS_PER_HOUR, MS_PER_MINUTE, MS_PER_SECOND, SECONDS_PER_HOUR, rate } from './formulas.ts';
 import {
   addressOf,
   cellAtPosition,
@@ -35,6 +35,7 @@ import {
 import { graduateReq, indexOf } from './lookup.ts';
 import { computeMod, type Modifier, type ModifierProvider } from './modifiers.ts';
 import { gainXp } from './progression.ts';
+import { pointStatus, pointsAtHex, performers, settlePoints } from './points.ts';
 import { regionOpenReq } from './regions.ts';
 import { actionFloor, activitySkill, currencyOf, moneyOf } from './vocab.ts';
 import { evalReq, skillLevel, type Req } from './requirements.ts';
@@ -335,6 +336,8 @@ function surveyOnce(state: GameState, subject: Subject, content: ContentDb, rule
     ? exploreOnce(state, subject.cell, content, rules)
     : plainOnce(state, subject, content, rules);
   surveysDone.set(state, (surveysDone.get(state) ?? 0) + 1);
+  // A survey may reveal a point (its hex reached a new level) under a performer who stands there.
+  settlePoints(state, content, rules);
   // The searches stay good while a hex only goes on being surveyed within its level, and the hex
   // is the one every plan has chosen (its count only makes it a better choice); anything else
   // (a new level, new land, a hex nobody planned) makes them be made again.
@@ -424,23 +427,54 @@ export function walkMs(
   );
 }
 
-/** Moves the performer of `slot` onto a hex: position, the event and the handlers of the rules. */
-function enterHex(
+/**
+ * Moves the performer of `slot` onto a hex: position, the event, the handlers of the rules, and the
+ * points of interest the performer now stands on. A handler that moves a performer or touches the
+ * clock is undone (the documents promise a handler does neither).
+ */
+export function enterHex(
   state: GameState,
   key: string,
   content: ContentDb,
   rules: Rules,
   slot: number,
+  by: 'walk' | 'paid' | 'outpost' = 'walk',
 ): void {
   const at = parseHexKey(key);
   const hex = indexOf(content).hexes.get(key);
   if (!at || !hex) return;
   placeAt(state, slot, addressOf(content, at));
   const terrain = hex.terrain ?? '';
-  emit(state, { type: 'hexEntered', hex: key, terrain, by: 'walk', slot });
-  const ctx = { hex: key, q: at.q, r: at.r, terrain, by: 'walk', slot } as const;
-  for (const hook of rules.hexEntered ?? []) hook(state, ctx, content, rules);
+  emit(state, { type: 'hexEntered', hex: key, terrain, by, slot });
+  const ctx = { hex: key, q: at.q, r: at.r, terrain, by, slot } as const;
+  const location = state.world.location;
+  const figures = state.world.figures ? { ...state.world.figures } : undefined;
+  const now = state.now;
+  for (const hook of rules.hexEntered ?? []) {
+    hook(state, ctx, content, rules);
+    if (state.now !== now) state.now = now;
+    if (state.world.location !== location) state.world.location = location;
+    if (JSON.stringify(state.world.figures) !== JSON.stringify(figures)) {
+      if (figures) state.world.figures = { ...figures };
+      else delete state.world.figures;
+    }
+  }
+  settlePoints(state, content, rules);
 }
+
+/** The action kind of a clone that has arrived: it stands where it is and does nothing, so it keeps its place on the map and its share of the speed. */
+export const STAND_KIND = 'stand';
+/** The only action id of standing. */
+export const STAND_ID = 'here';
+/** The length of the quiet cycle of standing: it never finishes anything, and a long one costs the engine almost no events. */
+const STAND_MS = SECONDS_PER_HOUR * MS_PER_HOUR;
+
+export const standKind: ActionKind = {
+  has: (id) => id === STAND_ID,
+  requirements: () => null,
+  intervalMs: () => STAND_MS,
+  complete: () => 'step',
+};
 
 export const walkKind: ActionKind = {
   has: (id, content) => hexOfAddress(content, id) !== null,
@@ -463,6 +497,8 @@ export const walkKind: ActionKind = {
     return 'stop';
   },
   abortCause: () => 'error.cellNotReachable',
+  // A clone that arrives stays where it is: its slot goes on standing there until it is dispelled or given something else.
+  after: (_state, slot) => (slot > 0 ? { kind: STAND_KIND, id: STAND_ID } : null),
 };
 
 // ---------- auto-survey ----------
@@ -548,6 +584,8 @@ function planFor(state: GameState, content: ContentDb, slot: number): AutoPlan |
     subject: Subject;
     /** 0 for a hex still in fog, 1 for one that is surveyed and only goes deeper: fog is lifted first. */
     deep: number;
+    /** 1 for a hex that holds a point of interest the player knows of (never one still hidden, so the order tells nothing). */
+    point: number;
     key: number;
     explored: number;
     stand: string;
@@ -556,10 +594,12 @@ function planFor(state: GameState, content: ContentDb, slot: number): AutoPlan |
     b === null ||
     a.deep < b.deep ||
     (a.deep === b.deep &&
-      (a.key < b.key ||
-        (a.key === b.key &&
-          (a.explored > b.explored ||
-            (a.explored === b.explored && a.subject.address < b.subject.address)))));
+      (a.point > b.point ||
+        (a.point === b.point &&
+          (a.key < b.key ||
+            (a.key === b.key &&
+              (a.explored > b.explored ||
+                (a.explored === b.explored && a.subject.address < b.subject.address)))))));
   let inRange: Pick | null = null;
   const seen: Axial[] = hexesWithin(here, range);
   for (const key of linkedKeys(content, hereKey)) {
@@ -574,6 +614,7 @@ function planFor(state: GameState, content: ContentDb, slot: number): AutoPlan |
     const pick = {
       subject,
       deep: isSurveyed(state, content, hexKey(a.q, a.r)) ? 1 : 0,
+      point: knownPoint(state, content, hexKey(a.q, a.r)),
       key: Math.min(hexDistance(here, a), range),
       explored: exploresOf(state, subject.address),
       stand: hereKey,
@@ -596,6 +637,7 @@ function planFor(state: GameState, content: ContentDb, slot: number): AutoPlan |
       const pick = {
         subject,
         deep: cut ? 0 : 1,
+        point: knownPoint(state, content, hexKey(hex.q, hex.r)),
         key: minutes,
         explored: exploresOf(state, subject.address),
         stand: spot,
@@ -609,6 +651,11 @@ function planFor(state: GameState, content: ContentDb, slot: number): AutoPlan |
     stand: far.stand,
     route: pathTo(content, reach, far.stand)?.hexes ?? [],
   };
+}
+
+/** 1 when the hex holds a point of interest that the player knows of (revealed, even if it only shows a hint), else 0. */
+function knownPoint(state: GameState, content: ContentDb, key: string): number {
+  return pointsAtHex(content, key).some((p) => pointStatus(state, content, p) !== 'hidden') ? 1 : 0;
 }
 
 function neighboursInReach(content: ContentDb, hex: Axial, reach: Reach): boolean {
@@ -683,11 +730,15 @@ export function claimPoi(state: GameState, poiId: string, content: ContentDb): C
 
 // ---------- modifiers ----------
 
-/** The training spot the player stands in, when its cell has been explored. */
+/** The training spots a performer (the character or a clone) stands in, once each, when their cells have been explored. */
 function trainingHere(state: GameState, content: ContentDb): (Poi & { kind: 'training' })[] {
-  const cell = locationCell(state, content);
-  if (!cell) return [];
-  return cell.pois.flatMap((p) => (p.kind === 'training' && state.world.pois[p.id] ? [p] : []));
+  const out = new Map<string, Poi & { kind: 'training' }>();
+  for (const { key } of performers(state, content)) {
+    const cell = indexOf(content).cellByHex.get(key);
+    for (const p of cell?.pois ?? [])
+      if (p.kind === 'training' && state.world.pois[p.id]) out.set(p.id, p);
+  }
+  return [...out.values()];
 }
 
 /**

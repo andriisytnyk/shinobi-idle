@@ -46,7 +46,9 @@ type Owner =
   /** A record of the content that is no entity (a coat, with its poison, base and product) and names several; one of the others that is fully shown names this one. */
   | { t: 'group'; others: string[] }
   /** The mission board, which offers every mission that is on it. */
-  | { t: 'board' };
+  | { t: 'board' }
+  /** What the map gives: the reward of a point of interest and the rare find of a place (named once the point is found), or the finds of a terrain (`place` is null: only held, they name nothing). */
+  | { t: 'find'; place: string | null };
 
 interface Catalog {
   entries: Map<string, Entry>;
@@ -202,6 +204,13 @@ function catalogOf(content: ContentDb): Catalog {
       }
     }
   }
+  // What the map gives is named by the place that gives it; the finds of a terrain by nothing (they are shown when held).
+  for (const place of content.places) {
+    for (const [id, field] of idsIn({ point: place.point, rare: place.rare }, ''))
+      link(id, { t: 'find', place: place.id }, field);
+  }
+  for (const terrain of content.terrains)
+    for (const [id, field] of idsIn(terrain.finds, '')) link(id, { t: 'find', place: null }, field);
   for (const zone of content.zones) link(zone.enemy, { t: 'zone', id: zone.id }, 'enemy');
   for (const op of content.operations) {
     // An operation is on the missions list under its own id; its stages name the fights it holds.
@@ -296,6 +305,8 @@ function ownerShows(ctx: Ctx, owner: Owner): boolean {
       return buyPrice(owner.item, ctx.content) !== null;
     case 'board':
       return true;
+    case 'find':
+      return owner.place !== null && ctx.state.world.pois[owner.place] === true;
     case 'group': {
       const outer = ctx.inOwner;
       ctx.inOwner = true;

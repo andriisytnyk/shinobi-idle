@@ -76,7 +76,7 @@ const ACTION_ENTITY: Readonly<Record<string, string>> = {
  */
 export function actionRef(action: { kind: string; id: string }, state?: GameState): EntityRef {
   // A hex that is no cell, and the auto-survey, have no page: the `hex` kind names them on the map.
-  if (action.kind === 'autosurvey') return { kind: HEX_KIND, id: '' };
+  if (action.kind === 'autosurvey' || action.kind === 'stand') return { kind: HEX_KIND, id: '' };
   if (action.kind === 'explore' || action.kind === 'walk') {
     const content = tryActiveContent();
     const known = state ?? tryActiveState();

@@ -188,8 +188,41 @@ export interface HexEnteredEvent extends EventBase {
   type: 'hexEntered';
   hex: string;
   terrain: string;
-  by: 'walk';
+  by: 'walk' | 'paid' | 'outpost';
   /** The action slot of the performer that moved: 0 is the character. */
+  slot: number;
+}
+/** A performer found a point of interest (a place with `Place.point`): the discovery reward was paid, once. */
+export interface PointFoundEvent extends EventBase {
+  type: 'pointFound';
+  place: string;
+  hex: string;
+  /** The action slot of the performer that found it. */
+  slot: number;
+  /** What the reward paid. */
+  reward: {
+    ryo: number;
+    items: { id: string; n: number }[];
+    currencies: Record<string, number>;
+    xp: { skill: string; amount: number } | null;
+  };
+}
+/** A walker found something on the way: on a hex of its terrain (`place` is empty) or near a place with a rare find. */
+export interface WayFoundEvent extends EventBase {
+  type: 'wayFound';
+  hex: string;
+  /** The place whose rare find it was; empty for a find of the terrain. */
+  place: string;
+  items: { id: string; n: number }[];
+  /** Other currencies paid, by id (Intel). */
+  currencies: Record<string, number>;
+  slot: number;
+}
+/** The performer of a slot paid the money of the game and travelled at once. */
+export interface PaidTravelEvent extends EventBase {
+  type: 'paidTravel';
+  hex: string;
+  price: number;
   slot: number;
 }
 /** A hex that is no cell reached a new survey level; `max` marks the last level. */
@@ -288,6 +321,9 @@ export type GameEvent =
   | TravelledEvent
   | HexEnteredEvent
   | HexSurveyedEvent
+  | PointFoundEvent
+  | WayFoundEvent
+  | PaidTravelEvent
   | MissionStageEvent
   | MissionDoneEvent
   | BuildingBuiltEvent

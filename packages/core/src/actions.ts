@@ -91,6 +91,18 @@ export interface ActionKind {
     content: ContentDb,
     rules: Rules,
   ): void;
+  /**
+   * What the slot does when this action finishes by itself (it returned 'stop'): another action
+   * (kind and id) that takes the slot over, or null to leave it idle. The figure of a clone stays on
+   * the map while its slot holds an action, so a clone's walk that ends in standing still keeps it there.
+   */
+  after?(
+    state: GameState,
+    slot: number,
+    id: string,
+    content: ContentDb,
+    rules: Rules,
+  ): { kind: string; id: string } | null;
   /** Called after the action is put in slot `slot` (its `data` is null). */
   start?(state: GameState, slot: number, id: string, content: ContentDb, rules: Rules): void;
   /** Called just before the action leaves slot `slot`, for any reason. */
@@ -220,6 +232,8 @@ export function stopSlot(
   content: ContentDb,
   rules: Rules,
   cause?: string,
+  /** The action that takes the slot over (and so keeps a clone's figure on the map). */
+  next: { kind: string; id: string } | null = null,
 ): void {
   const slot = state.slots[index];
   if (!slot?.action) return;
@@ -236,11 +250,11 @@ export function stopSlot(
     ...(missing ? { missing } : {}),
     ...(cause ? { cause } : {}),
   });
-  slot.action = null;
+  slot.action = next;
   slot.progress = 0;
   slot.data = null;
   // A clone that stops (dispelled, or done) leaves the map; one whose action is replaced stays where it stands.
-  if (index > 0 && reason !== 'replaced') removeFigure(state, index);
+  if (index > 0 && reason !== 'replaced' && next === null) removeFigure(state, index);
   rebalanceShares(state, content);
 }
 
@@ -299,7 +313,18 @@ export const actionSystem: System = {
         bump(state, actionsKey(name));
         if (result === 'stop') {
           const lacking = kind.missing?.(state, id, content, rules);
-          return stopSlot(state, index, lacking ? 'requirements' : 'finished', content, rules);
+          const after = lacking ? null : (kind.after?.(state, index, id, content, rules) ?? null);
+          const next =
+            after && actionKindOf(rules, after.kind)?.has(after.id, content) ? after : null;
+          return stopSlot(
+            state,
+            index,
+            lacking ? 'requirements' : 'finished',
+            content,
+            rules,
+            undefined,
+            next,
+          );
         }
         const req = kind.requirements(state, id, content, rules);
         if (req && !evalReq(state, req, content).met) {

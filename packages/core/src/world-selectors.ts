@@ -1,4 +1,4 @@
-import type { CellKey, ContentDb, PoiKind } from '@shinobi/content';
+import type { CellKey, ContentDb, Mod, Payout, PoiKind } from '@shinobi/content';
 import { MS_PER_HOUR } from './formulas.ts';
 import { indexOf } from './lookup.ts';
 import { getMod } from './mod.ts';
@@ -40,6 +40,8 @@ import {
   type Reach,
 } from './hex.ts';
 import { regionOpenReq } from './regions.ts';
+import { performers, pointStatus, pointsAtHex, type PointStatus } from './points.ts';
+import { jumpBlocked, travelPrice } from './travel.ts';
 
 /*
  * Read-only views of the map for the UI and bots. Nothing here changes the state.
@@ -228,8 +230,14 @@ function locationHexKey(state: GameState, content: ContentDb, slot = 0): string 
 }
 
 export interface TravelPlan {
-  /** Why the trip cannot be made (a localization key); null when it can. */
+  /** Why the trip on foot cannot be made (a localization key); null when it can. */
   blocked: string | null;
+  /** The price in ryo of the same trip made at once; null when it cannot be made for ryo (no route, or no ryo for it: see `paidBlocked`). */
+  price: number | null;
+  /** Why the trip for ryo cannot be made (a localization key); null when it can. */
+  paidBlocked: string | null;
+  /** Whether the trip is free and at once between outposts: the performer stands on a found outpost and the target is one of its group. */
+  free: boolean;
   /** Keys of the hexes the route enters in order, the start excluded; empty when there is no route. */
   hexes: string[];
   /** Length of the whole route in ms at full speed, modifiers included; 0 when there is no route. */
@@ -249,11 +257,64 @@ export function travelPlan(
     ? subjectOf(content, address)?.hex
     : indexOf(content).hexes.get(address);
   const route = blocked === null && hex ? routeTo(state, content, hex, slot) : null;
+  const price = blocked === null ? travelPrice(state, address, content, rules, slot) : null;
   return {
     blocked,
+    price,
+    paidBlocked: blocked ?? jumpBlocked(state, address, 'paid', content, rules, slot),
+    free: jumpBlocked(state, address, 'outpost', content, rules, slot) === null,
     hexes: route?.hexes ?? [],
     ms: hex && route ? (routeMs(state, content, rules, hex, slot) ?? 0) : 0,
   };
+}
+
+/** A point of interest on a hex, as far as the player knows it. */
+export interface PointInfo {
+  /** The place. Null for a veiled point: the player knows only that something is there, and which place it is stays hidden. */
+  place: string | null;
+  status: Exclude<PointStatus, 'hidden'>;
+  /** The localization key of the vague hint while the point's requirement is not met; null otherwise. */
+  hint: string | null;
+  /** What the point gives while a performer stands on it (none until it is revealed beyond a hint). */
+  power: Mod[];
+  /** The travel group of an outpost, once it is revealed. */
+  travel: string | null;
+  /** What the discovery paid; only once found. */
+  reward: Payout | null;
+  /** Whether a performer (the character or a clone) stands on it now. */
+  active: boolean;
+}
+
+/** The points of interest the player knows on the hex `key`, in the order of the places. */
+export function pointInfos(state: GameState, key: string, content: ContentDb): PointInfo[] {
+  const here = new Set(performers(state, content).map((x) => x.key));
+  return pointsAtHex(content, key).flatMap((place): PointInfo[] => {
+    const status = pointStatus(state, content, place);
+    if (status === 'hidden' || !place.point) return [];
+    if (status === 'veiled')
+      return [
+        {
+          place: null,
+          status,
+          hint: `place.${place.id}.hint`,
+          power: [],
+          travel: null,
+          reward: null,
+          active: false,
+        },
+      ];
+    return [
+      {
+        place: place.id,
+        status,
+        hint: null,
+        power: place.point.power ?? [],
+        travel: place.point.travel ?? null,
+        reward: status === 'found' ? place.point.reward : null,
+        active: status === 'found' && here.has(key),
+      },
+    ];
+  });
 }
 
 /** What one hex looks like to the player: what is known, what can be done. */
@@ -276,8 +337,10 @@ export interface HexInfo {
   inRange: boolean;
   /** The id of the cell on the hex, known once the hex is surveyed. */
   cell: string | null;
-  /** The ids of the named places on the hex, once it has been surveyed at least once. */
+  /** The ids of the named places on the hex, once it has been surveyed at least once; a place whose point is hidden or veiled is not among them. */
   places: string[];
+  /** The points of interest the player knows on the hex (a veiled one shows only its hint). */
+  points: PointInfo[];
   level: number;
   maxLevel: number;
   explores: number;
@@ -322,7 +385,13 @@ export function hexInfo(
     here,
     inRange: surveyAccess(state, content, hex, reach, slot) === 'ok',
     cell: surveyed ? (subject?.cell?.id ?? null) : null,
-    places: surveyed && level >= 1 ? (index.placesByHex.get(key) ?? []).map((p) => p.id) : [],
+    places:
+      surveyed && level >= 1
+        ? (index.placesByHex.get(key) ?? [])
+            .filter((p) => !p.point || ['open', 'found'].includes(pointStatus(state, content, p)))
+            .map((p) => p.id)
+        : [],
+    points: surveyed && level >= 1 ? pointInfos(state, key, content) : [],
     level,
     // Fog hides what a hex is: how many surveys it has had and how many it can have tell a cell from a plain hex.
     maxLevel: surveyed && subject ? surveyMaxLevel(subject, content) : 0,
@@ -357,6 +426,8 @@ export function listHexes(
     surveyCount(state),
     exploreIntervalMs(state, content, rules),
     state.slots.map((s) => (s.action?.kind === 'walk' ? s.action.id : '')).join(','),
+    Object.keys(state.world.pois).length,
+    JSON.stringify(state.world.figures ?? {}),
   ].join('#');
   const name = `${slot}|${only ?? ''}`;
   const memo = listed.get(state)?.get(name);

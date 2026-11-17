@@ -1,4 +1,34 @@
 {
-  "core:edelweiss": { "t": "skill", "skill": "cc", "level": 15 },
-  "core:lotus": { "t": "skill", "skill": "cc", "level": 30 }
+  "core:edelweiss": {
+    "t": "all",
+    "of": [
+      {
+        "t": "skill",
+        "skill": "cc",
+        "level": 15
+      },
+      {
+        "t": "flag",
+        "id": "point.core:jofuku_forest"
+      }
+    ]
+  },
+  "core:lotus": {
+    "t": "all",
+    "of": [
+      {
+        "t": "skill",
+        "skill": "cc",
+        "level": 30
+      },
+      {
+        "t": "flag",
+        "id": "point.core:waterfall_shrine"
+      }
+    ]
+  },
+  "core:fireflower": {
+    "t": "flag",
+    "id": "point.core:hell_valley"
+  }
 }

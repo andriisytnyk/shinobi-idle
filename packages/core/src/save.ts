@@ -605,6 +605,18 @@ function sanitizeWorld(raw: unknown, content: ContentDb): GameState['world'] {
     if (levelForExplores(world.explores[cell.id] ?? 0, content) < 1) continue;
     for (const poi of cell.pois) world.pois[poi.id] = true;
   }
+  // A place that is a point of interest is found by a performer stepping on it: that is not derived
+  // from the surveys, so a saved find is kept (when the content still has a point there).
+  if (isRecord(raw.pois))
+    for (const place of content.places)
+      if (place.point && raw.pois[place.id] === true) world.pois[place.id] = true;
+  const stock = pick(raw.stock, (key, v) => {
+    const rare = index.places.get(key)?.rare;
+    if (!rare || !isRecord(v)) return undefined;
+    const left = typeof v.left === 'number' && Number.isInteger(v.left) ? v.left : rare.stock;
+    return { left: Math.min(Math.max(left, 0), rare.stock), at: nonNegative(v.at) };
+  });
+  if (Object.keys(stock).length > 0) world.stock = stock;
   world.claimed = pick(raw.claimed, (key, v) => {
     const kind = index.pois.get(key)?.poi.kind;
     return v === true && world.pois[key] && (kind === 'cache' || kind === 'vault')

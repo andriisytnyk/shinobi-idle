@@ -68,10 +68,15 @@ describe('gather', () => {
     setLevel(s, 'herb', 35);
     refused(s, gather('core:edelweiss'), 'error.requirementsNotMet');
     setLevel(s, 'cc', 15);
+    // A rare herb grows at a place: the place's point of interest must be found too.
+    refused(s, gather('core:edelweiss'), 'error.requirementsNotMet');
+    s.world.pois['core:jofuku_forest'] = true;
     ok(s, gather('core:edelweiss'));
     setLevel(s, 'herb', 45);
     refused(s, gather('core:lotus'), 'error.requirementsNotMet');
     setLevel(s, 'cc', 30);
+    refused(s, gather('core:lotus'), 'error.requirementsNotMet');
+    s.world.pois['core:waterfall_shrine'] = true;
     ok(s, gather('core:lotus'));
   });
 

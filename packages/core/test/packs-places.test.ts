@@ -92,6 +92,7 @@ describe('one round trip per place', () => {
       explores: { [ghost('c')]: 3, 'core:cell': 1 },
       pois: { [ghost('p')]: true },
       claimed: { [ghost('p')]: true },
+      stock: { [ghost('p')]: { left: 1, at: 5 } },
     },
     village: {
       levels: { [ghost('hut')]: 2, 'core:academy': 1 },

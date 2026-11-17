@@ -21,13 +21,17 @@ import { natureProvider } from './natures.ts';
 import { missionKind, MISSION_KIND } from './missions/index.ts';
 import { questSystem } from './quests.ts';
 import { villageProvider, villageSystem } from './village.ts';
+import { walkHook } from './finds.ts';
 import type { HexEnteredHook } from './hex-hooks.ts';
+import { masteryProvider, pointSystem, pointsProvider } from './points.ts';
 import {
   AUTOSURVEY_KIND,
   EXPLORE_KIND,
+  STAND_KIND,
   WALK_KIND,
   autoSurveyKind,
   exploreKind,
+  standKind,
   walkKind,
   worldProvider,
 } from './world.ts';
@@ -58,6 +62,7 @@ const named = (id: string, system: System): System => ({ ...system, id });
 export const defaultRules: Rules = {
   systems: [
     named('action', actionSystem),
+    named('points', pointSystem),
     named('combat', combatSystem),
     named('wound', woundSystem),
     named('village', villageSystem),
@@ -76,6 +81,7 @@ export const defaultRules: Rules = {
     senseiTest: senseiTestKind,
     [EXPLORE_KIND]: exploreKind,
     [WALK_KIND]: walkKind,
+    [STAND_KIND]: standKind,
     [AUTOSURVEY_KIND]: autoSurveyKind,
   },
   modifierProviders: [
@@ -86,12 +92,14 @@ export const defaultRules: Rules = {
     obstacleProvider,
     natureProvider,
     worldProvider,
+    pointsProvider,
+    masteryProvider,
     villageProvider,
     cloneLinkProvider,
   ],
   combatAi: defaultCombatAi,
   fightHooks: defaultFightHooks,
-  hexEntered: [],
+  hexEntered: [walkHook],
 };
 
 // ---------- rules from packs ----------

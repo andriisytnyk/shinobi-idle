@@ -9,17 +9,18 @@ export interface HexEnteredContext {
   q: number;
   r: number;
   terrain: string;
-  /** How the player got there; `walk` is the only way now. */
-  by: 'walk';
+  /** How the performer got there: `walk` one step of a walk (or of the auto-survey), `paid` a trip paid for, `outpost` a free trip between outposts. */
+  by: 'walk' | 'paid' | 'outpost';
   /** The action slot of the performer that moved: 0 is the character, a shadow clone has its own. */
   slot: number;
 }
 
 /**
  * A handler that runs on every hex the player enters, after the sight is refreshed and the
- * `hexEntered` event is queued. Handlers run in the order of `Rules.hexEntered`; the list is empty in
- * the built-in rules and is where later rules and packs hook in (finds along the way, XP per hex,
- * survey progress). A handler may change the state but must not move the player or touch `now`.
+ * `hexEntered` event is queued. Handlers run in the order of `Rules.hexEntered`; the built-in rules
+ * hold the one that pays the walk (XP per hex, finds of the terrain and rare finds, see `finds.ts`)
+ * and packs add their own after it. A handler may change the state but must not move a performer
+ * or touch `now`: the engine puts every position back after a handler that moved one.
  */
 export type HexEnteredHook = (
   state: GameState,

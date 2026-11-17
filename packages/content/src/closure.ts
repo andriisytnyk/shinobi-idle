@@ -4,7 +4,7 @@
  * exist in the balance object, and every modifier key must be a key of the composed database.
  * Each problem names the pack that owns the entity holding the dangling reference.
  */
-import type { ContentDb, Req, RevealRule, RevealTerm } from './schema.ts';
+import type { ContentDb, Req, RevealRule, RevealTerm, Payout } from './schema.ts';
 import type { EntityListKey } from './pack.ts';
 
 /** The effects the engine and the core hooks put on a body under their own ids (not statuses): a tag or a trait may name them. */
@@ -457,6 +457,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
   for (const x of db.terrains) {
     at('terrains', x.id);
     needNumber('map.terrain', `map.terrain.${x.id}`);
+    x.finds?.drops.forEach((d, n) => ref(`finds.drops[${n}].item`, d.item, 'items'));
   }
   for (const h of db.hexes) {
     at('hexes', `${h.q},${h.r}`);
@@ -482,10 +483,58 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     if (other !== undefined) problem('hex', `the hex ${where} also holds the cell "${other}"`);
     else cellAt.set(where, c.id);
   }
+  const placeOf = new Map(db.places.map((x) => [x.id, x]));
+  /** The things a payout names exist. */
+  const payout = (field: string, pay: Payout): void => {
+    pay.items?.forEach((i, n) => ref(`${field}.items[${n}].item`, i.item, 'items'));
+    for (const id of Object.keys(pay.currencies ?? {}))
+      ref(`${field}.currencies.${id}`, id, 'currencies');
+    if (pay.xp) ref(`${field}.xp.skill`, pay.xp.skill, 'skills');
+  };
+  const groups = new Map<string, number>();
   for (const p of db.places) {
     at('places', p.id);
     standable('hex', p.hex);
+    if (p.rare) payout('rare.payout', p.rare.payout);
+    if (!p.point) continue;
+    payout('point.reward', p.point.reward);
+    req('point.needs', p.point.needs);
+    if (p.point.needs && !Object.hasOwn(db.locales.uk, `place.${p.id}.hint`))
+      problem('point.needs', `the locale key place.${p.id}.hint (the vague hint) is missing`);
+    const by = p.point.revealedBy?.point;
+    if (by !== undefined) {
+      if (by === p.id) problem('point.revealedBy.point', 'a point cannot reveal itself');
+      else if (!placeOf.get(by)?.point)
+        problem('point.revealedBy.point', `"${by}" is not a place with a point of interest`);
+    }
+    if (p.point.travel !== undefined)
+      groups.set(p.point.travel, (groups.get(p.point.travel) ?? 0) + 1);
   }
+  // A chain of reveals that ends in itself can never be opened.
+  for (const p of db.places) {
+    const seen = new Set<string>();
+    for (let at2: string | undefined = p.id; at2 !== undefined;) {
+      if (seen.has(at2)) {
+        at('places', p.id);
+        problem('point.revealedBy.point', 'the points reveal one another in a circle');
+        break;
+      }
+      seen.add(at2);
+      at2 = placeOf.get(at2)?.point?.revealedBy?.point;
+    }
+  }
+  for (const [group, n] of groups) {
+    if (n < 2) {
+      at('places', group);
+      problem('point.travel', `the travel group "${group}" has one point: there is nowhere to go`);
+    }
+  }
+  needNumber('map.walk', 'map.walk');
+  needNumber('map.travel', 'map.travel');
+  db.balance.K.map.mastery.forEach((tier, n) => {
+    at('balance', `map.mastery[${n}]`);
+    scanMods(tier.mods, 'mods');
+  });
   const linked = new Set<string>();
   for (const l of db.links) {
     at('links', l.id);

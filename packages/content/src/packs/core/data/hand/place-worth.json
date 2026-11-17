@@ -1,0 +1,147 @@
+{
+  "core:west_gate_post": {
+    "point": { "reward": { "ryo": 10 }, "travel": "leaf_road" },
+    "rare": {
+      "radius": 2,
+      "chance": 0.15,
+      "stock": 2,
+      "restockMs": 3600000,
+      "payout": { "currencies": { "intel": 1 } }
+    }
+  },
+  "core:caravan_yard": {
+    "point": { "reward": { "ryo": 30 }, "travel": "leaf_road" }
+  },
+  "core:wayside_teahouse": {
+    "point": {
+      "reward": { "ryo": 25, "items": [{ "item": "core:rice", "n": 2 }] },
+      "travel": "leaf_road",
+      "revealedBy": { "survey": 2 }
+    }
+  },
+  "core:fishing_village": {
+    "point": {
+      "reward": { "ryo": 20, "items": [{ "item": "core:river_catch", "n": 3 }] },
+      "travel": "leaf_road",
+      "revealedBy": { "point": "core:wayside_teahouse" }
+    }
+  },
+  "core:training_ground_44": {
+    "point": {
+      "reward": { "xp": { "skill": "tai", "amount": 40 } },
+      "power": [{ "key": "xp.skill.tai", "op": "add", "value": 0.05 }]
+    }
+  },
+  "core:valley_of_the_end": {
+    "point": {
+      "reward": { "currencies": { "intel": 4 } },
+      "power": [{ "key": "xp.skill.nin", "op": "add", "value": 0.05 }],
+      "needs": { "t": "skill", "skill": "scout", "level": 12 }
+    }
+  },
+  "core:waterfall_shrine": {
+    "point": {
+      "reward": { "xp": { "skill": "med", "amount": 30 } },
+      "power": [{ "key": "xp.skill.med", "op": "add", "value": 0.05 }]
+    }
+  },
+  "core:fire_temple": {
+    "point": {
+      "reward": { "currencies": { "intel": 3 } },
+      "power": [{ "key": "xp.skill.cc", "op": "add", "value": 0.05 }],
+      "needs": { "t": "rank", "rank": "genin" }
+    }
+  },
+  "core:charcoal_camp": {
+    "point": {
+      "reward": { "ryo": 40 },
+      "power": [{ "key": "gather.double", "op": "add", "value": 0.05 }]
+    }
+  },
+  "core:fishers_camp": {
+    "point": {
+      "reward": { "items": [{ "item": "core:river_catch", "n": 4 }] },
+      "power": [{ "key": "bush.regrow", "op": "add", "value": -0.05 }]
+    }
+  },
+  "core:salt_pans": {
+    "point": {
+      "reward": { "items": [{ "item": "core:salt", "n": 5 }] },
+      "power": [{ "key": "craft.keep.prov", "op": "add", "value": 0.05 }]
+    }
+  },
+  "core:jofuku_forest": {
+    "point": {
+      "reward": { "currencies": { "intel": 4 } },
+      "revealedBy": { "survey": 3 }
+    }
+  },
+  "core:hell_valley": {
+    "point": {
+      "reward": { "ryo": 60 },
+      "needs": { "t": "skill", "skill": "scout", "level": 15 }
+    }
+  },
+  "core:war_fort_ruins": {
+    "point": {
+      "reward": { "items": [{ "item": "core:coin", "n": 1 }], "currencies": { "intel": 3 } }
+    },
+    "rare": {
+      "radius": 2,
+      "chance": 0.2,
+      "stock": 2,
+      "restockMs": 5400000,
+      "payout": { "items": [{ "item": "core:note", "n": 1 }] }
+    }
+  },
+  "core:fort_cellar": {
+    "point": {
+      "reward": { "items": [{ "item": "core:gem", "n": 1 }], "currencies": { "intel": 5 } },
+      "revealedBy": { "point": "core:war_fort_ruins" }
+    }
+  },
+  "core:hunter_lodge": {
+    "point": { "reward": { "currencies": { "intel": 3 } } },
+    "rare": {
+      "radius": 3,
+      "chance": 0.12,
+      "stock": 3,
+      "restockMs": 7200000,
+      "payout": { "currencies": { "intel": 2 } }
+    }
+  },
+  "core:mercenary_den": {
+    "point": {
+      "reward": { "ryo": 80 },
+      "needs": { "t": "currency", "role": "study", "n": 5 }
+    },
+    "rare": {
+      "radius": 2,
+      "chance": 0.15,
+      "stock": 2,
+      "restockMs": 7200000,
+      "payout": { "currencies": { "intel": 3 } }
+    }
+  },
+  "core:kikyo_pass": {
+    "point": { "reward": { "currencies": { "intel": 3 } } },
+    "rare": {
+      "radius": 2,
+      "chance": 0.15,
+      "stock": 2,
+      "restockMs": 5400000,
+      "payout": { "items": [{ "item": "core:notes", "n": 1 }] }
+    }
+  },
+  "core:deserted_farm": {
+    "point": {
+      "reward": { "items": [{ "item": "core:note", "n": 1 }], "currencies": { "intel": 2 } }
+    }
+  },
+  "core:rice_hamlet": {
+    "point": { "reward": { "ryo": 20, "items": [{ "item": "core:rice", "n": 3 }] } }
+  },
+  "core:nara_forest": {
+    "point": { "reward": { "items": [{ "item": "core:mint", "n": 3 }] } }
+  }
+}

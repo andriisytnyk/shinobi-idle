@@ -1,9 +1,10 @@
 <script lang="ts">
   import type { SkillId } from '@shinobi/content';
-  import { exploreIntervalMs, rangeNow, stepTimeHere } from '@shinobi/core';
+  import { exploreIntervalMs, mapMastery, rangeNow, stepTimeHere } from '@shinobi/core';
   import { actionRef } from '../lib/entities.ts';
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
+  import { modLine } from '../lib/points.ts';
   import { skillProgress } from '../lib/progress.ts';
   import { currencyOf, held } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
@@ -40,6 +41,7 @@
         exploreMs: exploreIntervalMs(gs, content, game.rules),
         range: rangeNow(gs, content),
         stepMs: stepTimeHere(gs, content, game.rules),
+        mastery: mapMastery(gs, content),
       };
     }),
   );
@@ -84,6 +86,25 @@
       </dd>
     </div>
   </dl>
+  <section class="mastery" data-ui="map-mastery" data-map-mastery>
+    <h3>{t('map.mastery.title')}</h3>
+    <p class="small">
+      {t('map.mastery.progress', { n: data.mastery.count, total: data.mastery.total })}
+    </p>
+    <ul class="tiers">
+      {#each data.mastery.tiers as tier, i (i)}
+        <li class="tier" class:reached={tier.reached} data-tier-reached={tier.reached}>
+          <Icon name={tier.reached ? 'lucide:check' : 'lucide:minus'} size={14} />
+          <span
+            >{tier.need === data.mastery.total
+              ? t('map.mastery.tierAll')
+              : t('map.mastery.tier', { n: tier.need })}
+            {tier.mods.map((m) => modLine(m)).join(', ')}</span
+          >
+        </li>
+      {/each}
+    </ul>
+  </section>
   <p class="small dim">{t('scout.intelHint')}</p>
   <a class="open" href="#/world" data-open-world
     ><Icon name="lucide:map" size={18} /> {t('scout.open')}</a
@@ -136,6 +157,39 @@
   .small {
     margin: 0 0 var(--space-3);
     font-size: var(--text-xs);
+  }
+
+  .mastery {
+    margin: 0 0 var(--space-3);
+    padding: var(--space-3);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+  }
+
+  .mastery h3 {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  .tiers {
+    display: grid;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tier {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
+  }
+
+  .tier.reached {
+    color: var(--fg);
   }
 
   .open {
