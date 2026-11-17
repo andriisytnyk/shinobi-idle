@@ -112,6 +112,19 @@
     }
   },
   {
+    "id": "core:scroll_chakra_halving_drill",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": [],
+    "scroll": {
+      "technique": "core:chakra_halving_drill",
+      "source": {
+        "t": "quest"
+      }
+    }
+  },
+  {
     "id": "core:scroll_dragon_fire",
     "kind": "consumable",
     "tags": [],

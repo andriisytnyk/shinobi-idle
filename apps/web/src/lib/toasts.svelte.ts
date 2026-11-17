@@ -84,7 +84,8 @@ export function toastFor(event: GameEvent, content: ContentDb): ToastSpec | null
       return { key: 'toast.natureGained', params: {}, ref: { kind: 'skill', id: event.nature } };
     case 'actionStopped':
       // The player's own stop and a replacement by another action need no announcement.
-      if (event.reason === 'manual' || event.reason === 'replaced') return null;
+      if (event.reason === 'manual' || event.reason === 'dispelled' || event.reason === 'replaced')
+        return null;
       // A craft that ran out of an ingredient names it, as a link.
       if (event.missing) {
         return {

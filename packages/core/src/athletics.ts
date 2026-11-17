@@ -11,6 +11,7 @@ import {
   bonusOf,
   computeMod,
   cycleFactor,
+  type ModRules,
   type Modifier,
   type ModifierProvider,
 } from './modifiers.ts';
@@ -69,7 +70,7 @@ export function buildCost(
   const K = content.balance.K;
   const empty = state.course[`${obstacle.slot}`] === undefined;
   if (obstacle.slot === K.athletics.freeSlot && empty) return 0;
-  const mod = computeMod(rules.modifierProviders, state, 'obstacle.cost', content).total;
+  const mod = computeMod(rules, state, 'obstacle.cost', content).total;
   return Math.max(0, Math.round(K.obstacleBase * obstacle.slot ** 2 * mod));
 }
 
@@ -127,7 +128,7 @@ export function lapXp(state: GameState, content: ContentDb): number {
 /** Length of one lap in ms: the built obstacles times the obstacle time, after speed modifiers; at least 1. */
 export function lapIntervalMs(state: GameState, content: ContentDb, rules: Rules): number {
   const count = Math.max(1, builtObstacles(state, content).length);
-  const factor = cycleFactor(rules.modifierProviders, state, courseSkill(content) ?? '', content);
+  const factor = cycleFactor(rules, state, courseSkill(content) ?? '', content);
   return Math.max(actionFloor(content), Math.round(count * obstacleMs(content) * factor));
 }
 
@@ -152,10 +153,13 @@ export const courseKind: ActionKind = {
  * `obstacle.penalty`, plus the pillar of the full course. The two scaling keys are read from
  * pool checkpoints and Meditation only, so an obstacle never scales itself.
  */
-export const obstacleProvider: ModifierProvider = (state, content) => {
+export const obstacleProvider: ModifierProvider = (state, content, rules) => {
   if (Object.keys(state.course).length === 0) return [];
   const built = builtObstacles(state, content);
-  const sources = [checkpointProvider, meditationProvider];
+  const sources: ModRules = {
+    ...rules,
+    modifierProviders: [checkpointProvider, meditationProvider],
+  };
   const scale = {
     bonus: Math.max(0, 1 + bonusOf(sources, state, 'obstacle.bonus', content)),
     penalty: Math.max(0, 1 + bonusOf(sources, state, 'obstacle.penalty', content)),

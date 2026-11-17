@@ -298,7 +298,12 @@ describe('A2: split invariance with fights running', () => {
       const start =
         i === at
           ? ({ type: 'action.start', slot: i, kind: 'fight', id: enemy } as const)
-          : ({ type: 'action.start', slot: i, kind: 'drill', id: 'core:lystok_na_lobi' } as const);
+          : ({
+              type: 'action.start',
+              slot: i,
+              kind: 'drill',
+              id: ['core:lystok_na_lobi', 'core:kunai_na_doloni', 'core:chakra_v_stopakh'][i] ?? '',
+            } as const);
       expect(dispatch(state, start, content)).toEqual({ ok: true });
     }
     expect(state.slots[at]?.share).toBeGreaterThan(0);
@@ -324,6 +329,7 @@ describe('A2: split invariance with fights running', () => {
 
   it('shares: the fight gets a third of the speed in the third case', () => {
     const state = genin(1);
+    setLevel(state, 'cc', 10);
     state.slots.push({ action: null, progress: 0, share: 0, data: null });
     state.slots.push({ action: null, progress: 0, share: 0, data: null });
     for (let i = 0; i < 3; i++) {
@@ -333,7 +339,7 @@ describe('A2: split invariance with fights running', () => {
           type: 'action.start',
           slot: i,
           kind: i === 1 ? 'fight' : 'drill',
-          id: i === 1 ? 'core:dummy' : 'core:lystok_na_lobi',
+          id: i === 1 ? 'core:dummy' : i === 0 ? 'core:lystok_na_lobi' : 'core:kunai_na_doloni',
         },
         content,
       );

@@ -536,8 +536,12 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     req('unlock', q.unlock);
     q.steps.forEach((s, n) => {
       if (s.objective.t === 'req') req(`steps[${n}].objective.req`, s.objective.req);
-      if (s.objective.t === 'pay' && !db.currencies.some((x) => x.role === (s.objective as { role: string }).role))
+      if (
+        s.objective.t === 'pay' &&
+        !db.currencies.some((x) => x.role === (s.objective as { role: string }).role)
+      )
         problem(`steps[${n}].objective.role`, `no currency has the role "${s.objective.role}"`);
+      s.grants?.forEach((x, g) => ref(`steps[${n}].grants[${g}].item`, x.item, 'items'));
     });
     q.rewards.items.forEach((x, n) => ref(`rewards.items[${n}].item`, x.item, 'items'));
     if (q.rewards.rank !== null) ref('rewards.rank', q.rewards.rank, 'ranks');

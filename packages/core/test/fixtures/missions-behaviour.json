@@ -21,7 +21,12 @@
       [0, "self", "scout", "", 40, 1, 1, false, 0, 36600, 0.99],
       [1, "self", "ath", "", 40, 5, 1, false, 0, 78000, 0.99]
     ],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1
+    },
     "currencies": { "ryo": 40, "rep": 2, "intel": 0 },
     "xp": {
       "tai": 37224,
@@ -52,7 +57,7 @@
       ["stage", 114600, "core:cat", 1, true],
       ["done", 114600, "core:cat", 40, 2]
     ],
-    "digest": "c7f654850b925233"
+    "digest": "9a9e599c980f7e83"
   },
   "core:cat@mid": {
     "start": "ok",
@@ -111,7 +116,7 @@
       [0, "self", "scout", "", 30, 1, 1, false, 0, 42600, 0.99],
       [1, "self", "ath", "", 30, 5, 1, false, 0, 90000, 0.99]
     ],
-    "bank": { "core:medpouch": 1 },
+    "bank": { "core:medpouch": 1, "core:scroll_chakra_halving_drill": 1 },
     "currencies": { "ryo": 40, "rep": 2, "intel": 0 },
     "xp": {
       "tai": 13363,
@@ -142,7 +147,7 @@
       ["stage", 132600, "core:cat", 1, true],
       ["done", 132600, "core:cat", 40, 2]
     ],
-    "digest": "541d8831f465c337"
+    "digest": "2e8e45a0059ab32d"
   },
   "core:cat@intelRich": {
     "start": "error.requirementsNotMet",
@@ -233,7 +238,13 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "herb", "", 20, 1, 1, false, 0, 97200, 0.99]],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1, "core:rice": 6 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1,
+      "core:rice": 6
+    },
     "currencies": { "ryo": 20, "rep": 0, "intel": 0 },
     "xp": {
       "tai": 37224,
@@ -264,7 +275,7 @@
       ["item", 97200, "core:rice", 6],
       ["done", 97200, "core:weed", 20, 0]
     ],
-    "digest": "232d78726c6ecdb3"
+    "digest": "490d1745309992e7"
   },
   "core:weed@mid": {
     "start": "ok",
@@ -317,7 +328,7 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "herb", "", 15, 1, 1, false, 0, 103200, 0.99]],
-    "bank": { "core:medpouch": 1, "core:rice": 6 },
+    "bank": { "core:medpouch": 1, "core:scroll_chakra_halving_drill": 1, "core:rice": 6 },
     "currencies": { "ryo": 20, "rep": 0, "intel": 0 },
     "xp": {
       "tai": 13363,
@@ -348,7 +359,7 @@
       ["item", 103200, "core:rice", 6],
       ["done", 103200, "core:weed", 20, 0]
     ],
-    "digest": "7b13a9491db16799"
+    "digest": "18df1d94e74cb02c"
   },
   "core:weed@intelRich": {
     "start": "ok",
@@ -401,7 +412,13 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "herb", "", 20, 1, 1, false, 0, 92340, 0.99]],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1, "core:rice": 6 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1,
+      "core:rice": 6
+    },
     "currencies": { "ryo": 20, "rep": 0, "intel": 0 },
     "xp": {
       "tai": 37224,
@@ -432,7 +449,7 @@
       ["item", 92340, "core:rice", 6],
       ["done", 92340, "core:weed", 20, 0]
     ],
-    "digest": "df55d6c0806f77cf"
+    "digest": "cb5b338523ec1b74"
   },
   "core:fire@fresh": {
     "start": "error.requirementsNotMet",
@@ -457,7 +474,13 @@
       [1, "self", "suiton", "core:water_formation_wall", 50, 20, 1, false, 0, 84000, 0.99],
       [2, "self", "tai", "core:leaf_great_whirlwind", 40, 20, 1, false, 0, 96000, 0.99]
     ],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1, "core:rice": 6 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1,
+      "core:rice": 6
+    },
     "currencies": { "ryo": 71, "rep": 2, "intel": 0 },
     "xp": {
       "tai": 37969.114101,
@@ -490,7 +513,7 @@
       ["item", 264000, "core:rice", 6],
       ["done", 264000, "core:fire", 71, 2]
     ],
-    "digest": "868f9ce8811f91ad"
+    "digest": "ba263e338d1bf31b"
   },
   "core:fire@mid": {
     "start": "error.requirementsNotMet",
@@ -515,7 +538,7 @@
       [1, "self", "suiton", "core:water_clone", 40, 20, 1, false, 0, 96000, 0.99],
       [2, "self", "tai", "core:gate_of_healing", 30, 20, 1, false, 0, 108000, 0.99]
     ],
-    "bank": { "core:medpouch": 1, "core:rice": 6 },
+    "bank": { "core:medpouch": 1, "core:scroll_chakra_halving_drill": 1, "core:rice": 6 },
     "currencies": { "ryo": 71, "rep": 2, "intel": 0 },
     "xp": {
       "tai": 14201.253364,
@@ -548,7 +571,7 @@
       ["item", 300000, "core:rice", 6],
       ["done", 300000, "core:fire", 71, 2]
     ],
-    "digest": "b0f831549562143c"
+    "digest": "08ae6c007e7fa269"
   },
   "core:fire@intelRich": {
     "start": "error.requirementsNotMet",
@@ -633,6 +656,7 @@
       "core:antidote": 50,
       "core:wire": 50,
       "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1,
       "core:rice": 6,
       "core:spice": 2
     },
@@ -667,7 +691,7 @@
       ["item", 210000, "core:spice", 2],
       ["done", 210000, "core:drought", 61, 0]
     ],
-    "digest": "fd0336b3e0c79543"
+    "digest": "ed0975b66d579783"
   },
   "core:drought@mid": {
     "start": "error.requirementsNotMet",
@@ -688,7 +712,12 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "suiton", "core:water_clone", 40, 20, 1, false, 0, 240000, 0.99]],
-    "bank": { "core:medpouch": 1, "core:rice": 6, "core:spice": 2 },
+    "bank": {
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1,
+      "core:rice": 6,
+      "core:spice": 2
+    },
     "currencies": { "ryo": 61, "rep": 0, "intel": 0 },
     "xp": {
       "tai": 13363,
@@ -720,7 +749,7 @@
       ["item", 240000, "core:spice", 2],
       ["done", 240000, "core:drought", 61, 0]
     ],
-    "digest": "bc8ca24aa1092270"
+    "digest": "d2f3de2d139887a2"
   },
   "core:drought@intelRich": {
     "start": "error.requirementsNotMet",
@@ -747,6 +776,7 @@
       "core:antidote": 50,
       "core:wire": 50,
       "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1,
       "core:rice": 6,
       "core:spice": 2
     },
@@ -781,7 +811,7 @@
       ["item", 199500, "core:spice", 2],
       ["done", 199500, "core:drought", 61, 0]
     ],
-    "digest": "378e54fabe6826da"
+    "digest": "b278a57f34460bb9"
   },
   "core:courier@fresh": {
     "start": "error.requirementsNotMet",
@@ -802,7 +832,12 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "nin", "core:shadow_clone", 40, 5, 1, false, 0, 156000, 0.99]],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1
+    },
     "currencies": { "ryo": 51, "rep": 0, "intel": 0 },
     "xp": {
       "tai": 37224,
@@ -832,7 +867,7 @@
       ["stage", 156000, "core:courier", 0, true],
       ["done", 156000, "core:courier", 51, 0]
     ],
-    "digest": "f8bbef966282227b"
+    "digest": "8d0932fc0884dd90"
   },
   "core:courier@mid": {
     "start": "ok",
@@ -884,7 +919,7 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "nin", "core:rope_escape", 30, 5, 1, false, 0, 180000, 0.99]],
-    "bank": { "core:medpouch": 1 },
+    "bank": { "core:medpouch": 1, "core:scroll_chakra_halving_drill": 1 },
     "currencies": { "ryo": 51, "rep": 0, "intel": 0 },
     "xp": {
       "tai": 13363,
@@ -914,7 +949,7 @@
       ["stage", 180000, "core:courier", 0, true],
       ["done", 180000, "core:courier", 51, 0]
     ],
-    "digest": "e232ed1d727e047b"
+    "digest": "b8deb02a422a1462"
   },
   "core:courier@intelRich": {
     "start": "error.requirementsNotMet",
@@ -935,7 +970,12 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "nin", "core:shadow_clone", 40, 5, 1, false, 0, 148200, 0.99]],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1
+    },
     "currencies": { "ryo": 51, "rep": 0, "intel": 0 },
     "xp": {
       "tai": 37224,
@@ -965,7 +1005,7 @@
       ["stage", 148200, "core:courier", 0, true],
       ["done", 148200, "core:courier", 51, 0]
     ],
-    "digest": "757aaa3cd15e73cc"
+    "digest": "b1a926c54c758c97"
   },
   "core:rockfall@fresh": {
     "start": "error.requirementsNotMet",
@@ -986,7 +1026,13 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "doton", "core:earth_style_wall", 50, 30, 1, false, 0, 288000, 0.99]],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1, "core:salt": 6 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1,
+      "core:salt": 6
+    },
     "currencies": { "ryo": 71, "rep": 0, "intel": 0 },
     "xp": {
       "tai": 37224,
@@ -1017,7 +1063,7 @@
       ["item", 288000, "core:salt", 6],
       ["done", 288000, "core:rockfall", 71, 0]
     ],
-    "digest": "fc040e490f6461d9"
+    "digest": "d32b6a40450d737b"
   },
   "core:rockfall@mid": {
     "start": "error.requirementsNotMet",
@@ -1038,7 +1084,7 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "tai", "", 30, 30, 1, false, 0, 360000, 0.9]],
-    "bank": { "core:medpouch": 1, "core:salt": 6 },
+    "bank": { "core:medpouch": 1, "core:scroll_chakra_halving_drill": 1, "core:salt": 6 },
     "currencies": { "ryo": 71, "rep": 0, "intel": 0 },
     "xp": {
       "tai": 16157.17788,
@@ -1069,7 +1115,7 @@
       ["item", 360000, "core:salt", 6],
       ["done", 360000, "core:rockfall", 71, 0]
     ],
-    "digest": "3ee096a73dcb4f5d"
+    "digest": "9d37b761b6322290"
   },
   "core:rockfall@intelRich": {
     "start": "error.requirementsNotMet",
@@ -1090,7 +1136,13 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "doton", "core:earth_style_wall", 50, 30, 1, false, 0, 273600, 0.99]],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1, "core:salt": 6 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1,
+      "core:salt": 6
+    },
     "currencies": { "ryo": 71, "rep": 0, "intel": 0 },
     "xp": {
       "tai": 37224,
@@ -1121,7 +1173,7 @@
       ["item", 273600, "core:salt", 6],
       ["done", 273600, "core:rockfall", 71, 0]
     ],
-    "digest": "81862aee2b76c565"
+    "digest": "36985017084ac064"
   },
   "core:thief@fresh": {
     "start": "error.requirementsNotMet",
@@ -1145,7 +1197,13 @@
       [0, "self", "scout", "", 40, 20, 1, false, 0, 144000, 0.99],
       [1, "self", "", "", 0, 0, 1, false, 0, 300000, 1]
     ],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1, "core:note": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1,
+      "core:note": 1
+    },
     "currencies": { "ryo": 101, "rep": 0, "intel": 0 },
     "xp": {
       "tai": 37224,
@@ -1177,7 +1235,7 @@
       ["item", 444000, "core:note", 1],
       ["done", 444000, "core:thief", 101, 0]
     ],
-    "digest": "1ae3a63b6e037af2"
+    "digest": "617fdcbac97cc19b"
   },
   "core:thief@mid": {
     "start": "error.requirementsNotMet",
@@ -1201,7 +1259,7 @@
       [0, "self", "scout", "", 30, 20, 1, false, 0, 162000, 0.99],
       [1, "self", "", "", 0, 0, 1, false, 0, 300000, 1]
     ],
-    "bank": { "core:medpouch": 1, "core:note": 1 },
+    "bank": { "core:medpouch": 1, "core:scroll_chakra_halving_drill": 1, "core:note": 1 },
     "currencies": { "ryo": 101, "rep": 0, "intel": 0 },
     "xp": {
       "tai": 13966.980999,
@@ -1233,7 +1291,7 @@
       ["item", 462000, "core:note", 1],
       ["done", 462000, "core:thief", 101, 0]
     ],
-    "digest": "8572769a231ad853"
+    "digest": "d7b055252d90d787"
   },
   "core:thief@intelRich": {
     "start": "error.requirementsNotMet",
@@ -1257,7 +1315,13 @@
       [0, "self", "scout", "", 40, 20, 1, false, 0, 136800, 0.99],
       [1, "self", "", "", 0, 0, 1, false, 0, 285000, 1]
     ],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1, "core:note": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1,
+      "core:note": 1
+    },
     "currencies": { "ryo": 101, "rep": 0, "intel": 0 },
     "xp": {
       "tai": 37797.781949,
@@ -1289,7 +1353,7 @@
       ["item", 421800, "core:note", 1],
       ["done", 421800, "core:thief", 101, 0]
     ],
-    "digest": "f2b5e303f097cb63"
+    "digest": "113ce97b19dd43f4"
   },
   "core:caravan@fresh": {
     "start": "error.requirementsNotMet",
@@ -1314,7 +1378,13 @@
       [1, "self", "", "", 0, 0, 1, false, 0, 540000, 1],
       [2, "self", "tai", "core:leaf_great_whirlwind", 40, 25, 1, false, 0, 408000, 0.99]
     ],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1, "core:crate": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1,
+      "core:crate": 1
+    },
     "currencies": { "ryo": 556, "rep": 8, "intel": 0 },
     "xp": {
       "tai": 48638.934543,
@@ -1347,7 +1417,7 @@
       ["item", 1332000, "core:crate", 1],
       ["done", 1332000, "core:caravan", 556, 8]
     ],
-    "digest": "1c18510a2fa0f376"
+    "digest": "a231c3807a3af12e"
   },
   "core:caravan@mid": {
     "start": "error.requirementsNotMet",
@@ -1372,7 +1442,7 @@
       [1, "self", "", "", 0, 0, 1, false, 0, 540000, 1],
       [2, "self", "tai", "core:gate_of_healing", 30, 25, 1, false, 0, 456000, 0.95]
     ],
-    "bank": { "core:medpouch": 1, "core:crate": 1 },
+    "bank": { "core:medpouch": 1, "core:scroll_chakra_halving_drill": 1, "core:crate": 1 },
     "currencies": { "ryo": 556, "rep": 8, "intel": 0 },
     "xp": {
       "tai": 19932.896883,
@@ -1405,7 +1475,7 @@
       ["item", 1428000, "core:crate", 1],
       ["done", 1428000, "core:caravan", 556, 8]
     ],
-    "digest": "d39e20aab2ba1669"
+    "digest": "4f813cd432b46864"
   },
   "core:caravan@intelRich": {
     "start": "error.requirementsNotMet",
@@ -1487,7 +1557,12 @@
       [0, "self", "nin", "core:enclosing", 40, 15, 1, false, 0, 270000, 0.99],
       [1, "self", "ath", "", 40, 20, 1, false, 0, 576000, 0.99]
     ],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1
+    },
     "currencies": { "ryo": 404, "rep": 0, "intel": 0 },
     "xp": {
       "tai": 37224,
@@ -1518,7 +1593,7 @@
       ["stage", 846000, "core:sealed", 1, true],
       ["done", 846000, "core:sealed", 404, 0]
     ],
-    "digest": "fcc73c55fbb31359"
+    "digest": "f223aafdf65c5e9c"
   },
   "core:sealed@mid": {
     "start": "error.requirementsNotMet",
@@ -1568,7 +1643,12 @@
       [0, "self", "nin", "core:enclosing", 40, 15, 1, false, 0, 256500, 0.99],
       [1, "self", "ath", "", 40, 20, 1, false, 0, 547200, 0.99]
     ],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1
+    },
     "currencies": { "ryo": 404, "rep": 0, "intel": 0 },
     "xp": {
       "tai": 37224,
@@ -1599,7 +1679,7 @@
       ["stage", 803700, "core:sealed", 1, true],
       ["done", 803700, "core:sealed", 404, 0]
     ],
-    "digest": "9bba53d526539858"
+    "digest": "3bdc6b4d76ed5587"
   },
   "core:mail@fresh": {
     "start": "error.requirementsNotMet",
@@ -1620,7 +1700,12 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "ath", "", 40, 40, 1, false, 0, 1200000, 0.9]],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1
+    },
     "currencies": { "ryo": 444, "rep": 0, "intel": 2 },
     "xp": {
       "tai": 37224,
@@ -1650,7 +1735,7 @@
       ["stage", 1200000, "core:mail", 0, true],
       ["done", 1200000, "core:mail", 444, 0]
     ],
-    "digest": "184a9ccccdd883ab"
+    "digest": "a65d9e01f32814af"
   },
   "core:mail@mid": {
     "start": "error.requirementsNotMet",
@@ -1697,7 +1782,12 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "ath", "", 40, 40, 1, false, 0, 1140000, 0.9]],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1
+    },
     "currencies": { "ryo": 444, "rep": 0, "intel": 2 },
     "xp": {
       "tai": 37224,
@@ -1727,7 +1817,7 @@
       ["stage", 1140000, "core:mail", 0, true],
       ["done", 1140000, "core:mail", 444, 0]
     ],
-    "digest": "3c635f1a68e2253b"
+    "digest": "4350db3a07594ea1"
   },
   "core:well@fresh": {
     "start": "error.missingIngredient",
@@ -1752,7 +1842,13 @@
       [1, "self", "", "", 0, 0, 1, false, 0, 120000, 1],
       [2, "self", "", "", 0, 0, 1, false, 0, 720000, 1]
     ],
-    "bank": { "core:antidote": 45, "core:wire": 50, "core:medpouch": 1, "core:spice": 2 },
+    "bank": {
+      "core:antidote": 45,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1,
+      "core:spice": 2
+    },
     "currencies": { "ryo": 485, "rep": 8, "intel": 0 },
     "xp": {
       "tai": 39907.024027,
@@ -1785,7 +1881,7 @@
       ["item", 1200000, "core:spice", 2],
       ["done", 1200000, "core:well", 485, 8]
     ],
-    "digest": "dc03c242d429e6cb"
+    "digest": "bd94b08bf5766aab"
   },
   "core:well@mid": {
     "start": "error.missingIngredient",
@@ -1894,7 +1990,12 @@
       [1, "self", "doton", "core:earth_style_wall", 50, 30, 1, false, 0, 432000, 0.99],
       [2, "self", "", "", 0, 0, 1, false, 0, 660000, 1]
     ],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1
+    },
     "currencies": { "ryo": 626, "rep": 8, "intel": 0 },
     "xp": {
       "tai": 39332.572267,
@@ -1926,7 +2027,7 @@
       ["stage", 1500000, "core:dig", 2, true],
       ["done", 1500000, "core:dig", 626, 8]
     ],
-    "digest": "6d4c4a47b166c4bd"
+    "digest": "69f1a4a1dc397803"
   },
   "core:dig@mid": {
     "start": "error.requirementsNotMet",
@@ -1951,7 +2052,7 @@
       [1, "self", "tai", "", 30, 30, 1, false, 0, 540000, 0.9],
       [2, "self", "", "", 0, 0, 1, false, 0, 660000, 1]
     ],
-    "bank": { "core:medpouch": 1 },
+    "bank": { "core:medpouch": 1, "core:scroll_chakra_halving_drill": 1 },
     "currencies": { "ryo": 626, "rep": 8, "intel": 0 },
     "xp": {
       "tai": 21629.918283,
@@ -1983,7 +2084,7 @@
       ["stage", 1656000, "core:dig", 2, true],
       ["done", 1656000, "core:dig", 626, 8]
     ],
-    "digest": "d432465fd1ca5a2a"
+    "digest": "89d077008d2786f0"
   },
   "core:dig@intelRich": {
     "start": "error.requirementsNotMet",
@@ -2061,7 +2162,12 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "tai", "core:leaf_great_whirlwind", 40, 10, 1, false, 0, 168000, 0.99]],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1
+    },
     "currencies": { "ryo": 0, "rep": 4, "intel": 0 },
     "xp": {
       "tai": 41360.348893,
@@ -2091,7 +2197,7 @@
       ["stage", 168000, "core:v_spar", 0, true],
       ["done", 168000, "core:v_spar", 0, 4]
     ],
-    "digest": "0ee00ecc4b462755"
+    "digest": "5bccf8e1e30182d1"
   },
   "core:v_spar@mid": {
     "start": "ok",
@@ -2143,7 +2249,7 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "tai", "core:gate_of_healing", 30, 10, 1, false, 0, 192000, 0.99]],
-    "bank": { "core:medpouch": 1 },
+    "bank": { "core:medpouch": 1, "core:scroll_chakra_halving_drill": 1 },
     "currencies": { "ryo": 0, "rep": 4, "intel": 0 },
     "xp": {
       "tai": 15552.634139,
@@ -2173,7 +2279,7 @@
       ["stage", 192000, "core:v_spar", 0, true],
       ["done", 192000, "core:v_spar", 0, 4]
     ],
-    "digest": "4c7f3b7dcdceb073"
+    "digest": "3c746cef1ba1e523"
   },
   "core:v_spar@intelRich": {
     "start": "error.requirementsNotMet",
@@ -2245,7 +2351,12 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "doton", "core:earth_style_wall", 50, 50, 1, false, 0, 600000, 0.9]],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1
+    },
     "currencies": { "ryo": 0, "rep": 4, "intel": 0 },
     "xp": {
       "tai": 37224,
@@ -2275,7 +2386,7 @@
       ["stage", 600000, "core:v_walls", 0, true],
       ["done", 600000, "core:v_walls", 0, 4]
     ],
-    "digest": "45d9ad702e45350d"
+    "digest": "c7df98b50d90641d"
   },
   "core:v_walls@mid": {
     "start": "error.requirementsNotMet",
@@ -2376,7 +2487,12 @@
       [0, "self", "raiton", "core:four_pillar_bind", 50, 30, 1, false, 0, 288000, 0.99],
       [1, "self", "", "", 0, 0, 1, false, 0, 120000, 1]
     ],
-    "bank": { "core:antidote": 50, "core:wire": 40, "core:medpouch": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 40,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1
+    },
     "currencies": { "ryo": 0, "rep": 4, "intel": 0 },
     "xp": {
       "tai": 37224,
@@ -2407,7 +2523,7 @@
       ["stage", 408000, "core:v_fence", 1, true],
       ["done", 408000, "core:v_fence", 0, 4]
     ],
-    "digest": "37b6a2c4c900b8bf"
+    "digest": "810643dc69760e2d"
   },
   "core:v_fence@mid": {
     "start": "error.missingIngredient",
@@ -2509,7 +2625,12 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "katon", "core:running_fire", 50, 20, 1, false, 0, 336000, 0.99]],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1
+    },
     "currencies": { "ryo": 0, "rep": 4, "intel": 0 },
     "xp": {
       "tai": 37224,
@@ -2539,7 +2660,7 @@
       ["stage", 336000, "core:v_clear", 0, true],
       ["done", 336000, "core:v_clear", 0, 4]
     ],
-    "digest": "d4e93941ecf72380"
+    "digest": "e36a72ab34a8f2c1"
   },
   "core:v_clear@mid": {
     "start": "error.requirementsNotMet",
@@ -2639,7 +2760,12 @@
     "stages": [
       [0, "self", "suiton", "core:water_formation_wall", 50, 20, 1, false, 0, 336000, 0.99]
     ],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1
+    },
     "currencies": { "ryo": 0, "rep": 4, "intel": 0 },
     "xp": {
       "tai": 37224,
@@ -2669,7 +2795,7 @@
       ["stage", 336000, "core:v_water", 0, true],
       ["done", 336000, "core:v_water", 0, 4]
     ],
-    "digest": "6d8be4868b6e3edc"
+    "digest": "6d55c8b89b082f02"
   },
   "core:v_water@mid": {
     "start": "error.requirementsNotMet",
@@ -2690,7 +2816,7 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "suiton", "core:water_clone", 40, 20, 1, false, 0, 384000, 0.99]],
-    "bank": { "core:medpouch": 1 },
+    "bank": { "core:medpouch": 1, "core:scroll_chakra_halving_drill": 1 },
     "currencies": { "ryo": 0, "rep": 4, "intel": 0 },
     "xp": {
       "tai": 13363,
@@ -2720,7 +2846,7 @@
       ["stage", 384000, "core:v_water", 0, true],
       ["done", 384000, "core:v_water", 0, 4]
     ],
-    "digest": "843221eda8da736d"
+    "digest": "1d705fb637810976"
   },
   "core:v_water@intelRich": {
     "start": "error.requirementsNotMet",
@@ -2794,7 +2920,12 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "katon", "core:great_fireball", 50, 30, 1, false, 0, 384000, 0.99]],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1
+    },
     "currencies": { "ryo": 0, "rep": 4, "intel": 0 },
     "xp": {
       "tai": 37224,
@@ -2824,7 +2955,7 @@
       ["stage", 384000, "core:v_sanit", 0, true],
       ["done", 384000, "core:v_sanit", 0, 4]
     ],
-    "digest": "4ba82055e044215b"
+    "digest": "19b5a4b010323f4e"
   },
   "core:v_sanit@mid": {
     "start": "error.requirementsNotMet",
@@ -2922,7 +3053,12 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "doton", "core:earth_style_wall", 50, 30, 1, false, 0, 384000, 0.99]],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1
+    },
     "currencies": { "ryo": 0, "rep": 4, "intel": 0 },
     "xp": {
       "tai": 37224,
@@ -2952,7 +3088,7 @@
       ["stage", 384000, "core:v_rubble", 0, true],
       ["done", 384000, "core:v_rubble", 0, 4]
     ],
-    "digest": "9d064b1e1de76fa5"
+    "digest": "18830aa0512f7f04"
   },
   "core:v_rubble@mid": {
     "start": "error.requirementsNotMet",
@@ -2973,7 +3109,7 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "core:ren", "doton", "", 32, 30, 10, false, 0, 457699, 0.938]],
-    "bank": { "core:medpouch": 1 },
+    "bank": { "core:medpouch": 1, "core:scroll_chakra_halving_drill": 1 },
     "currencies": { "ryo": 0, "rep": 4, "intel": 0 },
     "xp": {
       "tai": 13363,
@@ -3003,7 +3139,7 @@
       ["stage", 457699, "core:v_rubble", 0, true],
       ["done", 457699, "core:v_rubble", 0, 4]
     ],
-    "digest": "73d83d0e4d94d6b4"
+    "digest": "6cc7996373559e7e"
   },
   "core:v_rubble@intelRich": {
     "start": "error.requirementsNotMet",
@@ -3075,7 +3211,12 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "nin", "core:shadow_clone", 40, 50, 1, false, 0, 600000, 0.9]],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1
+    },
     "currencies": { "ryo": 0, "rep": 4, "intel": 0 },
     "xp": {
       "tai": 37224,
@@ -3105,7 +3246,7 @@
       ["stage", 600000, "core:v_clones", 0, true],
       ["done", 600000, "core:v_clones", 0, 4]
     ],
-    "digest": "95926b18e3fbab39"
+    "digest": "bceaae6b8234469c"
   },
   "core:v_clones@mid": {
     "start": "error.requirementsNotMet",
@@ -3203,7 +3344,12 @@
     "finished": true,
     "stopped": false,
     "stages": [[0, "self", "nin", "core:enclosing", 40, 15, 1, false, 0, 270000, 0.99]],
-    "bank": { "core:antidote": 50, "core:wire": 50, "core:medpouch": 1 },
+    "bank": {
+      "core:antidote": 50,
+      "core:wire": 50,
+      "core:medpouch": 1,
+      "core:scroll_chakra_halving_drill": 1
+    },
     "currencies": { "ryo": 0, "rep": 4, "intel": 0 },
     "xp": {
       "tai": 37224,
@@ -3233,7 +3379,7 @@
       ["stage", 270000, "core:v_seal", 0, true],
       ["done", 270000, "core:v_seal", 0, 4]
     ],
-    "digest": "19deacb814a2f598"
+    "digest": "89d2b6890e6551b2"
   },
   "core:v_seal@mid": {
     "start": "error.requirementsNotMet",

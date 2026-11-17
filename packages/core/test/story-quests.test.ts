@@ -7,13 +7,16 @@ import {
   counterValue,
   depositFlag,
   dispatch,
+  defaultRules,
   evalReq,
   examFor,
+  growSlots,
   examWrittenFlag,
   killsKey,
   payKey,
   poiFlag,
   regionFlag,
+  senseiTestKind,
   senseiTestSeconds,
   updateQuests,
   writtenPassed,
@@ -237,16 +240,27 @@ describe('the Chunin exam, taken in two parts', () => {
     expect(start(state)).toEqual({ ok: false, reason: 'error.examPassed' });
   });
 
-  it('does not confer the rank in a second slot before the rest of the exam is done', () => {
+  it('does not confer the rank on a finished run while the rest of the exam is not done', () => {
+    // A second slot is refused the same test while the first runs (`sameActionElsewhere`), but the
+    // conferral still checks the whole gate: a run that ends after the written test is passed and
+    // before «Ім'я на камені» is done must not give the rank.
     const state = ready();
-    state.slots.push({ action: null, progress: 0, share: state.slots[0]!.share, data: null });
+    state.known['core:shadow_clone'] = true;
+    growSlots(state, content);
     expect(dispatch(state, { type: 'exam.start', rank: 'chunin', slot: 0 }, content).ok).toBe(true);
-    expect(dispatch(state, { type: 'exam.start', rank: 'chunin', slot: 1 }, content).ok).toBe(true);
-    advance(state, 30 * 60_000, content);
-    expect(writtenPassed(state, exam)).toBe(true);
+    expect(dispatch(state, { type: 'exam.start', rank: 'chunin', slot: 1 }, content)).toEqual({
+      ok: false,
+      reason: 'error.sameActionElsewhere',
+    });
+    state.flags[examWrittenFlag(exam)] = true;
+    expect(senseiTestKind.complete(state, exam.id, content, defaultRules, 1)).toBe('stop');
     expect(state.player.rank).toBe('genin');
     expect(state.bank['core:chunin_vest']).toBeUndefined();
     expect(state.events.some((e) => e.type === 'rankUp')).toBe(false);
+    // With the chain done, the same call confers it.
+    state.quests['core:name_on_stone'] = { step: 6, base: 0, done: true };
+    senseiTestKind.complete(state, exam.id, content, defaultRules, 1);
+    expect(state.player.rank).toBe('chunin');
   });
 
   it('is shorter with Scouting and Intel, and the conferral is the shortest test', () => {

@@ -118,7 +118,8 @@
     "Ім'я на камені": "name_on_stone",
     "Вічне суперництво": "eternal_rivalry",
     "Околиці": "outskirts",
-    "Суперник": "rival"
+    "Суперник": "rival",
+    "Тіньові клони": "shadow_clones"
   },
   "exam": {
     "Іспит на Геніна": "genin_exam",
@@ -134,6 +135,7 @@
     "Сувій: Приховані тіньові руки-змії": "scroll_hidden_shadow_snake_hands",
     "Частина сувою: Приховані тіньові руки-змії": "scrollpart_hidden_shadow_snake_hands",
     "Сувій: Техніка тіньового клонування": "scroll_shadow_clone",
+    "Сувій: Вправа: поділ чакри": "scroll_chakra_halving_drill",
     "Сувій: Техніка вогню дракона": "scroll_dragon_fire",
     "Сувій: Полум'яна куля вогняного дракона": "scroll_fire_dragon_flame_bullet",
     "Сувій: Вакуумна хвиля": "scroll_vacuum_wave",

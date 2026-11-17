@@ -2,6 +2,7 @@ import type { ContentDb, SkillId } from '@shinobi/content';
 import { isAcademyRank, nextExamRank } from './vocab.ts';
 import {
   cellLevel,
+  cloneSlots,
   evalReq,
   examFor,
   levelAt,
@@ -76,6 +77,7 @@ export const HINTS: readonly HintDef[] = [
       );
     },
   },
+  { id: 'clone', when: (state, content) => cloneSlots(state, content).length > 0 },
   { id: 'graduation', when: (state, content) => !isAcademyRank(content, state.player.rank) },
   // Turning points of the story: a chain asks for payment, a boss opens, a permission opens more missions, the second exam.
   {

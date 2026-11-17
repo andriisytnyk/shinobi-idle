@@ -403,6 +403,9 @@ describe('missionStatus', () => {
     const state = ableFor(combat);
     openWorld(state);
     state.slots.push({ action: null, progress: 0, share: 0, data: null });
+    // A slot of the player's own: a clone's slot does not take fights.
+    delete state.known['core:shadow_clone'];
+    dispatch(state, { type: 'loadout.auto', on: true }, content);
     const slot = state.slots[0];
     if (slot) slot.action = { kind: 'operation', id: op?.id ?? '' };
     const byOp = missionStatus(state, combat.id, 1, content, defaultRules).refusal;

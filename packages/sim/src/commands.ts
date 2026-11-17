@@ -129,7 +129,7 @@ export function runCli(argv: string[], registry: Readonly<Record<string, Bot>> =
   const report = buildReport(bot, {
     seed,
     runs,
-    limitMs: LIMIT_MS,
+    limitMs: bot.limitMs ?? LIMIT_MS,
     content: env.content,
     rules: env.rules,
   });
