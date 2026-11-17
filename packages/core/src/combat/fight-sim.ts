@@ -49,6 +49,18 @@ function addAll(into: Record<string, number>, from: Record<string, number>, n: n
   for (const [key, value] of Object.entries(from)) into[key] = (into[key] ?? 0) + value / n;
 }
 
+/** A run of fights that can be advanced a few fights at a time; the result does not depend on how it was cut. */
+export interface FightSim {
+  /** Fights played so far. */
+  readonly played: number;
+  /** Fight time played so far, in ms. */
+  readonly simulatedMs: number;
+  /** Plays up to `fights` more fights (fewer when the run is over); true once all `n` are played. */
+  step(fights: number): boolean;
+  /** The summary of the fights played; complete once `step` has returned true. */
+  summary(): FightSummary;
+}
+
 /**
  * Runs `n` fights of the player against the enemy and aggregates them. Every fight has its own
  * seed derived from `seed`. Reads its arguments only; no game state, no shared mutable state.
@@ -64,6 +76,21 @@ export function simulateFights(
   rules: FightRules,
   regen?: number,
 ): FightSummary {
+  const sim = fightSim(snap, encounter, n, seed, content, rules, regen);
+  sim.step(n);
+  return sim.summary();
+}
+
+/** The same run as `simulateFights`, advanced in steps of a few fights. */
+export function fightSim(
+  snap: PlayerSnapshot,
+  encounter: Encounter,
+  n: number,
+  seed: number,
+  content: ContentDb,
+  rules: FightRules,
+  regen?: number,
+): FightSim {
   let carried: number | undefined;
   const times: number[] = [];
   const items: Record<string, number> = {};
@@ -82,7 +109,9 @@ export function simulateFights(
     kills: 0,
     taken: 0,
   };
-  for (let i = 0; i < n; i++) {
+  let played = 0;
+  let simulatedMs = 0;
+  const play = (i: number): void => {
     const start = carried === undefined ? snap : { ...snap, hp: carried };
     const fight = createFight(start, encounter, fightSeed(seed, i), content, rules);
     fight.log = null;
@@ -102,6 +131,7 @@ export function simulateFights(
       const spent = slot.n - (fight.pouch[i]?.n ?? slot.n);
       if (slot.id !== '' && spent > 0) items[slot.id] = (items[slot.id] ?? 0) + spent / n;
     });
+    simulatedMs += fightTimeMs(fight);
     allMs += fightTimeMs(fight) / n;
     const won = fight.result === 'victory' || fight.result === 'fled';
     wounds +=
@@ -114,25 +144,40 @@ export function simulateFights(
       won && regen !== undefined
         ? Math.min(fight.player.maxHp, fight.player.hp + regen * fight.player.maxHp)
         : undefined;
-    if (!won) continue;
+    if (!won) return;
     times.push(fightTimeMs(fight));
     lost += startHp - fight.player.hp;
     share += (startHp - fight.player.hp) / fight.player.maxHp;
-  }
-  const wins = times.length;
-  times.sort((a, b) => a - b);
-  const mean = wins === 0 ? 0 : times.reduce((a, b) => a + b, 0) / wins;
-  const p = (q: number) => percentile(times, q);
+  };
+  const summary = (): FightSummary => {
+    const wins = times.length;
+    const sorted = [...times].sort((a, b) => a - b);
+    const mean = wins === 0 ? 0 : times.reduce((a, b) => a + b, 0) / wins;
+    const p = (q: number) => percentile(sorted, q);
+    return {
+      fights: played,
+      wins,
+      winRate: played === 0 ? 0 : wins / played,
+      timeMs: { mean, p50: p(1 / 2), p90: p(0.9), p99: p(0.99) },
+      hpLost: { mean: wins === 0 ? 0 : lost / wins, share: wins === 0 ? 0 : share / wins },
+      timeAllMs: allMs,
+      wounds,
+      items,
+      masteryWork,
+      tally,
+    };
+  };
   return {
-    fights: n,
-    wins,
-    winRate: n === 0 ? 0 : wins / n,
-    timeMs: { mean, p50: p(1 / 2), p90: p(0.9), p99: p(0.99) },
-    hpLost: { mean: wins === 0 ? 0 : lost / wins, share: wins === 0 ? 0 : share / wins },
-    timeAllMs: allMs,
-    wounds,
-    items,
-    masteryWork,
-    tally,
+    get played() {
+      return played;
+    },
+    get simulatedMs() {
+      return simulatedMs;
+    },
+    step(fights) {
+      for (let k = 0; k < fights && played < n; k++) play(played++);
+      return played >= n;
+    },
+    summary,
   };
 }

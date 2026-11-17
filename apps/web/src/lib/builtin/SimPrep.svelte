@@ -36,10 +36,46 @@
     ...(compare ? [{ which: 'suggested' as const, state: 'waiting' as const, result: null }] : []),
   ]);
 
+  /*
+   * What the forecast really depends on, as one text: the hand and the suggestion (the context), the
+   * pouch as the fight would see it (with what the bank adds), the Wounds, the rank, how many techniques
+   * are known and the levels of the skills. The game state changes on every tick; this text does not, so
+   * the effect below runs again only when the character does change, and a tick never cancels a forecast.
+   */
+  const digest = $derived(
+    api.read((gs) => {
+      const cap = api.content.balance.K.pouchStack;
+      return JSON.stringify([
+        ctx.target,
+        ctx.hand,
+        ctx.suggested,
+        gs.player.rank,
+        gs.wounds.stacks,
+        Object.keys(gs.known).filter((id) => gs.known[id]).length,
+        gs.loadouts.active,
+        gs.pouch.slots.map((slot) => [
+          slot.id,
+          slot.id === '' ? 0 : Math.min(cap, slot.n + (gs.bank[slot.id] ?? 0)),
+        ]),
+        Object.keys(gs.skills).map((k) => api.core.skillLevel(gs, k, api.content)),
+      ]);
+    }),
+  );
+
   $effect(() => {
+    void digest;
     if (!known) return;
+    return untrack(restart);
+  });
+
+  /** Starts the forecasts again from the character as they are now; returns the way to stop them. */
+  function restart(): () => void {
     let stop: (() => void) | null = null;
     let cancelled = false;
+    for (const column of columns) {
+      column.state = 'waiting';
+      column.result = null;
+    }
     const state = api.read();
     const run = (at: number): void => {
       const column = columns[at];
@@ -67,7 +103,7 @@
       cancelled = true;
       stop?.();
     };
-  });
+  }
 
   const pct = (x: number): string => `${Math.round(x * 100)}%`;
   const num = (x: number): string => (Math.round(x * 10) / 10).toLocaleString('uk');

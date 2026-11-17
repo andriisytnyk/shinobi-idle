@@ -112,6 +112,32 @@ describe('F1: the official mod «Симулятор бою»', () => {
     ).toHaveLength(2);
   }, 90_000);
 
+  it('gives its numbers while the game clock runs: a tick does not restart the forecast', async () => {
+    booted = await bootApp([coreUi, simulatorUi], player(2), PREPARE);
+    const app = booted;
+    // The clock is running: the game state changes every 20 ms of real time while the forecast works.
+    let ticks = 0;
+    const clock = setInterval(() => {
+      ticks++;
+      app.advance(1000);
+    }, 20);
+    try {
+      await vi.waitFor(
+        () => {
+          const cells = qa('[data-sim="prep"] .cell');
+          expect(cells.length).toBeGreaterThan(5);
+          expect(cells.every((c) => c.getAttribute('data-state') === 'done')).toBe(true);
+        },
+        { timeout: 60_000, interval: 100 },
+      );
+    } finally {
+      clearInterval(clock);
+    }
+    // It was not a quiet game: many ticks came in while the numbers were worked out.
+    expect(ticks).toBeGreaterThan(20);
+    expect(q('[data-sim="prep"]')?.textContent).toMatch(/\d+% \(від \d+% до \d+%/);
+  }, 90_000);
+
   it('does not give numbers for an enemy that is not known', async () => {
     booted = await bootApp([coreUi, simulatorUi], player(0), PREPARE);
     expect(q('[data-sim="prep"]')?.textContent).toContain('Невідомий ворог: чисел немає');

@@ -69,6 +69,29 @@ async function open(level: 0 | 1 | 2 | 3, explored = true): Promise<HTMLElement>
   return q('[data-ui="prep-verdict"]')!;
 }
 
+describe('F1-fix1: the forecast of the preparation screen with the game clock running', () => {
+  it('finishes while ticks keep coming in, and the bank of other things does not restart it', async () => {
+    booted = await bootApp([coreUi], withKnowledge(2), PREPARE);
+    const app = booted;
+    let ticks = 0;
+    const clock = setInterval(() => {
+      ticks++;
+      // The player gathers meanwhile: the bank grows with every tick.
+      game.state.bank['core:test_gather'] = ticks;
+      app.advance(1000);
+    }, 20);
+    try {
+      await vi.waitFor(
+        () => expect(q('[data-ui="prep-verdict"]')?.getAttribute('data-forecast')).toBe('done'),
+        { timeout: 30_000, interval: 50 },
+      );
+    } finally {
+      clearInterval(clock);
+    }
+    expect(ticks).toBeGreaterThan(10);
+  }, 60_000);
+});
+
 describe('F1: the preparation screen and its verdict follow the Bingo level', () => {
   it('knows nothing of an unknown enemy: no verdict, no forecast, a hint how to learn more', async () => {
     const verdict = await open(0, false);

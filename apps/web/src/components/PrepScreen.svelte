@@ -109,7 +109,27 @@
   });
 
   /** What the forecast depends on: it is run again when the hand, the pouch, the Wounds or the knowledge change. */
-  const forecastKey = $derived(show.verdict ? inputs : '');
+  const forecastInputs = $derived(
+    game.read((gs) => {
+      const cap = content.balance.K.pouchStack;
+      return JSON.stringify([
+        target,
+        knowledgeOfTarget(gs, target, content),
+        gs.player.rank,
+        Object.keys(gs.known).filter((id) => gs.known[id]).length,
+        gs.loadouts.active,
+        gs.loadouts.auto,
+        // The pouch as the fight sees it: what the bank adds counts, the rest of the bank does not (it changes while the player gathers).
+        gs.pouch.slots.map((s) => [
+          s.id,
+          s.id === '' ? 0 : Math.min(cap, s.n + (gs.bank[s.id] ?? 0)),
+        ]),
+        gs.pouch.medic,
+        gs.wounds.stacks,
+      ]);
+    }),
+  );
+  const forecastKey = $derived(show.verdict ? forecastInputs : '');
   $effect(() => {
     if (forecastKey === '') {
       forecast = { state: 'idle', progress: { done: 0, total: 0, finished: false }, result: null };
