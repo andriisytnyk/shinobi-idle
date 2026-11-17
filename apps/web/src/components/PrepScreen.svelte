@@ -1,13 +1,16 @@
 <script lang="ts">
   import { untrack } from 'svelte';
   import {
+    evalReq,
     loadoutLimits,
     pouchSlotCount,
     rankIndex,
     startAnalysis,
     stepAnalysis,
+    zoneRequirement,
     type Analysis,
     type AnalysisProgress,
+    type ReqResult,
   } from '@shinobi/core';
   import { laterInBrowser, runAnalysis } from '../lib/analysis-runner.ts';
   import Slot from '../lib/ext/Slot.svelte';
@@ -35,6 +38,7 @@
   import ActionEmblem from './ActionEmblem.svelte';
   import EntityLink from './EntityLink.svelte';
   import NatureLink from './NatureLink.svelte';
+  import ReqTree from './ReqTree.svelte';
 
   interface Props {
     target: PrepTarget;
@@ -156,6 +160,24 @@
       }),
     );
   });
+
+  /** The target is not open yet: why, as the requirement the player has to meet (it is shown apart from the verdict). */
+  const lockedReq = $derived.by((): ReqResult | null => {
+    if (!forecast.result?.sessionBlocked) return null;
+    return game.read((gs) => {
+      const zone = content.zones.find((z) => z.id === target.id);
+      const req =
+        target.kind === 'operation'
+          ? (content.operations.find((o) => o.id === target.id)?.unlock ?? null)
+          : zone
+            ? zoneRequirement(zone)
+            : null;
+      if (!req) return null;
+      const result = evalReq(gs, req, content);
+      return result.met ? null : result;
+    });
+  });
+  const blocked = $derived(forecast.result?.sessionBlocked ?? null);
 
   const verdict = $derived(forecast.result?.session?.verdict ?? null);
   const reasons = $derived.by((): Reason[] => {
@@ -362,14 +384,14 @@
       ></progress>
     {:else if forecast.state === 'failed' || !forecast.result}
       <p class="note">{t('prep.forecastFailed')}</p>
-    {:else if forecast.result.sessionBlocked}
-      <p class="note">{t(forecast.result.sessionBlocked)}</p>
+    {:else if blocked}
+      <p class="note" data-locked>{t('prep.locked')}</p>
     {:else if verdict}
       <p class="verdict-word" data-verdict-word={verdict}>{t(`prep.verdict.${verdict}`)}</p>
       <p class="note">{t(`prep.verdictNote.${verdict}`)}</p>
       {#if !show.reasons}<p class="note">{t('prep.reasonsHidden')}</p>{/if}
     {/if}
-    {#if show.reasons && reasons.length > 0}
+    {#if show.reasons && reasons.length > 0 && !blocked}
       <h4>{t('prep.reasons')}</h4>
       <ul class="reasons">
         {#each reasons as r, i (i)}
@@ -405,6 +427,17 @@
     {/if}
     <Slot name="prep.verdict" ctx={{ target, level, hand, suggested: view.suggested.techniques }} />
   </section>
+
+  {#if blocked}
+    <section class="block" data-prep-locked>
+      <h3>{t('prep.lockedNeeds')}</h3>
+      {#if lockedReq}
+        <ReqTree node={lockedReq} />
+      {:else}
+        <p class="note">{t(blocked)}</p>
+      {/if}
+    </section>
+  {/if}
 
   {#if message}<p class="message" role="status">{t(message)}</p>{/if}
 

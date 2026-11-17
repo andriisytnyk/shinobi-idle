@@ -74,7 +74,18 @@
   const opName = (id: string) => (hasKey(`operation.${id}.name`) ? t(`operation.${id}.name`) : id);
 </script>
 
-<SimplePage title={t('combat.title')}>
+<SimplePage
+  title={t(
+    section === 'bingo'
+      ? 'combat.tab.bingo'
+      : section === 'report'
+        ? 'combat.tab.report'
+        : section === 'prepare'
+          ? 'combat.prepare'
+          : 'combat.title',
+  )}
+  compact={listing.fighting}
+>
   <nav class="tabs" aria-label={t('combat.sections')} data-combat-tabs>
     <a
       href="#/combat"
@@ -101,8 +112,9 @@
   {:else if section === 'report'}
     <BattleReport />
   {:else if listing.fighting}
-    <Hint id="combat" />
+    <!-- The arena comes first: on a phone the hint above it would push the fight off the screen. -->
     <FightScreen />
+    <Hint id="combat" />
   {:else if section === 'prepare' && target}
     <PrepScreen {target} />
   {:else}
@@ -180,7 +192,7 @@
     {/if}
   {/if}
 
-  {#if section === 'fight' || section === 'prepare'}
+  {#if section === 'fight' || (section === 'prepare' && listing.fighting)}
     <details class="log" data-fight-log>
       <summary>{t('combat.log')}</summary>
       <CombatLog entries={game.combatLog} fighting={listing.fighting} />

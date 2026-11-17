@@ -14,9 +14,11 @@
     f: FighterView;
     /** What young actions did to this body: flying figures for about a second. */
     outcomes?: readonly Outcome[];
+    /** For an enemy: the player's action is aimed at it. On a phone the other bodies shrink to a line or two. */
+    targeted?: boolean;
   }
 
-  let { f, outcomes = [] }: Props = $props();
+  let { f, outcomes = [], targeted = false }: Props = $props();
 
   const player = $derived(f.side === 'player');
   const action = $derived(f.action);
@@ -64,6 +66,27 @@
   {/each}
 {/snippet}
 
+{#snippet pops()}
+  {#each outcomes as o (o.key)}
+    <div
+      class="pop"
+      data-ui="fight-outcome"
+      data-kind="pop"
+      data-outcome={o.kind}
+      aria-hidden="true"
+    >
+      {#if o.kind === 'damage'}
+        <span class="dmg">{t('fight.out.damage', { n: formatInt(o.amount) })}</span>
+      {:else if o.kind === 'dodge'}
+        <span class="dodge">{t('fight.out.dodged')}</span>
+        {#if o.via && hasKey(dodgeKey(o.via))}<span class="via">{t(dodgeKey(o.via))}</span>{/if}
+      {:else if o.kind === 'interrupted'}
+        <span class="interrupted">{t('fight.out.interrupted')}</span>
+      {/if}
+    </div>
+  {/each}
+{/snippet}
+
 <article
   class="fighter"
   class:down={!f.alive}
@@ -71,6 +94,7 @@
   data-side={f.side}
   data-entity={f.entry === null ? undefined : entityAttr({ kind: 'enemy', id: f.entry })}
   data-alive={f.alive}
+  data-targeted={f.side === 'enemy' && f.alive ? targeted : undefined}
 >
   <header class="head">
     <span class="face">
@@ -87,16 +111,37 @@
         />{#if f.of > 1}&nbsp;<span class="nth">#{f.nth}</span>{/if}{/if}
     </h3>
     {#if !f.alive}<span class="down-tag">{t('fight.down')}</span>{/if}
+    {@render pops()}
   </header>
 
   {#if f.alive}
-    <StatBar label={t('combat.hpBar')} value={f.hp} max={f.maxHp} tone={player ? 'hp' : 'enemy'} />
-    {#if f.maxChakra > 0}
-      <StatBar label={t('combat.chakraBar')} value={f.chakra} max={f.maxChakra} tone="chakra" />
-    {/if}
-    {#if f.maxStamina > 0}
-      <StatBar label={t('combat.staminaBar')} value={f.stamina} max={f.maxStamina} tone="stamina" />
-    {/if}
+    <div class="bars">
+      <StatBar
+        label={t('combat.hpBar')}
+        value={f.hp}
+        max={f.maxHp}
+        tone={player ? 'hp' : 'enemy'}
+        dense
+      />
+      {#if f.maxChakra > 0}
+        <StatBar
+          label={t('combat.chakraBar')}
+          value={f.chakra}
+          max={f.maxChakra}
+          tone="chakra"
+          dense
+        />
+      {/if}
+      {#if f.maxStamina > 0}
+        <StatBar
+          label={t('combat.staminaBar')}
+          value={f.stamina}
+          max={f.maxStamina}
+          tone="stamina"
+          dense
+        />
+      {/if}
+    </div>
 
     {#if f.statuses.length > 0}
       <ul class="statuses" aria-label={t('fight.statuses')}>
@@ -208,25 +253,6 @@
       {@render applied(f.last.statuses, f.last.combos)}
     </p>
   {/if}
-
-  {#each outcomes as o (o.key)}
-    <div
-      class="pop"
-      data-ui="fight-outcome"
-      data-kind="pop"
-      data-outcome={o.kind}
-      aria-hidden="true"
-    >
-      {#if o.kind === 'damage'}
-        <span class="dmg">{t('fight.out.damage', { n: formatInt(o.amount) })}</span>
-      {:else if o.kind === 'dodge'}
-        <span class="dodge">{t('fight.out.dodged')}</span>
-        {#if o.via && hasKey(dodgeKey(o.via))}<span class="via">{t(dodgeKey(o.via))}</span>{/if}
-      {:else if o.kind === 'interrupted'}
-        <span class="interrupted">{t('fight.out.interrupted')}</span>
-      {/if}
-    </div>
-  {/each}
 </article>
 
 <style>
@@ -418,6 +444,111 @@
   @media (prefers-reduced-motion: reduce) {
     .pop {
       display: none;
+    }
+  }
+
+  .bars {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  /*
+   * Phone: the arena has to be readable without scrolling, so a body is a few lines, not a card.
+   * The pop is a flex item of the head (never over the name); the three bars are one line each; the
+   * action is a medallion with its words and its bar beside it. A body that is not the target keeps
+   * its name, health and action line, and drops the rest (secondary bars, the last-action text).
+   */
+  @media (max-width: 768px) {
+    .fighter {
+      gap: var(--space-1);
+      padding: var(--space-2);
+    }
+
+    .name {
+      flex: 1;
+      min-width: var(--icon-md);
+      font-size: var(--text-sm);
+    }
+
+    .pop {
+      position: static;
+      flex: 0 1 auto;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0;
+      max-width: 60%;
+      margin-left: auto;
+      padding: 0 var(--space-2);
+      animation: fade 1s ease-out forwards;
+      font-size: var(--text-md);
+      line-height: 1.2;
+      text-align: right;
+      white-space: normal;
+    }
+
+    .bars {
+      gap: var(--space-1);
+    }
+
+    .action {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      column-gap: var(--space-2);
+      row-gap: var(--space-1);
+      padding: var(--space-1) var(--space-2);
+    }
+
+    .action .row {
+      display: contents;
+    }
+
+    .action > :global(.time-bar) {
+      grid-column: 2;
+    }
+
+    .action > :global(:not(.time-bar)) {
+      grid-column: 1 / -1;
+    }
+
+    .action .row > :global(.emblem) {
+      grid-row: 1 / span 2;
+    }
+
+    .last {
+      font-size: var(--text-xs);
+    }
+
+    /* The links of the arena are read, not aimed at while a fight runs: no tap-target height, like the Now bar. */
+    .name :global(a),
+    .what :global(a),
+    .last :global(a) {
+      display: inline;
+      min-height: 0;
+    }
+
+    .fighter[data-targeted='false'] .bars > :global(:not(:first-child)),
+    .fighter[data-targeted='false'] .last {
+      display: none;
+    }
+
+    .fighter[data-targeted='true'] {
+      border-color: var(--accent);
+    }
+  }
+
+  @keyframes fade {
+    from {
+      opacity: 1;
+    }
+
+    70% {
+      opacity: 1;
+    }
+
+    to {
+      opacity: 0;
     }
   }
 </style>

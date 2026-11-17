@@ -9,6 +9,7 @@ import {
   buildScene,
   castView,
   outcomesOf,
+  targetedKey,
   type FighterView,
   type LastView,
   type Outcome,
@@ -286,6 +287,47 @@ describe('F1: the outcomes that fly off a body', () => {
     expect(out.player?.find((o) => o.kind === 'dodge')?.via).toBe('core:clone');
     const old = outcomesOf(scene(player({ last: last({ damage: 3, ageMs: 5000 }) }), [body()]));
     expect(old).toEqual({});
+  });
+});
+
+describe('F1-fix1: the body the player is aiming at', () => {
+  const scene = (p: FighterView, enemies: FighterView[]): Scene => ({
+    slot: 0,
+    phase: 'fight',
+    player: p,
+    enemies,
+    nowMs: 2000,
+  });
+
+  it('is the one the action names while it stands, else the first one standing', () => {
+    const dead = body({ key: 'a', alive: false, hp: 0 });
+    const b = body({ key: 'b' });
+    const c = body({ key: 'c' });
+    const aimed = (target: string | null, enemies: FighterView[]) =>
+      targetedKey(scene(player({ action: { kind: 'basic', id: null, target } }), enemies));
+    expect(aimed('c', [dead, b, c])).toBe('c');
+    expect(aimed(null, [dead, b, c])).toBe('b');
+    // The named body is down: the engine's pick.
+    expect(aimed('a', [dead, b, c])).toBe('b');
+    expect(aimed(null, [dead])).toBe('a');
+    expect(aimed(null, [])).toBeNull();
+  });
+
+  it('marks the target on its card and keeps the pop out of the name (a flex item of the head)', () => {
+    const f = body({ key: 'b' });
+    const marked = html(Fighter, { f, targeted: true });
+    expect(marked).toContain('data-targeted="true"');
+    expect(html(Fighter, { f, targeted: false })).toContain('data-targeted="false"');
+    // The player and a body that is down carry no mark.
+    expect(html(Fighter, { f: player() })).not.toContain('data-targeted');
+    const pop = html(Fighter, {
+      f,
+      outcomes: [
+        { key: 'k', kind: 'damage' as const, amount: 7, via: null, statuses: [], combos: [] },
+      ],
+    });
+    const head = pop.slice(pop.indexOf('<header'), pop.indexOf('</header>'));
+    expect(head).toContain('data-kind="pop"');
   });
 });
 

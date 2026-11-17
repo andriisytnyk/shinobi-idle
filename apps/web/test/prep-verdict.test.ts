@@ -69,6 +69,48 @@ async function open(level: 0 | 1 | 2 | 3, explored = true): Promise<HTMLElement>
   return q('[data-ui="prep-verdict"]')!;
 }
 
+describe('F1-fix1: a target that is not open yet, and the page around the screen', () => {
+  const BOSS_PREPARE = '#/combat/prepare/zone/core:zone_boss_hunter';
+
+  it('shows what is needed as a requirement, not as a verdict, and no verdict word or reasons', async () => {
+    const state = withKnowledge(2);
+    state.bingo['core:boss_hunter'] = {
+      seen: 1,
+      wins: 1,
+      losses: 0,
+      timeouts: 0,
+      bought: 0,
+      bounty: 0,
+    };
+    booted = await bootApp([coreUi], state, BOSS_PREPARE);
+    await vi.waitFor(
+      () => expect(q('[data-ui="prep-verdict"]')?.getAttribute('data-forecast')).toBe('done'),
+      { timeout: 30_000, interval: 50 },
+    );
+    const verdict = q('[data-ui="prep-verdict"]')!;
+    expect(verdict.textContent).toContain('ще недоступна');
+    expect(verdict.textContent).not.toContain('Вимоги до цієї дії не виконано');
+    expect(verdict.querySelector('[data-verdict-word]')).toBeNull();
+    expect(verdict.querySelector('[data-reason]')).toBeNull();
+    const needs = q('[data-prep-locked]');
+    expect(needs).not.toBeNull();
+    expect(needs?.querySelector('[data-ui="req-row"]')).not.toBeNull();
+    expect(needs?.textContent).not.toContain('Вимоги до цієї дії не виконано');
+  }, 60_000);
+
+  it('does not end with the log of an old fight, and names the page for what it is', async () => {
+    booted = await bootApp([coreUi], withKnowledge(0, false), PREPARE);
+    expect(q('[data-fight-log]')).toBeNull();
+    expect(q('h1')?.textContent).toBe('Підготуватися');
+    await booted.go('#/combat/bingo');
+    expect(q('h1')?.textContent).toBe('Бінґо-книга');
+    await booted.go('#/combat/report');
+    expect(q('h1')?.textContent).toBe('Звіт бою');
+    await booted.go('#/combat');
+    expect(q('h1')?.textContent).toBe('Тренувальний бій');
+  });
+});
+
 describe('F1-fix1: the forecast of the preparation screen with the game clock running', () => {
   it('finishes while ticks keep coming in, and the bank of other things does not restart it', async () => {
     booted = await bootApp([coreUi], withKnowledge(2), PREPARE);

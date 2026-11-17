@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { buildScene, outcomesOf } from '../lib/fight-scene.ts';
+  import { buildScene, outcomesOf, targetedKey } from '../lib/fight-scene.ts';
   import Slot from '../lib/ext/Slot.svelte';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
@@ -10,6 +10,8 @@
   /** The scene of the running fight: every body, what it does, how far it has got. */
   const scene = $derived(game.read((gs) => buildScene(gs, content, game.rules)));
   const outcomes = $derived(scene ? outcomesOf(scene) : {});
+  /** The enemy the player's action is aimed at. */
+  const aimed = $derived(scene ? targetedKey(scene) : null);
   /** What the owning slot runs: a zone's fight or an operation names a target a pack can read; a mission does not. */
   const target = $derived(
     game.read((gs) => {
@@ -38,7 +40,7 @@
         </p>
       {/if}
       {#each scene.enemies as e (e.key)}
-        <Fighter f={e} outcomes={outcomes[e.key] ?? []} />
+        <Fighter f={e} outcomes={outcomes[e.key] ?? []} targeted={e.key === aimed} />
       {/each}
     </div>
   </section>
@@ -68,6 +70,38 @@
     border: var(--border-thin) dashed var(--line);
     border-radius: var(--radius-sm);
     color: var(--fg-dim);
+  }
+
+  /* Phone: one column, the player on top and the enemies under it, close together; the player stays in view while the pack is read. */
+  @media (max-width: 768px) {
+    .arena {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-2);
+    }
+
+    .side {
+      gap: var(--space-2);
+    }
+
+    /* The body the player is aiming at comes first, the ones that are down come last. */
+    .banner {
+      order: -2;
+    }
+
+    .side :global([data-ui='fighter'][data-targeted='true']) {
+      order: -1;
+    }
+
+    .side :global([data-ui='fighter'][data-alive='false']) {
+      order: 1;
+      padding-block: var(--space-1);
+    }
+
+    .side[data-side='player'] {
+      position: sticky;
+      top: 0;
+      z-index: var(--z-raised);
+    }
   }
 
   .stop {

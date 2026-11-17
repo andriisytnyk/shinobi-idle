@@ -252,6 +252,16 @@ function targetOfAction(scene: Scene, actor: FighterView): string {
 }
 
 /**
+ * The enemy the player's action is aimed at: the one the action names while it stands, else the first
+ * one standing (the engine's pick), else the first body; null when the fight has no enemy.
+ */
+export function targetedKey(scene: Scene): string | null {
+  const named = scene.player.action?.target;
+  const aimed = named ? scene.enemies.find((e) => e.key === named && e.alive) : undefined;
+  return (aimed ?? scene.enemies.find((e) => e.alive) ?? scene.enemies[0])?.key ?? null;
+}
+
+/**
  * The outcomes still young enough to show, by the key of the body they land on. An interrupted action
  * lands on its own actor; a miss on an attack lands on the one who avoided it.
  */

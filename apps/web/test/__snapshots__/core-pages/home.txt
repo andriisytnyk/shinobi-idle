@@ -3,7 +3,7 @@
     <a class="brand" href="#/">
       Shinobi Idle
     <dl class="stats">
-      <div class="stat" data-entity="currency:ryo" data-ui="topbar-currency">
+      <div class="stat primary" data-entity="currency:ryo" data-ui="topbar-currency">
         <dt>
           <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
             <path d="#957-1xqth0s" fill="currentColor">
@@ -27,7 +27,7 @@
             Intel
         <dd>
           0
-      <div class="stat rank">
+      <div class="stat rank primary">
         <dt>
           <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
             <path d="#300-1w5w1cd" fill="currentColor">
@@ -53,7 +53,8 @@
           Збереження
         <dd>
           Не збережено
-    <div class="tools">
+    <span aria-hidden="true" class="fold">
+    <div class="tools" id="topbar-menu">
       <label class="lang">
         <span class="label">
           Мова
@@ -93,6 +94,9 @@
             <path d="#8-1fwukk9">
         <span>
           Мета
+    <button aria-controls="topbar-menu" aria-expanded="false" aria-label="Меню" class="menu-btn" type="button">
+      <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+        <path d="#23-15lkpf4" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
 ---
 <div class="side">
   <nav aria-label="Розділи гри" class="main-nav">

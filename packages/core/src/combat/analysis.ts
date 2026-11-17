@@ -1053,7 +1053,7 @@ function unit(job: AnalysisJob, found: Resolved, content: ContentDb, live: Rules
  * (a step of the first-fight run is one fight, and a fight is a few milliseconds of work), so a slice
  * of the forecast stays near its budget whatever the size of the session.
  */
-export const SESSION_STEP_MS = 30 * MS_PER_SECOND;
+export const SESSION_STEP_MS = MS_PER_MINUTE / 2;
 
 /** The fights (or runs of an operation) of a first-fight batch one step plays. */
 const BATCH_STEP = 1;

@@ -19,6 +19,8 @@
   let { metaOpen, onToggleMeta }: Props = $props();
 
   const ui = tryUi();
+  /** At phone width the bar is one row and the rest of it sits behind this button. */
+  let menuOpen = $state(false);
   const numbers = new Intl.NumberFormat('uk');
   const nature = $derived(game.read((gs) => natureStatus(gs, content)));
   const natures = $derived(game.read((gs) => gs.player.natures));
@@ -31,12 +33,19 @@
   );
 </script>
 
-<header class="topbar">
+<svelte:window onhashchange={() => (menuOpen = false)} />
+
+<header class="topbar" class:open={menuOpen}>
   <a class="brand" href="#/">{t('app.title')}</a>
 
   <dl class="stats">
-    {#each content.currencies as currency (currency.id)}
-      <div class="stat" data-ui="topbar-currency" data-entity="currency:{currency.id}">
+    {#each content.currencies as currency, i (currency.id)}
+      <div
+        class="stat"
+        class:primary={i === 0}
+        data-ui="topbar-currency"
+        data-entity="currency:{currency.id}"
+      >
         <dt>
           <Icon entity={{ kind: 'currency', id: currency.id }} size={16} /><span class="label"
             >{currencyName(currency.id)}</span
@@ -45,7 +54,7 @@
         <dd>{numbers.format(held(game.state, currency.id))}</dd>
       </div>
     {/each}
-    <div class="stat rank">
+    <div class="stat rank primary">
       <dt><Icon name="rank-3" size={16} /><span class="label">{t('topbar.rank')}</span></dt>
       <dd>
         <a class="rank-link" href="#/rank" data-rank-plate
@@ -86,7 +95,9 @@
     </div>
   </dl>
 
-  <div class="tools">
+  <span class="fold" aria-hidden="true"></span>
+
+  <div class="tools" id="topbar-menu">
     <label class="lang">
       <span class="label">{t('lang.switch')}</span>
       <select disabled aria-label={t('lang.switch')}>
@@ -120,6 +131,16 @@
       <span>{t('nav.meta')}</span>
     </button>
   </div>
+  <button
+    type="button"
+    class="menu-btn"
+    aria-expanded={menuOpen}
+    aria-controls="topbar-menu"
+    aria-label={t('topbar.menu')}
+    onclick={() => (menuOpen = !menuOpen)}
+  >
+    <Icon name={menuOpen ? 'lucide:x' : 'lucide:menu'} size={18} />
+  </button>
   <Slot name="topbar" />
 </header>
 
@@ -248,34 +269,97 @@
     border-color: var(--accent);
   }
 
+  .menu-btn,
+  .fold {
+    display: none;
+  }
+
+  /*
+   * Phone: one row, brand, the first currency and the rank, then the menu button. The rest of the
+   * stats and the tools unfold under it when the button is pressed. `.stats` dissolves into the bar
+   * so its items can be ordered next to the others.
+   */
   @media (max-width: 768px) {
     .topbar {
+      position: relative;
       flex-wrap: wrap;
-      gap: var(--space-2) var(--space-3);
-      padding: var(--space-2) var(--space-3);
+      gap: 0 var(--space-3);
+      padding: var(--space-1) var(--space-3);
     }
 
     .stats {
-      order: 3;
-      flex-basis: 100%;
-      gap: var(--space-3);
-      font-size: var(--text-xs);
+      display: contents;
+      font-size: var(--text-sm);
+    }
+
+    .brand {
+      order: 0;
+    }
+
+    .stat.primary {
+      order: 1;
+    }
+
+    .stat:not(.primary) {
+      display: none;
+      order: 5;
+      min-height: var(--control-md);
+    }
+
+    .menu-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      order: 2;
+      min-width: var(--control-md);
+      min-height: var(--control-md);
+      margin-left: auto;
+      padding: var(--space-1) var(--space-2);
+      border: var(--border-thin) solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--surface-raised);
+      color: var(--fg);
+      cursor: pointer;
+    }
+
+    .menu-btn[aria-expanded='true'] {
+      border-color: var(--accent);
     }
 
     .tools {
-      margin-left: auto;
+      display: none;
+      order: 6;
+      flex-basis: 100%;
+      flex-wrap: wrap;
+      margin-left: 0;
+      padding-bottom: var(--space-2);
+    }
+
+    .fold {
+      order: 4;
+      flex-basis: 100%;
+      height: 0;
+    }
+
+    .open .stat:not(.primary) {
+      display: flex;
+    }
+
+    .open .tools {
+      display: flex;
+    }
+
+    .open .fold {
+      display: block;
     }
 
     /* Whole-tap targets of at least 44 px on a phone. */
     .meta-toggle,
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      min-height: var(--control-md);
-    }
-
+    .brand,
     .rank-link,
     .nature-link {
+      display: inline-flex;
+      align-items: center;
       min-height: var(--control-md);
     }
 
@@ -284,22 +368,7 @@
       display: none;
     }
 
-    /* The shop and bank links keep only their icons, so the brand and the tools share one row. */
-    .shop-link {
-      justify-content: center;
-      min-width: var(--control-md);
-    }
-
-    .shop-link span {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      clip-path: inset(50%);
-      white-space: nowrap;
-    }
-
-    /* Icons stay, labels remain available to screen readers. */
+    /* The labels of the stats are for the unfolded menu; in the bar the icons say enough. */
     .label {
       position: absolute;
       width: 1px;
@@ -307,6 +376,14 @@
       overflow: hidden;
       clip-path: inset(50%);
       white-space: nowrap;
+    }
+
+    .open .stat:not(.primary) .label {
+      position: static;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      clip-path: none;
     }
   }
 </style>

@@ -1282,5 +1282,9 @@
   "builtin.simulator.name": "Симулятор бою",
   "builtin.simulator.desc": "Точні числа прогнозу: шанси на перемогу з інтервалами, здобич за годину, порівняння твоєї руки з порадою.",
   "fight.out.youDodged": "Ти ухилився",
-  "prep.reason.supply": "Запас:"
+  "prep.reason.supply": "Запас:",
+  "topbar.menu": "Меню",
+  "prep.locked": "Ця ціль ще недоступна, тож вердикту немає.",
+  "prep.lockedNeeds": "Що для цього потрібно",
+  "fight.target": "Ціль"
 }
