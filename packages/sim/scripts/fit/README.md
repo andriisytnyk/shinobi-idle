@@ -33,6 +33,8 @@ pnpm content:import                                                    # regener
 pnpm --filter @shinobi/sim exec tsx scripts/hit-curves.ts              # the hit-chance table
 ```
 
+`opt-best.json` is committed as the identity (every knob 1): `apply.mjs` multiplies the numbers in `balance.mjs`, `patch.mjs` and `ai.json`, which already carry the last applied pass, so run it only right after an `opt.ts` pass, and reset the file to `DEFAULTS` after applying. `out-last.txt` is a run artifact (ignored).
+
 Knobs are multipliers on the numbers the content has when the harness starts (see `DEFAULTS` and `BOUNDS`).
 One evaluation takes about 3-5 s; a round over ~30 knobs x 6 steps is about 10-15 minutes; a pass of 4 rounds
 about an hour. Run it from a terminal, stop it with Ctrl+C; `opt-best.json` is rewritten after every round.

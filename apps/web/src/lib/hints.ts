@@ -1,6 +1,14 @@
 import type { ContentDb, SkillId } from '@shinobi/content';
 import { isAcademyRank, nextExamRank } from './vocab.ts';
-import { cellLevel, evalReq, examFor, levelAt, skillLevel, type GameState } from '@shinobi/core';
+import {
+  cellLevel,
+  cloneSlots,
+  evalReq,
+  examFor,
+  levelAt,
+  skillLevel,
+  type GameState,
+} from '@shinobi/core';
 
 /** A one-time tutorial hint. Its text is `hint.<id>` and its title `hint.title.<id>`. */
 export interface HintDef {
@@ -68,6 +76,7 @@ export const HINTS: readonly HintDef[] = [
       );
     },
   },
+  { id: 'clone', when: (state, content) => cloneSlots(state, content).length > 0 },
   { id: 'graduation', when: (state, content) => !isAcademyRank(content, state.player.rank) },
 ];
 

@@ -58,7 +58,7 @@ export function meditationChances(
   rules: Rules,
 ): { insight: number; enlight: number } {
   const K = content.balance.K.meditation;
-  const providers = rules.modifierProviders;
+  const providers = rules;
   return {
     insight: K.insightChance + bonusOf(providers, state, 'meditation.insightChance', content),
     enlight: K.enlightChance + bonusOf(providers, state, 'meditation.enlightChance', content),

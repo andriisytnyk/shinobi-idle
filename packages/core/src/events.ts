@@ -34,7 +34,8 @@ export interface ActionStoppedEvent extends EventBase {
   slot: number;
   kind: string;
   id: string;
-  reason: 'manual' | 'requirements' | 'replaced' | 'missing' | 'finished' | 'defeated';
+  reason:
+    'manual' | 'dispelled' | 'requirements' | 'replaced' | 'missing' | 'finished' | 'defeated';
   /** Item id the action ran out of, when it stopped for lack of ingredients. */
   missing?: string | undefined;
   /** A localization key that says why the action could not go on, when it stopped for a cause of its own. */

@@ -18,7 +18,8 @@ describe('slice size', () => {
     expect(content.enemies.length).toBe(24);
     expect(content.bosses.length).toBe(8);
     expect(content.buildings.length).toBe(16);
-    expect(content.items.filter((i) => i.scroll)).toHaveLength(15);
+    // Fifteen scrolls of techniques, and the one the quest hands over for the chakra drill.
+    expect(content.items.filter((i) => i.scroll)).toHaveLength(16);
     // Five scrolls carried by enemies, and the one the dig of the missions pays in parts.
     expect(content.items.filter((i) => i.part)).toHaveLength(6);
     expect(content.zones).toHaveLength(31);

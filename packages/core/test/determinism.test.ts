@@ -100,7 +100,12 @@ function play(name: string, slots: number, at: number, total: number, chunk: num
     if (i !== at) {
       dispatch(
         state,
-        { type: 'action.start', slot: i, kind: 'drill', id: 'core:lystok_na_lobi' },
+        {
+          type: 'action.start',
+          slot: i,
+          kind: 'drill',
+          id: ['core:lystok_na_lobi', 'core:kunai_na_doloni', 'core:chakra_v_stopakh'][i] ?? '',
+        },
         content,
       );
     }

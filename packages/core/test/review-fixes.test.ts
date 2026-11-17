@@ -60,6 +60,7 @@ describe('mastery from combat and items feeds the pool', () => {
   it('pays about masteryPerHour in an hour of fighting, and the pool share of it', () => {
     const state = genin(3);
     setLevel(state, 'vit', 40);
+    setLevel(state, 'cc', 10);
     dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: 'core:dummy' }, content);
     advance(state, HOUR, content);
     // Every technique the player knows shares the XP; the total is what the balance fixes.
@@ -89,6 +90,7 @@ describe('combat runs at the slot share', () => {
   function shared(seed: number, slots: number, at: number): GameState {
     const state = genin(seed);
     setLevel(state, 'vit', 40);
+    setLevel(state, 'cc', 10);
     while (state.slots.length < slots) {
       state.slots.push({ action: null, progress: 0, share: 0, data: null });
     }
@@ -96,7 +98,12 @@ describe('combat runs at the slot share', () => {
       const start =
         i === at
           ? ({ type: 'action.start', slot: i, kind: 'fight', id: 'core:dummy' } as const)
-          : ({ type: 'action.start', slot: i, kind: 'drill', id: 'core:lystok_na_lobi' } as const);
+          : ({
+              type: 'action.start',
+              slot: i,
+              kind: 'drill',
+              id: ['core:lystok_na_lobi', 'core:kunai_na_doloni', 'core:chakra_v_stopakh'][i] ?? '',
+            } as const);
       expect(dispatch(state, start, content)).toEqual({ ok: true });
     }
     return state;

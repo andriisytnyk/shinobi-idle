@@ -1,6 +1,7 @@
 import type { ContentDb, Mission, MissionPay } from '@shinobi/content';
 import { scrollPartId } from '@shinobi/content';
 import { hasItem } from '../bank.ts';
+import { isCloneSlot } from '../clone.ts';
 import { fightBusyReason, isCombatKind } from '../combat/system.ts';
 import { effectiveLoadout } from '../combat/loadout.ts';
 import { MS_PER_HOUR, masteryLevel } from '../formulas.ts';
@@ -125,7 +126,7 @@ function stageXpForecast(
 ): StageXpForecast {
   const fight = fightXpShares(mission, index, plan, content);
   if (fight) {
-    const common = computeMod(rules.modifierProviders, state, 'xp.all', content).total;
+    const common = computeMod(rules, state, 'xp.all', content).total;
     const style = fight.style * common;
     const lines: StageXpForecast['lines'] = [{ skill: null, amount: style, certain: false }];
     for (const [skill, amount] of fight.others) {
@@ -210,7 +211,7 @@ export function missionForecast(
   content: ContentDb,
   rules: Rules,
 ): MissionForecast {
-  const mods = rules.modifierProviders;
+  const mods = rules;
   const ration = armedRation(state, content);
   const stages: StageForecast[] = [];
   const xpAmount: Record<string, number> = {};
@@ -389,7 +390,7 @@ export function missionGoalReq(
  */
 export function missionInputs(state: GameState, content: ContentDb, rules: Rules): string {
   const parts: (string | number)[] = [state.player.rank];
-  for (const m of rules.modifierProviders.flatMap((p) => p(state, content))) {
+  for (const m of rules.modifierProviders.flatMap((p) => p(state, content, rules))) {
     parts.push(`${m.key}${m.op}${m.value}${m.group}`);
   }
   for (const skill of content.skills) parts.push(skillLevel(state, skill.id, content));
@@ -409,8 +410,11 @@ export function missionInputs(state: GameState, content: ContentDb, rules: Rules
 // ---------- can it be started ----------
 
 /** The slot a mission is started in: the first one with nothing in it, else the first slot. */
-export function missionStartSlot(state: GameState): number {
-  const free = state.slots.findIndex((s) => s.action === null);
+export function missionStartSlot(state: GameState, content?: ContentDb): number {
+  // With the content, a clone's slot is not the player's: it is asked for on its own.
+  const free = state.slots.findIndex(
+    (s, i) => s.action === null && !(content && isCloneSlot(state, content, i)),
+  );
   return free >= 0 ? free : 0;
 }
 
@@ -549,7 +553,14 @@ export function missionEntry(
 ): BoardEntry {
   const blocker = missionBlocker(state, mission, content, rules);
   const unlock = mission.unlock ? evalReq(state, mission.unlock, content) : null;
-  const status = missionStatus(state, mission.id, missionStartSlot(state), content, rules, blocker);
+  const status = missionStatus(
+    state,
+    mission.id,
+    missionStartSlot(state, content),
+    content,
+    rules,
+    blocker,
+  );
   return {
     id: mission.id,
     rank: mission.rank,

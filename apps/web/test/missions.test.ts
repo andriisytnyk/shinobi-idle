@@ -257,6 +257,9 @@ describe('a blocked mission shows the reason dispatch gives', () => {
   it('for a fight held by another slot, and for a mission running in another slot', () => {
     const state = able();
     state.slots.push({ action: null, progress: 0, share: 0, data: null });
+    // A slot of the player's own: a clone's slot does not take fights.
+    delete state.known['core:shadow_clone'];
+    dispatch(state, { type: 'loadout.auto', on: true }, content);
     dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: 'core:dummy' }, content);
     // Slot 1 is the free one now: a mission with a combat stage is refused there.
     const reasons = agree(state);
@@ -321,6 +324,9 @@ describe('a blocked mission shows the reason dispatch gives', () => {
   it('names the action that holds the fight, as a link, and says it must be stopped first', async () => {
     const state = able();
     state.slots.push({ action: null, progress: 0, share: 0, data: null });
+    // A slot of the player's own: a clone's slot does not take fights.
+    delete state.known['core:shadow_clone'];
+    dispatch(state, { type: 'loadout.auto', on: true }, content);
     dispatch(
       state,
       { type: 'action.start', slot: 0, kind: MISSION_KIND, id: 'core:thief' },

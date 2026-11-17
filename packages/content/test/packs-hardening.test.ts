@@ -436,3 +436,29 @@ describe('closure of the fields packs added in the review fixes', () => {
     throwsFor([corePack, ranked('aa', 'bb:r'), ranked('bb', 'aa:r')], 'aa', /cycle/);
   });
 });
+
+describe('a defensive technique of a pack needs a row of K.passiveFx', () => {
+  const veil = (p: Loose, fx: string) => {
+    const tech = (p.data.techniques as { id: string; combat: { passive: { fx: string } } }[]).find(
+      (t) => t.id === 'testmod:glass_veil',
+    );
+    if (!tech) throw new Error('no glass_veil');
+    tech.combat.passive.fx = fx;
+  };
+
+  it('is rejected, naming the pack and the key, when the key has no row (a typo)', () => {
+    throwsFor(
+      [corePack, tm((p) => veil(p, 'testmod:vail'))],
+      'testmod',
+      /glass_veil.*combat.passive.fx.*passiveFx.testmod:vail.evasion is missing/,
+    );
+  });
+
+  it('is rejected for a key that is a prototype property, not a row', () => {
+    throwsFor([corePack, tm((p) => veil(p, 'constructor'))], 'testmod', /passiveFx.constructor/);
+  });
+
+  it('passes for the real key', () => {
+    expect(() => composeContent([corePack, tm((p) => veil(p, 'testmod:veil'))])).not.toThrow();
+  });
+});

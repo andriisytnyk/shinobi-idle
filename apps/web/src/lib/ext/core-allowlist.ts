@@ -97,6 +97,11 @@ export const CORE_API = {
     'enemyStats',
     'revealOf',
     'revealHint',
+    'cloneSlots',
+    'isCloneSlot',
+    'slotCount',
+    'cloneTelemetry',
+    'linked',
   ],
   world: [
     'villageBuildings',

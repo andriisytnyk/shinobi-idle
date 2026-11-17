@@ -9,12 +9,15 @@ import {
   createState,
   deserialize,
   encounterFor,
+  evasionAgainst,
   evasionOf,
   evasionParts,
+  hitChance,
   fightAdvance,
   fightStatus,
   hitChanceOf,
   makeCtx,
+  playerEvasion,
   playerEvasionParts,
   serialize,
   type PlayerSnapshot,
@@ -87,7 +90,34 @@ describe('the evasion rating of the player', () => {
     const sum = (view?.parts ?? []).reduce((n, p) => n + p.value, 0);
     expect(view?.total).toBeCloseTo(sum, 9);
     expect(view?.parts.find((p) => p.source === 'technique')?.levelAdj).toBeDefined();
-    expect(view?.parts.map((p) => p.source)).toEqual(['base', 'tier', 'technique']);
+    expect(view?.parts.map((p) => p.source)).toEqual(['base', 'tier', 'technique', 'knowledge']);
+  });
+
+  it('shows the total the hit roll uses, with what knowing the enemy adds as a named part', () => {
+    for (const n of [0, 1, 2, 3]) {
+      const fight = createFight(
+        { ...snap([CLONE]), knowledgeLevel: { 'core:test': n } },
+        enemyAt(20),
+        1,
+        content,
+        rules,
+      );
+      const enemy = fight.enemies[0];
+      if (!enemy) throw new Error('no enemy');
+      const view = fightStatus(fight, content, rules).player.evasion;
+      const roll = evasionAgainst(makeCtx(fight, content, rules), fight.player, enemy);
+      expect(view?.total).toBeCloseTo(roll, 9);
+      const part = view?.parts.find((p) => p.source === 'knowledge');
+      expect(part?.knowledgeLevel).toBe(n);
+      expect(part?.value).toBeCloseTo(K.rating.knowledge * n, 9);
+      const sum = (view?.parts ?? []).reduce((a, p) => a + p.value, 0);
+      expect(sum).toBeCloseTo(roll, 9);
+      // The hit chance shown from the total is the one the roll uses.
+      expect(hitChance(enemy.accuracy, view?.total ?? 0, content)).toBeCloseTo(
+        hitChanceOf(makeCtx(fight, content, rules), enemy, fight.player),
+        9,
+      );
+    }
   });
 
   it('can be read from a game state with its sources', () => {
@@ -239,6 +269,21 @@ describe('a pack in the new loop: a passive technique, a cast of its own, an int
     );
     const fight = createFight(modSnap([veil, touch]), enemyAt(5), 1, modContent, modRules);
     expect(fight.kit.techniques.map((t) => t.id)).toEqual([touch]);
+  });
+
+  it('never throws on a defensive technique whose key has no row (a typo the closure did not catch): it adds nothing', () => {
+    // The closure check rejects such a pack at compose time; this is the guard behind it, on a content that skipped it.
+    const typo = structuredClone(modContent);
+    const tech = typo.techniques.find((t) => t.id === veil);
+    if (!tech?.combat?.passive) throw new Error('no passive');
+    tech.combat.passive.fx = 'testmod:vail';
+    const known = modSnap([veil]);
+    expect(() => evasionParts(known, typo)).not.toThrow();
+    expect(evasionParts(known, typo).some((p) => p.id === veil)).toBe(false);
+    const state = createState(1, typo);
+    state.known[veil] = true;
+    expect(() => playerEvasion(state, typo)).not.toThrow();
+    expect(() => createFight(known, enemyAt(5), 1, typo, modRules)).not.toThrow();
   });
 
   it('casts for its own number, whatever its seals', () => {

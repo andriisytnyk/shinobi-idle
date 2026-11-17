@@ -323,7 +323,7 @@ export function resourceUnits(
 ): number {
   if (!mission.resource) return 0;
   const mod = mission.resourceMod
-    ? computeMod(rules.modifierProviders, state, mission.resourceMod, content).total
+    ? computeMod(rules, state, mission.resourceMod, content).total
     : 1;
   return Math.round(content.balance.K.shinobiResPerMission * mod);
 }
@@ -341,7 +341,7 @@ export function payMission(
   rules: Rules,
 ): void {
   const K = content.balance.K;
-  const mods = rules.modifierProviders;
+  const mods = rules;
   const ryo = Math.round(mission.ryo * computeMod(mods, state, 'mission.ryo', content).total);
   const rep = mission.team
     ? Math.round(mission.rep * computeMod(mods, state, 'mission.rep', content).total)
@@ -608,6 +608,22 @@ export function repairMissions(state: GameState, content: ContentDb, rules: Rule
     const fightHere = state.combat?.owner === at;
     const fightFits = wanted === null ? !fightHere : fightHere && state.combat?.enemy === wanted;
     if (run && fightFits) return;
+    // A run whose fight is gone (a save of an older fight loop) keeps its stage, attempts and ration: the stage's
+    // fight starts afresh. The run restarts only when no fight can be made for it.
+    if (run && wanted !== null && state.combat === null) {
+      const entry = entryOf(content, wanted);
+      if (entry && stage?.t === 'combat') {
+        state.combat = newMissionCombat(
+          state,
+          entry,
+          supportOf(state, mission, content),
+          content,
+          rules,
+          at,
+        );
+        return;
+      }
+    }
     if (fightHere) state.combat = null;
     slot.progress = 0;
     if (!beginRun(state, at, mission, content, rules)) {

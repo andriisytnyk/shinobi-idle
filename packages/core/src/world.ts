@@ -112,7 +112,7 @@ export function exploreBlocked(state: GameState, cell: Cell, content: ContentDb)
 
 /** Length of one exploration in ms at full speed, modifiers included; at least 1. */
 export function exploreIntervalMs(state: GameState, content: ContentDb, rules: Rules): number {
-  const mod = computeMod(rules.modifierProviders, state, 'interval.explore', content).total;
+  const mod = computeMod(rules, state, 'interval.explore', content).total;
   return Math.max(
     actionFloor(content),
     Math.round(content.balance.K.explore * MS_PER_SECOND * mod),
@@ -213,7 +213,7 @@ export function instantCost(cell: Cell, content: ContentDb): number {
 export function walkMs(state: GameState, cell: Cell, content: ContentDb, rules: Rules): number {
   const S = content.balance.K.scouting;
   const minutes = inRegionOf(state, cell, content) ? S.walkWithinMin : S.walkBetweenMin;
-  const mod = computeMod(rules.modifierProviders, state, 'interval.walk', content).total;
+  const mod = computeMod(rules, state, 'interval.walk', content).total;
   return Math.max(actionFloor(content), Math.round(minutes * MS_PER_MINUTE * mod));
 }
 

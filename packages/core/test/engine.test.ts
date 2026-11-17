@@ -4,6 +4,7 @@ import {
   actionInfo,
   advance,
   createState,
+  xpAt,
   dispatch,
   defaultRules,
   deserialize,
@@ -167,15 +168,20 @@ describe('integer time accounting', () => {
   }
 
   it('slows cycles in proportion to the share', () => {
-    const full = make(1000);
-    const half = make(500);
+    // The cast part of a cycle shortens with the mastery the practice earns, so the cycle drifts over the run and
+    // the halves would differ by that, not by rounding. With the mastery already at its cap (it cannot grow) the cycle is
+    // constant, and the share must give exactly half.
+    const pinned = (share: number) => {
+      const state = make(share);
+      state.mastery[LEAF] = { xp: xpAt(content.balance.K.masteryCap) };
+      return state;
+    };
+    const full = pinned(1000);
+    const half = pinned(500);
     advance(full, 600_000, content);
     advance(half, 600_000, content);
-    // The cast part of the cycle shortens with the mastery the practice itself earns (2087 ms at half the
-    // mastery against 2060 ms at full), so the halves differ by that drift, about 1%, not by rounding.
-    expect(Math.abs(half.stats.completed - full.stats.completed / 2)).toBeLessThanOrEqual(
-      full.stats.completed * 0.01 + 1,
-    );
+    expect(full.stats.completed).toBeGreaterThan(100);
+    expect(half.stats.completed).toBe(full.stats.completed / 2);
   });
 
   it('rounds the next event up: a cycle ends at the first whole ms with enough work', () => {

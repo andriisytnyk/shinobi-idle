@@ -26,6 +26,13 @@ function stepMet(state: GameState, quest: Quest, step: number, content: ContentD
   return evalReq(state, objective.req, content).met;
 }
 
+/** Hands over what a step grants when it becomes the active one. */
+function grantStep(state: GameState, quest: Quest, step: number): void {
+  for (const { item, n } of quest.steps[step]?.grants ?? []) {
+    if (addItem(state, item, n)) emit(state, { type: 'itemGained', id: item, n });
+  }
+}
+
 function applyRewards(state: GameState, rewards: QuestRewards, content: ContentDb): void {
   for (const { item, n } of rewards.items) {
     if (addItem(state, item, n)) emit(state, { type: 'itemGained', id: item, n });
@@ -64,6 +71,7 @@ export function updateQuests(state: GameState, content: ContentDb): void {
         if (quest.unlock && !evalReq(state, quest.unlock, content).met) continue;
         progress = { step: 0, base: baselineFor(state, quest, 0), done: false };
         state.quests[quest.id] = progress;
+        grantStep(state, quest, 0);
         changed = true;
       }
       if (progress.done || !stepMet(state, quest, progress.step, content)) continue;
@@ -77,6 +85,7 @@ export function updateQuests(state: GameState, content: ContentDb): void {
         applyRewards(state, quest.rewards, content);
       } else {
         progress.base = baselineFor(state, quest, progress.step);
+        grantStep(state, quest, progress.step);
       }
     }
   }

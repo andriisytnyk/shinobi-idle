@@ -8,6 +8,7 @@
   import { slotTiming } from '../lib/timing.ts';
   import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import ActionEmblem from './ActionEmblem.svelte';
+  import CloneStart from './CloneStart.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import MasteryRing from './MasteryRing.svelte';
@@ -131,16 +132,19 @@
     </div>
   {/if}
 
-  <button
-    type="button"
-    class="ct-action"
-    class:stop={running}
-    disabled={!info.available}
-    aria-describedby={block ? `why-${info.id}` : undefined}
-    onclick={toggle}
-  >
-    {t(running ? 'tile.stop' : 'tile.start')}
-  </button>
+  <div class="ct-actions">
+    <button
+      type="button"
+      class="ct-action"
+      class:stop={running}
+      disabled={!info.available}
+      aria-describedby={block ? `why-${info.id}` : undefined}
+      onclick={toggle}
+    >
+      {t(running ? 'tile.stop' : 'tile.start')}
+    </button>
+    <CloneStart kind={info.kind} id={info.id} disabled={!info.available} />
+  </div>
   {#if block}
     <p class="ct-why" id="why-{info.id}" data-why={block.kind}>{blockText(block)}</p>
   {/if}

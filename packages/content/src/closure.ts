@@ -348,6 +348,9 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
       const fx = t.combat.effect;
       if (fx.kind === 'cleanse') refs('combat.effect.statuses', fx.statuses, 'statuses');
       if ('fx' in fx) needNumber('combat.effect.fx', `techFx.${fx.fx}`);
+      // A defensive technique adds by a row of `K.passiveFx`: a key without a row would stop every fight of the player.
+      if (t.combat.passive)
+        needNumber('combat.passive.fx', `passiveFx.${t.combat.passive.fx}.evasion`);
     }
   }
   for (const p of db.practices) {
@@ -539,6 +542,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     req('unlock', q.unlock);
     q.steps.forEach((s, n) => {
       if (s.objective.t === 'req') req(`steps[${n}].objective.req`, s.objective.req);
+      s.grants?.forEach((x, g) => ref(`steps[${n}].grants[${g}].item`, x.item, 'items'));
     });
     q.rewards.items.forEach((x, n) => ref(`rewards.items[${n}].item`, x.item, 'items'));
     if (q.rewards.rank !== null) ref('rewards.rank', q.rewards.rank, 'ranks');

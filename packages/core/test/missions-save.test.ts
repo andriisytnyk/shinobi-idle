@@ -180,14 +180,17 @@ describe('A11: saves', () => {
     }
   });
 
-  it('drops a fight that does not belong to the stage and starts the stage anew', () => {
+  it('drops a fight that does not belong to the stage and fights the stage anew, the run and its ration kept', () => {
     const state = scene('core:thief', false);
     advance(state, (state.slots[0]?.data as { p: { ms: number } }).p.ms + 3000, content);
+    const before = state.slots[0]?.data as { s: number; r: number; a: number };
+    expect(before.s).toBeGreaterThanOrEqual(1);
     const raw = JSON.parse(serialize(state)) as { state: { combat: { enemy: string } } };
     raw.state.combat.enemy = 'core:merc_pack';
     const loaded = deserialize(JSON.stringify(raw), content);
-    expect(loaded.slots[0]?.data).toMatchObject({ s: 0 });
-    expect(loaded.combat).toBeNull();
+    expect(loaded.slots[0]?.data).toMatchObject({ s: before.s, r: before.r, a: before.a, f: 1 });
+    expect(loaded.combat?.enemy).toBe('core:thief');
+    expect(loaded.combat?.owner).toBe(0);
   });
 
   it('forgets the mission of a slot when the content no longer has it', () => {

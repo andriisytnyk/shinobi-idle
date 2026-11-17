@@ -45,50 +45,44 @@ describe('the session forecast against real play', () => {
     { c: hideout, played: 3, verdict: 'risky' },
   ];
   for (const [i, { c, played: games, verdict }] of cases.entries()) {
-    // The hideout operation is forecast hopeless, the test wants risky.
-    // balance: refit at stage 9, see #82
-    (c.name === 'the hideout operation' ? it.skip : it)(
-      `describes ${c.name}`,
-      { timeout: 300_000 },
-      () => {
-        const state = build(c, 20 + i);
-        const before = serialize(state, 0);
-        // The time budget: a zone about half a second and a boss or an operation about two and a half on an idle machine (printed);
-        // the limit is stretched for a loaded one, since the full suite runs every file at once.
-        const limit = speedBudget(
-          c.target.kind === 'zone' ? 2500 : K.analysis.budgetMs * 2,
-          c.target.kind === 'zone' ? 5000 : K.analysis.budgetMs * 4,
-        );
-        let a = analyze(state, c.target);
-        const ms = bestOf(2, limit, () => {
-          a = analyze(state, c.target);
-        });
-        console.log(`analysis of ${c.name}: ${ms.toFixed(0)} ms (limit ${limit.toFixed(0)} ms)`);
-        expect(ms).toBeLessThan(limit);
-        expect(serialize(state, 0), 'the analysis changes nothing').toBe(before);
-        const s = a.session;
-        if (!s) throw new Error('no session');
-        const played = Array.from({ length: games }, (_, g) =>
-          play(c, 200 + 10 * i + g, s.minutes),
-        );
-        const rates = played.map((p) => rateOf(total(p)));
-        const inside = rates.filter((r) => inBand(r, s.winRate.p10, s.winRate.p90)).length;
-        const wins = played.reduce((n, p) => n + total(p).wins, 0);
-        const meanPerHour = (wins * 60) / (games * s.minutes);
-        const noDefeat = played.filter((p) => p.firstDefeat === null).length / games;
-        console.log(
-          `| ${c.name} | ${(100 * a.fresh.winRate).toFixed(0)}% | ${(100 * s.winRate.p10).toFixed(0)} / ${(100 * s.winRate.median).toFixed(0)} / ${(100 * s.winRate.p90).toFixed(0)}% (${s.runs}) | ${rates.map((r) => (100 * r).toFixed(0)).join(' ')} | ${s.winsPerHour.mean.toFixed(1)} / ${meanPerHour.toFixed(1)} | ${(100 * s.collapseShare).toFixed(0)}% [${(100 * s.collapseCi.lo).toFixed(0)}-${(100 * s.collapseCi.hi).toFixed(0)}] | ${s.verdict} | ${s.horizonMinutes?.toFixed(0) ?? '-'} | ${s.afterSupplies?.verdict ?? '-'} | ${(100 * s.untilDefeat.noDefeatShare).toFixed(0)}% / ${(100 * noDefeat).toFixed(0)}% | ${s.share} |`,
-        );
-        expect(inside / games, 'sessions inside the p10-p90 band').toBeGreaterThanOrEqual(0.5);
-        expect(s.verdict).toBe(verdict);
-        expect(s.assumesRestart).toBe(true);
-        // Where the sessions agree, the yield is a plain number and must match.
-        if (s.winRate.p90 - s.winRate.p10 < 0.1 && s.winsPerHour.mean > 5) {
-          expect(Math.abs(s.winsPerHour.mean - meanPerHour) / meanPerHour).toBeLessThanOrEqual(0.1);
-        }
-        expect(Math.abs(s.untilDefeat.noDefeatShare - noDefeat)).toBeLessThanOrEqual(0.4);
-      },
-    );
+    it(`describes ${c.name}`, { timeout: 300_000 }, () => {
+      const state = build(c, 20 + i);
+      const before = serialize(state, 0);
+      // The time budget: a zone about half a second and a boss or an operation about two and a half on an idle machine (printed);
+      // the limit is stretched for a loaded one, since the full suite runs every file at once.
+      const limit = speedBudget(
+        c.target.kind === 'zone' ? 2500 : K.analysis.budgetMs * 2,
+        c.target.kind === 'zone' ? 5000 : K.analysis.budgetMs * 4,
+      );
+      let a = analyze(state, c.target);
+      const ms = bestOf(2, limit, () => {
+        a = analyze(state, c.target);
+      });
+      console.log(`analysis of ${c.name}: ${ms.toFixed(0)} ms (limit ${limit.toFixed(0)} ms)`);
+      expect(ms).toBeLessThan(limit);
+      expect(serialize(state, 0), 'the analysis changes nothing').toBe(before);
+      const s = a.session;
+      if (!s) throw new Error('no session');
+      const played = Array.from({ length: games }, (_, g) => play(c, 200 + 10 * i + g, s.minutes));
+      const rates = played.map((p) => rateOf(total(p)));
+      const inside = rates.filter((r) => inBand(r, s.winRate.p10, s.winRate.p90)).length;
+      const wins = played.reduce((n, p) => n + total(p).wins, 0);
+      const meanPerHour = (wins * 60) / (games * s.minutes);
+      const noDefeat = played.filter((p) => p.firstDefeat === null).length / games;
+      console.log(
+        `| ${c.name} | ${(100 * a.fresh.winRate).toFixed(0)}% | ${(100 * s.winRate.p10).toFixed(0)} / ${(100 * s.winRate.median).toFixed(0)} / ${(100 * s.winRate.p90).toFixed(0)}% (${s.runs}) | ${rates.map((r) => (100 * r).toFixed(0)).join(' ')} | ${s.winsPerHour.mean.toFixed(1)} / ${meanPerHour.toFixed(1)} | ${(100 * s.collapseShare).toFixed(0)}% [${(100 * s.collapseCi.lo).toFixed(0)}-${(100 * s.collapseCi.hi).toFixed(0)}] | ${s.verdict} | ${s.horizonMinutes?.toFixed(0) ?? '-'} | ${s.afterSupplies?.verdict ?? '-'} | ${(100 * s.untilDefeat.noDefeatShare).toFixed(0)}% / ${(100 * noDefeat).toFixed(0)}% | ${s.share} |`,
+      );
+      expect(inside / games, 'sessions inside the p10-p90 band').toBeGreaterThanOrEqual(0.5);
+      // The hideout operation is forecast hopeless, the test wants risky.
+      // balance: refit at stage 9, see #82
+      if (c.name !== 'the hideout operation') expect(s.verdict).toBe(verdict);
+      expect(s.assumesRestart).toBe(true);
+      // Where the sessions agree, the yield is a plain number and must match.
+      if (s.winRate.p90 - s.winRate.p10 < 0.1 && s.winsPerHour.mean > 5) {
+        expect(Math.abs(s.winsPerHour.mean - meanPerHour) / meanPerHour).toBeLessThanOrEqual(0.1);
+      }
+      expect(Math.abs(s.untilDefeat.noDefeatShare - noDefeat)).toBeLessThanOrEqual(0.4);
+    });
   }
 
   it('says which share of the speed the fight slot has', () => {

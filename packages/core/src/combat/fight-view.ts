@@ -1,7 +1,7 @@
 import type { ContentDb } from '@shinobi/content';
-import { makeCtx, speed } from './fight.ts';
+import { evasionAgainst, makeCtx, speed } from './fight.ts';
 import type { Combatant, FightAct, FightRules, FightState, LastAct } from './fight-types.ts';
-import { partsAgainst, shiftAgainst, type EvasionPart } from './numbers.ts';
+import { KNOWLEDGE_MAX, knowledgeTerm, partsAgainst, type EvasionPart } from './numbers.ts';
 import { WORK_PER_MS } from './units.ts';
 
 /*
@@ -35,6 +35,9 @@ export interface CombatantStatus {
   evasion?: { total: number; parts: EvasionPart[] };
 }
 
+/** Below this much a rating difference is rounding, not an effect. */
+const EFFECT_EPS = Math.sqrt(Number.EPSILON);
+
 /** The status of one combatant of a fight. */
 export function combatantStatus(
   fight: FightState,
@@ -44,7 +47,10 @@ export function combatantStatus(
 ): CombatantStatus {
   const rate = speed(makeCtx(fight, content, rules), c);
   const left = Math.max(0, c.timer.need - c.timer.progress);
-  const stopper = c.effects.find((e) => e.kind === 'modifier' && e.stat === 'speed');
+  // The effect that stops the clock is the speed modifier that brings it to zero (a stun), not a slowing one (wet).
+  const stopper = c.effects.find(
+    (e) => e.kind === 'modifier' && e.stat === 'speed' && e.op === 'mul' && e.value <= 0,
+  );
   return {
     id: c.id,
     side: c.side,
@@ -66,27 +72,40 @@ export function combatantStatus(
             atMs: Math.floor(c.last.at / WORK_PER_MS),
             avoidedBy: c.last.avoidedBy,
           },
-    ...(c === fight.player ? { evasion: evasionView(fight, content) } : {}),
+    ...(c === fight.player ? { evasion: evasionView(fight, content, rules) } : {}),
   };
 }
 
 /**
- * The player's evasion rating and its parts, against the first living enemy (the level of its skills against the level of the
- * attacker adjusts every defensive technique; the adjustment is named on the part as `levelAdj`).
+ * The player's evasion rating and its parts, against the first living enemy. The total is what the hit roll uses
+ * (`evasionAgainst`): the level of the player's skills against the level of the attacker adjusts every defensive
+ * technique (named on the part as `levelAdj`), knowing the attacker adds a `knowledge` part, and what Wounds and
+ * the timed modifiers (a smoke bomb, a bind) add or take away is the `effects` part, so the parts sum to the total.
  */
 function evasionView(
   fight: FightState,
   content: ContentDb,
+  rules: FightRules,
 ): { total: number; parts: EvasionPart[] } {
   const attacker = fight.enemies.find((e) => e.hp > 0);
-  const level = attacker?.data['combat.level'];
-  if (level === undefined) {
+  if (!attacker) {
     return { total: fight.player.evasion, parts: fight.kit.evasion.map((p) => ({ ...p })) };
   }
-  const parts = partsAgainst(fight.kit.evasion, level, content);
-  const adj = shiftAgainst(fight.kit.evasion, level, content);
-  const raw = fight.kit.evasion.reduce((n, p) => n + p.value, 0);
-  const total = fight.player.evasion + (raw > 0 ? adj * (fight.player.evasion / raw) : adj);
+  const total = evasionAgainst(makeCtx(fight, content, rules), fight.player, attacker);
+  const level = attacker.data['combat.level'];
+  const parts =
+    level === undefined
+      ? fight.kit.evasion.map((p) => ({ ...p }))
+      : partsAgainst(fight.kit.evasion, level, content);
+  const known = fight.player.data[`know.${attacker.entry}`] ?? KNOWLEDGE_MAX;
+  parts.push({
+    source: 'knowledge',
+    id: attacker.entry,
+    value: knowledgeTerm(known, content),
+    knowledgeLevel: known,
+  });
+  const rest = total - parts.reduce((n, p) => n + p.value, 0);
+  if (Math.abs(rest) > EFFECT_EPS) parts.push({ source: 'effects', id: null, value: rest });
   return { total, parts };
 }
 

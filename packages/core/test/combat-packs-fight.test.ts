@@ -252,6 +252,9 @@ describe('a boss special that a pack adds, implemented by a hook of the pack', (
     const fight = createFight(player([]), encounter(boss), seed, mod, modRules);
     fight.player.hp = fight.player.maxHp = 1e9;
     fight.player.evasion = 0;
+    // The boss outlives the minute (the plain strikes of the player would end it in about 21 s), so the count of its attacks is the loop's rhythm alone.
+    const body = fight.enemies[0];
+    if (body) body.hp = body.maxHp = 1e12;
     fight.log = [];
     const total = sec(60);
     if (chunk === undefined) fightAdvance(fight, total, mod, modRules);
@@ -263,7 +266,7 @@ describe('a boss special that a pack adds, implemented by a hook of the pack', (
 
   it('makes every third attack a heavy one, and only those', () => {
     const list = attacks(5);
-    expect(list.length).toBeGreaterThanOrEqual(7);
+    expect(list.length).toBeGreaterThanOrEqual(9);
     const mult = (K.bossFx as Record<string, Record<string, number>>)['testmod:third']?.mult ?? 0;
     const normal = list.find((d, i) => d !== null && (i + 1) % 3 !== 0);
     if (normal === undefined || normal === null) throw new Error('no normal hit');

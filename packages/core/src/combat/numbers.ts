@@ -46,8 +46,10 @@ export const KNOWLEDGE_MAX = 3;
 
 /** One part of the evasion rating, with where it comes from. */
 export interface EvasionPart {
-  /** "base"; "tier" (the rank of the player); "technique" (a known defensive technique, `id` names it); "modifiers" (gear and the like). */
-  source: 'base' | 'tier' | 'technique' | 'modifiers';
+  /** "base"; "tier" (the rank of the player); "technique" (a known defensive technique, `id` names it); "modifiers" (gear and the like).
+   * Only the fight view adds two more: "knowledge" (what knowing the attacker adds, `id` names its entry) and "effects" (what
+   * Wounds and the timed stat modifiers of the fight add to the sum, with the sign they have). */
+  source: 'base' | 'tier' | 'technique' | 'modifiers' | 'knowledge' | 'effects';
   id: string | null;
   /** What the part adds against the attacker it was worked out for. */
   value: number;
@@ -60,6 +62,8 @@ export interface EvasionPart {
   effectiveLevel?: number;
   /** A technique: its effective level over the combat level of the attacker, kept between `min` and `max` of `K.evaLevel`. */
   ratio?: number;
+  /** Knowledge: how well the player knows the attacker (the Bingo level). */
+  knowledgeLevel?: number;
   /** A technique: what that ratio added to `full` (negative: took away). */
   levelAdj?: number;
 }
@@ -126,7 +130,9 @@ export function evasionParts(
   for (const tech of content.techniques) {
     const fx = tech.combat?.passive?.fx;
     if (fx === undefined || !known.has(tech.id)) continue;
-    const row = need(K.passiveFx[fx], `passiveFx.${fx}`);
+    // The pack closure rejects a key without a row; a content that got through anyway adds nothing instead of stopping the fight.
+    const row = Object.hasOwn(K.passiveFx, fx) ? K.passiveFx[fx] : undefined;
+    if (!row) continue;
     const skillLevel = snap.levels?.[tech.skill] ?? 1;
     const masteryLevel = Math.max(1, snap.mastery[tech.id] ?? 1);
     const effectiveLevel = (skillLevel * masteryLevel) / K.masteryCap;

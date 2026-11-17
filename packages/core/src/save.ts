@@ -266,8 +266,12 @@ export const MIGRATIONS: readonly Migration[] = [
     return { ...state, shown };
   },
   // v15 -> v16: the Evasion skill is gone (evasion is a rating now): its XP and pool entries are dropped. The fight
-  // loop is another one (waiting and acting): a fight in progress cannot go on in it and is dropped, so the fight
-  // action starts a fresh one without a reward, a Wound or a lost item. Nothing else of a save changes here.
+  // loop is another one (waiting and acting): the fight in progress (the bodies, their timers and pools) cannot go
+  // on in it and is dropped; the place it had is kept (its owner slot, its enemy, an operation's step), so the load
+  // starts a fresh fight of the same enemy there without a reward, a Wound or a lost item. What is kept: the action
+  // and its slot, a mission's run (stage, attempts, the ration already spent, the plan), an operation's step, the
+  // mastery and XP already paid. What restarts: the fight of the stage (full pools, nothing dealt yet) and an
+  // operation's approach. Nothing else of a save changes here.
   (state) => {
     const without = (branch: unknown): unknown => {
       if (!isRecord(branch)) return branch;
@@ -275,7 +279,11 @@ export const MIGRATIONS: readonly Migration[] = [
       void _eva;
       return rest;
     };
-    return { ...state, skills: without(state.skills), pools: without(state.pools), combat: null };
+    const fight = state.combat;
+    const place = isRecord(fight)
+      ? { enemy: fight.enemy, owner: fight.owner, run: fight.run }
+      : null;
+    return { ...state, skills: without(state.skills), pools: without(state.pools), combat: place };
   },
 ];
 
@@ -856,7 +864,7 @@ export function deserialize(
   }
   // Shares are derived from which slots run, so they are recomputed rather than trusted; a
   // saved progress beyond one cycle is cut so a doctored save cannot make the loop spin.
-  rebalanceShares(state);
+  rebalanceShares(state, content);
   for (const [at, slot] of state.slots.entries()) {
     const kind = slot.action && rules.actionKinds[slot.action.kind];
     if (slot.action && kind) {
@@ -889,7 +897,9 @@ export function deserialize(
     }
     if (action?.kind === OPERATION_KIND) {
       const op = indexOf(content).operations.get(action.id);
-      return op ? newOperation(state, op, content, rules, i) : null;
+      // A fight that could not be carried over (an older save) goes on from the step of its run.
+      const saved = isRecord(raw.combat) ? sanitizeRun(raw.combat.run, action, content) : null;
+      return op ? newOperation(state, op, content, rules, i, saved?.step) : null;
     }
     return null;
   };

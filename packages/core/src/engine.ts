@@ -1,5 +1,6 @@
 import type { ContentDb } from '@shinobi/content';
 import { actionKindOf, rebalanceShares, stopSlot } from './actions.ts';
+import { cloneSlots, growSlots } from './clone.ts';
 import { startRefusal } from './start-check.ts';
 import {
   deleteSavedLoadout,
@@ -46,6 +47,8 @@ import { claimPoi, travelInstant, WALK_KIND } from './world.ts';
 export type Command =
   | { type: 'action.start'; slot: number; kind: string; id: string }
   | { type: 'action.stop'; slot: number }
+  /** Dispels the clone: what it does stops and all the speed goes back to the player's action. Without `slot`, every clone slot is dispelled. */
+  | { type: 'clone.dispel'; slot?: number }
   /** Starts the sensei test of the exam that grants `rank`; the checklist must be met. `slot` defaults to 0. */
   | { type: 'exam.start'; rank: string; slot?: number }
   /** The exam that grants the first rank after the Academy; kept for the code that began with it. Same as `exam.start` for that rank. */
@@ -234,6 +237,8 @@ function startAction(
   content: ContentDb,
   rules: Rules,
 ): CommandResult {
+  // A technique learned by other means than the scroll (a tool, a test) has opened its slot by now.
+  if (slotIndex >= state.slots.length && growSlots(state, content)) rebalanceShares(state, content);
   const refusal = startRefusal(state, slotIndex, kindName, id, content, rules);
   if (refusal) return { ok: false, reason: refusal.reason };
   const slot = state.slots[slotIndex];
@@ -243,7 +248,7 @@ function startAction(
   slot.action = { kind: kindName, id };
   slot.progress = 0;
   slot.data = null;
-  rebalanceShares(state);
+  rebalanceShares(state, content);
   kind.start?.(state, slotIndex, id, content, rules);
   return { ok: true };
 }
@@ -321,6 +326,16 @@ function apply(
       if (!slot) return { ok: false, reason: 'error.invalidSlot' };
       if (!slot.action) return { ok: false, reason: 'error.noAction' };
       stopSlot(state, command.slot, 'manual', content, rules);
+      return { ok: true };
+    }
+    case 'clone.dispel': {
+      const slots = cloneSlots(state, content)
+        .map((c) => c.slot)
+        .filter((at) => command.slot === undefined || command.slot === at);
+      if (slots.length === 0) return { ok: false, reason: 'error.invalidSlot' };
+      const running = slots.filter((at) => state.slots[at]?.action);
+      if (running.length === 0) return { ok: false, reason: 'error.noAction' };
+      for (const at of running) stopSlot(state, at, 'dispelled', content, rules);
       return { ok: true };
     }
     case 'exam.start':

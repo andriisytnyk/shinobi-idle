@@ -51,7 +51,7 @@ export function snapshotPlayer(
 ): PlayerSnapshot {
   const snapshot = planningSnapshot(state, content);
   const [chakra, stamina, evasion] = computeMods(
-    rules.modifierProviders,
+    rules,
     state,
     ['cost.chakra', 'cost.stamina', 'evasion'],
     content,
