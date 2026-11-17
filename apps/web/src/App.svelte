@@ -17,15 +17,13 @@
   import WelcomeModal from './components/WelcomeModal.svelte';
   import { isDevMode } from './lib/dev.ts';
   import { coreUi } from './lib/ext/core-ui.ts';
-  import EntityExtras from './lib/ext/EntityExtras.svelte';
   import PageHost from './lib/ext/PageHost.svelte';
   import { createUi, provideUi, type Ui } from './lib/ext/runtime.svelte.ts';
   import Slot from './lib/ext/Slot.svelte';
   import { createStyleInjector, createThemeApplier } from './lib/ext/theme.ts';
   import type { UiPack } from './lib/ext/types.ts';
   import { t } from './lib/i18n.ts';
-  import { currentHash, currentRoute, setBeforeRoute } from './lib/router.svelte.ts';
-  import { revealLevel } from './lib/reveal.ts';
+  import { currentHash, setBeforeRoute } from './lib/router.svelte.ts';
   import { settings } from './lib/settings.svelte.ts';
   import { game } from './lib/store.ts';
 
@@ -67,7 +65,6 @@
   // The meta panel starts open beside the page on wide screens and closed on phones, where it is an overlay.
   let metaOpen = $state(window.matchMedia('(min-width: 769px)').matches);
   const hash = $derived(currentHash());
-  const route = $derived(currentRoute());
 
   // Hooks for the packs: the route (the hash changed / the page is drawn) and the state (after every update).
   let lastHash = untrack(() => hash);
@@ -116,9 +113,6 @@
     <main class="main" class:dev>
       <HintHost />
       <PageHost {hash} />
-      {#if route.page === 'entity' && revealLevel(route.ref) === 'full'}
-        <EntityExtras entity={route.ref} />
-      {/if}
       <Slot name="page.footer" ctx={{ route: hash }} />
     </main>
 
@@ -187,6 +181,17 @@
     grid-area: main;
     padding: var(--space-6);
     overflow-y: auto;
+  }
+
+  /* An open sheet docks to the right edge: the page makes room, so the tile it is about stays in view. */
+  @media (min-width: 1200px) {
+    .main:has(:global([data-ui='sheet'])) {
+      padding-inline-end: calc(var(--space-6) + var(--modal-width));
+    }
+
+    .app.meta-open .main:has(:global([data-ui='sheet'])) {
+      padding-inline-end: calc(var(--space-6) + var(--modal-width) - var(--meta-width));
+    }
   }
 
   .main.dev {

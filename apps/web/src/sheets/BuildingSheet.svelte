@@ -11,7 +11,7 @@
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import { effectLines, resourceName } from '../lib/village.ts';
-  import SimplePage from './SimplePage.svelte';
+  import SimplePage from '../pages/SimplePage.svelte';
 
   const content = game.content;
 

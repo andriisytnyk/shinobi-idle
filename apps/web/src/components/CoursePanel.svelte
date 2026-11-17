@@ -12,6 +12,7 @@
   } from '@shinobi/core';
   import { formatInt, formatSeconds, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
+  import { entityAttr } from '../lib/reveal.ts';
   import { game } from '../lib/store.ts';
   import { currencyName, moneyOf } from '../lib/vocab.ts';
   import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
@@ -143,7 +144,13 @@
           {#each slot.options as option (option.id)}
             {@const [bonus, penalty] = halves(option.id)}
             {@const missing = needs(slot, option.id)}
-            <li class="option" class:built={option.built} data-obstacle={option.id}>
+            {@const ref = { kind: 'obstacle', id: option.id }}
+            <li
+              class="option"
+              class:built={option.built}
+              data-obstacle={option.id}
+              data-entity={entityAttr(ref)}
+            >
               <p class="name">
                 <ActionEmblem kind="obstacle" id={option.id} {skill} size="sm" />
                 <EntityLink kind="obstacle" id={option.id} />

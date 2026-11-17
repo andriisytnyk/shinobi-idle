@@ -2,18 +2,20 @@
   import { localeKey } from '@shinobi/content';
   import { actionInfo, evalReq, type Req } from '@shinobi/core';
   import ActionEmblem from '../components/ActionEmblem.svelte';
-  import ActionTile from '../components/ActionTile.svelte';
   import EntityLink from '../components/EntityLink.svelte';
   import Icon from '../components/Icon.svelte';
+  import MasteryRing from '../components/MasteryRing.svelte';
   import PinGoal from '../components/PinGoal.svelte';
   import ReqTree from '../components/ReqTree.svelte';
   import SealStrip from '../components/SealStrip.svelte';
   import { t, textOf } from '../lib/i18n.ts';
   import { techniqueGoal } from '../lib/goal.ts';
   import { techniqueRelations } from '../lib/technique-links.ts';
+  import { techniqueFigures } from '../lib/technique-figures.ts';
   import { game } from '../lib/store.ts';
   import { practiceView } from '../lib/timing.ts';
-  import { entityName } from '../lib/entities.ts';
+  import { entityDesc, entityName } from '../lib/entities.ts';
+  import { formatFactor, formatInt, formatSeconds } from '../lib/format.ts';
   import { graduateRank } from '../lib/vocab.ts';
 
   const content = game.content;
@@ -26,6 +28,7 @@
 
   const tech = $derived(content.techniques.find((x) => x.id === id));
   const ref = $derived({ kind: 'technique', id } as const);
+  const desc = $derived(entityDesc(ref));
   const relations = $derived(techniqueRelations(id, content));
   const known = $derived(game.read((gs) => gs.known[id] === true));
 
@@ -63,9 +66,33 @@
     }),
   );
 
+  /** The fight numbers for the player as he is now, with the factors behind damage and cost. */
+  const figures = $derived(
+    game.read((gs) =>
+      tech && tech.rank !== null
+        ? techniqueFigures(gs, tech, content, game.rules, info?.masteryLevel ?? 1)
+        : null,
+    ),
+  );
+  const K = content.balance.K;
+  const pct = (x: number): number => Math.round(x * 100);
+
   const stateStatus = $derived(content.statuses.find((x) => x.state === tech?.state));
   const goal = $derived(techniqueGoal(id, content));
 </script>
+
+{#snippet factors(rows: readonly { key: string; value: number; base?: boolean }[])}
+  <ul class="factors">
+    {#each rows as row (row.key)}
+      <li>
+        <span>{t(row.key)}</span>
+        <span class="num"
+          >{#if !row.base}&times;&nbsp;{/if}{formatFactor(row.value)}</span
+        >
+      </li>
+    {/each}
+  </ul>
+{/snippet}
 
 {#if tech}
   <article class="technique" data-technique={id} data-ui="entity-page" data-entity="technique:{id}">
@@ -77,8 +104,10 @@
         </p>
         <h1>{entityName(ref)}</h1>
       </div>
-      {#if goal}<PinGoal kind="technique" {id} variant="button" />{/if}
+      {#if goal}<span class="pin"><PinGoal kind="technique" {id} variant="button" /></span>{/if}
     </header>
+
+    {#if desc}<p class="desc">{desc}</p>{/if}
 
     <dl class="facts">
       <div>
@@ -126,6 +155,75 @@
       </section>
     {/if}
 
+    {#if figures}
+      <section data-ui="entity-section" data-figures>
+        <h2>{t('technique.numbers')}</h2>
+        <dl class="figures">
+          <div>
+            <dt>{t('technique.damage')}</dt>
+            <dd data-figure="damage">
+              {figures.damage ? formatInt(figures.numbers.damage) : t('technique.noDamage')}
+            </dd>
+          </div>
+          <div>
+            <dt>{t('technique.cast')}</dt>
+            <dd data-figure="cast">{formatSeconds(figures.numbers.castMs)}</dd>
+          </div>
+          <div>
+            <dt>{t('technique.cooldown')}</dt>
+            <dd data-figure="cooldown">
+              {figures.numbers.cooldownMs > 0
+                ? formatSeconds(figures.numbers.cooldownMs)
+                : t('technique.none')}
+            </dd>
+          </div>
+          <div>
+            <dt>
+              {t('technique.cost')}: {t(
+                figures.numbers.pool === 'stamina' ? 'combat.staminaBar' : 'combat.chakraBar',
+              ).toLowerCase()}
+            </dt>
+            <dd data-figure="cost">
+              {figures.numbers.cost > 0 ? formatFactor(figures.numbers.cost) : t('technique.none')}
+            </dd>
+          </div>
+        </dl>
+        {#if figures.damage || figures.cost.length > 0}
+          <details class="breakdown" data-breakdown>
+            <summary>{t('technique.breakdown')}</summary>
+            {#if figures.damage}
+              <h3>{t('technique.damage')}</h3>
+              {@render factors(figures.damage)}
+            {/if}
+            {#if figures.cost.length > 0}
+              <h3>{t('technique.cost')}</h3>
+              {@render factors(figures.cost)}
+            {/if}
+          </details>
+        {/if}
+      </section>
+    {/if}
+
+    {#if info}
+      <section data-ui="entity-section" data-mastery>
+        <h2>{t('technique.mastery')}</h2>
+        <p class="mastery-line">
+          <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
+          <span>{t('technique.masteryLevel', { n: info.masteryLevel, cap: K.masteryCap })}</span>
+        </p>
+        <p class="dim">{t('technique.gives')}</p>
+        <ul class="gives">
+          {#if !tech.noDamage && tech.rank !== null}
+            <li>{t('technique.gives.damage', { pct: pct(K.masteryDmg) })}</li>
+          {/if}
+          <li>{t('technique.gives.cost', { pct: pct(K.masteryCost) })}</li>
+          {#if tech.sealSeq.length > 0}
+            <li>{t('technique.gives.cast', { pct: pct(K.masteryCast) })}</li>
+          {/if}
+        </ul>
+      </section>
+    {/if}
+
     <section data-ui="entity-section">
       <h2>{t('technique.source')}</h2>
       <p>{t(`technique.src.${tech.src}`)}</p>
@@ -137,11 +235,19 @@
             {t('technique.libraryLevel', { n: relations.library.level })}
           </li>
         {/if}
-        {#each relations.carriers as carrier (carrier.id)}
-          <li><EntityLink kind={carrier.kind} id={carrier.id} /></li>
-        {/each}
       </ul>
     </section>
+
+    {#if relations.carriers.length > 0}
+      <section data-ui="entity-section" data-scroll-carriers>
+        <h2>{t('technique.scroll')}</h2>
+        <ul class="links">
+          {#each relations.carriers as carrier (carrier.id)}
+            <li><EntityLink kind={carrier.kind} id={carrier.id} /></li>
+          {/each}
+        </ul>
+      </section>
+    {/if}
 
     {#if relations.missions.length > 0}
       <section data-ui="entity-section" data-missions>
@@ -159,13 +265,6 @@
         <h2>{t('technique.requirements')}</h2>
         <ReqTree node={requirements} />
         {#if goal}<p class="pin-caption"><PinGoal kind="technique" {id} variant="link" /></p>{/if}
-      </section>
-    {/if}
-
-    {#if info}
-      <section data-ui="entity-section">
-        <h2>{t('technique.mastery')}</h2>
-        <ul class="tile-host"><ActionTile {info} /></ul>
       </section>
     {/if}
   </article>
@@ -195,7 +294,21 @@
   }
 
   .title {
-    flex: 1;
+    --_flex-basis: 8rem;
+    flex: 1 1 var(--_flex-basis);
+    min-width: 0;
+  }
+
+  /* On a phone the pin button takes its own line under the title. */
+  @media (max-width: 768px) {
+    .pin {
+      flex: 1 0 100%;
+    }
+
+    .pin :global(button) {
+      width: 100%;
+      justify-content: center;
+    }
   }
 
   .kind {
@@ -218,7 +331,17 @@
     font-weight: 400;
   }
 
-  .links {
+  .desc {
+    margin: var(--space-3) 0 0;
+  }
+
+  .dim {
+    margin: 0 0 var(--space-1);
+    color: var(--fg-dim);
+  }
+
+  .links,
+  .gives {
     margin: 0;
     padding-left: var(--space-4);
   }
@@ -226,7 +349,7 @@
   .facts {
     --_grid-template-columns: 11rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(var(--_grid-template-columns), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--_grid-template-columns)), 1fr));
     gap: var(--space-3);
     margin: var(--space-3) 0 0;
   }
@@ -248,11 +371,58 @@
     color: var(--success);
   }
 
-  .tile-host {
-    --_max-width: 20rem;
-    max-width: var(--_max-width);
+  .figures {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+    margin: 0;
+  }
+
+  .figures dd {
+    font-size: var(--text-lg);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .breakdown {
+    margin-top: var(--space-3);
+  }
+
+  .breakdown summary {
+    min-height: var(--control-sm);
+    color: var(--accent);
+    cursor: pointer;
+  }
+
+  .breakdown h3 {
+    margin: var(--space-2) 0 var(--space-1);
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
+    font-weight: 400;
+  }
+
+  .factors {
     margin: 0;
     padding: 0;
+    list-style: none;
+  }
+
+  .factors li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-1) 0;
+    border-top: var(--border-thin) solid var(--line);
+  }
+
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mastery-line {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin: 0 0 var(--space-2);
   }
 
   .pin-caption {

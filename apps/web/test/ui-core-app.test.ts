@@ -17,20 +17,21 @@ vi.mock('../src/lib/store.ts', async () => {
   return { game: createGame({ clock: { now: () => 0 } }) };
 });
 
-/** The routes that existed before the registries, as patterns, written out by hand. */
+/**
+ * The routes that existed before the registries, as patterns, written out by hand. The kinds whose details
+ * became a sheet over a parent page (technique, item, recipe, gear, building) have no page of their own now:
+ * their addresses are answered by the generic route and drawn as a sheet (see entity-sheets.test.ts).
+ */
 const ROUTES = [
   '#/',
   '#/:kind/*id',
   '#/bank',
-  '#/building/*id',
   '#/cell/*id',
   '#/combat',
   '#/credits',
   '#/exam/*id',
-  '#/gear/*id',
   '#/mission/*id',
   '#/help',
-  '#/item/*id',
   '#/missions',
   '#/more',
   '#/nature',
@@ -38,14 +39,12 @@ const ROUTES = [
   '#/quest/*id',
   '#/quests',
   '#/rank',
-  '#/recipe/*id',
   '#/region/*id',
   '#/settings',
   '#/shop',
   '#/shop/sell',
   '#/skill/*id',
   '#/skills',
-  '#/technique/*id',
   '#/village',
   '#/village/*focus',
   '#/world',

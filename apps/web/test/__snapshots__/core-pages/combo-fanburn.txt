@@ -1,4 +1,15 @@
 <main class="main">
+  <nav aria-label="Де ти зараз" class="crumbs" data-ui="breadcrumb">
+    <ol>
+      <li>
+        <a href="#/">
+          Головна
+      <li>
+        <span>
+          Комбо станів
+      <li aria-current="page">
+        <span>
+          Футон по Горінню
   <div class="ui-page" data-page="core:entity" data-ui="page">
     <article class="entity-page" data-entity="combo:fanBurn" data-ui="entity-page">
       <p class="kind">

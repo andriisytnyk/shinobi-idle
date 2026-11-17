@@ -11,7 +11,7 @@ import { parseHash } from '../src/lib/route.ts';
 import { settings } from '../src/lib/settings.svelte.ts';
 import { game } from '../src/lib/store.ts';
 import { toastFor as toastForIn } from '../src/lib/toasts.svelte.ts';
-import BuildingPage from '../src/pages/BuildingPage.svelte';
+import BuildingSheet from '../src/sheets/BuildingSheet.svelte';
 import ShopPage from '../src/pages/ShopPage.svelte';
 import VillagePage from '../src/pages/VillagePage.svelte';
 
@@ -211,7 +211,7 @@ describe('the village page', () => {
 
 describe('the building page', () => {
   it('shows the card and every level with its effects and cost', () => {
-    app = mount(BuildingPage, { target, props: { id: id('grounds') } });
+    app = mount(BuildingSheet, { target, props: { id: id('grounds') } });
     flushSync();
     expect(target.querySelector('[data-building-page]')).not.toBeNull();
     expect(target.querySelectorAll('[data-level-row]')).toHaveLength(6);
@@ -220,7 +220,7 @@ describe('the building page', () => {
     // A building without level six lists five levels.
     unmount(app);
     target.innerHTML = '';
-    app = mount(BuildingPage, { target, props: { id: id('library') } });
+    app = mount(BuildingSheet, { target, props: { id: id('library') } });
     flushSync();
     expect(target.querySelectorAll('[data-level-row]')).toHaveLength(5);
   });

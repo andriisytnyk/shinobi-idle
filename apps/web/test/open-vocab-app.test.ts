@@ -6,6 +6,7 @@ import PoiRow from '../src/components/PoiRow.svelte';
 import { testmodUi } from '../dev-packs/testmod-ui.ts';
 import { clearMissingKeys, missingKeys } from '../src/lib/i18n.ts';
 import { coreUi } from '../src/lib/ext/core-ui.ts';
+import { revealLevel } from '../src/lib/reveal.ts';
 import { settings } from '../src/lib/settings.svelte.ts';
 import { game } from '../src/lib/store.ts';
 import { bootApp, type BootedApp } from './helpers/boot-app.ts';
@@ -404,10 +405,21 @@ describe('R1 (T4): the entities of the pack follow their reveal rules', () => {
   });
 
   it('keeps the core items on the rule of their kind', async () => {
-    // A mint leaf is named by a technique, so by name; held, it is shown in full.
-    booted = await boot('#/item/core:mint', noPellets());
+    // An item that is only named (by a recipe or a mission) is shown by name; held, it is shown in full.
+    // A herb is left out: its tile on the page of its skill, which the address opens, offers it to the player.
+    booted = await boot('#/', noPellets());
+    const herbs = new Set(game.content.herbs.map((h) => h.id));
+    const named = game.content.items.find(
+      (i) =>
+        i.id.startsWith('core:') &&
+        !herbs.has(i.id) &&
+        revealLevel({ kind: 'item', id: i.id }) === 'name',
+    );
+    expect(named, 'a core item that is shown by name').toBeDefined();
+    const id = named?.id ?? '';
+    await booted.go('#/item/' + id);
     expect(q('[data-name-only]')).not.toBeNull();
-    game.state.bank['core:mint'] = 1;
+    game.state.bank[id] = 1;
     game.devAdvance(0);
     flushSync();
     expect(q('[data-name-only]')).toBeNull();

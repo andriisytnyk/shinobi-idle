@@ -33,6 +33,10 @@ export const UI_PARTS = [
   'goal-row',
   /** The pin that makes an entity the goal: on a tile's corner, as a caption under a requirement tree, or as a button of an entity page; carries `data-entity` and `data-pinned`. */
   'pin-goal',
+  /** The details of an entity, open over its parent page; carries `data-entity` (not for an entity that is not shown). */
+  'sheet',
+  /** The path above a page that stays a page: its section, then the entity. */
+  'breadcrumb',
   /** The root of an entity page. */
   'entity-page',
   'entity-header',

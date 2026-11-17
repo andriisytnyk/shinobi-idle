@@ -1,4 +1,15 @@
 <main class="main">
+  <nav aria-label="Де ти зараз" class="crumbs" data-ui="breadcrumb">
+    <ol>
+      <li>
+        <a href="#/">
+          Головна
+      <li>
+        <span>
+          Ворог
+      <li aria-current="page">
+        <span>
+          ???
   <div class="ui-page" data-page="reveal-gate" data-ui="page">
     <article class="gate" data-not-revealed="" data-ui="entity-page">
       <h1 data-ui="entity-header">
