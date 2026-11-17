@@ -252,6 +252,54 @@ describe('fog and the survey range', () => {
   });
 });
 
+describe('what the fog gives away', () => {
+  it('shows nothing of a hex in fog: not its cell, its levels or its survey count', () => {
+    const state = genin();
+    const cell = content.cells.find((c) => isFog(state, hexKey(c.hex[0], c.hex[1])))!;
+    const key = hexKey(cell.hex[0], cell.hex[1]);
+    // Part-way to the first level: the surveys are the player's own, but they must not tell a cell from a plain hex.
+    state.world.explores[cell.id] = (K.cellExplores[0] ?? 2) - 1;
+    const info = hexInfo(state, key, content)!;
+    expect(info).toMatchObject({
+      surveyed: false,
+      cell: null,
+      terrain: null,
+      country: null,
+      places: [],
+      level: 0,
+      maxLevel: 0,
+      explores: 0,
+    });
+    // The same hex, surveyed, shows all of it.
+    state.world.surveyed[key] = true;
+    state.world.explores[cell.id] = K.cellExplores[0] ?? 2;
+    expect(hexInfo(state, key, content)).toMatchObject({
+      cell: cell.id,
+      maxLevel: expect.any(Number),
+    });
+  });
+
+  it('keeps the list of hexes while nothing it shows changes, and makes it again when it does', () => {
+    const state = genin();
+    setLevel(state, 'scout', 10);
+    const first = listHexes(state, content, defaultRules, 0, 'playable');
+    expect(first.every((i) => i.playable)).toBe(true);
+    expect(first).toHaveLength(content.hexes.filter((h) => h.terrain).length);
+    expect(listHexes(state, content, defaultRules, 0, 'playable')).toBe(first);
+    // A survey that finishes changes the counts on show.
+    const near = fogPlain(state, 3);
+    ok(state, survey(near));
+    advance(state, 2 * MIN, content);
+    const after = listHexes(state, content, defaultRules, 0, 'playable');
+    expect(after).not.toBe(first);
+    expect(after.find((i) => i.key === near)?.explores).toBeGreaterThan(0);
+    // A walk changes where the player stands.
+    expect(listHexes(state, content, defaultRules, 0, 'playable')).toBe(after);
+    state.world.location = 'core:rysovi_polia';
+    expect(listHexes(state, content, defaultRules, 0, 'playable')).not.toBe(after);
+  });
+});
+
 describe('routes', () => {
   it('goes only over surveyed, enterable hexes, and the same way each time', () => {
     const state = genin();
@@ -353,7 +401,9 @@ describe('travel is hex by hex', () => {
     expect(dispatch(state, walk('core:rysovi_polia'), withMod, game)).toEqual({ ok: true });
     advance(state, 90 * MIN, withMod, game);
     expect(state.world.location).toBe('core:rysovi_polia');
-    expect(state.events.some((e) => e.type === 'ruleDisabled')).toBe(true);
+    // The handler is switched off at its first failure: one notice for the whole walk, not one per hex.
+    expect(eventsOf(state, 'hexEntered').length).toBeGreaterThan(1);
+    expect(state.events.filter((e) => e.type === 'ruleDisabled')).toHaveLength(1);
   });
 
   it('gives the same state however the time is cut', () => {

@@ -384,3 +384,11 @@ export const stepTime = (
   content: ContentDb,
   rules: Rules = defaultRules,
 ): number => stepMs(state, content, rules, terrainMinutes(content, terrain));
+
+/** Length of a step onto a hex of the terrain the performer of `slot` stands on, as a measure of the pace of the walk here. */
+export const stepTimeHere = (
+  state: GameState,
+  content: ContentDb,
+  rules: Rules = defaultRules,
+  slot = 0,
+): number => stepTime(state, positionHex(state, content, slot)?.terrain ?? '', content, rules);

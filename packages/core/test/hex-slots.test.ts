@@ -205,7 +205,9 @@ describe('performers on the map', () => {
       expect(dispatch(state, walkTo(1, 'core:rysovi_polia'), content)).toEqual({ ok: true });
       expect(state.world.figures?.[1]).toBe(HOME);
       // The character walks off; the clone keeps its own position and its own route.
-      expect(dispatch(state, walkTo(0, 'core:prykordonnyi_lis_okolytsia'), content)).toEqual({ ok: true });
+      expect(dispatch(state, walkTo(0, 'core:prykordonnyi_lis_okolytsia'), content)).toEqual({
+        ok: true,
+      });
       // Step by step until the character has left home while the clone is still on its way.
       for (let i = 0; i < 40 && state.world.location === HOME; i++) advance(state, MIN, content);
       expect(state.slots[1]?.action?.kind).toBe('walk');
@@ -251,7 +253,11 @@ describe('performers on the map', () => {
       expect(state.world.figures?.[1]).toBe(HOME);
       // A new action given to a running clone keeps it where it stands.
       state.world.figures = { 1: FAR };
-      dispatch(state, { type: 'action.start', slot: 1, kind: AUTOSURVEY_KIND, id: AUTOSURVEY_ID }, content);
+      dispatch(
+        state,
+        { type: 'action.start', slot: 1, kind: AUTOSURVEY_KIND, id: AUTOSURVEY_ID },
+        content,
+      );
       expect(state.world.figures?.[1]).toBe(FAR);
     });
 

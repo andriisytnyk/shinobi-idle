@@ -380,7 +380,8 @@ describe('A5: a disabled control says why', () => {
   });
 
   it('a hex that cannot be reached yet', () => {
-    show({ cell: 'core:stezhka_myslyvtsia', region: VALLEY });
+    show();
+    click(tile('core:stezhka_myslyvtsia'));
     expect(q('[data-travel-walk]')?.hasAttribute('disabled')).toBe(true);
     expect(reason('walk')).toBe(name('error.cellNotReachable'));
   });
@@ -663,5 +664,107 @@ describe('R1: places the player has not discovered stay hidden on the map', () =
     game.devAdvance(10);
     flushSync();
     expect(q('[data-places]')?.textContent).toContain(placeName);
+  });
+});
+
+describe('R2: a hex in fog gives nothing away, wherever the interface speaks of it', () => {
+  const FOG_CELL = 'core:khram_vohniu';
+
+  /** A genin who stands next to the fog cell, on surveyed land, with the cell in range. */
+  function nextTo(): GameState {
+    const state = genin();
+    state.skills.scout = { xp: xpAt(10) };
+    const [q0, r0] = cellOf(FOG_CELL).hex;
+    const key = `${q0 - 1},${r0}`;
+    state.world.surveyed[key] = true;
+    state.world.location = key;
+    return state;
+  }
+
+  it('names a survey of it "a hex in fog" in the Now bar, without the cell, its link or its pace', () => {
+    game.replaceState(nextTo());
+    app = mount(NowBar, { target });
+    const started = game.dispatch({ type: 'action.start', slot: 0, kind: 'explore', id: FOG_CELL });
+    expect(started).toEqual({ ok: true });
+    flushSync();
+    const row = q('.slot');
+    expect(row?.textContent).toContain(name('map.hex.fog'));
+    expect(row?.textContent).not.toContain(name(`cell.${FOG_CELL}.name`));
+    expect(row?.innerHTML).not.toContain(FOG_CELL);
+    expect(row?.textContent).not.toMatch(/\d\s*\/\s*год/);
+  });
+
+  it('says nothing of the levels or the survey count of a hex in fog in its panel', () => {
+    const state = nextTo();
+    // Part-way to the first level of the cell: the count must not tell a cell from a plain hex.
+    state.world.explores[FOG_CELL] = FIRST_LEVEL - 14;
+    game.replaceState(state);
+    show({ cell: null, region: FOREST });
+    click(hexEl(coordOf(FOG_CELL)));
+    const panel = q('[data-hex-panel]');
+    expect(panel).not.toBeNull();
+    expect(panel?.querySelector('[role="progressbar"]')).toBeNull();
+    expect(panel?.textContent).not.toMatch(/\d+ з \d+/);
+    expect(panel?.innerHTML).not.toContain(FOG_CELL);
+  });
+
+  it('does not repeat "in fog" in the label of a hex, and names no cell on it', () => {
+    game.replaceState(nextTo());
+    show();
+    const label = hexEl(coordOf(FOG_CELL))?.getAttribute('aria-label') ?? '';
+    expect(label.match(/тумані/g)?.length ?? 0).toBeLessThanOrEqual(1);
+    expect(label).not.toContain(name(`cell.${FOG_CELL}.name`));
+  });
+
+  it('names a stop of a survey of a hex in fog by the hex, not by the cell', () => {
+    game.replaceState(nextTo());
+    const spec = toastFor({
+      type: 'actionStopped',
+      at: 0,
+      slot: 0,
+      kind: 'explore',
+      id: FOG_CELL,
+      reason: 'requirements',
+    });
+    expect(spec?.ref).toEqual({ kind: 'hex', id: coordOf(FOG_CELL) });
+  });
+
+  it('does not put the map on a cell that is still in fog when the address names it', () => {
+    game.replaceState(nextTo());
+    show({ cell: FOG_CELL, region: null });
+    // The panel stays shut and the hex of the cell is not marked selected.
+    expect(q('[data-hex-panel]')).toBeNull();
+    expect(hexEl(coordOf(FOG_CELL))?.getAttribute('aria-pressed')).toBe('false');
+  });
+
+  it('draws a terrain by the mark its data gives, not by a table of ids in the code', () => {
+    game.replaceState(genin());
+    show();
+    expect(content.terrains.every((x) => x.glyph)).toBe(true);
+    const paths = [...target.querySelectorAll('[data-ui="hex"] path.glyph')];
+    expect(paths.length).toBeGreaterThan(5);
+    const data = new Set(content.terrains.map((x) => x.glyph));
+    for (const p of paths) expect(data.has(p.getAttribute('d') ?? '')).toBe(true);
+  });
+
+  it('has no terrain id in the source of the interface', async () => {
+    const { readdirSync, readFileSync, statSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const files: string[] = [];
+    const walk = (dir: string) => {
+      for (const f of readdirSync(dir)) {
+        const p = join(dir, f);
+        if (statSync(p).isDirectory()) walk(p);
+        else if (/\.(ts|svelte)$/.test(f) && !f.endsWith('.generated.ts')) files.push(p);
+      }
+    };
+    walk(join(process.cwd(), 'src'));
+    const found: string[] = [];
+    for (const file of files) {
+      const text = readFileSync(file, 'utf8');
+      for (const { id } of content.terrains)
+        if (new RegExp(`['"\`]${id}['"\`]`).test(text)) found.push(`${file}: ${id}`);
+    }
+    expect(found).toEqual([]);
   });
 });

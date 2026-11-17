@@ -339,7 +339,9 @@ function surveyOnce(state: GameState, subject: Subject, content: ContentDb, rule
   // is the one every plan has chosen (its count only makes it a better choice); anything else
   // (a new level, new land, a hex nobody planned) makes them be made again.
   const plans = planned.get(state);
-  const ownPlans = plans ? [...plans.values()].every((e) => e.plan?.subject.address === subject.address) : true;
+  const ownPlans = plans
+    ? [...plans.values()].every((e) => e.plan?.subject.address === subject.address)
+    : true;
   if (
     done ||
     !ownPlans ||
@@ -632,7 +634,12 @@ export const autoSurveyKind: ActionKind = {
     if (!plan) return actionFloor(content);
     const next = plan.route[0];
     if (next === undefined) return exploreIntervalMs(state, content, rules, plan.subject.address);
-    return stepMs(state, content, rules, stepMinutes(content, positionKey(state, content, slot), next));
+    return stepMs(
+      state,
+      content,
+      rules,
+      stepMinutes(content, positionKey(state, content, slot), next),
+    );
   },
   complete(state, _id, content, rules, slot = 0) {
     const plan = autoPlan(state, content, slot);

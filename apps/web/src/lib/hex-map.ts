@@ -124,9 +124,23 @@ export interface MapHex {
   pois: string[];
 }
 
+/** A way between two hexes that are not neighbours (a ferry, a pass), as the map draws it: the two ends. */
+export interface MapLink {
+  id: string;
+  kind: string;
+  a: Point;
+  b: Point;
+}
+
 export interface MapView {
   hexes: MapHex[];
-  /** The bounds of the playable land in map units. */
+  /** The links the player knows: one end of each is surveyed. */
+  links: MapLink[];
+  /**
+   * The bounds of the land the player may know in map units: the surveyed hexes, the hexes next to
+   * them (and across a link from them) and the one the player stands on. Land far away that the
+   * player has not reached, a pack's island say, does not stretch the map.
+   */
   bounds: { x0: number; y0: number; x1: number; y1: number };
   here: string | null;
   /** The other performers (shadow clones) on the map, by action slot; each is a figure of its own. */
@@ -150,14 +164,39 @@ export function mapView(state: GameState, content: ContentDb, rules: Rules): Map
   const cellOf = new Map(content.cells.map((c) => [c.id, c]));
   const hexes: MapHex[] = [];
   let here: string | null = null;
+  const infos = listHexes(state, content, rules, 0, 'playable');
+  // What the player may know of: the surveyed land, the hexes next to it and across a link from it.
+  const known = new Set<string>();
+  for (const info of infos) {
+    if (!info.surveyed && !info.here) continue;
+    known.add(info.key);
+    for (const [dq, dr] of NEIGHBOURS) known.add(hexKey(info.q + dq, info.r + dr));
+  }
+  const surveyedKeys = new Set(infos.filter((i) => i.surveyed || i.here).map((i) => i.key));
+  const links: MapLink[] = [];
+  for (const link of content.links) {
+    const a = hexKey(link.a[0], link.a[1]);
+    const b = hexKey(link.b[0], link.b[1]);
+    if (!surveyedKeys.has(a) && !surveyedKeys.has(b)) continue;
+    known.add(a);
+    known.add(b);
+    links.push({
+      id: link.id,
+      kind: link.kind ?? 'link',
+      a: hexCenter(link.a[0], link.a[1]),
+      b: hexCenter(link.b[0], link.b[1]),
+    });
+  }
   const bounds = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
-  for (const info of listHexes(state, content, rules)) {
+  for (const info of infos) {
     if (!info.playable) continue;
     const { x, y } = hexCenter(info.q, info.r);
-    bounds.x0 = Math.min(bounds.x0, x - SIZE * SQRT3 * 0.5);
-    bounds.x1 = Math.max(bounds.x1, x + SIZE * SQRT3 * 0.5);
-    bounds.y0 = Math.min(bounds.y0, y - SIZE);
-    bounds.y1 = Math.max(bounds.y1, y + SIZE);
+    if (known.has(info.key)) {
+      bounds.x0 = Math.min(bounds.x0, x - SIZE * SQRT3 * 0.5);
+      bounds.x1 = Math.max(bounds.x1, x + SIZE * SQRT3 * 0.5);
+      bounds.y0 = Math.min(bounds.y0, y - SIZE);
+      bounds.y1 = Math.max(bounds.y1, y + SIZE);
+    }
     if (info.here) here = info.key;
     const cell = info.cell ? cellOf.get(info.cell) : undefined;
     hexes.push({
@@ -183,7 +222,12 @@ export function mapView(state: GameState, content: ContentDb, rules: Rules): Map
     const at = positionHex(state, content, slot);
     return at ? [{ slot, coord: hexKey(at.q, at.r) }] : [];
   });
-  return { hexes, bounds, here, figures, range: rangeNow(state, content) };
+  if (bounds.x0 === Infinity) {
+    // Nothing is known (no land at all): a unit box, so that the camera has something to fit.
+    bounds.x0 = bounds.y0 = -SIZE;
+    bounds.x1 = bounds.y1 = SIZE;
+  }
+  return { hexes, links, bounds, here, figures, range: rangeNow(state, content) };
 }
 
 /** The route and its time to the hex at `coord`, as the map draws it. */

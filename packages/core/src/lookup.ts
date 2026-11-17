@@ -181,8 +181,14 @@ function build(content: ContentDb): ContentIndex {
   for (const link of content.links) {
     const a = `${link.a[0]},${link.a[1]}`;
     const b = `${link.b[0]},${link.b[1]}`;
-    linksByHex.set(a, [...(linksByHex.get(a) ?? []), { id: link.id, to: b, minutes: link.minutes }]);
-    linksByHex.set(b, [...(linksByHex.get(b) ?? []), { id: link.id, to: a, minutes: link.minutes }]);
+    linksByHex.set(a, [
+      ...(linksByHex.get(a) ?? []),
+      { id: link.id, to: b, minutes: link.minutes },
+    ]);
+    linksByHex.set(b, [
+      ...(linksByHex.get(b) ?? []),
+      { id: link.id, to: a, minutes: link.minutes },
+    ]);
   }
   return {
     cells: byId(content.cells),

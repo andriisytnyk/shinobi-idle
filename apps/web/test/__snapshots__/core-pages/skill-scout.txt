@@ -38,11 +38,11 @@
                   5 с
           <div>
             <dt>
-              Крок по рівнині (один гекс)
+              Крок на гекс, де ти стоїш
             <dd>
               <span class="mod">
                 <button aria-expanded="false" class="figure" type="button">
-                  3 хв
+                  2 хв
           <div>
             <dt>
               Дальність розвідки

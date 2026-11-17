@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { hexKey, hexOfAddress, travelPlan } from '@shinobi/core';
+  import { hexKey, hexOfAddress, isSurveyed, travelPlan } from '@shinobi/core';
+  import { untrack } from 'svelte';
   import AutoSurveyButton from '../components/AutoSurveyButton.svelte';
   import HexMap from '../components/HexMap.svelte';
   import HexPanel from '../components/HexPanel.svelte';
@@ -44,6 +45,8 @@
         ? hexOfCell(content.regions.find((r) => r.id === region)?.cells[0] ?? '')
         : null;
     if (!at) return;
+    // A cell the player has not surveyed is not placed on the map: the address would give its hex away.
+    if (!untrack(() => game.read((gs) => isSurveyed(gs, content, at)))) return;
     if (cell) selected = at;
     queueMicrotask(() => map?.focusOn(at));
   });
@@ -92,21 +95,37 @@
 
   /** Where the bottom sheet rests: just above the Now bar, whatever height that bar has. */
   let sheetBottom = $state<string | null>(null);
+  /** The room between the top bar and the Now bar, in px: the sheet takes a share of it, and the map keeps the rest. */
+  let room = $state(0);
+  /** The sheet is opened wide: most of the room, for reading a long panel; the map is a strip then. */
+  let expanded = $state(false);
   $effect(() => {
     const now = document.querySelector('.now');
+    const top = document.querySelector('.topbar');
     if (!now) return;
     const update = () => {
-      sheetBottom = `${Math.max(0, window.innerHeight - now.getBoundingClientRect().top)}px`;
+      const upper = now.getBoundingClientRect().top;
+      sheetBottom = `${Math.max(0, window.innerHeight - upper)}px`;
+      room = Math.max(0, upper - (top?.getBoundingClientRect().bottom ?? 0));
     };
     update();
     window.addEventListener('resize', update);
     const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(update);
     observer?.observe(now);
+    if (top) observer?.observe(top);
     return () => {
       window.removeEventListener('resize', update);
       observer?.disconnect();
     };
   });
+  // A new hex starts with the sheet at its usual height.
+  $effect(() => {
+    void selected;
+    expanded = false;
+  });
+  const sheetMax = $derived(
+    room > 0 ? `${Math.round(room * (expanded ? 0.92 : 0.62))}px` : expanded ? '85dvh' : '55dvh',
+  );
 
   const select = (coord: string | null): void => {
     selected = coord;
@@ -123,14 +142,16 @@
 </script>
 
 <SimplePage title={t('world.title')} compact>
-  <div class="world" data-world style:--sheet-bottom={sheetBottom}>
+  <div class="world" data-world style:--sheet-bottom={sheetBottom} style:--sheet-max={sheetMax}>
     <Hint id="world" />
 
     <div class="strip" data-map-status>
       <p class="where">
         <Icon name="lucide:map-pin" size={16} />
         <span>{t('map.statusHere')} <strong data-here-name>{hereName}</strong></span>
-        <span class="range" data-range>· {t('map.range', { n: view.range })}</span>
+        <span class="range" data-range
+          ><span class="sep" aria-hidden="true">· </span>{t('map.range', { n: view.range })}</span
+        >
       </p>
       <div class="auto-row">
         <AutoSurveyButton whyId="why-auto-strip" />
@@ -161,7 +182,13 @@
 
       {#if selected}
         <aside class="side" class:sheet={!wide} data-side aria-label={t('map.panel.label')}>
-          {#key selected}<HexPanel coord={selected} onClose={() => select(null)} />{/key}
+          {#key selected}<HexPanel
+              coord={selected}
+              sheet={!wide}
+              {expanded}
+              onToggle={() => (expanded = !expanded)}
+              onClose={() => select(null)}
+            />{/key}
         </aside>
       {/if}
     </div>
@@ -233,9 +260,34 @@
     margin-inline-start: auto;
   }
 
+  /* On a phone the status takes two short lines beside the button, so the map starts higher up. */
   @media (max-width: 768px) {
     .strip {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: var(--space-2);
+      margin-bottom: var(--space-2);
+    }
+
+    .where {
+      gap: 0 var(--space-2);
+    }
+
+    .range {
+      flex-basis: 100%;
+      font-size: var(--text-xs);
+    }
+
+    .sep {
+      display: none;
+    }
+
+    .auto-row {
+      margin-inline-start: 0;
+    }
+
+    .why {
+      grid-column: 1 / -1;
     }
   }
 
@@ -279,10 +331,7 @@
     bottom: var(--sheet-bottom);
     left: 0;
     z-index: var(--z-popover-top);
-    max-height: min(
-      40dvh,
-      calc(100dvh - var(--sheet-bottom) - var(--topbar-height) - var(--space-8))
-    );
+    max-height: var(--sheet-max, 55dvh);
     border-width: var(--border-thick) 0 0;
     border-top-color: var(--accent);
     border-radius: 0;

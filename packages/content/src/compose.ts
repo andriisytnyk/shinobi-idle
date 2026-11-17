@@ -550,7 +550,16 @@ export function composeContent(packs: readonly ContentPack[]): ContentDb {
   // Patches run in load order, after everything is merged.
   const patched = new Set<string>();
   for (const { pack, patch } of patches)
-    applyPatch(pack, patch, lists, keyed.get('hexes') ?? [], patched, patchedBy, balance, balanceOwners);
+    applyPatch(
+      pack,
+      patch,
+      lists,
+      keyed.get('hexes') ?? [],
+      patched,
+      patchedBy,
+      balance,
+      balanceOwners,
+    );
 
   // Modifier keys: the families of the composed skills, then each pack's declarations.
   const skills = (lists.get('skills') ?? []) as { id: string; activity: string }[];

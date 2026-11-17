@@ -115,7 +115,11 @@ export function toastFor(event: GameEvent, content: ContentDb): ToastSpec | null
         gains: claimGains(event.poi, content),
       };
     case 'travelled':
-      return { key: 'toast.travelled', params: {}, ref: { kind: 'cell', id: event.cell } };
+      return {
+        key: 'toast.travelled',
+        params: {},
+        ref: actionRef({ kind: 'walk', id: event.cell }),
+      };
     case 'buildingBuilt':
       return {
         key: 'toast.buildingBuilt',

@@ -3,11 +3,12 @@
   import {
     actionInfo,
     cellInfo,
-  isCloneSlot,
+    isCloneSlot,
     hexKey,
     locationCell,
     positionHex,
     SHARE_FULL,
+    travelPlan,
   } from '@shinobi/core';
   import { actionRef } from '../lib/entities.ts';
   import { senseiTestInfo } from '../lib/exam-test.ts';
@@ -86,8 +87,13 @@
         if (intervalMs === undefined) return;
         const isExplore = slot.action.kind === 'explore';
         const isWalk = slot.action.kind === 'walk';
-        // Exploring has no tile; its XP per hour comes from the map view of the cell.
-        const mapInfo = isExplore ? cellInfo(state, slot.action.id, content, game.rules) : null;
+        const ref = actionRef(slot.action, state);
+        // Exploring has no tile; its XP per hour comes from the map view of the cell. A hex in fog
+        // is only "a hex": the numbers of the cell on it are not shown before it is surveyed.
+        const mapInfo =
+          isExplore && ref.kind !== 'hex'
+            ? cellInfo(state, slot.action.id, content, game.rules)
+            : null;
         const xpPerHour = info
           ? (info.xpPerHour * slot.share) / SHARE_FULL
           : mapInfo
@@ -130,14 +136,20 @@
           slot: index,
           clone: isCloneSlot(state, content, index),
           kind: slot.action.kind,
-          ref: actionRef(slot.action),
+          ref,
           skill: info?.skill,
           xpPerHour,
           mission: missionNow(state, index, game.content),
           practice,
           fight,
+          // The time to arrival: the whole route, less what the step in progress has already taken.
           walkLeft: isWalk
-            ? Math.max(0, (intervalMs * SHARE_FULL - slot.progress) / Math.max(1, slot.share))
+            ? Math.max(
+                0,
+                (travelPlan(state, slot.action.id, content, game.rules, index).ms * SHARE_FULL -
+                  slot.progress) /
+                  Math.max(1, slot.share),
+              )
             : 0,
         });
       });

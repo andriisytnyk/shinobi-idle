@@ -1,5 +1,6 @@
 import type { ContentDb } from '@shinobi/content';
-import { tryActiveContent } from './active.ts';
+import { hexKey, hexOfAddress, isSurveyed, type GameState } from '@shinobi/core';
+import { tryActiveContent, tryActiveState } from './active.ts';
 import { fallbackText, hasKey, reportMissing, t } from './i18n.ts';
 import { MASK, revealLevel } from './reveal.ts';
 import { isEntityKind, type EntityRef } from './route.ts';
@@ -68,14 +69,19 @@ const ACTION_ENTITY: Readonly<Record<string, string>> = {
   walk: 'cell',
 };
 
-export function actionRef(action: { kind: string; id: string }): EntityRef {
+export function actionRef(action: { kind: string; id: string }, state?: GameState): EntityRef {
   // A hex that is no cell, and the auto-survey, have no page: the `hex` kind names them on the map.
   if (action.kind === 'autosurvey') return { kind: HEX_KIND, id: '' };
-  if (
-    (action.kind === 'explore' || action.kind === 'walk') &&
-    !tryActiveContent()?.cells.some((c) => c.id === action.id)
-  )
-    return { kind: HEX_KIND, id: action.id };
+  if (action.kind === 'explore' || action.kind === 'walk') {
+    const content = tryActiveContent();
+    const known = state ?? tryActiveState();
+    const hex = content ? hexOfAddress(content, action.id) : null;
+    const key = hex ? hexKey(hex.q, hex.r) : action.id;
+    // A hex the player has not surveyed is only "a hex in fog": the cell on it is not named, nor linked.
+    const fog = content && known && hex ? !isSurveyed(known, content, key) : false;
+    if (fog) return { kind: HEX_KIND, id: key };
+    if (!content?.cells.some((c) => c.id === action.id)) return { kind: HEX_KIND, id: action.id };
+  }
   return { kind: ACTION_ENTITY[action.kind] ?? 'technique', id: action.id };
 }
 

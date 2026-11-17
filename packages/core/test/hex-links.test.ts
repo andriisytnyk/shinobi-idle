@@ -60,7 +60,6 @@ describe('hexes patched by a pack', () => {
       icons: {},
       patches: [{ target: { kind: 'hexes', id: '9,17' }, set: { terrain: 'hills' } }],
       rules: undefined,
-    modifierKeys: undefined,
       modifierKeys: undefined,
       ui: undefined,
     });
@@ -79,7 +78,6 @@ describe('hexes patched by a pack', () => {
       icons: {},
       patches,
       rules: undefined,
-    modifierKeys: undefined,
       modifierKeys: undefined,
       ui: undefined,
     });
@@ -116,7 +114,6 @@ describe('links between hexes that are not neighbours', () => {
       icons: {},
       patches: [],
       rules: undefined,
-    modifierKeys: undefined,
       modifierKeys: undefined,
       ui: undefined,
     });

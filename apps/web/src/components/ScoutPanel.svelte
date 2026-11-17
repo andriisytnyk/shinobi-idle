@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { SkillId } from '@shinobi/content';
-  import { exploreIntervalMs, rangeNow, stepTime } from '@shinobi/core';
+  import { exploreIntervalMs, rangeNow, stepTimeHere } from '@shinobi/core';
   import { actionRef } from '../lib/entities.ts';
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
@@ -39,7 +39,7 @@
         action,
         exploreMs: exploreIntervalMs(gs, content, game.rules),
         range: rangeNow(gs, content),
-        stepMs: stepTime(gs, 'plains', content, game.rules),
+        stepMs: stepTimeHere(gs, content, game.rules),
       };
     }),
   );
@@ -67,13 +67,13 @@
     </div>
     <div>
       <dt>{t('scout.range')}</dt>
-      <dd data-scout-range>{t('map.range', { n: data.range }).replace(/^[^:]*:s*/, '')}</dd>
+      <dd data-scout-range>{t('scout.rangeValue', { n: data.range })}</dd>
     </div>
     <div>
       <dt>{t('scout.current')}</dt>
       <dd data-scout-current>
         {#if current}
-          {@const ref = actionRef(current)}
+          {@const ref = actionRef(current, game.state)}
           <span class="verb"
             >{t(current.kind === 'walk' ? 'world.walking' : 'world.exploring')}</span
           >

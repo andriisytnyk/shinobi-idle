@@ -22,10 +22,15 @@
   interface Props {
     /** The hex, as `"q,r"`. */
     coord: string;
+    /** Shown in a bottom sheet: the actions come right after the header, so that they stay in view. */
+    sheet?: boolean;
+    /** The sheet is opened wide (only in a sheet). */
+    expanded?: boolean;
+    onToggle?: () => void;
     onClose?: () => void;
   }
 
-  let { coord, onClose }: Props = $props();
+  let { coord, sheet = false, expanded = false, onToggle, onClose }: Props = $props();
 
   const scoutSkill = skillByActivity(content, 'map') ?? '';
 
@@ -62,7 +67,9 @@
         ),
         timing: exploreSlot >= 0 ? slotTiming(gs, exploreSlot, info.surveyMs) : IDLE_TIMING,
         autoWhy: autoState(gs, content).why,
-        nextAt: info.level >= info.maxLevel ? null : (thresholds[info.level] ?? null),
+        // In fog nothing is said of levels or counts: they would tell a cell from a plain hex.
+        nextAt:
+          !info.surveyed || info.level >= info.maxLevel ? null : (thresholds[info.level] ?? null),
       };
     }),
   );
@@ -128,6 +135,7 @@
 {#if view && info}
   <article
     class="panel"
+    class:sheet
     data-ui="hex-panel"
     data-hex-panel={coord}
     aria-label={t('map.panel.label')}
@@ -152,11 +160,25 @@
             })}{/if}
         </p>
       </div>
-      {#if onClose}
-        <button type="button" class="close" aria-label={t('map.panel.close')} onclick={onClose}>
-          <Icon name="lucide:x" size={18} />
-        </button>
-      {/if}
+      <div class="head-buttons">
+        {#if sheet && onToggle}
+          <button
+            type="button"
+            class="close"
+            data-sheet-toggle
+            aria-expanded={expanded}
+            aria-label={t(expanded ? 'map.panel.collapse' : 'map.panel.expand')}
+            onclick={onToggle}
+          >
+            <Icon name={expanded ? 'lucide:chevron-down' : 'lucide:chevron-up'} size={18} />
+          </button>
+        {/if}
+        {#if onClose}
+          <button type="button" class="close" aria-label={t('map.panel.close')} onclick={onClose}>
+            <Icon name="lucide:x" size={18} />
+          </button>
+        {/if}
+      </div>
     </header>
 
     <div class="body">
@@ -373,6 +395,44 @@
     gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
     border-bottom: var(--border-thin) solid var(--line);
+  }
+
+  .head-buttons {
+    display: flex;
+    flex: none;
+    gap: var(--space-2);
+  }
+
+  /* In a sheet the terrain, the level and the actions come first and stay in view; the rest scrolls under them. */
+  .panel.sheet .head {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .panel.sheet h2 {
+    font-size: var(--text-md);
+  }
+
+  .panel.sheet .actions {
+    order: 2;
+    padding: var(--space-2) var(--space-3);
+    border-top: 0;
+    border-bottom: var(--border-thin) solid var(--line);
+  }
+
+  .panel.sheet .body {
+    order: 3;
+    padding: var(--space-3);
+  }
+
+  .panel.sheet .buttons {
+    gap: var(--space-2);
+  }
+
+  .panel.sheet .actions :global(.action) {
+    min-height: var(--control-sm);
+    --_flex: 5.5rem;
+    padding-inline: var(--space-1);
+    font-size: var(--text-sm);
   }
 
   .sub,

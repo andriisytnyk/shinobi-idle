@@ -10,6 +10,7 @@ export const UI_ICON_NAMES = [
   'check',
   'chevron-down',
   'chevron-right',
+  'chevron-up',
   'circle-dot',
   'circle-help',
   'copy',

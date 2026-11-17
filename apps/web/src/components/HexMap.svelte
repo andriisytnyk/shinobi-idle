@@ -45,19 +45,12 @@
 
   // ---------- what is drawn ----------
 
-  /** Shapes drawn on a hex of a terrain: our own, one path each, in units of the hex. */
-  const GLYPHS: Readonly<Record<string, { d: string; fill?: boolean }>> = {
-    forest: { d: 'M-10 6L-5 -4L0 6Z M0 7L5 -7L10 7Z', fill: true },
-    hills: { d: 'M-11 6Q-6 -6 -1 6M-3 6Q4 -8 11 6' },
-    plains: {
-      d: 'M-8 5V1M-8 5L-10 2M-8 5L-6 2M6 -1V-5M6 -1L4 -4M6 -1L8 -4M0 8V4M0 8L-2 5M0 8L2 5',
-    },
-    road: { d: 'M-12 8Q-3 3 0 0T12 -8' },
-    river: { d: 'M-12 -4q4 -4 8 0t8 0t8 0M-12 4q4 -4 8 0t8 0t8 0' },
-    lake: { d: 'M-10 0a10 6 0 1 0 20 0a10 6 0 1 0 -20 0M-5 0a5 3 0 1 0 10 0a5 3 0 1 0 -10 0' },
-    coast: { d: 'M-11 -2q3 -3 5.5 0t5.5 0t5.5 0t5.5 0M-11 5q3 -3 5.5 0t5.5 0t5.5 0t5.5 0' },
-    settlement: { d: 'M-8 7V-1L0 -8L8 -1V7Z', fill: true },
-  };
+  /** The mark drawn on a hex of a terrain: the path its data gives (a pack's terrain draws the same way); none for a bare hex. */
+  const glyphs = new Map(
+    content.terrains.flatMap((x) =>
+      x.glyph ? [[x.id, { d: x.glyph, fill: x.glyphFill === true }] as const] : [],
+    ),
+  );
 
   /** The mark of a named place by its role; any other role gets a plain disc. */
   const PLACE_MARKS: Readonly<Record<string, string>> = {
@@ -93,7 +86,11 @@
     return h.terrain ? t(`terrain.${h.terrain}.name`) : t('map.hex.fog');
   };
 
-  const label = (h: MapHex): string => `${nameOf(h)}, ${t(`map.state.${stateOf(h)}`)}`;
+  // A hex in fog is already "a hex in fog": the state is said only when it adds something.
+  const label = (h: MapHex): string => {
+    const s = stateOf(h);
+    return s === 'fog' ? nameOf(h) : `${nameOf(h)}, ${t(`map.state.${s}`)}`;
+  };
 
   // ---------- the camera ----------
 
@@ -150,7 +147,14 @@
     void width;
     void height;
     untrack(() => {
-      if (ready) cam = clamp(cam);
+      if (!ready) return;
+      cam = clamp(cam);
+      // After a change of size (a window made narrow, a phone turned) the player may be off screen: bring them back.
+      const p = view.here ? pointOf(view.here) : null;
+      if (!p) return;
+      const sx = p.x * cam.k + cam.x;
+      const sy = p.y * cam.k + cam.y;
+      if (sx < 0 || sx > width || sy < 0 || sy > height) focusOn(view.here ?? '', cam.k);
     });
   });
 
@@ -346,7 +350,7 @@
     <g transform="translate({cam.x} {cam.y}) scale({cam.k})">
       {#each view.hexes as h (h.coord)}
         {@const s = stateOf(h)}
-        {@const glyph = h.terrain ? GLYPHS[h.terrain] : undefined}
+        {@const glyph = h.terrain ? glyphs.get(h.terrain) : undefined}
         {@const mark = h.places[0]}
         <g
           class="hex {s}"
@@ -398,6 +402,14 @@
             </g>
           {/if}
         </g>
+      {/each}
+
+      {#each view.links as link (link.id)}
+        <path
+          class="link link-{link.kind.replace(/[^a-z0-9_-]/gi, '')}"
+          d="M{link.a.x} {link.a.y}L{link.b.x} {link.b.y}"
+          aria-hidden="true"
+        />
       {/each}
 
       {#if routePoints && routeEnd}
@@ -481,6 +493,16 @@
 
   .panning .canvas {
     cursor: grabbing;
+  }
+
+  .link {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-dasharray: 2 5;
+    stroke-linecap: round;
+    opacity: 0.8;
+    pointer-events: none;
   }
 
   .fog-base {

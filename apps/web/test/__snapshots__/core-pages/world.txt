@@ -3,7 +3,7 @@
     <article class="simple-page">
       <h1 class="compact">
         Мапа світу
-      <div class="world" data-world="" style="--sheet-bottom: 768px;">
+      <div class="world" data-world="" style="--sheet-max: 55dvh; --sheet-bottom: 768px;">
         <div class="strip" data-map-status="">
           <p class="where">
             <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -15,7 +15,9 @@
               <strong data-here-name="">
                 Околиці села
             <span class="range" data-range="">
-              · Дальність розвідки: 2 гекси
+              <span aria-hidden="true" class="sep">
+                ·
+              Дальність розвідки: 2 гекси
           <div class="auto-row">
             <button class="action" data-auto="" type="button">
               Авторозвідка
@@ -28,109 +30,109 @@
                     <rect class="fog-base" height="6" width="6">
                     <line class="fog-line" x1="0" x2="0" y1="0" y2="6">
                 <g transform="translate(0 0) scale(1)">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="7,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(433.0127018922193 330)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="7,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(433.0127018922193 330)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="8,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(467.6537180435968 330)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="8,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(467.6537180435968 330)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="9,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(502.29473419497435 330)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="9,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(502.29473419497435 330)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="10,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(536.9357503463519 330)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="10,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(536.9357503463519 330)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="11,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(571.5767664977294 330)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="11,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(571.5767664977294 330)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="12,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(606.217782649107 330)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="12,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(606.217782649107 330)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="13,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(640.8587988004846 330)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="13,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(640.8587988004846 330)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="15,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(710.1408311032396 330)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="15,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(710.1408311032396 330)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="16,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(744.7818472546171 330)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="16,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(744.7818472546171 330)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="17,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(779.4228634059947 330)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="17,11" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(779.4228634059947 330)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="6,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(415.6921938165305 360)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="6,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(415.6921938165305 360)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="7,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(450.33320996790803 360)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="7,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(450.33320996790803 360)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="8,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(484.9742261192856 360)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="8,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(484.9742261192856 360)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="9,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(519.6152422706631 360)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="9,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(519.6152422706631 360)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="10,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(554.2562584220407 360)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="10,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(554.2562584220407 360)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="11,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(588.8972745734183 360)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="11,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(588.8972745734183 360)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="12,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(623.5382907247957 360)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="12,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(623.5382907247957 360)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="13,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(658.1793068761733 360)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="13,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(658.1793068761733 360)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="14,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(692.8203230275508 360)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="14,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(692.8203230275508 360)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="15,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(727.4613391789284 360)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="15,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(727.4613391789284 360)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="16,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(762.102355330306 360)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="16,12" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(762.102355330306 360)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="6,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(433.0127018922193 390)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="6,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(433.0127018922193 390)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="7,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(467.6537180435968 390)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="7,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(467.6537180435968 390)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="8,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(502.29473419497435 390)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="8,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(502.29473419497435 390)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="9,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(536.9357503463519 390)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="9,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(536.9357503463519 390)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="10,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(571.5767664977294 390)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="10,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(571.5767664977294 390)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="11,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(606.217782649107 390)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="11,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(606.217782649107 390)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="12,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(640.8587988004846 390)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="12,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(640.8587988004846 390)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="13,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(675.499814951862 390)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="13,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(675.499814951862 390)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="14,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(710.1408311032396 390)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="14,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(710.1408311032396 390)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="15,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(744.7818472546171 390)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="15,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(744.7818472546171 390)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="16,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(779.4228634059947 390)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="16,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(779.4228634059947 390)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="17,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(814.0638795573723 390)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="17,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(814.0638795573723 390)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="18,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(848.7048957087497 390)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="18,13" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(848.7048957087497 390)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="5,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(415.6921938165305 420)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="5,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(415.6921938165305 420)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="6,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(450.33320996790803 420)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="6,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(450.33320996790803 420)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="7,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(484.9742261192856 420)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="7,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(484.9742261192856 420)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="8,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(519.6152422706631 420)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="8,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(519.6152422706631 420)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="9,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(554.2562584220407 420)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="9,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(554.2562584220407 420)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="10,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(588.8972745734183 420)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="10,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(588.8972745734183 420)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="11,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(623.5382907247957 420)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="11,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(623.5382907247957 420)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="12,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(658.1793068761733 420)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="12,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(658.1793068761733 420)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="13,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(692.8203230275508 420)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="13,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(692.8203230275508 420)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="14,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(727.4613391789284 420)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="14,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(727.4613391789284 420)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="15,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(762.102355330306 420)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="15,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(762.102355330306 420)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="16,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(796.7433714816834 420)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="16,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(796.7433714816834 420)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="17,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(831.384387633061 420)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="17,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(831.384387633061 420)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="18,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(866.0254037844386 420)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="18,14" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(866.0254037844386 420)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="5,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(433.0127018922193 450)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="5,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(433.0127018922193 450)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="6,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(467.6537180435968 450)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="6,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(467.6537180435968 450)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="7,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(502.29473419497435 450)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="7,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(502.29473419497435 450)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="8,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(536.9357503463519 450)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="8,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(536.9357503463519 450)">
                     <path class="face" d="#52-78kory">
                   <g aria-label="Ліс, розвіданий частково" aria-pressed="false" class="hex partial" data-hex="9,15" data-state="partial" data-ui="hex" role="button" tabindex="-1" transform="translate(571.5767664977294 450)">
                     <path class="face" d="#52-78kory" style="--_fill: var(--terrain-forest);">
@@ -156,23 +158,23 @@
                       <circle class="pip" cx="0" cy="13" r="1.8">
                       <circle class="pip" cx="5" cy="13" r="1.8">
                       <circle class="pip" cx="10" cy="13" r="1.8">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="12,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(675.499814951862 450)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="12,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(675.499814951862 450)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="13,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(710.1408311032396 450)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="13,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(710.1408311032396 450)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="14,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(744.7818472546171 450)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="14,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(744.7818472546171 450)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="15,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(779.4228634059947 450)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="15,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(779.4228634059947 450)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="16,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(814.0638795573723 450)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="16,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(814.0638795573723 450)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="17,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(848.7048957087497 450)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="17,15" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(848.7048957087497 450)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="5,16" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(450.33320996790803 480)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="5,16" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(450.33320996790803 480)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="6,16" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(484.9742261192856 480)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="6,16" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(484.9742261192856 480)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="7,16" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(519.6152422706631 480)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="7,16" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(519.6152422706631 480)">
                     <path class="face" d="#52-78kory">
                   <g aria-label="Ліс, розвіданий частково" aria-pressed="false" class="hex partial" data-hex="8,16" data-state="partial" data-ui="hex" role="button" tabindex="-1" transform="translate(554.2562584220407 480)">
                     <path class="face" d="#52-78kory" style="--_fill: var(--terrain-forest);">
@@ -204,17 +206,17 @@
                     <g aria-hidden="true" class="pips">
                       <circle class="pip on" cx="-2.5" cy="13" r="1.8">
                       <circle class="pip" cx="2.5" cy="13" r="1.8">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="12,16" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(692.8203230275508 480)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="12,16" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(692.8203230275508 480)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="13,16" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(727.4613391789284 480)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="13,16" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(727.4613391789284 480)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="14,16" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(762.102355330306 480)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="14,16" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(762.102355330306 480)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="15,16" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(796.7433714816834 480)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="15,16" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(796.7433714816834 480)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="5,17" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(467.6537180435968 510)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="5,17" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(467.6537180435968 510)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="6,17" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(502.29473419497435 510)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="6,17" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(502.29473419497435 510)">
                     <path class="face" d="#52-78kory">
                   <g aria-label="Поселення, розвіданий, рівень 0" aria-pressed="false" class="hex marked" data-hex="7,17" data-state="marked" data-ui="hex" role="button" tabindex="-1" transform="translate(536.9357503463519 510)">
                     <path class="face" d="#52-78kory" style="--_fill: var(--terrain-settlement);">
@@ -254,15 +256,15 @@
                       <circle class="pip" cx="-5" cy="13" r="1.8">
                       <circle class="pip" cx="0" cy="13" r="1.8">
                       <circle class="pip" cx="5" cy="13" r="1.8">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="12,17" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(710.1408311032396 510)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="12,17" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(710.1408311032396 510)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="13,17" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(744.7818472546171 510)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="13,17" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(744.7818472546171 510)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="14,17" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(779.4228634059947 510)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="14,17" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(779.4228634059947 510)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="15,17" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(814.0638795573723 510)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="15,17" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(814.0638795573723 510)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="6,18" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(519.6152422706631 540)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="6,18" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(519.6152422706631 540)">
                     <path class="face" d="#52-78kory">
                   <g aria-label="Рівнини, розвіданий частково" aria-pressed="false" class="hex partial" data-hex="7,18" data-state="partial" data-ui="hex" role="button" tabindex="-1" transform="translate(554.2562584220407 540)">
                     <path class="face" d="#52-78kory" style="--_fill: var(--terrain-plains);">
@@ -291,15 +293,15 @@
                       <circle class="pip" cx="0" cy="13" r="1.8">
                       <circle class="pip" cx="5" cy="13" r="1.8">
                       <circle class="pip" cx="10" cy="13" r="1.8">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="11,18" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(692.8203230275508 540)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="11,18" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(692.8203230275508 540)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="12,18" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(727.4613391789284 540)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="12,18" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(727.4613391789284 540)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="13,18" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(762.102355330306 540)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="13,18" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(762.102355330306 540)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="14,18" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(796.7433714816834 540)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="14,18" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(796.7433714816834 540)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="6,19" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(536.9357503463519 570)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="6,19" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(536.9357503463519 570)">
                     <path class="face" d="#52-78kory">
                   <g aria-label="Рівнини, розвіданий, рівень 0" aria-pressed="false" class="hex marked" data-hex="7,19" data-state="marked" data-ui="hex" role="button" tabindex="-1" transform="translate(571.5767664977294 570)">
                     <path class="face" d="#52-78kory" style="--_fill: var(--terrain-plains);">
@@ -328,49 +330,49 @@
                       <circle class="pip" cx="0" cy="13" r="1.8">
                       <circle class="pip" cx="5" cy="13" r="1.8">
                       <circle class="pip" cx="10" cy="13" r="1.8">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="10,19" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(675.499814951862 570)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="10,19" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(675.499814951862 570)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="11,19" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(710.1408311032396 570)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="11,19" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(710.1408311032396 570)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="12,19" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(744.7818472546171 570)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="12,19" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(744.7818472546171 570)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="13,19" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(779.4228634059947 570)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="13,19" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(779.4228634059947 570)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="14,19" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(814.0638795573723 570)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="14,19" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(814.0638795573723 570)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="6,20" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(554.2562584220407 600)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="6,20" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(554.2562584220407 600)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="7,20" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(588.8972745734183 600)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="7,20" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(588.8972745734183 600)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="8,20" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(623.5382907247957 600)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="8,20" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(623.5382907247957 600)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="9,20" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(658.1793068761733 600)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="9,20" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(658.1793068761733 600)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="10,20" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(692.8203230275508 600)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="10,20" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(692.8203230275508 600)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="11,20" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(727.4613391789284 600)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="11,20" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(727.4613391789284 600)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="12,20" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(762.102355330306 600)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="12,20" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(762.102355330306 600)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="13,20" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(796.7433714816834 600)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="13,20" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(796.7433714816834 600)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="5,21" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(536.9357503463519 630)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="5,21" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(536.9357503463519 630)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="6,21" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(571.5767664977294 630)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="6,21" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(571.5767664977294 630)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="7,21" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(606.217782649107 630)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="7,21" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(606.217782649107 630)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="8,21" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(640.8587988004846 630)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="8,21" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(640.8587988004846 630)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="9,21" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(675.499814951862 630)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="9,21" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(675.499814951862 630)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="10,21" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(710.1408311032396 630)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="10,21" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(710.1408311032396 630)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="11,21" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(744.7818472546171 630)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="11,21" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(744.7818472546171 630)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="12,21" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(779.4228634059947 630)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="12,21" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(779.4228634059947 630)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Гекс у тумані, у тумані" aria-pressed="false" class="hex fog" data-hex="13,21" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(814.0638795573723 630)">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="13,21" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(814.0638795573723 630)">
                     <path class="face" d="#52-78kory">
                   <g aria-hidden="true" class="me" data-ui="map-token" transform="translate(606.217782649107 510)">
                     <circle class="halo" r="8">
