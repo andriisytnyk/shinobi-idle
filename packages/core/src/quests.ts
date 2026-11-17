@@ -6,6 +6,8 @@ import { evalReq } from './requirements.ts';
 import { currencyOf, rankIndex } from './vocab.ts';
 import type { System } from './system.ts';
 import type { GameState } from './state.ts';
+import { syncNaturesGained } from './natures.ts';
+import { rewardScroll } from './scrolls.ts';
 import { refreshRegions } from './regions.ts';
 import { refreshUnlocks } from './unlocks.ts';
 import { syncVillage } from './village.ts';
@@ -26,7 +28,7 @@ function counted(
 /** Counter value a step is measured from: its counter right now, or 0 for any other step. */
 function baselineFor(state: GameState, quest: Quest, step: number): number {
   const objective = quest.steps[step]?.objective;
-  return objective?.t === 'counter' ? counted(state, objective) : 0;
+  return objective?.t === 'counter' && !objective.total ? counted(state, objective) : 0;
 }
 
 function stepMet(state: GameState, quest: Quest, step: number, content: ContentDb): boolean {
@@ -72,6 +74,10 @@ function applyRewards(state: GameState, rewards: QuestRewards, content: ContentD
   for (const { item, n } of rewards.items) {
     if (addItem(state, item, n)) emit(state, { type: 'itemGained', id: item, n });
   }
+  if (rewards.scroll) {
+    const scroll = rewardScroll(state, rewards.scroll.library, content);
+    if (scroll && addItem(state, scroll, 1)) emit(state, { type: 'itemGained', id: scroll, n: 1 });
+  }
   const money = currencyOf(content, 'money');
   const reputation = currencyOf(content, 'renown');
   if (money !== null) addCurrency(state, money, rewards.ryo);
@@ -100,6 +106,8 @@ function applyRewards(state: GameState, rewards: QuestRewards, content: ContentD
 export function updateQuests(state: GameState, content: ContentDb): void {
   // A new Genin gets a village and Reputation may open its second stage; a quest may ask for either.
   syncVillage(state, content);
+  // Saves from before the counter existed keep the natures their character already has.
+  syncNaturesGained(state);
   // Region flags first: a step may ask for an open region.
   refreshRegions(state, content);
   for (let changed = true; changed;) {

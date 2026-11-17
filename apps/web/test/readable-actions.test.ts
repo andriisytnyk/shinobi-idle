@@ -1,10 +1,18 @@
 // @vitest-environment happy-dom
 import { content, iconFor } from '@shinobi/content';
-import { actionInfo, listSkillActions, SHARE_FULL, xpAt, type GameState } from '@shinobi/core';
+import {
+  actionInfo,
+  defaultRules,
+  listSkillActions,
+  SHARE_FULL,
+  xpAt,
+  type GameState,
+} from '@shinobi/core';
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import ActionEmblem from '../src/components/ActionEmblem.svelte';
 import { actionRef } from '../src/lib/entities.ts';
+import { hasKey } from '../src/lib/i18n.ts';
 import { emblemTint, NEUTRAL_TINT } from '../src/lib/emblem.ts';
 import { coreUi } from '../src/lib/ext/core-ui.ts';
 import { game } from '../src/lib/store.ts';
@@ -262,5 +270,32 @@ describe('emblems', () => {
     expect(emblemTint(odd, { kind: 'technique', id: FIREBALL })).toBe(NEUTRAL_TINT);
     expect(emblemTint(content, { kind: 'recipe', skill: 'alch' })).toContain('--group-craft');
     expect(emblemTint(content, { kind: 'recipe', skill: 'nope' })).toBe(NEUTRAL_TINT);
+  });
+});
+
+describe('every action kind of the content has a name in the Now bar', () => {
+  it('resolves each action to a localised name, never a raw id', async () => {
+    booted = await bootApp([coreUi], caster());
+    const ids = new Set<string>();
+    // A fight starts by an enemy id in the interface; a zone id is only accepted by the core.
+    for (const [name, list] of Object.entries(content)) {
+      if (!Array.isArray(list) || name === 'zones') continue;
+      for (const row of list) {
+        const id = (row as { id?: unknown } | null)?.id;
+        if (typeof id === 'string') ids.add(id);
+      }
+    }
+    const kinds = new Set<string>();
+    for (const [kind, rule] of Object.entries(defaultRules.actionKinds)) {
+      for (const id of ids) {
+        if (!rule.has(id, content)) continue;
+        kinds.add(kind);
+        const ref = actionRef({ kind, id });
+        expect(hasKey(`${ref.kind}.${ref.id}.name`), `${kind} ${id}`).toBe(true);
+      }
+    }
+    // The exam operations are among them: they ran into a raw id once.
+    expect(kinds.has('operation')).toBe(true);
+    expect(kinds.has('senseiTest')).toBe(true);
   });
 });

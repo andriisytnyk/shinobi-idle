@@ -730,7 +730,8 @@
         "objective": {
           "t": "counter",
           "counter": "natures.gained",
-          "n": 1
+          "n": 2,
+          "total": true
         }
       },
       {
@@ -763,12 +764,10 @@
       }
     ],
     "rewards": {
-      "items": [
-        {
-          "item": "core:scroll_dragon_fire",
-          "n": 1
-        }
-      ],
+      "items": [],
+      "scroll": {
+        "library": 3
+      },
       "ryo": 800,
       "rep": 30,
       "flags": [],

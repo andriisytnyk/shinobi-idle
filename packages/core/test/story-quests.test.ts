@@ -236,6 +236,18 @@ describe('the Chunin exam, taken in two parts', () => {
     expect(start(state)).toEqual({ ok: false, reason: 'error.examPassed' });
   });
 
+  it('does not confer the rank in a second slot before the rest of the exam is done', () => {
+    const state = ready();
+    state.slots.push({ action: null, progress: 0, share: state.slots[0]!.share, data: null });
+    expect(dispatch(state, { type: 'exam.start', rank: 'chunin', slot: 0 }, content).ok).toBe(true);
+    expect(dispatch(state, { type: 'exam.start', rank: 'chunin', slot: 1 }, content).ok).toBe(true);
+    advance(state, 30 * 60_000, content);
+    expect(writtenPassed(state, exam)).toBe(true);
+    expect(state.player.rank).toBe('genin');
+    expect(state.bank['core:chunin_vest']).toBeUndefined();
+    expect(state.events.some((e) => e.type === 'rankUp')).toBe(false);
+  });
+
   it('is shorter with Scouting and Intel, and the conferral is the shortest test', () => {
     const base = ready();
     base.skills.scout!.xp = xpAt(20);
@@ -325,3 +337,72 @@ function flagsIn(value: unknown, out = new Set<string>()): Set<string> {
   }
   return out;
 }
+
+describe('«Суперник» on a save from before the natures counter', () => {
+  /** The shape of an older save: natures held, no `natures.gained`, no entry for the chain. */
+  function oldSave(natures: string[]): GameState {
+    const state = genin(5);
+    state.player.natures = natures;
+    delete state.counters['natures.gained'];
+    delete state.quests['core:rival'];
+    return state;
+  }
+
+  it('counts the natures the character already has: three natures finish step 1', () => {
+    const state = oldSave(['katon', 'futon', 'doton']);
+    updateQuests(state, content);
+    expect(state.counters['natures.gained']).toBe(3);
+    expect(state.quests['core:rival']?.step).toBeGreaterThanOrEqual(1);
+  });
+
+  it('with two natures it is done too, with one it waits for the second', () => {
+    const two = oldSave(['katon', 'futon']);
+    updateQuests(two, content);
+    expect(two.quests['core:rival']?.step).toBeGreaterThanOrEqual(1);
+    const one = oldSave(['katon']);
+    updateQuests(one, content);
+    expect(one.quests['core:rival']?.step).toBe(0);
+    one.player.natures.push('doton');
+    updateQuests(one, content);
+    expect(one.quests['core:rival']?.step).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('the reward scroll of «Суперник»', () => {
+  const scrollsIn = (state: GameState): string[] =>
+    Object.keys(state.bank).filter((id) => content.items.find((i) => i.id === id)?.scroll);
+  const finish = (natures: string[]): GameState => {
+    const state = atChain('core:rival', 3);
+    state.player.natures = natures;
+    state.quests['core:rival'] = { step: 3, base: 0, done: false };
+    state.counters['kills.core:boss_ren2'] = 1;
+    updateQuests(state, content);
+    expect(state.quests['core:rival']?.done).toBe(true);
+    return state;
+  };
+  const techOf = (item: string) =>
+    content.techniques.find(
+      (x) => x.id === content.items.find((i) => i.id === item)?.scroll?.technique,
+    )!;
+
+  it('is a scroll the player can read, whatever the natures: not a fixed one', () => {
+    const quest = content.quests.find((q) => q.id === 'core:rival')!;
+    expect(quest.rewards.items).toEqual([]);
+    expect(quest.rewards.scroll).toEqual({ library: 3 });
+    for (const natures of [['suiton'], ['katon'], ['doton', 'raiton']]) {
+      const state = finish(natures);
+      const got = scrollsIn(state);
+      expect(got).toHaveLength(1);
+      const tech = techOf(got[0]!);
+      const open = content.skills.find((s) => s.id === tech.skill)?.unlockReq;
+      if (open) expect(evalReq(state, open, content).met).toBe(true);
+    }
+  });
+
+  it('gives a player without Katon no Katon scroll, and one with Katon the scroll of his nature', () => {
+    const without = finish(['suiton']);
+    expect(without.bank['core:scroll_dragon_fire']).toBeUndefined();
+    const withKaton = finish(['katon']);
+    expect(techOf(scrollsIn(withKaton)[0]!).skill).toBe('katon');
+  });
+});

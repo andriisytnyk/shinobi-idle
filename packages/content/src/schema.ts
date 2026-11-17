@@ -804,7 +804,11 @@ export const reqSchema: z.ZodType<Req> = z.lazy(() =>
     z.strictObject({ t: z.literal('building'), id: coreId, level: z.number().int().min(1) }),
     z.strictObject({ t: z.literal('flag'), id: z.string(), n: z.number().int().optional() }),
     /** The balance of the currency that has this role (`renown` for Reputation, `study` for Intel). */
-    z.strictObject({ t: z.literal('currency'), role: z.string().min(1), n: z.number().int().min(1) }),
+    z.strictObject({
+      t: z.literal('currency'),
+      role: z.string().min(1),
+      n: z.number().int().min(1),
+    }),
     z.strictObject({ t: z.literal('all'), of: z.array(reqSchema).min(1) }),
     z.strictObject({ t: z.literal('any'), of: z.array(reqSchema).min(1) }),
   ]),
@@ -828,6 +832,8 @@ export const questObjectiveSchema = z.discriminatedUnion('t', [
     counter: z.string().min(1),
     also: z.array(z.string().min(1)).optional(),
     n: z.number().int().min(1),
+    /** The counter is compared to `n` as it stands, not as growth since the step began. */
+    total: z.boolean().optional(),
   }),
   z.strictObject({ t: z.literal('pay'), role: z.string().min(1), n: z.number().int().min(1) }),
 ]);
@@ -850,6 +856,11 @@ export const questRewardsSchema = z.strictObject({
   rank: playerRankId.nullable(),
   /** The goal pinned when the chain is done. */
   goal: entityRefSchema.optional(),
+  /**
+   * A Library scroll the player can read, chosen when the chain is done: of a nature the player owns
+   * first, of the highest Library level up to `library`, never a technique already known.
+   */
+  scroll: z.strictObject({ library: z.number().int().min(1).max(5) }).optional(),
 });
 
 export const questSchema = z.strictObject({

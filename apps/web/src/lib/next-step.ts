@@ -4,6 +4,7 @@ import {
   evalReq,
   examFor,
   missionDoneKey,
+  NATURES_GAINED,
   type GameState,
   type ReqResult,
 } from '@shinobi/core';
@@ -31,7 +32,7 @@ export function counterLabel(
   if (rank) return { key: 'quests.missionsRank', params: { rank: rank[1] ?? '' } };
   if (counter.startsWith('missions.elemental.'))
     return { key: 'quests.missionsElemental', params: {} };
-  if (counter === 'natures.gained') return { key: 'quests.natureGained', params: {} };
+  if (counter === NATURES_GAINED) return { key: 'quests.natureGained', params: {} };
   return null;
 }
 
@@ -57,8 +58,17 @@ export function counterProgress(
     0,
   );
   const raw =
-    status === 'done' ? objective.n : status === 'pending' || !progress ? 0 : total - progress.base;
+    status === 'done'
+      ? objective.n
+      : status === 'pending' || !progress
+        ? 0
+        : total - (objective.total ? 0 : progress.base);
   return { n: Math.max(0, Math.min(objective.n, raw)), of: objective.n };
+}
+
+/** A requirement result with every row met in full: a finished step shows what it asked, whatever the player holds now. */
+export function asMet(node: ReqResult): ReqResult {
+  return { ...node, met: true, current: node.target, children: node.children.map(asMet) };
 }
 
 /** The first requirement row still unmet, searching a result tree depth first. */
@@ -141,7 +151,7 @@ export function objectiveTarget(
     if (counterEnemy(objective.counter) !== null) return '#/combat';
     const mission = counterMission(objective.counter);
     if (mission !== null) return hrefFor({ kind: 'mission', id: mission });
-    if (objective.counter === 'natures.gained') return '#/nature';
+    if (objective.counter === NATURES_GAINED) return '#/nature';
     // The other mission counters (by rank, in total) are worked on the board.
     if (objective.counter.startsWith('missions.')) return '#/missions';
     // Cells of a region explored: the world page on that region.

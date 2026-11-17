@@ -4,7 +4,7 @@ import { addItem } from './bank.ts';
 import { emit } from './events.ts';
 import { MS_PER_SECOND } from './formulas.ts';
 import { indexOf } from './lookup.ts';
-import { skillLevel } from './requirements.ts';
+import { evalReq, skillLevel } from './requirements.ts';
 import { currencyOf, rankIndex } from './vocab.ts';
 import type { GameState } from './state.ts';
 import { refreshUnlocks } from './unlocks.ts';
@@ -81,6 +81,8 @@ export const senseiTestKind: ActionKind = {
       emit(state, { type: 'examPassed', exam: exam.id });
       return 'stop';
     }
+    // A second slot may have started the same test: the rank needs the whole gate, checked here too.
+    if (exam.then !== undefined && !evalReq(state, exam.then, content).met) return 'stop';
     state.player.rank = exam.rank;
     emit(state, { type: 'rankUp', rank: exam.rank });
     refreshUnlocks(state, content);

@@ -1,8 +1,9 @@
 <script lang="ts">
+  import { tryActiveContent } from '../lib/active.ts';
   import { entityName } from '../lib/entities.ts';
   import { t } from '../lib/i18n.ts';
   import { markShown, MASK, revealHintKey, revealLevel } from '../lib/reveal.ts';
-  import { hrefFor, type EntityKind } from '../lib/route.ts';
+  import { hrefFor, isEntityKind, type EntityKind } from '../lib/route.ts';
 
   interface Props {
     kind: EntityKind;
@@ -14,6 +15,8 @@
   let { kind, id, offered = false }: Props = $props();
 
   const level = $derived(revealLevel({ kind, id }));
+  /** A name with no page of its own (a pack action kind such as an operation) is plain text; with no game running every link stays a link. */
+  const linkable = $derived(tryActiveContent() === null || isEntityKind(kind));
 
   /** Runs again when the level changes: a link the place offers tells the core while it is not yet shown in full. */
   const offer = (): void => {
@@ -26,6 +29,7 @@
     data-masked
     title={hint ? t(hint) : undefined}
     {@attach offer}>{MASK}</span
+  >{:else if !linkable}<span class="entity-link">{entityName({ kind, id })}</span
   >{:else}<a class="entity-link" href={hrefFor({ kind, id })} {@attach offer}
     >{entityName({ kind, id })}</a
   >{/if}

@@ -64,8 +64,17 @@ const ACTION_ENTITY: Readonly<Record<string, string>> = {
   walk: 'cell',
 };
 
+/**
+ * The entity an action names. A kind with no entry above is the pack's own: when its locale names
+ * the action as `<kind>.<id>.name` (an operation does), that is the reference; else a technique.
+ */
 export function actionRef(action: { kind: string; id: string }): EntityRef {
-  return { kind: ACTION_ENTITY[action.kind] ?? 'technique', id: action.id };
+  const mapped = ACTION_ENTITY[action.kind];
+  if (mapped) return { kind: mapped, id: action.id };
+  return {
+    kind: hasKey(`${action.kind}.${action.id}.name`) ? action.kind : 'technique',
+    id: action.id,
+  };
 }
 
 /** The entity that owns a mastery key; masteries live on techniques, exercises, practices and obstacles. */

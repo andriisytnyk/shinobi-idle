@@ -23,6 +23,33 @@ export function scrollOf(technique: string, content: ContentDb): string | null {
 }
 
 /**
+ * The Library scroll a chain hands out in place of a fixed one: a technique the player does not
+ * know and can read once its skill is open, from a Library level up to `maxLibrary`. A scroll of a
+ * nature the player owns comes first, then the higher Library level, then the content order.
+ */
+export function rewardScroll(
+  state: GameState,
+  maxLibrary: number,
+  content: ContentDb,
+): string | null {
+  let best: { item: string; owned: boolean; level: number } | null = null;
+  for (const item of content.items) {
+    const scroll = item.scroll;
+    if (!scroll || scroll.source.t !== 'library' || scroll.source.level > maxLibrary) continue;
+    const tech = indexOf(content).techniques.get(scroll.technique);
+    if (!tech || state.known[tech.id]) continue;
+    const open = content.skills.find((s) => s.id === tech.skill)?.unlockReq;
+    if (open && !evalReq(state, open, content).met) continue;
+    const owned = state.player.natures.includes(tech.skill);
+    const level = scroll.source.level;
+    if (!best || (owned && !best.owned) || (owned === best.owned && level > best.level)) {
+      best = { item: item.id, owned, level };
+    }
+  }
+  return best?.item ?? null;
+}
+
+/**
  * Turns `partsPerScroll` parts of a technique into its scroll. `item` names the part (or the
  * scroll the parts make). Fewer parts than that, an item that is neither, or a technique with no
  * scroll is refused and nothing changes.

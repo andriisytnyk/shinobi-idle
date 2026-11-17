@@ -77,7 +77,7 @@ export const HINTS: readonly HintDef[] = [
     },
   },
   { id: 'graduation', when: (state, content) => !isAcademyRank(content, state.player.rank) },
-  // Turning points of the story: a chain asks for payment, a boss opens, the C rank opens, the second exam.
+  // Turning points of the story: a chain asks for payment, a boss opens, a permission opens more missions, the second exam.
   {
     id: 'tracking',
     when: (state, content) =>
@@ -95,7 +95,14 @@ export const HINTS: readonly HintDef[] = [
         (z) => z.region === 'boss' && z.unlock !== null && evalReq(state, z.unlock, content).met,
       ),
   },
-  { id: 'cMissions', when: (state) => state.flags['missions.c.unlocked'] !== undefined },
+  {
+    // A mission whose unlock is more than the rank (a permission the story gives) has opened.
+    id: 'missionsOpened',
+    when: (state, content) =>
+      content.missions.some(
+        (m) => m.unlock !== null && m.unlock.t !== 'rank' && evalReq(state, m.unlock, content).met,
+      ),
+  },
   {
     id: 'chuninReady',
     when: (state, content) => {

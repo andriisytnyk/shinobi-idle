@@ -1,11 +1,12 @@
 <script lang="ts">
   import type { Quest } from '@shinobi/content';
-  import { evalReq } from '@shinobi/core';
+  import { evalReq, NATURES_GAINED } from '@shinobi/core';
   import { stepStatus } from '../lib/next-step.ts';
   import { formatInt } from '../lib/format.ts';
   import { currencyName, currencyOf, held } from '../lib/vocab.ts';
   import { t } from '../lib/i18n.ts';
   import {
+    asMet,
     counterEnemy,
     counterLabel,
     counterMission,
@@ -29,9 +30,12 @@
 
   const objective = $derived(quest.steps[index]?.objective);
   const result = $derived(
-    game.read((gs) =>
-      objective?.t === 'req' ? withoutRankRows(evalReq(gs, objective.req, content)) : null,
-    ),
+    game.read((gs) => {
+      if (objective?.t !== 'req') return null;
+      const shown = withoutRankRows(evalReq(gs, objective.req, content));
+      // A finished step stays met, though the mint or the ointments were spent later.
+      return stepStatus(gs, quest, index) === 'done' ? asMet(shown) : shown;
+    }),
   );
   const counted = $derived(
     game.read((gs) =>
@@ -93,7 +97,7 @@
         <span class="detail">{t('quests.mission')}</span> <EntityLink kind="mission" id={mission} />
       {:else if label}
         <span class="detail">{t(label.key, label.params)}</span>
-        {#if objective?.t === 'counter' && objective.counter === 'natures.gained'}
+        {#if objective?.t === 'counter' && objective.counter === NATURES_GAINED}
           <a href="#/nature">{t('req.natureLink')}</a>
         {/if}
       {:else}
