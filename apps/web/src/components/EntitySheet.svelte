@@ -35,10 +35,27 @@
     };
   });
 
+  // Closing goes through the history and lands a tick later: a second Escape or click before that
+  // must not step back past the parent page.
+  let closing = false;
+  function close(): void {
+    if (closing) return;
+    closing = true;
+    onClose();
+  }
+
+  /** A dialog drawn above the sheet (a modal) owns the keyboard while focus is inside it. */
+  function insideAnotherDialog(node: EventTarget | null): boolean {
+    if (!(node instanceof Element)) return false;
+    const dialog = node.closest('[aria-modal="true"]');
+    return dialog !== null && dialog !== sheet;
+  }
+
   function onKeydown(event: KeyboardEvent): void {
+    if (insideAnotherDialog(event.target) || insideAnotherDialog(document.activeElement)) return;
     if (event.key === 'Escape' && !event.defaultPrevented) {
       event.preventDefault();
-      onClose();
+      close();
       return;
     }
     if (event.key !== 'Tab' || !sheet) return;
@@ -65,8 +82,7 @@
 <svelte:window onkeydown={onKeydown} />
 
 <div class="layer">
-  <button type="button" class="backdrop" tabindex="-1" aria-hidden="true" onclick={onClose}
-  ></button>
+  <button type="button" class="backdrop" tabindex="-1" aria-hidden="true" onclick={close}></button>
   <div
     class="sheet"
     data-ui="sheet"
@@ -78,7 +94,7 @@
     bind:this={sheet}
   >
     <div class="bar">
-      <button type="button" class="close" data-sheet-close onclick={onClose}>
+      <button type="button" class="close" data-sheet-close onclick={close}>
         <span class="phone"><Icon name="lucide:arrow-left" size={18} /> {t('sheet.back')}</span>
         <span class="desk"><Icon name="lucide:x" size={18} /> {t('sheet.close')}</span>
       </button>

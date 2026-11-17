@@ -187,6 +187,46 @@ describe('focus', () => {
     flushSync();
     expect(document.activeElement).toBe(opener);
   });
+
+  it('leaves Tab and Escape to a modal drawn above the sheet', async () => {
+    setRevealDisabled(true);
+    booted = await bootApp([coreUi], open(), '#/skill/katon');
+    await booted.go('#/technique/core:great_fireball');
+    flushSync();
+    const modal = document.createElement('div');
+    modal.setAttribute('data-ui', 'modal');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    const input = document.createElement('input');
+    modal.append(input, document.createElement('button'));
+    document.body.append(modal);
+    try {
+      input.focus();
+      const tab = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+      input.dispatchEvent(tab);
+      expect(tab.defaultPrevented).toBe(false);
+      expect(document.activeElement).toBe(input);
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await wait();
+      flushSync();
+      expect(q('[data-ui="sheet"]'), 'Escape in the modal does not close the sheet').not.toBeNull();
+    } finally {
+      modal.remove();
+    }
+  });
+
+  it('a second Escape before the first close lands does not leave the parent page', async () => {
+    setRevealDisabled(true);
+    booted = await bootApp([coreUi], open(), '#/skill/katon');
+    await booted.go('#/technique/core:great_fireball');
+    flushSync();
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    flushSync();
+    expect(location.hash).toBe('#/skill/katon');
+    expect(q('[data-ui="sheet"]')).toBeNull();
+  });
 });
 
 describe('the pack slots and kinds', () => {
@@ -299,16 +339,19 @@ describe('the reveal rule carries over', () => {
   });
 
   it('a hidden technique opens over the skill list, not over the page of its skill', async () => {
-    const hidden = content.techniques.find((x) => x.src === 'O');
-    expect(hidden).toBeDefined();
-    booted = await bootApp([coreUi], open(), `#/technique/${hidden?.id}`);
+    // Every technique of the slice is offered by its skill page, so none is hidden from a fresh
+    // student; an id the player cannot know stands for a hidden one (its real parent would leak it).
+    const hidden = { id: 'core:nope_hidden_tech' };
+    booted = await bootApp([coreUi], open(), `#/technique/${hidden.id}`);
     await wait();
     flushSync();
     const sheet = q('[data-ui="sheet"]');
     expect(sheet).not.toBeNull();
-    if (sheet?.querySelector('[data-not-revealed]')) {
-      expect(q('[data-ui="page"]')?.getAttribute('data-page')).toBe('core:skills');
-      expect(booted.target.innerHTML).not.toContain(hidden?.id ?? '');
-    }
+    expect(
+      sheet?.querySelector('[data-not-revealed]'),
+      'the technique is not revealed',
+    ).not.toBeNull();
+    expect(q('[data-ui="page"]')?.getAttribute('data-page')).toBe('core:skills');
+    expect(booted.target.innerHTML).not.toContain('nope_hidden_tech');
   });
 });
