@@ -29,8 +29,6 @@
   /** What a start in the clone's slot would answer; null before the player has a clone. */
   const clone = $derived(cloneCardState(mission, view));
   const cloneRuns = $derived(running && clone !== null && status.runningAt === clone.slot);
-  /** Why the clone cannot take the mission (when the mission itself is startable). */
-  const cloneRefusal = $derived(clone?.refusal?.reason ?? null);
   const refusal = $derived(running ? null : status.refusal);
   const shown = $derived(running ? 'running' : status.startable ? 'startable' : 'blocked');
   const by = $derived(refusal?.by ? holderRef(refusal.by) : null);
@@ -162,15 +160,15 @@
       class="ct-action clone"
       data-ui="clone-start"
       disabled={!clone.startable}
-      aria-describedby={cloneRefusal === 'error.cloneNoFight'
+      aria-describedby={clone.refusal?.reason === 'error.fightBusy'
         ? `why-clone-${mission.id}`
         : undefined}
       onclick={startClone}
     >
       {t('tile.clone')}
     </button>
-    {#if cloneRefusal === 'error.cloneNoFight'}
-      <p class="ct-why" id="why-clone-{mission.id}" data-clone-why>{t(cloneRefusal)}</p>
+    {#if clone.refusal?.reason === 'error.fightBusy'}
+      <p class="ct-why" id="why-clone-{mission.id}" data-clone-why>{t(clone.refusal.reason)}</p>
     {/if}
   {/if}
 </li>

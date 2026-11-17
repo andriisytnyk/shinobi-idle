@@ -1,5 +1,11 @@
 import type { ContentDb } from '@shinobi/content';
-import { practiceSplit, RATE_FULL, SHARE_FULL, type GameState } from '@shinobi/core';
+import {
+  fightSlotIndex,
+  practiceSplit,
+  RATE_FULL,
+  SHARE_FULL,
+  type GameState,
+} from '@shinobi/core';
 import type { ProgressTiming } from './time-progress.ts';
 
 /** A cycle that is not running: the visual stays where it is. */
@@ -28,22 +34,21 @@ export function slotTiming(
 
 /**
  * Timing of one of the fight's timers (a cast or an attack). The fight is advanced at events, so
- * the work the slot has received since then still counts; timers fill at the slot's share times
- * full speed (a slowed or stunned combatant makes the next update re-sync the visual).
+ * the work the slot has received since then still counts; timers fill at full speed whatever the
+ * share of the fight's slot (a slowed or stunned combatant makes the next update re-sync the visual).
  */
 export function combatTiming(
   state: GameState,
   timer: { progress: number; need: number },
 ): ProgressTiming {
   const combat = state.combat;
-  const slot = combat ? state.slots.find((s) => s.action?.kind === 'fight') : undefined;
-  if (!combat || !slot || timer.need <= 0) return IDLE_TIMING;
-  const share = Math.max(0, slot.share);
+  // The fight of any slot (the clone's too) runs at full speed, whatever share its slot has.
+  if (!combat || fightSlotIndex(state) < 0 || timer.need <= 0) return IDLE_TIMING;
   const done = timer.progress + combat.work * RATE_FULL;
   return {
     fraction: Math.min(1, Math.max(0, done / timer.need)),
-    cycleMs: share > 0 ? timer.need / (share * RATE_FULL) : 0,
-    running: share > 0 && combat.phase === 'fight',
+    cycleMs: timer.need / (SHARE_FULL * RATE_FULL),
+    running: combat.phase === 'fight',
     repeat: false,
   };
 }

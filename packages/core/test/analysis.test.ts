@@ -85,15 +85,16 @@ describe('the session forecast against real play', () => {
     });
   }
 
-  it('says which share of the speed the fight slot has', () => {
+  it('says the fight runs at full speed whatever share its slot has', () => {
     const quick = { samples: 20, sessionMinutes: 10, minSessions: 1, maxSessions: 1 };
     const alone = analyze(build(zone(false), 61), zone(false).target, quick).session;
     const shared = analyze(build(zone(true), 62), zone(true).target, quick).session;
+    // A fight is not slowed by the share of its slot: the drill beside it changes nothing.
     expect(alone?.share).toBe(1000);
-    expect(shared?.share).toBe(500);
+    expect(shared?.share).toBe(1000);
     const ratio = (shared?.winsPerHour.mean ?? 0) / (alone?.winsPerHour.mean ?? 1);
-    expect(ratio).toBeGreaterThan(0.3);
-    expect(ratio).toBeLessThan(0.6);
+    expect(ratio).toBeGreaterThan(0.6);
+    expect(ratio).toBeLessThan(1.6);
   });
 
   // balance: refit at stage 9, see #82

@@ -4,11 +4,13 @@
     enemyStats,
     evalReq,
     fightSlotIndex,
+    isCloneSlot,
     killsKey,
     RATE_FULL,
     zoneAvailable,
     zoneCellOf,
   } from '@shinobi/core';
+  import CloneStart from '../components/CloneStart.svelte';
   import CombatLog from '../components/CombatLog.svelte';
   import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
@@ -101,6 +103,8 @@
 
       return {
         slot,
+        /** Whether a clone fights: the pools below are the clone's. */
+        clone: isCloneSlot(state, content, slot),
         enemy,
         c: {
           hp: p.hp,
@@ -123,7 +127,12 @@
   const start = (id: string) =>
     void game.dispatch({ type: 'action.start', slot: 0, kind: 'fight', id });
   const stop = () => {
-    if (fight) void game.dispatch({ type: 'action.stop', slot: fight.slot });
+    if (fight)
+      void game.dispatch(
+        fight.clone
+          ? { type: 'clone.dispel', slot: fight.slot }
+          : { type: 'action.stop', slot: fight.slot },
+      );
   };
 </script>
 
@@ -133,7 +142,12 @@
   {#if fight}
     <section class="arena" data-fighting={fight.enemy.id}>
       <div class="side">
-        <h2>{t('combat.you')}</h2>
+        <h2 data-fighter={fight.clone ? 'clone' : 'you'}>
+          {t(fight.clone ? 'combat.cloneYou' : 'combat.you')}
+        </h2>
+        {#if fight.clone}<p class="clone-note" data-clone-fights>
+            <strong>{t('combat.cloneFights')}</strong> · {t('combat.cloneNote')}
+          </p>{/if}
         <StatBar label={t('combat.hpBar')} value={fight.c.hp} max={fight.maxHp} tone="hp" />
         <StatBar
           label={t('combat.chakraBar')}
@@ -187,7 +201,9 @@
       </div>
     </section>
 
-    <button type="button" class="stop" onclick={stop}>{t('combat.stop')}</button>
+    <button type="button" class="stop" onclick={stop}
+      >{t(fight.clone ? 'now.dispel' : 'combat.stop')}</button
+    >
   {:else}
     <h2>{t('combat.enemies')}</h2>
     {#if enemies.length === 0}
@@ -205,9 +221,12 @@
               })}
             </p>
           </div>
-          <button type="button" class="start" onclick={() => start(enemy.id)}
-            >{t('combat.start')}</button
-          >
+          <div class="starts">
+            <button type="button" class="start" onclick={() => start(enemy.id)}
+              >{t('combat.start')}</button
+            >
+            <CloneStart kind="fight" id={enemy.id} />
+          </div>
         </li>
       {/each}
     </ul>
@@ -227,13 +246,16 @@
                   {t('world.where.closed')}
                 </p>{/if}
             </div>
-            <button
-              type="button"
-              class="start"
-              disabled={!zone.available}
-              aria-describedby={zone.available ? undefined : `why-zone-${zone.id}`}
-              onclick={() => start(zone.id)}>{t('combat.zoneStart')}</button
-            >
+            <div class="starts">
+              <button
+                type="button"
+                class="start"
+                disabled={!zone.available}
+                aria-describedby={zone.available ? undefined : `why-zone-${zone.id}`}
+                onclick={() => start(zone.id)}>{t('combat.zoneStart')}</button
+              >
+              <CloneStart kind="fight" id={zone.id} disabled={!zone.available} />
+            </div>
           </li>
         {/each}
       </ul>
@@ -306,6 +328,17 @@
     background: var(--surface-raised);
     color: var(--fg-dim);
     cursor: not-allowed;
+  }
+
+  .starts {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .clone-note {
+    margin: 0;
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
   }
 
   .stop,
@@ -386,8 +419,12 @@
       flex-wrap: wrap;
     }
 
-    .start {
+    .starts {
       width: 100%;
+    }
+
+    .starts > :global(button) {
+      flex: 1;
     }
   }
 </style>

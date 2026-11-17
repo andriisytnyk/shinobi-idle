@@ -8,7 +8,6 @@ import {
   poolCapacity,
   serialize,
   SHARE_FULL,
-  xpAt,
   type GameState,
 } from '../src/index.ts';
 import { HOUR, genin, setLevel } from './helpers.ts';
@@ -85,7 +84,7 @@ describe('mastery from combat and items feeds the pool', () => {
   });
 });
 
-describe('combat runs at the slot share', () => {
+describe('combat runs at full speed whatever the slot share', () => {
   /** A fight in slot `at` with drills in the other slots, so the fight gets 1/slots of the speed. */
   function shared(seed: number, slots: number, at: number): GameState {
     const state = genin(seed);
@@ -111,23 +110,16 @@ describe('combat runs at the slot share', () => {
   const kills = (s: GameState) => s.counters['kills.core:dummy'] ?? 0;
   const ticks = (s: GameState) => s.counters['actions.fight'] ?? 0;
 
-  it('halves kills and XP at a 500 share', () => {
+  it('does not slow a fight at a 500 share: kills and XP are those of the full share', () => {
     const full = shared(5, 1, 0);
     const half = shared(5, 2, 0);
     expect(half.slots[0]?.share).toBe(SHARE_FULL / 2);
     advance(full, HOUR, content);
     advance(half, HOUR, content);
-    expect(ticks(half) * 2).toBe(ticks(full));
-    // Kills are not exactly linear (the longer run levels up and hits harder), but an hour at
-    // half share is the same fight as half an hour at full share, kill for kill (checked below).
-    expect(kills(half)).toBeLessThan(kills(full));
-    const vit0 = xpAt(40);
-    // Vitality is trained only by the fight, so its total halves exactly.
-    expect(half.skills.vit!.xp - vit0).toBeCloseTo((full.skills.vit!.xp - vit0) / 2, 6);
-    // The same clock gives the same fight: half an hour at full speed matches an hour at half.
-    const thirty = shared(5, 1, 0);
-    advance(thirty, HOUR / 2, content);
-    expect(kills(thirty)).toBe(kills(half));
+    // A fight runs at full speed whatever the share of its slot: the same cycles, kills and XP.
+    expect(ticks(half)).toBe(ticks(full));
+    expect(kills(half)).toBe(kills(full));
+    expect(half.skills.vit!.xp).toBeCloseTo(full.skills.vit!.xp, 6);
   });
 
   for (const [slots, at] of [

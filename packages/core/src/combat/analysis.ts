@@ -19,7 +19,7 @@ import type { Rules } from '../rules.ts';
 import { deserialize, serialize } from '../save.ts';
 import { scrollOf } from '../scrolls.ts';
 import { buyPrice } from '../shop.ts';
-import type { GameState } from '../state.ts';
+import { SHARE_FULL, type GameState } from '../state.ts';
 import { bingoLevel, dropShown, isFirstWin, revealAt } from './bingo.ts';
 import { voidCount } from './fight-guard.ts';
 import { figure, need } from './need.ts';
@@ -171,7 +171,7 @@ export interface Session {
   minutes: number;
   /** Sessions played. */
   runs: number;
-  /** The share of full speed the fight slot had (thousandths), with the other slots as they are now. */
+  /** The speed of the fight in thousandths of full speed: a fight is not slowed by the slot share (always full). */
   share: number;
   assumesRestart: true;
   /** The consumables used, the soonest to run out first, and the time until the first runs out. */
@@ -840,7 +840,8 @@ function playSession(
     return result.ok;
   };
   if (!start()) return refusal;
-  job.share ??= clone.slots[at]?.share ?? 0;
+  // A fight runs at full speed whoever fights, so the share of the pool does not slow it.
+  job.share ??= SHARE_FULL;
 
   const skills = Object.keys(clone.skills) as SkillId[];
   const xp0 = Object.fromEntries(skills.map((k) => [k, clone.skills[k]?.xp ?? 0]));

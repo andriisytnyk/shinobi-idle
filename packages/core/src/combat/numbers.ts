@@ -39,6 +39,8 @@ export interface PlayerSnapshot {
   evasionMod?: number;
   /** How well the player knows each enemy of the fight (Bingo level); an enemy without an entry is known completely. */
   knowledgeLevel?: Record<string, number>;
+  /** What the chakra pool is divided by: `n + 1` while `n` clones exist (the performer's pool is the character's divided by it); absent means 1. */
+  chakraDivisor?: number;
 }
 
 /** The highest level of knowledge of an enemy: unknown, seen, defeated, studied. */
@@ -88,9 +90,13 @@ export function maxHpOf(levels: Levels, content: ContentDb): number {
   return K.hpBase + K.hpPerVit * (levels.vit ?? 1);
 }
 
-export function maxChakraOf(levels: Levels, content: ContentDb): number {
+/** The key of a fight body's `data` that says what its chakra pool was divided by (absent: 1, no clone). */
+export const CHAKRA_DIVISOR_KEY = 'chakraDiv';
+
+/** The chakra pool of a performer: the character's pool divided by `divisor` (`n + 1` while `n` clones exist). */
+export function maxChakraOf(levels: Levels, content: ContentDb, divisor = 1): number {
   const K = content.balance.K;
-  return K.chakraBase * (1 + K.chakraPerMed * (levels.med ?? 1));
+  return (K.chakraBase * (1 + K.chakraPerMed * (levels.med ?? 1))) / Math.max(1, divisor);
 }
 
 export function chakraRegenOf(levels: Levels, content: ContentDb): number {

@@ -5,7 +5,8 @@ import {
   type Enemy,
   type Operation,
 } from '@shinobi/content';
-import { stopSlot } from '../actions.ts';
+import { actionKindOf, stopSlot } from '../actions.ts';
+import { chakraDivisor, isCloneSlot } from '../clone.ts';
 import { bump, defeatsKey, killsKey } from '../counters.ts';
 import { emit } from '../events.ts';
 import { MS_PER_HOUR } from '../formulas.ts';
@@ -13,7 +14,7 @@ import { indexOf } from '../lookup.ts';
 import { grantMastery } from '../progression.ts';
 import { nextInt, nextSeed } from '../rng.ts';
 import type { Rules } from '../rules.ts';
-import type { GameState } from '../state.ts';
+import { SHARE_FULL, type GameState } from '../state.ts';
 import type { System } from '../system.ts';
 import { encounterFor } from './fight-encounter.ts';
 import { bossNature } from '../natures.ts';
@@ -23,7 +24,7 @@ import { recordFight, recordItems, recordLoot, recordWounds, stampDefeat } from 
 import { payOperation } from './rewards.ts';
 import type { TeamSupport } from './fight-types.ts';
 import { createFight, fightAdvance, fightNextEventIn, fightOutcome } from './fight.ts';
-import { secMs } from './numbers.ts';
+import { CHAKRA_DIVISOR_KEY, secMs } from './numbers.ts';
 import { ensurePouch, refillPouch, syncPouch } from './pouch.ts';
 import { snapshotPlayer } from './snapshot.ts';
 import type { CombatState, RunState } from './types.ts';
@@ -225,7 +226,11 @@ function report(state: GameState, c: CombatState): void {
   for (const line of lines.splice(0)) emit(state, { type: 'combatLog', enemy: c.enemy, ...line });
 }
 
-/** The Wounds a finished fight costs: the stances it used, and falling low in a won fight; items then shorten the healing. */
+/**
+ * The Wounds a finished fight costs: the stances it used, losing, and falling low in a won fight;
+ * items then shorten the healing. A clone's body is not the player's: its defeat and its near
+ * defeat cost no Wound (the price of a stance the clone chose still counts).
+ */
 function woundsAfter(
   state: GameState,
   c: CombatState,
@@ -233,10 +238,11 @@ function woundsAfter(
   rules: Rules,
   lost: boolean,
   key: string,
+  clone: boolean,
 ): void {
   const tally = c.fight.tally;
-  const low = c.fight.player.data.low === 1 && !lost ? 1 : 0;
-  const n = (lost ? 1 : 0) + low + tally.wounds;
+  const low = c.fight.player.data.low === 1 && !lost && !clone ? 1 : 0;
+  const n = (lost && !clone ? 1 : 0) + low + tally.wounds;
   addWounds(state, n, content, rules);
   recordWounds(state, key, n);
   if (tally.woundMin > 0) shortenWounds(state, tally.woundMin, content);
@@ -287,6 +293,7 @@ function victory(
   content: ContentDb,
   rules: Rules,
   key: string,
+  clone: boolean,
 ): boolean {
   const K = content.balance.K;
   const player = c.fight.player;
@@ -306,8 +313,8 @@ function victory(
     noteBounty(state, c.enemy, loot.bounty);
   }
   noteFight(state, c.enemy, 'win', content);
-  recordFight(state, key, c.fight, 'win', content);
-  woundsAfter(state, c, content, rules, false, key);
+  recordFight(state, key, c.fight, 'win', content, clone);
+  woundsAfter(state, c, content, rules, false, key, clone);
   if (!c.run) {
     player.hp = Math.min(player.maxHp, player.hp + K.zoneHpRegen * player.maxHp);
     player.chakra = player.maxChakra;
@@ -329,8 +336,52 @@ function victory(
 }
 
 /**
- * Real-time combat. The slot's share becomes work units; the fight engine spends them on its own
- * clock, so the system only wakes at the fight's next event or the end of the pause.
+ * A lost fight. The player's defeat is counted (event, counter, Bingo book, Wound); a clone's is
+ * not: it is marked in the event and in the battle report and costs the player nothing.
+ */
+function lose(
+  state: GameState,
+  c: CombatState,
+  key: string,
+  content: ContentDb,
+  rules: Rules,
+  clone: boolean,
+): void {
+  emit(state, { type: 'playerDefeated', enemy: c.enemy, ...(clone ? { clone: true } : {}) });
+  if (!clone) {
+    bump(state, defeatsKey(c.enemy));
+    noteFight(state, c.enemy, 'loss', content);
+  }
+  recordFight(state, key, c.fight, 'loss', content, clone);
+  stampDefeat(state, key);
+  woundsAfter(state, c, content, rules, true, key, clone);
+}
+
+/**
+ * The chakra pool of the fight in progress follows the clones that exist (the character's pool
+ * divided by `n + 1`): the maximum changes at once, the chakra the performer has now is kept,
+ * cut only to a smaller maximum.
+ */
+export function followChakraPool(state: GameState, content: ContentDb): void {
+  const c = state.combat;
+  if (!c) return;
+  const player = c.fight.player;
+  // The body remembers what its pool was divided by; the pool is scaled from that to the divisor now.
+  const had = player.data[CHAKRA_DIVISOR_KEY] ?? 1;
+  // One slot, no clone: nothing to follow (the common case, kept cheap).
+  if (had === 1 && state.slots.length < 2) return;
+  const now = chakraDivisor(state, content);
+  if (had === now) return;
+  player.maxChakra = (player.maxChakra * had) / now;
+  player.chakra = Math.min(player.chakra, player.maxChakra);
+  if (now > 1) player.data[CHAKRA_DIVISOR_KEY] = now;
+  else delete player.data[CHAKRA_DIVISOR_KEY];
+}
+
+/**
+ * Real-time combat. A fight runs at full speed whoever fights (the clone's slot share does not
+ * slow it); the fight engine spends the work on its own clock, so the system only wakes at the
+ * fight's next event or the end of the pause.
  */
 export const combatSystem: System = {
   nextEventIn(state, content, rules) {
@@ -339,13 +390,13 @@ export const combatSystem: System = {
     if (!c || !slot || slot.share <= 0) return null;
     const wait = c.phase === 'fight' ? fightNextEventIn(c.fight, content, rules) : c.pause;
     if (wait === null) return 0;
-    return Math.max(0, Math.ceil((wait - c.work) / slot.share));
+    return Math.max(0, Math.ceil((wait - c.work) / SHARE_FULL));
   },
 
   elapse(state, dt) {
     const c = state.combat;
     const slot = state.slots[fightSlotIndex(state)];
-    if (c && slot) c.work += dt * slot.share;
+    if (c && slot) c.work += dt * SHARE_FULL;
   },
 
   run(state, content, rules) {
@@ -356,6 +407,8 @@ export const combatSystem: System = {
       state.combat = null;
       return;
     }
+    const clone = isCloneSlot(state, content, index);
+    followChakraPool(state, content);
     for (;;) {
       const entry = entryOf(content, c.enemy);
       if (!entry) return stopSlot(state, index, 'missing', content, rules);
@@ -410,7 +463,7 @@ export const combatSystem: System = {
       if (result === 'timeout') {
         // A fight that ran out of time pays nothing and costs nothing: a new one starts at once.
         noteFight(state, c.enemy, 'timeout', content);
-        recordFight(state, key, c.fight, 'timeout', content);
+        recordFight(state, key, c.fight, 'timeout', content, clone);
         c.carry += c.fight.t - c.fight.tally.lastUseAt;
         const p = c.fight.player;
         c.fight = startFight(
@@ -428,19 +481,14 @@ export const combatSystem: System = {
       if (owner?.combatEnded) {
         // The action that started the fight decides what follows (a mission's combat stage).
         if (result === 'defeat') {
-          emit(state, { type: 'playerDefeated', enemy: c.enemy });
-          bump(state, defeatsKey(c.enemy));
-          noteFight(state, c.enemy, 'loss', content);
-          recordFight(state, key, c.fight, 'loss', content);
-          stampDefeat(state, key);
-          woundsAfter(state, c, content, rules, true, key);
+          lose(state, c, key, content, rules, clone);
         } else {
           bump(state, killsKey(c.enemy));
           emit(state, { type: 'enemyDefeated', enemy: c.enemy });
           // A mission pays its own rewards; the book and the report still count the fight.
           noteFight(state, c.enemy, 'win', content);
-          recordFight(state, key, c.fight, 'win', content);
-          woundsAfter(state, c, content, rules, false, key);
+          recordFight(state, key, c.fight, 'win', content, clone);
+          woundsAfter(state, c, content, rules, false, key, clone);
         }
         return owner.combatEnded(
           state,
@@ -451,16 +499,19 @@ export const combatSystem: System = {
         );
       }
       if (result === 'defeat') {
-        emit(state, { type: 'playerDefeated', enemy: c.enemy });
-        bump(state, defeatsKey(c.enemy));
-        noteFight(state, c.enemy, 'loss', content);
-        recordFight(state, key, c.fight, 'loss', content);
-        stampDefeat(state, key);
-        woundsAfter(state, c, content, rules, true, key);
+        lose(state, c, key, content, rules, clone);
+        // A clone that lost is dispelled and made anew: its action starts again (a zone fight with
+        // fresh pools, an operation from its first step), the pouch refilled from the shared bank.
+        if (clone) {
+          const action = state.slots[index]?.action;
+          if (!action) return;
+          actionKindOf(rules, action.kind)?.start?.(state, index, action.id, content, rules);
+          return;
+        }
         // A defeat ends an operation run with the action: nothing of it is kept.
         return stopSlot(state, index, 'defeated', content, rules);
       }
-      if (victory(state, c, content, rules, key))
+      if (victory(state, c, content, rules, key, clone))
         return stopSlot(state, index, 'finished', content, rules);
     }
   },

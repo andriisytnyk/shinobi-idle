@@ -1,9 +1,7 @@
 import type { ContentDb } from '@shinobi/content';
 import { actionKindOf, type ActionFlow } from './actions.ts';
-import { isCombatKind, MISSION_KIND } from './combat/system.ts';
 import { counterValue } from './counters.ts';
 import type { EntityRef } from './entity.ts';
-import { indexOf } from './lookup.ts';
 import type { ModRules, ModifierProvider, Modifier } from './modifiers.ts';
 import { SHARE_FULL, type ActionSlot, type GameState } from './state.ts';
 
@@ -78,37 +76,23 @@ export function growSlots(state: GameState, content: ContentDb): boolean {
 export const sharePool = (content: ContentDb): number =>
   Math.round(SHARE_FULL * content.balance.K.clone.pool);
 
-// ---------- what a clone may do ----------
-
-/** The reason (localization key) a clone's slot refuses fights, operations and missions with a combat stage. */
-export const CLONE_NO_FIGHT = 'error.cloneNoFight';
+// ---------- the clones that exist ----------
 
 /**
- * Whether an action can hold a fight: a fight, an operation, or a mission with a combat stage.
- * A clone does not fight until the fight rules of the clone are in the fight engine.
+ * How many clones exist now: the clone slots that run an action. A slot a known technique opened
+ * but that does nothing holds no clone (dispelling the clones, or a clone that finished, takes it
+ * away), so this is the `n` the chakra pool is divided by (`chakraDivisor`).
  */
-export function fightCapable(kind: string, id: string, content: ContentDb): boolean {
-  if (isCombatKind(kind)) return true;
-  return (
-    kind === MISSION_KIND &&
-    (indexOf(content)
-      .missions.get(id)
-      ?.stages.some((stage) => stage.t === 'combat') ??
-      false)
-  );
+export function cloneCount(state: GameState, content: ContentDb): number {
+  return cloneSlots(state, content).filter((c) => state.slots[c.slot]?.action != null).length;
 }
 
-/** The refusal of starting `kind`/`id` in slot `slot` for the sake of the clone, or null. */
-export function cloneRefusal(
-  state: GameState,
-  slot: number,
-  kind: string,
-  id: string,
-  content: ContentDb,
-): string | null {
-  if (!isCloneSlot(state, content, slot)) return null;
-  return fightCapable(kind, id, content) ? CLONE_NO_FIGHT : null;
-}
+/**
+ * What the chakra pool is divided by: `n + 1` for `n` clones that exist. Every performer's pool, the
+ * clone's and the character's, is the character's pool divided by it; 1 with no clone.
+ */
+export const chakraDivisor = (state: GameState, content: ContentDb): number =>
+  cloneCount(state, content) + 1;
 
 // ---------- the link ----------
 

@@ -1,4 +1,5 @@
 import type { ContentDb, SkillId } from '@shinobi/content';
+import { chakraDivisor } from '../clone.ts';
 import { masteryLevel } from '../formulas.ts';
 import { computeMods } from '../modifiers.ts';
 import { skillLevel } from '../requirements.ts';
@@ -33,6 +34,7 @@ export function planningSnapshot(state: GameState, content: ContentDb): PlayerSn
     natures: [...state.player.natures],
     tier: rankIndex(content, state.player.rank),
     costMod: { chakra: 1, stamina: 1 },
+    chakraDivisor: chakraDivisor(state, content),
   };
 }
 

@@ -34,7 +34,8 @@
         {#if event.type === 'enemyDefeated'}
           <span>{t('log.enemyDefeated')}</span> <EntityLink kind="enemy" id={event.enemy} />
         {:else if event.type === 'playerDefeated'}
-          <span>{t('log.playerDefeated')}</span> <EntityLink kind="enemy" id={event.enemy} />
+          <span>{t(event.clone ? 'log.cloneDefeated' : 'log.playerDefeated')}</span>
+          <EntityLink kind="enemy" id={event.enemy} />
         {:else if event.side === 'enemy'}
           <EntityLink kind="enemy" id={event.enemy} />
           <span>{t(event.act === 'hit' ? 'log.enemyHit' : 'log.enemyMiss')}</span>

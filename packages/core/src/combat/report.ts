@@ -28,6 +28,8 @@ export interface TargetReport {
   wins: number;
   losses: number;
   timeouts: number;
+  /** How many of these fights a clone fought (counted in the totals above too); absent while none was. */
+  cloneFights?: number;
   /** Fight time in ms: of the won fights, and of all of them. */
   winMs: number;
   allMs: number;
@@ -98,11 +100,14 @@ export function recordFight(
   fight: FightState,
   result: 'win' | 'loss' | 'timeout',
   content: ContentDb,
+  /** Whether a clone fought it: the report marks the fight as the clone's. */
+  clone = false,
 ): void {
   const r = reportOf(state, key);
   const t = fight.tally;
   const ms = fightTimeMs(fight);
   r.fights++;
+  if (clone) r.cloneFights = (r.cloneFights ?? 0) + 1;
   r.allMs += ms;
   if (result === 'win') {
     r.wins++;
@@ -187,6 +192,7 @@ export function mergeReport(into: TargetReport, from: TargetReport, keep: number
   into.wins += from.wins;
   into.losses += from.losses;
   into.timeouts += from.timeouts;
+  if (from.cloneFights) into.cloneFights = (into.cloneFights ?? 0) + from.cloneFights;
   into.winMs += from.winMs;
   into.allMs += from.allMs;
   add(into.damage, from.damage);
@@ -253,6 +259,7 @@ export function parseReport(raw: unknown, content: ContentDb): TargetReport | nu
   r.wins = count(raw.wins);
   r.losses = count(raw.losses);
   r.timeouts = count(raw.timeouts);
+  if (count(raw.cloneFights) > 0) r.cloneFights = count(raw.cloneFights);
   r.winMs = count(raw.winMs);
   r.allMs = count(raw.allMs);
   r.damage = counts(raw.damage, damage);
