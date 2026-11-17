@@ -26,7 +26,7 @@
       "basic": true
     },
     "core:centipede": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": false
     },
@@ -41,7 +41,7 @@
       "basic": false
     },
     "core:merc_pack": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": false
     },
@@ -188,7 +188,7 @@
       "basic": false
     },
     "core:centipede": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": false
     },
@@ -203,7 +203,7 @@
       "basic": false
     },
     "core:merc_pack": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": false
     },
@@ -228,7 +228,7 @@
       "basic": false
     },
     "core:suna": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": false
     },
@@ -512,7 +512,7 @@
       "basic": true
     },
     "core:centipede": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": false
     },
@@ -527,7 +527,7 @@
       "basic": false
     },
     "core:merc_pack": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": false
     },

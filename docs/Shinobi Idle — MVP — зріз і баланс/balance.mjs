@@ -55,7 +55,7 @@ export const K = {
   zoneHpRegen: 0.8, opRegen: 0.25, respawn: 3,
   wound: { stat:0.05, max:4, healMin:10, healFloorMin:2.5 },
   // --- вороги ---
-  eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [219.3,0], eEva: [29.8,4.3],
+  eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [219.3,0], eEva: [31.0,4.3],
   boss: { hp:3.46, dmg:1.49 }, pack: { n:3, hp:0.4, dmg:0.4 },
   trait: { armor:0.30, armorOff:6, casterEvery:12, casterCast:3, casterMult:3, evasive:1.59, regenPct:0.01, illusionEvery:10, illusionDur:6, illusionAcc:0.25,
     hidden:8, hiddenAcc:0.07, hiddenFirst:2.0, poisonChance:0.35 },

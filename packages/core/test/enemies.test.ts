@@ -44,7 +44,7 @@ describe('A10: regular enemies at the level of the player', () => {
 
   for (const { enemy, byNature } of results) {
     for (const { nature, r } of byNature) {
-      // The armoured pack of the doton hand takes 66 s against 60.
+      // The armoured pack of the doton hand takes 66.5 s against 60.
       // balance: refit at stage 9, see #82
       const open = enemy.id === 'core:guard_pack' && nature === 'doton';
       (open ? it.skip : it)(

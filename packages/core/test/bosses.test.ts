@@ -85,7 +85,7 @@ describe('A9: bosses against a prepared player', () => {
       expect(r.full).toBeGreaterThanOrEqual(0.6);
     });
 
-    // boss_ren2 wins 87% four levels below.
+    // boss_ren2 wins 86% four levels below.
     // balance: refit at stage 9, see #82
     (name === 'boss_ren2' ? it.skip : it)(
       `${name}: four levels below wins less often than at the level, and under 50%`,
