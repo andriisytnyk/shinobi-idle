@@ -12,6 +12,7 @@ export * from './fight-sim.ts';
 export * from './fight-team.ts';
 export * from './fight-team-id.ts';
 export * from './fight-types.ts';
+export * from './fight-view.ts';
 export * from './fight.ts';
 export * from './analysis.ts';
 export * from './bingo.ts';

@@ -112,7 +112,7 @@ describe('zones', () => {
     player.chakra = 0;
     player.stamina = 0;
     weaken(state);
-    advance(state, 2000, content);
+    advance(state, 9000, content);
     const c = state.combat;
     expect(c?.phase).toBe('respawn');
     const p = c?.fight.player;

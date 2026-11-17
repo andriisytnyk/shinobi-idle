@@ -3,6 +3,8 @@
  * states a full run through `dispatch` + `advance` (time, rewards, XP by skill, performer per
  * stage, events, a digest of the whole state) is compared with a fixture recorded before the
  * API was added. Record anew with `RECORD_MISSIONS=1 pnpm --filter @shinobi/core test missions-behaviour`.
+ * The recorder keeps the records of the cases that are now refused for a missing team (they describe the
+ * behaviour before the API, which a re-record cannot reproduce) and re-records the rest.
  * The only allowed difference is the refusal of a team mission when the player has no team.
  */
 import { createHash } from 'node:crypto';
@@ -121,20 +123,26 @@ function recordRun(state: GameState, m: Mission): Recorded {
   return base;
 }
 
+/** The refusal core gives a team mission when the player has no team. */
+const NO_TEAM = 'error.missionNeedsTeam';
+
 function recordAll(): Record<string, Recorded> {
   const out: Record<string, Recorded> = {};
+  const old: Record<string, Recorded> = existsSync(FIXTURE)
+    ? (JSON.parse(readFileSync(FIXTURE, 'utf8')) as Record<string, Recorded>)
+    : {};
   for (const m of BOARD) {
     for (const [name, build] of Object.entries(STATES)) {
+      const key = `${m.id}@${name}`;
       const state = build(m);
       state.events = [];
-      out[`${m.id}@${name}`] = recordRun(state, m);
+      const now = recordRun(state, m);
+      // Keep the pre-API record of a case that is refused for a missing team.
+      out[key] = now.start === NO_TEAM && old[key] ? old[key] : now;
     }
   }
   return out;
 }
-
-/** The refusal core gives a team mission when the player has no team. */
-const NO_TEAM = 'error.missionNeedsTeam';
 
 describe('missions behave as before the forecast API', () => {
   if (process.env.RECORD_MISSIONS === '1') {

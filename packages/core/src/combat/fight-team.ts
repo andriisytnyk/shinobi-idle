@@ -49,7 +49,8 @@ export const teamSupportHook: FightHook = {
     timer.need = needOf(support.everyMs);
     const target = ctx.fight.enemies.find(alive);
     if (!target) return;
-    const src = `team:${support.nature}`;
+    // A bare id: a damage source is read back by the pack its id names, and no pack is called `team`.
+    const src = `team.${support.nature}`;
     const raw = c.damage * support.damage * wheelFactor(support.nature, target.nature, ctx.content);
     dealDamage(ctx, target, raw, src);
     if (alive(target)) applyState(ctx, supportState(ctx, support.nature), target, raw, src);

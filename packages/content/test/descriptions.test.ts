@@ -42,13 +42,13 @@ describe('description rules', () => {
 describe('descriptions of content entities', () => {
   it('covers the expected number of entities', () => {
     expect(content.techniques).toHaveLength(60);
-    expect(content.skills).toHaveLength(16);
+    expect(content.skills).toHaveLength(15);
     expect(content.enemies).toHaveLength(24);
     expect(content.bosses).toHaveLength(8);
     expect(content.buildings).toHaveLength(16);
     expect(content.regions).toHaveLength(3);
     expect(content.seals).toHaveLength(17);
-    expect(content.statuses).toHaveLength(5);
+    expect(content.statuses).toHaveLength(6);
     expect(content.traits).toHaveLength(8);
   });
 

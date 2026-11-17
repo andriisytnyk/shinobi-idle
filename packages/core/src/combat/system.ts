@@ -164,17 +164,24 @@ function enemyOfStep(state: GameState, step: OpStep | undefined): string | null 
   return step.pool[nextInt(state.rng, 'combat', step.pool.length)] ?? null;
 }
 
-/** The first moment of an operation run: the approach (if it has one) and the first fight, prepared at full pools. */
+/**
+ * The first moment of an operation run: the approach (if it has one) and the first fight, prepared at full pools.
+ * `resume` starts the fight of that step instead, with no approach: the run of a save whose fight could not be
+ * carried over goes on from the step it was at.
+ */
 export function newOperation(
   state: GameState,
   op: Operation,
   content: ContentDb,
   rules: Rules,
   owner: number,
+  resume?: number,
 ): CombatState | null {
   const steps = opSteps(op);
-  const approach = steps[0]?.t === 'approach';
-  const at = approach ? 1 : 0;
+  const resumed =
+    resume !== undefined && steps[resume] !== undefined && steps[resume].t !== 'approach';
+  const approach = !resumed && steps[0]?.t === 'approach';
+  const at = resumed ? resume : approach ? 1 : 0;
   const enemy = enemyOfStep(state, steps[at]);
   const entry = enemy ? entryOf(content, enemy) : undefined;
   if (!entry) return null;

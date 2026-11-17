@@ -36,7 +36,7 @@ const scenarios: Record<string, Scenario> = {
     run(state, { type: 'pouch.set', slot: 2, item: ids.kunai });
     run(state, { type: 'pouch.medic', slot: 0 });
     // A weak player in a pack zone: the tags and the pills are in constant use.
-    for (const skill of ['tai', 'nin', 'katon', 'vit', 'eva'] as const) setLevel(state, skill, 14);
+    for (const skill of ['tai', 'nin', 'katon', 'vit'] as const) setLevel(state, skill, 14);
     dispatch(
       state,
       { type: 'action.start', slot: at, kind: 'fight', id: 'core:zone_merc_pack' },
@@ -70,17 +70,7 @@ const scenarios: Record<string, Scenario> = {
         stock(state, { [ids.heal]: 8, [ids.kunai]: 8 });
         run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
         run(state, { type: 'pouch.set', slot: 1, item: ids.kunai });
-        for (const skill of [
-          'tai',
-          'nin',
-          'katon',
-          'futon',
-          'vit',
-          'eva',
-          'med',
-          'ath',
-          'cc',
-        ] as const) {
+        for (const skill of ['tai', 'nin', 'katon', 'futon', 'vit', 'med', 'ath', 'cc'] as const) {
           setLevel(state, skill, Math.min(50, boss.cl));
         }
         dispatch(

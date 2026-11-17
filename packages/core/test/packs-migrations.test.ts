@@ -48,6 +48,8 @@ for (const name of ['saves-v10', 'saves-v11', 'saves-v12', 'saves-v13']) {
         expect(state.player.rank).toBe(old.player.rank);
         expect(state.player.name).toBe(old.player.name);
         for (const [skill, entry] of Object.entries(old.skills)) {
+          // The Evasion skill of a version-14 save is gone.
+          if (skill === 'eva') continue;
           expect(state.skills[skill as 'tai']?.xp).toBe(
             Math.min(entry.xp, xpAt(plainContent.balance.K.cap)),
           );

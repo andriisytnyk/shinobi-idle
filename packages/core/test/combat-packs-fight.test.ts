@@ -252,12 +252,15 @@ describe('a boss special that a pack adds, implemented by a hook of the pack', (
     const fight = createFight(player([]), encounter(boss), seed, mod, modRules);
     fight.player.hp = fight.player.maxHp = 1e9;
     fight.player.evasion = 0;
+    // The boss outlives the minute (the plain strikes of the player would end it in about 21 s), so the count of its attacks is the loop's rhythm alone.
+    const body = fight.enemies[0];
+    if (body) body.hp = body.maxHp = 1e12;
     fight.log = [];
     const total = sec(60);
     if (chunk === undefined) fightAdvance(fight, total, mod, modRules);
     else for (let t = 0; t < total; t += chunk) fightAdvance(fight, chunk, mod, modRules);
     return (fight.log ?? [])
-      .filter((l) => l.side === 'enemy')
+      .filter((l) => l.side === 'enemy' && (l.act === 'hit' || l.act === 'miss'))
       .map((l) => (l.act === 'hit' ? l.dmg : null));
   }
 

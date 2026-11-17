@@ -8,7 +8,11 @@
     "masteryPerHour": 10500,
     "poolShare": 0.25,
     "poolCapPerItem": 1500,
-    "practiceRecovery": 1.2,
+    "practiceFocus": {
+      "base": 0.8,
+      "perLevel": 0.06
+    },
+    "practiceCast": 0.82,
     "practiceMin": 2,
     "drill": 3,
     "meditate": 3,
@@ -16,8 +20,24 @@
     "gather": 2.5,
     "craft": 2.5,
     "explore": 5,
-    "castBase": 0.4,
-    "castPerSeal": 0.15,
+    "castByRank": {
+      "E": 0.944,
+      "D": 1.133,
+      "C": 0.947,
+      "B": 2.186,
+      "A": 1.748,
+      "S": 2.622
+    },
+    "castByRole": {
+      "projectile": 1,
+      "series": 1.25,
+      "area": 1.2,
+      "control": 0.9,
+      "defense": 1,
+      "buff": 0.7,
+      "signature": 1.5,
+      "drill": 1
+    },
     "masteryCast": 0.5,
     "castFloor": 0.4,
     "nonNativeCast": 0.3,
@@ -37,37 +57,37 @@
     "role": {
       "projectile": {
         "m": 1,
-        "cd": 6,
+        "cd": 4.64,
         "c": 1
       },
       "series": {
         "m": 1.15,
-        "cd": 8,
+        "cd": 7.69,
         "c": 1.1
       },
       "area": {
         "m": 0.75,
-        "cd": 9,
+        "cd": 18.97,
         "c": 1.2
       },
       "control": {
         "m": 0.3,
-        "cd": 11,
+        "cd": 20.67,
         "c": 0.9
       },
       "defense": {
         "m": 0,
-        "cd": 12,
+        "cd": 13.35,
         "c": 0.9
       },
       "buff": {
         "m": 0,
-        "cd": 25,
+        "cd": 27.82,
         "c": 1
       },
       "signature": {
         "m": 1.7,
-        "cd": 15,
+        "cd": 16.68,
         "c": 1.3
       },
       "drill": {
@@ -111,13 +131,21 @@
       "slow": 0.15,
       "dur": 8
     },
+    "evaLevel": {
+      "min": 0.046,
+      "max": 1.014
+    },
+    "rhythm": {
+      "slow": 0.29,
+      "dur": 3.5
+    },
     "stun": {
       "C": 1,
       "B": 1.5,
       "D": 0.7
     },
     "bind": {
-      "dur": 4
+      "dur": 4.23
     },
     "poison": {
       "pctPerSec": 0.02,
@@ -134,21 +162,6 @@
       "steam": 0.4
     },
     "techFx": {
-      "shield": {
-        "mult": 1.3,
-        "durationMs": 6000
-      },
-      "decoy": {
-        "charges": 1,
-        "durationMs": 8000
-      },
-      "evasionBuff": {
-        "mult": 1.5,
-        "durationMs": 8000
-      },
-      "passiveNegate": {
-        "everyMs": 20000
-      },
       "gateOpening": {
         "taiDamage": 0.03,
         "staminaPerSec": 2,
@@ -265,14 +278,39 @@
     ],
     "accBase": 40,
     "accPerLevel": 5,
-    "evaBase": 30,
-    "evaPerLevel": 5,
+    "evaBase": 188.4,
+    "rating": {
+      "accTier": 16.6,
+      "evaTier": 13,
+      "knowledge": 32.3,
+      "enemyAccTier": 0,
+      "enemyEvaTier": 0
+    },
+    "passiveFx": {
+      "shield": {
+        "evasion": 28
+      },
+      "decoy": {
+        "evasion": 28
+      },
+      "evasionBuff": {
+        "evasion": 28
+      },
+      "passiveNegate": {
+        "evasion": 28
+      }
+    },
     "hitMin": 0.05,
     "hitMax": 0.95,
-    "basicInterval": 2.4,
+    "basicCast": 1.341,
+    "basicCost": 0.31,
+    "rest": {
+      "s": 1.5,
+      "share": 0.08
+    },
     "basicDmg": [
-      8,
-      0.45
+      14.21,
+      0.8
     ],
     "dodgeStamina": 2,
     "ccCostPerLevel": 0.0015,
@@ -328,16 +366,16 @@
     ],
     "eInterval": 2.6,
     "eAcc": [
-      40,
-      4.5
+      219.3,
+      0
     ],
     "eEva": [
-      30,
-      4.2
+      31,
+      4.3
     ],
     "boss": {
-      "hp": 3.2,
-      "dmg": 1.5
+      "hp": 3.46,
+      "dmg": 1.49
     },
     "pack": {
       "n": 3,
@@ -350,20 +388,19 @@
       "casterEvery": 12,
       "casterCast": 3,
       "casterMult": 3,
-      "evasive": 1.6,
+      "evasive": 1.59,
       "regenPct": 0.01,
       "illusionEvery": 10,
       "illusionDur": 6,
       "illusionAcc": 0.25,
       "hidden": 8,
-      "hiddenAcc": 0.4,
+      "hiddenAcc": 0.07,
       "hiddenFirst": 2,
       "poisonChance": 0.35
     },
     "combatXp": {
       "style": 0.7,
-      "vit": 0.35,
-      "eva": 0.3
+      "vit": 0.35
     },
     "ryoPerMin": {
       "D": 12,
@@ -559,7 +596,8 @@
       "timerFires": 1000,
       "timerMinMs": 100,
       "hookEventsPerSec": 500,
-      "hookStatMax": 10
+      "hookStatMax": 10,
+      "interruptLost": 0.5
     },
     "bindEva": 0.3,
     "loadout": {
@@ -585,8 +623,10 @@
       "vestRank": "chunin"
     },
     "ai": {
-      "geninReactionMs": 1000,
-      "guardBelow": 0.6
+      "enemyTier": {
+        "genin": 8,
+        "chunin": 35
+      }
     },
     "woundHp": 0.1,
     "bingo": {
@@ -643,8 +683,7 @@
       "maxDefeats": 3,
       "defaultStyle": "tai",
       "fightSkills": [
-        "vit",
-        "eva"
+        "vit"
       ],
       "success": {
         "base": 0.9,

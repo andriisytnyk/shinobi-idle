@@ -1,13 +1,15 @@
 {
-  "visibleTraits": ["armor", "pack"],
+  "visibleTraits": [
+    "armor",
+    "pack"
+  ],
   "tiers": [
     {
-      "id": "genin",
+      "id": "student",
       "minTier": 0,
       "rules": [
         "heal",
         "interrupt",
-        "defend",
         "answer",
         "maintain",
         "signature",
@@ -15,9 +17,24 @@
         "filler",
         "basic"
       ],
-      "defends": "known",
       "tactical": false,
-      "reaction": true
+      "waitMs": 880
+    },
+    {
+      "id": "genin",
+      "minTier": 1,
+      "rules": [
+        "heal",
+        "interrupt",
+        "answer",
+        "maintain",
+        "signature",
+        "best",
+        "filler",
+        "basic"
+      ],
+      "tactical": false,
+      "waitMs": 440
     },
     {
       "id": "chunin",
@@ -25,7 +42,6 @@
       "rules": [
         "heal",
         "interrupt",
-        "defend",
         "answer",
         "maintain",
         "signature",
@@ -33,9 +49,8 @@
         "filler",
         "basic"
       ],
-      "defends": "all",
       "tactical": true,
-      "reaction": false
+      "waitMs": 250
     }
   ]
 }

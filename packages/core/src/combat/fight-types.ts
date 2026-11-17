@@ -1,5 +1,6 @@
 import type { AiTier, ContentDb, Rank, SkillId } from '@shinobi/content';
 import type { RngState } from '../rng.ts';
+import type { EvasionPart } from './numbers.ts';
 
 /** Stats an effect can change. Multipliers combine by product, additions as `1 + sum`. */
 export type ModStat = 'accuracy' | 'evasion' | 'speed' | 'damageTaken' | 'taiDamage' | 'resist';
@@ -50,6 +51,33 @@ export interface Timer {
   need: number;
 }
 
+/**
+ * What a combatant is doing besides waiting: its action. `technique` takes the technique's cast
+ * time; `basic` is the plain strike; `item` uses a pouch item; `attack` is the plain attack of an
+ * enemy; `rest` is catching the breath. `id` is the technique or item id (null for the others).
+ */
+export interface FightAct {
+  kind: 'technique' | 'basic' | 'item' | 'attack' | 'rest';
+  id: string | null;
+  /** The body the action is aimed at (the id of the enemy, or the player); null when the engine picks. */
+  target: string | null;
+}
+
+/** How the last action of a combatant ended. */
+export interface LastAct {
+  kind: FightAct['kind'];
+  id: string | null;
+  outcome: 'hit' | 'miss' | 'interrupted' | 'none';
+  /** Damage dealt by it (to health), and what it applied and triggered. */
+  damage: number;
+  statuses: string[];
+  combos: string[];
+  /** Fight clock time at which it was resolved or broken off. */
+  at: number;
+  /** For an attack that missed: the defensive technique that did it (chosen among the known ones in proportion to their contribution); null for none. */
+  avoidedBy: string | null;
+}
+
 /** One fighter. The player and every enemy have this shape. */
 export interface Combatant {
   id: string;
@@ -62,11 +90,14 @@ export interface Combatant {
   maxChakra: number;
   stamina: number;
   maxStamina: number;
-  /** Basic attack and defence numbers: accuracy, evasion, damage, and ms between attacks. */
+  /** Basic attack and defence numbers: accuracy, evasion and damage of the plain strike. */
   accuracy: number;
   evasion: number;
   damage: number;
-  intervalMs: number;
+  /** How long this fighter waits for the moment before every action, in ms (the AI tier's number). */
+  waitMs: number;
+  /** How long its plain strike takes (a cast of its own for the player, the wind-up of an enemy's attack), in ms. */
+  strikeMs: number;
   nature: string | null;
   /** Traits, as content ids; the fight hooks give them their behaviour. */
   traits: string[];
@@ -76,12 +107,17 @@ export interface Combatant {
   /** Fight clock time at which each technique is ready again. */
   cd: Record<string, number>;
   /**
-   * `idle`: the player is free to act. `cast` and `recover`: the player is busy until `timer`
-   * fills. `attack`: an enemy counts down to its next blow.
+   * A fighter's time is two things: `wait` (it waits for the moment, as long as its tier says) and
+   * `act` (its action, until `timer` fills). The player, with nothing it can pay for, `rest`s.
+   * A stun or a bind does not change the phase: it only stops `timer`.
    */
-  phase: 'idle' | 'cast' | 'recover' | 'attack';
-  /** Technique being cast, while `phase` is `cast`. */
-  cast: string | null;
+  phase: 'wait' | 'act' | 'rest';
+  /** The action under way, while `phase` is `act` or `rest`; null while it waits. */
+  act: FightAct | null;
+  /** Fight clock time at which the phase began. */
+  phaseAt: number;
+  /** The action that ended last, and how; null before the first. */
+  last: LastAct | null;
   timer: Timer;
   /** Timers owned by fight hooks, by name; they fill at the combatant's speed. */
   timers: Record<string, Timer>;
@@ -101,17 +137,7 @@ export interface Combatant {
 /** What a technique does besides damage, with its numbers resolved for this player. */
 export interface KitEffect {
   /** `damage` for a plain attack, else the kind named by the technique's combat data. */
-  kind:
-    | 'damage'
-    | 'none'
-    | 'shield'
-    | 'decoy'
-    | 'evasionBuff'
-    | 'cleanse'
-    | 'passiveNegate'
-    | 'stance'
-    | 'nextCast'
-    | 'reveal';
+  kind: 'damage' | 'none' | 'cleanse' | 'stance' | 'nextCast' | 'reveal';
   /** Shield strength, decoy charges. */
   amount: number;
   /** Evasion multiplier, Taijutsu damage share of a stance, cast time scale of the next cast. */
@@ -168,6 +194,8 @@ export interface PlayerKit {
   med: number;
   chakraRegen: number;
   staminaRegen: number;
+  /** The parts of the player's evasion rating, with their sources (the rating itself is the player's `evasion`, wounds counted). */
+  evasion: EvasionPart[];
 }
 
 /** What happened in a fight; battle analysis averages these over many fights. */
@@ -203,12 +231,19 @@ export interface FightTally {
 /** One line of the battle log: who did what, with which technique, for how much damage. */
 export interface FightLogLine {
   side: 'player' | 'enemy';
-  /** `cast`: the player began a technique; `hit` and `miss`: an attack landed or not. */
-  act: 'cast' | 'hit' | 'miss';
+  /**
+   * `cast`: an action began; `resolve`: it ended with its effect; `interrupted`: it was broken off;
+   * `hit` and `miss`: an attack landed or not.
+   */
+  act: 'cast' | 'resolve' | 'interrupted' | 'hit' | 'miss';
   /** Technique id; null for a basic attack and for every enemy attack. */
   tech: string | null;
   /** Damage dealt by a hit; 0 otherwise. */
   dmg: number;
+  /** The id of the combatant the action is of (set on `cast`, `resolve` and `interrupted`). */
+  by?: string;
+  /** On a `miss` of an attack on the player: the defensive technique that avoided it. */
+  via?: string;
 }
 
 /** One kind of enemy body an encounter puts into the fight. */
@@ -335,6 +370,8 @@ export interface ViewPouch {
   answers: readonly string[];
   interrupts: boolean;
   guard: boolean;
+  /** The effect the item leaves on the player (a timed bonus); null for none. */
+  selfBonus: string | null;
 }
 
 /** What the player AI knows of the traits of the content. */
@@ -408,9 +445,6 @@ export interface FightView {
   stance: string | null;
   /** Whether the next cast is already hastened. */
   hastened: boolean;
-  /** The reaction delay of this tier in work units, and the share of health below which a spare buff is cast. */
-  reactWork: number;
-  guardBelow: number;
   /** Work units a tool or pill takes to use. */
   itemWork: number;
 }
@@ -430,6 +464,8 @@ export interface FightCtx {
 export interface AttackPlan {
   chance: number;
   damage: number;
+  /** The attack carries the interrupt: when it hits a fighter that is casting, the cast is broken. */
+  interrupts?: boolean;
 }
 
 /**

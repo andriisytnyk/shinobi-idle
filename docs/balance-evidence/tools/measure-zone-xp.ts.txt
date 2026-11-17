@@ -1,0 +1,36 @@
+// Run: copy to packages/sim/measure-zone-xp.ts, then pnpm --filter @shinobi/sim exec tsx measure-zone-xp.ts (delete the copy afterwards).
+/* Zone XP per game hour for the yardstick character of each zone's enemy (level = its combat level), one nature, no pouch. */
+import { content } from '@shinobi/content';
+import { advance, defaultRules, dispatch } from '@shinobi/core';
+import { buildCharacter, equipFor, rankForLevel } from './src/character.ts';
+import { defaultNature } from './src/constants.ts';
+
+const satisfy = (state: any, req: any): void => {
+  if (!req) return;
+  if (req.t === "flag") state.flags[req.id] = req.n ?? true;
+  else if (req.t === "all" || req.t === "any") for (const r of req.of) satisfy(state, r);
+};
+const HOUR = 3_600_000;
+const out: Record<string, number> = {};
+for (const zone of content.zones) {
+  const entry = [...content.enemies, ...content.bosses].find((e) => e.id === zone.enemy);
+  if (!entry) continue;
+  const level = Math.min(content.balance.K.cap, Math.max(1, entry.cl));
+  const state = buildCharacter(content, {
+    seed: 1,
+    level,
+    rank: rankForLevel(level, content),
+    natures: [defaultNature(content)],
+  });
+  equipFor(state, entry.id, content, defaultRules, { pouch: 'none', food: 'model' }, level);
+  for (const cell of content.cells) state.world.explores[cell.id] = 1_000_000;
+  satisfy(state, zone.unlock);
+  const before = Object.fromEntries(Object.entries(state.skills).map(([k, v]) => [k, v.xp]));
+  const r = dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: zone.id }, content, defaultRules);
+  if (!r.ok) console.error(zone.id, JSON.stringify(r));
+  advance(state, HOUR, content, defaultRules);
+  let gained = 0;
+  for (const [k, v] of Object.entries(state.skills)) gained += v.xp - (before[k] ?? 0);
+  out[zone.id] = Math.round(gained);
+}
+console.log(JSON.stringify(out, null, 1));

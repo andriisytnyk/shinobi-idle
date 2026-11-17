@@ -424,7 +424,7 @@ describe('A7: failures', () => {
   it('an items stage takes its items at its start and blocks the start when they are missing', () => {
     const state = player({
       natures: ['katon'],
-      levels: { scout: 15, tai: 36, vit: 36, eva: 36, med: 20, cc: 20, katon: 36 },
+      levels: { scout: 15, tai: 36, vit: 36, med: 20, cc: 20, katon: 36 },
       bank: { 'core:antidote': 12 },
     });
     expect(startMission(state, 'core:well')).toEqual({ ok: true });
@@ -441,11 +441,19 @@ describe('A7: failures', () => {
 
   it('a lost combat stage costs a Wound and restarts that stage until it has been lost too often; the stages before it stand', () => {
     // A player who cannot win: Scouting passes the first stage, the thief wins the second.
-    const state = player({ natures: ['katon'], levels: { scout: 30, vit: 1, eva: 1, tai: 1 } });
+    const state = player({ natures: ['katon'], levels: { scout: 30, vit: 1, tai: 1 } });
     startMission(state, 'core:thief');
     const lost = (): number => state.events.filter((e) => e.type === 'playerDefeated').length;
     // After the first defeat the stage has started over: the same stage, a new fight, a Wound.
-    for (let i = 0; i < 40 * 60 && lost() < 1; i++) advance(state, 1000, content);
+    // Kept at the edge of defeat: under the new rules a character of this level no longer loses to the thief on its own.
+    const weak = (): void => {
+      const me = state.combat?.fight.player;
+      if (me) me.hp = Math.min(me.hp, 3);
+    };
+    for (let i = 0; i < 40 * 60 && lost() < 1; i++) {
+      weak();
+      advance(state, 1000, content);
+    }
     expect(lost()).toBe(1);
     expect(state.wounds.stacks).toBeGreaterThan(0);
     expect(state.slots[0]?.data).toMatchObject({ s: 1, a: 1 });
@@ -454,7 +462,10 @@ describe('A7: failures', () => {
     const stages = state.events.flatMap((e) => (e.type === 'missionStage' ? [e] : []));
     expect(stages.filter((e) => e.stage === 0)).toHaveLength(1);
     // After as many lost fights in a row as the balance allows, the mission stops and says why.
-    advance(state, 6 * 60 * MIN, content);
+    for (let i = 0; i < 6 * 60 * 60 && state.slots[0]?.action; i++) {
+      weak();
+      advance(state, 1000, content);
+    }
     expect(lost()).toBe(content.balance.K.mission.maxDefeats);
     expect(state.slots[0]?.action).toBeNull();
     expect(state.combat).toBeNull();

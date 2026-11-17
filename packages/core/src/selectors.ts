@@ -84,6 +84,38 @@ interface Facts {
   outputs?: { item: string; n: number }[];
 }
 
+/** How a practice cycle divides: the focus, then the cast of the technique, in ms of an unmodified cycle. */
+export interface PracticeSplit {
+  focusMs: number;
+  castMs: number;
+  /** The whole cycle: `focusMs + castMs`. */
+  intervalMs: number;
+}
+
+/**
+ * The cycle of practising a technique as the player sees it: first the focus, then the cast, which
+ * is the cast time of the technique (its own number, shortened by mastery, stretched when the
+ * nature is not the player's own). A cycle that would be shorter than the least one is padded with
+ * focus. Null when `id` is no technique.
+ */
+export function practiceSplit(
+  state: GameState,
+  id: string,
+  content: ContentDb,
+): PracticeSplit | null {
+  const t = indexOf(content).techniques.get(id);
+  if (!t) return null;
+  const cast = techniqueCastSeconds(
+    t,
+    masteryLevel(state, id, content),
+    content,
+    nonNativeLevel(t.skill, state.player.natures, skillLevel(state, t.skill, content), content),
+  );
+  const castMs = Math.round(cast * MS_PER_SECOND);
+  const intervalMs = Math.round(practiceIntervalSeconds(cast, content, t.level) * MS_PER_SECOND);
+  return { focusMs: intervalMs - castMs, castMs, intervalMs };
+}
+
 /** The skill, unlock level and unmodified cycle of an action of a built-in kind; null otherwise. */
 function factsOf(
   state: GameState,
@@ -100,7 +132,7 @@ function factsOf(
       const t = index.techniques.get(id);
       if (!t) return null;
       const cast = techniqueCastSeconds(
-        t.sealSeq.length,
+        t,
         masteryLevel(state, id, content),
         content,
         nonNativeLevel(t.skill, state.player.natures, skillLevel(state, t.skill, content), content),
@@ -108,7 +140,7 @@ function factsOf(
       return {
         skill: t.skill,
         level: t.level,
-        baseMs: ms(practiceIntervalSeconds(cast, content)),
+        baseMs: ms(practiceIntervalSeconds(cast, content, t.level)),
       };
     }
     case 'drill': {

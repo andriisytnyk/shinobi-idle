@@ -1,14 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
-import {
-  masteryLevel,
-  nonNativeLevel,
-  practiceIntervalSeconds,
-  skillLevel,
-  RATE_FULL,
-  SHARE_FULL,
-  techniqueCastSeconds,
-  type GameState,
-} from '@shinobi/core';
+import { practiceSplit, RATE_FULL, SHARE_FULL, type GameState } from '@shinobi/core';
 import type { ProgressTiming } from './time-progress.ts';
 
 /** A cycle that is not running: the visual stays where it is. */
@@ -72,29 +63,9 @@ export interface PracticePhases {
 /** The release is a flash at the moment the interval completes: at most this long, at most a tenth of the interval. */
 const RELEASE_MAX_S = 0.3;
 
-/** The cast time of a technique in seconds, always from the core formula (the UI never derives it from the seals). */
-function castSecondsOf(
-  state: GameState,
-  tech: ContentDb['techniques'][number],
-  content: ContentDb,
-): number {
-  const foreign = nonNativeLevel(
-    tech.skill,
-    state.player.natures,
-    skillLevel(state, tech.skill, content),
-  );
-  return techniqueCastSeconds(
-    tech.sealSeq.length,
-    masteryLevel(state, tech.id, content),
-    content,
-    foreign,
-  );
-}
-
 /**
  * Splits the practice interval into focus, cast and release. The interval and the cast time come
- * from core (practiceIntervalSeconds, techniqueCastSeconds); the focus is the part of the interval
- * that is not casting and comes before the cast; the seals are spread evenly over the cast; the
+ * from core (practiceSplit); the focus is the part of the interval that comes before the cast; the seals are spread evenly over the cast; the
  * release flash is the last moments of the interval. Core exposes no such split itself.
  */
 export function practicePhases(
@@ -105,8 +76,10 @@ export function practicePhases(
   const tech = content.techniques.find((t) => t.id === id);
   if (!tech) return null;
   const count = tech.sealSeq.length;
-  const cast = castSecondsOf(state, tech, content);
-  const total = practiceIntervalSeconds(cast, content);
+  const split = practiceSplit(state, id, content);
+  if (!split) return null;
+  const cast = split.castMs / 1000;
+  const total = split.intervalMs / 1000;
   const release = Math.min(RELEASE_MAX_S, total * 0.1);
   const sealsEnd = Math.max(0, 1 - release / total);
   const castFraction = Math.min(sealsEnd, cast / total);

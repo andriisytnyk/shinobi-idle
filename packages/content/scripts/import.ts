@@ -189,6 +189,27 @@ const seals: Seal[] = Object.entries(slice.seals).map(([key, s]) => {
 
 const english: Record<string, string> = {};
 const techByUk = new Map<string, string>();
+/** The base cast of a technique: its hand-set number, else the cast of its rank times that of its role (a drill has no rank: the band of its level, as the balance model has it). */
+const castOf = (t: {
+  rank: string;
+  role: string;
+  level: number;
+  castOverride?: number | undefined;
+}): number => {
+  if (t.castOverride !== undefined) return t.castOverride;
+  const byRank = need(
+    bal.params.castByRank as Record<string, number> | undefined,
+    'balance castByRank',
+  );
+  const byRole = need(
+    bal.params.castByRole as Record<string, number> | undefined,
+    'balance castByRole',
+  );
+  const rank = t.rank === '—' ? (t.level < 30 ? 'D' : t.level < 50 ? 'C' : 'B') : t.rank;
+  return (
+    need(byRank[rank], `cast of rank ${rank}`) * need(byRole[t.role], `cast of role ${t.role}`)
+  );
+};
 const techniques: TechniqueBase[] = slice.techniques.map((t) => {
   techByUk.set(t.uk, t.id);
   text('technique', t.id, 'name', t.uk);
@@ -212,6 +233,7 @@ const techniques: TechniqueBase[] = slice.techniques.map((t) => {
     sealsCanon: t.sealsCanon,
     tier: t.tier as TechniqueBase['tier'],
     noDamage: t.noDamage,
+    cast: Math.round(castOf(t) * 1000) / 1000,
   };
 });
 const techId = (uk: string) => need(techByUk.get(uk), `technique "${uk}" is not in the slice`);
@@ -592,6 +614,12 @@ const params = balanceParamsSchema.parse({
   ...withOverrides({ ...BALANCE_EXT, ...rawParams }, BALANCE_OVERRIDE),
   role: Object.fromEntries(
     Object.entries(rawRole).map(([uk, v]) => [need(roleKeys.get(uk), `balance role "${uk}"`), v]),
+  ),
+  castByRole: Object.fromEntries(
+    Object.entries(rawParams.castByRole as Record<string, number>).map(([uk, v]) => [
+      need(roleKeys.get(uk), `balance castByRole "${uk}"`),
+      v,
+    ]),
   ),
 });
 const balance = { K: params, pace: bal.pace, capHours: bal.capHours, milestones: bal.milestones };

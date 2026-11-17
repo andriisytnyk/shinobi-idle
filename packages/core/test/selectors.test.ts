@@ -23,7 +23,7 @@ describe('skill unlock rules', () => {
     }
   });
 
-  it('keeps every other skill shut for a student except vit and eva, which wait for a fight', () => {
+  it('keeps every other skill shut for a student except vit, which waits for a fight', () => {
     const state = createState(1, content);
     const shut = SKILL_IDS.filter((id) => !isSkillUnlocked(state, id, content));
     expect(shut).toEqual([
@@ -37,7 +37,6 @@ describe('skill unlock rules', () => {
       'prov',
       'alch',
       'vit',
-      'eva',
     ]);
     expect(skillUnlockStatus(state, 'vit', content)?.req).toEqual({ t: 'flag', id: 'firstFight' });
     expect(skillUnlockStatus(state, 'katon', content)?.req).toEqual({
@@ -46,7 +45,7 @@ describe('skill unlock rules', () => {
     });
   });
 
-  it('opens the rank-gated skills at genin and vit and eva with the firstFight flag', () => {
+  it('opens the rank-gated skills at genin and vit with the firstFight flag', () => {
     const state = createState(1, content);
     state.player.rank = 'genin';
     expect(isSkillUnlocked(state, 'katon', content)).toBe(false);
@@ -56,7 +55,6 @@ describe('skill unlock rules', () => {
     expect(isSkillUnlocked(state, 'vit', content)).toBe(false);
     state.flags.firstFight = true;
     expect(isSkillUnlocked(state, 'vit', content)).toBe(true);
-    expect(isSkillUnlocked(state, 'eva', content)).toBe(true);
   });
 });
 

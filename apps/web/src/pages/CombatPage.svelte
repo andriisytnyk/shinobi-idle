@@ -70,25 +70,31 @@
         progress: number;
         timing: ProgressTiming;
       };
-      if (p.phase === 'cast' && p.cast) {
-        playerDoing = {
-          key: 'combat.doing.cast',
-          tech: p.cast,
-          progress: fraction(p.timer),
-          timing: combatTiming(state, p.timer),
-        };
-      } else if (p.phase === 'recover') {
-        playerDoing = { key: 'combat.doing.recover', tech: null, progress: 0, timing: IDLE_TIMING };
-      } else {
-        playerDoing = { key: 'combat.doing.ready', tech: null, progress: 0, timing: IDLE_TIMING };
-      }
+      // A fighter waits for the moment, acts (a technique, the plain strike, an item) or, out of breath, rests.
+      const doing = p.act;
+      const key =
+        p.phase === 'rest'
+          ? 'combat.doing.rest'
+          : doing?.kind === 'technique'
+            ? 'combat.doing.cast'
+            : doing?.kind === 'item'
+              ? 'combat.doing.item'
+              : doing?.kind === 'basic'
+                ? 'combat.doing.basic'
+                : 'combat.doing.wait';
+      playerDoing = {
+        key,
+        tech: doing?.kind === 'technique' ? doing.id : null,
+        progress: fraction(p.timer),
+        timing: combatTiming(state, p.timer),
+      };
 
       const front = f.enemies.find((e) => e.hp > 0) ?? f.enemies[0];
       const enemyDoing =
         combat.phase === 'respawn' || !front
           ? { key: 'combat.doing.respawn', progress: 0, timing: IDLE_TIMING }
           : {
-              key: 'combat.doing.attack',
+              key: front.phase === 'wait' ? 'combat.doing.wait' : 'combat.doing.attack',
               progress: fraction(front.timer),
               timing: combatTiming(state, front.timer),
             };

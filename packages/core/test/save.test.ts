@@ -98,10 +98,10 @@ describe('A10: save', () => {
     s.rng.combat = [1, 2];
     s.slots = [{ action: { kind: 'practice', id: 'core:ghost' }, progress: 5, share: -1 }, 7];
     const state = deserialize(JSON.stringify(raw), content);
-    expect(Object.keys(state.skills)).toHaveLength(16);
+    expect(Object.keys(state.skills)).toHaveLength(15);
     expect(state.skills.tai!.xp).toBe(xpAt(content.balance.K.cap));
     expect(state.pools.tai!.xp).toBeLessThan(1e15);
-    expect(Object.keys(state.pools)).toHaveLength(16);
+    expect(Object.keys(state.pools)).toHaveLength(15);
     expect(state.mastery['core:clone']).toEqual({ xp: 0 });
     expect(state.mastery['core:ghost']).toBeUndefined();
     expect(state.known['core:ghost']).toBeUndefined();

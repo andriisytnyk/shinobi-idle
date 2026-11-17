@@ -71,7 +71,7 @@
   ],
   "core:ukhylennia_vid_kunaiv": [
     {
-      "key": "xp.skill.eva",
+      "key": "evasion",
       "op": "add",
       "value": 0.03,
       "side": "bonus"

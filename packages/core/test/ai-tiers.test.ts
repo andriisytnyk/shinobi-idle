@@ -19,7 +19,7 @@ import { fighter, know, startFight } from './prep-state.ts';
 import { aiVocab, viewTechnique } from './view-helpers.ts';
 import { advance } from '../src/index.ts';
 
-const tierOf = (id: 'genin' | 'chunin'): AiTier => {
+const tierOf = (id: 'student' | 'genin' | 'chunin'): AiTier => {
   const t = content.ai.tiers.find((x) => x.id === id);
   if (!t) throw new Error(`no ${id} tier`);
   return t;
@@ -60,20 +60,6 @@ const kt = (
   requiresStance: false,
   ...extra,
 });
-const shield = (id: string) =>
-  kt(id, [], 0, {
-    role: 'defense',
-    fx: {
-      kind: 'shield',
-      amount: 50,
-      mult: 1,
-      durationMs: 6000,
-      drain: 0,
-      wounds: 0,
-      everyMs: 0,
-      statuses: [],
-    },
-  });
 const vt = (tech: KitTechnique): ViewTechnique => viewTechnique(tech);
 const enemyView = (o: Partial<ViewEnemy> = {}): ViewEnemy => ({
   id: 'e#0',
@@ -114,8 +100,6 @@ function view(id: 'genin' | 'chunin', techs: KitTechnique[], enemies: ViewEnemy[
     medic: null,
     stance: null,
     hastened: false,
-    reactWork: ai.reaction ? workOf(K.ai.geninReactionMs) : 0,
-    guardBelow: K.ai.guardBelow,
     itemWork: sec(K.pillAction),
   };
 }
@@ -134,17 +118,14 @@ describe('the two tiers are data', () => {
     // Both interrupt and answer; the genin needs a reaction delay and does not reserve an interrupt.
     expect(genin.rules).toContain('interrupt');
     expect(chunin.rules).toContain('interrupt');
-    expect(genin.reaction).toBe(true);
-    expect(chunin.reaction).toBe(false);
-    expect(genin.defends).toBe('known');
-    expect(chunin.defends).toBe('all');
+    // A higher tier waits for the moment less.
+    expect(genin.waitMs).toBeGreaterThan(chunin.waitMs);
     expect(genin.tactical).toBe(false);
     expect(chunin.tactical).toBe(true);
     expect(content.ai.visibleTraits).toEqual(['armor', 'pack']);
-    expect(K.ai.geninReactionMs).toBeGreaterThan(0);
   });
 
-  it('plays a student and a genin with the genin tier and a chunin with the other', () => {
+  it('plays a student, a genin and a chunin each with the tier of its rank', () => {
     const run = (tier: number) => {
       const fight = createFight(
         { ...scripted(['core:leaf_whirlwind']), tier },
@@ -160,21 +141,21 @@ describe('the two tiers are data', () => {
   });
 });
 
-describe('interrupts: a genin reacts after a delay to a cast it knows, a chunin at once to any', () => {
+describe('interrupts: a genin answers a cast it knows, a chunin any (both when their wait ends)', () => {
   const techs = [kt('int', ['interrupt'], 1), kt('big', [], 50)];
-  const react = workOf(K.ai.geninReactionMs);
+  const react = 1;
 
-  it('does not interrupt before the genin reaction delay has passed, and does after', () => {
-    expect(defaultCombatAi(view('genin', techs, [cast_(0, true)]))).toEqual(cast('big'));
+  it('interrupts a cast it knows to be heavy as soon as it decides: the wait is its reaction', () => {
+    expect(defaultCombatAi(view('genin', techs, [cast_(0, true)]))).toEqual(cast('int'));
     expect(defaultCombatAi(view('genin', techs, [cast_(react + 1, true)]))).toEqual(cast('int'));
   });
 
-  it('does not interrupt a cast it does not know to be heavy, while a chunin does at once', () => {
-    expect(defaultCombatAi(view('genin', techs, [cast_(react + 1, false)]))).toEqual(cast('big'));
+  it('interrupts any cast it sees: the tiers do not differ in what they see', () => {
+    expect(defaultCombatAi(view('genin', techs, [cast_(react + 1, false)]))).toEqual(cast('int'));
     expect(defaultCombatAi(view('chunin', techs, [cast_(0, false)]))).toEqual(cast('int'));
   });
 
-  it('does not reserve an interrupt for a known caster, as a chunin does', () => {
+  it('does not reserve an interrupt for a known caster, whatever the tier', () => {
     const waiting = (t: 'genin' | 'chunin') =>
       defaultCombatAi(
         view(
@@ -184,7 +165,7 @@ describe('interrupts: a genin reacts after a delay to a cast it knows, a chunin 
         ),
       );
     expect(waiting('genin')).toEqual(cast('int'));
-    expect(waiting('chunin')).toEqual(cast('plain'));
+    expect(waiting('chunin')).toEqual(cast('int'));
   });
 
   it('in a real fight against a caster the player knows, both interrupt', () => {
@@ -247,19 +228,20 @@ describe('answers: every known trait, at either tier, and nothing else', () => {
   });
 });
 
-describe('defence', () => {
-  const techs = [shield('guard'), kt('big', [], 50)];
-  const react = workOf(K.ai.geninReactionMs);
-
-  it('a chunin guards against every heavy cast, a genin only against the ones it knows to be heavy', () => {
-    expect(defaultCombatAi(view('chunin', techs, [cast_(0, false)]))).toEqual(cast('guard'));
-    expect(defaultCombatAi(view('genin', techs, [cast_(react + 1, false)]))).toEqual(cast('big'));
-    expect(defaultCombatAi(view('genin', techs, [cast_(react + 1, true)]))).toEqual(cast('guard'));
+describe('defence is not a matter for the AI', () => {
+  it('has no rule that defends, in any tier of the content', () => {
+    for (const tier of content.ai.tiers) expect(tier.rules as string[]).not.toContain('defend');
   });
 
-  it('a genin guards only after the reaction delay', () => {
-    expect(defaultCombatAi(view('genin', techs, [cast_(0, true)]))).toEqual(cast('big'));
-    expect(defaultCombatAi(view('genin', techs, [cast_(react + 1, true)]))).toEqual(cast('guard'));
+  it('never puts a defensive technique into the hand: the kit of a fight has none', () => {
+    const fight = createFight(
+      scripted(['core:clone', 'core:body_replacement', 'core:leaf_whirlwind']),
+      enemyAt(10),
+      1,
+      content,
+      defaultRules,
+    );
+    expect(fight.kit.techniques.map((t) => t.id)).toEqual(['core:leaf_whirlwind']);
   });
 });
 

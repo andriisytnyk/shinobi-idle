@@ -11,3 +11,4 @@ test-results/
 Thumbs.db
 .claude/settings.local.json
 .claude/worktrees/
+packages/sim/scripts/fit/out-last.txt

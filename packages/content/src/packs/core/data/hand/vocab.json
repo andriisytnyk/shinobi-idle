@@ -129,6 +129,10 @@
       "onHit": [
         {
           "op": "cancelCast"
+        },
+        {
+          "op": "status",
+          "status": "interrupt"
         }
       ]
     },

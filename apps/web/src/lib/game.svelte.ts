@@ -263,7 +263,13 @@ export function createGame(deps: GameDeps = {}) {
         signals = { ...signals, travelled: true };
       }
       if (
-        event.type === 'combatLog' ||
+        // The log tells what was cast and what hit; the starts, ends and breaks of every action are for the fight view.
+        (event.type === 'combatLog' &&
+          (event.act === 'hit' ||
+            event.act === 'miss' ||
+            (event.act === 'cast' &&
+              event.side === 'player' &&
+              content.techniques.some((x) => x.id === event.tech)))) ||
         event.type === 'enemyDefeated' ||
         event.type === 'playerDefeated'
       ) {

@@ -1,6 +1,5 @@
 import type { AiRuleId } from '@shinobi/content';
 import type { CombatAi, Decision, FightView, ViewPouch, ViewTechnique } from './fight-types.ts';
-import { workOf } from './units.ts';
 
 /*
  * The player AI. It reads only the view. The priority list, and how each rule behaves, come from
@@ -46,29 +45,15 @@ const works = (view: FightView, trait: string): boolean =>
 /** The effect id a status put on a body: the effects after the first are `<id>#<n>`. */
 const statusOf = (effect: string): string => effect.split('#')[0] ?? effect;
 
-/**
- * The casts under way that the tier answers: those it knows to be heavy (or every cast, at the
- * tier that sees them all), once the reaction delay since the cast began has passed.
- */
+/** The casts under way that the AI can see when it decides: a cast shows from its start, and the wait is the AI's reaction. */
 function noticed(view: FightView): { remaining: number; total: number; interruptible: boolean }[] {
   const out: { remaining: number; total: number; interruptible: boolean }[] = [];
-  for (const e of view.enemies) {
-    const c = e.cast;
-    if (!c || (view.ai.defends !== 'all' && !c.known)) continue;
-    if (c.total - c.remaining < view.reactWork) continue;
-    out.push(c);
-  }
+  for (const e of view.enemies) if (e.cast) out.push(e.cast);
   return out;
 }
 
-/** Soonest end of an interruptible cast that the tier has noticed, or null. */
-function interruptibleCast(view: FightView): number | null {
-  return noticed(view).reduce<number | null>(
-    (soonest, c) =>
-      c.interruptible && (soonest === null || c.remaining < soonest) ? c.remaining : soonest,
-    null,
-  );
-}
+/** Whether an enemy happens to be casting something an interrupt can stop, at the moment the AI decides. */
+const interruptibleNow = (view: FightView): boolean => noticed(view).some((c) => c.interruptible);
 
 const heal: Rule = (view) => {
   const medic = view.medic;
@@ -83,35 +68,16 @@ const heal: Rule = (view) => {
   return needed ? { type: 'item', id: slot.id } : null;
 };
 
+/**
+ * An interrupting technique, or a tool that interrupts, when an enemy happens to be casting at the
+ * moment of the decision. The AI does not plan around when a cast ends: interrupting is a property
+ * of the attack, and this is only a preference for it while it can still matter.
+ */
 const interrupt: Rule = (view) => {
-  const left = interruptibleCast(view);
-  if (left === null) return null;
-  const tech = use(best(view, (r) => r.interrupts && workOf(r.tech.castMs) < left));
+  if (!interruptibleNow(view)) return null;
+  const tech = use(best(view, (r) => r.interrupts));
   if (tech) return tech;
-  // A tool is quicker than any cast, but takes its own action time.
-  return item(
-    view,
-    (p) => p.interrupts && (p.use === 'throw' || p.use === 'bomb') && view.itemWork < left,
-  );
-};
-
-const DEFENSES = ['shield', 'decoy', 'evasionBuff'] as const;
-
-const defend: Rule = (view) => {
-  // The strongest cast under way that this tier cares about.
-  let threat: { remaining: number; total: number } | null = null;
-  for (const c of noticed(view)) if (!threat || c.remaining < threat.remaining) threat = c;
-  if (!threat) return null;
-  const left = threat.remaining;
-  const covered = view.player.ward > 0 || view.player.decoys > 0;
-  if (!covered) {
-    for (const kind of DEFENSES) {
-      const tech = use(best(view, (r) => r.tech.fx.kind === kind && workOf(r.tech.castMs) < left));
-      if (tech) return tech;
-    }
-    return item(view, (p) => p.use === 'bomb' && p.guard && view.itemWork < left);
-  }
-  return null;
+  return item(view, (p) => p.interrupts && (p.use === 'throw' || p.use === 'bomb'));
 };
 
 /** The effects the traits of the content put on the player are answered with the trait's answer, then the rest by the techniques that take them off. */
@@ -165,20 +131,9 @@ const maintain: Rule = (view) => {
       if (stance) return stance;
     }
   }
-  // A spare guard while health is falling: a shield, then a decoy, then the evasion buff.
-  if (view.player.hp < view.player.maxHp * view.guardBelow) {
-    const p = view.player;
-    const wards: [string, boolean][] = [
-      ['shield', p.ward <= 0],
-      ['decoy', p.decoys <= 0],
-      ['evasionBuff', !status(view, 'evasionBuff')],
-    ];
-    for (const [kind, missing] of wards) {
-      if (!missing) continue;
-      const decision = use(best(view, (r) => r.tech.fx.kind === kind));
-      if (decision) return decision;
-    }
-  }
+  // A timed bonus the pouch carries for the player (a smoke bomb's evasion) is thrown when it is not active and there is something to be hit by.
+  const bonus = item(view, (p) => p.selfBonus !== null && !status(view, p.selfBonus));
+  if (bonus) return bonus;
   // A hastened cast is worth it only when it saves more time than the buff takes.
   if (!view.hastened) {
     const hasten = best(view, (r) => r.tech.fx.kind === 'nextCast');
@@ -195,17 +150,9 @@ const signature: Rule = (view) =>
 
 const bestAttack: Rule = (view) => {
   const tactical = view.ai.tactical;
-  // A tactical tier keeps an interrupt back for the next heavy cast when it would still be cooling down then.
-  const nextCasts = view.enemies.flatMap((e) => (e.nextCastIn === null ? [] : [e.nextCastIn]));
-  const soonest = nextCasts.length > 0 ? Math.min(...nextCasts) : null;
-  const reserved = (r: ViewTechnique): boolean =>
-    tactical &&
-    soonest !== null &&
-    r.interrupts &&
-    soonest < workOf(r.tech.cooldownMs + r.tech.castMs);
   const score = (r: ViewTechnique) =>
     tactical ? r.expected : r.power * (r.tech.hitsAll ? view.enemies.length : 1);
-  return use(best(view, (r) => r.expected > 0 && !reserved(r), score));
+  return use(best(view, (r) => r.expected > 0, score));
 };
 
 /**
@@ -227,7 +174,6 @@ const basic: Rule = () => ({ type: 'basic' });
 const RULES: Record<AiRuleId, Rule> = {
   heal,
   interrupt,
-  defend,
   answer,
   maintain,
   signature,

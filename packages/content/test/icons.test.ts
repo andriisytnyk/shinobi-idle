@@ -45,9 +45,9 @@ const required: Record<IconKind, string[]> = {
 
 describe('icon registry', () => {
   it('covers the expected number of entities', () => {
-    expect(required.skill).toHaveLength(16);
+    expect(required.skill).toHaveLength(15);
     expect(required.technique).toHaveLength(60);
-    expect(required.status).toHaveLength(5);
+    expect(required.status).toHaveLength(6);
     expect(required.trait).toHaveLength(9);
     expect(required.nature).toHaveLength(5);
     expect(required.currency).toHaveLength(3);
@@ -68,7 +68,7 @@ describe('icon registry', () => {
     });
   }
 
-  it('gives each of the 16 skills a different icon', () => {
+  it('gives each of the 15 skills a different icon', () => {
     const icons = SKILL_IDS.map((id) => iconFor('skill', id));
     expect(new Set(icons).size).toBe(SKILL_IDS.length);
   });
