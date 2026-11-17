@@ -76,6 +76,8 @@ const MAX_COUNTED = 1e12;
 /** The keys the fight engine files damage under besides technique ids: the basic attack, and a trait's own damage. */
 const BASIC_KEY = 'basic';
 const TRAIT_SRC = 'trait:';
+/** The key a teammate's support hit is filed under: this and the nature of the teammate. */
+const TEAM_SRC = 'team.';
 
 /** Rounds the floating figures of a tally so a report stays a short, exact JSON. */
 const round = (x: number): number => Math.min(MAX_COUNTED, Math.round(x));
@@ -244,7 +246,9 @@ export function parseReport(raw: unknown, content: ContentDb): TargetReport | nu
   const damage = (key: string): boolean =>
     technique(key) ||
     key === BASIC_KEY ||
-    (key.startsWith(TRAIT_SRC) && content.traits.some((x) => x.id === key.slice(TRAIT_SRC.length)));
+    (key.startsWith(TRAIT_SRC) &&
+      content.traits.some((x) => x.id === key.slice(TRAIT_SRC.length))) ||
+    (key.startsWith(TEAM_SRC) && content.natures.some((x) => x.id === key.slice(TEAM_SRC.length)));
   r.fights = count(raw.fights);
   r.wins = count(raw.wins);
   r.losses = count(raw.losses);

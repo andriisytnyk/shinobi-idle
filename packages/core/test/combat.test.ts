@@ -44,7 +44,8 @@ describe('combat formulas', () => {
     expect(playerMaxStamina(state, content)).toBeCloseTo(K.staminaBase * (1 + K.staminaPerAth));
     const basic = basicAttack(state, content);
     expect(basic.damage).toBeCloseTo(K.basicDmg[0] + K.basicDmg[1]);
-    expect(basic.intervalMs).toBe(Math.round(K.basicInterval * 1000));
+    expect(basic.castMs).toBe(Math.round(K.basicCast * 1000));
+    expect(basic.cost).toBe(K.basicCost);
   });
 
   it('uses the higher of Taijutsu and Ninjutsu for a basic attack', () => {
@@ -72,7 +73,7 @@ describe('combat formulas', () => {
   });
 
   it('matches the documented technique numbers', () => {
-    // Dynamic Entry at level 10 (no mastery): 13.5 damage, 0.4 s cast, 6 s cooldown.
+    // Dynamic Entry at level 10 (no mastery): its damage, the cooldown of its role and rank.
     const s = genin();
     setLevel(s, 'tai', 10);
     const entry = content.techniques.find(
@@ -84,7 +85,7 @@ describe('combat formulas', () => {
     expect(n.damage).toBeCloseTo(
       K.power.D! * (1 + K.levelScale * 10) * (1 + K.masteryDmg / K.masteryCap),
     );
-    expect(n.cooldownMs).toBe(6000);
+    expect(n.cooldownMs).toBe(Math.round((K.role.projectile?.cd ?? 0) * (K.rankCd.D ?? 1) * 1000));
     expect(n.pool).toBe('stamina');
     // Mastery 99 raises damage by the full masteryDmg and cuts cost by masteryCost.
     s.mastery[entry.id] = { xp: xpAt(K.masteryCap) };
@@ -183,11 +184,12 @@ describe('fight action', () => {
   it('casts the technique, pays its cost and puts it on cooldown', () => {
     const state = createState(7, content);
     dispatch(state, fight(), content);
-    advance(state, 1, content);
+    // The player waits for the moment first, then casts.
+    advance(state, (content.ai.tiers[0]?.waitMs ?? 0) + 100, content);
     const player = state.combat?.fight.player;
-    expect(player?.cast).toBe('core:leaf_whirlwind');
+    expect(player?.act?.id).toBe('core:leaf_whirlwind');
     expect(player?.stamina).toBeLessThan(playerMaxStamina(state, content));
-    advance(state, 1000, content);
+    advance(state, 4000, content);
     expect(state.combat?.fight.player.cd['core:leaf_whirlwind']).toBeGreaterThan(
       state.combat?.fight.t ?? Infinity,
     );
@@ -195,14 +197,12 @@ describe('fight action', () => {
 });
 
 describe('A4: combat XP follows the formula', () => {
-  it('pays style, Vitality and Evasion XP by the hour within 5%', () => {
+  it('pays style and Vitality XP by the hour within 5%', () => {
     const state = genin(8);
     setLevel(state, 'vit', 40);
-    setLevel(state, 'eva', 40);
     const before = {
       tai: state.skills.tai!.xp,
       vit: state.skills.vit!.xp,
-      eva: state.skills.eva!.xp,
     };
     dispatch(state, fight(), content);
     advance(state, HOUR, content);
@@ -214,8 +214,7 @@ describe('A4: combat XP follows the formula', () => {
     };
     // The dummy is beaten with Leaf Whirlwind (Taijutsu) and basic attacks (Taijutsu).
     near(state.skills.tai!.xp - before.tai, K.combatXp.style * r);
-    near(state.skills.vit!.xp - before.vit, K.combatXp.vit * r);
-    near(state.skills.eva!.xp - before.eva, K.combatXp.eva * r);
+    near(state.skills.vit!.xp - before.vit, (K.combatXp.vit ?? 0) * r);
   });
 
   it('pays mastery XP for time since the previous action, to techniques only', () => {

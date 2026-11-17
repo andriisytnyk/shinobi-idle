@@ -30,9 +30,9 @@
   ],
   "core:pool_nin_25": [
     {
-      "key": "cooldown.body_replacement",
+      "key": "evasion",
       "op": "add",
-      "value": -0.05
+      "value": 0.05
     }
   ],
   "core:pool_nin_50": [

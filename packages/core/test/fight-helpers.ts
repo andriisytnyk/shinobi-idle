@@ -54,7 +54,6 @@ export function levelsFor(c: number, nature: NatureId): PlayerSnapshot['levels']
   levels.nin = Math.max(1, style - 6);
   levels[nature] = style;
   levels.vit = d;
-  levels.eva = d;
   levels.med = d;
   levels.ath = Math.min(K.cap, d);
   levels.cc = Math.min(K.cap, d);

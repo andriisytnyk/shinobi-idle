@@ -50,10 +50,8 @@ const natureOf = (tech: Technique, content: ContentDb): string | null =>
 
 const isStance = (tech: Technique): boolean => tech.combat?.effect.kind === 'stance';
 
-const isGuard = (tech: Technique): boolean => {
-  const kind = tech.combat?.effect.kind;
-  return kind === 'shield' || kind === 'decoy' || kind === 'evasionBuff';
-};
+/** A defensive technique: passive, it adds to the evasion rating and is never in the hand. */
+export const isPassive = (tech: Technique): boolean => tech.combat?.passive !== undefined;
 
 /** Whether a technique answers a trait: it carries the answering tag, or its state switches the trait off (burning stops Regeneration). */
 export function answersTrait(tech: Technique, trait: string, content: ContentDb): boolean {
@@ -138,7 +136,7 @@ export function planLoadout(
   const cands: Cand[] = [];
   for (const id of snap.known) {
     const tech = index.techniques.get(id);
-    if (!tech || tech.rank === null || tech.combat?.outOfLoadout) continue;
+    if (!tech || tech.rank === null || tech.combat?.outOfLoadout || isPassive(tech)) continue;
     // Stances cost Wounds: they, and the techniques that need one, are for the player to take by
     // hand, or as the signature (the player has opted in to the price).
     if ((isStance(tech) || tech.combat?.requiresStance) && tech.id !== options.keep) continue;
@@ -192,12 +190,9 @@ export function planLoadout(
         covered++;
         continue;
       }
-      let answering = pool.filter(
+      const answering = pool.filter(
         (c) => answersTrait(c.tech, trait, content) && !c.tech.combat?.requiresStance,
       );
-      // A heavy caster is also met with a guard when nothing interrupts it.
-      if (answering.length === 0 && fightData(content).traits.get(trait)?.casts)
-        answering = pool.filter((c) => isGuard(c.tech));
       const pick = answering.sort(byScore)[0];
       // An answer that only answers, when the pouch has a tool for it, leaves its slot to an attack.
       if (!pick || (pick.score <= 0 && options.covered?.has(trait))) continue;
@@ -208,7 +203,6 @@ export function planLoadout(
       if (chosen.length >= limits.slots) break;
       add(c);
     }
-    for (const c of [...pool].filter((x) => isGuard(x.tech)).sort(byScore)) add(c);
     const top = pool.reduce((m, c) => Math.max(m, c.score), 0);
     const total = chosen.reduce((s, c) => s + c.score, 0) + covered * top;
     const ids = chosen.map((c) => c.tech.id).sort();
@@ -362,6 +356,7 @@ function invalidLoadout(
     const tech = index.techniques.get(id);
     if (!tech || !state.known[id] || tech.rank === null) return 'error.unknownTechnique';
     if (tech.combat?.outOfLoadout) return 'error.alwaysAvailable';
+    if (isPassive(tech)) return 'error.passiveTechnique';
     const nature = natureOf(tech, content);
     if (nature) natures.add(nature);
   }
@@ -451,7 +446,13 @@ export function setSignature(
   // player takes the Wound price on. The signature is always in a slot, so a manual loadout
   // must hold it already, and an automatic one is rebuilt around it.
   const tech = indexOf(content).techniques.get(technique);
-  if (!tech || tech.rank === null || tech.combat?.outOfLoadout || !state.known[technique]) {
+  if (
+    !tech ||
+    tech.rank === null ||
+    tech.combat?.outOfLoadout ||
+    isPassive(tech) ||
+    !state.known[technique]
+  ) {
     return { ok: false, reason: 'error.unknownTechnique' };
   }
   if (!l.auto && !l.active.includes(technique)) return { ok: false, reason: 'error.notInLoadout' };

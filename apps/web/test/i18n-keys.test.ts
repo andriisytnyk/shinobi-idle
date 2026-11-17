@@ -52,7 +52,7 @@ describe('interface strings', () => {
       'hint.title.': HINTS.map((h) => h.id),
       'log.': ['cast', 'hit', 'miss', 'basicHit', 'basicMiss', 'enemyHit', 'enemyMiss'],
       'now.phase.': ['focus', 'seal', 'release'],
-      'combat.doing.': ['ready', 'cast', 'recover', 'attack', 'respawn'],
+      'combat.doing.': ['wait', 'cast', 'basic', 'item', 'rest', 'attack', 'respawn'],
       'entity.kind.': [
         'skill',
         'technique',

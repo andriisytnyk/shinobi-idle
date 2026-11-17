@@ -34,7 +34,7 @@
                   <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 Закріпити як мету
           <p class="desc">
-            Ілюзорний клон відволікає ворога, і його наступний удар проходить повз. Одна з трьох технік іспиту Академії.
+            Ілюзорний клон відволікає ворога, і удар проходить повз. Пасивна, у набір не береться; одна з трьох технік іспиту Академії.
           <dl class="facts">
             <div>
               <dt>
@@ -84,12 +84,12 @@
                 <dt>
                   Час накладання
                 <dd data-figure="cast">
-                  0,8 с
+                  1,1 с
               <div>
                 <dt>
                   Перезарядка
                 <dd data-figure="cooldown">
-                  12 с
+                  13,4 с
               <div>
                 <dt>
                   Ціна: чакра
@@ -354,7 +354,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2,3 с
+                  2 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід
@@ -480,7 +480,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2 с
+                  2,3 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід
@@ -557,7 +557,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2 с
+                  2,5 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід
@@ -639,7 +639,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2 с
+                  2,8 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід
@@ -716,7 +716,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2 с
+                  3,2 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід
@@ -798,7 +798,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2 с
+                  3,4 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід
@@ -875,7 +875,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2 с
+                  3,5 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід
@@ -954,7 +954,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2 с
+                  3,9 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід
@@ -1036,7 +1036,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2 с
+                  4,7 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід
@@ -1111,7 +1111,7 @@
                   <path d="#24-1tb3nx8">
               25%
             <span class="text">
-              −5% перезарядки Підміни
+              +5% рейтингу ухилення
             <span class="state" data-active="false">
               Ще не діє
           <li data-checkpoint="core:pool_nin_50">

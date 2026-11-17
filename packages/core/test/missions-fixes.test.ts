@@ -103,7 +103,7 @@ describe('the forecast reads the grant', () => {
 
 describe('Intel stands in for the caravan ambush', () => {
   const caravan = mission('core:caravan');
-  const fit = { scout: 1, tai: 25, vit: 30, eva: 30 };
+  const fit = { scout: 1, tai: 25, vit: 30 };
 
   it('is data on the stage, not a rule of one mission', () => {
     expect(caravan.skip).toEqual([K.intel.caravanSkip, 0, 0]);

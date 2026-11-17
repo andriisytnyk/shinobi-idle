@@ -73,7 +73,7 @@ describe('S4-3: the nature screen', () => {
       for (const id of cons.cells) expect(body, id).toMatch(anchor({ kind: 'cell', id }));
       for (const id of cons.traits) expect(body, id).toMatch(anchor({ kind: 'trait', id }));
       for (const id of cons.combos) expect(body, id).toMatch(anchor({ kind: 'combo', id }));
-      for (const id of [cons.strongAgainst, cons.weakAgainst, cons.rival, cons.aya]) {
+      for (const id of [...cons.strongAgainst, ...cons.weakAgainst, cons.rival, cons.aya]) {
         expect(body, id).toMatch(anchor({ kind: 'skill', id }));
       }
     }

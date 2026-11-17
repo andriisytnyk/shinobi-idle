@@ -72,6 +72,8 @@ export interface ItemFacts {
   answers: readonly string[];
   interrupts: boolean;
   guard: boolean;
+  /** The id of the effect the item leaves on the player when used (a timed bonus such as a smoke bomb's evasion); null when it leaves none. */
+  selfBonus: string | null;
 }
 
 const itemFacts = new WeakMap<ContentDb, Map<string, ItemFacts | null>>();
@@ -95,6 +97,10 @@ export function itemView(content: ContentDb, id: string): ItemFacts | null {
       answers: Object.freeze([...data.traits.keys()].filter((t) => itemAnswers(item, t, content))),
       interrupts: item.tags.some((tag) => data.tags.get(tag)?.interrupts === true),
       guard: item.tags.some((tag) => data.tags.get(tag)?.guard === true),
+      selfBonus:
+        use === 'bomb' && item.fx?.kind === 'bomb' && item.fx.target === 'self'
+          ? bombEffectId(item.fx.stat)
+          : null,
     });
   }
   facts.set(id, made);
@@ -104,6 +110,9 @@ export function itemView(content: ContentDb, id: string): ItemFacts | null {
 /** Whether a body is an ordinary enemy rather than a boss. */
 const ordinary = (content: ContentDb, c: Combatant): boolean =>
   !content.bosses.some((b) => b.id === c.entry);
+
+/** The id a bomb's timed bonus has on a body: one per stat, so using it again renews it. */
+export const bombEffectId = (stat_: string): string => `bomb.${stat_}`;
 
 function addBomb(
   fight: FightState,
@@ -115,7 +124,7 @@ function addBomb(
 ): void {
   addEffect(target, {
     kind: 'modifier',
-    id: `bomb.${stat_}`,
+    id: bombEffectId(stat_),
     src: id,
     until: fight.t + workOf(durationMs),
     stat: stat_,

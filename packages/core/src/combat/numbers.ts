@@ -35,6 +35,37 @@ export interface PlayerSnapshot {
   medic?: number | null;
   /** Wound stacks; each one cuts the combat stats. */
   wounds?: number;
+  /** The total of the `evasion` modifiers (gear, obstacles, tonics); absent means 1, none. */
+  evasionMod?: number;
+  /** How well the player knows each enemy of the fight (Bingo level); an enemy without an entry is known completely. */
+  knowledgeLevel?: Record<string, number>;
+}
+
+/** The highest level of knowledge of an enemy: unknown, seen, defeated, studied. */
+export const KNOWLEDGE_MAX = 3;
+
+/** One part of the evasion rating, with where it comes from. */
+export interface EvasionPart {
+  /** "base"; "tier" (the rank of the player); "technique" (a known defensive technique, `id` names it); "modifiers" (gear and the like).
+   * Only the fight view adds two more: "knowledge" (what knowing the attacker adds, `id` names its entry) and "effects" (what
+   * Wounds and the timed stat modifiers of the fight add to the sum, with the sign they have). */
+  source: 'base' | 'tier' | 'technique' | 'modifiers' | 'knowledge' | 'effects';
+  id: string | null;
+  /** What the part adds against the attacker it was worked out for. */
+  value: number;
+  /** A technique: what it would add at an effective level equal to the level of the attacker (the row of `K.passiveFx`). */
+  full?: number;
+  /** A technique: the player's level in the skill it belongs to, and its own mastery. */
+  skillLevel?: number;
+  masteryLevel?: number;
+  /** A technique: the level it works at, the share of its skill that its mastery realises (skill level x mastery / mastery cap). */
+  effectiveLevel?: number;
+  /** A technique: its effective level over the combat level of the attacker, kept between `min` and `max` of `K.evaLevel`. */
+  ratio?: number;
+  /** Knowledge: how well the player knows the attacker (the Bingo level). */
+  knowledgeLevel?: number;
+  /** A technique: what that ratio added to `full` (negative: took away). */
+  levelAdj?: number;
 }
 
 export type Levels = PlayerSnapshot['levels'];
@@ -77,10 +108,115 @@ export function staminaRegenOf(levels: Levels, content: ContentDb): number {
   return (base ?? 0) + (perLevel ?? 0) * (levels.ath ?? 1);
 }
 
-export function evasionOf(levels: Levels, content: ContentDb): number {
+/**
+ * The parts of the evasion rating of the player, each with its source: the base, a term per rank tier, what every
+ * known defensive technique adds, and the evasion modifiers of gear and the like over the sum. A technique works at
+ * its effective level, its skill level times its mastery over the mastery cap, and adds its row of `K.passiveFx` times the
+ * ratio of that level to the combat level of the attacker (`attackerLevel`; without one, an attacker at the level of the
+ * technique's skill), kept between `K.evaLevel.min` and `max`. There is no skill term of the player's own.
+ * What knowing the attacker adds comes per enemy, in the fight.
+ */
+export function evasionParts(
+  snap: Pick<PlayerSnapshot, 'tier' | 'known' | 'mastery' | 'evasionMod' | 'levels'>,
+  content: ContentDb,
+  attackerLevel?: number,
+): EvasionPart[] {
   const K = content.balance.K;
-  return K.evaBase + K.evaPerLevel * (levels.eva ?? 1);
+  const parts: EvasionPart[] = [
+    { source: 'base', id: null, value: K.evaBase },
+    { source: 'tier', id: null, value: K.rating.evaTier * (snap.tier ?? 0) },
+  ];
+  const known = new Set(snap.known);
+  for (const tech of content.techniques) {
+    const fx = tech.combat?.passive?.fx;
+    if (fx === undefined || !known.has(tech.id)) continue;
+    // The pack closure rejects a key without a row; a content that got through anyway adds nothing instead of stopping the fight.
+    const row = Object.hasOwn(K.passiveFx, fx) ? K.passiveFx[fx] : undefined;
+    if (!row) continue;
+    const skillLevel = snap.levels?.[tech.skill] ?? 1;
+    const masteryLevel = Math.max(1, snap.mastery[tech.id] ?? 1);
+    const effectiveLevel = (skillLevel * masteryLevel) / K.masteryCap;
+    const part: EvasionPart = {
+      source: 'technique',
+      id: tech.id,
+      value: 0,
+      full: row.evasion,
+      skillLevel,
+      masteryLevel,
+      effectiveLevel,
+    };
+    parts.push(part);
+  }
+  for (const p of parts)
+    if (p.source === 'technique') worked(p, attackerLevel ?? p.skillLevel ?? 1, content);
+  const sum = parts.reduce((n, p) => n + p.value, 0);
+  const mod = snap.evasionMod ?? 1;
+  if (mod !== 1) parts.push({ source: 'modifiers', id: null, value: sum * (mod - 1) });
+  return parts;
 }
+
+/** The factor a defensive technique's effective level puts on what it adds against an attacker: the ratio of the two levels, kept between min and max. */
+export function levelScale(
+  effectiveLevel: number,
+  attackerLevel: number,
+  content: ContentDb,
+): number {
+  const L = content.balance.K.evaLevel;
+  return Math.min(L.max, Math.max(L.min, effectiveLevel / Math.max(1, attackerLevel)));
+}
+
+/** Works a technique part out against an attacker of that combat level. */
+function worked(p: EvasionPart, attackerLevel: number, content: ContentDb): void {
+  const full = p.full ?? 0;
+  const ratio = levelScale(p.effectiveLevel ?? 0, attackerLevel, content);
+  p.ratio = ratio;
+  p.value = full * ratio;
+  p.levelAdj = p.value - full;
+}
+
+/** The parts of the evasion rating against an attacker of combat level `attackerLevel`: every technique part worked out again, its adjustment named on it. */
+export function partsAgainst(
+  parts: readonly EvasionPart[],
+  attackerLevel: number,
+  content: ContentDb,
+): EvasionPart[] {
+  return parts.map((p) => {
+    const q = { ...p };
+    if (q.source === 'technique' && q.full !== undefined) worked(q, attackerLevel, content);
+    return q;
+  });
+}
+
+/** What the parts worked out against an attacker add to the rating beyond `parts`. */
+export function shiftAgainst(
+  parts: readonly EvasionPart[],
+  attackerLevel: number,
+  content: ContentDb,
+): number {
+  const now = partsAgainst(parts, attackerLevel, content);
+  return now.reduce((n, p, i) => n + p.value - (parts[i]?.value ?? 0), 0);
+}
+
+/** The evasion rating of the player: the sum of its parts. */
+export function evasionOf(
+  snap: Pick<PlayerSnapshot, 'tier' | 'known' | 'mastery' | 'evasionMod' | 'levels'>,
+  content: ContentDb,
+  attackerLevel?: number,
+): number {
+  return evasionParts(snap, content, attackerLevel).reduce((n, p) => n + p.value, 0);
+}
+
+/** What a rank tier adds to the accuracy rating of whoever attacks. */
+export const accuracyTierTerm = (tier: number, content: ContentDb, enemy = false): number =>
+  (enemy ? content.balance.K.rating.enemyAccTier : content.balance.K.rating.accTier) * tier;
+
+/** What a rank tier adds to the evasion rating of whoever defends. */
+export const evasionTierTerm = (tier: number, content: ContentDb, enemy = false): number =>
+  (enemy ? content.balance.K.rating.enemyEvaTier : content.balance.K.rating.evaTier) * tier;
+
+/** What knowing an enemy at `level` adds to the evasion rating of the player against it. */
+export const knowledgeTerm = (level: number, content: ContentDb): number =>
+  content.balance.K.rating.knowledge * level;
 
 /** Accuracy rating when attacking with a technique of `skill`. */
 export function accuracyOf(levels: Levels, skill: SkillId, content: ContentDb): number {
@@ -91,7 +227,10 @@ export function accuracyOf(levels: Levels, skill: SkillId, content: ContentDb): 
 export interface BasicAttack {
   accuracy: number;
   damage: number;
-  intervalMs: number;
+  /** How long the plain strike takes, in ms: it is an action of its own. */
+  castMs: number;
+  /** The stamina it costs. */
+  cost: number;
 }
 
 /** The basic attack uses the higher of the Taijutsu and Ninjutsu levels. */
@@ -101,7 +240,8 @@ export function basicAttackOf(levels: Levels, content: ContentDb): BasicAttack {
   return {
     accuracy: K.accBase + K.accPerLevel * lvl,
     damage: K.basicDmg[0] + K.basicDmg[1] * lvl,
-    intervalMs: secMs(K.basicInterval),
+    castMs: secMs(K.basicCast),
+    cost: K.basicCost,
   };
 }
 
@@ -157,14 +297,11 @@ export function techniqueFigures(
       need(K.tierMult[`${tech.tier}`], `tierMult.${tech.tier}`) *
       (1 + K.levelScale * skillLvl) *
       (1 + K.masteryDmg * masteryShare);
-  const cast = Math.max(
-    K.castFloor,
-    techniqueCastSeconds(
-      tech.sealSeq.length,
-      mastery,
-      content,
-      nonNativeLevel(tech.skill, snap.natures ?? [], skillLvl, content),
-    ),
+  const cast = techniqueCastSeconds(
+    tech,
+    mastery,
+    content,
+    nonNativeLevel(tech.skill, snap.natures ?? [], skillLvl, content),
   );
   const base =
     need(pool === 'stamina' ? K.staminaCost[rank] : K.chakraCost[rank], `cost.${rank}`) * role.c;

@@ -161,7 +161,10 @@ describe('Stun', () => {
     expect(e.timer.progress).toBe(progress);
     fightAdvance(fight, sec(seconds), content, idle);
     expect(findEffect(e, 'stun')).toBeUndefined();
-    expect(speedOf(e)).toBe(1000);
+    // The technique carries the interrupting tag, which leaves its own status (a slower rhythm) after the stun.
+    expect(speedOf(e)).toBe(
+      findEffect(e, 'interrupt') ? Math.round(1000 * (1 - K.rhythm.slow)) : 1000,
+    );
   });
 
   it('refreshes on a second stun and never stacks', () => {

@@ -608,6 +608,22 @@ export function repairMissions(state: GameState, content: ContentDb, rules: Rule
     const fightHere = state.combat?.owner === at;
     const fightFits = wanted === null ? !fightHere : fightHere && state.combat?.enemy === wanted;
     if (run && fightFits) return;
+    // A run whose fight is gone (a save of an older fight loop) keeps its stage, attempts and ration: the stage's
+    // fight starts afresh. The run restarts only when no fight can be made for it.
+    if (run && wanted !== null && state.combat === null) {
+      const entry = entryOf(content, wanted);
+      if (entry && stage?.t === 'combat') {
+        state.combat = newMissionCombat(
+          state,
+          entry,
+          supportOf(state, mission, content),
+          content,
+          rules,
+          at,
+        );
+        return;
+      }
+    }
     if (fightHere) state.combat = null;
     slot.progress = 0;
     if (!beginRun(state, at, mission, content, rules)) {

@@ -54,7 +54,9 @@
   },
   "core:clone": {
     "effect": {
-      "kind": "decoy",
+      "kind": "none"
+    },
+    "passive": {
       "fx": "decoy"
     }
   },
@@ -65,10 +67,11 @@
   },
   "core:body_replacement": {
     "effect": {
-      "kind": "passiveNegate",
-      "fx": "passiveNegate"
+      "kind": "none"
     },
-    "outOfLoadout": true
+    "passive": {
+      "fx": "passiveNegate"
+    }
   },
   "core:body_flicker": {
     "effect": {
@@ -207,19 +210,25 @@
   },
   "core:earth_style_wall": {
     "effect": {
-      "kind": "shield",
+      "kind": "none"
+    },
+    "passive": {
       "fx": "shield"
     }
   },
   "core:hiding_in_mist": {
     "effect": {
-      "kind": "evasionBuff",
+      "kind": "none"
+    },
+    "passive": {
       "fx": "evasionBuff"
     }
   },
   "core:water_clone": {
     "effect": {
-      "kind": "decoy",
+      "kind": "none"
+    },
+    "passive": {
       "fx": "decoy"
     }
   },
@@ -245,7 +254,9 @@
   },
   "core:water_formation_wall": {
     "effect": {
-      "kind": "shield",
+      "kind": "none"
+    },
+    "passive": {
       "fx": "shield"
     }
   }
