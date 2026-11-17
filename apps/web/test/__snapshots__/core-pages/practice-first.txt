@@ -1,21 +1,1106 @@
 <main class="main">
-  <div class="ui-page" data-page="core:entity" data-ui="page">
-    <article class="entity-page" data-entity="practice:core:tykha_kimnata" data-ui="entity-page">
-      <p class="kind">
-        Практика
-      <h1 data-ui="entity-header">
-        <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
-          <path d="#800-1enpkv5" fill="currentColor">
-        Тиха кімната
-      <p class="placeholder">
-        Сторінка цієї сутності з'явиться на наступних етапах.
-      <section data-entity-links="" data-ui="entity-section">
+  <div class="layer">
+    <button aria-hidden="true" class="backdrop" tabindex="-1" type="button">
+    <div aria-label="Тиха кімната" aria-modal="true" class="sheet" data-entity="practice:core:tykha_kimnata" data-ui="sheet" role="dialog" tabindex="-1">
+      <div class="bar">
+        <button class="close" data-sheet-close="" type="button">
+          <span class="phone">
+            <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+              <path d="#21-14x91bd" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            Назад
+          <span class="desk">
+            <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+              <path d="#20-zr2y6e" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            Закрити
+      <div class="body">
+        <article class="entity-page" data-entity="practice:core:tykha_kimnata" data-ui="entity-page">
+          <p class="kind">
+            Практика
+          <h1 data-ui="entity-header">
+            <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+              <path d="#800-1enpkv5" fill="currentColor">
+            Тиха кімната
+          <p class="placeholder">
+            Сторінка цієї сутності з'явиться на наступних етапах.
+          <section data-entity-links="" data-ui="entity-section">
+            <h2>
+              Пов'язане
+            <ul class="links">
+              <li>
+                <a class="entity-link" href="#/skill/cc">
+                  Контроль чакри
+              <li>
+                <a class="entity-link" href="#/skill/nin">
+                  Ніндзюцу
+  <div class="ui-page" data-page="core:entity.skill" data-ui="page">
+    <article class="skill-page" data-entity="skill:med" data-skill="med" data-ui="entity-page">
+      <header class="plate" data-ui="entity-header">
+        <h1>
+          <span class="plate-icon" style="color: var(--steel);">
+            <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+              <path d="#1454-1ow43cq" fill="currentColor">
+          Медитація
+        <span class="level">
+          Рів. 1
+      <p class="lore">
+        Медитація заспокоює розум і збільшує запас та відновлення чакри.
+      <p class="unlock">
+        Академія, з першого дня.
+      <section data-ui="entity-section">
         <h2>
-          Пов'язане
-        <ul class="links">
-          <li>
-            <a class="entity-link" href="#/skill/cc">
-              Контроль чакри
-          <li>
-            <a class="entity-link" href="#/skill/nin">
-              Ніндзюцу
+          Дії
+        <ul class="tiles">
+          <li class="tile" data-action="core:tykha_kimnata" data-entity="practice:core:tykha_kimnata" data-highlighted="" data-ui="action-tile">
+            <div class="top">
+              <span class="emblem md" data-emblem-icon="silence" data-emblem-kind="practice" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#800-1enpkv5" fill="currentColor">
+              <div class="main">
+                <div class="head">
+                  <h3 class="name">
+                    <a class="entity-link" href="#/practice/core:tykha_kimnata">
+                      Тиха кімната
+                  <span class="corner">
+                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                        <circle class="track" cx="22" cy="22" r="18">
+                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                      <span class="level">
+                        1
+                    <button aria-label="Закріпити як мету" class="pin" data-entity="practice:core:tykha_kimnata" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <dl class="facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  1
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  3 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      5 184 дос./год
+            <button class="action" type="button">
+              Почати
+          <li class="tile locked" data-action="core:medytatsiia_v_rusi" data-entity="practice:core:medytatsiia_v_rusi" data-ui="action-tile">
+            <div class="top">
+              <span class="emblem md" data-emblem-icon="footsteps" data-emblem-kind="practice" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#945-1rra7yu" fill="currentColor">
+              <div class="main">
+                <div class="head">
+                  <h3 class="name">
+                    <a class="entity-link" href="#/practice/core:medytatsiia_v_rusi">
+                      Медитація в русі
+                  <span class="corner">
+                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                        <circle class="track" cx="22" cy="22" r="18">
+                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                      <span class="level">
+                        1
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="practice:core:medytatsiia_v_rusi" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <dl class="facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  10
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  3 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      10 363 дос./год
+            <div class="req">
+              <p class="locked-label">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row" data-entity="skill:med" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/med">
+                          Медитація
+                        <span class="detail">
+                          рів. 10
+                      <span class="count">
+                        1/10
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 10%;">
+              <p class="pin-caption">
+                <button class="link" data-entity="practice:core:medytatsiia_v_rusi" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
+          <li class="tile locked" data-action="core:lisove_sviatylyshche" data-entity="practice:core:lisove_sviatylyshche" data-ui="action-tile">
+            <div class="top">
+              <span class="emblem md" data-emblem-icon="temple-gate" data-emblem-kind="practice" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#431-6fn8xf" fill="currentColor">
+              <div class="main">
+                <div class="head">
+                  <h3 class="name">
+                    <a class="entity-link" href="#/practice/core:lisove_sviatylyshche">
+                      Лісове святилище
+                  <span class="corner">
+                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                        <circle class="track" cx="22" cy="22" r="18">
+                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                      <span class="level">
+                        1
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="practice:core:lisove_sviatylyshche" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <dl class="facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  20
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  3 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      22 373 дос./год
+            <div class="req">
+              <p class="locked-label">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row" data-entity="skill:med" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/med">
+                          Медитація
+                        <span class="detail">
+                          рів. 20
+                      <span class="count">
+                        1/20
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 5%;">
+              <p class="pin-caption">
+                <button class="link" data-entity="practice:core:lisove_sviatylyshche" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
+          <li class="tile locked" data-action="core:bilia_vohnyshcha" data-entity="practice:core:bilia_vohnyshcha" data-ui="action-tile">
+            <div class="top">
+              <span class="emblem md" data-emblem-icon="campfire" data-emblem-kind="practice" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#1555-6a6qpr" fill="currentColor">
+              <div class="main">
+                <div class="head">
+                  <h3 class="name">
+                    <a class="entity-link" href="#/practice/core:bilia_vohnyshcha">
+                      Біля вогнища
+                  <span class="corner">
+                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                        <circle class="track" cx="22" cy="22" r="18">
+                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                      <span class="level">
+                        1
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="practice:core:bilia_vohnyshcha" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <dl class="facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  30
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  3 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      48 301 дос./год
+            <div class="req">
+              <p class="locked-label">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row" data-entity="skill:med" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/med">
+                          Медитація
+                        <span class="detail">
+                          рів. 30
+                      <span class="count">
+                        1/30
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 3.3333333333333335%;">
+              <p class="pin-caption">
+                <button class="link" data-entity="practice:core:bilia_vohnyshcha" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
+          <li class="tile locked" data-action="core:pid_vodospadom" data-entity="practice:core:pid_vodospadom" data-ui="action-tile">
+            <div class="top">
+              <span class="emblem md" data-emblem-icon="waterfall" data-emblem-kind="practice" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#2837-1y5vck7" fill="currentColor">
+              <div class="main">
+                <div class="head">
+                  <h3 class="name">
+                    <a class="entity-link" href="#/practice/core:pid_vodospadom">
+                      Під водоспадом
+                  <span class="corner">
+                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                        <circle class="track" cx="22" cy="22" r="18">
+                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                      <span class="level">
+                        1
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="practice:core:pid_vodospadom" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <dl class="facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  40
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  3 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      104 278 дос./год
+            <div class="req">
+              <p class="locked-label">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row" data-entity="skill:med" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/med">
+                          Медитація
+                        <span class="detail">
+                          рів. 40
+                      <span class="count">
+                        1/40
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 2.5%;">
+              <p class="pin-caption">
+                <button class="link" data-entity="practice:core:pid_vodospadom" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
+          <li class="tile locked" data-action="core:sad_kameniv" data-entity="practice:core:sad_kameniv" data-ui="action-tile">
+            <div class="top">
+              <span class="emblem md" data-emblem-icon="stone-stack" data-emblem-kind="practice" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#2031-1pmyd7g" fill="currentColor">
+              <div class="main">
+                <div class="head">
+                  <h3 class="name">
+                    <a class="entity-link" href="#/practice/core:sad_kameniv">
+                      Сад каменів
+                  <span class="corner">
+                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                        <circle class="track" cx="22" cy="22" r="18">
+                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                      <span class="level">
+                        1
+                    <button aria-label="Закріпити як мету" class="pin always" data-entity="practice:core:sad_kameniv" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                      <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                        <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <dl class="facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  50
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  3 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      225 128 дос./год
+            <div class="req">
+              <p class="locked-label">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row" data-entity="skill:med" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/med">
+                          Медитація
+                        <span class="detail">
+                          рів. 50
+                      <span class="count">
+                        1/50
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 2%;">
+              <p class="pin-caption">
+                <button class="link" data-entity="practice:core:sad_kameniv" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
+      <section aria-label="Практики: Прозріння й Просвітлення" class="meditation" data-meditation="">
+        <h2>
+          Практики: Прозріння й Просвітлення
+        <ul class="practices">
+          <li class="practice" data-entity="practice:core:tykha_kimnata" data-practice="core:tykha_kimnata">
+            <h3>
+              <a class="entity-link" href="#/practice/core:tykha_kimnata">
+                Тиха кімната
+              <span class="pin-end">
+                <button aria-label="Закріпити як мету" class="pin" data-entity="practice:core:tykha_kimnata" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <p class="counts">
+              <span data-insight="">
+                Прозріння: 0
+              <span data-enlight="">
+                Просвітлення: 0
+            <ul class="mods">
+              <li class="mod" data-mod="insight.0">
+                <p class="text">
+                  <span class="kind">
+                    Прозріння
+                  +8% досвіду Контролю чакри
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 8
+                  <span>
+                    Наступний рівень коштує 1
+                  <span>
+                    Майстерність практики: 1
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="insight.1">
+                <p class="text">
+                  <span class="kind">
+                    Прозріння
+                  +8% досвіду Ніндзюцу
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 8
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 40
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="insight.2">
+                <p class="text">
+                  <span class="kind">
+                    Прозріння
+                  −8% часу вправ Контролю чакри
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 8
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 80
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="enlight.0">
+                <p class="text">
+                  <span class="kind">
+                    Просвітлення
+                  −5% вартості чакри нестихійних технік
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 5
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 20
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="enlight.1">
+                <p class="text">
+                  <span class="kind">
+                    Просвітлення
+                  +5% до спільного пулу тіньових клонів
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 5
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 60
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="enlight.2">
+                <p class="text">
+                  <span class="kind">
+                    Просвітлення
+                  +5% досвіду Майстерності технік Ніндзюцу
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 5
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 99
+                <button disabled="" type="button">
+                  Купити
+          <li class="practice" data-entity="practice:core:medytatsiia_v_rusi" data-practice="core:medytatsiia_v_rusi">
+            <h3>
+              <a class="entity-link" href="#/practice/core:medytatsiia_v_rusi">
+                Медитація в русі
+              <span class="pin-end">
+                <button aria-label="Закріпити як мету" class="pin" data-entity="practice:core:medytatsiia_v_rusi" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <p class="counts">
+              <span data-insight="">
+                Прозріння: 0
+              <span data-enlight="">
+                Просвітлення: 0
+            <ul class="mods">
+              <li class="mod" data-mod="insight.0">
+                <p class="text">
+                  <span class="kind">
+                    Прозріння
+                  +8% досвіду Тайдзюцу
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 8
+                  <span>
+                    Наступний рівень коштує 1
+                  <span>
+                    Майстерність практики: 1
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="insight.1">
+                <p class="text">
+                  <span class="kind">
+                    Прозріння
+                  +8% досвіду Ухилення
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 8
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 40
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="insight.2">
+                <p class="text">
+                  <span class="kind">
+                    Прозріння
+                  +8% пулу витривалості
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 8
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 80
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="enlight.0">
+                <p class="text">
+                  <span class="kind">
+                    Просвітлення
+                  +2,5% шансу ухилитися
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 5
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 20
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="enlight.1">
+                <p class="text">
+                  <span class="kind">
+                    Просвітлення
+                  −5% витрат витривалості на тайдзюцу
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 5
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 60
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="enlight.2">
+                <p class="text">
+                  <span class="kind">
+                    Просвітлення
+                  −10% часу загоєння Ран від брам
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 5
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 99
+                <button disabled="" type="button">
+                  Купити
+          <li class="practice" data-entity="practice:core:lisove_sviatylyshche" data-practice="core:lisove_sviatylyshche">
+            <h3>
+              <a class="entity-link" href="#/practice/core:lisove_sviatylyshche">
+                Лісове святилище
+              <span class="pin-end">
+                <button aria-label="Закріпити як мету" class="pin" data-entity="practice:core:lisove_sviatylyshche" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <p class="counts">
+              <span data-insight="">
+                Прозріння: 0
+              <span data-enlight="">
+                Просвітлення: 0
+            <ul class="mods">
+              <li class="mod" data-mod="insight.0">
+                <p class="text">
+                  <span class="kind">
+                    Прозріння
+                  +8% досвіду Травництва
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 8
+                  <span>
+                    Наступний рівень коштує 1
+                  <span>
+                    Майстерність практики: 1
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="insight.1">
+                <p class="text">
+                  <span class="kind">
+                    Прозріння
+                  +8% досвіду Алхімії
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 8
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 40
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="insight.2">
+                <p class="text">
+                  <span class="kind">
+                    Прозріння
+                  +8 до запасу всіх кущів
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 8
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 80
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="enlight.0">
+                <p class="text">
+                  <span class="kind">
+                    Просвітлення
+                  +5% шансу подвійного збору
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 5
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 20
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="enlight.1">
+                <p class="text">
+                  <span class="kind">
+                    Просвітлення
+                  +5% до відновлення HP від мазей і страв
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 5
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 60
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="enlight.2">
+                <p class="text">
+                  <span class="kind">
+                    Просвітлення
+                  +5% шансу зберегти трави при варінні
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 5
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 99
+                <button disabled="" type="button">
+                  Купити
+          <li class="practice" data-entity="practice:core:bilia_vohnyshcha" data-practice="core:bilia_vohnyshcha">
+            <h3>
+              <a class="entity-link" href="#/practice/core:bilia_vohnyshcha">
+                Біля вогнища
+              <span class="pin-end">
+                <button aria-label="Закріпити як мету" class="pin" data-entity="practice:core:bilia_vohnyshcha" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <p class="counts">
+              <span data-insight="">
+                Прозріння: 0
+              <span data-enlight="">
+                Просвітлення: 0
+            <ul class="mods">
+              <li class="mod" data-mod="insight.0">
+                <p class="text">
+                  <span class="kind">
+                    Прозріння
+                  +8% досвіду Катону
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 8
+                  <span>
+                    Наступний рівень коштує 1
+                  <span>
+                    Майстерність практики: 1
+                <p class="locked" data-locked="">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                      <path d="#24-1tb3nx8">
+                  Не діє, поки немає природи чакри:
+                  <a class="entity-link" href="#/skill/katon">
+                    Катон
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="insight.1">
+                <p class="text">
+                  <span class="kind">
+                    Прозріння
+                  +8% досвіду Провіанту
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 8
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 40
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="insight.2">
+                <p class="text">
+                  <span class="kind">
+                    Прозріння
+                  −8% часу активної станції
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 8
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 80
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="enlight.0">
+                <p class="text">
+                  <span class="kind">
+                    Просвітлення
+                  +2,5% шансу ідеального приготування
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 5
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 20
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="enlight.1">
+                <p class="text">
+                  <span class="kind">
+                    Просвітлення
+                  +10% тривалості Горіння
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 5
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 60
+                <p class="locked" data-locked="">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                      <path d="#24-1tb3nx8">
+                  Не діє, поки немає природи чакри:
+                  <a class="entity-link" href="#/skill/katon">
+                    Катон
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="enlight.2">
+                <p class="text">
+                  <span class="kind">
+                    Просвітлення
+                  +10% зарядів тоніків
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 5
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 99
+                <button disabled="" type="button">
+                  Купити
+          <li class="practice" data-entity="practice:core:pid_vodospadom" data-practice="core:pid_vodospadom">
+            <h3>
+              <a class="entity-link" href="#/practice/core:pid_vodospadom">
+                Під водоспадом
+              <span class="pin-end">
+                <button aria-label="Закріпити як мету" class="pin" data-entity="practice:core:pid_vodospadom" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <p class="counts">
+              <span data-insight="">
+                Прозріння: 0
+              <span data-enlight="">
+                Просвітлення: 0
+            <ul class="mods">
+              <li class="mod" data-mod="insight.0">
+                <p class="text">
+                  <span class="kind">
+                    Прозріння
+                  +8% досвіду Суйтону
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 8
+                  <span>
+                    Наступний рівень коштує 1
+                  <span>
+                    Майстерність практики: 1
+                <p class="locked" data-locked="">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                      <path d="#24-1tb3nx8">
+                  Не діє, поки немає природи чакри:
+                  <a class="entity-link" href="#/skill/suiton">
+                    Суйтон
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="insight.1">
+                <p class="text">
+                  <span class="kind">
+                    Прозріння
+                  +8% досвіду Атлетики
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 8
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 40
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="insight.2">
+                <p class="text">
+                  <span class="kind">
+                    Прозріння
+                  −8% вартості будівництва перешкод
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 8
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 80
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="enlight.0">
+                <p class="text">
+                  <span class="kind">
+                    Просвітлення
+                  +10% тривалості Мокрого
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 5
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 20
+                <p class="locked" data-locked="">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                      <path d="#24-1tb3nx8">
+                  Не діє, поки немає природи чакри:
+                  <a class="entity-link" href="#/skill/suiton">
+                    Суйтон
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="enlight.1">
+                <p class="text">
+                  <span class="kind">
+                    Просвітлення
+                  +2,5% до плюсів смуги
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 5
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 60
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="enlight.2">
+                <p class="text">
+                  <span class="kind">
+                    Просвітлення
+                  −5% тривалості місій
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 5
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 99
+                <button disabled="" type="button">
+                  Купити
+          <li class="practice" data-entity="practice:core:sad_kameniv" data-practice="core:sad_kameniv">
+            <h3>
+              <a class="entity-link" href="#/practice/core:sad_kameniv">
+                Сад каменів
+              <span class="pin-end">
+                <button aria-label="Закріпити як мету" class="pin" data-entity="practice:core:sad_kameniv" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <p class="counts">
+              <span data-insight="">
+                Прозріння: 0
+              <span data-enlight="">
+                Просвітлення: 0
+            <ul class="mods">
+              <li class="mod" data-mod="insight.0">
+                <p class="text">
+                  <span class="kind">
+                    Прозріння
+                  +8% досвіду Дотону
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 8
+                  <span>
+                    Наступний рівень коштує 1
+                  <span>
+                    Майстерність практики: 1
+                <p class="locked" data-locked="">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                      <path d="#24-1tb3nx8">
+                  Не діє, поки немає природи чакри:
+                  <a class="entity-link" href="#/skill/doton">
+                    Дотон
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="insight.1">
+                <p class="text">
+                  <span class="kind">
+                    Прозріння
+                  +8% досвіду Живучості
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 8
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 40
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="insight.2">
+                <p class="text">
+                  <span class="kind">
+                    Прозріння
+                  +8% запасу HP
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 8
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 80
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="enlight.0">
+                <p class="text">
+                  <span class="kind">
+                    Просвітлення
+                  +10% міцності щитів
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 5
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 20
+                <p class="locked" data-locked="">
+                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                      <path d="#24-1tb3nx8">
+                  Не діє, поки немає природи чакри:
+                  <a class="entity-link" href="#/skill/doton">
+                    Дотон
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="enlight.1">
+                <p class="text">
+                  <span class="kind">
+                    Просвітлення
+                  −10% часу загоєння Ран
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 5
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 60
+                <button disabled="" type="button">
+                  Купити
+              <li class="mod closed" data-mod="enlight.2">
+                <p class="text">
+                  <span class="kind">
+                    Просвітлення
+                  +5% захисту
+                <p class="meta">
+                  <span>
+                    Рівень 0 з 5
+                  <span>
+                    Наступний рівень коштує 1
+                  <span class="unmet">
+                    Майстерність практики: 99
+                <button disabled="" type="button">
+                  Купити
+      <section aria-label="Пул Майстерності" class="pool" data-entity="skill:med" data-ui="pool-bar">
+        <h2>
+          Пул Майстерності
+        <p class="amount">
+          0 / 9 000
+        <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="bar" role="progressbar">
+          <span class="fill" style="width: 0%;">
+          <span class="tick" style="left: 10%;">
+          <span class="tick" style="left: 25%;">
+          <span class="tick" style="left: 50%;">
+          <span class="tick" style="left: 95%;">
+        <ul class="checkpoints">
+          <li data-checkpoint="core:pool_med_10">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              10%
+            <span class="text">
+              +5% досвіду Майстерності практик
+            <span class="state" data-active="false">
+              Ще не діє
+          <li data-checkpoint="core:pool_med_25">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              25%
+            <span class="text">
+              +5% до шансу Прозріння (5% → 10%)
+            <span class="state" data-active="false">
+              Ще не діє
+          <li data-checkpoint="core:pool_med_50">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              50%
+            <span class="text">
+              +10% відновлення чакри в бою
+            <span class="state" data-active="false">
+              Ще не діє
+          <li data-checkpoint="core:pool_med_95">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              95%
+            <span class="text">
+              +5% досвіду Майстерності в усіх навичках

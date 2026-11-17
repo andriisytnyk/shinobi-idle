@@ -1148,7 +1148,7 @@
         <h2>
           Тренувальне спорядження
         <div class="gears">
-          <section class="gear" data-gear="core:trenuvalni_manekeny" data-owned="0">
+          <section class="gear" data-entity="gear:core:trenuvalni_manekeny" data-gear="core:trenuvalni_manekeny" data-owned="0">
             <h3 class="name">
               <span class="icon">
                 <svg aria-hidden="true" class="icon" height="24" viewBox="0 0 512 512" width="24">
@@ -1189,7 +1189,7 @@
               Купити
             <p class="ct-why" data-why="level" id="why-gear-core:trenuvalni_manekeny">
               Рівень замалий: потрібен 10.
-          <section class="gear" data-gear="core:serp_i_rukavytsi_travnyka" data-owned="0">
+          <section class="gear" data-entity="gear:core:serp_i_rukavytsi_travnyka" data-gear="core:serp_i_rukavytsi_travnyka" data-owned="0">
             <h3 class="name">
               <span class="icon">
                 <svg aria-hidden="true" class="icon" height="24" viewBox="0 0 512 512" width="24">
@@ -1204,7 +1204,7 @@
               Наступний рівень I. Ціна — Рьо: 300.
             <button class="ct-button" data-buy-gear="core:serp_i_rukavytsi_travnyka" type="button">
               Купити
-          <section class="gear" data-gear="core:perehinnyi_kub" data-owned="0">
+          <section class="gear" data-entity="gear:core:perehinnyi_kub" data-gear="core:perehinnyi_kub" data-owned="0">
             <h3 class="name">
               <span class="icon">
                 <svg aria-hidden="true" class="icon" height="24" viewBox="0 0 512 512" width="24">
@@ -1245,7 +1245,7 @@
               Купити
             <p class="ct-why" data-why="level" id="why-gear-core:perehinnyi_kub">
               Рівень замалий: потрібен 20.
-          <section class="gear" data-gear="core:stantsii_proviantu" data-owned="0">
+          <section class="gear" data-entity="gear:core:stantsii_proviantu" data-gear="core:stantsii_proviantu" data-owned="0">
             <h3 class="name">
               <span class="icon">
                 <svg aria-hidden="true" class="icon" height="24" viewBox="0 0 512 512" width="24">
@@ -1260,7 +1260,7 @@
               Наступний рівень I. Ціна — Рьо: 300.
             <button class="ct-button" data-buy-gear="core:stantsii_proviantu" type="button">
               Купити
-          <section class="gear" data-gear="core:karty_i_kompas" data-owned="0">
+          <section class="gear" data-entity="gear:core:karty_i_kompas" data-gear="core:karty_i_kompas" data-owned="0">
             <h3 class="name">
               <span class="icon">
                 <svg aria-hidden="true" class="icon" height="24" viewBox="0 0 512 512" width="24">

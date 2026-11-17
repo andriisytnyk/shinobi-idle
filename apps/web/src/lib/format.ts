@@ -2,6 +2,7 @@ import { t } from './i18n.ts';
 
 const integer = new Intl.NumberFormat('uk', { maximumFractionDigits: 0 });
 const oneDecimal = new Intl.NumberFormat('uk', { maximumFractionDigits: 1 });
+const twoDecimals = new Intl.NumberFormat('uk', { maximumFractionDigits: 2 });
 
 /** Whole number with Ukrainian digit grouping. */
 export function formatInt(n: number): string {
@@ -11,6 +12,11 @@ export function formatInt(n: number): string {
 /** XP-style figure: no decimals from 100 up, one decimal below. */
 export function formatXp(n: number): string {
   return n >= 100 ? integer.format(n) : oneDecimal.format(n);
+}
+
+/** A multiplier or a base amount with up to two decimals, e.g. `1,15`. */
+export function formatFactor(n: number): string {
+  return twoDecimals.format(n);
 }
 
 /** A bonus factor as a signed percent: 1.1 gives `+10%`, 0.95 gives `−5%`. */
