@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { ReqResult } from '@shinobi/core';
   import { humanId, webRef } from '../lib/entities.ts';
-  import { rankName } from '../lib/vocab.ts';
+  import { currencyName, currencyOf, rankName } from '../lib/vocab.ts';
+  import { game } from '../lib/store.ts';
   import { formatInt } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
   import { nameShown } from '../lib/reveal.ts';
@@ -31,11 +32,14 @@
       req.t === 'item' ||
       req.t === 'building' ||
       req.t === 'quest' ||
+      req.t === 'currency' ||
       (req.t === 'flag' && node.target > 1),
   );
   const fraction = $derived(
     node.target > 0 ? Math.min(1, Math.max(0, node.current / node.target)) : node.met ? 1 : 0,
   );
+  /** The currency a `currency` row counts: the one with the role. */
+  const currency = $derived(req.t === 'currency' ? currencyOf(game.content, req.role) : null);
   /** A map flag (a point found, a region open) names the place it is about. */
   const flagRef = $derived(req.t === 'flag' ? flagEntity(req.id) : null);
   const flagText = $derived(
@@ -80,6 +84,8 @@
         {#if !node.met}<a class="detail-link" href="#/nature">{t('req.natureLink')}</a>{/if}
       {:else if req.t === 'item'}
         {#if ref}<EntityLink kind={ref.kind} id={ref.id} offered />{/if}
+      {:else if req.t === 'currency'}
+        {currency === null ? t(`req.type.currency`) : currencyName(currency)}
       {:else if req.t === 'rank'}
         {t('req.rank', { rank: rankName(req.rank) })}
       {:else if req.t === 'flag' && flagRef}

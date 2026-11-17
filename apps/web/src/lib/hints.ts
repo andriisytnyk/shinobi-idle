@@ -7,6 +7,7 @@ import {
   examFor,
   levelAt,
   skillLevel,
+  writtenPassed,
   type GameState,
 } from '@shinobi/core';
 
@@ -78,6 +79,55 @@ export const HINTS: readonly HintDef[] = [
   },
   { id: 'clone', when: (state, content) => cloneSlots(state, content).length > 0 },
   { id: 'graduation', when: (state, content) => !isAcademyRank(content, state.player.rank) },
+  // Turning points of the story: a chain asks for payment, a boss opens, a permission opens more missions, the second exam.
+  {
+    id: 'tracking',
+    when: (state, content) =>
+      content.quests.some((q) => {
+        const progress = state.quests[q.id];
+        return (
+          progress !== undefined && !progress.done && q.steps[progress.step]?.objective.t === 'pay'
+        );
+      }),
+  },
+  {
+    id: 'boss',
+    when: (state, content) =>
+      content.zones.some(
+        (z) => z.region === 'boss' && z.unlock !== null && evalReq(state, z.unlock, content).met,
+      ),
+  },
+  {
+    // A mission whose unlock is more than the rank (a permission the story gives) has opened.
+    id: 'missionsOpened',
+    when: (state, content) =>
+      content.missions.some(
+        (m) => m.unlock !== null && m.unlock.t !== 'rank' && evalReq(state, m.unlock, content).met,
+      ),
+  },
+  {
+    id: 'chuninReady',
+    when: (state, content) => {
+      const next = nextExamRank(content, state.player.rank);
+      const exam = next === null ? undefined : examFor(content, next);
+      // The first exam has its own hint; a later one is ready when the checklist holds and the written test is still to take.
+      return (
+        !isAcademyRank(content, state.player.rank) &&
+        exam !== undefined &&
+        exam.then !== undefined &&
+        !writtenPassed(state, exam) &&
+        evalReq(state, exam.checklist, content).met
+      );
+    },
+  },
+  {
+    id: 'examStages',
+    when: (state, content) => {
+      const next = nextExamRank(content, state.player.rank);
+      const exam = next === null ? undefined : examFor(content, next);
+      return exam !== undefined && writtenPassed(state, exam);
+    },
+  },
 ];
 
 export const hintTextKey = (id: string): string => `hint.${id}`;

@@ -11,8 +11,16 @@
           "req": {
             "t": "all",
             "of": [
-              { "t": "skill", "skill": "tai", "level": 5 },
-              { "t": "skill", "skill": "ath", "level": 5 }
+              {
+                "t": "skill",
+                "skill": "tai",
+                "level": 5
+              },
+              {
+                "t": "skill",
+                "skill": "ath",
+                "level": 5
+              }
             ]
           }
         }
@@ -24,8 +32,16 @@
           "req": {
             "t": "all",
             "of": [
-              { "t": "skill", "skill": "cc", "level": 5 },
-              { "t": "skill", "skill": "med", "level": 5 }
+              {
+                "t": "skill",
+                "skill": "cc",
+                "level": 5
+              },
+              {
+                "t": "skill",
+                "skill": "med",
+                "level": 5
+              }
             ]
           }
         }
@@ -37,16 +53,29 @@
           "req": {
             "t": "all",
             "of": [
-              { "t": "technique", "id": "core:clone" },
-              { "t": "technique", "id": "core:transformation" },
-              { "t": "technique", "id": "core:body_replacement" }
+              {
+                "t": "technique",
+                "id": "core:clone"
+              },
+              {
+                "t": "technique",
+                "id": "core:transformation"
+              },
+              {
+                "t": "technique",
+                "id": "core:body_replacement"
+              }
             ]
           }
         }
       },
       {
         "textKey": "quest.core:graduation.step.4",
-        "objective": { "t": "counter", "counter": "kills.core:dummy", "n": 10 }
+        "objective": {
+          "t": "counter",
+          "counter": "kills.core:dummy",
+          "n": 10
+        }
       },
       {
         "textKey": "quest.core:graduation.step.5",
@@ -55,24 +84,57 @@
           "req": {
             "t": "all",
             "of": [
-              { "t": "rank", "rank": "genin" },
-              { "t": "skill", "skill": "tai", "level": 10 },
-              { "t": "skill", "skill": "nin", "level": 10 },
-              { "t": "skill", "skill": "cc", "level": 10 },
-              { "t": "technique", "id": "core:clone" },
-              { "t": "technique", "id": "core:transformation" },
-              { "t": "technique", "id": "core:body_replacement" }
+              {
+                "t": "rank",
+                "rank": "genin"
+              },
+              {
+                "t": "skill",
+                "skill": "tai",
+                "level": 10
+              },
+              {
+                "t": "skill",
+                "skill": "nin",
+                "level": 10
+              },
+              {
+                "t": "skill",
+                "skill": "cc",
+                "level": 10
+              },
+              {
+                "t": "technique",
+                "id": "core:clone"
+              },
+              {
+                "t": "technique",
+                "id": "core:transformation"
+              },
+              {
+                "t": "technique",
+                "id": "core:body_replacement"
+              }
             ]
           }
         }
       }
     ],
-    "rewards": { "items": [], "ryo": 0, "rep": 0, "flags": ["leaf_headband"], "rank": null }
+    "rewards": {
+      "items": [],
+      "ryo": 0,
+      "rep": 0,
+      "flags": ["leaf_headband"],
+      "rank": null
+    }
   },
   {
     "id": "core:mission_board",
     "chain": "core:mission_board",
-    "unlock": { "t": "rank", "rank": "genin" },
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
     "steps": [
       {
         "textKey": "quest.core:mission_board.step.1",
@@ -81,22 +143,644 @@
           "req": {
             "t": "any",
             "of": [
-              { "t": "nature", "nature": "katon" },
-              { "t": "nature", "nature": "futon" },
-              { "t": "nature", "nature": "raiton" },
-              { "t": "nature", "nature": "doton" },
-              { "t": "nature", "nature": "suiton" }
+              {
+                "t": "nature",
+                "nature": "katon"
+              },
+              {
+                "t": "nature",
+                "nature": "futon"
+              },
+              {
+                "t": "nature",
+                "nature": "raiton"
+              },
+              {
+                "t": "nature",
+                "nature": "doton"
+              },
+              {
+                "t": "nature",
+                "nature": "suiton"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "textKey": "quest.core:mission_board.step.2",
+        "objective": {
+          "t": "counter",
+          "counter": "missions.rank.D",
+          "n": 5
+        }
+      },
+      {
+        "textKey": "quest.core:mission_board.step.3",
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "item",
+            "id": "core:mint",
+            "n": 20
+          }
+        }
+      },
+      {
+        "textKey": "quest.core:mission_board.step.4",
+        "objective": {
+          "t": "counter",
+          "counter": "kills.core:arsonist",
+          "n": 5
+        }
+      },
+      {
+        "textKey": "quest.core:mission_board.step.5",
+        "objective": {
+          "t": "counter",
+          "counter": "explored.core:forest",
+          "n": 5
+        }
+      }
+    ],
+    "rewards": {
+      "items": [],
+      "ryo": 400,
+      "rep": 20,
+      "flags": [],
+      "rank": null
+    }
+  },
+  {
+    "id": "core:border_wolves",
+    "chain": "core:border_wolves",
+    "unlock": {
+      "t": "quest",
+      "id": "core:mission_board"
+    },
+    "steps": [
+      {
+        "textKey": "quest.core:border_wolves.step.1",
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "all",
+            "of": [
+              {
+                "t": "flag",
+                "id": "poi.core:poi_prykordonnyi_lis_okolytsia_zone_wolf"
+              },
+              {
+                "t": "flag",
+                "id": "poi.core:poi_prykordonnyi_lis_khashchi_zone_wolfmask"
+              },
+              {
+                "t": "flag",
+                "id": "poi.core:poi_prykordonnyi_lis_brid_story"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "textKey": "quest.core:border_wolves.step.2",
+        "objective": {
+          "t": "pay",
+          "role": "study",
+          "n": 3
+        }
+      },
+      {
+        "textKey": "quest.core:border_wolves.step.3",
+        "objective": {
+          "t": "counter",
+          "counter": "kills.core:bandit",
+          "n": 20
+        }
+      },
+      {
+        "textKey": "quest.core:border_wolves.step.4",
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "item",
+            "id": "core:tsiliushcha_maz",
+            "n": 10
+          }
+        }
+      },
+      {
+        "textKey": "quest.core:border_wolves.step.5",
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "skill",
+            "skill": "cc",
+            "level": 15
+          }
+        }
+      },
+      {
+        "textKey": "quest.core:border_wolves.step.6",
+        "objective": {
+          "t": "counter",
+          "counter": "kills.core:boss_wolf",
+          "n": 1
+        },
+        "opens": ["boss.wolf.unlocked"]
+      }
+    ],
+    "rewards": {
+      "items": [
+        {
+          "item": "core:scroll_temporary_paralysis",
+          "n": 1
+        }
+      ],
+      "ryo": 800,
+      "rep": 30,
+      "flags": ["missions.c.unlocked"],
+      "rank": null
+    }
+  },
+  {
+    "id": "core:grey_bands",
+    "chain": "core:grey_bands",
+    "unlock": {
+      "t": "quest",
+      "id": "core:border_wolves"
+    },
+    "steps": [
+      {
+        "textKey": "quest.core:grey_bands.step.1",
+        "objective": {
+          "t": "counter",
+          "counter": "missions.done.core:caravan",
+          "n": 3
+        }
+      },
+      {
+        "textKey": "quest.core:grey_bands.step.2",
+        "objective": {
+          "t": "pay",
+          "role": "study",
+          "n": 5
+        }
+      },
+      {
+        "textKey": "quest.core:grey_bands.step.3",
+        "objective": {
+          "t": "counter",
+          "counter": "missions.done.core:sealed",
+          "n": 2
+        }
+      },
+      {
+        "textKey": "quest.core:grey_bands.step.4",
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "flag",
+            "id": "poi.core:poi_ruiny_prykordonnoi_fortetsi_story"
+          }
+        }
+      },
+      {
+        "textKey": "quest.core:grey_bands.step.5",
+        "objective": {
+          "t": "counter",
+          "counter": "kills.core:boss_fighter",
+          "n": 1
+        },
+        "opens": ["boss.fighter.unlocked"]
+      },
+      {
+        "textKey": "quest.core:grey_bands.step.6",
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "flag",
+            "id": "region.valley.unlocked"
+          }
+        }
+      },
+      {
+        "textKey": "quest.core:grey_bands.step.7",
+        "objective": {
+          "t": "counter",
+          "counter": "kills.core:boss_hunter",
+          "n": 1
+        },
+        "opens": ["boss.hunter.unlocked"]
+      },
+      {
+        "textKey": "quest.core:grey_bands.step.8",
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "flag",
+            "id": "op.hideout.cleared"
+          }
+        },
+        "opens": ["op.hideout.unlocked"]
+      }
+    ],
+    "rewards": {
+      "items": [],
+      "ryo": 2000,
+      "rep": 30,
+      "flags": ["boss.twins.unlocked", "boss.mist.unlocked"],
+      "rank": null,
+      "goal": {
+        "kind": "exam",
+        "id": "core:chunin_exam"
+      }
+    }
+  },
+  {
+    "id": "core:name_on_stone",
+    "chain": "core:name_on_stone",
+    "unlock": {
+      "t": "quest",
+      "id": "core:grey_bands"
+    },
+    "steps": [
+      {
+        "textKey": "quest.core:name_on_stone.step.1",
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "all",
+            "of": [
+              {
+                "t": "skill",
+                "skill": "vit",
+                "level": 40
+              },
+              {
+                "t": "any",
+                "of": [
+                  {
+                    "t": "skill",
+                    "skill": "tai",
+                    "level": 40
+                  },
+                  {
+                    "t": "skill",
+                    "skill": "nin",
+                    "level": 40
+                  },
+                  {
+                    "t": "skill",
+                    "skill": "katon",
+                    "level": 40
+                  },
+                  {
+                    "t": "skill",
+                    "skill": "futon",
+                    "level": 40
+                  },
+                  {
+                    "t": "skill",
+                    "skill": "raiton",
+                    "level": 40
+                  },
+                  {
+                    "t": "skill",
+                    "skill": "doton",
+                    "level": 40
+                  },
+                  {
+                    "t": "skill",
+                    "skill": "suiton",
+                    "level": 40
+                  }
+                ]
+              },
+              {
+                "t": "skill",
+                "skill": "scout",
+                "level": 20
+              },
+              {
+                "t": "skill",
+                "skill": "ath",
+                "level": 25
+              },
+              {
+                "t": "currency",
+                "role": "renown",
+                "n": 300
+              }
+            ]
+          }
+        }
+      },
+      {
+        "textKey": "quest.core:name_on_stone.step.2",
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "flag",
+            "id": "exam.core:chunin_exam.written"
+          }
+        }
+      },
+      {
+        "textKey": "quest.core:name_on_stone.step.3",
+        "objective": {
+          "t": "counter",
+          "counter": "kills.core:serpent",
+          "also": ["kills.core:leech", "kills.core:fake_genin"],
+          "n": 15
+        },
+        "opens": ["region.exam.unlocked", "op.forest_of_death.unlocked"]
+      },
+      {
+        "textKey": "quest.core:name_on_stone.step.4",
+        "objective": {
+          "t": "counter",
+          "counter": "kills.core:boss_nameless",
+          "n": 1
+        },
+        "opens": ["boss.nameless.unlocked"]
+      },
+      {
+        "textKey": "quest.core:name_on_stone.step.5",
+        "objective": {
+          "t": "pay",
+          "role": "study",
+          "n": 5
+        }
+      },
+      {
+        "textKey": "quest.core:name_on_stone.step.6",
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "flag",
+            "id": "op.tournament.cleared"
+          }
+        },
+        "opens": ["op.tournament.unlocked"]
+      }
+    ],
+    "rewards": {
+      "items": [],
+      "ryo": 3000,
+      "rep": 30,
+      "flags": ["boss.ren2.unlocked"],
+      "rank": null
+    }
+  },
+  {
+    "id": "core:eternal_rivalry",
+    "chain": "core:eternal_rivalry",
+    "unlock": {
+      "t": "all",
+      "of": [
+        {
+          "t": "rank",
+          "rank": "genin"
+        },
+        {
+          "t": "skill",
+          "skill": "ath",
+          "level": 10
+        }
+      ]
+    },
+    "steps": [
+      {
+        "textKey": "quest.core:eternal_rivalry.step.1",
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "skill",
+            "skill": "ath",
+            "level": 15
+          }
+        }
+      },
+      {
+        "textKey": "quest.core:eternal_rivalry.step.2",
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "skill",
+            "skill": "ath",
+            "level": 25
+          }
+        }
+      },
+      {
+        "textKey": "quest.core:eternal_rivalry.step.3",
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "skill",
+            "skill": "vit",
+            "level": 20
+          }
+        }
+      },
+      {
+        "textKey": "quest.core:eternal_rivalry.step.4",
+        "objective": {
+          "t": "counter",
+          "counter": "missions.done.core:v_spar",
+          "n": 3
+        }
+      }
+    ],
+    "rewards": {
+      "items": [
+        {
+          "item": "core:gai_lesson",
+          "n": 1
+        }
+      ],
+      "ryo": 0,
+      "rep": 10,
+      "flags": [],
+      "rank": null
+    }
+  },
+  {
+    "id": "core:outskirts",
+    "chain": "core:outskirts",
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
+    "steps": [
+      {
+        "textKey": "quest.core:outskirts.step.1",
+        "objective": {
+          "t": "counter",
+          "counter": "missions.done.core:v_rubble",
+          "n": 5
+        }
+      },
+      {
+        "textKey": "quest.core:outskirts.step.2",
+        "objective": {
+          "t": "counter",
+          "counter": "missions.elemental.V",
+          "n": 10
+        }
+      },
+      {
+        "textKey": "quest.core:outskirts.step.3",
+        "objective": {
+          "t": "counter",
+          "counter": "missions.done.core:v_seal",
+          "n": 5
+        }
+      },
+      {
+        "textKey": "quest.core:outskirts.step.4",
+        "objective": {
+          "t": "counter",
+          "counter": "kills.core:merc_pack",
+          "n": 10
+        }
+      },
+      {
+        "textKey": "quest.core:outskirts.step.5",
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "any",
+            "of": [
+              {
+                "t": "building",
+                "id": "core:grounds",
+                "level": 6
+              },
+              {
+                "t": "building",
+                "id": "core:shrine",
+                "level": 6
+              },
+              {
+                "t": "building",
+                "id": "core:hospital",
+                "level": 6
+              },
+              {
+                "t": "building",
+                "id": "core:barrier",
+                "level": 6
+              },
+              {
+                "t": "building",
+                "id": "core:farms",
+                "level": 6
+              },
+              {
+                "t": "building",
+                "id": "core:store",
+                "level": 6
+              }
             ]
           }
         }
       }
     ],
-    "rewards": { "items": [], "ryo": 0, "rep": 0, "flags": [], "rank": null }
+    "rewards": {
+      "items": [],
+      "ryo": 600,
+      "rep": 30,
+      "flags": [],
+      "rank": null
+    }
+  },
+  {
+    "id": "core:rival",
+    "chain": "core:rival",
+    "unlock": {
+      "t": "any",
+      "of": [
+        {
+          "t": "nature",
+          "nature": "katon"
+        },
+        {
+          "t": "nature",
+          "nature": "futon"
+        },
+        {
+          "t": "nature",
+          "nature": "raiton"
+        },
+        {
+          "t": "nature",
+          "nature": "doton"
+        },
+        {
+          "t": "nature",
+          "nature": "suiton"
+        }
+      ]
+    },
+    "steps": [
+      {
+        "textKey": "quest.core:rival.step.1",
+        "objective": {
+          "t": "counter",
+          "counter": "natures.gained",
+          "n": 2,
+          "total": true
+        }
+      },
+      {
+        "textKey": "quest.core:rival.step.2",
+        "objective": {
+          "t": "counter",
+          "counter": "kills.core:boss_ren1",
+          "n": 1
+        },
+        "opens": ["boss.ren1.unlocked"]
+      },
+      {
+        "textKey": "quest.core:rival.step.3",
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "quest",
+            "id": "core:name_on_stone",
+            "step": 3
+          }
+        }
+      },
+      {
+        "textKey": "quest.core:rival.step.4",
+        "objective": {
+          "t": "counter",
+          "counter": "kills.core:boss_ren2",
+          "n": 1
+        }
+      }
+    ],
+    "rewards": {
+      "items": [],
+      "scroll": {
+        "library": 3
+      },
+      "ryo": 800,
+      "rep": 30,
+      "flags": [],
+      "rank": null
+    }
   },
   {
     "id": "core:shadow_clones",
     "chain": "core:shadow_clones",
-    "unlock": { "t": "rank", "rank": "genin" },
+    "unlock": {
+      "t": "rank",
+      "rank": "genin"
+    },
     "steps": [
       {
         "textKey": "quest.core:shadow_clones.step.1",
@@ -105,31 +789,79 @@
           "req": {
             "t": "all",
             "of": [
-              { "t": "skill", "skill": "nin", "level": 30 },
-              { "t": "skill", "skill": "med", "level": 20 }
+              {
+                "t": "skill",
+                "skill": "nin",
+                "level": 30
+              },
+              {
+                "t": "skill",
+                "skill": "med",
+                "level": 20
+              }
             ]
           }
         }
       },
       {
         "textKey": "quest.core:shadow_clones.step.2",
-        "objective": { "t": "counter", "counter": "missions.rank.V", "n": 10 },
-        "grants": [{ "item": "core:scroll_chakra_halving_drill", "n": 1 }]
+        "objective": {
+          "t": "counter",
+          "counter": "missions.rank.V",
+          "n": 10
+        },
+        "grants": [
+          {
+            "item": "core:scroll_chakra_halving_drill",
+            "n": 1
+          }
+        ]
       },
       {
         "textKey": "quest.core:shadow_clones.step.3",
-        "objective": { "t": "req", "req": { "t": "skill", "skill": "med", "level": 40 } }
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "skill",
+            "skill": "med",
+            "level": 40
+          }
+        }
       },
       {
         "textKey": "quest.core:shadow_clones.step.4",
-        "objective": { "t": "req", "req": { "t": "skill", "skill": "nin", "level": 50 } }
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "skill",
+            "skill": "nin",
+            "level": 50
+          }
+        }
       },
       {
         "textKey": "quest.core:shadow_clones.step.5",
-        "objective": { "t": "req", "req": { "t": "technique", "id": "core:shadow_clone" } },
-        "grants": [{ "item": "core:scroll_shadow_clone", "n": 1 }]
+        "objective": {
+          "t": "req",
+          "req": {
+            "t": "technique",
+            "id": "core:shadow_clone"
+          }
+        },
+        "grants": [
+          {
+            "item": "core:scroll_shadow_clone",
+            "n": 1
+          }
+        ]
       }
     ],
-    "rewards": { "items": [], "ryo": 0, "rep": 0, "flags": [], "rank": null }
+    "rewards": {
+      "items": [],
+      "ryo": 0,
+      "rep": 0,
+      "flags": [],
+      "rank": null
+    }
   }
 ]

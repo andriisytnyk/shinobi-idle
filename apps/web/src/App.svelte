@@ -4,6 +4,7 @@
   import LoadErrorScreen from './components/LoadErrorScreen.svelte';
   import DevTools from './components/DevTools.svelte';
   import GoalPanel from './components/GoalPanel.svelte';
+  import FinaleModal from './components/FinaleModal.svelte';
   import GraduationModal from './components/GraduationModal.svelte';
   import HintHost from './components/HintHost.svelte';
   import MainNav from './components/MainNav.svelte';
@@ -124,6 +125,8 @@
     <DevTools />
     {#if game.state.player.name === ''}
       <WelcomeModal />
+    {:else if game.finale}
+      <FinaleModal onClose={() => game.dismissFinale()} />
     {:else if game.graduation}
       <GraduationModal onClose={() => game.dismissGraduation()} />
     {/if}

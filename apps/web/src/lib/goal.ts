@@ -5,6 +5,7 @@ import {
   isSkillUnlocked,
   missionGoalReq,
   skillLevel,
+  writtenPassed,
   type GameState,
   type Req,
   type Rules,
@@ -93,6 +94,12 @@ export function goalTree(
   if (ref.kind === 'mission') {
     const mission = content.missions.find((m) => m.id === ref.id);
     return mission ? missionGoalReq(state, mission, content, rules) : null;
+  }
+  // An exam asks its checklist; once the written test is passed, the rest of it.
+  if (ref.kind === 'exam') {
+    const exam = content.exams.find((e) => e.id === ref.id);
+    if (!exam) return null;
+    return exam.then && writtenPassed(state, exam) ? exam.then : exam.checklist;
   }
   const own = goalReq(ref, content);
   const actionKind = GOAL_ACTION[ref.kind] ?? (ref.kind === 'item' ? GATHER : undefined);

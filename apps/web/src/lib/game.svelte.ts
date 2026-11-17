@@ -143,6 +143,8 @@ export function createGame(deps: GameDeps = {}) {
   let logId = 0;
   /** Set when the player has just graduated; the graduation modal clears it. */
   let graduation = $state(false);
+  /** Set when the player has passed the exam that ends the story; the final screen clears it. */
+  let finale = $state(false);
   /** One-off happenings of this session that hints wait for (a craft that ran out of ingredients). */
   let signals = $state.raw<Signals>({});
 
@@ -275,7 +277,9 @@ export function createGame(deps: GameDeps = {}) {
       ) {
         lines.push({ id: ++logId, event });
       } else if (event.type === 'rankUp' && content.exams.some((e) => e.rank === event.rank)) {
-        graduation = true;
+        // An exam that ends the story (the Chunin one ends the slice) has its own screen instead of the promotion dialog.
+        if (content.exams.some((e) => e.rank === event.rank && e.finale === true)) finale = true;
+        else graduation = true;
       }
       if (event.type === 'ruleDisabled' && !noteRule(event.pack, event.rule, event.reason))
         continue;
@@ -379,6 +383,7 @@ export function createGame(deps: GameDeps = {}) {
     setRevealReader(reveal);
     log = [];
     graduation = false;
+    finale = false;
     signals = {};
     lastWall = clock.now();
     touch();
@@ -469,6 +474,10 @@ export function createGame(deps: GameDeps = {}) {
     get graduation(): boolean {
       return graduation;
     },
+    /** Whether the final screen of the slice is due (the last rank was just reached, or the player asked for it again). */
+    get finale(): boolean {
+      return finale;
+    },
     get phase(): Phase {
       return phase;
     },
@@ -535,6 +544,14 @@ export function createGame(deps: GameDeps = {}) {
     },
     dismissGraduation(): void {
       graduation = false;
+    },
+    dismissFinale(): void {
+      finale = false;
+    },
+    /** Opens the final screen again, from the rank page; only once the rank of an exam that ends the story is held. */
+    showFinale(): void {
+      if (content.exams.some((e) => e.rank === state.player.rank && e.finale === true))
+        finale = true;
     },
     /** Developer tool: moves game time forward through `advance`, like waiting would. */
     devAdvance(ms: number): void {

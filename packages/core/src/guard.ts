@@ -122,6 +122,8 @@ export function validReq(x: unknown, depth = 0): x is Req {
       return str(r.id);
     case 'rank':
       return str(r.rank);
+    case 'currency':
+      return str(r.role) && finite(r.n);
     case 'nature':
       return str(r.nature);
     case 'item':
