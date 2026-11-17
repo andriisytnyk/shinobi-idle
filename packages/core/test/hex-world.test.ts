@@ -470,10 +470,15 @@ describe('auto-survey', () => {
   });
 });
 
-describe('the save', () => {
+// Real saves of the game before the map: version 15 goes through 15 -> 16 -> 17, and version 16
+// (the same saves as version 16 of dev wrote them) through 16 -> 17.
+describe.each([
+  [15, 'save-v15-world.json'],
+  [16, 'save-v16-world.json'],
+] as const)('the save of version %i', (version, file) => {
   type Fixture = Record<'fresh' | 'mid' | 'late', string>;
   const saves = JSON.parse(
-    readFileSync(new URL('./fixtures/save-v15-world.json', import.meta.url), 'utf8'),
+    readFileSync(new URL(`./fixtures/${file}`, import.meta.url), 'utf8'),
   ) as Fixture;
   const raw = (name: keyof Fixture) =>
     JSON.parse(saves[name]) as {
@@ -481,12 +486,12 @@ describe('the save', () => {
       state: { world: { explores: Record<string, number>; location: string } };
     };
 
-  it('has the version after the reveal rule', () => {
-    expect(STATE_VERSION).toBeGreaterThanOrEqual(16);
+  it('has the version after the map', () => {
+    expect(STATE_VERSION).toBeGreaterThanOrEqual(17);
   });
 
-  it('loads a real version-15 save with nothing explored: the starting area is surveyed', () => {
-    expect(raw('fresh').v).toBe(15);
+  it('loads a real save with nothing explored: the starting area is surveyed', () => {
+    expect(raw('fresh').v).toBe(version);
     const loaded = deserialize(saves.fresh, content);
     expect(loaded.v).toBe(STATE_VERSION);
     expect(loaded.world.location).toBe(content.regions[0]?.cells[0]);
@@ -494,9 +499,9 @@ describe('the save', () => {
     expect(Object.keys(loaded.world.surveyed).length).toBeGreaterThan(6);
   });
 
-  it('carries explored cells, the position and the found points over a real version-15 save', () => {
+  it('carries explored cells, the position and the found points over a real save', () => {
     const before = raw('mid');
-    expect(before.v).toBe(15);
+    expect(before.v).toBe(version);
     const loaded = deserialize(saves.mid, content);
     for (const [id, n] of Object.entries(before.state.world.explores))
       expect(loaded.world.explores[id], id).toBe(n);
