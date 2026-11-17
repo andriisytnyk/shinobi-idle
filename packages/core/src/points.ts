@@ -169,6 +169,13 @@ export function pay(state: GameState, content: ContentDb, rules: Rules, payout: 
  */
 export function settlePoints(state: GameState, content: ContentDb, rules: Rules): void {
   if (pointIndex(content).all.length === 0) return;
+  // The usual case, run after every event: the character alone, on a hex with nothing left to find.
+  if (!state.world.figures) {
+    const here = positionHex(state, content, 0);
+    if (!here) return;
+    if (pointsAtHex(content, hexKey(here.q, here.r)).every((p) => state.world.pois[p.id] === true))
+      return;
+  }
   for (let round = 0; round <= pointIndex(content).all.length; round++) {
     let found = false;
     for (const { slot, key } of performers(state, content)) {
@@ -279,8 +286,19 @@ export function mapMastery(state: GameState, content: ContentDb): MapMastery {
 }
 
 /** The modifiers of the reached tiers of the map mastery (source: the localization key `mod.source.mapMastery`). */
+const NO_MODS: Modifier[] = [];
+/** The last answer of the provider for a state: good while the surveyed land and the natures stay as they were (the providers are asked all the time). */
+const masteryKept = new WeakMap<
+  GameState,
+  { revision: number; natures: string; mods: Modifier[] }
+>();
+
 export const masteryProvider: ModifierProvider = (state, content) => {
-  if (content.balance.K.map.mastery.length === 0) return [];
+  if (content.balance.K.map.mastery.length === 0) return NO_MODS;
+  const revision = worldRevision(state);
+  const natures = state.player.natures.join(',');
+  const kept = masteryKept.get(state);
+  if (kept && kept.revision === revision && kept.natures === natures) return kept.mods;
   const out: Modifier[] = [];
   for (const tier of mapMastery(state, content).tiers) {
     if (!tier.reached) continue;
@@ -294,5 +312,7 @@ export const masteryProvider: ModifierProvider = (state, content) => {
           source: 'mod.source.mapMastery',
         });
   }
-  return out;
+  const mods = out.length === 0 ? NO_MODS : out;
+  masteryKept.set(state, { revision, natures, mods });
+  return mods;
 };
