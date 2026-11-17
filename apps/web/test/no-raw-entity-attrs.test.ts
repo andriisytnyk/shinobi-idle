@@ -57,13 +57,9 @@ const ALLOWED: Record<string, string> = {
   'components/BuildingCard.svelte': 'buildings have no reveal rule: always shown',
   'components/BuildingNeed.svelte': 'buildings: always shown',
   'sheets/BuildingSheet.svelte': 'buildings: always shown',
-  'components/CellPanel.svelte':
-    'the panel opens only for a cell the map shows by name or more (a hidden cell has no tile)',
-  'components/CellTile.svelte':
-    'a tile is drawn only for the cells of a region shown by name; a cell of it is at least by name',
+  'components/HexPanel.svelte':
+    'the cell and its points come from the hex view, which names them only once the hex is surveyed; a place is a hex fact, not an entity',
   'components/ZoneWhere.svelte': 'a zone is listed only when its cell is explored',
-  'components/RegionEntry.svelte':
-    'drawn only for an open region, which is shown by name (actionable)',
   'components/CoursePanel.svelte': 'obstacles: always shown',
   'components/Hint.svelte': 'a hint id is a text id, not an entity',
   'pages/HelpPage.svelte': 'a hint id is a text id, not an entity',
@@ -101,7 +97,6 @@ const ALLOWED: Record<string, string> = {
   'pages/SettingsPage.svelte': 'packs and settings, not entities',
   'pages/ShopPage.svelte': 'section and currency ids, not entities',
   'pages/VillagePage.svelte': 'village resources: always shown',
-  'pages/WorldPage.svelte': 'region tabs: the id attribute is masked by idAttr, the rest is state',
   'components/GearLine.svelte':
     'the why-text ids of a gear line: a line is offered by its skill page (at least by name)',
   'components/HerbTile.svelte':

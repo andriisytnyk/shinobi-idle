@@ -303,6 +303,7 @@ describe('the public lists', () => {
       'missions.header',
       'mission.header',
       'mission.footer',
+      'map.panel',
       'page.footer',
     ]);
     expect(SLOT_NAMES.every(isSlotName)).toBe(true);

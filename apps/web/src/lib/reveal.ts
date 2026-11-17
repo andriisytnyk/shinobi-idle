@@ -32,7 +32,7 @@ export function setRevealReader(next: RevealReader | null): void {
 
 /** How much of an entity may be shown now. */
 export const revealLevel = (ref: EntityRef): RevealLevel =>
-  disabled ? 'full' : (reader?.level(ref) ?? 'full');
+  disabled || ref.kind === 'hex' ? 'full' : (reader?.level(ref) ?? 'full');
 
 /** The hint text key for an entity that is not fully shown, or null. */
 export const revealHintKey = (ref: EntityRef): string | null =>

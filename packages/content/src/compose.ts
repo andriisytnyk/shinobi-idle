@@ -38,6 +38,8 @@ export const ENTITY_LISTS = [
   'entityKinds',
   'trophies',
   'gearFx',
+  'terrains',
+  'countries',
   'skills',
   'seals',
   'techniques',
@@ -52,6 +54,8 @@ export const ENTITY_LISTS = [
   'team',
   'regions',
   'cells',
+  'places',
+  'links',
   'enemies',
   'bosses',
   'buildings',
@@ -68,11 +72,12 @@ export const ENTITY_LISTS = [
 
 const ENTITY_LIST_SET: ReadonlySet<string> = new Set(ENTITY_LISTS);
 
-/** Lists whose entries have no id of their own: the field that names the entry. */
-const KEYED_LISTS: ReadonlyMap<string, string> = new Map([
-  ['market', 'item'],
-  ['shop', 'item'],
-  ['coat', 'product'],
+/** Lists whose entries have no id of their own: what names the entry (a field, or the coordinates of a hex). */
+const KEYED_LISTS: ReadonlyMap<string, (e: Plain) => string> = new Map([
+  ['market', (e: Plain) => String(e.item)],
+  ['shop', (e: Plain) => String(e.item)],
+  ['coat', (e: Plain) => String(e.product)],
+  ['hexes', (e: Plain) => `${String(e.q)},${String(e.r)}`],
 ]);
 
 /** Keys that would reach the prototype chain; they are never valid in pack data. */
@@ -289,6 +294,7 @@ function applyPatch(
   pack: string,
   patch: Patch,
   lists: Map<string, Plain[]>,
+  hexes: Plain[],
   patched: Set<string>,
   patchedBy: Map<string, string>,
   balance: Plain,
@@ -317,9 +323,18 @@ function applyPatch(
     return;
   }
   const { kind, id } = patch.target;
-  if (!ENTITY_LIST_SET.has(kind)) return fail(pack, `patch targets unknown list "${kind}"`);
-  const entity = lists.get(kind)?.find((e) => e.id === id);
+  // A hex has no id of its own: a patch names it by its coordinates ("q,r") and may set its terrain or country.
+  const isHex = kind === 'hexes';
+  if (!isHex && !ENTITY_LIST_SET.has(kind))
+    return fail(pack, `patch targets unknown list "${kind}"`);
+  const entity = isHex
+    ? hexes.find((e) => `${String(e.q)},${String(e.r)}` === id)
+    : lists.get(kind)?.find((e) => e.id === id);
   if (!entity) return fail(pack, `patch targets ${kind} "${id}", which does not exist`);
+  if (isHex)
+    for (const field of Object.keys(patch.set ?? {}).concat(Object.keys(patch.append ?? {})))
+      if (field !== 'terrain' && field !== 'country')
+        fail(pack, `patch to hex "${id}" may set only "terrain" and "country", not "${field}"`);
   const mark = (field: string) => {
     const key = `${kind}:${id}:${field}`;
     if (patched.has(key))
@@ -351,6 +366,7 @@ const DESCRIBED: Partial<Record<EntityListKey, string>> = {
   bosses: 'boss',
   buildings: 'building',
   resources: 'resource',
+  places: 'place',
   regions: 'region',
   seals: 'seal',
   statuses: 'status',
@@ -377,6 +393,7 @@ export function composeContent(packs: readonly ContentPack[]): ContentDb {
     ['market', []],
     ['shop', []],
     ['coat', []],
+    ['hexes', []],
   ]);
   const owners = new Map<string, string>(); // `${list}:${id}` -> pack
   const patchedBy = new Map<string, string>(); // `${list}:${id}` -> the last pack that patched it
@@ -436,13 +453,13 @@ export function composeContent(packs: readonly ContentPack[]): ContentDb {
       }
     }
 
-    for (const [list, field] of KEYED_LISTS) {
+    for (const [list, keyOf] of KEYED_LISTS) {
       const raw = data[list];
       if (raw === undefined) continue;
       const parsed = LIST_SCHEMAS.get(list)?.safeParse(raw);
       if (!parsed?.success) fail(pid, `${list}: ${issues(parsed?.error)}`);
       for (const e of (parsed?.data ?? []) as Plain[]) {
-        const key = String(e[field]);
+        const key = keyOf(e);
         const k = `${list}:${key}`;
         if (owners.has(k))
           fail(
@@ -533,7 +550,16 @@ export function composeContent(packs: readonly ContentPack[]): ContentDb {
   // Patches run in load order, after everything is merged.
   const patched = new Set<string>();
   for (const { pack, patch } of patches)
-    applyPatch(pack, patch, lists, patched, patchedBy, balance, balanceOwners);
+    applyPatch(
+      pack,
+      patch,
+      lists,
+      keyed.get('hexes') ?? [],
+      patched,
+      patchedBy,
+      balance,
+      balanceOwners,
+    );
 
   // Modifier keys: the families of the composed skills, then each pack's declarations.
   const skills = (lists.get('skills') ?? []) as { id: string; activity: string }[];
@@ -568,6 +594,7 @@ export function composeContent(packs: readonly ContentPack[]): ContentDb {
     market: keyed.get('market'),
     shop: keyed.get('shop'),
     coat: keyed.get('coat'),
+    hexes: keyed.get('hexes'),
     cellKeys: Object.fromEntries(cellKeys),
     ai,
     balance,

@@ -49,8 +49,14 @@ export const UI_PARTS = [
   'shop-good',
   'bank-item',
   'building-card',
-  /** A cell of the world map. */
-  'world-cell',
+  /** The world map: the SVG canvas with its zoom buttons. */
+  'map',
+  /** One hex of the world map; `data-hex` is its `"q,r"` coordinates, `data-state` is `here`, `fog`, `reach` (fog within survey range), `marked`, `partial` or `full`. */
+  'hex',
+  /** The player's token on the map. */
+  'map-token',
+  /** The panel of the selected hex: beside the map, or a bottom sheet on a narrow screen. */
+  'hex-panel',
   /** A point-of-interest row of the cell panel. */
   'poi-row',
   /** A mission's card on the board; carries `data-entity="mission:<id>"`. */
@@ -93,7 +99,6 @@ export const ENTITY_PARTS: readonly UiPart[] = [
   'shop-good',
   'bank-item',
   'building-card',
-  'world-cell',
   'poi-row',
   'mission-card',
   'mission-stage',

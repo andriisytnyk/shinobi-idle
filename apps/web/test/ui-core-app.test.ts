@@ -272,7 +272,9 @@ describe('stable anchors (D11)', () => {
       'shop-good',
       'bank-item',
       'building-card',
-      'world-cell',
+      'map',
+      'hex',
+      'hex-panel',
       'topbar-currency',
     ]) {
       expect(seen, part).toContain(part);

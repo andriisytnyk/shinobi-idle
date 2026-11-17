@@ -29,6 +29,8 @@ export type PackData = {
   market?: ContentDb['market'];
   shop?: ContentDb['shop'];
   coat?: ContentDb['coat'];
+  /** The world grid: hexes keyed by their coordinates. */
+  hexes?: ContentDb['hexes'];
 };
 
 /** A balance fragment: the same shape as `ContentDb['balance']`, with only the leaves the pack sets. */
@@ -36,7 +38,8 @@ export type PackBalance = { K?: Record<string, unknown>; [key: string]: unknown 
 
 /** A reference to one entity of the composed database: its list and its id. */
 export interface PatchTarget {
-  kind: EntityListKey;
+  /** A list of entities with ids, or `hexes` (then `id` is the hex "q,r" and a patch may set only its `terrain` and `country`). */
+  kind: EntityListKey | 'hexes';
   id: string;
 }
 

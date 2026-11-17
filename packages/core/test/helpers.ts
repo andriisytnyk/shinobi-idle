@@ -49,6 +49,11 @@ export function genin(seed = 1): GameState {
   return state;
 }
 
+/** Puts the player on the hex of a cell (short id or full id), without walking. */
+export function teleport(state: GameState, cell: string): void {
+  state.world.location = cell.includes(':') ? cell : `core:${cell}`;
+}
+
 /** Sets building levels of a genin's village directly, for tests that need a shop or a bonus open. */
 export function withBuildings(state: GameState, levels: Record<string, number>): GameState {
   if (!state.village) throw new Error('no village');

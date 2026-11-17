@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { SkillId } from '@shinobi/content';
-  import { exploreIntervalMs, walkMs } from '@shinobi/core';
+  import { exploreIntervalMs, rangeNow, stepTimeHere } from '@shinobi/core';
   import { actionRef } from '../lib/entities.ts';
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
@@ -26,20 +26,20 @@
   const data = $derived(
     game.read((gs) => {
       const action =
-        gs.slots.find((s) => s.action?.kind === 'explore' || s.action?.kind === 'walk')?.action ??
-        null;
-      // A cell in the region the player stands in, and one in another region: the two lengths of a walk.
-      const here = content.cells.find((c) => c.id === gs.world.location)?.region;
-      const first = content.cells.find((c) => c.region === here) ?? content.cells[0];
-      const other = content.cells.find((c) => c.region !== here);
+        gs.slots.find(
+          (s) =>
+            s.action?.kind === 'explore' ||
+            s.action?.kind === 'walk' ||
+            s.action?.kind === 'autosurvey',
+        )?.action ?? null;
       return {
         xp: gs.skills[skill as SkillId]?.xp ?? 0,
         fraction: skillProgress(gs, skill as SkillId).fraction,
         intel: held(gs, study),
         action,
         exploreMs: exploreIntervalMs(gs, content, game.rules),
-        walkMs: first ? walkMs(gs, first, content, game.rules) : 0,
-        walkBetweenMs: other ? walkMs(gs, other, content, game.rules) : 0,
+        range: rangeNow(gs, content),
+        stepMs: stepTimeHere(gs, content, game.rules),
       };
     }),
   );
@@ -63,19 +63,17 @@
     </div>
     <div>
       <dt>{t('scout.walk')}</dt>
-      <dd><ModBreakdown keys={['interval.walk']} display={formatDuration(data.walkMs)} /></dd>
+      <dd><ModBreakdown keys={['interval.walk']} display={formatDuration(data.stepMs)} /></dd>
     </div>
     <div>
-      <dt>{t('scout.walkBetween')}</dt>
-      <dd>
-        <ModBreakdown keys={['interval.walk']} display={formatDuration(data.walkBetweenMs)} />
-      </dd>
+      <dt>{t('scout.range')}</dt>
+      <dd data-scout-range>{t('scout.rangeValue', { n: data.range })}</dd>
     </div>
     <div>
       <dt>{t('scout.current')}</dt>
       <dd data-scout-current>
         {#if current}
-          {@const ref = actionRef(current)}
+          {@const ref = actionRef(current, game.state)}
           <span class="verb"
             >{t(current.kind === 'walk' ? 'world.walking' : 'world.exploring')}</span
           >

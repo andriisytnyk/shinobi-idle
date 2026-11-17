@@ -57,6 +57,8 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     currencies: ids(db.currencies),
     trophies: ids(db.trophies),
     gearFx: ids(db.gearFx),
+    terrains: ids(db.terrains),
+    countries: ids(db.countries),
     entityKinds: ids(db.entityKinds),
     cellKeys: new Set(Object.keys(db.cellKeys)),
     items: ids(db.items),
@@ -448,6 +450,56 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
   for (const r of db.regions) {
     at('regions', r.id);
     refs('cells', r.cells, 'cells');
+  }
+  // ----- the hex grid -----
+  const hexAt = new Map(db.hexes.map((h) => [`${h.q},${h.r}`, h]));
+  const terrainOf = new Map(db.terrains.map((x) => [x.id, x]));
+  for (const x of db.terrains) {
+    at('terrains', x.id);
+    needNumber('map.terrain', `map.terrain.${x.id}`);
+  }
+  for (const h of db.hexes) {
+    at('hexes', `${h.q},${h.r}`);
+    if (h.country !== undefined) ref('country', h.country, 'countries');
+    if (h.terrain !== undefined) ref('terrain', h.terrain, 'terrains');
+    if (h.terrain !== undefined && h.country === undefined)
+      problem('terrain', 'a playable hex belongs to a country');
+  }
+  /** A hex a cell or a place can stand on: it exists, it is playable and it can be entered. */
+  const standable = (field: string, hex: readonly [number, number]) => {
+    const h = hexAt.get(`${hex[0]},${hex[1]}`);
+    if (!h) return problem(field, `the hex ${hex[0]},${hex[1]} is not on the map`);
+    const kind = h.terrain === undefined ? undefined : terrainOf.get(h.terrain);
+    if (!kind) return problem(field, `the hex ${hex[0]},${hex[1]} is not playable`);
+    if (kind.blocked === true) problem(field, `the hex ${hex[0]},${hex[1]} cannot be entered`);
+  };
+  const cellAt = new Map<string, string>();
+  for (const c of db.cells) {
+    at('cells', c.id);
+    standable('hex', c.hex);
+    const where = `${c.hex[0]},${c.hex[1]}`;
+    const other = cellAt.get(where);
+    if (other !== undefined) problem('hex', `the hex ${where} also holds the cell "${other}"`);
+    else cellAt.set(where, c.id);
+  }
+  for (const p of db.places) {
+    at('places', p.id);
+    standable('hex', p.hex);
+  }
+  const linked = new Set<string>();
+  for (const l of db.links) {
+    at('links', l.id);
+    standable('a', l.a);
+    standable('b', l.b);
+    const dq = l.a[0] - l.b[0];
+    const dr = l.a[1] - l.b[1];
+    const steps = (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
+    if (steps === 0) problem('b', 'a link joins two different hexes');
+    else if (steps === 1)
+      problem('b', 'a link joins hexes that are not neighbours: those are joined already');
+    const pair = [`${l.a[0]},${l.a[1]}`, `${l.b[0]},${l.b[1]}`].sort().join('|');
+    if (linked.has(pair)) problem('b', 'another link joins the same two hexes');
+    linked.add(pair);
   }
   for (const c of db.cells) {
     at('cells', c.id);

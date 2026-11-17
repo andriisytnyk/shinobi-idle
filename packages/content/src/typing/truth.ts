@@ -11,6 +11,7 @@ export interface IdTypes {
   nature: string;
   techSkill: string;
   techRank: string;
+  terrain: string;
   playerRank: string;
   role: string;
   tag: string;
@@ -68,4 +69,5 @@ export interface ShapeTypes {
   sessionMinutes: Record<string, number>;
   sessionHours: Record<string, number>;
   batch: Record<string, number>;
+  terrainFx: Record<string, { walkMin: number; survey: number }>;
 }

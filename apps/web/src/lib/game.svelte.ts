@@ -34,7 +34,7 @@ import {
   type LoadReason,
 } from './persistence.ts';
 import type { Signals } from './hints.ts';
-import { setActiveContent } from './active.ts';
+import { setActiveContent, setActiveState } from './active.ts';
 import { composeBoot } from './boot.ts';
 import { deepFreeze } from './freeze.ts';
 import { detach as detachData } from './read.ts';
@@ -131,6 +131,7 @@ export function createGame(deps: GameDeps = {}) {
   const toasts = deps.toasts ?? defaultToasts;
 
   let state = $state.raw<GameState>(createState(1, content));
+  setActiveState(() => state);
   let version = $state(0);
   let report = $state.raw<AnbuReport | null>(null);
   let phase = $state<Phase>('loading');

@@ -8,7 +8,7 @@ import { defaultRules, type Rules } from './rules.ts';
 import { buyPrice } from './shop.ts';
 import { addShown } from './shown.ts';
 import type { GameState } from './state.ts';
-import { cellLevel, isRegionOpen } from './world.ts';
+import { cellLevel, isRegionOpen, regionHere } from './world.ts';
 
 /*
  * The reveal rule: how much of an entity the player may see. `full`: everything. `name`: the name
@@ -364,8 +364,7 @@ function termHolds(ctx: Ctx, term: RevealTerm, entry: Entry): boolean {
       if (entry.list !== 'regions') return false;
       const at = ctx.catalog.regionAt.get(id);
       if (at === undefined) return false;
-      const here = indexOf(content).cells.get(state.world.location)?.region;
-      if (here === id) return true;
+      if (regionHere(state, content) === id) return true;
       return [at - 1, at + 1].some((i) => {
         const near = content.regions[i];
         return near !== undefined && regionExplored(ctx, near.id);

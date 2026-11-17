@@ -411,6 +411,7 @@ describe('closure of the fields packs added in the review fixes', () => {
         {
           id: 'zz:c',
           region: 'zz:r',
+          hex: [90, 90],
           index: 0,
           key: null,
           story: false,

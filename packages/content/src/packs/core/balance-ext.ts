@@ -73,16 +73,41 @@ export const BALANCE_EXT = {
    */
   natures: { second: 20, third: 40, max: 3, penaltyEnd: 50 },
   /**
-   * Exploration: a cell with no point of interest stops at this level in the slice; a walk takes
-   * 10 minutes within a region and 30 between regions; Athletics shortens explore and walk time by
-   * 0.1% per level, never by more than 10%.
+   * Exploration: a cell with no point of interest stops at this level in the slice; Athletics
+   * shortens explore and walk time by 0.1% per level, never by more than 10%.
    */
   scouting: {
     plainMaxLevel: 3,
-    walkWithinMin: 10,
-    walkBetweenMin: 30,
     athPerLevel: 0.001,
     athCap: 0.1,
+  },
+  /**
+   * The hex map. Minutes to cross a hex by terrain (a road is quickest, hills slowest) and the
+   * factor of the survey time; how far the player can survey by Scouting level; one more hex from a
+   * found outpost; the hexes within 2 steps of the first cell are surveyed from the start; a hex
+   * that is no cell is surveyed twice (6 and 18 surveys) at the pace of Scouting level 1.
+   */
+  map: {
+    terrain: {
+      road: { walkMin: 2, survey: 0.6 },
+      settlement: { walkMin: 2, survey: 0.8 },
+      plains: { walkMin: 3, survey: 0.8 },
+      coast: { walkMin: 3, survey: 1 },
+      forest: { walkMin: 4, survey: 1.2 },
+      river: { walkMin: 4, survey: 1.2 },
+      hills: { walkMin: 5, survey: 1.4 },
+      lake: { walkMin: 6, survey: 1 },
+    },
+    range: [
+      { scout: 0, range: 2 },
+      { scout: 10, range: 3 },
+      { scout: 25, range: 4 },
+      { scout: 40, range: 5 },
+    ],
+    outpostRange: 1,
+    startRadius: 2,
+    plainSurvey: [6, 18],
+    plainScout: 1,
   },
   /**
    * The village: building levels a new Genin starts with (every building not named starts at 0;
