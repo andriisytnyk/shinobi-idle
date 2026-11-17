@@ -131,9 +131,14 @@ describe('A4: Academy page', () => {
     expect(running).not.toContain('class="take ');
   });
 
-  it('shows the passed state after graduation', () => {
+  it('shows the next exam to a Genin and the passed state at the last rank', () => {
+    const next = createState(1, content);
+    next.player.rank = 'genin';
+    game.replaceState(next);
+    expect(html(RankPage, {})).not.toContain('data-passed');
+    expect(html(RankPage, {})).toContain('data-exam="core:chunin_exam"');
     const state = createState(1, content);
-    state.player.rank = 'genin';
+    state.player.rank = 'chunin';
     game.replaceState(state);
     expect(html(RankPage, {})).toContain('data-passed');
   });

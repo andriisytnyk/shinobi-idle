@@ -170,7 +170,10 @@ describe('the app booted with core and testmod (T1)', () => {
   });
 
   it('shows the exam of the rank on the rank page with its requirement tree', async () => {
-    booted = await boot('#/rank');
+    // A Chunin: the exam of the pack is the next one (the Chunin exam of the core is behind them).
+    const gs = state();
+    gs.player.rank = 'chunin';
+    booted = await boot('#/rank', gs);
     const exam = q('[data-exam="testmod:adept_exam"]');
     expect(exam).not.toBeNull();
     const list = exam?.querySelector('[data-checklist]')?.textContent ?? '';

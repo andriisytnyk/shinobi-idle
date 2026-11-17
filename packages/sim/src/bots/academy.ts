@@ -82,6 +82,8 @@ export const academyBot: Bot = {
         : null;
     }
 
+    // The Academy has no payment step.
+    if (objective.t !== 'req') return null;
     const unmet = leaves(evalReq(state, objective.req, content)).filter((r) => !r.met);
     const trained = trainLowest(ctx, unmet, start);
     if (trained !== undefined) return trained;

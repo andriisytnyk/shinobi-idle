@@ -3,7 +3,7 @@ import type { EntityRef } from './entity.ts';
 import { indexOf } from './lookup.ts';
 import type { GameState } from './state.ts';
 import { buildingLevel } from './village-state.ts';
-import { ownsNature, rankIndex, skillEntry } from './vocab.ts';
+import { currencyOf, ownsNature, rankIndex, skillEntry } from './vocab.ts';
 import { levelAt, levelCap } from './xp.ts';
 
 /** The condition tree; the ids in it are open strings. */
@@ -16,6 +16,7 @@ export type Req =
   | { t: 'quest'; id: string; step?: number | undefined }
   | { t: 'building'; id: string; level: number }
   | { t: 'flag'; id: string; n?: number | undefined }
+  | { t: 'currency'; role: string; n: number }
   | { t: 'all'; of: Req[] }
   | { t: 'any'; of: Req[] };
 
@@ -92,6 +93,11 @@ export function evalReq(state: GameState, req: Req, content: ContentDb): ReqResu
       });
     case 'flag':
       return leaf(req, flagValue(state, req.id), req.n ?? 1, null);
+    case 'currency': {
+      // A role no currency has can never be met.
+      const id = currencyOf(content, req.role);
+      return leaf(req, id === null ? 0 : (state.currencies[id] ?? 0), req.n, null);
+    }
     case 'all':
     case 'any': {
       const children = req.of.map((r) => evalReq(state, r, content));

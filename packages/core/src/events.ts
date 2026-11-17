@@ -107,6 +107,11 @@ export interface RankUpEvent extends EventBase {
   type: 'rankUp';
   rank: string;
 }
+/** The written test of an exam taken in two parts was passed; the rest of the exam is open. */
+export interface ExamPassedEvent extends EventBase {
+  type: 'examPassed';
+  exam: string;
+}
 export interface ItemGainedEvent extends EventBase {
   type: 'itemGained';
   id: string;
@@ -252,6 +257,7 @@ export type GameEvent =
   | QuestStepEvent
   | QuestDoneEvent
   | RankUpEvent
+  | ExamPassedEvent
   | ItemGainedEvent
   | ItemUsedEvent
   | GoalSetEvent

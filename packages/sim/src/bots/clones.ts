@@ -77,6 +77,8 @@ export const clonesBot: Bot = {
       return pick ? [...out, ...(start('mission', pick.id) ?? [])] : out.length > 0 ? out : null;
     }
 
+    // A payment step belongs to another chain; the clone chain never asks for one.
+    if (objective.t !== 'req') return out.length > 0 ? out : null;
     const unmet: ReqResult[] = leaves(evalReq(state, objective.req, content)).filter((r) => !r.met);
     // The scroll of the technique the step wants, when it is in the bank.
     for (const leaf of unmet) {

@@ -70,5 +70,29 @@
         "finale": "core:boss_nameless"
       }
     ]
+  },
+  {
+    "id": "core:op_tournament",
+    "unlock": {
+      "t": "flag",
+      "id": "op.tournament.unlocked"
+    },
+    "clearFlag": "op.tournament.cleared",
+    "regen": "opRegen",
+    "rewards": null,
+    "stages": [
+      {
+        "t": "fight",
+        "enemy": "core:foreign_genin"
+      },
+      {
+        "t": "fight",
+        "enemy": "core:foreign_genin"
+      },
+      {
+        "t": "fight",
+        "enemy": "core:boss_ren2"
+      }
+    ]
   }
 ]

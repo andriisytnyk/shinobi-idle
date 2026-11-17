@@ -4,6 +4,7 @@ import {
   evalReq,
   examFor,
   missionDoneKey,
+  NATURES_GAINED,
   type GameState,
   type ReqResult,
 } from '@shinobi/core';
@@ -23,6 +24,18 @@ export function counterMission(counter: string): string | null {
   return counter.startsWith(prefix) ? counter.slice(prefix.length) : null;
 }
 
+/** A label for the counters that name no entity: missions of a rank, village missions with an element stage, natures taken. Null for the rest. */
+export function counterLabel(
+  counter: string,
+): { key: string; params: Record<string, string> } | null {
+  const rank = counter.match(/^missions.rank.(.+)$/);
+  if (rank) return { key: 'quests.missionsRank', params: { rank: rank[1] ?? '' } };
+  if (counter.startsWith('missions.elemental.'))
+    return { key: 'quests.missionsElemental', params: {} };
+  if (counter === NATURES_GAINED) return { key: 'quests.natureGained', params: {} };
+  return null;
+}
+
 /** Where a step stands: finished steps, the active one, and those still to come. */
 export function stepStatus(state: GameState, quest: Quest, index: number): StepStatus {
   const progress = state.quests[quest.id];
@@ -40,13 +53,22 @@ export function counterProgress(
 ): { n: number; of: number } {
   const status = stepStatus(state, quest, index);
   const progress = state.quests[quest.id];
+  const total = [objective.counter, ...(objective.also ?? [])].reduce(
+    (sum, key) => sum + counterValue(state, key),
+    0,
+  );
   const raw =
     status === 'done'
       ? objective.n
       : status === 'pending' || !progress
         ? 0
-        : counterValue(state, objective.counter) - progress.base;
+        : total - (objective.total ? 0 : progress.base);
   return { n: Math.max(0, Math.min(objective.n, raw)), of: objective.n };
+}
+
+/** A requirement result with every row met in full: a finished step shows what it asked, whatever the player holds now. */
+export function asMet(node: ReqResult): ReqResult {
+  return { ...node, met: true, current: node.target, children: node.children.map(asMet) };
 }
 
 /** The first requirement row still unmet, searching a result tree depth first. */
@@ -73,6 +95,14 @@ export function flagPage(id: string, content: ContentDb): string | null {
     return found ? hrefFor({ kind: 'region', id: found.id }) : '#/world';
   }
   if (id.startsWith('deposit.')) return '#/world';
+  // An operation that is a mission of the board or of a place is read on the mission's page; the exam's own parts on the rank page.
+  const op = content.operations.find((o) => o.clearFlag === id);
+  if (op) {
+    return content.missions.some((m) => m.id === op.id)
+      ? hrefFor({ kind: 'mission', id: op.id })
+      : '#/rank';
+  }
+  if (id.startsWith('exam.')) return '#/rank';
   return null;
 }
 
@@ -99,6 +129,9 @@ function pageFor(state: GameState, node: ReqResult, content: ContentDb): string 
       return `#/village/${req.id}`;
     case 'item':
       return itemPlace(req.id, content) ?? '#/bank';
+    case 'currency':
+      // Reputation and Intel come from missions and from exploring.
+      return req.role === 'study' ? '#/world' : '#/missions';
     case 'flag':
       return flagPage(req.id, content) ?? (req.id === 'firstFight' ? '#/combat' : '#/quests');
     default:
@@ -112,10 +145,13 @@ export function objectiveTarget(
   objective: QuestObjective,
   content: ContentDb,
 ): string {
+  // A payment is made on the journal page, from the step's own button.
+  if (objective.t === 'pay') return '#/quests';
   if (objective.t === 'counter') {
     if (counterEnemy(objective.counter) !== null) return '#/combat';
     const mission = counterMission(objective.counter);
     if (mission !== null) return hrefFor({ kind: 'mission', id: mission });
+    if (objective.counter === NATURES_GAINED) return '#/nature';
     // The other mission counters (by rank, in total) are worked on the board.
     if (objective.counter.startsWith('missions.')) return '#/missions';
     // Cells of a region explored: the world page on that region.

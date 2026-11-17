@@ -131,6 +131,10 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
         break;
       case 'flag':
         break;
+      case 'currency':
+        if (!db.currencies.some((x) => x.role === r.role))
+          problem(`${field}.role`, `no currency has the role "${r.role}"`);
+        break;
       case 'all':
       case 'any':
         r.of.forEach((x, i) => req(`${field}.of[${i}]`, x));
@@ -542,10 +546,16 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     req('unlock', q.unlock);
     q.steps.forEach((s, n) => {
       if (s.objective.t === 'req') req(`steps[${n}].objective.req`, s.objective.req);
+      if (
+        s.objective.t === 'pay' &&
+        !db.currencies.some((x) => x.role === (s.objective as { role: string }).role)
+      )
+        problem(`steps[${n}].objective.role`, `no currency has the role "${s.objective.role}"`);
       s.grants?.forEach((x, g) => ref(`steps[${n}].grants[${g}].item`, x.item, 'items'));
     });
     q.rewards.items.forEach((x, n) => ref(`rewards.items[${n}].item`, x.item, 'items'));
     if (q.rewards.rank !== null) ref('rewards.rank', q.rewards.rank, 'ranks');
+    if (q.rewards.goal) ref('rewards.goal.kind', q.rewards.goal.kind, 'entityKinds');
     for (const id of Object.keys(q.rewards.currencies ?? {}))
       ref('rewards.currencies', id, 'currencies');
   }
@@ -578,6 +588,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     at('exams', e.id);
     ref('rank', e.rank, 'ranks');
     req('checklist', e.checklist);
+    req('then', e.then);
     refs('reduceBy', e.reduceBy, 'skills');
     e.rewards.items.forEach((x, n) => ref(`rewards.items[${n}].item`, x.item, 'items'));
     if (e.rewards.goal) ref('rewards.goal.kind', e.rewards.goal.kind, 'entityKinds');

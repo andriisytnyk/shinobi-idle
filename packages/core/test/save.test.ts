@@ -106,7 +106,8 @@ describe('A10: save', () => {
     expect(state.mastery['core:ghost']).toBeUndefined();
     expect(state.known['core:ghost']).toBeUndefined();
     expect(state.bank).toEqual({});
-    expect(state.flags).toEqual({ gate: true });
+    // The played game held two natures, which opened the rival's duel before the save was edited.
+    expect(state.flags).toEqual({ gate: true, 'boss.ren1.unlocked': true });
     expect(state.player.rank).toBe('student');
     expect(state.player.natures).toEqual(['katon']);
     expect(state.rng.combat).toEqual(createState(0, content).rng.combat);
