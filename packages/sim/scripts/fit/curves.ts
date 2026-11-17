@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { writeFileSync } from 'node:fs';
 import { content } from '@shinobi/content';
 import { curveLoss, curves } from '../hit-curves.ts';

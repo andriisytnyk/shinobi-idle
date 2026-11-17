@@ -73,7 +73,7 @@ set(/knowledge:([0-9.]+),/, (v) => r2(v * k.kn, 1));
 set(/enemyAccTier:([0-9.]+),/, (v) => r2(v * k.etA, 1));
 set(/enemyEvaTier:([0-9.]+) \}/, (v) => r2(v * k.etE, 1));
 for (const n of ['shield', 'decoy', 'evasionBuff', 'passiveNegate'])
-  set(new RegExp(`${n}:\{ evasion:([0-9.]+)`), (v) => r2(v * k.ps, 1));
+  set(new RegExp(`${n}:{ evasion:([0-9.]+)`), (v) => r2(v * k.ps, 1));
 set(/eAcc: \[([0-9.]+),/, (v) => r2(v * k.eA0, 1));
 set(/eAcc: \[[0-9.]+,([0-9.]+)\]/, (v) => r2(v * k.eAL, 2));
 set(/eEva: \[([0-9.]+),/, (v) => r2(v * k.eE0, 1));
