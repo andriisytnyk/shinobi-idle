@@ -9,6 +9,8 @@ export interface SettingsData {
   theme: string;
   /** Values of the settings that UI packs registered, by `<packId>:<id>`. */
   ext: Record<string, boolean | string>;
+  /** Ids of the built-in UI packs the player switched on; they start with the next boot. */
+  builtinPacks: string[];
 }
 
 export const SETTINGS_KEY = 'shinobi.settings';
@@ -19,6 +21,7 @@ const defaults = (): SettingsData => ({
   dismissedHints: [],
   theme: 'core:base',
   ext: {},
+  builtinPacks: [],
 });
 
 /** The slice of `localStorage` the settings use. */
@@ -43,6 +46,9 @@ export function parseSettings(text: string | null): SettingsData {
       out.dismissedHints = raw.dismissedHints.filter((h): h is string => typeof h === 'string');
     }
     if (typeof raw.theme === 'string') out.theme = raw.theme;
+    if (Array.isArray(raw.builtinPacks)) {
+      out.builtinPacks = raw.builtinPacks.filter((p): p is string => typeof p === 'string');
+    }
     if (isRecord(raw.ext)) {
       for (const [key, value] of Object.entries(raw.ext)) {
         if (typeof value === 'boolean' || typeof value === 'string') out.ext[key] = value;
@@ -130,6 +136,15 @@ export function createSettings(storage: TextStorage | null = browserStorage()) {
     setExt(key: string, value: boolean | string) {
       data.ext = { ...data.ext, [key]: value };
       revision++;
+      persist();
+    },
+    /** The built-in UI packs that are switched on (they start with the next boot). */
+    get builtinPacks(): readonly string[] {
+      return data.builtinPacks;
+    },
+    setBuiltinPack(id: string, on: boolean) {
+      const rest = data.builtinPacks.filter((p) => p !== id);
+      data.builtinPacks = on ? [...rest, id] : rest;
       persist();
     },
     /** Shows every hint again. */

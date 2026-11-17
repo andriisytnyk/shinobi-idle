@@ -305,6 +305,10 @@ describe('the public lists', () => {
       'mission.footer',
       'map.panel',
       'page.footer',
+      'fight.arena',
+      'prep.verdict',
+      'prep.footer',
+      'bingo.entry',
     ]);
     expect(SLOT_NAMES.every(isSlotName)).toBe(true);
     const registry = createRegistry([coreUi, testmodUi]);

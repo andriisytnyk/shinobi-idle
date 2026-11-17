@@ -3,6 +3,13 @@
     <article class="simple-page">
       <h1>
         Тренувальний бій
+      <nav aria-label="Розділи бою" class="tabs" data-combat-tabs="">
+        <a aria-current="page" class="active" data-combat-tab="fight" href="#/combat">
+          Бій
+        <a data-combat-tab="bingo" href="#/combat/bingo">
+          Бінґо-книга
+        <a data-combat-tab="report" href="#/combat/report">
+          Звіт бою
       <h2>
         З ким битися
       <ul class="cards">
@@ -16,14 +23,17 @@
                 Тренувальний манекен
             <p class="meta">
               Бойовий рівень 2 · Здоров'я 40
-          <div class="starts">
+          <div class="buttons">
+            <a class="prepare" href="#/combat/prepare/zone/core:zone_dummy">
+              Підготуватися
             <button class="start" type="button">
               Почати бій
       <p class="idle">
         Бій не йде. Обери супротивника.
-      <h2>
-        Журнал бою
-      <div aria-label="Журнал бою" aria-live="off" class="log" data-log="" role="log">
-        <p class="empty">
-          Журнал заповниться, щойно бій почнеться.
-        <ul>
+      <details class="log" data-fight-log="">
+        <summary>
+          Журнал бою
+        <div aria-label="Журнал бою" aria-live="off" class="log" data-log="" role="log">
+          <p class="empty">
+            Журнал заповниться, щойно бій почнеться.
+          <ul>

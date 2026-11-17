@@ -161,6 +161,25 @@ describe('the API gives no way to write to the game (A7)', () => {
     expect(ui.getMod('xp.all').total).toBeGreaterThan(0);
   });
 
+  it('gives a pack the rules of the run as a frozen copy: no list can be changed', async () => {
+    booted = await bootApp([coreUi, probe]);
+    const ui = api as unknown as UiApi;
+    const rules = ui.rules;
+    expect(Object.isFrozen(rules)).toBe(true);
+    expect(Object.isFrozen(rules.systems)).toBe(true);
+    expect(Object.isFrozen(rules.fightHooks)).toBe(true);
+    expect(Object.isFrozen(rules.modifierProviders)).toBe(true);
+    const before = game.rules.systems.length;
+    expect(() => (rules.systems as unknown as unknown[]).push({})).toThrow();
+    expect(() => (rules.fightHooks as unknown as unknown[]).pop()).toThrow();
+    expect(() => {
+      (rules as { combatAi: unknown }).combatAi = null;
+    }).toThrow();
+    expect(game.rules.systems.length).toBe(before);
+    // The live game still reads its own, unfrozen rules.
+    expect(Object.isFrozen(game.rules)).toBe(false);
+  });
+
   it('keeps the storage of a pack apart from the save and from other packs', async () => {
     localStorage.clear();
     booted = await bootApp([coreUi, probe, { id: 'other' }]);

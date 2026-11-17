@@ -1,5 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
-import type { Command, CommandResult, GameEvent, GameState, ModResult } from '@shinobi/core';
+import type { Command, CommandResult, GameEvent, GameState, ModResult, Rules } from '@shinobi/core';
 import type { Component } from 'svelte';
 import type { SlotContext, SlotContexts, SlotName } from './slots.ts';
 
@@ -53,6 +53,8 @@ export interface UiApi {
   read<T>(select: (state: GameState) => T): T;
   readonly content: ContentDb;
   readonly core: CoreApi;
+  /** The rules of this boot (the hooks of its packs): the last argument of the forecasts of `api.core` (`startAnalysis`, `stepAnalysis`, `analyzeFight`, `compareLoadouts`). */
+  readonly rules: Rules;
   /** The modifier total and breakdown for a key such as `xp.skill.tai`. */
   getMod(key: string): ModResult;
   t(key: string, params?: Record<string, string | number>): string;

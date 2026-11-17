@@ -140,6 +140,23 @@ export function createUi(packs: readonly UiPack[], deps: UiDeps) {
    * The state as packs see it: one copy per update of the store, shared by every widget and frozen,
    * so that a write to it throws instead of changing what the next reader gets.
    */
+  /**
+   * The rules as packs see them: a copy whose lists are frozen, so that a pack cannot add, drop or swap a
+   * system or a hook of the live game (the entries themselves are the game's own and are not copied).
+   */
+  const frozenRules = (): core.Rules => {
+    const out: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(game.rules)) {
+      out[key] = Array.isArray(value)
+        ? Object.freeze([...value])
+        : value !== null && typeof value === 'object'
+          ? Object.freeze({ ...value })
+          : value;
+    }
+    return Object.freeze(out) as unknown as core.Rules;
+  };
+  const rules = frozenRules();
+
   let snap: { version: number; state: core.GameState } | null = null;
   function snapshot(): core.GameState {
     const version = game.version;
@@ -229,6 +246,7 @@ export function createUi(packs: readonly UiPack[], deps: UiDeps) {
       },
       content: game.content,
       core: corePublic,
+      rules,
       getMod: (key) => core.getMod(snapshot(), key, game.content, game.rules),
       t,
       href: (ref) => hrefFor(ref as EntityRef),

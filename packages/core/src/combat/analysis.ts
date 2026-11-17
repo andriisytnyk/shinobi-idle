@@ -25,7 +25,7 @@ import { voidCount } from './fight-guard.ts';
 import { figure, need } from './need.ts';
 import { createFight, fightAdvance, fightTimeMs } from './fight.ts';
 import { encounterFor } from './fight-encounter.ts';
-import { simulateFights } from './fight-sim.ts';
+import { fightSim } from './fight-sim.ts';
 import type { Encounter, FightState } from './fight-types.ts';
 import { itemAnswers } from './fight-items.ts';
 import { answersTrait, planTarget } from './loadout.ts';
@@ -317,6 +317,15 @@ interface Figures {
   items: Record<string, number>;
 }
 
+/** A batch of plays that is advanced a few plays at a time; the figures do not depend on how it was cut. */
+interface Batch {
+  /** Fight time played so far, in ms. */
+  simulatedMs(): number;
+  /** Plays up to `plays` more; true once the batch is complete. */
+  step(plays: number): boolean;
+  figures(): Figures;
+}
+
 function runZone(
   snap: PlayerSnapshot,
   encounter: Encounter,
@@ -324,8 +333,8 @@ function runZone(
   seed: number,
   content: ContentDb,
   rules: Rules,
-): Figures {
-  const sum = simulateFights(
+): Batch {
+  const sim = fightSim(
     snap,
     encounter,
     samples,
@@ -335,12 +344,19 @@ function runZone(
     content.balance.K.zoneHpRegen,
   );
   return {
-    runs: sum.fights,
-    wins: sum.wins,
-    allMs: sum.timeAllMs,
-    winMs: sum.timeMs.mean,
-    wounds: sum.wounds,
-    items: sum.items,
+    simulatedMs: () => sim.simulatedMs,
+    step: (plays) => sim.step(plays),
+    figures() {
+      const sum = sim.summary();
+      return {
+        runs: sum.fights,
+        wins: sum.wins,
+        allMs: sum.timeAllMs,
+        winMs: sum.timeMs.mean,
+        wounds: sum.wounds,
+        items: sum.items,
+      };
+    },
   };
 }
 
@@ -354,13 +370,15 @@ function runOperation(
   seed: number,
   content: ContentDb,
   rules: Rules,
-): Figures {
+): Batch {
   const K = content.balance.K;
   const steps = opSteps(op);
   const rng = createStream(seed, 'analysis.pick');
   const total: Figures = { runs, wins: 0, allMs: 0, winMs: 0, wounds: 0, items: {} };
   const respawn = secMs(K.respawn);
-  for (let r = 0; r < runs; r++) {
+  let played = 0;
+  let simulatedMs = 0;
+  const play = (r: number): void => {
     let pools: { hp?: number; chakra?: number; stamina?: number } = {};
     let pouch = (snap.pouch ?? []).map((s) => ({ ...s }));
     let wounds = snap.wounds ?? 0;
@@ -416,14 +434,21 @@ function runOperation(
       };
       if (i < steps.length - 1) ms += respawn;
     }
+    simulatedMs += ms;
     total.allMs += ms / runs;
     if (won) {
       total.wins++;
       total.winMs += ms;
     }
-  }
-  total.winMs = total.wins === 0 ? 0 : total.winMs / total.wins;
-  return total;
+  };
+  return {
+    simulatedMs: () => simulatedMs,
+    step(plays) {
+      for (let k = 0; k < plays && played < runs; k++) play(played++);
+      return played >= runs;
+    },
+    figures: () => ({ ...total, winMs: total.wins === 0 ? 0 : total.winMs / total.wins }),
+  };
 }
 
 function nextIntFrom(rng: ReturnType<typeof createStream>, n: number): number {
@@ -618,6 +643,8 @@ export interface AnalysisJob {
   /** The refusal that kept the target from starting in a session, if it did not start. */
   blockedReason: string | null;
   stopped: boolean;
+  /** Game time played by the job so far, in ms: the fights of the first-fight run and the sessions. */
+  simulatedMs: number;
 }
 
 /** The middle of the unit interval. */
@@ -766,6 +793,7 @@ export function startAnalysis(
     share: null,
     blockedReason: null,
     stopped: false,
+    simulatedMs: 0,
   };
 }
 
@@ -778,15 +806,29 @@ function stockOf(state: GameState): Record<string, number> {
   return stock;
 }
 
-/** Plays one session on a detached copy of the state, with a stream set of its own. */
-function playSession(
+/** A session being played on its detached copy of the state, a slice of game time at a time. */
+interface SessionRun {
+  /** Plays up to `ms` of game time more (whole seconds); true once the session is over. */
+  step(ms: number): boolean;
+  /** Game time played so far, in ms. */
+  simulatedMs(): number;
+  /** The record of the session; complete once `step` has returned true. */
+  record(): SessionRecord;
+}
+
+/**
+ * Opens one session on a detached copy of the state, with a stream set of its own. The text of a
+ * refusal when the target cannot start in it. `advance` is split-invariant, so the session gives
+ * the same record however its game time is cut into steps.
+ */
+function openSession(
   job: AnalysisJob,
   found: Resolved,
   label: string,
   removed: readonly string[],
   content: ContentDb,
   rules: Rules,
-): SessionRecord | string {
+): SessionRun | string {
   const clone = deserialize(job.stateText, content, rules);
   clone.rng = createStreams(nextUint32(createStream(job.seed, label)));
   // The forecast for after the supplies: the consumables that ran out are not there.
@@ -866,7 +908,10 @@ function playSession(
   const gain = (items: readonly { id: string; n: number }[]): void => {
     for (const it of items) rec.gained[it.id] = (rec.gained[it.id] ?? 0) + it.n;
   };
-  for (let t = 0; t < job.minutes * MS_PER_MINUTE; t += MS_PER_SECOND) {
+  const length = job.minutes * MS_PER_MINUTE;
+  let t = 0;
+  let over = false;
+  const tick = (): void => {
     advance(clone, MS_PER_SECOND, content, rules);
     for (const e of clone.events) {
       if (e.type === win) {
@@ -891,22 +936,38 @@ function playSession(
     rec.steps++;
     rec.stackSum += clone.wounds.stacks;
     rec.stackMax = Math.max(rec.stackMax, clone.wounds.stacks);
+    t += MS_PER_SECOND;
     // A defeat (or a finished operation) ends the action; this forecast restarts it at once.
-    if (!clone.slots[at]?.action && !start()) break;
-  }
-  const r = clone.report[id];
-  if (!found.op) rec.fights += r?.timeouts ?? 0;
-  rec.wounds = r?.wounds ?? 0;
-  rec.used = { ...(r?.items ?? {}) };
-  for (const k of skills) {
-    const d = (clone.skills[k]?.xp ?? 0) - (xp0[k] ?? 0);
-    if (d > 0) rec.xp[k] = d;
-  }
-  for (const [k, v] of Object.entries(clone.mastery)) {
-    const d = v.xp - (mastery0[k] ?? 0);
-    if (d > 0) rec.mastery[k] = d;
-  }
-  return rec;
+    if (!clone.slots[at]?.action && !start()) over = true;
+  };
+  const finish = (): void => {
+    const r = clone.report[id];
+    if (!found.op) rec.fights += r?.timeouts ?? 0;
+    rec.wounds = r?.wounds ?? 0;
+    rec.used = { ...(r?.items ?? {}) };
+    for (const k of skills) {
+      const d = (clone.skills[k]?.xp ?? 0) - (xp0[k] ?? 0);
+      if (d > 0) rec.xp[k] = d;
+    }
+    for (const [k, v] of Object.entries(clone.mastery)) {
+      const d = v.xp - (mastery0[k] ?? 0);
+      if (d > 0) rec.mastery[k] = d;
+    }
+  };
+  let finished = false;
+  return {
+    step(ms) {
+      const until = Math.min(length, t + ms);
+      while (!over && t < until) tick();
+      if ((over || t >= length) && !finished) {
+        finished = true;
+        finish();
+      }
+      return finished;
+    },
+    simulatedMs: () => t,
+    record: () => rec,
+  };
 }
 
 const rateOf = (r: SessionRecord): number => (r.fights === 0 ? 0 : r.wins / r.fights);
@@ -988,23 +1049,56 @@ function unit(job: AnalysisJob, found: Resolved, content: ContentDb, live: Rules
   }
 }
 
+/**
+ * The game time one step of a session plays, in ms. A unit of work is never longer than this
+ * (a step of the first-fight run is one fight, and a fight is a few milliseconds of work), so a slice
+ * of the forecast stays near its budget whatever the size of the session.
+ */
+export const SESSION_STEP_MS = MS_PER_MINUTE / 2;
+
+/** The fights (or runs of an operation) of a first-fight batch one step plays. */
+const BATCH_STEP = 1;
+
+/**
+ * Work that is under way between two steps: a batch of the first-fight run or a session. It lives next
+ * to the job, not in it (the job is plain JSON); a job that was stored and loaded again plays the
+ * unfinished one from its start, which gives the same figures.
+ */
+interface Open {
+  batch?: Batch;
+  session?: { run: SessionRun; into: 'sessions' | 'after' };
+}
+const open = new WeakMap<AnalysisJob, Open>();
+
 function step(job: AnalysisJob, found: Resolved, content: ContentDb, rules: Rules): boolean {
   const f = job.fresh;
   const A = content.balance.K.analysis;
+  const under = open.get(job) ?? {};
+  open.set(job, under);
+  if (under.session) return stepSession(job, under.session);
   if (f.done < f.batches) {
-    const size = figure(A.batch, found.op ? 'operation' : 'zone', 'analysis.batch');
-    const n = Math.min(size, job.samples - f.done * size);
-    const seed = nextUint32(createStream(job.seed, `fresh.${f.done}`));
-    const fig = found.op
-      ? runOperation(job.snap, found.op, job.encounters, job.approach, n, seed, content, rules)
-      : runZone(
-          job.snap,
-          job.encounters[found.entries[0]?.id ?? ''] as Encounter,
-          n,
-          seed,
-          content,
-          rules,
-        );
+    if (!under.batch) {
+      const size = figure(A.batch, found.op ? 'operation' : 'zone', 'analysis.batch');
+      const n = Math.min(size, job.samples - f.done * size);
+      const seed = nextUint32(createStream(job.seed, `fresh.${f.done}`));
+      under.batch = found.op
+        ? runOperation(job.snap, found.op, job.encounters, job.approach, n, seed, content, rules)
+        : runZone(
+            job.snap,
+            job.encounters[found.entries[0]?.id ?? ''] as Encounter,
+            n,
+            seed,
+            content,
+            rules,
+          );
+    }
+    const batch = under.batch;
+    const before = batch.simulatedMs();
+    const complete = batch.step(BATCH_STEP);
+    job.simulatedMs += batch.simulatedMs() - before;
+    if (!complete) return true;
+    const fig = batch.figures();
+    under.batch = undefined;
     f.done++;
     f.n += fig.runs;
     f.wins += fig.wins;
@@ -1017,14 +1111,16 @@ function step(job: AnalysisJob, found: Resolved, content: ContentDb, rules: Rule
   }
   if (job.stopped) return false;
   if (!decided(job.sessions, job.maxSessions, job.minSessions, content)) {
-    const rec = playSession(job, found, `session.${job.sessions.length}`, [], content, rules);
-    if (typeof rec === 'string') {
-      job.blockedReason = rec;
-      job.stopped = true;
-      return false;
-    }
-    job.sessions.push(rec);
-    return true;
+    return beginSession(
+      job,
+      under,
+      'sessions',
+      `session.${job.sessions.length}`,
+      [],
+      found,
+      content,
+      rules,
+    );
   }
   // The main forecast is done: what runs out within the planning horizon is taken away for the second one.
   job.removed ??= suppliesOf(job)
@@ -1032,16 +1128,52 @@ function step(job: AnalysisJob, found: Resolved, content: ContentDb, rules: Rule
     .map((x) => x.item);
   const least = Math.min(job.minSessions, job.maxAfter);
   if (job.removed.length > 0 && !decided(job.after, job.maxAfter, least, content)) {
-    const rec = playSession(job, found, `after.${job.after.length}`, job.removed, content, rules);
-    if (typeof rec === 'string') {
-      job.stopped = true;
-      return false;
-    }
-    job.after.push(rec);
-    return true;
+    return beginSession(
+      job,
+      under,
+      'after',
+      `after.${job.after.length}`,
+      job.removed,
+      found,
+      content,
+      rules,
+    );
   }
   job.stopped = true;
   return false;
+}
+
+/** Opens the next session of the forecast and plays its first step. */
+function beginSession(
+  job: AnalysisJob,
+  under: Open,
+  into: 'sessions' | 'after',
+  label: string,
+  removed: readonly string[],
+  found: Resolved,
+  content: ContentDb,
+  rules: Rules,
+): boolean {
+  const run = openSession(job, found, label, removed, content, rules);
+  if (typeof run === 'string') {
+    if (into === 'sessions') job.blockedReason = run;
+    job.stopped = true;
+    return false;
+  }
+  under.session = { run, into };
+  return stepSession(job, under.session);
+}
+
+/** Plays one step of the session under way; its record is kept when it is over. */
+function stepSession(job: AnalysisJob, session: NonNullable<Open['session']>): boolean {
+  const before = session.run.simulatedMs();
+  const over = session.run.step(SESSION_STEP_MS);
+  job.simulatedMs += session.run.simulatedMs() - before;
+  if (over) {
+    job[session.into].push(session.run.record());
+    open.set(job, {});
+  }
+  return true;
 }
 
 /** The result so far, complete once the job is finished. Gated by the Bingo levels the job started with. */
@@ -1212,7 +1344,13 @@ export function stepAnalysis(
   const found = resolve(job.target, content);
   if (!found) throw new Error(`analysis target ${job.target.id} is gone`);
   for (let i = 0; i < n && unit(job, found, content, rules); i++);
-  return { progress: analysisProgress(job, content), result: assemble(job, found, content) };
+  // The result is worked out when it is read, so a caller that steps in small slices and reads it at the end pays for it once.
+  return {
+    progress: analysisProgress(job, content),
+    get result(): Analysis {
+      return assemble(job, found, content);
+    },
+  };
 }
 
 /**

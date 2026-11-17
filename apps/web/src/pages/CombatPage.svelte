@@ -1,43 +1,46 @@
 <script lang="ts">
   import {
     cloneCount,
-    counterValue,
     enemyStats,
     evalReq,
     fightSlotIndex,
     isCloneSlot,
-    killsKey,
-    RATE_FULL,
     zoneAvailable,
     zoneCellOf,
+    type GameState,
   } from '@shinobi/core';
+  import BattleReport from '../components/BattleReport.svelte';
+  import BingoBook from '../components/BingoBook.svelte';
   import CloneStart from '../components/CloneStart.svelte';
   import CombatLog from '../components/CombatLog.svelte';
-  import EntityLink from '../components/EntityLink.svelte';
+  import FightScreen from '../components/FightScreen.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
-  import StatBar from '../components/StatBar.svelte';
-  import TimeBar from '../components/TimeBar.svelte';
+  import EntityLink from '../components/EntityLink.svelte';
+  import PrepScreen from '../components/PrepScreen.svelte';
   import ZoneWhere from '../components/ZoneWhere.svelte';
   import { formatInt } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
+  import type { PrepTarget } from '../lib/prep.ts';
   import { game } from '../lib/store.ts';
-  import { combatTiming, IDLE_TIMING } from '../lib/timing.ts';
-  import type { ProgressTiming } from '../lib/time-progress.ts';
   import SimplePage from './SimplePage.svelte';
+
+  interface Props {
+    /** The part of the page: the fight (or the list of targets), the Bingo book, the battle report or a preparation. */
+    section?: 'fight' | 'bingo' | 'report' | 'prepare';
+    /** For a preparation: what it is for. */
+    target?: PrepTarget | null;
+  }
+
+  let { section = 'fight', target = null }: Props = $props();
 
   const content = game.content;
 
-  /** Enemies of the Academy yard are open to everyone; the other regions arrive with missions. */
-  const enemies = $derived(content.enemies.filter((e) => e.region === 'academy'));
-
-  /**
-   * Fight zones the player may see: a region zone once its cell was explored (its point is
-   * found), a boss zone once unlocked. Nothing undiscovered and nothing without a name is listed.
-   */
-  const zones = $derived(
-    game.read((gs) =>
-      content.zones.flatMap((z) => {
+  /** What the player can fight: the Academy yard is open to everyone; a region zone once its cell is explored (its point is found); a boss zone once unlocked. */
+  const listing = $derived(
+    game.read((gs: GameState) => {
+      const yard = content.zones.filter((z) => z.region === 'academy');
+      const zones = content.zones.flatMap((z) => {
         if (z.region === 'academy') return [];
         const boss = z.region === 'boss';
         const kind = boss ? ('boss' as const) : ('enemy' as const);
@@ -47,190 +50,102 @@
           ? z.unlock === null || evalReq(gs, z.unlock, content).met
           : zoneCellOf(z.id, content) !== null && available;
         return seen ? [{ id: z.id, enemy: z.enemy, kind, available }] : [];
-      }),
-    ),
-  );
-
-  /** Whether a clone exists: the character's chakra pool is divided then. */
-  const cloned = $derived(game.read((gs) => cloneCount(gs, game.content) > 0));
-  const fight = $derived.by(() =>
-    game.read((gs) => {
-      const state = gs;
-      const combat = state.combat;
-      const slot = fightSlotIndex(state);
-      if (!combat || slot < 0) return null;
-      const enemy = content.enemies.find((e) => e.id === combat.enemy);
-      if (!enemy) return null;
-      const f = combat.fight;
-      const p = f.player;
-      // The fight is advanced at events; work the slot has received since then still counts.
-      const fraction = (timer: { progress: number; need: number }): number =>
-        timer.need > 0
-          ? Math.min(1, Math.max(0, (timer.progress + combat.work * RATE_FULL) / timer.need))
-          : 1;
-
-      let playerDoing: {
-        key: string;
-        tech: string | null;
-        progress: number;
-        timing: ProgressTiming;
-      };
-      // A fighter waits for the moment, acts (a technique, the plain strike, an item) or, out of breath, rests.
-      const doing = p.act;
-      const key =
-        p.phase === 'rest'
-          ? 'combat.doing.rest'
-          : doing?.kind === 'technique'
-            ? 'combat.doing.cast'
-            : doing?.kind === 'item'
-              ? 'combat.doing.item'
-              : doing?.kind === 'basic'
-                ? 'combat.doing.basic'
-                : 'combat.doing.wait';
-      playerDoing = {
-        key,
-        tech: doing?.kind === 'technique' ? doing.id : null,
-        progress: fraction(p.timer),
-        timing: combatTiming(state, p.timer),
-      };
-
-      const front = f.enemies.find((e) => e.hp > 0) ?? f.enemies[0];
-      const enemyDoing =
-        combat.phase === 'respawn' || !front
-          ? { key: 'combat.doing.respawn', progress: 0, timing: IDLE_TIMING }
-          : {
-              key: front.phase === 'wait' ? 'combat.doing.wait' : 'combat.doing.attack',
-              progress: fraction(front.timer),
-              timing: combatTiming(state, front.timer),
-            };
-
+      });
+      const operations = content.operations
+        .filter((o) => o.unlock === null || evalReq(gs, o.unlock, content).met)
+        .map((o) => ({ id: o.id }));
       return {
-        slot,
-        /** Whether a clone fights: the pools below are the clone's. */
-        clone: isCloneSlot(state, content, slot),
-        enemy,
-        c: {
-          hp: p.hp,
-          chakra: p.chakra,
-          stamina: p.stamina,
-          enemyHp: f.enemies.reduce((sum, e) => sum + e.hp, 0),
-          phase: combat.phase,
-        },
-        maxHp: p.maxHp,
-        maxChakra: p.maxChakra,
-        maxStamina: p.maxStamina,
-        enemyMaxHp: f.enemies.reduce((sum, e) => sum + e.maxHp, 0),
-        kills: counterValue(state, killsKey(enemy.id)),
-        playerDoing,
-        enemyDoing,
+        fighting: fightSlotIndex(gs) >= 0,
+        cloneFights: isCloneSlot(gs, content, fightSlotIndex(gs)),
+        yard: yard.map((z) => ({
+          id: z.id,
+          enemy: z.enemy,
+          hp: enemyStats(
+            content.enemies.find((e) => e.id === z.enemy)!,
+            content,
+          ).maxHp,
+          cl: content.enemies.find((e) => e.id === z.enemy)?.cl ?? 0,
+        })),
+        zones,
+        operations,
       };
     }),
   );
 
-  const start = (id: string) =>
-    void game.dispatch({ type: 'action.start', slot: 0, kind: 'fight', id });
-  const stop = () => {
-    if (fight)
-      void game.dispatch(
-        fight.clone
-          ? { type: 'clone.dispel', slot: fight.slot }
-          : { type: 'action.stop', slot: fight.slot },
-      );
-  };
+  /** Whether a clone exists: the character's chakra pool is divided then. */
+  const cloned = $derived(game.read((gs: GameState) => cloneCount(gs, content) > 0));
+
+  const start = (kind: 'fight' | 'operation', id: string) =>
+    void game.dispatch({ type: 'action.start', slot: 0, kind, id });
+  const prepareHref = (kind: PrepTarget['kind'], id: string) => `#/combat/prepare/${kind}/${id}`;
+  const opName = (id: string) => (hasKey(`operation.${id}.name`) ? t(`operation.${id}.name`) : id);
 </script>
 
-<SimplePage title={t('combat.title')}>
-  <Hint id="combat" />
-
-  {#if fight}
-    <section class="arena" data-fighting={fight.enemy.id}>
-      <div class="side">
-        <h2 data-fighter={fight.clone ? 'clone' : 'you'}>
-          {t(fight.clone ? 'combat.cloneYou' : 'combat.you')}
-        </h2>
-        {#if fight.clone}<p class="clone-note" data-clone-fights>
-            <strong>{t('combat.cloneFights')}</strong> · {t('combat.cloneNote')}
-          </p>{:else if cloned}<p class="clone-note" data-clone-split>
-            {t('combat.cloneSplit')}
-          </p>{/if}
-        <StatBar label={t('combat.hpBar')} value={fight.c.hp} max={fight.maxHp} tone="hp" />
-        <StatBar
-          label={t('combat.chakraBar')}
-          value={fight.c.chakra}
-          max={fight.maxChakra}
-          tone="chakra"
-        />
-        <StatBar
-          label={t('combat.staminaBar')}
-          value={fight.c.stamina}
-          max={fight.maxStamina}
-          tone="stamina"
-        />
-        <p class="doing" data-player-doing>
-          <span class="doing-label">{t(fight.playerDoing.key)}</span>
-          {#if fight.playerDoing.tech}<EntityLink
-              kind="technique"
-              id={fight.playerDoing.tech}
-            />{/if}
-        </p>
-        {#if fight.playerDoing.tech}
-          <TimeBar
-            timing={fight.playerDoing.timing}
-            size="md"
-            tone="chakra"
-            label={t('combat.doing.cast')}
-          />
-        {/if}
-      </div>
-
-      <div class="side">
-        <h2><EntityLink kind="enemy" id={fight.enemy.id} /></h2>
-        <StatBar
-          label={t('combat.hpBar')}
-          value={fight.c.enemyHp}
-          max={fight.enemyMaxHp}
-          tone="enemy"
-        />
-        <p class="doing" data-enemy-doing>
-          <span class="doing-label">{t(fight.enemyDoing.key)}</span>
-        </p>
-        {#if fight.enemyDoing.progress > 0 || fight.c.phase === 'fight'}
-          <TimeBar
-            timing={fight.enemyDoing.timing}
-            size="md"
-            tone="enemy"
-            label={t('combat.doing.attack')}
-          />
-        {/if}
-        <p class="kills" data-kills>{t('combat.kills', { n: formatInt(fight.kills) })}</p>
-      </div>
-    </section>
-
-    <button type="button" class="stop" onclick={stop}
-      >{t(fight.clone ? 'now.dispel' : 'combat.stop')}</button
+<SimplePage
+  title={t(
+    section === 'bingo'
+      ? 'combat.tab.bingo'
+      : section === 'report'
+        ? 'combat.tab.report'
+        : section === 'prepare'
+          ? 'combat.prepare'
+          : 'combat.title',
+  )}
+  compact={listing.fighting}
+>
+  <nav class="tabs" aria-label={t('combat.sections')} data-combat-tabs>
+    <a
+      href="#/combat"
+      class:active={section === 'fight' || section === 'prepare'}
+      aria-current={section === 'fight' || section === 'prepare' ? 'page' : undefined}
+      data-combat-tab="fight">{t('combat.tab.fight')}</a
     >
+    <a
+      href="#/combat/bingo"
+      class:active={section === 'bingo'}
+      aria-current={section === 'bingo' ? 'page' : undefined}
+      data-combat-tab="bingo">{t('combat.tab.bingo')}</a
+    >
+    <a
+      href="#/combat/report"
+      class:active={section === 'report'}
+      aria-current={section === 'report' ? 'page' : undefined}
+      data-combat-tab="report">{t('combat.tab.report')}</a
+    >
+  </nav>
+
+  {#if section === 'bingo'}
+    <BingoBook />
+  {:else if section === 'report'}
+    <BattleReport />
+  {:else if listing.fighting}
+    <!-- The arena comes first: on a phone the hint above it would push the fight off the screen. -->
+    <FightScreen />
+    <Hint id="combat" />
+  {:else if section === 'prepare' && target}
+    <PrepScreen {target} />
   {:else}
+    <Hint id="combat" />
     <h2>{t('combat.enemies')}</h2>
-    {#if enemies.length === 0}
+    {#if listing.yard.length === 0}
       <p class="empty">{t('combat.empty')}</p>
     {/if}
     <ul class="cards">
-      {#each enemies as enemy (enemy.id)}
-        <li class="card" data-enemy={enemy.id}>
-          <span class="icon"><Icon entity={{ kind: 'enemy', id: enemy.id }} size={36} /></span>
+      {#each listing.yard as zone (zone.id)}
+        <li class="card" data-enemy={zone.enemy}>
+          <span class="icon"><Icon entity={{ kind: 'enemy', id: zone.enemy }} size={36} /></span>
           <div class="info">
-            <p class="name"><EntityLink kind="enemy" id={enemy.id} /></p>
+            <p class="name"><EntityLink kind="enemy" id={zone.enemy} /></p>
             <p class="meta">
-              {t('combat.level', { n: enemy.cl })} · {t('combat.hp', {
-                n: formatInt(enemyStats(enemy, content).maxHp),
-              })}
+              {t('combat.level', { n: zone.cl })} · {t('combat.hp', { n: formatInt(zone.hp) })}
             </p>
           </div>
-          <div class="starts">
-            <button type="button" class="start" onclick={() => start(enemy.id)}
+          <div class="buttons">
+            <a class="prepare" href={prepareHref('zone', zone.id)}>{t('combat.prepare')}</a>
+            <button type="button" class="start" onclick={() => start('fight', zone.id)}
               >{t('combat.start')}</button
             >
-            <CloneStart kind="fight" id={enemy.id} />
+            <CloneStart kind="fight" id={zone.id} />
           </div>
         </li>
       {/each}
@@ -238,10 +153,10 @@
     <p class="idle">{t('combat.idle')}</p>
     {#if cloned}<p class="clone-note" data-clone-split>{t('combat.cloneSplit')}</p>{/if}
 
-    {#if zones.length > 0}
+    {#if listing.zones.length > 0}
       <h2>{t('combat.zones')}</h2>
       <ul class="cards" data-zones>
-        {#each zones as zone (zone.id)}
+        {#each listing.zones as zone (zone.id)}
           <li class="card" data-zone={zone.id}>
             <span class="icon"><Icon entity={{ kind: zone.kind, id: zone.enemy }} size={36} /></span
             >
@@ -252,13 +167,14 @@
                   {t('world.where.closed')}
                 </p>{/if}
             </div>
-            <div class="starts">
+            <div class="buttons">
+              <a class="prepare" href={prepareHref('zone', zone.id)}>{t('combat.prepare')}</a>
               <button
                 type="button"
                 class="start"
                 disabled={!zone.available}
                 aria-describedby={zone.available ? undefined : `why-zone-${zone.id}`}
-                onclick={() => start(zone.id)}>{t('combat.zoneStart')}</button
+                onclick={() => start('fight', zone.id)}>{t('combat.zoneStart')}</button
               >
               <CloneStart kind="fight" id={zone.id} disabled={!zone.available} />
             </div>
@@ -266,10 +182,33 @@
         {/each}
       </ul>
     {/if}
+
+    {#if listing.operations.length > 0}
+      <h2>{t('combat.operations')}</h2>
+      <ul class="cards" data-operations>
+        {#each listing.operations as op (op.id)}
+          <li class="card">
+            <span class="icon"><Icon name="lucide:swords" size={36} /></span>
+            <div class="info"><p class="name">{opName(op.id)}</p></div>
+            <div class="buttons">
+              <a class="prepare" href={prepareHref('operation', op.id)}>{t('combat.prepare')}</a>
+              <button type="button" class="start" onclick={() => start('operation', op.id)}
+                >{t('combat.start')}</button
+              >
+              <CloneStart kind="operation" id={op.id} />
+            </div>
+          </li>
+        {/each}
+      </ul>
+    {/if}
   {/if}
 
-  <h2>{t('combat.log')}</h2>
-  <CombatLog entries={game.combatLog} fighting={fight !== null} clone={fight?.clone === true} />
+  {#if section === 'fight' || (section === 'prepare' && listing.fighting)}
+    <details class="log" data-fight-log>
+      <summary>{t('combat.log')}</summary>
+      <CombatLog entries={game.combatLog} fighting={listing.fighting} clone={listing.cloneFights} />
+    </details>
+  {/if}
 </SimplePage>
 
 <style>
@@ -281,46 +220,49 @@
     font-weight: 400;
   }
 
-  h2 :global(a) {
-    color: inherit;
-  }
-
-  .arena {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(var(--tile-min), 1fr));
-    gap: var(--space-4);
-  }
-
-  .side {
+  .tabs {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: var(--space-2);
-    padding: var(--space-3);
+    margin: 0 0 var(--space-3);
+  }
+
+  .tabs a {
+    display: inline-flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--control-md);
+    padding: 0 var(--space-3);
     border: var(--border-thin) solid var(--line);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     background: var(--surface);
+    color: var(--fg);
+    text-decoration: none;
   }
 
-  .side h2 {
-    margin: 0;
-  }
-
-  .doing {
-    margin: var(--space-1) 0 0;
-  }
-
-  .doing-label {
-    color: var(--fg-dim);
-  }
-
-  .doing :global(a) {
+  .tabs a.active {
+    border-color: var(--accent);
     color: var(--accent);
     font-weight: 600;
   }
 
-  .kills {
+  .log {
+    margin-top: var(--space-4);
+  }
+
+  .log summary {
+    min-height: var(--control-sm);
+    color: var(--heading);
+    font-family: var(--font-heading);
+    font-size: var(--text-md);
+    cursor: pointer;
+  }
+
+  .clone-note {
     margin: 0;
     color: var(--fg-dim);
+    font-size: var(--text-xs);
   }
 
   .why {
@@ -336,19 +278,11 @@
     cursor: not-allowed;
   }
 
-  .starts {
-    display: flex;
-    gap: var(--space-2);
-  }
-
-  .clone-note {
-    margin: 0;
-    color: var(--fg-dim);
-    font-size: var(--text-xs);
-  }
-
-  .stop,
-  .start {
+  .start,
+  .prepare {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-height: var(--control-md);
     padding: var(--space-1) var(--space-4);
     border: var(--border-thin) solid var(--accent);
@@ -357,14 +291,19 @@
     color: var(--ink-900);
     font: inherit;
     font-weight: 600;
+    text-decoration: none;
     cursor: pointer;
   }
 
-  .stop {
-    margin-top: var(--space-3);
-    border-color: var(--line);
-    background: var(--surface-raised);
-    color: var(--fg);
+  .prepare {
+    background: transparent;
+    color: var(--accent);
+  }
+
+  .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
   }
 
   .cards {
@@ -425,11 +364,11 @@
       flex-wrap: wrap;
     }
 
-    .starts {
+    .buttons {
       width: 100%;
     }
 
-    .starts > :global(button) {
+    .buttons > * {
       flex: 1;
     }
   }
