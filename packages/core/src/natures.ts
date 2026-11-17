@@ -1,5 +1,5 @@
 import type { Boss, Cell, ContentDb, Mission, MissionStage, NatureId } from '@shinobi/content';
-import { bump, counterValue } from './counters.ts';
+import { bump, NATURES_GAINED } from './counters.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
 import { indexOf } from './lookup.ts';
@@ -174,15 +174,6 @@ export function chooseNature(
   bump(state, NATURES_GAINED);
   emit(state, { type: 'natureGained', nature, first: true });
   return { ok: true };
-}
-
-/** Counter of the natures the player has taken, the native one included: what a chain that asks for another nature counts. */
-export const NATURES_GAINED = 'natures.gained';
-
-/** The counter never reads below the natures the character has: derived from the state, so a save without it needs no migration. */
-export function syncNaturesGained(state: GameState): void {
-  const owned = state.player.natures.length;
-  if (counterValue(state, NATURES_GAINED) < owned) state.counters[NATURES_GAINED] = owned;
 }
 
 /** `nature.add`: a second nature at Chakra Control 20, a third at 40; only natures not owned. */

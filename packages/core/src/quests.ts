@@ -6,7 +6,6 @@ import { evalReq } from './requirements.ts';
 import { currencyOf, rankIndex } from './vocab.ts';
 import type { System } from './system.ts';
 import type { GameState } from './state.ts';
-import { syncNaturesGained } from './natures.ts';
 import { rewardScroll } from './scrolls.ts';
 import { refreshRegions } from './regions.ts';
 import { refreshUnlocks } from './unlocks.ts';
@@ -106,8 +105,6 @@ function applyRewards(state: GameState, rewards: QuestRewards, content: ContentD
 export function updateQuests(state: GameState, content: ContentDb): void {
   // A new Genin gets a village and Reputation may open its second stage; a quest may ask for either.
   syncVillage(state, content);
-  // Saves from before the counter existed keep the natures their character already has.
-  syncNaturesGained(state);
   // Region flags first: a step may ask for an open region.
   refreshRegions(state, content);
   for (let changed = true; changed;) {

@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   advance,
   conferralSeconds,
+  counterValue,
   depositFlag,
   dispatch,
   evalReq,
@@ -351,7 +352,7 @@ describe('«Суперник» on a save from before the natures counter', () =>
   it('counts the natures the character already has: three natures finish step 1', () => {
     const state = oldSave(['katon', 'futon', 'doton']);
     updateQuests(state, content);
-    expect(state.counters['natures.gained']).toBe(3);
+    expect(counterValue(state, 'natures.gained')).toBe(3);
     expect(state.quests['core:rival']?.step).toBeGreaterThanOrEqual(1);
   });
 
