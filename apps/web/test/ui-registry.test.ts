@@ -303,6 +303,7 @@ describe('the public lists', () => {
       'missions.header',
       'mission.header',
       'mission.footer',
+      'map.panel',
       'page.footer',
       'fight.arena',
       'prep.verdict',

@@ -227,14 +227,14 @@ describe('the app booted with core and testmod (T1)', () => {
     gs.world.explores[CELL] = game.content.balance.K.cellExplores[0] ?? 1;
     gs.world.pois[POI] = true;
     booted = await boot(`#/cell/${CELL}`, gs);
-    expect(q(`[data-cell="${CELL}"]`)).not.toBeNull();
-    expect(text(`[data-cell-panel="${CELL}"] [data-cell-title]`)).toBe('Край тестового гаю');
+    expect(q('[data-ui="hex"]')).not.toBeNull();
+    expect(text('[data-hex-panel] [data-hex-title]')).toBe('Край тестового гаю');
     const row = q(`[data-poi="${POI}"]`);
     expect(row?.textContent).toContain('Тестова застава');
     // The outpost renderer of the built-in game draws the line under the name.
     expect(row?.querySelector('svg.icon')).not.toBeNull();
     await booted.go('#/region/testmod:grove');
-    expect(q('[data-region], [data-ui="world-cell"]')).not.toBeNull();
+    expect(q('[data-ui="map"]')).not.toBeNull();
     expect(rawTexts()).toEqual([]);
   });
 

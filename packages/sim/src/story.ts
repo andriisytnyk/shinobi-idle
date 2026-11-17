@@ -165,17 +165,15 @@ export function playSlice(options: StoryOptions = {}): StoryRun {
 
   // ---- places ----
   const cellOf = (id: string) => content.cells.find((c) => c.id === id);
-  /** Stands in the region of the cell: the free walk to an outpost of the region when it is another one. */
+  /**
+   * Stands on the hex of the cell (the model walks there at no cost: the map is a walk, and this
+   * bot measures the story, not the walk), marked as surveyed as walking would have left it.
+   */
   const enterRegionOf = (id: string): void => {
     const cell = cellOf(id);
     if (!cell) throw new Error(`no cell ${id}`);
-    const here = content.cells.find((c) => c.id === state.world.location);
-    if (here?.region === cell.region) return;
-    const outpost = content.cells.find(
-      (c) => c.region === cell.region && c.pois.some((p) => p.kind === 'outpost'),
-    );
-    if (!outpost) throw new Error(`no outpost in the region of ${id}`);
-    must({ type: 'world.travel', cell: outpost.id, mode: 'instant' });
+    state.world.location = cell.id;
+    state.world.surveyed[`${cell.hex[0]},${cell.hex[1]}`] = true;
   };
   /** Explores a cell to level 1 (its points of interest are found then). */
   const explore = (id: string): void => {

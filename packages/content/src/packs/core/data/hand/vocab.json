@@ -463,5 +463,49 @@
     {
       "id": "maps"
     }
+  ],
+  "terrains": [
+    {
+      "id": "forest",
+      "token": "--terrain-forest",
+      "glyph": "M-10 6L-5 -4L0 6Z M0 7L5 -7L10 7Z",
+      "glyphFill": true
+    },
+    {
+      "id": "plains",
+      "token": "--terrain-plains",
+      "glyph": "M-8 5V1M-8 5L-10 2M-8 5L-6 2M6 -1V-5M6 -1L4 -4M6 -1L8 -4M0 8V4M0 8L-2 5M0 8L2 5"
+    },
+    {
+      "id": "hills",
+      "token": "--terrain-hills",
+      "glyph": "M-11 6Q-6 -6 -1 6M-3 6Q4 -8 11 6"
+    },
+    {
+      "id": "coast",
+      "token": "--terrain-coast",
+      "glyph": "M-11 -2q3 -3 5.5 0t5.5 0t5.5 0t5.5 0M-11 5q3 -3 5.5 0t5.5 0t5.5 0t5.5 0"
+    },
+    {
+      "id": "river",
+      "token": "--terrain-river",
+      "glyph": "M-12 -4q4 -4 8 0t8 0t8 0M-12 4q4 -4 8 0t8 0t8 0"
+    },
+    {
+      "id": "road",
+      "token": "--terrain-road",
+      "glyph": "M-12 8Q-3 3 0 0T12 -8"
+    },
+    {
+      "id": "settlement",
+      "token": "--terrain-settlement",
+      "glyph": "M-8 7V-1L0 -8L8 -1V7Z",
+      "glyphFill": true
+    },
+    {
+      "id": "lake",
+      "token": "--terrain-lake",
+      "glyph": "M-10 0a10 6 0 1 0 20 0a10 6 0 1 0 -20 0M-5 0a5 3 0 1 0 10 0a5 3 0 1 0 -10 0"
+    }
   ]
 }

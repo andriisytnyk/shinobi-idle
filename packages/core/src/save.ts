@@ -66,8 +66,9 @@ import {
 } from './village.ts';
 import { createVillage, type VillageState } from './village-state.ts';
 import { isAcademyRank, isNature, packOfId, poolEntry, rankIndex, skillEntry } from './vocab.ts';
-import { cellMaxExplores, levelForExplores } from './world.ts';
-import { createWorld } from './world-state.ts';
+import { hexKey, hexLine, isPlayable, removeFigure } from './hex.ts';
+import { cellMaxExplores, levelForExplores, plainMaxExplores, subjectOf } from './world.ts';
+import { createWorld, seedSurvey } from './world-state.ts';
 import { xpAt } from './xp.ts';
 
 type Raw = Record<string, unknown>;
@@ -284,6 +285,46 @@ export const MIGRATIONS: readonly Migration[] = [
       ? { enemy: fight.enemy, owner: fight.owner, run: fight.run }
       : null;
     return { ...state, skills: without(state.skills), pools: without(state.pools), combat: place };
+  },
+  // v16 -> v17: the world became a grid of hexes surveyed one by one. The position is still the
+  // address of a cell (a cell id names its hex) and surveys keep their cell ids. What the save
+  // proves is surveyed, as a player who had played on this version would have it: the starting
+  // area (the hexes within `K.map.startRadius` of the first cell); for every region of which a cell
+  // is explored to level 1, the hexes of all its cells and of the straight lines that join each to
+  // the first cell (so that the way there can be walked); and the hex underfoot. A hex that is no
+  // cell is marked with the surveys of its first level; a cell is only marked, its level stays.
+  (state, content) => {
+    const world = isRecord(state.world) ? state.world : {};
+    const explores = isRecord(world.explores) ? world.explores : {};
+    const index = indexOf(content);
+    const seeded = createWorld(content);
+    const keys = new Set<string>(Object.keys(seeded.surveyed));
+    const first = content.cells[0];
+    const add = (a: { q: number; r: number }): void => void keys.add(hexKey(a.q, a.r));
+    for (const region of content.regions) {
+      const explored = region.cells.some((id) => {
+        const n = explores[id];
+        return typeof n === 'number' && levelForExplores(n, content) >= 1;
+      });
+      if (!explored) continue;
+      for (const id of region.cells) {
+        const cell = index.cells.get(id);
+        if (!cell) continue;
+        const at = { q: cell.hex[0], r: cell.hex[1] };
+        add(at);
+        if (first) for (const h of hexLine({ q: first.hex[0], r: first.hex[1] }, at)) add(h);
+      }
+    }
+    const here = typeof world.location === 'string' ? index.cells.get(world.location) : undefined;
+    if (here) add({ q: here.hex[0], r: here.hex[1] });
+    const marked = { ...seeded, explores: { ...seeded.explores } };
+    for (const [id, n] of Object.entries(explores))
+      if (typeof n === 'number' && index.cells.has(id)) marked.explores[id] = n;
+    seedSurvey(marked, content, keys);
+    return {
+      ...state,
+      world: { ...world, surveyed: marked.surveyed, explores: { ...marked.explores } },
+    };
   },
 ];
 
@@ -529,20 +570,35 @@ function sanitizePouch(raw: unknown, content: ContentDb): PouchState {
 }
 
 /**
- * A saved world. Explorations are clamped to what the cell can hold; found points follow from
- * them, so they are recomputed, never trusted; loot counts as taken only when it can be.
+ * A saved world. The position must name a hex of the map. Surveys are clamped to what the hex can
+ * hold (a cell's levels, or a plain hex's); found points follow from them, so they are recomputed,
+ * never trusted; loot counts as taken only when it can be. Surveyed hexes must be playable hexes of
+ * the map; a hex surveyed to its first level counts as surveyed whether or not it is listed.
  */
 function sanitizeWorld(raw: unknown, content: ContentDb): GameState['world'] {
   const world = createWorld(content);
   if (!isRecord(raw)) return world;
   const index = indexOf(content);
-  if (typeof raw.location === 'string' && index.cells.has(raw.location)) {
+  if (typeof raw.location === 'string' && subjectOf(content, raw.location) !== null) {
     world.location = raw.location;
   }
+  // The figures of the other performers: a slot index (1 and up) and a hex of the map.
+  if (isRecord(raw.figures)) {
+    const figures: Record<number, string> = {};
+    for (const [slot, at] of Object.entries(raw.figures)) {
+      const n = Number(slot);
+      if (Number.isInteger(n) && n >= 1 && typeof at === 'string' && subjectOf(content, at))
+        figures[n] = at;
+    }
+    if (Object.keys(figures).length > 0) world.figures = figures;
+  }
   world.explores = pick(raw.explores, (key, v) => {
-    const cell = index.cells.get(key);
-    if (!cell || typeof v !== 'number') return undefined;
-    const count = Math.min(Math.floor(nonNegative(v)), cellMaxExplores(cell, content));
+    if (typeof v !== 'number') return undefined;
+    const subject = subjectOf(content, key);
+    // Only the address of a hex is a key: a cell id for a cell, the key of the hex for any other.
+    if (!subject || subject.address !== key) return undefined;
+    const top = subject.cell ? cellMaxExplores(subject.cell, content) : plainMaxExplores(content);
+    const count = Math.min(Math.floor(nonNegative(v)), top);
     return count >= 1 ? count : undefined;
   });
   for (const cell of content.cells) {
@@ -555,6 +611,12 @@ function sanitizeWorld(raw: unknown, content: ContentDb): GameState['world'] {
       ? (true as const)
       : undefined;
   });
+  world.surveyed = {
+    ...world.surveyed,
+    ...pick(raw.surveyed, (key, v) =>
+      v === true && isPlayable(index.hexes.get(key)) ? (true as const) : undefined,
+    ),
+  };
   return world;
 }
 
@@ -874,6 +936,9 @@ export function deserialize(
       );
     }
   }
+  // A figure belongs to a clone that works: one of a slot that is gone or idle is not on the map.
+  for (const slot of Object.keys(state.world.figures ?? {}))
+    if (!state.slots[Number(slot)]?.action) removeFigure(state, Number(slot));
   ensurePouch(state, content);
   syncLoadout(state, content);
   // A fight needs both its slot and its state: it belongs to the slot its `owner` names, and only if that

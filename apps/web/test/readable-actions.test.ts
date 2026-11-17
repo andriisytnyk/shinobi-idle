@@ -291,6 +291,8 @@ describe('every action kind of the content has a name in the Now bar', () => {
         if (!rule.has(id, content)) continue;
         kinds.add(kind);
         const ref = actionRef({ kind, id });
+        // A hex (a cell not yet surveyed is one) is named by what the map knows of it, not by a locale key.
+        if (ref.kind === 'hex') continue;
         expect(hasKey(`${ref.kind}.${ref.id}.name`), `${kind} ${id}`).toBe(true);
       }
     }

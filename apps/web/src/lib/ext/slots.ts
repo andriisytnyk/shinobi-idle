@@ -36,6 +36,8 @@ export interface SlotContexts {
   'mission.header': { mission: string };
   /** At the end of a mission page. */
   'mission.footer': { mission: string };
+  /** In the hex panel of the world map, after the points of interest; `hex` is the hex's `"q,r"`, `cell` the id of the cell on it once the hex is surveyed. */
+  'map.panel': { hex: string; cell: string | null };
   /** At the end of every page; `route` is the location hash. */
   'page.footer': { route: string };
   /** Under the arena of a running fight; `target` is what the fight is of (a zone or an operation), null for a mission's fight. */
@@ -81,6 +83,7 @@ const SLOT_TABLE: Record<SlotName, true> = {
   'missions.header': true,
   'mission.header': true,
   'mission.footer': true,
+  'map.panel': true,
   'page.footer': true,
   'fight.arena': true,
   'prep.verdict': true,

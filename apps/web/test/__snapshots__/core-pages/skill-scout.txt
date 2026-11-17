@@ -15,7 +15,7 @@
         Генін.
       <section class="explore-panel" data-scout-panel="">
         <p class="intro">
-          Розвідка відкриває мапу: чим вищий її рівень, тим глибше ти вивчаєш клітинки й тим більше регіонів стає тобі доступно.
+          Розвідка відкриває мапу: нерозвіданий гекс — туман, а розвіданий стає прохідним. Чим вищий рівень Розвідки, тим далі від тебе можна розвідувати й тим глибше ти вивчаєш клітинки.
         <dl class="facts">
           <div>
             <dt>
@@ -38,18 +38,16 @@
                   5 с
           <div>
             <dt>
-              Ходьба в межах регіону
+              Крок на гекс, де ти стоїш
             <dd>
               <span class="mod">
                 <button aria-expanded="false" class="figure" type="button">
-                  9 хв
+                  2 хв
           <div>
             <dt>
-              Ходьба між регіонами
-            <dd>
-              <span class="mod">
-                <button aria-expanded="false" class="figure" type="button">
-                  29 хв
+              Дальність розвідки
+            <dd data-scout-range="">
+              2 гекси
           <div>
             <dt>
               Поточна дія
