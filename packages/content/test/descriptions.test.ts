@@ -48,7 +48,7 @@ describe('descriptions of content entities', () => {
     expect(content.buildings).toHaveLength(16);
     expect(content.regions).toHaveLength(3);
     expect(content.seals).toHaveLength(17);
-    expect(content.statuses).toHaveLength(5);
+    expect(content.statuses).toHaveLength(6);
     expect(content.traits).toHaveLength(8);
   });
 

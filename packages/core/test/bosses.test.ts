@@ -81,16 +81,11 @@ describe('A9: bosses against a prepared player', () => {
   for (const r of rows) {
     const name = r.boss.id.replace('core:', '');
 
-    // boss_nameless wins 58% against 60%.
-    // balance: refit at stage 9, see #82
-    (name === 'boss_nameless' ? it.skip : it)(
-      `${name}: a prepared player of the favourable nature who knows the boss wins at least 60%`,
-      () => {
-        expect(r.full).toBeGreaterThanOrEqual(0.6);
-      },
-    );
+    it(`${name}: a prepared player of the favourable nature who knows the boss wins at least 60%`, () => {
+      expect(r.full).toBeGreaterThanOrEqual(0.6);
+    });
 
-    // boss_ren2 wins 84% four levels below.
+    // boss_ren2 wins 87% four levels below.
     // balance: refit at stage 9, see #82
     (name === 'boss_ren2' ? it.skip : it)(
       `${name}: four levels below wins less often than at the level, and under 50%`,

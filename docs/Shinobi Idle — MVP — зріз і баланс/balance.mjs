@@ -20,20 +20,20 @@ export const K = {
   practiceFocus: { base:0.8, perLevel:0.06 }, practiceCast: 0.82, practiceMin: 2.0, drill: 3.0, meditate: 3.0, obstacle: 2.5, gather: 2.5, craft: 2.5, explore: 5.0,
   // --- техніки ---
   // Каст — число самої техніки й не залежить від печаток (рішення автора 15.11): базовий каст рангу × множник ролі, для окремих технік — вручну (patch.mjs, TECH.cast).
-  castByRank: { E:0.95, D:1.14, C:0.953, B:2.2, A:1.759, S:2.639 },
+  castByRank: { E:0.944, D:1.133, C:0.947, B:2.186, A:1.748, S:2.622 },
   castByRole: { "Снаряд":1.0, "Серія":1.25, "Площа":1.2, "Контроль":0.9, "Захист":1.0, "Посилення":0.7, "Сигнатурна":1.5, "Тренування":1.0 },
   masteryCast: 0.5, castFloor: 0.4, nonNativeCast: 0.30,
   power: { E:10, D:10, C:17, B:27, A:42, S:65 },
   tierMult: { "-1":0.88, "0":1, "1":1.12 },
   role: { // множник шкоди, перезарядка (с), множник вартості
-    "Снаряд":{m:1.0,cd:4.3,c:1.0}, "Серія":{m:1.15,cd:7.69,c:1.1}, "Площа":{m:0.75,cd:34.37,c:1.2}, "Контроль":{m:0.30,cd:11.96,c:0.9},
+    "Снаряд":{m:1.0,cd:4.64,c:1.0}, "Серія":{m:1.15,cd:7.69,c:1.1}, "Площа":{m:0.75,cd:18.97,c:1.2}, "Контроль":{m:0.30,cd:20.67,c:0.9},
     "Захист":{m:0,cd:13.35,c:0.9}, "Посилення":{m:0,cd:27.82,c:1.0}, "Сигнатурна":{m:1.7,cd:16.68,c:1.3}, "Тренування":{m:0,cd:0,c:0} },
   rankCd: { E:0.9, D:1.0, C:1.1, B:1.25, A:1.4, S:1.6 },
   chakraCost: { E:5, D:6, C:12, B:22, A:38, S:60 }, staminaCost: { E:5, D:6, C:10, B:16, A:26, S:40 },
   levelScale: 0.035,                         // шкода техніки × (1 + levelScale × рівень навички)
   masteryDmg: 0.10, masteryCost: 0.25,
   // --- стани ---
-  burn: { share:0.30, dur:6 }, wet: { slow:0.15, dur:8 }, evaLevel: { min:0.023, max:1.014 }, rhythm: { slow:0.29, dur:3.24 }, stun: { C:1.0, B:1.5, D:0.7 }, bind: { dur:4.23 }, poison: { pctPerSec:0.02, dur:8 },
+  burn: { share:0.30, dur:6 }, wet: { slow:0.15, dur:8 }, evaLevel: { min:0.046, max:1.014 }, rhythm: { slow:0.29, dur:3.5 }, stun: { C:1.0, B:1.5, D:0.7 }, bind: { dur:4.23 }, poison: { pctPerSec:0.02, dur:8 },
   combo: { base:0.15, perLevel:0.004, perMastery:0.001, cap:0.60, fanBurn:1.5, shockWet:2.0, mudEva:0.5, steam:0.40 },
   wheel: 0.30, habituation: 0.15, habituationCap: 0.60, signatureHabituation: 0.5,
   // --- гравець ---
@@ -46,7 +46,7 @@ export const K = {
   passiveFx: { shield:{ evasion:28 }, decoy:{ evasion:28 }, evasionBuff:{ evasion:28 }, passiveNegate:{ evasion:28 } },
   // evaLevel: захисна техніка працює на дієвому рівні = рівень її навички × Майстерність ÷ masteryCap; внесок = evasion × межі(дієвий рівень ÷ бойовий рівень нападника; min; max).
   // Звичайний удар — дія зі своїм кастом і малою вартістю витривалості; «переводить подих», коли не вистачає ні на техніку, ні на удар: rest.s секунд і частка rest.share від обох пулів.
-  basicCast: 1.341, basicCost: 0.65, rest: { s:1.5, share:0.08 },
+  basicCast: 1.341, basicCost: 0.31, rest: { s:1.5, share:0.08 },
   modelWait: 0.6, // лише для спрощеного симулятора нижче: вичікування гравця між діями; має дорівнювати waitMs тіру genin з ai.json
   basicDmg: [14.21,0.8], dodgeStamina: 2, ccCostPerLevel: 0.0015,
   pillAction: 0.5, pouchStack: 4, pillAt: 0.45,   // пілюля — дія 0,5 с; у слоті підсумка до 10 штук; автовживання нижче 45% HP
@@ -55,9 +55,9 @@ export const K = {
   zoneHpRegen: 0.8, opRegen: 0.25, respawn: 3,
   wound: { stat:0.05, max:4, healMin:10, healFloorMin:2.5 },
   // --- вороги ---
-  eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [219.3,0], eEva: [32.4,4.3],
+  eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [219.3,0], eEva: [29.8,4.3],
   boss: { hp:3.46, dmg:1.49 }, pack: { n:3, hp:0.4, dmg:0.4 },
-  trait: { armor:0.30, armorOff:6, casterEvery:12, casterCast:3, casterMult:3, evasive:1.47, regenPct:0.01, illusionEvery:10, illusionDur:6, illusionAcc:0.25,
+  trait: { armor:0.30, armorOff:6, casterEvery:12, casterCast:3, casterMult:3, evasive:1.59, regenPct:0.01, illusionEvery:10, illusionDur:6, illusionAcc:0.25,
     hidden:8, hiddenAcc:0.07, hiddenFirst:2.0, poisonChance:0.35 },
   // --- бій: досвід за годину бою в зоні рівня Z, частки від rate(Z) ---
   combatXp: { style:0.70, vit:0.35 },

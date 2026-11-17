@@ -248,6 +248,7 @@ export const CORE_ICONS: Readonly<Record<string, Readonly<Record<string, string>
     stun: 'star-swirl',
     bind: 'crossed-chains',
     poison: 'poison-cloud',
+    interrupt: 'hourglass',
   },
 
   // `shield` is out of the slice but kept so the full list of nine traits is covered.

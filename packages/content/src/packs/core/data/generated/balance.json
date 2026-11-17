@@ -21,12 +21,12 @@
     "craft": 2.5,
     "explore": 5,
     "castByRank": {
-      "E": 0.95,
-      "D": 1.14,
-      "C": 0.953,
-      "B": 2.2,
-      "A": 1.759,
-      "S": 2.639
+      "E": 0.944,
+      "D": 1.133,
+      "C": 0.947,
+      "B": 2.186,
+      "A": 1.748,
+      "S": 2.622
     },
     "castByRole": {
       "projectile": 1,
@@ -57,7 +57,7 @@
     "role": {
       "projectile": {
         "m": 1,
-        "cd": 4.3,
+        "cd": 4.64,
         "c": 1
       },
       "series": {
@@ -67,12 +67,12 @@
       },
       "area": {
         "m": 0.75,
-        "cd": 34.37,
+        "cd": 18.97,
         "c": 1.2
       },
       "control": {
         "m": 0.3,
-        "cd": 11.96,
+        "cd": 20.67,
         "c": 0.9
       },
       "defense": {
@@ -132,12 +132,12 @@
       "dur": 8
     },
     "evaLevel": {
-      "min": 0.023,
+      "min": 0.046,
       "max": 1.014
     },
     "rhythm": {
       "slow": 0.29,
-      "dur": 3.24
+      "dur": 3.5
     },
     "stun": {
       "C": 1,
@@ -303,7 +303,7 @@
     "hitMin": 0.05,
     "hitMax": 0.95,
     "basicCast": 1.341,
-    "basicCost": 0.65,
+    "basicCost": 0.31,
     "rest": {
       "s": 1.5,
       "share": 0.08
@@ -370,7 +370,7 @@
       0
     ],
     "eEva": [
-      32.4,
+      29.8,
       4.3
     ],
     "boss": {
@@ -388,7 +388,7 @@
       "casterEvery": 12,
       "casterCast": 3,
       "casterMult": 3,
-      "evasive": 1.47,
+      "evasive": 1.59,
       "regenPct": 0.01,
       "illusionEvery": 10,
       "illusionDur": 6,

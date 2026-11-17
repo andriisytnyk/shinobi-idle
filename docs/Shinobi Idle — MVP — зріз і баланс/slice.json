@@ -104,7 +104,7 @@
   }
  },
  "meta": {
-  "built": "2026-11-16",
+  "built": "2026-11-17",
   "cap": 50,
   "skills": [
    "tai",
@@ -229,7 +229,7 @@
    "sealsCanon": true,
    "tier": 0,
    "noDamage": false,
-   "castOverride": 1.43
+   "castOverride": 1.42
   },
   {
    "skill": "tai",
@@ -253,7 +253,7 @@
    "sealsCanon": true,
    "tier": 0,
    "noDamage": false,
-   "castOverride": 1.43
+   "castOverride": 1.42
   },
   {
    "skill": "tai",
@@ -683,7 +683,7 @@
    "sealsCanon": true,
    "tier": 0,
    "noDamage": false,
-   "castOverride": 1.15
+   "castOverride": 1.14
   },
   {
    "skill": "katon",
@@ -855,7 +855,7 @@
    "sealsCanon": true,
    "tier": 1,
    "noDamage": false,
-   "castOverride": 1.19
+   "castOverride": 1.18
   },
   {
    "skill": "katon",
@@ -1437,7 +1437,7 @@
    "sealsCanon": true,
    "tier": 0,
    "noDamage": false,
-   "castOverride": 1.19
+   "castOverride": 1.18
   },
   {
    "skill": "doton",
@@ -1465,7 +1465,7 @@
    "sealsCanon": true,
    "tier": 1,
    "noDamage": false,
-   "castOverride": 1.26
+   "castOverride": 1.25
   },
   {
    "skill": "doton",
@@ -1714,7 +1714,7 @@
    "sealsCanon": true,
    "tier": 0,
    "noDamage": false,
-   "castOverride": 1.32
+   "castOverride": 1.31
   },
   {
    "skill": "suiton",

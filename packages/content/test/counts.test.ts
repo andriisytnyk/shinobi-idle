@@ -23,7 +23,7 @@ describe('slice size', () => {
     expect(content.items.filter((i) => i.part)).toHaveLength(6);
     expect(content.zones).toHaveLength(31);
     expect(content.operations).toHaveLength(2);
-    expect(content.statuses).toHaveLength(5);
+    expect(content.statuses).toHaveLength(6);
     expect(content.traits).toHaveLength(8);
     expect(content.combos).toHaveLength(4);
   });

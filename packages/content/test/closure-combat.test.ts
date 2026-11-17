@@ -372,9 +372,11 @@ describe('scrolls, parts and tools', () => {
 });
 
 describe('statuses, traits and combos', () => {
-  it('lists the five statuses with their numbers in the balance object', () => {
+  it('lists the six statuses with their numbers in the balance object', () => {
     expect(content.statuses.map((s) => s.id)).toEqual([...STATUS_IDS]);
-    for (const s of content.statuses) expect(K, s.id).toHaveProperty(s.id);
+    // The interrupt status keeps its numbers under `rhythm`.
+    for (const s of content.statuses)
+      expect(K, s.id).toHaveProperty(s.id === 'interrupt' ? 'rhythm' : s.id);
   });
 
   it('lists the eight traits with their answer tag and numbers', () => {

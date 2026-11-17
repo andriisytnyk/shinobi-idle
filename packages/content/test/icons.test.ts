@@ -47,7 +47,7 @@ describe('icon registry', () => {
   it('covers the expected number of entities', () => {
     expect(required.skill).toHaveLength(15);
     expect(required.technique).toHaveLength(60);
-    expect(required.status).toHaveLength(5);
+    expect(required.status).toHaveLength(6);
     expect(required.trait).toHaveLength(9);
     expect(required.nature).toHaveLength(5);
     expect(required.currency).toHaveLength(3);
