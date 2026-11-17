@@ -90,8 +90,10 @@ describe('performers on the map', () => {
     const command: Command = { type: 'world.travel', cell: 'core:rysovi_polia', slot: 1 };
     expect(travelPlan(state, 'core:rysovi_polia', content, undefined, 1).blocked).toBeNull();
     expect(dispatch(state, command, content)).toEqual({ ok: true });
-    advance(state, 60 * MIN, content);
-    expect(state.world.figures?.[1]).toBe('core:rysovi_polia');
+    advance(state, MIN, content);
+    // On the way the clone stands on its own hex; the character stays at home.
+    expect(state.slots[1]?.action?.kind).toBe('walk');
+    expect(positionOf(state, 1)).not.toBe(HOME);
     expect(state.world.location).toBe(HOME);
     expect(state.slots[0]?.action).toBeNull();
   });
@@ -139,7 +141,7 @@ describe('performers on the map', () => {
     ).toEqual({ ok: true });
   });
 
-  it('plans the auto-survey of each slot from its own position', () => {
+  it('plans the auto-survey of each slot from its own position; one auto-survey runs at a time', () => {
     const state = twoSlots();
     state.world.figures = { 1: FAR };
     const a = autoPlan(state, content, 0);
@@ -148,31 +150,39 @@ describe('performers on the map', () => {
     expect(b).not.toBeNull();
     expect(a?.stand).toBe(keyOf(HOME));
     expect(b?.stand).toBe(keyOf(FAR));
-    for (const slot of [0, 1]) {
-      expect(
-        dispatch(
-          state,
-          { type: 'action.start', slot, kind: AUTOSURVEY_KIND, id: AUTOSURVEY_ID },
-          content,
-        ),
-      ).toEqual({ ok: true });
-    }
-    // The two do not take the same hex: the second plan skips what the first is surveying.
+    const auto = (slot: number): Command => ({
+      type: 'action.start',
+      slot,
+      kind: AUTOSURVEY_KIND,
+      id: AUTOSURVEY_ID,
+    });
+    expect(dispatch(state, auto(0), content)).toEqual({ ok: true });
+    // The same action in a second slot is refused, as every other action is.
+    expect(dispatch(state, auto(1), content)).toMatchObject({
+      ok: false,
+      reason: 'error.sameActionElsewhere',
+    });
+    // The clone surveys by hand the hex the character would take next: that is another action, and
+    // the plan of the character then skips the hex the clone is surveying.
+    const target = autoPlan(state, content, 0)?.subject.address ?? '';
+    expect(
+      dispatch(state, { type: 'action.start', slot: 1, kind: EXPLORE_KIND, id: target }, content),
+    ).toEqual({ ok: true });
+    expect(autoPlan(state, content, 0)?.subject.address).not.toBe(target);
     advance(state, 30 * MIN, content);
     expect(state.slots[0]?.action?.kind).toBe(AUTOSURVEY_KIND);
-    expect(state.slots[1]?.action?.kind).toBe(AUTOSURVEY_KIND);
   });
 
   it('does not depend on how the time is cut with two performers, and survives a save', () => {
     const make = (): GameState => {
       const s = twoSlots();
-      s.world.figures = { 1: FAR };
       dispatch(s, { type: 'world.travel', cell: 'core:rysovi_polia', slot: 0 }, content);
       dispatch(
         s,
         { type: 'action.start', slot: 1, kind: AUTOSURVEY_KIND, id: AUTOSURVEY_ID },
         content,
       );
+      s.world.figures = { 1: FAR };
       return s;
     };
     const whole = make();
@@ -184,5 +194,72 @@ describe('performers on the map', () => {
     const loaded = deserialize(serialize(whole), content);
     expect(loaded.world.figures).toEqual(whole.world.figures);
     expect(loaded.world.location).toBe(whole.world.location);
+  });
+
+  describe('the life of a clone on the map', () => {
+    const walkTo = (slot: number, cell: string): Command => ({ type: 'world.travel', cell, slot });
+
+    it('appears where the character stands, and does not follow the character afterwards', () => {
+      const state = twoSlots();
+      expect(state.world.figures).toBeUndefined();
+      expect(dispatch(state, walkTo(1, 'core:rysovi_polia'), content)).toEqual({ ok: true });
+      expect(state.world.figures?.[1]).toBe(HOME);
+      // The character walks off; the clone keeps its own position and its own route.
+      expect(dispatch(state, walkTo(0, 'core:prykordonnyi_lis_okolytsia'), content)).toEqual({ ok: true });
+      // Step by step until the character has left home while the clone is still on its way.
+      for (let i = 0; i < 40 && state.world.location === HOME; i++) advance(state, MIN, content);
+      expect(state.slots[1]?.action?.kind).toBe('walk');
+      expect(state.world.location).not.toBe(HOME);
+      expect(positionOf(state, 1)).toBe(state.world.figures?.[1]);
+      expect(positionOf(state, 1)).not.toBe(positionOf(state, 0));
+    });
+
+    it('walks apart from the character and surveys from its own position', () => {
+      const state = twoSlots();
+      dispatch(state, walkTo(1, 'core:rysovi_polia'), content);
+      advance(state, 60 * MIN, content);
+      // Arrived: the walk is done, so the clone is gone from the map (it has nothing left to do).
+      expect(state.slots[1]?.action).toBeNull();
+      expect(state.world.figures?.[1]).toBeUndefined();
+      expect(state.world.location).toBe(HOME);
+      // A clone that surveys and a character that walks: the survey keeps its position.
+      const auto: Command = {
+        type: 'action.start',
+        slot: 1,
+        kind: AUTOSURVEY_KIND,
+        id: AUTOSURVEY_ID,
+      };
+      expect(dispatch(state, auto, content)).toEqual({ ok: true });
+      dispatch(state, walkTo(0, FAR), content);
+      advance(state, 30 * MIN, content);
+      expect(state.slots[1]?.action?.kind).toBe(AUTOSURVEY_KIND);
+      expect(positionOf(state, 0)).not.toBe(HOME);
+      expect(positionOf(state, 1)).toBe(state.world.figures?.[1]);
+      expect(keyOf(positionOf(state, 1))).toBeDefined();
+    });
+
+    it('leaves the map when dispelled or stopped: no stale figure, the next clone starts at the character', () => {
+      const state = twoSlots();
+      dispatch(state, walkTo(1, 'core:rysovi_polia'), content);
+      advance(state, 2 * MIN, content);
+      expect(state.world.figures?.[1]).toBeDefined();
+      state.world.figures = { 1: FAR };
+      // A stop by hand is not a dispel, but the clone is gone all the same.
+      expect(dispatch(state, { type: 'action.stop', slot: 1 }, content)).toEqual({ ok: true });
+      expect(state.world.figures).toBeUndefined();
+      dispatch(state, walkTo(1, 'core:rysovi_polia'), content);
+      expect(state.world.figures?.[1]).toBe(HOME);
+      // A new action given to a running clone keeps it where it stands.
+      state.world.figures = { 1: FAR };
+      dispatch(state, { type: 'action.start', slot: 1, kind: AUTOSURVEY_KIND, id: AUTOSURVEY_ID }, content);
+      expect(state.world.figures?.[1]).toBe(FAR);
+    });
+
+    it('drops the figure of an idle slot when a save is loaded', () => {
+      const state = twoSlots();
+      state.world.figures = { 1: FAR };
+      const loaded = deserialize(serialize(state), content);
+      expect(loaded.world.figures).toBeUndefined();
+    });
   });
 });

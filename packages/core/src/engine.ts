@@ -21,6 +21,7 @@ import { examFor, SENSEI_TEST_KIND } from './exam.ts';
 import { rankIndex } from './vocab.ts';
 import { buyGear } from './gear.ts';
 import { coatItem, useItem } from './items.ts';
+import { placeAt } from './hex.ts';
 import { indexOf } from './lookup.ts';
 import { buyMeditationLevel } from './meditation.ts';
 import { addNature, chooseNature, type NatureChoice } from './natures.ts';
@@ -244,7 +245,10 @@ function startAction(
   const slot = state.slots[slotIndex];
   const kind = actionKindOf(rules, kindName);
   if (!slot || !kind) return { ok: false, reason: 'error.invalidSlot' };
+  const replaced = slot.action !== null;
   stopSlot(state, slotIndex, 'replaced', content, rules);
+  // A clone appears where the character stands, then goes on by itself; one given a new action stays.
+  if (slotIndex > 0 && !replaced) placeAt(state, slotIndex, state.world.location);
   slot.action = { kind: kindName, id };
   slot.progress = 0;
   slot.data = null;

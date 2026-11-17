@@ -10,6 +10,7 @@ import {
   rate,
   techniqueCastSeconds,
 } from './formulas.ts';
+import { removeFigure } from './hex.ts';
 import { indexOf } from './lookup.ts';
 import { actionFloor, entitySkill } from './vocab.ts';
 import { trackClone } from './clone.ts';
@@ -238,6 +239,8 @@ export function stopSlot(
   slot.action = null;
   slot.progress = 0;
   slot.data = null;
+  // A clone that stops (dispelled, or done) leaves the map; one whose action is replaced stays where it stands.
+  if (index > 0 && reason !== 'replaced') removeFigure(state, index);
   rebalanceShares(state, content);
 }
 

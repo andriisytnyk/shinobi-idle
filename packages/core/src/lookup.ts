@@ -68,6 +68,10 @@ export interface ContentIndex {
   cellByHex: Map<string, Cell>;
   /** The named places on each hex, by hex key. */
   placesByHex: Map<string, Place[]>;
+  /** The hexes of the grid that have a terrain, in the order of the grid. */
+  playableHexes: Hex[];
+  /** The ways to hexes that are not neighbours, from each end of a link, by hex key; a link is listed at both its ends. */
+  linksByHex: Map<string, { id: string; to: string; minutes: number }[]>;
   regions: Map<string, Region>;
   /** Every point of interest with the cell it lies in. */
   pois: Map<string, { poi: Poi; cell: Cell }>;
@@ -173,8 +177,17 @@ function build(content: ContentDb): ContentIndex {
     const key = `${place.hex[0]},${place.hex[1]}`;
     placesByHex.set(key, [...(placesByHex.get(key) ?? []), place]);
   }
+  const linksByHex = new Map<string, { id: string; to: string; minutes: number }[]>();
+  for (const link of content.links) {
+    const a = `${link.a[0]},${link.a[1]}`;
+    const b = `${link.b[0]},${link.b[1]}`;
+    linksByHex.set(a, [...(linksByHex.get(a) ?? []), { id: link.id, to: b, minutes: link.minutes }]);
+    linksByHex.set(b, [...(linksByHex.get(b) ?? []), { id: link.id, to: a, minutes: link.minutes }]);
+  }
   return {
     cells: byId(content.cells),
+    playableHexes: content.hexes.filter((h) => h.terrain !== undefined),
+    linksByHex,
     hexes: new Map(content.hexes.map((h) => [`${h.q},${h.r}`, h])),
     terrains: byId(content.terrains),
     cellByHex,

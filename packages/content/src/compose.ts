@@ -55,6 +55,7 @@ export const ENTITY_LISTS = [
   'regions',
   'cells',
   'places',
+  'links',
   'enemies',
   'bosses',
   'buildings',
@@ -293,6 +294,7 @@ function applyPatch(
   pack: string,
   patch: Patch,
   lists: Map<string, Plain[]>,
+  hexes: Plain[],
   patched: Set<string>,
   patchedBy: Map<string, string>,
   balance: Plain,
@@ -321,9 +323,18 @@ function applyPatch(
     return;
   }
   const { kind, id } = patch.target;
-  if (!ENTITY_LIST_SET.has(kind)) return fail(pack, `patch targets unknown list "${kind}"`);
-  const entity = lists.get(kind)?.find((e) => e.id === id);
+  // A hex has no id of its own: a patch names it by its coordinates ("q,r") and may set its terrain or country.
+  const isHex = kind === 'hexes';
+  if (!isHex && !ENTITY_LIST_SET.has(kind))
+    return fail(pack, `patch targets unknown list "${kind}"`);
+  const entity = isHex
+    ? hexes.find((e) => `${String(e.q)},${String(e.r)}` === id)
+    : lists.get(kind)?.find((e) => e.id === id);
   if (!entity) return fail(pack, `patch targets ${kind} "${id}", which does not exist`);
+  if (isHex)
+    for (const field of Object.keys(patch.set ?? {}).concat(Object.keys(patch.append ?? {})))
+      if (field !== 'terrain' && field !== 'country')
+        fail(pack, `patch to hex "${id}" may set only "terrain" and "country", not "${field}"`);
   const mark = (field: string) => {
     const key = `${kind}:${id}:${field}`;
     if (patched.has(key))
@@ -539,7 +550,7 @@ export function composeContent(packs: readonly ContentPack[]): ContentDb {
   // Patches run in load order, after everything is merged.
   const patched = new Set<string>();
   for (const { pack, patch } of patches)
-    applyPatch(pack, patch, lists, patched, patchedBy, balance, balanceOwners);
+    applyPatch(pack, patch, lists, keyed.get('hexes') ?? [], patched, patchedBy, balance, balanceOwners);
 
   // Modifier keys: the families of the composed skills, then each pack's declarations.
   const skills = (lists.get('skills') ?? []) as { id: string; activity: string }[];

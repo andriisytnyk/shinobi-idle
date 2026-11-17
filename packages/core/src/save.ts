@@ -66,7 +66,7 @@ import {
 } from './village.ts';
 import { createVillage, type VillageState } from './village-state.ts';
 import { isAcademyRank, isNature, packOfId, poolEntry, rankIndex, skillEntry } from './vocab.ts';
-import { hexKey, hexLine, isPlayable } from './hex.ts';
+import { hexKey, hexLine, isPlayable, removeFigure } from './hex.ts';
 import { cellMaxExplores, levelForExplores, plainMaxExplores, subjectOf } from './world.ts';
 import { createWorld, seedSurvey } from './world-state.ts';
 import { xpAt } from './xp.ts';
@@ -909,6 +909,9 @@ export function deserialize(
       );
     }
   }
+  // A figure belongs to a clone that works: one of a slot that is gone or idle is not on the map.
+  for (const slot of Object.keys(state.world.figures ?? {}))
+    if (!state.slots[Number(slot)]?.action) removeFigure(state, Number(slot));
   ensurePouch(state, content);
   syncLoadout(state, content);
   // A fight needs both its slot and its state: it belongs to the slot its `owner` names, and only if that

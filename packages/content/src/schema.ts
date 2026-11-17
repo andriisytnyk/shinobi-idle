@@ -636,6 +636,14 @@ export const terrainSchema = z.strictObject({
   id: vocabId,
   token: z.string().optional(),
   blocked: z.boolean().optional(),
+  /** The mark drawn on a hex of the terrain: an SVG path in units of the hex (about -12..12 across); none draws a bare hex. */
+  glyph: z
+    .string()
+    .max(400)
+    .regex(/^[MmLlHhVvCcSsQqTtAaZz0-9.,\s-]+$/, 'expected the data of an SVG path')
+    .optional(),
+  /** Whether the mark is filled (a stroke otherwise). */
+  glyphFill: z.boolean().optional(),
 });
 
 /**
@@ -656,6 +664,22 @@ export type Hex = z.infer<typeof hexSchema>;
  * (`place.<id>.name` and `.desc`); what can be done there lives in the points of interest of the
  * hex's cell. `kind` and `role` only choose the mark that is drawn.
  */
+/**
+ * A way between two hexes that are not neighbours (a ferry, a mountain pass): the player walks it
+ * as if the two stood side by side, and from one end can survey the other. `minutes` is the time
+ * to cross at full speed, before modifiers. `kind` only chooses the mark that is drawn. Both ends
+ * must be playable hexes that can be entered; a link is no road through fog: an end the player has
+ * not surveyed cannot be walked to.
+ */
+export const linkSchema = z.strictObject({
+  id: coreId,
+  a: z.tuple([z.number().int(), z.number().int()]),
+  b: z.tuple([z.number().int(), z.number().int()]),
+  minutes: z.number().positive(),
+  kind: z.string().min(1).optional(),
+});
+export type Link = z.infer<typeof linkSchema>;
+
 export const placeSchema = z.strictObject({
   id: coreId,
   hex: z.tuple([z.number().int(), z.number().int()]),
@@ -1582,6 +1606,8 @@ export const contentDbSchema = z.object({
   /** The world grid; a hex is keyed by its coordinates. */
   hexes: z.array(hexSchema),
   places: z.array(placeSchema),
+  /** Ways between hexes that are not neighbours. */
+  links: z.array(linkSchema),
   /** What each kind of key cell needs. */
   cellKeys: open<Record<IdTypes['cellKey'], Req>>(z.record(z.string(), reqSchema)),
   enemies: z.array(enemySchema),
@@ -1612,6 +1638,7 @@ export const generatedDbSchema = contentDbSchema
     coat: true,
     zones: true,
     cellKeys: true,
+    links: true,
     resources: true,
     operations: true,
     statuses: true,

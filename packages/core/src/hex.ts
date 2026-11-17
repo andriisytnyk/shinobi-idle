@@ -121,6 +121,14 @@ export function placeAt(state: GameState, slot: number, address: string): void {
   else state.world.location = address;
 }
 
+/** Takes the figure of the performer of `slot` off the map (a clone that was dispelled or has nothing left to do). */
+export function removeFigure(state: GameState, slot: number): void {
+  const figures = state.world.figures;
+  if (!figures || !(slot in figures)) return;
+  delete figures[slot];
+  if (Object.keys(figures).length === 0) delete state.world.figures;
+}
+
 /** The hex the performer of `slot` stands on; the first cell's hex when the saved position names nothing. */
 export function positionHex(state: GameState, content: ContentDb, slot = 0): Hex | null {
   const index = indexOf(content);

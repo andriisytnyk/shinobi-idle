@@ -38,7 +38,8 @@ export type PackBalance = { K?: Record<string, unknown>; [key: string]: unknown 
 
 /** A reference to one entity of the composed database: its list and its id. */
 export interface PatchTarget {
-  kind: EntityListKey;
+  /** A list of entities with ids, or `hexes` (then `id` is the hex "q,r" and a patch may set only its `terrain` and `country`). */
+  kind: EntityListKey | 'hexes';
   id: string;
 }
 

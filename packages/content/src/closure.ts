@@ -473,6 +473,20 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     at('places', p.id);
     standable('hex', p.hex);
   }
+  const linked = new Set<string>();
+  for (const l of db.links) {
+    at('links', l.id);
+    standable('a', l.a);
+    standable('b', l.b);
+    const dq = l.a[0] - l.b[0];
+    const dr = l.a[1] - l.b[1];
+    const steps = (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
+    if (steps === 0) problem('b', 'a link joins two different hexes');
+    else if (steps === 1) problem('b', 'a link joins hexes that are not neighbours: those are joined already');
+    const pair = [`${l.a[0]},${l.a[1]}`, `${l.b[0]},${l.b[1]}`].sort().join('|');
+    if (linked.has(pair)) problem('b', 'another link joins the same two hexes');
+    linked.add(pair);
+  }
   for (const c of db.cells) {
     at('cells', c.id);
     ref('region', c.region, 'regions');
