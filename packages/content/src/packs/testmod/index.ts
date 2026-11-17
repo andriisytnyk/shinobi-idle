@@ -304,18 +304,19 @@ const data = {
     { id: 'testmod:zone_shellback', enemy: 'testmod:shellback', region: 'academy', unlock: null },
     { id: 'testmod:zone_boss_shell', enemy: 'testmod:boss_shell', region: 'boss', unlock: null },
   ],
-  /** A two-hex island far outside the world grid: the grid is full, so a pack's land is an island of its own. */
+  /**
+   * A two-hex island off the south-east coast of the Land of Fire. The grid is full, so the pack makes
+   * two hexes of open sea its own land with `patches` (below), and a ferry (a `link`) joins the coast
+   * to the island: the island can be surveyed from the coast and walked to.
+   */
   countries: [{ id: 'testmod:isle' }],
-  hexes: [
-    { q: 100, r: 100, country: 'testmod:isle', terrain: 'forest' },
-    { q: 101, r: 100, country: 'testmod:isle', terrain: 'plains' },
-  ],
+  links: [{ id: 'testmod:ferry', a: [15, 17], b: [18, 17], minutes: 5, kind: 'ferry' }],
   regions: [{ id: 'testmod:grove', scout: 1, cells: ['testmod:grove_edge'] }],
   cells: [
     {
       id: 'testmod:grove_edge',
       region: 'testmod:grove',
-      hex: [100, 100],
+      hex: [17, 17],
       index: 0,
       key: null,
       story: false,
@@ -513,14 +514,15 @@ export const testmodPack: ContentPack = {
       'boss.testmod:boss_shell.place': 'Тестовий гай',
       'country.testmod:isle.name': 'Тестовий острів',
       'region.testmod:grove.name': 'Тестовий гай',
-      'region.testmod:grove.desc': 'Тестовий регіон мода з однією клітинкою, до якої можна дійти.',
+      'region.testmod:grove.desc':
+        'Тестовий регіон мода з однією клітинкою на острові: до неї йде переправа з узбережжя.',
       'cell.testmod:grove_edge.name': 'Край тестового гаю',
       'cell.testmod:grove_edge.note': 'Єдина клітинка тестового регіону.',
       'poi.testmod:poi_grove_cache.name': 'Тестовий тайник',
       'poi.testmod:poi_grove_cache.desc': 'Тестова схованка, що платить тестовими жетонами.',
       'poi.testmod:poi_grove_edge_outpost.name': 'Тестова застава',
       'poi.testmod:poi_grove_edge_outpost.desc':
-        'Тестова точка інтересу відомого виду: вільна ціль подорожі.',
+        'Тестова точка інтересу відомого виду: застава, з якої видно трохи далі.',
       'building.testmod:hut.name': 'Тестова хатина',
       'building.testmod:hut.desc': 'Тестова будівля мода з одним власним модифікатором за рівень.',
       'mission.testmod:test_run.name': 'Тестове доручення',
@@ -555,6 +557,12 @@ export const testmodPack: ContentPack = {
     },
   },
   patches: [
+    {
+      /** Open sea becomes the forest of the island: a pack can make a hex outside the playable land playable. */
+      target: { kind: 'hexes', id: '17,17' },
+      set: { country: 'testmod:isle', terrain: 'forest' },
+    },
+    { target: { kind: 'hexes', id: '18,17' }, set: { country: 'testmod:isle', terrain: 'plains' } },
     {
       /** The wheel both ways: a core nature beats the test nature, which beats another core one. */
       target: { kind: 'natures', id: 'doton' },

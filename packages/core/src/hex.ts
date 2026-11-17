@@ -11,8 +11,10 @@ import { activitySkill } from './vocab.ts';
  * of the cell that stands on the hex, or the key of the hex when no cell does.
  *
  * There is no sight. A hex the player has not surveyed is fog: it cannot be entered and a route
- * never crosses it. Surveying a hex to its first level makes it *surveyed* (see `isSurveyed`). Pure:
- * everything here reads the state.
+ * never crosses it. Surveying a hex to its first level makes it *surveyed* (see `isSurveyed`). A
+ * *link* of the content joins two hexes that are not neighbours (a ferry, a pass): to the search
+ * and to the survey the two ends are neighbours. Pure: everything here reads the state; the
+ * searches are remembered per state and forgotten when the survey changes (see `touchWorld`).
  */
 
 export interface Axial {
@@ -80,6 +82,26 @@ export function hexLine(a: Axial, b: Axial): Axial[] {
   }
   return out;
 }
+
+// ---------- what changed ----------
+
+const revisions = new WeakMap<GameState, number>();
+
+/**
+ * Tells the searches that the surveyed land, or a level that decides what can be surveyed, changed
+ * (a hex was surveyed to a new level). The engine calls it where it changes them.
+ */
+export const touchWorld = (state: GameState): void => {
+  revisions.set(state, (revisions.get(state) ?? 0) + 1);
+};
+
+/**
+ * What the remembered searches of a state were made for: the revision, and the sizes of the lists
+ * of surveys (a list changed behind the engine's back changes its size, as a doctored or a test
+ * state does).
+ */
+export const worldStamp = (state: GameState): string =>
+  `${revisions.get(state) ?? 0}|${Object.keys(state.world.surveyed).length}|${Object.keys(state.world.explores).length}`;
 
 // ---------- addresses ----------
 
@@ -213,13 +235,14 @@ export interface Reach {
   prev: Map<string, string>;
 }
 
-/** The enterable neighbours of each enterable hex with the minutes of entering them, built once per content. */
+/** The enterable neighbours of each enterable hex, and the far ends of its links, with the minutes of entering them; built once per content. */
 const graphs = new WeakMap<ContentDb, Map<string, { key: string; minutes: number }[]>>();
 function walkGraph(content: ContentDb): Map<string, { key: string; minutes: number }[]> {
   let graph = graphs.get(content);
   if (graph) return graph;
   graph = new Map();
-  const hexes = indexOf(content).hexes;
+  const index = indexOf(content);
+  const hexes = index.hexes;
   for (const [key, hex] of hexes) {
     if (!isEnterable(content, hex)) continue;
     const edges: { key: string; minutes: number }[] = [];
@@ -229,11 +252,35 @@ function walkGraph(content: ContentDb): Map<string, { key: string; minutes: numb
       if (isEnterable(content, nh))
         edges.push({ key: nk, minutes: terrainMinutes(content, nh?.terrain ?? '') });
     }
+    for (const link of index.linksByHex.get(key) ?? [])
+      if (isEnterable(content, hexes.get(link.to)))
+        edges.push({ key: link.to, minutes: link.minutes });
     graph.set(key, edges);
   }
   graphs.set(content, graph);
   return graph;
 }
+
+/** The hexes a hex is joined to by links (not its neighbours), as keys. */
+export const linkedKeys = (content: ContentDb, key: string): string[] =>
+  (indexOf(content).linksByHex.get(key) ?? []).map((l) => l.to);
+
+/** Minutes of stepping from the hex `from` onto the hex `to` (neighbours, or the ends of a link) at full speed, before modifiers. */
+export function stepMinutes(content: ContentDb, from: string, to: string): number {
+  const link = (indexOf(content).linksByHex.get(from) ?? []).find((l) => l.to === to);
+  if (link) return link.minutes;
+  return terrainMinutes(content, indexOf(content).hexes.get(to)?.terrain ?? '');
+}
+
+/** Whether a performer at `here` can reach the hex `target` with a survey: it is within `range` steps, or the far end of a link from `here`. */
+export const inSurveyReach = (
+  content: ContentDb,
+  here: Axial,
+  target: Axial,
+  range: number,
+): boolean =>
+  hexDistance(here, target) <= range ||
+  linkedKeys(content, hexKey(here.q, here.r)).includes(hexKey(target.q, target.r));
 
 type HeapItem = [number, string];
 
@@ -242,6 +289,23 @@ type HeapItem = [number, string];
  * ties go to the smaller key so that the result never depends on the order of the search.
  */
 export function reachFrom(state: GameState, content: ContentDb, from: Axial, slot = 0): Reach {
+  const stamp = `${hexKey(from.q, from.r)}|${positionOf(state, slot)}|${worldStamp(state)}`;
+  const memo = reaches.get(state)?.get(slot);
+  if (memo && memo.content === content && memo.stamp === stamp) return memo.reach;
+  const reach = searchFrom(state, content, from, slot);
+  const all = reaches.get(state) ?? new Map();
+  all.set(slot, { content, stamp, reach });
+  reaches.set(state, all);
+  return reach;
+}
+
+/** The last search of each performer of a state, good while the surveyed land and the position stay as they were. */
+const reaches = new WeakMap<
+  GameState,
+  Map<number, { content: ContentDb; stamp: string; reach: Reach }>
+>();
+
+function searchFrom(state: GameState, content: ContentDb, from: Axial, slot: number): Reach {
   const graph = walkGraph(content);
   const known = surveyedKeys(state, content, slot);
   const start = hexKey(from.q, from.r);
@@ -309,10 +373,9 @@ export function pathTo(content: ContentDb, reach: Reach, goal: string): Route | 
     at = reach.prev.get(at)
   )
     hexes.unshift(at);
-  const index = indexOf(content);
   return {
     hexes,
-    minutes: hexes.map((key) => terrainMinutes(content, index.hexes.get(key)?.terrain ?? '')),
+    minutes: hexes.map((key, i) => stepMinutes(content, hexes[i - 1] ?? reach.start, key)),
   };
 }
 
@@ -343,15 +406,17 @@ export function surveyAccess(
   slot = 0,
 ): 'ok' | 'outOfRange' | 'cutOff' {
   const here = positionHex(state, content, slot);
-  if (!here || hexDistance(here, target) > surveyRange(state, content, slot)) return 'outOfRange';
+  if (!here || !inSurveyReach(content, here, target, surveyRange(state, content, slot)))
+    return 'outOfRange';
   if (isSurveyed(state, content, hexKey(target.q, target.r))) return 'ok';
   // The hex underfoot is always standable.
   if (hexDistance(here, target) === 0) return 'ok';
   const walkable = reach ?? reachFrom(state, content, here, slot);
   const hexes = indexOf(content).hexes;
-  const touches = neighbours(target).some((n) => {
-    const key = hexKey(n.q, n.r);
-    return hexes.has(key) && walkable.dist.has(key);
-  });
+  const touches =
+    neighbours(target).some((n) => {
+      const key = hexKey(n.q, n.r);
+      return hexes.has(key) && walkable.dist.has(key);
+    }) || linkedKeys(content, hexKey(target.q, target.r)).some((key) => walkable.dist.has(key));
   return touches ? 'ok' : 'cutOff';
 }

@@ -12,9 +12,11 @@ import {
   hexKey,
   hexOfAddress,
   hexesWithin,
+  inSurveyReach,
   isEnterable,
   isPlayable,
   isSurveyed,
+  linkedKeys,
   parseHexKey,
   pathTo,
   placeAt,
@@ -23,8 +25,10 @@ import {
   reachFrom,
   routeTo,
   surveyAccess,
+  stepMinutes,
   surveyRange,
-  terrainMinutes,
+  touchWorld,
+  worldStamp,
   type Axial,
   type Reach,
 } from './hex.ts';
@@ -62,12 +66,26 @@ export interface Subject {
   cell: Cell | null;
 }
 
+const subjects = new WeakMap<ContentDb, Map<string, Subject | null>>();
+
+/** How many surveys each state has seen finish: a view that shows survey counts is good until it changes. */
+const surveysDone = new WeakMap<GameState, number>();
+export const surveyCount = (state: GameState): number => surveysDone.get(state) ?? 0;
+
 /** The hex an address names, when it can be surveyed (it is playable). */
 export function subjectOf(content: ContentDb, address: string): Subject | null {
+  let known = subjects.get(content);
+  if (!known) subjects.set(content, (known = new Map()));
+  const cached = known.get(address);
+  if (cached !== undefined) return cached;
   const hex = hexOfAddress(content, address);
-  if (!isPlayable(hex)) return null;
-  const cell = indexOf(content).cellByHex.get(hexKey(hex.q, hex.r)) ?? null;
-  return { address: cell?.id ?? hexKey(hex.q, hex.r), hex, cell };
+  let subject: Subject | null = null;
+  if (isPlayable(hex)) {
+    const cell = indexOf(content).cellByHex.get(hexKey(hex.q, hex.r)) ?? null;
+    subject = { address: cell?.id ?? hexKey(hex.q, hex.r), hex, cell };
+  }
+  known.set(address, subject);
+  return subject;
 }
 
 // ---------- levels ----------
@@ -310,10 +328,26 @@ function plainOnce(state: GameState, subject: Subject, content: ContentDb, rules
 
 /** One survey of a subject. */
 function surveyOnce(state: GameState, subject: Subject, content: ContentDb, rules: Rules): boolean {
-  planned.delete(state);
-  return subject.cell
+  const key = hexKey(subject.hex.q, subject.hex.r);
+  const level = surveyLevel(state, subject, content);
+  const known = isSurveyed(state, content, key);
+  const done = subject.cell
     ? exploreOnce(state, subject.cell, content, rules)
     : plainOnce(state, subject, content, rules);
+  surveysDone.set(state, (surveysDone.get(state) ?? 0) + 1);
+  // The searches stay good while a hex only goes on being surveyed within its level, and the hex
+  // is the one every plan has chosen (its count only makes it a better choice); anything else
+  // (a new level, new land, a hex nobody planned) makes them be made again.
+  const plans = planned.get(state);
+  const ownPlans = plans ? [...plans.values()].every((e) => e.plan?.subject.address === subject.address) : true;
+  if (
+    done ||
+    !ownPlans ||
+    surveyLevel(state, subject, content) !== level ||
+    isSurveyed(state, content, key) !== known
+  )
+    touchWorld(state);
+  return done;
 }
 
 export const exploreKind: ActionKind = {
@@ -334,18 +368,15 @@ export const exploreKind: ActionKind = {
 
 // ---------- travel ----------
 
-/** Minutes of the hexes of a route in ms with the walking modifiers, each hex at least the action floor. */
+/** Length in ms of a step that takes `minutes` at full speed, with the walking modifiers, at least the action floor. */
 export function stepMs(
   state: GameState,
   content: ContentDb,
   rules: Rules,
-  terrain: string,
+  minutes: number,
 ): number {
   const mod = computeMod(rules, state, 'interval.walk', content).total;
-  return Math.max(
-    actionFloor(content),
-    Math.round(terrainMinutes(content, terrain) * MS_PER_MINUTE * mod),
-  );
+  return Math.max(actionFloor(content), Math.round(minutes * MS_PER_MINUTE * mod));
 }
 
 /** Total length in ms of the route to the hex `target`, modifiers included; null when there is no route. */
@@ -358,11 +389,8 @@ export function routeMs(
 ): number | null {
   const route = routeTo(state, content, target, slot);
   if (!route) return null;
-  const hexes = indexOf(content).hexes;
-  return route.hexes.reduce(
-    (sum, key) => sum + stepMs(state, content, rules, hexes.get(key)?.terrain ?? ''),
-    0,
-  );
+  // The modifiers are the same for every step: one evaluation, then the steps are summed.
+  return route.minutes.reduce((sum, minutes) => sum + stepMs(state, content, rules, minutes), 0);
 }
 
 /** Why the player cannot go to the hex `address` names (a localization key), or null when the trip is allowed. */
@@ -402,7 +430,6 @@ function enterHex(
   rules: Rules,
   slot: number,
 ): void {
-  planned.delete(state);
   const at = parseHexKey(key);
   const hex = indexOf(content).hexes.get(key);
   if (!at || !hex) return;
@@ -419,9 +446,8 @@ export const walkKind: ActionKind = {
   blocked: (state, id, content, _rules, slot = 0) => travelBlocked(state, id, content, slot),
   intervalMs(state, id, content, rules, slot = 0) {
     const target = hexOfAddress(content, id);
-    const next = target ? routeTo(state, content, target, slot)?.hexes[0] : undefined;
-    const terrain = next ? indexOf(content).hexes.get(next)?.terrain : undefined;
-    return terrain === undefined ? actionFloor(content) : stepMs(state, content, rules, terrain);
+    const minutes = target ? routeTo(state, content, target, slot)?.minutes[0] : undefined;
+    return minutes === undefined ? actionFloor(content) : stepMs(state, content, rules, minutes);
   },
   complete(state, id, content, rules, slot = 0) {
     const target = hexOfAddress(content, id);
@@ -454,11 +480,36 @@ function surveyable(state: GameState, subject: Subject, content: ContentDb): boo
   return req === null || evalReq(state, req, content).met;
 }
 
-/** The last plan of each performer of a state, good for the same game time and position until a step or a survey changes the world. */
+/** The last plan of each performer of a state, with what it was made for (see `planStamp`). */
 const planned = new WeakMap<
   GameState,
-  Map<number, { now: number; location: string; plan: AutoPlan | null }>
+  Map<number, { content: ContentDb; stamp: string; plan: AutoPlan | null }>
 >();
+
+/**
+ * Everything the plan of a performer reads: where it stands and how far it sees, the surveyed land
+ * (the revision of the world), its Scouting level, the rank and the keys that decide what may be
+ * surveyed, and what the other slots survey. The plan is good until one of them changes, at any time.
+ */
+export function planStamp(state: GameState, content: ContentDb, slot: number): string {
+  const scouting = scoutSkill(content);
+  const level = scouting === null ? 0 : skillLevel(state, scouting, content);
+  const keys = Object.values(content.cellKeys)
+    .map((req) => (evalReq(state, req, content).met ? 1 : 0))
+    .join('');
+  const others = state.slots
+    .map((s, i) => (i !== slot && s.action?.kind === EXPLORE_KIND ? s.action.id : ''))
+    .join(',');
+  return [
+    positionOf(state, slot),
+    worldStamp(state),
+    surveyRange(state, content, slot),
+    level,
+    evalReq(state, graduateReq(content), content).met ? 1 : 0,
+    keys,
+    others,
+  ].join('|');
+}
 
 /**
  * The next hex for the auto-survey. Of the hexes within the survey range that can be surveyed now,
@@ -469,12 +520,12 @@ const planned = new WeakMap<
  * nothing is left to survey.
  */
 export function autoPlan(state: GameState, content: ContentDb, slot = 0): AutoPlan | null {
-  const where = positionOf(state, slot);
+  const stamp = planStamp(state, content, slot);
   const memo = planned.get(state)?.get(slot);
-  if (memo && memo.now === state.now && memo.location === where) return memo.plan;
+  if (memo && memo.content === content && memo.stamp === stamp) return memo.plan;
   const plan = planFor(state, content, slot);
   const all = planned.get(state) ?? new Map();
-  all.set(slot, { now: state.now, location: where, plan });
+  all.set(slot, { content, stamp, plan });
   planned.set(state, all);
   return plan;
 }
@@ -508,7 +559,12 @@ function planFor(state: GameState, content: ContentDb, slot: number): AutoPlan |
           (a.explored > b.explored ||
             (a.explored === b.explored && a.subject.address < b.subject.address)))));
   let inRange: Pick | null = null;
-  for (const a of hexesWithin(here, range)) {
+  const seen: Axial[] = hexesWithin(here, range);
+  for (const key of linkedKeys(content, hereKey)) {
+    const at = parseHexKey(key);
+    if (at && !seen.some((x) => x.q === at.q && x.r === at.r)) seen.push(at);
+  }
+  for (const a of seen) {
     const subject = subjectOf(content, addressOf(content, a));
     if (!subject || !surveyable(state, subject, content)) continue;
     if (surveyedByOther(state, subject.address, slot)) continue;
@@ -516,7 +572,7 @@ function planFor(state: GameState, content: ContentDb, slot: number): AutoPlan |
     const pick = {
       subject,
       deep: isSurveyed(state, content, hexKey(a.q, a.r)) ? 1 : 0,
-      key: hexDistance(here, a),
+      key: Math.min(hexDistance(here, a), range),
       explored: exploresOf(state, subject.address),
       stand: hereKey,
     };
@@ -525,17 +581,16 @@ function planFor(state: GameState, content: ContentDb, slot: number): AutoPlan |
   if (inRange) return { subject: inRange.subject, stand: hereKey, route: [] };
   // Nothing in range: walk to where something is.
   let far: Pick | null = null;
-  for (const hex of content.hexes) {
-    if (!isPlayable(hex)) continue;
+  for (const hex of indexOf(content).playableHexes) {
     const subject = subjectOf(content, hexKey(hex.q, hex.r));
     if (!subject || !surveyable(state, subject, content)) continue;
     if (surveyedByOther(state, subject.address, slot)) continue;
     const cut = !isSurveyed(state, content, hexKey(hex.q, hex.r));
     for (const [spot, minutes] of reach.dist) {
       const at = parseHexKey(spot);
-      if (!at || hexDistance(at, hex) > range) continue;
+      if (!at || !inSurveyReach(content, at, hex, range)) continue;
       // A hex still in fog needs a surveyed neighbour that can be walked to.
-      if (cut && !neighboursInReach(hex, reach)) continue;
+      if (cut && !neighboursInReach(content, hex, reach)) continue;
       const pick = {
         subject,
         deep: cut ? 0 : 1,
@@ -554,9 +609,17 @@ function planFor(state: GameState, content: ContentDb, slot: number): AutoPlan |
   };
 }
 
-function neighboursInReach(hex: Axial, reach: Reach): boolean {
-  return hexesWithin(hex, 1).some((n) => reach.dist.has(hexKey(n.q, n.r)));
+function neighboursInReach(content: ContentDb, hex: Axial, reach: Reach): boolean {
+  return (
+    hexesWithin(hex, 1).some((n) => reach.dist.has(hexKey(n.q, n.r))) ||
+    linkedKeys(content, hexKey(hex.q, hex.r)).some((key) => reach.dist.has(key))
+  );
 }
+
+const positionKey = (state: GameState, content: ContentDb, slot: number): string => {
+  const at = positionHex(state, content, slot);
+  return at ? hexKey(at.q, at.r) : '';
+};
 
 export const autoSurveyKind: ActionKind = {
   has: (id) => id === AUTOSURVEY_ID,
@@ -569,7 +632,7 @@ export const autoSurveyKind: ActionKind = {
     if (!plan) return actionFloor(content);
     const next = plan.route[0];
     if (next === undefined) return exploreIntervalMs(state, content, rules, plan.subject.address);
-    return stepMs(state, content, rules, indexOf(content).hexes.get(next)?.terrain ?? '');
+    return stepMs(state, content, rules, stepMinutes(content, positionKey(state, content, slot), next));
   },
   complete(state, _id, content, rules, slot = 0) {
     const plan = autoPlan(state, content, slot);

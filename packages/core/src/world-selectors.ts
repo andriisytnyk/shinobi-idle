@@ -19,8 +19,10 @@ import {
   regionHere,
   routeMs,
   stepMs,
+  planStamp,
   subjectOf,
   surveyBlocked,
+  surveyCount,
   surveyLevel,
   surveyMaxLevel,
   surveyReq,
@@ -31,6 +33,7 @@ import {
   isSurveyed,
   positionHex,
   reachFrom,
+  terrainMinutes,
   routeTo,
   surveyAccess,
   surveyRange,
@@ -321,26 +324,53 @@ export function hexInfo(
     cell: surveyed ? (subject?.cell?.id ?? null) : null,
     places: surveyed && level >= 1 ? (index.placesByHex.get(key) ?? []).map((p) => p.id) : [],
     level,
-    maxLevel: subject ? surveyMaxLevel(subject, content) : 0,
-    explores: subject ? exploresOf(state, subject.address) : 0,
+    // Fog hides what a hex is: how many surveys it has had and how many it can have tell a cell from a plain hex.
+    maxLevel: surveyed && subject ? surveyMaxLevel(subject, content) : 0,
+    explores: surveyed && subject ? exploresOf(state, subject.address) : 0,
     surveyWhy: why,
     surveyMs:
       subject && why === null ? exploreIntervalMs(state, content, rules, subject.address) : 0,
   };
 }
 
-/** Every hex of the grid; the way search is done once for all of them. */
+/** The last list of each performer of a state, with what it was made for. */
+const listed = new WeakMap<
+  GameState,
+  Map<string, { content: ContentDb; rules: Rules; stamp: string; list: HexInfo[] }>
+>();
+
+/**
+ * The hexes of the grid (only the playable ones with `playable`); the way search is done once for
+ * all of them. The list is kept while nothing it shows changes (where the performer stands, the
+ * surveys, what decides what may be surveyed, how long a survey takes, what the other slots do):
+ * the same array comes back, so a view that asks ten times a second costs one search.
+ */
 export function listHexes(
   state: GameState,
   content: ContentDb,
   rules: Rules = defaultRules,
   slot = 0,
+  only?: 'playable',
 ): HexInfo[] {
+  const stamp = [
+    planStamp(state, content, slot),
+    surveyCount(state),
+    exploreIntervalMs(state, content, rules),
+    state.slots.map((s) => (s.action?.kind === 'walk' ? s.action.id : '')).join(','),
+  ].join('#');
+  const name = `${slot}|${only ?? ''}`;
+  const memo = listed.get(state)?.get(name);
+  if (memo && memo.content === content && memo.rules === rules && memo.stamp === stamp)
+    return memo.list;
   const here = positionHex(state, content, slot);
   const reach = here ? reachFrom(state, content, here, slot) : undefined;
-  return content.hexes.flatMap(
+  const list = (only === 'playable' ? indexOf(content).playableHexes : content.hexes).flatMap(
     (h) => hexInfo(state, hexKey(h.q, h.r), content, rules, reach, slot) ?? [],
   );
+  const all = listed.get(state) ?? new Map();
+  all.set(name, { content, rules, stamp, list });
+  listed.set(state, all);
+  return list;
 }
 
 /** How far the player can survey from here now, for drawing the reach. */
@@ -353,4 +383,4 @@ export const stepTime = (
   terrain: string,
   content: ContentDb,
   rules: Rules = defaultRules,
-): number => stepMs(state, content, rules, terrain);
+): number => stepMs(state, content, rules, terrainMinutes(content, terrain));

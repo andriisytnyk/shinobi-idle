@@ -90,8 +90,8 @@ describe('performers on the map', () => {
     const command: Command = { type: 'world.travel', cell: 'core:rysovi_polia', slot: 1 };
     expect(travelPlan(state, 'core:rysovi_polia', content, undefined, 1).blocked).toBeNull();
     expect(dispatch(state, command, content)).toEqual({ ok: true });
-    advance(state, MIN, content);
     // On the way the clone stands on its own hex; the character stays at home.
+    for (let i = 0; i < 40 && positionOf(state, 1) === HOME; i++) advance(state, MIN, content);
     expect(state.slots[1]?.action?.kind).toBe('walk');
     expect(positionOf(state, 1)).not.toBe(HOME);
     expect(state.world.location).toBe(HOME);

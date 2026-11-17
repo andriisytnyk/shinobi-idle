@@ -125,14 +125,14 @@
       "maps": "3d5d6de0a0ae"
     },
     "terrains": {
-      "forest": "b6c70b116301",
-      "plains": "d3c2021a7102",
-      "hills": "9bc861f7ca4d",
-      "coast": "d31d6570923e",
-      "river": "8c6217e933fe",
-      "road": "58bc6c9ac6d0",
-      "settlement": "cc27b7cddad3",
-      "lake": "bc34fb49f7c2"
+      "forest": "a9b1eb103c2d",
+      "plains": "bfaadb4be8c1",
+      "hills": "533080d625e9",
+      "coast": "91cd4cb24505",
+      "river": "1dae27391bcd",
+      "road": "570ca15751d9",
+      "settlement": "77440777493c",
+      "lake": "2602f3d44229"
     },
     "countries": {
       "core:fire": "6904141396d4",
@@ -1721,6 +1721,7 @@
       "core:wayside_teahouse": "6974cec1a82d",
       "core:fishing_village": "bfa81332d64d"
     },
+    "links": {},
     "cellKeys": {
       "rock": "df06919a498c",
       "brush": "ae177b1a6364",
@@ -4308,6 +4309,7 @@
       "core:wayside_teahouse",
       "core:fishing_village"
     ],
+    "links": [],
     "cellKeys": [
       "rock",
       "brush",
