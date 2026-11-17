@@ -1,4 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
+import { tryActiveContent } from './active.ts';
 import { fallbackText, hasKey, reportMissing, t } from './i18n.ts';
 import { MASK, revealLevel } from './reveal.ts';
 import { isEntityKind, type EntityRef } from './route.ts';
@@ -49,6 +50,9 @@ export function webRef(ref: { kind: string; id: string } | null): EntityRef | nu
   return ref && isEntityKind(ref.kind) ? { kind: ref.kind, id: ref.id } : null;
 }
 
+/** The pseudo kind of a place on the map that is no cell: a plain hex, named by its address (`"q,r"`). It links to the map. */
+export const HEX_KIND = 'hex';
+
 /** The entity kind that an action kind of the core trains, so a tile can link to its page. */
 const ACTION_ENTITY: Readonly<Record<string, string>> = {
   practice: 'technique',
@@ -65,6 +69,13 @@ const ACTION_ENTITY: Readonly<Record<string, string>> = {
 };
 
 export function actionRef(action: { kind: string; id: string }): EntityRef {
+  // A hex that is no cell, and the auto-survey, have no page: the `hex` kind names them on the map.
+  if (action.kind === 'autosurvey') return { kind: HEX_KIND, id: '' };
+  if (
+    (action.kind === 'explore' || action.kind === 'walk') &&
+    !tryActiveContent()?.cells.some((c) => c.id === action.id)
+  )
+    return { kind: HEX_KIND, id: action.id };
   return { kind: ACTION_ENTITY[action.kind] ?? 'technique', id: action.id };
 }
 

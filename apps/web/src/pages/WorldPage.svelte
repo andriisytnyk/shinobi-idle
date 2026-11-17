@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { cellInfo, listRegions, type CellInfo } from '@shinobi/core';
-  import CellPanel from '../components/CellPanel.svelte';
-  import CellTile from '../components/CellTile.svelte';
-  import EntityLink from '../components/EntityLink.svelte';
+  import { hexKey, hexOfAddress, travelPlan } from '@shinobi/core';
+  import AutoSurveyButton from '../components/AutoSurveyButton.svelte';
+  import HexMap from '../components/HexMap.svelte';
+  import HexPanel from '../components/HexPanel.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
-  import RegionEntry from '../components/RegionEntry.svelte';
-  import ReqTree from '../components/ReqTree.svelte';
+  import { entityName } from '../lib/entities.ts';
+  import { autoState, mapView, type MapView } from '../lib/hex-map.ts';
   import { t } from '../lib/i18n.ts';
-  import { idAttr } from '../lib/reveal.ts';
+  import { MASK } from '../lib/reveal.ts';
   import { navigate } from '../lib/router.svelte.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
@@ -22,22 +22,73 @@
 
   let { focus = { cell: null, region: null } }: Props = $props();
 
-  const regions = $derived(game.read((gs) => listRegions(gs, content)));
+  const view = $derived(game.read((gs): MapView => mapView(gs, content, game.rules)));
+  const byCoord = $derived(new Map(view.hexes.map((h) => [h.coord, h])));
 
-  /** The region the player picked; a route to a cell or region, or the player's own region, is the default. */
-  let picked = $state<string | null>(null);
+  let selected = $state<string | null>(null);
+  let hovered = $state<string | null>(null);
+  let map = $state<ReturnType<typeof HexMap> | undefined>();
+
+  const hexOfCell = (id: string): string | null => {
+    const cell = content.cells.find((c) => c.id === id);
+    return cell ? hexKey(cell.hex[0], cell.hex[1]) : null;
+  };
+
+  // A route to a cell or a region opens it on the map.
   $effect(() => {
-    if (focus.region) picked = focus.region;
+    const cell = focus.cell;
+    const region = focus.region;
+    const at = cell
+      ? hexOfCell(cell)
+      : region
+        ? hexOfCell(content.regions.find((r) => r.id === region)?.cells[0] ?? '')
+        : null;
+    if (!at) return;
+    if (cell) selected = at;
+    queueMicrotask(() => map?.focusOn(at));
   });
 
-  const activeId = $derived(picked ?? regions.find((r) => r.here)?.id ?? regions[0]?.id ?? '');
-  const active = $derived(regions.find((r) => r.id === activeId) ?? null);
-
-  const cells = $derived(
-    game.read((gs): CellInfo[] =>
-      (active?.cells ?? []).flatMap((id) => cellInfo(gs, id, content, game.rules) ?? []),
-    ),
+  /** The hex the walk in progress leads to, so the route stays drawn while the player walks. */
+  const walking = $derived(
+    game.read((gs) => {
+      const action = gs.slots.find((s) => s.action?.kind === 'walk')?.action;
+      const hex = action ? hexOfAddress(content, action.id) : null;
+      return hex ? hexKey(hex.q, hex.r) : null;
+    }),
   );
+
+  const previewTarget = $derived(hovered ?? selected ?? walking);
+  const preview = $derived(
+    game.read((gs) => {
+      const target = previewTarget ? byCoord.get(previewTarget) : null;
+      if (!target || target.info.here || !target.info.surveyed) return null;
+      const plan = travelPlan(gs, target.info.address, content, game.rules);
+      return plan.hexes.length > 0 ? { hexes: plan.hexes, ms: plan.ms } : null;
+    }),
+  );
+
+  const auto = $derived(game.read((gs) => autoState(gs, content)));
+
+  const here = $derived(view.here ? byCoord.get(view.here) : null);
+  const hereName = $derived.by(() => {
+    if (!here) return '';
+    const cell = here.info.cell ? entityName({ kind: 'cell', id: here.info.cell }) : null;
+    if (cell && cell !== MASK) return cell;
+    if (here.places.length > 0) return here.places.map((p) => t(`place.${p.id}.name`)).join(', ');
+    return here.terrain ? t(`terrain.${here.terrain}.name`) : '';
+  });
+
+  // ---------- layout ----------
+
+  let stageWidth = $state(0);
+  let stageEl = $state<HTMLElement | undefined>();
+  /** Wide enough for the panel to stand beside the map; otherwise it is a bottom sheet. */
+  const wide = $derived.by(() => {
+    if (typeof document === 'undefined') return true;
+    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    return stageWidth === 0 || stageWidth >= rem * 44;
+  });
+  const sheet = $derived(!wide && selected !== null);
 
   /** Where the bottom sheet rests: just above the Now bar, whatever height that bar has. */
   let sheetBottom = $state<string | null>(null);
@@ -57,341 +108,275 @@
     };
   });
 
-  const selected = $derived(focus.cell);
-  const close = () => navigate(`#/world`);
+  const select = (coord: string | null): void => {
+    selected = coord;
+    // A cell route that was left behind is cleared with the panel.
+    if (coord === null && focus.cell) navigate('#/world');
+    if (coord !== null && !wide) {
+      // The sheet covers the lower part of the screen: the map comes to the top, with the hex above the sheet.
+      stageEl?.scrollIntoView({ block: 'start' });
+      queueMicrotask(() => map?.focusOn(coord));
+    }
+  };
 
-  /** Below the wide layout the cell panel is a modal bottom sheet. */
-  let sheetMode = $state(typeof window !== 'undefined' && window.innerWidth < 1280);
-  $effect(() => {
-    const query = window.matchMedia('(max-width: 1279px)');
-    const update = () => (sheetMode = query.matches);
-    update();
-    query.addEventListener('change', update);
-    return () => query.removeEventListener('change', update);
-  });
-
-  let side = $state<HTMLElement | undefined>();
-  const open = $derived(selected !== null);
-
-  // Focus goes into the panel when it opens and back to where it was when it closes.
-  $effect(() => {
-    if (!open || !side) return;
-    const before = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    side.focus({ preventScroll: true });
-    return () => before?.focus({ preventScroll: true });
-  });
-
-  // While the sheet covers the page, the page behind does not scroll.
-  $effect(() => {
-    if (!open || !sheetMode) return;
-    const main = document.querySelector<HTMLElement>('.main');
-    if (!main) return;
-    const was = main.style.overflow;
-    main.style.overflow = 'hidden';
-    return () => {
-      main.style.overflow = was;
-    };
-  });
-
-  function onKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Escape' && selected) close();
-  }
+  const terrains = content.terrains;
 </script>
 
-<svelte:window onkeydown={onKeydown} />
-
-<SimplePage title={t('world.title')}>
+<SimplePage title={t('world.title')} compact>
   <div class="world" data-world style:--sheet-bottom={sheetBottom}>
     <Hint id="world" />
-    <p class="intro">{t('world.intro')}</p>
 
-    <nav class="regions" aria-label={t('world.regions')}>
-      {#each regions as region (region.id)}
-        <div
-          class="region"
-          class:active={region.id === activeId}
-          class:closed={!region.open}
-          data-region={idAttr('region', region.id)}
-          data-open={region.open}
-          aria-current={region.id === activeId ? 'true' : undefined}
-        >
-          <span class="region-icon"
-            ><Icon entity={{ kind: 'region', id: region.id }} size={22} /></span
-          >
-          <span class="region-name"><EntityLink kind="region" id={region.id} /></span>
-          <span class="region-status">
-            {#if region.open}
-              {t('world.region.explored', { n: region.explored, total: region.cells.length })}
-            {:else}
-              <Icon name="lucide:lock" size={12} /> {t('world.region.closed')}
-            {/if}
-            {#if region.here}
-              · <span data-region-here>{t('world.region.here')}</span>
-            {/if}
-          </span>
-        </div>
-      {/each}
-    </nav>
+    <div class="strip" data-map-status>
+      <p class="where">
+        <Icon name="lucide:map-pin" size={16} />
+        <span>{t('map.statusHere')} <strong data-here-name>{hereName}</strong></span>
+        <span class="range" data-range>· {t('map.range', { n: view.range })}</span>
+      </p>
+      <div class="auto-row">
+        <AutoSurveyButton whyId="why-auto-strip" />
+        {#if auto.why && auto.slot < 0}
+          <span class="why" id="why-auto-strip" data-why="auto-strip">{t(auto.why)}</span>
+        {/if}
+      </div>
+    </div>
 
-    {#if active && !active.open}
-      <section class="closed-block" data-region-closed>
-        <h2><Icon name="lucide:lock" size={18} /> {t('world.region.closedTitle')}</h2>
-        <ReqTree node={active.req} />
-      </section>
-    {/if}
-
-    {#if active && active.open}<RegionEntry region={activeId} />{/if}
-
-    <div class="layout" class:with-panel={selected !== null}>
-      <div class="grid-wrap">
-        <ul class="grid" aria-label={t('world.region.grid')} data-grid={activeId}>
-          {#each cells as info (info.id)}
-            <CellTile {info} selected={info.id === selected} />
-          {/each}
-        </ul>
+    <div
+      class="stage"
+      class:wide
+      class:with-panel={selected !== null}
+      bind:clientWidth={stageWidth}
+      bind:this={stageEl}
+    >
+      <div class="map-wrap">
+        <HexMap
+          bind:this={map}
+          {view}
+          {selected}
+          {preview}
+          {sheet}
+          onSelect={select}
+          onHover={(c) => (hovered = c)}
+        />
       </div>
 
       {#if selected}
-        <button
-          type="button"
-          class="scrim"
-          tabindex="-1"
-          aria-label={t('world.panel.close')}
-          onclick={close}
-        ></button>
-        <div
-          class="side"
-          data-side
-          bind:this={side}
-          tabindex="-1"
-          role="dialog"
-          aria-modal={sheetMode ? 'true' : undefined}
-          aria-label={t('world.panel.label')}
-        >
-          {#key selected}<CellPanel id={selected} onClose={close} />{/key}
-        </div>
+        <aside class="side" class:sheet={!wide} data-side aria-label={t('map.panel.label')}>
+          {#key selected}<HexPanel coord={selected} onClose={() => select(null)} />{/key}
+        </aside>
       {/if}
     </div>
+
+    <details class="legend" data-legend>
+      <summary>{t('map.legend')}</summary>
+      <p class="intro">{t('map.intro')}</p>
+      <ul class="terrains">
+        {#each terrains as terrain (terrain.id)}
+          <li>
+            <span class="swatch" style:--_fill="var({terrain.token ?? `--terrain-${terrain.id}`})"
+            ></span>
+            {t(`terrain.${terrain.id}.name`)}
+          </li>
+        {/each}
+      </ul>
+      <ul class="marks">
+        <li><span class="swatch fog"></span>{t('map.legend.fog')}</li>
+        <li><span class="swatch reach"></span>{t('map.legend.reach')}</li>
+        <li><span class="swatch you"></span>{t('map.legend.you')}</li>
+        <li><span class="swatch route"></span>{t('map.legend.route')}</li>
+        <li><Icon name="lucide:landmark" size={16} />{t('map.legend.place')}</li>
+        <li><span class="swatch poi"></span>{t('map.legend.poi')}</li>
+        <li><span class="swatch pips"></span>{t('map.legend.pips')}</li>
+      </ul>
+    </details>
   </div>
 </SimplePage>
 
 <style>
   .world {
     --sheet-bottom: var(--now-height);
+    --_stage-h: max(26rem, calc(100dvh - 21rem));
   }
 
   .intro {
-    margin: 0 0 var(--space-3);
+    margin: var(--space-2) 0;
     color: var(--fg-dim);
   }
 
-  .regions {
-    --_grid-template-columns: 11rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(var(--_grid-template-columns), 1fr));
-    gap: var(--space-2);
+  .strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
     margin-bottom: var(--space-3);
   }
 
-  .region {
-    position: relative;
+  .strip p {
+    margin: 0;
+  }
+
+  .where {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .range {
+    color: var(--fg-dim);
+  }
+
+  .auto-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin-inline-start: auto;
+  }
+
+  @media (max-width: 768px) {
+    .strip {
+      gap: var(--space-2);
+    }
+  }
+
+  .why {
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
+  }
+
+  .stage {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    grid-template-areas:
-      'icon name'
-      'icon status';
-    column-gap: var(--space-2);
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+    height: var(--_stage-h);
+  }
+
+  .stage.wide.with-panel {
+    --_panel-w: 22rem;
+    grid-template-columns: minmax(0, 1fr) var(--_panel-w);
+  }
+
+  .map-wrap {
     min-width: 0;
+    min-height: 0;
+  }
+
+  .side {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--surface-raised);
+    overflow: hidden;
+  }
+
+  /* Below the wide layout the hex panel is a bottom sheet over the map. */
+  .side.sheet {
+    position: fixed;
+    right: 0;
+    bottom: var(--sheet-bottom);
+    left: 0;
+    z-index: var(--z-popover-top);
+    max-height: min(
+      40dvh,
+      calc(100dvh - var(--sheet-bottom) - var(--topbar-height) - var(--space-8))
+    );
+    border-width: var(--border-thick) 0 0;
+    border-top-color: var(--accent);
+    border-radius: 0;
+  }
+
+  .legend {
+    margin-top: var(--space-3);
     padding: var(--space-2) var(--space-3);
     border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-md);
     background: var(--surface);
   }
 
-  .region.active {
-    border-color: var(--accent);
-    background: var(--surface-raised);
-  }
-
-  .region.closed {
-    color: var(--fg-dim);
-  }
-
-  .region-icon {
-    grid-area: icon;
-    display: inline-flex;
-    align-items: center;
-  }
-
-  .region-name {
-    grid-area: name;
-    font-weight: 600;
-    overflow-wrap: anywhere;
-  }
-
-  .region-name :global(a) {
-    color: var(--fg);
-    min-height: var(--control-md);
-    display: inline-flex;
-    align-items: center;
-  }
-
-  /* The name link stretches over the whole region card. */
-  .region-name :global(a)::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-  }
-
-  .region-status {
-    grid-area: status;
-    margin-top: calc(-1 * var(--space-2));
-    color: var(--fg-dim);
-    font-size: var(--text-xs);
-  }
-
-  .closed-block {
-    margin-bottom: var(--space-3);
-    padding: var(--space-3);
-    border: var(--border-thin) solid var(--line);
-    border-radius: var(--radius-md);
-    background: var(--surface);
-  }
-
-  .closed-block h2 {
+  .legend summary {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
-    margin: 0 0 var(--space-2);
-    font-size: var(--text-sm);
-  }
-
-  .layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-4);
-    align-items: start;
-  }
-
-  .grid-wrap {
-    container-type: inline-size;
-    min-width: 0;
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-2);
-    margin: 0;
-    padding: 0;
-  }
-
-  @container (min-width: 26rem) {
-    .grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  @container (min-width: 40rem) {
-    .grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-  }
-
-  /* Below the wide layout the cell panel is a bottom sheet over a dimmed page. */
-  .scrim {
-    position: fixed;
-    inset: 0;
-    z-index: var(--z-popover);
-    border: 0;
-    background: var(--scrim);
+    min-height: var(--control-sm);
+    font-weight: 600;
     cursor: pointer;
   }
 
-  .side {
-    position: fixed;
-    right: 0;
-    bottom: var(--sheet-bottom);
-    left: 0;
-    z-index: var(--z-popover-top);
+  .legend ul {
     display: flex;
-    flex-direction: column;
-    max-height: min(80dvh, calc(100dvh - var(--sheet-bottom) - var(--space-4)));
-    border-top: var(--border-thick) solid var(--accent);
-    background: var(--surface-raised);
-    overflow: hidden;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    margin: var(--space-2) 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-xs);
   }
 
-  .side:focus {
-    outline: none;
+  .legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .swatch {
+    --_swatch: 1rem;
+    display: inline-block;
+    width: var(--_swatch);
+    height: var(--_swatch);
+    border: var(--border-thin) solid var(--bg);
+    border-radius: var(--radius-xs);
+    background: var(--_fill, var(--map-fog));
+  }
+
+  .swatch.fog {
+    --_stripe: 3px;
+    --_stripe-end: 5px;
+    background: repeating-linear-gradient(
+      45deg,
+      var(--map-fog),
+      var(--map-fog) var(--_stripe),
+      var(--map-fog-line) var(--_stripe),
+      var(--map-fog-line) var(--_stripe-end)
+    );
+  }
+
+  .swatch.reach {
+    border: var(--border-thin) dashed var(--accent);
+    background: var(--map-fog);
+  }
+
+  .swatch.you {
+    border-color: var(--paper);
+    border-radius: var(--radius-pill);
+    background: var(--chakra);
+  }
+
+  .swatch.route {
+    height: 0;
+    border: 0;
+    border-top: var(--border-thick) dashed var(--accent);
+    border-radius: 0;
+    background: none;
+  }
+
+  .swatch.poi {
+    --_swatch: 0.6rem;
+    border-radius: var(--radius-pill);
+    background: var(--hanko);
+  }
+
+  .swatch.pips {
+    --_swatch: 0.6rem;
+    border-color: var(--paper);
+    border-radius: var(--radius-pill);
+    background: var(--accent);
   }
 
   @media (max-width: 768px) {
     .world {
-      --sheet-bottom: calc(var(--now-height) + var(--tabbar-height));
-    }
-
-    /* The grid must start near the top: the three regions share one row and the intro is left to the hint. */
-    .intro {
-      display: none;
-    }
-
-    .regions {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: var(--space-1);
-    }
-
-    .region {
-      grid-template-columns: minmax(0, 1fr);
-      grid-template-areas:
-        'name'
-        'status';
-      padding: var(--space-1) var(--space-2);
-    }
-
-    .region-icon {
-      display: none;
-    }
-
-    .region-name {
-      font-size: var(--text-xs);
-      line-height: 1.2;
-    }
-
-    .region-name :global(a) {
-      min-height: var(--control-md);
-    }
-
-    .region-status {
-      margin-top: 0;
-      font-size: var(--text-2xs);
-    }
-
-    /* Leaves the top of the screen to the toasts. */
-    .side {
-      --_max-height: 10rem;
-      max-height: min(80dvh, calc(100dvh - var(--sheet-bottom) - var(--_max-height)));
-    }
-  }
-
-  @media (min-width: 1280px) {
-    .layout.with-panel {
-      --_grid-template-columns: 22rem;
-      grid-template-columns: minmax(0, 1fr) var(--_grid-template-columns);
-    }
-
-    .scrim {
-      display: none;
-    }
-
-    .side {
-      position: sticky;
-      top: 0;
-      z-index: auto;
-      max-height: calc(100dvh - var(--topbar-height) - var(--now-height) - var(--space-6) * 2);
-      border: var(--border-thin) solid var(--line);
-      border-radius: var(--radius-md);
-      background: var(--surface);
+      --_stage-h: max(20rem, calc(100dvh - 22rem));
     }
   }
 </style>

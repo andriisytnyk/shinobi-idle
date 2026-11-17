@@ -3,7 +3,6 @@ import { content, ukLocale } from '@shinobi/content';
 import { createState, xpAt, type GameState } from '@shinobi/core';
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import CellPanel from '../src/components/CellPanel.svelte';
 import Hint from '../src/components/Hint.svelte';
 import NowBar from '../src/components/NowBar.svelte';
 import ZoneWhere from '../src/components/ZoneWhere.svelte';
@@ -67,7 +66,6 @@ function show(
   flushSync();
 }
 
-const tile = (id: string) => target.querySelector<HTMLElement>(`[data-cell="${id}"]`);
 const q = (selector: string) => target.querySelector<HTMLElement>(selector);
 const reason = (which: string) => q(`[data-why="${which}"]`)?.textContent?.trim() ?? null;
 
@@ -84,11 +82,32 @@ afterEach(() => {
   target.remove();
 });
 
+/** The coordinates of a cell hex as the map names them. */
+const coordOf = (id: string): string => {
+  const [x, y] = cellOf(id).hex;
+  return `${x},${y}`;
+};
+const hexEl = (coord: string) =>
+  target.querySelector<SVGElement>(`[data-ui="hex"][data-hex="${coord}"]`);
+const tile = (id: string) => hexEl(coordOf(id));
+/** Puts the player on a cell's hex and marks it surveyed, as walking there would have. */
+function stand(state: GameState, id: string): void {
+  state.world.location = id;
+  state.world.surveyed[coordOf(id)] = true;
+}
+const click = (el: Element | null) => {
+  el?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  flushSync();
+};
+
 describe('A3: the map follows the core', () => {
-  it('an exploration that finishes updates the cell tile', () => {
+  it('a survey that finishes updates the hex', () => {
     show();
-    expect(tile(PLAIN_CELL)?.getAttribute('data-level')).toBe('0');
-    expect(tile(PLAIN_CELL)?.querySelectorAll('.pip')).toHaveLength(0);
+    expect(tile(PLAIN_CELL)?.getAttribute('data-state')).toBe('marked');
+    expect(tile(PLAIN_CELL)?.querySelectorAll('.pip')).toHaveLength(
+      content.balance.K.scouting.plainMaxLevel,
+    );
+    expect(tile(PLAIN_CELL)?.querySelectorAll('.pip.on')).toHaveLength(0);
 
     expect(
       game.dispatch({ type: 'action.start', slot: 0, kind: 'explore', id: PLAIN_CELL }).ok,
@@ -96,71 +115,153 @@ describe('A3: the map follows the core', () => {
     game.devAdvance((FIRST_LEVEL + 2) * 5000);
     flushSync();
 
-    expect(tile(PLAIN_CELL)?.getAttribute('data-level')).toBe('1');
+    expect(tile(PLAIN_CELL)?.getAttribute('data-state')).toBe('partial');
     expect(tile(PLAIN_CELL)?.querySelectorAll('.pip.on')).toHaveLength(1);
     expect(game.state.currencies.intel ?? 0).toBe(content.balance.K.intel.perCellLevel);
   });
 
-  it('travel moves the location marker', () => {
+  it('travel moves the player token', () => {
     const state = genin();
     explored(state, PLAIN_CELL);
-    state.currencies.ryo = 100;
     game.replaceState(state);
     show();
-    expect(tile(HOME)?.querySelector('[data-here]')).not.toBeNull();
-    expect(tile(PLAIN_CELL)?.querySelector('[data-here]')).toBeNull();
+    expect(tile(HOME)?.getAttribute('data-state')).toBe('here');
+    expect(tile(PLAIN_CELL)?.getAttribute('data-state')).not.toBe('here');
 
     expect(game.dispatch({ type: 'world.travel', cell: PLAIN_CELL, mode: 'walk' }).ok).toBe(true);
     game.devAdvance(2 * 60 * 60_000);
     flushSync();
 
-    expect(tile(HOME)?.querySelector('[data-here]')).toBeNull();
-    expect(tile(PLAIN_CELL)?.querySelector('[data-here]')).not.toBeNull();
+    expect(tile(HOME)?.getAttribute('data-state')).not.toBe('here');
+    expect(tile(PLAIN_CELL)?.getAttribute('data-state')).toBe('here');
   });
 
-  it('a claim pays into the bank and removes the loot marker', () => {
+  it('a claim pays into the bank and removes the claim button', () => {
     const state = genin();
     state.skills.scout!.xp = xpAt(20);
     explored(state, CACHE_CELL);
     state.world.location = CACHE_CELL;
     game.replaceState(state);
     show({ cell: CACHE_CELL, region: VALLEY });
-    expect(tile(CACHE_CELL)?.querySelector('[data-loot]')).not.toBeNull();
+    expect(tile(CACHE_CELL)?.querySelector('.poi-cache')).not.toBeNull();
 
     q('[data-claim]')?.click();
     flushSync();
 
     expect(game.state.bank['core:coin']).toBe(5);
-    expect(tile(CACHE_CELL)?.querySelector('[data-loot]')).toBeNull();
     expect(q('[data-claimed]')).not.toBeNull();
     expect(q('[data-claim]')).toBeNull();
   });
 
-  it('a region that opens is shown as open', () => {
-    const state = genin();
-    // A cell of the forest is explored, so that the next region is shown by name.
-    explored(state, HOME);
-    state.skills.scout!.xp = xpAt(9);
-    game.replaceState(state);
-    show({ cell: null, region: PLAINS });
-    expect(q(`[data-region="${PLAINS}"]`)?.getAttribute('data-open')).toBe('false');
-    expect(q('[data-region-closed]')).not.toBeNull();
-
-    game.state.skills.scout!.xp = xpAt(10);
-    game.devAdvance(1000);
-    flushSync();
-
-    expect(q(`[data-region="${PLAINS}"]`)?.getAttribute('data-open')).toBe('true');
-    expect(q('[data-region-closed]')).toBeNull();
-  });
-
-  it('shows the tile of a cell at its highest level as maxed', () => {
+  it('marks a hex surveyed to its highest level as full', () => {
     const state = genin();
     state.world.explores[PLAIN_CELL] = content.balance.K.cellExplores[2] ?? 0;
     game.replaceState(state);
     show();
-    expect(tile(PLAIN_CELL)?.getAttribute('data-maxed')).toBe('true');
-    expect(tile(PLAIN_CELL)?.querySelector('[data-max]')).not.toBeNull();
+    expect(tile(PLAIN_CELL)?.getAttribute('data-state')).toBe('full');
+    expect(tile(PLAIN_CELL)?.querySelectorAll('.pip.on')).toHaveLength(3);
+  });
+
+  it('draws the surveyed land and the fog apart, and only the first has a terrain', () => {
+    show();
+    const states = new Set(
+      [...target.querySelectorAll('[data-ui="hex"]')].map((h) => h.getAttribute('data-state')),
+    );
+    expect(states.has('here')).toBe(true);
+    expect(states.has('fog')).toBe(true);
+    // A fog hex has no terrain mark, and its label says only that it is fog.
+    const fog = target.querySelector('[data-ui="hex"][data-state="fog"]');
+    expect(fog?.querySelector('.glyph, .place')).toBeNull();
+    expect(fog?.getAttribute('aria-label')).toContain(name('map.hex.fog'));
+  });
+});
+
+describe('the map page', () => {
+  it('opens the panel of a hex when it is clicked and closes it with the button', () => {
+    show();
+    expect(q('[data-hex-panel]')).toBeNull();
+    click(tile(PLAIN_CELL));
+    expect(q('[data-hex-panel]')?.getAttribute('data-hex-panel')).toBe(coordOf(PLAIN_CELL));
+    expect(tile(PLAIN_CELL)?.getAttribute('aria-pressed')).toBe('true');
+    click(q('[data-hex-panel] .close'));
+    expect(q('[data-hex-panel]')).toBeNull();
+  });
+
+  it('draws the route to the chosen hex with its time, the same as the button says', () => {
+    show();
+    click(tile(PLAIN_CELL));
+    expect(q('[data-route]')).not.toBeNull();
+    const time = q('[data-route-label]')?.textContent?.trim() ?? '';
+    expect(time).not.toBe('');
+    expect(q('[data-travel-walk]')?.textContent).toContain(time);
+  });
+
+  it('draws no route to a hex in fog, and the panel says why the trip cannot be made', () => {
+    show();
+    click(hexEl('10,13'));
+    expect(q('[data-route]')).toBeNull();
+    expect(q('[data-travel-walk]')?.hasAttribute('disabled')).toBe(true);
+    expect(reason('walk')).toBe(name('error.cellNotReachable'));
+  });
+
+  it('refuses to survey a hex behind fog until surveyed land reaches it', () => {
+    const state = genin();
+    // Scouting 25 reaches four hexes; this hex lies four away with only fog round it.
+    state.skills.scout!.xp = xpAt(25);
+    game.replaceState(state);
+    show();
+    click(hexEl('10,13'));
+    expect(q('[data-explore]')?.hasAttribute('disabled')).toBe(true);
+    expect(reason('explore')).toBe(name('error.cutOff'));
+  });
+
+  it('surveys a hex that touches surveyed land once it is in range, and the fog lifts', () => {
+    show();
+    const edge = '10,14';
+    expect(hexEl(edge)?.getAttribute('data-state')).toBe('fog');
+    click(hexEl(edge));
+    expect(q('[data-explore]')?.hasAttribute('disabled')).toBe(true);
+    expect(reason('explore')).toBe(name('error.outOfRange'));
+    // From the edge of the start area it is in range.
+    game.state.world.location = 'core:prykordonnyi_lis_okolytsia';
+    game.devAdvance(10);
+    flushSync();
+    expect(hexEl(edge)?.getAttribute('data-state')).toBe('reach');
+    click(q('[data-explore]'));
+    game.devAdvance(60 * 60_000);
+    flushSync();
+    expect(hexEl(edge)?.getAttribute('data-state')).not.toMatch(/fog|reach/);
+  });
+
+  it('starts and stops the auto-survey from the strip', () => {
+    show();
+    click(q('[data-map-status] [data-auto]'));
+    expect(game.state.slots[0]?.action?.kind).toBe('autosurvey');
+    click(q('[data-map-status] [data-auto-stop]'));
+    expect(game.state.slots[0]?.action).toBeNull();
+  });
+
+  it('zooms with the buttons and moves between hexes with the arrow keys', () => {
+    show();
+    const scale = () =>
+      /scale\(([\d.]+)\)/.exec(q('svg.canvas > g')?.getAttribute('transform') ?? '')?.[1];
+    const before = scale();
+    click(q('[data-zoom="in"]'));
+    expect(scale()).not.toBe(before);
+    const here = target.querySelector<SVGElement>('[data-ui="hex"][data-state="here"]');
+    expect(here?.getAttribute('tabindex')).toBe('0');
+    here?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    flushSync();
+    const [x, y] = (here?.getAttribute('data-hex') ?? '0,0').split(',').map(Number);
+    expect(target.querySelector(`[data-hex="${(x ?? 0) + 1},${y}"]`)).not.toBeNull();
+  });
+
+  it('puts the extension parts on the map, the hexes, the token and the panel', () => {
+    show();
+    click(tile(PLAIN_CELL));
+    for (const part of ['map', 'hex', 'hex-panel', 'map-token']) {
+      expect(q(`[data-ui="${part}"]`), part).not.toBeNull();
+    }
   });
 });
 
@@ -170,13 +271,12 @@ describe('A4: names are entity links', () => {
 
   const href = (kind: string, id: string) => `a[href="#/${kind}/${id}"]`;
 
-  it('links the regions and the cells of the map', () => {
-    show();
-    for (const id of [FOREST, PLAINS, VALLEY]) {
-      expect(q(`nav ${href('region', id)}`)?.textContent).toBe(name(`region.${id}.name`));
-    }
-    expect(tile(HOME)?.querySelector(href('cell', HOME))?.textContent).toBe(
-      name(`cell.${HOME}.name`),
+  it('links the region and the cell in the panel of a cell hex', () => {
+    show({ cell: HOME, region: FOREST });
+    const panel = q('[data-hex-panel]');
+    expect(panel?.querySelector(href('cell', HOME))?.textContent).toBe(name(`cell.${HOME}.name`));
+    expect(panel?.querySelector(href('region', FOREST))?.textContent).toBe(
+      name(`region.${FOREST}.name`),
     );
   });
 
@@ -185,7 +285,7 @@ describe('A4: names are entity links', () => {
     explored(state, TRAINING_CELL);
     game.replaceState(state);
     show({ cell: TRAINING_CELL, region: FOREST });
-    const panel = q('[data-cell-panel]');
+    const panel = q('[data-hex-panel]');
     expect(panel?.querySelector(href('cell', TRAINING_CELL))).not.toBeNull();
     for (const poi of cellOf(TRAINING_CELL).pois) {
       expect(panel?.querySelector(href('poi', poi.id))?.textContent).toBe(
@@ -197,9 +297,11 @@ describe('A4: names are entity links', () => {
 
     unmount(app!);
     app = null;
+    const keyed = genin();
+    stand(keyed, KEYED);
+    game.replaceState(keyed);
     show({ cell: KEYED, region: FOREST });
-    const req = q('[data-key-req]');
-    expect(req?.querySelector(href('skill', 'cc'))).not.toBeNull();
+    expect(q('[data-key-req]')?.querySelector(href('skill', 'cc'))).not.toBeNull();
   });
 
   it('puts the cell of a fight zone on the enemy page, as links', () => {
@@ -242,14 +344,14 @@ describe('A4: names are entity links', () => {
 
 describe('A5: a disabled control says why', () => {
   it('region closed', () => {
-    show({ cell: 'core:khram_vohniu', region: PLAINS });
+    show({ cell: 'core:pivdennyi_trakt', region: PLAINS });
     expect(q('[data-explore]')?.hasAttribute('disabled')).toBe(true);
     expect(reason('explore')).toBe(name('error.regionClosed'));
   });
 
   it('key missing', () => {
     const state = genin();
-    state.world.location = KEYED;
+    stand(state, KEYED);
     game.replaceState(state);
     show({ cell: KEYED, region: FOREST });
     expect(q('[data-explore]')?.hasAttribute('disabled')).toBe(true);
@@ -265,7 +367,7 @@ describe('A5: a disabled control says why', () => {
     expect(reason('explore')).toBe(name('error.scoutLevelLow'));
   });
 
-  it('not located in the region, and not in the cell for a claim', () => {
+  it('out of range, and not in the hex for a claim', () => {
     const state = genin();
     state.skills.scout!.xp = xpAt(20);
     explored(state, CACHE_CELL);
@@ -277,13 +379,13 @@ describe('A5: a disabled control says why', () => {
     expect(reason('claim')).toBe(name('error.notHere'));
   });
 
-  it('a cell that cannot be reached yet', () => {
+  it('a hex that cannot be reached yet', () => {
     show({ cell: 'core:stezhka_myslyvtsia', region: VALLEY });
     expect(q('[data-travel-walk]')?.hasAttribute('disabled')).toBe(true);
     expect(reason('walk')).toBe(name('error.cellNotReachable'));
   });
 
-  it('cell at its highest level', () => {
+  it('hex at its highest level', () => {
     const state = genin();
     state.world.explores[PLAIN_CELL] = content.balance.K.cellExplores[2] ?? 0;
     game.replaceState(state);
@@ -294,14 +396,14 @@ describe('A5: a disabled control says why', () => {
 });
 
 describe('A6: undiscovered points stay hidden', () => {
-  it('an unexplored cell shows no point of interest, in the panel or the tile', () => {
+  it('an unexplored cell shows no point of interest, in the panel or on the hex', () => {
     show({ cell: TRAINING_CELL, region: FOREST });
     const cellName = name(`cell.${TRAINING_CELL}.name`);
-    // The cell's own name may contain a point's name; it is the point itself that must not appear.
+    // The name of the cell may contain the name of a point; it is the point itself that must not appear.
     const html = target.innerHTML.replaceAll(cellName, '');
     expect(q('[data-pois]')).toBeNull();
     expect(q('[data-poi]')).toBeNull();
-    expect(tile(TRAINING_CELL)?.querySelector('[data-poi-kind]')).toBeNull();
+    expect(tile(TRAINING_CELL)?.querySelector('.poi')).toBeNull();
     for (const poi of cellOf(TRAINING_CELL).pois) {
       expect(html).not.toContain(poi.id);
       expect(html).not.toContain(name(`poi.${poi.id}.name`));
@@ -310,68 +412,43 @@ describe('A6: undiscovered points stay hidden', () => {
     expect(html).not.toContain(name(`cell.${TRAINING_CELL}.note`));
   });
 
-  it('a cell with a partial count shows only a thin progress bar', () => {
+  it('a cell with a partial count shows a progress bar and no lit pip', () => {
     const state = genin();
     state.world.explores[TRAINING_CELL] = 3;
     game.replaceState(state);
-    show();
-    expect(tile(TRAINING_CELL)?.querySelector('.pip')).toBeNull();
-    expect(tile(TRAINING_CELL)?.querySelector('.bar')).not.toBeNull();
+    show({ cell: TRAINING_CELL, region: FOREST });
+    expect(tile(TRAINING_CELL)?.querySelectorAll('.pip.on')).toHaveLength(0);
+    expect(q('[data-hex-panel] .bar')).not.toBeNull();
   });
 
-  it('exploring reveals the points', () => {
+  it('surveying reveals the points', () => {
     const state = genin();
     explored(state, TRAINING_CELL);
     game.replaceState(state);
     show({ cell: TRAINING_CELL, region: FOREST });
     expect(target.querySelectorAll('[data-poi]')).toHaveLength(cellOf(TRAINING_CELL).pois.length);
+    expect(tile(TRAINING_CELL)?.querySelectorAll('.poi').length).toBeGreaterThan(0);
   });
 });
 
 describe('the key-locked state', () => {
-  it('keeps the tile short: a key badge and a lock label, no requirement text', () => {
-    show();
-    const t = tile(KEYED);
-    expect(t?.querySelector('[data-key="rock"]')).not.toBeNull();
-    expect(t?.querySelector('[data-need]')?.textContent).toContain(name('world.tile.lockedShort'));
-    expect(t?.querySelector('a[href="#/skill/cc"]')).toBeNull();
-  });
-});
-
-describe('entering a newly opened region', () => {
-  it('works from the visible controls: go to the region, then explore its first cell', () => {
+  it('shows the key and what opens it in the panel of the cell', () => {
     const state = genin();
-    state.skills.scout!.xp = xpAt(10);
+    stand(state, KEYED);
     game.replaceState(state);
-    game.devAdvance(1000);
-    show({ cell: null, region: PLAINS });
-    // The entry cell is marked, and the region header offers the trip.
-    expect(tile('core:pivdennyi_trakt')?.querySelector('[data-entry]')).not.toBeNull();
-    expect(q('[data-region-entry]')).not.toBeNull();
-    expect(q('[data-region-walk]')?.textContent).toMatch(/[0-9]/);
-
-    unmount(app!);
-    app = null;
-    show({ cell: 'core:pokynutyi_khutir', region: PLAINS });
-    // Too far for the survey from here: it says why.
-    expect(reason('explore')).toBe(name('error.outOfRange'));
-    expect(q('[data-explore]')?.hasAttribute('disabled')).toBe(true);
-
-    q('[data-region-walk]')?.click();
-    game.devAdvance(2 * 60 * 60_000);
-    flushSync();
-    expect(game.state.world.location).toBe('core:pivdennyi_trakt');
+    show({ cell: KEYED, region: FOREST });
+    expect(q('[data-key="rock"]')).not.toBeNull();
+    expect(q('[data-key-req]')).not.toBeNull();
   });
 });
 
-describe('the cell panel keeps its actions in view', () => {
+describe('the hex panel keeps its actions in view', () => {
   it('has a header with the close button and an action row outside the scrolling body', () => {
     show({ cell: PLAIN_CELL, region: FOREST });
-    const panel = q('[data-cell-panel]');
+    const panel = q('[data-hex-panel]');
     expect(panel?.querySelector(':scope > .head .close')).not.toBeNull();
     expect(panel?.querySelector(':scope > .actions [data-explore]')).not.toBeNull();
     expect(panel?.querySelector(':scope > .body [data-explore]')).toBeNull();
-    expect(q('[data-side]')?.getAttribute('role')).toBe('dialog');
   });
 });
 
@@ -542,39 +619,49 @@ describe('hints of the map', () => {
   });
 });
 
-describe('CellPanel on its own', () => {
-  it('renders nothing for an unknown cell', () => {
-    app = mount(CellPanel, { target, context: coreContext(), props: { id: 'core:nowhere' } });
-    flushSync();
-    expect(q('[data-cell-panel]')).toBeNull();
-  });
-});
-
 describe('R1: places the player has not discovered stay hidden on the map', () => {
-  const link = (kind: string, id: string) => `a[href="#/${kind}/${id}"]`;
+  /** Cells the player has not met on a new game: not on surveyed land, and not named by any rule. */
+  const FAR = ['core:khram_vohniu', 'core:stezhka_myslyvtsia', 'core:pokynutyi_khutir'];
 
-  it('names the region the player stands in and masks the farther ones, without their ids', () => {
+  it('puts no cell, region or place id and no far name in the DOM of a new game', () => {
     show();
-    expect(q(`nav ${link('region', FOREST)}`)?.textContent).toBe(name(`region.${FOREST}.name`));
-    for (const id of [PLAINS, VALLEY]) {
-      expect(q(`nav ${link('region', id)}`), id).toBeNull();
-      expect(q(`[data-region="${id}"]`), id).toBeNull();
-      expect(target.innerHTML).not.toContain(id);
-      expect(target.textContent).not.toContain(name(`region.${id}.name`));
+    for (const id of FAR) {
+      expect(target.innerHTML, id).not.toContain(id);
+      expect(target.textContent, id).not.toContain(name(`cell.${id}.name`));
     }
-    expect(target.querySelectorAll('nav [data-masked]')).toHaveLength(2);
-    // The tiles of the region in view keep their names: the player may explore them.
-    expect(tile(HOME)?.querySelector(link('cell', HOME))?.textContent).toBe(
-      name(`cell.${HOME}.name`),
-    );
+    for (const id of [PLAINS, VALLEY]) {
+      expect(target.innerHTML, id).not.toContain(id);
+      expect(target.textContent, id).not.toContain(name(`region.${id}.name`));
+    }
+    expect(target.innerHTML).not.toContain('core:');
   });
 
-  it('opens the next region by name once a cell of this one is explored', () => {
+  it('shows a hex in fog without its terrain, its cell or its places, even when it is selected', () => {
+    const fog = coordOf('core:khram_vohniu');
+    show();
+    click(hexEl(fog));
+    const panel = q('[data-hex-panel]');
+    expect(panel).not.toBeNull();
+    expect(panel?.querySelector('[data-terrain]')).toBeNull();
+    expect(panel?.querySelector('[data-places]')).toBeNull();
+    expect(panel?.querySelector('a')).toBeNull();
+    expect(panel?.textContent).toContain(name('map.hex.fog'));
+    for (const id of FAR) expect(panel?.textContent).not.toContain(name(`cell.${id}.name`));
+  });
+
+  it('names the places of a hex only once it is surveyed to its first level', () => {
+    const place = content.places.find((p) => cellOf(HOME).hex.join() === p.hex.join());
+    expect(place).toBeDefined();
+    const placeName = name(`place.${place?.id}.name`);
+    show({ cell: HOME, region: FOREST });
+    expect(q('[data-places]')).toBeNull();
+    expect(target.textContent).not.toContain(placeName);
+
     const state = genin();
     explored(state, HOME);
     game.replaceState(state);
-    show();
-    expect(q(`nav ${link('region', PLAINS)}`)?.textContent).toBe(name(`region.${PLAINS}.name`));
-    expect(q(`nav ${link('region', VALLEY)}`)).toBeNull();
+    game.devAdvance(10);
+    flushSync();
+    expect(q('[data-places]')?.textContent).toContain(placeName);
   });
 });

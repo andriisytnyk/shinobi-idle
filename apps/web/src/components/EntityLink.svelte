@@ -1,8 +1,10 @@
 <script lang="ts">
   import { entityName } from '../lib/entities.ts';
+  import { hexLabel } from '../lib/hex-map.ts';
   import { t } from '../lib/i18n.ts';
   import { markShown, MASK, revealHintKey, revealLevel } from '../lib/reveal.ts';
   import { hrefFor, type EntityKind } from '../lib/route.ts';
+  import { game } from '../lib/store.ts';
 
   interface Props {
     kind: EntityKind;
@@ -14,6 +16,8 @@
   let { kind, id, offered = false }: Props = $props();
 
   const level = $derived(revealLevel({ kind, id }));
+  /** A hex that is no cell is named by what the player knows of it. */
+  const hexName = $derived(kind === 'hex' ? game.read((gs) => hexLabel(gs, game.content, id)) : '');
 
   /** Runs again when the level changes: a link the place offers tells the core while it is not yet shown in full. */
   const offer = (): void => {
@@ -26,6 +30,7 @@
     data-masked
     title={hint ? t(hint) : undefined}
     {@attach offer}>{MASK}</span
+  >{:else if kind === 'hex'}<a class="entity-link" href={hrefFor({ kind, id })}>{hexName}</a
   >{:else}<a class="entity-link" href={hrefFor({ kind, id })} {@attach offer}
     >{entityName({ kind, id })}</a
   >{/if}

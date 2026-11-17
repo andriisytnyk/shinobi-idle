@@ -31,6 +31,19 @@
   --nature-doton: #a9805b;
   --nature-suiton: #3b8fd9;
 
+  /* World map: the colour of each terrain, and of the fog that hides land not yet surveyed */
+  --terrain-road: #a89a7c;
+  --terrain-settlement: #b8845c;
+  --terrain-plains: #8fa65a;
+  --terrain-coast: #cdbb86;
+  --terrain-forest: #3f6f3a;
+  --terrain-river: #4f89a8;
+  --terrain-hills: #8a7a5e;
+  --terrain-lake: #3b6f9e;
+  --map-fog: #232731;
+  --map-fog-line: #2f3440;
+  --map-sea: #171a21;
+
   /* Progress of a running cycle, 0..1; animated by lib/time-progress.ts, read by bars, the seal strip and the emblem flash */
   --tp: 0;
 

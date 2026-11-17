@@ -192,12 +192,13 @@ export function surveyBlocked(
   state: GameState,
   address: string,
   content: ContentDb,
+  reach?: Reach,
 ): string | null {
   const subject = subjectOf(content, address);
   if (!subject) return 'error.unknownCell';
   if (surveyLevel(state, subject, content) >= surveyMaxLevel(subject, content))
     return 'error.cellMaxed';
-  const access = surveyAccess(state, content, subject.hex);
+  const access = surveyAccess(state, content, subject.hex, reach);
   if (access === 'outOfRange') return 'error.outOfRange';
   if (access === 'cutOff') return 'error.cutOff';
   return null;

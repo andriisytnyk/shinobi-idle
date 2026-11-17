@@ -34,7 +34,7 @@ export * from './state.ts';
 export * from './system.ts';
 export * from './unlocks.ts';
 export * from './regions.ts';
-export { shopEntries } from './lookup.ts';
+export { graduateReq, shopEntries } from './lookup.ts';
 export * from './village.ts';
 export * from './village-selectors.ts';
 export * from './village-state.ts';

@@ -26,7 +26,16 @@ import {
   surveyReq,
   travelBlocked,
 } from './world.ts';
-import { hexKey, isSurveyed, positionHex, routeTo, surveyAccess, surveyRange } from './hex.ts';
+import {
+  hexKey,
+  isSurveyed,
+  positionHex,
+  reachFrom,
+  routeTo,
+  surveyAccess,
+  surveyRange,
+  type Reach,
+} from './hex.ts';
 import { regionOpenReq } from './regions.ts';
 
 /*
@@ -277,6 +286,7 @@ export function hexInfo(
   key: string,
   content: ContentDb,
   rules: Rules = defaultRules,
+  reach?: Reach,
 ): HexInfo | null {
   const index = indexOf(content);
   const hex = index.hexes.get(key);
@@ -286,9 +296,12 @@ export function hexInfo(
   const here = locationHexKey(state, content) === key;
   const level = subject ? surveyLevel(state, subject, content) : 0;
   const req = subject ? surveyReq(state, subject.address, content) : null;
-  const blocked = subject ? surveyBlocked(state, subject.address, content) : 'error.unknownCell';
+  const blocked = subject
+    ? surveyBlocked(state, subject.address, content, reach)
+    : 'error.unknownCell';
   let why = blocked;
-  if (!why && req && !evalReq(state, req, content).met) why = 'error.scoutLevelLow';
+  if (!why && req && !evalReq(state, req, content).met)
+    why = req.t === 'rank' ? 'error.surveyRank' : 'error.scoutLevelLow';
   return {
     key,
     q: hex.q,
@@ -299,7 +312,7 @@ export function hexInfo(
     playable: hex.terrain !== undefined,
     surveyed,
     here,
-    inRange: surveyAccess(state, content, hex) === 'ok',
+    inRange: surveyAccess(state, content, hex, reach) === 'ok',
     cell: surveyed ? (subject?.cell?.id ?? null) : null,
     places: surveyed && level >= 1 ? (index.placesByHex.get(key) ?? []).map((p) => p.id) : [],
     level,
@@ -311,13 +324,17 @@ export function hexInfo(
   };
 }
 
-/** Every hex of the grid. */
+/** Every hex of the grid; the way search is done once for all of them. */
 export function listHexes(
   state: GameState,
   content: ContentDb,
   rules: Rules = defaultRules,
 ): HexInfo[] {
-  return content.hexes.flatMap((h) => hexInfo(state, hexKey(h.q, h.r), content, rules) ?? []);
+  const here = positionHex(state, content);
+  const reach = here ? reachFrom(state, content, here) : undefined;
+  return content.hexes.flatMap(
+    (h) => hexInfo(state, hexKey(h.q, h.r), content, rules, reach) ?? [],
+  );
 }
 
 /** How far the player can survey from here now, for drawing the reach. */

@@ -80,5 +80,7 @@ export function parseHash(hash: string): Route {
 
 /** The hash that opens an entity's page. */
 export function hrefFor(ref: EntityRef): string {
+  // A hex that is no cell has no page of its own: the link opens the map.
+  if (ref.kind === 'hex') return '#/world';
   return `#/${ref.kind}/${encodeURIComponent(ref.id).replace(/%3A/gi, ':')}`;
 }

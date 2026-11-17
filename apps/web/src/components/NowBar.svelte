@@ -1,6 +1,13 @@
 <script lang="ts">
   import { entityAttr } from '../lib/reveal.ts';
-  import { actionInfo, cellInfo, locationCell, SHARE_FULL } from '@shinobi/core';
+  import {
+    actionInfo,
+    cellInfo,
+    hexKey,
+    locationCell,
+    positionHex,
+    SHARE_FULL,
+  } from '@shinobi/core';
   import { actionRef } from '../lib/entities.ts';
   import { senseiTestInfo } from '../lib/exam-test.ts';
   import { formatDuration, formatXp } from '../lib/format.ts';
@@ -24,6 +31,7 @@
     course: 'now.doing.course',
     explore: 'now.doing.explore',
     walk: 'now.doing.walk',
+    autosurvey: 'now.doing.autosurvey',
     fight: 'now.doing.fight',
     mission: 'now.doing.mission',
     senseiTest: 'now.doing.exam',
@@ -39,6 +47,7 @@
   /** The picture of an action whose entity kind has no pictogram in the content. */
   const FALLBACK_ICON: Readonly<Record<string, string>> = {
     cell: 'lucide:map-pin',
+    hex: 'lucide:map-pin',
     mission: 'lucide:scroll-text',
     exam: 'lucide:clipboard-list',
   };
@@ -128,10 +137,13 @@
   const place = $derived(
     game.read((state) => {
       const cell = locationCell(state, game.content);
-      if (!cell) return null;
+      const at = positionHex(state, game.content);
+      if (!cell && !at) return null;
       return {
-        id: cell.id,
-        training: cell.pois.flatMap((p) =>
+        id: cell?.id ?? null,
+        /** The key of the hex, for a hex that is no cell. */
+        hex: at ? hexKey(at.q, at.r) : '',
+        training: (cell?.pois ?? []).flatMap((p) =>
           p.kind === 'training' && state.world.pois[p.id]
             ? [{ poi: p.id, skill: p.skill, pct: Math.round(p.bonus * 100) }]
             : [],
@@ -155,7 +167,12 @@
     <div class="place" data-place>
       <Icon name="lucide:map-pin" size={14} />
       <span class="place-label">{t('world.location')}</span>
-      <span class="place-name" data-place-cell><EntityLink kind="cell" id={place.id} /></span>
+      <span class="place-name" data-place-cell
+        >{#if place.id}<EntityLink kind="cell" id={place.id} />{:else}<EntityLink
+            kind="hex"
+            id={place.hex}
+          />{/if}</span
+      >
       {#each place.training as spot (spot.poi)}
         <span class="chip" data-training-bonus>
           {t('world.trainingNow', { pct: spot.pct })}
@@ -175,7 +192,7 @@
           data-slot={row.slot}
           data-ui="now-slot"
           data-slot-index={row.slot}
-          data-entity={entityAttr(row.ref)}
+          data-entity={row.ref.kind === 'hex' ? undefined : entityAttr(row.ref)}
           class:with-mission={row.mission}
         >
           <span class="emblem">
