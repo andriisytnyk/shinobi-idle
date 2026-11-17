@@ -150,6 +150,37 @@ export interface PageSpec {
    * that is not shown at all never reaches any page.
    */
   reveal?: 'self';
+  /**
+   * For the page of an entity kind that stays a page: draws a breadcrumb above it (the section of its
+   * `nav` item, then the entity), with a way back to the section.
+   */
+  crumbs?: boolean;
+}
+
+/** What a parent function may read: the content of the running game (the parent is a fact of the data, not of the state). */
+export interface SheetParentContext {
+  content: ContentDb;
+}
+
+/**
+ * How the details of one entity kind open: as a sheet over its parent page, not as a page of their
+ * own. `#/<kind>/<id>` then draws the parent page with the sheet open and the entity's tile
+ * highlighted; Back closes the sheet. A kind without a sheet opens its generic (or registered) page.
+ */
+export interface SheetSpec {
+  /**
+   * The parent page: a hash, or a function that picks it from the entity (a technique opens over
+   * the page of its skill). Return `null` to use `home`.
+   */
+  parent: string | ((ref: { kind: string; id: string }, ctx: SheetParentContext) => string | null);
+  /**
+   * The parent for an entity the player has not discovered, or an id the content does not have: a
+   * fixed hash, because the real parent would tell what the entity belongs to. Required with a
+   * `parent` function; defaults to `parent` when that is a hash.
+   */
+  home?: string;
+  /** The content of the sheet; defaults to the generic entity content (name, description, requirements, links). */
+  mount?: PageMount;
 }
 
 /**
@@ -249,6 +280,8 @@ export interface SettingSpec {
 export interface UiRegistrar {
   addWidget<N extends SlotName>(slot: N, widget: Widget<N>, opts?: WidgetOptions): void;
   addPage(spec: PageSpec): void;
+  /** Makes the details of entities of this kind a sheet over a parent page. The later pack wins, with a warning. */
+  addSheet(kind: string, spec: SheetSpec): void;
   addNavItem(spec: NavItemSpec): void;
   addEntityLink(spec: EntityLinkSpec): void;
   addSetting(spec: SettingSpec): void;

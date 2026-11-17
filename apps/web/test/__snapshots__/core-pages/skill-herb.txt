@@ -970,7 +970,7 @@
       <section data-gear-section="" data-ui="entity-section">
         <h2>
           Тренувальне спорядження
-        <section class="gear" data-gear="core:serp_i_rukavytsi_travnyka" data-owned="0">
+        <section class="gear" data-entity="gear:core:serp_i_rukavytsi_travnyka" data-gear="core:serp_i_rukavytsi_travnyka" data-owned="0">
           <h3 class="name">
             <span class="icon">
               <svg aria-hidden="true" class="icon" height="24" viewBox="0 0 512 512" width="24">
