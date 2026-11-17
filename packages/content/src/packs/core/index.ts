@@ -44,6 +44,7 @@ import handQuests from './data/hand/quests.json' with { type: 'json' };
 import handSkillFight from './data/hand/skill-fight.json' with { type: 'json' };
 import handStatuses from './data/hand/statuses.json' with { type: 'json' };
 import handTechniqueCombat from './data/hand/technique-combat.json' with { type: 'json' };
+import handTechniqueSlots from './data/hand/technique-slots.json' with { type: 'json' };
 import handTraits from './data/hand/traits.json' with { type: 'json' };
 import handZones from './data/hand/zones.json' with { type: 'json' };
 import contentUk from './locales/content.uk.json' with { type: 'json' };
@@ -78,6 +79,7 @@ import {
   layerTechniques,
   shopToolsSchema,
   techniqueCombatMapSchema,
+  techniqueSlotMapSchema,
 } from '../../overlay.ts';
 import { layerMissions, missionExtraMapSchema } from '../../overlay-missions.ts';
 import {
@@ -120,6 +122,7 @@ const data: Record<string, unknown> = {
   techniques: layerTechniques(
     z.array(techniqueBaseSchema).parse(techniques),
     techniqueCombatMapSchema.parse(handTechniqueCombat),
+    techniqueSlotMapSchema.parse(handTechniqueSlots),
   ),
   exercises,
   practices: layerPractices(

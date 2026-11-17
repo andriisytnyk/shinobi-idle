@@ -1,5 +1,6 @@
 import { untrack } from 'svelte';
 import {
+  cloneSlots,
   missionInputs,
   missionStartSlot,
   missionStatus,
@@ -85,12 +86,25 @@ export function cardState(mission: Mission, view: MissionView): MissionStatus {
     missionStatus(
       game.state,
       mission.id,
-      missionStartSlot(game.state),
+      missionStartSlot(game.state, game.content),
       game.content,
       game.rules,
       view.blocker,
     ),
   );
+}
+
+/**
+ * The answer `dispatch` would give to starting a mission in the clone's slot, from core; null
+ * before the player has a clone. A mission with a combat stage is refused there.
+ */
+export function cloneCardState(mission: Mission, view: MissionView): MissionStatus | null {
+  void game.version;
+  return untrack(() => {
+    const slot = cloneSlots(game.state, game.content)[0]?.slot;
+    if (slot === undefined) return null;
+    return missionStatus(game.state, mission.id, slot, game.content, game.rules, view.blocker);
+  });
 }
 
 /** The missions of the list that can be started or are running now (what the filter «лише доступні» keeps). */

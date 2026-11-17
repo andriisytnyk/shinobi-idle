@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   academyBot,
   buildReport,
+  clonesBot,
   runBench,
   runBot,
   runCli,
@@ -154,5 +155,17 @@ describe('benchmarks', () => {
       expect(r.cycles, r.label).toBeGreaterThan(1000);
       expect(r.restarts, r.label).toBe(0);
     }
+  });
+});
+
+describe('clones bot', () => {
+  it.each([1, 2])('opens the clone technique within 5 to 8 game hours (seed %i)', (seed) => {
+    const run = runBot(clonesBot, { seed, limitMs: 14 * 60 * MINUTE });
+    expect(run.ended).toBe('done');
+    expect(run.goalAt).toBeGreaterThanOrEqual(5 * 60 * MINUTE);
+    expect(run.goalAt).toBeLessThanOrEqual(8 * 60 * MINUTE);
+    expect(run.rejected).toBe(0);
+    expect(run.state.slots.length).toBe(2);
+    expect(run.actions['mission']).toBeGreaterThanOrEqual(10);
   });
 });

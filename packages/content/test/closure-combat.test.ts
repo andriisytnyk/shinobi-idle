@@ -303,7 +303,8 @@ describe('scrolls, parts and tools', () => {
       expect(s, `${t.id} has no scroll item`).toBeDefined();
       expect(s?.id).toBe(`core:scroll_${slug(t.id)}`);
     }
-    expect(content.items.filter((i) => i.scroll)).toHaveLength(scrolled.length);
+    // The one scroll more is the quest's: it teaches the chakra drill, which is a training technique.
+    expect(content.items.filter((i) => i.scroll)).toHaveLength(scrolled.length + 1);
   });
 
   it('has a library level and a price for every library scroll, matching the technique home', () => {

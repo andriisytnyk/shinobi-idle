@@ -12,6 +12,7 @@ import {
 } from './formulas.ts';
 import { indexOf } from './lookup.ts';
 import { actionFloor, entitySkill } from './vocab.ts';
+import { trackClone } from './clone.ts';
 import { nonNativeLevel } from './natures.ts';
 import { cycleFactor } from './modifiers.ts';
 import { spendTonicCharges } from './buffs.ts';
@@ -22,6 +23,17 @@ import { SHARE_FULL, type GameState } from './state.ts';
 import type { System } from './system.ts';
 
 export type StopReason = ActionStoppedEvent['reason'];
+
+/**
+ * What an action makes and uses, for rules that link two running actions (the clone technique's
+ * `slotLinks`): the items it makes, the items it uses up, and the speed key a link raises for it
+ * when it is the one that uses.
+ */
+export interface ActionFlow {
+  makes: string[];
+  uses: string[];
+  speed: string;
+}
 
 /** What one kind of action does. Rule sets map kind names to these; slots refer to the names. */
 export interface ActionKind {
@@ -58,6 +70,12 @@ export interface ActionKind {
   abortCause?(state: GameState, id: string, content: ContentDb, rules: Rules): string | null;
   /** The item the action lacks for its next cycle, if any; names the cause when it stops or is refused. */
   missing?(state: GameState, id: string, content: ContentDb, rules: Rules): string | null;
+  /**
+   * What the action `id` makes and uses (see `ActionFlow`), or null when it takes part in no item
+   * flow. A kind without it never gets a link bonus; a pack's own kind that has it can feed or be
+   * fed by the kinds of the clone technique's `slotLinks`.
+   */
+  flow?(id: string, content: ContentDb): ActionFlow | null;
   /** The skill the action trains, when it trains one; a locked skill refuses its actions. */
   skill?(id: string, content: ContentDb): string | null;
   /**
@@ -86,7 +104,10 @@ export interface ActionKind {
 }
 
 /** The action kind a rule set has under `name`; a name of the object prototype (`constructor`) is no kind. */
-export function actionKindOf(rules: Rules, name: string): ActionKind | undefined {
+export function actionKindOf(
+  rules: Pick<Rules, 'actionKinds'>,
+  name: string,
+): ActionKind | undefined {
   return Object.hasOwn(rules.actionKinds, name) ? rules.actionKinds[name] : undefined;
 }
 
@@ -124,7 +145,7 @@ export function skillAction(resolve: Resolver): ActionKind {
     intervalMs(state, id, content, rules) {
       const def = resolve(state, id, content);
       if (!def) return 1;
-      const mod = cycleFactor(rules.modifierProviders, state, def.skill, content, def.extraSpeed);
+      const mod = cycleFactor(rules, state, def.skill, content, def.extraSpeed);
       return Math.max(actionFloor(content), Math.round(baseMs(def) * mod));
     },
     complete(state, id, content, rules) {
@@ -172,17 +193,22 @@ export const drillKind = skillAction((_state, id, content) => {
 });
 
 /**
- * Splits the speed budget: active slots share SHARE_FULL equally, the remainder goes to the first
- * active slot, idle slots get 0 (slot 0 keeps the full budget when nothing runs).
+ * Splits the speed budget: active slots share it equally, the remainder goes to the first active
+ * slot, idle slots get 0 (slot 0 keeps the full budget when nothing runs). One running slot has
+ * SHARE_FULL; two or more share the pool of the content (K.clone.pool, SHARE_FULL by default).
  */
-export function rebalanceShares(state: GameState): void {
+export function rebalanceShares(state: GameState, content?: ContentDb): void {
   const active = state.slots.filter((s) => s.action);
   const takers = active.length > 0 ? active : state.slots.slice(0, 1);
+  const total =
+    takers.length > 1 && content
+      ? Math.round(SHARE_FULL * content.balance.K.clone.pool)
+      : SHARE_FULL;
   for (const slot of state.slots) slot.share = 0;
-  const each = Math.floor(SHARE_FULL / Math.max(1, takers.length));
+  const each = Math.floor(total / Math.max(1, takers.length));
   for (const slot of takers) slot.share = each;
   const [first] = takers;
-  if (first) first.share += SHARE_FULL - each * takers.length;
+  if (first) first.share += total - each * takers.length;
 }
 
 /** Clears a slot, calls the kind's stop hook, tells the UI why and re-splits the speed budget. */
@@ -212,7 +238,7 @@ export function stopSlot(
   slot.action = null;
   slot.progress = 0;
   slot.data = null;
-  rebalanceShares(state);
+  rebalanceShares(state, content);
 }
 
 /**
@@ -234,7 +260,8 @@ export const actionSystem: System = {
     return best;
   },
 
-  elapse(state, dt) {
+  elapse(state, dt, content) {
+    trackClone(state, dt, content);
     for (const slot of state.slots) if (slot.action) slot.progress += dt * slot.share;
   },
 

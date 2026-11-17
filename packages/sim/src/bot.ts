@@ -28,5 +28,7 @@ export interface Bot {
   goal: BotGoal;
   /** When set, the runner also asks again after this much game time without a decision (ms). */
   reviewMs?: number;
+  /** The longest game time a run of this bot may take, in ms; the CLI default when absent. */
+  limitMs?: number;
   decide(ctx: BotContext): Command[] | null;
 }

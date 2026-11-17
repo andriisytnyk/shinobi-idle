@@ -57,7 +57,7 @@ export function missionToast(event: GameEvent, content: ContentDb): ToastSpec | 
     }
     case 'actionStopped': {
       if (event.kind !== MISSION_KIND) return undefined;
-      if (event.reason === 'manual') return null;
+      if (event.reason === 'manual' || event.reason === 'dispelled') return null;
       const subject = { kind: 'mission', id: event.id } as const;
       if (event.reason === 'replaced') {
         return { key: 'toast.mission.stopped.replaced', params: {}, subject };

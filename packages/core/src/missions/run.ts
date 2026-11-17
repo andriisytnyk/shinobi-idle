@@ -323,7 +323,7 @@ export function resourceUnits(
 ): number {
   if (!mission.resource) return 0;
   const mod = mission.resourceMod
-    ? computeMod(rules.modifierProviders, state, mission.resourceMod, content).total
+    ? computeMod(rules, state, mission.resourceMod, content).total
     : 1;
   return Math.round(content.balance.K.shinobiResPerMission * mod);
 }
@@ -341,7 +341,7 @@ export function payMission(
   rules: Rules,
 ): void {
   const K = content.balance.K;
-  const mods = rules.modifierProviders;
+  const mods = rules;
   const ryo = Math.round(mission.ryo * computeMod(mods, state, 'mission.ryo', content).total);
   const rep = mission.team
     ? Math.round(mission.rep * computeMod(mods, state, 'mission.rep', content).total)

@@ -12,14 +12,47 @@ import {
 } from '@shinobi/core';
 import type { Bot, BotContext } from '../bot.ts';
 
-const leaves = (r: ReqResult): ReqResult[] =>
+export const leaves = (r: ReqResult): ReqResult[] =>
   r.children.length > 0 ? r.children.flatMap(leaves) : [r];
+
+/**
+ * Trains the lowest-level skill among the unmet skill requirements with the action that pays the
+ * most XP. Returns the commands (null: nothing to do), or undefined when none of the unmet
+ * requirements is a skill level.
+ */
+export function trainLowest(
+  { state, content, rules }: BotContext,
+  unmet: ReqResult[],
+  start: (kind: string, id: string) => Command[] | null,
+): Command[] | null | undefined {
+  const skills = unmet.filter((r) => r.req.t === 'skill');
+  if (skills.length === 0) return undefined;
+  // Lowest current level first; the first listed wins a tie.
+  const target = skills.reduce((a, b) => (b.current < a.current ? b : a));
+  if (target.req.t !== 'skill') return null;
+  // Athletics runs the course: the first time, the free obstacle of slot 1 has to be built.
+  const course = courseSkill(content);
+  if (course !== null && target.req.skill === course && Object.keys(state.course).length === 0) {
+    const free = content.obstacles.find((o) => o.slot === content.balance.K.athletics.freeSlot);
+    if (!free) return null;
+    return [
+      { type: 'athletics.build', slot: free.slot, obstacle: free.id },
+      ...(start(COURSE_KIND, course) ?? []),
+    ];
+  }
+  let best: ActionInfo | null = null;
+  for (const action of listSkillActions(state, target.req.skill, content, rules)) {
+    if (action.available && (!best || action.xpPerHour > best.xpPerHour)) best = action;
+  }
+  return best ? start(best.kind, best.id) : null;
+}
 
 /**
  * Act 1: follows the objective of the active quest step. It trains the lowest-level skill the
  * step still wants with the action that pays the most XP, fights the enemy a kill objective
  * names, and starts the rank exam once the exam's checklist holds.
  */
+
 export const academyBot: Bot = {
   name: 'academy',
   description: 'Академія: від нового збереження до Геніна за квестом «Випуск».',
@@ -28,7 +61,8 @@ export const academyBot: Bot = {
     reached: (state, content) => !isAcademyRank(content, state.player.rank),
   },
 
-  decide({ state, content, rules }: BotContext): Command[] | null {
+  decide(ctx: BotContext): Command[] | null {
+    const { state, content } = ctx;
     const quest = content.quests.find((q) => {
       const progress = state.quests[q.id];
       return progress && !progress.done;
@@ -49,31 +83,8 @@ export const academyBot: Bot = {
     }
 
     const unmet = leaves(evalReq(state, objective.req, content)).filter((r) => !r.met);
-    const skills = unmet.filter((r) => r.req.t === 'skill');
-    if (skills.length > 0) {
-      // Lowest current level first; the first listed wins a tie.
-      const target = skills.reduce((a, b) => (b.current < a.current ? b : a));
-      if (target.req.t !== 'skill') return null;
-      // Athletics runs the course: the first time, the free obstacle of slot 1 has to be built.
-      const course = courseSkill(content);
-      if (
-        course !== null &&
-        target.req.skill === course &&
-        Object.keys(state.course).length === 0
-      ) {
-        const free = content.obstacles.find((o) => o.slot === content.balance.K.athletics.freeSlot);
-        if (!free) return null;
-        return [
-          { type: 'athletics.build', slot: free.slot, obstacle: free.id },
-          ...(start(COURSE_KIND, course) ?? []),
-        ];
-      }
-      let best: ActionInfo | null = null;
-      for (const action of listSkillActions(state, target.req.skill, content, rules)) {
-        if (action.available && (!best || action.xpPerHour > best.xpPerHour)) best = action;
-      }
-      return best ? start(best.kind, best.id) : null;
-    }
+    const trained = trainLowest(ctx, unmet, start);
+    if (trained !== undefined) return trained;
 
     const rank = unmet.find((r) => r.req.t === 'rank')?.req;
     if (rank?.t === 'rank' && running?.kind !== 'senseiTest') {

@@ -254,6 +254,14 @@ export const techniqueBaseSchema = z.strictObject({
 
 export const techniqueSchema = techniqueBaseSchema.extend({
   ...revealField,
+  /** The action slot (index from 1, at most 8) that knowing the technique opens, for a technique that sends a clone to work; absent for every other. */
+  opensSlot: z.number().int().min(1).max(8).optional(),
+  /**
+   * The pairs of actions the clone links, for a technique with `opensSlot`: an action of the kind
+   * `from` that makes an item an action of the kind `to` uses feeds it, and while the two run in two
+   * slots the consumer (`to`) gets `K.clone.link` speed.
+   */
+  slotLinks: z.array(z.strictObject({ from: z.string().min(1), to: z.string().min(1) })).optional(),
   /** Combat behaviour; `null` for training drills, which are never cast. */
   combat: techniqueCombatSchema.nullable(),
 });
@@ -827,6 +835,8 @@ export const questStepSchema = z.strictObject({
   /** Localization key of the step's one-line text. */
   textKey: z.string().min(1),
   objective: questObjectiveSchema,
+  /** Items handed over once, when the step becomes the active one (the step before it was finished). */
+  grants: z.array(ingredientRef).optional(),
 });
 
 export const questRewardsSchema = z.strictObject({

@@ -100,6 +100,12 @@
     if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 
+  /** Reads a scroll of a technique: the core learns the technique, or takes the scroll as Notes when it is known. */
+  function read(id: string): void {
+    const result = game.dispatch({ type: 'item.use', id });
+    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
+  }
+
   function coat(poison: string, base: string): void {
     const result = game.dispatch({ type: 'item.coat', poison, base });
     error = result.ok ? null : result.reason;
@@ -172,6 +178,10 @@
             {#if tonic}
               <button type="button" class="act" data-drink={item.id} onclick={() => drink(item.id)}>
                 {t('bank.drink')}
+              </button>
+            {:else if item.scroll}
+              <button type="button" class="act" data-read={item.id} onclick={() => read(item.id)}>
+                {t('bank.read')}
               </button>
             {:else if item.use}
               <button type="button" class="act use" onclick={() => (picking = item.id)}>

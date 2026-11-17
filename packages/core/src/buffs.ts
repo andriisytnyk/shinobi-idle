@@ -51,7 +51,7 @@ export function tonicCharges(
   content: ContentDb,
   rules: Rules,
 ): number {
-  const bonus = bonusOf(rules.modifierProviders, state, 'tonic.charges', content);
+  const bonus = bonusOf(rules, state, 'tonic.charges', content);
   return Math.max(1, Math.round(base * (1 + bonus)));
 }
 

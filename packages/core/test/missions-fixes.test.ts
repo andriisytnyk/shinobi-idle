@@ -241,6 +241,9 @@ describe('fights in two slots', () => {
     const state = ableFor(mission(id));
     openWorld(state);
     state.slots.push({ action: null, progress: 0, share: 0, data: null });
+    // A slot of the player's own: a clone's slot does not take fights.
+    delete state.known['core:shadow_clone'];
+    dispatch(state, { type: 'loadout.auto', on: true }, content);
     return state;
   };
 

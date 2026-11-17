@@ -9,6 +9,7 @@
   import { practiceView, slotTiming } from '../lib/timing.ts';
   import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import ActionEmblem from './ActionEmblem.svelte';
+  import CloneStart from './CloneStart.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import MasteryRing from './MasteryRing.svelte';
@@ -115,9 +116,12 @@
     {#if running}
       <TimeBar {timing} part="action-progress" />
     {/if}
-    <button type="button" class="action" class:stop={running} onclick={toggle}>
-      {t(running ? 'tile.stop' : 'tile.start')}
-    </button>
+    <div class="ct-actions">
+      <button type="button" class="action" class:stop={running} onclick={toggle}>
+        {t(running ? 'tile.stop' : 'tile.start')}
+      </button>
+      <CloneStart kind={info.kind} id={info.id} />
+    </div>
   {:else if info.req}
     <div class="req">
       <p class="locked-label"><Icon name="lucide:lock" size={14} /> {t('tile.locked')}</p>

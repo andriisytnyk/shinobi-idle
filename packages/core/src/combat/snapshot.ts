@@ -50,12 +50,7 @@ export function snapshotPlayer(
   entries: readonly string[] = [],
 ): PlayerSnapshot {
   const snapshot = planningSnapshot(state, content);
-  const [chakra, stamina] = computeMods(
-    rules.modifierProviders,
-    state,
-    ['cost.chakra', 'cost.stamina'],
-    content,
-  );
+  const [chakra, stamina] = computeMods(rules, state, ['cost.chakra', 'cost.stamina'], content);
   snapshot.costMod = { chakra: chakra?.total ?? 1, stamina: stamina?.total ?? 1 };
   snapshot.wounds = state.wounds.stacks;
   snapshot.knowledge = knowledgeOf(state, content, entries);
