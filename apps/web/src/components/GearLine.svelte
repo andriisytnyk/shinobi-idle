@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { idAttr } from '../lib/reveal.ts';
+  import { entityAttr, idAttr } from '../lib/reveal.ts';
   import { type Gear } from '@shinobi/content';
   import { evalReq, nextTierPrice, nextTierReq, ownedTiers } from '@shinobi/core';
   import { blockOf, blockText } from '../lib/crafts.ts';
@@ -50,7 +50,12 @@
   }
 </script>
 
-<section class="gear" data-gear={idAttr('gear', line.id)} data-owned={view.owned}>
+<section
+  class="gear"
+  data-gear={idAttr('gear', line.id)}
+  data-entity={entityAttr(ref)}
+  data-owned={view.owned}
+>
   <h3 class="name">
     <span class="icon"><Icon entity={ref} size={24} /></span>
     <EntityLink kind="gear" id={line.id} offered />

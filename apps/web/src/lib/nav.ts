@@ -1,4 +1,6 @@
+import { tryActiveContent } from './active.ts';
 import type { NavEntry, UiRegistry } from './ext/registry.ts';
+import { sheetRoute } from './ext/sheet-route.ts';
 import { navTarget } from './next-step.ts';
 
 /*
@@ -42,7 +44,10 @@ export const tabOf = (registry: UiRegistry, id: string | null): string | null =>
 
 /** The nav item a location hash belongs to, or null when none does. */
 export function activeNav(hash: string, registry: UiRegistry): string | null {
-  return registry.matchPage(hash)?.page.nav ?? null;
+  // The details of an entity open over their parent page: the parent's section stays lit.
+  const content = tryActiveContent();
+  const sheet = content ? sheetRoute(registry, content, hash) : null;
+  return registry.matchPage(sheet?.parent ?? hash)?.page.nav ?? null;
 }
 
 /** Which nav item and which skill the suggested next step points at, from the step's target hash. */

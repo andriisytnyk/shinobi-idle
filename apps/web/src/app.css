@@ -35,6 +35,12 @@ a {
   outline-offset: var(--focus-offset);
 }
 
+/* The tile that the open sheet is about. */
+[data-highlighted] {
+  outline: var(--border-thick) solid var(--accent);
+  outline-offset: var(--focus-offset);
+}
+
 button {
   font-family: inherit;
 }

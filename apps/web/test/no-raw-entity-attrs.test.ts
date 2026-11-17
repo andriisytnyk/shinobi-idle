@@ -52,10 +52,11 @@ function hits(): Hit[] {
 
 /** Files whose raw ids are fine, and why: the entity cannot be hidden where the id is written. */
 const ALLOWED: Record<string, string> = {
+  'components/Breadcrumb.svelte': 'navigation links of a page, not entities',
   'components/BuffStrip.svelte': 'a running tonic: the player has held it',
   'components/BuildingCard.svelte': 'buildings have no reveal rule: always shown',
   'components/BuildingNeed.svelte': 'buildings: always shown',
-  'pages/BuildingPage.svelte': 'buildings: always shown',
+  'sheets/BuildingSheet.svelte': 'buildings: always shown',
   'components/CellPanel.svelte':
     'the panel opens only for a cell the map shows by name or more (a hidden cell has no tile)',
   'components/CellTile.svelte':
@@ -90,11 +91,11 @@ const ALLOWED: Record<string, string> = {
   'pages/CombatPage.svelte':
     'an enemy is listed only when it is shown by name (open zone); the fight is the one being fought',
   'pages/EntityPage.svelte': 'drawn after the gate: the entity is shown in full',
-  'pages/GearPage.svelte': 'drawn after the gate: the entity is shown at least by name',
-  'pages/ItemPage.svelte': 'drawn after the gate: the entity is shown in full',
-  'pages/RecipePage.svelte': 'drawn after the gate: the entity is shown in full',
+  'sheets/GearSheet.svelte': 'drawn after the gate: the entity is shown at least by name',
+  'sheets/ItemSheet.svelte': 'drawn after the gate: the entity is shown in full',
+  'sheets/RecipeSheet.svelte': 'drawn after the gate: the entity is shown in full',
   'pages/SkillPage.svelte': 'skills: always shown',
-  'pages/TechniquePage.svelte': 'techniques: always shown',
+  'sheets/TechniqueSheet.svelte': 'techniques: always shown',
   'pages/QuestsPage.svelte': 'the journal lists chains that have started',
   'pages/RankPage.svelte': 'exams and ranks: always shown',
   'pages/SettingsPage.svelte': 'packs and settings, not entities',

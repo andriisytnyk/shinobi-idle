@@ -1,101 +1,121 @@
 <main class="main">
-  <div class="ui-page" data-page="core:entity.building" data-ui="page">
+  <div class="layer">
+    <button aria-hidden="true" class="backdrop" tabindex="-1" type="button">
+    <div aria-label="Кузня" aria-modal="true" class="sheet" data-entity="building:core:forge" data-ui="sheet" role="dialog" tabindex="-1">
+      <div class="bar">
+        <button class="close" data-sheet-close="" type="button">
+          <span class="phone">
+            <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+              <path d="#21-14x91bd" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            Назад
+          <span class="desk">
+            <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+              <path d="#20-zr2y6e" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            Закрити
+      <div class="body">
+        <article class="simple-page">
+          <h1>
+            Кузня
+          <div class="building-page" data-building-page="core:forge" data-entity="building:core:forge" data-ui="entity-page">
+            <p class="kind" data-ui="entity-header">
+              Будівля
+            <p>
+              Кузня кує зброю та інструменти, від кунаїв до дротяної пастки. Вищі рівні відкривають складніші вироби й станції Провіанту.
+            <section class="card" data-building="core:forge" data-entity="building:core:forge" data-focused="false" data-level="0" data-ui="building-card" id="building-core:forge">
+              <header>
+                <span class="icon">
+                  <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                    <path d="#351-3iwd2g" fill="currentColor">
+                <h3>
+                  <span data-name="">
+                    Кузня
+                <span class="level" data-level-text="">
+                  Рівень 0 з 5
+              <div class="unlocks" data-unlocks="">
+                <p class="label">
+                  Відкриває в крамницях:
+                <ul>
+                  <li data-unlock-level="1">
+                    <span class="lv">
+                      Рівень 1:
+                    <span class="chip">
+                      <a class="entity-link" href="#/item/core:kunai">
+                        Кунаї
+                    <span class="chip">
+                      <a class="entity-link" href="#/item/core:shuriken">
+                        Сюрікени
+                  <li data-unlock-level="2">
+                    <span class="lv">
+                      Рівень 2:
+                    <span class="chip">
+                      <a class="entity-link" href="#/item/core:senbon">
+                        Сенбон
+                    <span class="chip">
+                      <a class="entity-link" href="#/item/core:wire">
+                        Дріт
+                  <li data-unlock-level="3">
+                    <span class="lv">
+                      Рівень 3:
+                    <span class="chip">
+                      <a class="entity-link" href="#/item/core:wiretrap">
+                        Дротяна пастка
+                  <li data-unlock-level="4">
+                    <span class="lv">
+                      Рівень 4:
+                    <span class="chip">
+                      <a class="entity-link" href="#/gear/core:trenuvalni_manekeny">
+                        Тренувальні манекени
+                      <span class="ct-muted">
+                        ступінь III
+                    <span class="chip">
+                      <a class="entity-link" href="#/gear/core:stantsii_proviantu">
+                        Станції Провіанту
+                      <span class="ct-muted">
+                        ступінь II
+              <div class="cost" data-cost="">
+                <p class="label">
+                  Ціна наступного рівня:
+                <ul>
+                <p class="ct-muted">
+                  Будується 1 тіків
+              <button aria-describedby="why-core:forge" class="ct-button" data-build="core:forge" disabled="" type="button">
+                Збудувати
+              <div class="why">
+                <p class="ct-why" data-why="error.noVillage" id="why-core:forge">
+                  Село з'являється зі званням Геніна.
+            <section class="ct-section" data-levels="" data-ui="entity-section">
+              <h2>
+                Усі рівні
+              <ol>
+                <li data-level-row="1">
+                  <strong>
+                    Рівень 1
+                  <span class="ct-muted">
+                    Деревина 20, Камінь 20, Казна 25
+                <li data-level-row="2">
+                  <strong>
+                    Рівень 2
+                  <span class="ct-muted">
+                    Деревина 44, Камінь 44, Казна 55
+                <li data-level-row="3">
+                  <strong>
+                    Рівень 3
+                  <span class="ct-muted">
+                    Деревина 96, Камінь 96, Казна 120
+                <li data-level-row="4">
+                  <strong>
+                    Рівень 4
+                  <span class="ct-muted">
+                    Деревина 210, Камінь 210, Залізо 105, Казна 263
+                <li data-level-row="5">
+                  <strong>
+                    Рівень 5
+                  <span class="ct-muted">
+                    Деревина 460, Камінь 460, Залізо 230, Казна 575
+  <div class="ui-page" data-page="core:village" data-ui="page">
     <article class="simple-page">
       <h1>
-        Кузня
-      <div class="building-page" data-building-page="core:forge" data-entity="building:core:forge" data-ui="entity-page">
-        <p class="kind" data-ui="entity-header">
-          Будівля
-        <p>
-          Кузня кує зброю та інструменти, від кунаїв до дротяної пастки. Вищі рівні відкривають складніші вироби й станції Провіанту.
-        <section class="card" data-building="core:forge" data-entity="building:core:forge" data-focused="false" data-level="0" data-ui="building-card" id="building-core:forge">
-          <header>
-            <span class="icon">
-              <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
-                <path d="#351-3iwd2g" fill="currentColor">
-            <h3>
-              <span data-name="">
-                Кузня
-            <span class="level" data-level-text="">
-              Рівень 0 з 5
-          <div class="unlocks" data-unlocks="">
-            <p class="label">
-              Відкриває в крамницях:
-            <ul>
-              <li data-unlock-level="1">
-                <span class="lv">
-                  Рівень 1:
-                <span class="chip">
-                  <a class="entity-link" href="#/item/core:kunai">
-                    Кунаї
-                <span class="chip">
-                  <a class="entity-link" href="#/item/core:shuriken">
-                    Сюрікени
-              <li data-unlock-level="2">
-                <span class="lv">
-                  Рівень 2:
-                <span class="chip">
-                  <a class="entity-link" href="#/item/core:senbon">
-                    Сенбон
-                <span class="chip">
-                  <a class="entity-link" href="#/item/core:wire">
-                    Дріт
-              <li data-unlock-level="3">
-                <span class="lv">
-                  Рівень 3:
-                <span class="chip">
-                  <a class="entity-link" href="#/item/core:wiretrap">
-                    Дротяна пастка
-              <li data-unlock-level="4">
-                <span class="lv">
-                  Рівень 4:
-                <span class="chip">
-                  <a class="entity-link" href="#/gear/core:trenuvalni_manekeny">
-                    Тренувальні манекени
-                  <span class="ct-muted">
-                    ступінь III
-                <span class="chip">
-                  <a class="entity-link" href="#/gear/core:stantsii_proviantu">
-                    Станції Провіанту
-                  <span class="ct-muted">
-                    ступінь II
-          <div class="cost" data-cost="">
-            <p class="label">
-              Ціна наступного рівня:
-            <ul>
-            <p class="ct-muted">
-              Будується 1 тіків
-          <button aria-describedby="why-core:forge" class="ct-button" data-build="core:forge" disabled="" type="button">
-            Збудувати
-          <div class="why">
-            <p class="ct-why" data-why="error.noVillage" id="why-core:forge">
-              Село з'являється зі званням Геніна.
-        <section class="ct-section" data-levels="" data-ui="entity-section">
-          <h2>
-            Усі рівні
-          <ol>
-            <li data-level-row="1">
-              <strong>
-                Рівень 1
-              <span class="ct-muted">
-                Деревина 20, Камінь 20, Казна 25
-            <li data-level-row="2">
-              <strong>
-                Рівень 2
-              <span class="ct-muted">
-                Деревина 44, Камінь 44, Казна 55
-            <li data-level-row="3">
-              <strong>
-                Рівень 3
-              <span class="ct-muted">
-                Деревина 96, Камінь 96, Казна 120
-            <li data-level-row="4">
-              <strong>
-                Рівень 4
-              <span class="ct-muted">
-                Деревина 210, Камінь 210, Залізо 105, Казна 263
-            <li data-level-row="5">
-              <strong>
-                Рівень 5
-              <span class="ct-muted">
-                Деревина 460, Камінь 460, Залізо 230, Казна 575
+        Село
+      <div class="village" data-village="">
+        <p class="ct-why" data-village-locked="">
+          Село з'явиться, коли ти станеш Геніном.
