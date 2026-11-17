@@ -69,6 +69,11 @@ const ACTION_ENTITY: Readonly<Record<string, string>> = {
   walk: 'cell',
 };
 
+/**
+ * The entity an action names. A kind with no entry above is the pack's own: when its locale names
+ * the action as `<kind>.<id>.name` (an operation does), that is the reference; else a technique.
+ * A survey or walk to a hex in fog names the hex, not the cell on it.
+ */
 export function actionRef(action: { kind: string; id: string }, state?: GameState): EntityRef {
   // A hex that is no cell, and the auto-survey, have no page: the `hex` kind names them on the map.
   if (action.kind === 'autosurvey') return { kind: HEX_KIND, id: '' };
@@ -82,7 +87,12 @@ export function actionRef(action: { kind: string; id: string }, state?: GameStat
     if (fog) return { kind: HEX_KIND, id: key };
     if (!content?.cells.some((c) => c.id === action.id)) return { kind: HEX_KIND, id: action.id };
   }
-  return { kind: ACTION_ENTITY[action.kind] ?? 'technique', id: action.id };
+  const mapped = ACTION_ENTITY[action.kind];
+  if (mapped) return { kind: mapped, id: action.id };
+  return {
+    kind: hasKey(`${action.kind}.${action.id}.name`) ? action.kind : 'technique',
+    id: action.id,
+  };
 }
 
 /** The entity that owns a mastery key; masteries live on techniques, exercises, practices and obstacles. */

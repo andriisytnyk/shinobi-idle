@@ -1,4 +1,5 @@
 import type { Boss, Cell, ContentDb, Mission, MissionStage, NatureId } from '@shinobi/content';
+import { bump, NATURES_GAINED } from './counters.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
 import { indexOf } from './lookup.ts';
@@ -182,6 +183,7 @@ export function chooseNature(
   if (!nature) return { ok: false, reason: 'error.invalidNature' };
   state.player.natures = [nature];
   state.team = teamFor(content, nature);
+  bump(state, NATURES_GAINED);
   emit(state, { type: 'natureGained', nature, first: true });
   return { ok: true };
 }
@@ -207,6 +209,7 @@ export function addNature(
   const nature = pick(state, choice, status.free);
   if (!nature) return { ok: false, reason: 'error.invalidNature' };
   state.player.natures.push(nature);
+  bump(state, NATURES_GAINED);
   emit(state, { type: 'natureGained', nature, first: false });
   return { ok: true };
 }

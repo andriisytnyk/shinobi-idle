@@ -53,6 +53,7 @@ import handZones from './data/hand/zones.json' with { type: 'json' };
 import contentUk from './locales/content.uk.json' with { type: 'json' };
 import generatedUk from './locales/uk.json' with { type: 'json' };
 import enGenerated from './locales/en.json' with { type: 'json' };
+import storyUk from './locales/story.uk.json' with { type: 'json' };
 import uiUk from './locales/ui.uk.json' with { type: 'json' };
 import { z } from 'zod';
 import {
@@ -195,7 +196,7 @@ export const corePack: ContentPack = {
   data: data as PackData,
   balance: balance as ContentPack['balance'],
   /** Generated names and descriptions, hand-written descriptions (they win) and UI strings. */
-  locales: { uk: { ...generatedUk, ...contentUk, ...uiUk }, en: enGenerated },
+  locales: { uk: { ...generatedUk, ...contentUk, ...uiUk, ...storyUk }, en: enGenerated },
   icons: CORE_ICONS,
   patches: [],
   modifierKeys: CORE_MODIFIER_KEYS,

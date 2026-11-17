@@ -1,9 +1,10 @@
 <script lang="ts">
+  import { tryActiveContent } from '../lib/active.ts';
   import { entityName } from '../lib/entities.ts';
   import { hexLabel } from '../lib/hex-map.ts';
   import { t } from '../lib/i18n.ts';
   import { markShown, MASK, revealHintKey, revealLevel } from '../lib/reveal.ts';
-  import { hrefFor, type EntityKind } from '../lib/route.ts';
+  import { hrefFor, isEntityKind, type EntityKind } from '../lib/route.ts';
   import { game } from '../lib/store.ts';
 
   interface Props {
@@ -18,6 +19,8 @@
   const level = $derived(revealLevel({ kind, id }));
   /** A hex that is no cell is named by what the player knows of it. */
   const hexName = $derived(kind === 'hex' ? game.read((gs) => hexLabel(gs, game.content, id)) : '');
+  /** A name with no page of its own (a pack action kind such as an operation) is plain text; with no game running every link stays a link. */
+  const linkable = $derived(tryActiveContent() === null || isEntityKind(kind));
 
   /** Runs again when the level changes: a link the place offers tells the core while it is not yet shown in full. */
   const offer = (): void => {
@@ -31,8 +34,10 @@
     title={hint ? t(hint) : undefined}
     {@attach offer}>{MASK}</span
   >{:else if kind === 'hex'}<a class="entity-link" href={hrefFor({ kind, id })}>{hexName}</a
-  >{:else}<a class="entity-link" href={hrefFor({ kind, id })} {@attach offer}
-    >{entityName({ kind, id })}</a
+  >{:else if !linkable}<span class="entity-link">{entityName({ kind, id })}</span>{:else}<a
+    class="entity-link"
+    href={hrefFor({ kind, id })}
+    {@attach offer}>{entityName({ kind, id })}</a
   >{/if}
 
 <style>
