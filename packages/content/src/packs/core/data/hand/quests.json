@@ -113,7 +113,8 @@
       },
       {
         "textKey": "quest.core:shadow_clones.step.2",
-        "objective": { "t": "counter", "counter": "missions.rank.V", "n": 10 }
+        "objective": { "t": "counter", "counter": "missions.rank.V", "n": 10 },
+        "grants": [{ "item": "core:scroll_chakra_halving_drill", "n": 1 }]
       },
       {
         "textKey": "quest.core:shadow_clones.step.3",

@@ -162,7 +162,9 @@
       class="ct-action clone"
       data-ui="clone-start"
       disabled={!clone.startable}
-      aria-describedby={clone.startable ? undefined : `why-clone-${mission.id}`}
+      aria-describedby={cloneRefusal === 'error.cloneNoFight'
+        ? `why-clone-${mission.id}`
+        : undefined}
       onclick={startClone}
     >
       {t('tile.clone')}

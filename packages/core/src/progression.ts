@@ -2,7 +2,7 @@ import type { ContentDb } from '@shinobi/content';
 import { emit } from './events.ts';
 import { masteryLevel, poolCapacity, poolGain } from './formulas.ts';
 import { indexOf } from './lookup.ts';
-import { computeMod } from './modifiers.ts';
+import { NO_MOD_RULES, computeMod } from './modifiers.ts';
 import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 import { refreshUnlocks } from './unlocks.ts';
@@ -26,7 +26,7 @@ export function xpGain(
   const K = content.balance.K;
   const entry = skillEntry(state, skill);
   if (!entry) return 0;
-  const mods = rules.modifierProviders;
+  const mods = rules;
   const raw =
     amount *
     computeMod(mods, state, 'xp.all', content).total *
@@ -114,7 +114,7 @@ export function grantMastery(
   content: ContentDb,
   rules?: Rules,
 ): void {
-  const mods = rules?.modifierProviders ?? [];
+  const mods = rules ?? NO_MOD_RULES;
   const earned =
     amount *
     computeMod(mods, state, 'mastery.xp.all', content).total *

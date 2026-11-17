@@ -100,7 +100,7 @@ export const scrollPartId = (technique: string): string =>
 export const techniqueSlotMapSchema = z.record(
   coreId,
   z.strictObject({
-    slot: z.number().int().min(1),
+    slot: z.number().int().min(1).max(8),
     links: z.array(z.strictObject({ from: z.string().min(1), to: z.string().min(1) })),
   }),
 );

@@ -10,5 +10,5 @@ export function getMod(
   content: ContentDb,
   rules: Rules = defaultRules,
 ): ModResult {
-  return computeMod(rules.modifierProviders, state, key, content);
+  return computeMod(rules, state, key, content);
 }

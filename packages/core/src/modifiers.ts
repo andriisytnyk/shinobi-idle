@@ -1,5 +1,6 @@
 import type { ContentDb } from '@shinobi/content';
 import type { EntityRef } from './entity.ts';
+import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 
 export type ModifierGroup = 'character' | 'village' | 'items';
@@ -13,7 +14,18 @@ export interface Modifier {
   source: EntityRef | string;
 }
 
-export type ModifierProvider = (state: GameState, content: ContentDb) => Modifier[];
+/** A provider of modifiers; `rules` is the rule set the game runs by, for providers that read its action kinds. */
+export type ModifierProvider = (
+  state: GameState,
+  content: ContentDb,
+  rules: ModRules,
+) => Modifier[];
+
+/** The part of the rules the modifier functions need: the providers, and what providers read. */
+export type ModRules = Pick<Rules, 'modifierProviders' | 'actionKinds'>;
+
+/** No providers: what a caller without rules at hand reads from. */
+export const NO_MOD_RULES: ModRules = { modifierProviders: [], actionKinds: {} };
 
 export interface ModResult {
   /** Multiplier to apply to the base value; 1 when nothing contributes. */
@@ -28,27 +40,28 @@ export interface ModResult {
  * Public callers use `getMod`, which supplies the default providers.
  */
 export function computeMod(
-  providers: readonly ModifierProvider[],
+  rules: ModRules,
   state: GameState,
   key: string,
   content: ContentDb,
 ): ModResult {
   const parts: Modifier[] = [];
-  for (const provider of providers) {
-    for (const m of provider(state, content)) if (m.key === key) parts.push(m);
+  for (const provider of rules.modifierProviders) {
+    for (const m of provider(state, content, rules)) if (m.key === key) parts.push(m);
   }
   return combine(parts, content);
 }
 
 /** The totals of several keys, asking each provider once: what a fight start needs for its cost modifiers. */
 export function computeMods(
-  providers: readonly ModifierProvider[],
+  rules: ModRules,
   state: GameState,
   keys: readonly string[],
   content: ContentDb,
 ): ModResult[] {
   const all: Modifier[] = [];
-  for (const provider of providers) for (const m of provider(state, content)) all.push(m);
+  for (const provider of rules.modifierProviders)
+    for (const m of provider(state, content, rules)) all.push(m);
   return keys.map((key) =>
     combine(
       all.filter((m) => m.key === key),
@@ -76,12 +89,12 @@ function combine(parts: Modifier[], content: ContentDb): ModResult {
 
 /** The total of `key` minus one: a share (0.05 for +5%) or, for a flat key, a count of units. */
 export function bonusOf(
-  providers: readonly ModifierProvider[],
+  rules: ModRules,
   state: GameState,
   key: string,
   content: ContentDb,
 ): number {
-  return computeMod(providers, state, key, content).total - 1;
+  return computeMod(rules, state, key, content).total - 1;
 }
 
 /**
@@ -89,14 +102,14 @@ export function bonusOf(
  * by the speed modifiers. `extraSpeed` names one more speed key, for example `speed.practice`.
  */
 export function cycleFactor(
-  providers: readonly ModifierProvider[],
+  rules: ModRules,
   state: GameState,
   skill: string,
   content: ContentDb,
   extraSpeed?: string,
 ): number {
-  const slower = computeMod(providers, state, `interval.skill.${skill}`, content).total;
-  let faster = computeMod(providers, state, `speed.skill.${skill}`, content).total;
-  if (extraSpeed) faster *= computeMod(providers, state, extraSpeed, content).total;
+  const slower = computeMod(rules, state, `interval.skill.${skill}`, content).total;
+  let faster = computeMod(rules, state, `speed.skill.${skill}`, content).total;
+  if (extraSpeed) faster *= computeMod(rules, state, extraSpeed, content).total;
   return slower / Math.max(faster, Number.EPSILON);
 }

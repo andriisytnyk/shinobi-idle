@@ -3,10 +3,12 @@ import { content, type ContentDb } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
   actionInfo,
+  addRule,
   advance,
   cloneSlots,
   cloneTelemetry,
   createState,
+  defaultRules,
   deserialize,
   feeds as feedsLink,
   dispatch,
@@ -19,6 +21,7 @@ import {
   xpAt,
   type GameState,
 } from '../src/index.ts';
+import { analyze, build, zone } from './analysis-helpers.ts';
 import { openWorld } from './helpers.ts';
 import { player } from './missions-helpers.ts';
 
@@ -169,7 +172,9 @@ describe('XP per hour with a clone', () => {
 
   for (const [name, a, b] of pairs) {
     it(`without a link, two actions at half speed earn what half of each alone earns: ${name}`, () => {
-      expect(linked({ kind: a[0], id: a[1] }, { kind: b[0], id: b[1] }, content)).toBe(false);
+      expect(
+        linked({ kind: a[0], id: a[1] }, { kind: b[0], id: b[1] }, content, defaultRules),
+      ).toBe(false);
       const soloA = gained(a, null, 2 * HOUR);
       const soloB = gained(b, null, 2 * HOUR);
       const both = gained(a, b, 2 * HOUR);
@@ -201,14 +206,14 @@ describe('the link bonus', () => {
   const act = (x: [string, string]) => ({ kind: x[0], id: x[1] });
 
   it('links an action that makes an item to the one that uses it: the feeder is the herb, the fed is the craft', () => {
-    expect(feedsLink(act(gather), act(feeds), content)).toBe(true);
-    expect(feedsLink(act(feeds), act(gather), content)).toBe(false);
-    expect(feedsLink(act(gather), act(feedsTonic), content)).toBe(true);
-    expect(feedsLink(act(gather), act(apart), content)).toBe(false);
-    expect(feedsLink(act(gather), act(gather), content)).toBe(false);
-    expect(linked(act(gather), act(feeds), content)).toBe(true);
-    expect(linked(act(feeds), act(gather), content)).toBe(true);
-    expect(linked(act(gather), { kind: 'drill', id: drill() }, content)).toBe(false);
+    expect(feedsLink(act(gather), act(feeds), content, defaultRules)).toBe(true);
+    expect(feedsLink(act(feeds), act(gather), content, defaultRules)).toBe(false);
+    expect(feedsLink(act(gather), act(feedsTonic), content, defaultRules)).toBe(true);
+    expect(feedsLink(act(gather), act(apart), content, defaultRules)).toBe(false);
+    expect(feedsLink(act(gather), act(gather), content, defaultRules)).toBe(false);
+    expect(linked(act(gather), act(feeds), content, defaultRules)).toBe(true);
+    expect(linked(act(feeds), act(gather), content, defaultRules)).toBe(true);
+    expect(linked(act(gather), { kind: 'drill', id: drill() }, content, defaultRules)).toBe(false);
   });
 
   it('adds K.clone.link to the fed action only, shown in the breakdown with the technique as its source', () => {
@@ -270,7 +275,7 @@ describe('the link bonus', () => {
     start(state, 0, gather[0], gather[1]);
     start(state, 1, feeds[0], feeds[1]);
     expect(getMod(state, 'speed.skill.alch', bare).total).toBe(1);
-    expect(linked(act(gather), act(feeds), bare)).toBe(false);
+    expect(linked(act(gather), act(feeds), bare, defaultRules)).toBe(false);
   });
 
   it('makes the fed craft earn 10% more, and leaves the gathering at its half', () => {
@@ -406,15 +411,20 @@ describe('time with two slots', () => {
 describe('clone telemetry', () => {
   it('counts the time a clone runs and the pairs that ran together', () => {
     const state = cloner();
-    expect(cloneTelemetry(state, content)).toEqual({ openMs: 0, runMs: 0, share: 0, pairs: [] });
+    expect(cloneTelemetry(state, content, defaultRules)).toEqual({
+      openMs: 0,
+      runMs: 0,
+      share: 0,
+      pairs: [],
+    });
     start(state, 0, 'gather', 'core:mint');
     advance(state, 600_000, content);
-    expect(cloneTelemetry(state, content).share).toBe(0);
+    expect(cloneTelemetry(state, content, defaultRules).share).toBe(0);
     start(state, 1, 'craft', 'core:antidote');
     advance(state, 600_000, content);
     dispatch(state, { type: 'clone.dispel' }, content);
     advance(state, 600_000, content);
-    const t = cloneTelemetry(state, content);
+    const t = cloneTelemetry(state, content, defaultRules);
     expect(t.openMs).toBe(1_800_000);
     expect(t.runMs).toBe(600_000);
     expect(t.share).toBeCloseTo(1 / 3, 9);
@@ -427,7 +437,7 @@ describe('clone telemetry', () => {
     const state = createState(1, content);
     state.skills.nin!.xp = xpAt(5);
     advance(state, 10_000, content);
-    expect(cloneTelemetry(state, content).openMs).toBe(0);
+    expect(cloneTelemetry(state, content, defaultRules).openMs).toBe(0);
   });
 });
 
@@ -462,5 +472,115 @@ describe('the chain «Тіньові клони»', () => {
     expect(quest()).toMatchObject({ step: 5, done: true });
     expect(state.slots.length).toBe(2);
     expect(start(state, 1, 'mission', 'core:v_clones')).toEqual({ ok: true });
+  });
+});
+
+describe('fight analysis with a clone', () => {
+  it('gives a forecast when the player is busy and the clone slot is free, and never uses the clone slot', () => {
+    const state = build(zone(false), 31);
+    state.known[CLONE] = true;
+    growSlots(state, content);
+    const drillId = content.exercises[0]?.id ?? '';
+    expect(start(state, 0, 'drill', drillId)).toEqual({ ok: true });
+    expect(isCloneSlot(state, content, 1)).toBe(true);
+    const a = analyze(state, zone(false).target, { maxSessions: 1 });
+    expect(a.sessionBlocked).toBeNull();
+    expect(a.session).not.toBeNull();
+  });
+});
+
+describe('the link is open to packs: the flow belongs to the action kind', () => {
+  const FEEDER = 'x:pick';
+  /** The clone technique also links the pack's kind to crafting; the pack kind is gathering with its own name. */
+  const linkedContent: ContentDb = {
+    ...content,
+    techniques: content.techniques.map((t) =>
+      t.id === CLONE
+        ? { ...t, slotLinks: [...(t.slotLinks ?? []), { from: FEEDER, to: 'craft' }] }
+        : t,
+    ),
+  };
+  const gatherKind = defaultRules.actionKinds.gather;
+  if (!gatherKind) throw new Error('gather');
+  const rulesWith = (flow: boolean) =>
+    addRule(defaultRules, 'actionKinds', FEEDER, {
+      ...gatherKind,
+      ...(flow ? {} : { flow: undefined }),
+    });
+  const antidoteUsesMint = (): boolean =>
+    content.recipes
+      .find((r) => r.id === 'core:antidote')
+      ?.ingredients.some((i) => i.item === 'core:mint') ?? false;
+
+  const alchemySpeed = (rules: ReturnType<typeof rulesWith>): number => {
+    const state = cloner();
+    expect(
+      dispatch(
+        state,
+        { type: 'action.start', slot: 0, kind: FEEDER, id: 'core:mint' },
+        linkedContent,
+        rules,
+      ).ok,
+    ).toBe(true);
+    expect(
+      dispatch(
+        state,
+        { type: 'action.start', slot: 1, kind: 'craft', id: 'core:antidote' },
+        linkedContent,
+        rules,
+      ).ok,
+    ).toBe(true);
+    return getMod(state, 'speed.skill.alch', linkedContent, rules).total;
+  };
+
+  it('gives the fed craft the bonus when the pack kind has a flow that makes what the craft uses', () => {
+    expect(antidoteUsesMint()).toBe(true);
+    const link = content.balance.K.clone.link;
+    expect(alchemySpeed(rulesWith(true))).toBeCloseTo(1 + link, 9);
+  });
+
+  it('gives nothing when the kind has no flow, or when the kind is not linked by the data', () => {
+    expect(alchemySpeed(rulesWith(false))).toBe(1);
+    const state = cloner();
+    const rules = rulesWith(true);
+    dispatch(
+      state,
+      { type: 'action.start', slot: 0, kind: FEEDER, id: 'core:mint' },
+      content,
+      rules,
+    );
+    dispatch(
+      state,
+      { type: 'action.start', slot: 1, kind: 'craft', id: 'core:antidote' },
+      content,
+      rules,
+    );
+    expect(getMod(state, 'speed.skill.alch', content, rules).total).toBe(1);
+  });
+});
+
+describe('the chakra drill of the clone chain', () => {
+  const DRILL = 'core:chakra_halving_drill';
+  const DRILL_SCROLL = 'core:scroll_chakra_halving_drill';
+
+  it('is handed over after step 1 of the chain and learned from its scroll at Ninjutsu 40', () => {
+    const state = player({ seed: 4, natures: ['katon'], levels: { nin: 29, med: 20 }, known: [] });
+    delete state.known[CLONE];
+    const quest = (): { step: number; done: boolean } | undefined =>
+      state.quests['core:shadow_clones'];
+    advance(state, 1, content);
+    expect(quest()?.step).toBe(0);
+    expect(state.bank[DRILL_SCROLL] ?? 0).toBe(0);
+    expect(state.known[DRILL]).toBeUndefined();
+    state.skills.nin!.xp = xpAt(30);
+    advance(state, 1, content);
+    expect(quest()?.step).toBe(1);
+    expect(state.bank[DRILL_SCROLL]).toBe(1);
+    // The scroll waits for the level the drill needs.
+    expect(dispatch(state, { type: 'item.use', id: DRILL_SCROLL }, content).ok).toBe(false);
+    state.skills.nin!.xp = xpAt(40);
+    expect(dispatch(state, { type: 'item.use', id: DRILL_SCROLL }, content)).toEqual({ ok: true });
+    expect(state.known[DRILL]).toBe(true);
+    expect(start(state, 0, 'drill', DRILL).ok || start(state, 0, 'practice', DRILL).ok).toBe(true);
   });
 });

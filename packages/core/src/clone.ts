@@ -1,9 +1,10 @@
 import type { ContentDb } from '@shinobi/content';
+import { actionKindOf, type ActionFlow } from './actions.ts';
 import { isCombatKind, MISSION_KIND } from './combat/system.ts';
 import { counterValue } from './counters.ts';
 import type { EntityRef } from './entity.ts';
 import { indexOf } from './lookup.ts';
-import type { ModifierProvider, Modifier } from './modifiers.ts';
+import type { ModRules, ModifierProvider, Modifier } from './modifiers.ts';
 import { SHARE_FULL, type ActionSlot, type GameState } from './state.ts';
 
 /**
@@ -111,39 +112,17 @@ export function cloneRefusal(
 
 // ---------- the link ----------
 
-/** What an action makes and uses, and the speed key a link raises for the one that uses. */
-interface Flow {
-  makes: string[];
-  uses: string[];
-  speed: string;
-}
-
 /**
- * The actions of the built-in kinds that make or use items: gathering makes a herb, a craft uses
- * its ingredients and makes its product. Which pairs of kinds are linked is the data of the clone
- * technique (`slotLinks`); this flow says whether two actions of such kinds really feed each
- * other, so a new recipe or herb is linked to what it feeds without any entry of its own.
+ * What an action makes and uses, from the `flow` of its action kind (a built-in kind or a pack's
+ * own). Which pairs of kinds are linked is the data of the clone technique (`slotLinks`); the flow
+ * says whether two actions of such kinds really feed each other, so a new recipe, herb or kind is
+ * linked to what it feeds without any entry of its own. A kind without a flow takes no part.
  */
-const FLOWS: Readonly<Record<string, (id: string, content: ContentDb) => Flow | null>> = {
-  gather(id, content) {
-    const herb = indexOf(content).herbs.get(id);
-    if (!herb) return null;
-    const skill = herb.skill ?? content.skills.find((s) => s.activity === 'patch')?.id;
-    return skill ? { makes: [id], uses: [], speed: `speed.skill.${skill}` } : null;
-  },
-  craft(id, content) {
-    const recipe = indexOf(content).recipes.get(id);
-    if (!recipe) return null;
-    return {
-      makes: [recipe.output.item],
-      uses: recipe.ingredients.map((i) => i.item),
-      speed: `speed.skill.${recipe.skill}`,
-    };
-  },
-};
-
-const flowOf = (action: { kind: string; id: string }, content: ContentDb): Flow | null =>
-  Object.hasOwn(FLOWS, action.kind) ? (FLOWS[action.kind]?.(action.id, content) ?? null) : null;
+const flowOf = (
+  action: { kind: string; id: string },
+  content: ContentDb,
+  rules: ModRules,
+): ActionFlow | null => actionKindOf(rules, action.kind)?.flow?.(action.id, content) ?? null;
 
 /** A pair of action kinds a technique links: the one that feeds and the one that is fed. */
 interface KindLink {
@@ -171,6 +150,7 @@ function feedingLink(
   producer: { kind: string; id: string },
   consumer: { kind: string; id: string },
   content: ContentDb,
+  rules: ModRules,
   known?: GameState,
 ): KindLink | null {
   const link = linksOf(content).find(
@@ -180,8 +160,8 @@ function feedingLink(
       (known === undefined || known.known[l.technique] === true),
   );
   if (!link) return null;
-  const made = flowOf(producer, content)?.makes ?? [];
-  const used = flowOf(consumer, content)?.uses ?? [];
+  const made = flowOf(producer, content, rules)?.makes ?? [];
+  const used = flowOf(consumer, content, rules)?.uses ?? [];
   return made.some((item) => used.includes(item)) ? link : null;
 }
 
@@ -190,8 +170,9 @@ export function feeds(
   producer: { kind: string; id: string },
   consumer: { kind: string; id: string },
   content: ContentDb,
+  rules: ModRules,
 ): boolean {
-  return feedingLink(producer, consumer, content) !== null;
+  return feedingLink(producer, consumer, content, rules) !== null;
 }
 
 /** Whether one of two actions feeds the other. */
@@ -199,8 +180,9 @@ export function linked(
   a: { kind: string; id: string },
   b: { kind: string; id: string },
   content: ContentDb,
+  rules: ModRules,
 ): boolean {
-  return feeds(a, b, content) || feeds(b, a, content);
+  return feeds(a, b, content, rules) || feeds(b, a, content, rules);
 }
 
 /**
@@ -208,7 +190,7 @@ export function linked(
  * fed (the consumer) gets `K.clone.link` speed (one entry per speed key, so two recipes of one
  * skill do not add it twice). The source is the technique whose data links the pair.
  */
-export const cloneLinkProvider: ModifierProvider = (state, content) => {
+export const cloneLinkProvider: ModifierProvider = (state, content, rules) => {
   if (state.slots.length < 2) return [];
   const bonus = content.balance.K.clone.link;
   if (bonus <= 0) return [];
@@ -218,8 +200,8 @@ export const cloneLinkProvider: ModifierProvider = (state, content) => {
   for (const producer of running) {
     for (const consumer of running) {
       if (producer === consumer) continue;
-      const link = feedingLink(producer, consumer, content, state);
-      const speed = link ? flowOf(consumer, content)?.speed : undefined;
+      const link = feedingLink(producer, consumer, content, rules, state);
+      const speed = link ? flowOf(consumer, content, rules)?.speed : undefined;
       if (!link || speed === undefined || parts.has(speed)) continue;
       const source: EntityRef = { kind: 'technique', id: link.technique };
       parts.set(speed, { key: speed, op: 'add', value: bonus, group: 'character', source });
@@ -290,7 +272,11 @@ const splitPart = (text: string): { kind: string; id: string } | null => {
 };
 
 /** The clone telemetry of a state (a selector; the counters carry the data and are saved with it). */
-export function cloneTelemetry(state: GameState, content: ContentDb): CloneTelemetry {
+export function cloneTelemetry(
+  state: GameState,
+  content: ContentDb,
+  rules: ModRules,
+): CloneTelemetry {
   const openMs = counterValue(state, CLONE_OPEN_MS);
   const runMs = counterValue(state, CLONE_RUN_MS);
   const pairs: ClonePair[] = [];
@@ -299,7 +285,7 @@ export function cloneTelemetry(state: GameState, content: ContentDb): CloneTelem
     const [x, y] = key.slice(CLONE_PAIR_PREFIX.length).split('|');
     const a = splitPart(x ?? '');
     const b = splitPart(y ?? '');
-    if (a && b) pairs.push({ a, b, ms, linked: linked(a, b, content) });
+    if (a && b) pairs.push({ a, b, ms, linked: linked(a, b, content, rules) });
   }
   pairs.sort((p, q) => q.ms - p.ms || (pairKey(p.a, p.b) < pairKey(q.a, q.b) ? -1 : 1));
   return { openMs, runMs, share: openMs > 0 ? runMs / openMs : 0, pairs };

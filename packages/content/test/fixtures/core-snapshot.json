@@ -391,6 +391,7 @@
       "core:scroll_hidden_shadow_snake_hands": "0e0e163355ce",
       "core:scrollpart_hidden_shadow_snake_hands": "0c3d50ba4b77",
       "core:scroll_shadow_clone": "bb0b1f76ae78",
+      "core:scroll_chakra_halving_drill": "d0e80a7b3e35",
       "core:scroll_dragon_fire": "82cc50f46d90",
       "core:scroll_fire_dragon_flame_bullet": "3effaf8d9b19",
       "core:scroll_vacuum_wave": "cf804b299890",
@@ -615,7 +616,7 @@
     "quests": {
       "core:graduation": "f106180a60cb",
       "core:mission_board": "707e194c7ad2",
-      "core:shadow_clones": "471f041bc935"
+      "core:shadow_clones": "0d9d699cf0fa"
     },
     "exams": {
       "core:genin_exam": "846cbe2ae25c"
@@ -1726,6 +1727,7 @@
       "core:scroll_hidden_shadow_snake_hands",
       "core:scrollpart_hidden_shadow_snake_hands",
       "core:scroll_shadow_clone",
+      "core:scroll_chakra_halving_drill",
       "core:scroll_dragon_fire",
       "core:scroll_fire_dragon_flame_bullet",
       "core:scroll_vacuum_wave",
@@ -2845,6 +2847,8 @@
       "item.core:scroll_hidden_shadow_snake_hands.name": "ffa5b6e803ca",
       "item.core:scroll_lion_combo.desc": "e982c49e5787",
       "item.core:scroll_lion_combo.name": "cac275fba361",
+      "item.core:scroll_chakra_halving_drill.desc": "d4cb01c84b9a",
+      "item.core:scroll_chakra_halving_drill.name": "23de7e1fe6d6",
       "item.core:scroll_shadow_clone.desc": "efa42b1303e9",
       "item.core:scroll_shadow_clone.name": "a802d518b7b8",
       "item.core:scroll_starch_syrup_capturing_field.desc": "3c44de8b4106",
@@ -3641,7 +3645,7 @@
       "quest.core:shadow_clones.name": "09bb105119a8",
       "quest.core:shadow_clones.desc": "aca164646b9a",
       "quest.core:shadow_clones.step.1": "d71a826e58af",
-      "quest.core:shadow_clones.step.2": "844c06e49067",
+      "quest.core:shadow_clones.step.2": "a704033475d4",
       "quest.core:shadow_clones.step.3": "d02a20cde23c",
       "quest.core:shadow_clones.step.4": "ae2bce5944ac",
       "quest.core:shadow_clones.step.5": "aa1edac6868b",
@@ -4335,6 +4339,7 @@
       "core:scroll_hidden_shadow_snake_hands": "tied-scroll",
       "core:scrollpart_hidden_shadow_snake_hands": "scroll-unfurled",
       "core:scroll_shadow_clone": "tied-scroll",
+      "core:scroll_chakra_halving_drill": "tied-scroll",
       "core:scroll_dragon_fire": "tied-scroll",
       "core:scroll_fire_dragon_flame_bullet": "tied-scroll",
       "core:scroll_vacuum_wave": "tied-scroll",

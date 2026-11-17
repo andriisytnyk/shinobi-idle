@@ -170,7 +170,9 @@
             class="ct-action clone"
             data-ui="clone-start"
             disabled={!clone.startable}
-            aria-describedby={clone.startable ? undefined : 'why-clone'}
+            aria-describedby={clone.refusal?.reason === 'error.cloneNoFight'
+              ? 'why-clone'
+              : undefined}
             onclick={startClone}
           >
             {t('tile.clone')}

@@ -126,7 +126,7 @@ function stageXpForecast(
 ): StageXpForecast {
   const fight = fightXpShares(mission, index, plan, content);
   if (fight) {
-    const common = computeMod(rules.modifierProviders, state, 'xp.all', content).total;
+    const common = computeMod(rules, state, 'xp.all', content).total;
     const style = fight.style * common;
     const lines: StageXpForecast['lines'] = [{ skill: null, amount: style, certain: false }];
     for (const [skill, amount] of fight.others) {
@@ -211,7 +211,7 @@ export function missionForecast(
   content: ContentDb,
   rules: Rules,
 ): MissionForecast {
-  const mods = rules.modifierProviders;
+  const mods = rules;
   const ration = armedRation(state, content);
   const stages: StageForecast[] = [];
   const xpAmount: Record<string, number> = {};
@@ -390,7 +390,7 @@ export function missionGoalReq(
  */
 export function missionInputs(state: GameState, content: ContentDb, rules: Rules): string {
   const parts: (string | number)[] = [state.player.rank];
-  for (const m of rules.modifierProviders.flatMap((p) => p(state, content))) {
+  for (const m of rules.modifierProviders.flatMap((p) => p(state, content, rules))) {
     parts.push(`${m.key}${m.op}${m.value}${m.group}`);
   }
   for (const skill of content.skills) parts.push(skillLevel(state, skill.id, content));

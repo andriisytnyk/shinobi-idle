@@ -141,6 +141,7 @@ export const CORE_ICONS: Readonly<Record<string, Readonly<Record<string, string>
     'core:scroll_hidden_shadow_snake_hands': 'tied-scroll',
     'core:scrollpart_hidden_shadow_snake_hands': 'scroll-unfurled',
     'core:scroll_shadow_clone': 'tied-scroll',
+    'core:scroll_chakra_halving_drill': 'tied-scroll',
     'core:scroll_dragon_fire': 'tied-scroll',
     'core:scroll_fire_dragon_flame_bullet': 'tied-scroll',
     'core:scroll_vacuum_wave': 'tied-scroll',

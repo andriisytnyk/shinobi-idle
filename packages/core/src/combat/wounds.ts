@@ -1,6 +1,6 @@
 import type { ContentDb } from '@shinobi/content';
 import { MS_PER_MINUTE } from '../formulas.ts';
-import { computeMod } from '../modifiers.ts';
+import { NO_MOD_RULES, computeMod } from '../modifiers.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 import type { System } from '../system.ts';
@@ -21,7 +21,7 @@ export const woundFloorMs = (content: ContentDb): number =>
 
 /** Time the next stack takes to heal now: the base interval with the `wound.heal` modifiers (the Hospital) applied, at least 1 ms. */
 export function woundHealMs(state: GameState, content: ContentDb, rules?: Rules): number {
-  const mod = computeMod(rules?.modifierProviders ?? [], state, 'wound.heal', content).total;
+  const mod = computeMod(rules ?? NO_MOD_RULES, state, 'wound.heal', content).total;
   return Math.max(1, Math.round(woundIntervalMs(content) * mod));
 }
 
