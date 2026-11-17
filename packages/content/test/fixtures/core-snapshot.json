@@ -3145,6 +3145,7 @@
       "error.unknownCommand": "dc43d124002f",
       "error.invalidSlot": "9091f5b76234",
       "error.cloneNoFight": "001b2aade09d",
+      "error.sameActionElsewhere": "53d1f3511546",
       "error.unknownActionKind": "820a5040ad8a",
       "error.unknownAction": "47cae9a86563",
       "error.requirementsNotMet": "22b55f33e77a",

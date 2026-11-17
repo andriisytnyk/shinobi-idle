@@ -44,6 +44,8 @@ function cloner(seed = 1, extra: Record<string, number> = {}): GameState {
 }
 
 const drill = (): string => content.exercises.find((e) => e.level <= 30)?.id ?? '';
+/** A second exercise, a different action of the same kind. */
+const drill2 = (): string => content.exercises.filter((e) => e.level <= 30)[1]?.id ?? '';
 const start = (state: GameState, slot: number, kind: string, id: string) =>
   dispatch(state, { type: 'action.start', slot, kind, id }, content);
 const xpSum = (state: GameState): number =>
@@ -120,7 +122,7 @@ describe('the clone slot', () => {
     const state = cloner();
     start(state, 0, 'drill', drill());
     expect(state.slots.map((s) => s.share)).toEqual([1000, 0]);
-    start(state, 1, 'drill', drill());
+    start(state, 1, 'drill', drill2());
     expect(state.slots.map((s) => s.share)).toEqual([500, 500]);
     expect(dispatch(state, { type: 'clone.dispel' }, content)).toEqual({ ok: true });
     expect(state.slots.map((s) => s.share)).toEqual([1000, 0]);
@@ -154,7 +156,7 @@ describe('the clone slot', () => {
       dispatch(state, { type: 'action.start', slot: 0, kind: 'drill', id: drill() }, lever).ok,
     ).toBe(true);
     expect(
-      dispatch(state, { type: 'action.start', slot: 1, kind: 'drill', id: drill() }, lever).ok,
+      dispatch(state, { type: 'action.start', slot: 1, kind: 'drill', id: drill2() }, lever).ok,
     ).toBe(true);
     expect(state.slots.map((s) => s.share)).toEqual([550, 550]);
   });
@@ -165,7 +167,8 @@ describe('XP per hour with a clone', () => {
   const katonPractice = actionOf('katon', 1);
   const ninPractice = actionOf('nin', 10);
   const pairs: [string, [string, string], [string, string]][] = [
-    ['two drills', drillAction, drillAction],
+    ['two different drills', drillAction, ['drill', drill2()]],
+    ['two different techniques of one skill', actionOf('katon', 1), actionOf('katon', 10)],
     ['a drill and a katon technique', drillAction, katonPractice],
     ['a katon and a ninjutsu technique', katonPractice, ninPractice],
   ];
@@ -183,10 +186,32 @@ describe('XP per hour with a clone', () => {
     });
   }
 
-  it('equals one action in two slots to that action alone', () => {
-    const solo = gained(drillAction, null, 2 * HOUR);
-    const both = gained(drillAction, drillAction, 2 * HOUR);
-    expect(Math.abs(both - solo) / solo).toBeLessThan(0.01);
+  it('refuses the same action in a second slot, in either order, and leaves the first running', () => {
+    const state = cloner();
+    expect(start(state, 0, 'drill', drill())).toEqual({ ok: true });
+    expect(start(state, 1, 'drill', drill())).toEqual({
+      ok: false,
+      reason: 'error.sameActionElsewhere',
+    });
+    expect(state.slots[1]?.action).toBeNull();
+    // The same action in its own slot restarts it, and a different action runs beside it.
+    expect(start(state, 0, 'drill', drill())).toEqual({ ok: true });
+    expect(start(state, 1, 'drill', drill2())).toEqual({ ok: true });
+    expect(start(state, 0, 'drill', drill2())).toEqual({
+      ok: false,
+      reason: 'error.sameActionElsewhere',
+    });
+  });
+
+  it('runs two different techniques of one skill together at half speed each', () => {
+    const [kind, a] = actionOf('katon', 1);
+    const [, b] = actionOf('katon', 10);
+    const state = cloner();
+    expect(start(state, 0, kind, a)).toEqual({ ok: true });
+    expect(start(state, 1, kind, b)).toEqual({ ok: true });
+    expect(state.slots.map((s) => s.share)).toEqual([500, 500]);
+    advance(state, HOUR, content);
+    expect(state.slots.every((s) => s.action !== null)).toBe(true);
   });
 
   it('is the same for a clone working alone while the player is idle', () => {

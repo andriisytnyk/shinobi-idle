@@ -43,6 +43,11 @@ export function startRefusal(
   if (clone) return { reason: clone };
   const blocked = kind.blocked?.(state, id, content, rules, slotIndex);
   if (blocked) return { reason: blocked };
+  // One action, one performer: the very same action does not run in two slots at once.
+  const same = state.slots.some(
+    (s, i) => i !== slotIndex && s.action?.kind === kindName && s.action.id === id,
+  );
+  if (same) return { reason: 'error.sameActionElsewhere' };
   let result = evaluated;
   if (result === undefined) {
     const req = kind.requirements(state, id, content, rules);

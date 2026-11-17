@@ -4,6 +4,7 @@
   "error.unknownCommand": "Невідома команда.",
   "error.invalidSlot": "Такого слота дій немає.",
   "error.cloneNoFight": "Клон не б'ється: бої, операції й місії з боєм він не бере. Це робиш ти сам.",
+  "error.sameActionElsewhere": "Цю дію вже виконує інший виконавець: одна дія — один виконавець.",
   "error.unknownActionKind": "Невідомий вид дії.",
   "error.unknownAction": "Такої дії немає.",
   "error.requirementsNotMet": "Вимоги до цієї дії не виконано.",
