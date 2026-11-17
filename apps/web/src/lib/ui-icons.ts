@@ -12,6 +12,7 @@ export const UI_ICON_NAMES = [
   'chevron-right',
   'circle-dot',
   'circle-help',
+  'copy',
   'clipboard-list',
   'cloud-fog',
   'coins',

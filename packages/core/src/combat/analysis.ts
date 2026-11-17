@@ -8,6 +8,7 @@ import {
   type SkillId,
   type Technique,
 } from '@shinobi/content';
+import { isCloneSlot } from '../clone.ts';
 import { rebalanceShares } from '../actions.ts';
 import { advance, dispatch } from '../engine.ts';
 import { MS_PER_HOUR, MS_PER_MINUTE, MS_PER_SECOND } from '../formulas.ts';
@@ -801,9 +802,12 @@ function playSession(
   clone.events = [];
   clone.report = {};
   clone.combat = null;
-  // The target takes the slot the fight is in, or the first free one; the other slots go on as they are.
+  // The target takes the slot the fight is in, or the first free one that may fight (never a clone's);
+  // the other slots go on as they are.
   const running = clone.slots.findIndex((s) => s.action !== null && isCombatKind(s.action.kind));
-  const free = clone.slots.findIndex((s) => s.action === null);
+  const free = clone.slots.findIndex(
+    (s, i) => s.action === null && !isCloneSlot(clone, content, i),
+  );
   const at = running >= 0 ? running : free >= 0 ? free : 0;
   for (const [i, slot] of clone.slots.entries()) {
     if (i === at || (slot.action !== null && isCombatKind(slot.action.kind))) {
@@ -812,7 +816,7 @@ function playSession(
       slot.data = null;
     }
   }
-  rebalanceShares(clone);
+  rebalanceShares(clone, content);
   if (job.loadout) {
     const known = new Set(Object.keys(clone.known));
     clone.loadouts.active = job.loadout.filter(

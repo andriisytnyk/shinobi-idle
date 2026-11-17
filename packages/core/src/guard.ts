@@ -2,7 +2,7 @@ import type { ContentDb } from '@shinobi/content';
 import type { ActionKind } from './actions.ts';
 import type { CombatAi } from './combat/fight-types.ts';
 import { emit } from './events.ts';
-import type { Modifier, ModifierProvider } from './modifiers.ts';
+import type { ModRules, Modifier, ModifierProvider } from './modifiers.ts';
 import type { HexEnteredHook } from './hex-hooks.ts';
 import type { Req } from './requirements.ts';
 import type { GameState } from './state.ts';
@@ -225,6 +225,23 @@ export function guardKind(kind: ActionKind, pack: string): ActionKind {
       }
     };
   }
+  if (kind.flow) {
+    const flow = kind.flow.bind(kind);
+    guarded.flow = (id, content) => {
+      try {
+        const out = flow(id, content);
+        return out && Array.isArray(out.makes) && Array.isArray(out.uses) && str(out.speed)
+          ? {
+              makes: out.makes.filter(str),
+              uses: out.uses.filter(str),
+              speed: out.speed,
+            }
+          : null;
+      } catch {
+        return null;
+      }
+    };
+  }
   if (kind.skill) {
     const skill = kind.skill.bind(kind);
     guarded.skill = (id, content) => {
@@ -281,9 +298,9 @@ const validModifier = (m: unknown): m is Modifier =>
 
 /** A modifier provider of a pack, guarded: a failing one contributes nothing, and so does a bad modifier. */
 export function guardProvider(provider: ModifierProvider, pack: string): ModifierProvider {
-  const guarded: ModifierProvider = (state: GameState, content: ContentDb) => {
+  const guarded: ModifierProvider = (state: GameState, content: ContentDb, rules: ModRules) => {
     try {
-      const out = provider(state, content);
+      const out = provider(state, content, rules);
       return Array.isArray(out) ? out.filter(validModifier) : [];
     } catch {
       return [];

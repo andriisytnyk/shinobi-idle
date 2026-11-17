@@ -44,7 +44,7 @@ export function bushOf(state: GameState, herb: string): Bush | null {
  * plus the `bush.stock` modifiers (whole herbs).
  */
 export function bushSize(state: GameState, herb: string, content: ContentDb, rules: Rules): number {
-  const extra = Math.round(bonusOf(rules.modifierProviders, state, 'bush.stock', content));
+  const extra = Math.round(bonusOf(rules, state, 'bush.stock', content));
   return Math.max(
     1,
     content.balance.K.field.stockBase + masteryLevel(state, herb, content) + extra,
@@ -53,7 +53,7 @@ export function bushSize(state: GameState, herb: string, content: ContentDb, rul
 
 /** Regrow pause of an empty bush in ms, after the `bush.regrow` modifiers. */
 export function regrowMs(state: GameState, content: ContentDb, rules: Rules): number {
-  const mod = computeMod(rules.modifierProviders, state, 'bush.regrow', content).total;
+  const mod = computeMod(rules, state, 'bush.regrow', content).total;
   return Math.max(0, Math.round(content.balance.K.field.regrowMs * mod));
 }
 
@@ -68,6 +68,11 @@ export function gatherAverageSeconds(size: number, content: ContentDb): number {
 }
 
 export const gatherKind: ActionKind = {
+  flow: (id, content) => {
+    const herb = indexOf(content).herbs.get(id);
+    const skill = herb ? herbSkill(content, herb) : null;
+    return herb && skill ? { makes: [id], uses: [], speed: `speed.skill.${skill}` } : null;
+  },
   has: (id, content) => {
     const herb = indexOf(content).herbs.get(id);
     return herb !== undefined && herbSkill(content, herb) !== null;
@@ -86,12 +91,7 @@ export const gatherKind: ActionKind = {
   intervalMs(state, id, content, rules) {
     const K = content.balance.K;
     const herb = indexOf(content).herbs.get(id);
-    const mod = cycleFactor(
-      rules.modifierProviders,
-      state,
-      (herb && herbSkill(content, herb)) ?? '',
-      content,
-    );
+    const mod = cycleFactor(rules, state, (herb && herbSkill(content, herb)) ?? '', content);
     const cycle = Math.max(actionFloor(content), Math.round(K.gather * MS_PER_SECOND * mod));
     // An empty bush regrows before the next herb: the pause is part of that cycle.
     return bushOf(state, id)?.stock === 0 ? cycle + regrowMs(state, content, rules) : cycle;
@@ -121,7 +121,7 @@ export const gatherKind: ActionKind = {
     const bush: Bush = held && held.stock > 0 ? held : { stock: fresh, size: fresh, carry: 0 };
     state.bushes[id] = { stock: bush.stock - 1, size: bush.size, carry: 0 };
     // A double gather yields one more herb without emptying the bush further.
-    const doubleChance = bonusOf(rules.modifierProviders, state, 'gather.double', content);
+    const doubleChance = bonusOf(rules, state, 'gather.double', content);
     const doubled = doubleChance > 0 && nextFloat(state.rng, 'action') < doubleChance;
     addItem(state, id, doubled ? 2 : 1);
     const seconds = gatherAverageSeconds(bush.size, content);
@@ -145,7 +145,7 @@ export function craftBonusChance(
 ): number {
   const K = content.balance.K;
   const tier = (craftTier(state, recipe, content) - 1) * K.craftRules.bonusPerTier;
-  const mods = bonusOf(rules.modifierProviders, state, 'craft.double', content);
+  const mods = bonusOf(rules, state, 'craft.double', content);
   return Math.min(1, Math.max(0, tier + mods));
 }
 
@@ -156,7 +156,7 @@ export function craftKeepChance(
   content: ContentDb,
   rules: Rules,
 ): number {
-  const providers = rules.modifierProviders;
+  const providers = rules;
   const general = computeMod(providers, state, 'craft.keep', content).total - 1;
   const own = computeMod(providers, state, `craft.keep.${skill}`, content).total - 1;
   return Math.min(1, Math.max(0, general + own));
@@ -169,6 +169,15 @@ function firstMissing(state: GameState, id: string, content: ContentDb): string 
 }
 
 export const craftKind: ActionKind = {
+  flow: (id, content) => {
+    const recipe = indexOf(content).recipes.get(id);
+    if (!recipe) return null;
+    return {
+      makes: [recipe.output.item],
+      uses: recipe.ingredients.map((i) => i.item),
+      speed: `speed.skill.${recipe.skill}`,
+    };
+  },
   has: (id, content) => indexOf(content).recipes.has(id),
   skill: (id, content) => indexOf(content).recipes.get(id)?.skill ?? null,
   requirements(_state, id, content) {
@@ -186,7 +195,7 @@ export const craftKind: ActionKind = {
   intervalMs(state, id, content, rules) {
     const recipe = indexOf(content).recipes.get(id);
     if (!recipe) return 1;
-    const mod = cycleFactor(rules.modifierProviders, state, recipe.skill, content);
+    const mod = cycleFactor(rules, state, recipe.skill, content);
     return Math.max(
       actionFloor(content),
       Math.round(content.balance.K.craft * MS_PER_SECOND * mod),

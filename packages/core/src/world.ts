@@ -225,7 +225,7 @@ export function exploreIntervalMs(
   rules: Rules,
   address?: string,
 ): number {
-  const mod = computeMod(rules.modifierProviders, state, 'interval.explore', content).total;
+  const mod = computeMod(rules, state, 'interval.explore', content).total;
   const subject = address === undefined ? null : subjectOf(content, address);
   const terrain =
     subject && !subject.cell
@@ -341,7 +341,7 @@ export function stepMs(
   rules: Rules,
   terrain: string,
 ): number {
-  const mod = computeMod(rules.modifierProviders, state, 'interval.walk', content).total;
+  const mod = computeMod(rules, state, 'interval.walk', content).total;
   return Math.max(
     actionFloor(content),
     Math.round(terrainMinutes(content, terrain) * MS_PER_MINUTE * mod),

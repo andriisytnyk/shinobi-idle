@@ -899,7 +899,7 @@ export function deserialize(
   }
   // Shares are derived from which slots run, so they are recomputed rather than trusted; a
   // saved progress beyond one cycle is cut so a doctored save cannot make the loop spin.
-  rebalanceShares(state);
+  rebalanceShares(state, content);
   for (const [at, slot] of state.slots.entries()) {
     const kind = slot.action && rules.actionKinds[slot.action.kind];
     if (slot.action && kind) {

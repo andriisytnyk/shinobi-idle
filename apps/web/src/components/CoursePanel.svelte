@@ -16,6 +16,7 @@
   import { game } from '../lib/store.ts';
   import { currencyName, moneyOf } from '../lib/vocab.ts';
   import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
+  import CloneStart from './CloneStart.svelte';
   import ActionEmblem from './ActionEmblem.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
@@ -113,15 +114,18 @@
     {#if built.length === 0}
       <p class="hint" data-course-empty>{t('course.empty')}</p>
     {/if}
-    <button
-      type="button"
-      class="action"
-      class:stop={running}
-      disabled={!running && !info?.available}
-      onclick={toggle}
-    >
-      {t(running ? 'tile.stop' : 'course.run')}
-    </button>
+    <div class="ct-actions">
+      <button
+        type="button"
+        class="action"
+        class:stop={running}
+        disabled={!running && !info?.available}
+        onclick={toggle}
+      >
+        {t(running ? 'tile.stop' : 'course.run')}
+      </button>
+      <CloneStart kind={COURSE_KIND} id={COURSE_ID} disabled={!info?.available} />
+    </div>
   </div>
 
   <p class="pillar" class:active={pillar} data-pillar={pillar}>

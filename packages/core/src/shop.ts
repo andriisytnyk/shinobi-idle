@@ -37,7 +37,7 @@ export function shopTotal(
 ): number | null {
   const base = buyPrice(itemId, content);
   if (base === null) return null;
-  const mod = computeMod(rules.modifierProviders, state, 'shop.price', content).total;
+  const mod = computeMod(rules, state, 'shop.price', content).total;
   return Math.max(1, Math.round(base * n * mod));
 }
 

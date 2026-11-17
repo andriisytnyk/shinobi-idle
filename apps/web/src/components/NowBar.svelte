@@ -3,6 +3,7 @@
   import {
     actionInfo,
     cellInfo,
+  isCloneSlot,
     hexKey,
     locationCell,
     positionHex,
@@ -54,6 +55,8 @@
 
   interface Row {
     slot: number;
+    /** Whether the slot is a clone's. */
+    clone: boolean;
     kind: string;
     ref: ReturnType<typeof actionRef>;
     skill: string | undefined;
@@ -117,6 +120,7 @@
 
         out.push({
           slot: index,
+          clone: isCloneSlot(state, content, index),
           kind: slot.action.kind,
           ref: actionRef(slot.action),
           skill: info?.skill,
@@ -154,11 +158,15 @@
 
   /** On a phone the bar is one line; the toggle opens the other slots. */
   let expanded = $state(false);
-  const shown = $derived(expanded ? rows : rows.slice(0, 1));
 
   const wait = $derived(game.read((gs) => senseiTestInfo(gs, game.rules, game.content)));
 
-  const stop = (slot: number) => void game.dispatch({ type: 'action.stop', slot });
+  const stop = (row: Row) =>
+    void game.dispatch(
+      row.clone
+        ? { type: 'clone.dispel', slot: row.slot }
+        : { type: 'action.stop', slot: row.slot },
+    );
 </script>
 
 <footer class="now" aria-label={t('now.title')}>
@@ -185,8 +193,8 @@
   {#if rows.length === 0}
     <span class="idle">{t('now.idle')}</span>
   {:else}
-    <ul class="slots">
-      {#each shown as row (row.slot)}
+    <ul class="slots" class:open={expanded}>
+      {#each rows as row (row.slot)}
         <li
           class="slot"
           data-slot={row.slot}
@@ -194,6 +202,7 @@
           data-slot-index={row.slot}
           data-entity={row.ref.kind === 'hex' ? undefined : entityAttr(row.ref)}
           class:with-mission={row.mission}
+          class:clone={row.clone}
         >
           <span class="emblem">
             <ActionEmblem
@@ -206,6 +215,9 @@
           </span>
           <span class="what" data-now-what>
             <span class="line">
+              {#if row.clone}<span class="clone-tag" data-ui="clone-tag" title={t('now.cloneMark')}
+                  ><Icon name="lucide:copy" size={14} />{t('now.clone')}</span
+                >{/if}
               {#if VERB[row.kind]}<span class="verb">{t(VERB[row.kind] ?? '')}</span>{/if}
               <span class="name"><EntityLink kind={row.ref.kind} id={row.ref.id} /></span>
             </span>
@@ -244,12 +256,14 @@
           <button
             type="button"
             class="stop"
-            aria-label={t('now.stop')}
-            title={t('now.stop')}
-            onclick={() => stop(row.slot)}
+            aria-label={t(row.clone ? 'now.dispel' : 'now.stop')}
+            title={t(row.clone ? 'now.dispelTitle' : 'now.stop')}
+            onclick={() => stop(row)}
           >
-            <span class="stop-icon"><Icon name="lucide:square" size={16} /></span>
-            <span class="stop-label">{t('now.stop')}</span>
+            <span class="stop-icon"
+              ><Icon name={row.clone ? 'lucide:x' : 'lucide:square'} size={16} /></span
+            >
+            <span class="stop-label">{t(row.clone ? 'now.dispel' : 'now.stop')}</span>
           </button>
           {#if row.mission}<NowMission now={row.mission} />{/if}
           <Slot name="now.bar" ctx={{ slot: row.slot }} />
@@ -386,6 +400,20 @@
     flex: none;
   }
 
+  /* The clone's slot is marked by a pill with the clone's glyph and its name. */
+  .clone-tag {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 0 var(--space-2);
+    border: var(--border-thin) solid var(--accent);
+    border-radius: var(--radius-pill);
+    color: var(--accent);
+    font-size: var(--text-xs);
+    font-weight: 600;
+  }
+
   .name,
   .phrase {
     min-width: 0;
@@ -458,7 +486,7 @@
   }
 
   .more {
-    display: inline-flex;
+    display: none;
     align-items: center;
     gap: var(--space-1);
   }
@@ -485,6 +513,15 @@
     .title,
     .xph,
     .place-label {
+      display: none;
+    }
+
+    /* One line on a phone: the other slots wait behind the toggle. */
+    .more {
+      display: inline-flex;
+    }
+
+    .slots:not(.open) > .slot:nth-child(n + 2) {
       display: none;
     }
 

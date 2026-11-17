@@ -310,13 +310,13 @@ function durationFactor(
   content: ContentDb,
   rules: Rules,
 ): Pick<DurationParts, 'modifiers' | 'modifiersTotal' | 'ration' | 'floor' | 'floored' | 'factor'> {
-  const all = computeMod(rules.modifierProviders, state, 'mission.duration', content);
+  const all = computeMod(rules, state, 'mission.duration', content);
   const modifiers = [{ key: 'mission.duration', total: all.total, parts: all.parts }];
   let factor = all.total;
   // A stage a technique of a skill performs may be shortened by a key of that skill (`mission.duration.<skill>`).
   const key = `mission.duration.${skill}`;
   if (tech !== '' && Object.hasOwn(content.modifierKeys, key)) {
-    const own = computeMod(rules.modifierProviders, state, key, content);
+    const own = computeMod(rules, state, key, content);
     modifiers.push({ key, total: own.total, parts: own.parts });
     factor *= own.total;
   }

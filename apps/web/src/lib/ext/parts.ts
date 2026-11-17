@@ -29,6 +29,10 @@ export const UI_PARTS = [
   'req-row',
   /** A running slot in the «Зараз» bar; carries `data-slot-index`. */
   'now-slot',
+  /** The mark of a clone's slot in the «Зараз» bar. */
+  'clone-tag',
+  /** The «Клоном» button of a tile or a mission: starts the action in the clone's slot. */
+  'clone-start',
   'goal-panel',
   'goal-row',
   /** The pin that makes an entity the goal: on a tile's corner, as a caption under a requirement tree, or as a button of an entity page; carries `data-entity` and `data-pinned`. */
