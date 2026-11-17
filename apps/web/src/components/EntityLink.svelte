@@ -29,9 +29,10 @@
     data-masked
     title={hint ? t(hint) : undefined}
     {@attach offer}>{MASK}</span
-  >{:else if !linkable}<span class="entity-link">{entityName({ kind, id })}</span
-  >{:else}<a class="entity-link" href={hrefFor({ kind, id })} {@attach offer}
-    >{entityName({ kind, id })}</a
+  >{:else if !linkable}<span class="entity-link">{entityName({ kind, id })}</span>{:else}<a
+    class="entity-link"
+    href={hrefFor({ kind, id })}
+    {@attach offer}>{entityName({ kind, id })}</a
   >{/if}
 
 <style>
