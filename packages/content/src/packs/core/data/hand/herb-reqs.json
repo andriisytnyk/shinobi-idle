@@ -26,9 +26,5 @@
         "id": "point.core:waterfall_shrine"
       }
     ]
-  },
-  "core:fireflower": {
-    "t": "flag",
-    "id": "point.core:hell_valley"
   }
 }

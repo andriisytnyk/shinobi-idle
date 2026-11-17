@@ -536,7 +536,6 @@ describe('actions that a place opens', () => {
     for (const [herb, place] of [
       ['core:edelweiss', 'core:jofuku_forest'],
       ['core:lotus', 'core:waterfall_shrine'],
-      ['core:fireflower', 'core:hell_valley'],
     ] as const) {
       expect(refusal(s, start(herb)), herb).toBe('error.requirementsNotMet');
       s.world.pois[place] = true;

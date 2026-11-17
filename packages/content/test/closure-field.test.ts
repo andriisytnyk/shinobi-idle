@@ -160,9 +160,7 @@ describe('herbs and gear', () => {
         { t: 'flag', id: 'point.core:waterfall_shrine' },
       ],
     });
-    // The fire flower grows only in the Hell Valley.
-    expect(req('core:fireflower')).toEqual({ t: 'flag', id: 'point.core:hell_valley' });
-    expect(content.herbs.filter((h) => h.req)).toHaveLength(3);
+    expect(content.herbs.filter((h) => h.req)).toHaveLength(2);
   });
 
   it('every gear line has an effect whose per-tier size is in the balance', () => {

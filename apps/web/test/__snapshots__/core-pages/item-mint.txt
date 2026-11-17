@@ -829,14 +829,6 @@
                       <span class="label">
                         Ранг: Генін
                   <li>
-                    <div class="row" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <span data-point-req="">
-                          Знайти точку інтересу: ???
-                  <li>
                     <div class="row" data-entity="skill:herb" data-met="false" data-ui="req-row">
                       <span class="mark">
                         <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
