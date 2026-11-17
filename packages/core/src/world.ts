@@ -17,7 +17,9 @@ import {
   isSurveyed,
   parseHexKey,
   pathTo,
+  placeAt,
   positionHex,
+  positionOf,
   reachFrom,
   routeTo,
   surveyAccess,
@@ -135,15 +137,15 @@ export function keyReq(cell: Cell, content: ContentDb): Req | null {
 export const scoutSkill = (content: ContentDb): string | null => activitySkill(content, 'map');
 
 /** The cell the player stands in, or null on a hex that holds no cell. */
-export const locationCell = (state: GameState, content: ContentDb): Cell | null =>
-  cellAtPosition(state, content);
+export const locationCell = (state: GameState, content: ContentDb, slot = 0): Cell | null =>
+  cellAtPosition(state, content, slot);
 
 /**
  * The region the player is in: the region of the cell underfoot, else of the cell nearest to the
  * position (the first on a tie). Null when the world has no cell.
  */
-export function regionHere(state: GameState, content: ContentDb): string | null {
-  const here = positionHex(state, content);
+export function regionHere(state: GameState, content: ContentDb, slot = 0): string | null {
+  const here = positionHex(state, content, slot);
   if (!here) return null;
   let best: Cell | null = null;
   let bestDistance = Infinity;
@@ -193,20 +195,25 @@ export function surveyBlocked(
   address: string,
   content: ContentDb,
   reach?: Reach,
+  slot = 0,
 ): string | null {
   const subject = subjectOf(content, address);
   if (!subject) return 'error.unknownCell';
   if (surveyLevel(state, subject, content) >= surveyMaxLevel(subject, content))
     return 'error.cellMaxed';
-  const access = surveyAccess(state, content, subject.hex, reach);
+  const access = surveyAccess(state, content, subject.hex, reach, slot);
   if (access === 'outOfRange') return 'error.outOfRange';
   if (access === 'cutOff') return 'error.cutOff';
   return null;
 }
 
 /** Why `cell` cannot be started now for a cause that is not a requirement (a localization key), or null. */
-export const exploreBlocked = (state: GameState, cell: Cell, content: ContentDb): string | null =>
-  surveyBlocked(state, cell.id, content);
+export const exploreBlocked = (
+  state: GameState,
+  cell: Cell,
+  content: ContentDb,
+  slot = 0,
+): string | null => surveyBlocked(state, cell.id, content, undefined, slot);
 
 /**
  * Length of one survey in ms at full speed, modifiers included; at least 1. A hex that is no cell
@@ -313,13 +320,14 @@ export const exploreKind: ActionKind = {
   has: (id, content) => subjectOf(content, id) !== null,
   skill: (_id, content) => scoutSkill(content),
   requirements: (state, id, content) => surveyReq(state, id, content),
-  blocked: (state, id, content) => surveyBlocked(state, id, content),
+  blocked: (state, id, content, _rules, slot = 0) =>
+    surveyBlocked(state, id, content, undefined, slot),
   intervalMs: (state, id, content, rules) => exploreIntervalMs(state, content, rules, id),
-  complete(state, id, content, rules) {
+  complete(state, id, content, rules, slot = 0) {
     const subject = subjectOf(content, id);
     if (!subject) return;
     // The player walked out of range while this ran: nothing was surveyed.
-    if (surveyAccess(state, content, subject.hex) !== 'ok') return 'abort';
+    if (surveyAccess(state, content, subject.hex, undefined, slot) !== 'ok') return 'abort';
     return surveyOnce(state, subject, content, rules) ? 'stop' : 'continue';
   },
 };
@@ -346,8 +354,9 @@ export function routeMs(
   content: ContentDb,
   rules: Rules,
   target: Axial,
+  slot = 0,
 ): number | null {
-  const route = routeTo(state, content, target);
+  const route = routeTo(state, content, target, slot);
   if (!route) return null;
   const hexes = indexOf(content).hexes;
   return route.hexes.reduce(
@@ -361,51 +370,66 @@ export function travelBlocked(
   state: GameState,
   address: string,
   content: ContentDb,
+  slot = 0,
 ): string | null {
   const hex = hexOfAddress(content, address);
   if (!hex) return 'error.unknownCell';
-  const here = positionHex(state, content);
+  const here = positionHex(state, content, slot);
   if (here && here.q === hex.q && here.r === hex.r) return 'error.alreadyThere';
   if (!isEnterable(content, hex) || !isSurveyed(state, content, hexKey(hex.q, hex.r)))
     return 'error.cellNotReachable';
-  return routeTo(state, content, hex) === null ? 'error.cellNotReachable' : null;
+  return routeTo(state, content, hex, slot) === null ? 'error.cellNotReachable' : null;
 }
 
 /** Length of a walk to `cell` from where the player stands, modifiers included; at least 1 when no route is known. */
-export function walkMs(state: GameState, cell: Cell, content: ContentDb, rules: Rules): number {
-  return routeMs(state, content, rules, { q: cell.hex[0], r: cell.hex[1] }) ?? actionFloor(content);
+export function walkMs(
+  state: GameState,
+  cell: Cell,
+  content: ContentDb,
+  rules: Rules,
+  slot = 0,
+): number {
+  return (
+    routeMs(state, content, rules, { q: cell.hex[0], r: cell.hex[1] }, slot) ?? actionFloor(content)
+  );
 }
 
-/** Moves the player onto a hex: position, the event and the handlers of the rules. */
-function enterHex(state: GameState, key: string, content: ContentDb, rules: Rules): void {
+/** Moves the performer of `slot` onto a hex: position, the event and the handlers of the rules. */
+function enterHex(
+  state: GameState,
+  key: string,
+  content: ContentDb,
+  rules: Rules,
+  slot: number,
+): void {
   planned.delete(state);
   const at = parseHexKey(key);
   const hex = indexOf(content).hexes.get(key);
   if (!at || !hex) return;
-  state.world.location = addressOf(content, at);
+  placeAt(state, slot, addressOf(content, at));
   const terrain = hex.terrain ?? '';
-  emit(state, { type: 'hexEntered', hex: key, terrain, by: 'walk' });
-  const ctx = { hex: key, q: at.q, r: at.r, terrain, by: 'walk' } as const;
+  emit(state, { type: 'hexEntered', hex: key, terrain, by: 'walk', slot });
+  const ctx = { hex: key, q: at.q, r: at.r, terrain, by: 'walk', slot } as const;
   for (const hook of rules.hexEntered ?? []) hook(state, ctx, content, rules);
 }
 
 export const walkKind: ActionKind = {
   has: (id, content) => hexOfAddress(content, id) !== null,
   requirements: (_state, _id, content) => graduateReq(content),
-  blocked: (state, id, content) => travelBlocked(state, id, content),
-  intervalMs(state, id, content, rules) {
+  blocked: (state, id, content, _rules, slot = 0) => travelBlocked(state, id, content, slot),
+  intervalMs(state, id, content, rules, slot = 0) {
     const target = hexOfAddress(content, id);
-    const next = target ? routeTo(state, content, target)?.hexes[0] : undefined;
+    const next = target ? routeTo(state, content, target, slot)?.hexes[0] : undefined;
     const terrain = next ? indexOf(content).hexes.get(next)?.terrain : undefined;
     return terrain === undefined ? actionFloor(content) : stepMs(state, content, rules, terrain);
   },
-  complete(state, id, content, rules) {
+  complete(state, id, content, rules, slot = 0) {
     const target = hexOfAddress(content, id);
-    const route = target ? routeTo(state, content, target) : null;
+    const route = target ? routeTo(state, content, target, slot) : null;
     const next = route?.hexes[0];
     // No way on (the way was never known, or the target cannot be entered): nothing was walked.
     if (next === undefined) return 'abort';
-    enterHex(state, next, content, rules);
+    enterHex(state, next, content, rules, slot);
     if (route && route.hexes.length > 1) return 'step';
     emit(state, { type: 'travelled', cell: id });
     return 'stop';
@@ -430,8 +454,11 @@ function surveyable(state: GameState, subject: Subject, content: ContentDb): boo
   return req === null || evalReq(state, req, content).met;
 }
 
-/** The last plan of a state, good for the same game time and position until a step or a survey changes the world. */
-const planned = new WeakMap<GameState, { now: number; location: string; plan: AutoPlan | null }>();
+/** The last plan of each performer of a state, good for the same game time and position until a step or a survey changes the world. */
+const planned = new WeakMap<
+  GameState,
+  Map<number, { now: number; location: string; plan: AutoPlan | null }>
+>();
 
 /**
  * The next hex for the auto-survey. Of the hexes within the survey range that can be surveyed now,
@@ -441,19 +468,28 @@ const planned = new WeakMap<GameState, { now: number; location: string; plan: Au
  * walk to) that is cheapest to get in range of, and the spot to stand on to survey it. Null when
  * nothing is left to survey.
  */
-export function autoPlan(state: GameState, content: ContentDb): AutoPlan | null {
-  const memo = planned.get(state);
-  if (memo && memo.now === state.now && memo.location === state.world.location) return memo.plan;
-  const plan = planFor(state, content);
-  planned.set(state, { now: state.now, location: state.world.location, plan });
+export function autoPlan(state: GameState, content: ContentDb, slot = 0): AutoPlan | null {
+  const where = positionOf(state, slot);
+  const memo = planned.get(state)?.get(slot);
+  if (memo && memo.now === state.now && memo.location === where) return memo.plan;
+  const plan = planFor(state, content, slot);
+  const all = planned.get(state) ?? new Map();
+  all.set(slot, { now: state.now, location: where, plan });
+  planned.set(state, all);
   return plan;
 }
 
-function planFor(state: GameState, content: ContentDb): AutoPlan | null {
-  const here = positionHex(state, content);
+/** Whether another performer is surveying the hex at `address` right now. */
+const surveyedByOther = (state: GameState, address: string, slot: number): boolean =>
+  state.slots.some(
+    (s, i) => i !== slot && s.action?.kind === EXPLORE_KIND && s.action.id === address,
+  );
+
+function planFor(state: GameState, content: ContentDb, slot: number): AutoPlan | null {
+  const here = positionHex(state, content, slot);
   if (!here) return null;
-  const reach: Reach = reachFrom(state, content, here);
-  const range = surveyRange(state, content);
+  const reach: Reach = reachFrom(state, content, here, slot);
+  const range = surveyRange(state, content, slot);
   const hereKey = hexKey(here.q, here.r);
   interface Pick {
     subject: Subject;
@@ -475,7 +511,8 @@ function planFor(state: GameState, content: ContentDb): AutoPlan | null {
   for (const a of hexesWithin(here, range)) {
     const subject = subjectOf(content, addressOf(content, a));
     if (!subject || !surveyable(state, subject, content)) continue;
-    if (surveyAccess(state, content, a, reach) !== 'ok') continue;
+    if (surveyedByOther(state, subject.address, slot)) continue;
+    if (surveyAccess(state, content, a, reach, slot) !== 'ok') continue;
     const pick = {
       subject,
       deep: isSurveyed(state, content, hexKey(a.q, a.r)) ? 1 : 0,
@@ -492,6 +529,7 @@ function planFor(state: GameState, content: ContentDb): AutoPlan | null {
     if (!isPlayable(hex)) continue;
     const subject = subjectOf(content, hexKey(hex.q, hex.r));
     if (!subject || !surveyable(state, subject, content)) continue;
+    if (surveyedByOther(state, subject.address, slot)) continue;
     const cut = !isSurveyed(state, content, hexKey(hex.q, hex.r));
     for (const [spot, minutes] of reach.dist) {
       const at = parseHexKey(spot);
@@ -524,23 +562,24 @@ export const autoSurveyKind: ActionKind = {
   has: (id) => id === AUTOSURVEY_ID,
   skill: (_id, content) => scoutSkill(content),
   requirements: (_state, _id, content) => graduateReq(content),
-  blocked: (state, _id, content) => (autoPlan(state, content) ? null : 'error.nothingToSurvey'),
-  intervalMs(state, _id, content, rules) {
-    const plan = autoPlan(state, content);
+  blocked: (state, _id, content, _rules, slot = 0) =>
+    autoPlan(state, content, slot) ? null : 'error.nothingToSurvey',
+  intervalMs(state, _id, content, rules, slot = 0) {
+    const plan = autoPlan(state, content, slot);
     if (!plan) return actionFloor(content);
     const next = plan.route[0];
     if (next === undefined) return exploreIntervalMs(state, content, rules, plan.subject.address);
     return stepMs(state, content, rules, indexOf(content).hexes.get(next)?.terrain ?? '');
   },
-  complete(state, _id, content, rules) {
-    const plan = autoPlan(state, content);
+  complete(state, _id, content, rules, slot = 0) {
+    const plan = autoPlan(state, content, slot);
     if (!plan) return 'abort';
     const next = plan.route[0];
     if (next === undefined) {
       surveyOnce(state, plan.subject, content, rules);
       return 'continue';
     }
-    enterHex(state, next, content, rules);
+    enterHex(state, next, content, rules, slot);
     return 'step';
   },
   abortCause: () => 'error.nothingToSurvey',

@@ -312,6 +312,12 @@
   const labelWidth = $derived(formatDuration(preview?.ms ?? 0).length * 7 + 16);
 
   const me = $derived(view.here ? pointOf(view.here) : null);
+  const others = $derived(
+    view.figures.flatMap((f) => {
+      const p = pointOf(f.coord);
+      return p ? [{ slot: f.slot, ...p }] : [];
+    }),
+  );
 </script>
 
 <div class="map" data-ui="map" class:panning bind:clientWidth={width} bind:clientHeight={height}>
@@ -408,6 +414,18 @@
           </text>
         </g>
       {/if}
+
+      {#each others as f (f.slot)}
+        <g
+          class="me other"
+          transform="translate({f.x + 7} {f.y - 7})"
+          data-ui="map-token"
+          data-figure={f.slot}
+          aria-hidden="true"
+        >
+          <circle r="5" class="dot" />
+        </g>
+      {/each}
 
       {#if me}
         <g class="me" transform="translate({me.x} {me.y})" data-ui="map-token" aria-hidden="true">
@@ -617,6 +635,10 @@
   .halo {
     fill: var(--chakra);
     opacity: 0.35;
+  }
+
+  .other .dot {
+    fill: var(--leaf);
   }
 
   .dot {

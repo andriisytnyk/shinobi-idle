@@ -555,6 +555,16 @@ function sanitizeWorld(raw: unknown, content: ContentDb): GameState['world'] {
   if (typeof raw.location === 'string' && subjectOf(content, raw.location) !== null) {
     world.location = raw.location;
   }
+  // The figures of the other performers: a slot index (1 and up) and a hex of the map.
+  if (isRecord(raw.figures)) {
+    const figures: Record<number, string> = {};
+    for (const [slot, at] of Object.entries(raw.figures)) {
+      const n = Number(slot);
+      if (Number.isInteger(n) && n >= 1 && typeof at === 'string' && subjectOf(content, at))
+        figures[n] = at;
+    }
+    if (Object.keys(figures).length > 0) world.figures = figures;
+  }
   world.explores = pick(raw.explores, (key, v) => {
     if (typeof v !== 'number') return undefined;
     const subject = subjectOf(content, key);

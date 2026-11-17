@@ -574,7 +574,11 @@ describe('A9: determinism and split invariance', () => {
       advance(whole, total, content, fast);
       // The cell went up a level during the run.
       expect(cellLevel(whole, cell('okolytsi_sela'), content)).toBeGreaterThanOrEqual(1);
-      if (two) expect(whole.world.location).toBe('core:polihon_44_lis_smerti');
+      // The walk of slot 1 moves the figure of slot 1 and not the character.
+      if (two) {
+        expect(whole.world.figures?.[1]).toBe('core:polihon_44_lis_smerti');
+        expect(whole.world.location).toBe('core:okolytsi_sela');
+      }
       for (const chunk of [1, 7, 999, 3600]) {
         const parts = scenario(two);
         for (let done = 0; done < total; done += chunk) {

@@ -8,6 +8,7 @@ import {
   hexInfo,
   listHexes,
   parseHexKey,
+  positionHex,
   rangeNow,
   travelPlan,
   type GameState,
@@ -128,6 +129,8 @@ export interface MapView {
   /** The bounds of the playable land in map units. */
   bounds: { x0: number; y0: number; x1: number; y1: number };
   here: string | null;
+  /** The other performers (shadow clones) on the map, by action slot; each is a figure of its own. */
+  figures: { slot: number; coord: string }[];
   range: number;
 }
 
@@ -175,7 +178,12 @@ export function mapView(state: GameState, content: ContentDb, rules: Rules): Map
           : [],
     });
   }
-  return { hexes, bounds, here, range: rangeNow(state, content) };
+  const figures = Object.keys(state.world.figures ?? {}).flatMap((s) => {
+    const slot = Number(s);
+    const at = positionHex(state, content, slot);
+    return at ? [{ slot, coord: hexKey(at.q, at.r) }] : [];
+  });
+  return { hexes, bounds, here, figures, range: rangeNow(state, content) };
 }
 
 /** The route and its time to the hex at `coord`, as the map draws it. */

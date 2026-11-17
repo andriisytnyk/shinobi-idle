@@ -227,7 +227,7 @@
             {t('world.panel.intel', { n: content.balance.K.intel.perCellLevel })}
           </p>
         {/if}
-        {#if cell?.req && view.nextAt !== null && info.level >= 1}
+        {#if cell?.req && view.nextAt !== null}
           <div data-req data-key-req={cell.key ?? undefined}>
             <p class="small dim">{t('world.panel.next')}</p>
             <ReqTree node={uniqueReq(cell.req)} />

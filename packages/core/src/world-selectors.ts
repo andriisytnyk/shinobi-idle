@@ -131,6 +131,7 @@ export function cellInfo(
   cellId: string,
   content: ContentDb,
   rules: Rules = defaultRules,
+  slot = 0,
 ): CellInfo | null {
   const index = indexOf(content);
   const cell = index.cells.get(cellId);
@@ -152,7 +153,7 @@ export function cellInfo(
   const xpMod =
     getMod(state, 'xp.all', content, rules).total *
     getMod(state, 'xp.skill.scout', content, rules).total;
-  const blocked = exploreBlocked(state, cell, content);
+  const blocked = exploreBlocked(state, cell, content, slot);
   const requirementsMet = reqResult?.met ?? false;
   let why: string | null = blocked;
   if (!why && !requirementsMet) {
@@ -179,8 +180,9 @@ export function cellInfo(
     keyReq: keyResult,
     req: reqResult,
     nextLevelNeed: top ? null : levelNeed(region, level + 1, content),
-    located: locationHexKey(state, content) === hexKey(cell.hex[0], cell.hex[1]),
-    near: surveyAccess(state, content, { q: cell.hex[0], r: cell.hex[1] }) === 'ok',
+    located: locationHexKey(state, content, slot) === hexKey(cell.hex[0], cell.hex[1]),
+    near:
+      surveyAccess(state, content, { q: cell.hex[0], r: cell.hex[1] }, undefined, slot) === 'ok',
     explorable: why === null,
     why,
     intervalMs,
@@ -201,8 +203,8 @@ export function cellInfo(
       };
     }),
     reachable:
-      travelBlocked(state, cell.id, content) === null ||
-      locationHexKey(state, content) === hexKey(cell.hex[0], cell.hex[1]),
+      travelBlocked(state, cell.id, content, slot) === null ||
+      locationHexKey(state, content, slot) === hexKey(cell.hex[0], cell.hex[1]),
   };
 }
 
@@ -211,13 +213,14 @@ export function listCells(
   state: GameState,
   content: ContentDb,
   rules: Rules = defaultRules,
+  slot = 0,
 ): CellInfo[] {
-  return content.cells.flatMap((c) => cellInfo(state, c.id, content, rules) ?? []);
+  return content.cells.flatMap((c) => cellInfo(state, c.id, content, rules, slot) ?? []);
 }
 
 /** The key of the hex the player stands on, or null when the world has no hex. */
-function locationHexKey(state: GameState, content: ContentDb): string | null {
-  const here = positionHex(state, content);
+function locationHexKey(state: GameState, content: ContentDb, slot = 0): string | null {
+  const here = positionHex(state, content, slot);
   return here ? hexKey(here.q, here.r) : null;
 }
 
@@ -236,16 +239,17 @@ export function travelPlan(
   address: string,
   content: ContentDb,
   rules: Rules = defaultRules,
+  slot = 0,
 ): TravelPlan {
-  const blocked = travelBlocked(state, address, content);
+  const blocked = travelBlocked(state, address, content, slot);
   const hex = indexOf(content).cells.get(address)
     ? subjectOf(content, address)?.hex
     : indexOf(content).hexes.get(address);
-  const route = blocked === null && hex ? routeTo(state, content, hex) : null;
+  const route = blocked === null && hex ? routeTo(state, content, hex, slot) : null;
   return {
     blocked,
     hexes: route?.hexes ?? [],
-    ms: hex && route ? (routeMs(state, content, rules, hex) ?? 0) : 0,
+    ms: hex && route ? (routeMs(state, content, rules, hex, slot) ?? 0) : 0,
   };
 }
 
@@ -287,17 +291,18 @@ export function hexInfo(
   content: ContentDb,
   rules: Rules = defaultRules,
   reach?: Reach,
+  slot = 0,
 ): HexInfo | null {
   const index = indexOf(content);
   const hex = index.hexes.get(key);
   if (!hex) return null;
   const surveyed = isSurveyed(state, content, key);
   const subject = subjectOf(content, key);
-  const here = locationHexKey(state, content) === key;
+  const here = locationHexKey(state, content, slot) === key;
   const level = subject ? surveyLevel(state, subject, content) : 0;
   const req = subject ? surveyReq(state, subject.address, content) : null;
   const blocked = subject
-    ? surveyBlocked(state, subject.address, content, reach)
+    ? surveyBlocked(state, subject.address, content, reach, slot)
     : 'error.unknownCell';
   let why = blocked;
   if (!why && req && !evalReq(state, req, content).met)
@@ -312,7 +317,7 @@ export function hexInfo(
     playable: hex.terrain !== undefined,
     surveyed,
     here,
-    inRange: surveyAccess(state, content, hex, reach) === 'ok',
+    inRange: surveyAccess(state, content, hex, reach, slot) === 'ok',
     cell: surveyed ? (subject?.cell?.id ?? null) : null,
     places: surveyed && level >= 1 ? (index.placesByHex.get(key) ?? []).map((p) => p.id) : [],
     level,
@@ -329,17 +334,18 @@ export function listHexes(
   state: GameState,
   content: ContentDb,
   rules: Rules = defaultRules,
+  slot = 0,
 ): HexInfo[] {
-  const here = positionHex(state, content);
-  const reach = here ? reachFrom(state, content, here) : undefined;
+  const here = positionHex(state, content, slot);
+  const reach = here ? reachFrom(state, content, here, slot) : undefined;
   return content.hexes.flatMap(
-    (h) => hexInfo(state, hexKey(h.q, h.r), content, rules, reach) ?? [],
+    (h) => hexInfo(state, hexKey(h.q, h.r), content, rules, reach, slot) ?? [],
   );
 }
 
 /** How far the player can survey from here now, for drawing the reach. */
-export const rangeNow = (state: GameState, content: ContentDb): number =>
-  surveyRange(state, content);
+export const rangeNow = (state: GameState, content: ContentDb, slot = 0): number =>
+  surveyRange(state, content, slot);
 
 /** Length of one step onto a hex of `terrain`, for showing a route before it is walked. */
 export const stepTime = (

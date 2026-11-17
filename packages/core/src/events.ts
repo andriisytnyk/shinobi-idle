@@ -181,6 +181,8 @@ export interface HexEnteredEvent extends EventBase {
   hex: string;
   terrain: string;
   by: 'walk';
+  /** The action slot of the performer that moved: 0 is the character. */
+  slot: number;
 }
 /** A hex that is no cell reached a new survey level; `max` marks the last level. */
 export interface HexSurveyedEvent extends EventBase {

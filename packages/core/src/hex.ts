@@ -107,18 +107,32 @@ export function isEnterable(content: ContentDb, hex: Hex | null | undefined): bo
   return indexOf(content).terrains.get(hex.terrain)?.blocked !== true;
 }
 
-/** The hex the player stands on; the first cell's hex when the saved position names nothing. */
-export function positionHex(state: GameState, content: ContentDb): Hex | null {
+/**
+ * The address where the performer of action slot `slot` stands. Slot 0 is the character
+ * (`world.location`); another slot stands in `world.figures`, and where it has no entry, with the
+ * character.
+ */
+export const positionOf = (state: GameState, slot = 0): string =>
+  (slot > 0 ? state.world.figures?.[slot] : undefined) ?? state.world.location;
+
+/** Puts the performer of `slot` on the hex at `address`. */
+export function placeAt(state: GameState, slot: number, address: string): void {
+  if (slot > 0) (state.world.figures ??= {})[slot] = address;
+  else state.world.location = address;
+}
+
+/** The hex the performer of `slot` stands on; the first cell's hex when the saved position names nothing. */
+export function positionHex(state: GameState, content: ContentDb, slot = 0): Hex | null {
   const index = indexOf(content);
-  const here = hexOfAddress(content, state.world.location);
+  const here = hexOfAddress(content, positionOf(state, slot));
   if (here) return here;
   const first = content.cells[0];
   return first ? (index.hexes.get(hexKey(first.hex[0], first.hex[1])) ?? null) : null;
 }
 
-/** The cell that stands on the hex the player is on, or null on a hex with no cell. */
-export function cellAtPosition(state: GameState, content: ContentDb): Cell | null {
-  const here = positionHex(state, content);
+/** The cell that stands on the hex the performer of `slot` is on, or null on a hex with no cell. */
+export function cellAtPosition(state: GameState, content: ContentDb, slot = 0): Cell | null {
+  const here = positionHex(state, content, slot);
   return here ? (indexOf(content).cellByHex.get(hexKey(here.q, here.r)) ?? null) : null;
 }
 
@@ -143,20 +157,20 @@ export function isSurveyed(state: GameState, content: ContentDb, key: string): b
 }
 
 /** How far from its position the player can survey: by Scouting level, plus a hex on a found outpost. */
-export function surveyRange(state: GameState, content: ContentDb): number {
+export function surveyRange(state: GameState, content: ContentDb, slot = 0): number {
   const map = content.balance.K.map;
   const scouting = activitySkill(content, 'map');
   const level = scouting === null ? 0 : skillLevel(state, scouting, content);
   let range = map.range[0]?.range ?? 1;
   for (const step of map.range) if (level >= step.scout) range = Math.max(range, step.range);
-  const cell = cellAtPosition(state, content);
+  const cell = cellAtPosition(state, content, slot);
   if (cell?.pois.some((p) => p.kind === 'outpost' && state.world.pois[p.id]))
     range += map.outpostRange;
   return range;
 }
 
 /** The keys of every surveyed hex, plus the one underfoot (the player can always stand and leave). */
-export function surveyedKeys(state: GameState, content: ContentDb): Set<string> {
+export function surveyedKeys(state: GameState, content: ContentDb, slot = 0): Set<string> {
   const keys = new Set(Object.keys(state.world.surveyed));
   for (const address of Object.keys(state.world.explores)) {
     const hex = hexOfAddress(content, address);
@@ -164,7 +178,7 @@ export function surveyedKeys(state: GameState, content: ContentDb): Set<string> 
     const key = hexKey(hex.q, hex.r);
     if (isSurveyed(state, content, key)) keys.add(key);
   }
-  const here = positionHex(state, content);
+  const here = positionHex(state, content, slot);
   if (here) keys.add(hexKey(here.q, here.r));
   return keys;
 }
@@ -219,9 +233,9 @@ type HeapItem = [number, string];
  * Dijkstra over the surveyed hexes the player can enter. Cost is the minutes of the hexes entered;
  * ties go to the smaller key so that the result never depends on the order of the search.
  */
-export function reachFrom(state: GameState, content: ContentDb, from: Axial): Reach {
+export function reachFrom(state: GameState, content: ContentDb, from: Axial, slot = 0): Reach {
   const graph = walkGraph(content);
-  const known = surveyedKeys(state, content);
+  const known = surveyedKeys(state, content, slot);
   const start = hexKey(from.q, from.r);
   const dist = new Map<string, number>([[start, 0]]);
   const prev = new Map<string, string>();
@@ -295,10 +309,15 @@ export function pathTo(content: ContentDb, reach: Reach, goal: string): Route | 
 }
 
 /** The route from the player's position to the hex `target`, or null when there is none. */
-export function routeTo(state: GameState, content: ContentDb, target: Axial): Route | null {
-  const here = positionHex(state, content);
+export function routeTo(
+  state: GameState,
+  content: ContentDb,
+  target: Axial,
+  slot = 0,
+): Route | null {
+  const here = positionHex(state, content, slot);
   if (!here) return null;
-  return pathTo(content, reachFrom(state, content, here), hexKey(target.q, target.r));
+  return pathTo(content, reachFrom(state, content, here, slot), hexKey(target.q, target.r));
 }
 
 // ---------- what can be surveyed from here ----------
@@ -313,13 +332,14 @@ export function surveyAccess(
   content: ContentDb,
   target: Axial,
   reach?: Reach,
+  slot = 0,
 ): 'ok' | 'outOfRange' | 'cutOff' {
-  const here = positionHex(state, content);
-  if (!here || hexDistance(here, target) > surveyRange(state, content)) return 'outOfRange';
+  const here = positionHex(state, content, slot);
+  if (!here || hexDistance(here, target) > surveyRange(state, content, slot)) return 'outOfRange';
   if (isSurveyed(state, content, hexKey(target.q, target.r))) return 'ok';
   // The hex underfoot is always standable.
   if (hexDistance(here, target) === 0) return 'ok';
-  const walkable = reach ?? reachFrom(state, content, here);
+  const walkable = reach ?? reachFrom(state, content, here, slot);
   const hexes = indexOf(content).hexes;
   const touches = neighbours(target).some((n) => {
     const key = hexKey(n.q, n.r);

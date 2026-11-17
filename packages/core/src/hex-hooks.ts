@@ -11,6 +11,8 @@ export interface HexEnteredContext {
   terrain: string;
   /** How the player got there; `walk` is the only way now. */
   by: 'walk';
+  /** The action slot of the performer that moved: 0 is the character, a shadow clone has its own. */
+  slot: number;
 }
 
 /**

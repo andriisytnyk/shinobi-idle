@@ -10,8 +10,17 @@ import { indexOf } from './lookup.ts';
  * that adding one never needs a migration of the rest.
  */
 export interface WorldState {
-  /** The address of the hex the player stands on; it starts at the first cell of the first region. */
+  /**
+   * The address of the hex the character (the performer of action slot 0) stands on; it starts at
+   * the first cell of the first region.
+   */
   location: string;
+  /**
+   * The positions of the other performers, by the index of their action slot (1 and up): a figure
+   * on the map for each shadow clone, put where the character stood when it was made. Read as empty
+   * when absent; a slot with no entry stands where the character stands. Slot 0 is `location`.
+   */
+  figures?: Record<number, string>;
   /** How many times each hex was surveyed. A cell's level follows from this count (`K.cellExplores`), any other hex's from `K.map.plainSurvey`. */
   explores: Record<string, number>;
   /**
