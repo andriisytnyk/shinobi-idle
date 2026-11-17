@@ -1,11 +1,12 @@
 import { mount } from 'svelte';
 import App from './App.svelte';
 import { composeBoot, devPacks, uiPacksFor } from './lib/boot.ts';
+import { enabledBuiltin } from './lib/builtin-packs.ts';
 import { isDevMode } from './lib/dev.ts';
 import { coreUi } from './lib/ext/core-ui.ts';
 import { migrateLocalGoal } from './lib/goal-migration.ts';
 import { pwa } from './lib/pwa.svelte.ts';
-import { browserStorage } from './lib/settings.svelte.ts';
+import { browserStorage, settings } from './lib/settings.svelte.ts';
 import { bootGame, game } from './lib/store.ts';
 import './fonts.css';
 import './tokens.css';
@@ -35,5 +36,12 @@ if (isDevMode()) Object.assign(window, { __shinobi: game });
 
 export default mount(App, {
   target,
-  props: { uiPacks: [coreUi, ...uiPacksFor(boot.packs, extra.available)] },
+  props: {
+    uiPacks: [
+      coreUi,
+      // The built-in packs the player switched on in the settings start with the app.
+      ...enabledBuiltin(settings.builtinPacks),
+      ...uiPacksFor(boot.packs, extra.available),
+    ],
+  },
 });

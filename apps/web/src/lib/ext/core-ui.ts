@@ -91,6 +91,35 @@ export const coreUi: UiPack = {
       mount: { svelte: CombatPage },
     });
     ui.addPage({
+      id: 'combat.bingo',
+      route: '#/combat/bingo',
+      title: 'combat.tab.bingo',
+      nav: 'combat',
+      mount: { svelte: CombatPage, props: () => ({ section: 'bingo' }) },
+    });
+    ui.addPage({
+      id: 'combat.report',
+      route: '#/combat/report',
+      title: 'combat.tab.report',
+      nav: 'combat',
+      mount: { svelte: CombatPage, props: () => ({ section: 'report' }) },
+    });
+    // A preparation is for a fight zone (a boss has one) or an operation: `#/combat/prepare/zone/<id>`.
+    ui.addPage({
+      id: 'combat.prepare',
+      route: '#/combat/prepare/:kind/*id',
+      title: 'combat.prepare',
+      nav: 'combat',
+      guard: ({ kind }) => kind === 'zone' || kind === 'operation',
+      mount: {
+        svelte: CombatPage,
+        props: ({ params }) => ({
+          section: 'prepare',
+          target: { kind: params.kind, id: params.id },
+        }),
+      },
+    });
+    ui.addPage({
       id: 'bank',
       route: '#/bank',
       title: 'nav.bank',
