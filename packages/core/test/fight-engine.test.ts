@@ -17,6 +17,7 @@ import {
   fightAdvance,
   fightNextEventIn,
   fightOutcome,
+  workOf,
   refreshUnlocks,
   serialize,
   simulateFights,
@@ -178,16 +179,7 @@ describe('A8: statistical sanity with simulateFights', () => {
 describe('A9: state is plain JSON and round-trips through a save', () => {
   function fighting(seed: number, enemy: string): GameState {
     const state = genin(seed);
-    for (const skill of [
-      'tai',
-      'nin',
-      'katon',
-      'futon',
-      'raiton',
-      'vit',
-      'eva',
-      'med',
-    ] as SkillId[]) {
+    for (const skill of ['tai', 'nin', 'katon', 'futon', 'raiton', 'vit', 'med'] as SkillId[]) {
       setLevel(state, skill, 36);
     }
     refreshUnlocks(state, content, true);
@@ -283,7 +275,6 @@ describe('A2: split invariance with fights running', () => {
       'doton',
       'suiton',
       'vit',
-      'eva',
       'med',
       'ath',
       'cc',
@@ -358,7 +349,7 @@ describe('A2: split invariance with fights running', () => {
 describe('the fight action wraps the fight engine', () => {
   function strong(seed: number): GameState {
     const state = genin(seed);
-    for (const skill of ['tai', 'nin', 'katon', 'vit', 'eva', 'med', 'ath'] as SkillId[]) {
+    for (const skill of ['tai', 'nin', 'katon', 'vit', 'med', 'ath'] as SkillId[]) {
       setLevel(state, skill, 30);
     }
     refreshUnlocks(state, content, true);
@@ -418,7 +409,8 @@ describe('the fight action wraps the fight engine', () => {
     );
     advance(state, 40_000, content, basicOnly);
     expect(Object.keys(state.mastery)).toEqual([]);
-    expect(state.combat?.fight.tally.basic ?? 0).toBeGreaterThan(0);
+    // The dummy falls to plain strikes alone.
+    expect(state.counters['kills.core:dummy'] ?? 0).toBeGreaterThan(0);
   });
 
   it('draws only from the combat and loot streams', () => {
@@ -446,7 +438,10 @@ describe('the fight action wraps the fight engine', () => {
 describe('fight engine basics', () => {
   it('reports its next event, and none once decided', () => {
     const fight = createFight(playerFor(34, 'katon'), enemyAt(34), 1, content, rules);
-    expect(fightNextEventIn(fight, content, rules)).toBe(0);
+    // The player waits for the moment before anything happens: the next event is that wait or the regeneration step, whichever comes first.
+    expect(fightNextEventIn(fight, content, rules)).toBe(
+      Math.min(workOf(fight.player.waitMs), workOf(K.combat.regenMs)),
+    );
     fightAdvance(fight, 0, content, rules);
     expect(fightNextEventIn(fight, content, rules)).toBeGreaterThan(0);
     fightAdvance(fight, sec(K.combat.fightCapMs / 1000), content, rules);
@@ -461,19 +456,21 @@ describe('fight engine basics', () => {
     pacify(fight);
     fightAdvance(fight, 0, content, rules);
     const quietNext = fightNextEventIn(fight, content, rules) ?? 0;
-    expect(quietNext).toBeGreaterThanOrEqual(sec(0.4));
+    expect(quietNext).toBeGreaterThanOrEqual(
+      sec(Math.min(...content.ai.tiers.map((t) => t.waitMs)) / 1000),
+    );
     const enemy = fight.enemies[0];
     if (!enemy) throw new Error('no enemy');
     enemy.effects.push({
       kind: 'modifier',
       id: 'm',
       src: 'test',
-      until: fight.t + sec(0.37),
+      until: fight.t + sec(0.17),
       stat: 'evasion',
       op: 'mul',
       value: 2,
     });
-    expect(fightNextEventIn(fight, content, rules)).toBe(sec(0.37));
+    expect(fightNextEventIn(fight, content, rules)).toBe(sec(0.17));
     enemy.effects.push({
       kind: 'periodic',
       id: 'p',
@@ -482,10 +479,10 @@ describe('fight engine basics', () => {
       mode: 'heal',
       amount: 1,
       every: sec(1),
-      next: fight.t + sec(0.21),
+      next: fight.t + sec(0.11),
     });
-    expect(fightNextEventIn(fight, content, rules)).toBe(sec(0.21));
-    fightAdvance(fight, sec(0.37), content, rules);
+    expect(fightNextEventIn(fight, content, rules)).toBe(sec(0.11));
+    fightAdvance(fight, sec(0.17), content, rules);
     expect(enemy.effects.some((e) => e.id === 'm')).toBe(false);
     expect(enemy.effects.some((e) => e.id === 'p')).toBe(true);
   });

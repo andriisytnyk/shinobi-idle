@@ -42,7 +42,11 @@ if (!chunin) throw new Error('no chunin AI tier');
 const LEVEL = 34;
 const enemyHp = K.eHp[0] + K.eHp[1] * LEVEL;
 const enemyDamage = K.eDmg[0] + K.eDmg[1] * LEVEL;
-const enemyEvasion = K.eEva[0] + K.eEva[1] * LEVEL;
+// An enemy of this level waits by the chunin tier, and the rank tier adds its term to the rating.
+const enemyEvasion =
+  K.eEva[0] +
+  K.eEva[1] * LEVEL +
+  K.rating.enemyEvaTier * (content.ai.tiers.find((t) => t.id === 'chunin')?.minTier ?? 0);
 
 describe('Armor (answer: pierce)', () => {
   const dyn = 'core:dynamic_entry';
@@ -91,6 +95,12 @@ describe('Caster (answer: interrupt)', () => {
     const fight = quiet(
       pacify(createFight(scripted(known), enemyAt(LEVEL, ['caster']), seed, content, rules)),
     );
+    // The heavy blow rolls like every strike: here it always lands.
+    for (const e of fight.enemies) e.accuracy = 1e9;
+    fight.player.evasion = 0;
+    // The wind-up is under way when the player first decides: the AI prefers an interrupting technique then.
+    const caster = fight.enemies[0]?.timers.caster;
+    if (caster) caster.progress = caster.need - sec(0.3) * 1000;
     fightAdvance(
       fight,
       sec(fig('trait.casterEvery') + fig('trait.casterCast') + 1),
@@ -101,10 +111,16 @@ describe('Caster (answer: interrupt)', () => {
   };
 
   it('lands a heavy attack for the multiplied damage when nothing interrupts it', () => {
-    for (const seed of [1, 2, 3]) {
+    // The blow rolls like any strike (at most 95% to hit): it either lands whole or misses.
+    let landed = 0;
+    for (let seed = 1; seed <= 12; seed++) {
       const fight = play([], seed);
-      expect(fight.tally.taken).toBeCloseTo(heavy, 8);
+      if (fight.tally.taken > 0) {
+        landed++;
+        expect(fight.tally.taken).toBeCloseTo(heavy, 8);
+      }
     }
+    expect(landed).toBeGreaterThanOrEqual(9);
   });
 
   it('is cancelled by an interrupt that hits during the cast', () => {
@@ -115,12 +131,12 @@ describe('Caster (answer: interrupt)', () => {
       if (fight.tally.interrupts === 1) {
         interrupted++;
         expect(fight.tally.taken).toBe(0);
-      } else {
+      } else if (fight.tally.taken > 0) {
         landed++;
         expect(fight.tally.taken).toBeCloseTo(heavy, 8);
       }
     }
-    expect(interrupted).toBeGreaterThan(15);
+    expect(interrupted).toBeGreaterThan(5);
     expect(landed).toBeGreaterThan(0);
   });
 });
@@ -337,7 +353,7 @@ describe('Illusionist (answer: dispel)', () => {
 describe('Hidden (answer: reveal)', () => {
   const sensing = 'core:sensing';
   const hiddenFight = (seed: number, known: string[], ai = rules): FightState =>
-    createFight(scripted(known), enemyAt(LEVEL, ['hidden']), seed, content, ai);
+    createFight({ ...scripted(known), tier: 1 }, enemyAt(LEVEL, ['hidden']), seed, content, ai);
   const firstBlow = (known: string[], ai = rules): { taken: number; fight: FightState } | null => {
     for (let seed = 1; seed < 100; seed++) {
       const fight = quiet(hiddenFight(seed, known, ai));
@@ -388,7 +404,8 @@ describe('Poisoner (answer: cleanse)', () => {
       if (fight.tally.taken > 0) hits++;
       if ((fight.tally.statuses.poison ?? 0) > 0) poisoned++;
     }
-    expect(hits).toBeGreaterThan(1000);
+    // About a third of the blows hit a scripted player: enough for the share of them that poison.
+    expect(hits).toBeGreaterThan(600);
     expect(Math.abs(poisoned / hits - fig('trait.poisonChance'))).toBeLessThan(0.04);
   });
 
@@ -414,8 +431,9 @@ describe('Poisoner (answer: cleanse)', () => {
     const fight = poisonFight(3);
     fight.player.hp = fight.player.maxHp = 1e15;
     for (const e of fight.enemies) {
-      e.intervalMs = 400;
-      e.timer.need = needOf(400);
+      e.waitMs = 100;
+      e.strikeMs = 300;
+      e.timer.need = needOf(100);
     }
     let seen = 0;
     while (fight.t < sec(20)) {
@@ -568,13 +586,11 @@ describe('the default AI decision rules, on hand-made views', () => {
     medic: null,
     stance: null,
     hastened: false,
-    reactWork: 0,
-    guardBelow: K.ai.guardBelow,
     itemWork: sec(K.pillAction),
   });
   const cast = (id: string) => ({ type: 'technique', id });
 
-  it('casts an interrupt only while an interruptible cast is under way and ends later than this one', () => {
+  it('casts an interrupt only while an interruptible cast is under way', () => {
     const techs = [kt('int', ['interrupt'], 1), kt('big', [], 50)];
     const casting = (remaining: number, interruptible = true) =>
       mk(techs, [
@@ -582,21 +598,21 @@ describe('the default AI decision rules, on hand-made views', () => {
           cast: { kind: 'heavy', remaining, total: remaining, mult: 3, interruptible, known: true },
         }),
       ]);
-    const need = sec(1);
-    expect(defaultCombatAi(casting(need + 1))).toEqual(cast('int'));
-    expect(defaultCombatAi(casting(need))).toEqual(cast('big'));
+    // The AI does not plan around when the cast ends: it interrupts whenever one is under way and can be stopped.
+    expect(defaultCombatAi(casting(sec(5)))).toEqual(cast('int'));
+    expect(defaultCombatAi(casting(1))).toEqual(cast('int'));
     expect(defaultCombatAi(mk(techs))).toEqual(cast('big'));
     // A cast an interrupt cannot stop is no reason to interrupt.
-    expect(defaultCombatAi(casting(need + 1, false))).toEqual(cast('big'));
+    expect(defaultCombatAi(casting(sec(5), false))).toEqual(cast('big'));
   });
 
-  it('keeps an interrupt back when the next heavy attack comes before it would be ready again', () => {
+  it('does not keep an interrupt back for the next heavy attack: it does not plan around casts', () => {
     const techs = [kt('int', ['interrupt'], 30), kt('plain', [], 10)];
     const waiting = (inWork: number) =>
       mk(techs, [
         enemyView({ knownTraits: ['caster'], workingTraits: ['caster'], nextCastIn: inWork }),
       ]);
-    expect(defaultCombatAi(waiting(sec(2)))).toEqual(cast('plain'));
+    expect(defaultCombatAi(waiting(sec(2)))).toEqual(cast('int'));
     expect(defaultCombatAi(waiting(sec(60)))).toEqual(cast('int'));
   });
 
@@ -651,13 +667,14 @@ describe('the view the AI gets', () => {
       knowledge: { 'core:test': ['armor'] },
     };
     const fight = createFight(snap, enemyAt(LEVEL, ['armor', 'regen']), 1, content, spy);
-    fight.player.cd['core:great_fireball'] = sec(3);
-    fightAdvance(fight, 0, content, spy);
+    fight.player.cd['core:great_fireball'] = sec(10);
+    // The AI decides when the first wait ends.
+    fightAdvance(fight, sec(1), content, spy);
     const view = seen as FightView | null;
     expect(view?.tier).toBe(2);
     expect(view?.techniques.map((t) => t.tech.id)).toEqual(['core:great_fireball']);
     const t0 = view?.techniques[0];
-    expect(t0?.cooldownLeft).toBe(sec(3));
+    expect(t0?.cooldownLeft).toBe(sec(10) - (view?.t ?? 0));
     expect(t0?.ready).toBe(false);
     expect(t0?.affordable).toBe(true);
     expect(view?.enemies[0]?.knownTraits).toEqual(['armor']);

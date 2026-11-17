@@ -1,18 +1,20 @@
 import type { ContentDb, Rank, SkillId } from '@shinobi/content';
 import type { RngState } from '../rng.ts';
 import { fightData } from './fight-data.ts';
-import { PASSIVE_NEGATE_HOOK } from './fight-hooks.ts';
+import type { EvasionPart } from './numbers.ts';
 import { TEAM_HOOK } from './fight-team-id.ts';
 import type {
   Combatant,
   Effect,
   Encounter,
+  FightAct,
   FightLogLine,
   FightResult,
   FightState,
   FightTally,
   KitEffect,
   KitTechnique,
+  LastAct,
   ModStat,
   PlayerKit,
   PouchSlot,
@@ -71,7 +73,7 @@ function vocabOf(content: ContentDb): Vocab {
         if (op.tally) effects.add(op.tally.as);
       }
     }
-    const specials = new Set<string>([PASSIVE_NEGATE_HOOK, TEAM_HOOK]);
+    const specials = new Set<string>([TEAM_HOOK]);
     for (const t of content.traits) if (t.hook !== undefined) specials.add(t.hook);
     for (const b of content.bosses) {
       specials.add(b.special.hook);
@@ -131,11 +133,7 @@ const MOD_STATS: readonly ModStat[] = [
 const KIT_EFFECTS: readonly KitEffect['kind'][] = [
   'damage',
   'none',
-  'shield',
-  'decoy',
-  'evasionBuff',
   'cleanse',
-  'passiveNegate',
   'stance',
   'nextCast',
   'reveal',
@@ -207,6 +205,43 @@ function parseEffect(raw: unknown, t: number, v: Vocab): Effect | 'drop' | null 
   return null;
 }
 
+const EVASION_SOURCES = ['base', 'tier', 'technique', 'modifiers'] as const;
+const ACT_KINDS = ['technique', 'basic', 'item', 'attack', 'rest'] as const;
+
+/** An action of a combatant: `undefined` for none, `null` when it is not a usable one. */
+function parseAct(raw: unknown, side: Combatant['side']): FightAct | null | undefined {
+  if (raw === null) return undefined;
+  if (!isRecord(raw) || !oneOf(ACT_KINDS, raw.kind)) return null;
+  if (raw.id !== null && !isStr(raw.id)) return null;
+  if (raw.target !== null && !isStr(raw.target)) return null;
+  const kind = raw.kind;
+  const own = side === 'player' ? kind !== 'attack' : kind === 'attack';
+  if (!own || (kind === 'technique' || kind === 'item') !== (raw.id !== null)) return null;
+  return { kind, id: raw.id, target: raw.target };
+}
+
+/** The last action of a combatant: `undefined` for none, `null` when it is not a usable one. */
+function parseLast(raw: unknown, t: number): LastAct | null | undefined {
+  if (raw === null) return undefined;
+  if (!isRecord(raw) || !oneOf(ACT_KINDS, raw.kind)) return null;
+  if (raw.id !== null && !isStr(raw.id)) return null;
+  if (!oneOf(['hit', 'miss', 'interrupted', 'none'] as const, raw.outcome)) return null;
+  if (!nonNeg(raw.damage) || !isInt(raw.at) || raw.at < 0 || raw.at > t) return null;
+  if (!Array.isArray(raw.statuses) || !raw.statuses.every(isStr)) return null;
+  if (!Array.isArray(raw.combos) || !raw.combos.every(isStr)) return null;
+  if (raw.avoidedBy !== null && !isStr(raw.avoidedBy)) return null;
+  return {
+    avoidedBy: raw.avoidedBy,
+    kind: raw.kind,
+    id: raw.id,
+    outcome: raw.outcome,
+    damage: raw.damage as number,
+    statuses: raw.statuses as string[],
+    combos: raw.combos as string[],
+    at: raw.at,
+  };
+}
+
 function parseTimer(raw: unknown, size: number): Timer | null {
   if (!isRecord(raw) || !isInt(raw.progress) || !isInt(raw.need)) return null;
   if (raw.progress < 0 || raw.need < size) return null;
@@ -232,14 +267,20 @@ function parseCombatant(
     raw.damage,
     raw.ward,
   ];
-  if (!figures.every(nonNeg) || !isInt(raw.intervalMs) || raw.intervalMs < 1) return null;
+  if (!figures.every(nonNeg) || !isInt(raw.waitMs) || raw.waitMs < 1) return null;
+  if (!isInt(raw.strikeMs) || raw.strikeMs < 1) return null;
   if ((raw.maxHp as number) <= 0) return null;
-  // The player is idle, casting or recovering; an enemy is always counting down to its attack.
-  const phases = side === 'player' ? ['idle', 'cast', 'recover'] : ['attack'];
+  // A fighter waits or acts; only the player rests. A fight saved before the loop of waits and actions has none of this and is not read.
+  const phases = side === 'player' ? ['wait', 'act', 'rest'] : ['wait', 'act'];
   if (typeof raw.phase !== 'string' || !phases.includes(raw.phase)) return null;
   const phase = raw.phase as Combatant['phase'];
+  const act = parseAct(raw.act, side);
+  if (act === null || (phase === 'wait') !== (act === undefined)) return null;
+  if (phase === 'rest' && act?.kind !== 'rest') return null;
+  if (!isInt(raw.phaseAt) || raw.phaseAt < 0 || raw.phaseAt > t) return null;
+  const last = parseLast(raw.last, t);
+  if (last === null) return null;
   if (raw.nature !== null && !isStr(raw.nature)) return null;
-  if (raw.cast !== null && !isStr(raw.cast)) return null;
   if (!Array.isArray(raw.traits) || !raw.traits.every(isStr)) return null;
   if (!Array.isArray(raw.specials) || !raw.specials.every(isStr)) return null;
   if (!Array.isArray(raw.effects)) return null;
@@ -251,7 +292,7 @@ function parseCombatant(
   }
   const cd = numberRecord(raw.cd);
   const data = numberRecord(raw.data);
-  const timer = parseTimer(raw.timer, phase === 'idle' ? 0 : needOf(1));
+  const timer = parseTimer(raw.timer, needOf(1));
   if (!cd || !data || !timer || !isRecord(raw.timers)) return null;
   const timers: Record<string, Timer> = {};
   for (const [name, value] of Object.entries(raw.timers)) {
@@ -281,7 +322,8 @@ function parseCombatant(
     accuracy: raw.accuracy as number,
     evasion: raw.evasion as number,
     damage: raw.damage as number,
-    intervalMs: raw.intervalMs,
+    waitMs: raw.waitMs,
+    strikeMs: raw.strikeMs,
     // A nature, trait or special of a pack that is not loaded is dropped: the body fights without it.
     nature: inSet(v.natures, raw.nature) ? raw.nature : null,
     traits: known(raw.traits as string[], v.traits),
@@ -290,7 +332,9 @@ function parseCombatant(
     effects,
     cd,
     phase,
-    cast: raw.cast,
+    act: act ?? null,
+    phaseAt: raw.phaseAt,
+    last: last ?? null,
     timer,
     timers,
     data,
@@ -326,6 +370,19 @@ function parseKit(raw: unknown, content: ContentDb, v: Vocab): PlayerKit | null 
   if (!nonNeg(raw.med) || !nonNeg(raw.chakraRegen) || !nonNeg(raw.staminaRegen)) return null;
   if (!nonNeg(raw.toolDamage)) return null;
   const known = new Set(content.techniques.map((t) => t.id));
+  if (!Array.isArray(raw.evasion)) return null;
+  const evasion: EvasionPart[] = [];
+  for (const p of raw.evasion) {
+    if (!isRecord(p) || !oneOf(EVASION_SOURCES, p.source) || !nonNeg(p.value)) return null;
+    if (p.id !== null && !(isStr(p.id) && known.has(p.id))) return null;
+    const optional = ['full', 'skillLevel', 'masteryLevel', 'effectiveLevel', 'ratio'] as const;
+    if (optional.some((k) => p[k] !== undefined && !nonNeg(p[k]))) return null;
+    if (p.levelAdj !== undefined && !Number.isFinite(p.levelAdj)) return null;
+    const part: EvasionPart = { source: p.source, id: p.id, value: p.value };
+    for (const k of optional) if (p[k] !== undefined) part[k] = p[k] as number;
+    if (p.levelAdj !== undefined) part.levelAdj = p.levelAdj as number;
+    evasion.push(part);
+  }
   const techniques: KitTechnique[] = [];
   for (const t of raw.techniques) {
     if (!isRecord(t) || !isStr(t.id) || !known.has(t.id)) return null;
@@ -371,6 +428,7 @@ function parseKit(raw: unknown, content: ContentDb, v: Vocab): PlayerKit | null 
     med: raw.med,
     chakraRegen: raw.chakraRegen,
     staminaRegen: raw.staminaRegen,
+    evasion,
   };
 }
 
@@ -466,15 +524,24 @@ function parseEncounter(raw: unknown, most: number, v: Vocab): Encounter | null 
 }
 
 /** The battle log lines still to be read; lines that do not fit are dropped, an absent log is empty. */
+const LOG_ACTS = ['cast', 'resolve', 'interrupted', 'hit', 'miss'] as const;
+
 function parseLog(raw: unknown): FightLogLine[] | null {
   if (raw === null) return null;
   if (!Array.isArray(raw)) return [];
   const lines: FightLogLine[] = [];
   for (const l of raw) {
     if (!isRecord(l) || (l.side !== 'player' && l.side !== 'enemy') || !isNum(l.dmg)) continue;
-    if (l.act !== 'cast' && l.act !== 'hit' && l.act !== 'miss') continue;
+    if (!oneOf(LOG_ACTS, l.act)) continue;
     if (l.tech !== null && !isStr(l.tech)) continue;
-    lines.push({ side: l.side, act: l.act, tech: l.tech, dmg: l.dmg });
+    lines.push({
+      side: l.side,
+      act: l.act,
+      tech: l.tech,
+      dmg: l.dmg,
+      ...(isStr(l.by) ? { by: l.by } : {}),
+      ...(isStr(l.via) ? { via: l.via } : {}),
+    });
   }
   return lines;
 }
@@ -536,9 +603,12 @@ export function parseFight(raw: unknown, content: ContentDb): FightState | null 
   }
   if (!Array.isArray(raw.natures) || !raw.natures.every(isStr)) return null;
   if (raw.target !== null && !isStr(raw.target)) return null;
-  // A player who is casting casts a technique of the kit.
-  if (player.phase === 'cast' && !kit.techniques.some((x) => x.id === player.cast)) return null;
-  if (player.phase !== 'cast' && player.cast !== null) return null;
+  // A player who is casting a technique casts one of the kit; one using an item uses one it has.
+  const doing = player.act;
+  if (doing?.kind === 'technique' && !kit.techniques.some((x) => x.id === doing.id)) return null;
+  if (doing?.kind === 'item' && !pouch.some((x) => x.id === doing.id)) return null;
+  if (doing?.kind === 'attack') return null;
+  if (enemies.some((e) => e.act !== null && e.act.kind !== 'attack')) return null;
   const w = rng as number[];
   const state: RngState = [w[0] ?? 0, w[1] ?? 0, w[2] ?? 0, w[3] ?? 0];
   const fault =

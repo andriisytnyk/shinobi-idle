@@ -118,14 +118,5 @@
       "t": "flag",
       "id": "firstFight"
     }
-  },
-  {
-    "id": "eva",
-    "group": "combat",
-    "activity": "none",
-    "unlockReq": {
-      "t": "flag",
-      "id": "firstFight"
-    }
   }
 ]

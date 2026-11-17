@@ -18,6 +18,18 @@ export interface TeamNatures {
 /** A choice of nature: the id of a nature, or `'random'` (the chakra paper decides). */
 export type NatureChoice = string;
 
+/** Every nature that beats `nature` on the wheel, in the order of the content; empty when none does. */
+export function naturesBeating(content: ContentDb, nature: string): NatureId[] {
+  return content.natures
+    .filter((n) => n.strongAgainst.includes(nature))
+    .map((n) => n.id as NatureId);
+}
+
+/** Every nature `nature` beats on the wheel; empty when it beats none. */
+export function naturesBeaten(content: ContentDb, nature: string): NatureId[] {
+  return (indexOf(content).natures.get(nature)?.strongAgainst ?? []) as NatureId[];
+}
+
 /** The nature that beats `nature` on the wheel: the first nature of the content that is strong against it. */
 export function natureBeating(content: ContentDb, nature: string): NatureId {
   return (content.natures.find((n) => n.strongAgainst.includes(nature))?.id ?? nature) as NatureId;
@@ -309,8 +321,9 @@ export interface NatureConsequences {
   cells: string[];
   /** Enemy traits answered by tags of this nature's techniques. */
   traits: string[];
-  strongAgainst: string;
-  weakAgainst: string;
+  /** The natures this one beats and the natures that beat it, all of them (a nature of a pack joins the wheel on both sides); none when none. */
+  strongAgainst: string[];
+  weakAgainst: string[];
   /** The rival's and Aya's natures if this one were the native nature. */
   rival: string;
   aya: string;
@@ -365,8 +378,8 @@ export function natureConsequences(
       .filter((c) => cellOpen(c, alone, content))
       .map((c) => c.id),
     traits,
-    strongAgainst: natureBeaten(content, nature),
-    weakAgainst: natureBeating(content, nature),
+    strongAgainst: naturesBeaten(content, nature),
+    weakAgainst: naturesBeating(content, nature),
     rival: rivalNatureFor(content, nature),
     aya: ayaNatureFor(content, nature),
     // A combo is joined by the nature that triggers it and by the nature whose techniques apply its state.

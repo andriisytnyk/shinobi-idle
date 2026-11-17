@@ -1,8 +1,10 @@
 import { content } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
+  actionInfo,
   advance,
   createState,
+  xpAt,
   dispatch,
   defaultRules,
   deserialize,
@@ -16,6 +18,13 @@ import { genin, HOUR, setLevel, start } from './helpers.ts';
 import { bestOf, speedBudget } from './speed.ts';
 
 const LEAF = 'core:leaf_whirlwind';
+
+/** The practice cycle of Leaf Whirlwind for the test player, in ms. */
+function leafCycleMs(): number {
+  const state = genin();
+  setLevel(state, 'tai', 12);
+  return actionInfo(state, { kind: 'practice', id: LEAF }, content)!.intervalMs;
+}
 
 function lcg(seed: number): () => number {
   let a = seed >>> 0;
@@ -159,21 +168,32 @@ describe('integer time accounting', () => {
   }
 
   it('slows cycles in proportion to the share', () => {
-    const full = make(1000);
-    const half = make(500);
+    // The cast part of a cycle shortens with the mastery the practice earns, so the cycle drifts over the run and
+    // the halves would differ by that, not by rounding. With the mastery already at its cap (it cannot grow) the cycle is
+    // constant, and the share must give exactly half.
+    const pinned = (share: number) => {
+      const state = make(share);
+      state.mastery[LEAF] = { xp: xpAt(content.balance.K.masteryCap) };
+      return state;
+    };
+    const full = pinned(1000);
+    const half = pinned(500);
     advance(full, 600_000, content);
     advance(half, 600_000, content);
+    expect(full.stats.completed).toBeGreaterThan(100);
     expect(half.stats.completed).toBe(full.stats.completed / 2);
   });
 
   it('rounds the next event up: a cycle ends at the first whole ms with enough work', () => {
-    // Leaf Whirlwind cycle is 2000 ms = 2 000 000 units; share 333 needs 2e6 / 333 = 6006.006 ms.
+    // A cycle of C ms is C x 1000 units; share 333 needs C x 1000 / 333 ms, rounded up.
+    const units = leafCycleMs() * 1000;
+    const need = Math.ceil(units / 333);
     const state = make(333);
-    advance(state, 6006, content);
+    advance(state, need - 1, content);
     expect(state.stats.completed).toBe(0);
     advance(state, 1, content);
     expect(state.stats.completed).toBe(1);
-    expect(state.slots[0]?.progress).toBe(6007 * 333 - 2_000_000);
+    expect(state.slots[0]?.progress).toBe(need * 333 - units);
   });
 });
 
@@ -350,7 +370,7 @@ describe('dispatch', () => {
     const doc = JSON.parse(serialize(state));
     doc.state.slots[0].progress = 1e15;
     const back = deserialize(JSON.stringify(doc), content);
-    expect(back.slots[0]?.progress).toBe(2000 * 1000);
+    expect(back.slots[0]?.progress).toBe(leafCycleMs() * 1000);
   });
 
   it('keeps only the newest 200 events', () => {

@@ -30,7 +30,7 @@ function fightWith(supports: TeamSupport[], known: string[] = [], seed = 1): Fig
 }
 
 const teamHits = (fight: FightState, nature: string): number =>
-  fight.tally.damage[`team:${nature}`] ?? 0;
+  fight.tally.damage[`team.${nature}`] ?? 0;
 
 describe('A8: team support', () => {
   it('hits at its interval: the first teammate at each period, the second half a period later', () => {
@@ -97,7 +97,7 @@ describe('A8: team support', () => {
   function watchFight(id: string) {
     const state = player({
       natures: ['katon'],
-      levels: { scout: 20, ath: 25, tai: 25, vit: 20, eva: 20, katon: 20, doton: 1 },
+      levels: { scout: 20, ath: 25, tai: 25, vit: 20, katon: 20, doton: 1 },
       bank: { 'core:antidote': 5 },
     });
     startMission(state, id);
@@ -109,7 +109,7 @@ describe('A8: team support', () => {
       seen.fight = true;
       seen.support = (c.fight.encounter.support ?? []).map((x) => x.nature);
       seen.special ||= c.fight.player.specials.includes('special:team');
-      seen.teamDamage ||= Object.keys(c.fight.tally.damage).some((k) => k.startsWith('team:'));
+      seen.teamDamage ||= Object.keys(c.fight.tally.damage).some((k) => k.startsWith('team.'));
       if (seen.teamDamage) break;
     }
     return { seen, state };
@@ -145,7 +145,7 @@ describe('A8: team support', () => {
   });
 
   it('follows the natures the team selector gives: the rival beats the first nature, Aya is Suiton or Raiton', () => {
-    const state = player({ natures: ['doton'], levels: { scout: 20, vit: 20, eva: 20 } });
+    const state = player({ natures: ['doton'], levels: { scout: 20, vit: 20 } });
     expect(state.team).toEqual({ rival: 'raiton', aya: 'suiton' });
     const katon = player({ natures: ['katon'] });
     expect(katon.team?.aya).toBe('raiton');

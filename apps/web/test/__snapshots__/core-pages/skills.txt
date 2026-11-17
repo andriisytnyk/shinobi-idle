@@ -318,24 +318,5 @@
                         <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                     <span class="label">
                       Перший бій
-              <li class="skill locked" data-entity="skill:eva" data-skill="eva" data-ui="skill-row" style="--skill-color: var(--steel);">
-                <span class="skill-icon">
-                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
-                    <path d="#843-729wlk" fill="currentColor">
-                <span class="skill-name">
-                  <a class="entity-link" href="#/skill/eva">
-                    Ухилення
-                <span aria-label="Навичка закрита" class="skill-level" role="img">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
-                      <path d="#24-1tb3nx8">
-                <span class="condition" data-lock="">
-                  <div class="row" data-met="false" data-ui="req-row">
-                    <span class="mark">
-                      <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                        <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <span class="label">
-                      Перший бій
       <p class="hint desktop-only">
         Відкрий розділ «Навички» й обери, що тренувати.

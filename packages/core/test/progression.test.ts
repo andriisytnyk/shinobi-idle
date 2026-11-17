@@ -31,20 +31,25 @@ describe('formulas', () => {
     expect(rate(500, content)).toBe(rate(K.cap, content));
   });
 
-  it('cast time grows with seals and shrinks with mastery, never below one seal', () => {
-    expect(techniqueCastSeconds(0, 1, content)).toBeCloseTo(K.castBase, 9);
-    expect(techniqueCastSeconds(6, 0, content)).toBeCloseTo(K.castBase + K.castPerSeal * 6, 9);
-    const m99 = techniqueCastSeconds(6, K.masteryCap, content);
-    expect(m99).toBeCloseTo(K.castBase + K.castPerSeal * 6 * (1 - K.masteryCast), 9);
-    expect(techniqueCastSeconds(1, K.masteryCap, content)).toBeCloseTo(
-      K.castBase + K.castPerSeal,
-      9,
-    );
+  it('cast time is a number of the technique, shrinks with mastery and never goes under the floor', () => {
+    const t = { cast: 2 };
+    expect(techniqueCastSeconds(t, 0, content)).toBeCloseTo(2, 9);
+    expect(techniqueCastSeconds(t, K.masteryCap, content)).toBeCloseTo(2 * (1 - K.masteryCast), 9);
+    // Mastery never takes a cast under the floor.
+    expect(techniqueCastSeconds({ cast: 0.5 }, K.masteryCap, content)).toBe(K.castFloor);
   });
 
-  it('practice interval is cast plus recovery, at least the minimum', () => {
+  it('practice interval is cast plus focus, at least the minimum', () => {
     expect(practiceIntervalSeconds(0.4, content)).toBe(K.practiceMin);
-    expect(practiceIntervalSeconds(5, content)).toBeCloseTo(5 + K.practiceRecovery, 9);
+    expect(practiceIntervalSeconds(5, content)).toBeCloseTo(
+      5 * K.practiceCast + K.practiceFocus.base,
+      9,
+    );
+    // A technique that needs more asks for more focus.
+    expect(practiceIntervalSeconds(5, content, 41)).toBeCloseTo(
+      5 * K.practiceCast + K.practiceFocus.base + 40 * K.practiceFocus.perLevel,
+      9,
+    );
   });
 
   it('mastery XP per action and pool numbers come from the balance parameters', () => {

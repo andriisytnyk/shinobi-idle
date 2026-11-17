@@ -122,9 +122,8 @@ describe('combat runs at the slot share', () => {
     // half share is the same fight as half an hour at full share, kill for kill (checked below).
     expect(kills(half)).toBeLessThan(kills(full));
     const vit0 = xpAt(40);
-    // Vitality and Evasion are trained only by the fight, so their totals halve exactly.
+    // Vitality is trained only by the fight, so its total halves exactly.
     expect(half.skills.vit!.xp - vit0).toBeCloseTo((full.skills.vit!.xp - vit0) / 2, 6);
-    expect(half.skills.eva!.xp).toBeCloseTo(full.skills.eva!.xp / 2, 6);
     // The same clock gives the same fight: half an hour at full speed matches an hour at half.
     const thirty = shared(5, 1, 0);
     advance(thirty, HOUR / 2, content);

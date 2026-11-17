@@ -14,7 +14,6 @@ const ENGINE_EFFECTS: ReadonlySet<string> = new Set([
   'twinMist',
   'stance',
   'stanceDrain',
-  'evasionBuff',
   'resist',
 ]);
 
@@ -72,6 +71,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     cells: ids(db.cells),
     regions: ids(db.regions),
     resources: ids(db.resources),
+    aiTiers: ids(db.ai.tiers),
   };
   type SetName = keyof typeof set;
 
@@ -312,6 +312,12 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
       for (const key of ['n', 'hp', 'dmg']) needNumber('swarm', `${t.swarm}.${key}`);
     if (t.regen !== undefined) numRef('regen', t.regen);
   }
+  for (const id of Object.keys(
+    (db.balance.K as { ai: { enemyTier: Record<string, number> } }).ai.enemyTier,
+  )) {
+    at('ai', id);
+    ref('K.ai.enemyTier', id, 'aiTiers');
+  }
   for (const tier of db.ai.tiers) {
     at('ai', tier.id);
     if (tier.minTier > db.playerRanks.length - 1)
@@ -346,6 +352,9 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
       const fx = t.combat.effect;
       if (fx.kind === 'cleanse') refs('combat.effect.statuses', fx.statuses, 'statuses');
       if ('fx' in fx) needNumber('combat.effect.fx', `techFx.${fx.fx}`);
+      // A defensive technique adds by a row of `K.passiveFx`: a key without a row would stop every fight of the player.
+      if (t.combat.passive)
+        needNumber('combat.passive.fx', `passiveFx.${t.combat.passive.fx}.evasion`);
     }
   }
   for (const p of db.practices) {
@@ -477,6 +486,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
       if (e.nature !== null) ref('nature', e.nature, 'natures', ['wheel']);
       if (e.carries !== null) ref('carries', e.carries, 'techniques');
       ref('style', e.style, 'styles');
+      if (e.aiTier !== undefined && e.aiTier !== null) ref('aiTier', e.aiTier, 'aiTiers');
       e.drops.forEach((d, n) => ref(`drops[${n}].item`, d.item, 'items'));
       if (e.scrollPart) {
         ref('scrollPart.item', e.scrollPart.item, 'items');

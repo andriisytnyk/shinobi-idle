@@ -94,7 +94,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2 с
+                  2,3 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід
@@ -171,7 +171,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2 с
+                  2,8 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід
@@ -248,7 +248,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2 с
+                  3,1 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід
@@ -325,7 +325,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2 с
+                  3,4 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід
@@ -402,7 +402,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2 с
+                  3,5 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід
@@ -479,7 +479,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2 с
+                  3,8 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід
@@ -556,7 +556,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2 с
+                  4,1 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід
@@ -633,7 +633,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2 с
+                  4,4 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід
@@ -710,7 +710,7 @@
                 <dt>
                   Цикл
                 <dd>
-                  2 с
+                  6,4 с
               <div data-ui="action-xp">
                 <dt>
                   Досвід

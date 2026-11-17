@@ -129,6 +129,9 @@ describe('A11: saves', () => {
     // Keep the enemy alive past the end of the stage's time.
     for (let i = 0; i < 400 && (state.slots[0]?.data as { w: number }).w === 0; i++) {
       for (const e of state.combat?.fight.enemies ?? []) e.hp = e.maxHp = 1e12;
+      // The player does not fall: a lost fight would end the stage, and this test is about the one that never ends.
+      const me = state.combat?.fight.player;
+      if (me) me.hp = me.maxHp = 1e12;
       advance(state, 5000, content);
     }
     expect(state.slots[0]?.data).toMatchObject({ s: 1, w: 1, f: 1 });
@@ -177,14 +180,17 @@ describe('A11: saves', () => {
     }
   });
 
-  it('drops a fight that does not belong to the stage and starts the stage anew', () => {
+  it('drops a fight that does not belong to the stage and fights the stage anew, the run and its ration kept', () => {
     const state = scene('core:thief', false);
     advance(state, (state.slots[0]?.data as { p: { ms: number } }).p.ms + 3000, content);
+    const before = state.slots[0]?.data as { s: number; r: number; a: number };
+    expect(before.s).toBeGreaterThanOrEqual(1);
     const raw = JSON.parse(serialize(state)) as { state: { combat: { enemy: string } } };
     raw.state.combat.enemy = 'core:merc_pack';
     const loaded = deserialize(JSON.stringify(raw), content);
-    expect(loaded.slots[0]?.data).toMatchObject({ s: 0 });
-    expect(loaded.combat).toBeNull();
+    expect(loaded.slots[0]?.data).toMatchObject({ s: before.s, r: before.r, a: before.a, f: 1 });
+    expect(loaded.combat?.enemy).toBe('core:thief');
+    expect(loaded.combat?.owner).toBe(0);
   });
 
   it('forgets the mission of a slot when the content no longer has it', () => {

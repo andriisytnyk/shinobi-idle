@@ -29,6 +29,7 @@ import {
   type GameState,
 } from '../src/index.ts';
 import { genin, setLevel, start, withNatures } from './helpers.ts';
+import { modContent, modGenin } from './packs-helpers.ts';
 
 const K = content.balance.K;
 const choose = (s: GameState, nature: NatureId | 'random') =>
@@ -197,14 +198,15 @@ describe('A3: locks, the native bonus and the non-native cast', () => {
       const s = withNatures(genin(), ...natures);
       s.known['core:nature_transformation_burn_a_leaf'] = true;
       dispatch(s, start('practice', 'core:nature_transformation_burn_a_leaf'), content);
-      advance(s, 60_000, content);
+      advance(s, 3_600_000, content);
       return s.skills.katon!.xp;
     };
-    // Same technique, same cast, same cycles: only the native bonus differs.
+    // Same technique: XP per hour does not depend on the interval, only the native bonus differs.
     const native = run(['katon']);
     const foreign = run(['futon', 'katon']);
     expect(foreign).toBeGreaterThan(0);
-    expect(native / foreign).toBeCloseTo(K.nativeXp, 9);
+    // A cycle that was cut off by the end of the hour is not paid, so the ratio is close, not exact.
+    expect(native / foreign).toBeCloseTo(K.nativeXp, 1);
   });
 
   it('stretches the cast of a non-native technique 1.30 at level 1, 1.15 at 25 and 1.00 at 50', () => {
@@ -213,9 +215,9 @@ describe('A3: locks, the native bonus and the non-native cast', () => {
     expect(nonNativeCastMult(50, content)).toBe(1);
     expect(nonNativeCastMult(80, content)).toBe(1);
     const fb = content.techniques.find((t) => t.id === 'core:great_fireball')!;
-    const base = techniqueCastSeconds(fb.sealSeq.length, 1, content);
-    expect(techniqueCastSeconds(fb.sealSeq.length, 1, content, 1)).toBeCloseTo(base * 1.3, 12);
-    expect(techniqueCastSeconds(fb.sealSeq.length, 1, content, 50)).toBeCloseTo(base, 12);
+    const base = techniqueCastSeconds(fb, 1, content);
+    expect(techniqueCastSeconds(fb, 1, content, 1)).toBeCloseTo(base * 1.3, 12);
+    expect(techniqueCastSeconds(fb, 1, content, 50)).toBeCloseTo(base, 12);
   });
 
   it('only a nature skill that is not the first nature is foreign', () => {
@@ -229,7 +231,7 @@ describe('A3: locks, the native bonus and the non-native cast', () => {
   it('applies to the practice interval at levels 1, 25 and 50', () => {
     const id = 'core:great_fireball';
     const t = content.techniques.find((x) => x.id === id)!;
-    const cast = techniqueCastSeconds(t.sealSeq.length, 1, content);
+    const cast = techniqueCastSeconds(t, 1, content);
     const intervalAt = (natures: NatureId[], level: number) => {
       const s = withNatures(genin(), ...natures);
       setLevel(s, 'katon', level);
@@ -241,11 +243,11 @@ describe('A3: locks, the native bonus and the non-native cast', () => {
       [25, 1 + K.nonNativeCast * (25 / 49)],
       [50, 1],
     ] as const) {
-      const expected = Math.round(practiceIntervalSeconds(cast * mult, content) * 1000);
+      const expected = Math.round(practiceIntervalSeconds(cast * mult, content, t.level) * 1000);
       expect(intervalAt(['futon', 'katon'], level)).toBe(expected);
       // The native player never pays it.
       expect(intervalAt(['katon', 'futon'], level)).toBe(
-        Math.round(practiceIntervalSeconds(cast, content) * 1000),
+        Math.round(practiceIntervalSeconds(cast, content, t.level) * 1000),
       );
     }
   });
@@ -364,8 +366,8 @@ describe('natureConsequences', () => {
     expect(suiton.missions).toContain('core:v_water');
     expect(suiton.buildings).toContain('core:farms');
     expect(suiton.cells).toEqual([]);
-    expect(suiton.strongAgainst).toBe('katon');
-    expect(suiton.weakAgainst).toBe('doton');
+    expect(suiton.strongAgainst).toEqual(['katon']);
+    expect(suiton.weakAgainst).toEqual(['doton']);
     expect(suiton.rival).toBe('doton');
     expect(suiton.aya).toBe('raiton');
     expect(suiton.combos.length).toBeGreaterThan(0);
@@ -447,5 +449,31 @@ describe('A8: save and determinism', () => {
     };
     expect(run(1)).toBe(run(1));
     expect(run(1)).toBe(run(6));
+  });
+});
+
+describe('the wheel of a pack nature', () => {
+  const aether = 'testmod:aether';
+  const state = modGenin();
+
+  it('lists the nature it beats, and the nature it beats lists it', () => {
+    const own = natureConsequences(aether, state, modContent);
+    expect(own.strongAgainst).toEqual(['katon']);
+    // The core nature the pack patched to beat it is the one it is weak against, not itself.
+    expect(own.weakAgainst).toEqual(['doton']);
+    const katon = natureConsequences('katon', state, modContent);
+    expect(katon.weakAgainst).toContain(aether);
+    // The core nature that beat katon before the pack still does.
+    expect(katon.weakAgainst).toContain('suiton');
+    expect(katon.weakAgainst).not.toContain('katon');
+  });
+
+  it('is unchanged for the core natures with the core pack alone', () => {
+    for (const n of NATURE_IDS) {
+      const c = natureConsequences(n, state, content);
+      expect(c.weakAgainst).not.toContain(n);
+      expect(c.strongAgainst).toHaveLength(1);
+      expect(c.weakAgainst).toHaveLength(1);
+    }
   });
 });

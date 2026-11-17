@@ -82,8 +82,14 @@
     <div class="row" data-row="wheel">
       <dt>{t('nature.cons.wheel')}</dt>
       <dd>
-        <span class="pair">{t('nature.cons.strong')} <NatureLink id={cons.strongAgainst} /></span>
-        <span class="pair">{t('nature.cons.weak')} <NatureLink id={cons.weakAgainst} /></span>
+        <span class="pair"
+          >{t('nature.cons.strong')}
+          {#each cons.strongAgainst as id (id)}<NatureLink {id} />{:else}—{/each}</span
+        >
+        <span class="pair"
+          >{t('nature.cons.weak')}
+          {#each cons.weakAgainst as id (id)}<NatureLink {id} />{:else}—{/each}</span
+        >
       </dd>
     </div>
     <div class="row" data-row="team">

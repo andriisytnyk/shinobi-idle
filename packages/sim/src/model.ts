@@ -1,9 +1,12 @@
 import type { Boss, ContentDb, Enemy, NatureId } from '@shinobi/content';
 import {
+  aiTierOf,
   encounterFor,
+  evasionOf,
   isNature,
   loadoutLimits,
   planningSnapshot,
+  techniqueCastSeconds,
   type GameState,
 } from '@shinobi/core';
 import { basicSkills } from './constants.ts';
@@ -71,7 +74,7 @@ export function modelExpectation(
   const style = Math.max(...basicSkills(content).map((s) => levels[s] ?? 1));
 
   const acc = K.accBase + K.accPerLevel * style;
-  const eva = K.evaBase + K.evaPerLevel * (levels.eva ?? 1);
+  const eva = evasionOf(snap, content);
   const known = new Set(snap.known);
   const figures = content.techniques
     .filter((t) => t.rank !== null && !t.noDamage && known.has(t.id))
@@ -81,11 +84,7 @@ export function modelExpectation(
       const power = K.power[rank];
       if (!role || power === undefined) return { nature: null, cast: 0, cycle: 1, value: 0 };
       const m = (snap.mastery[t.id] ?? 1) / K.masteryCap;
-      const seals = Math.max(
-        Math.round(t.sealSeq.length * (1 - K.masteryCast * m)),
-        t.sealSeq.length > 0 ? 1 : 0,
-      );
-      const cast = Math.max(K.castFloor, K.castBase + K.castPerSeal * seals);
+      const cast = techniqueCastSeconds(t, snap.mastery[t.id] ?? 1, content);
       const cycle = cast + role.cd * (K.rankCd[rank] ?? 0);
       const reach = t.role === 'area' ? Math.min(bodies, K.loadout.areaBodies) : 1;
       const nature = isNature(content, t.skill) ? (t.skill as NatureId) : null;
@@ -129,7 +128,9 @@ export function modelExpectation(
     best.reduce((s, f) => s + f.cast / f.cycle, 0),
   );
   const basic = K.basicDmg[0] + K.basicDmg[1] * style;
-  const playerDps = hitRate * (bestScore + ((1 - busy) * basic) / K.basicInterval);
+  // A plain strike is an action after a wait of the player's tier: that is its whole cycle.
+  const strikeEvery = K.basicCast + aiTierOf(content, snap.tier ?? 0).waitMs / 1000;
+  const playerDps = hitRate * (bestScore + ((1 - busy) * basic) / strikeEvery);
   if (!(playerDps > 0)) return null;
   const ttkSec = hpTotal / playerDps;
 

@@ -19,6 +19,19 @@ const data = {
     },
   ],
   playerRanks: [{ id: 'testmod:adept', tier: 3 }],
+  /** An AI tier with its own wait: the adept (and the test boss, by its `aiTier`) wait for the moment 300 ms, shorter than any tier of the core. */
+  ai: {
+    visibleTraits: [],
+    tiers: [
+      {
+        id: 'testmod:keen',
+        minTier: 3,
+        rules: ['heal', 'answer', 'best', 'basic'],
+        waitMs: 300,
+        tactical: true,
+      },
+    ],
+  },
   missionRanks: [{ id: 'testmod:trial' }],
   currencies: [{ id: 'testmod:token' }],
   villageStages: [{ id: 'testmod:stage3', rep: 'testmod:stage3', cap: 6 }],
@@ -119,6 +132,7 @@ const data = {
       sealsCanon: false,
       tier: 0,
       noDamage: false,
+      cast: 1.5,
       /** The combo fires whenever its rule is met (a chilled body), without a roll. */
       combat: { effect: { kind: 'damage' }, guaranteedCombo: 'testmod:frostburn' },
     },
@@ -138,6 +152,46 @@ const data = {
       sealsCanon: false,
       tier: 0,
       noDamage: false,
+      /** A cast of its own, whatever its rank, role and seals say. */
+      cast: 3,
+      combat: { effect: { kind: 'damage' } },
+    },
+    {
+      /** A defensive technique of a pack: passive, it adds to the evasion rating by its mastery and is never in the hand. */
+      id: 'testmod:glass_veil',
+      skill: 'testmod:aether',
+      level: 1,
+      rank: 'E',
+      rankCanon: false,
+      role: 'testmod:sapper',
+      tags: [],
+      state: null,
+      src: 'N',
+      mentor: 'academy',
+      sealSeq: ['testmod:glyph'],
+      sealsCanon: false,
+      tier: 0,
+      noDamage: true,
+      cast: 1,
+      combat: { effect: { kind: 'none' }, passive: { fx: 'testmod:veil' } },
+    },
+    {
+      /** An attack with the interrupt tag: when it hits a fighter that is casting, the cast is broken. */
+      id: 'testmod:shatter_pulse',
+      skill: 'testmod:aether',
+      level: 4,
+      rank: 'D',
+      rankCanon: false,
+      role: 'testmod:sapper',
+      tags: ['interrupt'],
+      state: null,
+      src: 'N',
+      mentor: 'academy',
+      sealSeq: ['testmod:glyph'],
+      sealsCanon: false,
+      tier: 0,
+      noDamage: false,
+      cast: 0.8,
       combat: { effect: { kind: 'damage' } },
     },
   ],
@@ -219,6 +273,7 @@ const data = {
     {
       id: 'testmod:boss_shell',
       cl: 8,
+      aiTier: 'testmod:keen',
       traits: ['testmod:shelled'],
       nature: 'testmod:aether',
       carries: 'testmod:ember_pulse',
@@ -369,6 +424,7 @@ export const testmodPack: ContentPack = {
       role: { 'testmod:sapper': { m: 0.5, cd: 8, c: 1 } },
       combo: { 'testmod:frostburn': 0.3 },
       bossFx: { 'testmod:third': { mult: 2.5, hp: 1, dmg: 1 } },
+      passiveFx: { 'testmod:veil': { evasion: 25 } },
       rep: { 'testmod:stage3': 500 },
       goods: { 'testmod:charm': 10 },
       ext: {
@@ -399,6 +455,12 @@ export const testmodPack: ContentPack = {
       'technique.testmod:aether_touch.name': 'Тестовий дотик ефіру',
       'technique.testmod:aether_touch.desc':
         'Тестова техніка наставника: її тренування розвиває тестову навичку ефіру.',
+      'technique.testmod:glass_veil.name': 'Скляна завіса',
+      'technique.testmod:glass_veil.desc':
+        'Тестова пасивна техніка: додає до ухилення тим більше, чим вища Майстерність.',
+      'technique.testmod:shatter_pulse.name': 'Розбивний імпульс',
+      'technique.testmod:shatter_pulse.desc':
+        'Тестова атака з тегом переривання: ламає каст того, у кого влучає.',
       'exam.testmod:adept_exam.name': 'Тестовий іспит адепта',
       'exam.testmod:adept_exam.desc': 'Тестовий іспит пакета: він дає тестовий ранг адепта.',
       'rank.testmod:adept': 'Тестовий адепт',

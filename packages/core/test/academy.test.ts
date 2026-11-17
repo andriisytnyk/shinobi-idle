@@ -349,7 +349,7 @@ describe('A8: saves', () => {
       advance(b, 10_000, content);
     };
     fresh(damage((d) => ((d.state.combat.fight.player as Record<string, unknown>).hp = 'x')));
-    fresh(damage((d) => ((d.state.combat.fight.player as Record<string, unknown>).intervalMs = 0)));
+    fresh(damage((d) => ((d.state.combat.fight.player as Record<string, unknown>).waitMs = 0)));
     fresh(damage((d) => (d.state.combat.fight.t = -4)));
     fresh(damage((d) => (d.state.combat.fight.result = 'defeat')));
     fresh(damage((d) => (d.state.combat.fight.rng = [1, 2])));

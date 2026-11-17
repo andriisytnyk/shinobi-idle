@@ -93,7 +93,6 @@ export const CORE_MODIFIER_KEYS: Readonly<Table> = (() => {
   add('damage.vs.melee', 'Damage against melee enemies');
   add('chakra.regen', 'Chakra recovery in a fight');
   add('evasion', 'Evasion rating');
-  add('evasion.chance', 'Chance to dodge a hit');
   add('accuracy', 'Accuracy rating');
   add('defense', 'Defense rating against enemy hits');
   add('heal.food', 'HP restored by salves and food');

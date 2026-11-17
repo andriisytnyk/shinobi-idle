@@ -25,7 +25,7 @@ describe('slice size', () => {
     expect(content.zones).toHaveLength(31);
     // The Hideout, the Forest of Death and the exam tournament.
     expect(content.operations).toHaveLength(3);
-    expect(content.statuses).toHaveLength(5);
+    expect(content.statuses).toHaveLength(6);
     expect(content.traits).toHaveLength(8);
     expect(content.combos).toHaveLength(4);
   });

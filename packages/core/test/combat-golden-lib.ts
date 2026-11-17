@@ -14,7 +14,6 @@ export function yardstick(c: number, nature: string): PlayerSnapshot {
   levels.nin = Math.max(1, style - 6);
   for (const n of NATURES) levels[n] = style;
   levels.vit = d;
-  levels.eva = d;
   levels.med = d;
   levels.ath = Math.min(K.cap, d);
   levels.cc = Math.min(K.cap, d);

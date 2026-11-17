@@ -45,7 +45,7 @@ describe('technique combat data', () => {
     area: ['damage'],
     signature: ['damage'],
     control: ['damage', 'none', 'reveal'],
-    defense: ['shield', 'decoy', 'evasionBuff', 'cleanse', 'passiveNegate'],
+    defense: ['none', 'cleanse'],
     buff: ['stance', 'nextCast', 'none'],
     drill: [],
   };
@@ -66,19 +66,24 @@ describe('technique combat data', () => {
   const effectOf = (id: string) => techById.get(id)?.combat;
 
   it('matches the slice for the defensive techniques', () => {
+    // They do nothing in the hand: each is passive and names the row of the passive numbers it adds by.
     for (const id of ['core:earth_style_wall', 'core:water_formation_wall'])
-      expect(effectOf(id)?.effect).toEqual({ kind: 'shield', fx: 'shield' });
+      expect(effectOf(id)).toEqual({ effect: { kind: 'none' }, passive: { fx: 'shield' } });
     for (const id of ['core:clone', 'core:water_clone'])
-      expect(effectOf(id)?.effect).toEqual({ kind: 'decoy', fx: 'decoy' });
-    expect(effectOf('core:hiding_in_mist')?.effect).toEqual({
-      kind: 'evasionBuff',
-      fx: 'evasionBuff',
+      expect(effectOf(id)).toEqual({ effect: { kind: 'none' }, passive: { fx: 'decoy' } });
+    expect(effectOf('core:hiding_in_mist')).toEqual({
+      effect: { kind: 'none' },
+      passive: { fx: 'evasionBuff' },
     });
     expect(effectOf('core:rope_escape')?.effect).toEqual({ kind: 'cleanse', statuses: ['bind'] });
     expect(effectOf('core:body_replacement')).toEqual({
-      effect: { kind: 'passiveNegate', fx: 'passiveNegate' },
-      outOfLoadout: true,
+      effect: { kind: 'none' },
+      passive: { fx: 'passiveNegate' },
     });
+    // Every defensive technique is passive and names a row of the passive numbers that exists.
+    for (const t of techById.values()) {
+      if (t.combat?.passive) expect(Object.keys(K.passiveFx)).toContain(t.combat.passive.fx);
+    }
   });
 
   it('matches the slice for the buffs and utility techniques', () => {
@@ -368,9 +373,11 @@ describe('scrolls, parts and tools', () => {
 });
 
 describe('statuses, traits and combos', () => {
-  it('lists the five statuses with their numbers in the balance object', () => {
+  it('lists the six statuses with their numbers in the balance object', () => {
     expect(content.statuses.map((s) => s.id)).toEqual([...STATUS_IDS]);
-    for (const s of content.statuses) expect(K, s.id).toHaveProperty(s.id);
+    // The interrupt status keeps its numbers under `rhythm`.
+    for (const s of content.statuses)
+      expect(K, s.id).toHaveProperty(s.id === 'interrupt' ? 'rhythm' : s.id);
   });
 
   it('lists the eight traits with their answer tag and numbers', () => {

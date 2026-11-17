@@ -285,9 +285,9 @@ describe('A7: modifiers of built obstacles', () => {
 
   it('keeps modifiers permanent: they stay while no action runs', () => {
     const s = rich();
-    build(s, 3, 'core:ukhylennia_vid_kunaiv'); // +3% Evasion XP / -1% accuracy
+    build(s, 3, 'core:ukhylennia_vid_kunaiv'); // +3% evasion rating / -1% accuracy
     advance(s, HOUR, content, plainRules);
-    expect(getMod(s, 'xp.skill.eva', content).total).toBeCloseTo(1.03, 12);
+    expect(getMod(s, 'evasion', content).total).toBeCloseTo(1.03, 12);
     expect(getMod(s, 'accuracy', content).total).toBeCloseTo(0.99, 12);
   });
 });

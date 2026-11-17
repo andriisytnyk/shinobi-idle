@@ -67,11 +67,14 @@ const thirdStrike: FightHook = {
   onAttack(ctx, c, plan) {
     const n = (c.data['testmod.attacks'] ?? 0) + 1;
     c.data['testmod.attacks'] = n;
-    if (n % 3 === 0)
+    if (n % 3 === 0) {
       plan.damage *=
         (ctx.content.balance.K.bossFx as Record<string, Record<string, number> | undefined>)[
           'testmod:third'
         ]?.mult ?? 1;
+      // The heavy blow carries the interrupt: it breaks the cast of whoever it hits.
+      plan.interrupts = true;
+    }
   },
 };
 
