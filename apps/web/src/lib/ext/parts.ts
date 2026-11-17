@@ -78,6 +78,22 @@ export const UI_PARTS = [
   'disabled-packs',
   /** The «Застосунок» section of the settings page. */
   'pwa-section',
+  /** The arena of a running fight: the player on one side, the enemies on the other. */
+  'fight-arena',
+  /** One body of the arena (the player or an enemy); `data-side`, and `data-entity` for an enemy that is shown. */
+  'fighter',
+  /** What a body does now: the action, its emblem, its progress bar and, for a technique, the seal strip; `data-phase`, `data-action`. */
+  'fight-action',
+  /** What an action did: the figure that flies off the target for about a second (`data-kind="pop"`) and the last-action line (`data-kind="last"`). */
+  'fight-outcome',
+  /** The hand of the preparation screen: the technique slots. */
+  'prep-hand',
+  /** The «Захист» block: the passive defensive techniques, the evasion and its parts. */
+  'prep-defence',
+  /** The verdict of the preparation screen and its reasons; `data-verdict`. */
+  'prep-verdict',
+  /** One entry of the Bingo book; carries `data-entity` while the enemy is shown. */
+  'bingo-entry',
 ] as const;
 
 export type UiPart = (typeof UI_PARTS)[number];
@@ -100,4 +116,5 @@ export const ENTITY_PARTS: readonly UiPart[] = [
   'mission-reward',
   'pin-goal',
   'topbar-currency',
+  'bingo-entry',
 ];

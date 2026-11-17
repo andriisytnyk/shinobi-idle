@@ -428,5 +428,13 @@
   "resource.food.name": "Їжа",
   "trait.pack.desc": "Зграя складається з кількох слабших ворогів. Відповідь — техніки по площі й вибухові мітки.",
   "trait.poisoner.desc": "Отруйник при влучанні може отруїти. Протиотрута знімає отруєння.",
-  "trait.regen.desc": "Ворог відновлює здоров'я з часом. Горіння чи отрута зупиняють відновлення; відповідь — Катон і отруєні сенбон."
+  "trait.regen.desc": "Ворог відновлює здоров'я з часом. Горіння чи отрута зупиняють відновлення; відповідь — Катон і отруєні сенбон.",
+  "technique.core:body_replacement.dodge": "підмінився колодою",
+  "technique.core:clone.dodge": "підставив клона",
+  "technique.core:earth_style_wall.dodge": "заступився земляною стіною",
+  "technique.core:hiding_in_mist.dodge": "зник у тумані",
+  "technique.core:water_clone.dodge": "підставив водяного клона",
+  "technique.core:water_formation_wall.dodge": "вкрився водяною стіною",
+  "state.stun.held": "Приголомшений",
+  "state.bind.held": "Скований"
 }

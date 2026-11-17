@@ -229,6 +229,7 @@ export function createUi(packs: readonly UiPack[], deps: UiDeps) {
       },
       content: game.content,
       core: corePublic,
+      rules: game.rules,
       getMod: (key) => core.getMod(snapshot(), key, game.content, game.rules),
       t,
       href: (ref) => hrefFor(ref as EntityRef),

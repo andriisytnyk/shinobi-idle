@@ -28,6 +28,9 @@ const ROUTES = [
   '#/bank',
   '#/cell/*id',
   '#/combat',
+  '#/combat/bingo',
+  '#/combat/prepare/:kind/*id',
+  '#/combat/report',
   '#/credits',
   '#/exam/*id',
   '#/mission/*id',
@@ -84,6 +87,7 @@ const SAMPLE: Record<string, string> = {
   'core:entity.region': `#/region/${firstCell?.region}`,
   'core:entity.poi': `#/poi/${poi?.id}`,
   'core:village.focus': '#/village/core:forge',
+  'core:combat.prepare': '#/combat/prepare/zone/core:zone_dummy',
 };
 /** The collection each entity kind lives in, to check that the sample hashes name real entities. */
 const REAL: Record<string, readonly { id: string }[]> = {

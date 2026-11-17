@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { CELL_KEYS, content, NATURE_IDS, SKILL_IDS, ukLocale } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import { BANK_TABS } from '../src/lib/crafts.ts';
+import { SIMULATOR_UK } from '../src/lib/builtin/simulator-ui.ts';
 import { HINTS } from '../src/lib/hints.ts';
 
 const src = fileURLToPath(new URL('../src', import.meta.url));
@@ -30,7 +31,8 @@ describe('interface strings', () => {
       const missing: string[] = [];
       for (const m of text.matchAll(LITERAL_KEY)) {
         const key = m[1] ?? m[2] ?? m[3];
-        if (key !== undefined && !(key in ukLocale)) missing.push(key);
+        // The texts of a built-in pack live in the pack, under its own prefix.
+        if (key !== undefined && !(key in ukLocale) && !(key in SIMULATOR_UK)) missing.push(key);
       }
       expect(missing).toEqual([]);
     });
@@ -52,7 +54,12 @@ describe('interface strings', () => {
       'hint.title.': HINTS.map((h) => h.id),
       'log.': ['cast', 'hit', 'miss', 'basicHit', 'basicMiss', 'enemyHit', 'enemyMiss'],
       'now.phase.': ['focus', 'seal', 'release'],
-      'combat.doing.': ['wait', 'cast', 'basic', 'item', 'rest', 'attack', 'respawn'],
+      'combat.doing.': ['wait', 'cast', 'basic', 'item', 'rest'],
+      'fight.action.': ['wait', 'cast', 'basic', 'item', 'rest', 'held'],
+      'prep.verdict.': ['stable', 'risky', 'hopeless'],
+      'prep.verdictNote.': ['stable', 'risky', 'hopeless'],
+      'prep.part.': ['base', 'tier', 'technique', 'modifiers', 'knowledge', 'effects'],
+      'bingo.levelDesc.': ['1', '2', '3'],
       'entity.kind.': [
         'skill',
         'technique',

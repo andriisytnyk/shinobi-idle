@@ -1,6 +1,7 @@
 <script lang="ts">
   import Icon from '../components/Icon.svelte';
   import Modal from '../components/Modal.svelte';
+  import { BUILTIN_PACKS } from '../lib/builtin-packs.ts';
   import { tryUi } from '../lib/ext/runtime.svelte.ts';
   import Slot from '../lib/ext/Slot.svelte';
   import { t } from '../lib/i18n.ts';
@@ -18,6 +19,13 @@
     themes.some((theme) => theme.key === settings.theme)
       ? settings.theme
       : (themes.find((theme) => theme.key === 'core:base') ?? themes[0])?.key,
+  );
+
+  /** Whether the switched-on built-in packs differ from the ones this boot started with. */
+  const pending = $derived(
+    BUILTIN_PACKS.some(
+      (p) => settings.builtinPacks.includes(p.id) !== (ui?.registry.packs.includes(p.id) ?? false),
+    ),
   );
 
   let exported = $state('');
@@ -105,6 +113,29 @@
           {/each}
         </select>
       </label>
+    {/if}
+  </section>
+
+  <section data-builtin-packs>
+    <h2>{t('settings.builtin')}</h2>
+    <p class="dim">{t('settings.builtinNote')}</p>
+    {#each BUILTIN_PACKS as pack (pack.id)}
+      <label class="check" data-builtin={pack.id}>
+        <input
+          type="checkbox"
+          checked={settings.builtinPacks.includes(pack.id)}
+          onchange={(e) => settings.setBuiltinPack(pack.id, e.currentTarget.checked)}
+        />
+        <span>
+          <strong>{t(pack.name)}</strong>
+          <span class="dim desc">{t(pack.desc)}</span>
+        </span>
+      </label>
+    {/each}
+    {#if pending}
+      <p class="dim" role="status">{t('settings.builtinPending')}</p>
+      <button type="button" onclick={() => location.reload()}>{t('settings.builtinRestart')}</button
+      >
     {/if}
   </section>
 
@@ -323,6 +354,10 @@
     width: var(--icon-md);
     height: var(--icon-md);
     accent-color: var(--accent);
+  }
+
+  .desc {
+    display: block;
   }
 
   .dim {
