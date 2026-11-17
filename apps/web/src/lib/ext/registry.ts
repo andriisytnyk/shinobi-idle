@@ -5,6 +5,7 @@ import type {
   NavItemSpec,
   PageSpec,
   PageWrap,
+  SheetSpec,
   PoiRendererSpec,
   SkillPanelSpec,
   UiApi,
@@ -62,6 +63,10 @@ export interface ThemeEntry extends Owned, Omit<UiTheme, 'id'> {}
 /** The panel of one skill activity. */
 export interface SkillPanelEntry extends Owned, SkillPanelSpec {
   activity: string;
+}
+/** How the details of one entity kind open: as a sheet over a parent page. */
+export interface SheetEntry extends Owned, SheetSpec {
+  kind: string;
 }
 /** The renderer of one kind of point of interest. */
 export interface PoiRendererEntry extends Owned, PoiRendererSpec {
@@ -154,6 +159,8 @@ export interface UiRegistry {
   skillPanel(activity: string): SkillPanelEntry | undefined;
   /** The renderer for points of interest of this kind; the later pack wins. */
   poiRenderer(kind: string): PoiRendererEntry | undefined;
+  /** The sheet of this kind of entity, or undefined when its details are a page; the later pack wins. */
+  sheet(kind: string): SheetEntry | undefined;
   /** Texts added by packs, by key. */
   readonly messages: Readonly<Record<string, string>>;
   /** Stylesheets that packs ship, in load order. */
@@ -182,6 +189,7 @@ export function createRegistry(packs: readonly UiPack[], guard: Guard = createGu
   const themes: ThemeEntry[] = [];
   const skillPanels: SkillPanelEntry[] = [];
   const poiRenderers: PoiRendererEntry[] = [];
+  const sheets: SheetEntry[] = [];
   const messages: Record<string, string> = {};
   const stylesheets: { packId: string; css: string }[] = [];
   const removedNav = new Map<string, NavRemoval[]>();
@@ -344,6 +352,26 @@ export function createRegistry(packs: readonly UiPack[], guard: Guard = createGu
           seq: seq++,
           wraps: [],
         });
+      },
+      addSheet(kind, spec) {
+        if (typeof kind !== 'string' || kind === '') fail('a sheet needs an entity kind');
+        const key = claim('sheet', kind);
+        const parent = spec.parent;
+        if (typeof parent === 'string' && !parent.startsWith('#/'))
+          fail(`sheet "${key}": parent "${parent}" must start with #/`);
+        if (typeof parent !== 'string' && typeof parent !== 'function')
+          fail(`sheet "${key}" needs a parent`);
+        if (spec.home !== undefined && !spec.home.startsWith('#/'))
+          fail(`sheet "${key}": home "${spec.home}" must start with #/`);
+        if (typeof parent === 'function' && spec.home === undefined)
+          fail(`sheet "${key}": a parent function needs a home for entities that are not shown`);
+        const prior = sheets.findLast((p) => p.kind === kind);
+        if (prior && prior.packId !== packId) {
+          warn(
+            `sheet for "${kind}" is set by "${prior.packId}" and by "${packId}"; the later pack wins`,
+          );
+        }
+        add(sheets, { ...spec, kind, key, packId });
       },
       addNavItem(spec) {
         const key = claim('nav', spec.id);
@@ -525,6 +553,7 @@ export function createRegistry(packs: readonly UiPack[], guard: Guard = createGu
     theme: (id) => themes.find((t) => t.key === id) ?? themes.find((t) => t.key === BASE_THEME),
     skillPanel: (activity) => skillPanels.findLast((p) => p.activity === activity),
     poiRenderer: (kind) => poiRenderers.findLast((p) => p.kind === kind),
+    sheet: (kind) => sheets.findLast((p) => p.kind === kind),
     messages,
     stylesheets,
     navRemovals: (key) => removedNav.get(key) ?? [],

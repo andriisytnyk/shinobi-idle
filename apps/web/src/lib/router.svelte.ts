@@ -1,6 +1,8 @@
 import { parseHash, type Route } from './route.ts';
 
 let hash = $state(typeof location === 'undefined' ? '' : location.hash);
+/** The hash the app was on before the current one, in this session: tells a sheet whether Back leads to its parent. */
+let previous = '';
 
 /**
  * Asked synchronously when the hash has changed, before the page is told: the old page is still on
@@ -24,9 +26,11 @@ if (typeof window !== 'undefined') {
       const target = verdict === false ? hash : verdict;
       history.replaceState(null, '', location.pathname + location.search + target);
       if (verdict === false) return;
+      previous = hash;
       hash = target;
       return;
     }
+    previous = hash;
     hash = to;
   });
 }
@@ -44,4 +48,20 @@ export function currentRoute(): Route {
 /** Navigates by changing the hash. */
 export function navigate(target: string): void {
   location.hash = target;
+}
+
+/** Moves to `target` without a history entry of its own: the current entry is replaced. */
+export function replaceHash(target: string): void {
+  if (target === hash) return;
+  history.replaceState(null, '', location.pathname + location.search + target);
+  hash = target;
+}
+
+/**
+ * Leaves a sheet for its parent page. When the entry before this one is the parent, that is plain
+ * Back (so the history holds no loop); otherwise the sheet's own entry is replaced by the parent.
+ */
+export function closeTo(parent: string): void {
+  if (previous === parent && typeof history !== 'undefined') history.back();
+  else replaceHash(parent);
 }

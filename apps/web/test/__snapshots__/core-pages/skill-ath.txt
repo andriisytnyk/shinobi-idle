@@ -52,7 +52,7 @@
               <span class="lvl">
                 відкривається з рівня Атлетики 1
             <ul class="options">
-              <li class="option" data-obstacle="core:strybky_po_dakhakh">
+              <li class="option" data-entity="obstacle:core:strybky_po_dakhakh" data-obstacle="core:strybky_po_dakhakh">
                 <p class="name">
                   <span class="emblem sm" data-emblem-icon="jump-across" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
                     <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
@@ -75,7 +75,7 @@
                   Безкоштовно
                 <button class="action" type="button">
                   Збудувати
-              <li class="option" data-obstacle="core:bih_navkolo_sela">
+              <li class="option" data-entity="obstacle:core:bih_navkolo_sela" data-obstacle="core:bih_navkolo_sela">
                 <p class="name">
                   <span class="emblem sm" data-emblem-icon="sprint" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
                     <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
@@ -104,7 +104,7 @@
               <span class="lvl">
                 відкривається з рівня Атлетики 10
             <ul class="options">
-              <li class="option" data-obstacle="core:obtiazhuvachi">
+              <li class="option" data-entity="obstacle:core:obtiazhuvachi" data-obstacle="core:obtiazhuvachi">
                 <p class="name">
                   <span class="emblem sm" data-emblem-icon="weight" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
                     <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
@@ -153,7 +153,7 @@
                   Рьо: 600
                 <button class="action" disabled="" type="button">
                   Збудувати
-              <li class="option" data-obstacle="core:vidzhymannia_na_paltsiakh">
+              <li class="option" data-entity="obstacle:core:vidzhymannia_na_paltsiakh" data-obstacle="core:vidzhymannia_na_paltsiakh">
                 <p class="name">
                   <span class="emblem sm" data-emblem-icon="muscle-up" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
                     <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
@@ -208,7 +208,7 @@
               <span class="lvl">
                 відкривається з рівня Атлетики 20
             <ul class="options">
-              <li class="option" data-obstacle="core:koloda_nad_prirvoiu">
+              <li class="option" data-entity="obstacle:core:koloda_nad_prirvoiu" data-obstacle="core:koloda_nad_prirvoiu">
                 <p class="name">
                   <span class="emblem sm" data-emblem-icon="cliff-crossing" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
                     <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
@@ -257,7 +257,7 @@
                   Рьо: 1 350
                 <button class="action" disabled="" type="button">
                   Збудувати
-              <li class="option" data-obstacle="core:ukhylennia_vid_kunaiv">
+              <li class="option" data-entity="obstacle:core:ukhylennia_vid_kunaiv" data-obstacle="core:ukhylennia_vid_kunaiv">
                 <p class="name">
                   <span class="emblem sm" data-emblem-icon="dodge" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
                     <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
@@ -312,7 +312,7 @@
               <span class="lvl">
                 відкривається з рівня Атлетики 30
             <ul class="options">
-              <li class="option" data-obstacle="core:bih_po_derevakh">
+              <li class="option" data-entity="obstacle:core:bih_po_derevakh" data-obstacle="core:bih_po_derevakh">
                 <p class="name">
                   <span class="emblem sm" data-emblem-icon="tree-branch" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
                     <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
@@ -375,7 +375,7 @@
                   Рьо: 2 400
                 <button class="action" disabled="" type="button">
                   Збудувати
-              <li class="option" data-obstacle="core:lazinnia_po_skeli">
+              <li class="option" data-entity="obstacle:core:lazinnia_po_skeli" data-obstacle="core:lazinnia_po_skeli">
                 <p class="name">
                   <span class="emblem sm" data-emblem-icon="mountaintop" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
                     <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
@@ -430,7 +430,7 @@
               <span class="lvl">
                 відкривається з рівня Атлетики 40
             <ul class="options">
-              <li class="option" data-obstacle="core:perehony_z_supernykom">
+              <li class="option" data-entity="obstacle:core:perehony_z_supernykom" data-obstacle="core:perehony_z_supernykom">
                 <p class="name">
                   <span class="emblem sm" data-emblem-icon="duel" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
                     <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
@@ -479,7 +479,7 @@
                   Рьо: 3 750
                 <button class="action" disabled="" type="button">
                   Збудувати
-              <li class="option" data-obstacle="core:strybky_cherez_stovpy">
+              <li class="option" data-entity="obstacle:core:strybky_cherez_stovpy" data-obstacle="core:strybky_cherez_stovpy">
                 <p class="name">
                   <span class="emblem sm" data-emblem-icon="ancient-columns" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
                     <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
@@ -534,7 +534,7 @@
               <span class="lvl">
                 відкривається з рівня Атлетики 50
             <ul class="options">
-              <li class="option" data-obstacle="core:bih_po_vodi">
+              <li class="option" data-entity="obstacle:core:bih_po_vodi" data-obstacle="core:bih_po_vodi">
                 <p class="name">
                   <span class="emblem sm" data-emblem-icon="splashy-stream" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
                     <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
@@ -597,7 +597,7 @@
                   Рьо: 5 400
                 <button class="action" disabled="" type="button">
                   Збудувати
-              <li class="option" data-obstacle="core:plavannia_proty_techii">
+              <li class="option" data-entity="obstacle:core:plavannia_proty_techii" data-obstacle="core:plavannia_proty_techii">
                 <p class="name">
                   <span class="emblem sm" data-emblem-icon="swimfins" data-emblem-kind="obstacle" data-ui="action-emblem" style="--_tint: var(--group-train, var(--steel));">
                     <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">

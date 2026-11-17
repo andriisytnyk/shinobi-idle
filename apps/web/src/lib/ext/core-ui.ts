@@ -1,27 +1,28 @@
 import { isEntityKind } from '../entities.ts';
 import { parseHash } from '../route.ts';
+import { sheetParents } from '../sheet-parents.ts';
 import { worldFocus } from '../world.ts';
 import BankPage from '../../pages/BankPage.svelte';
-import BuildingPage from '../../pages/BuildingPage.svelte';
 import CombatPage from '../../pages/CombatPage.svelte';
 import CreditsPage from '../../pages/CreditsPage.svelte';
 import EntityPage from '../../pages/EntityPage.svelte';
-import GearPage from '../../pages/GearPage.svelte';
 import HelpPage from '../../pages/HelpPage.svelte';
 import HomePage from '../../pages/HomePage.svelte';
-import ItemPage from '../../pages/ItemPage.svelte';
 import MorePage from '../../pages/MorePage.svelte';
 import NaturePage from '../../pages/NaturePage.svelte';
 import MissionPage from '../../pages/MissionPage.svelte';
 import MissionsPage from '../../pages/MissionsPage.svelte';
 import QuestsPage from '../../pages/QuestsPage.svelte';
 import RankPage from '../../pages/RankPage.svelte';
-import RecipePage from '../../pages/RecipePage.svelte';
 import SettingsPage from '../../pages/SettingsPage.svelte';
 import ShopPage from '../../pages/ShopPage.svelte';
 import SkillPage from '../../pages/SkillPage.svelte';
 import SkillsPage from '../../pages/SkillsPage.svelte';
-import TechniquePage from '../../pages/TechniquePage.svelte';
+import BuildingSheet from '../../sheets/BuildingSheet.svelte';
+import GearSheet from '../../sheets/GearSheet.svelte';
+import ItemSheet from '../../sheets/ItemSheet.svelte';
+import RecipeSheet from '../../sheets/RecipeSheet.svelte';
+import TechniqueSheet from '../../sheets/TechniqueSheet.svelte';
 import PwaSection from '../../components/PwaSection.svelte';
 import CoursePanel from '../../components/CoursePanel.svelte';
 import MeditationPanel from '../../components/MeditationPanel.svelte';
@@ -33,7 +34,7 @@ import PoiZone from '../../components/poi/PoiZone.svelte';
 import VillagePage from '../../pages/VillagePage.svelte';
 import WorldPage from '../../pages/WorldPage.svelte';
 import { svelteWidget } from './svelte-widget.ts';
-import type { UiPack } from './types.ts';
+import type { PageMount, UiPack } from './types.ts';
 
 /**
  * The built-in interface as a UI pack: its pages, its navigation and its base theme go through the
@@ -170,6 +171,7 @@ export const coreUi: UiPack = {
       mount: Parameters<typeof ui.addPage>[0]['mount'],
       nav?: string,
       reveal?: 'self',
+      crumbs = false,
     ): void =>
       ui.addPage({
         id: `entity.${kind}`,
@@ -178,17 +180,31 @@ export const coreUi: UiPack = {
         nav,
         mount,
         ...(reveal ? { reveal } : {}),
+        ...(crumbs ? { crumbs } : {}),
       });
-    entity('quest', { svelte: QuestsPage }, 'quests');
+    entity('quest', { svelte: QuestsPage }, 'quests', undefined, true);
     // A mission is shown by name before its rank opens; the page then shows what the board card shows.
-    entity('mission', byId(MissionPage), 'missions', 'self');
-    entity('exam', { svelte: RankPage }, 'rank');
+    entity('mission', byId(MissionPage), 'missions', 'self', true);
+    entity('exam', { svelte: RankPage }, 'rank', undefined, true);
     entity('skill', byId(SkillPage), 'skills');
-    entity('technique', byId(TechniquePage));
-    entity('recipe', byId(RecipePage), 'skills');
-    entity('gear', byId(GearPage), 'shop');
-    entity('building', byId(BuildingPage), 'village');
-    entity('item', byId(ItemPage));
+    // The details of these kinds open as a sheet over a parent page (the highlighted tile stays in view);
+    // a parent that depends on the entity is data of the kind, and its home is where an entity the player
+    // has not discovered opens (the real parent would give it away).
+    const over = (kind: keyof typeof sheetParents, home: string, mount?: PageMount): void =>
+      ui.addSheet(kind, {
+        parent: (ref, ctx) => sheetParents[kind](ref.id, ctx.content),
+        home,
+        ...(mount ? { mount } : {}),
+      });
+    over('technique', '#/skills', byId(TechniqueSheet));
+    over('exercise', '#/skills');
+    over('practice', '#/skills');
+    over('obstacle', '#/skills');
+    over('recipe', '#/skills', byId(RecipeSheet));
+    over('item', '#/bank', byId(ItemSheet));
+    // Gear lines are sold in the shop; a building is a card of the village.
+    ui.addSheet('gear', { parent: '#/shop', mount: byId(GearSheet) });
+    ui.addSheet('building', { parent: '#/village', mount: byId(BuildingSheet) });
     const world = {
       svelte: WorldPage,
       props: ({ hash }: { hash: string }) => ({ focus: worldFocus(parseHash(hash)) }),
@@ -199,6 +215,7 @@ export const coreUi: UiPack = {
       id: 'entity',
       route: '#/:kind/*id',
       title: 'route.entity',
+      crumbs: true,
       guard: ({ kind }) => kind !== undefined && isEntityKind(kind),
       mount: {
         svelte: EntityPage,

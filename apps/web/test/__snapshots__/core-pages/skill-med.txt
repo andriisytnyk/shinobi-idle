@@ -381,7 +381,7 @@
         <h2>
           Практики: Прозріння й Просвітлення
         <ul class="practices">
-          <li class="practice" data-practice="core:tykha_kimnata">
+          <li class="practice" data-entity="practice:core:tykha_kimnata" data-practice="core:tykha_kimnata">
             <h3>
               <a class="entity-link" href="#/practice/core:tykha_kimnata">
                 Тиха кімната
@@ -479,7 +479,7 @@
                     Майстерність практики: 99
                 <button disabled="" type="button">
                   Купити
-          <li class="practice" data-practice="core:medytatsiia_v_rusi">
+          <li class="practice" data-entity="practice:core:medytatsiia_v_rusi" data-practice="core:medytatsiia_v_rusi">
             <h3>
               <a class="entity-link" href="#/practice/core:medytatsiia_v_rusi">
                 Медитація в русі
@@ -577,7 +577,7 @@
                     Майстерність практики: 99
                 <button disabled="" type="button">
                   Купити
-          <li class="practice" data-practice="core:lisove_sviatylyshche">
+          <li class="practice" data-entity="practice:core:lisove_sviatylyshche" data-practice="core:lisove_sviatylyshche">
             <h3>
               <a class="entity-link" href="#/practice/core:lisove_sviatylyshche">
                 Лісове святилище
@@ -675,7 +675,7 @@
                     Майстерність практики: 99
                 <button disabled="" type="button">
                   Купити
-          <li class="practice" data-practice="core:bilia_vohnyshcha">
+          <li class="practice" data-entity="practice:core:bilia_vohnyshcha" data-practice="core:bilia_vohnyshcha">
             <h3>
               <a class="entity-link" href="#/practice/core:bilia_vohnyshcha">
                 Біля вогнища
@@ -789,7 +789,7 @@
                     Майстерність практики: 99
                 <button disabled="" type="button">
                   Купити
-          <li class="practice" data-practice="core:pid_vodospadom">
+          <li class="practice" data-entity="practice:core:pid_vodospadom" data-practice="core:pid_vodospadom">
             <h3>
               <a class="entity-link" href="#/practice/core:pid_vodospadom">
                 Під водоспадом
@@ -903,7 +903,7 @@
                     Майстерність практики: 99
                 <button disabled="" type="button">
                   Купити
-          <li class="practice" data-practice="core:sad_kameniv">
+          <li class="practice" data-entity="practice:core:sad_kameniv" data-practice="core:sad_kameniv">
             <h3>
               <a class="entity-link" href="#/practice/core:sad_kameniv">
                 Сад каменів
