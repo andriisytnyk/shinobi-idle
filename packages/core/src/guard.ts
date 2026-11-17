@@ -206,6 +206,7 @@ export function guardKind(kind: ActionKind, pack: string): ActionKind {
       }
     },
   };
+  if (kind.fullSpeed === true) guarded.fullSpeed = true;
   if (kind.blocked) {
     const blocked = kind.blocked.bind(kind);
     guarded.blocked = (state, id, content, rules, slot) => {

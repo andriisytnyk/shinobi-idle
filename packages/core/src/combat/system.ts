@@ -367,7 +367,12 @@ export function followChakraPool(state: GameState, content: ContentDb): void {
   if (!c) return;
   const player = c.fight.player;
   // The body remembers what its pool was divided by; the pool is scaled from that to the divisor now.
-  const had = player.data[CHAKRA_DIVISOR_KEY] ?? 1;
+  // A saved divisor is trusted no further than a sane range: a doctored save cannot zero or negate the pool.
+  const saved = player.data[CHAKRA_DIVISOR_KEY];
+  const had =
+    typeof saved === 'number' && Number.isFinite(saved)
+      ? Math.min(Math.max(1, Math.floor(saved)), Math.max(1, state.slots.length))
+      : 1;
   // One slot, no clone: nothing to follow (the common case, kept cheap).
   if (had === 1 && state.slots.length < 2) return;
   const now = chakraDivisor(state, content);

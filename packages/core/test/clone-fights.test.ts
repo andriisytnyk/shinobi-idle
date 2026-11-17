@@ -9,6 +9,7 @@ import {
   dispatch,
   fightTimeMs,
   growSlots,
+  moneyOf,
   planningSnapshot,
   playerMaxChakra,
   serialize,
@@ -16,7 +17,7 @@ import {
 } from '../src/index.ts';
 import { analyze, zone } from './analysis-helpers.ts';
 import { HOUR, setLevel } from './helpers.ts';
-import { fighter, ids, startFight, startOperation, stock } from './prep-state.ts';
+import { fighter, ids, startFight, startOperation, stock, unlock } from './prep-state.ts';
 
 const CLONE = 'core:shadow_clone';
 const WOLF = 'core:zone_wolfmask';
@@ -48,19 +49,20 @@ describe('what a clone may fight', () => {
     expect(state.combat?.owner).toBe(1);
     expect(dispel(state)).toEqual({ ok: true });
     expect(state.combat).toBeNull();
-    // An operation and a mission with a combat stage are never refused for the clone.
-    for (const op of content.operations) {
-      const result = startOperation(state, op.id, 1);
-      if (!result.ok) expect(result.reason, op.id).not.toBe('error.cloneNoFight');
-      dispel(state);
-    }
-    for (const m of content.missions.filter(
-      (x) => x.board && x.stages.some((s) => s.t === 'combat'),
-    )) {
-      const result = start(state, 1, 'mission', m.id);
-      if (!result.ok) expect(result.reason, m.id).not.toBe('error.cloneNoFight');
-      dispel(state);
-    }
+    // An operation, once unlocked, is taken by the clone and fights in its slot.
+    unlock(state, 'op.hideout.unlocked');
+    expect(startOperation(state, 'core:op_hideout', 1)).toEqual({ ok: true });
+    expect(state.slots[1]?.action?.kind).toBe('operation');
+    expect(dispel(state)).toEqual({ ok: true });
+    // A mission with a combat stage is taken by the clone as well.
+    state.events = [];
+    const mission = content.missions.find(
+      (x) => x.board && x.rank !== 'OP' && x.stages.some((s) => s.t === 'combat'),
+    );
+    expect(mission).toBeDefined();
+    expect(start(state, 1, 'mission', mission?.id ?? '')).toEqual({ ok: true });
+    expect(state.slots[1]?.action?.kind).toBe('mission');
+    dispel(state);
   });
 
   it('runs a mission with a combat stage in the clone slot: the stages at the slot speed, the fight at full speed, the pay to the player', () => {
@@ -197,6 +199,23 @@ describe('the chakra pool', () => {
     expect(p?.chakra ?? 0).toBeLessThanOrEqual(full / 2 + 1e-9);
   });
 
+  it('does not trust a doctored divisor of a saved fight: zero or negative cannot empty the pool', () => {
+    for (const doctored of [0, -2, Number.NaN, 99, 1.5]) {
+      const state = cloner(7);
+      startFight(state, WOLF, 0);
+      const full = state.combat?.fight.player.maxChakra ?? 0;
+      const player = state.combat?.fight.player;
+      if (!player) throw new Error('no fight');
+      player.data.chakraDiv = doctored;
+      start(state, 1, 'drill', drill());
+      advance(state, 1, content);
+      const p = state.combat?.fight.player;
+      expect(p?.maxChakra, String(doctored)).toBeGreaterThan(0);
+      expect(p?.maxChakra, String(doctored)).toBeLessThanOrEqual(full + 1e-9);
+      expect(p?.chakra ?? -1, String(doctored)).toBeGreaterThanOrEqual(0);
+    }
+  });
+
   it('shows in the forecast: a player who prepares a fight while a clone works has the divided pool', () => {
     const state = cloner(8);
     state.known[CLONE] = true;
@@ -215,7 +234,7 @@ describe('the chakra pool', () => {
 });
 
 describe('a clone that loses', () => {
-  /** A clone far too weak for the zone, with the character strong (the pool is shared, the levels are not). */
+  /** A clone far too weak for the zone, with the character's levels untouched (the pool is shared, the levels are not). */
   function weakClone(seed: number): GameState {
     const state = cloner(seed, 1);
     setLevel(state, 'nin', 1);
@@ -224,8 +243,7 @@ describe('a clone that loses', () => {
 
   it('costs the player no Wound and no defeat, and the fight starts again', () => {
     const state = weakClone(9);
-    const mission = state.slots.length;
-    expect(mission).toBe(2);
+    expect(state.slots.length).toBe(2);
     startFight(state, 'core:zone_wolfmask', 1);
     let lost = 0;
     for (let i = 0; i < 40 && lost === 0; i++) {
@@ -265,14 +283,15 @@ describe('what a clone earns', () => {
   it('pays XP, Mastery and loot to the player', () => {
     const state = cloner(11);
     const xp0 = Object.values(state.skills).reduce((s, k) => s + k.xp, 0);
-    const ryo0 = state.bank['core:ryo'] ?? 0;
+    const ryo0 = state.currencies[moneyOf(content)] ?? 0;
     startFight(state, WOLF, 1);
     advance(state, 20 * MIN, content);
     expect(Object.values(state.skills).reduce((s, k) => s + k.xp, 0)).toBeGreaterThan(xp0);
     const kills = Object.entries(state.counters).filter(([k]) => k.startsWith('kills.'));
     expect(kills.reduce((s, [, n]) => s + n, 0)).toBeGreaterThan(0);
     expect(Object.keys(state.mastery).length).toBeGreaterThan(0);
-    expect(state.report[WOLF]?.loot.ryo ?? 0 + ryo0).toBeGreaterThanOrEqual(0);
+    expect(state.report[WOLF]?.loot.ryo ?? 0).toBeGreaterThan(0);
+    expect(state.currencies[moneyOf(content)] ?? 0).toBeGreaterThan(ryo0);
   });
 });
 

@@ -16,8 +16,9 @@
                 Тренувальний манекен
             <p class="meta">
               Бойовий рівень 2 · Здоров'я 40
-          <button class="start" type="button">
-            Почати бій
+          <div class="starts">
+            <button class="start" type="button">
+              Почати бій
       <p class="idle">
         Бій не йде. Обери супротивника.
       <h2>

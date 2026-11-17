@@ -1,5 +1,6 @@
 <script lang="ts">
   import {
+    cloneCount,
     counterValue,
     enemyStats,
     evalReq,
@@ -50,6 +51,8 @@
     ),
   );
 
+  /** Whether a clone exists: the character's chakra pool is divided then. */
+  const cloned = $derived(game.read((gs) => cloneCount(gs, game.content) > 0));
   const fight = $derived.by(() =>
     game.read((gs) => {
       const state = gs;
@@ -147,6 +150,8 @@
         </h2>
         {#if fight.clone}<p class="clone-note" data-clone-fights>
             <strong>{t('combat.cloneFights')}</strong> · {t('combat.cloneNote')}
+          </p>{:else if cloned}<p class="clone-note" data-clone-split>
+            {t('combat.cloneSplit')}
           </p>{/if}
         <StatBar label={t('combat.hpBar')} value={fight.c.hp} max={fight.maxHp} tone="hp" />
         <StatBar
@@ -231,6 +236,7 @@
       {/each}
     </ul>
     <p class="idle">{t('combat.idle')}</p>
+    {#if cloned}<p class="clone-note" data-clone-split>{t('combat.cloneSplit')}</p>{/if}
 
     {#if zones.length > 0}
       <h2>{t('combat.zones')}</h2>
@@ -263,7 +269,7 @@
   {/if}
 
   <h2>{t('combat.log')}</h2>
-  <CombatLog entries={game.combatLog} fighting={fight !== null} />
+  <CombatLog entries={game.combatLog} fighting={fight !== null} clone={fight?.clone === true} />
 </SimplePage>
 
 <style>

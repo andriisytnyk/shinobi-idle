@@ -82,7 +82,7 @@ interface ActionKind {
   start?(state, slot, id, content, rules): void;
   stop?(state, slot, id, content, rules, reason): void;
   flow?(id, content): { makes: string[]; uses: string[]; speed: string } | null;   // що дія робить і що витрачає: для зв'язку слотів клона
-  fullSpeed?: boolean;                                                            // дія не сповільнюється часткою слота (бій)
+  fullSpeed?: boolean;                                                            // дія не сповільнюється часткою слота (бій); охоронець (`guardKind`) переносить прапорець і для видів пакетів, і для обгорнутих (`wrapRule`)
 }
 ```
 

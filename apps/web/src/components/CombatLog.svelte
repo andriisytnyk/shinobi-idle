@@ -9,9 +9,11 @@
     entries: readonly LogEntry[];
     /** A fight is running, so an empty log means the page was opened mid-fight. */
     fighting?: boolean;
+    /** The fight is a clone's: the lines name the clone, not the player. */
+    clone?: boolean;
   }
 
-  let { entries, fighting = false }: Props = $props();
+  let { entries, fighting = false, clone = false }: Props = $props();
 
   /** The newest line is shown last; the list keeps itself scrolled to it. */
   let box: HTMLElement | undefined = $state();
@@ -38,14 +40,28 @@
           <EntityLink kind="enemy" id={event.enemy} />
         {:else if event.side === 'enemy'}
           <EntityLink kind="enemy" id={event.enemy} />
-          <span>{t(event.act === 'hit' ? 'log.enemyHit' : 'log.enemyMiss')}</span>
+          <span
+            >{t(
+              event.act === 'hit'
+                ? clone
+                  ? 'log.enemyHitClone'
+                  : 'log.enemyHit'
+                : 'log.enemyMiss',
+            )}</span
+          >
           {#if event.act === 'hit'}<span class="dmg"
               >{t('log.damage', { n: formatInt(event.dmg) })}</span
             >{/if}
         {:else if event.tech}
           <span
             >{t(
-              event.act === 'cast' ? 'log.cast' : event.act === 'hit' ? 'log.hit' : 'log.miss',
+              event.act === 'cast'
+                ? clone
+                  ? 'log.cloneCast'
+                  : 'log.cast'
+                : event.act === 'hit'
+                  ? 'log.hit'
+                  : 'log.miss',
             )}</span
           >
           <EntityLink kind="technique" id={event.tech} />

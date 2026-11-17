@@ -331,7 +331,7 @@ describe('what a clone may do', () => {
     for (const m of content.missions) {
       if (m.stages.some((s) => s.t === 'combat') || m.rank === 'OP') continue;
       const result = start(state, 1, 'mission', m.id);
-      if (!result.ok) expect(result.reason).not.toBe('error.cloneNoFight');
+      if (!result.ok) expect(result.reason).not.toBe('error.fightBusy');
     }
     expect(start(state, 1, 'mission', 'core:v_clones')).toEqual({ ok: true });
   });
