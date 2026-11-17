@@ -84,7 +84,7 @@
       {#if player}{t('fight.you')}{:else if f.entry}<EntityLink
           kind="enemy"
           id={f.entry}
-        />{#if f.of > 1}{' '}<span class="nth">#{f.nth}</span>{/if}{/if}
+        />{#if f.of > 1}&#32;<span class="nth">#{f.nth}</span>{/if}{/if}
     </h3>
     {#if !f.alive}<span class="down-tag">{t('fight.down')}</span>{/if}
   </header>
@@ -194,9 +194,9 @@
         <span class="dodge"
           >{t(
             player ? 'fight.out.foeDodged' : 'fight.out.youDodged',
-          )}{#if f.last.avoidedBy}{' '}{#if hasKey(dodgeKey(f.last.avoidedBy))}({t(
+          )}{#if f.last.avoidedBy}&#32;{#if hasKey(dodgeKey(f.last.avoidedBy))}({t(
                 dodgeKey(f.last.avoidedBy),
-              )}){:else}({t('fight.out.thanks')}{' '}<EntityLink
+              )}){:else}({t('fight.out.thanks')}&#32;<EntityLink
                 kind="technique"
                 id={f.last.avoidedBy}
               />){/if}{/if}</span
