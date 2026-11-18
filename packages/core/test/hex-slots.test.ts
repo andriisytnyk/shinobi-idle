@@ -157,11 +157,8 @@ describe('performers on the map', () => {
       id: AUTOSURVEY_ID,
     });
     expect(dispatch(state, auto(0), content)).toEqual({ ok: true });
-    // The same action in a second slot is refused, as every other action is.
-    expect(dispatch(state, auto(1), content)).toMatchObject({
-      ok: false,
-      reason: 'error.sameActionElsewhere',
-    });
+    // The same action runs in a second performer too: it plans from its own position.
+    expect(dispatch(state, auto(1), content)).toEqual({ ok: true });
     // The clone surveys by hand the hex the character would take next: that is another action, and
     // the plan of the character then skips the hex the clone is surveying.
     const target = autoPlan(state, content, 0)?.subject.address ?? '';
@@ -226,6 +223,8 @@ describe('performers on the map', () => {
       expect(state.world.location).toBe(HOME);
       expect(dispatch(state, { type: 'action.stop', slot: 1 }, content)).toEqual({ ok: true });
       expect(state.world.figures?.[1]).toBeUndefined();
+      // What the clone learned tires the mind; a rested one makes the next clone.
+      state.fatigue = 0;
       // A clone that surveys and a character that walks: the survey keeps its position.
       const auto: Command = {
         type: 'action.start',
@@ -248,9 +247,12 @@ describe('performers on the map', () => {
       advance(state, 2 * MIN, content);
       expect(state.world.figures?.[1]).toBeDefined();
       state.world.figures = { 1: FAR };
-      // A stop by hand is not a dispel, but the clone is gone all the same.
+      // A stop by hand lets the clone stand; stopping the standing clone dispels it, and it is gone from the map.
+      expect(dispatch(state, { type: 'action.stop', slot: 1 }, content)).toEqual({ ok: true });
+      expect(state.slots[1]?.action?.kind).toBe('stand');
       expect(dispatch(state, { type: 'action.stop', slot: 1 }, content)).toEqual({ ok: true });
       expect(state.world.figures).toBeUndefined();
+      state.fatigue = 0;
       dispatch(state, walkTo(1, 'core:rysovi_polia'), content);
       expect(state.world.figures?.[1]).toBe(HOME);
       // A new action given to a running clone keeps it where it stands.

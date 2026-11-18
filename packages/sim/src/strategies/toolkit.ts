@@ -1,11 +1,14 @@
 import type { Cell, ContentDb, Enemy, Boss, Zone } from '@shinobi/content';
 import {
+  bingoLevel,
   buyPrice,
   cellInfo,
   cellLevel,
   cloneSlots,
+  STAND_KIND,
   counterValue,
   defeatsKey,
+  dispatch,
   entryOf,
   evalReq,
   examFor,
@@ -35,6 +38,7 @@ import {
   skillLevel,
   skillUnlockStatus,
   slotCount,
+  studyCost,
   targetOf,
   villageBuildings,
   zoneBlocked,
@@ -46,6 +50,7 @@ import {
   type Command,
   type Req,
   type ReqResult,
+  type GameState,
 } from '@shinobi/core';
 import type { BotContext } from '../bot.ts';
 import { combatSkills, KIND_CRAFT, KIND_FIGHT, KIND_GATHER, styleSkills } from '../constants.ts';
@@ -59,6 +64,10 @@ export const TUNING = {
   safeWinRate: 0.9,
   /** Estimated win rate a fight the story asks for needs before the bot walks into it. */
   storyWinRate: 0.5,
+  /** Estimated win rate (with the entry studied) from which the first fight with an unknown one is worth a look. */
+  scoutWinRate: 0.3,
+  /** Estimated chance (the product over its stages) from which the story player walks into an operation. */
+  opWinRate: 0.25,
   estimateRuns: 12,
   estimateSeed: 7,
   /** A zone, boss or operation the bot lost in is left alone this long. */
@@ -96,6 +105,8 @@ export interface Memory {
   /** The commands of the last decision that the game refused, counted by reason (filled by the runner's observer). */
   board: { at: number; fingerprint: string; entries: BoardEntry[] } | null;
   lastNow: number;
+  /** The enemies and bosses the story is about to fight: the Intel goes to their Bingo entries. */
+  studyTargets: Set<string>;
 }
 
 export function createMemory(): Memory {
@@ -108,6 +119,7 @@ export function createMemory(): Memory {
     wantBuilding: null,
     board: null,
     lastNow: 0,
+    studyTargets: new Set(),
   };
 }
 
@@ -179,13 +191,35 @@ function fingerprint(tk: Toolkit): string {
 }
 
 /** The estimated win rate against one enemy or boss, from the engine's own fight loop; cached until the character changes. */
-export function winRate(tk: Toolkit, entry: Enemy | Boss): number {
+export function winRate(tk: Toolkit, entry: Enemy | Boss, studied = false): number {
   const { state, content, rules } = tk.ctx;
-  const key = `${entry.id}|${fingerprint(tk)}`;
+  const key = `${entry.id}|${studied ? 'studied|' : ''}${bingoLevel(state, entry.id, content)}|${fingerprint(tk)}`;
   let rate = tk.mem.estimates.get(key);
   if (rate === undefined) {
+    // What the player would fight with: the loadout, the pouch and the supplies as the fight's preparation leaves them.
+    const ready = structuredClone(state) as GameState;
+    // A studied entry: what the Bingo book shows once the fight that teaches the mechanic is behind and the Intel is spent.
+    if (studied) {
+      const b = ready.bingo[entry.id];
+      ready.bingo[entry.id] = {
+        seen: 1,
+        wins: 0,
+        losses: 0,
+        timeouts: 0,
+        bounty: 0,
+        ...b,
+        bought: 3,
+      };
+    }
+    const tk2: Toolkit = { ...tk, ctx: { ...tk.ctx, state: ready } };
+    for (const c of [
+      { type: 'loadout.prepare', encounter: entry.id } as Command,
+      ...prepareFight(tk2, entry.id),
+    ]) {
+      dispatch(ready, c, content, rules);
+    }
     rate = runFights(
-      fightSnapshot(state, entry.id, content, rules),
+      fightSnapshot(ready, entry.id, content, rules),
       encounterOf(state, entry, content),
       TUNING.estimateRuns,
       TUNING.estimateSeed,
@@ -194,6 +228,24 @@ export function winRate(tk: Toolkit, entry: Enemy | Boss): number {
     ).winRate;
     if (tk.mem.estimates.size > 4000) tk.mem.estimates.clear();
     tk.mem.estimates.set(key, rate);
+  }
+  return rate;
+}
+
+/**
+ * The estimated chance to clear a whole operation in one run: the stages are fought back to back with a
+ * little rest between them, so it is taken as the product of the chances of its fights. `studied` assumes
+ * every fight is known to the last level.
+ */
+export function operationRate(tk: Toolkit, opId: string, studied = false): number {
+  const { content } = tk.ctx;
+  const op = content.operations.find((o) => o.id === opId);
+  if (!op) return 0;
+  let rate = 1;
+  for (const stage of op.stages) {
+    if (stage.t !== 'fight') continue;
+    const entry = entryOf(content, stage.enemy);
+    if (entry) rate *= winRate(tk, entry, studied);
   }
   return rate;
 }
@@ -474,7 +526,9 @@ export function trainSkill(tk: Toolkit, skill: string): Plan {
   const def = content.skills.find((s) => s.id === skill);
   if (!def) return null;
   if (def.group === 'combat') {
-    return tk.fightsToTrain ? fightBest(tk) : null;
+    // A fight trains it fastest; without one (a peaceful player, or nothing safe to fight) the bodily drills do.
+    const fight = tk.fightsToTrain ? fightBest(tk) : null;
+    if (fight) return fight;
   }
   if (def.activity === 'course' && Object.keys(state.course).length === 0) {
     const free = content.obstacles.find((o) => o.slot === content.balance.K.athletics.freeSlot);
@@ -534,6 +588,20 @@ export function trainLowestOf(tk: Toolkit, skills: readonly string[]): Plan {
 /** Trains the lowest skill of all that can be trained. */
 export function trainAny(tk: Toolkit): Plan {
   return trainLowestOf(tk, trainableSkills(tk));
+}
+
+/**
+ * What a player does when a fight the story asks for is too hard: it trains what makes it stronger (the
+ * style skills and the combat ones), the lowest of them first, not every skill in turn. With nothing of that
+ * to train it trains whatever is lowest.
+ */
+export function trainForFight(tk: Toolkit): Plan {
+  const { content } = tk.ctx;
+  const fighting = trainableSkills(tk).filter((s) => {
+    const def = content.skills.find((d) => d.id === s);
+    return def !== undefined && (def.group === 'combat' || def.activity === 'tech');
+  });
+  return trainLowestOf(tk, fighting) ?? trainAny(tk);
 }
 
 // ------------------------------------------------------------ missions
@@ -619,8 +687,13 @@ function fightFor(tk: Toolkit, enemy: string): Plan {
     tk.mem.blocked = `zone ${zone.id}: requirement`;
     return null;
   }
+  tk.mem.studyTargets.add(enemy);
   const rate = winRate(tk, entry);
-  const strong = !banned(tk, zone.id) && !wounded(tk) && (rate >= TUNING.storyWinRate || maxed(tk));
+  // The first fight with an entry teaches its mechanic: go and look when a character who knew it would win.
+  const scouting =
+    bingoLevel(state, enemy, content) < 2 && winRate(tk, entry, true) >= TUNING.scoutWinRate;
+  const strong =
+    !banned(tk, zone.id) && !wounded(tk) && (rate >= TUNING.storyWinRate || scouting || maxed(tk));
   if (strong) return fightPlan(tk, zone);
   tk.mem.blocked = `fight ${enemy}: win rate ${rate.toFixed(2)}`;
   return trainAny(tk);
@@ -641,10 +714,16 @@ function operationPlan(tk: Toolkit, opId: string): Plan {
   const hardest = op.stages
     .flatMap((s) => (s.t === 'fight' ? [entryOf(content, s.enemy)] : []))
     .flatMap((e) => (e ? [e] : []));
-  const worst = Math.min(1, ...hardest.map((e) => winRate(tk, e)));
+  for (const e of hardest) tk.mem.studyTargets.add(e.id);
+  // The stages are fought back to back, so the chance is that of the whole run, not of the weakest stage.
+  const rate = operationRate(tk, opId);
+  // A stage whose entry is still unknown teaches its mechanic with the first fight: go and look when a studied character would win.
+  const scouting =
+    hardest.some((e) => bingoLevel(state, e.id, content) < 2) &&
+    operationRate(tk, opId, true) >= TUNING.scoutWinRate;
   // A character with every skill at the cap has nothing left to train: it goes in and takes what comes.
-  if (worst < 0.3) {
-    tk.mem.blocked = `operation ${opId}: weakest stage win rate ${worst.toFixed(2)}${maxed(tk) ? ' with every skill at the cap' : ''}`;
+  if (rate < TUNING.opWinRate && !scouting) {
+    tk.mem.blocked = `operation ${opId}: win rate of a run ${rate.toFixed(2)}${maxed(tk) ? ' with every skill at the cap' : ''}`;
     if (!maxed(tk)) return trainAny(tk);
   }
   return [
@@ -786,7 +865,11 @@ export function objectivePlan(
   const { state, content } = tk.ctx;
   if (objective.t === 'req') {
     const result = evalReq(state, objective.req as Req, content);
-    for (const leaf of unmetLeaves(result)) {
+    // Renown is earned by missions, which train skills as fast as practice does: it is worked on first, not last.
+    const leaves = unmetLeaves(result).sort(
+      (a, b) => Number(b.req.t === 'currency') - Number(a.req.t === 'currency'),
+    );
+    for (const leaf of leaves) {
       const plan = leafPlan(tk, leaf, depth);
       if (plan !== null) return plan;
     }
@@ -875,6 +958,18 @@ export function storyPlan(tk: Toolkit): Plan {
 
 // ------------------------------------------------------------ housekeeping
 
+/** What the open quest steps still ask to be paid in the currency of `role`. */
+function openPayment(tk: Toolkit, role: string): number {
+  const { state, content } = tk.ctx;
+  let owed = 0;
+  for (const quest of content.quests) {
+    const progress = state.quests[quest.id];
+    const step = progress && !progress.done ? quest.steps[progress.step] : undefined;
+    if (step?.objective.t === 'pay' && step.objective.role === role) owed += step.objective.n;
+  }
+  return owed;
+}
+
 /** Everything a player does between actions: nature, exam, scrolls, payments, shopping, building. Always on. */
 export function housekeeping(tk: Toolkit): Command[] {
   const { state, content, rules } = tk.ctx;
@@ -933,6 +1028,20 @@ export function housekeeping(tk: Toolkit): Command[] {
       if (currency && (state.currencies[currency] ?? 0) >= step.objective.n) {
         out.push({ type: 'quest.pay', quest: quest.id });
       }
+    }
+  }
+
+  // Intel buys the Bingo levels of the entries the story is about to fight (the level between is earned by a fight).
+  const intelId = content.currencies.find((c) => c.role === 'study')?.id;
+  if (intelId) {
+    let intel = state.currencies[intelId] ?? 0;
+    const owed = openPayment(tk, 'study');
+    for (const id of tk.mem.studyTargets) {
+      const level = bingoLevel(state, id, content);
+      if (level === 1 || level >= 3 || level === 0) continue;
+      if (intel - studyCost(content) < owed) break;
+      out.push({ type: 'bingo.study', enemy: id });
+      intel -= studyCost(content);
     }
   }
 
@@ -1001,6 +1110,10 @@ export function clonePlan(tk: Toolkit, mainSkill: string | null): Command[] {
   if (slotCount(state, content) < 2 || cloneSlots(state, content).length === 0) return [];
   const slot = 1;
   const current = state.slots[slot]?.action ?? null;
+  // A clone is a burst: one that has nothing left to do is dispelled (its knowledge goes to the character),
+  // and a tired mind makes none.
+  if (current?.kind === STAND_KIND) return [{ type: 'clone.dispel', slot }];
+  if (!state.clones[slot] && state.fatigue > 0) return [];
   const main = state.slots[0]?.action ?? null;
   const skills = trainableSkills(tk)
     .filter((s) => s !== mainSkill)

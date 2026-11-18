@@ -29,7 +29,7 @@
   let { compact = false, performers }: Props = $props();
 
   const content = game.content;
-  const own = $derived(game.read((gs) => performersOf(gs, content)));
+  const own = $derived(game.read((gs) => performersOf(gs, content, game.rules)));
   const list = $derived(performers ?? own);
   const counts = $derived(game.read((gs) => squadCounts(list, gs, content)));
   const timings = $derived(
@@ -61,7 +61,7 @@
   }
 
   function create(): void {
-    toasts.push({ key: 'squad.createHint', params: {} });
+    squadUi.askClone();
   }
 
   function onKeydown(event: KeyboardEvent): void {
@@ -75,7 +75,7 @@
 {#snippet row(p: Performer)}
   <li
     class="row"
-    class:picked={squadUi.picked === p.id}
+    class:picked={squadUi.picked === p.n}
     class:idle={p.clone && p.state === 'idle'}
     data-ui="squad-row"
     data-performer={p.n}
@@ -85,9 +85,9 @@
     <button
       type="button"
       class="who"
-      aria-pressed={squadUi.picked === p.id}
+      aria-pressed={squadUi.picked === p.n}
       aria-label={t('squad.pick', { who: summary(p) })}
-      onclick={() => squadUi.pick(squadUi.picked === p.id ? null : p.id)}
+      onclick={() => squadUi.pick(squadUi.picked === p.n ? null : p.id)}
     >
       <span class="dot" aria-hidden="true"></span>
       <span class="name">{nameOf(p)}</span>
@@ -113,12 +113,8 @@
           <dt>{t('squad.life')}</dt>
           <dd>{t('squad.lifeValue', { time: formatDuration(p.lifeMs) })}</dd>
         </div>
-        {#if p.lifeMaxMs}
-          <progress
-            class="life"
-            max={p.lifeMaxMs}
-            value={Math.max(0, Math.min(p.lifeMaxMs, p.lifeMs))}
-            aria-label={t('squad.life')}
+        {#if p.lifeFraction !== undefined}
+          <progress class="life" max="1" value={p.lifeFraction} aria-label={t('squad.life')}
           ></progress>
         {/if}
       {/if}
@@ -195,7 +191,7 @@
             type="button"
             class="chip"
             class:idle={p.clone && p.state === 'idle'}
-            class:picked={squadUi.picked === p.id}
+            class:picked={squadUi.picked === p.n}
             data-ui="squad-chip"
             data-performer={p.n}
             data-state={p.state}

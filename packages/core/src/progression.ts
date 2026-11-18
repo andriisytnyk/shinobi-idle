@@ -3,6 +3,7 @@ import { emit } from './events.ts';
 import { masteryLevel, poolCapacity, poolGain } from './formulas.ts';
 import { indexOf } from './lookup.ts';
 import { NO_MOD_RULES, totalsOf } from './modifiers.ts';
+import { actingBody } from './performer.ts';
 import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 import { refreshUnlocks } from './unlocks.ts';
@@ -37,8 +38,13 @@ export function xpGain(
   return Math.max(0, Math.min(entry.xp + gained, xpAt(K.cap)) - entry.xp);
 }
 
+/** The most XP or Mastery a clone can hold: a doctored number cannot grow without bound. */
+const HELD_MAX = 1e15;
+
 /**
  * Adds skill XP (see `xpGain`). XP stops at the level cap. Emits `levelUp` and refreshes unlocks.
+ * A clone's action earns the XP into the clone (modifiers applied, the place of power it stands on
+ * included): the character gets it when the clone is dispelled (`takeXp`).
  */
 export function gainXp(
   state: GameState,
@@ -48,11 +54,34 @@ export function gainXp(
   rules: Rules,
 ): void {
   if (!(amount > 0)) return;
+  const body = actingBody(state);
+  if (body) {
+    const gained = xpGain(state, skill, amount, content, rules);
+    // What the level cap would throw away is not held: no fatigue is charged for it.
+    if (gained > 0)
+      body.xp[skill] = Math.min(
+        HELD_MAX,
+        xpRoom(state, skill, content),
+        (body.xp[skill] ?? 0) + gained,
+      );
+    return;
+  }
+  takeXp(state, skill, xpGain(state, skill, amount, content, rules), content);
+}
+
+/** The XP `skill` can still take before the level cap. */
+export function xpRoom(state: GameState, skill: string, content: ContentDb): number {
+  return Math.max(0, xpAt(content.balance.K.cap) - (state.skills[skill]?.xp ?? 0));
+}
+
+/** Adds `gained` XP (already modified) to `skill`, to the level cap; emits `levelUp` and refreshes unlocks. */
+export function takeXp(state: GameState, skill: string, gained: number, content: ContentDb): void {
+  if (!(gained > 0)) return;
   const cap = content.balance.K.cap;
   const entry = skillEntry(state, skill);
   if (!entry) return;
   const before = levelAt(entry.xp, cap);
-  entry.xp = Math.min(entry.xp + xpGain(state, skill, amount, content, rules), xpAt(cap));
+  entry.xp = Math.min(entry.xp + gained, xpAt(cap));
   const after = levelAt(entry.xp, cap);
   if (after === before) return;
   for (let level = before + 1; level <= after; level++) {
@@ -120,6 +149,28 @@ export function grantMastery(
     content,
   );
   const earned = amount * all * own;
+  const body = actingBody(state);
+  if (body) {
+    // A clone keeps what it earns until it is dispelled (`takeMastery`).
+    if (!(amount > 0)) return;
+    const held = (body.mastery[key] ??= { skill, amount: 0, pool: 0 });
+    held.amount = Math.min(HELD_MAX, held.amount + Math.max(0, earned));
+    held.pool = Math.min(HELD_MAX, held.pool + Math.max(0, poolGain(amount, content)));
+    return;
+  }
   gainMasteryXp(state, key, earned, content);
   gainPoolXp(state, skill, poolGain(amount, content), content);
+}
+
+/** Hands the character the Mastery a clone kept (see `grantMastery`). */
+export function takeMastery(
+  state: GameState,
+  key: string,
+  skill: string,
+  amount: number,
+  pool: number,
+  content: ContentDb,
+): void {
+  gainMasteryXp(state, key, amount, content);
+  gainPoolXp(state, skill, pool, content);
 }

@@ -30,7 +30,6 @@ import {
   type MissionDoneEvent,
   type Rules,
 } from '../src/index.ts';
-import { openWorld } from './helpers.ts';
 import { ableFor, player } from './missions-helpers.ts';
 import { BOARD, STATES, STATUS_STATES } from './missions-states.ts';
 
@@ -381,7 +380,6 @@ describe('missionStatus', () => {
     for (const reason of [
       'ok',
       'error.missionRunning',
-      'error.fightBusy',
       'error.missionNeedsTeam',
       'error.missingIngredient',
       'error.requirementsNotMet',
@@ -390,32 +388,12 @@ describe('missionStatus', () => {
     }
   });
 
-  it('names a zone fight and an operation as the holder of the fight', () => {
+  it('does not refuse a mission with a combat stage for a fight in another slot: every performer has its own', () => {
     const combat = BOARD.find((m) => m.stages.some((st) => st.t === 'combat')) as Mission;
     const zone = STATUS_STATES.zoneFightRuns?.(combat) as { state: GameState; slot: number };
     expect(zone.state.slots[0]?.action?.kind).toBe('fight');
-    const byFight = missionStatus(zone.state, combat.id, 1, content, defaultRules).refusal;
-    expect(byFight?.reason).toBe('error.fightBusy');
-    expect(byFight?.by).toEqual({ slot: 0, kind: 'fight', id: zone.state.slots[0]?.action?.id });
-    // An operation holds the fight too; it is set in the slot directly so the test is about the holder, not the operation's requirements.
-    const op = content.operations[0];
-    expect(op).toBeDefined();
-    const state = ableFor(combat);
-    openWorld(state);
-    state.slots.push({ action: null, progress: 0, share: 0, data: null });
-    // A slot of the player's own: a clone's slot does not take fights.
-    delete state.known['core:shadow_clone'];
-    dispatch(state, { type: 'loadout.auto', on: true }, content);
-    const slot = state.slots[0];
-    if (slot) slot.action = { kind: 'operation', id: op?.id ?? '' };
-    const byOp = missionStatus(state, combat.id, 1, content, defaultRules).refusal;
-    expect(byOp?.reason).toBe('error.fightBusy');
-    expect(byOp?.by).toEqual({ slot: 0, kind: 'operation', id: op?.id });
-    // A mission with no fight in it is not refused by either.
-    const quiet = BOARD.find(
-      (m) => !m.team && m.stages.every((st) => st.t !== 'combat'),
-    ) as Mission;
-    expect(missionStatus(state, quiet.id, 1, content, defaultRules).refusal?.by ?? null).toBeNull();
+    const status = missionStatus(zone.state, combat.id, 1, content, defaultRules);
+    expect(status.refusal?.reason).not.toBe('error.fightBusy');
   });
 
   it('names the action that holds the fight or runs the mission, and the missing items', () => {
@@ -424,10 +402,8 @@ describe('missionStatus', () => {
       (m) => m.id !== thief.id && m.stages.some((s) => s.t === 'combat'),
     ) as Mission;
     const state = STATUS_STATES.combatMissionRuns?.(thief) as { state: GameState; slot: number };
-    const busy = missionStatus(state.state, thief.id, 1, content, defaultRules).refusal;
-    expect(busy?.reason).toBe('error.fightBusy');
-    expect(busy?.by).toMatchObject({ slot: 0, kind: 'mission' });
-    expect(busy?.by?.id).not.toBe(thief.id);
+    const beside = missionStatus(state.state, thief.id, 1, content, defaultRules).refusal;
+    expect(beside?.reason).not.toBe('error.fightBusy');
     void other;
 
     const again = STATUS_STATES.runsInOtherSlot?.(thief) as { state: GameState; slot: number };

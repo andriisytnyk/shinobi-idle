@@ -330,7 +330,7 @@
     [0, -12],
     [0, 12],
   ];
-  const figures = $derived(game.read((gs) => squadFigures(gs, game.content)));
+  const figures = $derived(game.read((gs) => squadFigures(gs, game.content, game.rules)));
   const others = $derived.by(() => {
     const seen: Record<string, number> = {};
     return figures.flatMap((f) => {
@@ -483,7 +483,7 @@
       {#each others as f (f.id)}
         <g
           class="figure"
-          class:picked={squadUi.picked === f.id}
+          class:picked={squadUi.picked === f.n}
           class:idle={f.state === 'idle'}
           transform="translate({f.x} {f.y})"
           data-ui="map-token"
@@ -493,7 +493,7 @@
           role="button"
           tabindex="0"
           aria-label={figureLabel(f)}
-          aria-pressed={squadUi.picked === f.id}
+          aria-pressed={squadUi.picked === f.n}
           onclick={(e) => {
             e.stopPropagation();
             pickFigure(f.id);

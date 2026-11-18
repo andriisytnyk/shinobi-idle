@@ -1,6 +1,8 @@
 import type { ContentDb } from '@shinobi/content';
 import { actionKindOf, rebalanceShares, stopSlot } from './actions.ts';
-import { cloneSlots, growSlots } from './clone.ts';
+import { growSlots } from './clone.ts';
+import { createClone, dispelClone } from './clone-life.ts';
+import { STAND_KIND, asPerformer } from './performer.ts';
 import { startRefusal } from './start-check.ts';
 import {
   deleteSavedLoadout,
@@ -50,7 +52,13 @@ import { claimPoi, WALK_KIND } from './world.ts';
 export type Command =
   | { type: 'action.start'; slot: number; kind: string; id: string }
   | { type: 'action.stop'; slot: number }
-  /** Dispels the clone: what it does stops and all the speed goes back to the player's action. Without `slot`, every clone slot is dispelled. */
+  /**
+   * Makes a shadow clone (the technique must be known, the mind not tired): it takes its share of the chakra pool and
+   * `items` from the Bank (item id to count; a default pouch when omitted), appears where the character stands and
+   * stands there until given an action. `slot` defaults to the first free clone slot.
+   */
+  | { type: 'clone.create'; slot?: number; items?: Record<string, number> }
+  /** Dispels the clone: its action stops, what it knows and carries goes to the character, who is left tired. Without `slot`, every clone is dispelled. */
   | { type: 'clone.dispel'; slot?: number }
   /** Starts the sensei test of the exam that grants `rank`; the checklist must be met. `slot` defaults to 0. */
   | { type: 'exam.start'; rank: string; slot?: number }
@@ -251,6 +259,17 @@ function startAction(
   const slot = state.slots[slotIndex];
   const kind = actionKindOf(rules, kindName);
   if (!slot || !kind) return { ok: false, reason: 'error.invalidSlot' };
+  // A clone slot with no clone: one is made first (with the default pouch), and the action has to pass
+  // its checks with what that clone carries, not with what the Bank holds.
+  if (slotIndex > 0 && !state.clones[slotIndex]) {
+    const made = createClone(state, slotIndex, undefined, content, rules);
+    if (!made.ok) return made;
+    const again = startRefusal(state, slotIndex, kindName, id, content, rules);
+    if (again) {
+      dispelClone(state, slotIndex, 'manual', content, rules, true);
+      return { ok: false, reason: again.reason };
+    }
+  }
   const replaced = slot.action !== null;
   stopSlot(state, slotIndex, 'replaced', content, rules);
   // A clone appears where the character stands, then goes on by itself; one given a new action stays.
@@ -259,8 +278,7 @@ function startAction(
   slot.progress = 0;
   slot.data = null;
   rebalanceShares(state, content);
-  kind.start?.(state, slotIndex, id, content, rules);
-  // A clone that starts (or the end of one) changes the chakra pool of the fight under way.
+  asPerformer(state, slotIndex, () => kind.start?.(state, slotIndex, id, content, rules));
   followChakraPool(state, content);
   return { ok: true };
 }
@@ -337,21 +355,26 @@ function apply(
       const slot = state.slots[command.slot];
       if (!slot) return { ok: false, reason: 'error.invalidSlot' };
       if (!slot.action) return { ok: false, reason: 'error.noAction' };
-      stopSlot(state, command.slot, 'manual', content, rules);
+      // A clone that is told to stop what it does stands; told again, while it stands, it is dispelled.
+      if (command.slot > 0 && state.clones[command.slot] && slot.action.kind === STAND_KIND)
+        dispelClone(state, command.slot, 'manual', content, rules);
+      else stopSlot(state, command.slot, 'manual', content, rules);
       followChakraPool(state, content);
       return { ok: true };
     }
     case 'quest.pay':
       return payStep(state, command.quest, content);
+    case 'clone.create':
+      return createClone(state, command.slot, command.items, content, rules);
     case 'clone.dispel': {
-      const slots = cloneSlots(state, content)
-        .map((c) => c.slot)
-        .filter((at) => command.slot === undefined || command.slot === at);
-      if (slots.length === 0) return { ok: false, reason: 'error.invalidSlot' };
-      const running = slots.filter((at) => state.slots[at]?.action);
-      if (running.length === 0) return { ok: false, reason: 'error.noAction' };
-      for (const at of running) stopSlot(state, at, 'dispelled', content, rules);
-      followChakraPool(state, content);
+      if (command.slot !== undefined && !state.slots[command.slot])
+        return { ok: false, reason: 'error.invalidSlot' };
+      const living = Object.keys(state.clones)
+        .map(Number)
+        .filter((at) => command.slot === undefined || command.slot === at)
+        .sort((a, b) => a - b);
+      if (living.length === 0) return { ok: false, reason: 'error.noClone' };
+      for (const at of living) dispelClone(state, at, 'manual', content, rules);
       return { ok: true };
     }
     case 'exam.start':

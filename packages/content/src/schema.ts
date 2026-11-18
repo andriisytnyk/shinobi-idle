@@ -1550,7 +1550,28 @@ export const balanceParamsSchema = z.object({
   towerStageMax: pair,
   cellExplores: z.array(z.number()),
   cellLevelStep: z.number(),
-  clone: z.object({ pool: z.number(), link: z.number() }),
+  /**
+   * Shadow clones. `life`: seconds a clone lives on its chakra by the kind of action it does (`default` for a kind
+   * that is not named: standing, physical work, techniques and fights each cost their own). `lifeSkill`: the skill
+   * (Meditation) whose level lengthens the life by `lifeSkillLevel` a level, as does the Mastery of the clone
+   * technique by `lifeMastery` a level. `fatigue`: the mind fatigue the knowledge a clone passes on leaves: `share`
+   * of the hours of work it stands for, `slow` the share the character's speed drops while it lasts, `maxMs` the
+   * longest it can grow, `decayPerLevel` how much faster it clears per level of `lifeSkill`, `meditating` the extra
+   * rate while the character meditates.
+   */
+  clone: z.object({
+    life: z.record(z.string(), z.number().positive()).refine((l) => 'default' in l),
+    lifeSkill: z.string().min(1),
+    lifeMastery: z.number().min(0),
+    lifeSkillLevel: z.number().min(0),
+    fatigue: z.object({
+      share: z.number().min(0),
+      slow: z.number().min(0).max(0.9),
+      maxMs: z.number().int().positive(),
+      decayPerLevel: z.number().min(0),
+      meditating: z.number().min(0),
+    }),
+  }),
   academyCap: z.number().int(),
   academySlow: z.number(),
   /** Herb bushes: stock is `stockBase` plus the herb's mastery level; an empty bush regrows for `regrowMs`. */

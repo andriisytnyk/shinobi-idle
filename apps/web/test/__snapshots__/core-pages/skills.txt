@@ -299,24 +299,16 @@
                   <path d="#14-mnqmls" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
               Бойові
             <ul>
-              <li class="skill locked" data-entity="skill:vit" data-skill="vit" data-ui="skill-row" style="--skill-color: var(--steel);">
+              <li class="skill" data-entity="skill:vit" data-skill="vit" data-ui="skill-row" style="--skill-color: var(--steel);">
                 <span class="skill-icon">
                   <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
                     <path d="#605-ucepax" fill="currentColor">
                 <span class="skill-name">
                   <a class="entity-link" href="#/skill/vit">
                     Живучість
-                <span aria-label="Навичка закрита" class="skill-level" role="img">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
-                      <path d="#24-1tb3nx8">
-                <span class="condition" data-lock="">
-                  <div class="row" data-met="false" data-ui="req-row">
-                    <span class="mark">
-                      <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                        <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <span class="label">
-                      Перший бій
+                <span class="skill-level">
+                  Рів. 1
+                <span aria-hidden="true" class="xp-bar">
+                  <span class="xp-fill" style="width: 0%;">
       <p class="hint desktop-only">
         Відкрий розділ «Навички» й обери, що тренувати.

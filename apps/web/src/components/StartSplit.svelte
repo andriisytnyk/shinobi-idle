@@ -5,7 +5,7 @@
   import {
     defaultPerformer,
     hasSquad,
-    newCloneCommand,
+    newCloneSlot,
     noteFor,
     performersOf,
     runningBy,
@@ -54,10 +54,10 @@
   }: Props = $props();
 
   const content = game.content;
-  const list = $derived(game.read((gs) => performersOf(gs, content)));
+  const list = $derived(game.read((gs) => performersOf(gs, content, game.rules)));
   const squad = $derived(game.read((gs) => hasSquad(gs, content)));
   /** Whether a new clone could take this action now. */
-  const canClone = $derived(game.read((gs) => newCloneCommand(gs, content, kind, id) !== null));
+  const canClone = $derived(game.read((gs) => newCloneSlot(gs, content) !== null));
 
   /** The runners come first, so that the button can stop what runs; else the first idle clone, else the character. */
   const performer = $derived.by(() => {
@@ -95,10 +95,10 @@
     if (refuse(result)) squadUi.pick(null);
   }
 
+  /** A new clone is made through the pouch picker, then does this action. */
   function startNewClone(): void {
     open = false;
-    const command = game.read((gs) => newCloneCommand(gs, content, kind, id));
-    if (command) refuse(game.dispatch(command));
+    squadUi.askClone({ kind, id });
   }
 
   function press(): void {

@@ -67,7 +67,9 @@ describe('formulas', () => {
     expect(poolGain(100, content)).toBe(100 * K.poolShare);
     const tech = content.techniques.filter((t) => t.skill === 'katon').length;
     expect(poolCapacity('katon', content)).toBe(K.poolCapPerItem * tech);
-    expect(poolCapacity('cc', content)).toBe(K.poolCapPerItem * content.exercises.length);
+    expect(poolCapacity('cc', content)).toBe(
+      K.poolCapPerItem * content.exercises.filter((e) => (e.skill ?? 'cc') === 'cc').length,
+    );
   });
 });
 
@@ -284,8 +286,8 @@ describe('mastery and pool events', () => {
 
   it('ignores skills without masteries and non-positive gains', () => {
     const state = genin();
-    gainPoolXp(state, 'vit', 100, content);
-    expect(state.pools.vit!.xp).toBe(0);
+    gainPoolXp(state, 'scout', 100, content);
+    expect(state.pools.scout?.xp ?? 0).toBe(0);
     gainXp(state, 'tai', -5, content, defaultRules);
     gainXp(state, 'tai', 0, content, defaultRules);
     gainMasteryXp(state, 'core:clone', 0, content);

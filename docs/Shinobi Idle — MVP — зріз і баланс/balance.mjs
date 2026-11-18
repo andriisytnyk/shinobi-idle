@@ -37,7 +37,7 @@ export const K = {
   levelScale: 0.035,                         // шкода техніки × (1 + levelScale × рівень навички)
   masteryDmg: 0.10, masteryCost: 0.25,
   // --- стани ---
-  burn: { share:0.30, dur:6 }, wet: { slow:0.15, dur:8 }, evaLevel: { min:0.046, max:1.014 }, rhythm: { slow:0.29, dur:3.5 }, stun: { C:1.0, B:1.5, D:0.7 }, bind: { dur:4.23 }, poison: { pctPerSec:0.02, dur:8 },
+  burn: { share:0.30, dur:6 }, wet: { slow:0.15, dur:8 }, evaLevel: { min:0.046, max:1.014 }, rhythm: { slow:0.29, dur:3.5 }, stun: { C:1.0, B:1.5, D:0.7 }, bind: { dur:4.23 }, poison: { pctPerSec:0.008, dur:8 },
   combo: { base:0.15, perLevel:0.004, perMastery:0.001, cap:0.60, fanBurn:1.5, shockWet:2.0, mudEva:0.5, steam:0.40 },
   wheel: 0.30, habituation: 0.15, habituationCap: 0.60, signatureHabituation: 0.5,
   // --- гравець ---
@@ -61,7 +61,7 @@ export const K = {
   // --- вороги ---
   eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [219.3,0], eEva: [31.0,4.3],
   boss: { hp:3.46, dmg:1.49 }, pack: { n:3, hp:0.4, dmg:0.4 },
-  trait: { armor:0.30, armorOff:6, casterEvery:12, casterCast:3, casterMult:3, evasive:1.59, regenPct:0.01, illusionEvery:10, illusionDur:6, illusionAcc:0.25,
+  trait: { armor:0.22, armorOff:6, casterEvery:12, casterCast:3, casterMult:3, evasive:1.59, regenPct:0.01, illusionEvery:10, illusionDur:6, illusionAcc:0.25,
     hidden:8, hiddenAcc:0.07, hiddenFirst:2.0, poisonChance:0.35 },
   // --- бій: досвід за годину бою в зоні рівня Z, частки від rate(Z) ---
   combatXp: { style:0.70, vit:0.35 },
@@ -81,7 +81,7 @@ export const K = {
   // --- розвідка ---
   cellExplores: [24,84,156,240,360], cellLevelStep: 10,
   // --- клони ---
-  clone: { pool:1.0, link:0.10 },
+  clone: { life:{ default:7200, stand:21600, practice:2400, meditate:3600, fight:1200, operation:1200, mission:3600 }, lifeSkill:"med", lifeMastery:0.01, lifeSkillLevel:0.01, fatigue:{ share:0.5, slow:0.15, maxMs:21600000, decayPerLevel:0.02, meditating:1 } },
 };
 
 // ======================= ФОРМУЛИ =======================

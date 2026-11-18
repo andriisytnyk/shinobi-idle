@@ -1,5 +1,7 @@
 import type { ContentDb } from '@shinobi/content';
-import { actionKindOf } from './actions.ts';
+import { actionKindOf, type ActionKind } from './actions.ts';
+import { asPerformer } from './performer.ts';
+import { probeBody } from './clone-life.ts';
 import { evalReq, type ReqResult } from './requirements.ts';
 import type { Rules } from './rules.ts';
 import { isSkillUnlocked } from './selectors.ts';
@@ -37,13 +39,42 @@ export function startRefusal(
   // A skill that is still shut refuses every action it would train, whatever else holds.
   const skill = kind.skill?.(id, content);
   if (skill && !isSkillUnlocked(state, skill, content)) return { reason: 'error.skillLocked' };
-  const blocked = kind.blocked?.(state, id, content, rules, slotIndex);
-  if (blocked) return { reason: blocked };
-  // One action, one performer: the very same action does not run in two slots at once.
-  const same = state.slots.some(
-    (s, i) => i !== slotIndex && s.action?.kind === kindName && s.action.id === id,
-  );
-  if (same) return { reason: 'error.sameActionElsewhere' };
+  // A clone is made on the spot when its slot has none; a tired mind makes none.
+  if (slotIndex > 0 && !state.clones[slotIndex]) {
+    if (state.fatigue > 0) return { reason: 'error.cloneFatigued' };
+    // The action is judged by what that clone would carry (the default pouch), not by the Bank, as `dispatch` does
+    // (a requirement result the caller evaluated against the Bank is not used).
+    // The probe lives in a shallow copy of the state, so the live state is never written to by a check.
+    const probe: GameState = {
+      ...state,
+      clones: { ...state.clones, [slotIndex]: probeBody(state, content) },
+    };
+    return startRefusal(probe, slotIndex, kindName, id, content, rules);
+  }
+  // What the performer of the slot holds (a clone's bag, not the Bank) is what the action's own checks read.
+  return asPerformer(state, slotIndex, () => {
+    const blocked = kind.blocked?.(state, id, content, rules, slotIndex);
+    if (blocked) return { reason: blocked };
+    // An action that is unique by nature (one raid fight per raid, one mission instance) runs in one performer only;
+    // any other action can run in several performers at once.
+    if (kind.unique?.(id, content)) {
+      const same = state.slots.some(
+        (s, i) => i !== slotIndex && s.action?.kind === kindName && s.action.id === id,
+      );
+      if (same) return { reason: 'error.sameActionElsewhere' };
+    }
+    return requirementRefusal(state, id, kind, content, rules, evaluated);
+  });
+}
+
+function requirementRefusal(
+  state: GameState,
+  id: string,
+  kind: ActionKind,
+  content: ContentDb,
+  rules: Rules,
+  evaluated: ReqResult | null | undefined,
+): StartRefusal | null {
   let result = evaluated;
   if (result === undefined) {
     const req = kind.requirements(state, id, content, rules);

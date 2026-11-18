@@ -33,6 +33,8 @@
     ),
   );
   const running = $derived(slotIndex >= 0);
+  /** Whether the character itself runs it: the tile's own button is the character's, whatever a clone does. */
+  const mine = $derived(slotIndex === 0);
   const timing = $derived(game.read((gs) => slotTiming(gs, slotIndex, info.intervalMs)));
   const block = $derived(info.available ? null : blockOf(info.req));
 </script>
@@ -138,7 +140,7 @@
       describedBy={block && !running ? `why-${info.id}` : undefined}
     />
   </div>
-  {#if block && !running}
+  {#if block && !mine}
     <p class="ct-why" id="why-{info.id}" data-why={block.kind}>{blockText(block)}</p>
     {#if info.req && block.kind !== 'missing'}
       <div class="req">

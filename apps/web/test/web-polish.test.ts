@@ -266,8 +266,8 @@ describe('a clone that runs a mission', () => {
   });
 });
 
-describe('a clone that cannot take a fight', () => {
-  it('names the action that holds the fight, as the player is told', async () => {
+describe('a clone and a fight held by the character', () => {
+  it('is not refused for the fight: every performer has a fight of its own', async () => {
     const state = able();
     growSlots(state, content);
     dispatch(
@@ -276,10 +276,10 @@ describe('a clone that cannot take a fight', () => {
       content,
     );
     booted = await bootApp([coreUi], state, '#/mission/core:caravan');
-    const why = q('[data-clone-why]');
-    expect(why).not.toBeNull();
-    expect(why?.textContent).toContain(t('error.fightBusy'));
-    expect(why?.textContent).toContain(t('mission.busyBy'));
-    expect(why?.querySelector('a')?.getAttribute('href')).toBe('#/mission/core:thief');
+    expect(q('[data-clone-why]')).toBeNull();
+    (q('[data-mission-actions] [data-ui="start-split"] .chevron') as HTMLButtonElement).click();
+    flushSync();
+    const button = q('[data-mission-actions] [data-ui="clone-start"]') as HTMLButtonElement | null;
+    expect(button?.disabled).toBe(false);
   });
 });

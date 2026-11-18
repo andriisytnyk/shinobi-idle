@@ -64,7 +64,9 @@
 
   /** The action slot of the performer picked on the map or in the squad; the character's when none is. */
   const viewSlot = $derived(
-    game.read((gs) => performersOf(gs, content).find((p) => p.id === squadUi.picked)?.slot ?? 0),
+    game.read(
+      (gs) => performersOf(gs, content, game.rules).find((p) => p.id === squadUi.picked)?.slot ?? 0,
+    ),
   );
 
   const view = $derived(

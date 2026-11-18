@@ -11,10 +11,13 @@
   const content = game.content;
 
   const performer = $derived(
-    game.read((gs) => performersOf(gs, content).find((p) => p.id === squadUi.dispelling) ?? null),
+    game.read(
+      (gs) =>
+        performersOf(gs, content, game.rules).find((p) => p.id === squadUi.dispelling) ?? null,
+    ),
   );
   const preview = $derived(
-    performer ? game.read((gs) => dispelPreview(gs, content, performer)) : null,
+    performer ? game.read((gs) => dispelPreview(gs, content, game.rules, performer)) : null,
   );
 
   function confirm(): void {

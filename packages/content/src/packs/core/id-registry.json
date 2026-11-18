@@ -7,7 +7,11 @@
     "Підйом скелею без рук": "pidiom_skeleiu_bez_ruk",
     "Ходіння по воді": "khodinnia_po_vodi",
     "Лопання водяної кулі": "lopannia_vodianoi_kuli",
-    "Лопання гумової кулі": "lopannia_humovoi_kuli"
+    "Лопання гумової кулі": "lopannia_humovoi_kuli",
+    "Біг із тягарем": "bih_iz_tiaharem",
+    "Віджимання на кулаках": "vidzhymannia_na_kulakakh",
+    "Стійка під водоспадом": "stiika_pid_vodospadom",
+    "Загартування ударами": "zahartuvannia_udaramy"
   },
   "obstacle": {
     "Стрибки по дахах": "strybky_po_dakhakh",

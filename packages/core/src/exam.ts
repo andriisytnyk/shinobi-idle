@@ -49,6 +49,8 @@ export const conferralSeconds = (content: ContentDb): number => content.balance.
  * rank, opens what the rank unlocks, hands out the reward items and pins the goal.
  */
 export const senseiTestKind: ActionKind = {
+  // The test is the character's: one at a time.
+  unique: () => true,
   has: (id, content) => indexOf(content).exams.has(id),
   // Only a player below the exam's rank can take it, and only with the checklist met. An `any`
   // of nothing can never hold, which is how a rank already held blocks the action.

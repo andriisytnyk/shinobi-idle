@@ -8,6 +8,7 @@ import {
   serialize,
   STATE_VERSION,
   type ActionStoppedEvent,
+  type CloneDispelledEvent,
   type GameState,
   type OfflineSummary,
   type RaidAway,
@@ -58,6 +59,8 @@ export interface AnbuReport {
   mastery: { key: string; levels: number }[];
   techniques: string[];
   stopped: ActionStoppedEvent[];
+  /** The clones dispelled while away: whose, why, and the XP each handed over. */
+  dispelled?: CloneDispelledEvent[];
   /** Raids that arrived or ended while away. */
   raids: RaidAway[];
 }
@@ -81,6 +84,7 @@ export function buildReport(summary: OfflineSummary): AnbuReport | null {
     mastery.length === 0 &&
     summary.techniquesLearned.length === 0 &&
     summary.actionsStopped.length === 0 &&
+    (summary.clonesDispelled ?? []).length === 0 &&
     (summary.raids ?? []).length === 0;
   if (summary.requestedMs < REPORT_MIN_MS || quiet) return null;
   return {
@@ -91,6 +95,7 @@ export function buildReport(summary: OfflineSummary): AnbuReport | null {
     mastery,
     techniques: summary.techniquesLearned,
     stopped: summary.actionsStopped,
+    dispelled: summary.clonesDispelled ?? [],
     raids: summary.raids ?? [],
   };
 }

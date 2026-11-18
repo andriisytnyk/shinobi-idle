@@ -1,16 +1,15 @@
 <script lang="ts">
   import { entityName } from '../lib/entities.ts';
+  import { fightView } from '../lib/fight-view.svelte.ts';
   import { t } from '../lib/i18n.ts';
   import { fightersOf, performersOf } from '../lib/squad.ts';
-  import { squadUi } from '../lib/squad-ui.svelte.ts';
   import { game } from '../lib/store.ts';
 
   const content = game.content;
   /** The performers that fight now; the switcher shows when there are several. */
-  const fighters = $derived(game.read((gs) => fightersOf(performersOf(gs, content))));
-  const current = $derived(
-    fighters.find((p) => p.id === squadUi.fight)?.id ?? fighters[0]?.id ?? null,
-  );
+  const fighters = $derived(game.read((gs) => fightersOf(performersOf(gs, content, game.rules))));
+  /** The slot whose fight is shown: the one the fight screen and the battle log share. */
+  const current = $derived(fightView.shown(fighters.map((p) => p.slot)));
 </script>
 
 {#if fighters.length > 1}
@@ -19,10 +18,10 @@
       <button
         type="button"
         role="tab"
-        class:active={current === p.id}
-        aria-selected={current === p.n}
+        class:active={current === p.slot}
+        aria-selected={current === p.slot}
         data-performer={p.n}
-        onclick={() => squadUi.focusFight(p.id)}
+        onclick={() => (fightView.chosen = p.slot)}
       >
         <span class="who">{p.clone ? t('squad.clone', { n: p.n }) : t('squad.you')}</span>
         {#if p.ref}<span class="what">{entityName(p.ref)}</span>{/if}

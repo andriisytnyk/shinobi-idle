@@ -17,7 +17,7 @@
   $effect(() => {
     void game.version;
     untrack(() => {
-      const now = performersOf(game.state, content);
+      const now = performersOf(game.state, content, game.rules);
       if (before) {
         for (const notice of squadNotices(before, now, warned)) {
           const give = notice.key === 'squad.notice.free';

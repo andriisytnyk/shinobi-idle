@@ -14,7 +14,7 @@
   /** Who runs this action now; nothing is drawn before the player has a clone to tell apart. */
   const runners = $derived(
     game.read((gs) =>
-      hasSquad(gs, content) ? runningBy(performersOf(gs, content), kind, id) : [],
+      hasSquad(gs, content) ? runningBy(performersOf(gs, content, game.rules), kind, id) : [],
     ),
   );
 </script>

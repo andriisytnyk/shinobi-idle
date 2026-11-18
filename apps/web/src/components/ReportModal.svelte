@@ -17,7 +17,9 @@
   let { report, onClose }: Props = $props();
   const moneyLabel = currencyName(moneyOf(game.content));
   /** The stops by performer; the heads show once there are clones to tell from the character. */
-  const sections = $derived(game.read((gs) => reportSections(report.stopped, gs, game.content)));
+  const sections = $derived(
+    game.read((gs) => reportSections(report.stopped, report.dispelled ?? [])),
+  );
   const heads = $derived(game.read((gs) => hasSquad(gs, game.content)));
 </script>
 
@@ -82,12 +84,18 @@
     </ul>
   {/if}
 
-  {#if report.stopped.length > 0}
+  {#if report.stopped.length > 0 || (report.dispelled ?? []).length > 0}
     <h3>{t('report.stopped')}</h3>
     {#each sections as section (section.n)}
       <section data-ui="report-performer" data-performer={section.n}>
         {#if heads}
           <h4>{section.clone ? t('squad.clone', { n: section.n }) : t('squad.you')}</h4>
+        {/if}
+        {#if section.dispelled}
+          <p data-report-dispelled={section.dispelled.cause}>
+            {t(`report.dispelled.${section.dispelled.cause}`)}{#if section.dispelled.xp > 0}
+              {t('report.dispelled.xp', { n: formatInt(section.dispelled.xp) })}{/if}
+          </p>
         {/if}
         <ul>
           {#each section.stopped as stop, i (i)}

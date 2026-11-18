@@ -53,6 +53,7 @@ describe('the table of places', () => {
         'rng',
         'stats',
         'wounds',
+        'fatigue',
         'events',
       ]).toContain(branch);
       void value;

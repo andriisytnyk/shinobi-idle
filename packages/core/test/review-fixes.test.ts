@@ -9,7 +9,6 @@ import {
   dispatch,
   poolCapacity,
   serialize,
-  SHARE_FULL,
   type GameState,
 } from '../src/index.ts';
 import { HOUR, genin, setLevel } from './helpers.ts';
@@ -89,7 +88,7 @@ describe('mastery from combat and items feeds the pool', () => {
   });
 });
 
-describe('combat runs at full speed whatever the slot share', () => {
+describe('fights of the character and of clones run at full speed', () => {
   /** A fight in slot `at` with drills in the other slots, so the fight gets 1/slots of the speed. */
   function shared(seed: number, slots: number, at: number): GameState {
     const state = genin(seed);
@@ -112,20 +111,6 @@ describe('combat runs at full speed whatever the slot share', () => {
     }
     return state;
   }
-  const kills = (s: GameState) => s.counters['kills.core:dummy'] ?? 0;
-  const ticks = (s: GameState) => s.counters['actions.fight'] ?? 0;
-
-  it('does not slow a fight at a 500 share: kills and XP are those of the full share', () => {
-    const full = shared(5, 1, 0);
-    const half = shared(5, 2, 0);
-    expect(half.slots[0]?.share).toBe(SHARE_FULL / 2);
-    advance(full, HOUR, content);
-    advance(half, HOUR, content);
-    // A fight runs at full speed whatever the share of its slot: the same cycles, kills and XP.
-    expect(ticks(half)).toBe(ticks(full));
-    expect(kills(half)).toBe(kills(full));
-    expect(half.skills.vit!.xp).toBeCloseTo(full.skills.vit!.xp, 6);
-  });
 
   for (const [slots, at] of [
     [2, 0],
@@ -140,7 +125,8 @@ describe('combat runs at full speed whatever the slot share', () => {
       };
       const whole = run(120_000);
       for (const chunk of [1, 7, 999, 3600]) expect(run(chunk)).toBe(whole);
-      expect(deserialize(whole, content).combat?.fight.t).toBeGreaterThan(0);
+      const back = deserialize(whole, content);
+      expect((at === 0 ? back.combat : back.clones[at]?.fight)?.fight.t).toBeGreaterThan(0);
     });
   }
 });

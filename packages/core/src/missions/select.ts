@@ -2,7 +2,7 @@ import type { ContentDb, Mission, MissionPay } from '@shinobi/content';
 import { scrollPartId } from '@shinobi/content';
 import { hasItem } from '../bank.ts';
 import { isCloneSlot } from '../clone.ts';
-import { fightBusyReason, isCombatKind } from '../combat/system.ts';
+
 import { effectiveLoadout } from '../combat/loadout.ts';
 import { MS_PER_HOUR, masteryLevel } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
@@ -447,22 +447,13 @@ function holderOf(
   slot: number,
   mission: Mission,
   reason: string,
-  content: ContentDb,
+  _content: ContentDb,
 ): MissionRefusal['by'] {
-  const missions = indexOf(content).missions;
   for (const [index, other] of state.slots.entries()) {
     const action = other.action;
     if (index === slot || !action) continue;
     if (reason === 'error.missionRunning') {
       if (action.kind === MISSION_KIND && action.id === mission.id) {
-        return { slot: index, kind: action.kind, id: action.id };
-      }
-    } else if (reason === fightBusyReason(state, slot, content)) {
-      // A mission with a combat stage ahead holds the fight too, even while it is not fighting.
-      const holds =
-        action.kind === MISSION_KIND &&
-        (missions.get(action.id)?.stages.some((s) => s.t === 'combat') ?? false);
-      if (isCombatKind(action.kind) || holds) {
         return { slot: index, kind: action.kind, id: action.id };
       }
     }

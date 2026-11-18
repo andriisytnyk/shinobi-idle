@@ -252,6 +252,8 @@ export function createGame(deps: GameDeps = {}) {
   /** Revision of the save this tab last read or wrote; a stored revision above it means a newer save exists. */
   let rev = 0;
   let lastWall = clock.now();
+  /** Game seconds per wall second; 1 except when a test build's developer panel speeds the clock up. */
+  let speed = 1;
   let timers: number[] = [];
   const commandHooks: CommandHook[] = [];
   // eslint-disable-next-line svelte/prefer-svelte-reactivity -- plain bookkeeping that no view reads
@@ -340,7 +342,8 @@ export function createGame(deps: GameDeps = {}) {
         const next = buildReport(summary);
         if (next) report = next;
       } else {
-        advance(state, delta, content, rules);
+        // A developer's speed-up (test builds) multiplies the game time that a stretch of the wall clock brings.
+        advance(state, speed === 1 ? delta : Math.floor(delta * speed), content, rules);
       }
       drainEvents();
       if (!asleep) tel.observe(state);
@@ -650,6 +653,31 @@ export function createGame(deps: GameDeps = {}) {
         stopOnCrash(error);
         return;
       }
+      touch();
+    },
+    /**
+     * Developer tool (test builds): runs `change` on the live state, the way a command would: events
+     * are drained, the views refresh and a crash stops the loop. `change` goes through core helpers.
+     */
+    devApply(change: (state: GameState, content: ContentDb, rules: Rules) => void): void {
+      epoch++;
+      try {
+        change(state, content, rules);
+        drainEvents();
+        tel.observe(state);
+      } catch (error) {
+        stopOnCrash(error);
+        return;
+      }
+      touch();
+    },
+    /** Developer tool (test builds): the live clock's multiplier. */
+    get devSpeed(): number {
+      void version;
+      return speed;
+    },
+    set devSpeed(value: number) {
+      speed = Number.isFinite(value) && value >= 1 ? value : 1;
       touch();
     },
     /** The local telemetry: export file, clearing. It never touches the network. */

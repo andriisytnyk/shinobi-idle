@@ -50,8 +50,13 @@ export default defineConfig(
   {
     files: ['apps/web/**/*.{ts,svelte}'],
     languageOptions: {
-      // `__APP_VERSION__` and `__BUILD_DATE__` are injected by Vite `define`.
-      globals: { ...globals.browser, __APP_VERSION__: 'readonly', __BUILD_DATE__: 'readonly' },
+      // `__APP_VERSION__`, `__BUILD_DATE__` and `__DEV_PANEL__` are injected by Vite `define`.
+      globals: {
+        ...globals.browser,
+        __APP_VERSION__: 'readonly',
+        __BUILD_DATE__: 'readonly',
+        __DEV_PANEL__: 'readonly',
+      },
     },
   },
   {

@@ -2,9 +2,17 @@ import type { ContentDb } from '@shinobi/content';
 import {
   actionInfo,
   chakraDivisor,
+  cloneRefusal,
   cloneSlots,
+  dispelPreview as corePreview,
+  fatigueLeftMs,
+  freeCloneSlot,
   hexKey,
+  lifeLeftMs,
+  LIFE_FULL,
   positionHex,
+  STAND_ID,
+  STAND_KIND,
   type Command,
   type GameState,
   type Rules,
@@ -16,17 +24,15 @@ import type { ProgressTiming } from './time-progress.ts';
 
 /**
  * The squad: the character and the clones as one list of performers. This module is the only place
- * that knows how a performer is read from the game state and what commands act on one. The clone
- * redesign (C3) changes the shape of a clone (a life by chakra, knowledge and a bag held until the
- * dispel, mind fatigue, a pouch at creation, one fight per performer); every bit that depends on it
- * sits in the `C3` section below as an optional value with a fallback, so wiring the real state
- * means editing that section alone.
+ * that knows how a performer is read from the game state and what commands act on one. A clone is a
+ * body with a life by chakra, the knowledge and the bag it holds until it is dispelled, and it stands
+ * (idle) when its action stops; the selectors are the core's (`clone-life.ts`, `performer.ts`).
  */
 
 /** What a performer is doing: nothing, a plain action, a fight, or standing on a point. */
 export type PerformerState = 'idle' | 'working' | 'fighting' | 'standing';
 
-/** What a clone holds until it is dispelled. Every part is optional: it is the C3 model. */
+/** What a clone holds until it is dispelled. */
 export interface Held {
   /** Skill XP the clone has gathered and gives to the character on the dispel. */
   xp?: number | undefined;
@@ -36,7 +42,7 @@ export interface Held {
   bag?: Record<string, number> | undefined;
 }
 
-/** The mind fatigue a dispel causes (C3). */
+/** The mind fatigue a dispel causes. */
 export interface FatigueHit {
   durationMs: number;
   /** The slowdown it brings, as a fraction (0.1 = 10%). */
@@ -49,20 +55,21 @@ export interface Performer {
   /** The action slot that carries the performer. */
   slot: number;
   clone: boolean;
-  /** The number of the clone; 0 for the character. */
+  /** The number of the clone, which is its slot; 0 for the character. */
   n: number;
   state: PerformerState;
+  /** What it does; null for the character with nothing to do and for a clone that stands (idle). */
   action: { kind: string; id: string } | null;
   ref: EntityRef | null;
   /** The share of the chakra pool the performer has, as a fraction (1 = all of it). */
   chakraShare: number;
-  /** The time the clone still lives by its chakra, ms (C3). */
+  /** The time the clone still lives by its chakra, ms. */
   lifeMs?: number | undefined;
-  /** The life the clone started with, ms (C3); with `lifeMs` it makes the life bar. */
-  lifeMaxMs?: number | undefined;
-  /** What the clone holds (C3). */
+  /** The share of its chakra the clone has left, 0 to 1: the life bar. */
+  lifeFraction?: number | undefined;
+  /** What the clone holds. */
   held?: Held | undefined;
-  /** The mind fatigue of the character, ms left (C3). */
+  /** The mind fatigue of the character, ms left. */
   fatigueMs?: number | undefined;
 }
 
@@ -82,50 +89,11 @@ export const ACTION_VERB: Readonly<Record<string, string>> = {
   senseiTest: 'now.doing.exam',
 };
 
-// ---------- C3: the fields the clone redesign adds ----------
-
-/** The fields of a clone that only the redesigned model has. Today none of them exists. */
-interface C3Fields {
-  lifeMs?: number | undefined;
-  lifeMaxMs?: number | undefined;
-  held?: Held | undefined;
-  fatigueMs?: number | undefined;
-  /** A clone that exists and does nothing: today a clone with no action does not exist. */
-  idle?: boolean | undefined;
-}
-
-/** The C3 fields of the performer in `slot`. The wiring point for the real selectors. */
-function c3Fields(_state: GameState, _content: ContentDb, _slot: number): C3Fields {
-  return {};
-}
-
-/** The mind fatigue of the character, ms left. The wiring point for the real selector. */
-function c3Fatigue(_state: GameState, _content: ContentDb): number | undefined {
-  return undefined;
-}
-
-/** What the dispel of the clone in `slot` would bring to the character. The wiring point for the real selector. */
-function c3DispelPreview(
-  _state: GameState,
-  _content: ContentDb,
-  _slot: number,
-): { held: Held | undefined; fatigue: FatigueHit | undefined } {
-  return { held: undefined, fatigue: undefined };
-}
-
-/** The commands for a clone's life: today a clone is an action slot that a known technique opens. */
-const c3 = {
-  /** The slot a new clone would take, or -1 when no clone can be made now. */
-  freeCloneSlot(state: GameState, content: ContentDb): number {
-    return cloneSlots(state, content).find((c) => state.slots[c.slot]?.action == null)?.slot ?? -1;
-  },
-  /** Starts `action` in a new clone; the default pouch is C3's. */
-  createWith(slot: number, kind: string, id: string): Command {
-    return { type: 'action.start', slot, kind, id };
-  },
-};
-
 // ---------- reading the squad ----------
+
+/** Whether the action is what a clone does when it has nothing to do: it stands where it is. */
+const isStanding = (action: { kind: string; id: string } | null): boolean =>
+  action?.kind === STAND_KIND && action.id === STAND_ID;
 
 function stateOf(action: { kind: string } | null): PerformerState {
   if (!action) return 'idle';
@@ -134,37 +102,73 @@ function stateOf(action: { kind: string } | null): PerformerState {
   return 'working';
 }
 
-/** The performers: the character, then every clone that exists (and, in C3, every idle clone). */
-export function performersOf(state: GameState, content: ContentDb): Performer[] {
+/** What the clone in `slot` holds, summed for the panel: skill XP, Mastery and the bag. */
+function heldOf(
+  state: GameState,
+  content: ContentDb,
+  rules: Rules,
+  slot: number,
+): Held | undefined {
+  const held = corePreview(state, slot, content, rules);
+  if (!held) return undefined;
+  const sum = (values: number[]): number => values.reduce((a, b) => a + b, 0);
+  return {
+    xp: sum(Object.values(held.xp)),
+    mastery: sum(Object.values(held.mastery).map((m) => m.amount)),
+    bag: held.bag,
+  };
+}
+
+/** The mind fatigue and slowdown a dispel would leave, when it leaves any. */
+const fatigueHit = (ms: number, content: ContentDb): FatigueHit | undefined =>
+  ms > 0 ? { durationMs: ms, slowdown: content.balance.K.clone.fatigue.slow } : undefined;
+
+/**
+ * The performers: the character, then every clone that exists, in slot order. A clone with nothing
+ * to do (it stands where it was made, or where its action ended) is idle; a number is its slot.
+ */
+export function performersOf(state: GameState, content: ContentDb, rules: Rules): Performer[] {
   const out: Performer[] = [];
   const share = 1 / chakraDivisor(state, content);
-  const make = (slot: number, n: number, extra: C3Fields): Performer => {
-    const action = state.slots[slot]?.action ?? null;
-    return {
-      id: n,
+  out.push({
+    id: 0,
+    slot: 0,
+    clone: false,
+    n: 0,
+    ...described(state, 0),
+    chakraShare: share,
+    fatigueMs: fatigueLeftMs(state, content, rules),
+  });
+  const slots = Object.keys(state.clones)
+    .map(Number)
+    .sort((a, b) => a - b);
+  for (const slot of slots) {
+    const body = state.clones[slot];
+    if (!body) continue;
+    out.push({
+      id: slot,
       slot,
-      clone: n > 0,
-      n,
-      state: stateOf(action),
-      action: action ? { kind: action.kind, id: action.id } : null,
-      ref: action ? actionRef(action, state, slot) : null,
+      clone: true,
+      n: slot,
+      ...described(state, slot),
       chakraShare: share,
-      lifeMs: extra.lifeMs,
-      lifeMaxMs: extra.lifeMaxMs,
-      held: extra.held,
-      fatigueMs: n === 0 ? c3Fatigue(state, content) : undefined,
-    };
-  };
-  out.push(make(0, 0, {}));
-  let n = 0;
-  for (const c of cloneSlots(state, content)) {
-    const extra = c3Fields(state, content, c.slot);
-    // A clone that does nothing is no clone in today's model; C3 may have one that waits.
-    if (state.slots[c.slot]?.action == null && extra.idle !== true) continue;
-    n += 1;
-    out.push(make(c.slot, n, extra));
+      lifeMs: lifeLeftMs(state, slot, content, rules),
+      lifeFraction: Math.max(0, Math.min(1, body.life / LIFE_FULL)),
+      held: heldOf(state, content, rules, slot),
+    });
   }
   return out;
+}
+
+/** What the performer in `slot` does: its action, picture and state. A clone that stands does nothing. */
+function described(state: GameState, slot: number): Pick<Performer, 'state' | 'action' | 'ref'> {
+  const raw = state.slots[slot]?.action ?? null;
+  const action = raw && !(slot > 0 && isStanding(raw)) ? { kind: raw.kind, id: raw.id } : null;
+  return {
+    state: stateOf(action),
+    action,
+    ref: raw && action ? actionRef(raw, state, slot) : null,
+  };
 }
 
 /** A clone on the map: its number, state and the hex it stands on (`"q,r"`). */
@@ -177,8 +181,8 @@ export interface SquadFigure {
 }
 
 /** The figures of the clones for the map; a clone with no place of its own stands with the character. */
-export function squadFigures(state: GameState, content: ContentDb): SquadFigure[] {
-  return performersOf(state, content).flatMap((p) => {
+export function squadFigures(state: GameState, content: ContentDb, rules: Rules): SquadFigure[] {
+  return performersOf(state, content, rules).flatMap((p) => {
     if (!p.clone) return [];
     const at = positionHex(state, content, p.slot);
     return at
@@ -201,9 +205,13 @@ export function squadCounts(
   };
 }
 
-/** Whether another clone can be made now. */
+/** Whether another clone can be made now: the core's own answer, the one `clone.create` gives. */
 export const canCreateClone = (state: GameState, content: ContentDb): boolean =>
-  c3.freeCloneSlot(state, content) >= 0;
+  cloneRefusal(state, content) === null;
+
+/** The slot a new clone would take, or null when none can be made now. */
+export const newCloneSlot = (state: GameState, content: ContentDb): number | null =>
+  cloneRefusal(state, content) === null ? freeCloneSlot(state, content) : null;
 
 /** The share of the chakra a new clone takes, as the text of a fraction: ½, 1/3 ... */
 export function newCloneShare(list: readonly Performer[]): string {
@@ -286,17 +294,6 @@ export const startCommand = (p: Pick<Performer, 'slot'>, kind: string, id: strin
 export const stopCommand = (p: Pick<Performer, 'slot' | 'clone'>): Command =>
   p.clone ? { type: 'clone.dispel', slot: p.slot } : { type: 'action.stop', slot: p.slot };
 
-/** The command that makes a new clone work at `kind:id`, or null when no clone can be made now. */
-export function newCloneCommand(
-  state: GameState,
-  content: ContentDb,
-  kind: string,
-  id: string,
-): Command | null {
-  const slot = c3.freeCloneSlot(state, content);
-  return slot < 0 ? null : c3.createWith(slot, kind, id);
-}
-
 // ---------- the dispel ----------
 
 export interface DispelPreview {
@@ -305,16 +302,22 @@ export interface DispelPreview {
   /** The items of the bag, by id, that go to the Bank. */
   bag: { id: string; n: number }[];
   fatigue: FatigueHit | undefined;
-  /** Whether the clone holds nothing to give (today it never does: its work is already the character's). */
+  /** Whether the clone holds nothing to give. */
   empty: boolean;
 }
 
+/** What dispelling `performer` would hand over: the core's own preview, the figures the dispel pays. */
 export function dispelPreview(
   state: GameState,
   content: ContentDb,
+  rules: Rules,
   performer: Performer,
 ): DispelPreview {
-  const { held, fatigue } = c3DispelPreview(state, content, performer.slot);
+  const held = heldOf(state, content, rules, performer.slot);
+  const fatigue = fatigueHit(
+    corePreview(state, performer.slot, content, rules)?.fatigueMs ?? 0,
+    content,
+  );
   const bag = Object.entries(held?.bag ?? {}).map(([id, n]) => ({ id, n }));
   const empty = !held?.xp && !held?.mastery && bag.length === 0 && !fatigue;
   return { performer, held, bag, fatigue, empty };
@@ -324,31 +327,41 @@ export function dispelPreview(
 
 /** The part of the report one performer gets. */
 export interface ReportSection {
-  /** 0 for the character, else the clone's number. */
+  /** 0 for the character, else the clone's number (its slot). */
   n: number;
   clone: boolean;
   stopped: { kind: string; id: string; reason: string }[];
+  /** The clone was dispelled while away: why, and the skill XP it handed over (summed). */
+  dispelled?: { cause: 'manual' | 'life' | 'death'; xp: number } | undefined;
 }
 
 /**
- * The sections of the report by performer, the character first. The engine's summary groups the
- * XP by skill only; the stops carry their slot, so the sections list what each performer stopped
- * doing. When C3's summary names the gains of each performer they join here.
+ * The sections of the report by performer, the character first: what each performer stopped doing,
+ * and, for a clone dispelled while away, why and the XP it handed over. The skills list above them
+ * is the character's total, the clones' XP included.
  */
 export function reportSections(
   stopped: readonly { slot: number; kind: string; id: string; reason: string }[],
-  state: GameState,
-  content: ContentDb,
+  dispelled: readonly {
+    slot: number;
+    cause: 'manual' | 'life' | 'death';
+    xp: Readonly<Record<string, number>>;
+  }[] = [],
 ): ReportSection[] {
-  const slots = cloneSlots(state, content).map((c) => c.slot);
   const sections = new Map<number, ReportSection>();
-  for (const stop of stopped) {
-    const n = slots.indexOf(stop.slot) + 1;
+  const of = (n: number): ReportSection => {
     const section = sections.get(n) ?? { n, clone: n > 0, stopped: [] };
-    section.stopped.push({ kind: stop.kind, id: stop.id, reason: stop.reason });
     sections.set(n, section);
+    return section;
+  };
+  for (const stop of stopped)
+    of(stop.slot).stopped.push({ kind: stop.kind, id: stop.id, reason: stop.reason });
+  for (const d of dispelled) {
+    const xp = Object.values(d.xp).reduce((sum, n) => sum + n, 0);
+    const section = of(d.slot);
+    section.dispelled = { cause: d.cause, xp: (section.dispelled?.xp ?? 0) + xp };
   }
-  return [...sections.values()].sort((a, b) => a.n - b.n);
+  return [...sections.values()].sort((x, y) => x.n - y.n);
 }
 
 // ---------- the notices ----------

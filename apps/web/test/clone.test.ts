@@ -27,6 +27,7 @@ beforeAll(async () => {
 });
 afterAll(() => game.stop());
 afterEach(() => {
+  vi.restoreAllMocks();
   booted?.destroy();
   booted = null;
   toasts.clear();
@@ -53,6 +54,19 @@ function newCloneItem(scope: Element | null | undefined): HTMLButtonElement | nu
   return scope?.querySelector<HTMLButtonElement>('[data-ui="clone-start"]') ?? null;
 }
 
+/** A phone: the squad is a strip of chips and the Now bar keeps every row with its life, knowledge and stop. */
+function phone(): void {
+  vi.spyOn(window, 'matchMedia').mockImplementation(
+    (query: string) =>
+      ({
+        matches: query.includes('max-width'),
+        media: query,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      }) as unknown as MediaQueryList,
+  );
+}
+
 const drill = () => content.exercises.find((e) => e.level <= 20)?.id ?? '';
 const start = (state: GameState, slot: number, kind: string, id: string) =>
   dispatch(state, { type: 'action.start', slot, kind, id }, content);
@@ -73,6 +87,7 @@ describe('learning the clone', () => {
 
 describe('the clone in the Now bar', () => {
   it('marks the clone slot with the tag «Клон:» and gives it «Розвіяти» in place of «Зупинити»', async () => {
+    phone();
     const state = cloner();
     start(state, 0, 'drill', drill());
     start(state, 1, 'gather', 'core:mint');
@@ -85,9 +100,14 @@ describe('the clone in the Now bar', () => {
     expect(rows[0]?.querySelector('.stop')?.getAttribute('aria-label')).toBe(t('now.stop'));
     const dispel = rows[1]?.querySelector<HTMLButtonElement>('.stop');
     expect(dispel?.getAttribute('aria-label')).toBe(t('now.dispel'));
+    // «Розвіяти» asks first: the dialog says what the clone hands over.
     dispel?.click();
     flushSync();
+    expect(game.state.clones[1]).toBeDefined();
+    (q('[data-dispel-confirm]') as HTMLButtonElement | null)?.click();
+    flushSync();
     expect(game.state.slots[1]?.action).toBeNull();
+    expect(game.state.clones[1]).toBeUndefined();
     expect(game.state.slots[0]?.action).not.toBeNull();
     expect(game.state.slots.map((s) => s.share)).toEqual([1000, 0]);
     expect(qa('[data-ui="clone-tag"]').length).toBe(0);
@@ -115,24 +135,15 @@ describe('the clone on a skill page', () => {
     expect(button?.textContent?.trim()).toBe(t('squad.menu.newClone'));
     button?.click();
     flushSync();
+    // There is no clone yet: a small pouch picker opens first, with the default pick.
+    expect(game.state.clones[1]).toBeUndefined();
+    (q('[data-ui="clone-pouch-make"]') as HTMLButtonElement | null)?.click();
+    flushSync();
+    expect(game.state.clones[1]).toBeDefined();
     expect(game.state.slots[1]?.action).toEqual({ kind: 'gather', id: 'core:mint' });
     expect(game.state.slots[0]?.action).toBeNull();
     // It runs now, so the tile's button stops it and the menu is shut.
     expect(q('[data-herb="core:mint"]')?.querySelector('[data-ui="clone-start"]')).toBeNull();
-  });
-
-  it('shows the link bonus in the breakdown of the fed craft, with the technique as its source', async () => {
-    const state = cloner();
-    start(state, 0, 'gather', 'core:mint');
-    start(state, 1, 'craft', 'core:antidote');
-    booted = await bootApp([coreUi], state, '#/skill/alch');
-    const tile = q('[data-action="core:antidote"]');
-    const figure = tile?.querySelector<HTMLButtonElement>('[data-ui="action-interval"] .figure');
-    figure?.click();
-    flushSync();
-    const list = tile?.querySelector('[data-ui="action-interval"] .list');
-    expect(list?.textContent).toContain('+10%');
-    expect(list?.querySelector('a')?.getAttribute('href')).toBe(`#/technique/${CLONE}`);
   });
 });
 
@@ -154,6 +165,8 @@ describe('the clone on the mission board', () => {
     expect(button?.disabled).toBe(false);
     button?.click();
     flushSync();
+    (q('[data-ui="clone-pouch-make"]') as HTMLButtonElement | null)?.click();
+    flushSync();
     expect(game.state.slots[1]?.action).toEqual({ kind: 'mission', id: 'core:v_clones' });
     expect(card('core:v_clones')?.querySelector('[data-running]')?.textContent).toContain(
       t('mission.runningClone'),
@@ -171,6 +184,8 @@ describe('the clone on the mission board', () => {
     expect(button?.disabled).toBe(false);
     button?.click();
     flushSync();
+    (q('[data-ui="clone-pouch-make"]') as HTMLButtonElement | null)?.click();
+    flushSync();
     expect(game.state.slots[1]?.action).toEqual({ kind: 'mission', id: 'core:v_clones' });
   });
 });
@@ -183,8 +198,11 @@ describe('the clone fights', () => {
     expect(enemy).not.toBeNull();
     enemy?.click();
     flushSync();
+    (q('[data-ui="clone-pouch-make"]') as HTMLButtonElement | null)?.click();
+    flushSync();
     expect(game.state.slots[1]?.action?.kind).toBe('fight');
-    expect(game.state.combat?.owner).toBe(1);
+    expect(game.state.clones[1]?.fight?.owner).toBe(1);
+    expect(game.state.combat).toBeNull();
     expect(q('[data-fighter="clone"]')?.textContent).toContain(t('combat.cloneYou'));
     expect(q('[data-clone-fights]')?.textContent).toContain(t('combat.cloneFights'));
     // The Now bar shows the clone's fight under the clone's mark.
@@ -194,6 +212,6 @@ describe('the clone fights', () => {
     (q('.stop') as HTMLButtonElement | null)?.click();
     flushSync();
     expect(game.state.slots[1]?.action).toBeNull();
-    expect(game.state.combat).toBeNull();
+    expect(game.state.clones[1]).toBeUndefined();
   });
 });
