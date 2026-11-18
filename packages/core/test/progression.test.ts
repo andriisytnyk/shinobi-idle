@@ -1,6 +1,7 @@
 import { content } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
+  masteryXpPerHour,
   advance,
   createState,
   dispatch,
@@ -53,7 +54,16 @@ describe('formulas', () => {
   });
 
   it('mastery XP per action and pool numbers come from the balance parameters', () => {
-    expect(masteryXpPerAction(3600, content)).toBe(K.masteryPerHour);
+    // Melvor's shape: the higher the mastery level of the action, the more a second of it pays.
+    expect(masteryXpPerAction(1, 3600, content)).toBeCloseTo(
+      K.mastery.perSecond * (K.mastery.base + 1) * 3600,
+      6,
+    );
+    expect(masteryXpPerAction(25, 10, content)).toBeCloseTo(
+      K.mastery.perSecond * (K.mastery.base + 25) * 10,
+      9,
+    );
+    expect(masteryXpPerHour(1, content)).toBe(masteryXpPerAction(1, 3600, content));
     expect(poolGain(100, content)).toBe(100 * K.poolShare);
     const tech = content.techniques.filter((t) => t.skill === 'katon').length;
     expect(poolCapacity('katon', content)).toBe(K.poolCapPerItem * tech);
@@ -80,7 +90,10 @@ describe('A4: XP per hour follows the rate formula', () => {
       advance(state, HOUR, content);
       const perHour = state.skills[t.skill]!.xp - before;
       const expected = K.rateBase * K.rateGrowth ** level;
-      expect(Math.abs(perHour / expected - 1)).toBeLessThan(0.02);
+      // The XP of a cycle is fixed at the cycle of mastery 1; mastery shortens the cast, so an hour of
+      // practice pays a little more, never less.
+      expect(perHour / expected).toBeGreaterThan(0.98);
+      expect(perHour / expected).toBeLessThan(1.08);
     });
   }
 

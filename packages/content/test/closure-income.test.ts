@@ -24,8 +24,9 @@ const sellPrice = (recipe: (typeof content.recipes)[number]): number => {
   return Math.max(1, Math.floor((value / recipe.output.n) * K.shop.craftSellFactor));
 };
 
-/** Seconds to gather one herb at mastery level 1, the regrow pause shared over the bush. */
-const gatherSeconds = K.gather + K.field.regrowMs / 1000 / (K.field.stockBase + 1);
+/** Seconds to gather one herb at mastery level 1: its own cycle, the regrow pause shared over the bush. */
+const gatherSecondsOf = (herb: { cycle?: number | undefined }): number =>
+  (herb.cycle ?? K.gather) + K.field.regrowMs / 1000 / (K.field.stockBase + 1);
 
 interface Loop {
   recipe: string;
@@ -43,7 +44,8 @@ function bestLoop(level: number, bonusUnits: number): Loop {
     const bought = r.ingredients
       .filter((i) => !herbs.has(i.item))
       .reduce((sum, i) => sum + (buyPrice(i.item) ?? Infinity) * i.n, 0);
-    const seconds = K.craft + mine.reduce((sum, i) => sum + i.n, 0) * gatherSeconds;
+    const seconds =
+      K.craft + mine.reduce((sum, i) => sum + i.n * gatherSecondsOf(herbs.get(i.item) ?? {}), 0);
     const profit = sellPrice(r) * (r.output.n + bonusUnits) - bought;
     const perHour = (profit / seconds) * 3600;
     if (perHour > best.perHour) best = { recipe: r.id, perHour };

@@ -35,6 +35,13 @@
                 <span class="mod">
                   <button aria-expanded="false" class="figure" type="button">
                     0 дос./год
+            <div data-ui="action-mastery">
+              <dt>
+                Майстерність
+              <dd>
+                <span class="mod">
+                  <button aria-expanded="false" class="figure" type="button">
+                    0 дос./год
           <p class="hint" data-course-empty="">
             Збудуй хоча б одну перешкоду, щоб пройти смугу.
           <div class="ct-actions">
@@ -651,7 +658,7 @@
         <h2>
           Пул Майстерності
         <p class="amount">
-          0 / 18 000
+          0 / 24 000
         <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="bar" role="progressbar">
           <span class="fill" style="width: 0%;">
           <span class="tick" style="left: 10%;">

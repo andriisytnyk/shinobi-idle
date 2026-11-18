@@ -88,6 +88,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       5 184 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div class="ct-actions">
               <button class="action" type="button">
                 Почати
@@ -129,6 +136,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       10 363 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -193,6 +207,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       22 373 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -257,6 +278,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       48 301 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -321,6 +349,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       104 278 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -384,7 +419,14 @@
                 <dd>
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
-                      225 128 дос./год
+                      225 127 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -1055,7 +1097,7 @@
         <h2>
           Пул Майстерності
         <p class="amount">
-          0 / 9 000
+          0 / 12 000
         <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="bar" role="progressbar">
           <span class="fill" style="width: 0%;">
           <span class="tick" style="left: 10%;">

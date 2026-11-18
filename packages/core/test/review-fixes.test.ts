@@ -1,6 +1,8 @@
 import { content } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
+  masteryLevel,
+  masteryXpPerHour,
   advance,
   defaultRules,
   deserialize,
@@ -64,8 +66,10 @@ describe('mastery from combat and items feeds the pool', () => {
     advance(state, HOUR, content);
     // Every technique the player knows shares the XP; the total is what the balance fixes.
     const mastery = Object.values(state.mastery).reduce((sum, m) => sum + m.xp, 0);
-    expect(mastery / K.masteryPerHour).toBeGreaterThan(0.95);
-    expect(mastery / K.masteryPerHour).toBeLessThan(1.05);
+    // An hour pays at least the rate of mastery 1 and at most that of the highest level reached.
+    const top = Math.max(...Object.keys(state.mastery).map((k) => masteryLevel(state, k, content)));
+    expect(mastery).toBeGreaterThan(0.95 * masteryXpPerHour(1, content));
+    expect(mastery).toBeLessThan(1.05 * masteryXpPerHour(top, content));
     expect(state.pools.tai!.xp).toBeCloseTo(
       Math.min(poolCapacity('tai', content), mastery * K.poolShare),
       6,
@@ -76,9 +80,10 @@ describe('mastery from combat and items feeds the pool', () => {
     const state = genin(4);
     state.bank[SCROLL] = 1;
     dispatch(state, { type: 'item.use', id: SCROLL, target: 'core:clone' }, content);
-    expect(state.mastery['core:clone']?.xp).toBe(K.masteryPerHour);
+    const hour = masteryXpPerHour(1, content);
+    expect(state.mastery['core:clone']?.xp).toBe(hour);
     expect(state.pools.nin!.xp).toBeCloseTo(
-      Math.min(poolCapacity('nin', content), K.masteryPerHour * K.poolShare),
+      Math.min(poolCapacity('nin', content), hour * K.poolShare),
       6,
     );
   });

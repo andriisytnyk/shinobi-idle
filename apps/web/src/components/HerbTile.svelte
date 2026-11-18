@@ -80,7 +80,7 @@
         <ModBreakdown
           keys={[`interval.skill.${info.skill}`, `speed.skill.${info.skill}`]}
           display={formatSeconds(info.intervalMs)}
-          base={formatSeconds(content.balance.K.gather * 1000)}
+          base={formatSeconds(info.baseMs)}
         />
       </dd>
     </div>
@@ -90,6 +90,15 @@
         <ModBreakdown
           keys={['xp.all', `xp.skill.${info.skill}`]}
           display={t('tile.xphValue', { n: formatXp(info.xpPerHour) })}
+        />
+      </dd>
+    </div>
+    <div data-ui="action-mastery">
+      <dt>{t('tile.mxph')}</dt>
+      <dd>
+        <ModBreakdown
+          keys={['mastery.xp.all', `mastery.xp.skill.${info.skill}`]}
+          display={t('tile.mxphValue', { n: formatXp(info.masteryPerHour) })}
         />
       </dd>
     </div>

@@ -1,123 +1,108 @@
 /**
- * Practising a technique pays the same XP and mastery per hour whatever the length of its cycle:
- * a cycle that got longer pays proportionally more. The fixture was recorded on dev at 3f559af
- * (before the cast time became a number of the technique) by running this file with DUMP=1.
+ * The pace of practising a technique. The fixture was recorded on dev at 3f559af, when XP per cycle
+ * was derived from the cycle (so XP per hour never moved): its XP per hour at mastery 1 of the
+ * player's own nature is still what the data now pays (the identity of the explicit XP per cycle).
+ * What changed on purpose: XP per cycle is data and does not depend on mastery, so a cast that
+ * mastery or a foreign nature shortens or stretches moves XP per hour; Mastery per hour grows with
+ * the mastery level (`K.mastery`).
  */
 import { content } from '@shinobi/content';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   actionInfo,
   advance,
   dispatch,
-  masteryXpPerAction,
+  masteryXpPerHour,
   xpAt,
   type GameState,
 } from '../src/index.ts';
 import { genin, setLevel, start } from './helpers.ts';
 
 const FIXTURE = new URL('./fixtures/practice-rates.json', import.meta.url);
-const HOUR = 3_600_000;
+const recorded = (JSON.parse(readFileSync(FIXTURE, 'utf8')) as { table: Record<string, number[]> })
+  .table;
 
-type Table = Record<string, [number, number]>;
-
-/** What an hour of real play pays, for a few techniques: skill XP and mastery XP gained. */
-function played(): Table {
-  const out: Table = {};
-  for (const id of [
-    'core:leaf_whirlwind',
-    'core:clone',
-    'core:great_fireball',
-    'core:gale_palm',
-    'core:shadow_clone',
-  ]) {
-    const tech = content.techniques.find((t) => t.id === id);
-    if (!tech) continue;
-    for (const native of [true, false]) {
-      const state = genin();
-      state.player.natures = native ? [tech.skill] : ['doton', tech.skill];
-      setLevel(state, tech.skill, tech.level);
-      state.known[id] = true;
-      const before = state.skills[tech.skill]?.xp ?? 0;
-      dispatch(state, start('practice', id), content);
-      advance(state, HOUR, content);
-      out[`${id}|${native ? 'native' : 'foreign'}`] = [
-        (state.skills[tech.skill]?.xp ?? 0) - before,
-        state.mastery[id]?.xp ?? 0,
-      ];
-    }
-  }
-  return out;
+function stateFor(id: string, mastery: number, native: boolean): GameState {
+  const tech = content.techniques.find((t) => t.id === id)!;
+  const isNature = content.natures.some((n) => n.id === tech.skill);
+  const other = content.natures.find((n) => n.id !== tech.skill)?.id ?? tech.skill;
+  const state = genin();
+  state.player.natures = isNature ? (native ? [tech.skill] : [other, tech.skill]) : ['katon'];
+  setLevel(state, tech.skill, tech.level);
+  state.known[id] = true;
+  state.mastery[id] = { xp: mastery === 1 ? 0 : xpAt(mastery) };
+  return state;
 }
 
-/** XP and mastery XP per hour of practising every technique of the pack, native and not, at mastery 1 and 60. */
-function table(): Table {
-  const out: Table = {};
-  for (const tech of content.techniques) {
-    const isNature = content.natures.some((n) => n.id === tech.skill);
-    const other = content.natures.find((n) => n.id !== tech.skill)?.id;
-    for (const mastery of [1, 60]) {
-      for (const native of isNature ? [true, false] : [true]) {
-        const state: GameState = genin();
-        state.player.natures = isNature
-          ? native
-            ? [tech.skill]
-            : [other ?? tech.skill, tech.skill]
-          : ['katon'];
-        setLevel(state, tech.skill, tech.level);
-        state.known[tech.id] = true;
-        state.mastery[tech.id] = { xp: mastery === 1 ? 0 : xpAt(mastery) };
-        const info = actionInfo(state, { kind: 'practice', id: tech.id }, content);
-        if (!info) continue;
-        const perHour = (info.xpPerHour * 1) / 1;
-        const masteryPerHour =
-          (masteryXpPerAction(info.intervalMs / 1000, content) * HOUR) / info.intervalMs;
-        out[`${tech.id}|${mastery}|${native ? 'native' : 'foreign'}`] = [
-          Math.round(perHour * 1000) / 1000,
-          Math.round(masteryPerHour * 1000) / 1000,
-        ];
-      }
+describe('the pace of practice', () => {
+  it('pays at mastery 1 the XP per hour it paid before XP per cycle became data', () => {
+    let checked = 0;
+    for (const tech of content.techniques) {
+      const old = recorded[`${tech.id}|1|native`];
+      if (!old) continue;
+      const info = actionInfo(
+        stateFor(tech.id, 1, true),
+        { kind: 'practice', id: tech.id },
+        content,
+      );
+      if (!info) continue;
+      // The data is rounded to a thousandth of an XP per cycle, the cycle to a millisecond.
+      expect(info.xpPerHour / (old[0] ?? 1), tech.id).toBeGreaterThan(0.999);
+      expect(info.xpPerHour / (old[0] ?? 1), tech.id).toBeLessThan(1.001);
+      checked++;
     }
-  }
-  return out;
-}
+    expect(checked).toBeGreaterThan(50);
+  });
 
-describe('practice pays the same per hour as before', () => {
-  if (process.env.DUMP) {
-    it('records the fixture', () => {
-      writeFileSync(FIXTURE, JSON.stringify({ table: table(), played: played() }, null, 1) + '\n');
-    });
-    return;
-  }
-  const file = JSON.parse(readFileSync(FIXTURE, 'utf8')) as { table: Table; played: Table };
-  const recorded = file.table;
-  const now = table();
-
-  it('pays what it paid in an hour of real play, within the cycle that is cut off at the end of the hour', () => {
-    const now = played();
-    for (const [key, [xp, mastery]] of Object.entries(file.played)) {
-      if (xp === 0) continue;
-      const got = now[key];
-      expect(got, key).toBeDefined();
-      expect((got?.[0] ?? 0) / xp, `${key} xp`).toBeGreaterThan(0.97);
-      expect((got?.[0] ?? 0) / xp, `${key} xp`).toBeLessThan(1.03);
-      expect((got?.[1] ?? 0) / mastery, `${key} mastery`).toBeGreaterThan(0.97);
-      expect((got?.[1] ?? 0) / mastery, `${key} mastery`).toBeLessThan(1.03);
+  it('pays the same XP per cycle at any mastery, and never less per hour at a higher one', () => {
+    for (const tech of content.techniques) {
+      const key = { kind: 'practice', id: tech.id };
+      const low = actionInfo(stateFor(tech.id, 1, true), key, content);
+      const high = actionInfo(stateFor(tech.id, 60, true), key, content);
+      if (!low || !high) continue;
+      expect(high.xpPerCycle, tech.id).toBeCloseTo(low.xpPerCycle, 9);
+      expect(high.xpPerHour, tech.id).toBeGreaterThanOrEqual(low.xpPerHour - 1e-6);
     }
   });
 
-  it('covers the same cases', () => {
-    expect(Object.keys(now).sort()).toEqual(Object.keys(recorded).sort());
-    expect(Object.keys(now).length).toBeGreaterThan(100);
+  it('pays Mastery per hour by the mastery level of the technique', () => {
+    const id = 'core:leaf_whirlwind';
+    for (const mastery of [1, 10, 25, 60]) {
+      const info = actionInfo(stateFor(id, mastery, true), { kind: 'practice', id }, content);
+      // The mastery level the XP gives is the one the formula reads (it may round to the level below).
+      expect(info?.masteryPerHour).toBeCloseTo(
+        masteryXpPerHour(info?.masteryLevel ?? 1, content),
+        3,
+      );
+    }
   });
 
-  it('pays the XP per hour and the mastery per hour of every technique, at mastery 1 and 60, native and not', () => {
-    for (const [key, [xp, mastery]] of Object.entries(recorded)) {
-      const got = now[key];
-      if (!got) continue;
-      // Rounding only: the cycle changed, the hour did not.
-      expect(got[0], `${key} xp`).toBeCloseTo(xp, 2);
-      expect(got[1], `${key} mastery`).toBeCloseTo(mastery, 2);
-    }
+  it('pays in an hour of real play what the forecast says', () => {
+    const id = 'core:leaf_whirlwind';
+    const state = stateFor(id, 1, true);
+    const info = actionInfo(state, { kind: 'practice', id }, content);
+    const before = state.skills.tai?.xp ?? 0;
+    dispatch(state, start('practice', id), content);
+    advance(state, 3_600_000, content);
+    const got = (state.skills.tai?.xp ?? 0) - before;
+    expect(got / (info?.xpPerHour ?? 1)).toBeGreaterThan(0.97);
+    // Mastery shortens the cast during the hour, so the hour pays a little more than the forecast at mastery 1.
+    expect(got / (info?.xpPerHour ?? 1)).toBeLessThan(1.1);
+  });
+
+  it('has a longer cycle for a technique of a foreign nature (the XP of a cycle is the same)', () => {
+    const tech = content.techniques.find((t) => t.id === 'core:great_fireball')!;
+    const native = actionInfo(
+      stateFor(tech.id, 1, true),
+      { kind: 'practice', id: tech.id },
+      content,
+    );
+    const foreign = actionInfo(
+      stateFor(tech.id, 1, false),
+      { kind: 'practice', id: tech.id },
+      content,
+    );
+    expect(foreign?.intervalMs ?? 0).toBeGreaterThanOrEqual(native?.intervalMs ?? 0);
   });
 });

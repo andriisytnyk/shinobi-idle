@@ -1,6 +1,7 @@
 import { content, type ContentDb } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
+  masteryXpPerHour,
   advance,
   createState,
   deserialize,
@@ -237,7 +238,7 @@ describe('A6: graduation', () => {
     expect(
       dispatch(state, { type: 'item.use', id: SCROLL, target: 'core:clone' }, content),
     ).toEqual({ ok: true });
-    expect((state.mastery['core:clone']?.xp ?? 0) - before).toBe(content.balance.K.masteryPerHour);
+    expect((state.mastery['core:clone']?.xp ?? 0) - before).toBe(masteryXpPerHour(1, content));
     expect(state.bank[SCROLL]).toBeUndefined();
   });
 

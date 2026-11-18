@@ -21,7 +21,7 @@ export const K = {
   // --- інтервали дій, с ---
   practiceFocus: { base:0.8, perLevel:0.06 }, practiceCast: 0.82, practiceMin: 2.0, drill: 3.0, meditate: 3.0, obstacle: 2.5, gather: 2.5, craft: 2.5, explore: 5.0,
   // Цикл дії росте з рівнем дії лінійно від K.<вид> (рівень 1) до cycleMax.<вид> (стеля навички). Ремесла (artisan у Melvor) і Медитація — стала.
-  cycleMax: { drill: 12.0, meditate: 3.0, gather: 10.0, obstacle: 7.5, craft: 2.5 },
+  cycleMax: { drill: 12.0, meditate: 3.0, gather: 8.0, obstacle: 7.5, craft: 2.5 },
   // --- техніки ---
   // Каст — число самої техніки й не залежить від печаток (рішення автора 15.11): базовий каст рангу × множник ролі, для окремих технік — вручну (patch.mjs, TECH.cast).
   castByRank: { E:0.944, D:1.133, C:0.947, B:2.186, A:1.748, S:2.622 },

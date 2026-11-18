@@ -453,6 +453,6 @@ describe('A4: each wired key changes its mechanic by exactly the modifier', () =
     dispatch(b, start('gather', MINT), content);
     for (let i = 0; i < 7200; i++) advance(b, 1000, content);
     expect(JSON.stringify(b.bank)).toBe(JSON.stringify(a.bank));
-    expect(masteryXpPerAction(1, content)).toBeGreaterThan(0);
+    expect(masteryXpPerAction(1, 1, content)).toBeGreaterThan(0);
   });
 });

@@ -110,6 +110,17 @@
           {:else}—{/if}
         </dd>
       </div>
+      <div data-ui="action-mastery">
+        <dt>{t('tile.mxph')}</dt>
+        <dd>
+          {#if info}
+            <ModBreakdown
+              keys={['mastery.xp.all', `mastery.xp.skill.${skill}`]}
+              display={t('tile.mxphValue', { n: formatXp(info.masteryPerHour) })}
+            />
+          {:else}—{/if}
+        </dd>
+      </div>
     </dl>
     {#if built.length === 0}
       <p class="hint" data-course-empty>{t('course.empty')}</p>

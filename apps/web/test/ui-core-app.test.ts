@@ -262,6 +262,7 @@ describe('stable anchors (D11)', () => {
       'skill-row',
       'action-tile',
       'action-xp',
+      'action-mastery',
       'action-interval',
       'action-progress',
       'mastery-ring',

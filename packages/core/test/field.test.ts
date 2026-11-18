@@ -105,8 +105,11 @@ describe('gather', () => {
       ok(s, gather(herb.id));
       advance(s, HOUR, content, plainRules);
       const perHour = s.skills.herb!.xp - before;
+      // A gather pays a fixed XP set against a bush of the first size; the bush grows with mastery and its pause is shared among more herbs, so the hour pays more, never beyond the cycle without any pause.
+      const cycle = herb.cycle ?? K.gather;
+      const noPause = (cycle + K.field.regrowMs / 1000 / (K.field.stockBase + 1)) / cycle;
       expect(perHour / rate(level, content)).toBeGreaterThan(0.98);
-      expect(perHour / rate(level, content)).toBeLessThan(1.02);
+      expect(perHour / rate(level, content)).toBeLessThan(noPause + 0.02);
     });
   }
 

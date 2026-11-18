@@ -110,6 +110,15 @@
         />
       </dd>
     </div>
+    <div data-ui="action-mastery">
+      <dt>{t('tile.mxph')}</dt>
+      <dd>
+        <ModBreakdown
+          keys={['mastery.xp.all', `mastery.xp.skill.${info.skill}`]}
+          display={t('tile.mxphValue', { n: formatXp(info.masteryPerHour) })}
+        />
+      </dd>
+    </div>
   </dl>
 
   {#if info.available}

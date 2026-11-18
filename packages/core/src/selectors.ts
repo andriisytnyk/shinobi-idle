@@ -59,6 +59,8 @@ export interface ActionInfo {
   blocked: string | null;
   /** The evaluated requirement tree; null when the action is available. */
   req: ReqResult | null;
+  /** Length of one cycle at full speed in ms before modifiers: the explicit cycle of the action. */
+  baseMs: number;
   /** Length of one cycle at full speed in ms, modifiers included. */
   intervalMs: number;
   /** Skill XP per hour at full speed, with modifiers and the Academy slowdown. */
@@ -132,7 +134,6 @@ function factsOf(
   rules: Rules,
 ): Facts | null {
   const index = indexOf(content);
-  const K = content.balance.K;
   const ms = (seconds: number) => Math.round(seconds * MS_PER_SECOND);
   switch (kind) {
     case 'practice': {
@@ -296,6 +297,7 @@ export function actionInfo(
     available: result.met && blocked === null,
     blocked,
     req: result.met ? null : result,
+    baseMs,
     intervalMs,
     xpPerHour,
     xpPerCycle,

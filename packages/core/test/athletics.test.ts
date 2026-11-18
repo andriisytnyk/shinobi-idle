@@ -2,6 +2,7 @@
 import { content } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
+  cycleSeconds,
   advance,
   buildCost,
   builtObstacles,
@@ -12,14 +13,18 @@ import {
   lapIntervalMs,
   listCourse,
   poolCapacity,
-  rate,
   serialize,
   type GameState,
 } from '../src/index.ts';
 import { genin, HOUR, plainRules, setLevel, start } from './helpers.ts';
 
 const K = content.balance.K;
-const OBSTACLE_MS = Math.round(K.obstacle * 1000);
+/** One obstacle's cycle in ms: obstacles of later slots take longer. */
+const cycleMs = (o: { cycle?: number | undefined; level: number }): number =>
+  Math.round(cycleSeconds('obstacle', o, content) * 1000);
+/** A lap at full speed before modifiers: the cycles of the built obstacles added up. */
+const lapMs = (s: GameState): number =>
+  builtObstacles(s, content).reduce((sum, o) => sum + cycleMs(o), 0);
 
 /** Obstacles with no Athletics XP or Athletics speed modifier, one per slot, so laps follow the plain formula. */
 const NEUTRAL: Record<number, string> = {
@@ -168,17 +173,16 @@ describe('A7: building obstacles', () => {
 
 describe('A7: laps', () => {
   it.each([1, 3, 6])(
-    'runs %i obstacles in a lap of n x the obstacle time that pays the sum of the rates',
+    'runs %i obstacles in a lap of the sum of their cycles that pays the sum of their XP',
     (n) => {
       const s = rich();
       buildNeutral(s, n);
-      expect(lapIntervalMs(s, content, defaultRules)).toBe(n * OBSTACLE_MS);
-      expect(courseKind.intervalMs(s, 'ath', content, defaultRules)).toBe(n * OBSTACLE_MS);
       const built = builtObstacles(s, content);
       expect(built).toHaveLength(n);
+      expect(lapIntervalMs(s, content, defaultRules)).toBe(lapMs(s));
+      expect(courseKind.intervalMs(s, 'ath', content, defaultRules)).toBe(lapMs(s));
       const pillar = n >= K.athletics.pillarCount ? 1 + K.athletics.pillarXp : 1;
-      const expected =
-        built.reduce((sum, o) => sum + (rate(o.level, content) * K.obstacle) / 3600, 0) * pillar;
+      const expected = built.reduce((sum, o) => sum + (o.xp ?? 0), 0) * pillar;
       const before = s.skills.ath!.xp;
       courseKind.complete(s, 'ath', content, defaultRules);
       expect(s.skills.ath!.xp - before).toBeCloseTo(expected, 6);
@@ -187,19 +191,19 @@ describe('A7: laps', () => {
     },
   );
 
-  it('runs the lap as an action: one lap takes n x the obstacle time, XP per hour is the mean rate', () => {
+  it('runs the lap as an action: one lap takes the sum of the cycles, XP per hour is the XP of a lap over its time', () => {
     for (const n of [1, 3]) {
       const s = rich();
       buildNeutral(s, n);
       expect(dispatch(s, start('course', 'ath'), content)).toEqual({ ok: true });
-      advance(s, n * OBSTACLE_MS - 1, content);
+      advance(s, lapMs(s) - 1, content);
       expect(s.counters['actions.course'] ?? 0).toBe(0);
       advance(s, 1, content);
       expect(s.counters['actions.course']).toBe(1);
       const before = s.skills.ath!.xp;
       advance(s, HOUR, content);
       const meanRate =
-        builtObstacles(s, content).reduce((sum, o) => sum + rate(o.level, content), 0) / n;
+        (builtObstacles(s, content).reduce((sum, o) => sum + (o.xp ?? 0), 0) * HOUR) / lapMs(s);
       expect((s.skills.ath!.xp - before) / meanRate).toBeGreaterThan(0.99);
       expect((s.skills.ath!.xp - before) / meanRate).toBeLessThan(1.01);
     }
@@ -221,7 +225,7 @@ describe('A7: laps', () => {
     dispatch(s, start('course', 'ath'), content);
     advance(s, 1000, content);
     build(s, 2, NEUTRAL[2] as string);
-    advance(s, 2 * OBSTACLE_MS - 1000 - 1, content);
+    advance(s, lapMs(s) - 1000 - 1, content);
     expect(s.counters['actions.course'] ?? 0).toBe(0);
     advance(s, 1, content);
     expect(s.counters['actions.course']).toBe(1);
@@ -249,7 +253,7 @@ describe('A7: modifiers of built obstacles', () => {
     expect(speed.total).toBeCloseTo(0.98, 12);
     // The penalty changes the lap exactly: the cycle is divided by the speed.
     build(s, 1, NEUTRAL[1] as string);
-    expect(lapIntervalMs(s, content, defaultRules)).toBe(Math.round((2 * OBSTACLE_MS) / 0.98));
+    expect(lapIntervalMs(s, content, defaultRules)).toBe(Math.round(lapMs(s) / 0.98));
     // The other obstacle of the slot swaps the modifiers.
     build(s, 2, 'core:vidzhymannia_na_paltsiakh'); // +2% stamina pool / -1% Alchemy speed
     expect(getMod(s, 'xp.skill.tai', content).total).toBe(1);

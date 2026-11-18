@@ -2,6 +2,7 @@
 import { content } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
+  masteryXpPerHour,
   dispatch,
   masteryLevel,
   refreshRegions,
@@ -90,8 +91,9 @@ describe('A4: reading a scroll', () => {
     state.known[TECH] = true;
     stock(state, { [SCROLL]: 2 });
     const before = mastery(state, TECH);
+    const hour = masteryXpPerHour(masteryLevel(state, TECH, content), content);
     expect(use(state, SCROLL)).toEqual({ ok: true });
-    expect(mastery(state, TECH) - before).toBeCloseTo(K.masteryPerHour, 6);
+    expect(mastery(state, TECH) - before).toBeCloseTo(hour, 6);
     expect(state.bank[SCROLL]).toBe(1);
     expect(masteryLevel(state, TECH, content)).toBeGreaterThanOrEqual(1);
   });
@@ -108,8 +110,9 @@ describe('A4: the generic Notes', () => {
     if (!known) throw new Error('no known technique');
     stock(state, { [NOTES]: 3 });
     const before = mastery(state, known);
+    const hour = masteryXpPerHour(masteryLevel(state, known, content), content);
     expect(use(state, NOTES, known)).toEqual({ ok: true });
-    expect(mastery(state, known) - before).toBeCloseTo(K.masteryPerHour, 6);
+    expect(mastery(state, known) - before).toBeCloseTo(hour, 6);
     expect(state.bank[NOTES]).toBe(2);
     // A technique not known, an unknown id and no target are refused without losing the item.
     expect(use(state, NOTES, TECH)).toEqual({ ok: false, reason: 'error.invalidTarget' });
