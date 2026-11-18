@@ -5,6 +5,13 @@
   const error = $derived(game.loadError);
   let showRaw = $state(false);
   let confirming = $state(false);
+  /** The newest copy made before an upgrade, as text; null before it was asked for. */
+  let backupText = $state<string | null>(null);
+  const newest = $derived(game.backups[0]);
+
+  async function exportBackup(): Promise<void> {
+    backupText = newest ? ((await game.exportBackup(newest.key)) ?? '') : '';
+  }
 </script>
 
 <main class="gate" data-gate="error">
@@ -25,8 +32,23 @@
     {#if error?.raw}
       <button type="button" onclick={() => (showRaw = !showRaw)}>{t('gate.error.export')}</button>
     {/if}
+    {#if newest}
+      <button type="button" data-export-backup onclick={() => void exportBackup()}>
+        {t('gate.error.exportBackup')}
+      </button>
+    {/if}
     <button type="button" onclick={() => (confirming = true)}>{t('gate.error.newGame')}</button>
   </div>
+
+  {#if backupText !== null}
+    {#if backupText === ''}
+      <p>{t('settings.backupExportFailed')}</p>
+    {:else}
+      <p>{t('gate.error.backupHint')}</p>
+      <textarea readonly rows="6" aria-label={t('gate.error.exportBackup')} value={backupText}
+      ></textarea>
+    {/if}
+  {/if}
 
   {#if showRaw && error?.raw}
     <textarea readonly rows="6" aria-label={t('gate.error.export')} value={error.raw}></textarea>

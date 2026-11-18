@@ -1,10 +1,18 @@
 import { content } from '@shinobi/content';
-import { advance, createState, dispatch, type GameState } from '@shinobi/core';
+import {
+  advance,
+  advanceOffline,
+  createState,
+  dispatch,
+  moneyOf,
+  type GameState,
+} from '@shinobi/core';
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { Clock, KeyValue } from './persistence.ts';
 import {
   createTelemetry,
+  OFFLINE_MIN_MS,
   TELEMETRY_FORMAT,
   TELEMETRY_KEY,
   telemetryFileName,
@@ -114,12 +122,101 @@ describe('local telemetry of the web layer', () => {
   });
 });
 
+describe('catch-ups and failures', () => {
+  it('counts only a real absence as an offline catch-up, and not twice as open time', () => {
+    const c = clock();
+    const state = createState(1, content);
+    state.player.rank = 'genin';
+    const tel = createTelemetry({ clock: c, kv: null, content, enabled: () => true });
+    tel.start(state);
+    play(tel, state, 10);
+    const open = tel.record.sessions.realMs;
+    for (const gap of [600, OFFLINE_MIN_MS + 1000]) {
+      c.set(c.now() + gap);
+      tel.beforeCatchUp(state);
+      const summary = advanceOffline(state, gap, content);
+      tel.afterCatchUp(state, summary);
+    }
+    expect(tel.record.offline.count).toBe(1);
+    // Neither gap is added to the session's real time; the next beat counts from after them.
+    advance(state, 1000, content);
+    tel.observe(state);
+    expect(tel.record.sessions.realMs).toBe(open);
+  });
+
+  it('stamps nothing after being cleared or switched back on late in a game', async () => {
+    const c = clock();
+    const state = createState(1, content);
+    state.player.rank = 'genin';
+    state.known['core:shadow_clone'] = true;
+    let on = true;
+    const tel = createTelemetry({ clock: c, kv: null, content, enabled: () => on });
+    tel.start(state);
+    await tel.clear(state);
+    for (const switchOff of [false, true]) {
+      if (switchOff) {
+        on = false;
+        tel.observe(state);
+        on = true;
+      }
+      tel.beforeCatchUp(state);
+      tel.afterCatchUp(state, advanceOffline(state, 120_000, content));
+      expect(tel.record.milestones.map((m) => m.key)).toEqual([]);
+    }
+  });
+
+  it('re-baselines on a swap of the state', () => {
+    const state = createState(1, content);
+    const tel = createTelemetry({ clock: clock(), kv: null, content, enabled: () => true });
+    tel.start(state);
+    play(tel, state, 3);
+    const rich = createState(2, content);
+    rich.currencies[moneyOf(content)] = 900;
+    tel.rebase(rich);
+    advance(rich, 1000, content);
+    tel.observe(rich);
+    expect(tel.record.ryo.earned.other ?? 0).toBe(0);
+    expect(tel.record.ryo.spent).toBe(0);
+  });
+
+  it('never throws into the game loop: a telemetry error switches recording off', () => {
+    const c = clock();
+    const state = createState(1, content);
+    const tel = createTelemetry({ clock: c, kv: null, content, enabled: () => true });
+    tel.start(state);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    c.now = () => {
+      throw new Error('clock broke');
+    };
+    advance(state, 1000, content);
+    expect(() => tel.observe(state)).not.toThrow();
+    expect(() => tel.fold([{ type: 'rankUp', rank: 'genin', at: 1 }])).not.toThrow();
+    expect(() => tel.observe(state)).not.toThrow();
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(tel.record.milestones).toEqual([]);
+    warn.mockRestore();
+  });
+
+  it('starts from a new record when the stored one is damaged', async () => {
+    const kv = memoryStore();
+    kv.data.set(TELEMETRY_KEY, '{"v":1,"ryo":null}');
+    const tel = createTelemetry({ clock: clock(), kv, content, enabled: () => true });
+    await tel.load();
+    expect(tel.record.ryo.earned).toEqual({});
+    expect(() => tel.observe(createState(1, content))).not.toThrow();
+  });
+});
+
 describe('no network', () => {
   it('has no network API in the telemetry sources', () => {
     const sources = [
       'src/lib/telemetry.ts',
       'src/lib/download.ts',
+      'src/lib/game.svelte.ts',
+      'src/lib/settings.svelte.ts',
+      'src/components/TelemetrySection.svelte',
       '../../packages/core/src/telemetry.ts',
+      '../../packages/sim/src/telemetryReport.ts',
     ];
     const network = /\b(fetch|XMLHttpRequest|WebSocket|sendBeacon|EventSource|importScripts)\b/;
     for (const path of sources) {

@@ -40,6 +40,36 @@ function nameOf(t: Translate, kind: string, id: string): string {
   return t(`${kind}.${id}.name`) ?? t(`${kind}.${id}`) ?? id;
 }
 
+/** Readable names of the action kinds of the built-in rules; a kind of a pack shows as its id. */
+const KIND_LABELS: Record<string, string> = {
+  practice: 'Практика',
+  drill: 'Муштра',
+  meditate: 'Медитація',
+  course: 'Курс',
+  fight: 'Бій',
+  operation: 'Операція',
+  mission: 'Місія',
+  gather: 'Збір',
+  craft: 'Крафт',
+  senseiTest: 'Іспит сенсея',
+  explore: 'Розвідка',
+  walk: 'Подорож',
+  stand: 'Очікування',
+  autosurvey: 'Автоогляд',
+};
+
+/** Readable names of the sources of money. */
+const SOURCE_LABELS: Record<string, string> = {
+  mission: 'Місії',
+  loot: 'Здобич з боїв',
+  bounty: 'Нагороди за голови',
+  operation: 'Операції',
+  point: 'Знахідки на мапі',
+  other: 'Інше (не пояснене подіями)',
+};
+
+const labelOf = (labels: Record<string, string>, key: string): string => labels[key] ?? key;
+
 /** Renders one milestone key (`skill:core:tai:10`, `rank:genin`, ...). */
 function milestoneName(t: Translate, key: string): string {
   const [kind = '', ...rest] = key.split(':');
@@ -143,9 +173,9 @@ export function telemetryReport(file: unknown, t: Translate): string[] {
   out.push('## Куди пішов час (ігровий)', '');
   out.push(
     ...table(
-      ['Вид дії', 'Час', 'Частка'],
+      ['Вид дії (приблизно для офлайну)', 'Час', 'Частка'],
       byKind.map(([k, ms]) => [
-        k,
+        labelOf(KIND_LABELS, k),
         duration(ms),
         `${((100 * ms) / Math.max(1, num(rec.game))).toFixed(0)}%`,
       ]),
@@ -195,7 +225,7 @@ export function telemetryReport(file: unknown, t: Translate): string[] {
   out.push(
     ...table(
       ['Джерело', 'Рьо'],
-      earned.map(([k, n]) => [k, String(n)]),
+      earned.map(([k, n]) => [labelOf(SOURCE_LABELS, k), String(n)]),
     ),
     '',
     `Зароблено разом: ${total(earned)}, витрачено: ${num(ryo.spent)}.`,

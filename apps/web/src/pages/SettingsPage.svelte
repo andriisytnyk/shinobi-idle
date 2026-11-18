@@ -4,9 +4,7 @@
   import { BUILTIN_PACKS } from '../lib/builtin-packs.ts';
   import { tryUi } from '../lib/ext/runtime.svelte.ts';
   import Slot from '../lib/ext/Slot.svelte';
-  import { downloadText } from '../lib/download.ts';
   import { t } from '../lib/i18n.ts';
-  import { telemetryFileName } from '../lib/telemetry.ts';
   import { ruleReasonText } from '../lib/vocab.ts';
   import { settings } from '../lib/settings.svelte.ts';
   import { game } from '../lib/store.ts';
@@ -36,29 +34,6 @@
   let confirmReset = $state(false);
   let confirmImport = $state(false);
   let typed = $state('');
-
-  const readTel = () => ({
-    sessions: game.telemetry.sessions(),
-    kb: (game.telemetry.size() / 1024).toFixed(1),
-  });
-  let telInfo = $state(readTel());
-  let telMessage = $state<{ ok: boolean; text: string } | null>(null);
-
-  function exportTelemetry(): void {
-    const file = game.telemetry.file();
-    const name = telemetryFileName(file.exportedAt);
-    const ok = downloadText(name, JSON.stringify(file, null, 1));
-    telMessage = ok
-      ? { ok, text: t('settings.telemetryExported', { name }) }
-      : { ok, text: t('settings.telemetryExportFailed') };
-    telInfo = readTel();
-  }
-
-  async function clearTelemetry(): Promise<void> {
-    await game.telemetry.clear();
-    telInfo = readTel();
-    telMessage = { ok: true, text: t('settings.telemetryCleared') };
-  }
 
   function doExport(): void {
     exported = game.exportText();
@@ -100,11 +75,35 @@
     message = { ok, key: ok ? 'settings.restored' : 'settings.restoreFailed' };
   }
 
+  /** The backup the player is about to restore (asks first), and the text of the one just exported. */
+  let restoring = $state<string | null>(null);
+  let backupExport = $state<{ key: string; text: string } | null>(null);
+
+  const dateOf = (at: number): string => new Date(at).toLocaleString('uk-UA');
+
+  async function exportBackup(key: string): Promise<void> {
+    const text = await game.exportBackup(key);
+    if (text === null) {
+      backupExport = null;
+      message = { ok: false, key: 'settings.backupExportFailed' };
+      return;
+    }
+    backupExport = { key, text };
+    message = null;
+  }
+
+  async function doRestoreFrom(): Promise<void> {
+    const key = restoring;
+    restoring = null;
+    if (key === null) return;
+    const ok = await game.restoreFrom(key);
+    message = { ok, key: ok ? 'settings.restored' : 'settings.restoreFailed' };
+  }
+
   async function doReset(): Promise<void> {
     confirmReset = false;
     typed = '';
     await game.reset();
-    telInfo = readTel();
     exported = '';
     message = { ok: true, key: 'settings.resetDone' };
   }
@@ -277,29 +276,36 @@
     {/if}
   </section>
 
-  <section data-telemetry>
-    <h2>{t('settings.telemetry')}</h2>
-    <p class="dim">{t('settings.telemetryHelp')}</p>
-    <label class="check">
-      <input
-        type="checkbox"
-        checked={settings.telemetry}
-        onchange={(e) => (settings.telemetry = e.currentTarget.checked)}
-      />
-      <span>{t('settings.telemetryOn')}</span>
-    </label>
-    <p class="dim" role="status">
-      {t('settings.telemetryInfo', {
-        sessions: telInfo.sessions,
-        size: telInfo.kb,
-      })}
-    </p>
-    <div class="row">
-      <button type="button" onclick={exportTelemetry}>{t('settings.telemetryExport')}</button>
-      <button type="button" onclick={clearTelemetry}>{t('settings.telemetryClear')}</button>
-    </div>
-    {#if telMessage}
-      <p class="message" class:bad={!telMessage.ok} role="status">{telMessage.text}</p>
+  <section data-settings="backups">
+    <h2>{t('settings.backups')}</h2>
+    <p class="dim">{t('settings.backupsHelp')}</p>
+    {#if game.backups.length === 0}
+      <p class="dim">{t('settings.backupsEmpty')}</p>
+    {:else}
+      <ul class="backups">
+        {#each game.backups as backup (backup.key)}
+          <li data-backup={backup.key}>
+            <span class="what"
+              >{t('settings.backupItem', { v: backup.v, date: dateOf(backup.at) })}</span
+            >
+            <span class="row">
+              <button type="button" onclick={() => (restoring = backup.key)}>
+                {t('settings.backupRestore')}
+              </button>
+              <button type="button" onclick={() => void exportBackup(backup.key)}>
+                {t('settings.backupExport')}
+              </button>
+            </span>
+            {#if backupExport?.key === backup.key}
+              <textarea
+                readonly
+                rows="4"
+                aria-label={t('settings.backupExport')}
+                value={backupExport.text}></textarea>
+            {/if}
+          </li>
+        {/each}
+      </ul>
     {/if}
   </section>
 
@@ -342,6 +348,18 @@
   </Modal>
 {/if}
 
+{#if restoring !== null}
+  <Modal title={t('settings.backupRestoreConfirmTitle')} onClose={() => (restoring = null)}>
+    <p>{t('settings.backupRestoreConfirm')}</p>
+    {#snippet actions()}
+      <button type="button" onclick={() => (restoring = null)}>{t('settings.cancel')}</button>
+      <button type="button" class="danger" onclick={doRestoreFrom}>
+        {t('settings.backupRestore')}
+      </button>
+    {/snippet}
+  </Modal>
+{/if}
+
 {#if confirmImport}
   <Modal title={t('settings.importConfirmTitle')} onClose={() => (confirmImport = false)}>
     <p>{t('settings.importConfirm')}</p>
@@ -365,6 +383,26 @@
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+
+  .backups {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .backups li {
+    padding: var(--space-2) var(--space-3);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+  }
+
+  .backups .row {
+    margin: var(--space-1) 0 0;
   }
 
   .version {

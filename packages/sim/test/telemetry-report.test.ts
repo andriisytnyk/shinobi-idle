@@ -39,7 +39,9 @@ describe('telemetry-report', () => {
     const text = result.out.join('\n');
     expect(text).toContain('# Звіт телеметрії');
     expect(text).toContain('## Віхи');
-    expect(text).toContain('fight');
+    expect(text).toContain('| Бій |');
+    expect(text).not.toContain('| fight |');
+    expect(text).toContain('Здобич з боїв');
   });
   it('refuses a file that is not telemetry', () => {
     const result = runTelemetryReportCli(['f.json'], env, () => '{"a":1}');

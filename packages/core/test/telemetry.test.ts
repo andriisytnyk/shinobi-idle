@@ -12,6 +12,8 @@ import {
   noteOffline,
   observeState,
   parseTelemetry,
+  rebaseTelemetry,
+  sessionResume,
   serializeTelemetry,
   sessionBeat,
   sessionStart,
@@ -127,7 +129,82 @@ describe('telemetry reducer', () => {
   });
 });
 
+describe('telemetry catch-up milestones', () => {
+  it('stamps nothing for what the game already had before the catch-up', () => {
+    const state = createState(3, content);
+    state.player.rank = 'genin';
+    setLevel(state, 'vit', 40);
+    state.known['core:shadow_clone'] = true;
+    state.now = 50_000_000;
+    const rec = newTelemetry(0);
+    const before = snapshotForTelemetry(state, content, true);
+    advanceOffline(state, 60_000, content);
+    observeState(rec, before, state, content, 9, true);
+    expect(rec.milestones).toEqual([]);
+    // The first observation baselines the stretch without milestones at the game's own time.
+    expect(rec.lastMilestone).toBe(50_000_000);
+    expect(rec.dry.ms).toBeLessThan(1_000_000);
+  });
+
+  it('stamps only what the catch-up changed', () => {
+    const state = createState(3, content);
+    setLevel(state, 'vit', 40);
+    dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: DUMMY }, content);
+    const rec = newTelemetry(0);
+    const before = snapshotForTelemetry(state, content, true);
+    state.player.rank = 'genin';
+    state.known['core:shadow_clone'] = true;
+    const summary = advanceOffline(state, 3_600_000, content);
+    observeState(rec, before, state, content, 9, true);
+    const keys = rec.milestones.map((m) => m.key);
+    expect(keys).toContain('rank:genin');
+    expect(keys).toContain('technique:core:shadow_clone');
+    // Starting ranks and old levels are not among them.
+    expect(keys).not.toContain('rank:student');
+    expect(keys).not.toContain('skill:vit:10');
+    expect(summary.simulatedMs).toBeGreaterThan(0);
+    // A second catch-up with nothing new adds nothing.
+    const count = rec.milestones.length;
+    const again = snapshotForTelemetry(state, content, true);
+    observeState(rec, again, state, content, 10, true);
+    expect(rec.milestones).toHaveLength(count);
+  });
+
+  it('moves the end of a session without counting the gap, and rebases on a state swap', () => {
+    const rec = newTelemetry(0);
+    sessionStart(rec, 0, 0);
+    sessionBeat(rec, 1_000, 1_000);
+    sessionResume(rec, 3_600_000, 3_600_000);
+    expect(rec.sessions.realMs).toBe(1_000);
+    expect(rec.sessions.last[0]?.end).toBe(3_600_000);
+    rec.ryo.expected = 5;
+    rebaseTelemetry(rec, 777);
+    expect(rec.ryo.expected).toBeNull();
+    expect(rec.lastMilestone).toBe(777);
+  });
+});
+
 describe('telemetry record', () => {
+  it('rejects damaged records of the right version and falls back to nothing', () => {
+    const good = JSON.parse(serializeTelemetry(newTelemetry(5))) as Record<string, unknown>;
+    expect(parseTelemetry(JSON.stringify(good))).not.toBeNull();
+    const bad: Record<string, unknown>[] = [
+      { ...good, ryo: null },
+      { ...good, sessions: null },
+      { ...good, milestones: [null] },
+      { ...good, milestones: [{ key: 1, game: 0, real: 0 }] },
+      { ...good, timeByKind: [] },
+      { ...good, fights: { a: null } },
+      { ...good, dry: { ms: 'x', from: 0 } },
+      { ...good, game: null },
+    ];
+    for (const record of bad) expect(parseTelemetry(JSON.stringify(record))).toBeNull();
+    expect(parseTelemetry('null')).toBeNull();
+    expect(parseTelemetry('[]')).toBeNull();
+    const { ryo: _ryo, ...missing } = good;
+    expect(parseTelemetry(JSON.stringify(missing))).toBeNull();
+  });
+
   it('round-trips through its text and rejects other versions', () => {
     const { rec } = play();
     expect(parseTelemetry(serializeTelemetry(rec))).toEqual(rec);

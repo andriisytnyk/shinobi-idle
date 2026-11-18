@@ -24,6 +24,7 @@ import ItemSheet from '../../sheets/ItemSheet.svelte';
 import RecipeSheet from '../../sheets/RecipeSheet.svelte';
 import TechniqueSheet from '../../sheets/TechniqueSheet.svelte';
 import PwaSection from '../../components/PwaSection.svelte';
+import TelemetrySection from '../../components/TelemetrySection.svelte';
 import CoursePanel from '../../components/CoursePanel.svelte';
 import MeditationPanel from '../../components/MeditationPanel.svelte';
 import ScoutPanel from '../../components/ScoutPanel.svelte';
@@ -46,6 +47,8 @@ export const coreUi: UiPack = {
   setup(ui) {
     // The «Застосунок» section of the settings page: install state, version, update.
     ui.addWidget('settings', svelteWidget(PwaSection), { id: 'pwa', order: 10 });
+    // The «Телеметрія» section: the switch, the size, export and clearing of the local record.
+    ui.addWidget('settings', svelteWidget(TelemetrySection), { id: 'telemetry', order: 20 });
 
     ui.addPage({ id: 'home', route: '#/', title: 'home.title', mount: { svelte: HomePage } });
     ui.addPage({

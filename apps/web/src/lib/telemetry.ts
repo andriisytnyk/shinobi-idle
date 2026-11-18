@@ -5,8 +5,10 @@ import {
   noteOffline,
   observeState,
   parseTelemetry,
+  rebaseTelemetry,
   serializeTelemetry,
   sessionBeat,
+  sessionResume,
   sessionStart,
   snapshotForTelemetry,
   type GameEvent,
@@ -29,6 +31,9 @@ export const TELEMETRY_KEY = 'telemetry';
 
 /** The `format` field of the exported file. */
 export const TELEMETRY_FORMAT = 'shinobi-telemetry';
+
+/** A catch-up shorter than this is a reload or a short sleep, not time away from the game. */
+export const OFFLINE_MIN_MS = 60_000;
 
 export interface TelemetryDeps {
   clock: Clock;
@@ -57,6 +62,25 @@ export function createTelemetry(deps: TelemetryDeps) {
   let rec: TelemetryRecord = newTelemetry(Math.floor(clock.now()));
   let prev: TelemetrySnapshot | null = null;
   let dirty = false;
+  /** A session is running (its end can be moved by a catch-up). */
+  let open = false;
+  /** The record was not watching (switched off) since the last observation. */
+  let wasOff = false;
+  /** A telemetry error switched recording off for the rest of the session. */
+  let broken = false;
+
+  const on = (): boolean => !broken && deps.enabled();
+
+  /** Runs a step of telemetry; whatever goes wrong here disables recording, never the game. */
+  function guard(what: string, step: () => void): void {
+    if (broken) return;
+    try {
+      step();
+    } catch (error) {
+      broken = true;
+      console.warn(`Telemetry failed in ${what}; recording is off for this session`, error);
+    }
+  }
 
   const real = (): number => Math.floor(clock.now());
 
@@ -81,47 +105,85 @@ export function createTelemetry(deps: TelemetryDeps) {
 
     /** A session begins with this state (after a load or a new game). */
     start(state: GameState): void {
-      prev = snapshotForTelemetry(state, content);
-      if (!deps.enabled()) return;
-      sessionStart(rec, real(), state.now);
-      dirty = true;
+      guard('start', () => {
+        prev = snapshotForTelemetry(state, content);
+        wasOff = !on();
+        open = on();
+        if (!on()) return;
+        sessionStart(rec, real(), state.now);
+        dirty = true;
+      });
+    },
+
+    /**
+     * The game was swapped for another state (a restore, an import, a new game): what the next
+     * observation compares with is the new state, not the discarded one. The record is kept.
+     */
+    rebase(state: GameState): void {
+      guard('rebase', () => {
+        prev = snapshotForTelemetry(state, content);
+        rebaseTelemetry(rec, state.now);
+      });
     },
 
     /** Called before the offline catch-up of a load or of a sleep: takes the snapshot with counters. */
     beforeCatchUp(state: GameState): void {
-      prev = snapshotForTelemetry(state, content, true);
+      guard('beforeCatchUp', () => {
+        prev = snapshotForTelemetry(state, content, true);
+      });
     },
 
     /** Called after the catch-up; folds what it did into the record. */
     afterCatchUp(state: GameState, summary: OfflineSummary): void {
-      if (!deps.enabled() || !prev) {
+      guard('afterCatchUp', () => {
+        const before = prev;
         prev = snapshotForTelemetry(state, content);
-        return;
-      }
-      if (summary.requestedMs > 0) {
-        noteOffline(rec, real(), summary.requestedMs, summary.simulatedMs);
-      }
-      observeState(rec, prev, state, content, real(), true);
-      prev = snapshotForTelemetry(state, content);
-      dirty = true;
+        if (!on() || !before) {
+          wasOff = !on();
+          return;
+        }
+        if (wasOff) {
+          rebaseTelemetry(rec, before.game);
+          wasOff = false;
+        }
+        if (summary.requestedMs >= OFFLINE_MIN_MS) {
+          noteOffline(rec, real(), summary.requestedMs, summary.simulatedMs);
+        }
+        observeState(rec, before, state, content, real(), true);
+        // The gap is counted as offline time; the open session does not count it again.
+        if (open) sessionResume(rec, real(), state.now);
+        dirty = true;
+      });
     },
 
     /** Events drained from the game. Call before `observe` of the same step. */
     fold(events: readonly GameEvent[]): void {
-      if (!deps.enabled() || events.length === 0) return;
-      foldEvents(rec, events, real());
-      dirty = true;
+      guard('fold', () => {
+        if (!on() || events.length === 0) return;
+        foldEvents(rec, events, real());
+        dirty = true;
+      });
     },
 
     /** After a step of the game: time, money and the session's end. */
     observe(state: GameState): void {
-      const on = deps.enabled();
-      const before = prev;
-      prev = snapshotForTelemetry(state, content);
-      if (!on || !before) return;
-      observeState(rec, before, state, content, real(), false);
-      sessionBeat(rec, real(), state.now);
-      dirty = true;
+      guard('observe', () => {
+        const before = prev;
+        prev = snapshotForTelemetry(state, content);
+        if (!on()) {
+          wasOff = true;
+          return;
+        }
+        if (!before) return;
+        if (wasOff) {
+          // Recording was off: the stretch without milestones and the money balance start again here.
+          rebaseTelemetry(rec, before.game);
+          wasOff = false;
+        }
+        observeState(rec, before, state, content, real(), false);
+        sessionBeat(rec, real(), state.now);
+        dirty = true;
+      });
     },
 
     /** Writes the record when it changed. Never throws. */
@@ -138,13 +200,18 @@ export function createTelemetry(deps: TelemetryDeps) {
     /** Empties the record (a new game, or the player's wish); a session goes on if `state` is given. */
     async clear(state?: GameState): Promise<void> {
       rec = newTelemetry(real());
-      prev = state ? snapshotForTelemetry(state, content) : null;
-      if (state && deps.enabled()) sessionStart(rec, real(), state.now);
+      // What the game already has is the baseline of the new record: it stamps no milestones for it.
+      guard('clear', () => {
+        prev = state ? snapshotForTelemetry(state, content) : null;
+        wasOff = !on();
+        open = state !== undefined && on();
+        if (state && on()) sessionStart(rec, real(), state.now);
+      });
       dirty = false;
       if (!kv) return;
       try {
         await kv.del(TELEMETRY_KEY);
-        if (state && deps.enabled()) await kv.set(TELEMETRY_KEY, serializeTelemetry(rec));
+        if (state && on()) await kv.set(TELEMETRY_KEY, serializeTelemetry(rec));
       } catch {
         // Nothing to do: the next save writes the record again.
         dirty = true;

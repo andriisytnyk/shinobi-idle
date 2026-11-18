@@ -1,4 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
+import { z } from 'zod';
 import { defeatsKey, killsKey } from './counters.ts';
 import type { GameEvent } from './events.ts';
 import { missionDoneKey } from './missions/run.ts';
@@ -88,12 +89,49 @@ export function newTelemetry(real: number): TelemetryRecord {
   };
 }
 
-const isRecord = (x: unknown): x is Record<string, unknown> =>
-  typeof x === 'object' && x !== null && !Array.isArray(x);
+const num = z.number();
+const numMap = z.record(z.string(), num);
+
+/** The whole shape of a stored record. A record that does not fit is dropped, never half-used. */
+const telemetrySchema = z.object({
+  v: z.literal(TELEMETRY_VERSION),
+  created: num,
+  sessions: z.object({
+    count: num,
+    realMs: num,
+    last: z
+      .array(z.object({ start: num, end: num, gameStart: num, gameEnd: num }))
+      .max(TELEMETRY_SESSIONS_CAP),
+  }),
+  offline: z.object({
+    count: num,
+    requestedMs: num,
+    simulatedMs: num,
+    last: z
+      .array(z.object({ real: num, requestedMs: num, simulatedMs: num }))
+      .max(TELEMETRY_OFFLINE_CAP),
+  }),
+  milestones: z
+    .array(z.object({ key: z.string(), game: num, real: num }))
+    .max(TELEMETRY_MILESTONES_CAP),
+  timeByKind: numMap,
+  timeBySkill: numMap,
+  fights: z.record(z.string(), z.object({ won: num, lost: num })),
+  missions: numMap,
+  ryo: z.object({
+    earned: numMap,
+    spent: num,
+    expected: num.nullable(),
+    unbased: num,
+  }),
+  dry: z.object({ ms: num, from: num }),
+  lastMilestone: num,
+  game: num,
+});
 
 /**
- * Reads a stored record. A text that is not a record of a known version gives null (the caller
- * starts a new one). This is where future versions get their migrations.
+ * Reads a stored record. A text that is not a complete record of the known version gives null (the
+ * caller starts a new one). This is where future versions get their migrations.
  */
 export function parseTelemetry(text: string): TelemetryRecord | null {
   let raw: unknown;
@@ -102,24 +140,8 @@ export function parseTelemetry(text: string): TelemetryRecord | null {
   } catch {
     return null;
   }
-  if (!isRecord(raw) || raw.v !== TELEMETRY_VERSION) return null;
-  const base = newTelemetry(typeof raw.created === 'number' ? raw.created : 0);
-  // Every field is taken only when it has the right shape, so a damaged record cannot break a fold.
-  const merged: Record<string, unknown> = { ...base };
-  for (const key of Object.keys(base)) {
-    const value = raw[key];
-    if (
-      value !== undefined &&
-      typeof value === typeof (base as unknown as Record<string, unknown>)[key]
-    ) {
-      merged[key] = value;
-    }
-  }
-  const rec = merged as unknown as TelemetryRecord;
-  if (!Array.isArray(rec.milestones)) rec.milestones = [];
-  if (!Array.isArray(rec.sessions.last)) rec.sessions.last = [];
-  if (!Array.isArray(rec.offline.last)) rec.offline.last = [];
-  return rec;
+  const result = telemetrySchema.safeParse(raw);
+  return result.success ? result.data : null;
 }
 
 /** The record as the text that is stored and exported. */
@@ -149,6 +171,26 @@ export function sessionBeat(rec: TelemetryRecord, real: number, game: number): v
   rec.sessions.realMs += end - last.end;
   last.end = end;
   last.gameEnd = Math.max(last.gameEnd, game);
+}
+
+/** The session slept and a catch-up covered the gap: moves its end without counting the gap as open time. */
+export function sessionResume(rec: TelemetryRecord, real: number, game: number): void {
+  const last = rec.sessions.last[rec.sessions.last.length - 1];
+  if (!last) return;
+  last.end = Math.max(last.end, real);
+  last.gameEnd = Math.max(last.gameEnd, game);
+}
+
+/**
+ * The record goes on after a break in what it watches (a state swap such as a restore, or a
+ * switch-off): the next observation compares with nothing before it, and the stretch without
+ * milestones counts from `game`.
+ */
+export function rebaseTelemetry(rec: TelemetryRecord, game: number): void {
+  rec.ryo.expected = null;
+  rec.ryo.unbased = 0;
+  rec.lastMilestone = game;
+  rec.game = game;
 }
 
 /** A catch-up after the app was closed or asleep was applied. */
@@ -260,14 +302,19 @@ export interface TelemetrySnapshot {
   kinds: string[];
   xp: Record<string, number>;
   money: number;
-  /** Counters, only when asked for (a catch-up, whose events are not queued). */
-  counters: Record<string, number> | null;
+  /** What a catch-up reads, only when asked for (its events are not queued). */
+  catchUp: {
+    counters: Record<string, number>;
+    rank: string;
+    known: string[];
+    quests: Record<string, { step: number; done: boolean }>;
+  } | null;
 }
 
 export function snapshotForTelemetry(
   state: GameState,
   content: ContentDb,
-  withCounters = false,
+  catchUp = false,
 ): TelemetrySnapshot {
   const xp: Record<string, number> = {};
   for (const skill of content.skills) xp[skill.id] = skillEntry(state, skill.id)?.xp ?? 0;
@@ -278,7 +325,16 @@ export function snapshotForTelemetry(
     kinds,
     xp,
     money: state.currencies[moneyOf(content)] ?? 0,
-    counters: withCounters ? { ...state.counters } : null,
+    catchUp: catchUp
+      ? {
+          counters: { ...state.counters },
+          rank: state.player.rank,
+          known: content.techniques.filter((t) => state.known[t.id] === true).map((t) => t.id),
+          quests: Object.fromEntries(
+            Object.entries(state.quests).map(([id, q]) => [id, { step: q.step, done: q.done }]),
+          ),
+        }
+      : null,
   };
 }
 
@@ -296,6 +352,11 @@ export function observeState(
   real: number,
   offline = false,
 ): void {
+  // The first observation of a fresh record starts its stretch without milestones here, not at game time 0.
+  if (rec.game === 0 && rec.lastMilestone === 0 && rec.milestones.length === 0) {
+    rec.game = before.game;
+    rec.lastMilestone = before.game;
+  }
   const dt = Math.max(0, state.now - before.game);
   const cap = content.balance.K.cap;
   if (rec.ryo.expected === null) {
@@ -314,39 +375,46 @@ export function observeState(
       // A catch-up queues no events: the levels it passed are read from the XP.
       if (offline) {
         for (const level of TELEMETRY_SKILL_LEVELS) {
-          if (levelAt(now, cap) >= level) {
+          if (levelAt(now, cap) >= level && levelAt(was, cap) < level) {
             addMilestone(rec, `skill:${skill.id}:${level}`, state.now, real);
           }
         }
       }
     }
   }
-  if (offline) {
-    addMilestone(rec, `rank:${state.player.rank}`, state.now, real);
+  const seen = before.catchUp;
+  if (offline && seen) {
+    // Only what was not true before the catch-up is a milestone of it; what the game already had is the baseline.
+    if (state.player.rank !== seen.rank) {
+      addMilestone(rec, `rank:${state.player.rank}`, state.now, real);
+    }
     for (const [id, q] of Object.entries(state.quests)) {
-      if (q.step > 0) addMilestone(rec, `quest:${id}:${q.step}`, state.now, real);
-      if (q.done) addMilestone(rec, `quest:${id}:done`, state.now, real);
+      const was = seen.quests[id] ?? { step: 0, done: false };
+      for (let step = was.step + 1; step <= q.step; step++) {
+        addMilestone(rec, `quest:${id}:${step}`, state.now, real);
+      }
+      if (q.done && !was.done) addMilestone(rec, `quest:${id}:done`, state.now, real);
     }
     for (const t of content.techniques) {
-      if (state.known[t.id] === true) addMilestone(rec, `technique:${t.id}`, state.now, real);
-    }
-    const was = before.counters;
-    if (was) {
-      for (const [key, value] of Object.entries(state.counters)) {
-        const gained = value - (was[key] ?? 0);
-        if (gained <= 0) continue;
-        for (const [prefix, field] of [
-          [killsKey(''), 'won'],
-          [defeatsKey(''), 'lost'],
-        ] as const) {
-          if (key.startsWith(prefix)) {
-            (rec.fights[key.slice(prefix.length)] ??= { won: 0, lost: 0 })[field] += gained;
-          }
-        }
-        const missionPrefix = missionDoneKey('');
-        if (key.startsWith(missionPrefix))
-          bumpMap(rec.missions, key.slice(missionPrefix.length), gained);
+      if (state.known[t.id] === true && !seen.known.includes(t.id)) {
+        addMilestone(rec, `technique:${t.id}`, state.now, real);
       }
+    }
+    const was = seen.counters;
+    for (const [key, value] of Object.entries(state.counters)) {
+      const gained = value - (was[key] ?? 0);
+      if (gained <= 0) continue;
+      for (const [prefix, field] of [
+        [killsKey(''), 'won'],
+        [defeatsKey(''), 'lost'],
+      ] as const) {
+        if (key.startsWith(prefix)) {
+          (rec.fights[key.slice(prefix.length)] ??= { won: 0, lost: 0 })[field] += gained;
+        }
+      }
+      const missionPrefix = missionDoneKey('');
+      if (key.startsWith(missionPrefix))
+        bumpMap(rec.missions, key.slice(missionPrefix.length), gained);
     }
   }
   const money = state.currencies[moneyOf(content)] ?? 0;
