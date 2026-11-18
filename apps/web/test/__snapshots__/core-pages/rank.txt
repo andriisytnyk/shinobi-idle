@@ -191,6 +191,52 @@
           Скласти письмовий тест
         <p class="blocked">
           Спершу виконай усі вимоги.
+      <section class="ladder renown" data-renown="">
+        <h2>
+          Ранги Репутації
+        <p class="label" data-renown-now="">
+          Репутація: 0
+        <ol>
+          <li data-renown-row="core:renown_courier" data-state="next">
+            <span class="name">
+              Довірений гінець
+            <span class="state">
+              від 180 Репутації
+            <div class="opens" data-renown-reward="">
+              <span>
+                Нагорода:
+              <ul class="chips">
+                <li>
+                  <a class="entity-link" href="#/mission/core:mail">
+                    Таємна пошта
+          <li data-renown-row="core:renown_teacher" data-state="ahead">
+            <span class="name">
+              Слово наставника
+            <span class="state">
+              від 210 Репутації
+            <p class="desc" data-renown-locked="">
+              Нагорода відкриється, коли ти її досягнеш.
+          <li data-renown-row="core:renown_merchants" data-state="ahead">
+            <span class="name">
+              Довіра торговців
+            <span class="state">
+              від 240 Репутації
+            <p class="desc" data-renown-locked="">
+              Нагорода відкриється, коли ти її досягнеш.
+          <li data-renown-row="core:renown_gift" data-state="ahead">
+            <span class="name">
+              Дарунок села
+            <span class="state">
+              від 270 Репутації
+            <p class="desc" data-renown-locked="">
+              Нагорода відкриється, коли ти її досягнеш.
+          <li data-renown-row="core:renown_recommendation" data-state="ahead">
+            <span class="name">
+              Рекомендація Хокаґе
+            <span class="state">
+              від 300 Репутації
+            <p class="desc" data-renown-locked="">
+              Нагорода відкриється, коли ти її досягнеш.
       <section class="ladder" data-ranks="">
         <h2>
           Ранги

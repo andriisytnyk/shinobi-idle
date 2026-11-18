@@ -113,6 +113,11 @@ export interface QuestDoneEvent extends EventBase {
   type: 'questDone';
   quest: string;
 }
+/** A Renown rank was reached and its rewards paid. */
+export interface RenownRankEvent extends EventBase {
+  type: 'renownRank';
+  rank: string;
+}
 export interface RankUpEvent extends EventBase {
   type: 'rankUp';
   rank: string;
@@ -362,6 +367,7 @@ export type GameEvent =
   | QuestStepEvent
   | QuestDoneEvent
   | RankUpEvent
+  | RenownRankEvent
   | ExamPassedEvent
   | ItemGainedEvent
   | ItemUsedEvent

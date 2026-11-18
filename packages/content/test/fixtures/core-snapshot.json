@@ -506,7 +506,7 @@
       "core:thief": "232ade05647b",
       "core:caravan": "45fa9e5f5eb1",
       "core:sealed": "0cedc81ab79a",
-      "core:mail": "0d42cca497ce",
+      "core:mail": "2b13a52bef77",
       "core:well": "45f9e2f5473d",
       "core:dig": "c219b2c1930b",
       "core:v_spar": "69974b08c824",
@@ -1827,6 +1827,13 @@
     "exams": {
       "core:genin_exam": "846cbe2ae25c",
       "core:chunin_exam": "d36876718df4"
+    },
+    "renownRanks": {
+      "core:renown_courier": "44483ed983ed",
+      "core:renown_teacher": "76e2793227ed",
+      "core:renown_merchants": "4a62e3c6df76",
+      "core:renown_gift": "1c66a1b3a60c",
+      "core:renown_recommendation": "5f3f90d89939"
     },
     "zones": {
       "core:zone_dummy": "c79ce14108a8",
@@ -4508,6 +4515,13 @@
       "core:genin_exam",
       "core:chunin_exam"
     ],
+    "renownRanks": [
+      "core:renown_courier",
+      "core:renown_teacher",
+      "core:renown_merchants",
+      "core:renown_gift",
+      "core:renown_recommendation"
+    ],
     "zones": [
       "core:zone_dummy",
       "core:zone_bandit",
@@ -6840,6 +6854,7 @@
       "hint.missionPage": "bbe494b05a78",
       "quests.mission": "035f06fd3d9f",
       "req.flag.missions.c.unlocked": "ce941527e745",
+      "req.flag.missions.mail.unlocked": "5dbe1e074b59",
       "mission.stage.altMet": "d7944e53ad2d",
       "mission.stage.altUnmet": "8cbbe1c78655",
       "mission.stage.fightXp": "91313110fe78",
@@ -7196,6 +7211,15 @@
       "toast.buildingRepaired": "731fb39ce6e0",
       "village.raid.fighting": "54215693fd25",
       "village.raid.toFight": "299365e5aaa7",
+      "toast.renownRank": "41bb5cfb68f8",
+      "rank.renown.title": "23d1a83f2bc7",
+      "rank.renown.now": "18677b5f7aed",
+      "rank.renown.held": "fd3f66f5f176",
+      "rank.renown.at": "80daa4ba699f",
+      "rank.renown.reward": "d950391e33c7",
+      "rank.renown.scroll": "6c9c4263404a",
+      "rank.renown.discount": "fd37b57c288a",
+      "rank.renown.locked": "b19a5c9cbf0f",
       "fight.ally": "ad9d5b3a9038",
       "fight.allies": "958454cb9c1f",
       "fight.out.allyDodged": "13fe7f056991",
@@ -7346,7 +7370,22 @@
       "item.core:chunin_vest.name": "3a3f2f3cb199",
       "item.core:chunin_vest.desc": "6fb20895f804",
       "item.core:gai_lesson.name": "21097b6131e2",
-      "item.core:gai_lesson.desc": "6937bf56a173"
+      "item.core:gai_lesson.desc": "6937bf56a173",
+      "renownRank.core:renown_courier.name": "832dd1a448c3",
+      "renownRank.core:renown_courier.desc": "1e9da3828f89",
+      "renownRank.core:renown_courier.reward": "21b504dc6d5d",
+      "renownRank.core:renown_teacher.name": "0356c822b599",
+      "renownRank.core:renown_teacher.desc": "f08e63587b60",
+      "renownRank.core:renown_teacher.reward": "2396ef909284",
+      "renownRank.core:renown_merchants.name": "0f60e247ea32",
+      "renownRank.core:renown_merchants.desc": "abeec5feeb28",
+      "renownRank.core:renown_merchants.reward": "58468882cd8a",
+      "renownRank.core:renown_gift.name": "f02de06899cc",
+      "renownRank.core:renown_gift.desc": "5c11b0c4a28d",
+      "renownRank.core:renown_gift.reward": "331e28674bcc",
+      "renownRank.core:renown_recommendation.name": "e0fd55bd91fb",
+      "renownRank.core:renown_recommendation.desc": "aa5378752a53",
+      "renownRank.core:renown_recommendation.reward": "7229c45f1bad"
     },
     "en": {
       "technique.core:body_flicker.name": "026242b01872",

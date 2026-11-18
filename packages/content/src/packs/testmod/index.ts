@@ -433,6 +433,18 @@ const data = {
       currency: 'testmod:token',
     },
   ],
+  renownRanks: [
+    {
+      id: 'testmod:renown_pellet',
+      renown: 150,
+      rewards: {
+        items: [{ item: 'testmod:pellet', n: 1 }],
+        flags: ['testmod.renown'],
+        mods: [],
+        opens: [{ kind: 'item', id: 'testmod:pellet' }],
+      },
+    },
+  ],
   exams: [
     {
       id: 'testmod:adept_exam',
@@ -529,6 +541,9 @@ export const testmodPack: ContentPack = {
       'exam.testmod:adept_exam.name': 'Тестовий іспит адепта',
       'exam.testmod:adept_exam.desc': 'Тестовий іспит пакета: він дає тестовий ранг адепта.',
       'rank.testmod:adept': 'Тестовий адепт',
+      'renownRank.testmod:renown_pellet.name': 'Тестова слава',
+      'renownRank.testmod:renown_pellet.desc': 'Тестовий ранг Репутації, який додає пакет.',
+      'renownRank.testmod:renown_pellet.reward': 'Тестова кулька.',
       'currency.testmod:token': 'Тестовий жетон',
       'state.testmod:chilled.name': 'Тестове охолодження',
       'status.testmod:chill.name': 'Тестовий холод',

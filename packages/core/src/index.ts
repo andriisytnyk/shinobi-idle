@@ -34,6 +34,7 @@ export * from './modifiers.ts';
 export * from './offline.ts';
 export * from './progression.ts';
 export * from './quests.ts';
+export * from './renown.ts';
 export * from './requirements.ts';
 export * from './reveal.ts';
 export * from './rng.ts';

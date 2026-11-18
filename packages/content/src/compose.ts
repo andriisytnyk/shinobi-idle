@@ -63,6 +63,7 @@ export const ENTITY_LISTS = [
   'gear',
   'quests',
   'exams',
+  'renownRanks',
   'zones',
   'raids',
   'operations',
@@ -377,6 +378,7 @@ const DESCRIBED: Partial<Record<EntityListKey, string>> = {
   operations: 'operation',
   raids: 'raid',
   cloneRoles: 'cloneRole',
+  renownRanks: 'renownRank',
 };
 
 /**

@@ -25,7 +25,8 @@ export type Milestone =
   | { at: number; type: 'skill'; id: string; level: number }
   | { at: number; type: 'questStep'; id: string; step: number }
   | { at: number; type: 'questDone'; id: string }
-  | { at: number; type: 'rank'; id: string };
+  | { at: number; type: 'rank'; id: string }
+  | { at: number; type: 'renownRank'; id: string };
 
 export interface RunOptions {
   seed: number;
@@ -81,6 +82,8 @@ function milestoneOf(event: GameEvent): Milestone | null {
       return { at: event.at, type: 'questStep', id: event.quest, step: event.step };
     case 'questDone':
       return { at: event.at, type: 'questDone', id: event.quest };
+    case 'renownRank':
+      return { at: event.at, type: 'renownRank', id: event.rank };
     case 'rankUp':
       return { at: event.at, type: 'rank', id: event.rank };
     default:

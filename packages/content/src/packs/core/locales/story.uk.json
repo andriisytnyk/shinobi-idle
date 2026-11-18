@@ -80,5 +80,21 @@
   "quest.core:shadow_clones.step.3": "Хокаґе ставить умову — запас чакри, як у джоніна: досягни Медитації 40.",
   "quest.core:shadow_clones.step.4": "«Печатки прості, важко не розвіятися разом із клоном»: досягни Ніндзюцу 50.",
   "quest.core:shadow_clones.step.5": "Сенсей приніс сувій із дозволом Хокаґе: прочитай його в Банку й освой Техніку тіньового клонування.",
-  "quest.core:shadow_clones.final": "Перший клон стоїть поруч — і вже втомлений. Ти відкрив одного клона й місію села «Клони на будівництві»; Множинне клонування заборонене й чекає на ранг Джоніна."
+  "quest.core:shadow_clones.final": "Перший клон стоїть поруч — і вже втомлений. Ти відкрив одного клона й місію села «Клони на будівництві»; Множинне клонування заборонене й чекає на ранг Джоніна.",
+
+  "renownRank.core:renown_courier.name": "Довірений гінець",
+  "renownRank.core:renown_courier.desc": "У Бюро місій тебе вже знають на ім'я: секретні звіти Вежі Каґе тепер доручають тобі.",
+  "renownRank.core:renown_courier.reward": "У Бюро місій відкрито «Таємну пошту».",
+  "renownRank.core:renown_teacher.name": "Слово наставника",
+  "renownRank.core:renown_teacher.desc": "Сенсей бачить, що ти виріс із простих вправ, і приносить із Бібліотеки сувій, який вважав зарано віддавати.",
+  "renownRank.core:renown_teacher.reward": "Сенсей дає сувій техніки з Бібліотеки.",
+  "renownRank.core:renown_merchants.name": "Довіра торговців",
+  "renownRank.core:renown_merchants.desc": "Крамарі Листя бояться за каравани й охоче платять тим, хто їх береже: для тебе ціни нижчі.",
+  "renownRank.core:renown_merchants.reward": "У крамницях знижка 5%.",
+  "renownRank.core:renown_gift.name": "Дарунок села",
+  "renownRank.core:renown_gift.desc": "Старійшини дякують за службу й передають напій, що додає сил на довгих тренуваннях.",
+  "renownRank.core:renown_gift.reward": "Село дарує два чаї бадьорості.",
+  "renownRank.core:renown_recommendation.name": "Рекомендація Хокаґе",
+  "renownRank.core:renown_recommendation.desc": "Ім'я, яке чують у селі, чує й комісія. Хокаґе ставить підпис: тебе рекомендовано на іспит Чуніна, лишилося довести це ділом.",
+  "renownRank.core:renown_recommendation.reward": "Хокаґе рекомендує тебе на іспит Чуніна."
 }

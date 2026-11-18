@@ -21,6 +21,7 @@ import { natureProvider } from './natures.ts';
 import { missionKind, MISSION_KIND } from './missions/index.ts';
 import { questSystem } from './quests.ts';
 import { villageProvider, villageSystem } from './village.ts';
+import { renownProvider } from './renown.ts';
 import { walkHook } from './finds.ts';
 import type { HexEnteredHook } from './hex-hooks.ts';
 import { masteryProvider, pointSystem, pointsProvider } from './points.ts';
@@ -96,6 +97,7 @@ export const defaultRules: Rules = {
     pointsProvider,
     masteryProvider,
     villageProvider,
+    renownProvider,
     fatigueProvider,
   ],
   combatAi: defaultCombatAi,
