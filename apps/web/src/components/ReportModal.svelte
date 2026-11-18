@@ -17,9 +17,7 @@
   let { report, onClose }: Props = $props();
   const moneyLabel = currencyName(moneyOf(game.content));
   /** The stops by performer; the heads show once there are clones to tell from the character. */
-  const sections = $derived(
-    game.read((gs) => reportSections(report.stopped, report.dispelled ?? [])),
-  );
+  const sections = $derived(reportSections(report.stopped, report.dispelled ?? []));
   const heads = $derived(game.read((gs) => hasSquad(gs, game.content)));
 </script>
 

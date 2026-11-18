@@ -32,8 +32,6 @@
     ),
   );
   const running = $derived(slotIndex >= 0);
-  /** Whether the character itself runs it: the tile's own button is the character's, whatever a clone does. */
-  const mine = $derived(slotIndex === 0);
   /** The running cycle; an empty bush's cycle also holds the regrow, which the tile's interval leaves out. */
   const timing = $derived(
     game.read((gs) =>

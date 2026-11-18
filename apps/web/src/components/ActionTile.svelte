@@ -34,8 +34,6 @@
     ),
   );
   const running = $derived(slotIndex >= 0);
-  /** Whether the character itself runs it: the tile's own button is the character's, whatever a clone does. */
-  const mine = $derived(slotIndex === 0);
   const timing = $derived(game.read((gs) => slotTiming(gs, slotIndex, info.intervalMs)));
   const technique = $derived(
     info.kind === 'practice' ? content.techniques.find((x) => x.id === info.id) : undefined,
