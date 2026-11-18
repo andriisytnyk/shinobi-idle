@@ -1,6 +1,7 @@
 import type { AiTier, ContentDb, SkillId, Technique } from '@shinobi/content';
 import { createStream, nextFloatFrom } from '../rng.ts';
 import { addEffect, findEffect, isSuppressed, removeEffect, statOf } from './fight-effects.ts';
+import { sharesOf } from './fight-allies.ts';
 import { figure, need } from './need.ts';
 import { answersTraitData, balanceOf, beatenBy, fightData, type TraitMod } from './fight-data.ts';
 import {
@@ -27,6 +28,7 @@ import {
 } from './fight-status.ts';
 import { TEAM_HOOK } from './fight-team-id.ts';
 import type {
+  AllyHeld,
   Combatant,
   AttackPlan,
   Decision,
@@ -44,6 +46,7 @@ import type {
   PeriodicEffect,
   PlayerKit,
   Spawn,
+  SummonSpec,
   Timer,
   ViewEffect,
   ViewEnemy,
@@ -77,6 +80,12 @@ import { needOf, RATE_FULL, TICK_MS, WORK_PER_MS, workOf } from './units.ts';
 const STALL_LIMIT = 10_000;
 
 export const alive = (c: Combatant): boolean => c.hp > 0;
+
+/** The bodies of the player's side besides the character (fallen ones stay in the list with no health). */
+export const alliesOf = (fight: FightState): readonly Combatant[] => fight.allies ?? [];
+
+/** Every body of the player's side: the character first, then the allies in the order they came in. */
+export const sideBodies = (fight: FightState): Combatant[] => [fight.player, ...alliesOf(fight)];
 
 /** Work units in a number of seconds of the balance object. */
 export const secWork = (seconds: number): number => workOf(secMs(seconds));
@@ -187,9 +196,9 @@ export function boundOf(ctx: FightCtx, c: Combatant): Bound {
   return made;
 }
 
-/** What a guarded call of a hook of a body may change: the body and the player. */
+/** What a guarded call of a hook of a body may change: the body and every body of the player's side (the character and the allies). */
 const bodiesOf = (ctx: FightCtx, c: Combatant, event: boolean): GuardOptions<void | undefined> => ({
-  bodies: c === ctx.fight.player ? [c] : [c, ctx.fight.player],
+  bodies: [c, ...sideBodies(ctx.fight).filter((b) => b !== c)],
   event,
 });
 const FACTOR: GuardOptions<number> = { check: isFactor };
@@ -276,6 +285,23 @@ function kitEffect(tech: Technique, snap: PlayerSnapshot, content: ContentDb): K
     case 'reveal':
       fx.durationMs = figure(row(effect.fx), 'durationMs', `techFx.${effect.fx}`);
       break;
+    case 'summon': {
+      const gate = row(effect.fx);
+      const path = `techFx.${effect.fx}`;
+      const max = Math.max(1, Math.floor(figure(gate, 'max', path)));
+      const step = Math.max(1, figure(gate, 'masteryStep', path));
+      const grown = Math.floor(figure(gate, 'count', path) + (snap.mastery[tech.id] ?? 1) / step);
+      fx.summon = {
+        count: Math.min(max, Math.max(1, grown)),
+        max,
+        share: figure(gate, 'share', path),
+        hp: figure(gate, 'hp', path),
+        dmg: figure(gate, 'dmg', path),
+        threat: figure(gate, 'threat', path),
+        casts: Math.max(1, Math.floor(figure(gate, 'casts', path))),
+      };
+      break;
+    }
     default:
       break;
   }
@@ -298,6 +324,7 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
     if (loadout && !loadout.has(tech.id) && !tech.combat?.outOfLoadout) continue;
     const n = techniqueFigures(snap, tech, content);
     const mastery = snap.mastery[tech.id] ?? 1;
+    const fx = kitEffect(tech, snap, content);
     techniques.push({
       id: tech.id,
       skill: tech.skill,
@@ -305,7 +332,8 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
       rank: tech.rank,
       tags: [...tech.tags],
       state: tech.state,
-      damage: n.damage * wound,
+      // A technique that puts allies on the player's side does not strike by itself.
+      damage: fx.kind === 'summon' ? 0 : n.damage * wound,
       castMs: n.castMs,
       cooldownMs: n.cooldownMs,
       pool: n.pool,
@@ -325,7 +353,7 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
         tech.combat?.hitsAll === true,
       guaranteedCombo: tech.combat?.guaranteedCombo ?? null,
       habituationMult: snap.signature === tech.id ? K.signatureHabituation : 1,
-      fx: kitEffect(tech, snap, content),
+      fx,
       requiresStance: tech.combat?.requiresStance === true,
     });
   }
@@ -661,6 +689,7 @@ export function fightNextEventIn(
   const ctx = makeCtx(fight, content, rules);
   let best = Math.min(fight.poolAt, fight.cap) - fight.t;
   best = soonest(ctx, fight, player, best);
+  for (const a of alliesOf(fight)) if (alive(a)) best = soonest(ctx, fight, a, best);
   for (const e of fight.enemies) if (alive(e)) best = soonest(ctx, fight, e, best);
   return Math.max(0, best);
 }
@@ -682,6 +711,7 @@ function step(ctx: FightCtx, dt: number): void {
   fight.t += dt;
   fight.tally.time = fight.t;
   fill(ctx, fight.player, dt);
+  for (const a of alliesOf(fight)) if (alive(a)) fill(ctx, a, dt);
   for (const e of fight.enemies) if (alive(e)) fill(ctx, e, dt);
 }
 
@@ -691,6 +721,20 @@ function step(ctx: FightCtx, dt: number): void {
  * returns the work that was not used.
  */
 export function fightAdvance(
+  fight: FightState,
+  work: number,
+  content: ContentDb,
+  rules: FightRules,
+): number {
+  const left = advanceFight(fight, work, content, rules);
+  // However it ended, the allies that still stand give back what they have left.
+  if (fight.result !== 'ongoing' && fight.allies) {
+    releaseAllies(makeCtx(fight, content, rules));
+  }
+  return left;
+}
+
+function advanceFight(
   fight: FightState,
   work: number,
   content: ContentDb,
@@ -710,7 +754,7 @@ export function fightAdvance(
     stalled = next === 0 ? stalled + 1 : 0;
     if (stalled > STALL_LIMIT) {
       // An event that repeats at once is a hook of another pack that never lets time pass, or a bug.
-      const bodies = [fight.player, ...fight.enemies];
+      const bodies = [...sideBodies(fight), ...fight.enemies];
       const culprit =
         bodies
           .flatMap((c) => Object.keys(c.timers).map((name) => timerOwner(c, name)))
@@ -750,6 +794,8 @@ function checkResult(fight: FightState): boolean {
 /** What the action that is being resolved did, collected from the notes of its hits. */
 interface ActRecord {
   avoidedBy: string | null;
+  /** The body an enemy's blow landed on (or missed), when the action struck one. */
+  struck: string | null;
   hit: boolean;
   miss: boolean;
   damage: number;
@@ -766,6 +812,7 @@ function note(
   dmg: number,
   by?: string,
   via?: string,
+  ally?: number,
 ): void {
   if (resolving) {
     if (act === 'hit') {
@@ -780,6 +827,7 @@ function note(
     dmg,
     ...(by === undefined ? {} : { by }),
     ...(via === undefined ? {} : { via }),
+    ...(ally === undefined ? {} : { ally }),
   });
 }
 
@@ -801,6 +849,7 @@ function resolveAs(
   const was = resolving;
   const rec: ActRecord = {
     avoidedBy: null,
+    struck: null,
     hit: false,
     miss: false,
     damage: 0,
@@ -813,6 +862,16 @@ function resolveAs(
   } finally {
     resolving = was;
   }
+  // Named only when it is not the plain case, so that a fight with no allies is written as it always was: an enemy's blow on a body
+  // other than the character, and what an ally aimed at.
+  const target =
+    rec.struck !== null
+      ? rec.struck === fight.player.id
+        ? null
+        : rec.struck
+      : c === fight.player
+        ? null
+        : act.target;
   c.last = {
     kind: act.kind,
     id: act.id,
@@ -822,8 +881,9 @@ function resolveAs(
     combos: grown(rec.combos, fight.tally.combos),
     at: fight.t,
     avoidedBy: rec.avoidedBy,
+    ...(target === null ? {} : { target }),
   };
-  if (log) note(fight, c.side, 'resolve', act.id, rec.damage, c.id);
+  if (log) note(fight, c.side, 'resolve', act.id, rec.damage, c.id, undefined, allyOf(c));
   return rec;
 }
 
@@ -838,7 +898,9 @@ export function hurt(ctx: FightCtx, target: Combatant, amount: number, src: stri
   const applied = Math.min(amount, target.hp);
   target.hp -= applied;
   if (target.side === 'enemy') count(fight.tally.damage, src, applied);
-  else {
+  else if (target.ally !== undefined) {
+    // What an ally takes is not the character's: no tally, no Wound.
+  } else {
     fight.tally.taken += applied;
     // A fight that took the player this low costs a Wound even when it is won.
     if (target.hp <= target.maxHp * ctx.content.balance.K.woundHp) target.data.low = 1;
@@ -860,6 +922,12 @@ export function hurt(ctx: FightCtx, target: Combatant, amount: number, src: stri
     leave(ctx, target);
     // A fallen body keeps no effects: its ticks would never be handled, and a save would not read them back.
     target.effects = [];
+    // A dispelled ally does not come back in this fight; what it had left returns to the character.
+    if (target.ally !== undefined) {
+      target.act = null;
+      target.phase = 'wait';
+      releaseAlly(ctx, target);
+    }
   } else if (target.fleeAt !== null && target.hp <= target.maxHp * target.fleeAt) {
     target.fled = true;
     target.hp = 0;
@@ -873,7 +941,7 @@ function leave(ctx: FightCtx, c: Combatant): void {
   for (const hook of hooksOf(ctx, c)) {
     guard(ctx, hook, () => hook.onLeave?.(ctx, c), undefined, bodiesOf(ctx, c, true));
   }
-  for (const holder of [ctx.fight.player, ...ctx.fight.enemies]) {
+  for (const holder of [...sideBodies(ctx.fight), ...ctx.fight.enemies]) {
     if (holder.effects.some((e) => e.whileAlive === c.id)) {
       holder.effects = holder.effects.filter((e) => e.whileAlive !== c.id);
     }
@@ -968,7 +1036,7 @@ export function breakAct(ctx: FightCtx, c: Combatant): boolean {
     at: fight.t,
     avoidedBy: null,
   };
-  note(fight, c.side, 'interrupted', act.id, 0, c.id);
+  note(fight, c.side, 'interrupted', act.id, 0, c.id, undefined, allyOf(c));
   if (c === fight.player) fight.target = null;
   enter(fight, c, 'wait', null, needOf(c.waitMs), 0);
   return true;
@@ -1019,10 +1087,28 @@ function habituationScale(ctx: FightCtx, target: Combatant | undefined): number 
 }
 
 /** The stance technique that is active on the player, or null. */
-function activeStance(fight: FightState): string | null {
-  const e = findEffect(fight.player, 'stance');
+function activeStance(actor: Combatant): string | null {
+  const e = findEffect(actor, 'stance');
   return e ? e.src : null;
 }
+
+/** Whether a technique is left out of an ally's hand: allies use the character's techniques except the ones that act on the character's own body or on the side itself. */
+const barredForAllies = (tech: KitTechnique): boolean =>
+  tech.fx.kind === 'summon' || tech.fx.kind === 'stance';
+
+/** Whether the fight lets the technique be cast now: a technique that puts allies is limited per fight and by the room on the side. */
+function castable(fight: FightState, tech: KitTechnique): boolean {
+  const summon = tech.fx.summon;
+  if (!summon) return true;
+  const living = alliesOf(fight).filter(alive).length;
+  return (fight.uses[tech.id] ?? 0) < summon.casts && living < summon.max;
+}
+
+/** The hand of a body: the character's techniques; an ally's are those that do not act on the body or the side itself. */
+const handOf = (fight: FightState, actor: Combatant): KitTechnique[] =>
+  actor === fight.player
+    ? fight.kit.techniques
+    : fight.kit.techniques.filter((t) => !barredForAllies(t));
 
 const techViews = new WeakMap<KitTechnique, KitTechnique>();
 const techFactsOf = new WeakMap<KitTechnique, { answers: string[]; interrupts: boolean }>();
@@ -1087,19 +1173,21 @@ const viewEffects = (fight: FightState, c: Combatant): ViewEffect[] =>
     remaining: e.until === null ? null : Math.max(0, e.until - fight.t),
   }));
 
-function buildView(ctx: FightCtx): FightView {
+function buildView(ctx: FightCtx, actor: Combatant): FightView {
   const { fight, content } = ctx;
   const K = content.balance.K;
-  const player = fight.player;
+  const player = actor;
+  // The pouch and the medic are the character's: an ally sees none.
+  const own = actor === fight.player;
   const tier = aiTierOf(content, fight.tier);
   const living = fight.enemies.filter(alive);
   const primary = lowestHp(living);
-  const stance = activeStance(fight);
+  const stance = activeStance(actor);
   // Per view, not per technique: the same for every technique.
   const taiMult = stat(ctx, player, 'taiDamage', 1);
   const habScale = habituationScale(ctx, primary);
   const physical = fightData(content).physical;
-  const techniques: ViewTechnique[] = fight.kit.techniques.map((tech) => {
+  const techniques: ViewTechnique[] = handOf(fight, actor).map((tech) => {
     const cooldownLeft = Math.max(0, (player.cd[tech.id] ?? 0) - fight.t);
     const affordable = (tech.pool === 'chakra' ? player.chakra : player.stamina) >= tech.cost;
     const uses = fight.uses[tech.id] ?? 0;
@@ -1112,7 +1200,7 @@ function buildView(ctx: FightCtx): FightView {
       tech: viewOf(tech),
       cooldownLeft,
       affordable,
-      ready: cooldownLeft === 0 && affordable && stanceOk,
+      ready: cooldownLeft === 0 && affordable && stanceOk && castable(fight, tech),
       uses,
       expected: tech.damage * hab * wheel * targets * (physical.has(tech.skill) ? taiMult : 1),
       power: tech.damage,
@@ -1186,11 +1274,12 @@ function buildView(ctx: FightCtx): FightView {
     },
     techniques,
     enemies,
+    allies: sideBodies(fight).filter((b) => b !== actor && alive(b) && b.ally !== undefined).length,
     habituation: { ...fight.uses },
     ai: tier,
     visibleTraits: content.ai.visibleTraits,
     vocab: fightData(content).ai,
-    pouch: fight.pouch.flatMap((slot, i) => {
+    pouch: (own ? fight.pouch : []).flatMap((slot, i) => {
       const view = slot.n > 0 ? itemView(content, slot.id) : null;
       return view
         ? [
@@ -1209,7 +1298,7 @@ function buildView(ctx: FightCtx): FightView {
         : [];
     }),
     medic:
-      fight.medic !== null && (fight.pouch[fight.medic]?.n ?? 0) > 0
+      own && fight.medic !== null && (fight.pouch[fight.medic]?.n ?? 0) > 0
         ? { slot: fight.medic, below: content.balance.K.pillAt }
         : null,
     stance,
@@ -1230,28 +1319,31 @@ export function aiTierOf(content: ContentDb, tier: number) {
 }
 
 /** The player has waited long enough: the AI chooses, and the player begins what it chose, or waits again, or catches its breath. */
-function decide(ctx: FightCtx): void {
+function decide(ctx: FightCtx, actor: Combatant): void {
   const { fight, content } = ctx;
-  const player = fight.player;
-  const view = buildView(ctx);
+  const player = actor;
+  const own = actor === fight.player;
+  const view = buildView(ctx, actor);
   const decision: Decision = ctx.rules.combatAi(view);
   if (decision.type === 'technique') {
     const chosen = view.techniques.find((r) => r.tech.id === decision.id && r.ready);
-    const tech = chosen && fight.kit.techniques.find((t) => t.id === chosen.tech.id);
-    if (tech) return startTechnique(ctx, tech, decision.target);
-  } else if (decision.type === 'item') {
+    const tech = chosen && handOf(fight, actor).find((t) => t.id === chosen.tech.id);
+    if (tech) return startTechnique(ctx, actor, tech, decision.target);
+  } else if (decision.type === 'item' && own) {
     if (startItem(ctx, decision.id, decision.target)) return;
   }
-  if (decision.type === 'wait') return beginWait(ctx);
+  if (decision.type === 'wait') return beginWait(ctx, actor);
   const cost = content.balance.K.basicCost;
   if (player.stamina >= cost) {
-    return startBasic(ctx, decision.type === 'basic' ? decision.target : undefined, cost);
+    return startBasic(ctx, actor, decision.type === 'basic' ? decision.target : undefined, cost);
   }
   // Rest only when neither the plain strike nor any technique can be paid for.
-  const canPay = fight.kit.techniques.some(
-    (t) => (t.pool === 'chakra' ? player.chakra : player.stamina) >= t.cost,
+  const canPay = handOf(fight, actor).some(
+    (t) => (t.pool === 'chakra' ? player.chakra : player.stamina) >= t.cost && castable(fight, t),
   );
-  if (canPay) return beginWait(ctx);
+  if (canPay) return beginWait(ctx, actor);
+  // An ally has no breath to catch: with nothing left to pay for it is dispelled and what it has returns to the character.
+  if (!own) return dispelAlly(ctx, actor);
   enter(
     fight,
     player,
@@ -1262,9 +1354,8 @@ function decide(ctx: FightCtx): void {
   );
 }
 
-function beginWait(ctx: FightCtx): void {
-  const player = ctx.fight.player;
-  enter(ctx.fight, player, 'wait', null, needOf(player.waitMs), player.timer.progress);
+function beginWait(ctx: FightCtx, actor: Combatant): void {
+  enter(ctx.fight, actor, 'wait', null, needOf(actor.waitMs), actor.timer.progress);
 }
 
 /** The rest ends: a share of both pools comes back. */
@@ -1330,9 +1421,14 @@ function startItem(ctx: FightCtx, id: string, target: string | undefined): boole
   return true;
 }
 
-function startTechnique(ctx: FightCtx, tech: KitTechnique, target: string | undefined): void {
+function startTechnique(
+  ctx: FightCtx,
+  actor: Combatant,
+  tech: KitTechnique,
+  target: string | undefined,
+): void {
   const fight = ctx.fight;
-  const player = fight.player;
+  const player = actor;
   if (tech.pool === 'chakra') player.chakra -= tech.cost;
   else player.stamina -= tech.cost;
   player.data[tech.pool === 'chakra' ? 'act.chakra' : 'act.stamina'] = tech.cost;
@@ -1347,18 +1443,31 @@ function startTechnique(ctx: FightCtx, tech: KitTechnique, target: string | unde
     needOf(hasten > 0 ? Math.max(1, Math.round(tech.castMs * hasten)) : tech.castMs),
     player.timer.progress,
   );
-  fight.target = target ?? null;
-  // Mastery is paid for the fight time since the previous technique use (or the fight's start).
-  count(fight.tally.masteryWork, tech.id, fight.t - fight.tally.lastUseAt);
-  fight.tally.lastUseAt = fight.t;
-  fight.tally.style = tech.skill;
-  note(fight, 'player', 'cast', tech.id, 0, player.id);
+  if (actor === fight.player) fight.target = target ?? null;
+  // Mastery is paid for the fight time since the previous technique use (or the fight's start), by whichever body cast: an ally's cast is the character's.
+  if (actor === fight.player) {
+    count(fight.tally.masteryWork, tech.id, fight.t - fight.tally.lastUseAt);
+    fight.tally.lastUseAt = fight.t;
+    fight.tally.style = tech.skill;
+  } else if (actor.ally) {
+    // Each body earns by its own actions: an ally's Mastery work and style are held in it until it leaves the fight.
+    const held = heldOf(actor, fight.t);
+    count(held.work, tech.id, fight.t - held.last);
+    held.last = fight.t;
+    held.style = tech.skill;
+  }
+  note(fight, 'player', 'cast', tech.id, 0, player.id, undefined, allyOf(actor));
 }
 
 /** The plain strike is an action: it costs a little stamina, takes its own time and lands when it ends. */
-function startBasic(ctx: FightCtx, targetId: string | undefined, cost: number): void {
+function startBasic(
+  ctx: FightCtx,
+  actor: Combatant,
+  targetId: string | undefined,
+  cost: number,
+): void {
   const fight = ctx.fight;
-  const player = fight.player;
+  const player = actor;
   player.stamina -= cost;
   player.data['act.stamina'] = cost;
   enter(
@@ -1369,13 +1478,18 @@ function startBasic(ctx: FightCtx, targetId: string | undefined, cost: number): 
     needOf(player.strikeMs),
     player.timer.progress,
   );
-  fight.tally.style = fightData(ctx.content).basicSkill ?? fight.tally.style;
-  note(fight, 'player', 'cast', null, 0, player.id);
+  if (actor === fight.player) {
+    fight.tally.style = fightData(ctx.content).basicSkill ?? fight.tally.style;
+  } else if (actor.ally) {
+    const basic = fightData(ctx.content).basicSkill;
+    if (basic) heldOf(actor, fight.t).style = basic;
+  }
+  note(fight, 'player', 'cast', null, 0, player.id, undefined, allyOf(actor));
 }
 
-function finishBasic(ctx: FightCtx, targetId: string | null): void {
+function finishBasic(ctx: FightCtx, actor: Combatant, targetId: string | null): void {
   const fight = ctx.fight;
-  const player = fight.player;
+  const player = actor;
   fight.tally.basic++;
   const target = pickTarget(fight, targetId);
   if (!target) return;
@@ -1384,32 +1498,43 @@ function finishBasic(ctx: FightCtx, targetId: string | null): void {
     evasionAgainst(ctx, target, player),
     ctx.content,
   );
+  const by = actor === fight.player ? undefined : actor.id;
   if (rollHit(ctx, target, chance)) {
     const damage = player.damage * stat(ctx, player, 'taiDamage', 1);
-    note(fight, 'player', 'hit', null, dealDamage(ctx, target, damage, 'basic'));
-  } else note(fight, 'player', 'miss', null, 0);
+    note(
+      fight,
+      'player',
+      'hit',
+      null,
+      dealDamage(ctx, target, damage, 'basic'),
+      by,
+      undefined,
+      allyOf(actor),
+    );
+  } else note(fight, 'player', 'miss', null, 0, by, undefined, allyOf(actor));
 }
 
-/** The player's action ends: its effect happens now, then the player waits again. */
-function finishAct(ctx: FightCtx): void {
-  const player = ctx.fight.player;
+/** A body's action ends: its effect happens now, then it waits again. */
+function finishAct(ctx: FightCtx, actor: Combatant): void {
+  const player = actor;
   const act = player.act;
   delete player.data['act.chakra'];
   delete player.data['act.stamina'];
   if (act) {
     resolveAs(ctx, player, act, () => {
-      if (act.kind === 'technique') resolveCast(ctx, act.id);
-      else if (act.kind === 'basic') finishBasic(ctx, act.target);
+      if (act.kind === 'technique') resolveCast(ctx, actor, act.id, act.target);
+      else if (act.kind === 'basic') finishBasic(ctx, actor, act.target);
     });
   }
-  if (ctx.fight.result === 'ongoing') {
+  // An ally that the action itself dispelled does not wait again.
+  if (ctx.fight.result === 'ongoing' && alive(actor)) {
     enter(ctx.fight, player, 'wait', null, needOf(player.waitMs), player.timer.progress);
   }
 }
 
-function resolveCast(ctx: FightCtx, id: string | null): void {
+function resolveCast(ctx: FightCtx, actor: Combatant, id: string | null, at: string | null): void {
   const { fight, content } = ctx;
-  const player = fight.player;
+  const player = actor;
   const tech = fight.kit.techniques.find((t) => t.id === id);
   if (!tech) return;
   player.cd[tech.id] = fight.t + workOf(tech.cooldownMs);
@@ -1422,14 +1547,21 @@ function resolveCast(ctx: FightCtx, id: string | null): void {
     const def = tags.get(tag);
     if (def) removeTagged(player, def.removes);
   }
-  applyTechniqueEffect(ctx, tech);
+  applyTechniqueEffect(ctx, actor, tech);
+  if (actor === fight.player) fight.target = at;
   const hurtsEnemy =
-    tech.damage > 0 ||
-    tech.state !== null ||
-    tech.tags.some((tag) => (tags.get(tag)?.onHit.length ?? 0) > 0);
-  if (!hurtsEnemy) return;
-  const aimed = pickTarget(fight, fight.target);
-  fight.target = null;
+    tech.fx.kind !== 'summon' &&
+    (tech.damage > 0 ||
+      tech.state !== null ||
+      tech.tags.some((tag) => (tags.get(tag)?.onHit.length ?? 0) > 0));
+  if (!hurtsEnemy) {
+    if (actor === fight.player) fight.target = null;
+    return;
+  }
+  const aimed = pickTarget(fight, at);
+  if (actor === fight.player) fight.target = null;
+  const by = actor === fight.player ? undefined : actor.id;
+  const ally = allyOf(actor);
   const targets = tech.hitsAll ? fight.enemies.filter(alive) : aimed ? [aimed] : [];
   for (const target of targets) {
     const chance = hitChance(
@@ -1443,15 +1575,24 @@ function resolveCast(ctx: FightCtx, id: string | null): void {
         tech.habituationMult * habituationScale(ctx, target),
         content,
       );
-      note(fight, 'player', 'hit', tech.id, applyHit(ctx, tech, target, hab));
-    } else note(fight, 'player', 'miss', tech.id, 0);
+      note(
+        fight,
+        'player',
+        'hit',
+        tech.id,
+        applyHit(ctx, actor, tech, target, hab),
+        by,
+        undefined,
+        ally,
+      );
+    } else note(fight, 'player', 'miss', tech.id, 0, by, undefined, ally);
   }
 }
 
 /** What a technique does to the player's side besides hurting an enemy, from its combat data. */
-function applyTechniqueEffect(ctx: FightCtx, tech: KitTechnique): void {
+function applyTechniqueEffect(ctx: FightCtx, actor: Combatant, tech: KitTechnique): void {
   const fight = ctx.fight;
-  const player = fight.player;
+  const player = actor;
   const fx = tech.fx;
   const until = fight.t + workOf(fx.durationMs);
   switch (fx.kind) {
@@ -1504,14 +1645,168 @@ function applyTechniqueEffect(ctx: FightCtx, tech: KitTechnique): void {
       }
       break;
     }
+    case 'summon':
+      if (actor === fight.player && fx.summon) summonAllies(ctx, tech, fx.summon);
+      break;
     default:
       break;
   }
 }
 
+/** The key of a body's data that scales what its techniques do (absent: 1); an ally's strikes are a share of the caster's. */
+const POWER_KEY = 'power';
+
+/** The number of an ally body, for the lines of the log and the view; undefined for the character and for enemies. */
+const allyOf = (c: Combatant): number | undefined => c.ally?.n;
+
+/**
+ * Puts the bodies a technique makes on the character's side. They take `share` of the character's
+ * current chakra and stamina between them (evenly); each has `hp` of the character's maximum
+ * health, the character's combat numbers, and waits and acts by the character's own timings. The
+ * side holds at most `max` living bodies at once.
+ */
+function summonAllies(ctx: FightCtx, tech: KitTechnique, spec: SummonSpec): void {
+  const { fight } = ctx;
+  const player = fight.player;
+  const living = alliesOf(fight).filter(alive).length;
+  const n = Math.min(spec.count, Math.max(0, spec.max - living));
+  if (n < 1 || !alive(player)) return;
+  const chakra = player.chakra * spec.share;
+  const stamina = player.stamina * spec.share;
+  player.chakra -= chakra;
+  player.stamina -= stamina;
+  const allies = (fight.allies ??= []);
+  for (let i = 0; i < n; i++) {
+    const number = (fight.allied = (fight.allied ?? 0) + 1);
+    const hp = player.maxHp * spec.hp;
+    // What the character knows of the enemies, the clone knows: the same hit and dodge numbers.
+    const data: Record<string, number> = { threat: spec.threat, [POWER_KEY]: spec.dmg };
+    for (const [key, value] of Object.entries(player.data)) {
+      if (key.startsWith('know.')) data[key] = value;
+    }
+    allies.push({
+      id: `ally#${number}`,
+      side: 'player',
+      entry: '',
+      hp,
+      maxHp: hp,
+      chakra: chakra / n,
+      maxChakra: chakra / n,
+      stamina: stamina / n,
+      maxStamina: stamina / n,
+      accuracy: player.accuracy,
+      evasion: player.evasion,
+      damage: player.damage * spec.dmg,
+      waitMs: player.waitMs,
+      strikeMs: player.strikeMs,
+      nature: null,
+      traits: [],
+      specials: [],
+      effects: [],
+      cd: {},
+      phase: 'wait',
+      act: null,
+      phaseAt: fight.t,
+      last: null,
+      // The bodies that came together do not all act at the same moment.
+      timer: {
+        progress: 0,
+        need: needOf(player.waitMs) + Math.round((needOf(player.waitMs) * i) / n),
+      },
+      timers: {},
+      data,
+      ward: 0,
+      wardUntil: null,
+      decoys: 0,
+      decoyUntil: null,
+      fleeAt: null,
+      fled: false,
+      ally: { n: number, kind: tech.id, held: { xp: {}, work: {}, last: fight.t } },
+    });
+  }
+}
+
+/** What an ally has earned and not yet handed over; made on first use. */
+export function heldOf(ally: Combatant, now: number): AllyHeld {
+  if (!ally.ally) throw new Error('only an ally holds what it earned');
+  return (ally.ally.held ??= { xp: {}, work: {}, last: now });
+}
+
+/** What an ally still holds goes back to the character; once, however many times it is called. */
+function releaseAlly(ctx: FightCtx, ally: Combatant): void {
+  const player = ctx.fight.player;
+  const held = ally.ally?.held;
+  if (held) {
+    // The XP and Mastery the body earned wait in the tally for the game to pay them, once.
+    const tally = ctx.fight.tally;
+    // The numbers come from the technique that summoned the body: what passes on, and how much of it tires the mind.
+    const shares = sharesOf(ctx.content, ally.ally?.kind ?? '');
+    for (const [skill, n] of Object.entries(held.xp)) {
+      count((tally.allyXp ??= {}), skill, n * shares.pass);
+      count((tally.allyTire ??= {}), skill, n * shares.pass * shares.fatigue);
+    }
+    for (const [id, n] of Object.entries(held.work)) {
+      count((tally.allyWork ??= {}), id, n * shares.xp * shares.pass);
+    }
+    held.xp = {};
+    held.work = {};
+  }
+  if (alive(player)) {
+    player.chakra = Math.min(player.maxChakra, player.chakra + ally.chakra);
+    player.stamina = Math.min(player.maxStamina, player.stamina + ally.stamina);
+  }
+  ally.chakra = 0;
+  ally.stamina = 0;
+}
+
+/** An ally leaves the fight without being struck down: its chakra runs dry. It does not come back. */
+function dispelAlly(ctx: FightCtx, ally: Combatant): void {
+  if (!alive(ally)) return;
+  ally.hp = 0;
+  leave(ctx, ally);
+  ally.effects = [];
+  ally.act = null;
+  ally.phase = 'wait';
+  releaseAlly(ctx, ally);
+}
+
+const sum = (r: Record<string, number> | undefined): number =>
+  Object.values(r ?? {}).reduce((n, x) => n + x, 0);
+
+/** The fight ends: the allies that still stand give back what they have left, and hand over what they earned. */
+export function releaseAllies(ctx: FightCtx): void {
+  for (const a of alliesOf(ctx.fight)) {
+    if (a.chakra > 0 || a.stamina > 0 || sum(a.ally?.held?.xp) > 0 || sum(a.ally?.held?.work) > 0) {
+      releaseAlly(ctx, a);
+    }
+  }
+}
+
+/** The body of the character's side that an enemy aims at: the character alone, or one of the living bodies drawn by weight (the character 1, an ally its `threat`) on the fight's own stream. */
+export function pickVictim(ctx: FightCtx): Combatant {
+  const fight = ctx.fight;
+  const allies = alliesOf(fight).filter(alive);
+  if (allies.length === 0) return fight.player;
+  const bodies = [fight.player, ...allies];
+  const weight = (c: Combatant): number => (c === fight.player ? 1 : (c.data.threat ?? 1));
+  const total = bodies.reduce((n, c) => n + weight(c), 0);
+  let at = nextFloatFrom(fight.rng) * total;
+  for (const c of bodies) {
+    at -= weight(c);
+    if (at < 0) return c;
+  }
+  return bodies[bodies.length - 1] ?? fight.player;
+}
+
 /** What one technique does to one enemy it hit: tags, damage, status, then combos. Returns the direct damage dealt. */
-function applyHit(ctx: FightCtx, tech: KitTechnique, target: Combatant, hab: number): number {
-  const { fight, content } = ctx;
+function applyHit(
+  ctx: FightCtx,
+  actor: Combatant,
+  tech: KitTechnique,
+  target: Combatant,
+  hab: number,
+): number {
+  const { content } = ctx;
   const data = fightData(content);
   // What the combos need of the body is read before the hit changes it.
   const priors = comboPriors(ctx, tech, target);
@@ -1521,9 +1816,10 @@ function applyHit(ctx: FightCtx, tech: KitTechnique, target: Combatant, hab: num
   }
   const base =
     tech.damage *
+    (actor.data[POWER_KEY] ?? 1) *
     hab *
     wheelFactor(tech.skill, target.nature, content) *
-    (data.physical.has(tech.skill) ? stat(ctx, fight.player, 'taiDamage', 1) : 1);
+    (data.physical.has(tech.skill) ? stat(ctx, actor, 'taiDamage', 1) : 1);
   const dealt = dealDamage(ctx, target, base, tech.id);
   if (!alive(target)) return dealt;
 
@@ -1542,9 +1838,12 @@ function applyHit(ctx: FightCtx, tech: KitTechnique, target: Combatant, hab: num
 // ---------- the enemies' side and the clock's ----------
 
 /** One basic attack of an enemy body on the player: hooks may change it, then the incoming pipeline runs. */
-function enemyAttack(ctx: FightCtx, enemy: Combatant): void {
+function enemyAttack(ctx: FightCtx, enemy: Combatant, aimedAt: string | null): void {
   const fight = ctx.fight;
-  const player = fight.player;
+  // The body the wind-up was aimed at, if it still stands; otherwise the enemy aims anew.
+  const player = sideBodies(fight).find((b) => b.id === aimedAt && alive(b)) ?? pickVictim(ctx);
+  const ally = allyOf(player);
+  if (resolving) resolving.struck = player.id;
   const plan: AttackPlan = {
     chance: hitChance(
       stat(ctx, enemy, 'accuracy', enemy.accuracy),
@@ -1571,13 +1870,14 @@ function enemyAttack(ctx: FightCtx, enemy: Combatant): void {
     plan.damage *= resist.value;
   }
   if (!rollHit(ctx, player, plan.chance)) {
-    const via = avoidedBy(ctx);
+    // What a defensive technique of the character did is the character's own: an ally's dodge has no name.
+    const via = ally === undefined ? avoidedBy(ctx) : null;
     if (resolving) resolving.avoidedBy = via;
-    note(fight, 'enemy', 'miss', null, 0, undefined, via ?? undefined);
+    note(fight, 'enemy', 'miss', null, 0, undefined, via ?? undefined, ally);
     return;
   }
   const dealt = dealDamage(ctx, player, plan.damage, enemy.id);
-  note(fight, 'enemy', 'hit', null, dealt);
+  note(fight, 'enemy', 'hit', null, dealt, undefined, undefined, ally);
   // An attack that carries the interrupt does what the interrupting tags of the content do to whoever it hits:
   // breaks the cast under way, and leaves the status that follows.
   if (plan.interrupts === true && alive(player)) {
@@ -1605,16 +1905,27 @@ export function hitChanceOf(ctx: FightCtx, attacker: Combatant, target: Combatan
   );
 }
 
-/** A heavy blow, for hooks such as the caster's: like every incoming strike it rolls once, its accuracy against the player's evasion. */
-export function heavyBlow(ctx: FightCtx, enemy: Combatant, damage: number): boolean {
-  const player = ctx.fight.player;
+/** A heavy blow, for hooks such as the caster's: like every incoming strike it rolls once, its accuracy against the evasion of the body it strikes. Returns that body when the blow lands, else null. */
+export function heavyBlow(ctx: FightCtx, enemy: Combatant, damage: number): Combatant | null {
+  const player = pickVictim(ctx);
+  const ally = allyOf(player);
+  if (resolving) resolving.struck = player.id;
   if (!rollHit(ctx, player, hitChanceOf(ctx, enemy, player))) {
-    const via = avoidedBy(ctx);
-    note(ctx.fight, 'enemy', 'miss', null, 0, undefined, via ?? undefined);
-    return false;
+    const via = ally === undefined ? avoidedBy(ctx) : null;
+    note(ctx.fight, 'enemy', 'miss', null, 0, undefined, via ?? undefined, ally);
+    return null;
   }
-  note(ctx.fight, 'enemy', 'hit', null, dealDamage(ctx, player, damage, enemy.id));
-  return true;
+  note(
+    ctx.fight,
+    'enemy',
+    'hit',
+    null,
+    dealDamage(ctx, player, damage, enemy.id),
+    undefined,
+    undefined,
+    ally,
+  );
+  return player;
 }
 
 function tickEffects(ctx: FightCtx, c: Combatant): void {
@@ -1696,9 +2007,11 @@ function handle(ctx: FightCtx): void {
   const player = fight.player;
 
   tickEffects(ctx, player);
+  for (const a of alliesOf(fight)) tickEffects(ctx, a);
   for (const e of fight.enemies) tickEffects(ctx, e);
   if (checkResult(fight)) return;
   expire(fight, player);
+  for (const a of alliesOf(fight)) if (alive(a)) expire(fight, a);
   for (const e of fight.enemies) if (alive(e)) expire(fight, e);
 
   // Enemies spawned during the loop wait for the next event.
@@ -1707,25 +2020,28 @@ function handle(ctx: FightCtx): void {
     while (e.timer.progress >= e.timer.need && alive(player)) {
       e.timer.progress -= e.timer.need;
       if (e.phase === 'wait') {
-        // The wait is over: the wind-up of the attack begins, and can be seen.
+        // The wait is over: the body it will strike is chosen, and the wind-up of the attack begins, and can be seen.
+        const victim = pickVictim(ctx);
         enter(
           fight,
           e,
           'act',
-          { kind: 'attack', id: null, target: player.id },
+          { kind: 'attack', id: null, target: victim.id },
           needOf(e.strikeMs),
           e.timer.progress,
         );
-        note(fight, 'enemy', 'cast', null, 0, e.id);
+        note(fight, 'enemy', 'cast', null, 0, e.id, undefined, allyOf(victim));
       } else {
         const act: FightAct = e.act ?? { kind: 'attack', id: null, target: player.id };
-        resolveAs(ctx, e, act, () => enemyAttack(ctx, e));
+        resolveAs(ctx, e, act, () => enemyAttack(ctx, e, act.target));
         enter(fight, e, 'wait', null, needOf(e.waitMs), e.timer.progress);
       }
     }
     runTimers(ctx, e);
   }
   runTimers(ctx, player);
+  // A timer a hook armed on an ally fires like the character's.
+  for (const a of alliesOf(fight)) if (alive(a)) runTimers(ctx, a);
   if (checkResult(fight)) return;
 
   while (fight.poolAt <= fight.t) {
@@ -1744,12 +2060,21 @@ function handle(ctx: FightCtx): void {
   // The player's phase ends: the wait (the AI chooses), the action (it takes effect) or the rest.
   while (fight.result === 'ongoing' && player.timer.progress >= player.timer.need) {
     player.timer.progress -= player.timer.need;
-    if (player.phase === 'wait') decide(ctx);
-    else if (player.phase === 'act') finishAct(ctx);
+    if (player.phase === 'wait') decide(ctx, player);
+    else if (player.phase === 'act') finishAct(ctx, player);
     else {
       finishRest(ctx);
-      beginWait(ctx);
+      beginWait(ctx, player);
     }
     checkResult(fight);
+  }
+  // The allies, in the order they came in, after the character: each waits, then acts, the same way.
+  for (const ally of [...alliesOf(fight)]) {
+    while (fight.result === 'ongoing' && alive(ally) && ally.timer.progress >= ally.timer.need) {
+      ally.timer.progress -= ally.timer.need;
+      if (ally.phase === 'wait') decide(ctx, ally);
+      else finishAct(ctx, ally);
+      checkResult(fight);
+    }
   }
 }

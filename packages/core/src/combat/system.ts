@@ -20,12 +20,20 @@ import type { System } from '../system.ts';
 import { encounterFor } from './fight-encounter.ts';
 import { bossNature } from '../natures.ts';
 import { noteBounty, noteFight, noteSighting } from './bingo.ts';
-import { dropPending, earnMastery, payPending } from './pending.ts';
+import { dropPending, earnMastery, earnXp, payPending } from './pending.ts';
+import { addFatigue, fatigueFor } from '../clone-life.ts';
 import { grantLoot, rollLoot } from './loot.ts';
 import { recordFight, recordItems, recordLoot, recordWounds, stampDefeat } from './report.ts';
 import { payOperation } from './rewards.ts';
 import type { TeamSupport } from './fight-types.ts';
-import { createFight, fightAdvance, fightNextEventIn, fightOutcome } from './fight.ts';
+import {
+  createFight,
+  fightAdvance,
+  fightNextEventIn,
+  fightOutcome,
+  makeCtx,
+  releaseAllies,
+} from './fight.ts';
 import { CHAKRA_DIVISOR_KEY, secMs } from './numbers.ts';
 import { ensurePouch, refillPouch, syncPouch } from './pouch.ts';
 import { snapshotPlayer } from './snapshot.ts';
@@ -172,6 +180,69 @@ export function newOperation(
   return c;
 }
 
+/**
+ * What the allies that have left the fight (fallen, dispelled, or the fight's end) earned by their own actions goes to the
+ * character, once: combat XP by the skill of the style each body had, and Mastery for the techniques it cast. The numbers
+ * (`xpShare`, `passShare`, `fatigueShare` of the `K.techFx` row of the technique that summoned the body) were applied when
+ * the body handed its earnings to the tally (`releaseAlly`), so what is paid here is what passes on.
+ */
+function payAllies(
+  state: GameState,
+  c: CombatState,
+  content: ContentDb,
+  rules: Rules,
+  clone: boolean,
+): void {
+  const tally = c.fight.tally;
+  const xp = tally.allyXp;
+  const work = tally.allyWork;
+  const tire = tally.allyTire;
+  delete tally.allyXp;
+  delete tally.allyWork;
+  delete tally.allyTire;
+  for (const [skill, amount] of Object.entries(xp ?? {})) {
+    earnXp(state, skill, amount, content, rules);
+  }
+  // The knowledge that reaches the character tires the mind as a clone does (a clone's fight keeps it for its dispel, which tires then).
+  if (!clone) {
+    const ms = fatigueFor(state, tire ?? {}, content);
+    if (ms > 0) addFatigue(state, ms, content);
+  }
+  for (const [id, units] of Object.entries(work ?? {})) {
+    const tech = indexOf(content).techniques.get(id);
+    if (!tech || !(units > 0)) continue;
+    earnMastery(
+      state,
+      c,
+      clone,
+      id,
+      tech.skill,
+      (masteryXpPerSecond(masteryLevel(state, id, content), content) * units) /
+        WORK_PER_MS /
+        MS_PER_SECOND,
+      content,
+      rules,
+    );
+  }
+}
+
+/**
+ * A fight is dropped without its normal end (the action stops, a clone is dispelled): the allies that still stand are
+ * released and what they hold is paid, once, by the same route as at the end of a fight. In a clone's fight it goes to
+ * the clone's pending knowledge, which the stop then pays. Call it before the fight is discarded.
+ */
+export function releaseFight(
+  state: GameState,
+  slot: number,
+  content: ContentDb,
+  rules: Rules,
+): void {
+  const c = state.combat;
+  if (c?.owner !== slot) return;
+  releaseAllies(makeCtx(c.fight, content, rules));
+  payAllies(state, c, content, rules, slot > 0);
+}
+
 /** Pays mastery XP for the technique time the fight has tallied since the last payment. */
 function settle(
   state: GameState,
@@ -183,6 +254,7 @@ function settle(
   const K = content.balance.K;
   const tally = c.fight.tally;
   c.style = tally.style;
+  payAllies(state, c, content, rules, clone);
   for (const [id, work] of Object.entries(tally.masteryWork)) {
     const due = work - (c.paid[id] ?? 0);
     const tech = indexOf(content).techniques.get(id);
@@ -420,6 +492,7 @@ function runFight(state: GameState, index: number, content: ContentDb, rules: Ru
     const c = state.combat;
     if (!c) return;
     if (!holdsFight(state, index)) {
+      releaseFight(state, index, content, rules);
       state.combat = null;
       return;
     }

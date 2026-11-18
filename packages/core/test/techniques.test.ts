@@ -196,17 +196,16 @@ describe('guaranteed combo and techniques that hit every enemy', () => {
     expect(tech(fight, wave).guaranteedCombo).toBe('shockWet');
   });
 
-  it('lets the Shadow Clone hit all enemies', () => {
+  it('makes the Shadow Clone put bodies on the player side instead of striking the enemies', () => {
     const clone = 'core:shadow_clone';
     const { fight, ai } = scene([clone], enemyAt(LEVEL, ['pack']));
     expect(fight.enemies.length).toBeGreaterThan(1);
-    expect(tech(fight, clone).hitsAll).toBe(true);
+    expect(tech(fight, clone).fx.kind).toBe('summon');
+    expect(tech(fight, clone).damage).toBe(0);
     const before = fight.enemies.map((e) => e.hp);
     runUntil(fight, cast(clone), ai);
-    // Every body that the clone hit lost health; with a hit chance below one, take several casts.
-    const ai2 = withAi(castSeq(clone));
-    runUntil(fight, (f) => (f.tally.uses[clone] ?? 0) >= 4, ai2, content, sec(120));
-    const lost = fight.enemies.filter((e, i) => e.hp < (before[i] ?? 0));
-    expect(lost.length).toBe(fight.enemies.length);
+    expect(fight.allies?.length).toBeGreaterThan(0);
+    // The cast itself touches no enemy.
+    expect(fight.enemies.map((e) => e.hp)).toEqual(before);
   });
 });

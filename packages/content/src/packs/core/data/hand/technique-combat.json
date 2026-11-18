@@ -113,9 +113,9 @@
   },
   "core:shadow_clone": {
     "effect": {
-      "kind": "damage"
-    },
-    "hitsAll": true
+      "kind": "summon",
+      "fx": "combatClone"
+    }
   },
   "core:running_fire": {
     "effect": {

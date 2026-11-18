@@ -134,6 +134,11 @@ const maintain: Rule = (view) => {
   // A timed bonus the pouch carries for the player (a smoke bomb's evasion) is thrown when it is not active and there is something to be hit by.
   const bonus = item(view, (p) => p.selfBonus !== null && !status(view, p.selfBonus));
   if (bonus) return bonus;
+  // A technique that puts allies on the player's side is worth it while there is a fight to take them into and none stands.
+  if ((view.allies ?? 0) === 0) {
+    const summon = use(best(view, (r) => r.tech.fx.kind === 'summon'));
+    if (summon) return summon;
+  }
   // A hastened cast is worth it only when it saves more time than the buff takes.
   if (!view.hastened) {
     const hasten = best(view, (r) => r.tech.fx.kind === 'nextCast');

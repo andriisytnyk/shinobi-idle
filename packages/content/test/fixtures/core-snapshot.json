@@ -210,7 +210,7 @@
       "core:temporary_paralysis": "fdf40074c6a2",
       "core:hidden_shadow_snake_hands": "a8d7e19d6414",
       "core:chakra_halving_drill": "fbf64d2bfe6d",
-      "core:shadow_clone": "ba0ab63ffc55",
+      "core:shadow_clone": "d69f4b9c5c59",
       "core:nature_transformation_burn_a_leaf": "6a0928ae4438",
       "core:fire_breath_control_drill": "2bb8ee86e996",
       "core:running_fire": "f92b124c56d0",
@@ -2023,6 +2023,17 @@
     "K.techFx.gateHealing.woundsAfter": 1,
     "K.techFx.nextCast.castMult": 0.5,
     "K.techFx.reveal.durationMs": 20000,
+    "K.techFx.combatClone.count": 2,
+    "K.techFx.combatClone.masteryStep": 50,
+    "K.techFx.combatClone.max": 3,
+    "K.techFx.combatClone.share": 0.4,
+    "K.techFx.combatClone.hp": 0.3,
+    "K.techFx.combatClone.dmg": 0.5,
+    "K.techFx.combatClone.threat": 0.6,
+    "K.techFx.combatClone.casts": 1,
+    "K.techFx.combatClone.xpShare": 1,
+    "K.techFx.combatClone.passShare": 1,
+    "K.techFx.combatClone.fatigueShare": 1,
     "K.bossFx.wolfPack.count": 4,
     "K.bossFx.wolfPack.everyMs": 20000,
     "K.bossFx.wolfPack.hp": 0.12,
@@ -5714,7 +5725,7 @@
       "technique.core:rope_escape.desc": "9c972afd8c76",
       "technique.core:running_fire.desc": "27349af15477",
       "technique.core:sensing.desc": "2173b9d037b9",
-      "technique.core:shadow_clone.desc": "7ba4553ff294",
+      "technique.core:shadow_clone.desc": "7ddf2c8cf871",
       "technique.core:shadow_shuriken.desc": "be2c2949d463",
       "technique.core:sickle_weasel.desc": "1b48882412e0",
       "technique.core:starch_syrup_capturing_field.desc": "0da27a931152",
@@ -7300,7 +7311,17 @@
       "item.core:chunin_vest.name": "3a3f2f3cb199",
       "item.core:chunin_vest.desc": "6fb20895f804",
       "item.core:gai_lesson.name": "21097b6131e2",
-      "item.core:gai_lesson.desc": "6937bf56a173"
+      "item.core:gai_lesson.desc": "6937bf56a173",
+      "fight.ally": "ad9d5b3a9038",
+      "fight.allies": "958454cb9c1f",
+      "fight.out.allyDodged": "13fe7f056991",
+      "log.allyCast": "53bef975df75",
+      "log.allyHit": "f17732974b41",
+      "log.allyMiss": "22779358c7e4",
+      "log.allyBasicHit": "8590ca1ae861",
+      "log.allyBasicMiss": "9997c92f5282",
+      "log.enemyHitAlly": "51a0a86eede9",
+      "log.enemyMissAlly": "f9b03cfecc1e"
     },
     "en": {
       "technique.core:body_flicker.name": "026242b01872",
@@ -8152,7 +8173,8 @@
       "gateOpening",
       "gateHealing",
       "nextCast",
-      "reveal"
+      "reveal",
+      "combatClone"
     ],
     "K.techFx.gateOpening": [
       "taiDamage",
@@ -8169,6 +8191,19 @@
     ],
     "K.techFx.reveal": [
       "durationMs"
+    ],
+    "K.techFx.combatClone": [
+      "count",
+      "masteryStep",
+      "max",
+      "share",
+      "hp",
+      "dmg",
+      "threat",
+      "casts",
+      "xpShare",
+      "passShare",
+      "fatigueShare"
     ],
     "K.bossFx": [
       "wolfPack",

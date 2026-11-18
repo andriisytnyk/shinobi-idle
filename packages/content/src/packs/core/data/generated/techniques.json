@@ -424,9 +424,7 @@
     "rank": "B",
     "rankCanon": true,
     "role": "series",
-    "tags": [
-      "area"
-    ],
+    "tags": [],
     "state": null,
     "src": "Q",
     "mentor": null,
@@ -435,7 +433,7 @@
     ],
     "sealsCanon": true,
     "tier": 0,
-    "noDamage": false,
+    "noDamage": true,
     "cast": 1.14,
     "practiceXp": 292.046
   },
