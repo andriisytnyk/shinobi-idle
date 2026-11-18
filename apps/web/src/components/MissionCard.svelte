@@ -7,10 +7,10 @@
   import { cardState, cloneCardState, viewOf } from '../lib/mission-feed.svelte.ts';
   import { holderRef, rewardRows } from '../lib/missions.ts';
   import { game } from '../lib/store.ts';
-  import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import BusyBy from './BusyBy.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
+  import StartSplit from './StartSplit.svelte';
   import MissionRankStamp from './MissionRankStamp.svelte';
   import MissionReward from './MissionReward.svelte';
   import PinGoal from './PinGoal.svelte';
@@ -36,31 +36,14 @@
   const rewards = $derived(rewardRows(forecast.rewards));
   const clientKey = $derived(`mission.${mission.id}.client`);
 
-  function startClone(): void {
-    if (!clone) return;
-    const result = game.dispatch({
+  /** Starts the mission with the performer: the character in the slot core names, a clone in its own. */
+  const startWith = (p: { slot: number; clone: boolean }) =>
+    game.dispatch({
       type: 'action.start',
-      slot: clone.slot,
+      slot: p.clone ? p.slot : status.slot,
       kind: MISSION_KIND,
       id: mission.id,
     });
-    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
-  }
-
-  function start(): void {
-    if (running) {
-      const result = game.dispatch({ type: 'action.stop', slot: status.runningAt });
-      if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
-      return;
-    }
-    const result = game.dispatch({
-      type: 'action.start',
-      slot: status.slot,
-      kind: MISSION_KIND,
-      id: mission.id,
-    });
-    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
-  }
 </script>
 
 <li
@@ -144,30 +127,14 @@
     </div>
   {/if}
 
-  <button
-    type="button"
-    class="ct-action"
-    class:stop={running}
-    disabled={shown === 'blocked'}
-    data-start
-    aria-describedby={shown === 'blocked' ? `why-${mission.id}` : undefined}
-    onclick={start}
-  >
-    {t(running ? 'tile.stop' : 'tile.start')}
-  </button>
+  <StartSplit
+    kind={MISSION_KIND}
+    id={mission.id}
+    disabledFor={(p) => (p.clone ? !(clone?.startable ?? false) : shown === 'blocked')}
+    describedBy={shown === 'blocked' ? `why-${mission.id}` : undefined}
+    run={startWith}
+  />
   {#if clone && !running}
-    <button
-      type="button"
-      class="ct-action clone"
-      data-ui="clone-start"
-      disabled={!clone.startable}
-      aria-describedby={clone.refusal?.reason === 'error.fightBusy'
-        ? `why-clone-${mission.id}`
-        : undefined}
-      onclick={startClone}
-    >
-      {t('tile.clone')}
-    </button>
     {#if clone.refusal?.reason === 'error.fightBusy'}
       <p class="ct-why" id="why-clone-{mission.id}" data-clone-why>
         <BusyBy reason={clone.refusal.reason} by={clone.refusal.by} />

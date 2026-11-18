@@ -6,13 +6,13 @@
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import { slotTiming } from '../lib/timing.ts';
-  import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import ActionEmblem from './ActionEmblem.svelte';
-  import CloneStart from './CloneStart.svelte';
+  import StartSplit from './StartSplit.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import IngredientRow from './IngredientRow.svelte';
   import MasteryRing from './MasteryRing.svelte';
+  import PerformerMarks from './PerformerMarks.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
   import PinGoal from './PinGoal.svelte';
   import ReqTree from './ReqTree.svelte';
@@ -37,13 +37,6 @@
   const mine = $derived(slotIndex === 0);
   const timing = $derived(game.read((gs) => slotTiming(gs, slotIndex, info.intervalMs)));
   const block = $derived(info.available ? null : blockOf(info.req));
-
-  function toggle(): void {
-    const result = mine
-      ? game.dispatch({ type: 'action.stop', slot: slotIndex })
-      : game.dispatch({ type: 'action.start', slot: 0, kind: info.kind, id: info.id });
-    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
-  }
 </script>
 
 <li
@@ -59,6 +52,7 @@
     <div class="ct-head">
       <h3 class="ct-name"><EntityLink kind="recipe" id={info.id} offered /></h3>
       <span class="ct-corner">
+        <PerformerMarks kind={info.kind} id={info.id} />
         <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
         <PinGoal kind="recipe" id={info.id} always={!info.available} />
       </span>
@@ -139,17 +133,12 @@
   {/if}
 
   <div class="ct-actions">
-    <button
-      type="button"
-      class="ct-action"
-      class:stop={mine}
-      disabled={!info.available && !mine}
-      aria-describedby={block && !mine ? `why-${info.id}` : undefined}
-      onclick={toggle}
-    >
-      {t(mine ? 'tile.stop' : 'tile.start')}
-    </button>
-    <CloneStart kind={info.kind} id={info.id} disabled={!info.available} />
+    <StartSplit
+      kind={info.kind}
+      id={info.id}
+      disabled={!info.available}
+      describedBy={block && !running ? `why-${info.id}` : undefined}
+    />
   </div>
   {#if block && !mine}
     <p class="ct-why" id="why-{info.id}" data-why={block.kind}>{blockText(block)}</p>

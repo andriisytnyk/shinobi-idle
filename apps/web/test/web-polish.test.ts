@@ -277,6 +277,8 @@ describe('a clone and a fight held by the character', () => {
     );
     booted = await bootApp([coreUi], state, '#/mission/core:caravan');
     expect(q('[data-clone-why]')).toBeNull();
+    (q('[data-mission-actions] [data-ui="start-split"] .chevron') as HTMLButtonElement).click();
+    flushSync();
     const button = q('[data-mission-actions] [data-ui="clone-start"]') as HTMLButtonElement | null;
     expect(button?.disabled).toBe(false);
   });

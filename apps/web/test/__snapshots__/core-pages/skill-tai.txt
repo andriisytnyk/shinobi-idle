@@ -66,8 +66,9 @@
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
             <div class="ct-actions">
-              <button class="action" type="button">
-                Почати
+              <span class="split plain" data-for="practice" data-ui="start-split">
+                <button class="main ct-action" data-performer="0" data-start="true" type="button">
+                  Почати
           <li class="tile locked" data-action="core:dynamic_entry" data-entity="technique:core:dynamic_entry" data-ui="action-tile">
             <div class="top">
               <span class="emblem md" data-emblem-icon="boot-kick" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">

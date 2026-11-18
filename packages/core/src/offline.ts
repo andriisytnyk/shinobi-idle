@@ -1,5 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
-import type { GameEvent, RuleDisabledEvent } from './events.ts';
+import type { CloneDispelledEvent, GameEvent, RuleDisabledEvent } from './events.ts';
 import { skillEntry } from './vocab.ts';
 import { mergeReports, type TargetReport } from './combat/report.ts';
 import { advance } from './engine.ts';
@@ -35,6 +35,8 @@ export interface OfflineSummary {
   actionsStopped: ActionStoppedEvent[];
   /** Rules of packs that failed and were switched off during the time away. */
   rulesDisabled?: RuleDisabledEvent[];
+  /** The clones that were dispelled while away, with the XP each handed over (the XP is already in `skillXp`). */
+  clonesDispelled?: CloneDispelledEvent[];
   /** Raids that arrived or ended while away, one row per raid (the village page has the detail). */
   raids?: RaidAway[];
   /** The battle report of the time away, by target. */
@@ -109,11 +111,13 @@ export function advanceOffline(
     actionsStopped: [],
     rulesDisabled: [],
     raids: [],
+    clonesDispelled: [],
     reports,
   };
   for (const e of away) {
     if (e.type === 'techniqueLearned') summary.techniquesLearned.push(e.id);
     else if (e.type === 'actionStopped') summary.actionsStopped.push(e);
+    else if (e.type === 'cloneDispelled') summary.clonesDispelled?.push(e);
     else if (e.type === 'ruleDisabled') summary.rulesDisabled?.push(e);
     else if (e.type === 'raidArrived' || e.type === 'raidOver') noteRaid(summary.raids ?? [], e);
   }

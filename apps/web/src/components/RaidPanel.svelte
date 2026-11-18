@@ -3,10 +3,10 @@
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
-  import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import { currencyName, moneyOf, resourceName } from '../lib/vocab.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
+  import StartSplit from './StartSplit.svelte';
 
   interface Props {
     /** A compact notice for another page: the state of the raid and the way to the fight, without the defence and the outcome. */
@@ -29,13 +29,15 @@
   const name = (raid: RaidInfo): string => t(`raid.${raid.id}.name`);
   const percent = (share: number): number => Math.round(share * 100);
 
-  function defend(raid: RaidInfo): void {
-    const result = game.dispatch({ type: 'action.start', slot: 0, kind: 'fight', id: raid.id });
-    if (!result.ok) {
-      toasts.push({ key: result.reason, params: refusalParams(result) });
-      return;
-    }
-    location.hash = '#/combat';
+  function defend(raid: RaidInfo, p: { slot: number }) {
+    const result = game.dispatch({
+      type: 'action.start',
+      slot: p.slot,
+      kind: 'fight',
+      id: raid.id,
+    });
+    if (result.ok) location.hash = '#/combat';
+    return result;
   }
 </script>
 
@@ -67,9 +69,13 @@
               <span class="ct-muted" data-raid-fighting>{t('village.raid.fighting')}</span>
               <a class="ct-button" href="#/combat" data-raid-fight>{t('village.raid.toFight')}</a>
             {:else}
-              <button type="button" class="ct-button" data-raid-defend onclick={() => defend(raid)}>
-                {t('village.raid.defend')}
-              </button>
+              <StartSplit
+                kind="fight"
+                id={raid.id}
+                label="village.raid.defend"
+                run={(p) => defend(raid, p)}
+                mark="raid-defend"
+              />
             {/if}
             <a class="prepare" href="#/combat/prepare/zone/{raid.id}" data-raid-prepare
               >{t('village.raid.prepare')}</a

@@ -6,6 +6,7 @@
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import AllyRow from './AllyRow.svelte';
+  import FightSwitcher from './FightSwitcher.svelte';
   import Fighter from './Fighter.svelte';
 
   const content = game.content;
@@ -45,21 +46,7 @@
 </script>
 
 {#if scene}
-  {#if fighters.length > 1}
-    <div class="switcher" data-ui="fight-switcher" role="tablist">
-      {#each fighters as slot (slot)}
-        <button
-          type="button"
-          role="tab"
-          aria-selected={slot === shown}
-          data-ui="fight-switch"
-          data-slot-index={slot}
-          onclick={() => (fightView.chosen = slot)}
-          >{t(slot === 0 ? 'combat.performer.you' : 'combat.performer.clone')}</button
-        >
-      {/each}
-    </div>
-  {/if}
+  <FightSwitcher />
   {#if clone}<p class="clone-note" data-clone-fights>
       <strong>{t('combat.cloneFights')}</strong> · {t('combat.cloneNote')}
     </p>{:else if cloned}<p class="clone-note" data-clone-split>{t('combat.cloneSplit')}</p>{/if}
@@ -94,11 +81,6 @@
 {/if}
 
 <style>
-  .switcher {
-    display: flex;
-    gap: var(--space-2);
-    margin-bottom: var(--space-3);
-  }
   .clone-note {
     margin: 0 0 var(--space-2);
     color: var(--fg-dim);
