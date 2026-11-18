@@ -51,3 +51,4 @@ export * from './vocab.ts';
 export * from './game.ts';
 export * from './guard.ts';
 export * from './xp.ts';
+export * from './telemetry.ts';
