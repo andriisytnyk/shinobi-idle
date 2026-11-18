@@ -4,6 +4,7 @@ import {
   advanceOffline,
   createState,
   defaultRules,
+  deserialize,
   dispatch as coreDispatch,
   revealHint,
   revealOf,
@@ -19,16 +20,21 @@ import {
   BACKUP_KEY,
   BROKEN_SAVE_KEY,
   SAVE_KEY,
+  assertSaneSave,
+  decodeStored,
   LoadError,
   backupSave,
   buildReport,
+  exportRaw,
   exportSave,
   importSave,
+  listBackups,
   loadGame,
   newGame,
   readBackup,
   saveGame,
   type AnbuReport,
+  type BackupEntry,
   type Clock,
   type KeyValue,
   type LoadReason,
@@ -88,9 +94,16 @@ export type SaveStatus = 'idle' | 'saved' | 'error';
 /**
  * `loading`: reading the save. `playing`: the loop and autosave run. `blocked`: another tab plays
  * (or took over); this tab neither runs nor saves. `error`: the save could not be read; nothing
- * runs and nothing is written until the player decides.
+ * runs and nothing is written until the player decides. `crashed`: the game loop threw; the loop is
+ * stopped and nothing is written, so the last good save stays as it is.
  */
-export type Phase = 'loading' | 'playing' | 'blocked' | 'error';
+export type Phase = 'loading' | 'playing' | 'blocked' | 'error' | 'crashed';
+
+/** What stopped the game loop. */
+export interface CrashInfo {
+  message: string;
+  stack: string;
+}
 
 /** Listeners that UI packs add around commands. `before` may replace the command or return `false` to cancel it. */
 export interface CommandHook {
@@ -140,6 +153,8 @@ export function createGame(deps: GameDeps = {}) {
     null,
   );
   let hasBackup = $state(false);
+  let backups = $state.raw<BackupEntry[]>([]);
+  let crash = $state.raw<CrashInfo | null>(null);
   let log = $state.raw<LogEntry[]>([]);
   let logId = 0;
   /** Set when the player has just graduated; the graduation modal clears it. */
@@ -303,16 +318,44 @@ export function createGame(deps: GameDeps = {}) {
     }
     if (delta === 0) return;
     lastWall += delta;
-    if (delta > SLEEP_GAP_MS) {
-      const summary = advanceOffline(state, delta, content, rules);
-      for (const r of summary.rulesDisabled ?? []) noteRule(r.pack, r.rule, r.reason);
-      const next = buildReport(summary);
-      if (next) report = next;
-    } else {
-      advance(state, delta, content, rules);
+    try {
+      if (delta > SLEEP_GAP_MS) {
+        const summary = advanceOffline(state, delta, content, rules);
+        for (const r of summary.rulesDisabled ?? []) noteRule(r.pack, r.rule, r.reason);
+        const next = buildReport(summary);
+        if (next) report = next;
+      } else {
+        advance(state, delta, content, rules);
+      }
+      drainEvents();
+    } catch (error) {
+      stopOnCrash(error);
+      return;
     }
-    drainEvents();
     touch();
+  }
+
+  /**
+   * An error inside the game loop: the state may be half-changed, so it is never written. The loop
+   * and every save trigger stop; the save in storage stays as the last good one.
+   */
+  function stopOnCrash(error: unknown): void {
+    halt();
+    crash = {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? (error.stack ?? '') : '',
+    };
+    phase = 'crashed';
+    console.error('The game loop failed', error);
+    touch();
+  }
+
+  async function refreshBackups(): Promise<void> {
+    try {
+      backups = kv ? await listBackups(kv) : [];
+    } catch {
+      backups = [];
+    }
   }
 
   async function refreshBackupFlag(): Promise<void> {
@@ -325,7 +368,7 @@ export function createGame(deps: GameDeps = {}) {
 
   /** Writes the save; a refusal because a newer one is stored hands the game to the other tab. */
   async function writeSave(force: boolean): Promise<void> {
-    if (!kv || phase === 'blocked' || phase === 'error') return;
+    if (!kv || phase === 'blocked' || phase === 'error' || phase === 'crashed') return;
     try {
       const result = await saveGame(kv, clock, state, rev, force);
       if (result.ok) {
@@ -409,12 +452,14 @@ export function createGame(deps: GameDeps = {}) {
       rev = loaded.rev;
       report = loaded.report;
       await refreshBackupFlag();
+      await refreshBackups();
       phase = 'playing';
       begin();
       touch();
       void requestPersistentStorage();
     } catch (error) {
       halt();
+      await refreshBackups();
       loadError =
         error instanceof LoadError
           ? { message: error.message, raw: error.raw, reason: error.reason }
@@ -491,6 +536,14 @@ export function createGame(deps: GameDeps = {}) {
     /** Why the save could not be read, and its raw text for export. */
     get loadError() {
       return loadError;
+    },
+    /** The copies of saves made before their format was upgraded, newest first. */
+    get backups(): readonly BackupEntry[] {
+      return backups;
+    },
+    /** What stopped the game loop; null while it runs. */
+    get crash(): CrashInfo | null {
+      return crash;
     },
     /** Whether a previous save is kept for «Відновити». */
     get hasBackup(): boolean {
@@ -598,6 +651,45 @@ export function createGame(deps: GameDeps = {}) {
       begin();
       touch();
       await save();
+    },
+    /** The save in storage (the last good one) as base64 text; null when there is none or it cannot be read. */
+    async exportStored(): Promise<string | null> {
+      if (!kv) return null;
+      try {
+        const raw = await kv.get(SAVE_KEY);
+        return raw === undefined ? null : exportRaw(raw);
+      } catch {
+        return null;
+      }
+    },
+    /** A backup made before an upgrade as base64 text; null when it is gone. */
+    async exportBackup(key: string): Promise<string | null> {
+      if (!kv || !backups.some((b) => b.key === key)) return null;
+      try {
+        const raw = await kv.get(key);
+        return raw === undefined ? null : exportRaw(raw);
+      } catch {
+        return null;
+      }
+    },
+    /** Swaps a backup made before an upgrade in; the game it replaces becomes the one-generation backup. */
+    async restoreFrom(key: string): Promise<boolean> {
+      if (!kv || phase !== 'playing' || !backups.some((b) => b.key === key)) return false;
+      let previous: GameState;
+      try {
+        const raw = await kv.get(key);
+        if (raw === undefined) return false;
+        const { text } = decodeStored(raw);
+        assertSaneSave(text);
+        previous = deserialize(text, content, rules);
+      } catch {
+        return false;
+      }
+      await backupSave(kv);
+      replaceState(previous);
+      await save(true);
+      await refreshBackupFlag();
+      return true;
     },
     /** Replaces the whole state (tests). */
     replaceState,

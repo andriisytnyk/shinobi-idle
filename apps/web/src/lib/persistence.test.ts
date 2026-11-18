@@ -2,7 +2,6 @@ import { content } from '@shinobi/content';
 import { advance, createState, dispatch, serialize, type GameState } from '@shinobi/core';
 import { describe, expect, it } from 'vitest';
 import {
-  BACKUP_KEY,
   LoadError,
   backupSave,
   decodeStored,
@@ -158,12 +157,12 @@ describe('loading a save', () => {
     expect(result.rev).toBe(0);
   });
 
-  it('keeps an older-format save as the backup when it is upgraded on load', async () => {
+  it('keeps an older-format save as a versioned backup when it is upgraded on load', async () => {
     const kv = memoryStore();
     const old = JSON.stringify({ ...JSON.parse(serialize(practising(), T0)), v: 3 });
     kv.data.set(SAVE_KEY, old);
     await loadGame(kv, fakeClock(T0), content);
-    expect(kv.data.get(BACKUP_KEY)).toBe(old);
+    expect(kv.data.get(`save.backup.v3.${T0}`)).toBe(old);
   });
 });
 
