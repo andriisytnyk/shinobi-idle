@@ -383,6 +383,10 @@ export const MIGRATIONS: readonly Migration[] = [
   // clone: full chakra, an empty bag (the Bank was shared before; what it did not carry it cannot use now), the pouch
   // slots of the character and, when the single fight of the old state was its fight, that fight. The speed pool is
   // gone (shares are recomputed on load), and the mind is not tired.
+  // Known and accepted: the empty bag means a clone that crafted from the shared Bank stops on its first step (it lacks
+  // the ingredients, `actionStopped: requirements`) and stands, and a clone mid-fight goes on with no pills. The player
+  // dispels it and makes a new one with a pick from the Bank. A migration has no content to read the Bank with, so it
+  // cannot fill the bag itself (the Bank is the character's; moving things out of it is a decision for the player).
   (state) => {
     const slots = Array.isArray(state.slots) ? state.slots : [];
     const pouch = isRecord(state.pouch) ? state.pouch : {};
@@ -602,6 +606,13 @@ function sanitizeClones(raw: unknown, state: GameState, content: ContentDb): Gam
     const saved = isRecord(v.purse) ? v.purse : {};
     for (const currency of Object.keys(state.currencies))
       purse[currency] = Object.hasOwn(saved, currency) ? Math.floor(held(saved[currency])) : 0;
+    const count = (x: unknown): number =>
+      typeof x === 'number' && Number.isInteger(x) && x > 0 ? Math.min(HELD_LIMIT, x) : 0;
+    const insight = pick(v.insight, (practice, m) => {
+      if (!index.practices.has(practice) || !isRecord(m)) return undefined;
+      const entry = { insight: count(m.insight), enlight: count(m.enlight) };
+      return entry.insight > 0 || entry.enlight > 0 ? entry : undefined;
+    });
     out[slot] = {
       life: Math.min(LIFE_FULL, Math.max(1, Math.floor(nonNegative(v.life)))),
       max: Math.min(1e9, nonNegative(v.max)),
@@ -621,6 +632,7 @@ function sanitizeClones(raw: unknown, state: GameState, content: ContentDb): Gam
         const pool = held(m.pool);
         return amount > 0 || pool > 0 ? { skill: String(m.skill), amount, pool } : undefined;
       }),
+      ...(Object.keys(insight).length > 0 ? { insight } : {}),
       fight: null,
       ...(v.doomed === 'death' ? { doomed: 'death' as const } : {}),
     };

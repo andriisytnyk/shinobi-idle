@@ -12,7 +12,8 @@ import { placeAt, removeFigure } from './hex.ts';
 import { indexOf } from './lookup.ts';
 import { bonusOf, type Modifier, type ModifierProvider } from './modifiers.ts';
 import { STAND_ID, STAND_KIND, asPerformer, actingPerformer } from './performer.ts';
-import { takeMastery, takeXp } from './progression.ts';
+import { takeInsight } from './meditation.ts';
+import { takeMastery, takeXp, xpGain, xpRoom } from './progression.ts';
 import { skillLevel } from './requirements.ts';
 import type { Rules } from './rules.ts';
 import { LIFE_FULL, type CloneBody, type GameState } from './state.ts';
@@ -98,6 +99,20 @@ export function fatigueRate(state: GameState, content: ContentDb, rules: Rules):
 /** The ms the mind fatigue lasts at its present rate (0 when none). */
 export function fatigueLeftMs(state: GameState, content: ContentDb, rules: Rules): number {
   return state.fatigue > 0 ? Math.ceil(state.fatigue / fatigueRate(state, content, rules)) : 0;
+}
+
+/** The XP of a clone that the character can take: what the level cap would throw away is left out. */
+function keptXp(
+  state: GameState,
+  xp: Readonly<Record<string, number>>,
+  content: ContentDb,
+): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const [skill, amount] of Object.entries(xp)) {
+    const kept = Math.min(amount, xpRoom(state, skill, content));
+    if (kept > 0) out[skill] = kept;
+  }
+  return out;
 }
 
 /** The fatigue (ms) that handing over this XP would leave: `share` of the hours of work it stands for, skill by skill. */
@@ -270,6 +285,7 @@ export function dispelPreview(
   state: GameState,
   slot: number,
   content: ContentDb,
+  rules: Rules,
 ): DispelPreview | null {
   const body = state.clones[slot];
   if (!body) return null;
@@ -279,16 +295,22 @@ export function dispelPreview(
   // A fight that is being fought pays what it earned when the clone is dispelled: it is held already or still in the fight.
   const xp = { ...body.xp };
   const pending = body.fight?.pending;
-  if (pending)
-    for (const [skill, amount] of Object.entries(pending.xp)) xp[skill] = (xp[skill] ?? 0) + amount;
+  if (pending) {
+    // The fight pays its XP after the modifiers, as the clone's action does: the preview shows that figure.
+    asPerformer(state, slot, () => {
+      for (const [skill, amount] of Object.entries(pending.xp))
+        xp[skill] = (xp[skill] ?? 0) + xpGain(state, skill, amount, content, rules);
+    });
+  }
+  const kept = keptXp(state, xp, content);
   return {
-    xp,
+    xp: kept,
     mastery: Object.fromEntries(
       Object.entries(body.mastery).map(([key, m]) => [key, { skill: m.skill, amount: m.amount }]),
     ),
     bag,
     purse: Object.fromEntries(Object.entries(body.purse).filter(([, n]) => n > 0)),
-    fatigueMs: fatigueFor(state, xp, content),
+    fatigueMs: fatigueFor(state, kept, content),
   };
 }
 
@@ -303,12 +325,15 @@ function absorb(
     if (held.id !== '' && held.n > 0) addItem(state, held.id, held.n);
   for (const [currency, n] of Object.entries(body.purse))
     if (n > 0) addCurrency(state, currency, n);
-  const fatigueMs = fatigueFor(state, body.xp, content);
-  for (const [skill, gained] of Object.entries(body.xp)) takeXp(state, skill, gained, content);
+  const kept = keptXp(state, body.xp, content);
+  const fatigueMs = fatigueFor(state, kept, content);
+  for (const [skill, gained] of Object.entries(kept)) takeXp(state, skill, gained, content);
+  for (const [practice, m] of Object.entries(body.insight ?? {}))
+    takeInsight(state, practice, m.insight, m.enlight);
   for (const [key, m] of Object.entries(body.mastery))
     takeMastery(state, key, m.skill, m.amount, m.pool, content);
   if (fatigueMs > 0) addFatigue(state, fatigueMs, content);
-  return { xp: { ...body.xp }, fatigueMs };
+  return { xp: kept, fatigueMs };
 }
 
 /**
@@ -351,9 +376,32 @@ export function dispelClone(
 
 // ---------- the system ----------
 
+type Rates = Map<number, { key: string; rate: number }>;
+
+/**
+ * The life rates `nextEventIn` worked out a moment ago, kept for the `elapse` that follows at the same game time:
+ * a rate needs every modifier provider, and the engine would ask for it twice per step otherwise. A kept rate is
+ * used once, only at the same time, for the same action of the same slot.
+ */
+const asked = new WeakMap<GameState, { now: number; rates: Rates }>();
+
+const actionKey = (state: GameState, slot: number): string => {
+  const action = state.slots[slot]?.action;
+  return action ? `${action.kind}/${action.id}` : '';
+};
+
+/** The life rate of the clone in `slot`, worked out and kept for the `elapse` that follows. */
+function keptRate(state: GameState, slot: number, content: ContentDb, rules: Rules, rates: Rates) {
+  const rate = lifeRate(state, slot, content, rules);
+  rates.set(slot, { key: actionKey(state, slot), rate });
+  return rate;
+}
+
 export const cloneSystem: System = {
   nextEventIn(state, content, rules) {
     let best: number | null = null;
+    const rates: Rates = new Map();
+    asked.set(state, { now: state.now, rates });
     const soonest = (wait: number): void => {
       if (best === null || wait < best) best = wait;
     };
@@ -362,7 +410,7 @@ export const cloneSystem: System = {
       soonest(
         body.doomed || body.life <= 0
           ? 0
-          : Math.ceil(body.life / lifeRate(state, Number(key), content, rules)),
+          : Math.ceil(body.life / keptRate(state, Number(key), content, rules, rates)),
       );
     }
     if (state.fatigue > 0) soonest(Math.ceil(state.fatigue / fatigueRate(state, content, rules)));
@@ -370,9 +418,18 @@ export const cloneSystem: System = {
   },
 
   elapse(state, dt, content, rules) {
+    const mine = asked.get(state);
+    const rates = mine && mine.now === state.now ? mine.rates : null;
+    asked.delete(state);
     for (const key of Object.keys(state.clones)) {
       const body = state.clones[key] as CloneBody;
-      body.life = Math.max(0, body.life - dt * lifeRate(state, Number(key), content, rules));
+      const slot = Number(key);
+      const kept = rates?.get(slot);
+      const rate =
+        kept && kept.key === actionKey(state, slot)
+          ? kept.rate
+          : lifeRate(state, slot, content, rules);
+      body.life = Math.max(0, body.life - dt * rate);
     }
     if (state.fatigue > 0)
       state.fatigue = Math.max(0, state.fatigue - dt * fatigueRate(state, content, rules));

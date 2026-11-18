@@ -95,6 +95,8 @@ export interface CloneBody {
   xp: Record<string, number>;
   /** Mastery the clone earned, by mastery key: the amount (modifiers applied), the skill it trains and the pool share. */
   mastery: Record<string, { skill: string; amount: number; pool: number }>;
+  /** Insights and Enlightenments the clone's meditation earned, by practice; the character gets them when the clone is dispelled. */
+  insight?: Record<string, { insight: number; enlight: number }>;
   /** The fight the clone fights, if its action holds one (the character's is `GameState.combat`). */
   fight: CombatState | null;
   /** Set when the clone is to be dispelled at the end of this moment (it fell in a fight). */

@@ -218,7 +218,7 @@ describe('knowledge stays in the clone until it is dispelled', () => {
     start(state, 1, 'drill', drill());
     advance(state, 30 * MIN, content);
     const held = heldXp(state);
-    const preview = dispelPreview(state, 1, content);
+    const preview = dispelPreview(state, 1, content, defaultRules);
     expect(preview?.fatigueMs).toBeGreaterThan(0);
     const before = xpSum(state);
     expect(dispel(state)).toEqual({ ok: true });
@@ -457,6 +457,58 @@ describe("the character's tonics and the clone", () => {
     expect(start(state, 0, 'meditate', practice()).ok).toBe(true);
     advance(state, 10 * MIN, content);
     expect(state.buffs[TONIC]?.charges ?? 0).toBeLessThan(full);
+  });
+});
+
+describe('what the character cannot take', () => {
+  it('holds no XP the level cap would throw away, and charges no fatigue for it', () => {
+    const state = cloner();
+    const skill = defaultRules.actionKinds.drill?.skill?.(drill(), content) ?? '';
+    const cap = xpAt(content.balance.K.cap);
+    const entry = state.skills[skill];
+    if (!entry) throw new Error(`no skill ${skill}`);
+    entry.xp = cap - 100;
+    expect(start(state, 1, 'drill', drill()).ok).toBe(true);
+    advance(state, HOUR, content);
+    expect(state.clones[1]?.xp[skill]).toBeLessThanOrEqual(100);
+    const preview = dispelPreview(state, 1, content, defaultRules);
+    expect(preview?.xp[skill]).toBeLessThanOrEqual(100);
+    expect(dispel(state).ok).toBe(true);
+    expect(state.skills[skill]?.xp).toBe(cap);
+    // 100 XP is a few seconds of work, not an hour.
+    expect(fatigueLeftMs(state, content, defaultRules)).toBeLessThan(5 * MIN);
+  });
+
+  it('shows what is paid at the dispel', () => {
+    const state = cloner();
+    expect(start(state, 1, 'drill', drill()).ok).toBe(true);
+    advance(state, 10 * MIN, content);
+    const preview = dispelPreview(state, 1, content, defaultRules);
+    const before = Object.values(state.skills).reduce((a, k) => a + k.xp, 0);
+    const held = Object.values(preview?.xp ?? {}).reduce((a, b) => a + b, 0);
+    expect(dispel(state).ok).toBe(true);
+    const after = Object.values(state.skills).reduce((a, k) => a + k.xp, 0);
+    expect(after - before).toBeCloseTo(held, 6);
+  });
+});
+
+describe('a clone that meditates', () => {
+  it('holds its Insights and Enlightenments with its knowledge and hands them over on the dispel', () => {
+    const state = cloner(5);
+    const practice = content.practices[0]?.id ?? '';
+    expect(start(state, 1, 'meditate', practice).ok).toBe(true);
+    // Chances are small: run until the clone has found something (and stop before its life ends).
+    for (let i = 0; i < 40 && !state.clones[1]?.insight; i++) advance(state, 10 * MIN, content);
+    const held = state.clones[1]?.insight?.[practice];
+    expect(held).toBeDefined();
+    expect(state.meditation[practice]?.insight ?? 0).toBe(0);
+    expect(state.meditation[practice]?.enlight ?? 0).toBe(0);
+    // It survives a save.
+    const loaded = deserialize(serialize(state, 0), content);
+    expect(loaded.clones[1]?.insight).toEqual(state.clones[1]?.insight);
+    expect(dispel(state).ok).toBe(true);
+    expect(state.meditation[practice]?.insight ?? 0).toBe(held?.insight);
+    expect(state.meditation[practice]?.enlight ?? 0).toBe(held?.enlight);
   });
 });
 

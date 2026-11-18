@@ -57,10 +57,21 @@ export function gainXp(
   const body = actingBody(state);
   if (body) {
     const gained = xpGain(state, skill, amount, content, rules);
-    if (gained > 0) body.xp[skill] = Math.min(HELD_MAX, (body.xp[skill] ?? 0) + gained);
+    // What the level cap would throw away is not held: no fatigue is charged for it.
+    if (gained > 0)
+      body.xp[skill] = Math.min(
+        HELD_MAX,
+        xpRoom(state, skill, content),
+        (body.xp[skill] ?? 0) + gained,
+      );
     return;
   }
   takeXp(state, skill, xpGain(state, skill, amount, content, rules), content);
+}
+
+/** The XP `skill` can still take before the level cap. */
+export function xpRoom(state: GameState, skill: string, content: ContentDb): number {
+  return Math.max(0, xpAt(content.balance.K.cap) - (state.skills[skill]?.xp ?? 0));
 }
 
 /** Adds `gained` XP (already modified) to `skill`, to the level cap; emits `levelUp` and refreshes unlocks. */

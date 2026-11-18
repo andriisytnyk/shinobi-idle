@@ -9,8 +9,10 @@ import {
   advance,
   allFights,
   chakraDivisor,
+  defaultRules,
   deserialize,
   dispatch,
+  dispelPreview,
   growSlots,
   playerMaxChakra,
   serialize,
@@ -80,12 +82,16 @@ describe('several fights at once', () => {
 
   it('keeps a raid one fight: the same raid is not fought by two performers', () => {
     const raid = content.raids[0];
-    if (!raid) return;
+    expect(raid).toBeDefined();
     const state = cloner();
-    state.flags[`raid.${raid.id}.active`] = true;
-    const first = startFight(state, raid.id, 1);
-    const second = startFight(state, raid.id, 0);
-    if (first.ok) expect(second).toEqual({ ok: false, reason: 'error.sameActionElsewhere' });
+    state.flags[`raid.${raid?.id}.active`] = true;
+    const first = startFight(state, raid?.id ?? '', 1);
+    // A raid the clone cannot take is refused for its own reason, never silently skipped.
+    expect(first).toEqual({ ok: true });
+    expect(startFight(state, raid?.id ?? '', 0)).toEqual({
+      ok: false,
+      reason: 'error.sameActionElsewhere',
+    });
   });
 
   it('divides the chakra pool of every performer by the number of performers', () => {
@@ -154,8 +160,12 @@ describe('what a clone fight pays', () => {
       Object.keys(state.clones[1]?.bag ?? {}).length +
         Object.keys(state.clones[1]?.purse ?? {}).length,
     ).toBeGreaterThan(0);
+    const preview = dispelPreview(state, 1, content, defaultRules);
+    const shown = Object.values(preview?.xp ?? {}).reduce((a, b) => a + b, 0);
     dispatch(state, { type: 'clone.dispel' }, content);
     expect(totalXp(state) - base).toBeGreaterThan(held * 0.99);
+    // What the preview shows is what the dispel pays, the fight's pending XP after the modifiers included.
+    expect(totalXp(state) - base).toBeCloseTo(shown, 4);
   });
 
   it('death: a lost fight dispels the clone, with no new try and nothing from the lost fight', () => {
@@ -163,12 +173,22 @@ describe('what a clone fight pays', () => {
     state.skills.nin!.xp = 0;
     expect(startFight(state, HARD, 1)).toEqual({ ok: true });
     const before = totalXp(state);
+    const sum = (x: Record<string, number> | undefined): number =>
+      Object.values(x ?? {}).reduce((a, b) => a + b, 0);
     let spent = 0;
-    for (let i = 0; i < 60 && state.clones[1]; i++) {
-      advance(state, MIN, content);
+    let heldSeen = 0;
+    let heldStep = 0;
+    let pendingSeen = 0;
+    for (let i = 0; i < 1200 && state.clones[1]; i++) {
+      advance(state, 5000, content);
       spent++;
+      const body = state.clones[1];
+      if (!body) break;
+      heldStep = sum(body.xp) - heldSeen;
+      heldSeen = sum(body.xp);
+      pendingSeen = Math.max(pendingSeen, sum(body.fight?.pending?.xp));
     }
-    expect(spent).toBeLessThan(60);
+    expect(spent).toBeLessThan(1200);
     expect(state.clones[1]).toBeUndefined();
     expect(state.slots[1]?.action).toBeNull();
     expect(state.world.figures).toBeUndefined();
@@ -184,7 +204,11 @@ describe('what a clone fight pays', () => {
     expect(state.report[HARD]?.losses ?? 0).toBe(losses);
     expect(state.clones[1]).toBeUndefined();
     // What the lost fight earned is gone; the combat XP of the fight (paid by time) was held and returns.
-    expect(totalXp(state)).toBeGreaterThanOrEqual(before);
+    // The fight had XP pending when the clone fell, and none of it was paid: the gain is what was held, and a step of it.
+    expect(pendingSeen).toBeGreaterThan(0);
+    const gain = totalXp(state) - before;
+    expect(gain).toBeGreaterThanOrEqual(heldSeen * 0.99);
+    expect(gain).toBeLessThanOrEqual(heldSeen + 2 * heldStep + 1);
     expect(state.report[HARD]?.cloneLosses).toBeGreaterThan(0);
   });
 

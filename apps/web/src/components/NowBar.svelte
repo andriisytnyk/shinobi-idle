@@ -151,7 +151,7 @@
               }
             : null,
           know: (() => {
-            const held = dispelPreview(state, index, content);
+            const held = dispelPreview(state, index, content, game.rules);
             return held
               ? {
                   xp: Object.entries(held.xp).map(([skill, n]) => ({ skill, n })),
