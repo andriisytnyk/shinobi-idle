@@ -57,6 +57,27 @@ function leaf(req: Req, current: number, target: number, ref: EntityRef | null):
   return { req, met: current >= target, current, target, ref, children: [] };
 }
 
+/**
+ * Whether a requirement tree holds: `evalReq(state, req, content).met` without building the
+ * result tree, for the checks that run all the time and need only the answer.
+ */
+export function reqMet(state: GameState, req: Req, content: ContentDb): boolean {
+  switch (req.t) {
+    case 'skill':
+      return skillLevel(state, req.skill, content) >= req.level;
+    case 'flag':
+      return flagValue(state, req.id) >= (req.n ?? 1);
+    case 'all':
+      for (const r of req.of) if (!reqMet(state, r, content)) return false;
+      return true;
+    case 'any':
+      for (const r of req.of) if (reqMet(state, r, content)) return true;
+      return false;
+    default:
+      return evalReq(state, req, content).met;
+  }
+}
+
 /** Evaluates a requirement tree against the state. */
 export function evalReq(state: GameState, req: Req, content: ContentDb): ReqResult {
   switch (req.t) {

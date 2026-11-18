@@ -70,6 +70,53 @@ export function computeMods(
   );
 }
 
+const GROUPS: readonly ModifierGroup[] = ['character', 'village', 'items'];
+
+/**
+ * The totals of several keys, as `computeMod(...).total` gives them, without building the parts:
+ * the providers are asked once and each modifier is folded into the groups of its key as it comes.
+ */
+export function totalsOf(
+  rules: ModRules,
+  state: GameState,
+  keys: readonly string[],
+  content: ContentDb,
+): number[] {
+  // Only the few modifiers of the keys asked for are kept, with the index of their key.
+  let hits: Modifier[] | null = null;
+  let hitKeys: number[] | null = null;
+  for (const provider of rules.modifierProviders) {
+    for (const m of provider(state, content, rules)) {
+      const k = keys.indexOf(m.key);
+      if (k < 0) continue;
+      (hits ??= []).push(m);
+      (hitKeys ??= []).push(k);
+    }
+  }
+  if (!hits || !hitKeys) return keys.map(() => 1);
+  const { modMin, modMax } = content.balance.K.engine;
+  const found = hits;
+  const owners = hitKeys;
+  return keys.map((_, k) => {
+    // The groups of the key in the order the first modifier of each came: the product is taken in that order.
+    const seen: number[] = [];
+    const add = [0, 0, 0];
+    const mul = [1, 1, 1];
+    for (let i = 0; i < found.length; i++) {
+      if (owners[i] !== k) continue;
+      const m = found[i] as Modifier;
+      const g = GROUPS.indexOf(m.group);
+      if (!seen.includes(g)) seen.push(g);
+      if (m.op === 'add') add[g] = (add[g] as number) + m.value;
+      else mul[g] = (mul[g] as number) * m.value;
+    }
+    if (seen.length === 0) return 1;
+    let total = 1;
+    for (const g of seen) total *= (1 + (add[g] as number)) * (mul[g] as number);
+    return Number.isFinite(total) ? Math.min(modMax, Math.max(modMin, total)) : 1;
+  });
+}
+
 function combine(parts: Modifier[], content: ContentDb): ModResult {
   if (parts.length === 0) return { total: 1, parts };
   const groups = new Map<ModifierGroup, { add: number; mul: number }>();
@@ -97,6 +144,24 @@ export function bonusOf(
   return computeMod(rules, state, key, content).total - 1;
 }
 
+const cycleKeysKept = new Map<string, Map<string, readonly string[]>>();
+
+/** The keys a cycle of `skill` reads, built once: they are looked up every cycle. */
+function cycleKeys(skill: string, extraSpeed?: string): readonly string[] {
+  let bySpeed = cycleKeysKept.get(skill);
+  if (!bySpeed) {
+    bySpeed = new Map();
+    cycleKeysKept.set(skill, bySpeed);
+  }
+  const extra = extraSpeed ?? '';
+  let keys = bySpeed.get(extra);
+  if (!keys) {
+    keys = [`interval.skill.${skill}`, `speed.skill.${skill}`, ...(extra ? [extra] : [])];
+    bySpeed.set(extra, keys);
+  }
+  return keys;
+}
+
 /**
  * How much longer than its base an action cycle of `skill` takes: the interval modifiers divided
  * by the speed modifiers. `extraSpeed` names one more speed key, for example `speed.practice`.
@@ -108,8 +173,22 @@ export function cycleFactor(
   content: ContentDb,
   extraSpeed?: string,
 ): number {
-  const slower = computeMod(rules, state, `interval.skill.${skill}`, content).total;
-  let faster = computeMod(rules, state, `speed.skill.${skill}`, content).total;
-  if (extraSpeed) faster *= computeMod(rules, state, extraSpeed, content).total;
+  // One sweep of the providers for all the keys; the totals are those of `computeMod` key by key.
+  const [slower = 1, speed = 1, extra = 1] = totalsOf(
+    rules,
+    state,
+    cycleKeys(skill, extraSpeed),
+    content,
+  );
+  const faster = extraSpeed ? speed * extra : speed;
   return slower / Math.max(faster, Number.EPSILON);
+}
+
+/** What a provider returns when it has nothing to give; callers read the list and never change it. */
+export const NO_MODIFIERS: Modifier[] = [];
+
+/** Whether an object has no own property, without building a list of them. */
+export function hasNone(record: object): boolean {
+  for (const key in record) if (Object.hasOwn(record, key)) return false;
+  return true;
 }

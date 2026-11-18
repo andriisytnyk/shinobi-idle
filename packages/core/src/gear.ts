@@ -2,7 +2,7 @@ import type { ContentDb, Gear } from '@shinobi/content';
 import { removeCurrency } from './bank.ts';
 import type { CommandResult } from './engine.ts';
 import { graduateReq, indexOf } from './lookup.ts';
-import type { Modifier, ModifierProvider } from './modifiers.ts';
+import { NO_MODIFIERS, hasNone, type Modifier, type ModifierProvider } from './modifiers.ts';
 import { evalReq, type Req } from './requirements.ts';
 import type { GameState } from './state.ts';
 import { moneyOf } from './vocab.ts';
@@ -32,6 +32,7 @@ export function nextTierPrice(state: GameState, gear: Gear, content: ContentDb):
 
 /** Each owned tier of a line adds its share to the line's modifier key. */
 export const gearProvider: ModifierProvider = (state, content) => {
+  if (hasNone(state.gear)) return NO_MODIFIERS;
   const out: Modifier[] = [];
   const index = indexOf(content);
   for (const [id, tiers] of Object.entries(state.gear)) {
