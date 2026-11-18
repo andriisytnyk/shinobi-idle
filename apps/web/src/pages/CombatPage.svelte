@@ -3,8 +3,7 @@
     cloneCount,
     enemyStats,
     evalReq,
-    fightSlotIndex,
-    isCloneSlot,
+    allFights,
     zoneAvailable,
     zoneCellOf,
     type GameState,
@@ -21,6 +20,7 @@
   import RaidPanel from '../components/RaidPanel.svelte';
   import ZoneWhere from '../components/ZoneWhere.svelte';
   import { formatInt } from '../lib/format.ts';
+  import { fightView } from '../lib/fight-view.svelte.ts';
   import { hasKey, t } from '../lib/i18n.ts';
   import type { PrepTarget } from '../lib/prep.ts';
   import { game } from '../lib/store.ts';
@@ -56,8 +56,9 @@
         .filter((o) => o.unlock === null || evalReq(gs, o.unlock, content).met)
         .map((o) => ({ id: o.id }));
       return {
-        fighting: fightSlotIndex(gs) >= 0,
-        cloneFights: isCloneSlot(gs, content, fightSlotIndex(gs)),
+        fighting: allFights(gs).length > 0,
+        selfFighting: gs.combat !== null,
+        fighters: allFights(gs).map((f) => f.slot),
         yard: yard.map((z) => ({
           id: z.id,
           enemy: z.enemy,
@@ -72,6 +73,10 @@
       };
     }),
   );
+
+  /** The performer whose fight is shown (the fight screen sets it), and the lines of that fight alone, worded for it. */
+  const shownFight = $derived(fightView.shown(listing.fighters));
+  const logEntries = () => game.combatLog.filter((e) => (e.event.slot ?? 0) === shownFight);
 
   /** Whether a clone exists: the character's chakra pool is divided then. */
   const cloned = $derived(game.read((gs: GameState) => cloneCount(gs, content) > 0));
@@ -119,7 +124,7 @@
     <BingoBook />
   {:else if section === 'report'}
     <BattleReport />
-  {:else if listing.fighting}
+  {:else if listing.selfFighting}
     <!-- The arena comes first: on a phone the hint above it would push the fight off the screen. -->
     <FightScreen />
     <RaidPanel compact progress />
@@ -127,6 +132,8 @@
   {:else if section === 'prepare' && target}
     <PrepScreen {target} />
   {:else}
+    <!-- Only clones fight: their fights show above the list, from which the character can start its own. -->
+    {#if listing.fighting}<FightScreen />{/if}
     <Hint id="combat" />
     <RaidPanel compact />
     <h2>{t('combat.enemies')}</h2>
@@ -209,7 +216,7 @@
   {#if section === 'fight' || (section === 'prepare' && listing.fighting)}
     <details class="log" data-fight-log>
       <summary>{t('combat.log')}</summary>
-      <CombatLog entries={game.combatLog} fighting={listing.fighting} clone={listing.cloneFights} />
+      <CombatLog entries={logEntries()} fighting={listing.fighting} clone={shownFight > 0} />
     </details>
   {/if}
 </SimplePage>

@@ -312,7 +312,7 @@ describe('A2: split invariance with fights running', () => {
         const whole = run(enemy, slots, at, total);
         for (const chunk of [1, 7, 999, 3600]) expect(run(enemy, slots, at, chunk)).toBe(whole);
         const loaded = deserialize(whole, content);
-        expect(loaded.combat?.fight.t).toBeGreaterThan(0);
+        expect((at === 0 ? loaded.combat : loaded.clones[at]?.fight)?.fight.t).toBeGreaterThan(0);
         expect(loaded.counters[`kills.${enemy}`] ?? 0).toBeGreaterThanOrEqual(0);
       });
     }
@@ -335,7 +335,7 @@ describe('A2: split invariance with fights running', () => {
         content,
       );
     }
-    expect(state.slots[1]?.share).toBe(333);
+    expect(state.slots[1]?.share).toBe(1000);
   });
 
   it('is deterministic for a seed and differs for another', () => {

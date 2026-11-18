@@ -236,7 +236,11 @@ export function measureRun(options: MatrixRun): RunMetrics {
   if (cloneAt !== null) marks.push({ at: cloneAt, label: 'техніка клонування' });
   marks.sort((a, b) => a.at - b.at);
   let gap = { hours: 0, after: 'старт' };
-  let cadence: { hours: number; allowed: number; after: string } = { hours: 0, allowed: TARGETS.maxGapHours, after: 'старт' };
+  let cadence: { hours: number; allowed: number; after: string } = {
+    hours: 0,
+    allowed: TARGETS.maxGapHours,
+    after: 'старт',
+  };
   for (let i = 0; i < marks.length; i++) {
     const from = marks[i] as { at: number; label: string };
     const to = marks[i + 1]?.at ?? result.endedAt;

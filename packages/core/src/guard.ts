@@ -207,6 +207,16 @@ export function guardKind(kind: ActionKind, pack: string): ActionKind {
     },
   };
   if (kind.fullSpeed === true) guarded.fullSpeed = true;
+  if (typeof kind.unique === 'function') {
+    const unique = kind.unique.bind(kind);
+    guarded.unique = (id, content) => {
+      try {
+        return unique(id, content) === true;
+      } catch {
+        return false;
+      }
+    };
+  }
   if (kind.blocked) {
     const blocked = kind.blocked.bind(kind);
     guarded.blocked = (state, id, content, rules, slot) => {

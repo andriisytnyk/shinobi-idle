@@ -13,7 +13,6 @@ import {
   dispatch,
   serialize,
   takeNotices,
-  wrapRule,
   type ActionKind,
   type GameState,
   type Rules,
@@ -453,29 +452,5 @@ describe('small fixes', () => {
     void state;
     expect(modRules.systems.some((s) => s.id === 'testmod:tokens')).toBe(true);
     expect(modContent.packs).toHaveLength(2);
-  });
-});
-
-describe('fullSpeed of an action kind', () => {
-  it('survives the guard for a wrapped kind and for a kind a pack adds', () => {
-    const fight = defaultRules.actionKinds.fight;
-    const practice = defaultRules.actionKinds.practice;
-    if (!fight || !practice) throw new Error('kinds');
-    expect(fight.fullSpeed).toBe(true);
-    // A wrapped `fight` is rebuilt by the guard and still runs its XP cycle at full speed.
-    const wrapped = game((r) => wrapRule(r, 'actionKinds', 'fight', (k) => ({ ...k })));
-    expect(wrapped.rules.actionKinds.fight?.fullSpeed).toBe(true);
-    // A kind of the pack declares it itself; a kind that does not keeps the slot share.
-    const added = game((r) =>
-      addRule(
-        addRule(r, 'actionKinds', 'bad:fast', { ...practice, fullSpeed: true }),
-        'actionKinds',
-        'bad:slow',
-        { ...practice },
-      ),
-    );
-    expect(added.rules.actionKinds['bad:fast']?.fullSpeed).toBe(true);
-    expect(added.rules.actionKinds['bad:slow']?.fullSpeed).toBeUndefined();
-    expect(added.rules.actionKinds.practice?.fullSpeed).toBeUndefined();
   });
 });

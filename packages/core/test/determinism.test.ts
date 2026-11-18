@@ -119,8 +119,8 @@ describe('A2: split invariance and determinism', () => {
   const TOTAL = 40_000;
   const arrangements = [
     [1, 0, 1000],
-    [2, 1, 500],
-    [3, 2, 333],
+    [2, 1, 1000],
+    [3, 2, 1000],
   ] as const;
 
   for (const name of Object.keys(scenarios)) {

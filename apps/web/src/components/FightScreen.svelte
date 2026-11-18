@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { cloneCount, isCloneSlot } from '@shinobi/core';
+  import { allFights, cloneCount } from '@shinobi/core';
   import { buildScene, outcomesOf, targetedKey } from '../lib/fight-scene.ts';
+  import { fightView } from '../lib/fight-view.svelte.ts';
   import Slot from '../lib/ext/Slot.svelte';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
@@ -8,8 +9,11 @@
 
   const content = game.content;
 
-  /** The scene of the running fight: every body, what it does, how far it has got. */
-  const scene = $derived(game.read((gs) => buildScene(gs, content, game.rules)));
+  /** The performers that fight now (each has a fight of its own), and the one whose fight is shown. */
+  const fighters = $derived(game.read((gs) => allFights(gs).map((f) => f.slot)));
+  const shown = $derived(fightView.shown(fighters));
+  /** The scene of the shown fight: every body, what it does, how far it has got. */
+  const scene = $derived(game.read((gs) => buildScene(gs, content, game.rules, shown)));
   const outcomes = $derived(scene ? outcomesOf(scene) : {});
   /** The enemy the player's action is aimed at. */
   const aimed = $derived(scene ? targetedKey(scene) : null);
@@ -25,7 +29,7 @@
   );
 
   /** Whether a clone fights: the pools of the left side are the clone's. */
-  const clone = $derived(game.read((gs) => (scene ? isCloneSlot(gs, content, scene.slot) : false)));
+  const clone = $derived(scene !== null && scene.slot > 0);
   /** Whether a clone exists: the chakra pool of the fighter is divided. */
   const cloned = $derived(game.read((gs) => cloneCount(gs, content) > 0));
 
@@ -40,6 +44,21 @@
 </script>
 
 {#if scene}
+  {#if fighters.length > 1}
+    <div class="switcher" data-ui="fight-switcher" role="tablist">
+      {#each fighters as slot (slot)}
+        <button
+          type="button"
+          role="tab"
+          aria-selected={slot === shown}
+          data-ui="fight-switch"
+          data-slot-index={slot}
+          onclick={() => (fightView.chosen = slot)}
+          >{t(slot === 0 ? 'combat.performer.you' : 'combat.performer.clone')}</button
+        >
+      {/each}
+    </div>
+  {/if}
   {#if clone}<p class="clone-note" data-clone-fights>
       <strong>{t('combat.cloneFights')}</strong> · {t('combat.cloneNote')}
     </p>{:else if cloned}<p class="clone-note" data-clone-split>{t('combat.cloneSplit')}</p>{/if}
@@ -67,6 +86,11 @@
 {/if}
 
 <style>
+  .switcher {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+  }
   .clone-note {
     margin: 0 0 var(--space-2);
     color: var(--fg-dim);

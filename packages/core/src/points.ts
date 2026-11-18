@@ -5,6 +5,7 @@ import { hexKey, isSurveyed, positionHex, touchWorld, worldRevision } from './he
 import { indexOf } from './lookup.ts';
 import type { Modifier, ModifierProvider } from './modifiers.ts';
 import { gainXp } from './progression.ts';
+import { actingPerformer } from './performer.ts';
 import { evalReq } from './requirements.ts';
 import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
@@ -206,15 +207,19 @@ const allowed = (state: GameState, mod: Mod): boolean =>
 
 /**
  * The modifiers of the places of power: while a performer (the character or a clone) stands on the
- * hex of a found point with `power`, its modifiers apply to every action of the player. One point
- * counts once however many performers stand on it; the sources are the places, so a breakdown names them.
+ * hex of a found point with `power`, its modifiers apply to the actions of that performer, and only
+ * to them (`actingPerformer`: whose action is being computed). Another performer's place does not
+ * help this one, and a clone that only stands on a place helps nobody. The sources are the places,
+ * so a breakdown names them.
  */
 export const pointsProvider: ModifierProvider = (state, content) => {
   // The providers are asked all the time: with no place of power found there is nothing to look at.
   if (!pointIndex(content).powered.some((p) => state.world.pois[p.id] === true)) return [];
   const out: Modifier[] = [];
   const seen = new Set<string>();
-  for (const { key } of performers(state, content)) {
+  const acting = actingPerformer();
+  for (const { slot, key } of performers(state, content)) {
+    if (slot !== acting) continue;
     for (const place of pointsAtHex(content, key)) {
       if (seen.has(place.id) || !place.point?.power || !isFound(state, place.id)) continue;
       seen.add(place.id);

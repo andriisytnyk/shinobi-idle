@@ -1,6 +1,7 @@
 import type { ContentDb } from '@shinobi/content';
 import {
   combatantStatus,
+  asPerformer,
   fightSlotIndex,
   SHARE_FULL,
   WORK_PER_MS,
@@ -208,10 +209,24 @@ function fighterOf(
   };
 }
 
-/** The scene of the running fight; null when no fight is running. */
-export function buildScene(state: GameState, content: ContentDb, rules: Rules): Scene | null {
+/**
+ * The scene of the fight of the performer of `performer` (the character, slot 0, by default; every clone has
+ * a fight of its own); null when that performer runs no fight.
+ */
+export function buildScene(
+  state: GameState,
+  content: ContentDb,
+  rules: Rules,
+  performer = 0,
+): Scene | null {
+  // A shallow copy takes the swap, so the live state is never touched by a read of the UI.
+  const view = performer > 0 ? { ...state } : state;
+  return asPerformer(view, performer, () => sceneOf(view, content, rules));
+}
+
+function sceneOf(state: GameState, content: ContentDb, rules: Rules): Scene | null {
   const combat = state.combat;
-  const slot = fightSlotIndex(state);
+  const slot = combat ? fightSlotIndex(state, combat.owner) : -1;
   if (!combat || slot < 0) return null;
   const fight = combat.fight;
   const share = Math.max(0, (state.slots[slot]?.share ?? 0) / SHARE_FULL);

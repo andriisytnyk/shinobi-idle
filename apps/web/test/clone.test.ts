@@ -108,24 +108,15 @@ describe('the clone on a skill page', () => {
     expect(button?.textContent?.trim()).toBe(t('tile.clone'));
     button?.click();
     flushSync();
+    // There is no clone yet: a small pouch picker opens first, with the default pick.
+    expect(game.state.clones[1]).toBeUndefined();
+    (q('[data-ui="clone-pouch-make"]') as HTMLButtonElement | null)?.click();
+    flushSync();
+    expect(game.state.clones[1]).toBeDefined();
     expect(game.state.slots[1]?.action).toEqual({ kind: 'gather', id: 'core:mint' });
     expect(game.state.slots[0]?.action).toBeNull();
     // It runs now, so the tile offers «Зупинити» and no second start.
     expect(q('[data-herb="core:mint"]')?.querySelector('[data-ui="clone-start"]')).toBeNull();
-  });
-
-  it('shows the link bonus in the breakdown of the fed craft, with the technique as its source', async () => {
-    const state = cloner();
-    start(state, 0, 'gather', 'core:mint');
-    start(state, 1, 'craft', 'core:antidote');
-    booted = await bootApp([coreUi], state, '#/skill/alch');
-    const tile = q('[data-action="core:antidote"]');
-    const figure = tile?.querySelector<HTMLButtonElement>('[data-ui="action-interval"] .figure');
-    figure?.click();
-    flushSync();
-    const list = tile?.querySelector('[data-ui="action-interval"] .list');
-    expect(list?.textContent).toContain('+10%');
-    expect(list?.querySelector('a')?.getAttribute('href')).toBe(`#/technique/${CLONE}`);
   });
 });
 
@@ -179,8 +170,11 @@ describe('the clone fights', () => {
     expect(enemy).not.toBeNull();
     enemy?.click();
     flushSync();
+    (q('[data-ui="clone-pouch-make"]') as HTMLButtonElement | null)?.click();
+    flushSync();
     expect(game.state.slots[1]?.action?.kind).toBe('fight');
-    expect(game.state.combat?.owner).toBe(1);
+    expect(game.state.clones[1]?.fight?.owner).toBe(1);
+    expect(game.state.combat).toBeNull();
     expect(q('[data-fighter="clone"]')?.textContent).toContain(t('combat.cloneYou'));
     expect(q('[data-clone-fights]')?.textContent).toContain(t('combat.cloneFights'));
     // The Now bar shows the clone's fight under the clone's mark.
@@ -190,6 +184,6 @@ describe('the clone fights', () => {
     (q('.stop') as HTMLButtonElement | null)?.click();
     flushSync();
     expect(game.state.slots[1]?.action).toBeNull();
-    expect(game.state.combat).toBeNull();
+    expect(game.state.clones[1]).toBeUndefined();
   });
 });

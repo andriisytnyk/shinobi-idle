@@ -11,6 +11,7 @@ import {
   type Modifier,
   type ModifierProvider,
 } from './modifiers.ts';
+import { actingBody } from './performer.ts';
 import { nextFloat } from './rng.ts';
 import type { Rules } from './rules.ts';
 import type { GameState, MeditationEntry } from './state.ts';
@@ -28,6 +29,18 @@ export type MeditationModRef = `${MeditationKind}.${number}`;
 /** The entry of a practice, created empty on first use. */
 function entryOf(state: GameState, practice: string): MeditationEntry {
   return (state.meditation[practice] ??= { insight: 0, enlight: 0, bought: {} });
+}
+
+/** Hands the character the Insights and Enlightenments a clone's meditation earned. */
+export function takeInsight(
+  state: GameState,
+  practice: string,
+  insight: number,
+  enlight: number,
+): void {
+  const entry = entryOf(state, practice);
+  entry.insight += insight;
+  entry.enlight += enlight;
 }
 
 /** Parses `insight.1` into its kind and index; null for anything else. */
@@ -95,7 +108,11 @@ export const meditateKind: ActionKind = {
     const insight = nextFloat(state.rng, 'action') < chance.insight;
     const enlight = nextFloat(state.rng, 'action') < chance.enlight;
     if (!insight && !enlight) return;
-    const entry = entryOf(state, id);
+    // A clone's finds are held with its knowledge and go to the character on the dispel.
+    const body = actingBody(state);
+    const entry = body
+      ? ((body.insight ??= {})[id] ??= { insight: 0, enlight: 0 })
+      : entryOf(state, id);
     if (insight) {
       entry.insight += 1;
       emit(state, { type: 'meditationGain', practice: id, kind: 'insight' });

@@ -101,7 +101,7 @@ export const CORE_MODIFIER_KEYS: Readonly<Table> = (() => {
   add('pool.hp', 'Size of the HP pool');
   add('pool.chakra', 'Size of the chakra pool');
   add('pool.stamina', 'Size of the stamina pool');
-  add('clone.pool', 'The shared pool of shadow clones');
+  add('clone.pool', 'How long shadow clones live on their chakra (+0.05 is 5% longer)');
 
   // Missions and exploration.
   add('mission.duration', 'Duration of every mission (-0.05 is 5% shorter)', { wired: true });
