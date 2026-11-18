@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ReqResult } from '@shinobi/core';
+  import { pointStatus, type ReqResult } from '@shinobi/core';
   import { humanId, webRef } from '../lib/entities.ts';
   import { currencyName, currencyOf, rankName } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
@@ -42,6 +42,24 @@
   const currency = $derived(req.t === 'currency' ? currencyOf(game.content, req.role) : null);
   /** A map flag (a point found, a region open) names the place it is about. */
   const flagRef = $derived(req.t === 'flag' ? flagEntity(req.id) : null);
+  /** The place whose point of interest a `point.<place>` flag asks to have found. */
+  const pointPlace = $derived(
+    req.t === 'flag' && req.id.startsWith('point.')
+      ? (game.content.places.find(
+          (p) => p.id === (req as { id: string }).id.slice('point.'.length),
+        ) ?? null)
+      : null,
+  );
+  /** Its name is printed only once the player knows the point: a hidden or veiled one is «???». */
+  const pointName = $derived(
+    pointPlace
+      ? game.read((gs) =>
+          ['open', 'found'].includes(pointStatus(gs, game.content, pointPlace))
+            ? t(`place.${pointPlace.id}.name`)
+            : t('req.pointHidden'),
+        )
+      : '',
+  );
   const flagText = $derived(
     req.t === 'flag'
       ? hasKey(`req.flag.${req.id}`)
@@ -88,6 +106,8 @@
         {currency === null ? t(`req.type.currency`) : currencyName(currency)}
       {:else if req.t === 'rank'}
         {t('req.rank', { rank: rankName(req.rank) })}
+      {:else if req.t === 'flag' && pointPlace}
+        <span data-point-req>{t('req.pointFound', { name: pointName })}</span>
       {:else if req.t === 'flag' && flagRef}
         <EntityLink kind={flagRef.kind} id={flagRef.id} offered />
         <span class="detail">{t(flagRef.kind === 'poi' ? 'req.poiFound' : 'req.regionOpen')}</span>

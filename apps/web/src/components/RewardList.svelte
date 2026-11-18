@@ -11,9 +11,11 @@
     /** Amounts of other currencies, by id. */
     currencies?: Readonly<Record<string, number>>;
     items?: readonly { id: string; n: number }[];
+    /** Skill XP the reward gives; the skill is an entity link. */
+    xp?: { skill: string; amount: number } | null;
   }
 
-  let { money = 0, currencies = {}, items = [] }: Props = $props();
+  let { money = 0, currencies = {}, items = [], xp = null }: Props = $props();
 
   /** Every currency payout, the money first; a currency is named in the nominative and the amount follows. */
   const payouts = $derived([
@@ -32,3 +34,10 @@
 {#each items as item (item.id)}
   <span data-reward="item"><EntityLink kind="item" id={item.id} offered /> ×{item.n}</span>
 {/each}
+
+{#if xp}
+  <span data-reward="xp"
+    >{t('map.reward.xp', { n: formatInt(xp.amount) })}
+    <EntityLink kind="skill" id={xp.skill} /></span
+  >
+{/if}

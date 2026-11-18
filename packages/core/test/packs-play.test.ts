@@ -232,13 +232,14 @@ describe('a game composed with the test pack', () => {
     expect(modRules.actionKinds.practice).toBe(plainRules.actionKinds.practice);
     expect(modRules.systems.map((s) => s.id)).toEqual([
       'action',
+      'points',
       'combat',
       'wound',
       'village',
       'quest',
       'testmod:tokens',
     ]);
-    expect(plainRules.systems).toHaveLength(5);
+    expect(plainRules.systems).toHaveLength(6);
   });
 
   it('applies modifiers keyed by the skill of the pack, with their sources', () => {

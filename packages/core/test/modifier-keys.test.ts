@@ -25,6 +25,7 @@ import {
   woundIntervalMs,
   regrowMs,
   techniqueNumbers,
+  travelPrice,
   useTonic,
   walkMs,
   type GameState,
@@ -398,6 +399,20 @@ describe('A4: each wired key changes its mechanic by exactly the modifier', () =
       const s = genin();
       payMission(s, missionById('core:cat'), [], content, withProvider(test('mission.rep', 0.5)));
       expect(s.currencies.rep).toBe(Math.round(missionById('core:cat').rep * 1.5));
+    },
+    'travel.price': () => {
+      const s = genin();
+      // Two hexes away, over a road and a forest: 6 minutes of walking.
+      const base = travelPrice(s, 'core:uzlissia', content, defaultRules);
+      const cheap = travelPrice(
+        s,
+        'core:uzlissia',
+        content,
+        withProvider(test('travel.price', -0.5)),
+      );
+      expect(base).toBe(Math.ceil(content.balance.K.map.travel.ryoPerMinute * 6));
+      expect(cheap).toBe(Math.max(content.balance.K.map.travel.min, Math.ceil(base! / 2)));
+      expect(cheap).toBeLessThan(base!);
     },
     'meditation.enlightChance': () => {
       const s = genin();

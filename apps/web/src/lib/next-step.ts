@@ -94,7 +94,7 @@ export function flagPage(id: string, content: ContentDb): string | null {
     const found = content.regions.find((r) => r.id.slice(r.id.lastIndexOf(':') + 1) === region[1]);
     return found ? hrefFor({ kind: 'region', id: found.id }) : '#/world';
   }
-  if (id.startsWith('deposit.')) return '#/world';
+  if (id.startsWith('deposit.') || id.startsWith('point.')) return '#/world';
   // An operation that is a mission of the board or of a place is read on the mission's page; the exam's own parts on the rank page.
   const op = content.operations.find((o) => o.clearFlag === id);
   if (op) {

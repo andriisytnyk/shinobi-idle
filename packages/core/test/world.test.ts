@@ -330,6 +330,9 @@ describe('A5: travel', () => {
     ).toBe('error.cellNotReachable');
   });
 
+  // The pace tests keep Athletics where it is: a step of a walk pays XP (finds.ts), which would raise the level on the way.
+  const still: Rules = { ...defaultRules, hexEntered: [] };
+
   it('walks hex by hex for the time of the terrain, shorter with Athletics, and arrives only at the end', () => {
     const state = genin();
     setLevel(state, 'scout', 20);
@@ -348,11 +351,11 @@ describe('A5: travel', () => {
     expect(need).toBe(
       minutes.reduce((sum, m) => sum + Math.round(m * MIN * (1 - S.athPerLevel)), 0),
     );
-    advance(state, need - 1, content);
+    advance(state, need - 1, content, still);
     expect(state.world.location).not.toBe(at);
     expect(state.world.location).not.toBe('core:rysovi_polia');
     expect(state.slots[0]?.action).not.toBeNull();
-    advance(state, 1, content);
+    advance(state, 1, content, still);
     expect(state.world.location).toBe('core:rysovi_polia');
     expect(state.slots[0]?.action).toBeNull();
 
@@ -389,11 +392,11 @@ describe('A5: travel', () => {
     const plan = travelPlan(state, 'core:rysovi_polia', content);
     expect(plan.hexes.length).toBeGreaterThan(1);
     const first = state.world.location;
-    advance(state, walkMs(state, cell('rysovi_polia'), content, defaultRules) - 1, content);
+    advance(state, walkMs(state, cell('rysovi_polia'), content, defaultRules) - 1, content, still);
     const mid = state.world.location;
     expect(mid).not.toBe(first);
     ok(state, { type: 'action.stop', slot: 0 });
-    advance(state, 40 * MIN, content);
+    advance(state, 40 * MIN, content, still);
     expect(state.world.location).toBe(mid);
   });
 });
@@ -574,10 +577,10 @@ describe('A9: determinism and split invariance', () => {
       advance(whole, total, content, fast);
       // The cell went up a level during the run.
       expect(cellLevel(whole, cell('okolytsi_sela'), content)).toBeGreaterThanOrEqual(1);
-      // The walk of slot 1 moves the figure of slot 1 and not the character; once it has arrived the clone is done and leaves the map.
+      // The walk of slot 1 moves the figure of slot 1 and not the character; once it has arrived the clone stands there.
       if (two) {
-        expect(whole.slots[1]?.action).toBeNull();
-        expect(whole.world.figures).toBeUndefined();
+        expect(whole.slots[1]?.action).toEqual({ kind: 'stand', id: 'here' });
+        expect(whole.world.figures?.[1]).toBe('core:polihon_44_lis_smerti');
         expect(whole.world.location).toBe('core:okolytsi_sela');
       }
       for (const chunk of [1, 7, 999, 3600]) {
@@ -647,7 +650,11 @@ describe('A11: save', () => {
       'core:okolytsi_sela': K.cellExplores[K.cellExplores.length - 1],
       'core:rysovi_polia': K.cellExplores[S.plainMaxLevel - 1],
     });
-    expect(Object.keys(loaded.world.pois)).toEqual(['core:poi_okolytsi_sela_outpost']);
+    // The point of the place where the game starts is known from the first day.
+    expect(Object.keys(loaded.world.pois)).toEqual([
+      'core:west_gate_post',
+      'core:poi_okolytsi_sela_outpost',
+    ]);
     expect(loaded.world.claimed).toEqual({});
   });
 });

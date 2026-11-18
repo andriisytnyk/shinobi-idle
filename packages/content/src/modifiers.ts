@@ -124,6 +124,7 @@ export const CORE_MODIFIER_KEYS: Readonly<Table> = (() => {
   });
   add('interval.explore', 'Time to explore a cell (-0.05 is 5% shorter)', { wired: true });
   add('interval.walk', 'Time of a walk to another cell (-0.05 is 5% shorter)', { wired: true });
+  add('travel.price', 'Ryo price of travelling for ryo (-0.1 is 10% cheaper)', { wired: true });
 
   // Field and crafts.
   add('bush.stock', 'Herbs a bush holds before it must regrow (whole units)', {

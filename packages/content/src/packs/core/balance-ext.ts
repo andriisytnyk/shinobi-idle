@@ -108,6 +108,19 @@ export const BALANCE_EXT = {
     startRadius: 2,
     plainSurvey: [6, 18],
     plainScout: 1,
+    /** Walking pays Athletics at the pace of level 3 and Scouting at the pace of level 2, for the minutes of each hex. */
+    walk: { athLevel: 3, scoutLevel: 2 },
+    /** Paid travel costs 1.5 ryo per minute the walk would take (a 3-minute plain is 4.5 ryo), never under 5. */
+    travel: { ryoPerMinute: 1.5, min: 5 },
+    /**
+     * Map mastery, by hexes surveyed to their highest level: 30 hexes +5% Scouting XP, 60 hexes
+     * 10% cheaper paid travel, all of them 5% faster surveys.
+     */
+    mastery: [
+      { hexes: 30, mods: [{ key: 'xp.skill.scout', op: 'add', value: 0.05 }] },
+      { hexes: 60, mods: [{ key: 'travel.price', op: 'add', value: -0.1 }] },
+      { hexes: 'all', mods: [{ key: 'interval.explore', op: 'add', value: -0.05 }] },
+    ],
   },
   /**
    * The village: building levels a new Genin starts with (every building not named starts at 0;

@@ -632,6 +632,24 @@ export const terrainSchema = z.strictObject({
     .optional(),
   /** Whether the mark is filled (a stroke otherwise). */
   glyphFill: z.boolean().optional(),
+  /**
+   * What a walker may find on a hex of this terrain: `chance` per hex entered, then one of `drops`
+   * by weight (each an item and a count). Data of the terrain, so a pack's terrain carries its own.
+   */
+  finds: z
+    .strictObject({
+      chance: z.number().gt(0).max(1),
+      drops: z
+        .array(
+          z.strictObject({
+            item: coreId,
+            n: z.number().int().min(1),
+            weight: z.number().int().min(1),
+          }),
+        )
+        .min(1),
+    })
+    .optional(),
 });
 
 /**
@@ -668,11 +686,77 @@ export const linkSchema = z.strictObject({
 });
 export type Link = z.infer<typeof linkSchema>;
 
+/**
+ * A one-time payout: ryo, items, other currencies by id (Intel is one), and a little XP of one skill.
+ * Used for the discovery reward of a point of interest and for a find along the road.
+ */
+export const payoutSchema = z
+  .strictObject({
+    ryo: z.number().int().min(1).optional(),
+    items: z.array(ingredientRef).min(1).optional(),
+    currencies: z.record(vocabId, z.number().int().min(1)).optional(),
+    xp: z.strictObject({ skill: skillId, amount: z.number().positive() }).optional(),
+  })
+  .refine((p) => Object.keys(p).length > 0, 'a payout must give something');
+export type Payout = z.infer<typeof payoutSchema>;
+
+/**
+ * What makes a place a point of interest (data, not code: a pack gives any place one, or adds a
+ * place with one). A performer that first steps on the hex after the point is revealed (and its
+ * `needs` hold) finds it and gets `reward`, once. A found point then
+ * - gives `power` (modifiers) while any performer, the character or a clone, stands on the hex (one
+ *   point counts once however many stand there; different points add up),
+ * - joins the free instant travel of its `travel` group (the outposts),
+ * - opens the actions whose requirement is the flag `point.<place id>` (raised when it is found).
+ * A point with `revealedBy` is absent from the map until a survey of its hex reaches `survey`, or the
+ * point of the place named by `point` is found (either is enough). A point with `needs` shows only
+ * a vague hint (`place.<id>.hint`) until the requirement holds.
+ */
+export const pointSchema = z.strictObject({
+  reward: payoutSchema,
+  power: z.array(modSchema).min(1).optional(),
+  travel: z
+    .string()
+    .regex(/^[a-z0-9_]+(:[a-z0-9_]+)?$/)
+    .optional(),
+  revealedBy: z
+    .strictObject({
+      survey: z.number().int().min(1).optional(),
+      point: coreId.optional(),
+    })
+    .refine(
+      (r) => r.survey !== undefined || r.point !== undefined,
+      'name a survey level or a point',
+    )
+    .optional(),
+  needs: z.lazy(() => reqSchema).optional(),
+});
+export type Point = z.infer<typeof pointSchema>;
+
+/**
+ * A rare find bound to a place: while a performer walks onto a hex within `radius` of the place it
+ * may drop `payout`, with a chance of `chance` on the place's own hex that falls linearly to
+ * `chance / (radius + 1)` on the outermost ring. At most `stock` drops are held; the place gives
+ * one more every `restockMs` of game time after it was drawn down.
+ */
+export const findSchema = z.strictObject({
+  radius: z.number().int().min(0),
+  chance: z.number().gt(0).max(1),
+  stock: z.number().int().min(1),
+  restockMs: z.number().int().min(1),
+  payout: payoutSchema,
+});
+export type Find = z.infer<typeof findSchema>;
+
 export const placeSchema = z.strictObject({
   id: coreId,
   hex: z.tuple([z.number().int(), z.number().int()]),
   kind: z.string().min(1),
   role: z.string().min(1),
+  /** What the place is worth: a point of interest (see `pointSchema`); none for a bare place. */
+  point: pointSchema.optional(),
+  /** A rare find along the roads around the place (see `findSchema`). */
+  rare: findSchema.optional(),
 });
 
 export const regionSchema = z.object({
@@ -1573,6 +1657,27 @@ export const balanceParamsSchema = z.object({
     startRadius: z.number().int().min(0),
     plainSurvey: z.array(z.number().int().min(1)).min(1),
     plainScout: z.number().int().min(1),
+    /**
+     * Walking: the pace level (as a region's `scout`) whose XP per hour Athletics and Scouting earn
+     * while walking; one hex pays that rate for the minutes it takes at full speed.
+     */
+    walk: z.object({ athLevel: z.number().int().min(1), scoutLevel: z.number().int().min(1) }),
+    /**
+     * Paid travel: ryo per minute of walking the route takes at full speed (so the price grows with
+     * distance and with the terrain, which sets the minutes per hex), at least `min`; the
+     * `travel.price` modifiers scale it.
+     */
+    travel: z.object({ ryoPerMinute: z.number().positive(), min: z.number().int().min(0) }),
+    /**
+     * Map mastery: tiers by the number of hexes surveyed to their highest level (`hexes`, or `all`
+     * of the playable hexes); a reached tier adds its modifiers.
+     */
+    mastery: z.array(
+      z.object({
+        hexes: z.union([z.number().int().min(1), z.literal('all')]),
+        mods: z.array(modSchema).min(1),
+      }),
+    ),
   }),
   masteryCap: z.number().int(),
   /**

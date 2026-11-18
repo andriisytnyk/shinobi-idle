@@ -305,5 +305,26 @@
       "xpBonus": 0.2,
       "charges": 200
     }
+  },
+  {
+    "id": "core:timber_scraps",
+    "kind": "misc",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:ore_chunk",
+    "kind": "misc",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:river_catch",
+    "kind": "misc",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
   }
 ]

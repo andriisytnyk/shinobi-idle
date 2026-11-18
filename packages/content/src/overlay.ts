@@ -7,8 +7,13 @@ import { z } from 'zod';
 import { modSchema, obstacleModSchema } from './modifiers.ts';
 import {
   bossBaseSchema,
+  findSchema,
+  pointSchema,
   poiSchema,
   type CellBase,
+  type Find,
+  type Place,
+  type Point,
   type Poi,
   coatSchema,
   coreId,
@@ -50,6 +55,23 @@ export function layerCells(
       throw new Error(`Points of interest for unknown cell ${id}`);
   }
   return cells.map((c) => ({ ...c, pois: [...(pois[c.id] ?? [])] }));
+}
+
+/** What each named place is worth, by place id: its point of interest and its rare find (see `pointSchema`, `findSchema`). */
+export const placeWorthMapSchema = z.record(
+  coreId,
+  z.strictObject({ point: pointSchema.optional(), rare: findSchema.optional() }),
+);
+
+/** Gives the places their points of interest and rare finds; a place the map does not name keeps none, a name that is no place is a data error. */
+export function layerPlaces(
+  places: readonly Place[],
+  worth: Readonly<Record<string, { point?: Point | undefined; rare?: Find | undefined }>>,
+): Place[] {
+  for (const id of Object.keys(worth)) {
+    if (!places.some((p) => p.id === id)) throw new Error(`Worth for unknown place ${id}`);
+  }
+  return places.map((p) => ({ ...p, ...worth[p.id] }));
 }
 
 export const buildingFxMapSchema = z.record(coreId, buildingFxSchema);

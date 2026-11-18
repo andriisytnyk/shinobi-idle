@@ -59,6 +59,12 @@ export const UI_PARTS = [
   'hex-panel',
   /** A point-of-interest row of the cell panel. */
   'poi-row',
+  /** A point of interest of a place in the hex panel (a place of power, an outpost, a hidden or veiled one); `data-point-status` is `veiled`, `open` or `found`, `data-point` the place (not for a veiled one). */
+  'point-row',
+  /** The markers of the points of interest drawn on a hex of the map. */
+  'map-point',
+  /** The map mastery block of the Scouting page. */
+  'map-mastery',
   /** A mission's card on the board; carries `data-entity="mission:<id>"`. */
   'mission-card',
   /** One stage of a mission on its page; `data-stage` is its index. */

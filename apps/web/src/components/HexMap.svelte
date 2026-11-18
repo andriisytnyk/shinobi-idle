@@ -59,6 +59,9 @@
     landmark: 'M-5 8V-8M-5 -8H7L3 -3L7 2H-5',
   };
   const PLACE_FALLBACK = 'M-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0';
+  /** The marker of a point of interest: a diamond (filled once found), a flag for an outpost, a question mark while only a hint is known. */
+  const POINT_DIAMOND = 'M0 -4L3.4 0L0 4L-3.4 0Z';
+  const POINT_FLAG = 'M-2.5 4V-4M-2.5 -4H3.5L1.5 -1.8L3.5 0.4H-2.5';
 
   /** The colour of a terrain: the token its data names, or ours. */
   const fillOf = (terrain: string | null): string | undefined => {
@@ -387,6 +390,25 @@
               {/each}
             </g>
           {/if}
+          {#if h.info.points.length > 0}
+            <g class="points" data-ui="map-point" aria-hidden="true">
+              {#each h.info.points as point, i (i)}
+                <g transform="translate({9 - i * 8} -13)" data-point-status={point.status}>
+                  {#if point.status === 'veiled'}
+                    <circle class="point veiled" r="3.6" />
+                    <text class="point-q" font-size="6" text-anchor="middle" y="2.2">?</text>
+                  {:else}
+                    <path
+                      class="point {point.status}"
+                      class:active={point.active}
+                      d={point.travel !== null ? POINT_FLAG : POINT_DIAMOND}
+                      data-point-outpost={point.travel !== null ? '' : undefined}
+                    />
+                  {/if}
+                </g>
+              {/each}
+            </g>
+          {/if}
           {#if s !== 'fog' && s !== 'reach'}
             <g class="pips" aria-hidden="true">
               {#each pipsOf(h) as pip, i (i)}
@@ -603,6 +625,33 @@
   .poi-cache,
   .poi-vault {
     fill: var(--stamina);
+  }
+
+  .point {
+    fill: none;
+    stroke: var(--paper);
+    stroke-width: 1;
+    stroke-linejoin: round;
+  }
+
+  .point.found {
+    fill: var(--accent);
+    stroke: var(--bg);
+  }
+
+  .point.active {
+    fill: var(--chakra);
+  }
+
+  .point.veiled {
+    fill: var(--bg);
+    stroke: var(--paper);
+  }
+
+  .point-q {
+    fill: var(--paper);
+    font-weight: 700;
+    pointer-events: none;
   }
 
   .pip {

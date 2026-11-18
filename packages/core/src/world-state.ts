@@ -29,10 +29,19 @@ export interface WorldState {
    * without the levels, so a cell there still has to be explored for what it holds. Fog otherwise.
    */
   surveyed: Record<string, true>;
-  /** Points of interest found. */
+  /**
+   * Points of interest found: the ids of the cells' points and the ids of the places that are
+   * points of interest (`Place.point`; the flag `point.<place id>` is raised with them).
+   */
   pois: Record<string, true>;
   /** Caches and vaults already emptied. */
   claimed: Record<string, true>;
+  /**
+   * The rare finds of the places (`Place.rare`) that were drawn on, by place id: the drops left when
+   * `at` was set, and the game time from which the next one is restocked. A place with no entry
+   * holds its whole stock. Optional, read as empty when absent.
+   */
+  stock?: Record<string, { left: number; at: number }>;
 }
 
 /**
@@ -63,6 +72,12 @@ export function createWorld(content: ContentDb): WorldState {
     claimed: {},
   };
   const start = indexOf(content).cells.get(world.location);
+  // The points on the hex of the start are known from the first day, without a reward: the new
+  // character knows the gate he leaves by. Only plain points (no `revealedBy`, no `needs`).
+  if (start) {
+    for (const place of indexOf(content).placesByHex.get(hexKey(start.hex[0], start.hex[1])) ?? [])
+      if (place.point && !place.point.revealedBy && !place.point.needs) world.pois[place.id] = true;
+  }
   if (start) {
     const around = hexesWithin(
       { q: start.hex[0], r: start.hex[1] },
