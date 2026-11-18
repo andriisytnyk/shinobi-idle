@@ -69,9 +69,73 @@ export function practiceIntervalSeconds(
   );
 }
 
-/** Mastery XP earned by one completed action of `intervalSeconds`. */
-export function masteryXpPerAction(intervalSeconds: number, content: ContentDb): number {
-  return (content.balance.K.masteryPerHour * intervalSeconds) / SECONDS_PER_HOUR;
+/**
+ * Mastery XP per second of an action whose mastery is at `level`: after Melvor's formula, an action pays
+ * more the higher its own mastery level is (`K.mastery`: `perSecond × (base + level)`).
+ */
+export function masteryXpPerSecond(level: number, content: ContentDb): number {
+  const m = content.balance.K.mastery;
+  return m.perSecond * (m.base + Math.max(1, level));
+}
+
+/** Mastery XP earned by one completed action of `seconds` (unmodified cycle) while its mastery is at `level`. */
+export function masteryXpPerAction(level: number, seconds: number, content: ContentDb): number {
+  return masteryXpPerSecond(level, content) * seconds;
+}
+
+/** Mastery XP of one hour of an action at mastery `level`. */
+export function masteryXpPerHour(level: number, content: ContentDb): number {
+  return masteryXpPerSecond(level, content) * SECONDS_PER_HOUR;
+}
+
+/** The kinds of action whose cycle and XP are data: `K.<kind>` is the first-tier cycle of each. */
+export type PacedKind = 'drill' | 'meditate' | 'gather' | 'obstacle' | 'craft';
+
+/** The pace facts an entity of a paced kind carries in its data. */
+export interface Paced {
+  level: number;
+  cycle?: number | undefined;
+  xp?: number | undefined;
+}
+
+/** Seconds of one cycle before modifiers: the explicit number of the action, else the first-tier cycle of its kind. */
+export function cycleSeconds(kind: PacedKind, action: Paced, content: ContentDb): number {
+  return action.cycle ?? content.balance.K[kind];
+}
+
+/**
+ * Skill XP one completed cycle pays before modifiers: the explicit number of the action, else the
+ * pace of its level times its cycle (a craft pays `K.craftXpMult` times that; a herb also its share of
+ * the regrow pause of a first-size bush). It never depends on mastery.
+ */
+export function cycleXp(kind: PacedKind, action: Paced, content: ContentDb): number {
+  if (action.xp !== undefined) return action.xp;
+  const K = content.balance.K;
+  const pause = kind === 'gather' ? K.field.regrowMs / MS_PER_SECOND / (K.field.stockBase + 1) : 0;
+  const mult = kind === 'craft' ? K.craftXpMult : 1;
+  return (
+    (rate(action.level, content) * (cycleSeconds(kind, action, content) + pause) * mult) /
+    SECONDS_PER_HOUR
+  );
+}
+
+/** The practice cycle of a technique at mastery 1 of the player's own nature, in seconds: what its XP is set against. */
+export function practiceReferenceSeconds(
+  tech: { level: number; cast: number },
+  content: ContentDb,
+): number {
+  return practiceIntervalSeconds(techniqueCastSeconds(tech, 1, content), content, tech.level);
+}
+
+/** Skill XP one completed practice cycle pays before modifiers: the technique's explicit number, else the pace of its level times its reference cycle. */
+export function practiceXp(
+  tech: { level: number; cast: number; practiceXp?: number | undefined },
+  content: ContentDb,
+): number {
+  return (
+    tech.practiceXp ??
+    (rate(tech.level, content) * practiceReferenceSeconds(tech, content)) / SECONDS_PER_HOUR
+  );
 }
 
 /** Pool XP that flows into the skill pool for a given amount of mastery XP. */

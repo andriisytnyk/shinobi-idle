@@ -25,6 +25,13 @@ import { CHUNIN_FROM_LEVEL, chuninRank, geninRank, studentRank } from './constan
 export const TYPICAL_MASTERY = 20;
 /** The share of its practice time a typical player gives to the defensive techniques it knows (all of them together). */
 export const DEFENCE_PRACTICE_SHARE = 0.15;
+/**
+ * Mastery XP per hour the yardstick character earns while it practises: the flat pace the fight fit was
+ * recorded at (the mastery pace by level, `K.mastery`, came later and is not part of the yardstick). Keeping it flat costs
+ * at most 0.4 points of the enemy-hit chance against the real level-based pace (measured in the review of #105:
+ * typical defence mastery -3 levels at L8-L20, +1 at L45-L50), so it stays unless a fit needs the real one.
+ */
+export const YARDSTICK_MASTERY_PER_HOUR = 10500;
 /** How many skills a typical player trains at once: its hours to reach a level are this many times the hours of one skill. */
 export const TRAINED_SKILLS = 10;
 
@@ -40,7 +47,7 @@ export function hoursToLevel(level: number, content: ContentDb): number {
 /**
  * The mastery a typical player has of a defensive technique at `level`: it learns the technique when the
  * skill level unlocks it, gives `DEFENCE_PRACTICE_SHARE` of the hours it has played since to the defensive
- * techniques it knows (`known` of them, shared equally) and earns `masteryPerHour` of mastery XP per hour.
+ * techniques it knows (`known` of them, shared equally) and earns `YARDSTICK_MASTERY_PER_HOUR` of mastery XP per hour.
  */
 export function typicalDefenceMastery(
   level: number,
@@ -51,7 +58,7 @@ export function typicalDefenceMastery(
   const K = content.balance.K;
   const played =
     TRAINED_SKILLS * Math.max(0, hoursToLevel(level, content) - hoursToLevel(unlockLevel, content));
-  const xp = (K.masteryPerHour * DEFENCE_PRACTICE_SHARE * played) / Math.max(1, known);
+  const xp = (YARDSTICK_MASTERY_PER_HOUR * DEFENCE_PRACTICE_SHARE * played) / Math.max(1, known);
   return Math.max(1, levelAt(xp, K.masteryCap));
 }
 

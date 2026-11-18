@@ -91,7 +91,7 @@ describe('a game composed with the test pack', () => {
     const info = actionInfo(state, { kind: 'practice', id: technique }, modContent, modRules);
     const plain = modGenin();
     const base = actionInfo(plain, { kind: 'practice', id: technique }, modContent, modRules);
-    expect((info?.xpPerHour ?? 0) / (base?.xpPerHour ?? 1)).toBeCloseTo(
+    expect((info?.xpPerCycle ?? 0) / (base?.xpPerCycle ?? 1)).toBeCloseTo(
       modContent.balance.K.nativeXp,
       10,
     );

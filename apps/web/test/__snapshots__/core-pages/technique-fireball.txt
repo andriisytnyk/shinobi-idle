@@ -339,6 +339,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       5 184 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -432,7 +439,14 @@
                 <dd>
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
-                      10 363 дос./год
+                      10 364 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -526,7 +540,14 @@
                 <dd>
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
-                      22 373 дос./год
+                      22 367 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -635,7 +656,14 @@
                 <dd>
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
-                      48 301 дос./год
+                      48 295 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -744,7 +772,14 @@
                 <dd>
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
-                      70 970 дос./год
+                      70 965 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -847,7 +882,14 @@
                 <dd>
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
-                      104 278 дос./год
+                      104 270 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -959,7 +1001,14 @@
                 <dd>
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
-                      225 128 дос./год
+                      225 134 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -1012,7 +1061,7 @@
         <h2>
           Пул Майстерності
         <p class="amount">
-          0 / 10 500
+          0 / 14 000
         <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="bar" role="progressbar">
           <span class="fill" style="width: 0%;">
           <span class="tick" style="left: 10%;">

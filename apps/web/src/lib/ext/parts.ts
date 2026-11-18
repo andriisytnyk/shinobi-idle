@@ -20,6 +20,8 @@ export const UI_PARTS = [
   'action-progress',
   /** The XP-per-hour figure of a tile. */
   'action-xp',
+  /** The Mastery-XP-per-hour figure of a tile. */
+  'action-mastery',
   /** The cycle length figure of a tile. */
   'action-interval',
   'mastery-ring',

@@ -7,7 +7,9 @@
       "nin"
     ],
     "insight": 3,
-    "enlight": 3
+    "enlight": 3,
+    "cycle": 3,
+    "xp": 4.32
   },
   {
     "id": "core:medytatsiia_v_rusi",
@@ -17,7 +19,9 @@
       "vit"
     ],
     "insight": 3,
-    "enlight": 3
+    "enlight": 3,
+    "cycle": 3,
+    "xp": 8.636
   },
   {
     "id": "core:lisove_sviatylyshche",
@@ -27,7 +31,9 @@
       "alch"
     ],
     "insight": 3,
-    "enlight": 3
+    "enlight": 3,
+    "cycle": 3,
+    "xp": 18.644
   },
   {
     "id": "core:bilia_vohnyshcha",
@@ -37,7 +43,9 @@
       "prov"
     ],
     "insight": 3,
-    "enlight": 3
+    "enlight": 3,
+    "cycle": 3,
+    "xp": 40.251
   },
   {
     "id": "core:pid_vodospadom",
@@ -47,7 +55,9 @@
       "ath"
     ],
     "insight": 3,
-    "enlight": 3
+    "enlight": 3,
+    "cycle": 3,
+    "xp": 86.898
   },
   {
     "id": "core:sad_kameniv",
@@ -57,6 +67,8 @@
       "vit"
     ],
     "insight": 3,
-    "enlight": 3
+    "enlight": 3,
+    "cycle": 3,
+    "xp": 187.606
   }
 ]

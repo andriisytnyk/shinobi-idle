@@ -1,6 +1,8 @@
 import { content } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
+  masteryLevel,
+  masteryXpPerHour,
   advance,
   basicAttack,
   createState,
@@ -224,7 +226,8 @@ describe('A4: combat XP follows the formula', () => {
     const mastery = state.mastery['core:leaf_whirlwind']?.xp ?? 0;
     expect(mastery).toBeGreaterThan(0);
     // The XP per hour of fight time is at most the practice rate.
-    expect(mastery).toBeLessThanOrEqual((K.masteryPerHour * 10) / 60 + 1);
+    const level = masteryLevel(state, 'core:leaf_whirlwind', content);
+    expect(mastery).toBeLessThanOrEqual((masteryXpPerHour(level, content) * 10) / 60 + 1);
     expect(Object.keys(state.mastery)).toEqual(['core:leaf_whirlwind']);
   });
 

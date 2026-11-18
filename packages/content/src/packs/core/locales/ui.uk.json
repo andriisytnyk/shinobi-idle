@@ -68,6 +68,8 @@
   "tile.interval": "Цикл",
   "tile.xph": "Досвід",
   "tile.xphValue": "{n} дос./год",
+  "tile.mxph": "Майстерність",
+  "tile.mxphValue": "{n} дос./год",
   "tile.start": "Почати",
   "tile.stop": "Зупинити",
   "tile.clone": "Клоном",

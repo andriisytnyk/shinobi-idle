@@ -19,7 +19,9 @@
     },
     "tags": [
       "cleanse"
-    ]
+    ],
+    "cycle": 2.5,
+    "xp": 14.4
   },
   {
     "id": "core:tsiliushcha_maz",
@@ -39,7 +41,9 @@
       "item": "core:tsiliushcha_maz",
       "n": 2
     },
-    "tags": []
+    "tags": [],
+    "cycle": 2.5,
+    "xp": 19.591
   },
   {
     "id": "core:paralitychna_otruta",
@@ -61,7 +65,9 @@
     },
     "tags": [
       "bind"
-    ]
+    ],
+    "cycle": 2.5,
+    "xp": 28.786
   },
   {
     "id": "core:dymova_bomba",
@@ -83,7 +89,9 @@
     },
     "tags": [
       "guard"
-    ]
+    ],
+    "cycle": 2.5,
+    "xp": 42.296
   },
   {
     "id": "core:sonnyi_poroshok",
@@ -101,7 +109,9 @@
     },
     "tags": [
       "bind"
-    ]
+    ],
+    "cycle": 2.5,
+    "xp": 62.146
   },
   {
     "id": "core:krovospynna_maz",
@@ -121,7 +131,9 @@
       "item": "core:krovospynna_maz",
       "n": 2
     },
-    "tags": []
+    "tags": [],
+    "cycle": 2.5,
+    "xp": 91.313
   },
   {
     "id": "core:slozohinna_bomba",
@@ -143,7 +155,9 @@
     },
     "tags": [
       "interrupt"
-    ]
+    ],
+    "cycle": 2.5,
+    "xp": 134.169
   },
   {
     "id": "core:hirska_maz",
@@ -163,7 +177,9 @@
       "item": "core:hirska_maz",
       "n": 2
     },
-    "tags": []
+    "tags": [],
+    "cycle": 2.5,
+    "xp": 197.138
   },
   {
     "id": "core:nervova_otruta",
@@ -185,7 +201,9 @@
     },
     "tags": [
       "dot"
-    ]
+    ],
+    "cycle": 2.5,
+    "xp": 289.66
   },
   {
     "id": "core:niukhalna_sil",
@@ -211,7 +229,9 @@
     },
     "tags": [
       "dispel"
-    ]
+    ],
+    "cycle": 2.5,
+    "xp": 425.606
   },
   {
     "id": "core:maz_vid_opikiv",
@@ -231,7 +251,9 @@
       "item": "core:maz_vid_opikiv",
       "n": 2
     },
-    "tags": []
+    "tags": [],
+    "cycle": 2.5,
+    "xp": 625.355
   },
   {
     "id": "core:onihiri",
@@ -251,7 +273,9 @@
       "item": "core:onihiri",
       "n": 3
     },
-    "tags": []
+    "tags": [],
+    "cycle": 2.5,
+    "xp": 14.4
   },
   {
     "id": "core:tonik_iasnoho_rozumu",
@@ -271,7 +295,9 @@
       "item": "core:tonik_iasnoho_rozumu",
       "n": 1
     },
-    "tags": []
+    "tags": [],
+    "cycle": 2.5,
+    "xp": 19.591
   },
   {
     "id": "core:piliulia_viiskovoho_paika",
@@ -291,7 +317,9 @@
       "item": "core:piliulia_viiskovoho_paika",
       "n": 2
     },
-    "tags": []
+    "tags": [],
+    "cycle": 2.5,
+    "xp": 28.786
   },
   {
     "id": "core:sushenyi_paiok",
@@ -311,7 +339,9 @@
       "item": "core:sushenyi_paiok",
       "n": 2
     },
-    "tags": []
+    "tags": [],
+    "cycle": 2.5,
+    "xp": 42.296
   },
   {
     "id": "core:krovotvorna_piliulia",
@@ -331,7 +361,9 @@
       "item": "core:krovotvorna_piliulia",
       "n": 2
     },
-    "tags": []
+    "tags": [],
+    "cycle": 2.5,
+    "xp": 62.146
   },
   {
     "id": "core:tonik_kontsentratsii",
@@ -351,7 +383,9 @@
       "item": "core:tonik_kontsentratsii",
       "n": 1
     },
-    "tags": []
+    "tags": [],
+    "cycle": 2.5,
+    "xp": 91.313
   },
   {
     "id": "core:bulion_ramenu",
@@ -379,7 +413,9 @@
       "item": "core:bulion_ramenu",
       "n": 2
     },
-    "tags": []
+    "tags": [],
+    "cycle": 2.5,
+    "xp": 134.169
   },
   {
     "id": "core:chai_badorosti",
@@ -399,7 +435,9 @@
       "item": "core:chai_badorosti",
       "n": 1
     },
-    "tags": []
+    "tags": [],
+    "cycle": 2.5,
+    "xp": 289.66
   },
   {
     "id": "core:iakitori_shynobi",
@@ -427,7 +465,9 @@
       "item": "core:iakitori_shynobi",
       "n": 2
     },
-    "tags": []
+    "tags": [],
+    "cycle": 2.5,
+    "xp": 425.606
   },
   {
     "id": "core:tonik_stykhii",
@@ -447,7 +487,9 @@
       "item": "core:tonik_stykhii",
       "n": 1
     },
-    "tags": []
+    "tags": [],
+    "cycle": 2.5,
+    "xp": 625.355
   },
   {
     "id": "core:piliulia_vidnovlennia_chakry",
@@ -467,6 +509,8 @@
       "item": "core:piliulia_vidnovlennia_chakry",
       "n": 2
     },
-    "tags": []
+    "tags": [],
+    "cycle": 2.5,
+    "xp": 625.355
   }
 ]

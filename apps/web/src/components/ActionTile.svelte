@@ -110,6 +110,15 @@
         />
       </dd>
     </div>
+    <div data-ui="action-mastery">
+      <dt>{t('tile.mxph')}</dt>
+      <dd>
+        <ModBreakdown
+          keys={['mastery.xp.all', `mastery.xp.skill.${info.skill}`]}
+          display={t('tile.mxphValue', { n: formatXp(info.masteryPerHour) })}
+        />
+      </dd>
+    </div>
   </dl>
 
   {#if info.available}
@@ -194,10 +203,10 @@
   }
 
   .facts {
-    display: grid;
-    grid-template-columns: repeat(3, auto);
+    display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
-    gap: var(--space-2);
+    gap: var(--space-1) var(--space-2);
     margin: 0;
   }
 
@@ -208,6 +217,7 @@
 
   dd {
     margin: 0;
+    white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
 

@@ -2,6 +2,7 @@
 import { content } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
+  cycleSeconds,
   actionInfo,
   advance,
   createState,
@@ -11,6 +12,7 @@ import {
   rate,
   refreshUnlocks,
   serialize,
+  xpAt,
   type Command,
   type GameState,
 } from '../src/index.ts';
@@ -75,7 +77,8 @@ describe('bush memory: stop and start does not skip the regrow', () => {
     ok(s, start('gather', MINT));
     advance(s, cycle * 2, content);
     ok(s, start('gather', 'core:nettle'));
-    advance(s, cycle, content);
+    const nettle = content.herbs.find((h) => h.id === 'core:nettle')!;
+    advance(s, Math.round(cycleSeconds('gather', nettle, content) * 1000), content);
     ok(s, start('gather', MINT));
     expect(s.bushes[MINT]?.stock).toBe(K.field.stockBase + 1 - 2);
     expect(s.bushes['core:nettle']?.stock).toBe(K.field.stockBase + 1 - 1);
@@ -161,8 +164,11 @@ describe('selectors cover gather and craft', () => {
     setLevel(s, 'cc', 15);
     const ready = actionInfo(s, { kind: 'gather', id: 'core:edelweiss' }, content);
     expect(ready?.available).toBe(true);
-    expect(ready?.intervalMs).toBe(K.gather * 1000);
-    expect(ready?.xpPerHour).toBeCloseTo(rate(35, content), 6);
+    const edelweiss = content.herbs.find((h) => h.id === 'core:edelweiss')!;
+    expect(ready?.intervalMs).toBe(Math.round(cycleSeconds('gather', edelweiss, content) * 1000));
+    // At mastery 1 the bush holds the first size, the one the XP of a gather is set against.
+    expect((ready?.xpPerHour ?? 0) / rate(35, content)).toBeCloseTo(1, 4);
+    expect(ready?.xpPerCycle).toBe(edelweiss.xp);
     expect(ready?.masteryLevel).toBe(1);
     expect(ready?.inputs).toEqual([]);
   });
@@ -184,16 +190,28 @@ describe('selectors cover gather and craft', () => {
     const ready = actionInfo(s, { kind: 'craft', id: OINTMENT }, content);
     expect(ready?.available).toBe(true);
     expect(ready?.intervalMs).toBe(K.craft * 1000);
-    expect(ready?.xpPerHour).toBeCloseTo(rate(5, content) * K.craftXpMult, 6);
+    expect((ready?.xpPerHour ?? 0) / (rate(5, content) * K.craftXpMult)).toBeCloseTo(1, 4);
     expect(ready?.inputs.map((i) => i.have)).toEqual([2, 1]);
   });
 
-  it('XP per hour of a gather matches what an hour of gathering gives', () => {
-    const s = genin();
-    const info = actionInfo(s, { kind: 'gather', id: MINT }, content);
-    ok(s, start('gather', MINT));
-    advance(s, HOUR, content);
-    expect(s.skills.herb!.xp / (info?.xpPerHour ?? 1)).toBeGreaterThan(0.98);
-    expect(s.skills.herb!.xp / (info?.xpPerHour ?? 1)).toBeLessThan(1.02);
-  });
+  // The XP of a gather is fixed against a first-size bush, while the bush grows with mastery, so its regrow pause is
+  // shared among more herbs and an hour pays more: the accepted mastery benefit of gathering, measured in the
+  // balance model ("Темп дії"): mint 1.00x at mastery 1, about 1.25x at 25, 1.29x at 50, 1.31x at 99. The band is
+  // that measurement; a change of it is a change of the model, to be decided and written there.
+  for (const [mastery, low, high] of [
+    [1, 1.0, 1.25],
+    [25, 1.2, 1.3],
+    [99, 1.25, 1.35],
+  ] as const) {
+    it(`XP per hour of a gather at mastery ${mastery} is the model's rate times the mastery benefit`, () => {
+      const s = genin();
+      s.mastery[MINT] = { xp: xpAt(mastery) };
+      ok(s, start('gather', MINT));
+      advance(s, HOUR, content);
+      const ratio =
+        s.skills.herb!.xp / rate(content.herbs.find((h) => h.id === MINT)!.level, content);
+      expect(ratio).toBeGreaterThan(low);
+      expect(ratio).toBeLessThan(high);
+    });
+  }
 });

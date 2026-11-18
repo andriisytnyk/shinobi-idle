@@ -1,34 +1,50 @@
 [
   {
     "id": "core:lystok_na_lobi",
-    "level": 1
+    "level": 1,
+    "cycle": 3,
+    "xp": 4.32
   },
   {
     "id": "core:kunai_na_doloni",
-    "level": 5
+    "level": 5,
+    "cycle": 3.7,
+    "xp": 7.249
   },
   {
     "id": "core:chakra_v_stopakh",
-    "level": 10
+    "level": 10,
+    "cycle": 4.7,
+    "xp": 13.529
   },
   {
     "id": "core:khodinnia_po_derevu",
-    "level": 15
+    "level": 15,
+    "cycle": 5.6,
+    "xp": 23.686
   },
   {
     "id": "core:pidiom_skeleiu_bez_ruk",
-    "level": 20
+    "level": 20,
+    "cycle": 6.5,
+    "xp": 40.395
   },
   {
     "id": "core:khodinnia_po_vodi",
-    "level": 30
+    "level": 30,
+    "cycle": 8.3,
+    "xp": 111.36
   },
   {
     "id": "core:lopannia_vodianoi_kuli",
-    "level": 40
+    "level": 40,
+    "cycle": 10.2,
+    "xp": 295.453
   },
   {
     "id": "core:lopannia_humovoi_kuli",
-    "level": 50
+    "level": 50,
+    "cycle": 12,
+    "xp": 750.426
   }
 ]

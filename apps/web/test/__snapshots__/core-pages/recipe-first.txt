@@ -143,6 +143,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       20 736 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -233,6 +240,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       28 211 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -373,7 +387,14 @@
                 <dd>
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
-                      41 451 дос./год
+                      41 452 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -509,6 +530,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       60 906 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -650,6 +678,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       89 490 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -763,6 +798,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       131 491 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -904,6 +946,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       193 203 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -1045,6 +1094,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       283 879 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -1185,7 +1241,14 @@
                 <dd>
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
-                      417 111 дос./год
+                      417 110 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -1321,6 +1384,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       612 873 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -1490,6 +1560,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       900 511 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -1638,7 +1715,7 @@
         <h2>
           Пул Майстерності
         <p class="amount">
-          0 / 16 500
+          0 / 22 000
         <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="bar" role="progressbar">
           <span class="fill" style="width: 0%;">
           <span class="tick" style="left: 10%;">

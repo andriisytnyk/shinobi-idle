@@ -79,6 +79,28 @@ const ids = new IdRegistry(
 
 // ---------- helpers ----------
 
+/** The numbers of the balance model that action pace is generated from. */
+const P = bal.params as Record<string, number> & {
+  cycleMax: Record<string, number>;
+  practiceFocus: { base: number; perLevel: number };
+};
+const round3 = (x: number): number => Math.round(x * 1000) / 1000;
+/** Skill XP per hour of an action unlocked at `level` (the pace of the balance model). */
+const paceRate = (level: number): number =>
+  P.rateBase! * P.rateGrowth! ** Math.max(1, Math.min(P.cap!, level));
+/**
+ * Cycle in seconds of an action of `kind` unlocked at `level`: it grows linearly from the first-tier
+ * cycle `K.<kind>` at level 1 to `K.cycleMax.<kind>` at the skill cap, in steps of a tenth of a second.
+ */
+const cycleAt = (kind: 'drill' | 'meditate' | 'gather' | 'obstacle' | 'craft', level: number) => {
+  const first = P[kind]!;
+  const last = need(P.cycleMax[kind], `balance cycleMax ${kind}`);
+  return Math.round((first + ((last - first) * (level - 1)) / (P.cap! - 1)) * 10) / 10;
+};
+/** XP one cycle pays: the pace of the level times the cycle, so XP per hour follows the model's pace table. */
+const xpOfCycle = (level: number, seconds: number, mult = 1): number =>
+  round3((paceRate(level) * seconds * mult) / 3600);
+
 const locale: Record<string, string> = {};
 const text = (kind: LocaleKind, id: string, field: string, value: string | null | undefined) => {
   if (value === null || value === undefined || value === '') return;
@@ -210,6 +232,12 @@ const castOf = (t: {
     need(byRank[rank], `cast of rank ${rank}`) * need(byRole[t.role], `cast of role ${t.role}`)
   );
 };
+/** Skill XP of one practice cycle: the pace of the technique's level times its cycle at mastery 1 (the cast shortened by it, the focus of its level). */
+const practiceXpOf = (t: Parameters<typeof castOf>[0]): number => {
+  const cast = Math.max(P.castFloor!, castOf(t) * (1 - P.masteryCast! / BALANCE_EXT.masteryCap));
+  const focus = P.practiceFocus.base + P.practiceFocus.perLevel * Math.max(0, t.level - 1);
+  return xpOfCycle(t.level, Math.max(P.practiceMin!, cast * P.practiceCast! + focus));
+};
 const techniques: TechniqueBase[] = slice.techniques.map((t) => {
   techByUk.set(t.uk, t.id);
   text('technique', t.id, 'name', t.uk);
@@ -234,6 +262,7 @@ const techniques: TechniqueBase[] = slice.techniques.map((t) => {
     tier: t.tier as TechniqueBase['tier'],
     noDamage: t.noDamage,
     cast: Math.round(castOf(t) * 1000) / 1000,
+    practiceXp: practiceXpOf(t),
   };
 });
 const techId = (uk: string) => need(techByUk.get(uk), `technique "${uk}" is not in the slice`);
@@ -245,7 +274,8 @@ const exercises: Exercise[] = slice.exercises.map((e) => {
   const id = core(exerciseSlugs.take(e.uk));
   text('exercise', id, 'name', e.uk);
   text('exercise', id, 'desc', e.note);
-  return { id, level: e.level };
+  const cycle = cycleAt('drill', e.level);
+  return { id, level: e.level, cycle, xp: xpOfCycle(e.level, cycle) };
 });
 
 const obstacleSlugs = { take: (k: string) => ids.take('obstacle', k) };
@@ -255,7 +285,8 @@ const obstacles: ObstacleBase[] = slice.obstacles.map((o) => {
   const id = core(obstacleSlugs.take(m[2] ?? o.uk));
   text('obstacle', id, 'name', m[2]);
   text('obstacle', id, 'desc', o.note);
-  return { id, level: o.level, slot: Number(m[1]) };
+  const cycle = cycleAt('obstacle', o.level);
+  return { id, level: o.level, slot: Number(m[1]), cycle, xp: xpOfCycle(o.level, cycle) };
 });
 
 const skillByName = new Map(
@@ -268,12 +299,15 @@ const practices: PracticeBase[] = slice.practices.map((p) => {
   p.insight.forEach((s, i) => text('practice', id, `insight.${i}`, s));
   p.enlight.forEach((s, i) => text('practice', id, `enlight.${i}`, s));
   text('practice', id, 'name', p.uk);
+  const cycle = cycleAt('meditate', p.level);
   return {
     id,
     level: p.level,
     pair: pair as PracticeBase['pair'],
     insight: p.insight.length,
     enlight: p.enlight.length,
+    cycle,
+    xp: xpOfCycle(p.level, cycle),
   };
 });
 
@@ -299,7 +333,17 @@ const addItem = (item: Item, name: string, desc: string | undefined) => {
 const itemName = (id: string) => need(map.ITEMS[id], `item ${id} missing in map data`)[0];
 const itemDesc = (id: string) => need(map.ITEMS[id], `item ${id} missing in map data`)[2];
 
-const herbs: HerbBase[] = slice.herbs.map((h) => ({ id: core(h.id), level: h.level }));
+/** A herb pays for its cycle and for its share of the regrow pause of a bush of the first size, so XP per hour is the pace of its level. */
+const herbs: HerbBase[] = slice.herbs.map((h) => {
+  const cycle = cycleAt('gather', h.level);
+  const { regrowMs, stockBase } = BALANCE_EXT.field;
+  return {
+    id: core(h.id),
+    level: h.level,
+    cycle,
+    xp: xpOfCycle(h.level, cycle + regrowMs / 1000 / (stockBase + 1)),
+  };
+});
 
 // Recipe ids come from the Ukrainian name; the antidote keeps a readable id because missions use it.
 const recipeSlugs = { take: (k: string, forced?: string) => ids.take('recipe', k, forced) };
@@ -315,6 +359,8 @@ const recipes: Recipe[] = slice.recipes.map((r) => {
     ingredients: r.ing.map(([item, n]) => ({ item: core(item), n })),
     output: { item: id, n: r.out },
     tags: r.tags.map(tag),
+    cycle: cycleAt('craft', r.level),
+    xp: xpOfCycle(r.level, cycleAt('craft', r.level), P.craftXpMult),
   };
 });
 const recipeByUk = new Map(slice.recipes.map((r, i) => [r.uk, need(recipes[i], r.uk)]));

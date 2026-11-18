@@ -2,61 +2,85 @@
   {
     "id": "core:strybky_po_dakhakh",
     "level": 1,
-    "slot": 1
+    "slot": 1,
+    "cycle": 2.5,
+    "xp": 3.6
   },
   {
     "id": "core:bih_navkolo_sela",
     "level": 1,
-    "slot": 1
+    "slot": 1,
+    "cycle": 2.5,
+    "xp": 3.6
   },
   {
     "id": "core:obtiazhuvachi",
     "level": 10,
-    "slot": 2
+    "slot": 2,
+    "cycle": 3.4,
+    "xp": 9.787
   },
   {
     "id": "core:vidzhymannia_na_paltsiakh",
     "level": 10,
-    "slot": 2
+    "slot": 2,
+    "cycle": 3.4,
+    "xp": 9.787
   },
   {
     "id": "core:koloda_nad_prirvoiu",
     "level": 20,
-    "slot": 3
+    "slot": 3,
+    "cycle": 4.4,
+    "xp": 27.344
   },
   {
     "id": "core:ukhylennia_vid_kunaiv",
     "level": 20,
-    "slot": 3
+    "slot": 3,
+    "cycle": 4.4,
+    "xp": 27.344
   },
   {
     "id": "core:bih_po_derevakh",
     "level": 30,
-    "slot": 4
+    "slot": 4,
+    "cycle": 5.5,
+    "xp": 73.793
   },
   {
     "id": "core:lazinnia_po_skeli",
     "level": 30,
-    "slot": 4
+    "slot": 4,
+    "cycle": 5.5,
+    "xp": 73.793
   },
   {
     "id": "core:perehony_z_supernykom",
     "level": 40,
-    "slot": 5
+    "slot": 5,
+    "cycle": 6.5,
+    "xp": 188.279
   },
   {
     "id": "core:strybky_cherez_stovpy",
     "level": 40,
-    "slot": 5
+    "slot": 5,
+    "cycle": 6.5,
+    "xp": 188.279
   },
   {
     "id": "core:bih_po_vodi",
     "level": 50,
-    "slot": 6
+    "slot": 6,
+    "cycle": 7.5,
+    "xp": 469.016
   },
   {
     "id": "core:plavannia_proty_techii",
     "level": 50,
-    "slot": 6
+    "slot": 6,
+    "cycle": 7.5,
+    "xp": 469.016
   }
 ]

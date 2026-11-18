@@ -16,7 +16,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.416
+    "cast": 1.416,
+    "practiceXp": 2.88
   },
   {
     "id": "core:dynamic_entry",
@@ -35,7 +36,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.133
+    "cast": 1.133,
+    "practiceXp": 6.518
   },
   {
     "id": "core:leaf_gale",
@@ -54,7 +56,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.416
+    "cast": 1.416,
+    "practiceXp": 11.824
   },
   {
     "id": "core:gate_of_opening",
@@ -71,7 +74,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.42
+    "cast": 1.42,
+    "practiceXp": 19.256
   },
   {
     "id": "core:gate_of_healing",
@@ -88,7 +92,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.42
+    "cast": 1.42,
+    "practiceXp": 31.033
   },
   {
     "id": "core:lion_combo",
@@ -105,7 +110,8 @@
     "sealsCanon": true,
     "tier": 1,
     "noDamage": false,
-    "cast": 1.184
+    "cast": 1.184,
+    "practiceXp": 47.037
   },
   {
     "id": "core:leaf_great_whirlwind",
@@ -124,7 +130,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.136
+    "cast": 1.136,
+    "practiceXp": 74.265
   },
   {
     "id": "core:drunken_fist",
@@ -141,7 +148,8 @@
     "sealsCanon": true,
     "tier": 1,
     "noDamage": false,
-    "cast": 1.184
+    "cast": 1.184,
+    "practiceXp": 118.928
   },
   {
     "id": "core:leaf_rising_wind",
@@ -158,7 +166,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.184
+    "cast": 1.184,
+    "practiceXp": 187.512
   },
   {
     "id": "core:front_lotus",
@@ -175,7 +184,8 @@
     "sealsCanon": true,
     "tier": 1,
     "noDamage": false,
-    "cast": 3.279
+    "cast": 3.279,
+    "practiceXp": 401.178
   },
   {
     "id": "core:clone",
@@ -196,7 +206,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.133
+    "cast": 1.133,
+    "practiceXp": 2.88
   },
   {
     "id": "core:transformation",
@@ -217,7 +228,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 0.793
+    "cast": 0.793,
+    "practiceXp": 2.88
   },
   {
     "id": "core:body_replacement",
@@ -242,7 +254,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.133
+    "cast": 1.133,
+    "practiceXp": 2.88
   },
   {
     "id": "core:body_flicker",
@@ -261,7 +274,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 0.793
+    "cast": 0.793,
+    "practiceXp": 3.918
   },
   {
     "id": "core:shadow_shuriken",
@@ -280,7 +294,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.133
+    "cast": 1.133,
+    "practiceXp": 6.518
   },
   {
     "id": "core:enclosing",
@@ -297,7 +312,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": true,
-    "cast": 1.02
+    "cast": 1.02,
+    "practiceXp": 10.455
   },
   {
     "id": "core:sensing",
@@ -318,7 +334,8 @@
     "sealsCanon": false,
     "tier": 0,
     "noDamage": true,
-    "cast": 1.02
+    "cast": 1.02,
+    "practiceXp": 17.226
   },
   {
     "id": "core:rope_escape",
@@ -335,7 +352,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.133
+    "cast": 1.133,
+    "practiceXp": 28.895
   },
   {
     "id": "core:temporary_paralysis",
@@ -356,7 +374,8 @@
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.02
+    "cast": 1.02,
+    "practiceXp": 45.241
   },
   {
     "id": "core:hidden_shadow_snake_hands",
@@ -375,7 +394,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 0.852
+    "cast": 0.852,
+    "practiceXp": 69.695
   },
   {
     "id": "core:chakra_halving_drill",
@@ -394,7 +414,8 @@
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false,
-    "cast": 0.947
+    "cast": 0.947,
+    "practiceXp": 113.333
   },
   {
     "id": "core:shadow_clone",
@@ -415,7 +436,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.14
+    "cast": 1.14,
+    "practiceXp": 292.046
   },
   {
     "id": "core:nature_transformation_burn_a_leaf",
@@ -434,7 +456,8 @@
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.133
+    "cast": 1.133,
+    "practiceXp": 2.88
   },
   {
     "id": "core:fire_breath_control_drill",
@@ -453,7 +476,8 @@
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.133
+    "cast": 1.133,
+    "practiceXp": 6.518
   },
   {
     "id": "core:running_fire",
@@ -474,7 +498,8 @@
     "sealsCanon": true,
     "tier": -1,
     "noDamage": false,
-    "cast": 1.36
+    "cast": 1.36,
+    "practiceXp": 18.95
   },
   {
     "id": "core:great_fireball",
@@ -500,7 +525,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 0.947
+    "cast": 0.947,
+    "practiceXp": 44.445
   },
   {
     "id": "core:phoenix_sage_fire",
@@ -526,7 +552,8 @@
     "sealsCanon": true,
     "tier": -1,
     "noDamage": false,
-    "cast": 1.184
+    "cast": 1.184,
+    "practiceXp": 75.026
   },
   {
     "id": "core:dragon_fire",
@@ -550,7 +577,8 @@
     "sealsCanon": true,
     "tier": 1,
     "noDamage": false,
-    "cast": 1.18
+    "cast": 1.18,
+    "practiceXp": 118.839
   },
   {
     "id": "core:fire_dragon_flame_bullet",
@@ -577,7 +605,8 @@
     "sealsCanon": true,
     "tier": 1,
     "noDamage": false,
-    "cast": 2.623
+    "cast": 2.623,
+    "practiceXp": 367.719
   },
   {
     "id": "core:nature_transformation_cut_a_leaf",
@@ -596,7 +625,8 @@
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.133
+    "cast": 1.133,
+    "practiceXp": 2.88
   },
   {
     "id": "core:nature_transformation_split_a_waterfall",
@@ -615,7 +645,8 @@
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.133
+    "cast": 1.133,
+    "practiceXp": 6.518
   },
   {
     "id": "core:wind_chakra_flow_drill",
@@ -634,7 +665,8 @@
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.133
+    "cast": 1.133,
+    "practiceXp": 17.801
   },
   {
     "id": "core:gale_palm",
@@ -660,7 +692,8 @@
     "sealsCanon": true,
     "tier": -1,
     "noDamage": false,
-    "cast": 0.947
+    "cast": 0.947,
+    "practiceXp": 44.445
   },
   {
     "id": "core:great_breakthrough",
@@ -686,7 +719,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.136
+    "cast": 1.136,
+    "practiceXp": 74.265
   },
   {
     "id": "core:sickle_weasel",
@@ -710,7 +744,8 @@
     "sealsCanon": true,
     "tier": 1,
     "noDamage": false,
-    "cast": 1.136
+    "cast": 1.136,
+    "practiceXp": 117.809
   },
   {
     "id": "core:vacuum_wave",
@@ -735,7 +770,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 2.623
+    "cast": 2.623,
+    "practiceXp": 367.719
   },
   {
     "id": "core:nature_transformation_crumple_a_leaf",
@@ -754,7 +790,8 @@
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.133
+    "cast": 1.133,
+    "practiceXp": 2.88
   },
   {
     "id": "core:lightning_discharge_drill",
@@ -773,7 +810,8 @@
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.133
+    "cast": 1.133,
+    "practiceXp": 6.518
   },
   {
     "id": "core:lightning_chakra_flow_drill",
@@ -792,7 +830,8 @@
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.133
+    "cast": 1.133,
+    "practiceXp": 17.801
   },
   {
     "id": "core:four_pillar_bind",
@@ -817,7 +856,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 0.852
+    "cast": 0.852,
+    "practiceXp": 43.408
   },
   {
     "id": "core:lightning_beast_tracking_fang",
@@ -840,7 +880,8 @@
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false,
-    "cast": 0.947
+    "cast": 0.947,
+    "practiceXp": 71.218
   },
   {
     "id": "core:wave_of_inspiration",
@@ -865,7 +906,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 0.947
+    "cast": 0.947,
+    "practiceXp": 113.333
   },
   {
     "id": "core:false_darkness",
@@ -887,7 +929,8 @@
     "sealsCanon": true,
     "tier": 1,
     "noDamage": false,
-    "cast": 2.186
+    "cast": 2.186,
+    "practiceXp": 345.413
   },
   {
     "id": "core:nature_transformation_crumble_a_leaf",
@@ -906,7 +949,8 @@
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.133
+    "cast": 1.133,
+    "practiceXp": 2.88
   },
   {
     "id": "core:double_suicide_decapitation",
@@ -925,7 +969,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.02
+    "cast": 1.02,
+    "practiceXp": 6.252
   },
   {
     "id": "core:earth_softening_drill",
@@ -944,7 +989,8 @@
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.133
+    "cast": 1.133,
+    "practiceXp": 17.801
   },
   {
     "id": "core:hiding_like_a_mole",
@@ -961,7 +1007,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": true,
-    "cast": 0.852
+    "cast": 0.852,
+    "practiceXp": 43.408
   },
   {
     "id": "core:tearing_earth_turning_palm",
@@ -984,7 +1031,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.136
+    "cast": 1.136,
+    "practiceXp": 74.265
   },
   {
     "id": "core:earth_flow_river",
@@ -1005,7 +1053,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.18
+    "cast": 1.18,
+    "practiceXp": 118.839
   },
   {
     "id": "core:earth_dragon_bullet",
@@ -1026,7 +1075,8 @@
     "sealsCanon": true,
     "tier": 1,
     "noDamage": false,
-    "cast": 1.25
+    "cast": 1.25,
+    "practiceXp": 189.813
   },
   {
     "id": "core:earth_style_wall",
@@ -1050,7 +1100,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 2.186
+    "cast": 2.186,
+    "practiceXp": 345.413
   },
   {
     "id": "core:nature_transformation_dampen_a_leaf",
@@ -1069,7 +1120,8 @@
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.133
+    "cast": 1.133,
+    "practiceXp": 2.88
   },
   {
     "id": "core:hiding_in_mist",
@@ -1090,7 +1142,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.133
+    "cast": 1.133,
+    "practiceXp": 6.518
   },
   {
     "id": "core:river_water_guiding_drill",
@@ -1109,7 +1162,8 @@
     "sealsCanon": false,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.133
+    "cast": 1.133,
+    "practiceXp": 17.801
   },
   {
     "id": "core:water_clone",
@@ -1128,7 +1182,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 0.947
+    "cast": 0.947,
+    "practiceXp": 44.445
   },
   {
     "id": "core:wild_water_wave",
@@ -1149,7 +1204,8 @@
     "sealsCanon": true,
     "tier": -1,
     "noDamage": false,
-    "cast": 0.947
+    "cast": 0.947,
+    "practiceXp": 44.445
   },
   {
     "id": "core:water_prison",
@@ -1177,7 +1233,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 0.852
+    "cast": 0.852,
+    "practiceXp": 69.695
   },
   {
     "id": "core:gunshot",
@@ -1198,7 +1255,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.136
+    "cast": 1.136,
+    "practiceXp": 117.809
   },
   {
     "id": "core:starch_syrup_capturing_field",
@@ -1220,7 +1278,8 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 1.31
+    "cast": 1.31,
+    "practiceXp": 191.896
   },
   {
     "id": "core:water_formation_wall",
@@ -1245,6 +1304,7 @@
     "sealsCanon": true,
     "tier": 0,
     "noDamage": false,
-    "cast": 2.186
+    "cast": 2.186,
+    "practiceXp": 345.413
   }
 ]

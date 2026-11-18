@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   advance,
   createState,
+  cycleSeconds,
   deserialize,
   dispatch,
   getMod,
@@ -105,8 +106,11 @@ describe('gather', () => {
       ok(s, gather(herb.id));
       advance(s, HOUR, content, plainRules);
       const perHour = s.skills.herb!.xp - before;
+      // A gather pays a fixed XP set against a bush of the first size; the bush grows with mastery and its pause is shared among more herbs, so the hour pays more, never beyond the cycle without any pause.
+      const cycle = herb.cycle ?? K.gather;
+      const noPause = (cycle + K.field.regrowMs / 1000 / (K.field.stockBase + 1)) / cycle;
       expect(perHour / rate(level, content)).toBeGreaterThan(0.98);
-      expect(perHour / rate(level, content)).toBeLessThan(1.02);
+      expect(perHour / rate(level, content)).toBeLessThan(noPause + 0.02);
     });
   }
 
@@ -664,15 +668,28 @@ describe('A12: saving', () => {
       'core:ghost': { stock: 1, size: 2, carry: 0 },
       [NETTLE]: { stock: 0, size: 3, carry: 1e18 },
       'core:hogweed': { stock: 9, size: 3, carry: 4 },
+      'core:shadowshroom': { stock: 0, size: 2, carry: 1e18 },
     };
     const state = deserialize(JSON.stringify(raw), content);
     expect(state.buffs).toEqual({ [CLEAR_MIND]: { skill: 'med', charges: 80 } });
     expect(state.gear).toEqual({ [SICKLE]: 2 });
     expect(state.slots[0]?.data).toBeNull();
     expect(state.slots[1]?.data).toEqual({ fine: [1, 'two', null] });
-    const room = (K.field.regrowMs + K.gather * 1000) * 1000;
+    // The bound is the herb's own cycle plus its regrowing, not the base gather time.
+    const room = (herb: string): number =>
+      (K.field.regrowMs +
+        cycleSeconds(
+          'gather',
+          content.herbs.find((h) => h.id === herb)!,
+          content,
+        ) *
+          1000) *
+      1000;
+    expect(room('core:shadowshroom')).toBeGreaterThan(room(NETTLE));
+    expect(room(NETTLE)).toBeGreaterThan((K.field.regrowMs + K.gather * 1000) * 1000);
     expect(state.bushes).toEqual({
-      [NETTLE]: { stock: 0, size: 3, carry: room },
+      [NETTLE]: { stock: 0, size: 3, carry: room(NETTLE) },
+      'core:shadowshroom': { stock: 0, size: 2, carry: room('core:shadowshroom') },
       'core:hogweed': { stock: 3, size: 3, carry: 0 },
     });
     ok(state, { type: 'action.stop', slot: 1 });

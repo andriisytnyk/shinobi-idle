@@ -4,12 +4,15 @@ import { indexOf } from './lookup.ts';
 import {
   MS_PER_HOUR,
   MS_PER_SECOND,
+  cycleSeconds,
+  cycleXp,
   masteryLevel,
+  masteryXpPerAction,
   practiceIntervalSeconds,
-  rate,
+  practiceXp,
   techniqueCastSeconds,
 } from './formulas.ts';
-import { builtObstacles, COURSE_KIND, courseSkill, lapXp } from './athletics.ts';
+import { builtObstacles, COURSE_KIND, courseSkill, lapBaseMs, lapXp } from './athletics.ts';
 import { bushOf, bushSize, gatherAverageSeconds, herbSkill, regrowMs } from './field.ts';
 import { getMod } from './mod.ts';
 import { nonNativeLevel } from './natures.ts';
@@ -56,10 +59,16 @@ export interface ActionInfo {
   blocked: string | null;
   /** The evaluated requirement tree; null when the action is available. */
   req: ReqResult | null;
+  /** Length of one cycle at full speed in ms before modifiers: the explicit cycle of the action. */
+  baseMs: number;
   /** Length of one cycle at full speed in ms, modifiers included. */
   intervalMs: number;
   /** Skill XP per hour at full speed, with modifiers and the Academy slowdown. */
   xpPerHour: number;
+  /** Skill XP one completed cycle pays, with modifiers and the Academy slowdown; it does not change with mastery. */
+  xpPerCycle: number;
+  /** Mastery XP per hour at full speed at the action's current mastery level, with modifiers (the mean over the obstacles for the course). */
+  masteryPerHour: number;
   masteryLevel: number;
   /** Fraction of the current mastery level, 0..1 (1 at the cap). */
   masteryProgress: number;
@@ -74,10 +83,10 @@ interface Facts {
   level: number;
   /** Cycle length in ms before modifiers. */
   baseMs: number;
-  /** Milliseconds of work one completion is paid for, before modifiers; defaults to `baseMs`. */
-  rewardMs?: number;
-  /** Skill XP one cycle pays when it is not the rate of one level (the course lap), before modifiers. */
-  rewardXp?: number;
+  /** Skill XP one completed cycle pays, before modifiers. */
+  rewardXp: number;
+  /** What one completion pays mastery for: a mastery key and the seconds of work (before modifiers) it is paid for; defaults to the action itself and its cycle. A lap pays each obstacle. */
+  masteryParts?: { key: string; seconds: number }[];
   /** Extra ms each completion costs on average at full speed, outside the cycle (herb regrow). */
   extraMs?: number;
   inputs?: { item: string; n: number }[];
@@ -125,7 +134,6 @@ function factsOf(
   rules: Rules,
 ): Facts | null {
   const index = indexOf(content);
-  const K = content.balance.K;
   const ms = (seconds: number) => Math.round(seconds * MS_PER_SECOND);
   switch (kind) {
     case 'practice': {
@@ -141,27 +149,45 @@ function factsOf(
         skill: t.skill,
         level: t.level,
         baseMs: ms(practiceIntervalSeconds(cast, content, t.level)),
+        rewardXp: practiceXp(t, content),
       };
     }
     case 'drill': {
       const e = index.exercises.get(id);
       const skill = e ? entitySkill(content, 'drill', e) : null;
-      return e && skill !== null ? { skill, level: e.level, baseMs: ms(K.drill) } : null;
+      return e && skill !== null
+        ? {
+            skill,
+            level: e.level,
+            baseMs: ms(cycleSeconds('drill', e, content)),
+            rewardXp: cycleXp('drill', e, content),
+          }
+        : null;
     }
     case 'meditate': {
       const p = index.practices.get(id);
       const skill = p ? entitySkill(content, 'insight', p) : null;
-      return p && skill !== null ? { skill, level: p.level, baseMs: ms(K.meditate) } : null;
+      return p && skill !== null
+        ? {
+            skill,
+            level: p.level,
+            baseMs: ms(cycleSeconds('meditate', p, content)),
+            rewardXp: cycleXp('meditate', p, content),
+          }
+        : null;
     }
     case COURSE_KIND: {
       const skill = courseSkill(content);
       if (id !== skill || skill === null) return null;
-      const laps = Math.max(1, builtObstacles(state, content).length);
       return {
         skill,
         level: 1,
-        baseMs: laps * ms(K.obstacle),
+        baseMs: lapBaseMs(state, content),
         rewardXp: lapXp(state, content),
+        masteryParts: builtObstacles(state, content).map((o) => ({
+          key: o.id,
+          seconds: cycleSeconds('obstacle', o, content),
+        })),
       };
     }
     case 'gather': {
@@ -173,8 +199,9 @@ function factsOf(
       return {
         skill,
         level: h.level,
-        baseMs: ms(K.gather),
-        rewardMs: gatherAverageSeconds(size, content) * MS_PER_SECOND,
+        baseMs: ms(cycleSeconds('gather', h, content)),
+        rewardXp: cycleXp('gather', h, content),
+        masteryParts: [{ key: id, seconds: gatherAverageSeconds(h, size, content) }],
         extraMs: regrowMs(state, content, rules) / size,
       };
     }
@@ -184,8 +211,8 @@ function factsOf(
       return {
         skill: r.skill,
         level: r.level,
-        baseMs: ms(K.craft),
-        rewardMs: K.craft * MS_PER_SECOND * K.craftXpMult,
+        baseMs: ms(cycleSeconds('craft', r, content)),
+        rewardXp: cycleXp('craft', r, content),
         inputs: r.ingredients.map((i) => ({ item: i.item, n: i.n })),
         outputs: [r.output],
       };
@@ -216,7 +243,6 @@ export function actionInfo(
   const facts = factsOf(state, action.kind, action.id, content, rules);
   if (!facts) return null;
   const { skill, level, baseMs } = facts;
-  const rewardMs = facts.rewardMs ?? baseMs;
 
   const parts: Req[] = [];
   const unlock = skillUnlockReq(skill, content);
@@ -232,18 +258,35 @@ export function actionInfo(
   if (facts.extraMs !== undefined && bushOf(state, action.id)?.stock === 0) {
     intervalMs -= regrowMs(state, content, rules);
   }
-  let xpPerHour =
-    facts.rewardXp === undefined
-      ? (rate(level, content) * rewardMs) / (intervalMs + (facts.extraMs ?? 0))
-      : (facts.rewardXp * MS_PER_HOUR) / intervalMs;
-  xpPerHour *= getMod(state, 'xp.all', content, rules).total;
-  xpPerHour *= getMod(state, `xp.skill.${skill}`, content, rules).total;
+  // The cycle with the regrow pause of a bush (extraMs), which is part of what a gather costs on average.
+  const cycleMs = intervalMs + (facts.extraMs ?? 0);
+  let xpPerCycle = facts.rewardXp;
+  xpPerCycle *= getMod(state, 'xp.all', content, rules).total;
+  xpPerCycle *= getMod(state, `xp.skill.${skill}`, content, rules).total;
   if (
     isAcademyRank(content, state.player.rank) &&
     (skillEntry(state, skill)?.xp ?? 0) >= xpAt(K.academyCap)
   ) {
-    xpPerHour *= K.academySlow;
+    xpPerCycle *= K.academySlow;
   }
+  const xpPerHour = (xpPerCycle * MS_PER_HOUR) / cycleMs;
+
+  // Mastery follows the unmodified cycle and the action's own mastery level.
+  const payers = facts.masteryParts ?? [{ key: action.id, seconds: baseMs / MS_PER_SECOND }];
+  const perCycle =
+    payers.length === 0
+      ? 0
+      : payers.reduce(
+          (sum, p) =>
+            sum + masteryXpPerAction(masteryLevel(state, p.key, content), p.seconds, content),
+          0,
+        ) / payers.length;
+  const masteryPerHour =
+    (perCycle *
+      getMod(state, 'mastery.xp.all', content, rules).total *
+      getMod(state, `mastery.xp.skill.${skill}`, content, rules).total *
+      MS_PER_HOUR) /
+    cycleMs;
 
   const mastery = masteryOf(state, action.id, content);
   return {
@@ -254,8 +297,11 @@ export function actionInfo(
     available: result.met && blocked === null,
     blocked,
     req: result.met ? null : result,
+    baseMs,
     intervalMs,
     xpPerHour,
+    xpPerCycle,
+    masteryPerHour,
     masteryLevel: mastery.level,
     masteryProgress: mastery.progress,
     inputs: (facts.inputs ?? []).map((i) => ({ ...i, have: state.bank[i.item] ?? 0 })),

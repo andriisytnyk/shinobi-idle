@@ -4,6 +4,7 @@ import { useTonic } from './buffs.ts';
 import { shortenWounds } from './combat/wounds.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
+import { masteryLevel, masteryXpPerHour } from './formulas.ts';
 import { indexOf } from './lookup.ts';
 import { grantMastery } from './progression.ts';
 import { openCrate } from './missions/crate.ts';
@@ -58,7 +59,7 @@ export function useItem(
     state,
     technique.id,
     technique.skill,
-    content.balance.K.masteryPerHour,
+    masteryXpPerHour(masteryLevel(state, technique.id, content), content),
     content,
     rules,
   );

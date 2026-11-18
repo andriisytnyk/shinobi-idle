@@ -3,7 +3,14 @@ import { stopSlot, type ActionKind } from '../actions.ts';
 import { addCurrency, addItem, hasItem, removeCurrency, removeItem } from '../bank.ts';
 import { actionsKey, bump } from '../counters.ts';
 import { emit, type MissionDoneEvent } from '../events.ts';
-import { MS_PER_HOUR, MS_PER_SECOND, SECONDS_PER_HOUR, rate } from '../formulas.ts';
+import {
+  MS_PER_HOUR,
+  MS_PER_SECOND,
+  SECONDS_PER_HOUR,
+  masteryLevel,
+  masteryXpPerHour,
+  rate,
+} from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
 import { computeMod } from '../modifiers.ts';
 import { gainXp, grantMastery } from '../progression.ts';
@@ -259,7 +266,14 @@ export function stageXp(
     return {
       xp: [[skill, K.missionXpShare * rate(level, content) * hours]],
       mastery: tech
-        ? { id: tech.id, skill: tech.skill, amount: K.missionXpShare * K.masteryPerHour * hours }
+        ? {
+            id: tech.id,
+            skill: tech.skill,
+            amount:
+              K.missionXpShare *
+              masteryXpPerHour(masteryLevel(state, tech.id, content), content) *
+              hours,
+          }
         : null,
     };
   }

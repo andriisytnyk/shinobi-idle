@@ -5,9 +5,19 @@
     "rateGrowth": 1.08,
     "nativeXp": 1.25,
     "craftXpMult": 4,
-    "masteryPerHour": 10500,
+    "mastery": {
+      "perSecond": 0.128,
+      "base": 8
+    },
+    "cycleMax": {
+      "drill": 12,
+      "meditate": 3,
+      "gather": 8,
+      "obstacle": 7.5,
+      "craft": 2.5
+    },
     "poolShare": 0.25,
-    "poolCapPerItem": 1500,
+    "poolCapPerItem": 2000,
     "practiceFocus": {
       "base": 0.8,
       "perLevel": 0.06
