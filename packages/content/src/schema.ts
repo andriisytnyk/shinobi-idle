@@ -1083,6 +1083,49 @@ export const zoneSchema = z.strictObject({
   unlock: reqSchema.nullable(),
 });
 
+/**
+ * A raid on the player's village: an event that is called when its `trigger` holds, gives the player
+ * `lead` village ticks to prepare, then holds at the gates for `hold` ticks with `packs` packs of
+ * `enemy`. The player repels packs by fighting: a `fight` action named by the raid's id fights `enemy`
+ * while the raid is at the gates, and each fall counts as one pack. When the hold ends the village's
+ * own defence (`defence`, in whole points; `perPack` points stop one pack) takes what is left, and only
+ * when it has any: a village with no defence waits for the player. Each pack that gets through damages
+ * one of `targets` (it stops working for `repair` ticks; nothing is lost). The reward is `reward`
+ * scaled by the share of the packs repelled, those the village repelled counting `autoShare` each.
+ * Ticks are village ticks (`K.tickMin` minutes).
+ */
+export const raidSchema = z.strictObject({
+  id: coreId,
+  /** When the raid is called: nothing happens before this holds, and it is called once. */
+  trigger: reqSchema,
+  /** The enemy of every pack. The fight against it, named by the raid's id, is open while the flag `raid.<id>.active` holds. */
+  enemy: coreId,
+  packs: z.number().int().min(1),
+  /** Ticks between the call and the arrival. */
+  lead: z.number().int().min(0),
+  /** Ticks the raid waits at the gates for the player before the village's defence takes the packs left. */
+  hold: z.number().int().min(1),
+  /** What the village's defence is made of; each entry gives `per` points for each level or unit. */
+  defence: z.array(
+    z.discriminatedUnion('t', [
+      z.strictObject({ t: z.literal('building'), id: coreId, per: z.number().int().min(0) }),
+      z.strictObject({
+        t: z.literal('resource'),
+        id: z.string().min(1),
+        per: z.number().int().min(0),
+      }),
+    ]),
+  ),
+  perPack: z.number().int().min(1),
+  /** The share of a pack's reward that a pack the village repels earns (0 to 1). */
+  autoShare: z.number().min(0).max(1),
+  /** The buildings a pack that gets through damages, in this order; a building not built is skipped. */
+  targets: z.array(coreId),
+  /** Ticks a damaged building stays out of work. */
+  repair: z.number().int().min(1),
+  reward: z.strictObject({ ryo: z.number().int().min(0), rep: z.number().int().min(0) }),
+});
+
 export const operationStageSchema = z.discriminatedUnion('t', [
   /** Traps and detours, no enemy; shortened when the requirement holds. */
   z.strictObject({ t: z.literal('approach'), shortenedBy: reqSchema }),
@@ -1801,6 +1844,7 @@ export const contentDbSchema = z.object({
   quests: z.array(questSchema),
   exams: z.array(examSchema),
   zones: z.array(zoneSchema),
+  raids: z.array(raidSchema),
   operations: z.array(operationSchema),
   statuses: z.array(statusSchema),
   traits: z.array(traitSchema),
@@ -1819,6 +1863,7 @@ export const generatedDbSchema = contentDbSchema
     shop: true,
     coat: true,
     zones: true,
+    raids: true,
     cellKeys: true,
     links: true,
     resources: true,
@@ -1915,6 +1960,7 @@ export type QuestObjective = z.infer<typeof questObjectiveSchema>;
 export type QuestRewards = z.infer<typeof questRewardsSchema>;
 export type Exam = z.infer<typeof examSchema>;
 export type Zone = z.infer<typeof zoneSchema>;
+export type Raid = z.infer<typeof raidSchema>;
 export type Operation = z.infer<typeof operationSchema>;
 export type OperationStage = z.infer<typeof operationStageSchema>;
 export type Status = z.infer<typeof statusSchema>;

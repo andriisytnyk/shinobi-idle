@@ -39,7 +39,7 @@ describe('A9: core source hygiene', () => {
       'hex.ts': [6], // the six sides of a hex, the widest coordinate in a hex key
       'save.ts': [4, 6, 1500, 2000], // four words of an rng stream; nesting depth of slot data; the pool capacities per item of versions 17 and 18 (the v17 -> v18 migration)
       'combat/report.ts': [1000, 100, 64], // three decimals of a multiplier, percent of a pool, longest id read from a save
-      'state.ts': [1000, 4, 18], // share scale, rng words, save version
+      'state.ts': [1000, 4, 19], // share scale, rng words, save version
       'reveal.ts': [64], // most refs one mark carries
       'shown.ts': [4000], // ceiling of the shown set for writes that do not know the content
       'guard.ts': [16, 64], // deepest requirement tree and widest node a pack's callback may return

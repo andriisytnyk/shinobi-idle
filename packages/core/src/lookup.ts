@@ -21,6 +21,7 @@ import type {
   PoolCheckpoint,
   Practice,
   Quest,
+  Raid,
   Region,
   Recipe,
   ShopEntry,
@@ -38,6 +39,8 @@ export interface ContentIndex {
   enemies: Map<string, Enemy>;
   bosses: Map<string, Boss>;
   zones: Map<string, Zone>;
+  /** The raids on the village, by id; a raid is fought as a `fight` action named by its id. */
+  raids: Map<string, Raid>;
   /** The zone that holds each enemy; an enemy of no zone (a mission enemy) has none. */
   zoneByEnemy: Map<string, Zone>;
   /** The items that are a medic pouch upgrade, with their tier. */
@@ -207,6 +210,7 @@ function build(content: ContentDb): ContentIndex {
     enemies: byId(content.enemies),
     bosses: byId(content.bosses),
     zones: byId(content.zones),
+    raids: byId(content.raids),
     medicItems: content.items.flatMap((i) =>
       i.medic === undefined ? [] : [{ id: i.id, tier: i.medic }],
     ),

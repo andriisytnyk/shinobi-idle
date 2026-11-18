@@ -112,6 +112,7 @@ export const CORE_API = {
     'villageBuildings',
     'villageResources',
     'villageStage',
+    'villageRaids',
     'villageQueue',
     'villageTreasury',
     'buildingLevel',

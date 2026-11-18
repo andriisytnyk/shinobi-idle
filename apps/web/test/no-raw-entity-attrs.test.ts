@@ -75,6 +75,8 @@ const ALLOWED: Record<string, string> = {
   'components/NowMission.svelte': 'a mission that runs: the player started it',
   'components/PinGoal.svelte': 'the pin is not drawn for a hidden entity (nameShown)',
   'components/PoolBar.svelte': 'pool checkpoints of a skill: skills are always shown',
+  'components/RaidPanel.svelte':
+    'a raid is not an entity with a reveal rule: it is shown once the story has called it, and its links go to buildings',
   'components/RevealGate.svelte': 'the name-only branch only: the hidden branch writes no id',
   'components/RewardList.svelte': 'currencies: always shown',
   'components/SkillList.svelte': 'skills: always shown',

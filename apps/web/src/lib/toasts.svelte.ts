@@ -149,6 +149,21 @@ export function toastFor(event: GameEvent, content: ContentDb): ToastSpec | null
         params: { n: event.level },
         ref: { kind: 'building', id: event.building },
       };
+    case 'raidCalled':
+      return { key: 'toast.raidCalled', params: {} };
+    case 'raidArrived':
+      return { key: 'toast.raidArrived', params: {} };
+    case 'raidOver':
+      return {
+        key: 'toast.raidOver',
+        params: { done: event.repelled + event.byVillage, breached: event.breached },
+      };
+    case 'buildingRepaired':
+      return {
+        key: 'toast.buildingRepaired',
+        params: {},
+        ref: { kind: 'building', id: event.building },
+      };
     case 'villageStage':
       return { key: 'toast.villageStage', params: {} };
     case 'packsChanged':

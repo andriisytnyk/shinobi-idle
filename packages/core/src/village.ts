@@ -7,6 +7,7 @@ import { MS_PER_MINUTE } from './formulas.ts';
 import type { Modifier, ModifierProvider } from './modifiers.ts';
 import type { System } from './system.ts';
 import type { GameState } from './state.ts';
+import { raidsTick, startRaids } from './raid.ts';
 import { createVillage, type VillageCost, type VillageState } from './village-state.ts';
 import { depositFlag } from './world.ts';
 
@@ -59,6 +60,8 @@ export function depositsOf(state: GameState, buildingId: string): number {
 export function effectiveLevel(state: GameState, building: Building): number {
   const village = state.village;
   if (!village) return 0;
+  // A building a raid damaged does not work until it is repaired.
+  if (village.damage[building.id]) return 0;
   const level = levelOf(village, building.id);
   return building.produces.length > 0 && level > 0 ? level + depositsOf(state, building.id) : level;
 }
@@ -140,6 +143,7 @@ export function syncVillage(state: GameState, content: ContentDb): void {
     emit(state, { type: 'villageStage', stage: village.stage });
   }
   drainPendingResources(state, content);
+  startRaids(state, content);
 }
 
 /**
@@ -192,6 +196,7 @@ function tick(state: GameState, village: VillageState, content: ContentDb): void
     village.job.ticks -= 1;
     if (village.job.ticks <= 0) finishJob(state, village);
   }
+  raidsTick(state, village, content);
 }
 
 export const villageSystem: System = {
@@ -357,7 +362,8 @@ export const villageProvider: ModifierProvider = (state, content) => {
   const out: Modifier[] = [];
   for (const b of content.buildings) {
     const level = levelOf(village, b.id);
-    if (level < 1) continue;
+    // A building a raid damaged gives nothing until it is repaired.
+    if (level < 1 || village.damage[b.id]) continue;
     for (const e of b.effects) {
       out.push({
         key: e.key,
@@ -387,6 +393,8 @@ export function treasuryIncome(state: GameState, content: ContentDb): number {
   if (!village) return 0;
   const bureau = dutyBuilding(content, 'treasury');
   return (
-    content.balance.K.bureauIncome * (bureau ? levelOf(village, bureau.id) : 0) + village.power
+    content.balance.K.bureauIncome *
+      (bureau && !village.damage[bureau.id] ? levelOf(village, bureau.id) : 0) +
+    village.power
   );
 }

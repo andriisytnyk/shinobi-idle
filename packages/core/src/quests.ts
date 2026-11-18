@@ -2,6 +2,7 @@ import type { ContentDb, Quest, QuestRewards } from '@shinobi/content';
 import { addCurrency, addItem, removeCurrency } from './bank.ts';
 import { bump, counterValue } from './counters.ts';
 import { emit } from './events.ts';
+import { startRaids } from './raid.ts';
 import { evalReq } from './requirements.ts';
 import { currencyOf, rankIndex } from './vocab.ts';
 import type { System } from './system.ts';
@@ -143,6 +144,8 @@ export function updateQuests(state: GameState, content: ContentDb): void {
       }
     }
   }
+  // A raid called by a step is called at the moment the step becomes the active one, whatever the cut of the time.
+  startRaids(state, content);
 }
 
 /** Runs after every other system so a change they made is seen at the moment it happens. */

@@ -17,7 +17,8 @@ import {
   tickMs,
   treasuryIncome,
 } from './village.ts';
-import type { VillageCost } from './village-state.ts';
+import { defenceParts, packsLeft, packsStopped } from './raid.ts';
+import type { RaidRun, VillageCost } from './village-state.ts';
 
 /*
  * Read-only views of the village for the UI and bots. Nothing here changes the state.
@@ -78,6 +79,8 @@ export interface BuildingInfo {
   unlocks: BuildingUnlock[];
   /** Whether the construction job is on this building. */
   building: boolean;
+  /** Village ticks until a building damaged by a raid works again; 0 when it is not damaged. */
+  damaged: number;
 }
 
 function buildingLeaves(req: Req, id: string, out: number[]): void {
@@ -188,6 +191,7 @@ export function villageBuildings(state: GameState, content: ContentDb): Building
       perTick,
       unlocks: buildingUnlocks(state, b.id, content),
       building: village?.job?.building === b.id,
+      damaged: village?.damage[b.id] ?? 0,
     };
   });
 }
@@ -288,6 +292,80 @@ export interface StageInfo {
   repNeeded: number;
   /** Whether the last stage is reached. */
   reached: boolean;
+}
+
+export interface RaidInfo {
+  id: string;
+  phase: RaidRun['phase'];
+  packs: number;
+  /** Packs not yet repelled. */
+  left: number;
+  repelled: number;
+  byVillage: number;
+  breached: number;
+  /** Game time until the arrival (`warned`) or the end of the hold (`active`); 0 otherwise. */
+  msLeft: number;
+  /** Whether the hold has run out and the raid waits for the player, because the village has no defence. */
+  waiting: boolean;
+  /** The village's defence now: its parts, the points they give, the points that stop one pack, and the packs they would stop. */
+  defence: {
+    parts: { t: 'building' | 'resource'; id: string; have: number; points: number }[];
+    points: number;
+    perPack: number;
+    stops: number;
+  };
+  /** The buildings in order that the packs that get through would damage, and the ticks a damage lasts. */
+  targets: string[];
+  repair: number;
+  /** The reward of a raid whose packs are all repelled by the player. */
+  reward: { ryo: number; rep: number };
+  /** The share of a pack's reward a pack the village repels earns. */
+  autoShare: number;
+  /** What was paid and which buildings were damaged, once it is over. */
+  paid: { ryo: number; rep: number };
+  damaged: string[];
+}
+
+/** The raids that were called, in the order of the content: coming, at the gates, or over. */
+export function villageRaids(state: GameState, content: ContentDb): RaidInfo[] {
+  const village = state.village;
+  if (!village) return [];
+  const tick = tickMs(content);
+  return content.raids.flatMap((raid) => {
+    const run = village.raids[raid.id];
+    if (!run) return [];
+    const parts = defenceParts(village, raid, content);
+    const points = parts.reduce((sum, p) => sum + p.points, 0);
+    const msLeft =
+      run.phase === 'over' || run.ticks <= 0
+        ? 0
+        : (run.ticks - 1) * tick + Math.max(0, tick - village.clock);
+    return [
+      {
+        id: raid.id,
+        phase: run.phase,
+        packs: raid.packs,
+        left: packsLeft(raid, run),
+        repelled: run.repelled,
+        byVillage: run.byVillage,
+        breached: run.breached,
+        msLeft,
+        waiting: run.phase === 'active' && run.ticks <= 0,
+        defence: {
+          parts,
+          points,
+          perPack: raid.perPack,
+          stops: packsStopped(village, raid, content),
+        },
+        targets: raid.targets,
+        repair: raid.repair,
+        reward: { ...raid.reward },
+        autoShare: raid.autoShare,
+        paid: { ryo: run.ryo, rep: run.rep },
+        damaged: [...run.damaged],
+      },
+    ];
+  });
 }
 
 export function villageStage(state: GameState, content: ContentDb): StageInfo {

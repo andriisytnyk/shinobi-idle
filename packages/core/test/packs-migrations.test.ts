@@ -15,8 +15,8 @@ const fixture = (name: string): { tag: string; saves: Record<string, string> } =
   );
 
 describe('the save format', () => {
-  it('is version 18 and has one migration per step', () => {
-    expect(STATE_VERSION).toBe(18);
+  it('is version 19 and has one migration per step', () => {
+    expect(STATE_VERSION).toBe(19);
     expect(MIGRATIONS).toHaveLength(STATE_VERSION - 1);
   });
 });

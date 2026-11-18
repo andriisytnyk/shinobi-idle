@@ -16,6 +16,27 @@ export interface VillageJob {
   paid: VillageCost;
 }
 
+/**
+ * One raid on the village (see `Raid` in the content): called and waiting to arrive (`warned`), at the gates
+ * (`active`), or finished (`over`, kept so the outcome can be read).
+ */
+export interface RaidRun {
+  phase: 'warned' | 'active' | 'over';
+  /** Village ticks to the arrival (`warned`) or to the end of the window (`active`); 0 when over. */
+  ticks: number;
+  /** Packs the player repelled in a fight. */
+  repelled: number;
+  /** Packs the village's defence repelled when the window ended. */
+  byVillage: number;
+  /** Packs that got through. */
+  breached: number;
+  /** The buildings the breach damaged. */
+  damaged: string[];
+  /** What was paid when the raid ended. */
+  ryo: number;
+  rep: number;
+}
+
 /** The player's district; plain JSON. Exists from the moment the player becomes Genin. */
 export interface VillageState {
   /** Building level by building id (0 when absent). */
@@ -34,6 +55,10 @@ export interface VillageState {
   stage: number;
   /** Game time into the current village tick, in whole ms. */
   clock: number;
+  /** Raids by raid id; a raid never called has no entry. */
+  raids: Record<string, RaidRun>;
+  /** Buildings out of work after a raid: village ticks left to repair, by building id. */
+  damage: Record<string, number>;
 }
 
 /** The village of a new Genin: starting levels from the balance, empty stores. */
@@ -59,6 +84,8 @@ export function createVillage(content: ContentDb): VillageState {
     job: null,
     stage: 1,
     clock: 0,
+    raids: {},
+    damage: {},
   };
 }
 

@@ -11,6 +11,7 @@ import { bump, defeatsKey, killsKey } from '../counters.ts';
 import { emit } from '../events.ts';
 import { MS_PER_SECOND, masteryLevel, masteryXpPerSecond } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
+import { raidPackFell } from '../raid.ts';
 import { nextInt, nextSeed } from '../rng.ts';
 import type { Rules } from '../rules.ts';
 import { SHARE_FULL, type GameState } from '../state.ts';
@@ -332,7 +333,8 @@ function victory(
     player.chakra = player.maxChakra;
     player.stamina = player.maxStamina;
     refillPouch(state, content);
-    return false;
+    // A pack of a raid at the village gates counts for the defence; the last one ends the raid and the fight with it.
+    return raidPackFell(state, key, content);
   }
   const op = indexOf(content).operations.get(c.run.op);
   if (!op) return true;

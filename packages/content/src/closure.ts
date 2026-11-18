@@ -700,6 +700,15 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     ref('region', z.region, 'fightRegions');
     req('unlock', z.unlock);
   }
+  for (const r of db.raids) {
+    at('raids', r.id);
+    req('trigger', r.trigger);
+    ref('enemy', r.enemy, 'enemies');
+    r.defence.forEach((d, n) =>
+      ref(`defence[${n}].id`, d.id, d.t === 'building' ? 'buildings' : 'resources'),
+    );
+    refs('targets', r.targets, 'buildings');
+  }
   for (const o of db.operations) {
     at('operations', o.id);
     for (const which of ['first', 'repeat'] as const)

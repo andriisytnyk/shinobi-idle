@@ -641,9 +641,11 @@
       {
         "textKey": "quest.core:outskirts.step.4",
         "objective": {
-          "t": "counter",
-          "counter": "kills.core:merc_pack",
-          "n": 10
+          "t": "req",
+          "req": {
+            "t": "flag",
+            "id": "raid.core:raid_grey_bands.over"
+          }
         }
       },
       {
