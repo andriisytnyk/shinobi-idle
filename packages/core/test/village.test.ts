@@ -20,7 +20,7 @@ import {
   type GameState,
 } from '../src/index.ts';
 import { genin, HOUR, setLevel, withBuildings } from './helpers.ts';
-import { bestOf, speedBudget } from './speed.ts';
+import { bestOf, speedBudget, speedIt } from './speed.ts';
 
 const K = content.balance.K;
 const TICK = K.tickMin * 60_000;
@@ -151,7 +151,7 @@ describe('A2: the tick', () => {
     expect(serialize(b)).toBe(serialize(a));
   });
 
-  it('keeps 12 hours of advance fast with the village running', () => {
+  speedIt('keeps 12 hours of advance fast with the village running', () => {
     const limit = speedBudget(500, 2000);
     const best = bestOf(3, limit, () => {
       advance(rich(), 12 * HOUR, content);

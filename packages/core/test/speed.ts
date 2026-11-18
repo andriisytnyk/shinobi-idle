@@ -5,7 +5,21 @@
  * regression in the code. So a budget is stated for the reference machine and stretched by how much
  * slower a fixed arithmetic workload runs here and now, up to a hard cap that is the real product
  * requirement.
+ *
+ * Speed tests are declared with `speedIt` and run apart from the rest: `pnpm test:speed` (one worker,
+ * `--mode speed`, selected by the `@speed` tag). In a normal `pnpm test` they are skipped, because
+ * the other test files share the CPUs and the timing would be noise.
  */
+import { it } from 'vitest';
+
+/** True in `pnpm test:speed` (`vitest --mode speed`). */
+export const speedMode: boolean =
+  (import.meta as { env?: { MODE?: string } }).env?.MODE === 'speed';
+
+/** A wall-clock test: runs only in speed mode; the `@speed` tag is what `test:speed` selects. */
+export const speedIt = (name: string, fn: () => void): void => {
+  (speedMode ? it : it.skip)(`${name} @speed`, { timeout: 300_000 }, fn);
+};
 
 /** What the workload below takes on the machine the budgets were set on, ms. */
 const REFERENCE_MS = 18;
@@ -29,7 +43,7 @@ function ms(fn: () => void): number {
 /** How many times slower than the reference machine this one is right now; never below 1. */
 export function machineFactor(): number {
   let best = Infinity;
-  for (let run = 0; run < 3; run++) best = Math.min(best, ms(workload));
+  for (let run = 0; run < 5; run++) best = Math.min(best, ms(workload));
   return Math.max(1, best / REFERENCE_MS);
 }
 

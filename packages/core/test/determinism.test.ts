@@ -18,7 +18,7 @@ import {
   type GameState,
 } from '../src/index.ts';
 import { HOUR, setLevel } from './helpers.ts';
-import { bestOf, speedBudget } from './speed.ts';
+import { bestOf, speedBudget, speedIt } from './speed.ts';
 import { fighter, ids, run, startFight, startOperation, stock, unlock } from './prep-state.ts';
 import { playerFor } from './prep-helpers.ts';
 import { encounterFor } from '../src/index.ts';
@@ -162,7 +162,7 @@ describe('A2: split invariance and determinism', () => {
 });
 
 describe('A11: speed', () => {
-  it('simulates 1000 fights against an at-level regular enemy in under 2000 ms', () => {
+  speedIt('simulates 1000 fights against an at-level regular enemy in under 2000 ms', () => {
     const enemy = content.enemies.find((e) => e.id === 'core:hunter');
     if (!enemy) throw new Error('no enemy');
     const snap = playerFor(enemy, 'katon', { prep: 'auto', tier: 1, knowledge: 'none' });
@@ -178,22 +178,30 @@ describe('A11: speed', () => {
     expect(ms).toBeLessThan(limit);
   });
 
-  it('plays 12 game hours of zone fighting with the pouch in under 3000 ms', () => {
-    const state = fighter(41, 38, 'katon');
-    stock(state, { [ids.heal]: 5000, [ids.kunai]: 5000, [ids.tag]: 5000, [ids.medpouch]: 1 });
-    run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
-    run(state, { type: 'pouch.set', slot: 1, item: ids.tag });
-    run(state, { type: 'pouch.set', slot: 2, item: ids.kunai });
-    run(state, { type: 'pouch.medic', slot: 0 });
-    dispatch(
-      state,
-      { type: 'action.start', slot: 0, kind: 'fight', id: 'core:zone_guard_pack' },
-      content,
-    );
+  speedIt('plays 12 game hours of zone fighting with the pouch in under 3000 ms', () => {
+    const make = () => {
+      const state = fighter(41, 38, 'katon');
+      stock(state, { [ids.heal]: 5000, [ids.kunai]: 5000, [ids.tag]: 5000, [ids.medpouch]: 1 });
+      run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
+      run(state, { type: 'pouch.set', slot: 1, item: ids.tag });
+      run(state, { type: 'pouch.set', slot: 2, item: ids.kunai });
+      run(state, { type: 'pouch.medic', slot: 0 });
+      dispatch(
+        state,
+        { type: 'action.start', slot: 0, kind: 'fight', id: 'core:zone_guard_pack' },
+        content,
+      );
+      return state;
+    };
+    let state = make();
     const bank =
       (state.bank[ids.tag] ?? 0) + (state.bank[ids.heal] ?? 0) + (state.bank[ids.kunai] ?? 0);
     const limit = speedBudget(3000, 12_000);
-    const ms = bestOf(1, limit, () => advance(state, 12 * HOUR, content));
+    // Each run starts from a fresh state: advancing the same one again would play hours 12 to 24.
+    const ms = bestOf(3, limit, () => {
+      state = make();
+      advance(state, 12 * HOUR, content);
+    });
     const kills = state.counters['kills.core:guard_pack'] ?? 0;
     const refilled =
       bank -
