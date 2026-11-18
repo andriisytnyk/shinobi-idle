@@ -101,7 +101,18 @@ describe('technique combat data', () => {
       effect: { kind: 'summon', fx: 'combatClone' },
     });
     expect(Object.keys(K.techFx.combatClone ?? {}).sort()).toEqual(
-      ['casts', 'count', 'dmg', 'hp', 'masteryStep', 'max', 'share', 'threat'].sort(),
+      [
+        'casts',
+        'count',
+        'dmg',
+        'hp',
+        'masteryStep',
+        'max',
+        'passShare',
+        'share',
+        'threat',
+        'xpShare',
+      ].sort(),
     );
   });
 

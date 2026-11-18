@@ -186,6 +186,8 @@ export const BALANCE_EXT = {
       dmg: 0.5,
       threat: 0.6,
       casts: 1,
+      xpShare: 1,
+      passShare: 1,
     },
   },
   /**

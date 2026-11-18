@@ -7,6 +7,8 @@ import type { Req } from '../requirements.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 import { earnXp, payOnStop } from './pending.ts';
+import { xpShareOf } from './allies.ts';
+import { alliesOf, heldOf } from './fight.ts';
 import { raidFlag } from '../raid.ts';
 import { ensurePouch, refillPouch } from './pouch.ts';
 import { fightBusyReason, newCombat, newOperation } from './system.ts';
@@ -22,6 +24,19 @@ function payTick(state: GameState, fallback: string, content: ContentDb, rules: 
   for (const [key, mult] of Object.entries(K.combatXp)) {
     const skill = key === 'style' ? (state.combat?.style ?? fightData(content).basicSkill) : key;
     if (skill) earnXp(state, skill, mult * perTick, content, rules);
+  }
+  // Every living ally earns by its own actions and its own style, and holds it until it leaves the fight.
+  const fight = state.combat?.fight;
+  if (fight && fight.result === 'ongoing') {
+    const share = xpShareOf(content);
+    for (const ally of alliesOf(fight)) {
+      if (ally.hp <= 0) continue;
+      const held = heldOf(ally, fight.t);
+      for (const [key, mult] of Object.entries(K.combatXp)) {
+        const skill = key === 'style' ? (held.style ?? fightData(content).basicSkill) : key;
+        if (skill) held.xp[skill] = (held.xp[skill] ?? 0) + mult * perTick * share;
+      }
+    }
   }
 }
 

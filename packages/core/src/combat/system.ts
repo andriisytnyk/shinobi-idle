@@ -19,7 +19,8 @@ import type { System } from '../system.ts';
 import { encounterFor } from './fight-encounter.ts';
 import { bossNature } from '../natures.ts';
 import { noteBounty, noteFight, noteSighting } from './bingo.ts';
-import { dropPending, earnMastery, payPending } from './pending.ts';
+import { dropPending, earnMastery, earnXp, payPending } from './pending.ts';
+import { passShareOf, xpShareOf } from './allies.ts';
 import { grantLoot, rollLoot } from './loot.ts';
 import { recordFight, recordItems, recordLoot, recordWounds, stampDefeat } from './report.ts';
 import { payOperation } from './rewards.ts';
@@ -195,6 +196,48 @@ export function newOperation(
   return c;
 }
 
+/**
+ * What the allies that have left the fight (fallen, dispelled, or the fight's end) earned by their own actions goes to the
+ * character, once: combat XP by the skill of the style each body had, and Mastery for the techniques it cast. `xpShare` of the
+ * clone technique's row scales what a body earns while it lives (see `payTick`); `passShare` is the share that passes on
+ * (the knowledge a body hands over, to be tied to the mind fatigue of the clones; 0 passes nothing).
+ */
+function payAllies(
+  state: GameState,
+  c: CombatState,
+  content: ContentDb,
+  rules: Rules,
+  clone: boolean,
+): void {
+  const tally = c.fight.tally;
+  const pass = Math.max(0, passShareOf(content));
+  const xp = tally.allyXp;
+  const work = tally.allyWork;
+  delete tally.allyXp;
+  delete tally.allyWork;
+  for (const [skill, amount] of Object.entries(xp ?? {}))
+    earnXp(state, skill, amount * pass, content, rules);
+  for (const [id, units] of Object.entries(work ?? {})) {
+    const tech = indexOf(content).techniques.get(id);
+    if (!tech || !(units > 0)) continue;
+    earnMastery(
+      state,
+      c,
+      clone,
+      id,
+      tech.skill,
+      (pass *
+        xpShareOf(content) *
+        masteryXpPerSecond(masteryLevel(state, id, content), content) *
+        units) /
+        WORK_PER_MS /
+        MS_PER_SECOND,
+      content,
+      rules,
+    );
+  }
+}
+
 /** Pays mastery XP for the technique time the fight has tallied since the last payment. */
 function settle(
   state: GameState,
@@ -206,6 +249,7 @@ function settle(
   const K = content.balance.K;
   const tally = c.fight.tally;
   c.style = tally.style;
+  payAllies(state, c, content, rules, clone);
   for (const [id, work] of Object.entries(tally.masteryWork)) {
     const due = work - (c.paid[id] ?? 0);
     const tech = indexOf(content).techniques.get(id);

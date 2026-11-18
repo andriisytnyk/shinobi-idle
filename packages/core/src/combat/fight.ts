@@ -27,6 +27,7 @@ import {
 } from './fight-status.ts';
 import { TEAM_HOOK } from './fight-team-id.ts';
 import type {
+  AllyHeld,
   Combatant,
   AttackPlan,
   Decision,
@@ -1443,10 +1444,17 @@ function startTechnique(
   );
   if (actor === fight.player) fight.target = target ?? null;
   // Mastery is paid for the fight time since the previous technique use (or the fight's start), by whichever body cast: an ally's cast is the character's.
-  count(fight.tally.masteryWork, tech.id, fight.t - fight.tally.lastUseAt);
-  fight.tally.lastUseAt = fight.t;
-  // The style the combat XP follows is the character's own: an ally's cast pays its technique's Mastery (above), not the style.
-  if (actor === fight.player) fight.tally.style = tech.skill;
+  if (actor === fight.player) {
+    count(fight.tally.masteryWork, tech.id, fight.t - fight.tally.lastUseAt);
+    fight.tally.lastUseAt = fight.t;
+    fight.tally.style = tech.skill;
+  } else if (actor.ally) {
+    // Each body earns by its own actions: an ally's Mastery work and style are held in it until it leaves the fight.
+    const held = heldOf(actor, fight.t);
+    count(held.work, tech.id, fight.t - held.last);
+    held.last = fight.t;
+    held.style = tech.skill;
+  }
   note(fight, 'player', 'cast', tech.id, 0, player.id, undefined, allyOf(actor));
 }
 
@@ -1471,6 +1479,9 @@ function startBasic(
   );
   if (actor === fight.player) {
     fight.tally.style = fightData(ctx.content).basicSkill ?? fight.tally.style;
+  } else if (actor.ally) {
+    const basic = fightData(ctx.content).basicSkill;
+    if (basic) heldOf(actor, fight.t).style = basic;
   }
   note(fight, 'player', 'cast', null, 0, player.id, undefined, allyOf(actor));
 }
@@ -1709,14 +1720,29 @@ function summonAllies(ctx: FightCtx, tech: KitTechnique, spec: SummonSpec): void
       decoyUntil: null,
       fleeAt: null,
       fled: false,
-      ally: { n: number, kind: tech.id },
+      ally: { n: number, kind: tech.id, held: { xp: {}, work: {}, last: fight.t } },
     });
   }
+}
+
+/** What an ally has earned and not yet handed over; made on first use. */
+export function heldOf(ally: Combatant, now: number): AllyHeld {
+  if (!ally.ally) throw new Error('only an ally holds what it earned');
+  return (ally.ally.held ??= { xp: {}, work: {}, last: now });
 }
 
 /** What an ally still holds goes back to the character; once, however many times it is called. */
 function releaseAlly(ctx: FightCtx, ally: Combatant): void {
   const player = ctx.fight.player;
+  const held = ally.ally?.held;
+  if (held) {
+    // The XP and Mastery the body earned wait in the tally for the game to pay them, once.
+    const tally = ctx.fight.tally;
+    for (const [skill, n] of Object.entries(held.xp)) count((tally.allyXp ??= {}), skill, n);
+    for (const [id, n] of Object.entries(held.work)) count((tally.allyWork ??= {}), id, n);
+    held.xp = {};
+    held.work = {};
+  }
   if (alive(player)) {
     player.chakra = Math.min(player.maxChakra, player.chakra + ally.chakra);
     player.stamina = Math.min(player.maxStamina, player.stamina + ally.stamina);
@@ -1736,9 +1762,16 @@ function dispelAlly(ctx: FightCtx, ally: Combatant): void {
   releaseAlly(ctx, ally);
 }
 
-/** The fight ends: the allies that still stand give back what they have left. */
+const sum = (r: Record<string, number> | undefined): number =>
+  Object.values(r ?? {}).reduce((n, x) => n + x, 0);
+
+/** The fight ends: the allies that still stand give back what they have left, and hand over what they earned. */
 function releaseAllies(ctx: FightCtx): void {
-  for (const a of alliesOf(ctx.fight)) if (a.chakra > 0 || a.stamina > 0) releaseAlly(ctx, a);
+  for (const a of alliesOf(ctx.fight)) {
+    if (a.chakra > 0 || a.stamina > 0 || sum(a.ally?.held?.xp) > 0 || sum(a.ally?.held?.work) > 0) {
+      releaseAlly(ctx, a);
+    }
+  }
 }
 
 /** The body of the character's side that an enemy aims at: the character alone, or one of the living bodies drawn by weight (the character 1, an ally its `threat`) on the fight's own stream. */

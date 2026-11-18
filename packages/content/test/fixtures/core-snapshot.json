@@ -2031,6 +2031,8 @@
     "K.techFx.combatClone.dmg": 0.5,
     "K.techFx.combatClone.threat": 0.6,
     "K.techFx.combatClone.casts": 1,
+    "K.techFx.combatClone.xpShare": 1,
+    "K.techFx.combatClone.passShare": 1,
     "K.bossFx.wolfPack.count": 4,
     "K.bossFx.wolfPack.everyMs": 20000,
     "K.bossFx.wolfPack.hp": 0.12,
@@ -8123,7 +8125,9 @@
       "hp",
       "dmg",
       "threat",
-      "casts"
+      "casts",
+      "xpShare",
+      "passShare"
     ],
     "K.bossFx": [
       "wolfPack",

@@ -80,6 +80,14 @@ export interface LastAct {
   target?: string;
 }
 
+/** What an ally holds of what it has earned; see `Combatant.ally`. */
+export interface AllyHeld {
+  style?: string;
+  xp: Record<string, number>;
+  work: Record<string, number>;
+  last: number;
+}
+
 /** One fighter. The player and every enemy have this shape. */
 export interface Combatant {
   id: string;
@@ -139,7 +147,16 @@ export interface Combatant {
    * (1-based, the order they came in) and the kind of ally it is (the id of the technique that put it
    * there). Absent on the character and on every enemy.
    */
-  ally?: { n: number; kind: string };
+  ally?: {
+    n: number;
+    kind: string;
+    /**
+     * What the body has earned by its own actions and not yet handed to the character: its style (the skill of what it did last),
+     * combat XP by skill (accrued by the game's ticks), and Mastery work by technique with the fight time of its last cast.
+     * It moves to `FightTally.allyXp` / `allyWork` when the body falls, is dispelled or the fight ends.
+     */
+    held?: AllyHeld;
+  };
 }
 
 /** An ally kind a technique puts on the caster's side, with its numbers resolved for this player. */
@@ -253,6 +270,9 @@ export interface FightTally {
   woundMin: number;
   /** Work units between a technique's start and the one before it, per technique: the basis of mastery XP. */
   masteryWork: Record<string, number>;
+  /** What allies that have left the fight (fallen, dispelled or at its end) earned and the game has not yet paid: combat XP by skill, Mastery work by technique. Absent until one has. */
+  allyXp?: Record<string, number>;
+  allyWork?: Record<string, number>;
 }
 
 /** One line of the battle log: who did what, with which technique, for how much damage. */

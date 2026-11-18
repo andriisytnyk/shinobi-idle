@@ -4,6 +4,7 @@ import { fightData } from './fight-data.ts';
 import type { EvasionPart } from './numbers.ts';
 import { TEAM_HOOK } from './fight-team-id.ts';
 import type {
+  AllyHeld,
   Combatant,
   Effect,
   Encounter,
@@ -279,7 +280,17 @@ function parseCombatant(
   if (raw.ally !== undefined) {
     const a = raw.ally;
     if (side !== 'player' || !isRecord(a) || !isInt(a.n) || a.n < 1 || !isStr(a.kind)) return null;
-    ally = { n: a.n, kind: a.kind };
+    const h = a.held;
+    let held: AllyHeld | undefined;
+    if (h !== undefined) {
+      const xp = isRecord(h) ? numberRecord(h.xp) : null;
+      const work = isRecord(h) ? numberRecord(h.work) : null;
+      if (!isRecord(h) || !xp || !work || !isInt(h.last) || h.last < 0 || h.last > t) return null;
+      if (h.style !== undefined && !isStr(h.style)) return null;
+      if (![...Object.values(xp), ...Object.values(work)].every(nonNeg)) return null;
+      held = { xp, work, last: h.last, ...(h.style === undefined ? {} : { style: h.style }) };
+    }
+    ally = { n: a.n, kind: a.kind, ...(held ? { held } : {}) };
   }
   // A fighter waits or acts; only the character rests. A fight saved before the loop of waits and actions has none of this and is not read.
   const phases =
@@ -474,6 +485,10 @@ function parseTally(raw: unknown, v: Vocab): FightTally | null {
     for (const key of Object.keys(statuses)) if (!knownEffect(key, v)) delete statuses[key];
   if (combos) for (const key of Object.keys(combos)) if (!v.combos.has(key)) delete combos[key];
   const masteryWork = numberRecord(raw.masteryWork);
+  const allyXp = raw.allyXp === undefined ? {} : numberRecord(raw.allyXp);
+  const allyWork = raw.allyWork === undefined ? {} : numberRecord(raw.allyWork);
+  if (!allyXp || !allyWork) return null;
+  if (![...Object.values(allyXp), ...Object.values(allyWork)].every(nonNeg)) return null;
   if (!damage || !uses || !statuses || !combos || !masteryWork) return null;
   const scalars = [
     raw.basic,
@@ -503,6 +518,8 @@ function parseTally(raw: unknown, v: Vocab): FightTally | null {
     style: style as SkillId,
     lastUseAt: raw.lastUseAt as number,
     masteryWork,
+    ...(raw.allyXp === undefined ? {} : { allyXp }),
+    ...(raw.allyWork === undefined ? {} : { allyWork }),
     wounds: raw.wounds as number,
     woundMin: raw.woundMin as number,
   };
