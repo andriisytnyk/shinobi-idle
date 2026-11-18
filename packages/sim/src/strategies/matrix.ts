@@ -19,9 +19,12 @@ const HOUR = 3_600_000;
 /** Targets of the documents (balance model, plan stage 9) the report judges the runs by. */
 export const TARGETS = {
   geninHours: { min: 0.5, max: 1.5 },
-  chuninHours: { min: 12, max: 15 },
+  chuninHours: { min: 20, max: 50 },
   capHours: { min: 20, max: 25 },
-  maxGapHours: 2,
+  /** Cadence (author, 18.11): a stretch without anything new is at most this share of the game time at its end, and at most `maxGapHours`; stretches under `minAllowedHours` are always fine. */
+  maxGapShare: 0.2,
+  maxGapHours: 8,
+  minAllowedHours: 2,
   minSkillAtEnd: 20,
   firstHours: 3,
 } as const;
@@ -65,6 +68,8 @@ export interface RunMetrics {
   cap: number | null;
   /** Longest stretch between two milestones, hours, with what stood at its start; the stretch to the end of the run counts. */
   longestGap: { hours: number; after: string };
+  /** The stretch that exceeds the cadence rule the most (hours over what the rule allows there), whether or not it does. */
+  cadence: { hours: number; allowed: number; after: string };
   /** Share of the run (and of the time since the clone opened) in which the clone's slot worked. */
   cloneShareRun: number;
   cloneShareOpen: number | null;
@@ -75,6 +80,8 @@ export interface RunMetrics {
   /** Final levels (trainable skills) and the lowest among them. */
   levels: Record<string, number>;
   minLevel: number;
+  /** The lowest skill level (trainable skills) the moment the last rank was taken; null when it never was. */
+  minLevelAtChunin: number | null;
   rank: string;
   rejected: number;
   firstRejection: string | null;
@@ -132,6 +139,7 @@ export function measureRun(options: MatrixRun): RunMetrics {
   let levelsAt3h: Record<string, number> | null = null;
   let cloneAt: number | null = null;
   let capAt: number | null = null;
+  let minAtChunin: number | null = null;
   const kinds = {
     mission: { ms: 0, xp: 0, ryo: 0 },
     practice: { ms: 0, xp: 0, ryo: 0 },
@@ -178,6 +186,14 @@ export function measureRun(options: MatrixRun): RunMetrics {
             trainable(state, content).map((id) => [id, levelAt(state.skills[id]?.xp ?? 0, cap)]),
           );
         }
+        if (
+          minAtChunin === null &&
+          state.player.rank === content.playerRanks[content.playerRanks.length - 1]?.id
+        ) {
+          minAtChunin = Math.min(
+            ...trainable(state, content).map((id) => levelAt(state.skills[id]?.xp ?? 0, cap)),
+          );
+        }
         if (cloneAt === null && cloneSlots(state, content).length > 0) cloneAt = state.now;
         if (
           capAt === null &&
@@ -189,6 +205,10 @@ export function measureRun(options: MatrixRun): RunMetrics {
       },
     },
   });
+
+  // The goal holds only when every skill is at the cap, so a run that ended on it has reached the cap by then (the
+  // observer does not look again after the last step).
+  if (capAt === null && result.ended === 'done') capAt = result.endedAt;
 
   const state = result.state;
   const levels = Object.fromEntries(
@@ -216,11 +236,19 @@ export function measureRun(options: MatrixRun): RunMetrics {
   if (cloneAt !== null) marks.push({ at: cloneAt, label: 'техніка клонування' });
   marks.sort((a, b) => a.at - b.at);
   let gap = { hours: 0, after: 'старт' };
+  let cadence: { hours: number; allowed: number; after: string } = { hours: 0, allowed: TARGETS.maxGapHours, after: 'старт' };
   for (let i = 0; i < marks.length; i++) {
     const from = marks[i] as { at: number; label: string };
     const to = marks[i + 1]?.at ?? result.endedAt;
     if ((to - from.at) / HOUR > gap.hours)
       gap = { hours: (to - from.at) / HOUR, after: from.label };
+    const span = (to - from.at) / HOUR;
+    const allowed = Math.min(
+      TARGETS.maxGapHours,
+      Math.max(TARGETS.minAllowedHours, TARGETS.maxGapShare * (to / HOUR)),
+    );
+    if (span / allowed > cadence.hours / cadence.allowed)
+      cadence = { hours: span, allowed, after: from.label };
   }
 
   const openMs = state.counters[CLONE_OPEN_MS] ?? 0;
@@ -237,6 +265,7 @@ export function measureRun(options: MatrixRun): RunMetrics {
     chunin: rankAt(last),
     cap: capAt === null ? null : capAt / HOUR,
     longestGap: gap,
+    cadence,
     cloneShareRun: result.endedAt > 0 ? runMs / result.endedAt : 0,
     cloneShareOpen: openMs > 0 ? runMs / openMs : null,
     mission: kinds.mission,
@@ -244,6 +273,7 @@ export function measureRun(options: MatrixRun): RunMetrics {
     fight: kinds.fight,
     levels,
     minLevel: Math.min(...Object.values(levels)),
+    minLevelAtChunin: minAtChunin,
     rank: state.player.rank,
     rejected: result.rejected,
     firstRejection: result.firstRejection,

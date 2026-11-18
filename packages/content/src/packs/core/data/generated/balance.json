@@ -158,7 +158,7 @@
       "dur": 4.23
     },
     "poison": {
-      "pctPerSec": 0.02,
+      "pctPerSec": 0.008,
       "dur": 8
     },
     "combo": {
@@ -236,7 +236,7 @@
         "count": 2,
         "hpEach": 0.5,
         "dmgEach": 0.5,
-        "mistMult": 0.3
+        "mistMult": 1.6
       },
       "mistRehide": {
         "everyMs": 25000,
@@ -251,8 +251,8 @@
       }
     },
     "ryoDrop": [
-      5,
-      8
+      1.2,
+      2
     ],
     "dropChance": {
       "band": 0.25,
@@ -393,7 +393,7 @@
       "dmg": 0.4
     },
     "trait": {
-      "armor": 0.3,
+      "armor": 0.22,
       "armorOff": 6,
       "casterEvery": 12,
       "casterCast": 3,

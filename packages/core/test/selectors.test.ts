@@ -38,23 +38,32 @@ describe('skill unlock rules', () => {
       'alch',
       'vit',
     ]);
-    expect(skillUnlockStatus(state, 'vit', content)?.req).toEqual({ t: 'flag', id: 'firstFight' });
+    expect(skillUnlockStatus(state, 'vit', content)?.req).toEqual({
+      t: 'any',
+      of: [
+        { t: 'flag', id: 'firstFight' },
+        { t: 'rank', rank: 'genin' },
+      ],
+    });
     expect(skillUnlockStatus(state, 'katon', content)?.req).toEqual({
       t: 'nature',
       nature: 'katon',
     });
   });
 
-  it('opens the rank-gated skills at genin and vit with the firstFight flag', () => {
+  it('opens the rank-gated skills at genin and vit with the firstFight flag or at genin', () => {
     const state = createState(1, content);
     state.player.rank = 'genin';
     expect(isSkillUnlocked(state, 'katon', content)).toBe(false);
     withNatures(state, 'katon');
     expect(isSkillUnlocked(state, 'katon', content)).toBe(true);
     expect(isSkillUnlocked(state, 'alch', content)).toBe(true);
-    expect(isSkillUnlocked(state, 'vit', content)).toBe(false);
-    state.flags.firstFight = true;
+    // A Genin who never fought trains Vitality with the bodily drills.
     expect(isSkillUnlocked(state, 'vit', content)).toBe(true);
+    const student = createState(1, content);
+    expect(isSkillUnlocked(student, 'vit', content)).toBe(false);
+    student.flags.firstFight = true;
+    expect(isSkillUnlocked(student, 'vit', content)).toBe(true);
   });
 });
 
@@ -120,7 +129,7 @@ describe('listSkillActions', () => {
     expect(listSkillActions(state, 'med', content).every((a) => a.kind === 'meditate')).toBe(true);
     expect(listSkillActions(state, 'ath', content).every((a) => a.kind === 'course')).toBe(true);
     expect(listSkillActions(state, 'scout', content)).toEqual([]);
-    expect(listSkillActions(state, 'vit', content)).toEqual([]);
+    expect(listSkillActions(state, 'vit', content).every((a) => a.kind === 'drill')).toBe(true);
   });
 
   it('reports mastery level and progress', () => {

@@ -189,11 +189,12 @@ const skills: Skill[] = SKILL_IDS.map((id) => {
   const unlockReq: Skill['unlockReq'] = open
     ? null
     : fight
-      ? { t: 'flag', id: FIRST_FIGHT_FLAG }
+      ? { t: 'any', of: [{ t: 'flag', id: FIRST_FIGHT_FLAG }, { t: 'rank', rank: 'genin' }] }
       : (NATURE_IDS as readonly string[]).includes(id)
         ? { t: 'nature', nature: id as NatureId }
         : { t: 'rank', rank: 'genin' };
-  return { id, group, activity: n.mt ?? 'none', unlockReq };
+  // Vitality grows in fights and, slower, in bodily drills (see VIT_DRILLS).
+  return { id, group, activity: fight ? 'drill' : (n.mt ?? 'none'), unlockReq };
 });
 for (const nat of NATURE_IDS)
   need(
@@ -277,6 +278,27 @@ const exercises: Exercise[] = slice.exercises.map((e) => {
   const cycle = cycleAt('drill', e.level);
   return { id, level: e.level, cycle, xp: xpOfCycle(e.level, cycle) };
 });
+// Vitality outside fights (stage 9 decision, docs/Shinobi Idle — модель балансу.md, section 2): a few bodily drills
+// that pay the skill at the share of the zone pace a fight pays it (K.combatXp.vit), so a peaceful player can raise it.
+const VIT_DRILLS: { level: number; uk: string; note: string }[] = [
+  { level: 1, uk: 'Біг із тягарем', note: 'Мішок із піском на плечах і коло навколо двору.' },
+  { level: 15, uk: 'Віджимання на кулаках', note: 'Кулаки на камінні: біль вчить тіло терпіти.' },
+  { level: 30, uk: 'Стійка під водоспадом', note: "Крижана вода б'є по плечах, доки не потемніє в очах." },
+  { level: 45, uk: 'Загартування ударами', note: "Напарник б'є дерев'яним мечем, а ти не відступаєш." },
+];
+for (const d of VIT_DRILLS) {
+  const id = core(exerciseSlugs.take(d.uk));
+  text('exercise', id, 'name', d.uk);
+  text('exercise', id, 'desc', d.note);
+  const cycle = cycleAt('drill', d.level);
+  exercises.push({
+    id,
+    level: d.level,
+    skill: 'vit',
+    cycle,
+    xp: xpOfCycle(d.level, cycle, need((P.combatXp as unknown as { vit: number }).vit, 'combatXp.vit')),
+  });
+}
 
 const obstacleSlugs = { take: (k: string) => ids.take('obstacle', k) };
 const obstacles: ObstacleBase[] = slice.obstacles.map((o) => {

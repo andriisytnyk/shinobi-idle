@@ -99,7 +99,7 @@ describe('the balance report', () => {
       expect(md).toContain(heading);
     }
     // Chunin is out of reach in two hours: the target is marked with a number.
-    expect(md).toMatch(/Чунін 12–15 год \| 1\/1 \| не досягнуто за 2\.0 год/);
+    expect(md).toMatch(/Чунін 20–50 год \| 1\/1 \| не досягнуто за 2\.0 год/);
   });
 
   it('is written the same way twice', () => {
