@@ -7,12 +7,12 @@
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import { practiceView, slotTiming } from '../lib/timing.ts';
-  import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import ActionEmblem from './ActionEmblem.svelte';
-  import CloneStart from './CloneStart.svelte';
+  import StartSplit from './StartSplit.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import MasteryRing from './MasteryRing.svelte';
+  import PerformerMarks from './PerformerMarks.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
   import PinGoal from './PinGoal.svelte';
   import ReqTree from './ReqTree.svelte';
@@ -49,13 +49,6 @@
   const flash = $derived(
     view ? { timing: view.timing, from: view.phases.sealsEnd, to: view.phases.releaseEnd } : null,
   );
-
-  function toggle(): void {
-    const result = running
-      ? game.dispatch({ type: 'action.stop', slot: slotIndex })
-      : game.dispatch({ type: 'action.start', slot: 0, kind: info.kind, id: info.id });
-    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
-  }
 </script>
 
 <li
@@ -78,6 +71,7 @@
       <div class="head">
         <h3 class="name"><EntityLink kind={ref.kind} id={ref.id} /></h3>
         <span class="corner">
+          <PerformerMarks kind={info.kind} id={info.id} />
           <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
           {#if canPin(ref.kind)}<PinGoal
               kind={ref.kind}
@@ -126,10 +120,7 @@
       <TimeBar {timing} part="action-progress" />
     {/if}
     <div class="ct-actions">
-      <button type="button" class="action" class:stop={running} onclick={toggle}>
-        {t(running ? 'tile.stop' : 'tile.start')}
-      </button>
-      <CloneStart kind={info.kind} id={info.id} />
+      <StartSplit kind={info.kind} id={info.id} />
     </div>
   {:else if info.req}
     <div class="req">
@@ -219,23 +210,6 @@
     margin: 0;
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
-  }
-
-  .action {
-    min-height: var(--control-md);
-    padding: var(--space-2) var(--space-4);
-    border: var(--border-thin) solid var(--accent);
-    border-radius: var(--radius-sm);
-    background: var(--accent);
-    color: var(--ink-900);
-    font: inherit;
-    font-weight: 600;
-    cursor: pointer;
-  }
-
-  .action.stop {
-    background: none;
-    color: var(--accent);
   }
 
   .locked-label {

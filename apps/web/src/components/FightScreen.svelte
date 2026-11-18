@@ -4,6 +4,7 @@
   import Slot from '../lib/ext/Slot.svelte';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
+  import FightSwitcher from './FightSwitcher.svelte';
   import Fighter from './Fighter.svelte';
 
   const content = game.content;
@@ -40,6 +41,7 @@
 </script>
 
 {#if scene}
+  <FightSwitcher />
   {#if clone}<p class="clone-note" data-clone-fights>
       <strong>{t('combat.cloneFights')}</strong> · {t('combat.cloneNote')}
     </p>{:else if cloned}<p class="clone-note" data-clone-split>{t('combat.cloneSplit')}</p>{/if}

@@ -132,8 +132,9 @@
               <p class="ct-note">
                 Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
             <div class="ct-actions">
-              <button class="ct-action" type="button">
-                Почати
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button class="main ct-action" data-performer="0" data-start="true" type="button">
+                  Почати
           <li class="ct-tile" data-action="core:nettle" data-entity="item:core:nettle" data-herb="core:nettle" data-ui="action-tile">
             <div class="ct-top">
               <span class="emblem md" data-emblem-icon="vine-leaf" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
@@ -224,8 +225,9 @@
                 <button class="link" data-entity="item:core:nettle" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
             <div class="ct-actions">
-              <button aria-describedby="why-core:nettle" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:nettle" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:nettle">
               Рівень замалий: потрібен 5.
           <li class="ct-tile" data-action="core:hogweed" data-entity="item:core:hogweed" data-herb="core:hogweed" data-ui="action-tile">
@@ -318,8 +320,9 @@
                 <button class="link" data-entity="item:core:hogweed" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
             <div class="ct-actions">
-              <button aria-describedby="why-core:hogweed" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:hogweed" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:hogweed">
               Рівень замалий: потрібен 10.
           <li class="ct-tile" data-action="core:bloodgrass" data-entity="item:core:bloodgrass" data-herb="core:bloodgrass" data-ui="action-tile">
@@ -412,8 +415,9 @@
                 <button class="link" data-entity="item:core:bloodgrass" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
             <div class="ct-actions">
-              <button aria-describedby="why-core:bloodgrass" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:bloodgrass" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:bloodgrass">
               Рівень замалий: потрібен 15.
           <li class="ct-tile" data-action="core:poppy" data-entity="item:core:poppy" data-herb="core:poppy" data-ui="action-tile">
@@ -506,8 +510,9 @@
                 <button class="link" data-entity="item:core:poppy" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
             <div class="ct-actions">
-              <button aria-describedby="why-core:poppy" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:poppy" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:poppy">
               Рівень замалий: потрібен 20.
           <li class="ct-tile" data-action="core:ironroot" data-entity="item:core:ironroot" data-herb="core:ironroot" data-ui="action-tile">
@@ -600,8 +605,9 @@
                 <button class="link" data-entity="item:core:ironroot" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
             <div class="ct-actions">
-              <button aria-describedby="why-core:ironroot" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:ironroot" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:ironroot">
               Рівень замалий: потрібен 25.
           <li class="ct-tile" data-action="core:silvermoss" data-entity="item:core:silvermoss" data-herb="core:silvermoss" data-ui="action-tile">
@@ -694,8 +700,9 @@
                 <button class="link" data-entity="item:core:silvermoss" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
             <div class="ct-actions">
-              <button aria-describedby="why-core:silvermoss" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:silvermoss" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:silvermoss">
               Рівень замалий: потрібен 30.
           <li class="ct-tile" data-action="core:edelweiss" data-entity="item:core:edelweiss" data-herb="core:edelweiss" data-ui="action-tile">
@@ -802,8 +809,9 @@
                 <button class="link" data-entity="item:core:edelweiss" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
             <div class="ct-actions">
-              <button aria-describedby="why-core:edelweiss" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:edelweiss" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:edelweiss">
               Рівень замалий: потрібен 15.
           <li class="ct-tile" data-action="core:fireflower" data-entity="item:core:fireflower" data-herb="core:fireflower" data-ui="action-tile">
@@ -896,8 +904,9 @@
                 <button class="link" data-entity="item:core:fireflower" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
             <div class="ct-actions">
-              <button aria-describedby="why-core:fireflower" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:fireflower" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:fireflower">
               Рівень замалий: потрібен 40.
           <li class="ct-tile" data-action="core:lotus" data-entity="item:core:lotus" data-herb="core:lotus" data-ui="action-tile">
@@ -1017,8 +1026,9 @@
                 <button class="link" data-entity="item:core:lotus" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
             <div class="ct-actions">
-              <button aria-describedby="why-core:lotus" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:lotus" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:lotus">
               Рівень замалий: потрібен 30.
           <li class="ct-tile" data-action="core:shadowshroom" data-entity="item:core:shadowshroom" data-herb="core:shadowshroom" data-ui="action-tile">
@@ -1111,8 +1121,9 @@
                 <button class="link" data-entity="item:core:shadowshroom" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
             <div class="ct-actions">
-              <button aria-describedby="why-core:shadowshroom" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:shadowshroom" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:shadowshroom">
               Рівень замалий: потрібен 50.
       <section data-gear-section="" data-ui="entity-section">

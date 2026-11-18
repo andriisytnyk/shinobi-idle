@@ -16,7 +16,7 @@
   import { game } from '../lib/store.ts';
   import { currencyName, moneyOf } from '../lib/vocab.ts';
   import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
-  import CloneStart from './CloneStart.svelte';
+  import StartSplit from './StartSplit.svelte';
   import ActionEmblem from './ActionEmblem.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
@@ -74,14 +74,6 @@
   const build = (slot: number, obstacle: string) =>
     report(game.dispatch({ type: 'athletics.build', slot, obstacle }));
 
-  function toggle(): void {
-    report(
-      running
-        ? game.dispatch({ type: 'action.stop', slot: slotIndex })
-        : game.dispatch({ type: 'action.start', slot: 0, kind: COURSE_KIND, id: COURSE_ID }),
-    );
-  }
-
   const label = (slot: CourseSlotInfo, option: ObstacleOption): string =>
     t(slot.built !== null && !option.built ? 'course.replace' : 'course.build');
 </script>
@@ -126,16 +118,12 @@
       <p class="hint" data-course-empty>{t('course.empty')}</p>
     {/if}
     <div class="ct-actions">
-      <button
-        type="button"
-        class="action"
-        class:stop={running}
-        disabled={!running && !info?.available}
-        onclick={toggle}
-      >
-        {t(running ? 'tile.stop' : 'course.run')}
-      </button>
-      <CloneStart kind={COURSE_KIND} id={COURSE_ID} disabled={!info?.available} />
+      <StartSplit
+        kind={COURSE_KIND}
+        id={COURSE_ID}
+        label="course.run"
+        disabled={!info?.available}
+      />
     </div>
   </div>
 
@@ -382,11 +370,6 @@
     color: var(--ink-900);
     font: inherit;
     cursor: pointer;
-  }
-
-  .action.stop {
-    background: none;
-    color: var(--accent);
   }
 
   .action:disabled {

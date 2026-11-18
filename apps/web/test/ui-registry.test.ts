@@ -294,6 +294,7 @@ describe('the public lists', () => {
       'skill.footer',
       'action.tile',
       'now.bar',
+      'squad.row',
       'goal.panel',
       'entity.sections',
       'sidebar.skill',

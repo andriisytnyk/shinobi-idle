@@ -2,6 +2,7 @@
   import { actionRef, masteryRef } from '../lib/entities.ts';
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
+  import { hasSquad, reportSections } from '../lib/squad.ts';
   import { game } from '../lib/store.ts';
   import { currencyName, moneyOf } from '../lib/vocab.ts';
   import type { AnbuReport } from '../lib/persistence.ts';
@@ -15,6 +16,9 @@
 
   let { report, onClose }: Props = $props();
   const moneyLabel = currencyName(moneyOf(game.content));
+  /** The stops by performer; the heads show once there are clones to tell from the character. */
+  const sections = $derived(game.read((gs) => reportSections(report.stopped, gs, game.content)));
+  const heads = $derived(game.read((gs) => hasSquad(gs, game.content)));
 </script>
 
 <Modal title={t('report.title')} paper {onClose}>
@@ -80,12 +84,21 @@
 
   {#if report.stopped.length > 0}
     <h3>{t('report.stopped')}</h3>
-    <ul>
-      {#each report.stopped as stop, i (i)}
-        {@const ref = actionRef(stop)}
-        <li><EntityLink kind={ref.kind} id={ref.id} />: {t(`report.reason.${stop.reason}`)}</li>
-      {/each}
-    </ul>
+    {#each sections as section (section.n)}
+      <section data-ui="report-performer" data-performer={section.n}>
+        {#if heads}
+          <h4>{section.clone ? t('squad.clone', { n: section.n }) : t('squad.you')}</h4>
+        {/if}
+        <ul>
+          {#each section.stopped as stop, i (i)}
+            {@const ref = actionRef(stop)}
+            <li>
+              <EntityLink kind={ref.kind} id={ref.id} />: {t(`report.reason.${stop.reason}`)}
+            </li>
+          {/each}
+        </ul>
+      </section>
+    {/each}
   {/if}
 </Modal>
 
@@ -103,6 +116,12 @@
     font-family: var(--font-heading);
     font-size: var(--text-sm);
     font-weight: 400;
+  }
+
+  h4 {
+    margin: var(--space-2) 0 var(--space-1);
+    font-size: var(--text-xs);
+    font-weight: 600;
   }
 
   ul {

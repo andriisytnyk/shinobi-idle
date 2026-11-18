@@ -5,6 +5,7 @@
   import ErrorBoundary from './components/ErrorBoundary.svelte';
   import LoadErrorScreen from './components/LoadErrorScreen.svelte';
   import DevTools from './components/DevTools.svelte';
+  import DispelDialog from './components/DispelDialog.svelte';
   import GoalPanel from './components/GoalPanel.svelte';
   import FinaleModal from './components/FinaleModal.svelte';
   import GraduationModal from './components/GraduationModal.svelte';
@@ -12,6 +13,8 @@
   import MainNav from './components/MainNav.svelte';
   import NowBar from './components/NowBar.svelte';
   import ReportModal from './components/ReportModal.svelte';
+  import SquadPanel from './components/SquadPanel.svelte';
+  import SquadWatch from './components/SquadWatch.svelte';
   import SkillList from './components/SkillList.svelte';
   import TabBar from './components/TabBar.svelte';
   import ToastHost from './components/ToastHost.svelte';
@@ -27,6 +30,7 @@
   import { t } from './lib/i18n.ts';
   import { currentHash, setBeforeRoute } from './lib/router.svelte.ts';
   import { settings } from './lib/settings.svelte.ts';
+  import { hasSquad } from './lib/squad.ts';
   import { game } from './lib/store.ts';
 
   interface Props {
@@ -86,6 +90,17 @@
 
   // The meta panel starts open beside the page on wide screens and closed on phones, where it is an overlay.
   let metaOpen = $state(window.matchMedia('(min-width: 769px)').matches);
+  // The squad is a side column on a wide screen and a strip of chips above the tab bar on a phone.
+  let narrow = $state(window.matchMedia('(max-width: 768px)').matches);
+  $effect(() => {
+    const query = window.matchMedia('(max-width: 768px)');
+    const update = () => (narrow = query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  });
+  /** The squad shows once the player knows the clone technique. */
+  const squadOn = $derived(game.ready && game.read((gs) => hasSquad(gs, game.content)));
   const hash = $derived(currentHash());
 
   // Hooks for the packs: the route (the hash changed / the page is drawn) and the state (after every update).
@@ -127,7 +142,7 @@
 {:else if !game.ready}
   <div class="boot" role="status">{t('app.loading')}</div>
 {:else}
-  <div class="app" class:meta-open={metaOpen} bind:this={appEl}>
+  <div class="app" class:meta-open={metaOpen} class:squad-on={squadOn && !narrow} bind:this={appEl}>
     <div class="top" bind:this={topEl}>
       <ErrorBoundary area="top"
         ><TopBar {metaOpen} onToggleMeta={() => (metaOpen = !metaOpen)} /></ErrorBoundary
@@ -149,6 +164,10 @@
       </ErrorBoundary>
     </main>
 
+    {#if squadOn && !narrow}
+      <div class="squad"><ErrorBoundary area="squad"><SquadPanel /></ErrorBoundary></div>
+    {/if}
+
     {#if metaOpen}
       <div class="meta">
         <ErrorBoundary area="goal"><GoalPanel onClose={() => (metaOpen = false)} /></ErrorBoundary>
@@ -156,6 +175,11 @@
     {/if}
 
     <div class="now" bind:this={nowEl}><ErrorBoundary area="now"><NowBar /></ErrorBoundary></div>
+    {#if squadOn && narrow}
+      <div class="chips"><ErrorBoundary area="squad"><SquadPanel compact /></ErrorBoundary></div>
+    {/if}
+    <SquadWatch />
+    <DispelDialog />
     <ToastHost />
     <DevTools />
     {#if game.state.player.name === ''}
@@ -198,6 +222,30 @@
       'top top top'
       'side main meta'
       'now now now';
+  }
+
+  .app.squad-on {
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr) var(--squad-width);
+    grid-template-areas:
+      'top top top'
+      'side main squad'
+      'now now now';
+  }
+
+  .app.squad-on.meta-open {
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr) var(--squad-width) var(--meta-width);
+    grid-template-areas:
+      'top top top top'
+      'side main squad meta'
+      'now now now now';
+  }
+
+  .squad {
+    grid-area: squad;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow-y: auto;
   }
 
   .top {
@@ -250,15 +298,20 @@
     grid-area: tabs;
   }
 
+  .chips {
+    grid-area: chips;
+  }
+
   @media (max-width: 768px) {
     .app,
     .app.meta-open {
       grid-template-columns: minmax(0, 1fr);
-      grid-template-rows: auto minmax(0, 1fr) auto auto;
+      grid-template-rows: auto minmax(0, 1fr) auto auto auto;
       grid-template-areas:
         'top'
         'main'
         'now'
+        'chips'
         'tabs';
     }
 

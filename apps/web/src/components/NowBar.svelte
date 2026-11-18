@@ -15,6 +15,7 @@
   import { formatDuration, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { missionNow, type MissionNow } from '../lib/missions.ts';
+  import { ACTION_VERB } from '../lib/squad.ts';
   import { game } from '../lib/store.ts';
   import { practiceView, type PhaseName } from '../lib/timing.ts';
   import ActionEmblem from './ActionEmblem.svelte';
@@ -24,21 +25,7 @@
   import Icon from './Icon.svelte';
   import NowMission from './NowMission.svelte';
 
-  /** The phrase that says what each kind of action is doing; a kind without one shows its name alone. */
-  const VERB: Readonly<Record<string, string>> = {
-    gather: 'now.doing.gather',
-    craft: 'now.doing.craft',
-    drill: 'now.doing.drill',
-    meditate: 'now.doing.meditate',
-    course: 'now.doing.course',
-    explore: 'now.doing.explore',
-    walk: 'now.doing.walk',
-    autosurvey: 'now.doing.autosurvey',
-    stand: 'now.doing.stand',
-    fight: 'now.doing.fight',
-    mission: 'now.doing.mission',
-    senseiTest: 'now.doing.exam',
-  };
+  const VERB = ACTION_VERB;
 
   /** The phase of a practice, by its phase name. */
   const PHASE_KEY: Readonly<Record<PhaseName, string>> = {

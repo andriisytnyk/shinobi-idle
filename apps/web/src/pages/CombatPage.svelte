@@ -11,7 +11,6 @@
   } from '@shinobi/core';
   import BattleReport from '../components/BattleReport.svelte';
   import BingoBook from '../components/BingoBook.svelte';
-  import CloneStart from '../components/CloneStart.svelte';
   import CombatLog from '../components/CombatLog.svelte';
   import FightScreen from '../components/FightScreen.svelte';
   import Hint from '../components/Hint.svelte';
@@ -19,6 +18,7 @@
   import EntityLink from '../components/EntityLink.svelte';
   import PrepScreen from '../components/PrepScreen.svelte';
   import RaidPanel from '../components/RaidPanel.svelte';
+  import StartSplit from '../components/StartSplit.svelte';
   import ZoneWhere from '../components/ZoneWhere.svelte';
   import { formatInt } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
@@ -76,8 +76,6 @@
   /** Whether a clone exists: the character's chakra pool is divided then. */
   const cloned = $derived(game.read((gs: GameState) => cloneCount(gs, content) > 0));
 
-  const start = (kind: 'fight' | 'operation', id: string) =>
-    void game.dispatch({ type: 'action.start', slot: 0, kind, id });
   const prepareHref = (kind: PrepTarget['kind'], id: string) => `#/combat/prepare/${kind}/${id}`;
   const opName = (id: string) => (hasKey(`operation.${id}.name`) ? t(`operation.${id}.name`) : id);
 </script>
@@ -145,10 +143,7 @@
           </div>
           <div class="buttons">
             <a class="prepare" href={prepareHref('zone', zone.id)}>{t('combat.prepare')}</a>
-            <button type="button" class="start" onclick={() => start('fight', zone.id)}
-              >{t('combat.start')}</button
-            >
-            <CloneStart kind="fight" id={zone.id} />
+            <StartSplit kind="fight" id={zone.id} label="combat.start" />
           </div>
         </li>
       {/each}
@@ -172,14 +167,13 @@
             </div>
             <div class="buttons">
               <a class="prepare" href={prepareHref('zone', zone.id)}>{t('combat.prepare')}</a>
-              <button
-                type="button"
-                class="start"
+              <StartSplit
+                kind="fight"
+                id={zone.id}
+                label="combat.zoneStart"
                 disabled={!zone.available}
-                aria-describedby={zone.available ? undefined : `why-zone-${zone.id}`}
-                onclick={() => start('fight', zone.id)}>{t('combat.zoneStart')}</button
-              >
-              <CloneStart kind="fight" id={zone.id} disabled={!zone.available} />
+                describedBy={zone.available ? undefined : `why-zone-${zone.id}`}
+              />
             </div>
           </li>
         {/each}
@@ -195,10 +189,7 @@
             <div class="info"><p class="name">{opName(op.id)}</p></div>
             <div class="buttons">
               <a class="prepare" href={prepareHref('operation', op.id)}>{t('combat.prepare')}</a>
-              <button type="button" class="start" onclick={() => start('operation', op.id)}
-                >{t('combat.start')}</button
-              >
-              <CloneStart kind="operation" id={op.id} />
+              <StartSplit kind="operation" id={op.id} label="combat.start" />
             </div>
           </li>
         {/each}
@@ -275,14 +266,6 @@
     font-size: var(--text-xs);
   }
 
-  .start:disabled {
-    border-color: var(--line);
-    background: var(--surface-raised);
-    color: var(--fg-dim);
-    cursor: not-allowed;
-  }
-
-  .start,
   .prepare {
     display: inline-flex;
     align-items: center;

@@ -46,6 +46,13 @@ function cloner(): GameState {
   return state;
 }
 
+/** Opens the menu of the split start button inside `scope` and returns its «Новий клон для цієї дії» item. */
+function newCloneItem(scope: Element | null | undefined): HTMLButtonElement | null {
+  scope?.querySelector<HTMLButtonElement>('[data-ui="start-split"] .chevron')?.click();
+  flushSync();
+  return scope?.querySelector<HTMLButtonElement>('[data-ui="clone-start"]') ?? null;
+}
+
 const drill = () => content.exercises.find((e) => e.level <= 20)?.id ?? '';
 const start = (state: GameState, slot: number, kind: string, id: string) =>
   dispatch(state, { type: 'action.start', slot, kind, id }, content);
@@ -96,21 +103,21 @@ describe('the clone in the Now bar', () => {
 });
 
 describe('the clone on a skill page', () => {
-  it('offers «Клоном» next to «Почати» only once the clone exists, and starts the action in its slot', async () => {
+  it('offers «Новий клон для цієї дії» in the start menu only once the clone is known, and starts the action in its slot', async () => {
     const before = player({ natures: ['katon'], base: 20 });
     booted = await bootApp([coreUi], before, '#/skill/herb');
-    expect(qa('[data-ui="clone-start"]').length).toBe(0);
+    expect(qa('[data-ui="start-split"] .chevron').length).toBe(0);
     booted.destroy();
 
     booted = await bootApp([coreUi], cloner(), '#/skill/herb');
     const mint = q('[data-herb="core:mint"]');
-    const button = mint?.querySelector<HTMLButtonElement>('[data-ui="clone-start"]');
-    expect(button?.textContent?.trim()).toBe(t('tile.clone'));
+    const button = newCloneItem(mint);
+    expect(button?.textContent?.trim()).toBe(t('squad.menu.newClone'));
     button?.click();
     flushSync();
     expect(game.state.slots[1]?.action).toEqual({ kind: 'gather', id: 'core:mint' });
     expect(game.state.slots[0]?.action).toBeNull();
-    // It runs now, so the tile offers «Зупинити» and no second start.
+    // It runs now, so the tile's button stops it and the menu is shut.
     expect(q('[data-herb="core:mint"]')?.querySelector('[data-ui="clone-start"]')).toBeNull();
   });
 
@@ -139,14 +146,11 @@ describe('the clone on the mission board', () => {
     const state = cloner();
     booted = await bootApp([coreUi], state, '#/missions');
     const card = (id: string) => q(`[data-ui="mission-card"][data-mission="${id}"]`);
-    const fightButton = card(fight?.id ?? '')?.querySelector<HTMLButtonElement>(
-      '[data-ui="clone-start"]',
-    );
+    const fightButton = newCloneItem(card(fight?.id ?? ''));
     // No refusal for the clone: the fight is free, so the button is there and the old reason is gone.
     expect(card(fight?.id ?? '')?.querySelector('[data-clone-why]')).toBeNull();
     expect(fightButton).not.toBeNull();
-    const button =
-      card('core:v_clones')?.querySelector<HTMLButtonElement>('[data-ui="clone-start"]');
+    const button = newCloneItem(card('core:v_clones'));
     expect(button?.disabled).toBe(false);
     button?.click();
     flushSync();
@@ -156,14 +160,14 @@ describe('the clone on the mission board', () => {
     );
   });
 
-  it('has no «Клоном» before the player has a clone', async () => {
+  it('has no performer menu before the player has a clone', async () => {
     booted = await bootApp([coreUi], player({ natures: ['katon'], base: 5 }), '#/missions');
-    expect(qa('[data-ui="clone-start"]').length).toBe(0);
+    expect(qa('[data-ui="start-split"] .chevron').length).toBe(0);
   });
 
-  it('puts «Клоном» on the mission page too', async () => {
+  it('puts the performer menu on the mission page too', async () => {
     booted = await bootApp([coreUi], cloner(), '#/mission/core:v_clones');
-    const button = q('[data-mission-actions] [data-ui="clone-start"]') as HTMLButtonElement | null;
+    const button = newCloneItem(q('[data-mission-actions]'));
     expect(button?.disabled).toBe(false);
     button?.click();
     flushSync();
@@ -172,10 +176,10 @@ describe('the clone on the mission board', () => {
 });
 
 describe('the clone fights', () => {
-  it('has «Клоном» on the combat page, starts a zone fight in the clone slot and shows who fights', async () => {
+  it('has «Новий клон для цієї дії» on the combat page, starts a zone fight in the clone slot and shows who fights', async () => {
     const state = cloner();
     booted = await bootApp([coreUi], state, '#/combat');
-    const enemy = q('[data-enemy] [data-ui="clone-start"]') as HTMLButtonElement | null;
+    const enemy = newCloneItem(q('[data-enemy]'));
     expect(enemy).not.toBeNull();
     enemy?.click();
     flushSync();

@@ -97,8 +97,9 @@
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <button aria-describedby="why-core:cat" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:cat" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
           <li class="ct-tile card" data-entity="mission:core:weed" data-mission="core:weed" data-state="startable" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -148,8 +149,9 @@
                     <a class="entity-link" href="#/item/core:rice">
                       Рис
                     ×6
-            <button class="ct-action" data-start="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button class="main ct-action" data-performer="0" data-start="true" type="button">
+                Почати
           <li class="ct-tile card" data-entity="mission:core:fire" data-mission="core:fire" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -223,8 +225,9 @@
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <button aria-describedby="why-core:fire" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:fire" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
           <li class="ct-tile card" data-entity="mission:core:drought" data-mission="core:drought" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -298,8 +301,9 @@
                   <span class="fill" style="width: 5%;">
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
-            <button aria-describedby="why-core:drought" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:drought" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
           <li class="ct-tile card" data-entity="mission:core:courier" data-mission="core:courier" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -357,8 +361,9 @@
                   <span class="fill" style="width: 20%;">
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
-            <button aria-describedby="why-core:courier" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:courier" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
           <li class="ct-tile card" data-entity="mission:core:rockfall" data-mission="core:rockfall" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -424,8 +429,9 @@
                   <span class="fill" style="width: 3.3333333333333335%;">
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
-            <button aria-describedby="why-core:rockfall" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:rockfall" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
           <li class="ct-tile card" data-entity="mission:core:thief" data-mission="core:thief" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -490,8 +496,9 @@
                   <span class="fill" style="width: 5%;">
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
-            <button aria-describedby="why-core:thief" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:thief" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
       <section class="group" data-open="false" data-rank="C">
         <header class="group-head">
           <span aria-label="Ранг C" class="stamp" role="img" style="--stamp: var(--rank-c, var(--accent));">
@@ -582,8 +589,9 @@
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <button aria-describedby="why-core:caravan" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:caravan" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
           <li class="ct-tile card closed" data-entity="mission:core:sealed" data-mission="core:sealed" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -634,8 +642,9 @@
                   Дозвіл Хокаґе на місії рангу C
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
-            <button aria-describedby="why-core:sealed" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:sealed" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
           <li class="ct-tile card closed" data-entity="mission:core:mail" data-mission="core:mail" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -692,8 +701,9 @@
                   Дозвіл Хокаґе на місії рангу C
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
-            <button aria-describedby="why-core:mail" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:mail" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
           <li class="ct-tile card closed" data-entity="mission:core:well" data-mission="core:well" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -760,8 +770,9 @@
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <button aria-describedby="why-core:well" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:well" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
           <li class="ct-tile card closed" data-entity="mission:core:dig" data-mission="core:dig" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -829,8 +840,9 @@
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <button aria-describedby="why-core:dig" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:dig" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
       <section class="group" data-open="true" data-rank="V">
         <header class="group-head">
           <span aria-label="Місії села" class="stamp" role="img" style="--stamp: var(--rank-v, var(--accent));">
@@ -908,8 +920,9 @@
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <button aria-describedby="why-core:v_spar" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:v_spar" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
           <li class="ct-tile card" data-entity="mission:core:v_walls" data-mission="core:v_walls" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -973,8 +986,9 @@
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <button aria-describedby="why-core:v_walls" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:v_walls" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
           <li class="ct-tile card" data-entity="mission:core:v_fence" data-mission="core:v_fence" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -1038,8 +1052,9 @@
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <button aria-describedby="why-core:v_fence" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:v_fence" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
           <li class="ct-tile card" data-entity="mission:core:v_clear" data-mission="core:v_clear" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -1103,8 +1118,9 @@
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <button aria-describedby="why-core:v_clear" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:v_clear" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
           <li class="ct-tile card" data-entity="mission:core:v_water" data-mission="core:v_water" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -1172,8 +1188,9 @@
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <button aria-describedby="why-core:v_water" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:v_water" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
           <li class="ct-tile card" data-entity="mission:core:v_sanit" data-mission="core:v_sanit" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -1237,8 +1254,9 @@
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <button aria-describedby="why-core:v_sanit" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:v_sanit" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
           <li class="ct-tile card" data-entity="mission:core:v_rubble" data-mission="core:v_rubble" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -1306,8 +1324,9 @@
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <button aria-describedby="why-core:v_rubble" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:v_rubble" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
           <li class="ct-tile card" data-entity="mission:core:v_clones" data-mission="core:v_clones" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -1371,8 +1390,9 @@
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <button aria-describedby="why-core:v_clones" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:v_clones" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати
           <li class="ct-tile card" data-entity="mission:core:v_seal" data-mission="core:v_seal" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -1436,5 +1456,6 @@
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <button aria-describedby="why-core:v_seal" class="ct-action" data-start="" disabled="" type="button">
-              Почати
+            <span class="split plain" data-for="mission" data-ui="start-split">
+              <button aria-describedby="why-core:v_seal" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Почати

@@ -3,6 +3,7 @@
   import { autoState } from '../lib/hex-map.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
+  import StartSplit from './StartSplit.svelte';
 
   const content = game.content;
 
@@ -15,8 +16,6 @@
 
   const data = $derived(game.read((gs) => autoState(gs, content)));
 
-  const start = () =>
-    void game.dispatch({ type: 'action.start', slot: 0, kind: AUTOSURVEY_KIND, id: AUTOSURVEY_ID });
   const stop = () => void game.dispatch({ type: 'action.stop', slot: data.slot });
 </script>
 
@@ -25,16 +24,14 @@
     {t('map.act.autoStop')}
   </button>
 {:else}
-  <button
-    type="button"
-    class="action"
-    data-auto
+  <StartSplit
+    kind={AUTOSURVEY_KIND}
+    id={AUTOSURVEY_ID}
+    label="map.act.auto"
     disabled={data.why !== null}
-    aria-describedby={data.why ? whyId : undefined}
-    onclick={start}
-  >
-    {t('map.act.auto')}
-  </button>
+    describedBy={data.why ? whyId : undefined}
+    mark="auto"
+  />
 {/if}
 
 <style>
@@ -53,12 +50,5 @@
   .action.stop {
     background: var(--surface-raised);
     color: var(--fg);
-  }
-
-  .action:disabled {
-    border-color: var(--line);
-    background: var(--surface-raised);
-    color: var(--fg-dim);
-    cursor: not-allowed;
   }
 </style>
