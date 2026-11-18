@@ -44,13 +44,10 @@ describe('A10: regular enemies at the level of the player', () => {
 
   for (const { enemy, byNature } of results) {
     for (const { nature, r } of byNature) {
-      it(
-        `${enemy.id.replace('core:', '')} (${nature}): wins at least 85% in at most 60 s`,
-        () => {
-          expect(r.winRate).toBeGreaterThanOrEqual(0.85);
-          expect(r.timeMs.mean / 1000).toBeLessThanOrEqual(60);
-        },
-      );
+      it(`${enemy.id.replace('core:', '')} (${nature}): wins at least 85% in at most 60 s`, () => {
+        expect(r.winRate).toBeGreaterThanOrEqual(0.85);
+        expect(r.timeMs.mean / 1000).toBeLessThanOrEqual(60);
+      });
     }
   }
 });

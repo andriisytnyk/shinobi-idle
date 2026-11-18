@@ -108,6 +108,7 @@ describe('technique combat data', () => {
         'hp',
         'masteryStep',
         'max',
+        'fatigueShare',
         'passShare',
         'share',
         'threat',

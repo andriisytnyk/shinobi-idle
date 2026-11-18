@@ -4,7 +4,7 @@
  */
 import { content } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
-import { advance, dealDamage, defaultRules, makeCtx } from '../src/index.ts';
+import { advance, dealDamage, defaultRules, dispatch, growSlots, makeCtx } from '../src/index.ts';
 import { fighter, run, startFight } from './prep-state.ts';
 
 const CLONE = 'core:shadow_clone';
@@ -85,5 +85,26 @@ describe('each body earns by its own actions, and hands it over once', () => {
     run20(state);
     run20(state);
     expect(state.combat?.style).toBe(state.combat?.fight.tally.style);
+  });
+});
+
+describe('the allies of a clone performer', () => {
+  it("hold their own XP and hand it to the clone's held knowledge, not to the character", () => {
+    const state = fighter(1, 40);
+    state.known[CLONE] = true;
+    state.mastery[CLONE] = { xp: 0 } as never;
+    growSlots(state, content);
+    expect(dispatch(state, { type: 'clone.create', items: {} }, content).ok).toBe(true);
+    const before = total(state);
+    expect(startFight(state, 'core:zone_foreign_genin', 1)).toEqual({ ok: true });
+    let bodies = 0;
+    for (let i = 0; i < 30; i++) {
+      advance(state, 1000, content);
+      bodies = Math.max(bodies, state.clones[1]?.fight?.fight.allies?.length ?? 0);
+    }
+    expect(bodies).toBeGreaterThan(0);
+    // What the clone and its bodies earned waits in the clone; the character's skills have not moved.
+    expect(total(state)).toBe(before);
+    expect(sum(state.clones[1]?.fight?.pending?.xp)).toBeGreaterThan(0);
   });
 });

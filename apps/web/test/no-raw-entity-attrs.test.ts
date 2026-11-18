@@ -20,34 +20,44 @@ function svelteFiles(dir: string): string[] {
   });
 }
 
-const ATTR = /(?<![\w:-])(data-[\w-]+|id|for|href|aria-[\w-]+)=(?:"([^"]*\{[^"]*)"|\{([^}]*)\})/g;
+// An expression in braces may hold a template literal with its own `${...}`: one level of nested braces is read.
+const BRACED = String.raw`\{((?:[^{}]|\{[^{}]*\})*)\}`;
+const ATTR = new RegExp(
+  String.raw`(?<![\w:-])(data-[\w-]+|id|for|href|aria-[\w-]+)=(?:"([^"]*\{[^"]*)"|${BRACED})`,
+  'g',
+);
 /** What an expression has to mention to count as the id of an entity. */
 const IDISH =
   /\.id\b|\.item\b|\.ref\b|\bid\b|\bitem\b|\bgood\b|\bkey\b|\bregion\b|\bzone\b|\bmission\b|\benemy\b/;
 const SAFE = /entityAttr\(|idAttr\(|hrefFor\(|\bt\(/;
-const TAG = /<([a-z][\w:-]*)((?:"[^"]*"|'[^']*'|\{[^}]*\}|[^>"'{}])*)>/g;
+const TAG = new RegExp(String.raw`<([a-z][\w:-]*)((?:"[^"]*"|'[^']*'|${BRACED}|[^>"'{}])*)>`, 'g');
 
 interface Hit {
   where: string;
   attr: string;
 }
 
-function hits(): Hit[] {
-  const out: Hit[] = [];
-  for (const file of svelteFiles(SRC)) {
-    const source = readFileSync(file, 'utf8').replace(/<style[\s\S]*?<\/style>/g, '');
-    for (const tag of source.matchAll(TAG)) {
-      for (const m of (tag[2] ?? '').matchAll(ATTR)) {
-        const expr = m[2] ?? m[3] ?? '';
-        if (SAFE.test(expr) || !IDISH.test(expr)) continue;
-        out.push({
-          where: `${relative(SRC, file).replaceAll('\\', '/')} <${tag[1]}>`,
-          attr: `${m[1]}=${m[0].slice((m[1] ?? '').length + 1)}`,
-        });
-      }
+/** The attributes of one source that are built from an id without a reveal helper. */
+function scan(raw: string): { tag: string; attr: string }[] {
+  const out: { tag: string; attr: string }[] = [];
+  const source = raw.replace(/<style[\s\S]*?<\/style>/g, '');
+  for (const tag of source.matchAll(TAG)) {
+    for (const m of (tag[2] ?? '').matchAll(ATTR)) {
+      const expr = m[2] ?? m[3] ?? '';
+      if (SAFE.test(expr) || !IDISH.test(expr)) continue;
+      out.push({ tag: tag[1] ?? '', attr: `${m[1]}=${m[0].slice((m[1] ?? '').length + 1)}` });
     }
   }
   return out;
+}
+
+function hits(): Hit[] {
+  return svelteFiles(SRC).flatMap((file) =>
+    scan(readFileSync(file, 'utf8')).map((h) => ({
+      where: `${relative(SRC, file).replaceAll('\\', '/')} <${h.tag}>`,
+      attr: h.attr,
+    })),
+  );
 }
 
 /** Files whose raw ids are fine, and why: the entity cannot be hidden where the id is written. */
@@ -61,6 +71,8 @@ const ALLOWED: Record<string, string> = {
     'the cell and its points come from the hex view, which names them only once the hex is surveyed; a place is a hex fact, not an entity',
   'components/ZoneWhere.svelte': 'a zone is listed only when its cell is explored',
   'components/CoursePanel.svelte': 'obstacles: always shown',
+  'components/Fighter.svelte': 'a flag of the fight (is the enemy aimed at), not an id',
+  'components/ReqTree.svelte': 'the id is written only when the entity is shown (nameShown)',
   'components/Hint.svelte': 'a hint id is a text id, not an entity',
   'pages/HelpPage.svelte': 'a hint id is a text id, not an entity',
   'components/MainNav.svelte': 'navigation items, not entities',
@@ -110,6 +122,13 @@ const ALLOWED: Record<string, string> = {
 };
 
 describe('attributes built from an entity id go through the reveal helpers (R1)', () => {
+  it('sees an id inside a template literal, and lets the helpers through', () => {
+    expect(scan('<li data-entity={`item:${id}`}>')).toHaveLength(1);
+    expect(scan('<li data-entity={`item:${row.id}`} class="x">')).toHaveLength(1);
+    expect(scan('<li data-entity={entityAttr({ kind: "item", id })}>')).toHaveLength(0);
+    expect(scan('<li data-entity={`item:${entityAttr(x)}`}>')).toHaveLength(0);
+  });
+
   it('writes no raw id into an attribute of an HTML element, apart from the listed files', () => {
     const raw = hits().filter((h) => !Object.hasOwn(ALLOWED, h.where.split(' ')[0] ?? ''));
     expect(raw.map((h) => `${h.where}  ${h.attr}`)).toEqual([]);

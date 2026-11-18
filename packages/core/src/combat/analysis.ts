@@ -19,7 +19,7 @@ import type { Rules } from '../rules.ts';
 import { deserialize, serialize } from '../save.ts';
 import { scrollOf } from '../scrolls.ts';
 import { buyPrice } from '../shop.ts';
-import { SHARE_FULL, type GameState } from '../state.ts';
+import { LIFE_FULL, SHARE_FULL, type GameState } from '../state.ts';
 import { bingoLevel, dropShown, isFirstWin, revealAt } from './bingo.ts';
 import { voidCount } from './fight-guard.ts';
 import { figure, need } from './need.ts';
@@ -31,7 +31,8 @@ import { itemAnswers } from './fight-items.ts';
 import { answersTrait, planTarget } from './loadout.ts';
 import { secMs, type PlayerSnapshot } from './numbers.ts';
 import { snapshotPlayer } from './snapshot.ts';
-import { FIGHT_KIND, OPERATION_KIND, isCombatKind } from './system.ts';
+import { FIGHT_KIND, MISSION_KIND, OPERATION_KIND, isCombatKind } from './system.ts';
+import { STAND_ID, STAND_KIND } from '../performer.ts';
 import { approachMs, entryOf, fightTarget, opSteps } from './zones.ts';
 
 /** What a battle analysis is asked about: a fight zone, a boss (its id or its zone's), or an operation. */
@@ -844,16 +845,31 @@ function openSession(
   clone.events = [];
   clone.report = {};
   clone.combat = null;
-  // The target takes the slot the fight is in, or the first free one that may fight (never a clone's);
+  // The clones that exist stay (they divide the chakra pool, and their bag is theirs), but they keep no
+  // fight and live as long as it takes: a forecast is about one fight.
+  for (const body of Object.values(clone.clones)) {
+    body.fight = null;
+    body.life = LIFE_FULL;
+    delete body.doomed;
+  }
+  clone.fatigue = 0;
+  // The target takes the slot of the character's fight, or the first free slot of the character's;
   // the other slots go on as they are.
-  const running = clone.slots.findIndex((s) => s.action !== null && isCombatKind(s.action.kind));
-  const free = clone.slots.findIndex(
-    (s, i) => s.action === null && !isCloneSlot(clone, content, i),
+  const holds = (i: number): boolean => {
+    const kind = clone.slots[i]?.action?.kind;
+    return kind !== undefined && (isCombatKind(kind) || kind === MISSION_KIND);
+  };
+  // The forecast is the character's: a clone's slot is never the target's, and a fight that a clone fights is cleared.
+  const mine = (i: number): boolean => !isCloneSlot(clone, content, i);
+  const running = clone.slots.findIndex(
+    (s, i) => mine(i) && s.action !== null && isCombatKind(s.action.kind),
   );
+  const free = clone.slots.findIndex((s, i) => mine(i) && s.action === null);
   const at = running >= 0 ? running : free >= 0 ? free : 0;
   for (const [i, slot] of clone.slots.entries()) {
-    if (i === at || (slot.action !== null && isCombatKind(slot.action.kind))) {
-      slot.action = null;
+    if (i === at || holds(i)) {
+      // A clone that is left stands; a slot of the character is idle.
+      slot.action = i > 0 && clone.clones[i] ? { kind: STAND_KIND, id: STAND_ID } : null;
       slot.progress = 0;
       slot.data = null;
     }

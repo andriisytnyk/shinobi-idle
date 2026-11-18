@@ -188,6 +188,7 @@ export const BALANCE_EXT = {
       casts: 1,
       xpShare: 1,
       passShare: 1,
+      fatigueShare: 1,
     },
   },
   /**

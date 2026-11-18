@@ -234,12 +234,13 @@ describe('a game composed with the test pack', () => {
       'action',
       'points',
       'combat',
+      'clone',
       'wound',
       'village',
       'quest',
       'testmod:tokens',
     ]);
-    expect(plainRules.systems).toHaveLength(6);
+    expect(plainRules.systems).toHaveLength(7);
   });
 
   it('applies modifiers keyed by the skill of the pack, with their sources', () => {

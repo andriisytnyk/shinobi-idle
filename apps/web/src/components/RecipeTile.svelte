@@ -33,11 +33,13 @@
     ),
   );
   const running = $derived(slotIndex >= 0);
+  /** Whether the character itself runs it: the tile's own button is the character's, whatever a clone does. */
+  const mine = $derived(slotIndex === 0);
   const timing = $derived(game.read((gs) => slotTiming(gs, slotIndex, info.intervalMs)));
   const block = $derived(info.available ? null : blockOf(info.req));
 
   function toggle(): void {
-    const result = running
+    const result = mine
       ? game.dispatch({ type: 'action.stop', slot: slotIndex })
       : game.dispatch({ type: 'action.start', slot: 0, kind: info.kind, id: info.id });
     if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
@@ -140,16 +142,16 @@
     <button
       type="button"
       class="ct-action"
-      class:stop={running}
-      disabled={!info.available && !running}
-      aria-describedby={block && !running ? `why-${info.id}` : undefined}
+      class:stop={mine}
+      disabled={!info.available && !mine}
+      aria-describedby={block && !mine ? `why-${info.id}` : undefined}
       onclick={toggle}
     >
-      {t(running ? 'tile.stop' : 'tile.start')}
+      {t(mine ? 'tile.stop' : 'tile.start')}
     </button>
     <CloneStart kind={info.kind} id={info.id} disabled={!info.available} />
   </div>
-  {#if block && !running}
+  {#if block && !mine}
     <p class="ct-why" id="why-{info.id}" data-why={block.kind}>{blockText(block)}</p>
     {#if info.req && block.kind !== 'missing'}
       <div class="req">

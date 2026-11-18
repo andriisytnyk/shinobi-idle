@@ -11,7 +11,7 @@ import { xpShareOf } from './allies.ts';
 import { alliesOf, heldOf } from './fight.ts';
 import { raidFlag } from '../raid.ts';
 import { ensurePouch, refillPouch } from './pouch.ts';
-import { fightBusyReason, newCombat, newOperation } from './system.ts';
+import { newCombat, newOperation } from './system.ts';
 import { entryOf, fightTarget, zoneBlocked, zoneRequirement } from './zones.ts';
 
 /** Combat XP of one tick against the enemy being fought. Combat XP is paid by time, at the fight's own (full) speed, whoever fights. */
@@ -54,15 +54,14 @@ export const fightKind: ActionKind = {
     const zone = indexOf(content).zones.get(id) ?? indexOf(content).zoneByEnemy.get(id);
     return zone ? zoneRequirement(zone) : null;
   },
-  blocked(state, id, content, _rules, slot) {
-    const busy = fightBusyReason(state, slot, content);
-    if (busy) return busy;
+  // A raid is one fight: one performer fights it at a time.
+  unique: (id, content) => indexOf(content).raids.has(id),
+  blocked(state, id, content) {
     // A region zone is fought only once its cell has been explored.
     const zone = indexOf(content).zones.get(id) ?? indexOf(content).zoneByEnemy.get(id);
     return zone ? zoneBlocked(state, zone, content) : null;
   },
   intervalMs: (_state, _id, content) => content.balance.K.combat.xpTickMs,
-  fullSpeed: true,
 
   complete(state, id, content, rules) {
     payTick(state, fightTarget(content, id)?.enemy.id ?? id, content, rules);
@@ -94,9 +93,7 @@ export const operationKind: ActionKind = {
   has: (id, content) => indexOf(content).operations.has(id),
   requirements: (_state, id, content): Req | null =>
     indexOf(content).operations.get(id)?.unlock ?? null,
-  blocked: (state, _id, content, _rules, slot) => fightBusyReason(state, slot, content),
   intervalMs: (_state, _id, content) => content.balance.K.combat.xpTickMs,
-  fullSpeed: true,
 
   complete(state, id, content, rules) {
     payTick(state, id, content, rules);

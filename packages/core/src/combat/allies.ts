@@ -11,4 +11,5 @@ const rowOf = (content: ContentDb): Record<string, number> =>
   {};
 
 export const xpShareOf = (content: ContentDb): number => rowOf(content).xpShare ?? 1;
+export const fatigueShareOf = (content: ContentDb): number => rowOf(content).fatigueShare ?? 1;
 export const passShareOf = (content: ContentDb): number => rowOf(content).passShare ?? 1;

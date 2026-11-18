@@ -218,10 +218,10 @@ describe('the fight in person', () => {
     growSlots(s, content);
     expect(s.slots).toHaveLength(2);
     expect(startFight(s, RAID, 1)).toEqual({ ok: true });
-    expect(startFight(s, RAID, 0)).toEqual({ ok: false, reason: 'error.fightBusy' });
+    expect(startFight(s, RAID, 0)).toEqual({ ok: false, reason: 'error.sameActionElsewhere' });
     for (let i = 0; i < 200 && info(s).phase !== 'over'; i++) advance(s, 30_000, content);
     expect(info(s)).toMatchObject({ phase: 'over', repelled: raid.packs });
-    expect(s.slots[1]?.action).toBeNull();
+    expect(s.slots[1]?.action).toEqual({ kind: 'stand', id: 'here' });
   });
 });
 

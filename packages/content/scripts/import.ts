@@ -189,7 +189,13 @@ const skills: Skill[] = SKILL_IDS.map((id) => {
   const unlockReq: Skill['unlockReq'] = open
     ? null
     : fight
-      ? { t: 'any', of: [{ t: 'flag', id: FIRST_FIGHT_FLAG }, { t: 'rank', rank: 'genin' }] }
+      ? {
+          t: 'any',
+          of: [
+            { t: 'flag', id: FIRST_FIGHT_FLAG },
+            { t: 'rank', rank: 'genin' },
+          ],
+        }
       : (NATURE_IDS as readonly string[]).includes(id)
         ? { t: 'nature', nature: id as NatureId }
         : { t: 'rank', rank: 'genin' };
@@ -289,8 +295,16 @@ const exercises: Exercise[] = slice.exercises.map((e) => {
 const VIT_DRILLS: { level: number; uk: string; note: string }[] = [
   { level: 1, uk: 'Біг із тягарем', note: 'Мішок із піском на плечах і коло навколо двору.' },
   { level: 15, uk: 'Віджимання на кулаках', note: 'Кулаки на камінні: біль вчить тіло терпіти.' },
-  { level: 30, uk: 'Стійка під водоспадом', note: "Крижана вода б'є по плечах, доки не потемніє в очах." },
-  { level: 45, uk: 'Загартування ударами', note: "Напарник б'є дерев'яним мечем, а ти не відступаєш." },
+  {
+    level: 30,
+    uk: 'Стійка під водоспадом',
+    note: "Крижана вода б'є по плечах, доки не потемніє в очах.",
+  },
+  {
+    level: 45,
+    uk: 'Загартування ударами',
+    note: "Напарник б'є дерев'яним мечем, а ти не відступаєш.",
+  },
 ];
 for (const d of VIT_DRILLS) {
   const id = core(exerciseSlugs.take(d.uk));
@@ -302,7 +316,11 @@ for (const d of VIT_DRILLS) {
     level: d.level,
     skill: 'vit',
     cycle,
-    xp: xpOfCycle(d.level, cycle, need((P.combatXp as unknown as { vit: number }).vit, 'combatXp.vit')),
+    xp: xpOfCycle(
+      d.level,
+      cycle,
+      need((P.combatXp as unknown as { vit: number }).vit, 'combatXp.vit'),
+    ),
   });
 }
 

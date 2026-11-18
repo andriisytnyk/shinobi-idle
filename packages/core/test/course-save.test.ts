@@ -47,7 +47,7 @@ describe('A8: determinism and split-invariance', () => {
       advance(whole, WINDOW, content);
       expect(whole.counters['actions.course']).toBeGreaterThan(5);
       if (shared) expect(whole.counters['actions.meditate']).toBeGreaterThan(10);
-      expect(whole.slots[0]?.share).toBe(shared ? 500 : 1000);
+      expect(whole.slots[0]?.share).toBe(1000);
       const expected = serialize(whole);
       for (const chunk of [1, 7, 999, 3600]) {
         const split = scene(5, shared);
