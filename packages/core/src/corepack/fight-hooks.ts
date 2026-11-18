@@ -144,13 +144,13 @@ const caster: FightHook = {
       c.data['caster.cast'] = 1;
       timer.need = needOf(n.cast);
     } else {
-      const landed = heavyBlow(ctx, c, c.damage * n.mult);
+      const struck = heavyBlow(ctx, c, c.damage * n.mult);
       c.data['caster.cast'] = 0;
       timer.need = needOf(n.every);
-      // A heavy cast of a boss stuns whoever it lands on.
-      if (landed && n.stun > 0) {
+      // A heavy cast of a boss stuns whoever it lands on, unless the blow felled it (a fallen body keeps no effects).
+      if (struck !== null && struck.hp > 0 && n.stun > 0) {
         // The stun is the stun of the data, for the boss's own time, without the report or a cancelled cast.
-        applyStatusById(ctx, ctx.fight.player, 'stun', 'special:heavyCast', {
+        applyStatusById(ctx, struck, 'stun', 'special:heavyCast', {
           durationMs: n.stun,
           refresh: 'replace',
           silent: true,

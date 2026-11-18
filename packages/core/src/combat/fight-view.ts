@@ -1,5 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
-import { evasionAgainst, makeCtx, speed } from './fight.ts';
+import { alliesOf, evasionAgainst, makeCtx, speed } from './fight.ts';
 import type { Combatant, FightAct, FightRules, FightState, LastAct } from './fight-types.ts';
 import { KNOWLEDGE_MAX, knowledgeTerm, partsAgainst, type EvasionPart } from './numbers.ts';
 import { WORK_PER_MS } from './units.ts';
@@ -19,6 +19,8 @@ export interface LastActStatus extends Omit<LastAct, 'at'> {
 export interface CombatantStatus {
   id: string;
   side: 'player' | 'enemy';
+  /** For an ally of the player's side: its number in the fight; absent for the character and for enemies. */
+  ally?: number;
   /** `wait` (waiting for the moment), `act` (doing something) or `rest` (the player catching its breath). */
   phase: Combatant['phase'];
   /** The effect (a stun, a bind) or hook that stops the phase's clock now; null while it runs. */
@@ -54,6 +56,7 @@ export function combatantStatus(
   return {
     id: c.id,
     side: c.side,
+    ...(c.ally === undefined ? {} : { ally: c.ally.n }),
     phase: c.phase,
     suspendedBy: rate > 0 ? null : (stopper?.id ?? 'hook'),
     action: c.act === null ? null : { ...c.act },
@@ -71,6 +74,7 @@ export function combatantStatus(
             combos: [...c.last.combos],
             atMs: Math.floor(c.last.at / WORK_PER_MS),
             avoidedBy: c.last.avoidedBy,
+            ...(c.last.target === undefined ? {} : { target: c.last.target }),
           },
     ...(c === fight.player ? { evasion: evasionView(fight, content, rules) } : {}),
   };
@@ -109,14 +113,17 @@ function evasionView(
   return { total, parts };
 }
 
-/** The status of the player and of every living enemy. */
+/** The status of the player, of every living ally and of every living enemy. */
 export function fightStatus(
   fight: FightState,
   content: ContentDb,
   rules: FightRules,
-): { player: CombatantStatus; enemies: CombatantStatus[] } {
+): { player: CombatantStatus; allies: CombatantStatus[]; enemies: CombatantStatus[] } {
   return {
     player: combatantStatus(fight, fight.player, content, rules),
+    allies: alliesOf(fight)
+      .filter((a) => a.hp > 0)
+      .map((a) => combatantStatus(fight, a, content, rules)),
     enemies: fight.enemies
       .filter((e) => e.hp > 0)
       .map((e) => combatantStatus(fight, e, content, rules)),

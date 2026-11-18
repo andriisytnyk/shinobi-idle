@@ -132,7 +132,7 @@ export function fatigueFor(
 }
 
 /** Adds `ms` of fatigue, up to the longest it can grow. */
-function addFatigue(state: GameState, ms: number, content: ContentDb): void {
+export function addFatigue(state: GameState, ms: number, content: ContentDb): void {
   const max = content.balance.K.clone.fatigue.maxMs * FATIGUE_UNIT;
   state.fatigue = Math.min(max, Math.max(0, state.fatigue) + Math.round(ms * FATIGUE_UNIT));
 }

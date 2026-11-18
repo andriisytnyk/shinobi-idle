@@ -169,6 +169,27 @@ export const BALANCE_EXT = {
     nextCast: { castMult: 0.5 },
     /** Removes the Hidden trait for this long. */
     reveal: { durationMs: 20000 },
+    /**
+     * Combat clones (the shadow clone technique in a fight): `count` bodies, one more for every
+     * `masteryStep` levels of the technique's Mastery up to `max`; together they take `share` of the
+     * caster's current chakra and stamina, split evenly, and give back what they have left when
+     * dispelled. A body has `hp` of the caster's maximum health and strikes for `dmg` of what the caster's same technique does. Enemies pick a target among the
+     * living bodies of the caster's side by weight: the caster 1, a body `threat`. The technique
+     * can be cast `casts` times in a fight.
+     */
+    combatClone: {
+      count: 2,
+      masteryStep: 50,
+      max: 3,
+      share: 0.4,
+      hp: 0.3,
+      dmg: 0.5,
+      threat: 0.6,
+      casts: 1,
+      xpShare: 1,
+      passShare: 1,
+      fatigueShare: 1,
+    },
   },
   /**
    * Numbers of boss specials; `hp` and `dmg` scale the boss's own health and damage for its fight. Bind duration of the mist fugitive is `bind.dur`, and the hit

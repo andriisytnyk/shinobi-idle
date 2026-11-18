@@ -239,9 +239,13 @@
       {:else if f.last.outcome === 'miss'}
         <span class="sep">—</span>
         <span class="dodge"
-          >{t(
-            player ? 'fight.out.foeDodged' : 'fight.out.youDodged',
-          )}{#if f.last.avoidedBy}&nbsp;{#if hasKey(dodgeKey(f.last.avoidedBy))}({t(
+          >{player
+            ? t('fight.out.foeDodged')
+            : f.last.onAlly !== null
+              ? t('fight.out.allyDodged', { n: f.last.onAlly })
+              : t(
+                  'fight.out.youDodged',
+                )}{#if f.last.avoidedBy}&nbsp;{#if hasKey(dodgeKey(f.last.avoidedBy))}({t(
                 dodgeKey(f.last.avoidedBy),
               )}){:else}({t('fight.out.thanks')}&nbsp;<EntityLink
                 kind="technique"

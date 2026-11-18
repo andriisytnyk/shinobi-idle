@@ -245,6 +245,12 @@ const practiceXpOf = (t: Parameters<typeof castOf>[0]): number => {
   const focus = P.practiceFocus.base + P.practiceFocus.perLevel * Math.max(0, t.level - 1);
   return xpOfCycle(t.level, Math.max(P.practiceMin!, cast * P.practiceCast! + focus));
 };
+/**
+ * Techniques that summon bodies instead of dealing damage (amendment row 19: the combat clone). The slice lists the
+ * clone as a damaging area series; as data it deals nothing and answers no trait, so its page, the prepared
+ * loadout and the fight AI read it as what it is.
+ */
+const SUMMONS: ReadonlySet<string> = new Set(['core:shadow_clone']);
 const techniques: TechniqueBase[] = slice.techniques.map((t) => {
   techByUk.set(t.uk, t.id);
   text('technique', t.id, 'name', t.uk);
@@ -260,14 +266,14 @@ const techniques: TechniqueBase[] = slice.techniques.map((t) => {
     rank: t.rank === '—' ? null : (t.rank as TechniqueBase['rank']),
     rankCanon: t.rankCanon,
     role: need(ROLE_BY_UK[t.role], `unknown role "${t.role}"`),
-    tags: t.tags.map(tag),
+    tags: SUMMONS.has(t.id) ? [] : t.tags.map(tag),
     state: t.state === '' ? null : need(STATE_BY_UK[t.state], `unknown state "${t.state}"`),
     src: t.src as TechniqueBase['src'],
     mentor: t.src === 'N' ? (t.home === 'Академія' ? 'academy' : 'other') : null,
     sealSeq: t.sealSeq.map(core),
     sealsCanon: t.sealsCanon,
     tier: t.tier as TechniqueBase['tier'],
-    noDamage: t.noDamage,
+    noDamage: SUMMONS.has(t.id) ? true : t.noDamage,
     cast: Math.round(castOf(t) * 1000) / 1000,
     practiceXp: practiceXpOf(t),
   };

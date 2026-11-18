@@ -50,6 +50,26 @@ const natureOf = (tech: Technique, content: ContentDb): string | null =>
 
 const isStance = (tech: Technique): boolean => tech.combat?.effect.kind === 'stance';
 
+/**
+ * What a summon adds, as a share of the character's own damage: its bodies' damage share times their number
+ * (Mastery counted), from the numbers the technique's effect names in the balance object. 0 for any other technique.
+ */
+function summonShare(snap: PlayerSnapshot, tech: Technique, content: ContentDb): number {
+  const effect = tech.combat?.effect;
+  if (effect?.kind !== 'summon') return 0;
+  const gate = (content.balance.K.techFx as Record<string, Record<string, number> | undefined>)[
+    effect.fx
+  ];
+  if (!gate) return 0;
+  const max = Math.max(1, Math.floor(gate.max ?? 1));
+  const step = Math.max(1, gate.masteryStep ?? 1);
+  const count = Math.min(
+    max,
+    Math.max(1, Math.floor((gate.count ?? 1) + (snap.mastery[tech.id] ?? 1) / step)),
+  );
+  return count * (gate.dmg ?? 0);
+}
+
 /** A defensive technique: passive, it adds to the evasion rating and is never in the hand. */
 export const isPassive = (tech: Technique): boolean => tech.combat?.passive !== undefined;
 
@@ -146,6 +166,9 @@ export function planLoadout(
       score: scoreOf(snap, tech, enemy, content),
     });
   }
+  // A summon deals nothing itself: it is worth what its bodies add to the best attack on offer.
+  const best = cands.reduce((m, c) => Math.max(m, c.score), 0);
+  for (const c of cands) c.score = Math.max(c.score, summonShare(snap, c.tech, content) * best);
   // A signature that needs a stance brings the best stance the player knows.
   let stance: Cand | undefined;
   const signature = cands.find((c) => c.tech.id === options.keep);

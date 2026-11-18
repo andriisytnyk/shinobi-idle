@@ -41,14 +41,38 @@
         {:else if event.side === 'enemy'}
           <EntityLink kind="enemy" id={event.enemy} />
           <span
+            >{event.ally !== undefined
+              ? t(event.act === 'hit' ? 'log.enemyHitAlly' : 'log.enemyMissAlly', {
+                  n: event.ally,
+                })
+              : t(
+                  event.act === 'hit'
+                    ? clone
+                      ? 'log.enemyHitClone'
+                      : 'log.enemyHit'
+                    : 'log.enemyMiss',
+                )}</span
+          >
+          {#if event.act === 'hit'}<span class="dmg"
+              >{t('log.damage', { n: formatInt(event.dmg) })}</span
+            >{/if}
+        {:else if event.ally !== undefined}
+          <!-- A combat clone acting: the line names the body. -->
+          <strong class="who">{t('fight.ally', { n: event.ally })}</strong>
+          <span
             >{t(
-              event.act === 'hit'
-                ? clone
-                  ? 'log.enemyHitClone'
-                  : 'log.enemyHit'
-                : 'log.enemyMiss',
+              event.act === 'cast'
+                ? 'log.allyCast'
+                : event.tech
+                  ? event.act === 'hit'
+                    ? 'log.allyHit'
+                    : 'log.allyMiss'
+                  : event.act === 'hit'
+                    ? 'log.allyBasicHit'
+                    : 'log.allyBasicMiss',
             )}</span
           >
+          {#if event.tech}<EntityLink kind="technique" id={event.tech} />{/if}
           {#if event.act === 'hit'}<span class="dmg"
               >{t('log.damage', { n: formatInt(event.dmg) })}</span
             >{/if}
@@ -119,6 +143,10 @@
   li :global(a) {
     color: var(--accent);
     font-weight: 600;
+  }
+
+  .who {
+    color: var(--heading);
   }
 
   .dmg {
