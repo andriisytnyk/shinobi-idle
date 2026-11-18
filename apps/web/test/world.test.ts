@@ -651,19 +651,32 @@ describe('R1: places the player has not discovered stay hidden on the map', () =
   });
 
   it('names the places of a hex only once it is surveyed to its first level', () => {
-    const place = content.places.find((p) => cellOf(HOME).hex.join() === p.hex.join());
+    // A place the player has not found; the outpost a new game starts with is on the home hex and shows from the start.
+    const place = content.places.find((p) => p.id === 'core:salt_pans');
     expect(place).toBeDefined();
+    const cell = content.cells.find((c) => c.hex.join() === place?.hex.join());
+    expect(cell).toBeDefined();
     const placeName = name(`place.${place?.id}.name`);
-    show({ cell: HOME, region: FOREST });
+    const state = genin();
+    state.world.surveyed[cell!.hex.join(',')] = true;
+    game.replaceState(state);
+    show({ cell: cell!.id, region: cell!.region });
     expect(q('[data-places]')).toBeNull();
     expect(target.textContent).not.toContain(placeName);
 
-    const state = genin();
-    explored(state, HOME);
+    explored(state, cell!.id);
     game.replaceState(state);
     game.devAdvance(10);
     flushSync();
     expect(q('[data-places]')?.textContent).toContain(placeName);
+  });
+
+  it('shows a point found at the start on the hex of a new game, before its first level', () => {
+    const state = genin();
+    expect(state.world.pois['core:west_gate_post']).toBe(true);
+    game.replaceState(state);
+    show({ cell: HOME, region: FOREST });
+    expect(q('[data-places]')?.textContent).toContain(name('place.core:west_gate_post.name'));
   });
 });
 

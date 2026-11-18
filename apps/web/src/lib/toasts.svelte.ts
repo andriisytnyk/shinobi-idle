@@ -2,7 +2,6 @@ import type { ContentDb } from '@shinobi/content';
 import type { GameEvent } from '@shinobi/core';
 import { actionRef, masteryRef } from './entities.ts';
 import { t, type Params } from './i18n.ts';
-import { localeKey } from '@shinobi/content';
 import { missionToast } from './mission-toasts.ts';
 import { currencyName, resourceName } from './vocab.ts';
 import type { EntityRef } from './route.ts';

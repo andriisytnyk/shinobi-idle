@@ -561,7 +561,7 @@ describe('content a player needs is never behind an elemental key', () => {
     const s = genin(1);
     setLevel(s, 'herb', 35);
     setLevel(s, 'cc', 15);
-    expect(content.techniques.filter((x) => s.known[x.id])).toHaveLength(0);
+    for (const x of content.techniques) delete s.known[x.id];
     ok(s, { type: 'action.start', slot: 0, kind: 'gather', id: 'core:edelweiss' });
   });
 });

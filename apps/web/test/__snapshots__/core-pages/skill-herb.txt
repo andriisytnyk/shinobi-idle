@@ -657,32 +657,19 @@
                       <span class="label">
                         Ранг: Генін
                   <li>
-                    <div class="group" data-met="false">
-                      <p class="caption">
-                        Потрібно все:
-                      <ul class="rows">
-                        <li>
-                          <div class="row" data-entity="skill:cc" data-met="false" data-ui="req-row">
-                            <span class="mark">
-                              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                                <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                            <span class="label">
-                              <a class="entity-link" href="#/skill/cc">
-                                Контроль чакри
-                              <span class="detail">
-                                рів. 15
-                            <span class="count">
-                              1/15
-                            <span aria-hidden="true" class="bar">
-                              <span class="fill" style="width: 6.666666666666667%;">
-                        <li>
-                          <div class="row" data-met="false" data-ui="req-row">
-                            <span class="mark">
-                              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                                <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                            <span class="label">
-                              <span data-point-req="">
-                                Знайти точку інтересу: ???
+                    <div class="row" data-entity="skill:cc" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/cc">
+                          Контроль чакри
+                        <span class="detail">
+                          рів. 15
+                      <span class="count">
+                        1/15
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 6.666666666666667%;">
                   <li>
                     <div class="row" data-entity="skill:herb" data-met="false" data-ui="req-row">
                       <span class="mark">
