@@ -3,10 +3,10 @@ import { fightData } from './fight-data.ts';
 import type { ActionKind } from '../actions.ts';
 import { MS_PER_HOUR, rate } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
-import { gainXp } from '../progression.ts';
 import type { Req } from '../requirements.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
+import { earnXp, payOnStop } from './pending.ts';
 import { ensurePouch, refillPouch } from './pouch.ts';
 import { fightBusyReason, newCombat, newOperation } from './system.ts';
 import { entryOf, fightTarget, zoneBlocked, zoneRequirement } from './zones.ts';
@@ -20,7 +20,7 @@ function payTick(state: GameState, fallback: string, content: ContentDb, rules: 
   // `style` is the skill of the technique last used (a basic attack's style before any); every other key is a skill.
   for (const [key, mult] of Object.entries(K.combatXp)) {
     const skill = key === 'style' ? (state.combat?.style ?? fightData(content).basicSkill) : key;
-    if (skill) gainXp(state, skill, mult * perTick, content, rules);
+    if (skill) earnXp(state, skill, mult * perTick, content, rules);
   }
 }
 
@@ -61,8 +61,9 @@ export const fightKind: ActionKind = {
     state.flags[FIRST_FIGHT_FLAG] = true;
   },
 
-  stop(state, slot) {
-    // Only the slot that owns the fight ends it.
+  stop(state, slot, _id, content, rules) {
+    // Only the slot that owns the fight ends it; a clone dispelled mid-fight is paid what it earned.
+    payOnStop(state, slot, content, rules);
     if (state.combat?.owner === slot) state.combat = null;
   },
 };
@@ -93,8 +94,9 @@ export const operationKind: ActionKind = {
     state.flags[FIRST_FIGHT_FLAG] = true;
   },
 
-  stop(state, slot) {
-    // Only the slot that owns the fight ends it.
+  stop(state, slot, _id, content, rules) {
+    // Only the slot that owns the fight ends it; a clone dispelled mid-fight is paid what it earned.
+    payOnStop(state, slot, content, rules);
     if (state.combat?.owner === slot) state.combat = null;
   },
 };

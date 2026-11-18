@@ -11,7 +11,6 @@ import { bump, defeatsKey, killsKey } from '../counters.ts';
 import { emit } from '../events.ts';
 import { MS_PER_HOUR } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
-import { grantMastery } from '../progression.ts';
 import { nextInt, nextSeed } from '../rng.ts';
 import type { Rules } from '../rules.ts';
 import { SHARE_FULL, type GameState } from '../state.ts';
@@ -19,6 +18,7 @@ import type { System } from '../system.ts';
 import { encounterFor } from './fight-encounter.ts';
 import { bossNature } from '../natures.ts';
 import { noteBounty, noteFight, noteSighting } from './bingo.ts';
+import { dropPending, earnMastery, payPending } from './pending.ts';
 import { grantLoot, rollLoot } from './loot.ts';
 import { recordFight, recordItems, recordLoot, recordWounds, stampDefeat } from './report.ts';
 import { payOperation } from './rewards.ts';
@@ -195,7 +195,13 @@ export function newOperation(
 }
 
 /** Pays mastery XP for the technique time the fight has tallied since the last payment. */
-function settle(state: GameState, c: CombatState, content: ContentDb, rules: Rules): void {
+function settle(
+  state: GameState,
+  c: CombatState,
+  content: ContentDb,
+  rules: Rules,
+  clone: boolean,
+): void {
   const K = content.balance.K;
   const tally = c.fight.tally;
   c.style = tally.style;
@@ -208,8 +214,10 @@ function settle(state: GameState, c: CombatState, content: ContentDb, rules: Rul
     c.carry = 0;
     // The signature technique learns a little faster.
     const bonus = state.loadouts.signature === id ? 1 + K.signature.xpBonus : 1;
-    grantMastery(
+    earnMastery(
       state,
+      c,
+      clone,
       id,
       tech.skill,
       (bonus * K.masteryPerHour * paying) / WORK_PER_MS / MS_PER_HOUR,
@@ -301,6 +309,8 @@ function victory(
   c.pause = workOf(secMs(K.respawn));
   // The time since the last technique use and the pause are paid with the next fight's first one.
   c.carry += c.fight.t - c.fight.tally.lastUseAt + c.pause;
+  // A clone's fight pays when it is won.
+  payPending(state, c, content, rules);
   bump(state, killsKey(c.enemy));
   emit(state, { type: 'enemyDefeated', enemy: c.enemy });
   // Loot is rolled before the book counts the win, so the first win pays the full bounty. A
@@ -347,6 +357,8 @@ function lose(
   rules: Rules,
   clone: boolean,
 ): void {
+  // What a clone's lost fight earned is dropped: a lost fight pays nothing.
+  dropPending(c);
   emit(state, { type: 'playerDefeated', enemy: c.enemy, ...(clone ? { clone: true } : {}) });
   if (!clone) {
     bump(state, defeatsKey(c.enemy));
@@ -438,7 +450,7 @@ export const combatSystem: System = {
         c.phase = 'fight';
       }
       c.work = fightAdvance(c.fight, c.work, content, rules);
-      settle(state, c, content, rules);
+      settle(state, c, content, rules, clone);
       const key = reportKey(state, index);
       recordItems(state, key, syncAndCount(state, c));
       report(state, c);
@@ -453,6 +465,7 @@ export const combatSystem: System = {
           reason: c.fight.fault?.reason ?? '',
         });
         c.carry += c.fight.t - c.fight.tally.lastUseAt;
+        payPending(state, c, content, rules);
         const p = c.fight.player;
         c.fight = startFight(
           state,
@@ -470,6 +483,7 @@ export const combatSystem: System = {
         noteFight(state, c.enemy, 'timeout', content);
         recordFight(state, key, c.fight, 'timeout', content, clone);
         c.carry += c.fight.t - c.fight.tally.lastUseAt;
+        payPending(state, c, content, rules);
         const p = c.fight.player;
         c.fight = startFight(
           state,
@@ -494,6 +508,7 @@ export const combatSystem: System = {
           noteFight(state, c.enemy, 'win', content);
           recordFight(state, key, c.fight, 'win', content, clone);
           woundsAfter(state, c, content, rules, false, key, clone);
+          payPending(state, c, content, rules);
         }
         return owner.combatEnded(
           state,

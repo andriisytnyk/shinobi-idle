@@ -44,6 +44,16 @@ export interface CombatState {
   owner: number;
   /** The operation run this fight belongs to; null for a zone fight. */
   run: RunState | null;
+  /** A clone's earnings of the fight in progress, paid on a win or a dispel and dropped on a defeat; absent for the character. */
+  pending?: Pending;
+}
+
+/** What a clone's fight has earned and not yet been paid (a clone's fight pays only when won). */
+export interface Pending {
+  /** Raw skill XP, by skill. */
+  xp: Record<string, number>;
+  /** Mastery amounts, by mastery key, with the skill they train. */
+  mastery: Record<string, { skill: string; amount: number }>;
 }
 
 /** The player's loadout: the techniques taken into a fight, and the ones saved under a name. */
