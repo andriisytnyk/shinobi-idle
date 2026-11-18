@@ -51,6 +51,12 @@ export function fightTarget(
   id: string,
 ): { enemy: Enemy | Boss; zone: Zone | null } | null {
   const index = indexOf(content);
+  // A raid at the village gates is fought by its own id.
+  const raid = index.raids.get(id);
+  if (raid) {
+    const enemy = entryOf(content, raid.enemy);
+    return enemy ? { enemy, zone: null } : null;
+  }
   const zone = index.zones.get(id);
   if (zone) {
     const enemy = entryOf(content, zone.enemy);

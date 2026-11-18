@@ -56,6 +56,8 @@ export const PLACES: readonly Place[] = [
   { path: 'village.levels', rule: 'keys' },
   { path: 'village.res', rule: 'keys' },
   { path: 'village.shinobi', rule: 'keys' },
+  { path: 'village.raids', rule: 'keys' },
+  { path: 'village.damage', rule: 'keys' },
   { path: 'missions.pending', rule: 'keys' },
   { path: 'loadouts.active', rule: 'list' },
   { path: 'loadouts.signature', rule: 'single' },

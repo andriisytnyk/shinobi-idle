@@ -1,7 +1,7 @@
 <script lang="ts">
   import { entityName } from '../lib/entities.ts';
   import type { BuildingInfo } from '@shinobi/core';
-  import { formatInt } from '../lib/format.ts';
+  import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
@@ -67,6 +67,13 @@
       >{t('village.level', { n: info.level, max: info.maxLevel })}</span
     >
     {#if info.building}<span class="busy" data-busy>{t('village.building')}</span>{/if}
+    {#if info.damaged > 0}
+      <span class="damaged" data-damaged>
+        {t('village.damaged', {
+          time: formatDuration(info.damagedMs),
+        })}
+      </span>
+    {/if}
   </header>
 
   {#if !plain || info.nextLevel === null}
@@ -219,6 +226,11 @@
 
   .busy {
     color: var(--accent);
+  }
+
+  .damaged {
+    color: var(--danger);
+    font-size: var(--text-xs);
   }
 
   .facts {

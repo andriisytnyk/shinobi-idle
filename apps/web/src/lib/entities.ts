@@ -107,6 +107,11 @@ export function actionRef(
     if (fog) return { kind: HEX_KIND, id: key };
     if (!content?.cells.some((c) => c.id === action.id)) return { kind: HEX_KIND, id: action.id };
   }
+  // A raid at the village gates is fought by its own id; what the player fights is its enemy.
+  if (action.kind === 'fight') {
+    const raid = tryActiveContent()?.raids.find((r) => r.id === action.id);
+    if (raid) return { kind: 'enemy', id: raid.enemy };
+  }
   const mapped = ACTION_ENTITY[action.kind];
   if (mapped) return { kind: mapped, id: action.id };
   return {

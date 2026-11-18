@@ -11,6 +11,7 @@ import {
   defaultRules,
   dispatch,
   killsKey,
+  raidFlag,
   missionDoneKey,
   refreshUnlocks,
   xpAt,
@@ -223,11 +224,19 @@ export function playSlice(options: StoryOptions = {}): StoryRun {
     }
     answers.items.forEach((item, slot) => cmd({ type: 'pouch.set', slot, item }));
   };
-  /** Fights in a zone until `done` holds; a lost fight is counted and the fight is simply started again. */
+  /** Fights in a zone (or against a raid at the gates, named by its id) until `done` holds; a lost fight is counted and the fight is simply started again. */
   const fight = (zone: string, done: () => boolean, maxMs = 6 * HOUR): void => {
-    const z = content.zones.find((x) => x.id === zone);
+    const raid = content.raids.find((x) => x.id === zone);
+    const z =
+      content.zones.find((x) => x.id === zone) ?? (raid ? { enemy: raid.enemy } : undefined);
     if (!z) throw new Error(`no zone ${zone}`);
-    if (z.region !== 'academy' && z.region !== 'boss' && z.region !== 'exam') {
+    if (
+      !raid &&
+      'region' in z &&
+      z.region !== 'academy' &&
+      z.region !== 'boss' &&
+      z.region !== 'exam'
+    ) {
       const cell = content.cells.find((c) =>
         c.pois.some((p) => p.kind === 'zone' && p.zone === zone),
       );
@@ -243,7 +252,8 @@ export function playSlice(options: StoryOptions = {}): StoryRun {
         );
       advance(state, 20_000, content, rules);
       drain();
-      if (!state.slots[0]?.action) {
+      // A fight that ends with its goal (a raid fought to the last pack) leaves the slot free and is not started again.
+      if (!state.slots[0]?.action && !done()) {
         rest();
         equip(zone);
         must({ type: 'action.start', slot: 0, kind: 'fight', id: zone });
@@ -414,7 +424,11 @@ export function playSlice(options: StoryOptions = {}): StoryRun {
       ['core:v_rubble', 'core:v_seal', 'core:v_clear', 'core:v_sanit'],
       () => stepOf('core:outskirts') >= 3,
     );
-    fight('core:zone_merc_pack', () => finished('core:outskirts'));
+    // The raid of the Grey Bands is called as the step becomes the active one, comes after its lead, and is fought at the gates.
+    const raid = content.raids[0];
+    if (!raid) throw new Error('no raid');
+    until(() => state.flags[raidFlag(raid.id, 'active')] === true, 4 * HOUR, 'the raid arrives');
+    fight(raid.id, () => finished('core:outskirts'));
   });
 
   // «Сірі пов'язки»

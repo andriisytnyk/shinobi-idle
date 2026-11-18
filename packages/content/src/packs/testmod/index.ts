@@ -305,6 +305,27 @@ const data = {
     { id: 'testmod:zone_boss_shell', enemy: 'testmod:boss_shell', region: 'boss', unlock: null },
   ],
   /**
+   * A raid of the pack on the village: called by a flag a test sets, defended by the pack's hut, damaging
+   * the hut. It proves that a pack's raid is announced in its own words, and that its state survives
+   * a load without the pack.
+   */
+  raids: [
+    {
+      id: 'testmod:raid_probe',
+      trigger: { t: 'flag', id: 'testmod.raid.call' },
+      enemy: 'testmod:shellback',
+      packs: 2,
+      lead: 1,
+      hold: 2,
+      defence: [{ t: 'building', id: 'testmod:hut', per: 10 }],
+      perPack: 10,
+      autoShare: 0.5,
+      targets: ['testmod:hut'],
+      repair: 3,
+      reward: { ryo: 20, rep: 1 },
+    },
+  ],
+  /**
    * A two-hex island off the south-east coast of the Land of Fire. The grid is full, so the pack makes
    * two hexes of open sea its own land with `patches` (below), and a ferry (a `link`) joins the coast
    * to the island: the island can be surveyed from the coast and walked to.
@@ -570,6 +591,9 @@ export const testmodPack: ContentPack = {
       'missionRank.testmod:trial.desc':
         'Тестовий ранг доручень мода: доручення цього рангу лише для перевірки.',
       'missionRank.testmod:trial.stamp': 'Т',
+      'raid.testmod:raid_probe.name': 'Тестовий напад мода',
+      'raid.testmod:raid_probe.desc':
+        'Тестовий напад мода на село: він лише доводить, що напад мода говорить своїми словами.',
       'stage.testmod:stage3.name': 'Тестовий етап села',
       'stage.testmod:stage3.desc': 'Тестовий етап села, який мод додає після відомих.',
       'state.testmod:chilled.desc': 'Тестовий стан охолодження, на який діє тестове комбо.',

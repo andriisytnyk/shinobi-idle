@@ -15,6 +15,7 @@ import {
   type StageForecast,
   type StageWays,
 } from '@shinobi/core';
+import { tryActiveContent } from './active.ts';
 import { hasKey } from './i18n.ts';
 import type { EntityRef } from './route.ts';
 
@@ -51,7 +52,11 @@ export interface ActionRef {
 /** The entity page an action of a slot belongs to: a mission or a fight's enemy; none for an operation. */
 export function actionEntity(action: { kind: string; id: string }): EntityRef | null {
   if (action.kind === MISSION_KIND) return { kind: 'mission', id: action.id };
-  if (action.kind === 'fight') return { kind: 'enemy', id: action.id };
+  if (action.kind === 'fight') {
+    // A raid at the village gates is fought by its own id; what is fought is its enemy.
+    const raid = tryActiveContent()?.raids.find((r) => r.id === action.id);
+    return { kind: 'enemy', id: raid ? raid.enemy : action.id };
+  }
   return null;
 }
 

@@ -18,6 +18,7 @@
   import Icon from '../components/Icon.svelte';
   import EntityLink from '../components/EntityLink.svelte';
   import PrepScreen from '../components/PrepScreen.svelte';
+  import RaidPanel from '../components/RaidPanel.svelte';
   import ZoneWhere from '../components/ZoneWhere.svelte';
   import { formatInt } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
@@ -121,11 +122,13 @@
   {:else if listing.fighting}
     <!-- The arena comes first: on a phone the hint above it would push the fight off the screen. -->
     <FightScreen />
+    <RaidPanel compact progress />
     <Hint id="combat" />
   {:else if section === 'prepare' && target}
     <PrepScreen {target} />
   {:else}
     <Hint id="combat" />
+    <RaidPanel compact />
     <h2>{t('combat.enemies')}</h2>
     {#if listing.yard.length === 0}
       <p class="empty">{t('combat.empty')}</p>

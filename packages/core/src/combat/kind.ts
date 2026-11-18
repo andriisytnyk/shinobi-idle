@@ -7,6 +7,7 @@ import type { Req } from '../requirements.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 import { earnXp, payOnStop } from './pending.ts';
+import { raidFlag } from '../raid.ts';
 import { ensurePouch, refillPouch } from './pouch.ts';
 import { fightBusyReason, newCombat, newOperation } from './system.ts';
 import { entryOf, fightTarget, zoneBlocked, zoneRequirement } from './zones.ts';
@@ -32,6 +33,8 @@ function payTick(state: GameState, fallback: string, content: ContentDb, rules: 
 export const fightKind: ActionKind = {
   has: (id, content) => fightTarget(content, id) !== null,
   requirements(_state, id, content): Req | null {
+    // A raid is fought while it is at the gates.
+    if (indexOf(content).raids.has(id)) return { t: 'flag', id: raidFlag(id, 'active') };
     // An enemy id is gated like the zone that holds the enemy.
     const zone = indexOf(content).zones.get(id) ?? indexOf(content).zoneByEnemy.get(id);
     return zone ? zoneRequirement(zone) : null;

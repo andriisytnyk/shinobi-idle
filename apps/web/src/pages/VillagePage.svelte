@@ -11,6 +11,7 @@
   import Hint from '../components/Hint.svelte';
   import Slot from '../lib/ext/Slot.svelte';
   import Icon from '../components/Icon.svelte';
+  import RaidPanel from '../components/RaidPanel.svelte';
   import Stepper from '../components/Stepper.svelte';
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
@@ -84,6 +85,8 @@
     {#if !has}
       <p class="ct-why" data-village-locked>{t('village.locked')}</p>
     {:else}
+      <RaidPanel />
+
       <section class="panel" data-stage={stage.stage}>
         <h2>{t('village.stage', { n: stage.stage })}</h2>
         <p>{t('village.stage.cap', { n: stage.levelCap })}</p>

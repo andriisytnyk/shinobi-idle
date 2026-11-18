@@ -275,6 +275,34 @@ export interface StorageFullEvent extends EventBase {
   resource: string;
 }
 
+/** A raid was called: it arrives in `ticks` village ticks. */
+export interface RaidCalledEvent extends EventBase {
+  type: 'raidCalled';
+  raid: string;
+  ticks: number;
+}
+/** A raid reached the gates: the player can fight its packs until the window ends. */
+export interface RaidArrivedEvent extends EventBase {
+  type: 'raidArrived';
+  raid: string;
+}
+/** A raid ended: how many packs the player and the village repelled, how many got through, what was damaged and paid. */
+export interface RaidOverEvent extends EventBase {
+  type: 'raidOver';
+  raid: string;
+  repelled: number;
+  byVillage: number;
+  breached: number;
+  damaged: string[];
+  ryo: number;
+  rep: number;
+}
+/** A building damaged by a raid works again. */
+export interface BuildingRepairedEvent extends EventBase {
+  type: 'buildingRepaired';
+  building: string;
+}
+
 /** A loaded save was made with other packs than the content has now: these appeared (`added`) or vanished (`removed`). */
 export interface PacksChangedEvent extends EventBase {
   type: 'packsChanged';
@@ -331,6 +359,10 @@ export type GameEvent =
   | BuildingBuiltEvent
   | VillageStageEvent
   | StorageFullEvent
+  | RaidCalledEvent
+  | RaidArrivedEvent
+  | RaidOverEvent
+  | BuildingRepairedEvent
   | PacksChangedEvent
   | RuleDisabledEvent;
 

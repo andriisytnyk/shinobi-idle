@@ -1,4 +1,4 @@
-import type { ContentDb, NatureId, SkillId } from '@shinobi/content';
+import type { ContentDb, NatureId, Req, SkillId } from '@shinobi/content';
 import { actionKindOf, rebalanceShares } from './actions.ts';
 import { COURSE_ID, COURSE_KIND } from './athletics.ts';
 import { tonicCharges } from './buffs.ts';
@@ -64,7 +64,8 @@ import {
   stageForRep,
   tickMs,
 } from './village.ts';
-import { createVillage, type VillageState } from './village-state.ts';
+import { raidFlag } from './raid.ts';
+import { createVillage, type RaidRun, type VillageState } from './village-state.ts';
 import { isAcademyRank, isNature, packOfId, poolEntry, rankIndex, skillEntry } from './vocab.ts';
 import { hexKey, hexLine, isPlayable, removeFigure } from './hex.ts';
 import { cellMaxExplores, levelForExplores, plainMaxExplores, subjectOf } from './world.ts';
@@ -336,6 +337,43 @@ export const MIGRATIONS: readonly Migration[] = [
     for (const [id, pool] of Object.entries(pools))
       scaled[id] = isRecord(pool) ? { ...pool, xp: (nonNegative(pool.xp) * 2000) / 1500 } : pool;
     return { ...state, pools: scaled };
+  },
+  // v18 -> v19: raids on the village. A village gets no damaged building and the list of raids: a raid that the story
+  // asks for at a step the chain is past is over, with nothing paid and nothing damaged (the step was done on a version
+  // that had a stand-in for it), so it is never called; a raid the chain has not come to, or is at, is called by the
+  // game as it is for a player who reached the step on this version.
+  (state, content) => {
+    const village = state.village;
+    if (!isRecord(village)) return state;
+    const quests = isRecord(state.quests) ? state.quests : {};
+    const raids: Raw = {};
+    for (const raid of content.raids) {
+      const over = raidFlag(raid.id, 'over');
+      const past = content.quests.some((quest) => {
+        const progress = quests[quest.id];
+        const at = quest.steps.findIndex(
+          (s) => s.objective.t === 'req' && asksFlag(s.objective.req, over),
+        );
+        return (
+          isRecord(progress) &&
+          at >= 0 &&
+          (progress.done === true || nonNegative(progress.step) > at)
+        );
+      });
+      if (past) {
+        raids[raid.id] = {
+          phase: 'over',
+          ticks: 0,
+          repelled: 0,
+          byVillage: 0,
+          breached: 0,
+          damaged: [],
+          ryo: 0,
+          rep: 0,
+        };
+      }
+    }
+    return { ...state, village: { ...village, raids, damage: {} } };
   },
 ];
 
@@ -657,6 +695,16 @@ function sanitizeWorld(raw: unknown, content: ContentDb): GameState['world'] {
 }
 
 /**
+ * Whether a requirement can only hold once the flag does: the flag itself, or an `all` with it inside. An `any`
+ * that merely mentions the flag does not count (the step could have been done another way), so a raid asked for
+ * only through an `any` is not taken as past.
+ */
+function asksFlag(req: Req, flag: string): boolean {
+  if (req.t === 'flag') return req.id === flag;
+  return req.t === 'all' && req.of.some((r) => asksFlag(r, flag));
+}
+
+/**
  * A saved village. A student has none. Levels are clamped to what the building can reach and never
  * fall below the starting level; stores are clamped to their caps; the job's cost is recomputed from
  * the level it builds, never trusted; the stage follows Reputation.
@@ -700,7 +748,63 @@ function sanitizeVillage(raw: unknown, state: GameState, content: ContentDb): Vi
       };
     }
   }
+  sanitizeRaids(raw, village, state, content);
   return village;
+}
+
+/**
+ * The raids and the damage of a saved village: a raid keeps its phase and its counts clamped to what its data
+ * allows, a building that is damaged must be a known one with a repair time in range, and the flags of a raid
+ * (at the gates, over) are written from the phase, never trusted.
+ */
+function sanitizeRaids(
+  raw: Raw,
+  village: VillageState,
+  state: GameState,
+  content: ContentDb,
+): void {
+  const whole = (x: unknown): number => Math.floor(nonNegative(x));
+  const savedRaids = isRecord(raw.raids) ? raw.raids : {};
+  for (const raid of content.raids) {
+    delete state.flags[raidFlag(raid.id, 'active')];
+    delete state.flags[raidFlag(raid.id, 'over')];
+    const saved = savedRaids[raid.id];
+    if (!isRecord(saved)) continue;
+    const phase = saved.phase;
+    if (phase !== 'warned' && phase !== 'active' && phase !== 'over') continue;
+    const repelled = phase === 'warned' ? 0 : Math.min(whole(saved.repelled), raid.packs);
+    const byVillage =
+      phase === 'over' ? Math.min(whole(saved.byVillage), raid.packs - repelled) : 0;
+    const run: RaidRun = {
+      phase,
+      ticks:
+        phase === 'over'
+          ? 0
+          : Math.min(whole(saved.ticks), phase === 'warned' ? raid.lead : raid.hold),
+      repelled,
+      byVillage,
+      breached:
+        phase === 'over' ? Math.min(whole(saved.breached), raid.packs - repelled - byVillage) : 0,
+      damaged: [],
+      ryo: 0,
+      rep: 0,
+    };
+    if (phase === 'over') {
+      const hit = Array.isArray(saved.damaged) ? saved.damaged : [];
+      run.damaged = raid.targets.filter((id) => hit.includes(id));
+      run.ryo = Math.min(whole(saved.ryo), raid.reward.ryo);
+      run.rep = Math.min(whole(saved.rep), raid.reward.rep);
+    }
+    village.raids[raid.id] = run;
+    if (phase === 'active') state.flags[raidFlag(raid.id, 'active')] = true;
+    if (phase === 'over') state.flags[raidFlag(raid.id, 'over')] = true;
+  }
+  const mostRepair = Math.max(0, ...content.raids.map((r) => r.repair));
+  const savedDamage = isRecord(raw.damage) ? raw.damage : {};
+  for (const b of content.buildings) {
+    const ticks = Math.min(whole(savedDamage[b.id]), mostRepair);
+    if (ticks > 0 && (village.levels[b.id] ?? 0) > 0) village.damage[b.id] = ticks;
+  }
 }
 
 /**

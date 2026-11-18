@@ -98,6 +98,19 @@ describe('one round trip per place', () => {
       levels: { [ghost('hut')]: 2, 'core:academy': 1 },
       res: { [ghost('wood')]: 5, 'core:plots': 1 },
       shinobi: { [ghost('chakra')]: 2 },
+      raids: {
+        [ghost('raid')]: {
+          phase: 'over',
+          ticks: 0,
+          repelled: 1,
+          byVillage: 0,
+          breached: 0,
+          damaged: [],
+          ryo: 0,
+          rep: 0,
+        },
+      },
+      damage: { [ghost('hut')]: 3 },
     },
     missions: { pending: { [ghost('wood')]: 3 } },
     loadouts: {
