@@ -239,6 +239,8 @@ export const techniqueBaseSchema = z.strictObject({
   noDamage: z.boolean(),
   /** Cast time in seconds: a number of the technique, from its rank and role or set by hand; never from the seals. */
   cast: z.number().positive(),
+  /** Skill XP one completed practice cycle pays, before modifiers. It does not change with mastery. Omitted: the pace of the technique's level times its cycle at mastery 1 of the player's own nature. */
+  practiceXp: z.number().positive().optional(),
 });
 
 export const techniqueSchema = techniqueBaseSchema.extend({
@@ -261,6 +263,10 @@ export const exerciseSchema = z.object({
   level,
   /** The skill the exercise trains; omitted: the first skill with the activity `drill`. */
   skill: skillId.optional(),
+  /** Seconds of one cycle before modifiers: explicit data of the action. Omitted: the first-tier cycle of its kind (`K.drill`). */
+  cycle: z.number().positive().optional(),
+  /** Skill XP one completed cycle pays before modifiers. Omitted: the pace of the action's level times its cycle. */
+  xp: z.number().positive().optional(),
 });
 
 /** The part of a practice that the importer generates; modifiers are layered on at load. */
@@ -274,6 +280,10 @@ export const practiceBaseSchema = z.strictObject({
   /** Count of insight and enlightenment modifiers (texts are locale keys by index). */
   insight: z.number().int(),
   enlight: z.number().int(),
+  /** Seconds of one cycle before modifiers: explicit data of the action. Omitted: the first-tier cycle of its kind (`K.meditate`). */
+  cycle: z.number().positive().optional(),
+  /** Skill XP one completed cycle pays before modifiers. Omitted: the pace of the action's level times its cycle. */
+  xp: z.number().positive().optional(),
 });
 
 export const practiceSchema = practiceBaseSchema.extend({
@@ -288,6 +298,10 @@ export const obstacleBaseSchema = z.object({
   id: coreId,
   level,
   slot: z.number().int().min(1),
+  /** Seconds of one cycle before modifiers: explicit data of the action. Omitted: the first-tier cycle of its kind (`K.obstacle`). */
+  cycle: z.number().positive().optional(),
+  /** Skill XP one completed cycle pays before modifiers. Omitted: the pace of the action's level times its cycle. */
+  xp: z.number().positive().optional(),
 });
 
 export const obstacleSchema = obstacleBaseSchema.extend({
@@ -304,6 +318,10 @@ export const herbBaseSchema = z.object({
   level,
   /** The skill that gathers the herb; omitted: the first skill with the activity `patch`. */
   skill: skillId.optional(),
+  /** Seconds of one gather before modifiers. Omitted: `K.gather`. */
+  cycle: z.number().positive().optional(),
+  /** Skill XP one gather pays before modifiers, the regrow pause of a bush counted in. Omitted: the pace of the herb's level times the cycle and the pause share. */
+  xp: z.number().positive().optional(),
 });
 
 export const herbSchema = herbBaseSchema.extend({
@@ -470,6 +488,10 @@ export const recipeSchema = z.object({
   /** Item produced and how many per craft. */
   output: ingredientRef,
   tags: z.array(tagId),
+  /** Seconds of one cycle before modifiers: explicit data of the action. Omitted: the first-tier cycle of its kind (`K.craft`). */
+  cycle: z.number().positive().optional(),
+  /** Skill XP one completed cycle pays before modifiers. Omitted: the pace of the action's level times its cycle. */
+  xp: z.number().positive().optional(),
 });
 
 // ---------- missions ----------
@@ -1313,7 +1335,16 @@ export const balanceParamsSchema = z.object({
   rateGrowth: z.number(),
   nativeXp: z.number(),
   craftXpMult: z.number(),
-  masteryPerHour: z.number(),
+  /** Mastery XP per second of action at mastery level L: `perSecond × (base + L)`, after Melvor's mastery formula. */
+  mastery: z.object({ perSecond: z.number().positive(), base: z.number().min(0) }),
+  /** Cycle in seconds at the skill cap, by kind of action; the cycle of the first tier is `K.<kind>`. Cycles grow linearly with the level of the action. */
+  cycleMax: z.object({
+    drill: z.number().positive(),
+    meditate: z.number().positive(),
+    gather: z.number().positive(),
+    obstacle: z.number().positive(),
+    craft: z.number().positive(),
+  }),
   poolShare: z.number(),
   poolCapPerItem: z.number(),
   /** Seconds of focus before the cast in a practice action: `base` at level 1 and `perLevel` more for each level the technique requires; the interval is the focus plus the technique's cast. */

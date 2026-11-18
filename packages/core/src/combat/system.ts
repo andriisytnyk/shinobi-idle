@@ -8,7 +8,7 @@ import {
 import { stopSlot } from '../actions.ts';
 import { bump, defeatsKey, killsKey } from '../counters.ts';
 import { emit } from '../events.ts';
-import { MS_PER_HOUR } from '../formulas.ts';
+import { MS_PER_SECOND, masteryLevel, masteryXpPerSecond } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
 import { grantMastery } from '../progression.ts';
 import { nextInt, nextSeed } from '../rng.ts';
@@ -211,7 +211,9 @@ function settle(state: GameState, c: CombatState, content: ContentDb, rules: Rul
       state,
       id,
       tech.skill,
-      (bonus * K.masteryPerHour * paying) / WORK_PER_MS / MS_PER_HOUR,
+      (bonus * masteryXpPerSecond(masteryLevel(state, id, content), content) * paying) /
+        WORK_PER_MS /
+        MS_PER_SECOND,
       content,
       rules,
     );

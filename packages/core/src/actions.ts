@@ -3,11 +3,12 @@ import { actionsKey, bump } from './counters.ts';
 import { emit, type ActionStoppedEvent } from './events.ts';
 import {
   MS_PER_SECOND,
-  SECONDS_PER_HOUR,
+  cycleSeconds,
+  cycleXp,
   masteryLevel,
   masteryXpPerAction,
   practiceIntervalSeconds,
-  rate,
+  practiceXp,
   techniqueCastSeconds,
 } from './formulas.ts';
 import { removeFigure } from './hex.ts';
@@ -127,11 +128,13 @@ export function actionKindOf(
 /** The facts a skill-training action is built from. */
 export interface SkillActionDef {
   skill: string;
-  /** Level at which the action unlocks; sets its XP rate. */
+  /** Level at which the action unlocks. */
   level: number;
   masteryKey: string;
   /** Cycle length in seconds before modifiers. */
   baseSeconds: number;
+  /** Skill XP one completed cycle pays before modifiers; it does not depend on mastery. */
+  xp: number;
   /** Requirements beyond the skill level. */
   extra: Req[];
   /** A speed modifier key besides the skill's own, for example `speed.practice`. */
@@ -164,11 +167,12 @@ export function skillAction(resolve: Resolver): ActionKind {
     complete(state, id, content, rules) {
       const def = resolve(state, id, content);
       if (!def) return;
-      // Rewards follow the unmodified cycle length, so a faster cycle earns more per hour.
+      // The XP of a cycle is data of the action; a faster cycle (modifiers) earns more per hour.
+      gainXp(state, def.skill, def.xp, content, rules);
+      // Mastery follows the unmodified cycle length and grows with the mastery level of the action.
       const seconds = baseMs(def) / MS_PER_SECOND;
-      const xp = (rate(def.level, content) * seconds) / SECONDS_PER_HOUR;
-      gainXp(state, def.skill, xp, content, rules);
-      const mastery = masteryXpPerAction(seconds, content);
+      const level = masteryLevel(state, def.masteryKey, content);
+      const mastery = masteryXpPerAction(level, seconds, content);
       grantMastery(state, def.masteryKey, def.skill, mastery, content, rules);
     },
   };
@@ -187,6 +191,7 @@ export const practiceKind = skillAction((state, id, content) => {
     level: t.level,
     masteryKey: id,
     baseSeconds: practiceIntervalSeconds(cast, content, t.level),
+    xp: practiceXp(t, content),
     extra: [{ t: 'technique', id }],
     extraSpeed: 'speed.practice',
   };
@@ -200,7 +205,8 @@ export const drillKind = skillAction((_state, id, content) => {
     skill,
     level: e.level,
     masteryKey: id,
-    baseSeconds: content.balance.K.drill,
+    baseSeconds: cycleSeconds('drill', e, content),
+    xp: cycleXp('drill', e, content),
     extra: [],
   };
 });

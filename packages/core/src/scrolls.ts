@@ -4,6 +4,7 @@ import { growSlots } from './clone.ts';
 import type { CommandResult } from './engine.ts';
 import { rebalanceShares } from './actions.ts';
 import { emit } from './events.ts';
+import { masteryLevel, masteryXpPerHour } from './formulas.ts';
 import { indexOf } from './lookup.ts';
 import { grantMastery } from './progression.ts';
 import { evalReq, type Req } from './requirements.ts';
@@ -73,7 +74,14 @@ export function combineParts(state: GameState, item: string, content: ContentDb)
 
 /** One hour of practice for a technique, as the balance defines it. */
 function notesFor(state: GameState, tech: Technique, content: ContentDb, rules: Rules): void {
-  grantMastery(state, tech.id, tech.skill, content.balance.K.masteryPerHour, content, rules);
+  grantMastery(
+    state,
+    tech.id,
+    tech.skill,
+    masteryXpPerHour(masteryLevel(state, tech.id, content), content),
+    content,
+    rules,
+  );
 }
 
 /**

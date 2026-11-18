@@ -14,10 +14,14 @@ export const K = {
   // --- досвід ---
   rateBase: 4800, rateGrowth: 1.08,          // номінальний досвід за годину дії, відкритої на рівні a: rateBase × rateGrowth^a
   nativeXp: 1.25, craftXpMult: 4,            // рідна природа; ремесла (бо їх обмежують трави)
-  masteryPerHour: 10500,                     // досвід Майстерності за годину дії (стала)
-  poolShare: 0.25, poolCapPerItem: 1500,     // частка в пул; місткість пулу на одну майстерність зрізу
+  // Майстерність за секунду дії на рівні Майстерності L: perSecond × (base + L). Форма — формула Melvor (початок: (відкриті × частка + L × N/10) × с × 0.5):
+  // перший доданок замінено сталою base, N/10 — одиницею; perSecond підігнано так, щоб рівень 25 настав за 45 хв дії.
+  mastery: { perSecond: 0.128, base: 8 },
+  poolShare: 0.25, poolCapPerItem: 2000,     // частка в пул; місткість пулу на одну майстерність зрізу
   // --- інтервали дій, с ---
   practiceFocus: { base:0.8, perLevel:0.06 }, practiceCast: 0.82, practiceMin: 2.0, drill: 3.0, meditate: 3.0, obstacle: 2.5, gather: 2.5, craft: 2.5, explore: 5.0,
+  // Цикл дії росте з рівнем дії лінійно від K.<вид> (рівень 1) до cycleMax.<вид> (стеля навички). Ремесла (artisan у Melvor) і Медитація — стала.
+  cycleMax: { drill: 12.0, meditate: 3.0, gather: 10.0, obstacle: 7.5, craft: 2.5 },
   // --- техніки ---
   // Каст — число самої техніки й не залежить від печаток (рішення автора 15.11): базовий каст рангу × множник ролі, для окремих технік — вручну (patch.mjs, TECH.cast).
   castByRank: { E:0.944, D:1.133, C:0.947, B:2.186, A:1.748, S:2.622 },
@@ -207,11 +211,15 @@ J.capHours=round((total-natAvg*2+ combatH(50)*60)/60,1);
 md.push(`\nСтеля 50 в усіх 15 навичках (три природи з п'ятьох, Живучість набирається в бою): **≈ ${J.capHours} год** чистої дії. Ціль MVP — 20–25 год.`);
 
 H("2. Майстерність і пул");
-md.push(`Майстерність росте зі сталою швидкістю ${K.masteryPerHour.toLocaleString("uk")} досвіду за годину дії; ${K.poolShare*100}% іде в пул навички. Місткість пулу в зрізі — ${K.poolCapPerItem} на кожну майстерність навички.\n`);
-head("Майстерність","Годин дії","Що дає техніці"); for(const m of [10,25,40,50]) row(m,round(xpAt(m)/K.masteryPerHour,1),m===25?"Коронна техніка; печаток −13%":`Печаток −${Math.round(K.masteryCast*m/99*100)}%, вартість −${Math.round(K.masteryCost*m/99*100)}%, шкода +${Math.round(K.masteryDmg*m/99*100)}%`);
+md.push(`Майстерність за секунду дії на рівні Майстерності L — ${K.mastery.perSecond} × (${K.mastery.base} + L); за дію — це, помножене на її цикл. Форма за Melvor: що вищий рівень Майстерності цієї дії, то більше вона дає. ${K.poolShare*100}% іде в пул навички. Місткість пулу в зрізі — ${K.poolCapPerItem} на кожну майстерність навички.
+`);
+export const masteryRate = L => K.mastery.perSecond*(K.mastery.base+L)*3600; // досвіду Майстерності за годину дії на рівні L
+export function masteryHours(xp){ let x=0,t=0; while(x<xp){ x+=masteryRate(Math.max(1,levelOf(x)))/3600*5; t+=5; } return t/3600; }
+const levelOf=x=>{ let L=1; while(L<99&&xpAt(L+1)<=x) L++; return L; };
+head("Майстерність","Годин дії","Що дає техніці"); for(const m of [10,25,40,50,99]) row(m,round(masteryHours(xpAt(m)),1),m===25?"Коронна техніка; печаток −13%":`Печаток −${Math.round(K.masteryCast*m/99*100)}%, вартість −${Math.round(K.masteryCost*m/99*100)}%, шкода +${Math.round(K.masteryDmg*m/99*100)}%`);
 md.push(""); head("Навичка","Майстерностей","Місткість пулу","10%, год дії","25%, год дії","50%, год дії");
 const mcount={tai:10,nin:12,katon:7,futon:7,raiton:7,doton:8,suiton:9,cc:8,med:6,ath:12,herb:11,prov:11,alch:11};
-for(const [sk,nn] of Object.entries(mcount)){ const cap=nn*K.poolCapPerItem; const hrs=p=>round(cap*p/(K.masteryPerHour*K.poolShare),1); row(NAME[sk],nn,cap.toLocaleString("uk"),hrs(.1),hrs(.25),hrs(.5)); }
+for(const [sk,nn] of Object.entries(mcount)){ const cap=nn*K.poolCapPerItem; const hrs=p=>round(masteryHours(cap*p/K.poolShare),1); row(NAME[sk],nn,cap.toLocaleString("uk"),hrs(.1),hrs(.25),hrs(.5)); }
 
 H("3. Техніки зрізу");
 md.push("Шкода = сила рангу × множник ролі × сила в межах рангу × (1 + "+K.levelScale+" × рівень навички) × (1 + "+K.masteryDmg+" × Майстерність ÷ 99). Каст = базовий каст рангу × множник ролі (або число самої техніки); Майстерність скорочує його до −"+K.masteryCast*100+"%, не нижче "+K.castFloor+" с; печатки на каст не впливають. Значення в таблиці — на рівні відкриття техніки, Майстерність 1.\n");

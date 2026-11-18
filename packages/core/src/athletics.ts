@@ -4,7 +4,13 @@ import { removeCurrency } from './bank.ts';
 import { checkpointProvider } from './checkpoints.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
-import { MS_PER_SECOND, SECONDS_PER_HOUR, masteryXpPerAction, rate } from './formulas.ts';
+import {
+  MS_PER_SECOND,
+  cycleSeconds,
+  cycleXp,
+  masteryLevel,
+  masteryXpPerAction,
+} from './formulas.ts';
 import { indexOf } from './lookup.ts';
 import { meditationProvider } from './meditation.ts';
 import {
@@ -111,25 +117,29 @@ export function buildObstacle(
   return { ok: true };
 }
 
-/** Time of one obstacle in a lap at full speed, before modifiers, in ms. */
-const obstacleMs = (content: ContentDb): number =>
-  Math.round(content.balance.K.obstacle * MS_PER_SECOND);
+/** Time of one obstacle in a lap at full speed, before modifiers, in ms: each obstacle has its own cycle. */
+const obstacleMs = (obstacle: Obstacle, content: ContentDb): number =>
+  Math.round(cycleSeconds('obstacle', obstacle, content) * MS_PER_SECOND);
 
-/** Skill XP of one lap, before modifiers: every built obstacle pays its slot's rate for the obstacle's time. */
+/** Skill XP of one lap, before modifiers: every built obstacle pays its own XP. */
 export function lapXp(state: GameState, content: ContentDb): number {
-  const K = content.balance.K;
-  let sum = 0;
-  for (const o of builtObstacles(state, content)) {
-    sum += (rate(o.level, content) * K.obstacle) / SECONDS_PER_HOUR;
-  }
-  return sum;
+  return builtObstacles(state, content).reduce(
+    (sum, o) => sum + cycleXp('obstacle', o, content),
+    0,
+  );
 }
 
-/** Length of one lap in ms: the built obstacles times the obstacle time, after speed modifiers; at least 1. */
+/** Length of one lap in ms before modifiers: the cycles of the built obstacles added up (the first-tier cycle for an empty course). */
+export function lapBaseMs(state: GameState, content: ContentDb): number {
+  const built = builtObstacles(state, content);
+  if (built.length === 0) return Math.round(content.balance.K.obstacle * MS_PER_SECOND);
+  return built.reduce((sum, o) => sum + obstacleMs(o, content), 0);
+}
+
+/** Length of one lap in ms: the cycles of the built obstacles, after speed modifiers; at least 1. */
 export function lapIntervalMs(state: GameState, content: ContentDb, rules: Rules): number {
-  const count = Math.max(1, builtObstacles(state, content).length);
   const factor = cycleFactor(rules, state, courseSkill(content) ?? '', content);
-  return Math.max(actionFloor(content), Math.round(count * obstacleMs(content) * factor));
+  return Math.max(actionFloor(content), Math.round(lapBaseMs(state, content) * factor));
 }
 
 export const courseKind: ActionKind = {
@@ -143,8 +153,11 @@ export const courseKind: ActionKind = {
     const skill = courseSkill(content);
     if (built.length === 0 || skill === null) return 'abort';
     gainXp(state, skill, lapXp(state, content), content, rules);
-    const mastery = masteryXpPerAction(content.balance.K.obstacle, content);
-    for (const o of built) grantMastery(state, o.id, skill, mastery, content, rules);
+    for (const o of built) {
+      const seconds = cycleSeconds('obstacle', o, content);
+      const mastery = masteryXpPerAction(masteryLevel(state, o.id, content), seconds, content);
+      grantMastery(state, o.id, skill, mastery, content, rules);
+    }
   },
 };
 

@@ -2,7 +2,7 @@ import type { ContentDb, Mod, Practice } from '@shinobi/content';
 import { skillAction, type ActionKind } from './actions.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
-import { masteryLevel } from './formulas.ts';
+import { cycleSeconds, cycleXp, masteryLevel } from './formulas.ts';
 import { indexOf } from './lookup.ts';
 import { bonusOf, type Modifier, type ModifierProvider } from './modifiers.ts';
 import { nextFloat } from './rng.ts';
@@ -74,7 +74,8 @@ const meditationBase = skillAction((_state, id, content) => {
     skill,
     level: p.level,
     masteryKey: id,
-    baseSeconds: content.balance.K.meditate,
+    baseSeconds: cycleSeconds('meditate', p, content),
+    xp: cycleXp('meditate', p, content),
     extra: [],
   };
 });

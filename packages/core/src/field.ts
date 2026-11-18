@@ -3,10 +3,10 @@ import type { ActionKind } from './actions.ts';
 import { addItem, hasItem, removeItem } from './bank.ts';
 import {
   MS_PER_SECOND,
-  SECONDS_PER_HOUR,
+  cycleSeconds,
+  cycleXp,
   masteryLevel,
   masteryXpPerAction,
-  rate,
 } from './formulas.ts';
 import { indexOf } from './lookup.ts';
 import { bonusOf, computeMod, cycleFactor } from './modifiers.ts';
@@ -58,13 +58,18 @@ export function regrowMs(state: GameState, content: ContentDb, rules: Rules): nu
 }
 
 /**
- * Seconds of one gather averaged over a whole bush, before modifiers: the base cycle plus the
- * regrow pause shared among the herbs of the bush. Rewards follow this, so XP per hour equals the
- * rate of the herb's level whatever the pause.
+ * Seconds of one gather of `herb` averaged over a whole bush, before modifiers: its cycle plus the
+ * regrow pause shared among the herbs of the bush. Mastery pays by this time; the skill XP of a
+ * gather is the herb's own number and does not depend on the size of the bush.
  */
-export function gatherAverageSeconds(size: number, content: ContentDb): number {
-  const K = content.balance.K;
-  return K.gather + K.field.regrowMs / MS_PER_SECOND / size;
+export function gatherAverageSeconds(
+  herb: { level: number; cycle?: number | undefined },
+  size: number,
+  content: ContentDb,
+): number {
+  return (
+    cycleSeconds('gather', herb, content) + content.balance.K.field.regrowMs / MS_PER_SECOND / size
+  );
 }
 
 export const gatherKind: ActionKind = {
@@ -89,10 +94,11 @@ export const gatherKind: ActionKind = {
     return { t: 'all', of: [...extra, { t: 'skill', skill, level: herb.level }] };
   },
   intervalMs(state, id, content, rules) {
-    const K = content.balance.K;
     const herb = indexOf(content).herbs.get(id);
-    const mod = cycleFactor(rules, state, (herb && herbSkill(content, herb)) ?? '', content);
-    const cycle = Math.max(actionFloor(content), Math.round(K.gather * MS_PER_SECOND * mod));
+    if (!herb) return 1;
+    const mod = cycleFactor(rules, state, herbSkill(content, herb) ?? '', content);
+    const base = cycleSeconds('gather', herb, content);
+    const cycle = Math.max(actionFloor(content), Math.round(base * MS_PER_SECOND * mod));
     // An empty bush regrows before the next herb: the pause is part of that cycle.
     return bushOf(state, id)?.stock === 0 ? cycle + regrowMs(state, content, rules) : cycle;
   },
@@ -124,9 +130,10 @@ export const gatherKind: ActionKind = {
     const doubleChance = bonusOf(rules, state, 'gather.double', content);
     const doubled = doubleChance > 0 && nextFloat(state.rng, 'action') < doubleChance;
     addItem(state, id, doubled ? 2 : 1);
-    const seconds = gatherAverageSeconds(bush.size, content);
-    gainXp(state, skill, (rate(herb.level, content) * seconds) / SECONDS_PER_HOUR, content, rules);
-    grantMastery(state, id, skill, masteryXpPerAction(seconds, content), content, rules);
+    gainXp(state, skill, cycleXp('gather', herb, content), content, rules);
+    const seconds = gatherAverageSeconds(herb, bush.size, content);
+    const mastery = masteryXpPerAction(masteryLevel(state, id, content), seconds, content);
+    grantMastery(state, id, skill, mastery, content, rules);
   },
 };
 
@@ -198,7 +205,7 @@ export const craftKind: ActionKind = {
     const mod = cycleFactor(rules, state, recipe.skill, content);
     return Math.max(
       actionFloor(content),
-      Math.round(content.balance.K.craft * MS_PER_SECOND * mod),
+      Math.round(cycleSeconds('craft', recipe, content) * MS_PER_SECOND * mod),
     );
   },
   complete(state, id, content, rules) {
@@ -206,15 +213,15 @@ export const craftKind: ActionKind = {
     if (!recipe) return;
     // Ingredients may have left the bank since the cycle began.
     if (firstMissing(state, id, content) !== null) return 'abort';
-    const K = content.balance.K;
     const bonusChance = craftBonusChance(state, id, content, rules);
     const bonus = bonusChance > 0 && nextFloat(state.rng, 'action') < bonusChance;
     const keepChance = craftKeepChance(state, recipe.skill, content, rules);
     const kept = keepChance > 0 && nextFloat(state.rng, 'action') < keepChance;
     if (!kept) for (const i of recipe.ingredients) removeItem(state, i.item, i.n);
     addItem(state, recipe.output.item, recipe.output.n + (bonus ? 1 : 0));
-    const xp = (rate(recipe.level, content) * K.craft * K.craftXpMult) / SECONDS_PER_HOUR;
-    gainXp(state, recipe.skill, xp, content, rules);
-    grantMastery(state, id, recipe.skill, masteryXpPerAction(K.craft, content), content, rules);
+    gainXp(state, recipe.skill, cycleXp('craft', recipe, content), content, rules);
+    const seconds = cycleSeconds('craft', recipe, content);
+    const mastery = masteryXpPerAction(masteryLevel(state, id, content), seconds, content);
+    grantMastery(state, id, recipe.skill, mastery, content, rules);
   },
 };
