@@ -269,7 +269,8 @@ export function runDev(
       return ok;
     case 'skill.setLevel': {
       const entry = state.skills[command.skill];
-      if (!entry || !isCount(command.level)) return fail('dev.err.badNumber');
+      // Levels start at 1: `xpAt(0)` throws, and a throw here would stop the game.
+      if (!entry || !isCount(command.level) || command.level < 1) return fail('dev.err.badNumber');
       entry.xp = xpAt(Math.min(command.level, levelCap(content)));
       settle(state, content);
       return ok;

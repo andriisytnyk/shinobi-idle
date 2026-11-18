@@ -103,6 +103,8 @@ describe('skills', () => {
     ok({ type: 'skill.setLevel', skill, level: 9999 });
     expect(levelAt(state.skills[skill]!.xp, K.cap)).toBe(levelCap(content));
     expect(refused({ type: 'skill.setLevel', skill: 'nope', level: 1 })).toBe('dev.err.badNumber');
+    // Level 0 is refused, not thrown: a throw would stop the game behind the crash screen.
+    expect(refused({ type: 'skill.setLevel', skill, level: 0 })).toBe('dev.err.badNumber');
   });
 
   it('skill.setLevel opens what the level unlocks', () => {

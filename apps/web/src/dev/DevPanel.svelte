@@ -199,7 +199,7 @@
         <label class="field"
           ><span>{dt('dev.level')}</span><input
             type="number"
-            min="0"
+            min="1"
             max={cap}
             bind:value={skillLevel}
           /></label
