@@ -56,6 +56,7 @@
         .map((o) => ({ id: o.id }));
       return {
         fighting: allFights(gs).length > 0,
+        selfFighting: gs.combat !== null,
         cloneFights: allFights(gs).some((f) => f.slot > 0),
         yard: yard.map((z) => ({
           id: z.id,
@@ -118,7 +119,7 @@
     <BingoBook />
   {:else if section === 'report'}
     <BattleReport />
-  {:else if listing.fighting}
+  {:else if listing.selfFighting}
     <!-- The arena comes first: on a phone the hint above it would push the fight off the screen. -->
     <FightScreen />
     <RaidPanel compact progress />
@@ -126,6 +127,8 @@
   {:else if section === 'prepare' && target}
     <PrepScreen {target} />
   {:else}
+    <!-- Only clones fight: their fights show above the list, from which the character can start its own. -->
+    {#if listing.fighting}<FightScreen />{/if}
     <Hint id="combat" />
     <RaidPanel compact />
     <h2>{t('combat.enemies')}</h2>

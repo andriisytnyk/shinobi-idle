@@ -307,7 +307,12 @@
           {#if row.know}
             <span class="clone-know" data-ui="clone-knowledge">
               {#each row.know.xp as part (part.skill)}
-                {t('clone.knows', { n: formatXp(part.n), skill: t(`skill.${part.skill}.name`) })}
+                <span class="know-part"
+                  >{t('clone.knows', {
+                    n: formatXp(part.n),
+                    skill: t(`skill.${part.skill}.name`),
+                  })}</span
+                >
               {:else}
                 {t('clone.knowsNothing')}
               {/each}
@@ -359,6 +364,15 @@
 </footer>
 
 <style>
+  .clone-life,
+  .clone-know {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    align-items: center;
+    font-size: var(--text-xs);
+  }
+
   .now {
     display: flex;
     align-items: center;
