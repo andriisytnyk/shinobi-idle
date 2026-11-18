@@ -16,6 +16,7 @@ import {
   serialize,
   type GameState,
 } from '../src/index.ts';
+import { analyze, boss, build } from './analysis-helpers.ts';
 import { HOUR } from './helpers.ts';
 import { fighter, ids, startFight, startOperation, stock, unlock } from './prep-state.ts';
 
@@ -238,5 +239,43 @@ describe('a version 19 save', () => {
     expect(loaded.combat?.owner).toBe(0);
     expect(loaded.clones).toEqual({});
     expect(loaded.slots[1]?.action).toBeNull();
+  });
+});
+
+describe("the fight forecast is the character's", () => {
+  const quick = { samples: 60, sessionMinutes: 10, minSessions: 2, maxSessions: 2 };
+
+  function withClone(fights: boolean): GameState {
+    const c = boss(46);
+    const state = build(c, 31);
+    state.known[CLONE] = true;
+    growSlots(state, content);
+    expect(dispatch(state, { type: 'clone.create', items: {} }, content).ok).toBe(true);
+    if (fights) expect(startFight(state, WOLF, 1)).toEqual({ ok: true });
+    return state;
+  }
+
+  it("does not take the clone's bag, pouch or life when a clone fights while the character prepares", () => {
+    const c = boss(46);
+    const standing = analyze(withClone(false), c.target, quick);
+    const fighting = analyze(withClone(true), c.target, quick);
+    // The same character, the same bag: the same numbers, whatever the clone does elsewhere.
+    expect(fighting.fresh.winRate).toBeCloseTo(standing.fresh.winRate, 6);
+    expect(standing.session).not.toBeNull();
+    expect(fighting.session?.winRate).toEqual(standing.session?.winRate);
+    expect(fighting.session?.supplies).toEqual(standing.session?.supplies);
+    expect(fighting.session?.horizonMinutes).toBe(standing.session?.horizonMinutes);
+    expect(standing.session?.supplies.length).toBeGreaterThan(0);
+  });
+
+  it("forecasts a plain zone from the character's slot with the clone fighting another zone", () => {
+    const state = withClone(true);
+    const a = analyze(state, { kind: 'zone', id: WOLF }, quick);
+    const alone = analyze(withClone(false), { kind: 'zone', id: WOLF }, quick);
+    expect(a.session).not.toBeNull();
+    expect(a.session?.winsPerHour.mean).toBeCloseTo(alone.session?.winsPerHour.mean ?? 0, 6);
+    // The forecast changed nothing in the live state.
+    expect(state.clones[1]?.fight).not.toBeNull();
+    expect(state.combat).toBeNull();
   });
 });

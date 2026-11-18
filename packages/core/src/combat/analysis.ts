@@ -853,16 +853,18 @@ function openSession(
     delete body.doomed;
   }
   clone.fatigue = 0;
-  // The target takes the slot the fight is in, or the first free one that may fight (never a clone's);
+  // The target takes the slot of the character's fight, or the first free slot of the character's;
   // the other slots go on as they are.
   const holds = (i: number): boolean => {
     const kind = clone.slots[i]?.action?.kind;
     return kind !== undefined && (isCombatKind(kind) || kind === MISSION_KIND);
   };
-  const running = clone.slots.findIndex((s) => s.action !== null && isCombatKind(s.action.kind));
-  const free = clone.slots.findIndex(
-    (s, i) => s.action === null && !isCloneSlot(clone, content, i),
+  // The forecast is the character's: a clone's slot is never the target's, and a fight that a clone fights is cleared.
+  const mine = (i: number): boolean => !isCloneSlot(clone, content, i);
+  const running = clone.slots.findIndex(
+    (s, i) => mine(i) && s.action !== null && isCombatKind(s.action.kind),
   );
+  const free = clone.slots.findIndex((s, i) => mine(i) && s.action === null);
   const at = running >= 0 ? running : free >= 0 ? free : 0;
   for (const [i, slot] of clone.slots.entries()) {
     if (i === at || holds(i)) {

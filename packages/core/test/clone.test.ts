@@ -3,10 +3,16 @@
  * Life by chakra, knowledge passed on dispel, mind fatigue, the clone's own pouch, death without a retry,
  * the same action in several performers, saving and telemetry. Fights are in clone-fights.test.ts.
  */
-import { content } from '@shinobi/content';
+import { composeContent, content, corePack, type ContentPack } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
+  actingPerformer,
+  addRule,
+  asPerformer,
   advance,
+  composeRules,
+  wrapRule,
+  type Rules,
   chakraDivisor,
   cloneSlots,
   cloneTelemetry,
@@ -416,5 +422,109 @@ describe('telemetry', () => {
     expect(t.openMs).toBe(2 * HOUR);
     expect(t.runMs).toBe(HOUR);
     expect(t.share).toBeCloseTo(0.5, 6);
+  });
+});
+
+describe("the character's tonics and the clone", () => {
+  const TONIC = 'core:tonik_iasnoho_rozumu';
+  const practice = (): string => content.practices[0]?.id ?? '';
+
+  function meditate(tonic: boolean): GameState {
+    const state = cloner(3, { [TONIC]: 1 });
+    if (tonic) expect(dispatch(state, { type: 'item.use', id: TONIC }, content).ok).toBe(true);
+    expect(start(state, 1, 'meditate', practice()).ok).toBe(true);
+    advance(state, 10 * MIN, content);
+    return state;
+  }
+
+  it('does not spend the charges of the tonic the character drank, and gets no bonus from it', () => {
+    const drank = meditate(true);
+    const plain = meditate(false);
+    const charges = drank.buffs[TONIC]?.charges ?? 0;
+    expect(charges).toBeGreaterThan(0);
+    // Nothing was spent by the clone: the full charges are still there.
+    expect(Object.keys(drank.buffs)).toEqual([TONIC]);
+    const left = meditate(true);
+    expect(left.buffs[TONIC]?.charges).toBe(charges);
+    expect(heldXp(drank)).toBeCloseTo(heldXp(plain), 6);
+    expect(heldXp(drank)).toBeGreaterThan(0);
+  });
+
+  it('still lets the character spend and use them in its own action', () => {
+    const state = cloner(3, { [TONIC]: 1 });
+    dispatch(state, { type: 'item.use', id: TONIC }, content);
+    const full = state.buffs[TONIC]?.charges ?? 0;
+    expect(start(state, 0, 'meditate', practice()).ok).toBe(true);
+    advance(state, 10 * MIN, content);
+    expect(state.buffs[TONIC]?.charges ?? 0).toBeLessThan(full);
+  });
+});
+
+describe('asPerformer nests', () => {
+  it('puts back the outer swap when the inner call is on another state', () => {
+    const a = cloner(4);
+    create(a, { 'core:rice': 7 });
+    const b = cloner(5);
+    const bank = a.bank;
+    const buffs = a.buffs;
+    asPerformer(a, 1, () => {
+      expect(a.bank['core:rice']).toBe(7);
+      asPerformer(b, 0, () => undefined);
+      asPerformer(b, 1, () => undefined);
+      expect(a.bank['core:rice']).toBe(7);
+      expect(actingPerformer()).toBe(1);
+    });
+    expect(a.bank).toBe(bank);
+    expect(a.buffs).toBe(buffs);
+    expect(a.bank['core:rice']).toBe(4993);
+    expect(actingPerformer()).toBe(0);
+  });
+});
+
+describe('a pack and the uniqueness of an action', () => {
+  const HEX = 'core:rysovi_polia';
+  const pack = (fn: (rules: Rules) => Rules): ContentPack => ({
+    manifest: { id: 'uniq', version: '1', dependsOn: ['core'], loadAfter: [] },
+    data: {},
+    balance: {},
+    locales: { uk: {} },
+    icons: {},
+    patches: [],
+    rules: fn as unknown as ContentPack['rules'],
+  });
+  const compose = (fn: (rules: Rules) => Rules): Rules => {
+    const p = pack(fn);
+    return composeRules(defaultRules, [corePack, p], composeContent([corePack, p]));
+  };
+  const explore = (state: GameState, slot: number, rules: Rules) =>
+    dispatch(state, { type: 'action.start', slot, kind: 'explore', id: HEX }, content, rules);
+
+  it('keeps `unique` on a core kind a pack wraps: the same hex is not explored by two performers', () => {
+    const rules = compose((r) => wrapRule(r, 'actionKinds', 'explore', (k) => ({ ...k })));
+    expect(rules.actionKinds.explore).not.toBe(defaultRules.actionKinds.explore);
+    expect(rules.actionKinds.explore?.unique?.(HEX, content)).toBe(true);
+    const state = cloner();
+    expect(explore(state, 1, rules)).toEqual({ ok: true });
+    expect(explore(state, 0, rules)).toEqual({ ok: false, reason: 'error.sameActionElsewhere' });
+  });
+
+  it('keeps `unique` on a kind of the pack itself, and a throwing `unique` means not unique', () => {
+    const base = defaultRules.actionKinds.explore;
+    if (!base) throw new Error('explore');
+    const rules = compose((r) =>
+      addRule(
+        addRule(r, 'actionKinds', 'uniq:one', { ...base, unique: () => true }),
+        'actionKinds',
+        'uniq:bad',
+        {
+          ...base,
+          unique: () => {
+            throw new Error('boom');
+          },
+        },
+      ),
+    );
+    expect(rules.actionKinds['uniq:one']?.unique?.(HEX, content)).toBe(true);
+    expect(rules.actionKinds['uniq:bad']?.unique?.(HEX, content)).toBe(false);
   });
 });

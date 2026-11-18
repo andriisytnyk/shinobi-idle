@@ -5,7 +5,7 @@ import type { CloneBody, GameState } from './state.ts';
  * Whose action is being computed. The character is slot 0; every shadow clone is the performer of its
  * own slot. Code that runs an action (a cycle, a stop, a fight step) runs it `asPerformer(state, slot, fn)`:
  * the clone's bag, purse, pouch and fight stand in for the state's `bank`, `currencies`, `pouch` and
- * `combat` for the time of `fn`, so the whole of the game's code, which reads those names, works on
+ * `combat` (and the character's tonics are out of reach: `buffs` is empty) for the time of `fn`, so the whole of the game's code, which reads those names, works on
  * the clone's own things; and `actingPerformer()` says whose action it is, for what depends on it (the
  * XP and Mastery a clone keeps for its dispel, the place of power the performer stands on, the fatigue).
  *
@@ -29,6 +29,7 @@ interface Held {
   currencies: GameState['currencies'];
   pouch: PouchState;
   combat: CombatState | null;
+  buffs: GameState['buffs'];
 }
 
 let current: Context = { state: null, slot: 0, body: null };
@@ -52,6 +53,7 @@ function leave(state: GameState): void {
     state.currencies = held.currencies;
     state.pouch = held.pouch;
     state.combat = held.combat;
+    state.buffs = held.buffs;
   }
   held = null;
   current = { state: null, slot: 0, body: null };
@@ -64,27 +66,41 @@ function enter(state: GameState, slot: number, body: CloneBody | null): void {
       currencies: state.currencies,
       pouch: state.pouch,
       combat: state.combat,
+      buffs: state.buffs,
     };
     state.bank = body.bag;
     state.currencies = body.purse;
     state.pouch = body.pouch;
     state.combat = body.fight;
+    // A clone drinks no tonic of the character: the buffs are the character's, and its own are none.
+    state.buffs = {};
   }
   current = { state, slot, body };
 }
 
-/** Runs `fn` as the performer of `slot` (see the note above). Calls may nest, also for different slots. */
+/**
+ * Runs `fn` as the performer of `slot` (see the note above). Calls may nest, for different slots and also
+ * for different states (a forecast or a load of a copy inside a step): each level puts back what the level
+ * outside it had.
+ */
 export function asPerformer<T>(state: GameState, slot: number, fn: () => T): T {
   const body = slot > 0 ? (state.clones[slot] ?? null) : null;
   if (current.state === state && current.slot === slot && current.body === body) return fn();
-  const outer = current.state === state ? current : null;
-  if (outer) leave(state);
+  const outer = current;
+  const outerHeld = held;
+  // The same state: take the outer swap back first, so the new one starts from the character's own things.
+  if (outer.state === state) leave(state);
+  else held = null;
   enter(state, slot, body);
   try {
     return fn();
   } finally {
     leave(state);
-    if (outer) enter(state, outer.slot, outer.body);
+    if (outer.state === state) enter(state, outer.slot, outer.body);
+    else {
+      current = outer;
+      held = outerHeld;
+    }
   }
 }
 
