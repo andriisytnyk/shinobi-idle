@@ -273,6 +273,8 @@ export interface FightTally {
   /** What allies that have left the fight (fallen, dispelled or at its end) earned and the game has not yet paid: combat XP by skill, Mastery work by technique. Absent until one has. */
   allyXp?: Record<string, number>;
   allyWork?: Record<string, number>;
+  /** The part of `allyXp` that tires the mind when it reaches the character, by skill (each body's `fatigueShare` applied). */
+  allyTire?: Record<string, number>;
 }
 
 /** One line of the battle log: who did what, with which technique, for how much damage. */

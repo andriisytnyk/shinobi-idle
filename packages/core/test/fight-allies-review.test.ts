@@ -71,6 +71,40 @@ describe('a heavy blow stuns the body it hits', () => {
   });
 });
 
+describe('a heavy blow that fells a clone does not stun it', () => {
+  it('leaves no stun on a fallen body (core:boss_hunter, clones of 1 HP)', () => {
+    const boss = content.bosses.find((b) => b.id === 'core:boss_hunter');
+    if (!boss) throw new Error('no boss_hunter');
+    const r = withAi(castSeq(CLONE, DYNAMIC));
+    let felled = 0;
+    for (let seed = 1; seed <= 40; seed++) {
+      const fresh = createFight(
+        scripted([CLONE, DYNAMIC]),
+        encounterFor(boss, content),
+        seed,
+        content,
+        r,
+      );
+      while ((fresh.tally.uses[CLONE] ?? 0) < 1 && fresh.result === 'ongoing') {
+        fightAdvance(fresh, fightNextEventIn(fresh, content, r) ?? 1, content, r);
+      }
+      for (const a of alliesOf(fresh)) {
+        a.data.threat = 1e9;
+        a.hp = a.maxHp = 1;
+      }
+      fresh.player.hp = fresh.player.maxHp = 1e9;
+      drive(fresh, r, 4000, () => {
+        for (const a of alliesOf(fresh)) {
+          if (a.hp > 0) continue;
+          felled++;
+          expect(stunned(a)).toBe(false);
+        }
+      });
+    }
+    expect(felled).toBeGreaterThan(0);
+  });
+});
+
 describe('the guard on hooks of other packs covers the allies', () => {
   const evil: FightHook = tagOrigin(
     {

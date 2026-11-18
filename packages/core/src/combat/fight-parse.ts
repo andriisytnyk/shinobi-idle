@@ -487,8 +487,14 @@ function parseTally(raw: unknown, v: Vocab): FightTally | null {
   const masteryWork = numberRecord(raw.masteryWork);
   const allyXp = raw.allyXp === undefined ? {} : numberRecord(raw.allyXp);
   const allyWork = raw.allyWork === undefined ? {} : numberRecord(raw.allyWork);
-  if (!allyXp || !allyWork) return null;
-  if (![...Object.values(allyXp), ...Object.values(allyWork)].every(nonNeg)) return null;
+  const allyTire = raw.allyTire === undefined ? {} : numberRecord(raw.allyTire);
+  if (!allyXp || !allyWork || !allyTire) return null;
+  if (
+    ![...Object.values(allyXp), ...Object.values(allyWork), ...Object.values(allyTire)].every(
+      nonNeg,
+    )
+  )
+    return null;
   if (!damage || !uses || !statuses || !combos || !masteryWork) return null;
   const scalars = [
     raw.basic,
@@ -520,6 +526,7 @@ function parseTally(raw: unknown, v: Vocab): FightTally | null {
     masteryWork,
     ...(raw.allyXp === undefined ? {} : { allyXp }),
     ...(raw.allyWork === undefined ? {} : { allyWork }),
+    ...(raw.allyTire === undefined ? {} : { allyTire }),
     wounds: raw.wounds as number,
     woundMin: raw.woundMin as number,
   };

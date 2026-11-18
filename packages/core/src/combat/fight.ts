@@ -1,6 +1,7 @@
 import type { AiTier, ContentDb, SkillId, Technique } from '@shinobi/content';
 import { createStream, nextFloatFrom } from '../rng.ts';
 import { addEffect, findEffect, isSuppressed, removeEffect, statOf } from './fight-effects.ts';
+import { sharesOf } from './fight-allies.ts';
 import { figure, need } from './need.ts';
 import { answersTraitData, balanceOf, beatenBy, fightData, type TraitMod } from './fight-data.ts';
 import {
@@ -1738,8 +1739,15 @@ function releaseAlly(ctx: FightCtx, ally: Combatant): void {
   if (held) {
     // The XP and Mastery the body earned wait in the tally for the game to pay them, once.
     const tally = ctx.fight.tally;
-    for (const [skill, n] of Object.entries(held.xp)) count((tally.allyXp ??= {}), skill, n);
-    for (const [id, n] of Object.entries(held.work)) count((tally.allyWork ??= {}), id, n);
+    // The numbers come from the technique that summoned the body: what passes on, and how much of it tires the mind.
+    const shares = sharesOf(ctx.content, ally.ally?.kind ?? '');
+    for (const [skill, n] of Object.entries(held.xp)) {
+      count((tally.allyXp ??= {}), skill, n * shares.pass);
+      count((tally.allyTire ??= {}), skill, n * shares.pass * shares.fatigue);
+    }
+    for (const [id, n] of Object.entries(held.work)) {
+      count((tally.allyWork ??= {}), id, n * shares.xp * shares.pass);
+    }
     held.xp = {};
     held.work = {};
   }
@@ -1766,7 +1774,7 @@ const sum = (r: Record<string, number> | undefined): number =>
   Object.values(r ?? {}).reduce((n, x) => n + x, 0);
 
 /** The fight ends: the allies that still stand give back what they have left, and hand over what they earned. */
-function releaseAllies(ctx: FightCtx): void {
+export function releaseAllies(ctx: FightCtx): void {
   for (const a of alliesOf(ctx.fight)) {
     if (a.chakra > 0 || a.stamina > 0 || sum(a.ally?.held?.xp) > 0 || sum(a.ally?.held?.work) > 0) {
       releaseAlly(ctx, a);
