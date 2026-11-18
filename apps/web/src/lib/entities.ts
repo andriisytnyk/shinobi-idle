@@ -107,10 +107,10 @@ export function actionRef(
     if (fog) return { kind: HEX_KIND, id: key };
     if (!content?.cells.some((c) => c.id === action.id)) return { kind: HEX_KIND, id: action.id };
   }
-  // A raid at the village gates is fought by its own id; what the player fights is its enemy.
+  // A raid at the village gates or a zone is fought by its own id; what the player fights is its enemy.
   if (action.kind === 'fight') {
-    const raid = tryActiveContent()?.raids.find((r) => r.id === action.id);
-    if (raid) return { kind: 'enemy', id: raid.enemy };
+    const target = fightTargetRef(action.id);
+    if (target) return target;
   }
   const mapped = ACTION_ENTITY[action.kind];
   if (mapped) return { kind: mapped, id: action.id };
@@ -120,10 +120,27 @@ export function actionRef(
   };
 }
 
-/** The entity that owns a mastery key; masteries live on techniques, exercises, practices and obstacles. */
+/**
+ * What a fight action's id stands for: a raid and a zone are fought by their own ids, which have no
+ * names; the player meets their enemy (a boss has its own kind). Null when the id is neither.
+ */
+export function fightTargetRef(id: string): EntityRef | null {
+  const content = tryActiveContent();
+  const raid = content?.raids.find((r) => r.id === id);
+  const enemy = raid?.enemy ?? content?.zones.find((z) => z.id === id)?.enemy;
+  if (!enemy) return null;
+  return { kind: hasKey(`boss.${enemy}.name`) ? 'boss' : 'enemy', id: enemy };
+}
+
+/** The entity that owns a mastery key; masteries live on techniques, exercises, practices, obstacles, and the items and recipes that gathering and crafting make. */
 export function masteryRef(key: string, content: ContentDb): EntityRef {
   if (content.exercises.some((e) => e.id === key)) return { kind: 'exercise', id: key };
   if (content.practices.some((p) => p.id === key)) return { kind: 'practice', id: key };
   if (content.obstacles.some((o) => o.id === key)) return { kind: 'obstacle', id: key };
+  // Gathering and crafting have a mastery of their own, kept under the item or recipe they make.
+  if (!content.techniques.some((x) => x.id === key)) {
+    if (content.recipes.some((r) => r.id === key)) return { kind: 'recipe', id: key };
+    if (content.items.some((i) => i.id === key)) return { kind: 'item', id: key };
+  }
   return { kind: 'technique', id: key };
 }

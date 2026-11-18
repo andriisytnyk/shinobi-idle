@@ -64,6 +64,26 @@
   });
   $effect(() => () => ui.dispose());
 
+  // The top bar and the «Зараз» bar change height (a clone, a mission, a long title): what floats against them
+  // (the toasts, the developer panel) follows their real height, as `--top-live` and `--now-live`.
+  let topEl = $state<HTMLElement>();
+  let nowEl = $state<HTMLElement>();
+  function trackHeight(el: HTMLElement | undefined, name: string): (() => void) | undefined {
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    // The variables live on the app element (the root element keeps only the theme's).
+    const root = el.closest<HTMLElement>('.app') ?? el;
+    const measure = () => root.style.setProperty(name, `${el.offsetHeight}px`);
+    measure();
+    const watcher = new ResizeObserver(measure);
+    watcher.observe(el);
+    return () => {
+      watcher.disconnect();
+      root.style.removeProperty(name);
+    };
+  }
+  $effect(() => trackHeight(topEl, '--top-live'));
+  $effect(() => trackHeight(nowEl, '--now-live'));
+
   // The meta panel starts open beside the page on wide screens and closed on phones, where it is an overlay.
   let metaOpen = $state(window.matchMedia('(min-width: 769px)').matches);
   const hash = $derived(currentHash());
@@ -75,7 +95,10 @@
     untrack(() => {
       const from = lastHash;
       lastHash = to;
-      if (from !== to) ui.emit('route', { phase: 'after', from, to });
+      if (from === to) return;
+      // On a phone the goal panel is an overlay: a link inside it leads to a page or a sheet under it, so it steps aside.
+      if (window.matchMedia('(max-width: 768px)').matches) metaOpen = false;
+      ui.emit('route', { phase: 'after', from, to });
     });
   });
   // «before» is asked by the router itself, synchronously, while the old page is still on screen.
@@ -105,7 +128,7 @@
   <div class="boot" role="status">{t('app.loading')}</div>
 {:else}
   <div class="app" class:meta-open={metaOpen} bind:this={appEl}>
-    <div class="top">
+    <div class="top" bind:this={topEl}>
       <ErrorBoundary area="top"
         ><TopBar {metaOpen} onToggleMeta={() => (metaOpen = !metaOpen)} /></ErrorBoundary
       >
@@ -132,7 +155,7 @@
       </div>
     {/if}
 
-    <div class="now"><ErrorBoundary area="now"><NowBar /></ErrorBoundary></div>
+    <div class="now" bind:this={nowEl}><ErrorBoundary area="now"><NowBar /></ErrorBoundary></div>
     <ToastHost />
     <DevTools />
     {#if game.state.player.name === ''}

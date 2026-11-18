@@ -26,10 +26,7 @@
                 <span class="icon">
                   <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                     <path d="#351-3iwd2g" fill="currentColor">
-                <h3>
-                  <span data-name="">
-                    Кузня
-                <span class="level" data-level-text="">
+                <span class="level grow" data-level-text="">
                   Рівень 0 з 5
               <div class="unlocks" data-unlocks="">
                 <p class="label">

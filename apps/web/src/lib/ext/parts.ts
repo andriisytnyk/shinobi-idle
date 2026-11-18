@@ -92,6 +92,8 @@ export const UI_PARTS = [
   'disabled-packs',
   /** The «Застосунок» section of the settings page. */
   'pwa-section',
+  /** The «Телеметрія» section of the settings page. */
+  'telemetry-section',
   /** The arena of a running fight: the player on one side, the enemies on the other. */
   'fight-arena',
   /** One body of the arena (the player or an enemy); `data-side`, and `data-entity` for an enemy that is shown. */

@@ -1,9 +1,11 @@
+import { readFileSync } from 'node:fs';
 import { runBench } from './bench.ts';
 import type { Bot } from './bot.ts';
 import { bots } from './bots/index.ts';
 import { runCraftsCli, runFightCli, runFighterCli } from './cliSim.ts';
 import { buildEnvironment, parsePacks } from './env.ts';
 import { buildReport, type Report } from './report.ts';
+import { runTelemetryReportCli } from './telemetryReport.ts';
 import type { Milestone } from './runner.ts';
 
 const HOUR_MS = 3_600_000;
@@ -94,11 +96,15 @@ export function runCli(argv: string[], registry: Readonly<Record<string, Bot>> =
         ...Object.values(registry).map((bot) => `  ${bot.name}: ${bot.description}`),
         '  bench: вимір швидкості advance на 12 ігрових годин',
         '  fight: бої з ворогом чи босом для типового гравця (pnpm sim fight --help)',
+        '  telemetry-report <файл>: Markdown-звіт із файлу телеметрії, експортованого з налаштувань',
         '  crafts: мирний бот збирає, варить, продає (pnpm sim crafts --help)',
         '  strategies: боти за стратегіями й звіт балансу (pnpm sim strategies --help)',
         '\nПриклад: pnpm sim academy --seed 1 --runs 5 [--json]',
       ],
     };
+  }
+  if (command === 'telemetry-report') {
+    return runTelemetryReportCli(args.slice(1), env, (path) => readFileSync(path, 'utf8'));
   }
   if (command === 'fight') return runFightCli(args.slice(1), env);
   if (command === 'fighter') return runFighterCli(args.slice(1), env);

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { MISSION_KIND, NEEDS_TEAM } from '@shinobi/core';
+  import BusyBy from '../components/BusyBy.svelte';
   import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
@@ -210,7 +211,9 @@
         </div>
       {/if}
       {#if clone && !running && clone.refusal?.reason === 'error.fightBusy'}
-        <p class="ct-why" id="why-clone" data-clone-why>{t(clone.refusal.reason)}</p>
+        <p class="ct-why" id="why-clone" data-clone-why>
+          <BusyBy reason={clone.refusal.reason} by={clone.refusal.by} />
+        </p>
       {/if}
     </section>
 

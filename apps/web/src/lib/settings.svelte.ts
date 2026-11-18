@@ -11,6 +11,8 @@ export interface SettingsData {
   ext: Record<string, boolean | string>;
   /** Ids of the built-in UI packs the player switched on; they start with the next boot. */
   builtinPacks: string[];
+  /** Whether the local telemetry records the game (it never leaves the device unless exported). */
+  telemetry: boolean;
 }
 
 export const SETTINGS_KEY = 'shinobi.settings';
@@ -22,6 +24,7 @@ const defaults = (): SettingsData => ({
   theme: 'core:base',
   ext: {},
   builtinPacks: [],
+  telemetry: true,
 });
 
 /** The slice of `localStorage` the settings use. */
@@ -42,6 +45,7 @@ export function parseSettings(text: string | null): SettingsData {
     if (!isRecord(raw)) return out;
     if (typeof raw.hideLocked === 'boolean') out.hideLocked = raw.hideLocked;
     if (typeof raw.hints === 'boolean') out.hints = raw.hints;
+    if (typeof raw.telemetry === 'boolean') out.telemetry = raw.telemetry;
     if (Array.isArray(raw.dismissedHints)) {
       out.dismissedHints = raw.dismissedHints.filter((h): h is string => typeof h === 'string');
     }
@@ -106,6 +110,14 @@ export function createSettings(storage: TextStorage | null = browserStorage()) {
     },
     set hints(value: boolean) {
       data.hints = value;
+      persist();
+    },
+    /** Whether the local telemetry records the game. */
+    get telemetry() {
+      return data.telemetry;
+    },
+    set telemetry(value: boolean) {
+      data.telemetry = value;
       persist();
     },
     /** Whether a hint with this id should still be shown. */

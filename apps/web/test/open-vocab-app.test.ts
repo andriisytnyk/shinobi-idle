@@ -218,7 +218,7 @@ describe('the app booted with core and testmod (T1)', () => {
     expect(card).not.toBeNull();
     expect(card?.textContent).toContain('Тестова хатина');
     await booted.go(`#/building/${HUT}`);
-    expect(text('[data-ui="entity-page"], [data-building-page]')).toContain('Тестова хатина');
+    expect(text('[data-ui="sheet"]')).toContain('Тестова хатина');
     expect(rawTexts()).toEqual([]);
   });
 

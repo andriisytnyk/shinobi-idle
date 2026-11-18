@@ -289,7 +289,7 @@
             >
             <span class="stop-label">{t(row.clone ? 'now.dispel' : 'now.stop')}</span>
           </button>
-          {#if row.mission}<NowMission now={row.mission} />{/if}
+          {#if row.mission}<NowMission now={row.mission} clone={row.clone} />{/if}
           <Slot name="now.bar" ctx={{ slot: row.slot }} />
         </li>
       {/each}

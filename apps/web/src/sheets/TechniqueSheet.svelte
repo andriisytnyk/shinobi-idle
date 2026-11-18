@@ -51,6 +51,12 @@
     })),
   );
 
+  /** The tag's name, and «(проти: » when it has traits to name: the words (and their spaces) are one string, so no markup eats or doubles them. */
+  const answerHead = (a: { tag: string; traits: string[] }, i: number): string =>
+    `${i > 0 ? ', ' : ''}${t(localeKey('tag', a.tag, 'name'))}${
+      a.traits.length > 0 ? ` (${t('technique.counters')} ` : ''
+    }`;
+
   const info = $derived(
     game.read((gs) =>
       tech ? actionInfo(gs, { kind: 'practice', id }, content, game.rules) : null,
@@ -136,13 +142,14 @@
         <div>
           <dt>{t('technique.answers')}</dt>
           <dd>
-            {#each answers as a, i (a.tag)}
-              {#if i > 0},
-              {/if}{t(localeKey('tag', a.tag, 'name'))}{#if a.traits.length > 0}
-                ({t('technique.counters')}
-                {#each a.traits as trait, j (trait)}{#if j > 0},
-                  {/if}<EntityLink kind="trait" id={trait} />{/each}){/if}
-            {/each}
+            {#each answers as a, i (a.tag)}{answerHead(
+                a,
+                i,
+              )}{#each a.traits as trait, j (trait)}{j > 0 ? ', ' : ''}<EntityLink
+                  kind="trait"
+                  id={trait}
+                />{/each}{#if a.traits.length > 0})
+              {/if}{/each}
           </dd>
         </div>
       {/if}

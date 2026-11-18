@@ -161,6 +161,22 @@ describe('points of interest in the hex panel', () => {
     expect(q('[data-why="paid"]')?.textContent).toContain('Бракує рьо');
   });
 
+  it('does not say «Діє зараз» on a found point that gives no bonus', () => {
+    const state = genin();
+    const yard = 'core:caravan_yard';
+    expect(place(yard).point).toBeDefined();
+    reveal(state, yard);
+    state.world.pois[yard] = true;
+    state.world.location = cellAtPlace(yard) ?? state.world.location;
+    game.replaceState(state);
+    show();
+    select(yard);
+    const row = q('[data-ui="point-row"]');
+    expect(row?.getAttribute('data-point-status')).toBe('found');
+    expect(row?.querySelector('[data-point-power]')).toBeNull();
+    expect(row?.querySelector('[data-point-active]')).toBeNull();
+  });
+
   it('the free trip between outposts is offered from a found outpost to another', () => {
     const state = genin();
     reveal(state, 'core:caravan_yard');
