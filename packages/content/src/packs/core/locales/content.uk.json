@@ -447,5 +447,13 @@
   "place.core:valley_of_the_end.hint": "Місце лунає силою, але без досвіду розвідника ти навіть не знайдеш до нього дороги.",
   "place.core:fire_temple.hint": "За стінами храму хтось читає молитви. Туди пускають лише тих, хто вже має ранг.",
   "place.core:hell_valley.hint": "Над долиною стелеться їдкий пар. Без чуття розвідника там легко заблукати.",
-  "place.core:mercenary_den.hint": "Тут хтось є. Без відомостей про це місце сюди краще не соватися."
+  "place.core:mercenary_den.hint": "Тут хтось є. Без відомостей про це місце сюди краще не соватися.",
+  "technique.core:body_replacement.dodge": "підмінився колодою",
+  "technique.core:clone.dodge": "підставив клона",
+  "technique.core:earth_style_wall.dodge": "заступився земляною стіною",
+  "technique.core:hiding_in_mist.dodge": "зник у тумані",
+  "technique.core:water_clone.dodge": "підставив водяного клона",
+  "technique.core:water_formation_wall.dodge": "вкрився водяною стіною",
+  "state.stun.held": "Приголомшений",
+  "state.bind.held": "Скований"
 }

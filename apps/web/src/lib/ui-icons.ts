@@ -49,6 +49,8 @@ export const UI_ICON_NAMES = [
   'tent',
   'trees',
   'users',
+  'wind',
+  'zap-off',
   'waves',
   'wheat',
   'x',

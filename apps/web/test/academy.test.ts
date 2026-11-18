@@ -157,16 +157,15 @@ describe('A4: combat screen', () => {
     expect(body).not.toContain('core:boss_');
   });
 
-  it('shows bars, what each side does and the kills while fighting', () => {
+  it('shows the arena with bars and what each side does while fighting', () => {
     expect(
-      game.dispatch({ type: 'action.start', slot: 0, kind: 'fight', id: 'core:dummy' }).ok,
+      game.dispatch({ type: 'action.start', slot: 0, kind: 'fight', id: 'core:zone_dummy' }).ok,
     ).toBe(true);
     game.devAdvance(30_000);
     const body = html(CombatPage, {});
-    expect(body).toContain('data-fighting="core:dummy"');
-    expect(body).toContain('data-player-doing');
-    expect(body).toContain('data-enemy-doing');
-    expect(body).toContain('data-kills');
+    expect(body).toContain('data-ui="fight-arena"');
+    expect((body.match(/data-ui="fighter"/g) ?? []).length).toBe(2);
+    expect((body.match(/data-ui="fight-action"/g) ?? []).length).toBeGreaterThanOrEqual(1);
     expect(body).toContain('Зупинити бій');
     expect((body.match(/role="progressbar"/g) ?? []).length).toBeGreaterThanOrEqual(4);
   });
@@ -210,7 +209,7 @@ describe('A4: combat screen', () => {
   });
 
   it('feeds the log from the core events of a real fight', () => {
-    game.dispatch({ type: 'action.start', slot: 0, kind: 'fight', id: 'core:dummy' });
+    game.dispatch({ type: 'action.start', slot: 0, kind: 'fight', id: 'core:zone_dummy' });
     game.devAdvance(30_000);
     expect(game.combatLog.length).toBeGreaterThan(0);
     const body = html(CombatLog, { entries: game.combatLog });

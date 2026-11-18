@@ -254,6 +254,9 @@
               </span>
             {:else if row.fight}
               <span class="phrase" data-now-fight>
+                {#if row.fight.tech}<span class="fight-tech" data-now-fight-tech
+                    ><ActionEmblem kind="technique" id={row.fight.tech} size="sm" /></span
+                  >{/if}
                 {t(row.fight.key)}
                 {#if row.fight.tech}<EntityLink kind="technique" id={row.fight.tech} />{/if}
               </span>
@@ -468,6 +471,13 @@
 
   .phrase :global(a) {
     font-weight: 600;
+  }
+
+  /* The technique the player is casting: its medallion leads the phrase. */
+  .fight-tech {
+    display: inline-flex;
+    vertical-align: middle;
+    margin-right: var(--space-1);
   }
 
   .kanji {
