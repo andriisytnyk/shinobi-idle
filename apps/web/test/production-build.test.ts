@@ -59,6 +59,12 @@ const PANEL_MARKS = [
   'raid.spawn',
   'dev.err.',
   'DevPanel',
+  // The panel's hooks into the game and the console: gated by the flag, so tree-shaken away too.
+  '__shinobi',
+  'devApply',
+  'devSpeed',
+  'clone.setLife',
+  'dev.cloneCreate',
 ];
 
 describe('the production bundle (T4)', () => {

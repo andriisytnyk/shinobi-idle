@@ -4,8 +4,13 @@ import {
   defaultRules,
   dispatch,
   examFor,
+  LIFE_FULL,
+  fatigueLeftMs,
+  freeCloneSlot,
   hexKey,
   levelAt,
+  lifeLeftMs,
+  masteryLevel,
   levelCap,
   poolCapacity,
   positionOf,
@@ -15,7 +20,7 @@ import {
 import { render } from 'svelte/server';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { cloneTechniques } from '../src/dev/clones.ts';
-import { runDev, type DevCommand, type DevResult } from '../src/dev/commands.ts';
+import { MAX_GRANT, runDev, type DevCommand, type DevResult } from '../src/dev/commands.ts';
 import DevPanel from '../src/dev/DevPanel.svelte';
 import { loadFixtures } from '../src/dev/saves.ts';
 import { DEV_UK } from '../src/dev/texts.ts';
@@ -55,7 +60,19 @@ describe('the flag', () => {
   it('has a text for every refusal the commands give', () => {
     const reasons = ['unknown', 'badNumber', 'noPool', 'noScroll', 'tooDeep', 'cannotSatisfy'];
     for (const r of reasons) expect(DEV_UK[`dev.err.${r}`], r).toBeTruthy();
-    for (const r of ['noSlot', 'badHex', 'noFight', 'noVillage', 'stepStuck', 'questDone'])
+    for (const r of [
+      'noSlot',
+      'badHex',
+      'noFight',
+      'noVillage',
+      'stepStuck',
+      'questDone',
+      'unknownMastery',
+      'noFreeSlot',
+      'noClone',
+      'fatigued',
+      'noCloneTechnique',
+    ])
       expect(DEV_UK[`dev.err.${r}`], r).toBeTruthy();
   });
 });
@@ -215,6 +232,23 @@ describe('story', () => {
     expect(refused({ type: 'story.completeStep', quest: 'core:nope' })).toBe('dev.err.unknown');
   });
 
+  it('story.completeStep moves every chain on the first call on a fresh state', () => {
+    for (const quest of content.quests) {
+      const fresh = createState(1, content);
+      const first = runDev(fresh, content, defaultRules, {
+        type: 'story.completeStep',
+        quest: quest.id,
+      });
+      // The only refusal allowed is the one that says a requirement cannot be made by hand.
+      expect(
+        first.ok || first.reason === 'dev.err.cannotSatisfy',
+        `${quest.id}: ${JSON.stringify(first)}`,
+      ).toBe(true);
+      if (first.ok)
+        expect(fresh.quests[quest.id]!.step > 0 || fresh.quests[quest.id]!.done).toBe(true);
+    }
+  });
+
   it('story.completeStep walks every chain of the slice through the same updates the game runs', () => {
     for (const quest of content.quests) {
       const fresh = createState(1, content);
@@ -356,18 +390,144 @@ describe('fights', () => {
 });
 
 describe('clones', () => {
-  it('clone.create learns the clone technique and opens its slot', () => {
+  it('clone.create learns the clone technique when needed and makes a clone in a free slot', () => {
     expect(cloneTechniques(content).length).toBeGreaterThan(0);
     const slots = state.slots.length;
     ok({ type: 'clone.create' });
     expect(state.slots.length).toBeGreaterThan(slots);
+    expect(Object.keys(state.clones)).toEqual(['1']);
+    expect(state.clones[1]!.life).toBe(LIFE_FULL);
     expect(refused({ type: 'clone.create', technique: 'core:nope' })).toBe('dev.err.unknown');
   });
 
-  it('clone.clearFatigue clears the wounds', () => {
-    state.wounds = { stacks: 2, left: 5000 };
+  it('clone.create gives the life asked for, in a share of the chakra or in minutes', () => {
+    ok({ type: 'clone.create', lifePct: 40 });
+    expect(state.clones[1]!.life).toBe(Math.round(LIFE_FULL * 0.4));
+    ok({ type: 'clone.dispel', slot: 1 });
+    ok({ type: 'clone.create', lifeMin: 2 });
+    const body = state.clones[1]!;
+    // Two minutes at the rate of the standing clone, as the game's own forecast reads it.
+    expect(lifeLeftMs(state, 1, content, defaultRules)).toBeGreaterThanOrEqual(119_000);
+    expect(lifeLeftMs(state, 1, content, defaultRules)).toBeLessThanOrEqual(121_000);
+    expect(body.life).toBeLessThanOrEqual(LIFE_FULL);
+    for (const bad of [0, -3, Number.NaN, Number.POSITIVE_INFINITY, 1e12])
+      expect(refused({ type: 'clone.create', lifeMin: bad }), String(bad)).toBe(
+        'dev.err.badNumber',
+      );
+    for (const bad of [0, -3, Number.NaN, 101])
+      expect(refused({ type: 'clone.create', lifePct: bad }), String(bad)).toBe(
+        'dev.err.badNumber',
+      );
+  });
+
+  it('clone.create takes the default pouch from the Bank, or leaves it empty', () => {
+    const genin = content.playerRanks.find((r) => r.academy !== true)!;
+    const took = (pouch: 'default' | 'empty'): number => {
+      const fresh = createState(1, content);
+      expect(runDev(fresh, content, defaultRules, { type: 'rank.set', rank: genin.id })).toEqual({
+        ok: true,
+      });
+      // The first item the game lets into a pouch slot.
+      let id = '';
+      for (const item of content.items) {
+        fresh.bank[item.id] = 5;
+        const set = dispatch(
+          fresh,
+          { type: 'pouch.set', slot: 0, item: item.id },
+          content,
+          defaultRules,
+        );
+        if (set.ok) {
+          id = item.id;
+          break;
+        }
+        delete fresh.bank[item.id];
+      }
+      expect(id).not.toBe('');
+      fresh.bank[id] = 5;
+      expect(runDev(fresh, content, defaultRules, { type: 'clone.create', pouch })).toEqual({
+        ok: true,
+      });
+      return fresh.bank[id] ?? 0;
+    };
+    expect(took('default')).toBeLessThan(5);
+    expect(took('empty')).toBe(5);
+  });
+
+  it('clone.create refuses when no slot is free, and while the mind is tired', () => {
+    ok({ type: 'clone.create' });
+    expect(freeCloneSlot(state, content)).toBeNull();
+    expect(refused({ type: 'clone.create' })).toBe('dev.err.noFreeSlot');
+    expect(Object.keys(state.clones)).toEqual(['1']);
+    ok({ type: 'clone.dispel', slot: 1 });
+    state.fatigue = 5000;
+    expect(refused({ type: 'clone.create' })).toBe('dev.err.fatigued');
+  });
+
+  it('clone.setLife and clone.refill set the life of a clone that lives', () => {
+    ok({ type: 'clone.create' });
+    ok({ type: 'clone.setLife', slot: 1, lifePct: 10 });
+    expect(state.clones[1]!.life).toBe(Math.round(LIFE_FULL * 0.1));
+    ok({ type: 'clone.setLife', slot: 1, lifeMin: 1 });
+    expect(lifeLeftMs(state, 1, content, defaultRules)).toBeGreaterThan(59_000);
+    ok({ type: 'clone.refill', slot: 1 });
+    expect(state.clones[1]!.life).toBe(LIFE_FULL);
+    expect(refused({ type: 'clone.setLife', slot: 1, lifePct: Number.NaN })).toBe(
+      'dev.err.badNumber',
+    );
+    expect(refused({ type: 'clone.setLife', slot: 1 })).toBe('dev.err.badNumber');
+    expect(refused({ type: 'clone.setLife', slot: 7, lifePct: 5 })).toBe('dev.err.noClone');
+    expect(refused({ type: 'clone.refill', slot: 7 })).toBe('dev.err.noClone');
+  });
+
+  it('clone.dispel dispels one clone (the character is left tired when it earned) or refuses', () => {
+    ok({ type: 'clone.create' });
+    ok({ type: 'clone.dispel', slot: 1 });
+    expect(state.clones[1]).toBeUndefined();
+    expect(refused({ type: 'clone.dispel', slot: 1 })).toBe('dev.err.noClone');
+    expect(refused({ type: 'clone.dispel' })).toBe('dev.err.noClone');
+    ok({ type: 'clone.create' });
+    ok({ type: 'clone.dispel' });
+    expect(Object.keys(state.clones)).toEqual([]);
+  });
+
+  it('clone.clearFatigue clears the mind fatigue', () => {
+    state.fatigue = 9_000_000;
+    expect(fatigueLeftMs(state, content, defaultRules)).toBeGreaterThan(0);
     ok({ type: 'clone.clearFatigue' });
-    expect(state.wounds).toEqual({ stacks: 0, left: 0 });
+    expect(state.fatigue).toBe(0);
+    expect(fatigueLeftMs(state, content, defaultRules)).toBe(0);
+    ok({ type: 'clone.create' });
+  });
+});
+
+describe('grants and Mastery are bounded', () => {
+  it('item.grant and currency.grant refuse huge, negative, fractional and NaN amounts', () => {
+    const id = content.items[0]!.id;
+    for (const n of [1e300, 1e10, -5, 1.5, Number.NaN, Number.POSITIVE_INFINITY, 0]) {
+      expect(refused({ type: 'item.grant', id, n }), `item ${n}`).toBe('dev.err.badNumber');
+      expect(refused({ type: 'currency.grant', id: money(), n }), `currency ${n}`).toBe(
+        'dev.err.badNumber',
+      );
+    }
+    expect(state.bank[id] ?? 0).toBe(0);
+    expect(state.currencies[money()] ?? 0).toBe(0);
+    ok({ type: 'item.grant', id, n: MAX_GRANT });
+    ok({ type: 'currency.grant', id: money(), n: MAX_GRANT });
+    expect(state.bank[id]).toBe(MAX_GRANT);
+    expect(state.currencies[money()]).toBe(MAX_GRANT);
+  });
+
+  it('mastery.set refuses a key the game has no Mastery for, and a level that is not a number', () => {
+    expect(refused({ type: 'mastery.set', key: 'core:nope', level: 3 })).toBe(
+      'dev.err.unknownMastery',
+    );
+    expect(Object.keys(state.mastery)).toEqual([]);
+    const key = content.techniques[0]!.id;
+    for (const level of [Number.NaN, -1, 1.5, Number.POSITIVE_INFINITY])
+      expect(refused({ type: 'mastery.set', key, level }), String(level)).toBe('dev.err.badNumber');
+    ok({ type: 'mastery.set', key, level: 1e15 });
+    expect(masteryLevel(state, key, content)).toBe(K.masteryCap);
   });
 });
 

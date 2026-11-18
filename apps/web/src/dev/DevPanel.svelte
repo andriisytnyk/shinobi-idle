@@ -3,7 +3,7 @@
   import { fallbackText, hasKey, t } from '../lib/i18n.ts';
   import { formatDuration } from '../lib/format.ts';
   import { game } from '../lib/store.ts';
-  import { cloneTechniques } from './clones.ts';
+  import { MAX_LIFE_MIN, cloneTechniques } from './clones.ts';
   import { runDev, type DevCommand, type DevResult } from './commands.ts';
   import Pick from './Pick.svelte';
   import { loadFixtures, type Fixture } from './saves.ts';
@@ -59,6 +59,10 @@
   let bingo = $state(3);
   let raid = $state(raids[0]?.id ?? '');
   let cloneTech = $state(clones[0]?.id ?? '');
+  let lifeMode = $state<'min' | 'pct'>('pct');
+  let lifeValue = $state(100);
+  let pouch = $state<'default' | 'empty'>('default');
+  let cloneSlot = $state(0);
   let customMin = $state(30);
   let dump = $state('');
   let pasted = $state('');
@@ -79,6 +83,28 @@
       label: slot === 0 ? dt('dev.performerSelf') : dt('dev.performerClone', { n: slot }),
     })),
   );
+
+  /** The slots of the clones that live now. */
+  const liveClones = $derived(
+    game.read((gs) =>
+      Object.keys(gs.clones)
+        .map(Number)
+        .sort((a, b) => a - b),
+    ),
+  );
+  $effect(() => {
+    if (!liveClones.includes(cloneSlot)) cloneSlot = liveClones[0] ?? 0;
+  });
+  const lifeChoice = () =>
+    lifeMode === 'pct' ? { lifePct: Number(lifeValue) } : { lifeMin: Number(lifeValue) };
+  function createClone(): void {
+    run({
+      type: 'clone.create',
+      technique: cloneTech,
+      pouch,
+      ...lifeChoice(),
+    });
+  }
 
   /** Runs a developer command on the live game and shows what came of it. */
   function run(command: DevCommand): void {
@@ -438,14 +464,66 @@
         <Pick label={dt('dev.technique')} options={clones} bind:value={cloneTech} />
       </div>
       <div class="row">
-        <button
-          type="button"
-          data-clone-create
-          onclick={() => run({ type: 'clone.create', technique: cloneTech })}
+        <label class="field"
+          ><span>{dt('dev.lifeMode')}</span>
+          <select bind:value={lifeMode} data-clone-life-mode>
+            <option value="min">{dt('dev.lifeMin')}</option>
+            <option value="pct">{dt('dev.lifePct')}</option>
+          </select>
+        </label>
+        <label class="field"
+          ><span>{dt('dev.lifeValue')}</span><input
+            type="number"
+            min="1"
+            max={lifeMode === 'pct' ? 100 : MAX_LIFE_MIN}
+            bind:value={lifeValue}
+            data-clone-life
+          /></label
+        >
+        <label class="field"
+          ><span>{dt('dev.pouch')}</span>
+          <select bind:value={pouch} data-clone-pouch>
+            <option value="default">{dt('dev.pouchDefault')}</option>
+            <option value="empty">{dt('dev.pouchEmpty')}</option>
+          </select>
+        </label>
+      </div>
+      <div class="row">
+        <button type="button" data-clone-create onclick={createClone}
           >{dt('dev.cloneCreate')}</button
         >
         <button type="button" data-clone-fatigue onclick={() => run({ type: 'clone.clearFatigue' })}
           >{dt('dev.clearFatigue')}</button
+        >
+      </div>
+      <div class="row">
+        <label class="field"
+          ><span>{dt('dev.cloneLive')}</span>
+          <select bind:value={cloneSlot} data-clone-slot>
+            {#each liveClones as n (n)}<option value={n}>{dt('dev.performerClone', { n })}</option
+              >{/each}
+          </select>
+        </label>
+      </div>
+      <div class="row">
+        <button
+          type="button"
+          data-clone-setlife
+          disabled={liveClones.length === 0}
+          onclick={() => run({ type: 'clone.setLife', slot: cloneSlot, ...lifeChoice() })}
+          >{dt('dev.setLife')}</button
+        >
+        <button
+          type="button"
+          data-clone-refill
+          disabled={liveClones.length === 0}
+          onclick={() => run({ type: 'clone.refill', slot: cloneSlot })}>{dt('dev.refill')}</button
+        >
+        <button
+          type="button"
+          data-clone-dispel
+          disabled={liveClones.length === 0}
+          onclick={() => run({ type: 'clone.dispel', slot: cloneSlot })}>{dt('dev.dispel')}</button
         >
       </div>
     </details>
