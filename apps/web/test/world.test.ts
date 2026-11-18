@@ -481,7 +481,7 @@ describe('the combat page lists only what is discovered', () => {
     app = mount(CombatPage, { target });
     flushSync();
     expect(q('[data-zone="core:zone_wolf"]')).not.toBeNull();
-    expect(q('[data-zone="core:zone_wolf"] .start')?.hasAttribute('disabled')).toBe(false);
+    expect(q('[data-zone="core:zone_wolf"]  [data-start]')?.hasAttribute('disabled')).toBe(false);
     expect(q('[data-zone="core:zone_bandit"]')).toBeNull();
     expect(target.innerHTML).not.toContain('core:boss_');
   });

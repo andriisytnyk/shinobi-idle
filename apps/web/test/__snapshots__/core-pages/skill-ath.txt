@@ -45,8 +45,9 @@
           <p class="hint" data-course-empty="">
             Збудуй хоча б одну перешкоду, щоб пройти смугу.
           <div class="ct-actions">
-            <button class="action" disabled="" type="button">
-              Пройти смугу
+            <span class="split plain" data-for="course" data-ui="start-split">
+              <button class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                Пройти смугу
         <p class="pillar" data-pillar="false">
           <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
             <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">

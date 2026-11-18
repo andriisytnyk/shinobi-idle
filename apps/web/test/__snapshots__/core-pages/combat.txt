@@ -26,8 +26,9 @@
           <div class="buttons">
             <a class="prepare" href="#/combat/prepare/zone/core:zone_dummy">
               Підготуватися
-            <button class="start" type="button">
-              Почати бій
+            <span class="split plain" data-for="fight" data-ui="start-split">
+              <button class="main ct-action" data-performer="0" data-start="true" type="button">
+                Почати бій
       <p class="idle">
         Бій не йде. Обери супротивника.
       <details class="log" data-fight-log="">

@@ -18,6 +18,8 @@
   import { entityName } from '../lib/entities.ts';
   import { t } from '../lib/i18n.ts';
   import { MASK } from '../lib/reveal.ts';
+  import { squadFigures } from '../lib/squad.ts';
+  import { squadUi } from '../lib/squad-ui.svelte.ts';
   import { game } from '../lib/store.ts';
   import Icon from './Icon.svelte';
 
@@ -319,12 +321,41 @@
   const labelWidth = $derived(formatDuration(preview?.ms ?? 0).length * 7 + 16);
 
   const me = $derived(view.here ? pointOf(view.here) : null);
-  const others = $derived(
-    view.figures.flatMap((f) => {
+  /** Where each figure stands around its hex's centre; clones on one hex take the corners in turn. */
+  const CORNERS: readonly (readonly [number, number])[] = [
+    [8, -8],
+    [-8, -8],
+    [8, 8],
+    [-8, 8],
+    [0, -12],
+    [0, 12],
+  ];
+  const figures = $derived(game.read((gs) => squadFigures(gs, game.content, game.rules)));
+  const others = $derived.by(() => {
+    const seen: Record<string, number> = {};
+    return figures.flatMap((f) => {
       const p = pointOf(f.coord);
-      return p ? [{ slot: f.slot, ...p }] : [];
-    }),
-  );
+      if (!p) return [];
+      const turn = seen[f.coord] ?? 0;
+      seen[f.coord] = turn + 1;
+      const [dx, dy] = CORNERS[turn % CORNERS.length] ?? [8, -8];
+      return [{ ...f, x: p.x + dx, y: p.y + dy }];
+    });
+  });
+
+  const figureLabel = (f: { n: number; state: string }): string =>
+    t('squad.map.figure', { n: f.n, state: t(`squad.state.${f.state}`) });
+
+  function pickFigure(id: number): void {
+    squadUi.pick(squadUi.picked === id ? null : id);
+  }
+
+  function onFigureKey(event: KeyboardEvent, id: number): void {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    event.stopPropagation();
+    pickFigure(id);
+  }
 </script>
 
 <div class="map" data-ui="map" class:panning bind:clientWidth={width} bind:clientHeight={height}>
@@ -449,15 +480,29 @@
         </g>
       {/if}
 
-      {#each others as f (f.slot)}
+      {#each others as f (f.id)}
         <g
-          class="me other"
-          transform="translate({f.x + 7} {f.y - 7})"
+          class="figure"
+          class:picked={squadUi.picked === f.n}
+          class:idle={f.state === 'idle'}
+          transform="translate({f.x} {f.y})"
           data-ui="map-token"
           data-figure={f.slot}
-          aria-hidden="true"
+          data-performer={f.n}
+          data-state={f.state}
+          role="button"
+          tabindex="0"
+          aria-label={figureLabel(f)}
+          aria-pressed={squadUi.picked === f.n}
+          onclick={(e) => {
+            e.stopPropagation();
+            pickFigure(f.id);
+          }}
+          onkeydown={(e) => onFigureKey(e, f.id)}
         >
-          <circle r="5" class="dot" />
+          <circle r="6.5" class="dot" />
+          <text class="num" text-anchor="middle" dy="0.35em">{f.n}</text>
+          {#if f.state === 'idle'}<circle class="idle-mark" cx="5" cy="-5" r="2.4" />{/if}
         </g>
       {/each}
 
@@ -708,8 +753,35 @@
     opacity: 0.35;
   }
 
-  .other .dot {
+  .figure {
+    cursor: pointer;
+  }
+
+  .figure .dot {
     fill: var(--leaf);
+  }
+
+  .figure.picked .dot {
+    stroke: var(--accent);
+    stroke-width: 2.4;
+  }
+
+  .figure:focus-visible .dot {
+    stroke: var(--accent);
+  }
+
+  .num {
+    fill: var(--ink-900);
+    --_size: 8px;
+    font-size: var(--_size);
+    font-weight: 700;
+    pointer-events: none;
+  }
+
+  .idle-mark {
+    fill: var(--stamina);
+    stroke: var(--ink-900);
+    stroke-width: 0.8;
   }
 
   .dot {

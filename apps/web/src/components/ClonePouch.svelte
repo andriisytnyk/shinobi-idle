@@ -10,9 +10,11 @@
     /** Called with the clone made; the opener goes on with what it wanted the clone to do. */
     onMade: () => void;
     onClose: () => void;
+    /** The slot the clone is made in; the next free one when omitted. */
+    slot?: number | undefined;
   }
 
-  let { onMade, onClose }: Props = $props();
+  let { onMade, onClose, slot }: Props = $props();
 
   /** What the Bank holds, with the default pick: the stacks of the character's pouch. */
   const stock = $derived(
@@ -36,7 +38,11 @@
 
   function make(): void {
     const items = Object.fromEntries(Object.entries(taken).filter(([, n]) => n > 0));
-    const result = game.dispatch({ type: 'clone.create', items });
+    const result = game.dispatch({
+      type: 'clone.create',
+      items,
+      ...(slot !== undefined ? { slot } : {}),
+    });
     if (!result.ok) {
       toasts.push({ key: result.reason, params: refusalParams(result) });
       return;

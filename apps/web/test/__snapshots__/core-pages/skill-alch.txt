@@ -110,8 +110,9 @@
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
             <div class="ct-actions">
-              <button aria-describedby="why-core:antidote" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:antidote" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="missing" id="why-core:antidote">
               Бракує інгредієнтів.
           <li class="ct-tile" data-action="core:tsiliushcha_maz" data-entity="recipe:core:tsiliushcha_maz" data-recipe="core:tsiliushcha_maz" data-ui="action-tile">
@@ -207,8 +208,9 @@
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
             <div class="ct-actions">
-              <button aria-describedby="why-core:tsiliushcha_maz" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:tsiliushcha_maz" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:tsiliushcha_maz">
               Рівень замалий: потрібен 5.
             <div class="req">
@@ -349,8 +351,9 @@
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
             <div class="ct-actions">
-              <button aria-describedby="why-core:paralitychna_otruta" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:paralitychna_otruta" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:paralitychna_otruta">
               Рівень замалий: потрібен 10.
             <div class="req">
@@ -497,8 +500,9 @@
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
             <div class="ct-actions">
-              <button aria-describedby="why-core:dymova_bomba" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:dymova_bomba" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:dymova_bomba">
               Рівень замалий: потрібен 15.
             <div class="req">
@@ -629,8 +633,9 @@
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
             <div class="ct-actions">
-              <button aria-describedby="why-core:sonnyi_poroshok" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:sonnyi_poroshok" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:sonnyi_poroshok">
               Рівень замалий: потрібен 20.
             <div class="req">
@@ -765,8 +770,9 @@
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
             <div class="ct-actions">
-              <button aria-describedby="why-core:krovospynna_maz" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:krovospynna_maz" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:krovospynna_maz">
               Рівень замалий: потрібен 25.
             <div class="req">
@@ -913,8 +919,9 @@
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
             <div class="ct-actions">
-              <button aria-describedby="why-core:slozohinna_bomba" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:slozohinna_bomba" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:slozohinna_bomba">
               Рівень замалий: потрібен 30.
             <div class="req">
@@ -1061,8 +1068,9 @@
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
             <div class="ct-actions">
-              <button aria-describedby="why-core:hirska_maz" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:hirska_maz" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:hirska_maz">
               Рівень замалий: потрібен 35.
             <div class="req">
@@ -1203,8 +1211,9 @@
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
             <div class="ct-actions">
-              <button aria-describedby="why-core:nervova_otruta" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:nervova_otruta" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:nervova_otruta">
               Рівень замалий: потрібен 40.
             <div class="req">
@@ -1367,8 +1376,9 @@
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
             <div class="ct-actions">
-              <button aria-describedby="why-core:niukhalna_sil" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:niukhalna_sil" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:niukhalna_sil">
               Рівень замалий: потрібен 45.
             <div class="req">
@@ -1527,8 +1537,9 @@
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
             <div class="ct-actions">
-              <button aria-describedby="why-core:maz_vid_opikiv" class="ct-action" disabled="" type="button">
-                Почати
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:maz_vid_opikiv" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
             <p class="ct-why" data-why="level" id="why-core:maz_vid_opikiv">
               Рівень замалий: потрібен 50.
             <div class="req">

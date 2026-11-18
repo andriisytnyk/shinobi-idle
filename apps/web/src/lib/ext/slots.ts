@@ -18,6 +18,8 @@ export interface SlotContexts {
   'action.tile': { action: RefCtx };
   /** In the «Зараз» bar, once per running slot. */
   'now.bar': { slot: number };
+  /** In the squad panel, once per performer; `performer` is 0 for the character, else the clone's number, `slot` its action slot. */
+  'squad.row': { performer: number; slot: number };
   /** In the goal panel («Мета»). */
   'goal.panel': Record<string, never>;
   /** After every entity page, the generic one included. */
@@ -74,6 +76,7 @@ const SLOT_TABLE: Record<SlotName, true> = {
   'skill.footer': true,
   'action.tile': true,
   'now.bar': true,
+  'squad.row': true,
   'goal.panel': true,
   'entity.sections': true,
   'sidebar.skill': true,
