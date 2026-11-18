@@ -15,6 +15,9 @@ import type { Bot } from './bot.ts';
 /** Skill levels worth a line in the timeline. */
 export const MILESTONE_LEVELS: readonly number[] = [5, 10, 20, 30, 40, 50];
 
+/** Game time per step while the player is away, ms. */
+const AWAY_STEP_MS = 300_000;
+
 /** Rejected commands tolerated before a run is declared failed. */
 export const DEFAULT_REJECT_LIMIT = 100;
 
@@ -34,6 +37,11 @@ export interface RunOptions {
   stepMs?: number;
   /** Hard game-time limit in ms. */
   limitMs: number;
+  /**
+   * A player who is not always looking: awake for `awakeMs` at the start of every `periodMs`, away
+   * for the rest. While away the bot is not asked and time runs in larger steps, as it does offline.
+   */
+  away?: { periodMs: number; awakeMs: number };
   /** Rejected commands after which the run stops as failed. */
   rejectLimit?: number;
   /** Watches the run without changing it: every command with its result, and every step before time moves. */
@@ -111,9 +119,14 @@ export function runBot(bot: Bot, options: RunOptions): RunResult {
   let changed = true;
   let lastDecision = -Infinity;
 
+  const away = options.away;
+  let wasAwake = true;
   while (goalAt === null && state.now < options.limitMs && rejected <= rejectLimit) {
+    const awake = away === undefined || state.now % away.periodMs < away.awakeMs;
+    if (awake && !wasAwake) changed = true;
+    wasAwake = awake;
     const due = bot.reviewMs !== undefined && state.now - lastDecision >= bot.reviewMs;
-    if (changed || due || state.slots.some((slot) => !slot.action)) {
+    if (awake && (changed || due || state.slots.some((slot) => !slot.action))) {
       changed = false;
       lastDecision = state.now;
       for (const command of bot.decide({ state, content, rules }) ?? []) {
@@ -125,7 +138,11 @@ export function runBot(bot: Bot, options: RunOptions): RunResult {
         }
       }
     }
-    const step = Math.min(stepMs, options.limitMs - state.now);
+    const untilWake = away ? away.periodMs - (state.now % away.periodMs) : Infinity;
+    const step = Math.min(
+      awake ? stepMs : Math.min(AWAY_STEP_MS, untilWake),
+      options.limitMs - state.now,
+    );
     options.observer?.step?.(state, step);
     advance(state, step, content, rules);
     const events = state.events.splice(0);

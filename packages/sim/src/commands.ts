@@ -95,6 +95,7 @@ export function runCli(argv: string[], registry: Readonly<Record<string, Bot>> =
         '  bench: вимір швидкості advance на 12 ігрових годин',
         '  fight: бої з ворогом чи босом для типового гравця (pnpm sim fight --help)',
         '  crafts: мирний бот збирає, варить, продає (pnpm sim crafts --help)',
+        '  strategies: боти за стратегіями й звіт балансу (pnpm sim strategies --help)',
         '\nПриклад: pnpm sim academy --seed 1 --runs 5 [--json]',
       ],
     };

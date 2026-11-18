@@ -138,5 +138,6 @@ ID і назва
 | `pnpm content:import` | Читає `slice.json`, `balance.json` з `docs/` і перегенеровує `packages/content/src/data/generated/` та `packages/content/src/locales/uk.json`; повторний запуск нічого не змінює |
 | `pnpm content:check` | Друкує кількість сутностей і запускає тести замкненості контенту |
 | `pnpm sim` | CLI пакета `sim`: поки що друкує кількість сутностей і `xpAt(50)` |
+| `pnpm sim strategies [--seeds N] [--hours H]` | Боти за п'ятьма стратегіями на всіх десяти трійках природ; пише `docs/balance-evidence/strategy-bots.md` і `.json` (детермінований вивід; на всіх ядрах кілька хвилин) |
 
 Назви й описи сутностей лежать лише в `packages/content/src/locales/uk.json` (генерується імпортом). Рядки інтерфейсу пишуться вручну в `packages/content/src/locales/ui.uk.json`.
