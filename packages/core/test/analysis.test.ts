@@ -34,7 +34,7 @@ import {
   type Case,
 } from './analysis-helpers.ts';
 import { setLevel } from './helpers.ts';
-import { bestOf, speedBudget } from './speed.ts';
+import { bestOf, speedBudget, speedIt } from './speed.ts';
 import { fighter, know, run, stock } from './prep-state.ts';
 
 describe('the session forecast against real play', () => {
@@ -48,18 +48,7 @@ describe('the session forecast against real play', () => {
     it(`describes ${c.name}`, { timeout: 300_000 }, () => {
       const state = build(c, 20 + i);
       const before = serialize(state, 0);
-      // The time budget: a zone about half a second and a boss or an operation about two and a half on an idle machine (printed);
-      // the limit is stretched for a loaded one, since the full suite runs every file at once.
-      const limit = speedBudget(
-        c.target.kind === 'zone' ? 2500 : K.analysis.budgetMs * 2,
-        c.target.kind === 'zone' ? 5000 : K.analysis.budgetMs * 4,
-      );
-      let a = analyze(state, c.target);
-      const ms = bestOf(2, limit, () => {
-        a = analyze(state, c.target);
-      });
-      console.log(`analysis of ${c.name}: ${ms.toFixed(0)} ms (limit ${limit.toFixed(0)} ms)`);
-      expect(ms).toBeLessThan(limit);
+      const a = analyze(state, c.target);
       expect(serialize(state, 0), 'the analysis changes nothing').toBe(before);
       const s = a.session;
       if (!s) throw new Error('no session');
@@ -82,6 +71,22 @@ describe('the session forecast against real play', () => {
         expect(Math.abs(s.winsPerHour.mean - meanPerHour) / meanPerHour).toBeLessThanOrEqual(0.1);
       }
       expect(Math.abs(s.untilDefeat.noDefeatShare - noDefeat)).toBeLessThanOrEqual(0.4);
+    });
+
+    // The time budget: a zone about half a second and a boss or an operation about two and a half on an
+    // idle machine (printed); it runs apart from the other tests, see `speed.ts`.
+    speedIt(`analyses ${c.name} within the time budget`, () => {
+      const state = build(c, 20 + i);
+      const limit = speedBudget(
+        c.target.kind === 'zone' ? 2500 : K.analysis.budgetMs * 2,
+        c.target.kind === 'zone' ? 5000 : K.analysis.budgetMs * 4,
+      );
+      analyze(state, c.target);
+      const ms = bestOf(3, limit, () => {
+        analyze(state, c.target);
+      });
+      console.log(`analysis of ${c.name}: ${ms.toFixed(0)} ms (limit ${limit.toFixed(0)} ms)`);
+      expect(ms).toBeLessThan(limit);
     });
   }
 

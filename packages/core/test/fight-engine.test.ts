@@ -26,7 +26,7 @@ import {
 } from '../src/index.ts';
 import { K, enemyAt, pacify, playerFor, rules, sec, withAi } from './fight-helpers.ts';
 import { fightingGenin as genin, openWorld, setLevel } from './helpers.ts';
-import { bestOf, speedBudget } from './speed.ts';
+import { bestOf, speedBudget, speedIt } from './speed.ts';
 
 // ---------- A3: independence from the game state ----------
 
@@ -106,7 +106,7 @@ describe('A3: the fight engine does not know the game', () => {
 // ---------- A4: speed ----------
 
 describe('A4: performance', () => {
-  it('simulates 1000 at-level fights in under 1500 ms', () => {
+  speedIt('simulates 1000 at-level fights in under 1500 ms', () => {
     const snap = playerFor(30, 'katon');
     const enemy = enemyAt(30);
     simulateFights(snap, enemy, 50, 1, content, defaultRules);

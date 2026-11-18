@@ -1,5 +1,6 @@
 import { content } from '@shinobi/content';
 import { createState, defaultRules, serialize, xpAt, type Rules } from '@shinobi/core';
+import { speedBudget, speedIt } from '@shinobi/core/speed';
 import { describe, expect, it } from 'vitest';
 import {
   academyBot,
@@ -145,40 +146,29 @@ describe('CLI', () => {
   });
 });
 
-/**
- * How much slower than the machine the budget was set on this one runs right now: the same fixed
- * workload and reference as `packages/core/test/speed.ts`, so a loaded CI runner gets a larger
- * budget, up to a hard cap that still catches a real slowdown.
- */
-function machineFactor(): number {
-  const REFERENCE_MS = 18;
-  let best = Infinity;
-  for (let run = 0; run < 3; run++) {
-    const start = performance.now();
-    let a = 1;
-    let sum = 0;
-    for (let i = 0; i < 20_000_000; i++) {
-      a = (Math.imul(a, 1664525) + 1013904223) >>> 0;
-      sum = (sum + (a & 1023)) | 0;
-    }
-    if (sum === 42) best = 0; // keeps the loop from being optimised away
-    best = Math.min(best, performance.now() - start);
-  }
-  return Math.max(1, best / REFERENCE_MS);
-}
-
 describe('benchmarks', () => {
-  it('advance 12 game hours within the budget (2000 ms on the reference machine), with practice and with a fight', () => {
-    const budget = Math.min(6000, 2000 * machineFactor());
-    const results = runBench();
-    expect(results.map((r) => r.label)).toEqual(['практика', 'бій']);
-    for (const r of results) {
-      expect(r.ms, `${r.label}, budget ${Math.round(budget)} ms`).toBeLessThan(budget);
-      // The activity really ran: thousands of cycles, never ended early.
-      expect(r.cycles, r.label).toBeGreaterThan(1000);
-      expect(r.restarts, r.label).toBe(0);
-    }
-  });
+  speedIt(
+    'advance 12 game hours within the budget (2000 ms on the reference machine), with practice and with a fight',
+    () => {
+      const budget = speedBudget(2000, 6000);
+      // The best of a few runs per activity: the run the machine disturbed least.
+      const best = new Map<string, number>();
+      for (let run = 0; run < 3; run++) {
+        const results = runBench();
+        expect(results.map((r) => r.label)).toEqual(['практика', 'бій']);
+        for (const r of results) {
+          best.set(r.label, Math.min(best.get(r.label) ?? Infinity, r.ms));
+          // The activity really ran: thousands of cycles, never ended early.
+          expect(r.cycles, r.label).toBeGreaterThan(1000);
+          expect(r.restarts, r.label).toBe(0);
+        }
+        if ([...best.values()].every((ms) => ms < budget)) break;
+      }
+      for (const [label, ms] of best) {
+        expect(ms, `${label}, budget ${Math.round(budget)} ms`).toBeLessThan(budget);
+      }
+    },
+  );
 });
 
 describe('clones bot', () => {
