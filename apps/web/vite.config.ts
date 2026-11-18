@@ -75,5 +75,9 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts', 'test/**/*.test.ts'],
+    // Booting the app and advancing game time takes seconds on a loaded runner (the default is 5 s
+    // per test, 10 s per hook). No test here asserts a time; a test that does has its own explicit one.
+    testTimeout: 60_000,
+    hookTimeout: 60_000,
   },
 });
