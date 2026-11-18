@@ -32,7 +32,7 @@
   /** Mastery keys: the techniques, and whatever the game already holds a mastery of. */
   const masteryKeys = $derived.by(() => {
     const known = new Set(content.techniques.map((x) => x.id));
-    const extra = Object.keys(game.state.mastery).filter((k) => !known.has(k));
+    const extra = game.read((gs) => Object.keys(gs.mastery)).filter((k) => !known.has(k));
     return [...techniques, ...extra.map((id) => ({ id, name: fallbackText(`x.${id}`) }))];
   });
 
@@ -67,13 +67,13 @@
   const cap = levelCap(content);
   const speeds = [1, 10, 60, 600];
   const steps = [
-    { key: 'dev.min1', ms: 60_000 },
-    { key: 'dev.min10', ms: 600_000 },
-    { key: 'dev.hour1', ms: 3_600_000 },
-    { key: 'dev.hour8', ms: 28_800_000 },
+    { text: 'dev.min1', ms: 60_000 },
+    { text: 'dev.min10', ms: 600_000 },
+    { text: 'dev.hour1', ms: 3_600_000 },
+    { text: 'dev.hour8', ms: 28_800_000 },
   ];
   const performers = $derived(
-    Array.from({ length: slotCount(game.state, content) }, (_, slot) => ({
+    Array.from({ length: game.read((gs) => slotCount(gs, content)) }, (_, slot) => ({
       slot,
       label: slot === 0 ? dt('dev.performerSelf') : dt('dev.performerClone', { n: slot }),
     })),
@@ -156,7 +156,7 @@
             data-advance={step.ms}
             onclick={() => run({ type: 'time.advance', ms: step.ms })}
           >
-            {dt(step.key)}
+            {dt(step.text)}
           </button>
         {/each}
       </div>
@@ -491,7 +491,7 @@
     position: fixed;
     inset: 0 0 0 auto;
     z-index: calc(var(--z-toast) + 1);
-    width: min(32rem, 100%);
+    width: min(var(--modal-width), 100%);
     overflow-y: auto;
     padding: var(--space-3);
     border-left: var(--border-thin) dashed var(--danger);
@@ -523,7 +523,7 @@
   }
 
   .status {
-    min-height: 1.5em;
+    min-height: var(--control-sm);
     font-size: var(--text-xs);
   }
 
@@ -563,7 +563,7 @@
   }
 
   .field.wide {
-    flex: 1 1 10rem;
+    flex: 1 1 var(--toast-width);
   }
 
   input,
@@ -580,7 +580,7 @@
   }
 
   input[type='number'] {
-    width: 7rem;
+    width: calc(var(--control-md) * 3);
   }
 
   textarea {

@@ -37,7 +37,7 @@
     display: grid;
     gap: var(--space-1);
     min-width: 0;
-    flex: 1 1 14rem;
+    flex: 1 1 var(--toast-width);
   }
 
   .cap {
