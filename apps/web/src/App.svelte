@@ -4,7 +4,6 @@
   import CrashScreen from './components/CrashScreen.svelte';
   import ErrorBoundary from './components/ErrorBoundary.svelte';
   import LoadErrorScreen from './components/LoadErrorScreen.svelte';
-  import DevTools from './components/DevTools.svelte';
   import GoalPanel from './components/GoalPanel.svelte';
   import FinaleModal from './components/FinaleModal.svelte';
   import GraduationModal from './components/GraduationModal.svelte';
@@ -116,6 +115,8 @@
   });
   /** Room at the foot of the page for the developer panel, so it never hides the last controls. */
   const dev = isDevMode();
+  /** The developer panel loads on its own, and only where the build has it: the production bundle holds no trace of it. */
+  const loadDevPanel = __DEV_PANEL__ ? () => import('./dev/DevPanel.svelte') : null;
 </script>
 
 {#if game.phase === 'blocked'}
@@ -157,7 +158,9 @@
 
     <div class="now" bind:this={nowEl}><ErrorBoundary area="now"><NowBar /></ErrorBoundary></div>
     <ToastHost />
-    <DevTools />
+    {#if loadDevPanel && isDevMode()}
+      {#await loadDevPanel() then panel}<panel.default />{/await}
+    {/if}
     {#if game.state.player.name === ''}
       <WelcomeModal />
     {:else if game.finale}

@@ -1,6 +1,7 @@
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { execSync } from 'node:child_process';
 import { VitePWA } from 'vite-plugin-pwa';
+import { loadEnv } from 'vite';
 import { defineConfig } from 'vitest/config';
 
 /** Short git hash of the commit being built; "dev" outside a git checkout. */
@@ -17,7 +18,18 @@ function gitShortHash(): string {
 // The ink token of tokens.css (--ink-900): the page background and the colour of the app frame.
 const INK = '#14161b';
 
-export default defineConfig({
+/**
+ * Whether the build contains the developer panel: the dev server, the Vitest run, a `test` build
+ * (`pnpm --filter @shinobi/web build:test`) and any build with `VITE_DEV_PANEL=1`. A production
+ * build has none of the panel's code or texts.
+ */
+function hasDevPanel(command: string, mode: string): boolean {
+  if (command === 'serve' || mode === 'test') return true;
+  const env = loadEnv(mode, process.cwd(), 'VITE_');
+  return env.VITE_DEV_PANEL === '1' || process.env.VITE_DEV_PANEL === '1';
+}
+
+export default defineConfig(({ command, mode }) => ({
   // Relative, so the build works from any sub-path: the hosting location is not decided yet.
   base: './',
   plugins: [
@@ -68,6 +80,7 @@ export default defineConfig({
   define: {
     __APP_VERSION__: JSON.stringify(gitShortHash()),
     __BUILD_DATE__: JSON.stringify(new Date().toISOString().slice(0, 10)),
+    __DEV_PANEL__: JSON.stringify(hasDevPanel(command, mode)),
   },
   server: { port: 5173 },
   // Svelte's browser build, so a component can be mounted in the DOM tests (server rendering uses svelte/server).
@@ -76,4 +89,4 @@ export default defineConfig({
     environment: 'node',
     include: ['src/**/*.test.ts', 'test/**/*.test.ts'],
   },
-});
+}));

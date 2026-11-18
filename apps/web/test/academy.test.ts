@@ -4,12 +4,12 @@ import type { Component } from 'svelte';
 import { render } from 'svelte/server';
 import { beforeEach, describe, expect, it } from 'vitest';
 import CombatLog from '../src/components/CombatLog.svelte';
-import DevTools from '../src/components/DevTools.svelte';
 import GoalPanel from '../src/components/GoalPanel.svelte';
 import HintHost from '../src/components/HintHost.svelte';
 import NowBar from '../src/components/NowBar.svelte';
 import MainNav from '../src/components/MainNav.svelte';
 import TabBar from '../src/components/TabBar.svelte';
+import DevPanel from '../src/dev/DevPanel.svelte';
 import { isDevMode } from '../src/lib/dev.ts';
 import { migrateLocalGoal } from '../src/lib/goal-migration.ts';
 import { HINTS, nextStateHint } from '../src/lib/hints.ts';
@@ -351,21 +351,17 @@ describe('A5: hints', () => {
 });
 
 describe('A6: developer tools', () => {
-  it('are absent without ?dev=1', () => {
+  it('are switched on by ?dev=1 only', () => {
     for (const search of ['', '?dev=0', '?dev', '?x=1', '?dev=true']) {
       expect(isDevMode(search), search).toBe(false);
-      expect(html(DevTools, { search }), search).not.toContain('data-dev-tools');
     }
-    expect(html(DevTools, {})).not.toContain('data-dev-tools');
-  });
-
-  it('show the time buttons and the dump button with ?dev=1', () => {
     expect(isDevMode('?dev=1')).toBe(true);
     expect(isDevMode('?foo=2&dev=1')).toBe(true);
-    const body = html(DevTools, { search: '?dev=1' });
-    expect(body).toContain('data-dev-tools');
-    for (const ms of [60_000, 600_000, 3_600_000]) expect(body).toContain(`data-advance="${ms}"`);
-    expect(body).toContain('data-dump');
+  });
+
+  it('show the panel opener', () => {
+    const body = html(DevPanel, {});
+    expect(body).toContain('data-dev-open');
   });
 
   it('advance game time through the core, not by editing the state', () => {
