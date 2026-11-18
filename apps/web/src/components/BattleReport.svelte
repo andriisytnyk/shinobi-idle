@@ -73,6 +73,12 @@
           {/if}
         </p>
 
+        {#if (r.cloneLosses ?? 0) > 0}
+          <p class="note" data-clone-losses>
+            {t('battle.cloneLosses', { n: formatInt(r.cloneLosses ?? 0) })}
+          </p>
+        {/if}
+
         {#if r.defeats.length > 0}
           <h4>{t('battle.defeats')}</h4>
           <ul class="list" data-defeats>

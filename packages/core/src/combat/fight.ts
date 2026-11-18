@@ -62,6 +62,7 @@ import {
   KNOWLEDGE_MAX,
   knowledgeTerm,
   hitChance,
+  CHAKRA_DIVISOR_KEY,
   maxChakraOf,
   maxHpOf,
   maxStaminaOf,
@@ -531,7 +532,8 @@ export function createFight(
   const levels = snap.levels;
   const wound = woundFactor(snap.wounds ?? 0, content);
   const maxHp = maxHpOf(levels, content) * wound;
-  const maxChakra = maxChakraOf(levels, content);
+  const chakraDivisor = Math.max(1, snap.chakraDivisor ?? 1);
+  const maxChakra = maxChakraOf(levels, content, chakraDivisor);
   const maxStamina = maxStaminaOf(levels, content);
   const basic = basicAttackOf(levels, content);
   const player: Combatant = {
@@ -560,7 +562,7 @@ export function createFight(
     last: null,
     timer: idleTimer(),
     timers: {},
-    data: {},
+    data: chakraDivisor > 1 ? { [CHAKRA_DIVISOR_KEY]: chakraDivisor } : {},
     ward: 0,
     wardUntil: null,
     decoys: 0,

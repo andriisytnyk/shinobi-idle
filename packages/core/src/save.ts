@@ -467,6 +467,18 @@ function sanitizeCombat(
       : undefined,
   );
   const style = fight.tally.style;
+  const num = (v: unknown): number | undefined =>
+    typeof v === 'number' && Number.isFinite(v) && v > 0 ? Math.min(1e15, v) : undefined;
+  const xp = pick(isRecord(raw.pending) ? raw.pending.xp : undefined, (key, v) =>
+    index.skills.has(key) ? num(v) : undefined,
+  );
+  const mastery = pick(isRecord(raw.pending) ? raw.pending.mastery : undefined, (key, v) => {
+    const amount = isRecord(v) ? num(v.amount) : undefined;
+    const tech = index.techniques.get(key);
+    return amount !== undefined && tech ? { skill: tech.skill, amount } : undefined;
+  });
+  const pending =
+    Object.keys(xp).length + Object.keys(mastery).length > 0 ? { xp, mastery } : undefined;
   return {
     enemy: enemy.id,
     phase,
@@ -481,6 +493,7 @@ function sanitizeCombat(
     style: index.skills.has(String(raw.style)) ? (raw.style as SkillId) : style,
     owner,
     run,
+    ...(pending ? { pending } : {}),
   };
 }
 

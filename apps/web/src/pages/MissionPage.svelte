@@ -170,9 +170,7 @@
             class="ct-action clone"
             data-ui="clone-start"
             disabled={!clone.startable}
-            aria-describedby={clone.refusal?.reason === 'error.cloneNoFight'
-              ? 'why-clone'
-              : undefined}
+            aria-describedby={clone.refusal?.reason === 'error.fightBusy' ? 'why-clone' : undefined}
             onclick={startClone}
           >
             {t('tile.clone')}
@@ -211,7 +209,7 @@
           {/if}
         </div>
       {/if}
-      {#if clone && !running && clone.refusal?.reason === 'error.cloneNoFight'}
+      {#if clone && !running && clone.refusal?.reason === 'error.fightBusy'}
         <p class="ct-why" id="why-clone" data-clone-why>{t(clone.refusal.reason)}</p>
       {/if}
     </section>

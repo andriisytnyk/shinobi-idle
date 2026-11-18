@@ -16,6 +16,7 @@ import { entryOf } from '../combat/zones.ts';
 import { drainPendingResources } from '../village.ts';
 import { MISSION_KIND, fightBusy, fightBusyReason, newMissionCombat } from '../combat/system.ts';
 import { refillPouch } from '../combat/pouch.ts';
+import { payOnStop } from '../combat/pending.ts';
 import type { TeamSupport } from '../combat/fight-types.ts';
 import { SELF, planStage, stageBaseMs, stageReq, teammates, type StagePlan } from './plan.ts';
 
@@ -508,8 +509,9 @@ export const missionKind: ActionKind = {
     if (mission) beginRun(state, slot, mission, content, rules);
   },
 
-  stop(state, slot) {
-    // The fight of a combat stage ends with the mission, but only if this slot owns it.
+  stop(state, slot, _id, content, rules) {
+    // The fight of a combat stage ends with the mission, but only if this slot owns it; a dispelled clone is paid what it earned.
+    payOnStop(state, slot, content, rules);
     if (state.combat?.owner === slot) state.combat = null;
   },
 

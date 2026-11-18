@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { cloneCount, isCloneSlot } from '@shinobi/core';
   import { buildScene, outcomesOf, targetedKey } from '../lib/fight-scene.ts';
   import Slot from '../lib/ext/Slot.svelte';
   import { t } from '../lib/i18n.ts';
@@ -23,15 +24,28 @@
     }),
   );
 
+  /** Whether a clone fights: the pools of the left side are the clone's. */
+  const clone = $derived(game.read((gs) => (scene ? isCloneSlot(gs, content, scene.slot) : false)));
+  /** Whether a clone exists: the chakra pool of the fighter is divided. */
+  const cloned = $derived(game.read((gs) => cloneCount(gs, content) > 0));
+
   const stop = () => {
-    if (scene) void game.dispatch({ type: 'action.stop', slot: scene.slot });
+    if (!scene) return;
+    void game.dispatch(
+      clone
+        ? { type: 'clone.dispel', slot: scene.slot }
+        : { type: 'action.stop', slot: scene.slot },
+    );
   };
 </script>
 
 {#if scene}
+  {#if clone}<p class="clone-note" data-clone-fights>
+      <strong>{t('combat.cloneFights')}</strong> · {t('combat.cloneNote')}
+    </p>{:else if cloned}<p class="clone-note" data-clone-split>{t('combat.cloneSplit')}</p>{/if}
   <section class="arena" data-ui="fight-arena" data-phase={scene.phase}>
     <div class="side" data-side="player">
-      <Fighter f={scene.player} outcomes={outcomes[scene.player.key] ?? []} />
+      <Fighter f={scene.player} outcomes={outcomes[scene.player.key] ?? []} {clone} />
     </div>
     <div class="side" data-side="enemies">
       {#if scene.phase !== 'fight'}
@@ -47,10 +61,18 @@
 
   <Slot name="fight.arena" ctx={{ target }} />
 
-  <button type="button" class="stop" onclick={stop}>{t('combat.stop')}</button>
+  <button type="button" class="stop" onclick={stop}
+    >{t(clone ? 'now.dispel' : 'combat.stop')}</button
+  >
 {/if}
 
 <style>
+  .clone-note {
+    margin: 0 0 var(--space-2);
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
+  }
+
   .arena {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(var(--tile-min), 1fr));

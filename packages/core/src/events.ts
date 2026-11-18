@@ -48,6 +48,8 @@ export interface EnemyDefeatedEvent extends EventBase {
 export interface PlayerDefeatedEvent extends EventBase {
   type: 'playerDefeated';
   enemy: string;
+  /** A clone lost the fight: no Wounds and no defeat for the player, the fight starts again. */
+  clone?: boolean | undefined;
 }
 /** One line of the battle log: who did what, with which technique, for how much damage. */
 export interface CombatLogEvent extends EventBase {

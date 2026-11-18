@@ -1,4 +1,5 @@
 import type { ContentDb, SkillId, Technique } from '@shinobi/content';
+import { chakraDivisor } from '../clone.ts';
 import { masteryLevel } from '../formulas.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
@@ -28,7 +29,7 @@ export const playerMaxHp = (state: GameState, content: ContentDb): number =>
   maxHpOf(levelsOf(state, content), content);
 
 export const playerMaxChakra = (state: GameState, content: ContentDb): number =>
-  maxChakraOf(levelsOf(state, content), content);
+  maxChakraOf(levelsOf(state, content), content, chakraDivisor(state, content));
 
 export const playerChakraRegen = (state: GameState, content: ContentDb): number =>
   chakraRegenOf(levelsOf(state, content), content);
