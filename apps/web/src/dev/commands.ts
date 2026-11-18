@@ -86,6 +86,22 @@ const fail = (reason: string): DevResult => ({ ok: false, reason });
 
 const isCount = (n: unknown): n is number => Number.isInteger(n) && (n as number) >= 0;
 
+/** The most one command hands out of an item or a currency: a sane bound for a test, not a game rule. */
+export const MAX_GRANT = 1e9;
+const isGrant = (n: unknown): n is number => isCount(n) && n > 0 && n <= MAX_GRANT;
+
+/** The keys a Mastery can be set for: the same things the game keeps one of (the techniques, drills, practices, obstacles, herbs, recipes). */
+export function masteryKeysOf(content: ContentDb): Set<string> {
+  return new Set([
+    ...content.techniques.map((x) => x.id),
+    ...content.exercises.map((x) => x.id),
+    ...content.practices.map((x) => x.id),
+    ...content.obstacles.map((x) => x.id),
+    ...content.herbs.map((x) => x.id),
+    ...content.recipes.map((x) => x.id),
+  ]);
+}
+
 /** What a command that moves levels, techniques or ranks leaves to settle: unlocks, slots and quests. */
 export function settle(state: GameState, content: ContentDb): void {
   refreshUnlocks(state, content);
@@ -176,9 +192,12 @@ function completeStep(state: GameState, id: string, content: ContentDb, depth = 
   if (!objective) return fail('dev.err.unknown');
   if (objective.t === 'counter') {
     const counters = [objective.counter, ...(objective.also ?? [])];
-    const counted = counters.reduce((sum, key) => sum + counterValue(state, key), 0);
-    const need = objective.total ? objective.n - counted : objective.n - (counted - progress.base);
-    if (need > 0) bump(state, objective.counter, need);
+    const counted = () => counters.reduce((sum, key) => sum + counterValue(state, key), 0);
+    const target = objective.total ? objective.n : progress.base + objective.n;
+    // A counter may be read as the larger of its stored value and something else (the natures the
+    // character has), so one bump may not move it: the shortfall is asked again until it is made up.
+    for (let guard = 0; guard < 4 && counted() < target; guard++)
+      bump(state, objective.counter, target - counted());
   } else if (objective.t === 'pay') {
     bump(state, payKey(quest.id, progress.step));
   } else {
@@ -277,6 +296,7 @@ export function runDev(
     }
     case 'mastery.set': {
       if (!isCount(command.level) || command.key === '') return fail('dev.err.badNumber');
+      if (!masteryKeysOf(content).has(command.key)) return fail('dev.err.unknownMastery');
       const level = Math.min(command.level, content.balance.K.masteryCap);
       if (level === 0) delete state.mastery[command.key];
       else state.mastery[command.key] = { xp: xpAt(level) };
@@ -294,13 +314,13 @@ export function runDev(
     }
     case 'item.grant': {
       if (!content.items.some((i) => i.id === command.id)) return fail('dev.err.unknown');
-      if (!isCount(command.n) || command.n === 0) return fail('dev.err.badNumber');
+      if (!isGrant(command.n)) return fail('dev.err.badNumber');
       addItem(state, command.id, command.n);
       emit(state, { type: 'itemGained', id: command.id, n: command.n });
       return ok;
     }
     case 'currency.grant':
-      if (!isCount(command.n) || command.n === 0) return fail('dev.err.badNumber');
+      if (!isGrant(command.n)) return fail('dev.err.badNumber');
       return addCurrency(state, command.id, command.n) ? ok : fail('dev.err.unknown');
     case 'technique.learn':
       return learn(state, command.id, content);
@@ -388,7 +408,10 @@ export function runDev(
     case 'raid.spawn':
       return spawnRaid(state, command.raid, content);
     case 'clone.create':
+    case 'clone.setLife':
+    case 'clone.refill':
+    case 'clone.dispel':
     case 'clone.clearFatigue':
-      return cloneCommand(state, content, command, { learn });
+      return cloneCommand(state, content, rules, command, { learn });
   }
 }
