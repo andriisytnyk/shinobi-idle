@@ -14,7 +14,8 @@ import {
   updateQuests,
   type GameState,
 } from '../src/index.ts';
-import { missionBoard } from '../src/index.ts';
+import { asPerformer, dispatch, growSlots, missionBoard } from '../src/index.ts';
+import { player } from './missions-helpers.ts';
 import { HOUR, modContent, modGenin, modRules, plainGenin, setNatures } from './packs-helpers.ts';
 import { learnReq, evalReq } from '../src/index.ts';
 
@@ -171,5 +172,31 @@ describe('Renown ranks: a pack adds its own', () => {
     expect(state.bank['testmod:pellet']).toBe(1);
     void modRules;
     void createState;
+  });
+});
+
+describe('Renown ranks: rewards belong to the character', () => {
+  it('pays the rewards to the character when a clone step triggers updateQuests', () => {
+    const state = player({
+      seed: 5,
+      natures: ['katon'],
+      known: ['core:shadow_clone'],
+      levels: { nin: 50, cc: 40 },
+      bank: { 'core:mint': 50 },
+    });
+    growSlots(state, content);
+    expect(dispatch(state, { type: 'clone.create' }, content).ok).toBe(true);
+    const clone = state.clones[1];
+    expect(clone).toBeDefined();
+    state.currencies[RENOWN] = 320;
+    state.events = [];
+    const cloneBagBefore = JSON.stringify(clone?.bag);
+    const clonePurseBefore = JSON.stringify(clone?.purse);
+    asPerformer(state, 1, () => updateQuests(state, content));
+    // The ranks are granted from the character's Reputation, not the clone's empty purse.
+    expect(events(state)).toEqual(ids());
+    expect(state.bank['core:chai_badorosti']).toBe(2);
+    expect(JSON.stringify(state.clones[1]?.bag)).toBe(cloneBagBefore);
+    expect(JSON.stringify(state.clones[1]?.purse)).toBe(clonePurseBefore);
   });
 });

@@ -13,6 +13,7 @@ import {
   dispatch,
   EXPLORE_KIND,
   getMod,
+  asPerformer,
   hexInfo,
   hexKey,
   isFound,
@@ -93,7 +94,8 @@ function stand(state: GameState, placeId: string, slot = 0): void {
 
 /** A second action slot with a clone standing in it at the hex of a place. */
 function cloneAt(state: GameState, placeId: string): void {
-  state.slots.push({ action: { kind: 'stand', id: 'here' }, progress: 0, share: 500, data: null });
+  state.slots.push({ action: null, progress: 0, share: 0, data: null });
+  expect(dispatch(state, { type: 'clone.create', slot: 1 }, content)).toEqual({ ok: true });
   stand(state, placeId, 1);
 }
 
@@ -237,22 +239,24 @@ describe('places of power', () => {
       { slot: 0, key: keyOfPlace('core:west_gate_post') },
       { slot: 1, key: keyOfPlace(TG44) },
     ]);
-    expect(getMod(s, 'xp.skill.tai', content).total).toBeCloseTo(1.05, 12);
-    // The character joins the clone: still one point, one bonus.
+    // The bonus is the clone's alone: its actions get it, the character's do not.
+    expect(getMod(s, 'xp.skill.tai', content).total).toBe(1);
+    expect(asPerformer(s, 1, () => getMod(s, 'xp.skill.tai', content).total)).toBeCloseTo(1.05, 12);
+    // The character joins the clone: each performer gets the bonus for its own actions, once.
     stand(s, TG44, 0);
     expect(getMod(s, 'xp.skill.tai', content).total).toBeCloseTo(1.05, 12);
     expect(getMod(s, 'xp.skill.tai', content).parts).toHaveLength(1);
+    expect(asPerformer(s, 1, () => getMod(s, 'xp.skill.tai', content).parts)).toHaveLength(1);
   });
 
-  it('a clone without an action is not on the map: it gives nothing', () => {
+  it('a clone that only stands on the point gives its bonus to nobody else', () => {
     const s = genin(1);
     s.world.pois[TG44] = true;
     cloneAt(s, TG44);
-    s.slots[1]!.action = null;
     expect(getMod(s, 'xp.skill.tai', content).total).toBe(1);
   });
 
-  it('different points add up', () => {
+  it('different points belong to their own performers and do not add up', () => {
     // A second place with the same bonus, two hexes away.
     const twin: Place = {
       id: 'core:twin_ground',
@@ -267,7 +271,8 @@ describe('places of power', () => {
     s.world.pois[twin.id] = true;
     cloneAt(s, 'core:rice_hamlet');
     stand(s, TG44, 0);
-    expect(getMod(s, 'xp.skill.tai', c2).total).toBeCloseTo(1.1, 12);
+    expect(getMod(s, 'xp.skill.tai', c2).total).toBeCloseTo(1.05, 12);
+    expect(asPerformer(s, 1, () => getMod(s, 'xp.skill.tai', c2).total)).toBeCloseTo(1.05, 12);
   });
 });
 
@@ -824,9 +829,9 @@ describe('a clone that arrives stays', () => {
     advance(s, 30 * MIN, content);
     expect(s.slots[1]?.action).toEqual({ kind: 'stand', id: 'here' });
     expect(s.world.figures?.[1]).toBe('core:rysovi_polia');
-    // The standing clone slows the character as every clone does: two slots share the pool.
-    expect(s.slots[0]?.share).toBeLessThan(1000);
-    expect(s.slots[1]?.share).toBe(s.slots[0]?.share);
+    // The standing clone slows nobody: every performer works at full speed.
+    expect(s.slots[0]?.share).toBe(1000);
+    expect(s.slots[1]?.share).toBe(1000);
     advance(s, 5 * HOUR, content);
     expect(s.world.figures?.[1]).toBe('core:rysovi_polia');
     // Given another action it stays where it is and surveys from there.

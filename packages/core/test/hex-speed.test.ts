@@ -14,7 +14,7 @@ import {
   type GameState,
 } from '../src/index.ts';
 import { genin, setLevel } from './helpers.ts';
-import { bestOf, speedBudget } from './speed.ts';
+import { bestOf, speedBudget, speedIt } from './speed.ts';
 
 const HOUR = 3_600_000;
 const MIN = 60_000;
@@ -32,39 +32,47 @@ function autoSurveying(scout: number): GameState {
 }
 
 describe('A11: the map is quick offline', () => {
-  it('12 hours of auto-survey finish within the speed budget (500 ms on the reference machine, never above 2 s)', () => {
-    // The same kind of budget as 12 hours of practice: scaled to the machine, the best of several runs.
-    const limit = speedBudget(500, 2000);
-    const best = bestOf(5, limit, () => {
-      const state = autoSurveying(1);
-      advance(state, 12 * HOUR, content);
-      expect(state.now).toBe(12 * HOUR);
-      // It really surveyed (and kept going), not stopped at once.
-      expect(Object.keys(state.world.surveyed).length).toBeGreaterThan(60);
-    });
-    expect(best).toBeLessThan(limit);
-  });
+  speedIt(
+    '12 hours of auto-survey finish within the speed budget (500 ms on the reference machine, never above 2 s)',
+    () => {
+      // The same kind of budget as 12 hours of practice: scaled to the machine, the best of several runs.
+      const limit = speedBudget(500, 2000);
+      const best = bestOf(5, limit, () => {
+        const state = autoSurveying(1);
+        advance(state, 12 * HOUR, content);
+        expect(state.now).toBe(12 * HOUR);
+        // It really surveyed (and kept going), not stopped at once.
+        expect(Object.keys(state.world.surveyed).length).toBeGreaterThan(60);
+      });
+      expect(best).toBeLessThan(limit);
+    },
+  );
 
-  it('12 hours of walking from one end of the surveyed land to the other and back finish within the budget', () => {
-    const limit = speedBudget(500, 2000);
-    const best = bestOf(5, limit, () => {
-      const state = genin(1);
-      // All the land is surveyed: the walk is a plain search over the whole grid.
-      for (const h of content.hexes) if (h.terrain) state.world.surveyed[hexKey(h.q, h.r)] = true;
-      const ends = ['core:okolytsi_sela', content.cells[content.cells.length - 1]?.id ?? ''];
-      let walked = 0;
-      for (let leg = 0; walked < 12 * HOUR; leg++) {
-        const to = ends[(leg + 1) % 2] ?? '';
-        const plan = travelPlan(state, to, content);
-        expect(plan.blocked, to).toBeNull();
-        expect(dispatch(state, { type: 'world.travel', cell: to }, content)).toEqual({ ok: true });
-        advance(state, plan.ms + MIN, content);
-        walked += plan.ms + MIN;
-        expect(state.world.location).toBe(to);
-      }
-    });
-    expect(best).toBeLessThan(limit);
-  });
+  speedIt(
+    '12 hours of walking from one end of the surveyed land to the other and back finish within the budget',
+    () => {
+      const limit = speedBudget(500, 2000);
+      const best = bestOf(5, limit, () => {
+        const state = genin(1);
+        // All the land is surveyed: the walk is a plain search over the whole grid.
+        for (const h of content.hexes) if (h.terrain) state.world.surveyed[hexKey(h.q, h.r)] = true;
+        const ends = ['core:okolytsi_sela', content.cells[content.cells.length - 1]?.id ?? ''];
+        let walked = 0;
+        for (let leg = 0; walked < 12 * HOUR; leg++) {
+          const to = ends[(leg + 1) % 2] ?? '';
+          const plan = travelPlan(state, to, content);
+          expect(plan.blocked, to).toBeNull();
+          expect(dispatch(state, { type: 'world.travel', cell: to }, content)).toEqual({
+            ok: true,
+          });
+          advance(state, plan.ms + MIN, content);
+          walked += plan.ms + MIN;
+          expect(state.world.location).toBe(to);
+        }
+      });
+      expect(best).toBeLessThan(limit);
+    },
+  );
 
   it('the plan that is kept between cycles is the plan a fresh search would make', () => {
     const state = autoSurveying(1);

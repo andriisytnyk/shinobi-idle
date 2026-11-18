@@ -166,9 +166,12 @@ describe('pnpm sim fight', () => {
 
 describe('pnpm sim crafts', () => {
   let report: CraftsReport;
+  // Six game hours of the crafts bot take about 5 s alone and more on a loaded runner (the village,
+  // modifier and world ticks dominate the profile since the balance fit). There is no wall-clock
+  // assertion here, so the hook gets a generous explicit timeout instead of the 10 s default.
   beforeAll(() => {
     report = craftsReport({ seed: 1, hours: 6 });
-  });
+  }, 120_000);
 
   it('prints byte-identical JSON for the same seed', () => {
     const args = ['crafts', '--seed', '2', '--hours', '1', '--json'];

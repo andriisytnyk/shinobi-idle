@@ -35,6 +35,7 @@ import {
 import { graduateReq, indexOf } from './lookup.ts';
 import { computeMod, type Modifier, type ModifierProvider } from './modifiers.ts';
 import { gainXp } from './progression.ts';
+import { STAND_ID, STAND_KIND, actingPerformer } from './performer.ts';
 import { pointStatus, pointsAtHex, performers, settlePoints } from './points.ts';
 import { regionOpenReq } from './regions.ts';
 import { actionFloor, activitySkill, currencyOf, moneyOf } from './vocab.ts';
@@ -355,16 +356,15 @@ function surveyOnce(state: GameState, subject: Subject, content: ContentDb, rule
   return done;
 }
 
-/** The action kind of a clone that has arrived: it stands where it is and does nothing, so it keeps its place on the map and its share of the speed. */
-export const STAND_KIND = 'stand';
-/** The only action id of standing. */
-export const STAND_ID = 'here';
+export { STAND_KIND, STAND_ID };
 
 /** What a clone does when its walk, survey or auto-survey ends: it stands where it stopped (the character's slot is left idle). */
 const standAfter = (_state: GameState, slot: number): { kind: string; id: string } | null =>
   slot > 0 ? { kind: STAND_KIND, id: STAND_ID } : null;
 
 export const exploreKind: ActionKind = {
+  // One performer surveys a hex at a time.
+  unique: () => true,
   has: (id, content) => subjectOf(content, id) !== null,
   skill: (_id, content) => scoutSkill(content),
   requirements: (state, id, content) => surveyReq(state, id, content),
@@ -753,12 +753,14 @@ function trainingIds(content: ContentDb): string[] {
   return ids;
 }
 
-/** The training spots a performer (the character or a clone) stands in, once each, when their cells have been explored. */
+/** The training spots the performer being computed (`actingPerformer`) stands in, once each, when their cells have been explored: a spot helps the one who stands on it. */
 function trainingHere(state: GameState, content: ContentDb): (Poi & { kind: 'training' })[] {
   // The providers are asked all the time: with no training spot found there is nothing to look at.
   if (!trainingIds(content).some((id) => state.world.pois[id])) return [];
   const out = new Map<string, Poi & { kind: 'training' }>();
-  for (const { key } of performers(state, content)) {
+  const acting = actingPerformer();
+  for (const { slot, key } of performers(state, content)) {
+    if (slot !== acting) continue;
     const cell = indexOf(content).cellByHex.get(key);
     for (const p of cell?.pois ?? [])
       if (p.kind === 'training' && state.world.pois[p.id]) out.set(p.id, p);

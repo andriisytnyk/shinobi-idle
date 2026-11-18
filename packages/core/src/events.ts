@@ -44,10 +44,14 @@ export interface ActionStoppedEvent extends EventBase {
 export interface EnemyDefeatedEvent extends EventBase {
   type: 'enemyDefeated';
   enemy: string;
+  /** The performer whose fight it was: 0, the character, or the slot of a clone. */
+  slot?: number | undefined;
 }
 export interface PlayerDefeatedEvent extends EventBase {
   type: 'playerDefeated';
   enemy: string;
+  /** The performer whose fight it was: 0, the character, or the slot of a clone. */
+  slot?: number | undefined;
   /** A clone lost the fight: no Wounds and no defeat for the player, the fight starts again. */
   clone?: boolean | undefined;
 }
@@ -61,6 +65,8 @@ export interface CombatLogEvent extends EventBase {
   tech: string | null;
   /** Content id of the enemy in the fight. */
   enemy: string;
+  /** The performer whose fight it is: 0, the character, or the slot of a clone. */
+  slot?: number | undefined;
   /** Damage dealt by a hit; 0 otherwise. */
   dmg: number;
   /** The id of the combatant whose action it is (on `cast`, `resolve` and `interrupted`). */
@@ -325,7 +331,25 @@ export interface RuleDisabledEvent extends EventBase {
   reason: string;
 }
 
+/** A shadow clone was made in a slot. */
+export interface CloneMadeEvent extends EventBase {
+  type: 'cloneMade';
+  slot: number;
+}
+/** A shadow clone was dispelled: by the player, by its chakra running out, or by death; what it knew went to the character. */
+export interface CloneDispelledEvent extends EventBase {
+  type: 'cloneDispelled';
+  slot: number;
+  cause: 'manual' | 'life' | 'death';
+  /** Skill XP handed over, by skill. */
+  xp: Record<string, number>;
+  /** Mind fatigue it left, in ms. */
+  fatigueMs: number;
+}
+
 export type GameEvent =
+  | CloneMadeEvent
+  | CloneDispelledEvent
   | LevelUpEvent
   | MasteryUpEvent
   | PoolCheckpointEvent

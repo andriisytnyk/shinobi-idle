@@ -2,6 +2,8 @@ export * from './actions.ts';
 export * from './athletics.ts';
 export * from './checkpoints.ts';
 export * from './clone.ts';
+export * from './clone-life.ts';
+export { actingPerformer, asPerformer, allFights, fightOf } from './performer.ts';
 export * from './meditation.ts';
 export * from './missions/index.ts';
 export * from './bank.ts';

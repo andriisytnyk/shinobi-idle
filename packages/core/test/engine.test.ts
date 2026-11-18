@@ -15,7 +15,7 @@ import {
   type ActionKind,
 } from '../src/index.ts';
 import { genin, HOUR, setLevel, start } from './helpers.ts';
-import { bestOf, speedBudget } from './speed.ts';
+import { bestOf, speedBudget, speedIt } from './speed.ts';
 
 const LEAF = 'core:leaf_whirlwind';
 
@@ -92,17 +92,20 @@ describe('advance', () => {
     expect(serialize(random)).toBe(serialize(whole));
   });
 
-  it('A11: 12 hours of practice finish within the speed budget (500 ms on the reference machine, never above 2 s)', () => {
-    // Other test files run at the same time and CI runners are slower, so the budget is scaled to
-    // the machine, and the best of several runs is taken: the run the machine disturbed least.
-    const limit = speedBudget(500, 2000);
-    const best = bestOf(5, limit, () => {
-      const state = busyState();
-      advance(state, 12 * HOUR, content);
-      expect(state.now).toBe(12 * HOUR);
-    });
-    expect(best).toBeLessThan(limit);
-  });
+  speedIt(
+    'A11: 12 hours of practice finish within the speed budget (500 ms on the reference machine, never above 2 s)',
+    () => {
+      // Other test files run at the same time and CI runners are slower, so the budget is scaled to
+      // the machine, and the best of several runs is taken: the run the machine disturbed least.
+      const limit = speedBudget(500, 2000);
+      const best = bestOf(5, limit, () => {
+        const state = busyState();
+        advance(state, 12 * HOUR, content);
+        expect(state.now).toBe(12 * HOUR);
+      });
+      expect(best).toBeLessThan(limit);
+    },
+  );
 
   it('runs extra systems of a custom rule set, without touching the default one', () => {
     const state = createState(1, content);
@@ -129,7 +132,7 @@ describe('advance', () => {
     expect(fired).toBe(1);
     advance(state, 10_000, content, rules);
     expect(fired).toBe(1);
-    expect(defaultRules.systems).toHaveLength(6);
+    expect(defaultRules.systems).toHaveLength(7);
   });
 
   it('throws instead of hanging when a system never lets time move', () => {
@@ -384,7 +387,6 @@ describe('dispatch', () => {
 });
 
 describe('speed budget', () => {
-  const sum = (s: GameState) => s.slots.reduce((n, slot) => n + slot.share, 0);
   const slots = (n: number) => {
     const s = createState(1, content);
     s.player.rank = 'genin';
@@ -401,16 +403,16 @@ describe('speed budget', () => {
     expect(s.slots[0]?.share).toBe(1000);
   });
 
-  it('splits among active slots, remainder to the first, and re-splits on stop', () => {
+  it('gives every running slot the full speed (no shared pool), and none to an idle one', () => {
     const s = slots(3);
     dispatch(s, start('practice', 'core:clone', 0), content);
     dispatch(s, start('practice', 'core:transformation', 1), content);
-    expect(s.slots.map((x) => x.share)).toEqual([500, 500, 0]);
+    expect(s.slots.map((x) => x.share)).toEqual([1000, 1000, 0]);
     dispatch(s, start('practice', 'core:body_replacement', 2), content);
-    expect(s.slots.map((x) => x.share)).toEqual([334, 333, 333]);
-    expect(sum(s)).toBe(1000);
+    expect(s.slots.map((x) => x.share)).toEqual([1000, 1000, 1000]);
+
     dispatch(s, { type: 'action.stop', slot: 0 }, content);
-    expect(s.slots.map((x) => x.share)).toEqual([0, 500, 500]);
+    expect(s.slots.map((x) => x.share)).toEqual([0, 1000, 1000]);
     advance(s, 30_000, content);
     expect(s.stats.completed).toBeGreaterThan(0);
   });

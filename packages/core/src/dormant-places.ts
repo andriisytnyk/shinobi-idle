@@ -101,6 +101,8 @@ export const STATE_IDS: Record<keyof GameState, StateIdRule> = {
   counters: 'place',
   quests: 'place',
   combat: 'dropped',
+  clones: 'dropped',
+  fatigue: 'none',
   buffs: 'place',
   bushes: 'place',
   gear: 'place',

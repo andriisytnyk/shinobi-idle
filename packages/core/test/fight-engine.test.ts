@@ -26,7 +26,7 @@ import {
 } from '../src/index.ts';
 import { K, enemyAt, pacify, playerFor, rules, sec, withAi } from './fight-helpers.ts';
 import { fightingGenin as genin, openWorld, setLevel } from './helpers.ts';
-import { bestOf, speedBudget } from './speed.ts';
+import { bestOf, speedBudget, speedIt } from './speed.ts';
 
 // ---------- A3: independence from the game state ----------
 
@@ -106,7 +106,7 @@ describe('A3: the fight engine does not know the game', () => {
 // ---------- A4: speed ----------
 
 describe('A4: performance', () => {
-  it('simulates 1000 at-level fights in under 1500 ms', () => {
+  speedIt('simulates 1000 at-level fights in under 1500 ms', () => {
     const snap = playerFor(30, 'katon');
     const enemy = enemyAt(30);
     simulateFights(snap, enemy, 50, 1, content, defaultRules);
@@ -312,7 +312,7 @@ describe('A2: split invariance with fights running', () => {
         const whole = run(enemy, slots, at, total);
         for (const chunk of [1, 7, 999, 3600]) expect(run(enemy, slots, at, chunk)).toBe(whole);
         const loaded = deserialize(whole, content);
-        expect(loaded.combat?.fight.t).toBeGreaterThan(0);
+        expect((at === 0 ? loaded.combat : loaded.clones[at]?.fight)?.fight.t).toBeGreaterThan(0);
         expect(loaded.counters[`kills.${enemy}`] ?? 0).toBeGreaterThanOrEqual(0);
       });
     }
@@ -335,7 +335,7 @@ describe('A2: split invariance with fights running', () => {
         content,
       );
     }
-    expect(state.slots[1]?.share).toBe(333);
+    expect(state.slots[1]?.share).toBe(1000);
   });
 
   it('is deterministic for a seed and differs for another', () => {

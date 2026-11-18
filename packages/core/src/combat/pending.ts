@@ -1,5 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
-import { isCloneSlot } from '../clone.ts';
+import { actingBody } from '../performer.ts';
 import { gainXp, grantMastery } from '../progression.ts';
 import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
@@ -11,9 +11,9 @@ import type { CombatState, Pending } from './types.ts';
  * so modifiers apply at the moment of payment. The state holds it (`CombatState.pending`).
  */
 
-/** Whether the fight the state holds is a clone's. */
-export const cloneFights = (state: GameState, content: ContentDb): boolean =>
-  state.combat !== null && isCloneSlot(state, content, state.combat.owner);
+/** Whether the fight the state holds (the one of the performer being computed) is a clone's. */
+export const cloneFights = (state: GameState): boolean =>
+  state.combat !== null && actingBody(state) !== null;
 
 const MAX = 1e15;
 
@@ -30,7 +30,7 @@ export function earnXp(
   rules: Rules,
 ): void {
   const c = state.combat;
-  if (c && cloneFights(state, content)) {
+  if (c && cloneFights(state)) {
     if (amount > 0) {
       const p = bucket(c);
       p.xp[skill] = Math.min(MAX, (p.xp[skill] ?? 0) + amount);

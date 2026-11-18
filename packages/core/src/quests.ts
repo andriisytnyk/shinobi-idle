@@ -8,6 +8,7 @@ import { currencyOf, rankIndex } from './vocab.ts';
 import type { System } from './system.ts';
 import type { GameState } from './state.ts';
 import { rewardScroll } from './scrolls.ts';
+import { asPerformer } from './performer.ts';
 import { updateRenownRanks } from './renown.ts';
 import { refreshRegions } from './regions.ts';
 import { refreshUnlocks } from './unlocks.ts';
@@ -112,6 +113,12 @@ function applyRewards(state: GameState, rewards: QuestRewards, content: ContentD
  * Emits `questStep` for each finished step and `questDone` when the last one falls.
  */
 export function updateQuests(state: GameState, content: ContentDb): void {
+  // Quests, Reputation and their rewards are the character's: when a clone's step calls this, the
+  // clone's bag and purse are swapped in, so step out to the character first.
+  asPerformer(state, 0, () => updateQuestsOf(state, content));
+}
+
+function updateQuestsOf(state: GameState, content: ContentDb): void {
   // A new Genin gets a village and Reputation may open its second stage; a quest may ask for either.
   syncVillage(state, content);
   // Region flags first: a step may ask for an open region.

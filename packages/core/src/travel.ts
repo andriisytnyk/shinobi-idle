@@ -2,6 +2,7 @@ import type { ContentDb, Place } from '@shinobi/content';
 import { rebalanceShares, stopSlot } from './actions.ts';
 import { hasCurrency, removeCurrency } from './bank.ts';
 import { growSlots } from './clone.ts';
+import { createClone } from './clone-life.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
 import { hexKey, hexOfAddress, placeAt, positionHex, positionOf, routeTo } from './hex.ts';
@@ -119,7 +120,11 @@ export function jumpTo(
   const hex = hexOfAddress(content, address);
   if (!hex) return { ok: false, reason: 'error.unknownCell' };
   const price = mode === 'paid' ? (travelPrice(state, address, content, rules, slot) ?? 0) : 0;
-  // A clone made here appears where the character stands, as a clone made by an action does.
+  // A clone slot with no clone: one is made (the default pouch) where the character stands, as by any action.
+  if (slot > 0 && !state.clones[slot]) {
+    const made = createClone(state, slot, undefined, content, rules);
+    if (!made.ok) return made;
+  }
   const idle = entry.action === null;
   if (slot > 0 && idle && positionOf(state, slot) === state.world.location)
     placeAt(state, slot, state.world.location);

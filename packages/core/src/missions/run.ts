@@ -21,7 +21,8 @@ import type { GameState, JsonValue } from '../state.ts';
 import { currencyOf, isNature } from '../vocab.ts';
 import { entryOf } from '../combat/zones.ts';
 import { drainPendingResources } from '../village.ts';
-import { MISSION_KIND, fightBusy, fightBusyReason, newMissionCombat } from '../combat/system.ts';
+import { MISSION_KIND, newMissionCombat } from '../combat/system.ts';
+import { asPerformer } from '../performer.ts';
 import { refillPouch } from '../combat/pouch.ts';
 import { payOnStop } from '../combat/pending.ts';
 import type { TeamSupport } from '../combat/fight-types.ts';
@@ -189,18 +190,15 @@ function beginStage(
   }
   const next: MissionRun = { ...run, s: index, p: plan, w: 0, q: 0, f: 0, st: '' };
   if (entry) {
-    if (fightBusy(state, at)) next.q = 1;
-    else {
-      state.combat = newMissionCombat(
-        state,
-        entry,
-        supportOf(state, mission, content),
-        content,
-        rules,
-        at,
-      );
-      next.f = 1;
-    }
+    state.combat = newMissionCombat(
+      state,
+      entry,
+      supportOf(state, mission, content),
+      content,
+      rules,
+      at,
+    );
+    next.f = 1;
   }
   store(state, at, next);
   slot.progress = 0;
@@ -483,10 +481,8 @@ export const missionKind: ActionKind = {
     if (other >= 0) return RUNNING_ELSEWHERE;
     // A team mission goes with the team, which exists once the nature test is passed.
     if (mission.team && state.team === null) return NEEDS_TEAM;
-    // A mission with a combat stage ahead needs the fight to be free, so only one such action runs.
-    return mission.stages.some((s) => s.t === 'combat')
-      ? fightBusyReason(state, slot, content)
-      : null;
+    // Every performer has a fight of its own: a combat stage never waits for another one's fight.
+    return null;
   },
 
   requirements(state, id, content, rules) {
@@ -542,7 +538,7 @@ export const missionKind: ActionKind = {
       // The stage waited for the fight to be free: begin it now if it is, else wait on.
       const entry = stage.t === 'combat' ? entryOf(content, stage.enemy) : undefined;
       if (!entry) return 'abort';
-      if (fightBusy(state, at)) return 'step';
+      // (A run saved while it waited for a free fight, before every performer had its own: it begins its fight now.)
       state.combat = newMissionCombat(
         state,
         entry,
@@ -617,6 +613,19 @@ export function repairMissions(state: GameState, content: ContentDb, rules: Rule
     const mission =
       slot.action?.kind === MISSION_KIND ? missionOf(content, slot.action.id) : undefined;
     if (!mission) return;
+    asPerformer(state, at, () => repairMission(state, slot, at, mission, content, rules));
+  });
+}
+
+function repairMission(
+  state: GameState,
+  slot: GameState['slots'][number],
+  at: number,
+  mission: Mission,
+  content: ContentDb,
+  rules: Rules,
+): void {
+  {
     const run = readRun(slot.data, mission, content);
     const stage = run ? mission.stages[run.s] : undefined;
     const wanted = run?.f === 1 && stage?.t === 'combat' ? stage.enemy : null;
@@ -645,5 +654,5 @@ export function repairMissions(state: GameState, content: ContentDb, rules: Rule
     if (!beginRun(state, at, mission, content, rules)) {
       stopSlot(state, at, 'requirements', content, rules, CANNOT_GO_ON);
     }
-  });
+  }
 }

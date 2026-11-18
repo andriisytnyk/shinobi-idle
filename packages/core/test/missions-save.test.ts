@@ -21,7 +21,7 @@ function run(state: GameState, total: number, chunk: number): GameState {
   return state;
 }
 
-/** A player running `id`, alone in slot 0 or sharing the speed with a practice in slot 1 (shares 500 and 500). */
+/** A player running `id`, alone in slot 0 or sharing the speed with a practice in slot 1 (a clone beside and 500). */
 function scene(id: string, shared: boolean, seed = 7): GameState {
   const state = ableFor(mission(id), undefined, seed);
   if (shared) {
@@ -49,7 +49,7 @@ describe('A9: determinism and split-invariance', () => {
     ['core:dig', 90],
   ] as const) {
     for (const shared of [false, true]) {
-      it(`${id} (skill, technique, items, combat) with ${shared ? 'shares 500' : 'share 1000'}: chunks of 7, 999, 3600 ms equal one call`, () => {
+      it(`${id} (skill, technique, items, combat) with ${shared ? 'a clone beside' : 'alone'}: chunks of 7, 999, 3600 ms equal one call`, () => {
         const whole = serialize(run(scene(id, shared), minutes * MIN, 0));
         for (const chunk of [7, 999, 3600]) {
           expect(serialize(run(scene(id, shared), minutes * MIN, chunk)), `chunk ${chunk}`).toBe(
@@ -61,9 +61,9 @@ describe('A9: determinism and split-invariance', () => {
   }
 
   for (const shared of [false, true]) {
-    it(`the thief, through the fight, in chunks of 1 ms, with ${shared ? 'shares 500' : 'share 1000'}`, () => {
-      // At half speed the same mission takes twice the time.
-      const horizon = (shared ? 8 : 4) * MIN;
+    it(`the thief, through the fight, in chunks of 1 ms, with ${shared ? 'a clone beside' : 'alone'}`, () => {
+      // Beside a clone the mission goes at the same speed.
+      const horizon = 4 * MIN;
       const whole = run(scene('core:thief', shared), horizon, 0);
       // The fight has begun by then, and the chunks cannot tell.
       expect(whole.slots[0]?.data).toMatchObject({ s: 1 });

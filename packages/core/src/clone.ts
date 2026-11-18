@@ -1,15 +1,11 @@
 import type { ContentDb } from '@shinobi/content';
-import { actionKindOf, type ActionFlow } from './actions.ts';
 import { counterValue } from './counters.ts';
-import type { EntityRef } from './entity.ts';
-import type { ModRules, ModifierProvider, Modifier } from './modifiers.ts';
-import { SHARE_FULL, type ActionSlot, type GameState } from './state.ts';
+import type { ActionSlot, GameState } from './state.ts';
 
 /**
  * Action slots opened by techniques (the clone). A technique with `opensSlot: n` gives the player
- * slot `n` once it is known; slot 0 is always there. Two running slots share one speed pool
- * (`K.clone.pool`), and in a pair of running actions of which one makes what the other uses (the
- * kinds linked by the technique's `slotLinks`) the one that uses gets `K.clone.link` speed.
+ * slot `n` once it is known; slot 0 is always there. A clone is made into a slot (`clone-life.ts`) and
+ * works there at full speed; the character and every clone each have their own speed.
  */
 
 /** A slot that a known technique opened. */
@@ -72,127 +68,21 @@ export function growSlots(state: GameState, content: ContentDb): boolean {
   return grown;
 }
 
-/** The shared speed of the running slots once two or more run, in thousandths of one action at full speed. */
-export const sharePool = (content: ContentDb): number =>
-  Math.round(SHARE_FULL * content.balance.K.clone.pool);
-
 // ---------- the clones that exist ----------
 
 /**
- * How many clones exist now: the clone slots that run an action. A slot a known technique opened
- * but that does nothing holds no clone (dispelling the clones, or a clone that finished, takes it
- * away), so this is the `n` the chakra pool is divided by (`chakraDivisor`).
+ * How many clones exist now: the bodies the character has made and not yet dispelled. This is the
+ * `n` the chakra pool is divided by (`chakraDivisor`).
  */
-export function cloneCount(state: GameState, content: ContentDb): number {
-  return cloneSlots(state, content).filter((c) => state.slots[c.slot]?.action != null).length;
-}
+export const cloneCount = (state: GameState, _content?: ContentDb): number =>
+  Object.keys(state.clones).length;
 
 /**
  * What the chakra pool is divided by: `n + 1` for `n` clones that exist. Every performer's pool, the
  * clone's and the character's, is the character's pool divided by it; 1 with no clone.
  */
-export const chakraDivisor = (state: GameState, content: ContentDb): number =>
+export const chakraDivisor = (state: GameState, content?: ContentDb): number =>
   cloneCount(state, content) + 1;
-
-// ---------- the link ----------
-
-/**
- * What an action makes and uses, from the `flow` of its action kind (a built-in kind or a pack's
- * own). Which pairs of kinds are linked is the data of the clone technique (`slotLinks`); the flow
- * says whether two actions of such kinds really feed each other, so a new recipe, herb or kind is
- * linked to what it feeds without any entry of its own. A kind without a flow takes no part.
- */
-const flowOf = (
-  action: { kind: string; id: string },
-  content: ContentDb,
-  rules: ModRules,
-): ActionFlow | null => actionKindOf(rules, action.kind)?.flow?.(action.id, content) ?? null;
-
-/** A pair of action kinds a technique links: the one that feeds and the one that is fed. */
-interface KindLink {
-  technique: string;
-  from: string;
-  to: string;
-}
-
-const linkLists = new WeakMap<ContentDb, KindLink[]>();
-
-/** The links of every technique of the content, in the order of the techniques. */
-function linksOf(content: ContentDb): KindLink[] {
-  let list = linkLists.get(content);
-  if (!list) {
-    list = content.techniques.flatMap((t) =>
-      (t.slotLinks ?? []).map((l) => ({ technique: t.id, from: l.from, to: l.to })),
-    );
-    linkLists.set(content, list);
-  }
-  return list;
-}
-
-/** The link (a pair of kinds of a technique's data) by which `producer` feeds `consumer`, or null. */
-function feedingLink(
-  producer: { kind: string; id: string },
-  consumer: { kind: string; id: string },
-  content: ContentDb,
-  rules: ModRules,
-  known?: GameState,
-): KindLink | null {
-  const link = linksOf(content).find(
-    (l) =>
-      l.from === producer.kind &&
-      l.to === consumer.kind &&
-      (known === undefined || known.known[l.technique] === true),
-  );
-  if (!link) return null;
-  const made = flowOf(producer, content, rules)?.makes ?? [];
-  const used = flowOf(consumer, content, rules)?.uses ?? [];
-  return made.some((item) => used.includes(item)) ? link : null;
-}
-
-/** Whether `producer` makes an item `consumer` uses, and the data of the clone links the two kinds. */
-export function feeds(
-  producer: { kind: string; id: string },
-  consumer: { kind: string; id: string },
-  content: ContentDb,
-  rules: ModRules,
-): boolean {
-  return feedingLink(producer, consumer, content, rules) !== null;
-}
-
-/** Whether one of two actions feeds the other. */
-export function linked(
-  a: { kind: string; id: string },
-  b: { kind: string; id: string },
-  content: ContentDb,
-  rules: ModRules,
-): boolean {
-  return feeds(a, b, content, rules) || feeds(b, a, content, rules);
-}
-
-/**
- * The link bonus: while two slots run a pair in which one action feeds the other, the one that is
- * fed (the consumer) gets `K.clone.link` speed (one entry per speed key, so two recipes of one
- * skill do not add it twice). The source is the technique whose data links the pair.
- */
-export const cloneLinkProvider: ModifierProvider = (state, content, rules) => {
-  if (state.slots.length < 2) return [];
-  const bonus = content.balance.K.clone.link;
-  if (bonus <= 0) return [];
-  const running = state.slots.flatMap((slot) => (slot.action ? [slot.action] : []));
-  if (running.length < 2) return [];
-  const parts = new Map<string, Modifier>();
-  for (const producer of running) {
-    for (const consumer of running) {
-      if (producer === consumer) continue;
-      const link = feedingLink(producer, consumer, content, rules, state);
-      const speed = link ? flowOf(consumer, content, rules)?.speed : undefined;
-      if (!link || speed === undefined || parts.has(speed)) continue;
-      const source: EntityRef = { kind: 'technique', id: link.technique };
-      parts.set(speed, { key: speed, op: 'add', value: bonus, group: 'character', source });
-    }
-  }
-  return [...parts.values()];
-};
 
 // ---------- telemetry ----------
 
@@ -209,19 +99,17 @@ export function pairKey(a: { kind: string; id: string }, b: { kind: string; id: 
   return `${CLONE_PAIR_PREFIX}${x}|${y}`;
 }
 
-/** Adds `dt` ms of game time to the clone telemetry: how long a clone slot existed, ran, and which pairs ran together. */
+/** Adds `dt` ms of game time to the clone telemetry: how long the clone technique was known with a slot open, how long a clone existed, and which pairs ran together. */
 export function trackClone(state: GameState, dt: number, content: ContentDb): void {
   if (state.slots.length < 2 || cloneSlots(state, content).length === 0) return;
   const c = state.counters;
   c[CLONE_OPEN_MS] = (c[CLONE_OPEN_MS] ?? 0) + dt;
   const running: { kind: string; id: string }[] = [];
-  let cloneRuns = false;
-  for (const [index, slot] of state.slots.entries()) {
+  for (const slot of state.slots) {
     if (!slot.action || slot.share <= 0) continue;
     running.push(slot.action);
-    if (isCloneSlot(state, content, index)) cloneRuns = true;
   }
-  if (cloneRuns) c[CLONE_RUN_MS] = (c[CLONE_RUN_MS] ?? 0) + dt;
+  if (Object.keys(state.clones).length > 0) c[CLONE_RUN_MS] = (c[CLONE_RUN_MS] ?? 0) + dt;
   const [first, second] = running;
   if (running.length === 2 && first && second) {
     const key = pairKey(first, second);
@@ -234,15 +122,13 @@ export interface ClonePair {
   a: { kind: string; id: string };
   b: { kind: string; id: string };
   ms: number;
-  /** Whether the pair is linked (the bonus applied). */
-  linked: boolean;
 }
 
-/** What the balance stage reads: how long a clone slot existed and was used, and the pairs run together. */
+/** What the balance stage reads: how long a clone existed, and the pairs run together. */
 export interface CloneTelemetry {
   /** Game time since the first slot opened, ms. */
   openMs: number;
-  /** Game time a clone slot ran an action, ms. */
+  /** Game time a clone existed, ms. */
   runMs: number;
   /** `runMs / openMs`; 0 when no slot was open. */
   share: number;
@@ -256,11 +142,7 @@ const splitPart = (text: string): { kind: string; id: string } | null => {
 };
 
 /** The clone telemetry of a state (a selector; the counters carry the data and are saved with it). */
-export function cloneTelemetry(
-  state: GameState,
-  content: ContentDb,
-  rules: ModRules,
-): CloneTelemetry {
+export function cloneTelemetry(state: GameState): CloneTelemetry {
   const openMs = counterValue(state, CLONE_OPEN_MS);
   const runMs = counterValue(state, CLONE_RUN_MS);
   const pairs: ClonePair[] = [];
@@ -269,7 +151,7 @@ export function cloneTelemetry(
     const [x, y] = key.slice(CLONE_PAIR_PREFIX.length).split('|');
     const a = splitPart(x ?? '');
     const b = splitPart(y ?? '');
-    if (a && b) pairs.push({ a, b, ms, linked: linked(a, b, content, rules) });
+    if (a && b) pairs.push({ a, b, ms });
   }
   pairs.sort((p, q) => q.ms - p.ms || (pairKey(p.a, p.b) < pairKey(q.a, q.b) ? -1 : 1));
   return { openMs, runMs, share: openMs > 0 ? runMs / openMs : 0, pairs };
