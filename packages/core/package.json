@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit -p . && tsc --noEmit -p tsconfig.test.json"
   },
   "dependencies": {
-    "@shinobi/content": "workspace:*"
+    "@shinobi/content": "workspace:*",
+    "zod": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

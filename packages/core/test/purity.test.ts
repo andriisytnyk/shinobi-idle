@@ -44,6 +44,7 @@ describe('A9: core source hygiene', () => {
       'shown.ts': [4000], // ceiling of the shown set for writes that do not know the content
       'guard.ts': [16, 64], // deepest requirement tree and widest node a pack's callback may return
       'pack-data.ts': [6, 16, 32, 64, 256, 4000], // limits on what a hostile save may make the loader keep: nesting depth, natures, packs, version text, text length, entries
+      'telemetry.ts': [10, 20, 30, 40, 50, 400], // the skill levels the telemetry marks, and the caps of its lists (not game balance)
       'xp.ts': [4, 7, 300], // the fixed Melvor level curve
     };
     const offenders: string[] = [];

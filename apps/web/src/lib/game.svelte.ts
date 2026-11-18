@@ -15,6 +15,7 @@ import {
   type GameEvent,
   type GameState,
   type Rules,
+  serializeTelemetry,
 } from '@shinobi/core';
 import {
   BACKUP_KEY,
@@ -45,6 +46,8 @@ import { composeBoot } from './boot.ts';
 import { deepFreeze } from './freeze.ts';
 import { detach as detachData } from './read.ts';
 import { requestPersistentStorage } from './platform.ts';
+import { settings } from './settings.svelte.ts';
+import { createTelemetry, type TelemetryFile } from './telemetry.ts';
 import { setRevealReader, type RevealReader } from './reveal.ts';
 import type { TabLock } from './tab-lock.ts';
 import { packsToasts, toastFor, toasts as defaultToasts } from './toasts.svelte.ts';
@@ -123,6 +126,8 @@ export interface GameDeps {
   kv?: KeyValue;
   lock?: TabLock | null;
   toasts?: Pick<typeof defaultToasts, 'push'>;
+  /** Whether the local telemetry records; the settings page decides it by default. */
+  telemetryEnabled?: () => boolean;
 }
 
 /**
@@ -142,6 +147,12 @@ export function createGame(deps: GameDeps = {}) {
   const kv = deps.kv ?? null;
   const lock = deps.lock ?? null;
   const toasts = deps.toasts ?? defaultToasts;
+  const tel = createTelemetry({
+    clock,
+    kv,
+    content,
+    enabled: deps.telemetryEnabled ?? (() => settings.telemetry),
+  });
 
   let state = $state.raw<GameState>(createState(1, content));
   setActiveState(() => state);
@@ -268,6 +279,7 @@ export function createGame(deps: GameDeps = {}) {
     epoch++;
     restamp();
     state.events = [];
+    tel.fold(events);
     for (const listener of eventListeners) for (const event of events) listener(event);
     const lines: LogEntry[] = [];
     let urgent = false;
@@ -319,8 +331,11 @@ export function createGame(deps: GameDeps = {}) {
     if (delta === 0) return;
     lastWall += delta;
     try {
-      if (delta > SLEEP_GAP_MS) {
+      const asleep = delta > SLEEP_GAP_MS;
+      if (asleep) {
+        tel.beforeCatchUp(state);
         const summary = advanceOffline(state, delta, content, rules);
+        tel.afterCatchUp(state, summary);
         for (const r of summary.rulesDisabled ?? []) noteRule(r.pack, r.rule, r.reason);
         const next = buildReport(summary);
         if (next) report = next;
@@ -328,6 +343,7 @@ export function createGame(deps: GameDeps = {}) {
         advance(state, delta, content, rules);
       }
       drainEvents();
+      if (!asleep) tel.observe(state);
     } catch (error) {
       stopOnCrash(error);
       return;
@@ -389,7 +405,7 @@ export function createGame(deps: GameDeps = {}) {
    */
   let writing: Promise<void> = Promise.resolve();
   function save(force = false): Promise<void> {
-    writing = writing.then(() => writeSave(force));
+    writing = writing.then(() => writeSave(force)).then(() => tel.save());
     return writing;
   }
 
@@ -422,6 +438,8 @@ export function createGame(deps: GameDeps = {}) {
 
   function replaceState(next: GameState): void {
     state = next;
+    // Telemetry compares with the new game from here on, not with the one that was dropped.
+    tel.rebase(next);
     epoch++;
     // The game that is given a state is the one that is played: the reveal rule reads from it.
     setRevealReader(reveal);
@@ -440,17 +458,23 @@ export function createGame(deps: GameDeps = {}) {
     if (!kv) {
       state = newGame(clock, content);
       epoch++;
+      tel.start(state);
       phase = 'playing';
       begin();
       touch();
       return;
     }
     try {
-      const loaded = await loadGame(kv, clock, content, rules);
+      await tel.load();
+      const loaded = await loadGame(kv, clock, content, rules, {
+        before: (s) => tel.beforeCatchUp(s),
+        after: (s, summary) => tel.afterCatchUp(s, summary),
+      });
       state = loaded.state;
       epoch++;
       rev = loaded.rev;
       report = loaded.report;
+      tel.start(state);
       await refreshBackupFlag();
       await refreshBackups();
       phase = 'playing';
@@ -613,7 +637,18 @@ export function createGame(deps: GameDeps = {}) {
       if (ms === 0) epoch++;
       advance(state, ms, content, rules);
       drainEvents();
+      tel.observe(state);
       touch();
+    },
+    /** The local telemetry: export file, clearing. It never touches the network. */
+    telemetry: {
+      file: (): TelemetryFile => tel.file(state),
+      /** The size in bytes of the stored record. */
+      size: (): number => serializeTelemetry(tel.record).length,
+      sessions: (): number => tel.record.sessions.count,
+      clear: (): Promise<void> => tel.clear(state),
+      /** Writes the record now. */
+      save: (): Promise<void> => tel.save(),
     },
     dismissReport(): void {
       report = null;
@@ -647,6 +682,7 @@ export function createGame(deps: GameDeps = {}) {
       state = newGame(clock, content);
       epoch++;
       rev = 0;
+      await tel.clear(state);
       phase = 'playing';
       begin();
       touch();
@@ -706,6 +742,7 @@ export function createGame(deps: GameDeps = {}) {
       const next = importSave(text, content, rules);
       if (kv) await backupSave(kv);
       replaceState(next);
+      await tel.clear(state);
       await save(true);
       await refreshBackupFlag();
     },
@@ -713,6 +750,7 @@ export function createGame(deps: GameDeps = {}) {
     async reset(): Promise<void> {
       if (kv) await backupSave(kv);
       replaceState(newGame(clock, content));
+      await tel.clear(state);
       report = null;
       await save(true);
       await refreshBackupFlag();

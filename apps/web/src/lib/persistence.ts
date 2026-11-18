@@ -179,6 +179,12 @@ export async function backupSave(kv: KeyValue): Promise<void> {
   if (raw !== undefined) await kv.set(BACKUP_KEY, raw);
 }
 
+/** Looks at the state around the offline catch-up of a load (the local telemetry does). */
+export interface CatchUpWatch {
+  before(state: GameState): void;
+  after(state: GameState, summary: OfflineSummary): void;
+}
+
 /** The backups kept before upgrades, newest first; an unreadable index counts as none. */
 export async function listBackups(kv: KeyValue): Promise<BackupEntry[]> {
   try {
@@ -235,6 +241,7 @@ export async function loadGame(
   clock: Clock,
   content: ContentDb,
   rules: Rules = defaultRules,
+  watch?: CatchUpWatch,
 ): Promise<LoadResult> {
   let raw: string | undefined;
   try {
@@ -260,7 +267,9 @@ export async function loadGame(
     }
     const state = deserialize(stored.text, content, rules);
     const elapsed = Math.max(0, clock.now() - readSavedAt(stored.text));
+    watch?.before(state);
     const summary = advanceOffline(state, elapsed, content, rules);
+    watch?.after(state, summary);
     return { state, summary, report: buildReport(summary), rev: stored.rev };
   } catch (error) {
     if (error instanceof LoadError) throw new LoadError(error.message, raw, error.reason);
