@@ -1400,5 +1400,16 @@
   "toast.raidOver": "{raid} завершено. Відбито груп: {done}, прорвалося: {breached}.",
   "toast.buildingRepaired": "Будівлю відремонтовано:",
   "village.raid.fighting": "Бій з нападниками триває.",
-  "village.raid.toFight": "До бою"
+  "village.raid.toFight": "До бою",
+
+  "toast.renownRank": "Новий ранг Репутації — {name}. {reward}",
+  "rank.renown.title": "Ранги Репутації",
+  "rank.renown.now": "Репутація: {n}",
+  "rank.renown.held": "Досягнуто",
+  "rank.renown.next": "Далі: {name} — {n} Репутації",
+  "rank.renown.at": "від {n} Репутації",
+  "rank.renown.reward": "Нагорода:",
+  "rank.renown.scroll": "Сувій техніки з Бібліотеки (до {n}-го рівня)",
+  "rank.renown.discount": "Знижка в крамницях: {n}%",
+  "rank.renown.locked": "Нагорода відкриється, коли ти її досягнеш."
 }

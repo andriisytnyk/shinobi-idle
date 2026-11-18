@@ -318,6 +318,7 @@ describe('the data the chains rest on', () => {
       for (const f of q.rewards.flags) raised.add(f);
     }
     for (const o of content.operations) raised.add(o.clearFlag);
+    for (const r of content.renownRanks) for (const f of r.rewards.flags) raised.add(f);
     for (const e of content.exams) raised.add(examWrittenFlag(e));
     const read = flagsIn([content.zones, content.operations, content.missions, content.skills]);
     for (const flag of read) expect(raised.has(flag), `no setter for ${flag}`).toBe(true);

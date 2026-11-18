@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { evalReq, examFor, writtenPassed } from '@shinobi/core';
+  import {
+    evalReq,
+    examFor,
+    hasRenownRank,
+    renownLadder,
+    renownOf,
+    writtenPassed,
+  } from '@shinobi/core';
   import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
@@ -62,6 +69,26 @@
   const takeKey = $derived(
     !exam?.then ? 'rank.take' : written ? 'rank.confer' : 'rank.takeWritten',
   );
+
+  /** The Renown ranks in order: held, the next one (its reward shown as far as the reveal rule of each thing allows), and those further on (name and threshold only). */
+  const academy = $derived(content.playerRanks.find((r) => r.id === rank)?.academy === true);
+  const renown = $derived(
+    game.read((gs) => {
+      const have = renownOf(gs, content);
+      let nextSeen = false;
+      return {
+        have,
+        rows: renownLadder(content).map((rank) => {
+          const held = hasRenownRank(gs, rank.id);
+          const state = held ? 'held' : nextSeen ? 'ahead' : 'next';
+          if (!held) nextSeen = true;
+          return { rank, state };
+        }),
+      };
+    }),
+  );
+  /** The discount a modifier of a rank gives, in whole percents. */
+  const discount = (value: number): number => Math.round(Math.abs(value) * 100);
 
   let error = $state<string | null>(null);
 
@@ -207,6 +234,46 @@
     </section>
   {/if}
 
+  {#if renown.rows.length > 0 && !academy}
+    <section class="ladder renown" data-renown>
+      <h2>{t('rank.renown.title')}</h2>
+      <p class="label" data-renown-now>{t('rank.renown.now', { n: renown.have })}</p>
+      <ol>
+        {#each renown.rows as { rank, state } (rank.id)}
+          <li data-renown-row={rank.id} data-state={state}>
+            <span class="name">{t(`renownRank.${rank.id}.name`)}</span>
+            <span class="state">
+              {state === 'held' ? t('rank.renown.held') : t('rank.renown.at', { n: rank.renown })}
+            </span>
+            {#if state === 'held'}
+              <p class="desc" data-renown-desc>{t(`renownRank.${rank.id}.desc`)}</p>
+            {:else if state === 'next'}
+              <div class="opens" data-renown-reward>
+                <span>{t('rank.renown.reward')}</span>
+                <ul class="chips">
+                  {#each rank.rewards.items as item (item.item)}
+                    <li><EntityLink kind="item" id={item.item} offered /> × {item.n}</li>
+                  {/each}
+                  {#each rank.rewards.opens as ref (ref.kind + ref.id)}
+                    <li><EntityLink kind={ref.kind} id={ref.id} /></li>
+                  {/each}
+                  {#if rank.rewards.scroll}
+                    <li>{t('rank.renown.scroll', { n: rank.rewards.scroll.library })}</li>
+                  {/if}
+                  {#each rank.rewards.mods.filter((m) => m.key === 'shop.price') as m (m.key)}
+                    <li>{t('rank.renown.discount', { n: discount(m.value) })}</li>
+                  {/each}
+                </ul>
+              </div>
+            {:else}
+              <p class="desc" data-renown-locked>{t('rank.renown.locked')}</p>
+            {/if}
+          </li>
+        {/each}
+      </ol>
+    </section>
+  {/if}
+
   <section class="ladder" data-ranks>
     <h2>{t('rank.ladder')}</h2>
     <ol>
@@ -287,7 +354,8 @@
     border-radius: var(--radius-md);
   }
 
-  .ladder li[data-state='current'] {
+  .ladder li[data-state='current'],
+  .ladder li[data-state='next'] {
     border-color: var(--accent);
   }
 
@@ -318,6 +386,13 @@
 
   .ladder .state,
   .ladder .opens {
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
+  }
+
+  .renown .desc {
+    flex-basis: 100%;
+    margin: 0;
     color: var(--fg-dim);
     font-size: var(--text-xs);
   }

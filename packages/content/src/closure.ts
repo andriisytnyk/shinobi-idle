@@ -694,6 +694,11 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     e.rewards.items.forEach((x, n) => ref(`rewards.items[${n}].item`, x.item, 'items'));
     if (e.rewards.goal) ref('rewards.goal.kind', e.rewards.goal.kind, 'entityKinds');
   }
+  for (const r of db.renownRanks) {
+    at('renownRanks', r.id);
+    r.rewards.items.forEach((x, n) => ref(`rewards.items[${n}].item`, x.item, 'items'));
+    r.rewards.opens.forEach((x, n) => ref(`rewards.opens[${n}].kind`, x.kind, 'entityKinds'));
+  }
   for (const z of db.zones) {
     at('zones', z.id);
     ref('enemy', z.enemy, 'enemies');

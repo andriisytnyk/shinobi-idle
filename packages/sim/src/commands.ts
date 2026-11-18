@@ -36,6 +36,8 @@ function describe(m: Milestone, t: (key: string) => string): string {
       return `Квест «${t(`quest.${m.id}.name`)}» завершено`;
     case 'rank':
       return `Ранг: ${t(`rank.${m.id}`)}`;
+    case 'renownRank':
+      return `Ранг Репутації: ${t(`renownRank.${m.id}.name`)}`;
   }
 }
 

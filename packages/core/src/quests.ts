@@ -8,6 +8,7 @@ import { currencyOf, rankIndex } from './vocab.ts';
 import type { System } from './system.ts';
 import type { GameState } from './state.ts';
 import { rewardScroll } from './scrolls.ts';
+import { updateRenownRanks } from './renown.ts';
 import { refreshRegions } from './regions.ts';
 import { refreshUnlocks } from './unlocks.ts';
 import { syncVillage } from './village.ts';
@@ -117,6 +118,8 @@ export function updateQuests(state: GameState, content: ContentDb): void {
   refreshRegions(state, content);
   for (let changed = true; changed;) {
     changed = false;
+    // A Renown rank may be reached by the Reputation a step has just paid; its flags may open a chain.
+    if (updateRenownRanks(state, content)) changed = true;
     for (const quest of content.quests) {
       let progress = state.quests[quest.id];
       if (!progress) {

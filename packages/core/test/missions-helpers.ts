@@ -53,6 +53,7 @@ export function player(opts: PlayerOptions = {}): GameState {
   for (const id of opts.known ?? []) state.known[id] = true;
   for (const [id, n] of Object.entries(opts.bank ?? {})) state.bank[id] = n;
   setFlag(state, 'missions.c.unlocked');
+  setFlag(state, 'missions.mail.unlocked');
   state.bank['core:medpouch'] = 1;
   refreshUnlocks(state, content, true);
   updateQuests(state, content);

@@ -112,6 +112,8 @@ function milestoneLabel(m: Milestone, content: ContentDb): string {
       return `ранг ${m.id}`;
     case 'questStep':
       return `«${t(`quest.${m.id}.name`)}» крок ${m.step}`;
+    case 'renownRank':
+      return `ранг Репутації «${t(`renownRank.${m.id}.name`)}»`;
     case 'questDone':
       return `«${t(`quest.${m.id}.name`)}» завершено`;
     case 'skill':

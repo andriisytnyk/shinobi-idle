@@ -1069,6 +1069,30 @@ export const examSchema = z.strictObject({
   }),
 });
 
+/**
+ * A Renown rank: a step on the ladder of Reputation. It is reached once, the first time the
+ * balance of the currency with the role `renown` is `renown` or more, and pays its rewards then
+ * (offline too, in the order of the thresholds). Its name and its story line are the locale keys
+ * `renownRank.<id>.name` and `.desc`. A rank is held by the flag `renownRank.<id>`.
+ */
+export const renownRankSchema = z.strictObject({
+  id: coreId,
+  /** The Reputation at which the rank is reached. */
+  renown: z.number().int().min(1),
+  rewards: z.strictObject({
+    /** Items handed over. */
+    items: z.array(ingredientRef),
+    /** A Library scroll the player can read, chosen when the rank is reached (see `questRewardsSchema.scroll`). */
+    scroll: z.strictObject({ library: z.number().int().min(1).max(5) }).optional(),
+    /** Unlock flags raised: what the content gates by them opens. */
+    flags: z.array(z.string().min(1)),
+    /** Modifiers that hold as long as the rank is held (a discount in the shop). */
+    mods: z.array(modSchema),
+    /** What the rank opens, as links the rank page shows under the reveal rule of each kind. */
+    opens: z.array(entityRefSchema),
+  }),
+});
+
 // ---------- combat world: zones, operations, statuses, traits, combos ----------
 
 /**
@@ -1843,6 +1867,7 @@ export const contentDbSchema = z.object({
   balance: balanceSchema,
   quests: z.array(questSchema),
   exams: z.array(examSchema),
+  renownRanks: z.array(renownRankSchema),
   zones: z.array(zoneSchema),
   raids: z.array(raidSchema),
   operations: z.array(operationSchema),
@@ -1860,6 +1885,7 @@ export const generatedDbSchema = contentDbSchema
   .omit({
     quests: true,
     exams: true,
+    renownRanks: true,
     shop: true,
     coat: true,
     zones: true,
@@ -1959,6 +1985,7 @@ export type QuestStep = z.infer<typeof questStepSchema>;
 export type QuestObjective = z.infer<typeof questObjectiveSchema>;
 export type QuestRewards = z.infer<typeof questRewardsSchema>;
 export type Exam = z.infer<typeof examSchema>;
+export type RenownRank = z.infer<typeof renownRankSchema>;
 export type Zone = z.infer<typeof zoneSchema>;
 export type Raid = z.infer<typeof raidSchema>;
 export type Operation = z.infer<typeof operationSchema>;

@@ -38,7 +38,10 @@ export function player(opts: PlayerOptions = {}): GameState {
   }
   for (const id of opts.known ?? []) state.known[id] = true;
   for (const [id, n] of Object.entries(opts.bank ?? {})) state.bank[id] = n;
-  if (opts.rankC) setFlag(state, 'missions.c.unlocked');
+  if (opts.rankC) {
+    setFlag(state, 'missions.c.unlocked');
+    setFlag(state, 'missions.mail.unlocked');
+  }
   if (opts.intel !== undefined) state.currencies.intel = opts.intel;
   refreshUnlocks(state, content, true);
   updateQuests(state, content);

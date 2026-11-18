@@ -70,6 +70,14 @@ export function toastFor(event: GameEvent, content: ContentDb): ToastSpec | null
       return { key: 'toast.questStep', params: {}, ref: { kind: 'quest', id: event.quest } };
     case 'questDone':
       return { key: 'toast.questDone', params: {}, ref: { kind: 'quest', id: event.quest } };
+    case 'renownRank':
+      return {
+        key: 'toast.renownRank',
+        params: {
+          name: t(`renownRank.${event.rank}.name`),
+          reward: t(`renownRank.${event.rank}.reward`),
+        },
+      };
     case 'examPassed':
       return { key: 'toast.examPassed', params: {}, ref: { kind: 'exam', id: event.exam } };
     case 'itemUsed':

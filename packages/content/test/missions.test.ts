@@ -7,10 +7,19 @@ const itemIds = new Set(content.items.map((i) => i.id));
 const K = content.balance.K;
 
 describe('missions: data', () => {
-  it('opens D and village missions with the Genin rank, C with a flag, and the operation with nothing', () => {
+  it('opens D and village missions with the Genin rank, C with a flag (the mail with a Renown rank), and the operation with nothing', () => {
     const genin: Req = { t: 'rank', rank: 'genin' };
     for (const m of content.missions) {
-      if (m.rank === 'C') expect(m.unlock, m.id).toEqual({ t: 'flag', id: 'missions.c.unlocked' });
+      if (m.id === 'core:mail')
+        expect(m.unlock, m.id).toEqual({
+          t: 'all',
+          of: [
+            { t: 'flag', id: 'missions.c.unlocked' },
+            { t: 'flag', id: 'missions.mail.unlocked' },
+          ],
+        });
+      else if (m.rank === 'C')
+        expect(m.unlock, m.id).toEqual({ t: 'flag', id: 'missions.c.unlocked' });
       else if (m.rank === 'OP') expect(m.unlock, m.id).toBeNull();
       else expect(m.unlock, m.id).toEqual(genin);
     }
