@@ -1893,6 +1893,12 @@
       "mudEva": "b03d24af663f",
       "steam": "0094cbf559e3"
     },
+    "cloneRoles": {
+      "core:role_mirror": "cc0ab88d2b81",
+      "core:role_assault": "d18d42c9a5cb",
+      "core:role_support": "509521e2beea",
+      "core:role_distract": "0881f23b9c30"
+    },
     "ai": {
       "ai": "3948f5ad7962"
     }
@@ -4567,6 +4573,12 @@
       "mudEva",
       "steam"
     ],
+    "cloneRoles": [
+      "core:role_mirror",
+      "core:role_assault",
+      "core:role_support",
+      "core:role_distract"
+    ],
     "ai": [
       "ai"
     ]
@@ -7184,6 +7196,16 @@
       "toast.buildingRepaired": "731fb39ce6e0",
       "village.raid.fighting": "54215693fd25",
       "village.raid.toFight": "299365e5aaa7",
+      "fight.ally": "ad9d5b3a9038",
+      "fight.allies": "958454cb9c1f",
+      "fight.out.allyDodged": "13fe7f056991",
+      "log.allyCast": "53bef975df75",
+      "log.allyHit": "f17732974b41",
+      "log.allyMiss": "22779358c7e4",
+      "log.allyBasicHit": "8590ca1ae861",
+      "log.allyBasicMiss": "9997c92f5282",
+      "log.enemyHitAlly": "51a0a86eede9",
+      "log.enemyMissAlly": "f9b03cfecc1e",
       "squad.title": "3a2cffa2881d",
       "squad.counts": "ddd52feeb9f9",
       "squad.you": "99812bf3cdd9",
@@ -7248,6 +7270,19 @@
       "clone.pouch.cancel": "da22fed3e839",
       "combat.performer.you": "99812bf3cdd9",
       "combat.performer.clone": "833e259e1976",
+      "cloneRole.core:role_mirror.name": "bec831f33351",
+      "cloneRole.core:role_mirror.desc": "f252427f89b2",
+      "cloneRole.core:role_assault.name": "b6fd38d20f7a",
+      "cloneRole.core:role_assault.desc": "b8f48d582469",
+      "cloneRole.core:role_support.name": "2c16698c7814",
+      "cloneRole.core:role_support.desc": "a9d52145a846",
+      "cloneRole.core:role_distract.name": "4346f9a2806b",
+      "cloneRole.core:role_distract.desc": "869739affd2c",
+      "cloneRole.title": "809a77c969e0",
+      "cloneRole.note": "3434f68c61c9",
+      "cloneRole.group": "6fc9ab62e72c",
+      "cloneRole.label": "cf247e3aa45a",
+      "error.unknownCloneRole": "a75afab5d840",
       "quest.core:mission_board.step.2": "318023c1cf1f",
       "quest.core:mission_board.step.3": "4685fe733958",
       "quest.core:mission_board.step.4": "1e3a06225f1e",
@@ -7311,17 +7346,7 @@
       "item.core:chunin_vest.name": "3a3f2f3cb199",
       "item.core:chunin_vest.desc": "6fb20895f804",
       "item.core:gai_lesson.name": "21097b6131e2",
-      "item.core:gai_lesson.desc": "6937bf56a173",
-      "fight.ally": "ad9d5b3a9038",
-      "fight.allies": "958454cb9c1f",
-      "fight.out.allyDodged": "13fe7f056991",
-      "log.allyCast": "53bef975df75",
-      "log.allyHit": "f17732974b41",
-      "log.allyMiss": "22779358c7e4",
-      "log.allyBasicHit": "8590ca1ae861",
-      "log.allyBasicMiss": "9997c92f5282",
-      "log.enemyHitAlly": "51a0a86eede9",
-      "log.enemyMissAlly": "f9b03cfecc1e"
+      "item.core:gai_lesson.desc": "6937bf56a173"
     },
     "en": {
       "technique.core:body_flicker.name": "026242b01872",

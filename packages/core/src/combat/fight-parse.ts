@@ -407,26 +407,14 @@ function parseKitEffect(raw: unknown): KitEffect | null {
   };
 }
 
-function parseKit(raw: unknown, content: ContentDb, v: Vocab): PlayerKit | null {
-  if (!isRecord(raw) || !Array.isArray(raw.techniques)) return null;
-  if (!nonNeg(raw.med) || !nonNeg(raw.chakraRegen) || !nonNeg(raw.staminaRegen)) return null;
-  if (!nonNeg(raw.toolDamage)) return null;
-  const known = new Set(content.techniques.map((t) => t.id));
-  if (!Array.isArray(raw.evasion)) return null;
-  const evasion: EvasionPart[] = [];
-  for (const p of raw.evasion) {
-    if (!isRecord(p) || !oneOf(EVASION_SOURCES, p.source) || !nonNeg(p.value)) return null;
-    if (p.id !== null && !(isStr(p.id) && known.has(p.id))) return null;
-    const optional = ['full', 'skillLevel', 'masteryLevel', 'effectiveLevel', 'ratio'] as const;
-    if (optional.some((k) => p[k] !== undefined && !nonNeg(p[k]))) return null;
-    if (p.levelAdj !== undefined && !Number.isFinite(p.levelAdj)) return null;
-    const part: EvasionPart = { source: p.source, id: p.id, value: p.value };
-    for (const k of optional) if (p[k] !== undefined) part[k] = p[k] as number;
-    if (p.levelAdj !== undefined) part.levelAdj = p.levelAdj as number;
-    evasion.push(part);
-  }
+/** The techniques of a list of a kit (the character's hand, or the hand the clones were given). */
+function parseKitTechniques(
+  list: unknown[],
+  known: ReadonlySet<string>,
+  v: Vocab,
+): KitTechnique[] | null {
   const techniques: KitTechnique[] = [];
-  for (const t of raw.techniques) {
+  for (const t of list) {
     if (!isRecord(t) || !isStr(t.id) || !known.has(t.id)) return null;
     if (!inSet(v.skills, t.skill) || !inSet(v.roles, t.role) || !inSet(v.ranks, t.rank)) {
       return null;
@@ -464,6 +452,40 @@ function parseKit(raw: unknown, content: ContentDb, v: Vocab): PlayerKit | null 
       requiresStance: t.requiresStance,
     });
   }
+  return techniques;
+}
+
+function parseKit(raw: unknown, content: ContentDb, v: Vocab): PlayerKit | null {
+  if (!isRecord(raw) || !Array.isArray(raw.techniques)) return null;
+  if (!nonNeg(raw.med) || !nonNeg(raw.chakraRegen) || !nonNeg(raw.staminaRegen)) return null;
+  if (!nonNeg(raw.toolDamage)) return null;
+  const known = new Set(content.techniques.map((t) => t.id));
+  if (!Array.isArray(raw.evasion)) return null;
+  const evasion: EvasionPart[] = [];
+  for (const p of raw.evasion) {
+    if (!isRecord(p) || !oneOf(EVASION_SOURCES, p.source) || !nonNeg(p.value)) return null;
+    if (p.id !== null && !(isStr(p.id) && known.has(p.id))) return null;
+    const optional = ['full', 'skillLevel', 'masteryLevel', 'effectiveLevel', 'ratio'] as const;
+    if (optional.some((k) => p[k] !== undefined && !nonNeg(p[k]))) return null;
+    if (p.levelAdj !== undefined && !Number.isFinite(p.levelAdj)) return null;
+    const part: EvasionPart = { source: p.source, id: p.id, value: p.value };
+    for (const k of optional) if (p[k] !== undefined) part[k] = p[k] as number;
+    if (p.levelAdj !== undefined) part.levelAdj = p.levelAdj as number;
+    evasion.push(part);
+  }
+  const techniques = parseKitTechniques(raw.techniques, known, v);
+  if (!techniques) return null;
+  // The hand, the threat and the name of the role the clones were given: absent for the default role (and in an old fight).
+  let cloneHand: KitTechnique[] | undefined;
+  if (raw.cloneHand !== undefined) {
+    if (!Array.isArray(raw.cloneHand)) return null;
+    const hand = parseKitTechniques(raw.cloneHand, known, v);
+    if (!hand) return null;
+    cloneHand = hand;
+  }
+  if (raw.cloneThreat !== undefined && !(isNum(raw.cloneThreat) && raw.cloneThreat > 0))
+    return null;
+  if (raw.cloneRole !== undefined && !isStr(raw.cloneRole)) return null;
   return {
     techniques,
     toolDamage: raw.toolDamage,
@@ -471,6 +493,9 @@ function parseKit(raw: unknown, content: ContentDb, v: Vocab): PlayerKit | null 
     chakraRegen: raw.chakraRegen,
     staminaRegen: raw.staminaRegen,
     evasion,
+    ...(cloneHand ? { cloneHand } : {}),
+    ...(raw.cloneThreat !== undefined ? { cloneThreat: raw.cloneThreat as number } : {}),
+    ...(raw.cloneRole !== undefined ? { cloneRole: raw.cloneRole as string } : {}),
   };
 }
 
@@ -681,7 +706,12 @@ export function parseFight(raw: unknown, content: ContentDb): FightState | null 
       const act = body.act;
       // An ally casts a technique of the kit and strikes plainly; it uses no item and takes no rest.
       if (act && act.kind !== 'basic' && act.kind !== 'technique') return null;
-      if (act?.kind === 'technique' && !kit.techniques.some((x) => x.id === act.id)) return null;
+      if (
+        act?.kind === 'technique' &&
+        ![...kit.techniques, ...(kit.cloneHand ?? [])].some((x) => x.id === act.id)
+      ) {
+        return null;
+      }
       allies.push(body);
     }
   }

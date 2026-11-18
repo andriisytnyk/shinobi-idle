@@ -1470,5 +1470,18 @@
   "clone.pouch.make": "Створити клона",
   "clone.pouch.cancel": "Скасувати",
   "combat.performer.you": "Ти",
-  "combat.performer.clone": "Клон"
+  "combat.performer.clone": "Клон",
+  "cloneRole.core:role_mirror.name": "Як ти",
+  "cloneRole.core:role_mirror.desc": "Клони б'ються тими самими техніками, що й ти.",
+  "cloneRole.core:role_assault.name": "Натиск",
+  "cloneRole.core:role_assault.desc": "Клони беруть найсильніші з відомих тобі технік ушкодження.",
+  "cloneRole.core:role_support.name": "Підтримка",
+  "cloneRole.core:role_support.desc": "Клони накладають стани, що відкривають комбо твоїх технік.",
+  "cloneRole.core:role_distract.name": "Відволікання",
+  "cloneRole.core:role_distract.desc": "Клони б'ють дешевими техніками й відтягують на себе увагу ворогів.",
+  "cloneRole.title": "Роль клонів у бою",
+  "cloneRole.note": "Одна роль для всіх твоїх клонів: вона визначає, якими техніками вони б'ються. Твої власні техніки не змінюються, а нова роль діє з наступного бою.",
+  "cloneRole.group": "Обери роль клонів",
+  "cloneRole.label": "Клон №{n} · {role}",
+  "error.unknownCloneRole": "Такої ролі клонів немає."
 }

@@ -61,6 +61,18 @@ const data = {
       effect: { kind: 'burst' },
     },
   ],
+  /** A role of the combat clones: it picks the single cheapest technique, and the enemies mind its clones thrice as much. */
+  cloneRoles: [
+    {
+      id: 'testmod:role_decoy',
+      threat: 3,
+      hand: {
+        mode: 'pick',
+        size: 1,
+        weights: { damage: 0, status: 0, opens: 0, cheap: 1 },
+      },
+    },
+  ],
   /** A tag that cracks a shell: the body takes more damage while the crack lasts and the trait stops. */
   tags: [
     {
@@ -521,6 +533,9 @@ export const testmodPack: ContentPack = {
       'state.testmod:chilled.name': 'Тестове охолодження',
       'status.testmod:chill.name': 'Тестовий холод',
       'status.testmod:chill.desc': 'Тестовий стан, що показує: мод додає власні стани бою.',
+      'cloneRole.testmod:role_decoy.name': 'Тестова приманка',
+      'cloneRole.testmod:role_decoy.desc':
+        'Тестова роль клонів: найдешевша техніка й потрійна увага ворогів.',
       'combo.testmod:frostburn.name': 'Тестовий морозний опік',
       'combo.testmod:frostburn.desc':
         'Тестове поєднання, яке мод додає даними без жодного рядка коду.',

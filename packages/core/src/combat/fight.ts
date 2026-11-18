@@ -2,6 +2,7 @@ import type { AiTier, ContentDb, SkillId, Technique } from '@shinobi/content';
 import { createStream, nextFloatFrom } from '../rng.ts';
 import { addEffect, findEffect, isSuppressed, removeEffect, statOf } from './fight-effects.ts';
 import { sharesOf } from './fight-allies.ts';
+import { cloneRoleOf, copiesHand, pickCloneHand } from './fight-roles.ts';
 import { figure, need } from './need.ts';
 import { answersTraitData, balanceOf, beatenBy, fightData, type TraitMod } from './fight-data.ts';
 import {
@@ -317,19 +318,15 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
   let style = 0;
   const data = fightData(content);
   for (const skill of data.techSkills) style = Math.max(style, snap.levels[skill] ?? 0);
-  for (const tech of content.techniques) {
-    if (!known.has(tech.id) || tech.rank === null) continue;
-    // A defensive technique is passive: it adds to the evasion rating and is never in the hand.
-    if (tech.combat?.passive !== undefined) continue;
-    if (loadout && !loadout.has(tech.id) && !tech.combat?.outOfLoadout) continue;
+  const make = (tech: Technique): KitTechnique => {
     const n = techniqueFigures(snap, tech, content);
     const mastery = snap.mastery[tech.id] ?? 1;
     const fx = kitEffect(tech, snap, content);
-    techniques.push({
+    return {
       id: tech.id,
       skill: tech.skill,
       role: tech.role,
-      rank: tech.rank,
+      rank: tech.rank ?? '',
       tags: [...tech.tags],
       state: tech.state,
       // A technique that puts allies on the player's side does not strike by itself.
@@ -355,9 +352,17 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
       habituationMult: snap.signature === tech.id ? K.signatureHabituation : 1,
       fx,
       requiresStance: tech.combat?.requiresStance === true,
-    });
+    };
+  };
+  // A defensive technique is passive: it adds to the evasion rating and is never in the hand.
+  const usable = (tech: Technique): boolean =>
+    known.has(tech.id) && tech.rank !== null && tech.combat?.passive === undefined;
+  for (const tech of content.techniques) {
+    if (!usable(tech)) continue;
+    if (loadout && !loadout.has(tech.id) && !tech.combat?.outOfLoadout) continue;
+    techniques.push(make(tech));
   }
-  return {
+  const kit: PlayerKit = {
     techniques,
     toolDamage: (K.toolTag[0] + K.toolTag[1] * style) * wound,
     med: snap.levels.med ?? 1,
@@ -365,6 +370,27 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
     staminaRegen: staminaRegenOf(snap.levels, content),
     evasion: evasionParts(snap, content),
   };
+  // The role of the clones. The default role copies the character's hand and leaves the kit as it always was.
+  const role = cloneRoleOf(content, snap.cloneRole);
+  if (role) {
+    if (!copiesHand(role)) {
+      // The hand is picked from every technique the character knows, the loadout or not, that a clone can cast.
+      const byId = new Map(techniques.map((t) => [t.id, t]));
+      const every = content.techniques
+        .filter(usable)
+        .map((tech) => byId.get(tech.id) ?? make(tech));
+      kit.cloneHand = pickCloneHand(
+        content,
+        role,
+        // A clone has no stance, so a technique that needs one is not offered to it.
+        every.filter((t) => !barredForAllies(t) && !t.requiresStance),
+        every,
+      );
+    }
+    if (role.threat !== 1) kit.cloneThreat = role.threat;
+    if (role.default !== true) kit.cloneRole = role.id;
+  }
+  return kit;
 }
 
 /** The nature an enemy fights with; `wheel` is the one that beats the player's first nature. */
@@ -1108,7 +1134,7 @@ function castable(fight: FightState, tech: KitTechnique): boolean {
 const handOf = (fight: FightState, actor: Combatant): KitTechnique[] =>
   actor === fight.player
     ? fight.kit.techniques
-    : fight.kit.techniques.filter((t) => !barredForAllies(t));
+    : (fight.kit.cloneHand ?? fight.kit.techniques.filter((t) => !barredForAllies(t)));
 
 const techViews = new WeakMap<KitTechnique, KitTechnique>();
 const techFactsOf = new WeakMap<KitTechnique, { answers: string[]; interrupts: boolean }>();
@@ -1535,7 +1561,7 @@ function finishAct(ctx: FightCtx, actor: Combatant): void {
 function resolveCast(ctx: FightCtx, actor: Combatant, id: string | null, at: string | null): void {
   const { fight, content } = ctx;
   const player = actor;
-  const tech = fight.kit.techniques.find((t) => t.id === id);
+  const tech = handOf(fight, actor).find((t) => t.id === id);
   if (!tech) return;
   player.cd[tech.id] = fight.t + workOf(tech.cooldownMs);
   const previous = fight.uses[tech.id] ?? 0;
@@ -1680,7 +1706,9 @@ function summonAllies(ctx: FightCtx, tech: KitTechnique, spec: SummonSpec): void
     const number = (fight.allied = (fight.allied ?? 0) + 1);
     const hp = player.maxHp * spec.hp;
     // What the character knows of the enemies, the clone knows: the same hit and dodge numbers.
-    const data: Record<string, number> = { threat: spec.threat, [POWER_KEY]: spec.dmg };
+    // The role of the clones may make the enemies mind them more or less (absent: as the technique made them).
+    const threat = spec.threat * (fight.kit.cloneThreat ?? 1);
+    const data: Record<string, number> = { threat, [POWER_KEY]: spec.dmg };
     for (const [key, value] of Object.entries(player.data)) {
       if (key.startsWith('know.')) data[key] = value;
     }

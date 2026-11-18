@@ -36,10 +36,11 @@ function strip(value: unknown): unknown {
   return value;
 }
 
-/** The branches that came with the clone redesign (state version 20): dev's states have none of them, and wrote version 19. */
+/** The branches that came with the clone redesign (state version 20) and the role of the clones (21): dev's states have none of them, and wrote version 19. */
 function withoutClones(save: Record<string, unknown>): Record<string, unknown> {
   const { clones: _clones, fatigue: _fatigue, ...state } = save.state as Record<string, unknown>;
-  return { ...save, v: 19, state: { ...state, v: 19 } };
+  const { cloneRole: _role, ...loadouts } = state.loadouts as Record<string, unknown>;
+  return { ...save, v: 19, state: { ...state, loadouts, v: 19 } };
 }
 
 const digest = (text: string): string =>

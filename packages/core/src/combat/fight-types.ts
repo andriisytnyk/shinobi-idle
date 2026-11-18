@@ -240,6 +240,15 @@ export interface PlayerKit {
   staminaRegen: number;
   /** The parts of the player's evasion rating, with their sources (the rating itself is the player's `evasion`, wounds counted). */
   evasion: EvasionPart[];
+  /**
+   * The hand of the clones when their role does not copy the character's: the techniques the character
+   * knows that the role's rule picked. Absent when the clones copy the character (the default role), which is how
+   * every fight was before the roles; so is `cloneThreat` (the role's multiplier on the clones' threat, absent: 1).
+   */
+  cloneHand?: KitTechnique[];
+  cloneThreat?: number;
+  /** The id of the role the clones were given, written only when it is not the default one (absent: the default). */
+  cloneRole?: string;
 }
 
 /** What happened in a fight; battle analysis averages these over many fights. */

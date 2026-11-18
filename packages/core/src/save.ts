@@ -414,6 +414,12 @@ export const MIGRATIONS: readonly Migration[] = [
     });
     return { ...state, clones, fatigue: 0, combat };
   },
+  // v20 -> v21: the role of the combat clones. Nobody has chosen one: the default role copies the character's hand, as
+  // the clones always did. A fight in progress keeps the kit it was begun with (it has no role in it: the default one).
+  (state) => {
+    const loadouts = isRecord(state.loadouts) ? state.loadouts : {};
+    return { ...state, loadouts: { ...loadouts, cloneRole: null } };
+  },
 ];
 
 /** Deepest nesting a slot's data may have. */
@@ -642,7 +648,14 @@ function sanitizeClones(raw: unknown, state: GameState, content: ContentDb): Gam
 
 /** A loadout read back: ids the content or the player no longer has are dropped. */
 function sanitizeLoadouts(raw: unknown, state: GameState, content: ContentDb): LoadoutState {
-  const out: LoadoutState = { active: [], auto: true, signature: null, basis: '', saved: {} };
+  const out: LoadoutState = {
+    active: [],
+    auto: true,
+    signature: null,
+    basis: '',
+    cloneRole: null,
+    saved: {},
+  };
   if (!isRecord(raw)) return out;
   const index = indexOf(content);
   const limits = loadoutLimits(rankIndex(content, state.player.rank), content);
@@ -684,6 +697,11 @@ function sanitizeLoadouts(raw: unknown, state: GameState, content: ContentDb): L
   out.signature =
     typeof raw.signature === 'string' && out.active.includes(raw.signature) ? raw.signature : null;
   out.basis = typeof raw.basis === 'string' ? raw.basis : '';
+  // A role the content does not have is kept (the fight falls back to the default one), so that a role of a mod comes back with it.
+  out.cloneRole =
+    typeof raw.cloneRole === 'string' && raw.cloneRole.length > 0 && raw.cloneRole.length <= 200
+      ? raw.cloneRole
+      : null;
   if (isRecord(raw.saved)) {
     for (const [name, entry] of Object.entries(raw.saved)) {
       if (

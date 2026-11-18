@@ -56,7 +56,7 @@
       {#if scene.allies.length > 0}
         <ul class="allies" data-ui="fight-allies" aria-label={t('fight.allies')}>
           {#each scene.allies as a (a.key)}
-            <li><AllyRow f={a} outcomes={outcomes[a.key] ?? []} /></li>
+            <li><AllyRow f={a} outcomes={outcomes[a.key] ?? []} role={scene.cloneRole} /></li>
           {/each}
         </ul>
       {/if}

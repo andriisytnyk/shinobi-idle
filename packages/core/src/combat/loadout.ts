@@ -492,6 +492,22 @@ export function setSignature(
   return { ok: true };
 }
 
+/** Chooses the role of the combat clones: an id the content has, or null for the default role. */
+export function setCloneRole(
+  state: GameState,
+  role: string | null,
+  content: ContentDb,
+): CommandResult {
+  if (
+    role !== null &&
+    !(typeof role === 'string' && content.cloneRoles.some((r) => r.id === role))
+  ) {
+    return { ok: false, reason: 'error.unknownCloneRole' };
+  }
+  state.loadouts.cloneRole = role;
+  return { ok: true };
+}
+
 export function saveLoadout(state: GameState, name: string, content: ContentDb): CommandResult {
   const l = state.loadouts;
   const clean = typeof name === 'string' ? name.trim() : '';

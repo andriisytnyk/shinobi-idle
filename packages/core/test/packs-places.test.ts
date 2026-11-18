@@ -117,6 +117,7 @@ describe('one round trip per place', () => {
     loadouts: {
       active: ['core:a', ghost('x'), 'core:b', ghost('y')],
       signature: ghost('x'),
+      cloneRole: ghost('role'),
       saved: { main: { techniques: ['core:a', ghost('x')], signature: null } },
     },
     pouch: {
@@ -152,6 +153,7 @@ describe('one round trip per place', () => {
     expect((out.pouch as { slots: unknown[] }).slots[1]).toEqual({ id: '', n: 0 });
     expect(out.goal).toBeNull();
     expect((out.loadouts as Raw).signature).toBeNull();
+    expect((out.loadouts as Raw).cloneRole).toBeNull();
   });
 
   it('gives every place back as it was', () => {

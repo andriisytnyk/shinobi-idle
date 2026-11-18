@@ -78,6 +78,7 @@ export function snapshotPlayer(
       snapshot.signature = sig;
     }
   }
+  if (state.loadouts.cloneRole !== null) snapshot.cloneRole = state.loadouts.cloneRole;
   snapshot.pouch = state.pouch.slots.map((s) => ({ id: s.id, n: s.n }));
   // The medic pouch works only while it is owned.
   snapshot.medic =

@@ -304,6 +304,16 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
       problem('effect.status', 'a status combo names its status');
     needNumber('combo', `combo.${c.id}`);
   }
+  // Exactly one role of the clones is the default: the fight falls back to it.
+  const defaults = db.cloneRoles.filter((r) => r.default === true);
+  if (db.cloneRoles.length > 0 && defaults.length === 0) {
+    at('cloneRoles', db.cloneRoles[0]?.id ?? '');
+    problem('default', 'no clone role is the default');
+  }
+  for (const r of defaults.slice(1)) {
+    at('cloneRoles', r.id);
+    problem('default', `a second default clone role (the first is ${defaults[0]?.id ?? ''})`);
+  }
   for (const t of db.traits) {
     at('traits', t.id);
     ref('answer', t.answer, 'tags');

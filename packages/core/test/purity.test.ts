@@ -37,9 +37,9 @@ describe('A9: core source hygiene', () => {
       'combat/units.ts': [1000], // work units per ms, speed scale, ms per tick
       'combat/loadout.ts': [24], // longest name of a saved loadout
       'hex.ts': [6], // the six sides of a hex, the widest coordinate in a hex key
-      'save.ts': [4, 6, 1500, 2000], // four words of an rng stream; nesting depth of slot data; the pool capacities per item of versions 17 and 18 (the v17 -> v18 migration)
+      'save.ts': [4, 6, 200, 1500, 2000], // four words of an rng stream; nesting depth of slot data; the longest id of a clone role a save may hold; the pool capacities per item of versions 17 and 18 (the v17 -> v18 migration)
       'combat/report.ts': [1000, 100, 64], // three decimals of a multiplier, percent of a pool, longest id read from a save
-      'state.ts': [1000, 4, 20], // share scale, rng words, save version
+      'state.ts': [1000, 4, 21], // share scale, rng words, save version
       'clone-life.ts': [1000], // fatigue is kept in thousandths of a ms
       'reveal.ts': [64], // most refs one mark carries
       'shown.ts': [4000], // ceiling of the shown set for writes that do not know the content

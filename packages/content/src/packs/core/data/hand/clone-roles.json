@@ -1,0 +1,35 @@
+[
+  {
+    "id": "core:role_mirror",
+    "default": true,
+    "threat": 1,
+    "hand": { "mode": "copy" }
+  },
+  {
+    "id": "core:role_assault",
+    "threat": 1,
+    "hand": {
+      "mode": "pick",
+      "size": 3,
+      "weights": { "damage": 1, "status": 0, "opens": 0, "cheap": 0 }
+    }
+  },
+  {
+    "id": "core:role_support",
+    "threat": 1,
+    "hand": {
+      "mode": "pick",
+      "size": 3,
+      "weights": { "damage": 0.15, "status": 0.5, "opens": 1, "cheap": 0 }
+    }
+  },
+  {
+    "id": "core:role_distract",
+    "threat": 2,
+    "hand": {
+      "mode": "pick",
+      "size": 3,
+      "weights": { "damage": 0.1, "status": 0, "opens": 0, "cheap": 1 }
+    }
+  }
+]
