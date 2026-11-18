@@ -122,6 +122,7 @@
   {:else if listing.fighting}
     <!-- The arena comes first: on a phone the hint above it would push the fight off the screen. -->
     <FightScreen />
+    <RaidPanel compact progress />
     <Hint id="combat" />
   {:else if section === 'prepare' && target}
     <PrepScreen {target} />

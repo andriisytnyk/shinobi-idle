@@ -150,13 +150,17 @@ export function toastFor(event: GameEvent, content: ContentDb): ToastSpec | null
         ref: { kind: 'building', id: event.building },
       };
     case 'raidCalled':
-      return { key: 'toast.raidCalled', params: {} };
+      return { key: 'toast.raidCalled', params: { raid: t(`raid.${event.raid}.name`) } };
     case 'raidArrived':
-      return { key: 'toast.raidArrived', params: {} };
+      return { key: 'toast.raidArrived', params: { raid: t(`raid.${event.raid}.name`) } };
     case 'raidOver':
       return {
         key: 'toast.raidOver',
-        params: { done: event.repelled + event.byVillage, breached: event.breached },
+        params: {
+          raid: t(`raid.${event.raid}.name`),
+          done: event.repelled + event.byVillage,
+          breached: event.breached,
+        },
       };
     case 'buildingRepaired':
       return {

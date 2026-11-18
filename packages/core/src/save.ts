@@ -1,4 +1,4 @@
-import type { ContentDb, NatureId, SkillId } from '@shinobi/content';
+import type { ContentDb, NatureId, Req, SkillId } from '@shinobi/content';
 import { actionKindOf, rebalanceShares } from './actions.ts';
 import { COURSE_ID, COURSE_KIND } from './athletics.ts';
 import { tonicCharges } from './buffs.ts';
@@ -352,8 +352,7 @@ export const MIGRATIONS: readonly Migration[] = [
       const past = content.quests.some((quest) => {
         const progress = quests[quest.id];
         const at = quest.steps.findIndex(
-          (s) =>
-            s.objective.t === 'req' && s.objective.req.t === 'flag' && s.objective.req.id === over,
+          (s) => s.objective.t === 'req' && asksFlag(s.objective.req, over),
         );
         return (
           isRecord(progress) &&
@@ -693,6 +692,16 @@ function sanitizeWorld(raw: unknown, content: ContentDb): GameState['world'] {
     ),
   };
   return world;
+}
+
+/**
+ * Whether a requirement can only hold once the flag does: the flag itself, or an `all` with it inside. An `any`
+ * that merely mentions the flag does not count (the step could have been done another way), so a raid asked for
+ * only through an `any` is not taken as past.
+ */
+function asksFlag(req: Req, flag: string): boolean {
+  if (req.t === 'flag') return req.id === flag;
+  return req.t === 'all' && req.of.some((r) => asksFlag(r, flag));
 }
 
 /**

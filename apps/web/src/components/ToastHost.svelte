@@ -53,6 +53,7 @@
       data-toast-id={toast.id}
       data-ui="toast"
       role={toast.persistent ? 'alert' : undefined}
+      style:pointer-events={toast.persistent || toast.action ? 'auto' : 'none'}
     >
       <span>
         {#if toast.subject}<EntityLink kind={toast.subject.kind} id={toast.subject.id} />{/if}
@@ -134,7 +135,6 @@
     background: var(--surface-raised);
     color: var(--fg-dim);
     font-size: var(--text-xs);
-    pointer-events: auto;
   }
 
   /* On a wide screen the toasts sit at the left of the page, clear of the side panel and the goal panel. */
@@ -159,6 +159,15 @@
     border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-md);
     background: var(--surface-raised);
+  }
+
+  /*
+   * A toast floats over the page and must never take a click meant for what lies under it (the first click on a
+   * button the toast column covers was lost). An ordinary toast lets clicks through its body; only its links and
+   * buttons take them. A toast that waits for an answer (a persistent one, one with an action) is solid.
+   */
+  .toast :global(a),
+  .toast button {
     pointer-events: auto;
   }
 

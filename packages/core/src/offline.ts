@@ -1,5 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
-import type { RuleDisabledEvent } from './events.ts';
+import type { GameEvent, RuleDisabledEvent } from './events.ts';
 import { skillEntry } from './vocab.ts';
 import { mergeReports, type TargetReport } from './combat/report.ts';
 import { advance } from './engine.ts';
@@ -8,6 +8,17 @@ import { MS_PER_HOUR, masteryLevel } from './formulas.ts';
 import { defaultRules, type Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 import { levelAt } from './xp.ts';
+
+/** A raid met while away: it arrived, or it ended with these counts and this pay. */
+export interface RaidAway {
+  raid: string;
+  over: boolean;
+  repelled: number;
+  byVillage: number;
+  breached: number;
+  ryo: number;
+  rep: number;
+}
 
 export interface OfflineSummary {
   /** Time the caller reported, and the time actually simulated after the cap. */
@@ -24,8 +35,32 @@ export interface OfflineSummary {
   actionsStopped: ActionStoppedEvent[];
   /** Rules of packs that failed and were switched off during the time away. */
   rulesDisabled?: RuleDisabledEvent[];
+  /** Raids that arrived or ended while away, one row per raid (the village page has the detail). */
+  raids?: RaidAway[];
   /** The battle report of the time away, by target. */
   reports: Record<string, TargetReport>;
+}
+
+/** Folds a raid event of the time away into the rows: one row per raid, its end replacing its arrival. */
+function noteRaid(
+  rows: RaidAway[],
+  e: Extract<GameEvent, { type: 'raidArrived' | 'raidOver' }>,
+): void {
+  const row: RaidAway =
+    e.type === 'raidOver'
+      ? {
+          raid: e.raid,
+          over: true,
+          repelled: e.repelled,
+          byVillage: e.byVillage,
+          breached: e.breached,
+          ryo: e.ryo,
+          rep: e.rep,
+        }
+      : { raid: e.raid, over: false, repelled: 0, byVillage: 0, breached: 0, ryo: 0, rep: 0 };
+  const at = rows.findIndex((r) => r.raid === e.raid);
+  if (at >= 0) rows[at] = row;
+  else rows.push(row);
 }
 
 /**
@@ -73,12 +108,14 @@ export function advanceOffline(
     techniquesLearned: [],
     actionsStopped: [],
     rulesDisabled: [],
+    raids: [],
     reports,
   };
   for (const e of away) {
     if (e.type === 'techniqueLearned') summary.techniquesLearned.push(e.id);
     else if (e.type === 'actionStopped') summary.actionsStopped.push(e);
     else if (e.type === 'ruleDisabled') summary.rulesDisabled?.push(e);
+    else if (e.type === 'raidArrived' || e.type === 'raidOver') noteRaid(summary.raids ?? [], e);
   }
   for (const skill of skills) {
     const xp = (skillEntry(state, skill)?.xp ?? 0) - (xpBefore.get(skill) ?? 0);

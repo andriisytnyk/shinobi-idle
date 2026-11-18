@@ -134,7 +134,10 @@ describe('the raid on the village page', () => {
         rep: 0,
         at: 0,
       }),
-    ).toEqual({ key: 'toast.raidOver', params: { done: 5, breached: 1 } });
+    ).toEqual({
+      key: 'toast.raidOver',
+      params: { raid: "Напад «Сірих пов'язок»", done: 5, breached: 1 },
+    });
     expect(toastFor({ type: 'buildingRepaired', building: 'core:farms', at: 0 })?.ref).toEqual({
       kind: 'building',
       id: 'core:farms',

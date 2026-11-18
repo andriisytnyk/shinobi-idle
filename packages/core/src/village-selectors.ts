@@ -18,7 +18,7 @@ import {
   treasuryIncome,
 } from './village.ts';
 import { defenceParts, packsLeft, packsStopped } from './raid.ts';
-import type { RaidRun, VillageCost } from './village-state.ts';
+import type { RaidRun, VillageCost, VillageState } from './village-state.ts';
 
 /*
  * Read-only views of the village for the UI and bots. Nothing here changes the state.
@@ -81,6 +81,8 @@ export interface BuildingInfo {
   building: boolean;
   /** Village ticks until a building damaged by a raid works again; 0 when it is not damaged. */
   damaged: number;
+  /** Game time until that building works again, counting the part of the tick already run; 0 when it is not damaged. */
+  damagedMs: number;
 }
 
 function buildingLeaves(req: Req, id: string, out: number[]): void {
@@ -192,6 +194,7 @@ export function villageBuildings(state: GameState, content: ContentDb): Building
       unlocks: buildingUnlocks(state, b.id, content),
       building: village?.job?.building === b.id,
       damaged: village?.damage[b.id] ?? 0,
+      damagedMs: repairMsLeft(village, b.id, content),
     };
   });
 }
@@ -294,6 +297,13 @@ export interface StageInfo {
   reached: boolean;
 }
 
+/** Game time until a building damaged by a raid works again: whole ticks left and the rest of the tick running; 0 when it is whole. */
+function repairMsLeft(village: VillageState | null, id: string, content: ContentDb): number {
+  const ticks = village?.damage[id] ?? 0;
+  if (!village || ticks <= 0) return 0;
+  return (ticks - 1) * tickMs(content) + Math.max(0, tickMs(content) - village.clock);
+}
+
 export interface RaidInfo {
   id: string;
   phase: RaidRun['phase'];
@@ -314,6 +324,8 @@ export interface RaidInfo {
     perPack: number;
     stops: number;
   };
+  /** The enemy of every pack. */
+  enemy: string;
   /** The buildings in order that the packs that get through would damage, and the ticks a damage lasts. */
   targets: string[];
   repair: number;
@@ -324,6 +336,8 @@ export interface RaidInfo {
   /** What was paid and which buildings were damaged, once it is over. */
   paid: { ryo: number; rep: number };
   damaged: string[];
+  /** Game time left to repair, for each of those buildings still damaged (a repaired one has no entry). */
+  repairMs: Record<string, number>;
 }
 
 /** The raids that were called, in the order of the content: coming, at the gates, or over. */
@@ -357,12 +371,19 @@ export function villageRaids(state: GameState, content: ContentDb): RaidInfo[] {
           perPack: raid.perPack,
           stops: packsStopped(village, raid, content),
         },
+        enemy: raid.enemy,
         targets: raid.targets,
         repair: raid.repair,
         reward: { ...raid.reward },
         autoShare: raid.autoShare,
         paid: { ryo: run.ryo, rep: run.rep },
         damaged: [...run.damaged],
+        repairMs: Object.fromEntries(
+          run.damaged.flatMap((id) => {
+            const ms = repairMsLeft(village, id, content);
+            return ms > 0 ? [[id, ms]] : [];
+          }),
+        ),
       },
     ];
   });

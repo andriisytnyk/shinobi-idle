@@ -19,7 +19,7 @@ import { nonNativeLevel } from './natures.ts';
 import { cycleFactor } from './modifiers.ts';
 import { spendTonicCharges } from './buffs.ts';
 import { gainXp, grantMastery } from './progression.ts';
-import { evalReq, skillLevel, type Req } from './requirements.ts';
+import { reqMet, skillLevel, type Req } from './requirements.ts';
 import type { Rules } from './rules.ts';
 import { SHARE_FULL, type GameState } from './state.ts';
 import type { System } from './system.ts';
@@ -325,7 +325,7 @@ export const actionSystem: System = {
         }
         if (result === 'step') {
           const req = kind.requirements(state, id, content, rules);
-          if (req && !evalReq(state, req, content).met) {
+          if (req && !reqMet(state, req, content)) {
             const cause = kind.abortCause?.(state, id, content, rules);
             return stopSlot(state, index, 'requirements', content, rules, cause ?? undefined);
           }
@@ -351,7 +351,7 @@ export const actionSystem: System = {
           );
         }
         const req = kind.requirements(state, id, content, rules);
-        if (req && !evalReq(state, req, content).met) {
+        if (req && !reqMet(state, req, content)) {
           return stopSlot(state, index, 'requirements', content, rules);
         }
       }

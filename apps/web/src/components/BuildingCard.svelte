@@ -70,7 +70,7 @@
     {#if info.damaged > 0}
       <span class="damaged" data-damaged>
         {t('village.damaged', {
-          time: formatDuration(info.damaged * game.content.balance.K.tickMin * 60_000),
+          time: formatDuration(info.damagedMs),
         })}
       </span>
     {/if}

@@ -3,6 +3,7 @@
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
+  import { currencyName, moneyOf } from '../lib/vocab.ts';
   import type { AnbuReport } from '../lib/persistence.ts';
   import EntityLink from './EntityLink.svelte';
   import Modal from './Modal.svelte';
@@ -13,6 +14,7 @@
   }
 
   let { report, onClose }: Props = $props();
+  const moneyLabel = currencyName(moneyOf(game.content));
 </script>
 
 <Modal title={t('report.title')} paper {onClose}>
@@ -50,6 +52,28 @@
     <ul>
       {#each report.techniques as id (id)}
         <li><EntityLink kind="technique" {id} /></li>
+      {/each}
+    </ul>
+  {/if}
+
+  {#if report.raids.length > 0}
+    <h3>{t('report.raids')}</h3>
+    <ul data-report-raids>
+      {#each report.raids as row (row.raid)}
+        <li data-report-raid={row.raid}>
+          {#if row.over}
+            {t('report.raid.over', {
+              raid: t(`raid.${row.raid}.name`),
+              repelled: row.repelled + row.byVillage,
+              breached: row.breached,
+              ryo: formatInt(row.ryo),
+              currency: moneyLabel,
+              rep: formatInt(row.rep),
+            })}
+          {:else}
+            {t('report.raid.arrived', { raid: t(`raid.${row.raid}.name`) })}
+          {/if}
+        </li>
       {/each}
     </ul>
   {/if}

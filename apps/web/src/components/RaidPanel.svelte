@@ -1,6 +1,5 @@
 <script lang="ts">
   import { villageRaids, type RaidInfo } from '@shinobi/core';
-  import { entityName } from '../lib/entities.ts';
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
@@ -12,9 +11,11 @@
   interface Props {
     /** A compact notice for another page: the state of the raid and the way to the fight, without the defence and the outcome. */
     compact?: boolean;
+    /** During the raid fight: only the time left and the packs repelled, for the fight page. */
+    progress?: boolean;
   }
 
-  let { compact = false }: Props = $props();
+  let { compact = false, progress = false }: Props = $props();
 
   const content = game.content;
   const raids = $derived(game.read((gs) => villageRaids(gs, content)));
@@ -39,40 +40,42 @@
 </script>
 
 {#each raids as raid (raid.id)}
-  {#if !compact || raid.phase !== 'over'}
+  {#if progress ? raid.phase === 'active' && fighting.includes(raid.id) : !compact || raid.phase !== 'over'}
     <section class="panel raid" data-raid={raid.id} data-phase={raid.phase} data-ui="raid-panel">
       <h2><Icon name="lucide:swords" size={18} /> {name(raid)}</h2>
 
       {#if raid.phase === 'warned'}
         <p data-raid-state="warned">
-          {t('village.raid.warned', { time: formatDuration(raid.msLeft) })}
+          {t('village.raid.warned', { raid: name(raid), time: formatDuration(raid.msLeft) })}
         </p>
         {#if !compact}<p class="ct-muted">{t('village.raid.warned.hint')}</p>{/if}
       {:else if raid.phase === 'active'}
         {#if raid.waiting}
-          <p data-raid-state="waiting">{t('village.raid.active.waiting')}</p>
+          <p data-raid-state="waiting">{t('village.raid.active.waiting', { raid: name(raid) })}</p>
         {:else}
           <p data-raid-state="active">
-            {t('village.raid.active', { time: formatDuration(raid.msLeft) })}
+            {t('village.raid.active', { raid: name(raid), time: formatDuration(raid.msLeft) })}
           </p>
           {#if !compact}<p class="ct-muted">{t('village.raid.active.hint')}</p>{/if}
         {/if}
         <p class="progress" data-raid-packs>
           {t('village.raid.packs', { done: raid.repelled, total: raid.packs })}
         </p>
-        <div class="actions">
-          {#if fighting.includes(raid.id)}
-            <span class="ct-muted" data-raid-fighting>{t('village.raid.fighting')}</span>
-            <a class="ct-button" href="#/combat" data-raid-fight>{t('village.raid.toFight')}</a>
-          {:else}
-            <button type="button" class="ct-button" data-raid-defend onclick={() => defend(raid)}>
-              {t('village.raid.defend')}
-            </button>
-          {/if}
-          <a class="prepare" href="#/combat/prepare/zone/{raid.id}" data-raid-prepare
-            >{t('village.raid.prepare')}</a
-          >
-        </div>
+        {#if !progress}
+          <div class="actions">
+            {#if fighting.includes(raid.id)}
+              <span class="ct-muted" data-raid-fighting>{t('village.raid.fighting')}</span>
+              <a class="ct-button" href="#/combat" data-raid-fight>{t('village.raid.toFight')}</a>
+            {:else}
+              <button type="button" class="ct-button" data-raid-defend onclick={() => defend(raid)}>
+                {t('village.raid.defend')}
+              </button>
+            {/if}
+            <a class="prepare" href="#/combat/prepare/zone/{raid.id}" data-raid-prepare
+              >{t('village.raid.prepare')}</a
+            >
+          </div>
+        {/if}
       {:else}
         <p data-raid-state="over"><strong>{t('village.raid.over')}</strong></p>
         <ul class="outcome" data-raid-outcome>
@@ -91,7 +94,18 @@
           <p class="ct-muted">{t('village.raid.over.damaged')}</p>
           <ul class="outcome" data-raid-damaged>
             {#each raid.damaged as id (id)}
-              <li><EntityLink kind="building" {id} /></li>
+              <li>
+                <EntityLink kind="building" {id} />
+                <span class="ct-muted" data-raid-repair={id in raid.repairMs ? 'going' : 'done'}>
+                  {#if raid.repairMs[id]}
+                    {t('village.raid.over.repairing', {
+                      time: formatDuration(raid.repairMs[id] ?? 0),
+                    })}
+                  {:else}
+                    {t('village.raid.over.repaired')}
+                  {/if}
+                </span>
+              </li>
             {/each}
           </ul>
         {:else}
@@ -100,6 +114,10 @@
       {/if}
 
       {#if !compact && raid.phase !== 'over'}
+        <p data-raid-attackers>
+          {t('village.raid.attackers')}
+          <EntityLink kind="enemy" id={raid.enemy} />
+        </p>
         <h3>{t('village.raid.defence')}</h3>
         <ul class="parts" data-raid-defence>
           {#each raid.defence.parts as part (part.t + part.id)}
@@ -123,12 +141,17 @@
           {/each}
         </ul>
         <p data-raid-stops>
-          {#if raid.defence.points > 0}
+          {#if raid.defence.stops > 0}
             {t('village.raid.defence.points', {
               points: formatInt(raid.defence.points),
               perPack: formatInt(raid.defence.perPack),
               stops: Math.min(raid.defence.stops, raid.left),
               total: raid.left,
+            })}
+          {:else if raid.defence.points > 0}
+            {t('village.raid.defence.short', {
+              points: formatInt(raid.defence.points),
+              perPack: formatInt(raid.defence.perPack),
             })}
           {:else}
             {t('village.raid.defence.none')}
@@ -144,10 +167,10 @@
         </p>
         <p class="ct-muted" data-raid-damage>
           {t('village.raid.damage', { time: formatDuration(raid.repair * tickMs) })}
-          {#each raid.targets as id, i (id)}{i === 0 ? ' ' : ', '}{entityName({
-              kind: 'building',
-              id,
-            })}{/each}.
+          {#each raid.targets as id, i (id)}{i === 0 ? ' ' : ', '}<EntityLink
+              kind="building"
+              {id}
+            />{/each}.
         </p>
       {/if}
     </section>

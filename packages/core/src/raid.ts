@@ -1,7 +1,7 @@
 import type { ContentDb, Raid } from '@shinobi/content';
 import { addCurrency } from './bank.ts';
 import { emit } from './events.ts';
-import { evalReq } from './requirements.ts';
+import { reqMet } from './requirements.ts';
 import type { GameState } from './state.ts';
 import { currencyOf } from './vocab.ts';
 import type { RaidRun, VillageState } from './village-state.ts';
@@ -74,7 +74,7 @@ export function startRaids(state: GameState, content: ContentDb): void {
   const village = state.village;
   if (!village) return;
   for (const raid of content.raids) {
-    if (village.raids[raid.id] || !evalReq(state, raid.trigger, content).met) continue;
+    if (village.raids[raid.id] || !reqMet(state, raid.trigger, content)) continue;
     village.raids[raid.id] = emptyRun('warned', raid.lead);
     emit(state, { type: 'raidCalled', raid: raid.id, ticks: raid.lead });
     if (raid.lead === 0) arrive(state, raid, village);

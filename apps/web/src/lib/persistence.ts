@@ -10,6 +10,7 @@ import {
   type ActionStoppedEvent,
   type GameState,
   type OfflineSummary,
+  type RaidAway,
   type Rules,
 } from '@shinobi/core';
 
@@ -42,6 +43,8 @@ export interface AnbuReport {
   mastery: { key: string; levels: number }[];
   techniques: string[];
   stopped: ActionStoppedEvent[];
+  /** Raids that arrived or ended while away. */
+  raids: RaidAway[];
 }
 
 /** An absence shorter than this is applied without a report. */
@@ -62,7 +65,8 @@ export function buildReport(summary: OfflineSummary): AnbuReport | null {
     skills.length === 0 &&
     mastery.length === 0 &&
     summary.techniquesLearned.length === 0 &&
-    summary.actionsStopped.length === 0;
+    summary.actionsStopped.length === 0 &&
+    (summary.raids ?? []).length === 0;
   if (summary.requestedMs < REPORT_MIN_MS || quiet) return null;
   return {
     requestedMs: summary.requestedMs,
@@ -72,6 +76,7 @@ export function buildReport(summary: OfflineSummary): AnbuReport | null {
     mastery,
     techniques: summary.techniquesLearned,
     stopped: summary.actionsStopped,
+    raids: summary.raids ?? [],
   };
 }
 
