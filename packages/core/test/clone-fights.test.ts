@@ -21,6 +21,7 @@ import { fighter, ids, startFight, startOperation, stock, unlock } from './prep-
 
 const CLONE = 'core:shadow_clone';
 const WOLF = 'core:zone_wolfmask';
+const HARD = 'core:zone_foreign_genin';
 const MIN = 60_000;
 
 /** A genin who knows the clone technique (the second slot is open) and is strong enough for the zone. */
@@ -244,7 +245,8 @@ describe('a clone that loses', () => {
   it('costs the player no Wound and no defeat, and the fight starts again', () => {
     const state = weakClone(9);
     expect(state.slots.length).toBe(2);
-    startFight(state, 'core:zone_wolfmask', 1);
+    // A zone too hard for it even with the bodies its clone technique puts at its side in a fight.
+    startFight(state, HARD, 1);
     let lost = 0;
     for (let i = 0; i < 40 && lost === 0; i++) {
       advance(state, MIN, content);
@@ -260,7 +262,7 @@ describe('a clone that loses', () => {
     // The clone is still at it: the action stands, a fight is going, and it is the clone's.
     expect(state.slots[1]?.action?.kind).toBe('fight');
     expect(state.combat?.owner).toBe(1);
-    const report = state.report[WOLF];
+    const report = state.report[HARD];
     expect(report?.losses).toBeGreaterThan(0);
     expect(report?.cloneFights).toBe(report?.fights);
   });

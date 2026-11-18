@@ -1,5 +1,6 @@
 import type { ContentDb } from '@shinobi/content';
 import {
+  alliesOf,
   combatantStatus,
   fightSlotIndex,
   SHARE_FULL,
@@ -48,8 +49,10 @@ export interface FighterView {
   /** The id of the body in the fight. */
   key: string;
   side: 'player' | 'enemy';
-  /** The content id of the enemy or boss the body came from; null for the player. */
+  /** The content id of the enemy or boss the body came from; null for the player and for an ally. */
   entry: string | null;
+  /** For an ally of the player's side (a combat clone): its number in the fight; null for every other body. */
+  ally: number | null;
   /** Which body of its kind this is (1-based) and how many the fight has of that kind. */
   nth: number;
   of: number;
@@ -80,6 +83,8 @@ export interface Scene {
   /** `fight`, or the pause before the next body (`respawn`) or an operation's first fight (`approach`). */
   phase: 'fight' | 'respawn' | 'approach';
   player: FighterView;
+  /** The bodies on the player's side besides the character, in the order they came in; fallen ones stay, down. */
+  allies: FighterView[];
   enemies: FighterView[];
   /** The fight clock, in ms, as the screen sees it. */
   nowMs: number;
@@ -176,6 +181,7 @@ function fighterOf(
     key: c.id,
     side: c.side,
     entry: c.side === 'enemy' ? c.entry : null,
+    ally: c.ally?.n ?? null,
     nth,
     of,
     alive: c.hp > 0,
@@ -224,10 +230,14 @@ export function buildScene(state: GameState, content: ContentDb, rules: Rules): 
     seen.set(e.entry, n);
     return fighterOf(state, e, n, total.get(e.entry) ?? 1, content, rules, share, nowMs);
   });
+  const allies = alliesOf(fight).map((a, i, all) =>
+    fighterOf(state, a, i + 1, all.length, content, rules, share, nowMs),
+  );
   return {
     slot,
     phase: combat.phase,
     player: fighterOf(state, fight.player, 1, 1, content, rules, share, nowMs),
+    allies,
     enemies,
     nowMs,
   };
@@ -245,10 +255,19 @@ export interface Outcome {
   combos: readonly string[];
 }
 
-/** The body an action of `actor` lands on: its opponent (the first one standing, for the player's own). */
+/**
+ * The body an action of `actor` lands on: for an enemy the body of the player's side it was aimed at
+ * (the character when it names none that is there); for the player's side the enemy it names while
+ * that one stands, else the first one standing.
+ */
 function targetOfAction(scene: Scene, actor: FighterView): string {
-  if (actor.side === 'enemy') return scene.player.key;
-  return (scene.enemies.find((e) => e.alive) ?? scene.enemies[0])?.key ?? actor.key;
+  const named = actor.action?.target ?? null;
+  if (actor.side === 'enemy') {
+    const side = [scene.player, ...scene.allies];
+    return side.find((b) => b.key === named)?.key ?? scene.player.key;
+  }
+  const aimed = named ? scene.enemies.find((e) => e.key === named && e.alive) : undefined;
+  return (aimed ?? scene.enemies.find((e) => e.alive) ?? scene.enemies[0])?.key ?? actor.key;
 }
 
 /**
@@ -267,7 +286,7 @@ export function targetedKey(scene: Scene): string | null {
  */
 export function outcomesOf(scene: Scene): Record<string, Outcome[]> {
   const out: Record<string, Outcome[]> = {};
-  for (const actor of [scene.player, ...scene.enemies]) {
+  for (const actor of [scene.player, ...scene.allies, ...scene.enemies]) {
     const last = actor.last;
     if (!last || last.ageMs >= OUTCOME_SHOWN_MS) continue;
     const key = `${actor.key}@${last.atMs}`;

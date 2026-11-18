@@ -65,6 +65,8 @@ export interface CombatLogEvent extends EventBase {
   dmg: number;
   /** The id of the combatant whose action it is (on `cast`, `resolve` and `interrupted`). */
   by?: string;
+  /** The number of the ally the line is about (the ally that acts, or the one an enemy attack was aimed at); absent for the character. */
+  ally?: number;
 }
 /** What a win paid: ryo, the bounty of a boss, trophies and scroll parts. */
 export interface LootEvent extends EventBase {

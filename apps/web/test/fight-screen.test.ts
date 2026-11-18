@@ -3,6 +3,9 @@ import { createState, defaultRules, fightSlotIndex, xpAt, type GameState } from 
 import type { Component } from 'svelte';
 import { render } from 'svelte/server';
 import { beforeEach, describe, expect, it } from 'vitest';
+import AllyRow from '../src/components/AllyRow.svelte';
+import CombatLog from '../src/components/CombatLog.svelte';
+import type { LogEntry } from '../src/lib/game.svelte.ts';
 import Fighter from '../src/components/Fighter.svelte';
 import CombatPage from '../src/pages/CombatPage.svelte';
 import {
@@ -32,6 +35,7 @@ function body(patch: Partial<FighterView> = {}): FighterView {
     key: 'enemy-1',
     side: 'enemy',
     entry: 'core:wolf',
+    ally: null,
     nth: 1,
     of: 1,
     alive: true,
@@ -249,12 +253,61 @@ describe('F1: what an action did stays under its fighter', () => {
 });
 
 describe('F1: the outcomes that fly off a body', () => {
-  const scene = (p: FighterView, enemies: FighterView[]): Scene => ({
+  const scene = (p: FighterView, enemies: FighterView[], allies: FighterView[] = []): Scene => ({
     slot: 0,
     phase: 'fight',
     player: p,
+    allies,
     enemies,
     nowMs: 2000,
+  });
+
+  it('puts an enemy hit on the ally it was aimed at, and an ally strike on the enemy it names', () => {
+    const clone = (patch: Partial<FighterView> = {}) =>
+      body({ key: 'ally#1', side: 'player', entry: null, ally: 1, ...patch });
+    const out = outcomesOf(
+      scene(
+        player(),
+        [
+          body({
+            key: 'e',
+            action: { kind: 'attack', id: null, target: 'ally#1' },
+            last: last({ kind: 'attack', damage: 7, atMs: 1900, ageMs: 100 }),
+          }),
+          body({ key: 'f' }),
+        ],
+        [
+          clone({
+            action: { kind: 'basic', id: null, target: 'f' },
+            last: last({ kind: 'basic', damage: 4, atMs: 1900, ageMs: 100 }),
+          }),
+        ],
+      ),
+    );
+    expect(out['ally#1']?.[0]?.amount).toBe(7);
+    expect(out.f?.[0]?.amount).toBe(4);
+    expect(out.player).toBeUndefined();
+  });
+
+  it('draws a combat clone as a small row with its name, its bars and what it does, and a fallen one as down', () => {
+    const f = body({
+      key: 'ally#2',
+      side: 'player',
+      entry: null,
+      ally: 2,
+      maxChakra: 20,
+      chakra: 12,
+      phase: 'act',
+      action: { kind: 'technique', id: FIREBALL, target: null },
+    });
+    const out = html(AllyRow, { f });
+    expect(out).toContain('Клон №2');
+    expect(out).toContain('data-ally="2"');
+    expect(out).toContain('data-ui="fight-action"');
+    expect(out).toContain(name('technique', FIREBALL));
+    const down = html(AllyRow, { f: { ...f, alive: false, hp: 0 } });
+    expect(down).toContain('Знешкоджено');
+    expect(down).not.toContain('data-ui="fight-action"');
   });
 
   it('puts the player damage on the first enemy standing and an enemy hit on the player', () => {
@@ -290,11 +343,44 @@ describe('F1: the outcomes that fly off a body', () => {
   });
 });
 
+describe('the battle log names the body acting', () => {
+  it('writes the number of a combat clone on its lines and on the enemy hits aimed at it', () => {
+    const line = (id: number, patch: Record<string, unknown>): LogEntry => ({
+      id,
+      event: {
+        type: 'combatLog',
+        at: id,
+        side: 'player',
+        act: 'cast',
+        tech: 'core:leaf_whirlwind',
+        enemy: 'core:wolf',
+        dmg: 0,
+        ...patch,
+      } as LogEntry['event'],
+    });
+    const out = html(CombatLog, {
+      entries: [
+        line(1, { ally: 2, by: 'ally#2' }),
+        line(2, { ally: 2, act: 'hit', dmg: 6 }),
+        line(3, { ally: 1, act: 'hit', tech: null, dmg: 3 }),
+        line(4, { side: 'enemy', act: 'hit', tech: null, ally: 1, dmg: 5 }),
+        line(5, { side: 'enemy', act: 'miss', tech: null }),
+      ],
+    });
+    expect(out).toContain('Клон №2');
+    expect(out).toContain('Клон №1');
+    expect(out).toContain('влучає по клону №1');
+    expect(out).toContain('промахується');
+    expect(out).not.toContain('Ти готуєш');
+  });
+});
+
 describe('F1-fix1: the body the player is aiming at', () => {
   const scene = (p: FighterView, enemies: FighterView[]): Scene => ({
     slot: 0,
     phase: 'fight',
     player: p,
+    allies: [],
     enemies,
     nowMs: 2000,
   });

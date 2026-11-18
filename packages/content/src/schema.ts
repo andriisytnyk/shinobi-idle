@@ -171,7 +171,13 @@ export const sealSchema = z.object({
 });
 
 /** Keys of the technique effect numbers in `K.techFx`. */
-export const TECH_FX_KEYS = ['gateOpening', 'gateHealing', 'nextCast', 'reveal'] as const;
+export const TECH_FX_KEYS = [
+  'gateOpening',
+  'gateHealing',
+  'nextCast',
+  'reveal',
+  'combatClone',
+] as const;
 /** Keys of the boss special numbers in `K.bossFx`. */
 export const BOSS_FX_KEYS = [
   'wolfPack',
@@ -200,6 +206,8 @@ export const techniqueEffectSchema = z.discriminatedUnion('kind', [
   }),
   z.strictObject({ kind: z.literal('nextCast'), fx: idOf('fxNextCast') }),
   z.strictObject({ kind: z.literal('reveal'), fx: idOf('fxReveal') }),
+  /** Puts bodies on the caster's side of a fight (allies); the row of `K.techFx` says how many, how strong, and what share of the caster's pools they take. */
+  z.strictObject({ kind: z.literal('summon'), fx: idOf('fxSummon') }),
 ]);
 
 export const techniqueCombatSchema = z.strictObject({

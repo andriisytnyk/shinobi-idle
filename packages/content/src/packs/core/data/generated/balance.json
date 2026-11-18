@@ -187,6 +187,16 @@
       },
       "reveal": {
         "durationMs": 20000
+      },
+      "combatClone": {
+        "count": 2,
+        "masteryStep": 50,
+        "max": 3,
+        "share": 0.4,
+        "hp": 0.3,
+        "dmg": 0.5,
+        "threat": 0.6,
+        "casts": 1
       }
     },
     "bossFx": {

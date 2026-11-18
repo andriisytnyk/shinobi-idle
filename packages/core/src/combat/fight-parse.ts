@@ -19,6 +19,7 @@ import type {
   PlayerKit,
   PouchSlot,
   Spawn,
+  SummonSpec,
   TeamSupport,
   Timer,
 } from './fight-types.ts';
@@ -137,6 +138,7 @@ const KIT_EFFECTS: readonly KitEffect['kind'][] = [
   'stance',
   'nextCast',
   'reveal',
+  'summon',
 ];
 const RESULTS: readonly FightResult[] = ['ongoing', 'victory', 'defeat', 'fled', 'timeout', 'void'];
 /** The largest multiplier an effect may carry; more would make a timer fill in no time. */
@@ -270,8 +272,16 @@ function parseCombatant(
   if (!figures.every(nonNeg) || !isInt(raw.waitMs) || raw.waitMs < 1) return null;
   if (!isInt(raw.strikeMs) || raw.strikeMs < 1) return null;
   if ((raw.maxHp as number) <= 0) return null;
-  // A fighter waits or acts; only the player rests. A fight saved before the loop of waits and actions has none of this and is not read.
-  const phases = side === 'player' ? ['wait', 'act', 'rest'] : ['wait', 'act'];
+  // An ally is a body of the player's side that is not the character: it carries its number and kind.
+  let ally: Combatant['ally'];
+  if (raw.ally !== undefined) {
+    const a = raw.ally;
+    if (side !== 'player' || !isRecord(a) || !isInt(a.n) || a.n < 1 || !isStr(a.kind)) return null;
+    ally = { n: a.n, kind: a.kind };
+  }
+  // A fighter waits or acts; only the character rests. A fight saved before the loop of waits and actions has none of this and is not read.
+  const phases =
+    side === 'player' && ally === undefined ? ['wait', 'act', 'rest'] : ['wait', 'act'];
   if (typeof raw.phase !== 'string' || !phases.includes(raw.phase)) return null;
   const phase = raw.phase as Combatant['phase'];
   const act = parseAct(raw.act, side);
@@ -344,6 +354,7 @@ function parseCombatant(
     decoyUntil: raw.decoyUntil === null ? null : Math.max(raw.decoyUntil as number, t),
     fleeAt: raw.fleeAt,
     fled: raw.fled,
+    ...(ally ? { ally } : {}),
   };
 }
 
@@ -353,8 +364,26 @@ function parseKitEffect(raw: unknown): KitEffect | null {
   if (!figures.every(nonNeg) || !isInt(raw.durationMs) || raw.durationMs < 0) return null;
   if (!isInt(raw.everyMs) || raw.everyMs < 0) return null;
   if (!Array.isArray(raw.statuses) || !raw.statuses.every(isStr)) return null;
+  let summon: SummonSpec | undefined;
+  if (raw.summon !== undefined) {
+    const s = raw.summon;
+    if (!isRecord(s)) return null;
+    if (![s.count, s.max, s.casts].every((x) => isInt(x) && x >= 1)) return null;
+    if (![s.share, s.hp].every(share) || !nonNeg(s.dmg)) return null;
+    if (!isNum(s.threat) || s.threat <= 0) return null;
+    summon = {
+      count: s.count as number,
+      max: s.max as number,
+      share: s.share as number,
+      hp: s.hp as number,
+      dmg: s.dmg as number,
+      threat: s.threat,
+      casts: s.casts as number,
+    };
+  }
   return {
     kind: raw.kind,
+    ...(summon ? { summon } : {}),
     amount: raw.amount as number,
     mult: raw.mult as number,
     durationMs: raw.durationMs,
@@ -541,6 +570,7 @@ function parseLog(raw: unknown): FightLogLine[] | null {
       dmg: l.dmg,
       ...(isStr(l.by) ? { by: l.by } : {}),
       ...(isStr(l.via) ? { via: l.via } : {}),
+      ...(isInt(l.ally) && l.ally >= 1 ? { ally: l.ally } : {}),
     });
   }
   return lines;
@@ -609,6 +639,22 @@ export function parseFight(raw: unknown, content: ContentDb): FightState | null 
   if (doing?.kind === 'item' && !pouch.some((x) => x.id === doing.id)) return null;
   if (doing?.kind === 'attack') return null;
   if (enemies.some((e) => e.act !== null && e.act.kind !== 'attack')) return null;
+  // The allies of the player's side: absent in a fight that never had one.
+  let allies: Combatant[] | undefined;
+  if (raw.allies !== undefined) {
+    if (!Array.isArray(raw.allies) || raw.allies.length > most + most) return null;
+    allies = [];
+    for (const a of raw.allies) {
+      const body = parseCombatant(a, 'player', t, v);
+      if (!body || body.ally === undefined) return null;
+      const act = body.act;
+      // An ally casts a technique of the kit and strikes plainly; it uses no item and takes no rest.
+      if (act && act.kind !== 'basic' && act.kind !== 'technique') return null;
+      if (act?.kind === 'technique' && !kit.techniques.some((x) => x.id === act.id)) return null;
+      allies.push(body);
+    }
+  }
+  if (raw.allied !== undefined && (!isInt(raw.allied) || raw.allied < 0)) return null;
   const w = rng as number[];
   const state: RngState = [w[0] ?? 0, w[1] ?? 0, w[2] ?? 0, w[3] ?? 0];
   const fault =
@@ -625,6 +671,8 @@ export function parseFight(raw: unknown, content: ContentDb): FightState | null 
     encounter,
     spawned: raw.spawned,
     player,
+    ...(allies ? { allies } : {}),
+    ...(raw.allied === undefined ? {} : { allied: raw.allied as number }),
     enemies,
     kit,
     tier: raw.tier,

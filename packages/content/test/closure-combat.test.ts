@@ -41,7 +41,7 @@ describe('technique combat data', () => {
 
   const ALLOWED: Record<RoleId, readonly string[]> = {
     projectile: ['damage'],
-    series: ['damage'],
+    series: ['damage', 'summon'],
     area: ['damage'],
     signature: ['damage'],
     control: ['damage', 'none', 'reveal'],
@@ -96,10 +96,13 @@ describe('technique combat data', () => {
       expect(effectOf(id)?.effect).toEqual({ kind: 'none' });
     expect(effectOf('core:front_lotus')?.requiresStance).toBe(true);
     expect(effectOf('core:wave_of_inspiration')?.guaranteedCombo).toBe('shockWet');
-    expect(effectOf('core:shadow_clone')).toMatchObject({
-      effect: { kind: 'damage' },
-      hitsAll: true,
+    // The clone technique does not strike in a fight: it puts bodies on the caster's side.
+    expect(effectOf('core:shadow_clone')).toEqual({
+      effect: { kind: 'summon', fx: 'combatClone' },
     });
+    expect(Object.keys(K.techFx.combatClone ?? {}).sort()).toEqual(
+      ['casts', 'count', 'dmg', 'hp', 'masteryStep', 'max', 'share', 'threat'].sort(),
+    );
   });
 
   it('names only effect numbers that exist in the balance object', () => {

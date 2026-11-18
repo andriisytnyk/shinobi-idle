@@ -4,6 +4,7 @@
   import Slot from '../lib/ext/Slot.svelte';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
+  import AllyRow from './AllyRow.svelte';
   import Fighter from './Fighter.svelte';
 
   const content = game.content;
@@ -46,6 +47,13 @@
   <section class="arena" data-ui="fight-arena" data-phase={scene.phase}>
     <div class="side" data-side="player">
       <Fighter f={scene.player} outcomes={outcomes[scene.player.key] ?? []} {clone} />
+      {#if scene.allies.length > 0}
+        <ul class="allies" data-ui="fight-allies" aria-label={t('fight.allies')}>
+          {#each scene.allies as a (a.key)}
+            <li><AllyRow f={a} outcomes={outcomes[a.key] ?? []} /></li>
+          {/each}
+        </ul>
+      {/if}
     </div>
     <div class="side" data-side="enemies">
       {#if scene.phase !== 'fight'}
@@ -86,6 +94,16 @@
     min-width: 0;
   }
 
+  /* The combat clones of the player's side: small rows under the character. */
+  .allies {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
   .banner {
     margin: 0;
     padding: var(--space-2) var(--space-3);
@@ -119,10 +137,20 @@
       padding-block: var(--space-1);
     }
 
+    /* The character stays in view while the pack is read; the clones under it scroll away with the rest. */
     .side[data-side='player'] {
+      display: contents;
+    }
+
+    .side[data-side='player'] > :global([data-ui='fighter']) {
       position: sticky;
       top: 0;
       z-index: var(--z-raised);
+      order: -4;
+    }
+
+    .allies {
+      order: -3;
     }
   }
 

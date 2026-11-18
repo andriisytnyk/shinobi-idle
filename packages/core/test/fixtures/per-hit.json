@@ -1205,57 +1205,57 @@
   "combos": {}
  },
  "core:shadow_clone|plain": {
-  "damage": 76.025455,
-  "hp": 999999923.974546,
+  "damage": 0,
+  "hp": 1000000000,
   "effects": [],
   "statuses": {},
   "combos": {}
  },
  "core:shadow_clone|nature-katon": {
-  "damage": 76.025455,
-  "hp": 999999923.974546,
+  "damage": 0,
+  "hp": 1000000000,
   "effects": [],
   "statuses": {},
   "combos": {}
  },
  "core:shadow_clone|nature-futon": {
-  "damage": 76.025455,
-  "hp": 999999923.974546,
+  "damage": 0,
+  "hp": 1000000000,
   "effects": [],
   "statuses": {},
   "combos": {}
  },
  "core:shadow_clone|nature-raiton": {
-  "damage": 76.025455,
-  "hp": 999999923.974546,
+  "damage": 0,
+  "hp": 1000000000,
   "effects": [],
   "statuses": {},
   "combos": {}
  },
  "core:shadow_clone|nature-doton": {
-  "damage": 76.025455,
-  "hp": 999999923.974546,
+  "damage": 0,
+  "hp": 1000000000,
   "effects": [],
   "statuses": {},
   "combos": {}
  },
  "core:shadow_clone|nature-suiton": {
-  "damage": 76.025455,
-  "hp": 999999923.974546,
+  "damage": 0,
+  "hp": 1000000000,
   "effects": [],
   "statuses": {},
   "combos": {}
  },
  "core:shadow_clone|armor": {
-  "damage": 53.217818,
-  "hp": 999999946.782182,
+  "damage": 0,
+  "hp": 1000000000,
   "effects": [],
   "statuses": {},
   "combos": {}
  },
  "core:shadow_clone|prior-burn": {
-  "damage": 76.025455,
-  "hp": 999999923.974546,
+  "damage": 0,
+  "hp": 999999999.5,
   "effects": [
    [
     "burn",
@@ -1268,8 +1268,8 @@
   "combos": {}
  },
  "core:shadow_clone|prior-wet": {
-  "damage": 76.025455,
-  "hp": 999999923.974546,
+  "damage": 0,
+  "hp": 1000000000,
   "effects": [
    [
     "wet",

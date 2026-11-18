@@ -27,6 +27,7 @@ export interface IdTypes {
   skillGroup: string;
   fxNextCast: string;
   fxReveal: string;
+  fxSummon: string;
   fxSleep: string;
   fxWolfPack: string;
   fxDrunkenEvasion: string;

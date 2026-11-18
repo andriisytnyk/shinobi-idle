@@ -132,12 +132,37 @@ export interface Combatant {
   /** The enemy leaves the fight when its health share falls to this; null never. */
   fleeAt: number | null;
   fled: boolean;
+  /**
+   * Set on a body of the player's side that is not the character (an ally): its number in the fight
+   * (1-based, the order they came in) and the kind of ally it is (the id of the technique that put it
+   * there). Absent on the character and on every enemy.
+   */
+  ally?: { n: number; kind: string };
+}
+
+/** An ally kind a technique puts on the caster's side, with its numbers resolved for this player. */
+export interface SummonSpec {
+  /** Bodies one cast makes (Mastery counted), and the most the caster's side may hold at once. */
+  count: number;
+  max: number;
+  /** The share of the caster's current chakra and stamina the bodies take between them. */
+  share: number;
+  /** A body's health, as a share of the caster's maximum. */
+  hp: number;
+  /** What a body's strikes do, as a share of the caster's (its plain strike and every technique it casts). */
+  dmg: number;
+  /** How much an enemy weighs a body as a target against the caster's 1. */
+  threat: number;
+  /** Casts allowed in one fight. */
+  casts: number;
 }
 
 /** What a technique does besides damage, with its numbers resolved for this player. */
 export interface KitEffect {
   /** `damage` for a plain attack, else the kind named by the technique's combat data. */
-  kind: 'damage' | 'none' | 'cleanse' | 'stance' | 'nextCast' | 'reveal';
+  kind: 'damage' | 'none' | 'cleanse' | 'stance' | 'nextCast' | 'reveal' | 'summon';
+  /** For `summon`: what the technique puts on the caster's side. */
+  summon?: SummonSpec;
   /** Shield strength, decoy charges. */
   amount: number;
   /** Evasion multiplier, Taijutsu damage share of a stance, cast time scale of the next cast. */
@@ -242,6 +267,11 @@ export interface FightLogLine {
   dmg: number;
   /** The id of the combatant the action is of (set on `cast`, `resolve` and `interrupted`). */
   by?: string;
+  /**
+   * The number of the ally the line is about: the ally that acts (a player-side line) or the ally an
+   * enemy attack was aimed at. Absent when the line is of the character.
+   */
+  ally?: number;
   /** On a `miss` of an attack on the player: the defensive technique that avoided it. */
   via?: string;
 }
@@ -300,6 +330,13 @@ export interface FightState {
   /** Bodies spawned so far, for naming. */
   spawned: number;
   player: Combatant;
+  /**
+   * The bodies on the player's side besides the character, in the order they came in; a fallen or
+   * dispelled one stays in the list with no health. Absent in a fight that never had one.
+   */
+  allies?: Combatant[];
+  /** Allies made so far, for numbering them. */
+  allied?: number;
   enemies: Combatant[];
   kit: PlayerKit;
   /** Rank tier of the player. */
@@ -430,6 +467,8 @@ export interface FightView {
   techniques: readonly ViewTechnique[];
   /** Living enemies. */
   enemies: readonly ViewEnemy[];
+  /** Living allies of the player's side besides the one this view is for. */
+  allies?: number;
   /** Casts per technique so far (habituation counts). */
   habituation: Readonly<Record<string, number>>;
   /** The tier of the AI that plays: its ordered rule list and how the rules behave. */

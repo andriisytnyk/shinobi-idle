@@ -1400,5 +1400,15 @@
   "toast.raidOver": "{raid} завершено. Відбито груп: {done}, прорвалося: {breached}.",
   "toast.buildingRepaired": "Будівлю відремонтовано:",
   "village.raid.fighting": "Бій з нападниками триває.",
-  "village.raid.toFight": "До бою"
+  "village.raid.toFight": "До бою",
+  "fight.ally": "Клон №{n}",
+  "fight.allies": "Бойові клони",
+  "fight.allyIdle": "Вичікує",
+  "log.allyCast": "готує:",
+  "log.allyHit": "влучив технікою",
+  "log.allyMiss": "схибив технікою",
+  "log.allyBasicHit": "ударив і влучив",
+  "log.allyBasicMiss": "ударив і схибив",
+  "log.enemyHitAlly": "влучає по клону №{n}",
+  "log.enemyMissAlly": "промахується по клону №{n}"
 }
