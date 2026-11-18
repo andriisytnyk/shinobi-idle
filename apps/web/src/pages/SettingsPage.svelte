@@ -75,6 +75,31 @@
     message = { ok, key: ok ? 'settings.restored' : 'settings.restoreFailed' };
   }
 
+  /** The backup the player is about to restore (asks first), and the text of the one just exported. */
+  let restoring = $state<string | null>(null);
+  let backupExport = $state<{ key: string; text: string } | null>(null);
+
+  const dateOf = (at: number): string => new Date(at).toLocaleString('uk-UA');
+
+  async function exportBackup(key: string): Promise<void> {
+    const text = await game.exportBackup(key);
+    if (text === null) {
+      backupExport = null;
+      message = { ok: false, key: 'settings.backupExportFailed' };
+      return;
+    }
+    backupExport = { key, text };
+    message = null;
+  }
+
+  async function doRestoreFrom(): Promise<void> {
+    const key = restoring;
+    restoring = null;
+    if (key === null) return;
+    const ok = await game.restoreFrom(key);
+    message = { ok, key: ok ? 'settings.restored' : 'settings.restoreFailed' };
+  }
+
   async function doReset(): Promise<void> {
     confirmReset = false;
     typed = '';
@@ -251,6 +276,39 @@
     {/if}
   </section>
 
+  <section data-settings="backups">
+    <h2>{t('settings.backups')}</h2>
+    <p class="dim">{t('settings.backupsHelp')}</p>
+    {#if game.backups.length === 0}
+      <p class="dim">{t('settings.backupsEmpty')}</p>
+    {:else}
+      <ul class="backups">
+        {#each game.backups as backup (backup.key)}
+          <li data-backup={backup.key}>
+            <span class="what"
+              >{t('settings.backupItem', { v: backup.v, date: dateOf(backup.at) })}</span
+            >
+            <span class="row">
+              <button type="button" onclick={() => (restoring = backup.key)}>
+                {t('settings.backupRestore')}
+              </button>
+              <button type="button" onclick={() => void exportBackup(backup.key)}>
+                {t('settings.backupExport')}
+              </button>
+            </span>
+            {#if backupExport?.key === backup.key}
+              <textarea
+                readonly
+                rows="4"
+                aria-label={t('settings.backupExport')}
+                value={backupExport.text}></textarea>
+            {/if}
+          </li>
+        {/each}
+      </ul>
+    {/if}
+  </section>
+
   <section>
     <h2>{t('settings.danger')}</h2>
     <button type="button" class="danger" onclick={() => (confirmReset = true)}>
@@ -290,6 +348,18 @@
   </Modal>
 {/if}
 
+{#if restoring !== null}
+  <Modal title={t('settings.backupRestoreConfirmTitle')} onClose={() => (restoring = null)}>
+    <p>{t('settings.backupRestoreConfirm')}</p>
+    {#snippet actions()}
+      <button type="button" onclick={() => (restoring = null)}>{t('settings.cancel')}</button>
+      <button type="button" class="danger" onclick={doRestoreFrom}>
+        {t('settings.backupRestore')}
+      </button>
+    {/snippet}
+  </Modal>
+{/if}
+
 {#if confirmImport}
   <Modal title={t('settings.importConfirmTitle')} onClose={() => (confirmImport = false)}>
     <p>{t('settings.importConfirm')}</p>
@@ -313,6 +383,26 @@
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+
+  .backups {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .backups li {
+    padding: var(--space-2) var(--space-3);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+  }
+
+  .backups .row {
+    margin: var(--space-1) 0 0;
   }
 
   .version {

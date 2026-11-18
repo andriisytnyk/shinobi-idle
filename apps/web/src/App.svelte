@@ -1,6 +1,8 @@
 <script lang="ts">
   import { untrack } from 'svelte';
   import BlockedScreen from './components/BlockedScreen.svelte';
+  import CrashScreen from './components/CrashScreen.svelte';
+  import ErrorBoundary from './components/ErrorBoundary.svelte';
   import LoadErrorScreen from './components/LoadErrorScreen.svelte';
   import DevTools from './components/DevTools.svelte';
   import GoalPanel from './components/GoalPanel.svelte';
@@ -97,30 +99,40 @@
   <BlockedScreen />
 {:else if game.phase === 'error'}
   <LoadErrorScreen />
+{:else if game.phase === 'crashed'}
+  <CrashScreen />
 {:else if !game.ready}
   <div class="boot" role="status">{t('app.loading')}</div>
 {:else}
   <div class="app" class:meta-open={metaOpen} bind:this={appEl}>
     <div class="top">
-      <TopBar {metaOpen} onToggleMeta={() => (metaOpen = !metaOpen)} />
+      <ErrorBoundary area="top"
+        ><TopBar {metaOpen} onToggleMeta={() => (metaOpen = !metaOpen)} /></ErrorBoundary
+      >
     </div>
 
     <div class="side">
-      <MainNav />
-      <nav aria-label={t('nav.skills')}><SkillList /></nav>
+      <ErrorBoundary area="side">
+        <MainNav />
+        <nav aria-label={t('nav.skills')}><SkillList /></nav>
+      </ErrorBoundary>
     </div>
 
     <main class="main" class:dev>
-      <HintHost />
-      <PageHost {hash} />
-      <Slot name="page.footer" ctx={{ route: hash }} />
+      <ErrorBoundary area="page" resetKey={hash}>
+        <HintHost />
+        <PageHost {hash} />
+        <Slot name="page.footer" ctx={{ route: hash }} />
+      </ErrorBoundary>
     </main>
 
     {#if metaOpen}
-      <div class="meta"><GoalPanel onClose={() => (metaOpen = false)} /></div>
+      <div class="meta">
+        <ErrorBoundary area="goal"><GoalPanel onClose={() => (metaOpen = false)} /></ErrorBoundary>
+      </div>
     {/if}
 
-    <div class="now"><NowBar /></div>
+    <div class="now"><ErrorBoundary area="now"><NowBar /></ErrorBoundary></div>
     <ToastHost />
     <DevTools />
     {#if game.state.player.name === ''}

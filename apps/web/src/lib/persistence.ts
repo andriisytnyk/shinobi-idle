@@ -33,6 +33,21 @@ export const BROKEN_SAVE_KEY = 'save.broken';
 /** The save as it was before an import, a reset, a restore or an upgrade of the format. */
 export const BACKUP_KEY = 'save.backup';
 
+/** The list of the backups made before a save was upgraded: `[{ key, v, at }]`, newest first. */
+export const BACKUPS_INDEX_KEY = 'save.backups';
+/** How many such backups are kept. */
+export const BACKUPS_KEEP = 3;
+
+/** A copy of a save as it was before its format was upgraded. */
+export interface BackupEntry {
+  /** The storage key of the raw text; carries the version of the save: `save.backup.v14.<time>`. */
+  key: string;
+  /** The version of the format the save had. */
+  v: number;
+  /** Wall-clock time of the copy, ms. */
+  at: number;
+}
+
 /** What «Звіт АНБУ» shows after the game was closed or asleep. */
 export interface AnbuReport {
   requestedMs: number;
@@ -159,6 +174,56 @@ export async function backupSave(kv: KeyValue): Promise<void> {
   if (raw !== undefined) await kv.set(BACKUP_KEY, raw);
 }
 
+/** The backups kept before upgrades, newest first; an unreadable index counts as none. */
+export async function listBackups(kv: KeyValue): Promise<BackupEntry[]> {
+  try {
+    const raw = await kv.get(BACKUPS_INDEX_KEY);
+    if (raw === undefined) return [];
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter(
+        (e): e is BackupEntry =>
+          typeof e === 'object' &&
+          e !== null &&
+          typeof (e as BackupEntry).key === 'string' &&
+          typeof (e as BackupEntry).v === 'number' &&
+          typeof (e as BackupEntry).at === 'number',
+      )
+      .sort((a, b) => b.at - a.at);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Keeps the raw stored text of a save of an older format, before it is upgraded. The last
+ * `BACKUPS_KEEP` copies stay; the same text is not kept twice (a retried load adds nothing).
+ */
+export async function addBackup(
+  kv: KeyValue,
+  raw: string,
+  v: number,
+  at: number,
+): Promise<BackupEntry> {
+  const known = await listBackups(kv);
+  for (const entry of known) {
+    if (entry.v === v && (await kv.get(entry.key)) === raw) return entry;
+  }
+  const entry: BackupEntry = { key: `save.backup.v${v}.${Math.floor(at)}`, v, at };
+  // The text goes in first: an index never points at a copy that is not there.
+  await kv.set(entry.key, raw);
+  const next = [entry, ...known.filter((e) => e.key !== entry.key)];
+  await kv.set(BACKUPS_INDEX_KEY, JSON.stringify(next.slice(0, BACKUPS_KEEP)));
+  for (const old of next.slice(BACKUPS_KEEP)) await kv.del(old.key);
+  return entry;
+}
+
+/** The text of a save (stored or bare) as base64, for copying out of the app. */
+export function exportRaw(raw: string): string {
+  return toBase64(decodeStored(raw).text);
+}
+
 /** Loads the save and catches the game up to the wall clock; starts a new game if there is none. */
 export async function loadGame(
   kv: KeyValue,
@@ -178,11 +243,17 @@ export async function loadGame(
   try {
     const stored = decodeStored(raw);
     assertSaneSave(stored.text);
-    const state = deserialize(stored.text, content, rules);
-    // An older format is upgraded on load; keep the old save until the player has played on.
-    if ((JSON.parse(stored.text) as { v?: unknown }).v !== STATE_VERSION) {
-      await kv.set(BACKUP_KEY, raw);
+    // An older format is upgraded on load: its text is kept first, whatever the upgrade does.
+    const version = (JSON.parse(stored.text) as { v: number }).v;
+    if (version < STATE_VERSION) {
+      try {
+        await addBackup(kv, raw, version, clock.now());
+      } catch (error) {
+        // The old save stays in place until the first save; a full disk must not lock the game.
+        console.warn('Could not back up the save before upgrading it', error);
+      }
     }
+    const state = deserialize(stored.text, content, rules);
     const elapsed = Math.max(0, clock.now() - readSavedAt(stored.text));
     const summary = advanceOffline(state, elapsed, content, rules);
     return { state, summary, report: buildReport(summary), rev: stored.rev };

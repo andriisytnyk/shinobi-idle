@@ -301,10 +301,10 @@ describe('toast action button', () => {
     });
     app = mount(ToastHost, { target });
     flushSync();
-    expect(target.textContent).toContain('Доступна нова версія гри');
+    expect(target.textContent).toContain('Є оновлення — перезавантажити');
     const button = target.querySelector<HTMLButtonElement>('[data-toast-action]');
     expect(button?.tagName).toBe('BUTTON');
-    expect(button?.textContent?.trim()).toBe('Оновити');
+    expect(button?.textContent?.trim()).toBe('Перезавантажити');
     button?.click();
     await Promise.resolve();
     await Promise.resolve();
