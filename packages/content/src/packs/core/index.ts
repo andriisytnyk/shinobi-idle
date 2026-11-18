@@ -29,6 +29,7 @@ import handPlaceWorth from './data/hand/place-worth.json' with { type: 'json' };
 import handCombos from './data/hand/combos.json' with { type: 'json' };
 import handEnemyCombat from './data/hand/enemy-combat.json' with { type: 'json' };
 import handCoat from './data/hand/coat.json' with { type: 'json' };
+import handCloneRoles from './data/hand/clone-roles.json' with { type: 'json' };
 import handExams from './data/hand/exams.json' with { type: 'json' };
 import handRaids from './data/hand/raids.json' with { type: 'json' };
 import handRenownRanks from './data/hand/renown-ranks.json' with { type: 'json' };
@@ -191,6 +192,7 @@ const data: Record<string, unknown> = {
   statuses: handStatuses,
   traits: handTraits,
   combos: handCombos,
+  cloneRoles: handCloneRoles,
   ai: handAi,
 };
 

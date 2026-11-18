@@ -260,6 +260,7 @@ describe('F1: the outcomes that fly off a body', () => {
     phase: 'fight',
     player: p,
     allies,
+    cloneRole: null,
     enemies,
     nowMs: 2000,
   });
@@ -407,6 +408,7 @@ describe('F1-fix1: the body the player is aiming at', () => {
     phase: 'fight',
     player: p,
     allies: [],
+    cloneRole: null,
     enemies,
     nowMs: 2000,
   });

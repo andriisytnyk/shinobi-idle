@@ -66,6 +66,8 @@ export interface LoadoutState {
   signature: string | null;
   /** What the automatic loadout was last built from (rank and number of known techniques). */
   basis: string;
+  /** The role all the combat clones take in a fight (`content.cloneRoles`); null: the default role. */
+  cloneRole: string | null;
   saved: Record<string, { techniques: string[]; signature: string | null }>;
 }
 

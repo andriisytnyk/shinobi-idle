@@ -407,7 +407,7 @@ describe('saving', () => {
   });
 
   it('is on the version of the redesign', () => {
-    expect(createState(1, content).v).toBe(20);
+    expect(createState(1, content).v).toBe(21);
   });
 });
 

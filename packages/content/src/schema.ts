@@ -1399,6 +1399,41 @@ export const comboSchema = z.strictObject({
   }),
 });
 
+/**
+ * A role of the combat clones: how the shadow clones of a fight choose what they cast. The player
+ * picks one role for all the clones (`state.loadouts.cloneRole`); a fight reads it when it puts
+ * the clones on the character's side. The name and the one-line description are the locale keys
+ * `cloneRole.<id>.name` and `.desc`.
+ */
+export const cloneRoleSchema = z.strictObject({
+  id: coreId,
+  /** The role the fight uses when none is chosen or the chosen one is gone; exactly one role of the content has it. */
+  default: z.boolean().optional(),
+  /** Multiplier on how much the enemies attend to a clone (its `threat`); 1 leaves it as the technique made it. */
+  threat: z.number().positive().max(10),
+  /** How the hand of a clone is built from the techniques the character knows. */
+  hand: z.discriminatedUnion('mode', [
+    /** The clone casts what the character casts (the loadout, minus what acts on the character's own body). */
+    z.strictObject({ mode: z.literal('copy') }),
+    /**
+     * The clone's hand is the `size` known techniques that score highest. Every figure is read
+     * against the best of the candidates (0 to 1), so the weights are comparable: `damage` the
+     * damage of a cast, `status` that it applies a status or leaves a state, `opens` how many combos
+     * of other known techniques wait for the state it leaves, `cheap` that it costs little.
+     */
+    z.strictObject({
+      mode: z.literal('pick'),
+      size: z.number().int().min(1).max(8),
+      weights: z.strictObject({
+        damage: z.number().min(0),
+        status: z.number().min(0),
+        opens: z.number().min(0),
+        cheap: z.number().min(0),
+      }),
+    }),
+  ]),
+});
+
 // ---------- balance ----------
 
 const pair = z.tuple([z.number(), z.number()]);
@@ -1903,6 +1938,7 @@ export const contentDbSchema = z.object({
   statuses: z.array(statusSchema),
   traits: z.array(traitSchema),
   combos: z.array(comboSchema),
+  cloneRoles: z.array(cloneRoleSchema),
   ai: aiSchema,
 });
 
@@ -1926,6 +1962,7 @@ export const generatedDbSchema = contentDbSchema
     statuses: true,
     traits: true,
     combos: true,
+    cloneRoles: true,
     ai: true,
     team: true,
     skillGroups: true,
@@ -2026,6 +2063,7 @@ export type TagOpData = z.infer<typeof tagOpSchema>;
 export type RoleEntity = z.infer<typeof roleSchema>;
 export type TraitEntity = z.infer<typeof traitSchema>;
 export type Combo = z.infer<typeof comboSchema>;
+export type CloneRole = z.infer<typeof cloneRoleSchema>;
 export type AiTier = z.infer<typeof aiTierSchema>;
 export type AiData = z.infer<typeof aiSchema>;
 export type AiRuleId = (typeof AI_RULE_IDS)[number];

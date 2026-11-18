@@ -1,6 +1,7 @@
 import type { ContentDb } from '@shinobi/content';
 import {
   alliesOf,
+  cloneRoleOf,
   combatantStatus,
   asPerformer,
   fightSlotIndex,
@@ -90,6 +91,8 @@ export interface Scene {
   player: FighterView;
   /** The bodies on the player's side besides the character, in the order they came in; fallen ones stay, down. */
   allies: FighterView[];
+  /** The id of the role the clones of this fight were given: the one the fight was begun with (the default role when it names none). */
+  cloneRole: string | null;
   enemies: FighterView[];
   /** The fight clock, in ms, as the screen sees it. */
   nowMs: number;
@@ -259,6 +262,7 @@ function sceneOf(state: GameState, content: ContentDb, rules: Rules): Scene | nu
     phase: combat.phase,
     player: fighterOf(state, fight.player, 1, 1, content, rules, share, nowMs),
     allies,
+    cloneRole: cloneRoleOf(content, fight.kit.cloneRole)?.id ?? null,
     enemies,
     nowMs,
   };

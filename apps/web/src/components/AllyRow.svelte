@@ -1,6 +1,6 @@
 <script lang="ts">
   import { formatInt } from '../lib/format.ts';
-  import { t } from '../lib/i18n.ts';
+  import { hasKey, t } from '../lib/i18n.ts';
   import type { FighterView, Outcome } from '../lib/fight-scene.ts';
   import ActionEmblem from './ActionEmblem.svelte';
   import EntityLink from './EntityLink.svelte';
@@ -18,9 +18,16 @@
     f: FighterView;
     /** What young actions did to this body: the last figure that flew off it. */
     outcomes?: readonly Outcome[];
+    /** The id of the role the clones of the fight were given (`content.cloneRoles`); the row says it after the name. */
+    role?: string | null;
   }
 
-  let { f, outcomes = [] }: Props = $props();
+  let { f, outcomes = [], role = null }: Props = $props();
+
+  const nth = $derived(f.ally ?? f.nth);
+  const roleName = $derived(
+    role !== null && hasKey(`cloneRole.${role}.name`) ? t(`cloneRole.${role}.name`) : null,
+  );
 
   const action = $derived(f.action);
   const technique = $derived(f.phase === 'act' && action?.kind === 'technique' && action.id);
@@ -40,7 +47,11 @@
 >
   <header class="head">
     <span class="face"><Icon name="fist" size={20} /></span>
-    <h3 class="name" data-fighter="ally">{t('fight.ally', { n: f.ally ?? f.nth })}</h3>
+    <h3 class="name" data-fighter="ally">
+      {#if roleName}<span data-ally-role={role}
+          >{t('cloneRole.label', { n: nth, role: roleName })}</span
+        >{:else}{t('fight.ally', { n: nth })}{/if}
+    </h3>
     {#if !f.alive}<span class="down-tag">{t('fight.down')}</span>{/if}
     {#if pop}
       <span class="pop" data-ui="fight-outcome" data-kind="pop" data-outcome={pop.kind}>
@@ -190,7 +201,7 @@
     grid-column: 2;
   }
 
-  /* On a phone a clone is two lines: the name beside the bars, then what it does beside its progress. */
+  /* On a phone a clone is three blocks: the name, the bars, then what it does beside its progress. */
   @media (max-width: 768px) {
     .ally {
       display: grid;
@@ -205,14 +216,14 @@
       display: none;
     }
 
-    .bars {
-      flex-direction: row;
-      gap: var(--space-2);
+    /* The name (with the role) takes a full row so the bars below keep the whole width. */
+    .head {
+      grid-column: 1 / -1;
     }
 
-    .bars > :global(*) {
-      flex: 1 1 0;
-      min-width: 0;
+    /* The bars sit one under the other, each over the full width, so the label and the figure both fit. */
+    .bars {
+      grid-column: 1 / -1;
     }
 
     .action {

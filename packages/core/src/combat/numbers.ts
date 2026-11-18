@@ -41,6 +41,8 @@ export interface PlayerSnapshot {
   knowledgeLevel?: Record<string, number>;
   /** What the chakra pool is divided by: `n + 1` while `n` clones exist (the performer's pool is the character's divided by it); absent means 1. */
   chakraDivisor?: number;
+  /** The role of the combat clones (`content.cloneRoles`); absent, or one the content does not have: the default role. */
+  cloneRole?: string;
 }
 
 /** The highest level of knowledge of an enemy: unknown, seen, defeated, studied. */

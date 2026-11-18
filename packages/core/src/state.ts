@@ -181,7 +181,7 @@ export interface GameState {
   events: GameEvent[];
 }
 
-export const STATE_VERSION = 20;
+export const STATE_VERSION = 21;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
@@ -218,7 +218,7 @@ export function createState(seed: number, content: ContentDb): GameState {
     buffs: {},
     gear: {},
     bushes: {},
-    loadouts: { active: [], auto: true, signature: null, basis: '', saved: {} },
+    loadouts: { active: [], auto: true, signature: null, basis: '', cloneRole: null, saved: {} },
     pouch: { slots: [], medic: null },
     wounds: { stacks: 0, left: 0 },
     bingo: {},

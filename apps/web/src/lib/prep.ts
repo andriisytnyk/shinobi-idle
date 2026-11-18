@@ -1,6 +1,7 @@
 import type { ContentDb, Technique } from '@shinobi/content';
 import {
   bingoLevel,
+  cloneRoleOf,
   effectiveLoadout,
   entryOf,
   fightTarget,
@@ -98,6 +99,16 @@ function ownedBank(state: GameState): Record<string, number> {
   }
   return bank;
 }
+
+/** Whether the character knows a technique that makes combat clones: only then the role of the clones means anything. */
+export const knowsCombatClone = (state: GameState, content: ContentDb): boolean =>
+  content.techniques.some(
+    (tech) => state.known[tech.id] === true && tech.combat?.effect?.kind === 'summon',
+  );
+
+/** The role the clones would take in a fight now: the chosen one, or the default when none is chosen or the chosen one is gone. */
+export const cloneRoleNow = (state: GameState, content: ContentDb): string | null =>
+  cloneRoleOf(content, state.loadouts.cloneRole)?.id ?? null;
 
 /** The target's facts a plan can use: the traits the player knows and the nature of the enemy. */
 function planFacts(

@@ -61,6 +61,7 @@ export const PLACES: readonly Place[] = [
   { path: 'missions.pending', rule: 'keys' },
   { path: 'loadouts.active', rule: 'list' },
   { path: 'loadouts.signature', rule: 'single' },
+  { path: 'loadouts.cloneRole', rule: 'single' },
   { path: 'loadouts.saved', rule: 'saved' },
   { path: 'pouch', rule: 'pouch' },
   { path: 'goal', rule: 'goal' },
