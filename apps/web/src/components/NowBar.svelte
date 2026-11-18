@@ -19,6 +19,8 @@
   import { formatDuration, formatXp } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { missionNow, type MissionNow } from '../lib/missions.ts';
+  import { ACTION_VERB } from '../lib/squad.ts';
+  import { squadUi } from '../lib/squad-ui.svelte.ts';
   import { game } from '../lib/store.ts';
   import { practiceView, type PhaseName } from '../lib/timing.ts';
   import ActionEmblem from './ActionEmblem.svelte';
@@ -28,21 +30,18 @@
   import Icon from './Icon.svelte';
   import NowMission from './NowMission.svelte';
 
-  /** The phrase that says what each kind of action is doing; a kind without one shows its name alone. */
-  const VERB: Readonly<Record<string, string>> = {
-    gather: 'now.doing.gather',
-    craft: 'now.doing.craft',
-    drill: 'now.doing.drill',
-    meditate: 'now.doing.meditate',
-    course: 'now.doing.course',
-    explore: 'now.doing.explore',
-    walk: 'now.doing.walk',
-    autosurvey: 'now.doing.autosurvey',
-    stand: 'now.doing.stand',
-    fight: 'now.doing.fight',
-    mission: 'now.doing.mission',
-    senseiTest: 'now.doing.exam',
-  };
+  interface Props {
+    /**
+     * The squad panel stands beside the bar (a wide screen): it already names every performer, its action,
+     * progress, life, knowledge and stop, so the bar keeps only what the panel does not show: the phase of a
+     * practice, the move in a fight, the stage of a mission, the time to arrival and the wait of an exam.
+     */
+    squad?: boolean;
+  }
+
+  let { squad = false }: Props = $props();
+
+  const VERB = ACTION_VERB;
 
   /** The phase of a practice, by its phase name. */
   const PHASE_KEY: Readonly<Record<PhaseName, string>> = {
@@ -208,12 +207,22 @@
 
   const wait = $derived(game.read((gs) => senseiTestInfo(gs, game.rules, game.content)));
 
-  const stop = (row: Row) =>
-    void game.dispatch(
-      row.clone
-        ? { type: 'clone.dispel', slot: row.slot }
-        : { type: 'action.stop', slot: row.slot },
-    );
+  /** Whether the row has a line of its own beyond what the squad panel shows. */
+  const hasDetail = (row: Row): boolean =>
+    row.practice !== null ||
+    row.fight !== null ||
+    row.mission !== null ||
+    row.walkLeft > 0 ||
+    (wait !== null && wait.slot === row.slot);
+
+  /** The rows the bar draws: all of them, or with the panel beside it only those that have a detail. */
+  const shown = $derived(squad ? rows.filter(hasDetail) : rows);
+
+  /** A clone is dispelled through the dialog that says what it hands over; the character just stops. */
+  const stop = (row: Row) => {
+    if (row.clone) squadUi.askDispel(row.slot);
+    else void game.dispatch({ type: 'action.stop', slot: row.slot });
+  };
 </script>
 
 <footer class="now" aria-label={t('now.title')}>
@@ -236,19 +245,20 @@
       {/each}
     </div>
   {/if}
-  {#if fatigue > 0}
+  {#if fatigue > 0 && !squad}
     <span class="chip" data-ui="fatigue" title={t('clone.fatigueTitle')}
       >{t('clone.fatigue', { time: formatDuration(fatigue) })}</span
     >
   {/if}
   <div class="buff-slot"><BuffStrip /></div>
-  {#if rows.length === 0}
-    <span class="idle">{t('now.idle')}</span>
+  {#if shown.length === 0}
+    {#if !squad}<span class="idle">{t('now.idle')}</span>{/if}
   {:else}
     <ul class="slots" class:open={expanded}>
-      {#each rows as row (row.slot)}
+      {#each shown as row (row.slot)}
         <li
           class="slot"
+          class:detail-only={squad}
           data-slot={row.slot}
           data-ui="now-slot"
           data-slot-index={row.slot}
@@ -256,6 +266,11 @@
           class:with-mission={row.mission}
           class:clone={row.clone}
         >
+          {#if squad}
+            <span class="who" data-now-mark
+              >{row.clone ? t('squad.mark.clone', { n: row.slot }) : t('squad.you')}</span
+            >
+          {/if}
           <span class="emblem">
             <ActionEmblem
               size="sm"
@@ -298,13 +313,13 @@
                 n: formatXp(row.xpPerHour),
               })}{/if}</span
           >
-          {#if row.life}
+          {#if row.life && !squad}
             <span class="clone-life" data-ui="clone-life">
               <progress max="100" value={row.life.pct} aria-label={t('clone.life')}></progress>
               {t('clone.lifeLeft', { time: formatDuration(row.life.leftMs) })}
             </span>
           {/if}
-          {#if row.know}
+          {#if row.know && !squad}
             <span class="clone-know" data-ui="clone-knowledge">
               {#if row.know.xp.length > 0}<span class="know-lead">{t('clone.knowsLead')}</span>{/if}
               {#each row.know.xp as part (part.skill)}
@@ -347,7 +362,7 @@
         </li>
       {/each}
     </ul>
-    {#if rows.length > 1}
+    {#if shown.length > 1}
       <button
         type="button"
         class="more"
@@ -356,13 +371,31 @@
         onclick={() => (expanded = !expanded)}
       >
         <Icon name={expanded ? 'lucide:chevron-down' : 'lucide:plus'} size={16} />
-        {#if !expanded}<span>{rows.length - 1}</span>{/if}
+        {#if !expanded}<span>{shown.length - 1}</span>{/if}
       </button>
     {/if}
   {/if}
 </footer>
 
 <style>
+  /* With the squad panel beside the bar a row is only a detail: who it is about, and the detail. */
+  .slot.detail-only > .emblem,
+  .slot.detail-only > .xph,
+  .slot.detail-only > .stop,
+  .slot.detail-only .line {
+    display: none;
+  }
+
+  .who {
+    flex: none;
+    padding: 0 var(--space-2);
+    border: var(--border-thin) solid var(--accent);
+    border-radius: var(--radius-pill);
+    color: var(--accent);
+    font-size: var(--text-xs);
+    font-weight: 600;
+  }
+
   .clone-life,
   .clone-know {
     display: flex;

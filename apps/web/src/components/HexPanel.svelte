@@ -4,6 +4,8 @@
   import { formatDuration, formatInt, formatXp } from '../lib/format.ts';
   import { autoState } from '../lib/hex-map.ts';
   import { t } from '../lib/i18n.ts';
+  import { performersOf } from '../lib/squad.ts';
+  import { squadUi } from '../lib/squad-ui.svelte.ts';
   import { game } from '../lib/store.ts';
   import { skillByActivity } from '../lib/vocab.ts';
   import { moneyName } from '../lib/vocab.ts';
@@ -16,6 +18,7 @@
   import ModLine from './ModLine.svelte';
   import PoiRow from './PoiRow.svelte';
   import ReqTree from './ReqTree.svelte';
+  import StartSplit from './StartSplit.svelte';
   import RewardList from './RewardList.svelte';
   import TimeBar from './TimeBar.svelte';
   import { IDLE_TIMING, slotTiming } from '../lib/timing.ts';
@@ -59,12 +62,19 @@
     nextAt: number | null;
   }
 
+  /** The action slot of the performer picked on the map or in the squad; the character's when none is. */
+  const viewSlot = $derived(
+    game.read(
+      (gs) => performersOf(gs, content, game.rules).find((p) => p.id === squadUi.picked)?.slot ?? 0,
+    ),
+  );
+
   const view = $derived(
     game.read((gs): View | null => {
-      const info = hexInfo(gs, coord, content, game.rules);
+      const info = hexInfo(gs, coord, content, game.rules, undefined, viewSlot);
       if (!info) return null;
       const cell = info.cell ? cellInfo(gs, info.cell, content, game.rules) : null;
-      const plan = travelPlan(gs, info.address, content, game.rules);
+      const plan = travelPlan(gs, info.address, content, game.rules, viewSlot);
       const K = content.balance.K;
       const thresholds = info.cell ? K.cellExplores : K.map.plainSurvey;
       const exploreSlot = gs.slots.findIndex(
@@ -139,20 +149,10 @@
     return 'map.next.plain';
   });
 
-  const survey = () =>
-    void game.dispatch({ type: 'action.start', slot: 0, kind: 'explore', id: info?.address ?? '' });
   const stop = (slot: number) => void game.dispatch({ type: 'action.stop', slot });
-  const go = () =>
-    void game.dispatch({ type: 'world.travel', cell: info?.address ?? '', mode: 'walk', slot: 0 });
-  const goPaid = () =>
-    void game.dispatch({ type: 'world.travel', cell: info?.address ?? '', mode: 'paid', slot: 0 });
-  const goFree = () =>
-    void game.dispatch({
-      type: 'world.travel',
-      cell: info?.address ?? '',
-      mode: 'outpost',
-      slot: 0,
-    });
+  /** The trip the performer makes: on foot, for ryo, or free from an outpost. */
+  const travel = (mode: 'walk' | 'paid' | 'outpost') => (p: { slot: number }) =>
+    game.dispatch({ type: 'world.travel', cell: info?.address ?? '', mode, slot: p.slot });
   /** Why the trip for ryo cannot be made, when the trip on foot can: it is said beside the button. */
   const reasonPaid = $derived(
     view && view.travel.blocked === null && !info?.here ? view.travel.paidBlocked : null,
@@ -416,16 +416,14 @@
             {t('map.act.surveyStop')}
           </button>
         {:else}
-          <button
-            type="button"
-            class="action"
-            data-explore
+          <StartSplit
+            kind="explore"
+            id={info.address}
+            label="map.act.survey"
             disabled={reasonSurvey !== null}
-            aria-describedby={reasonSurvey ? 'why-explore' : undefined}
-            onclick={survey}
-          >
-            {t('map.act.survey')}
-          </button>
+            describedBy={reasonSurvey ? 'why-explore' : undefined}
+            mark="explore"
+          />
         {/if}
         {#if view.walkSlot >= 0}
           <button
@@ -437,32 +435,36 @@
             {t('now.stop')}
           </button>
         {:else if !info.here}
-          <button
-            type="button"
-            class="action"
-            data-travel-walk
+          <StartSplit
+            kind="walk"
+            id={info.address}
+            label="map.act.walk"
+            suffix={view.travel.ms > 0 ? formatDuration(view.travel.ms) : ''}
             disabled={reasonGo !== null}
-            aria-describedby={reasonGo ? 'why-walk' : undefined}
-            onclick={go}
-          >
-            {t('map.act.walk')}{view.travel.ms > 0 ? ` · ${formatDuration(view.travel.ms)}` : ''}
-          </button>
-          <button
-            type="button"
-            class="action"
-            data-travel-paid
-            disabled={view.travel.paidBlocked !== null}
-            aria-describedby={reasonPaid ? 'why-paid' : undefined}
-            onclick={goPaid}
-          >
-            {t('map.act.paid')}{view.travel.price !== null
-              ? ` · ${formatInt(view.travel.price)} ${moneyName(content)}`
+            describedBy={reasonGo ? 'why-walk' : undefined}
+            run={travel('walk')}
+            mark="travel-walk"
+          />
+          <StartSplit
+            kind="travel-paid"
+            id={info.address}
+            label="map.act.paid"
+            suffix={view.travel.price !== null
+              ? `${formatInt(view.travel.price)} ${moneyName(content)}`
               : ''}
-          </button>
+            disabled={view.travel.paidBlocked !== null}
+            describedBy={reasonPaid ? 'why-paid' : undefined}
+            run={travel('paid')}
+            mark="travel-paid"
+          />
           {#if view.travel.free}
-            <button type="button" class="action" data-travel-free onclick={goFree}>
-              {t('map.act.free')}
-            </button>
+            <StartSplit
+              kind="travel-free"
+              id={info.address}
+              label="map.act.free"
+              run={travel('outpost')}
+              mark="travel-free"
+            />
           {/if}
         {/if}
         <AutoSurveyButton whyId="why-auto" />

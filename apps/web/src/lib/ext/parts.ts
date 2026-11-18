@@ -33,8 +33,30 @@ export const UI_PARTS = [
   'now-slot',
   /** The mark of a clone's slot in the «Зараз» bar. */
   'clone-tag',
-  /** The «Клоном» button of a tile or a mission: starts the action in the clone's slot. */
+  /** The «Новий клон для цієї дії» item of the performer menu: starts the action in a new clone. */
   'clone-start',
+  /** The squad panel «Загін» (the side column, or the phone's strip of chips). */
+  'squad',
+  /** One performer of the panel; carries `data-performer` (0 is the character), `data-slot-index` and `data-state` (`idle`, `working`, `fighting`, `standing`). */
+  'squad-row',
+  /** The chip of a performer in the phone's strip. */
+  'squad-chip',
+  /** The sheet that a tap on the phone's strip opens. */
+  'squad-sheet',
+  /** The split start button: the main button names the performer, the chevron opens the menu. */
+  'start-split',
+  /** The menu of performers of the split start button. */
+  'performer-menu',
+  /** The marks of who runs an action, on a tile or a card. */
+  'performer-marks',
+  /** One mark: «Ти», «К1». */
+  'performer-mark',
+  /** What the dispel of a clone would bring, in the confirmation. */
+  'dispel-preview',
+  /** The switcher of the fight screen, when several fights run. */
+  'fight-switcher',
+  /** The part of the offline report that belongs to one performer. */
+  'report-performer',
   'goal-panel',
   'goal-row',
   /** The pin that makes an entity the goal: on a tile's corner, as a caption under a requirement tree, or as a button of an entity page; carries `data-entity` and `data-pinned`. */

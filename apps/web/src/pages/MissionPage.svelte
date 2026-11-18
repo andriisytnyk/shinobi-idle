@@ -4,6 +4,7 @@
   import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
+  import StartSplit from '../components/StartSplit.svelte';
   import MissionRankStamp from '../components/MissionRankStamp.svelte';
   import MissionRation from '../components/MissionRation.svelte';
   import MissionReward from '../components/MissionReward.svelte';
@@ -25,7 +26,6 @@
   } from '../lib/mission-feed.svelte.ts';
   import { holderRef, hourChain, missionNow, rewardRows } from '../lib/missions.ts';
   import { game } from '../lib/store.ts';
-  import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
   import EntityPage from './EntityPage.svelte';
 
   interface Props {
@@ -101,28 +101,14 @@
     ];
   }
 
-  function startClone(): void {
-    if (!clone || !mission) return;
-    const result = game.dispatch({
+  /** Starts the mission with the performer: the character in the slot core names, a clone in its own. */
+  function startWith(p: { slot: number; clone: boolean }) {
+    return game.dispatch({
       type: 'action.start',
-      slot: clone.slot,
+      slot: p.clone ? p.slot : (status?.slot ?? 0),
       kind: MISSION_KIND,
-      id: mission.id,
+      id: mission?.id ?? '',
     });
-    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
-  }
-
-  function toggle(): void {
-    if (!status || !mission) return;
-    const result = running
-      ? game.dispatch({ type: 'action.stop', slot: status.runningAt })
-      : game.dispatch({
-          type: 'action.start',
-          slot: status.slot,
-          kind: MISSION_KIND,
-          id: mission.id,
-        });
-    if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 </script>
 
@@ -154,29 +140,13 @@
 
     <section class="actions" data-ui="entity-section" data-mission-actions>
       <div class="buttons">
-        <button
-          type="button"
-          class="ct-action"
-          class:stop={running}
-          disabled={refusal !== null}
-          data-start
-          aria-describedby={refusal ? 'why-mission' : undefined}
-          onclick={toggle}
-        >
-          {t(running ? 'tile.stop' : 'tile.start')}
-        </button>
-        {#if clone && !running}
-          <button
-            type="button"
-            class="ct-action clone"
-            data-ui="clone-start"
-            disabled={!clone.startable}
-            aria-describedby={clone.refusal?.reason === 'error.fightBusy' ? 'why-clone' : undefined}
-            onclick={startClone}
-          >
-            {t('tile.clone')}
-          </button>
-        {/if}
+        <StartSplit
+          kind={MISSION_KIND}
+          id={mission.id}
+          disabledFor={(p) => (p.clone ? !(clone?.startable ?? false) : refusal !== null)}
+          describedBy={refusal ? 'why-mission' : undefined}
+          run={startWith}
+        />
         <PinGoal kind="mission" id={mission.id} variant="button" />
       </div>
       {#if running}
