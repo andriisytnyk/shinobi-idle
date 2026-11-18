@@ -20,6 +20,7 @@
   import RaidPanel from '../components/RaidPanel.svelte';
   import ZoneWhere from '../components/ZoneWhere.svelte';
   import { formatInt } from '../lib/format.ts';
+  import { fightView } from '../lib/fight-view.svelte.ts';
   import { hasKey, t } from '../lib/i18n.ts';
   import type { PrepTarget } from '../lib/prep.ts';
   import { game } from '../lib/store.ts';
@@ -57,7 +58,7 @@
       return {
         fighting: allFights(gs).length > 0,
         selfFighting: gs.combat !== null,
-        cloneFights: allFights(gs).some((f) => f.slot > 0),
+        fighters: allFights(gs).map((f) => f.slot),
         yard: yard.map((z) => ({
           id: z.id,
           enemy: z.enemy,
@@ -72,6 +73,10 @@
       };
     }),
   );
+
+  /** The performer whose fight is shown (the fight screen sets it), and the lines of that fight alone, worded for it. */
+  const shownFight = $derived(fightView.shown(listing.fighters));
+  const logEntries = $derived(game.combatLog.filter((e) => (e.event.slot ?? 0) === shownFight));
 
   /** Whether a clone exists: the character's chakra pool is divided then. */
   const cloned = $derived(game.read((gs: GameState) => cloneCount(gs, content) > 0));
@@ -211,7 +216,7 @@
   {#if section === 'fight' || (section === 'prepare' && listing.fighting)}
     <details class="log" data-fight-log>
       <summary>{t('combat.log')}</summary>
-      <CombatLog entries={game.combatLog} fighting={listing.fighting} clone={listing.cloneFights} />
+      <CombatLog entries={logEntries} fighting={listing.fighting} clone={shownFight > 0} />
     </details>
   {/if}
 </SimplePage>

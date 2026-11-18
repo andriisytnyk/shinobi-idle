@@ -211,7 +211,8 @@ function settle(
 function report(state: GameState, c: CombatState): void {
   const lines = c.fight.log;
   if (!lines) return;
-  for (const line of lines.splice(0)) emit(state, { type: 'combatLog', enemy: c.enemy, ...line });
+  for (const line of lines.splice(0))
+    emit(state, { type: 'combatLog', enemy: c.enemy, slot: c.owner, ...line });
 }
 
 /**
@@ -292,7 +293,7 @@ function victory(
   // A clone's fight pays when it is won.
   payPending(state, c, content, rules);
   bump(state, killsKey(c.enemy));
-  emit(state, { type: 'enemyDefeated', enemy: c.enemy });
+  emit(state, { type: 'enemyDefeated', enemy: c.enemy, slot: c.owner });
   // Loot is rolled before the book counts the win, so the first win pays the full bounty. A
   // fight that ended with an enemy leaving counts as won.
   const fallen = entryOf(content, c.enemy);
@@ -340,7 +341,12 @@ function lose(
 ): void {
   // What a clone's lost fight earned is dropped: a lost fight pays nothing.
   dropPending(c);
-  emit(state, { type: 'playerDefeated', enemy: c.enemy, ...(clone ? { clone: true } : {}) });
+  emit(state, {
+    type: 'playerDefeated',
+    enemy: c.enemy,
+    slot: c.owner,
+    ...(clone ? { clone: true } : {}),
+  });
   if (!clone) {
     bump(state, defeatsKey(c.enemy));
     noteFight(state, c.enemy, 'loss', content);
@@ -498,7 +504,7 @@ function runFight(state: GameState, index: number, content: ContentDb, rules: Ru
           if (clone) return doom(state, index);
         } else {
           bump(state, killsKey(c.enemy));
-          emit(state, { type: 'enemyDefeated', enemy: c.enemy });
+          emit(state, { type: 'enemyDefeated', enemy: c.enemy, slot: c.owner });
           // A mission pays its own rewards; the book and the report still count the fight.
           noteFight(state, c.enemy, 'win', content);
           recordFight(state, key, c.fight, 'win', content, clone);

@@ -44,12 +44,12 @@ export function startRefusal(
     if (state.fatigue > 0) return { reason: 'error.cloneFatigued' };
     // The action is judged by what that clone would carry (the default pouch), not by the Bank, as `dispatch` does
     // (a requirement result the caller evaluated against the Bank is not used).
-    state.clones[slotIndex] = probeBody(state, content);
-    try {
-      return startRefusal(state, slotIndex, kindName, id, content, rules);
-    } finally {
-      delete state.clones[slotIndex];
-    }
+    // The probe lives in a shallow copy of the state, so the live state is never written to by a check.
+    const probe: GameState = {
+      ...state,
+      clones: { ...state.clones, [slotIndex]: probeBody(state, content) },
+    };
+    return startRefusal(probe, slotIndex, kindName, id, content, rules);
   }
   // What the performer of the slot holds (a clone's bag, not the Bank) is what the action's own checks read.
   return asPerformer(state, slotIndex, () => {

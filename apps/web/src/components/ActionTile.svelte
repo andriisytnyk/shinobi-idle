@@ -34,6 +34,8 @@
     ),
   );
   const running = $derived(slotIndex >= 0);
+  /** Whether the character itself runs it: the tile's own button is the character's, whatever a clone does. */
+  const mine = $derived(slotIndex === 0);
   const timing = $derived(game.read((gs) => slotTiming(gs, slotIndex, info.intervalMs)));
   const technique = $derived(
     info.kind === 'practice' ? content.techniques.find((x) => x.id === info.id) : undefined,
@@ -51,7 +53,7 @@
   );
 
   function toggle(): void {
-    const result = running
+    const result = mine
       ? game.dispatch({ type: 'action.stop', slot: slotIndex })
       : game.dispatch({ type: 'action.start', slot: 0, kind: info.kind, id: info.id });
     if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
@@ -126,8 +128,8 @@
       <TimeBar {timing} part="action-progress" />
     {/if}
     <div class="ct-actions">
-      <button type="button" class="action" class:stop={running} onclick={toggle}>
-        {t(running ? 'tile.stop' : 'tile.start')}
+      <button type="button" class="action" class:stop={mine} onclick={toggle}>
+        {t(mine ? 'tile.stop' : 'tile.start')}
       </button>
       <CloneStart kind={info.kind} id={info.id} />
     </div>

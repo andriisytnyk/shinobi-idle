@@ -1,6 +1,7 @@
 <script lang="ts">
   import { allFights, cloneCount } from '@shinobi/core';
   import { buildScene, outcomesOf, targetedKey } from '../lib/fight-scene.ts';
+  import { fightView } from '../lib/fight-view.svelte.ts';
   import Slot from '../lib/ext/Slot.svelte';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
@@ -10,8 +11,7 @@
 
   /** The performers that fight now (each has a fight of its own), and the one whose fight is shown. */
   const fighters = $derived(game.read((gs) => allFights(gs).map((f) => f.slot)));
-  let chosen = $state(0);
-  const shown = $derived(fighters.includes(chosen) ? chosen : (fighters[0] ?? 0));
+  const shown = $derived(fightView.shown(fighters));
   /** The scene of the shown fight: every body, what it does, how far it has got. */
   const scene = $derived(game.read((gs) => buildScene(gs, content, game.rules, shown)));
   const outcomes = $derived(scene ? outcomesOf(scene) : {});
@@ -53,7 +53,7 @@
           aria-selected={slot === shown}
           data-ui="fight-switch"
           data-slot-index={slot}
-          onclick={() => (chosen = slot)}
+          onclick={() => (fightView.chosen = slot)}
           >{t(slot === 0 ? 'combat.performer.you' : 'combat.performer.clone')}</button
         >
       {/each}

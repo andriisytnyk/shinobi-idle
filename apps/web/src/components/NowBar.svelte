@@ -306,12 +306,11 @@
           {/if}
           {#if row.know}
             <span class="clone-know" data-ui="clone-knowledge">
+              {#if row.know.xp.length > 0}<span class="know-lead">{t('clone.knowsLead')}</span>{/if}
               {#each row.know.xp as part (part.skill)}
                 <span class="know-part"
-                  >{t('clone.knows', {
-                    n: formatXp(part.n),
-                    skill: t(`skill.${part.skill}.name`),
-                  })}</span
+                  >{t('clone.knows', { n: formatXp(part.n) })}
+                  <EntityLink kind="skill" id={part.skill} /></span
                 >
               {:else}
                 {t('clone.knowsNothing')}
@@ -457,6 +456,31 @@
   /* A mission shows its stage on a line of its own under the bar. */
   .slot.with-mission {
     flex-wrap: wrap;
+  }
+
+  /* A clone's life and knowledge take a line of their own under the row: the action name keeps its room. */
+  @media (min-width: 769px) {
+    .slot.clone {
+      flex-wrap: wrap;
+    }
+
+    .slot.clone > .what {
+      min-width: 10rem;
+    }
+
+    .slot.clone > .stop {
+      order: 1;
+    }
+
+    .slot.clone > .clone-life,
+    .slot.clone > .clone-know {
+      flex: 1 1 100%;
+      order: 2;
+    }
+
+    .slot.clone > :global(.mission) {
+      order: 3;
+    }
   }
 
   /* One line: the name gives way first, then the phrase; each is cut with an ellipsis. */

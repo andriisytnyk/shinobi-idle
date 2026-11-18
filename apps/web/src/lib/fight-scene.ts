@@ -219,7 +219,9 @@ export function buildScene(
   rules: Rules,
   performer = 0,
 ): Scene | null {
-  return asPerformer(state, performer, () => sceneOf(state, content, rules));
+  // A shallow copy takes the swap, so the live state is never touched by a read of the UI.
+  const view = performer > 0 ? { ...state } : state;
+  return asPerformer(view, performer, () => sceneOf(view, content, rules));
 }
 
 function sceneOf(state: GameState, content: ContentDb, rules: Rules): Scene | null {

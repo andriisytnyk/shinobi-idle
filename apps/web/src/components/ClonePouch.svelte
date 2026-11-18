@@ -3,6 +3,7 @@
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
+  import EntityLink from './EntityLink.svelte';
   import Modal from './Modal.svelte';
 
   interface Props {
@@ -52,9 +53,9 @@
     {:else}
       <ul class="pouch-list">
         {#each stock.bank as [id, have] (id)}
-          <li data-entity={`item:${id}`}>
+          <li>
             <label>
-              <span>{t(`item.${id}.name`)} ({have})</span>
+              <span><EntityLink kind="item" {id} /> ({have})</span>
               <input
                 type="number"
                 min="0"

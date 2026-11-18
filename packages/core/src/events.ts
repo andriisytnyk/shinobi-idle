@@ -44,10 +44,14 @@ export interface ActionStoppedEvent extends EventBase {
 export interface EnemyDefeatedEvent extends EventBase {
   type: 'enemyDefeated';
   enemy: string;
+  /** The performer whose fight it was: 0, the character, or the slot of a clone. */
+  slot?: number | undefined;
 }
 export interface PlayerDefeatedEvent extends EventBase {
   type: 'playerDefeated';
   enemy: string;
+  /** The performer whose fight it was: 0, the character, or the slot of a clone. */
+  slot?: number | undefined;
   /** A clone lost the fight: no Wounds and no defeat for the player, the fight starts again. */
   clone?: boolean | undefined;
 }
@@ -61,6 +65,8 @@ export interface CombatLogEvent extends EventBase {
   tech: string | null;
   /** Content id of the enemy in the fight. */
   enemy: string;
+  /** The performer whose fight it is: 0, the character, or the slot of a clone. */
+  slot?: number | undefined;
   /** Damage dealt by a hit; 0 otherwise. */
   dmg: number;
   /** The id of the combatant whose action it is (on `cast`, `resolve` and `interrupted`). */

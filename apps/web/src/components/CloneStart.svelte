@@ -18,9 +18,17 @@
   const slot = $derived(game.read((gs) => cloneSlots(gs, game.content)[0]?.slot ?? -1));
   /** Whether the clone exists: then the action goes to it at once; else a clone is made first, with a pouch. */
   const exists = $derived(game.read((gs) => slot >= 0 && gs.clones[slot] !== undefined));
-  /** Whether the action already runs, in any slot: the tile's own button stops it then. */
+  /** Whether the clone already runs it; the character running it too does not matter, unless the action is unique. */
   const running = $derived(
-    game.read((gs) => gs.slots.some((s) => s.action?.kind === kind && s.action.id === id)),
+    game.read((gs) => {
+      // An action that is unique by nature runs in one performer only: a button for the other would be refused.
+      if (game.rules.actionKinds[kind]?.unique?.(id, game.content))
+        return gs.slots.some((s) => s.action?.kind === kind && s.action.id === id);
+      const action = gs.slots[slot]?.action;
+      return (
+        slot >= 0 && gs.clones[slot] !== undefined && action?.kind === kind && action.id === id
+      );
+    }),
   );
   let picking = $state(false);
 
