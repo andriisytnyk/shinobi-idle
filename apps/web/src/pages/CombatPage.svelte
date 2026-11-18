@@ -76,7 +76,7 @@
 
   /** The performer whose fight is shown (the fight screen sets it), and the lines of that fight alone, worded for it. */
   const shownFight = $derived(fightView.shown(listing.fighters));
-  const logEntries = $derived(game.combatLog.filter((e) => (e.event.slot ?? 0) === shownFight));
+  const logEntries = () => game.combatLog.filter((e) => (e.event.slot ?? 0) === shownFight);
 
   /** Whether a clone exists: the character's chakra pool is divided then. */
   const cloned = $derived(game.read((gs: GameState) => cloneCount(gs, content) > 0));
@@ -216,7 +216,7 @@
   {#if section === 'fight' || (section === 'prepare' && listing.fighting)}
     <details class="log" data-fight-log>
       <summary>{t('combat.log')}</summary>
-      <CombatLog entries={logEntries} fighting={listing.fighting} clone={shownFight > 0} />
+      <CombatLog entries={logEntries()} fighting={listing.fighting} clone={shownFight > 0} />
     </details>
   {/if}
 </SimplePage>

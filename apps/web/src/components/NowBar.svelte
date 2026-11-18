@@ -465,7 +465,8 @@
     }
 
     .slot.clone > .what {
-      min-width: 10rem;
+      --_name-room: 10rem;
+      min-width: var(--_name-room);
     }
 
     .slot.clone > .stop {

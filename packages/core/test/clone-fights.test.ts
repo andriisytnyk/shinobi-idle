@@ -44,6 +44,27 @@ const defeats = (s: GameState): number =>
     .reduce((sum, [, n]) => sum + n, 0);
 
 describe('several fights at once', () => {
+  it('stamps the battle log, the wins and the defeats with the performer of the fight', () => {
+    const state = cloner();
+    startFight(state, WOLF, 0);
+    startFight(state, HARD, 1);
+    advance(state, 3 * MIN, content);
+    const log = state.events.filter((e) => e.type === 'combatLog');
+    expect(log.length).toBeGreaterThan(0);
+    // A line of the character's fight names the wolf, a line of the clone's names the other enemy: no mixing.
+    for (const e of log) {
+      if (e.type !== 'combatLog') continue;
+      expect(e.slot).toBe(e.enemy === 'core:wolf' ? 0 : 1);
+    }
+    expect(new Set(log.map((e) => (e.type === 'combatLog' ? e.slot : -1)))).toEqual(
+      new Set([0, 1]),
+    );
+    const won = state.events.filter((e) => e.type === 'enemyDefeated');
+    expect(won.length).toBeGreaterThan(0);
+    for (const e of won)
+      if (e.type === 'enemyDefeated') expect(e.slot).toBe(e.enemy === 'core:wolf' ? 0 : 1);
+  });
+
   it('lets the character and a clone each hold a fight, in a zone and in the same zone', () => {
     const state = cloner();
     expect(startFight(state, WOLF, 0)).toEqual({ ok: true });
