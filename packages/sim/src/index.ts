@@ -19,3 +19,8 @@ export * from './hourly.ts';
 export * from './model.ts';
 export * from './constants.ts';
 export * from './fighterReport.ts';
+export * from './strategies/matrix.ts';
+export * from './strategies/runMatrix.ts';
+export * from './strategies/strategies.ts';
+export * from './strategies/strategyReport.ts';
+export * from './strategies/toolkit.ts';
