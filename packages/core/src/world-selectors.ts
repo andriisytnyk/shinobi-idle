@@ -286,11 +286,18 @@ export interface PointInfo {
 }
 
 /** The points of interest the player knows on the hex `key`, in the order of the places. */
-export function pointInfos(state: GameState, key: string, content: ContentDb): PointInfo[] {
+export function pointInfos(
+  state: GameState,
+  key: string,
+  content: ContentDb,
+  foundOnly = false,
+): PointInfo[] {
   const here = new Set(performers(state, content).map((x) => x.key));
   return pointsAtHex(content, key).flatMap((place): PointInfo[] => {
     const status = pointStatus(state, content, place);
     if (status === 'hidden' || !place.point) return [];
+    // A hex not yet surveyed to level 1 shows only what is already found on it (the outpost a new game starts with).
+    if (foundOnly && status !== 'found') return [];
     if (status === 'veiled')
       return [
         {
@@ -385,13 +392,16 @@ export function hexInfo(
     here,
     inRange: surveyAccess(state, content, hex, reach, slot) === 'ok',
     cell: surveyed ? (subject?.cell?.id ?? null) : null,
-    places:
-      surveyed && level >= 1
-        ? (index.placesByHex.get(key) ?? [])
-            .filter((p) => !p.point || ['open', 'found'].includes(pointStatus(state, content, p)))
-            .map((p) => p.id)
-        : [],
-    points: surveyed && level >= 1 ? pointInfos(state, key, content) : [],
+    places: surveyed
+      ? (index.placesByHex.get(key) ?? [])
+          .filter((p) =>
+            level >= 1
+              ? !p.point || ['open', 'found'].includes(pointStatus(state, content, p))
+              : p.point && pointStatus(state, content, p) === 'found',
+          )
+          .map((p) => p.id)
+      : [],
+    points: surveyed ? pointInfos(state, key, content, level < 1) : [],
     level,
     // Fog hides what a hex is: how many surveys it has had and how many it can have tell a cell from a plain hex.
     maxLevel: surveyed && subject ? surveyMaxLevel(subject, content) : 0,
@@ -400,6 +410,14 @@ export function hexInfo(
     surveyMs:
       subject && why === null ? exploreIntervalMs(state, content, rules, subject.address) : 0,
   };
+}
+
+/** One letter per point with a requirement: whether the player meets it now (veiled or open). */
+function pointNeedsStamp(state: GameState, content: ContentDb): string {
+  return content.places
+    .filter((p) => p.point?.needs !== undefined)
+    .map((p) => pointStatus(state, content, p)[0])
+    .join('');
 }
 
 /** The last list of each performer of a state, with what it was made for. */
@@ -428,6 +446,8 @@ export function listHexes(
     state.slots.map((s) => (s.action?.kind === 'walk' ? s.action.id : '')).join(','),
     Object.keys(state.world.pois).length,
     JSON.stringify(state.world.figures ?? {}),
+    // A point with a requirement turns veiled or open as the balance or the rank changes.
+    pointNeedsStamp(state, content),
   ].join('#');
   const name = `${slot}|${only ?? ''}`;
   const memo = listed.get(state)?.get(name);

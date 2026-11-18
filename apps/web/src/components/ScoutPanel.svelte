@@ -4,13 +4,13 @@
   import { actionRef } from '../lib/entities.ts';
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
-  import { modLine } from '../lib/points.ts';
   import { skillProgress } from '../lib/progress.ts';
   import { currencyOf, held } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
+  import ModLine from './ModLine.svelte';
 
   const content = game.content;
 
@@ -99,7 +99,7 @@
             >{tier.need === data.mastery.total
               ? t('map.mastery.tierAll')
               : t('map.mastery.tier', { n: tier.need })}
-            {tier.mods.map((m) => modLine(m)).join(', ')}</span
+            {#each tier.mods as m, j (j)}{j > 0 ? ', ' : ''}<ModLine mod={m} />{/each}</span
           >
         </li>
       {/each}

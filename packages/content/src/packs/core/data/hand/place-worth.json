@@ -36,7 +36,7 @@
     "point": {
       "reward": { "currencies": { "intel": 4 } },
       "power": [{ "key": "xp.skill.nin", "op": "add", "value": 0.05 }],
-      "needs": { "t": "skill", "skill": "scout", "level": 12 }
+      "needs": { "t": "skill", "skill": "scout", "level": 25 }
     }
   },
   "core:waterfall_shrine": {
@@ -49,7 +49,7 @@
     "point": {
       "reward": { "currencies": { "intel": 3 } },
       "power": [{ "key": "xp.skill.cc", "op": "add", "value": 0.05 }],
-      "needs": { "t": "rank", "rank": "genin" }
+      "needs": { "t": "rank", "rank": "chunin" }
     }
   },
   "core:charcoal_camp": {
@@ -73,6 +73,7 @@
   "core:jofuku_forest": {
     "point": {
       "reward": { "currencies": { "intel": 4 } },
+      "power": [{ "key": "xp.skill.herb", "op": "add", "value": 0.05 }],
       "revealedBy": { "survey": 3 }
     }
   },

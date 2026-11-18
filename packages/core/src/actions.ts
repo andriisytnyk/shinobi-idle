@@ -297,7 +297,11 @@ export const actionSystem: System = {
           const lacking = kind.missing?.(state, id, content, rules);
           const cause = kind.abortCause?.(state, id, content, rules);
           const reason = lacking || cause ? 'requirements' : 'finished';
-          return stopSlot(state, index, reason, content, rules, cause ?? undefined);
+          // A clone whose survey or auto-survey ends keeps its place: the kind may hand the slot to standing.
+          const after = kind.after?.(state, index, id, content, rules) ?? null;
+          const next =
+            after && actionKindOf(rules, after.kind)?.has(after.id, content) ? after : null;
+          return stopSlot(state, index, reason, content, rules, cause ?? undefined, next);
         }
         if (result === 'step') {
           const req = kind.requirements(state, id, content, rules);

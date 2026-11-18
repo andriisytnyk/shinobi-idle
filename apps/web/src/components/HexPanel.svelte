@@ -6,7 +6,6 @@
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import { skillByActivity } from '../lib/vocab.ts';
-  import { modLine, payoutLine } from '../lib/points.ts';
   import { moneyName } from '../lib/vocab.ts';
   import { keyIcon, keyNameKey, uniqueReq } from '../lib/world.ts';
   import Slot from '../lib/ext/Slot.svelte';
@@ -14,8 +13,10 @@
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
+  import ModLine from './ModLine.svelte';
   import PoiRow from './PoiRow.svelte';
   import ReqTree from './ReqTree.svelte';
+  import RewardList from './RewardList.svelte';
   import TimeBar from './TimeBar.svelte';
   import { IDLE_TIMING, slotTiming } from '../lib/timing.ts';
 
@@ -298,7 +299,7 @@
                     <p class="small dim">{t('map.point.bonus')}</p>
                     <ul class="mods">
                       {#each point.power as mod, j (j)}
-                        <li class="small" data-point-mod>{modLine(mod)}</li>
+                        <li class="small" data-point-mod><ModLine {mod} /></li>
                       {/each}
                     </ul>
                   {/if}
@@ -307,7 +308,13 @@
                   {/if}
                   {#if point.reward}
                     <p class="small" data-point-reward>
-                      {t('map.point.reward', { text: payoutLine(point.reward, content) })}
+                      {t('map.point.reward')}
+                      <RewardList
+                        money={point.reward.ryo ?? 0}
+                        currencies={point.reward.currencies}
+                        items={(point.reward.items ?? []).map((i) => ({ id: i.item, n: i.n }))}
+                        xp={point.reward.xp ?? null}
+                      />
                     </p>
                   {:else}
                     <p class="small dim">{t('map.point.rewardUnknown')}</p>

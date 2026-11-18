@@ -503,7 +503,7 @@ describe('hidden points and points with a requirement', () => {
     advance(s, 1 * MIN, content);
     expect(isFound(s, VALLEY)).toBe(false);
     // ... until the requirement is met: the system finds it under the performer's feet at the next event.
-    setLevel(s, 'scout', 12);
+    setLevel(s, 'scout', 25);
     ok(s, { type: 'action.start', slot: 0, kind: 'drill', id: content.exercises[0]?.id ?? '' });
     advance(s, 1 * MIN, content);
     expect(isFound(s, VALLEY)).toBe(true);
@@ -518,9 +518,9 @@ describe('hidden points and points with a requirement', () => {
     s.currencies.intel = 5;
     expect(pointStatus(s, content, placeOf('core:mercenary_den'))).toBe('open');
     reveal(s, 'core:fire_temple');
-    s.player.rank = 'student';
-    expect(pointStatus(s, content, placeOf('core:fire_temple'))).toBe('veiled');
     s.player.rank = 'genin';
+    expect(pointStatus(s, content, placeOf('core:fire_temple'))).toBe('veiled');
+    s.player.rank = 'chunin';
     expect(pointStatus(s, content, placeOf('core:fire_temple'))).toBe('open');
   });
 });
@@ -533,15 +533,36 @@ describe('actions that a place opens', () => {
     setLevel(s, 'herb', 45);
     setLevel(s, 'cc', 30);
     const start = (id: string): Command => ({ type: 'action.start', slot: 0, kind: 'gather', id });
-    for (const [herb, place] of [
-      ['core:edelweiss', 'core:jofuku_forest'],
-      ['core:lotus', 'core:waterfall_shrine'],
-    ] as const) {
+    for (const [herb, place] of [['core:lotus', 'core:waterfall_shrine']] as const) {
       expect(refusal(s, start(herb)), herb).toBe('error.requirementsNotMet');
       s.world.pois[place] = true;
       ok(s, start(herb));
       dispatch(s, { type: 'action.stop', slot: 0 }, content, defaultRules);
     }
+  });
+});
+
+describe('content a player needs is never behind an elemental key', () => {
+  const techniqueIn = (req: unknown): boolean =>
+    JSON.stringify(req ?? null).includes('"t":"technique"');
+
+  it('a herb that asks for a point stands on a cell whose key needs no technique', () => {
+    for (const herb of content.herbs) {
+      const flags = [...JSON.stringify(herb.req ?? null).matchAll(/point\.(core:[a-z0-9_]+)/g)];
+      for (const [, place] of flags) {
+        const cell = content.cells.find((c) => c.id === cellAt(keyOfPlace(place!)));
+        const key = cell?.key ? content.cellKeys[cell.key] : null;
+        expect(techniqueIn(key), `${herb.id} <- ${place}`).toBe(false);
+      }
+    }
+  });
+
+  it('edelweiss can be gathered with no technique at all (no Futon)', () => {
+    const s = genin(1);
+    setLevel(s, 'herb', 35);
+    setLevel(s, 'cc', 15);
+    expect(content.techniques.filter((x) => s.known[x.id])).toHaveLength(0);
+    ok(s, { type: 'action.start', slot: 0, kind: 'gather', id: 'core:edelweiss' });
   });
 });
 

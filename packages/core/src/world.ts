@@ -355,6 +355,15 @@ function surveyOnce(state: GameState, subject: Subject, content: ContentDb, rule
   return done;
 }
 
+/** The action kind of a clone that has arrived: it stands where it is and does nothing, so it keeps its place on the map and its share of the speed. */
+export const STAND_KIND = 'stand';
+/** The only action id of standing. */
+export const STAND_ID = 'here';
+
+/** What a clone does when its walk, survey or auto-survey ends: it stands where it stopped (the character's slot is left idle). */
+const standAfter = (_state: GameState, slot: number): { kind: string; id: string } | null =>
+  slot > 0 ? { kind: STAND_KIND, id: STAND_ID } : null;
+
 export const exploreKind: ActionKind = {
   has: (id, content) => subjectOf(content, id) !== null,
   skill: (_id, content) => scoutSkill(content),
@@ -369,6 +378,7 @@ export const exploreKind: ActionKind = {
     if (surveyAccess(state, content, subject.hex, undefined, slot) !== 'ok') return 'abort';
     return surveyOnce(state, subject, content, rules) ? 'stop' : 'continue';
   },
+  after: standAfter,
 };
 
 // ---------- travel ----------
@@ -462,10 +472,6 @@ export function enterHex(
   settlePoints(state, content, rules);
 }
 
-/** The action kind of a clone that has arrived: it stands where it is and does nothing, so it keeps its place on the map and its share of the speed. */
-export const STAND_KIND = 'stand';
-/** The only action id of standing. */
-export const STAND_ID = 'here';
 /** The length of the quiet cycle of standing: it never finishes anything, and a long one costs the engine almost no events. */
 const STAND_MS = SECONDS_PER_HOUR * MS_PER_HOUR;
 
@@ -498,7 +504,7 @@ export const walkKind: ActionKind = {
   },
   abortCause: () => 'error.cellNotReachable',
   // A clone that arrives stays where it is: its slot goes on standing there until it is dispelled or given something else.
-  after: (_state, slot) => (slot > 0 ? { kind: STAND_KIND, id: STAND_ID } : null),
+  after: standAfter,
 };
 
 // ---------- auto-survey ----------
@@ -700,6 +706,7 @@ export const autoSurveyKind: ActionKind = {
     return 'step';
   },
   abortCause: () => 'error.nothingToSurvey',
+  after: standAfter,
 };
 
 // ---------- loot ----------

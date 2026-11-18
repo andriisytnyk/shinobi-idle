@@ -159,7 +159,6 @@ describe('selectors cover gather and craft', () => {
     expect(info?.req?.children.length).toBeGreaterThanOrEqual(2);
     setLevel(s, 'herb', 35);
     setLevel(s, 'cc', 15);
-    s.world.pois['core:jofuku_forest'] = true;
     const ready = actionInfo(s, { kind: 'gather', id: 'core:edelweiss' }, content);
     expect(ready?.available).toBe(true);
     expect(ready?.intervalMs).toBe(K.gather * 1000);

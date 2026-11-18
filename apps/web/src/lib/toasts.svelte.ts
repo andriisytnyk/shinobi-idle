@@ -21,6 +21,8 @@ export interface Toast {
     /** Other currencies, by id. */
     currencies?: Record<string, number>;
     items: { id: string; n: number }[];
+    /** Skill XP, the skill an entity link. */
+    xp?: { skill: string; amount: number } | null;
     /** Village resource units: `units` earned, `added` to the village, `lost` to a full store, `waiting` for a village that does not exist yet. */
     resource?: { slug: string; units: number; added: number; lost: number; waiting: number };
   };
@@ -125,6 +127,7 @@ export function toastFor(event: GameEvent, content: ContentDb): ToastSpec | null
           ryo: event.reward.ryo,
           currencies: event.reward.currencies,
           items: event.reward.items,
+          xp: event.reward.xp,
         },
       };
     case 'wayFound':
@@ -132,12 +135,8 @@ export function toastFor(event: GameEvent, content: ContentDb): ToastSpec | null
       if (event.place === '') return null;
       return {
         key: 'toast.wayFound',
-        params: {
-          text: [
-            ...event.items.map((i) => `${t(localeKey('item', i.id, 'name'))} ×${i.n}`),
-            ...Object.entries(event.currencies).map(([id, n]) => `${n} ${currencyName(id)}`),
-          ].join(', '),
-        },
+        params: {},
+        gains: { ryo: 0, currencies: event.currencies, items: event.items },
       };
     case 'travelled':
       return {

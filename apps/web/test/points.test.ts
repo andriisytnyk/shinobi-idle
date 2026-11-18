@@ -220,6 +220,66 @@ describe('the rest of the interface', () => {
     app = mount(NowBar, { target, context: coreContext() });
     flushSync();
     expect(target.textContent).toContain(name('now.doing.stand'));
+    // It is not the auto-survey: no such name (a place in fog is only «a hex in fog»).
+    expect(target.textContent).not.toContain(name('map.auto.name'));
+  });
+
+  it('the Now bar names the surveyed place a clone stands on, as a link', () => {
+    const state = genin();
+    const cellId = 'core:rysovi_polia';
+    const cell = content.cells.find((c) => c.id === cellId)!;
+    state.world.surveyed[`${cell.hex[0]},${cell.hex[1]}`] = true;
+    state.world.explores[cellId] = FIRST;
+    state.known['core:shadow_clone'] = true;
+    state.slots.push({
+      action: { kind: 'stand', id: 'here' },
+      progress: 0,
+      share: 500,
+      data: null,
+    });
+    state.slots[0]!.share = 500;
+    state.world.figures = { 1: cellId };
+    game.replaceState(state);
+    app = mount(NowBar, { target, context: coreContext() });
+    flushSync();
+    expect(target.textContent).not.toContain(name('map.auto.name'));
+    expect(target.querySelector(`a[href$="${cellId}"]`)?.textContent).toBe(
+      name(`cell.${cellId}.name`),
+    );
+  });
+
+  it('shows the reward of a found point with the skill and items as links, and tells them in the toasts', () => {
+    const state = genin();
+    reveal(state, TG44);
+    state.world.pois[TG44] = true;
+    game.replaceState(state);
+    show();
+    select(TG44);
+    const reward = q('[data-point-reward]');
+    expect(reward?.querySelector('[data-reward="xp"] a.entity-link')?.getAttribute('href')).toMatch(
+      /tai$/,
+    );
+    const found = toastFor({
+      type: 'pointFound',
+      at: 0,
+      place: TG44,
+      hex: coordOf(TG44),
+      slot: 0,
+      reward: { ryo: 0, items: [], currencies: {}, xp: { skill: 'tai', amount: 40 } },
+    });
+    expect(found?.gains?.xp).toEqual({ skill: 'tai', amount: 40 });
+    const rare = toastFor({
+      type: 'wayFound',
+      at: 0,
+      hex: '10,16',
+      place: 'core:war_fort_ruins',
+      items: [{ id: 'core:note', n: 1 }],
+      currencies: {},
+      slot: 0,
+    });
+    // The items travel as data, so the toast renders them as entity links.
+    expect(rare?.gains?.items).toEqual([{ id: 'core:note', n: 1 }]);
+    expect(rare?.params).toEqual({});
   });
 
   it('tells a point found and a rare find in a toast, and keeps the small finds quiet', () => {

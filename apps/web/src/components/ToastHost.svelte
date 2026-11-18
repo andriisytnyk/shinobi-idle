@@ -64,6 +64,7 @@
               money={toast.gains.ryo}
               currencies={toast.gains.currencies}
               items={toast.gains.items}
+              xp={toast.gains.xp ?? null}
             />
             {#if toast.gains.resource}
               {@const res = toast.gains.resource}

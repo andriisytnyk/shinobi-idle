@@ -1,5 +1,12 @@
 import type { ContentDb } from '@shinobi/content';
-import { hexKey, hexOfAddress, isSurveyed, type GameState } from '@shinobi/core';
+import {
+  cellAtPosition,
+  hexKey,
+  hexOfAddress,
+  isSurveyed,
+  positionHex,
+  type GameState,
+} from '@shinobi/core';
 import { tryActiveContent, tryActiveState } from './active.ts';
 import { fallbackText, hasKey, reportMissing, t } from './i18n.ts';
 import { MASK, revealLevel } from './reveal.ts';
@@ -74,9 +81,22 @@ const ACTION_ENTITY: Readonly<Record<string, string>> = {
  * the action as `<kind>.<id>.name` (an operation does), that is the reference; else a technique.
  * A survey or walk to a hex in fog names the hex, not the cell on it.
  */
-export function actionRef(action: { kind: string; id: string }, state?: GameState): EntityRef {
-  // A hex that is no cell, and the auto-survey, have no page: the `hex` kind names them on the map.
-  if (action.kind === 'autosurvey' || action.kind === 'stand') return { kind: HEX_KIND, id: '' };
+export function actionRef(
+  action: { kind: string; id: string },
+  state?: GameState,
+  slot = 0,
+): EntityRef {
+  // The auto-survey has no page: the `hex` kind names it on the map.
+  if (action.kind === 'autosurvey') return { kind: HEX_KIND, id: '' };
+  // A standing clone names the place it stands on, as far as the player has revealed it.
+  if (action.kind === 'stand') {
+    const content = tryActiveContent();
+    const known = state ?? tryActiveState();
+    const here = content && known ? positionHex(known, content, slot) : null;
+    if (!content || !known || !here) return { kind: HEX_KIND, id: '' };
+    const cell = cellAtPosition(known, content, slot);
+    return actionRef({ kind: 'walk', id: cell?.id ?? hexKey(here.q, here.r) }, known);
+  }
   if (action.kind === 'explore' || action.kind === 'walk') {
     const content = tryActiveContent();
     const known = state ?? tryActiveState();
