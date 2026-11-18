@@ -75,8 +75,10 @@ describe('explicit cycle and XP per action', () => {
     // The identity of the change: the data was generated as rate x cycle (a herb also pays its share of
     // the regrow pause of a first-size bush, a craft its multiplier), so XP per hour is what it was.
     for (const e of content.exercises) {
+      // The Vitality drills pay the share of the pace a fight pays the skill (K.combatXp.vit).
+      const share = e.skill === 'vit' ? (K.combatXp.vit ?? 1) : 1;
       expect(((e.xp ?? 0) * 3600) / (e.cycle ?? 1) / rate(e.level, content), e.id).toBeCloseTo(
-        1,
+        share,
         3,
       );
     }

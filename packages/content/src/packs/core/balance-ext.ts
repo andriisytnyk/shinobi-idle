@@ -221,7 +221,7 @@ export const BALANCE_EXT = {
     /** A heavy cast: `castMs` wind-up every `everyMs`, `damageMult` x damage, stuns the player for `stunMs` when it lands. */
     heavyCast: { everyMs: 20000, castMs: 2500, damageMult: 2, stunMs: 500, hp: 0.85, dmg: 1.05 },
     /** Two bodies: each has `hpEach` of the boss health and `dmgEach` of its damage; while both live the mist poisons the player for `mistMult` x the poison strength. */
-    twins: { count: 2, hpEach: 0.5, dmgEach: 0.5, mistMult: 0.3 },
+    twins: { count: 2, hpEach: 0.5, dmgEach: 0.5, mistMult: 1.6 },
     mistRehide: { everyMs: 25000, hp: 0.97, dmg: 0.95 },
     illusion: { everyMs: 8000, fleeAtHp: 0.3, hp: 1.25, dmg: 1.25 },
   },
@@ -291,7 +291,7 @@ export const BALANCE_EXT = {
   /** Numbers of tools that the item data does not carry: the poisoned senbon's damage over time (share of maximum health per second, seconds), and the damage multiplier of a burn ointment against the nature it names. */
   toolFx: { dot: { pct: 0.012, durS: 10 }, resist: 0.6 },
   /** Ryo dropped by an enemy per combat level: range of the multiplier. */
-  ryoDrop: [5, 8],
+  ryoDrop: [1.2, 2],
   /** Chance of a trophy drop per kill. */
   dropChance: { band: 0.25, pelt: 0.4, fang: 0.3, coin: 0.03, gem: 0.01 },
   /** Sell price of a trophy in ryo. */

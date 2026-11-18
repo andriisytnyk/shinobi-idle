@@ -113,10 +113,19 @@
   {
     "id": "vit",
     "group": "combat",
-    "activity": "none",
+    "activity": "drill",
     "unlockReq": {
-      "t": "flag",
-      "id": "firstFight"
+      "t": "any",
+      "of": [
+        {
+          "t": "flag",
+          "id": "firstFight"
+        },
+        {
+          "t": "rank",
+          "rank": "genin"
+        }
+      ]
     }
   }
 ]

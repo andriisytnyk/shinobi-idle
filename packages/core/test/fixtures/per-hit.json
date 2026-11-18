@@ -2,63 +2,117 @@
  "core:leaf_whirlwind|plain": {
   "damage": 28.157576,
   "hp": 999999971.842424,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:leaf_whirlwind|nature-katon": {
   "damage": 28.157576,
   "hp": 999999971.842424,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:leaf_whirlwind|nature-futon": {
   "damage": 28.157576,
   "hp": 999999971.842424,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:leaf_whirlwind|nature-raiton": {
   "damage": 28.157576,
   "hp": 999999971.842424,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:leaf_whirlwind|nature-doton": {
   "damage": 28.157576,
   "hp": 999999971.842424,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:leaf_whirlwind|nature-suiton": {
   "damage": 28.157576,
   "hp": 999999971.842424,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:leaf_whirlwind|armor": {
-  "damage": 19.710303,
-  "hp": 999999980.289697,
-  "effects": [],
-  "statuses": {},
+  "damage": 21.962909,
+  "hp": 999999978.037091,
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:leaf_whirlwind|prior-burn": {
   "damage": 28.157576,
-  "hp": 999999971.842424,
+  "hp": 999999971.342424,
   "effects": [
    [
     "burn",
     0.5
+   ],
+   [
+    "interrupt",
+    0.71
    ]
   ],
   "statuses": {
-   "burn": 1
+   "burn": 1,
+   "interrupt": 1
   },
   "combos": {}
  },
@@ -67,75 +121,134 @@
   "hp": 999999971.842424,
   "effects": [
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "wet",
     0.85
    ]
   ],
   "statuses": {
-   "wet": 1
+   "wet": 1,
+   "interrupt": 1
   },
   "combos": {}
  },
  "core:dynamic_entry|plain": {
   "damage": 24.484848,
   "hp": 999999975.515152,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:dynamic_entry|nature-katon": {
   "damage": 24.484848,
   "hp": 999999975.515152,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:dynamic_entry|nature-futon": {
   "damage": 24.484848,
   "hp": 999999975.515152,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:dynamic_entry|nature-raiton": {
   "damage": 24.484848,
   "hp": 999999975.515152,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:dynamic_entry|nature-doton": {
   "damage": 24.484848,
   "hp": 999999975.515152,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:dynamic_entry|nature-suiton": {
   "damage": 24.484848,
   "hp": 999999975.515152,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:dynamic_entry|armor": {
-  "damage": 17.139394,
-  "hp": 999999982.860606,
-  "effects": [],
-  "statuses": {},
+  "damage": 19.098182,
+  "hp": 999999980.901818,
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:dynamic_entry|prior-burn": {
   "damage": 24.484848,
-  "hp": 999999975.515152,
+  "hp": 999999975.015152,
   "effects": [
    [
     "burn",
     0.5
+   ],
+   [
+    "interrupt",
+    0.71
    ]
   ],
   "statuses": {
-   "burn": 1
+   "burn": 1,
+   "interrupt": 1
   },
   "combos": {}
  },
@@ -144,75 +257,134 @@
   "hp": 999999975.515152,
   "effects": [
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "wet",
     0.85
    ]
   ],
   "statuses": {
-   "wet": 1
+   "wet": 1,
+   "interrupt": 1
   },
   "combos": {}
  },
  "core:leaf_gale|plain": {
   "damage": 28.157576,
   "hp": 999999971.842424,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:leaf_gale|nature-katon": {
   "damage": 28.157576,
   "hp": 999999971.842424,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:leaf_gale|nature-futon": {
   "damage": 28.157576,
   "hp": 999999971.842424,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:leaf_gale|nature-raiton": {
   "damage": 28.157576,
   "hp": 999999971.842424,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:leaf_gale|nature-doton": {
   "damage": 28.157576,
   "hp": 999999971.842424,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:leaf_gale|nature-suiton": {
   "damage": 28.157576,
   "hp": 999999971.842424,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:leaf_gale|armor": {
-  "damage": 19.710303,
-  "hp": 999999980.289697,
-  "effects": [],
-  "statuses": {},
+  "damage": 21.962909,
+  "hp": 999999978.037091,
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:leaf_gale|prior-burn": {
   "damage": 28.157576,
-  "hp": 999999971.842424,
+  "hp": 999999971.342424,
   "effects": [
    [
     "burn",
     0.5
+   ],
+   [
+    "interrupt",
+    0.71
    ]
   ],
   "statuses": {
-   "burn": 1
+   "burn": 1,
+   "interrupt": 1
   },
   "combos": {}
  },
@@ -221,12 +393,17 @@
   "hp": 999999971.842424,
   "effects": [
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "wet",
     0.85
    ]
   ],
   "statuses": {
-   "wet": 1
+   "wet": 1,
+   "interrupt": 1
   },
   "combos": {}
  },
@@ -281,7 +458,7 @@
  },
  "core:gate_of_opening|prior-burn": {
   "damage": 0,
-  "hp": 1000000000,
+  "hp": 999999999.5,
   "effects": [
    [
     "burn",
@@ -358,7 +535,7 @@
  },
  "core:gate_of_healing|prior-burn": {
   "damage": 0,
-  "hp": 1000000000,
+  "hp": 999999999.5,
   "effects": [
    [
     "burn",
@@ -427,15 +604,15 @@
   "combos": {}
  },
  "core:lion_combo|armor": {
-  "damage": 37.528417,
-  "hp": 999999962.471583,
+  "damage": 41.817379,
+  "hp": 999999958.182621,
   "effects": [],
   "statuses": {},
   "combos": {}
  },
  "core:lion_combo|prior-burn": {
   "damage": 53.612024,
-  "hp": 999999946.387976,
+  "hp": 999999945.887976,
   "effects": [
    [
     "burn",
@@ -504,15 +681,15 @@
   "combos": {}
  },
  "core:leaf_great_whirlwind|armor": {
-  "damage": 21.852727,
-  "hp": 999999978.147273,
+  "damage": 24.350182,
+  "hp": 999999975.649818,
   "effects": [],
   "statuses": {},
   "combos": {}
  },
  "core:leaf_great_whirlwind|prior-burn": {
   "damage": 31.218182,
-  "hp": 999999968.781818,
+  "hp": 999999968.281818,
   "effects": [
    [
     "burn",
@@ -581,15 +758,15 @@
   "combos": {}
  },
  "core:drunken_fist|armor": {
-  "damage": 37.528417,
-  "hp": 999999962.471583,
+  "damage": 41.817379,
+  "hp": 999999958.182621,
   "effects": [],
   "statuses": {},
   "combos": {}
  },
  "core:drunken_fist|prior-burn": {
   "damage": 53.612024,
-  "hp": 999999946.387976,
+  "hp": 999999945.887976,
   "effects": [
    [
     "burn",
@@ -658,15 +835,15 @@
   "combos": {}
  },
  "core:leaf_rising_wind|armor": {
-  "damage": 33.507515,
-  "hp": 999999966.492485,
+  "damage": 37.336945,
+  "hp": 999999962.663055,
   "effects": [],
   "statuses": {},
   "combos": {}
  },
  "core:leaf_rising_wind|prior-burn": {
   "damage": 47.867879,
-  "hp": 999999952.132121,
+  "hp": 999999951.632121,
   "effects": [
    [
     "burn",
@@ -858,63 +1035,117 @@
  "core:shadow_shuriken|plain": {
   "damage": 24.484848,
   "hp": 999999975.515152,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:shadow_shuriken|nature-katon": {
   "damage": 24.484848,
   "hp": 999999975.515152,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:shadow_shuriken|nature-futon": {
   "damage": 24.484848,
   "hp": 999999975.515152,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:shadow_shuriken|nature-raiton": {
   "damage": 24.484848,
   "hp": 999999975.515152,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:shadow_shuriken|nature-doton": {
   "damage": 24.484848,
   "hp": 999999975.515152,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:shadow_shuriken|nature-suiton": {
   "damage": 24.484848,
   "hp": 999999975.515152,
-  "effects": [],
-  "statuses": {},
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:shadow_shuriken|armor": {
-  "damage": 17.139394,
-  "hp": 999999982.860606,
-  "effects": [],
-  "statuses": {},
+  "damage": 19.098182,
+  "hp": 999999980.901818,
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1
+  },
   "combos": {}
  },
  "core:shadow_shuriken|prior-burn": {
   "damage": 24.484848,
-  "hp": 999999975.515152,
+  "hp": 999999975.015152,
   "effects": [
    [
     "burn",
     0.5
+   ],
+   [
+    "interrupt",
+    0.71
    ]
   ],
   "statuses": {
-   "burn": 1
+   "burn": 1,
+   "interrupt": 1
   },
   "combos": {}
  },
@@ -923,12 +1154,17 @@
   "hp": 999999975.515152,
   "effects": [
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "wet",
     0.85
    ]
   ],
   "statuses": {
-   "wet": 1
+   "wet": 1,
+   "interrupt": 1
   },
   "combos": {}
  },
@@ -1017,8 +1253,8 @@
   "combos": {}
  },
  "core:temporary_paralysis|armor": {
-  "damage": 5.141818,
-  "hp": 999999994.858182,
+  "damage": 5.729455,
+  "hp": 999999994.270546,
   "effects": [
    [
     "bind",
@@ -1032,7 +1268,7 @@
  },
  "core:temporary_paralysis|prior-burn": {
   "damage": 7.345455,
-  "hp": 999999992.654545,
+  "hp": 999999992.154545,
   "effects": [
    [
     "bind",
@@ -1153,8 +1389,8 @@
   "combos": {}
  },
  "core:hidden_shadow_snake_hands|armor": {
-  "damage": 8.741091,
-  "hp": 999999991.258909,
+  "damage": 9.740073,
+  "hp": 999999990.259927,
   "effects": [
    [
     "bind",
@@ -1168,7 +1404,7 @@
  },
  "core:hidden_shadow_snake_hands|prior-burn": {
   "damage": 12.487273,
-  "hp": 999999987.512727,
+  "hp": 999999987.012727,
   "effects": [
    [
     "bind",
@@ -1332,7 +1568,7 @@
  },
  "core:nature_transformation_burn_a_leaf|prior-burn": {
   "damage": 0,
-  "hp": 1000000000,
+  "hp": 999999999.5,
   "effects": [
    [
     "burn",
@@ -1409,7 +1645,7 @@
  },
  "core:fire_breath_control_drill|prior-burn": {
   "damage": 0,
-  "hp": 1000000000,
+  "hp": 999999999.5,
   "effects": [
    [
     "burn",
@@ -1520,8 +1756,8 @@
   "combos": {}
  },
  "core:running_fire|armor": {
-  "damage": 11.312,
-  "hp": 999999988.688,
+  "damage": 12.6048,
+  "hp": 999999987.3952,
   "effects": [
    [
     "burn",
@@ -1535,7 +1771,7 @@
  },
  "core:running_fire|prior-burn": {
   "damage": 16.16,
-  "hp": 999999983.84,
+  "hp": 999999983.34,
   "effects": [
    [
     "burn",
@@ -1649,8 +1885,8 @@
   "combos": {}
  },
  "core:great_fireball|armor": {
-  "damage": 29.13697,
-  "hp": 999999970.86303,
+  "damage": 32.466909,
+  "hp": 999999967.533091,
   "effects": [
    [
     "burn",
@@ -1778,8 +2014,8 @@
   "combos": {}
  },
  "core:phoenix_sage_fire|armor": {
-  "damage": 29.486613,
-  "hp": 999999970.513387,
+  "damage": 32.856512,
+  "hp": 999999967.143488,
   "effects": [
    [
     "burn",
@@ -1907,8 +2143,8 @@
   "combos": {}
  },
  "core:dragon_fire|armor": {
-  "damage": 32.633406,
-  "hp": 999999967.366594,
+  "damage": 36.362938,
+  "hp": 999999963.637062,
   "effects": [
    [
     "burn",
@@ -1922,7 +2158,7 @@
  },
  "core:dragon_fire|prior-burn": {
   "damage": 46.619152,
-  "hp": 999999953.380849,
+  "hp": 999999952.880849,
   "effects": [
    [
     "burn",
@@ -2036,8 +2272,8 @@
   "combos": {}
  },
  "core:fire_dragon_flame_bullet|armor": {
-  "damage": 38.872145,
-  "hp": 999999961.127855,
+  "damage": 43.314676,
+  "hp": 999999956.685324,
   "effects": [
    [
     "burn",
@@ -2051,7 +2287,7 @@
  },
  "core:fire_dragon_flame_bullet|prior-burn": {
   "damage": 55.531636,
-  "hp": 999999943.968364,
+  "hp": 999999943.468364,
   "effects": [
    [
     "burn",
@@ -2131,7 +2367,7 @@
  },
  "core:nature_transformation_cut_a_leaf|prior-burn": {
   "damage": 0,
-  "hp": 1000000000,
+  "hp": 999999999.5,
   "effects": [
    [
     "burn",
@@ -2208,7 +2444,7 @@
  },
  "core:nature_transformation_split_a_waterfall|prior-burn": {
   "damage": 0,
-  "hp": 1000000000,
+  "hp": 999999999.5,
   "effects": [
    [
     "burn",
@@ -2285,7 +2521,7 @@
  },
  "core:wind_chakra_flow_drill|prior-burn": {
   "damage": 0,
-  "hp": 1000000000,
+  "hp": 999999999.5,
   "effects": [
    [
     "burn",
@@ -2478,8 +2714,8 @@
   "combos": {}
  },
  "core:great_breakthrough|armor": {
-  "damage": 21.852727,
-  "hp": 999999978.147273,
+  "damage": 24.350182,
+  "hp": 999999975.649818,
   "effects": [],
   "statuses": {},
   "combos": {}
@@ -2602,7 +2838,7 @@
  },
  "core:sickle_weasel|prior-burn": {
   "damage": 34.964364,
-  "hp": 999999965.035636,
+  "hp": 999999964.535636,
   "effects": [
    [
     "armorOff",
@@ -2726,7 +2962,7 @@
  },
  "core:vacuum_wave|prior-burn": {
   "damage": 49.581818,
-  "hp": 999999950.418182,
+  "hp": 999999949.418182,
   "effects": [
    [
     "armorOff",
@@ -2813,7 +3049,7 @@
  },
  "core:nature_transformation_crumple_a_leaf|prior-burn": {
   "damage": 0,
-  "hp": 1000000000,
+  "hp": 999999999.5,
   "effects": [
    [
     "burn",
@@ -2890,7 +3126,7 @@
  },
  "core:lightning_discharge_drill|prior-burn": {
   "damage": 0,
-  "hp": 1000000000,
+  "hp": 999999999.5,
   "effects": [
    [
     "burn",
@@ -2967,7 +3203,7 @@
  },
  "core:lightning_chakra_flow_drill|prior-burn": {
   "damage": 0,
-  "hp": 1000000000,
+  "hp": 999999999.5,
   "effects": [
    [
     "burn",
@@ -3108,8 +3344,8 @@
   "combos": {}
  },
  "core:four_pillar_bind|armor": {
-  "damage": 8.741091,
-  "hp": 999999991.258909,
+  "damage": 9.740073,
+  "hp": 999999990.259927,
   "effects": [
    [
     "bind",
@@ -3181,11 +3417,16 @@
   "hp": 999999958.375758,
   "effects": [
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3195,11 +3436,16 @@
   "hp": 999999958.375758,
   "effects": [
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3209,11 +3455,16 @@
   "hp": 999999970.86303,
   "effects": [
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3223,11 +3474,16 @@
   "hp": 999999958.375758,
   "effects": [
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3237,11 +3493,16 @@
   "hp": 999999945.888485,
   "effects": [
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3251,36 +3512,50 @@
   "hp": 999999958.375758,
   "effects": [
    [
-    "stun",
-    0
-   ]
-  ],
-  "statuses": {
-   "stun": 1
-  },
-  "combos": {}
- },
- "core:lightning_beast_tracking_fang|armor": {
-  "damage": 29.13697,
-  "hp": 999999970.86303,
-  "effects": [
+    "interrupt",
+    0.71
+   ],
    [
     "stun",
     0
    ]
   ],
   "statuses": {
+   "interrupt": 1,
+   "stun": 1
+  },
+  "combos": {}
+ },
+ "core:lightning_beast_tracking_fang|armor": {
+  "damage": 32.466909,
+  "hp": 999999967.533091,
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ],
+   [
+    "stun",
+    0
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
  },
  "core:lightning_beast_tracking_fang|prior-burn": {
   "damage": 41.624242,
-  "hp": 999999958.375758,
+  "hp": 999999957.875758,
   "effects": [
    [
     "burn",
     0.5
+   ],
+   [
+    "interrupt",
+    0.71
    ],
    [
     "stun",
@@ -3289,6 +3564,7 @@
   ],
   "statuses": {
    "burn": 1,
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3297,6 +3573,10 @@
   "damage": 41.624242,
   "hp": 999999958.375758,
   "effects": [
+   [
+    "interrupt",
+    0.71
+   ],
    [
     "stun",
     0
@@ -3308,6 +3588,7 @@
   ],
   "statuses": {
    "wet": 1,
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {
@@ -3319,11 +3600,16 @@
   "hp": 999999958.375758,
   "effects": [
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3333,11 +3619,16 @@
   "hp": 999999958.375758,
   "effects": [
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3347,11 +3638,16 @@
   "hp": 999999970.86303,
   "effects": [
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3361,11 +3657,16 @@
   "hp": 999999958.375758,
   "effects": [
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3375,11 +3676,16 @@
   "hp": 999999945.888485,
   "effects": [
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3389,25 +3695,35 @@
   "hp": 999999958.375758,
   "effects": [
    [
-    "stun",
-    0
-   ]
-  ],
-  "statuses": {
-   "stun": 1
-  },
-  "combos": {}
- },
- "core:wave_of_inspiration|armor": {
-  "damage": 29.13697,
-  "hp": 999999970.86303,
-  "effects": [
+    "interrupt",
+    0.71
+   ],
    [
     "stun",
     0
    ]
   ],
   "statuses": {
+   "interrupt": 1,
+   "stun": 1
+  },
+  "combos": {}
+ },
+ "core:wave_of_inspiration|armor": {
+  "damage": 32.466909,
+  "hp": 999999967.533091,
+  "effects": [
+   [
+    "interrupt",
+    0.71
+   ],
+   [
+    "stun",
+    0
+   ]
+  ],
+  "statuses": {
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3421,12 +3737,17 @@
     0.5
    ],
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
    "burn": 1,
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3435,6 +3756,10 @@
   "damage": 41.624242,
   "hp": 999999958.375758,
   "effects": [
+   [
+    "interrupt",
+    0.71
+   ],
    [
     "stun",
     0
@@ -3446,6 +3771,7 @@
   ],
   "statuses": {
    "wet": 1,
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {
@@ -3461,11 +3787,16 @@
     1
    ],
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3479,11 +3810,16 @@
     1
    ],
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3497,11 +3833,16 @@
     1
    ],
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3515,11 +3856,16 @@
     1
    ],
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3533,11 +3879,16 @@
     1
    ],
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3551,11 +3902,16 @@
     1
    ],
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3569,19 +3925,24 @@
     1
    ],
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
    "armorBreak": 1,
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
  },
  "core:false_darkness|prior-burn": {
   "damage": 74.042182,
-  "hp": 999999925.957818,
+  "hp": 999999924.957818,
   "effects": [
    [
     "armorOff",
@@ -3592,12 +3953,17 @@
     0.5
    ],
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ]
   ],
   "statuses": {
    "burn": 1,
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {}
@@ -3611,6 +3977,10 @@
     1
    ],
    [
+    "interrupt",
+    0.71
+   ],
+   [
     "stun",
     0
    ],
@@ -3621,6 +3991,7 @@
   ],
   "statuses": {
    "wet": 1,
+   "interrupt": 1,
    "stun": 1
   },
   "combos": {
@@ -3678,7 +4049,7 @@
  },
  "core:nature_transformation_crumble_a_leaf|prior-burn": {
   "damage": 0,
-  "hp": 1000000000,
+  "hp": 999999999.5,
   "effects": [
    [
     "burn",
@@ -3789,8 +4160,8 @@
   "combos": {}
  },
  "core:double_suicide_decapitation|armor": {
-  "damage": 5.141818,
-  "hp": 999999994.858182,
+  "damage": 5.729455,
+  "hp": 999999994.270546,
   "effects": [
    [
     "bind",
@@ -3804,7 +4175,7 @@
  },
  "core:double_suicide_decapitation|prior-burn": {
   "damage": 7.345455,
-  "hp": 999999992.654545,
+  "hp": 999999992.154545,
   "effects": [
    [
     "bind",
@@ -3893,7 +4264,7 @@
  },
  "core:earth_softening_drill|prior-burn": {
   "damage": 0,
-  "hp": 1000000000,
+  "hp": 999999999.5,
   "effects": [
    [
     "burn",
@@ -3962,15 +4333,15 @@
   "combos": {}
  },
  "core:tearing_earth_turning_palm|armor": {
-  "damage": 21.852727,
-  "hp": 999999978.147273,
+  "damage": 24.350182,
+  "hp": 999999975.649818,
   "effects": [],
   "statuses": {},
   "combos": {}
  },
  "core:tearing_earth_turning_palm|prior-burn": {
   "damage": 31.218182,
-  "hp": 999999968.781818,
+  "hp": 999999968.281818,
   "effects": [
    [
     "burn",
@@ -4088,8 +4459,8 @@
   "combos": {}
  },
  "core:earth_flow_river|armor": {
-  "damage": 8.741091,
-  "hp": 999999991.258909,
+  "damage": 9.740073,
+  "hp": 999999990.259927,
   "effects": [
    [
     "bind",
@@ -4103,7 +4474,7 @@
  },
  "core:earth_flow_river|prior-burn": {
   "damage": 12.487273,
-  "hp": 999999987.512727,
+  "hp": 999999987.012727,
   "effects": [
    [
     "bind",
@@ -4184,15 +4555,15 @@
   "combos": {}
  },
  "core:earth_dragon_bullet|armor": {
-  "damage": 32.633406,
-  "hp": 999999967.366594,
+  "damage": 36.362938,
+  "hp": 999999963.637062,
   "effects": [],
   "statuses": {},
   "combos": {}
  },
  "core:earth_dragon_bullet|prior-burn": {
   "damage": 46.619152,
-  "hp": 999999953.380849,
+  "hp": 999999952.880849,
   "effects": [
    [
     "burn",
@@ -4276,7 +4647,7 @@
  },
  "core:nature_transformation_dampen_a_leaf|prior-burn": {
   "damage": 0,
-  "hp": 1000000000,
+  "hp": 999999999.5,
   "effects": [
    [
     "burn",
@@ -4353,7 +4724,7 @@
  },
  "core:river_water_guiding_drill|prior-burn": {
   "damage": 0,
-  "hp": 1000000000,
+  "hp": 999999999.5,
   "effects": [
    [
     "burn",
@@ -4464,8 +4835,8 @@
   "combos": {}
  },
  "core:wild_water_wave|armor": {
-  "damage": 25.640533,
-  "hp": 999999974.359467,
+  "damage": 28.57088,
+  "hp": 999999971.42912,
   "effects": [
    [
     "wet",
@@ -4479,7 +4850,7 @@
  },
  "core:wild_water_wave|prior-burn": {
   "damage": 36.629333,
-  "hp": 999999963.370667,
+  "hp": 999999962.870667,
   "effects": [
    [
     "burn",
@@ -4625,8 +4996,8 @@
   "combos": {}
  },
  "core:water_prison|armor": {
-  "damage": 8.741091,
-  "hp": 999999991.258909,
+  "damage": 9.740073,
+  "hp": 999999990.259927,
   "effects": [
    [
     "bind",
@@ -4771,8 +5142,8 @@
   "combos": {}
  },
  "core:gunshot|armor": {
-  "damage": 21.852727,
-  "hp": 999999978.147273,
+  "damage": 24.350182,
+  "hp": 999999975.649818,
   "effects": [
    [
     "wet",
@@ -4786,7 +5157,7 @@
  },
  "core:gunshot|prior-burn": {
   "damage": 31.218182,
-  "hp": 999999968.781818,
+  "hp": 999999968.281818,
   "effects": [
    [
     "burn",
@@ -4932,8 +5303,8 @@
   "combos": {}
  },
  "core:starch_syrup_capturing_field|armor": {
-  "damage": 8.741091,
-  "hp": 999999991.258909,
+  "damage": 9.740073,
+  "hp": 999999990.259927,
   "effects": [
    [
     "bind",
@@ -4952,7 +5323,7 @@
  },
  "core:starch_syrup_capturing_field|prior-burn": {
   "damage": 12.487273,
-  "hp": 999999987.512727,
+  "hp": 999999987.012727,
   "effects": [
    [
     "bind",
