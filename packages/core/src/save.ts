@@ -37,7 +37,7 @@ import {
   stashMissing,
 } from './pack-data.ts';
 import { bushSize } from './field.ts';
-import { MS_PER_HOUR, MS_PER_SECOND, poolCapacity } from './formulas.ts';
+import { cycleSeconds, MS_PER_HOUR, MS_PER_SECOND, poolCapacity } from './formulas.ts';
 import { maxLevels, parseModRef } from './meditation.ts';
 import { indexOf } from './lookup.ts';
 import { teamFor } from './natures.ts';
@@ -325,6 +325,17 @@ export const MIGRATIONS: readonly Migration[] = [
       ...state,
       world: { ...world, surveyed: marked.surveyed, explores: { ...marked.explores } },
     };
+  },
+  // v17 -> v18: the pool capacity per item went from 1500 to 2000 (action pace, #69). The saved pool XP is a
+  // number against that capacity, so every pool is scaled by 2000 / 1500: it keeps its fraction of the capacity and
+  // so the pool checkpoints it had reached (a checkpoint never switches off). The two numbers are the capacities of
+  // the two versions, not `K.poolCapPerItem`: a migration says what the save was, whatever the data is now.
+  (state) => {
+    const pools = isRecord(state.pools) ? state.pools : {};
+    const scaled: Raw = {};
+    for (const [id, pool] of Object.entries(pools))
+      scaled[id] = isRecord(pool) ? { ...pool, xp: (nonNegative(pool.xp) * 2000) / 1500 } : pool;
+    return { ...state, pools: scaled };
   },
 ];
 
@@ -903,7 +914,10 @@ export function deserialize(
     const size = Math.floor(nonNegative(v.size));
     if (size < 1 || size > bushSize(state, key, content, rules)) return undefined;
     const stock = Math.min(Math.floor(nonNegative(v.stock)), size);
-    const room = (K.field.regrowMs + K.gather * MS_PER_SECOND) * SHARE_FULL;
+    // The carried progress of an empty bush is bounded by the herb's own cycle and its regrowing.
+    const herb = index.herbs.get(key);
+    const cycle = herb ? cycleSeconds('gather', herb, content) : K.gather;
+    const room = (K.field.regrowMs + cycle * MS_PER_SECOND) * SHARE_FULL;
     const carry = stock === 0 ? Math.min(Math.floor(nonNegative(v.carry)), room) : 0;
     return { stock, size, carry };
   });

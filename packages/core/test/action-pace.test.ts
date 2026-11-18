@@ -21,15 +21,12 @@ import {
   xpAt,
   type GameState,
 } from '../src/index.ts';
-import { genin, HOUR, plainRules, setLevel, start } from './helpers.ts';
+import { genin, plainRules, setLevel, start } from './helpers.ts';
 
 const K = content.balance.K;
 const MINUTE = 60_000;
 const ok = (s: GameState, kind: string, id: string) =>
   expect(dispatch(s, start(kind, id), content, plainRules)).toEqual({ ok: true });
-
-/** The number of a thousandth: the data is rounded to it. */
-const ROUND = 0.0015;
 
 describe('explicit cycle and XP per action', () => {
   const lists = [
@@ -104,12 +101,13 @@ describe('explicit cycle and XP per action', () => {
       const perHour = ((h.xp ?? 0) * 3600) / ((h.cycle ?? 1) + pause);
       expect(perHour / rate(h.level, content), h.id).toBeCloseTo(1, 3);
     }
-    void ROUND;
   });
 
   it('pays a practice cycle the pace of the technique at mastery 1: its XP per hour is what it was', () => {
     const t = content.techniques.find((x) => x.id === 'core:great_fireball')!;
-    expect(practiceXp(t, content)).toBe(t.practiceXp);
+    // The importer's number and the core fallback (a technique of a pack without the field) agree.
+    expect(t.practiceXp).toBeDefined();
+    expect(practiceXp({ ...t, practiceXp: undefined }, content)).toBeCloseTo(t.practiceXp!, 2);
     const s = genin();
     s.player.natures = [t.skill];
     setLevel(s, t.skill, t.level);
@@ -274,6 +272,5 @@ describe('the mastery milestones of the model', () => {
     expect(hoursTo(50)).toBeLessThan(6);
     expect(hoursTo(99)).toBeGreaterThan(200);
     expect(hoursTo(99)).toBeLessThan(400);
-    void HOUR;
   });
 });

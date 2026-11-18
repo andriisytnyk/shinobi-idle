@@ -203,10 +203,10 @@
   }
 
   .facts {
-    display: grid;
-    grid-template-columns: repeat(3, auto);
+    display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
-    gap: var(--space-2);
+    gap: var(--space-1) var(--space-2);
     margin: 0;
   }
 
@@ -217,6 +217,7 @@
 
   dd {
     margin: 0;
+    white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
 

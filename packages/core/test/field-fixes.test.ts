@@ -12,6 +12,7 @@ import {
   rate,
   refreshUnlocks,
   serialize,
+  xpAt,
   type Command,
   type GameState,
 } from '../src/index.ts';
@@ -193,13 +194,24 @@ describe('selectors cover gather and craft', () => {
     expect(ready?.inputs.map((i) => i.have)).toEqual([2, 1]);
   });
 
-  it('XP per hour of a gather matches what an hour of gathering gives', () => {
-    const s = genin();
-    const info = actionInfo(s, { kind: 'gather', id: MINT }, content);
-    ok(s, start('gather', MINT));
-    advance(s, HOUR, content);
-    // The XP of a gather is fixed; a bush grows with mastery, so its regrow pause is shared among more herbs and an hour pays a little more.
-    expect(s.skills.herb!.xp / (info?.xpPerHour ?? 1)).toBeGreaterThan(0.98);
-    expect(s.skills.herb!.xp / (info?.xpPerHour ?? 1)).toBeLessThan(1.3);
-  });
+  // The XP of a gather is fixed against a first-size bush, while the bush grows with mastery, so its regrow pause is
+  // shared among more herbs and an hour pays more: the accepted mastery benefit of gathering, measured in the
+  // balance model ("Темп дії"): mint 1.00x at mastery 1, about 1.25x at 25, 1.29x at 50, 1.31x at 99. The band is
+  // that measurement; a change of it is a change of the model, to be decided and written there.
+  for (const [mastery, low, high] of [
+    [1, 1.0, 1.25],
+    [25, 1.2, 1.3],
+    [99, 1.25, 1.35],
+  ] as const) {
+    it(`XP per hour of a gather at mastery ${mastery} is the model's rate times the mastery benefit`, () => {
+      const s = genin();
+      s.mastery[MINT] = { xp: xpAt(mastery) };
+      ok(s, start('gather', MINT));
+      advance(s, HOUR, content);
+      const ratio =
+        s.skills.herb!.xp / rate(content.herbs.find((h) => h.id === MINT)!.level, content);
+      expect(ratio).toBeGreaterThan(low);
+      expect(ratio).toBeLessThan(high);
+    });
+  }
 });

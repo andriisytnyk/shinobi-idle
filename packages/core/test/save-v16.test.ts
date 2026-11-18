@@ -22,7 +22,8 @@ describe('migration v15 -> v16', () => {
     expect(Object.keys(loaded.skills)).not.toContain('eva');
     expect(Object.keys(loaded.pools)).not.toContain('eva');
     expect(loaded.skills.tai?.xp).toBe(1234);
-    expect(loaded.pools.tai?.xp).toBe(77);
+    // The v17 -> v18 migration scales every pool by 2000 / 1500 on the way.
+    expect(loaded.pools.tai?.xp).toBeCloseTo((77 * 2000) / 1500, 9);
     expect(content.skills).toHaveLength(15);
   });
 });

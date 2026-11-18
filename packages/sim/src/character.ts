@@ -27,7 +27,9 @@ export const TYPICAL_MASTERY = 20;
 export const DEFENCE_PRACTICE_SHARE = 0.15;
 /**
  * Mastery XP per hour the yardstick character earns while it practises: the flat pace the fight fit was
- * recorded at (the mastery pace by level, `K.mastery`, came later and is not part of the yardstick).
+ * recorded at (the mastery pace by level, `K.mastery`, came later and is not part of the yardstick). Keeping it flat costs
+ * at most 0.4 points of the enemy-hit chance against the real level-based pace (measured in the review of #105:
+ * typical defence mastery -3 levels at L8-L20, +1 at L45-L50), so it stays unless a fit needs the real one.
  */
 export const YARDSTICK_MASTERY_PER_HOUR = 10500;
 /** How many skills a typical player trains at once: its hours to reach a level are this many times the hours of one skill. */

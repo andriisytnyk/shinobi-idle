@@ -43,7 +43,7 @@ describe('saves of version 17 recorded on dev', () => {
     it(`${name}: loads as dev saved it, and knows only the gate of the start besides`, () => {
       const { state, dev } = load(name);
       expect(state.v).toBe(STATE_VERSION);
-      expect(STATE_VERSION).toBe(17);
+      expect(STATE_VERSION).toBeGreaterThanOrEqual(17);
       expect(state.now).toBe(dev.now);
       expect(state.world.location).toBe(dev.location);
       expect(state.world.figures ?? null).toEqual(dev.figures);
@@ -66,7 +66,7 @@ describe('saves of version 17 recorded on dev', () => {
       for (let done = 0; done < total; done += 4321)
         advance(parts, Math.min(4321, total - done), content);
       expect(serialize(parts)).toBe(serialize(whole));
-      expect(JSON.parse(serialize(whole)).state.v).toBe(17);
+      expect(JSON.parse(serialize(whole)).state.v).toBe(STATE_VERSION);
     });
   }
 
