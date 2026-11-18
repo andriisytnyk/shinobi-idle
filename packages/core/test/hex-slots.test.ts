@@ -220,10 +220,12 @@ describe('performers on the map', () => {
       const state = twoSlots();
       dispatch(state, walkTo(1, 'core:rysovi_polia'), content);
       advance(state, 60 * MIN, content);
-      // Arrived: the walk is done, so the clone is gone from the map (it has nothing left to do).
-      expect(state.slots[1]?.action).toBeNull();
-      expect(state.world.figures?.[1]).toBeUndefined();
+      // Arrived: the clone stays where it is, standing still in its slot (issue #95).
+      expect(state.slots[1]?.action).toEqual({ kind: 'stand', id: 'here' });
+      expect(positionOf(state, 1)).toBe('core:rysovi_polia');
       expect(state.world.location).toBe(HOME);
+      expect(dispatch(state, { type: 'action.stop', slot: 1 }, content)).toEqual({ ok: true });
+      expect(state.world.figures?.[1]).toBeUndefined();
       // A clone that surveys and a character that walks: the survey keeps its position.
       const auto: Command = {
         type: 'action.start',

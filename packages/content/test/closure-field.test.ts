@@ -144,10 +144,16 @@ describe('coating', () => {
 });
 
 describe('herbs and gear', () => {
-  it('rare herbs ask for Chakra Control', () => {
+  it('rare herbs ask for Chakra Control and for the place where they grow (a point of interest found)', () => {
     const req = (id: string) => content.herbs.find((h) => h.id === id)?.req;
     expect(req('core:edelweiss')).toEqual({ t: 'skill', skill: 'cc', level: 15 });
-    expect(req('core:lotus')).toEqual({ t: 'skill', skill: 'cc', level: 30 });
+    expect(req('core:lotus')).toEqual({
+      t: 'all',
+      of: [
+        { t: 'skill', skill: 'cc', level: 30 },
+        { t: 'flag', id: 'point.core:waterfall_shrine' },
+      ],
+    });
     expect(content.herbs.filter((h) => h.req)).toHaveLength(2);
   });
 

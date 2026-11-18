@@ -52,6 +52,7 @@ export const PLACES: readonly Place[] = [
   { path: 'world.explores', rule: 'keys' },
   { path: 'world.pois', rule: 'keys' },
   { path: 'world.claimed', rule: 'keys' },
+  { path: 'world.stock', rule: 'keys' },
   { path: 'village.levels', rule: 'keys' },
   { path: 'village.res', rule: 'keys' },
   { path: 'village.shinobi', rule: 'keys' },

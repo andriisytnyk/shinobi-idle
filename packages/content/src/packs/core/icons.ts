@@ -122,6 +122,9 @@ export const CORE_ICONS: Readonly<Record<string, Readonly<Record<string, string>
     'core:medpouch': 'medical-pack',
     // Misc
     'core:crate': 'wooden-crate',
+    'core:timber_scraps': 'wooden-crate',
+    'core:ore_chunk': 'gems',
+    'core:river_catch': 'meat',
     'core:gem': 'gems',
     'core:band': 'headband-knot',
     'core:pelt': 'fur-shirt',

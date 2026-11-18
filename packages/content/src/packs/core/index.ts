@@ -25,6 +25,7 @@ import handBossSpecials from './data/hand/boss-specials.json' with { type: 'json
 import handBuildings from './data/hand/buildings.json' with { type: 'json' };
 import handCellKeys from './data/hand/cell-keys.json' with { type: 'json' };
 import handCellPois from './data/hand/cell-pois.json' with { type: 'json' };
+import handPlaceWorth from './data/hand/place-worth.json' with { type: 'json' };
 import handCombos from './data/hand/combos.json' with { type: 'json' };
 import handEnemyCombat from './data/hand/enemy-combat.json' with { type: 'json' };
 import handCoat from './data/hand/coat.json' with { type: 'json' };
@@ -76,6 +77,8 @@ import {
   layerEnemies,
   layerGear,
   layerObstacles,
+  layerPlaces,
+  placeWorthMapSchema,
   layerPools,
   layerPractices,
   layerHerbs,
@@ -162,7 +165,7 @@ const data: Record<string, unknown> = {
   cells: layerCells(z.array(cellBaseSchema).parse(cells), cellPoiMapSchema.parse(handCellPois)),
   hexes,
   countries,
-  places,
+  places: layerPlaces(places as never, placeWorthMapSchema.parse(handPlaceWorth)),
   cellKeys: handCellKeys,
   enemies: layerEnemies(z.array(enemyBaseSchema).parse(enemies), enemyCombat, bal.K),
   bosses: layerBosses(

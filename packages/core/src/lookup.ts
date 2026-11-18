@@ -66,6 +66,8 @@ export interface ContentIndex {
   terrains: Map<string, Terrain>;
   /** The cell that stands on each hex, by hex key. */
   cellByHex: Map<string, Cell>;
+  /** The named places by id. */
+  places: Map<string, Place>;
   /** The named places on each hex, by hex key. */
   placesByHex: Map<string, Place[]>;
   /** The hexes of the grid that have a terrain, in the order of the grid. */
@@ -197,6 +199,7 @@ function build(content: ContentDb): ContentIndex {
     hexes: new Map(content.hexes.map((h) => [`${h.q},${h.r}`, h])),
     terrains: byId(content.terrains),
     cellByHex,
+    places: byId(content.places),
     placesByHex,
     regions: byId(content.regions),
     pois,

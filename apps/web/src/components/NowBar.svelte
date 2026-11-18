@@ -34,6 +34,7 @@
     explore: 'now.doing.explore',
     walk: 'now.doing.walk',
     autosurvey: 'now.doing.autosurvey',
+    stand: 'now.doing.stand',
     fight: 'now.doing.fight',
     mission: 'now.doing.mission',
     senseiTest: 'now.doing.exam',
@@ -87,7 +88,7 @@
         if (intervalMs === undefined) return;
         const isExplore = slot.action.kind === 'explore';
         const isWalk = slot.action.kind === 'walk';
-        const ref = actionRef(slot.action, state);
+        const ref = actionRef(slot.action, state, index);
         // Exploring has no tile; its XP per hour comes from the map view of the cell. A hex in fog
         // is only "a hex": the numbers of the cell on it are not shown before it is surveyed.
         const mapInfo =

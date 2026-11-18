@@ -125,14 +125,14 @@
       "maps": "3d5d6de0a0ae"
     },
     "terrains": {
-      "forest": "a9b1eb103c2d",
-      "plains": "bfaadb4be8c1",
-      "hills": "533080d625e9",
-      "coast": "91cd4cb24505",
-      "river": "1dae27391bcd",
-      "road": "570ca15751d9",
+      "forest": "f55161cda4ba",
+      "plains": "12779601d3a2",
+      "hills": "8b8744e06617",
+      "coast": "cbb32bb463c4",
+      "river": "409f7432d818",
+      "road": "70cd1d0826a6",
       "settlement": "77440777493c",
-      "lake": "2602f3d44229"
+      "lake": "827e91e1614e"
     },
     "countries": {
       "core:fire": "6904141396d4",
@@ -292,7 +292,7 @@
       "core:silvermoss": "1b75189b9765",
       "core:edelweiss": "28ae3b916c0f",
       "core:fireflower": "8888b204bb12",
-      "core:lotus": "8c5f3d1ddfab",
+      "core:lotus": "d201f13f78c7",
       "core:shadowshroom": "d52583b2def8"
     },
     "pools": {
@@ -433,7 +433,10 @@
       "core:scroll_starch_syrup_capturing_field": "2ed026831dd0",
       "core:scrollpart_fire_dragon_flame_bullet": "37d393b5afa3",
       "core:chunin_vest": "8e1ee1c6ce30",
-      "core:gai_lesson": "7c69f7e61771"
+      "core:gai_lesson": "7c69f7e61771",
+      "core:timber_scraps": "9504e46a5692",
+      "core:ore_chunk": "7f7bd31ae05e",
+      "core:river_catch": "c159ad907705"
     },
     "market": {
       "core:water": "e3f682cbd50f",
@@ -1700,28 +1703,28 @@
       "core:hidden_leaf": "ada1c7fd1df3",
       "core:tanzaku": "a517c9a36393",
       "core:shukuba": "9678e24d1fa4",
-      "core:valley_of_the_end": "c87be17232dc",
-      "core:fire_temple": "5f5fe6a3fa96",
-      "core:training_ground_44": "3d39d5d7d525",
-      "core:nara_forest": "2730f4c871e6",
-      "core:kikyo_pass": "09b039fc4631",
-      "core:jofuku_forest": "0a225b7dac59",
+      "core:valley_of_the_end": "e5ad85d6e467",
+      "core:fire_temple": "4e4776e74a64",
+      "core:training_ground_44": "b95378e5600d",
+      "core:nara_forest": "e2de6290b249",
+      "core:kikyo_pass": "dc6dc2daabb1",
+      "core:jofuku_forest": "b93e7bfefa22",
       "core:bamboo_village": "f5217a5ecb9b",
-      "core:hell_valley": "dc35ed86a963",
-      "core:west_gate_post": "760d4f68f355",
-      "core:rice_hamlet": "c489dc15e9aa",
-      "core:charcoal_camp": "6add41ea0637",
-      "core:fishers_camp": "699e85c5f7b5",
-      "core:caravan_yard": "ae5e755eb422",
-      "core:mercenary_den": "228a8c158834",
-      "core:war_fort_ruins": "0e853bc20dba",
-      "core:fort_cellar": "f5df982ac2ef",
-      "core:salt_pans": "b1c6765feaee",
-      "core:deserted_farm": "fdc55400cbff",
-      "core:hunter_lodge": "f7f49d0e5d01",
-      "core:waterfall_shrine": "32960299b88e",
-      "core:wayside_teahouse": "6974cec1a82d",
-      "core:fishing_village": "bfa81332d64d"
+      "core:hell_valley": "bbecbd7ce7c8",
+      "core:west_gate_post": "0702230801b9",
+      "core:rice_hamlet": "ba9a937e68c8",
+      "core:charcoal_camp": "f2a31949eaea",
+      "core:fishers_camp": "e78b3075acf5",
+      "core:caravan_yard": "5c7c9aff2701",
+      "core:mercenary_den": "e224024ce2ef",
+      "core:war_fort_ruins": "ce3fe1db335b",
+      "core:fort_cellar": "1bc9774b6abc",
+      "core:salt_pans": "66c220aee6b2",
+      "core:deserted_farm": "640633922d86",
+      "core:hunter_lodge": "bd5638de5058",
+      "core:waterfall_shrine": "0bc45d9c608a",
+      "core:wayside_teahouse": "4499b7dc8f69",
+      "core:fishing_village": "d4fef75f085c"
     },
     "links": {},
     "cellKeys": {
@@ -2475,6 +2478,42 @@
       18
     ],
     "K.map.plainScout": 1,
+    "K.map.walk.athLevel": 3,
+    "K.map.walk.scoutLevel": 2,
+    "K.map.travel.ryoPerMinute": 1.5,
+    "K.map.travel.min": 5,
+    "K.map.mastery": [
+      {
+        "hexes": 30,
+        "mods": [
+          {
+            "key": "xp.skill.scout",
+            "op": "add",
+            "value": 0.05
+          }
+        ]
+      },
+      {
+        "hexes": 60,
+        "mods": [
+          {
+            "key": "travel.price",
+            "op": "add",
+            "value": -0.1
+          }
+        ]
+      },
+      {
+        "hexes": "all",
+        "mods": [
+          {
+            "key": "interval.explore",
+            "op": "add",
+            "value": -0.05
+          }
+        ]
+      }
+    ],
     "K.masteryCap": 99,
     "K.meditation.insightChance": 0.05,
     "K.meditation.enlightChance": 0.02,
@@ -3031,7 +3070,10 @@
       "core:scroll_starch_syrup_capturing_field",
       "core:scrollpart_fire_dragon_flame_bullet",
       "core:chunin_vest",
-      "core:gai_lesson"
+      "core:gai_lesson",
+      "core:timber_scraps",
+      "core:ore_chunk",
+      "core:river_catch"
     ],
     "market": [
       "core:water",
@@ -5677,6 +5719,16 @@
       "trait.pack.desc": "e2ced996379b",
       "trait.poisoner.desc": "8d3608c0e158",
       "trait.regen.desc": "ce06f9e7758e",
+      "item.core:timber_scraps.name": "6aaa56801420",
+      "item.core:timber_scraps.desc": "887ebb23347c",
+      "item.core:ore_chunk.name": "9220cc038bfa",
+      "item.core:ore_chunk.desc": "46f599e370b3",
+      "item.core:river_catch.name": "037419591cd0",
+      "item.core:river_catch.desc": "114bb1943873",
+      "place.core:valley_of_the_end.hint": "c0b626aa783c",
+      "place.core:fire_temple.hint": "ed86499d1008",
+      "place.core:hell_valley.hint": "e7fdaec427e1",
+      "place.core:mercenary_den.hint": "1ac44e167f50",
       "technique.core:body_replacement.dodge": "930571e18207",
       "technique.core:clone.dodge": "f819114616be",
       "technique.core:earth_style_wall.dodge": "26f993b75b46",
@@ -6052,7 +6104,7 @@
       "error.notSellable": "67719ee4a61a",
       "error.packRuleFailed": "be1bb3a4e28d",
       "error.notEnoughCurrency": "dc671808af5b",
-      "error.notEnoughRyo": "2ee87f3d2019",
+      "error.notEnoughRyo": "19d6d7304744",
       "error.unknownGear": "41a647bae199",
       "error.gearMaxed": "da5251b9a2c0",
       "error.unknownObstacle": "078f4207d1d9",
@@ -6503,14 +6555,12 @@
       "world.explore.stop": "06e9f4802c94",
       "world.explore.running": "7f00007a7248",
       "world.travel.title": "f4c3f54a0ac8",
-      "world.travel.instant": "f7242993fab1",
       "world.travel.cost": "63fccc15f1a0",
-      "world.travel.free": "8336cd4547aa",
       "world.travel.walk": "733d6e3e16af",
       "world.travel.here": "ffd6bd885156",
       "world.poi.title": "b952449fcdce",
       "world.poi.none": "2472853bde27",
-      "world.poi.kind.outpost": "8c1fcfeb4894",
+      "world.poi.kind.outpost": "6df531ed6a4f",
       "world.poi.kind.training": "0b395b22cc70",
       "world.poi.kind.zone": "c41cc0ec7628",
       "world.poi.kind.story": "45a3e1a558d5",
@@ -6524,7 +6574,7 @@
       "world.poi.zoneEnemy": "70be6fecb2d2",
       "world.poi.story": "575a8efb043b",
       "world.poi.deposit": "52e8b49f5b33",
-      "world.poi.outpost": "10052cab33f8",
+      "world.poi.outpost": "41b78b65fd8e",
       "world.poi.mission": "aafff6f249d0",
       "world.poi.lootCache": "f834ce4acdfb",
       "world.poi.lootVault": "cef7fa787252",
@@ -6745,13 +6795,47 @@
       "map.panel.notSurveyed": "1a6e70173d56",
       "map.panel.level": "3956b7ceb43c",
       "map.places": "49628616e2fa",
+      "req.pointFound": "31215b424179",
+      "req.pointHidden": "010cc1f86ac7",
+      "error.notAtOutpost": "97d6d0a71dc3",
+      "error.notOutpostTarget": "a949a4fec61e",
+      "map.points": "b952449fcdce",
+      "map.point.found": "54dd88390977",
+      "map.point.open": "c48314a6eca9",
+      "map.point.veiled": "80c901163281",
+      "map.point.outpost": "43d8e5962c56",
+      "map.point.power": "df7d8b6c61bc",
+      "map.point.active": "eb3109c2cea2",
+      "map.point.reward": "6bef833cdd02",
+      "map.point.rewardUnknown": "97e903b2acb1",
+      "map.point.bonus": "6b96022a6bea",
+      "map.point.outpostHint": "9a5cd02e1b7c",
+      "map.act.walk": "cc243fad4ada",
+      "map.act.paid": "f1b8e062dea0",
+      "map.act.free": "f66440443989",
+      "map.route": "868e4f858e15",
+      "map.route.free": "6d20db341277",
+      "map.mod.xpSkill": "c569c196325c",
+      "map.mod.gather.double": "35a779e696f6",
+      "map.mod.bush.regrow": "301332b1c089",
+      "map.mod.craft.keep.prov": "1d5606feb790",
+      "map.mod.interval.explore": "ec02cfa69566",
+      "map.mod.travel.price": "0a2017ad3d3b",
+      "map.reward.xp": "2281a8d6ccc2",
+      "map.mastery.title": "d96687913485",
+      "map.mastery.progress": "596b894e58b8",
+      "map.mastery.tier": "bccf9dc7298c",
+      "map.mastery.tierAll": "461bc4db8af4",
+      "mod.source.mapMastery": "d96687913485",
+      "now.doing.stand": "833a78aebf2d",
+      "toast.pointFound": "ea41722a9ce5",
+      "toast.wayFound": "76b28e7ea77f",
       "map.next.fog": "ae00ead24d6a",
       "map.next.cell0": "018421a95b20",
-      "map.next.plain": "b6e2216d9157",
+      "map.next.plain": "3e8adf61d855",
       "map.next.max": "2a815e0c83c6",
       "map.act.survey": "07beefdf2834",
       "map.act.surveyStop": "06e9f4802c94",
-      "map.act.go": "821d39368f7f",
       "map.act.auto": "fbec5312f2b9",
       "map.act.autoStop": "4ee7bb195c26",
       "map.running.survey": "fd9229bace44",
@@ -7212,6 +7296,9 @@
       "core:parsenbon": "needle-jaws",
       "core:medpouch": "medical-pack",
       "core:crate": "wooden-crate",
+      "core:timber_scraps": "wooden-crate",
+      "core:ore_chunk": "gems",
+      "core:river_catch": "meat",
       "core:gem": "gems",
       "core:band": "headband-knot",
       "core:pelt": "fur-shirt",
@@ -7543,6 +7630,7 @@
     "shop.price": "f0c8b77ab532",
     "interval.explore": "35a1012d19c2",
     "interval.walk": "a9267976f157",
+    "travel.price": "d61af9953e40",
     "bush.stock": "b1c0488ecc13",
     "bush.regrow": "73e5d807096b",
     "gather.double": "a36fc6419686",
@@ -8324,7 +8412,10 @@
       "outpostRange",
       "startRadius",
       "plainSurvey",
-      "plainScout"
+      "plainScout",
+      "walk",
+      "travel",
+      "mastery"
     ],
     "K.map.terrain": [
       "road",
@@ -8367,6 +8458,14 @@
     "K.map.terrain.lake": [
       "walkMin",
       "survey"
+    ],
+    "K.map.walk": [
+      "athLevel",
+      "scoutLevel"
+    ],
+    "K.map.travel": [
+      "ryoPerMinute",
+      "min"
     ],
     "K.meditation": [
       "insightChance",

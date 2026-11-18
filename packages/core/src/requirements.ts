@@ -43,7 +43,12 @@ export function skillLevel(state: GameState, skill: string, content: ContentDb):
   return levelAt(skillEntry(state, skill)?.xp ?? 0, levelCap(content));
 }
 
+/** The prefix of the flags that read a point of interest found (see `pointFlag`): they are not stored, `world.pois` is. */
+const POINT_FLAG = 'point.';
+
 const flagValue = (state: GameState, id: string): number => {
+  if (id.startsWith(POINT_FLAG))
+    return state.world.pois[id.slice(POINT_FLAG.length)] === true ? 1 : 0;
   const v = state.flags[id];
   return v === undefined ? 0 : v === true ? 1 : v;
 };

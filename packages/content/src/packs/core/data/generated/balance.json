@@ -811,7 +811,47 @@
         6,
         18
       ],
-      "plainScout": 1
+      "plainScout": 1,
+      "walk": {
+        "athLevel": 3,
+        "scoutLevel": 2
+      },
+      "travel": {
+        "ryoPerMinute": 1.5,
+        "min": 5
+      },
+      "mastery": [
+        {
+          "hexes": 30,
+          "mods": [
+            {
+              "key": "xp.skill.scout",
+              "op": "add",
+              "value": 0.05
+            }
+          ]
+        },
+        {
+          "hexes": 60,
+          "mods": [
+            {
+              "key": "travel.price",
+              "op": "add",
+              "value": -0.1
+            }
+          ]
+        },
+        {
+          "hexes": "all",
+          "mods": [
+            {
+              "key": "interval.explore",
+              "op": "add",
+              "value": -0.05
+            }
+          ]
+        }
+      ]
     },
     "masteryCap": 99,
     "meditation": {

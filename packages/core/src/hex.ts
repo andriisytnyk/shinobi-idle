@@ -95,6 +95,9 @@ export const touchWorld = (state: GameState): void => {
   revisions.set(state, (revisions.get(state) ?? 0) + 1);
 };
 
+/** The revision of the surveyed land of a state (see `touchWorld`): a cheap stamp for what depends on the surveys alone. */
+export const worldRevision = (state: GameState): number => revisions.get(state) ?? 0;
+
 /**
  * What the remembered searches of a state were made for: the revision, and the sizes of the lists
  * of surveys (a list changed behind the engine's back changes its size, as a doctored or a test

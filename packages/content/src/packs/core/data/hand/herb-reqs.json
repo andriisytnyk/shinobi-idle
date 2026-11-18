@@ -1,4 +1,10 @@
 {
   "core:edelweiss": { "t": "skill", "skill": "cc", "level": 15 },
-  "core:lotus": { "t": "skill", "skill": "cc", "level": 30 }
+  "core:lotus": {
+    "t": "all",
+    "of": [
+      { "t": "skill", "skill": "cc", "level": 30 },
+      { "t": "flag", "id": "point.core:waterfall_shrine" }
+    ]
+  }
 }

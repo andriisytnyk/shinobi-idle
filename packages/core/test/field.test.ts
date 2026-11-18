@@ -68,10 +68,13 @@ describe('gather', () => {
     setLevel(s, 'herb', 35);
     refused(s, gather('core:edelweiss'), 'error.requirementsNotMet');
     setLevel(s, 'cc', 15);
+    // Edelweiss needs no point of interest and no elemental key (a player with no Futon can gather it).
     ok(s, gather('core:edelweiss'));
     setLevel(s, 'herb', 45);
     refused(s, gather('core:lotus'), 'error.requirementsNotMet');
     setLevel(s, 'cc', 30);
+    refused(s, gather('core:lotus'), 'error.requirementsNotMet');
+    s.world.pois['core:waterfall_shrine'] = true;
     ok(s, gather('core:lotus'));
   });
 
