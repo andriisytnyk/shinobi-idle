@@ -62,7 +62,8 @@ function hits(): Hit[] {
 
 /** Files whose raw ids are fine, and why: the entity cannot be hidden where the id is written. */
 const ALLOWED: Record<string, string> = {
-  'components/Breadcrumb.svelte': 'navigation links of a page, not entities',
+  'components/CloneRolePicker.svelte': 'roles of the clones have no reveal rule: all are shown',
+  'components/Breadcrumb.svelte':'navigation links of a page, not entities',
   'components/BuffStrip.svelte': 'a running tonic: the player has held it',
   'components/BuildingCard.svelte': 'buildings have no reveal rule: always shown',
   'components/BuildingNeed.svelte': 'buildings: always shown',
