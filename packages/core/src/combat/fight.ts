@@ -194,9 +194,9 @@ export function boundOf(ctx: FightCtx, c: Combatant): Bound {
   return made;
 }
 
-/** What a guarded call of a hook of a body may change: the body and the player. */
+/** What a guarded call of a hook of a body may change: the body and every body of the player's side (the character and the allies). */
 const bodiesOf = (ctx: FightCtx, c: Combatant, event: boolean): GuardOptions<void | undefined> => ({
-  bodies: c === ctx.fight.player ? [c] : [c, ctx.fight.player],
+  bodies: [c, ...sideBodies(ctx.fight).filter((b) => b !== c)],
   event,
 });
 const FACTOR: GuardOptions<number> = { check: isFactor };
@@ -792,6 +792,8 @@ function checkResult(fight: FightState): boolean {
 /** What the action that is being resolved did, collected from the notes of its hits. */
 interface ActRecord {
   avoidedBy: string | null;
+  /** The body an enemy's blow landed on (or missed), when the action struck one. */
+  struck: string | null;
   hit: boolean;
   miss: boolean;
   damage: number;
@@ -845,6 +847,7 @@ function resolveAs(
   const was = resolving;
   const rec: ActRecord = {
     avoidedBy: null,
+    struck: null,
     hit: false,
     miss: false,
     damage: 0,
@@ -857,6 +860,16 @@ function resolveAs(
   } finally {
     resolving = was;
   }
+  // Named only when it is not the plain case, so that a fight with no allies is written as it always was: an enemy's blow on a body
+  // other than the character, and what an ally aimed at.
+  const target =
+    rec.struck !== null
+      ? rec.struck === fight.player.id
+        ? null
+        : rec.struck
+      : c === fight.player
+        ? null
+        : act.target;
   c.last = {
     kind: act.kind,
     id: act.id,
@@ -866,6 +879,7 @@ function resolveAs(
     combos: grown(rec.combos, fight.tally.combos),
     at: fight.t,
     avoidedBy: rec.avoidedBy,
+    ...(target === null ? {} : { target }),
   };
   if (log) note(fight, c.side, 'resolve', act.id, rec.damage, c.id, undefined, allyOf(c));
   return rec;
@@ -1431,7 +1445,8 @@ function startTechnique(
   // Mastery is paid for the fight time since the previous technique use (or the fight's start), by whichever body cast: an ally's cast is the character's.
   count(fight.tally.masteryWork, tech.id, fight.t - fight.tally.lastUseAt);
   fight.tally.lastUseAt = fight.t;
-  fight.tally.style = tech.skill;
+  // The style the combat XP follows is the character's own: an ally's cast pays its technique's Mastery (above), not the style.
+  if (actor === fight.player) fight.tally.style = tech.skill;
   note(fight, 'player', 'cast', tech.id, 0, player.id, undefined, allyOf(actor));
 }
 
@@ -1454,7 +1469,9 @@ function startBasic(
     needOf(player.strikeMs),
     player.timer.progress,
   );
-  fight.tally.style = fightData(ctx.content).basicSkill ?? fight.tally.style;
+  if (actor === fight.player) {
+    fight.tally.style = fightData(ctx.content).basicSkill ?? fight.tally.style;
+  }
   note(fight, 'player', 'cast', null, 0, player.id, undefined, allyOf(actor));
 }
 
@@ -1785,6 +1802,7 @@ function enemyAttack(ctx: FightCtx, enemy: Combatant, aimedAt: string | null): v
   // The body the wind-up was aimed at, if it still stands; otherwise the enemy aims anew.
   const player = sideBodies(fight).find((b) => b.id === aimedAt && alive(b)) ?? pickVictim(ctx);
   const ally = allyOf(player);
+  if (resolving) resolving.struck = player.id;
   const plan: AttackPlan = {
     chance: hitChance(
       stat(ctx, enemy, 'accuracy', enemy.accuracy),
@@ -1846,14 +1864,15 @@ export function hitChanceOf(ctx: FightCtx, attacker: Combatant, target: Combatan
   );
 }
 
-/** A heavy blow, for hooks such as the caster's: like every incoming strike it rolls once, its accuracy against the player's evasion. */
-export function heavyBlow(ctx: FightCtx, enemy: Combatant, damage: number): boolean {
+/** A heavy blow, for hooks such as the caster's: like every incoming strike it rolls once, its accuracy against the evasion of the body it strikes. Returns that body when the blow lands, else null. */
+export function heavyBlow(ctx: FightCtx, enemy: Combatant, damage: number): Combatant | null {
   const player = pickVictim(ctx);
   const ally = allyOf(player);
+  if (resolving) resolving.struck = player.id;
   if (!rollHit(ctx, player, hitChanceOf(ctx, enemy, player))) {
     const via = ally === undefined ? avoidedBy(ctx) : null;
     note(ctx.fight, 'enemy', 'miss', null, 0, undefined, via ?? undefined, ally);
-    return false;
+    return null;
   }
   note(
     ctx.fight,
@@ -1865,7 +1884,7 @@ export function heavyBlow(ctx: FightCtx, enemy: Combatant, damage: number): bool
     undefined,
     ally,
   );
-  return true;
+  return player;
 }
 
 function tickEffects(ctx: FightCtx, c: Combatant): void {
@@ -1980,6 +1999,8 @@ function handle(ctx: FightCtx): void {
     runTimers(ctx, e);
   }
   runTimers(ctx, player);
+  // A timer a hook armed on an ally fires like the character's.
+  for (const a of alliesOf(fight)) if (alive(a)) runTimers(ctx, a);
   if (checkResult(fight)) return;
 
   while (fight.poolAt <= fight.t) {

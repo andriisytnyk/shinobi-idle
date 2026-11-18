@@ -117,7 +117,7 @@ describe('allies act, are targeted, fall', () => {
       }
     }
     // Every body acted, and the cooldown of one is not the other's.
-    expect(seen.size).toBeGreaterThanOrEqual(1);
+    expect(seen.size).toBe(alliesOf(fight).length);
     const [a, b] = alliesOf(fight);
     expect(a?.id).not.toBe(b?.id);
   });
@@ -245,7 +245,12 @@ describe('what reaches the allies, and what does not', () => {
     const heal = content.items.find((i) => i.fx?.kind === 'heal');
     if (!heal) throw new Error('no healing item');
     const snap = { ...scripted([CLONE, DYNAMIC, GALE]), pouch: [{ id: heal.id, n: 5 }], medic: 0 };
-    const r = withAi(castSeq(CLONE, DYNAMIC));
+    // The character summons, then drinks whatever it holds.
+    const r = withAi((view) =>
+      view.techniques.some((x) => x.ready && x.tech.id === CLONE)
+        ? { type: 'technique', id: CLONE }
+        : { type: 'item', id: heal.id },
+    );
     const fight = createFight(snap, enemyAt(20), 3, content, r);
     while ((fight.tally.uses[CLONE] ?? 0) < 1) {
       fightAdvance(fight, fightNextEventIn(fight, content, r) ?? 1, content, r);
@@ -253,11 +258,12 @@ describe('what reaches the allies, and what does not', () => {
     for (const a of alliesOf(fight)) a.hp = a.maxHp * 0.1;
     fight.player.hp = fight.player.maxHp * 0.5;
     const before = alliesOf(fight).map((a) => a.hp);
-    const ctx = makeCtx(fight, content, r);
+    const healthBefore = fight.player.hp;
     // The player's hand item heals the character; the medic pouch of the AI is the character's too.
     expect(fightStatus(fight, content, r).allies).toHaveLength(2);
-    void ctx;
     fightAdvance(fight, sec(5), content, r);
+    expect(fight.pouch[0]?.n).toBeLessThan(5);
+    expect(fight.player.hp).toBeGreaterThan(healthBefore);
     // Only an ally's own technique could mend it, and the clone has none: its health never rises.
     alliesOf(fight).forEach((a, i) => expect(a.hp).toBeLessThanOrEqual(before[i] ?? 0));
   });
@@ -288,7 +294,7 @@ describe('what reaches the allies, and what does not', () => {
     expect(spent).toBe(itemLines.length);
   });
 
-  it('keeps the techniques that act on the body itself out of an ally hand: no clone of a clone, no gate', () => {
+  it('keeps the techniques that act on the body itself out of an ally hand: no clone of a clone', () => {
     const { fight, r } = summoned();
     fight.log = [];
     fightAdvance(fight, sec(60), content, r);

@@ -1403,7 +1403,7 @@
   "village.raid.toFight": "До бою",
   "fight.ally": "Клон №{n}",
   "fight.allies": "Бойові клони",
-  "fight.allyIdle": "Вичікує",
+  "fight.out.allyDodged": "Клон №{n} ухилився",
   "log.allyCast": "готує:",
   "log.allyHit": "влучив технікою",
   "log.allyMiss": "схибив технікою",

@@ -189,13 +189,7 @@ const skills: Skill[] = SKILL_IDS.map((id) => {
   const unlockReq: Skill['unlockReq'] = open
     ? null
     : fight
-      ? {
-          t: 'any',
-          of: [
-            { t: 'flag', id: FIRST_FIGHT_FLAG },
-            { t: 'rank', rank: 'genin' },
-          ],
-        }
+      ? { t: 'any', of: [{ t: 'flag', id: FIRST_FIGHT_FLAG }, { t: 'rank', rank: 'genin' }] }
       : (NATURE_IDS as readonly string[]).includes(id)
         ? { t: 'nature', nature: id as NatureId }
         : { t: 'rank', rank: 'genin' };
@@ -245,6 +239,12 @@ const practiceXpOf = (t: Parameters<typeof castOf>[0]): number => {
   const focus = P.practiceFocus.base + P.practiceFocus.perLevel * Math.max(0, t.level - 1);
   return xpOfCycle(t.level, Math.max(P.practiceMin!, cast * P.practiceCast! + focus));
 };
+/**
+ * Techniques that summon bodies instead of dealing damage (amendment row 19: the combat clone). The slice lists the
+ * clone as a damaging area series; as data it deals nothing and answers no trait, so its page, the prepared
+ * loadout and the fight AI read it as what it is.
+ */
+const SUMMONS: ReadonlySet<string> = new Set(['core:shadow_clone']);
 const techniques: TechniqueBase[] = slice.techniques.map((t) => {
   techByUk.set(t.uk, t.id);
   text('technique', t.id, 'name', t.uk);
@@ -260,14 +260,14 @@ const techniques: TechniqueBase[] = slice.techniques.map((t) => {
     rank: t.rank === '—' ? null : (t.rank as TechniqueBase['rank']),
     rankCanon: t.rankCanon,
     role: need(ROLE_BY_UK[t.role], `unknown role "${t.role}"`),
-    tags: t.tags.map(tag),
+    tags: SUMMONS.has(t.id) ? [] : t.tags.map(tag),
     state: t.state === '' ? null : need(STATE_BY_UK[t.state], `unknown state "${t.state}"`),
     src: t.src as TechniqueBase['src'],
     mentor: t.src === 'N' ? (t.home === 'Академія' ? 'academy' : 'other') : null,
     sealSeq: t.sealSeq.map(core),
     sealsCanon: t.sealsCanon,
     tier: t.tier as TechniqueBase['tier'],
-    noDamage: t.noDamage,
+    noDamage: SUMMONS.has(t.id) ? true : t.noDamage,
     cast: Math.round(castOf(t) * 1000) / 1000,
     practiceXp: practiceXpOf(t),
   };
@@ -289,16 +289,8 @@ const exercises: Exercise[] = slice.exercises.map((e) => {
 const VIT_DRILLS: { level: number; uk: string; note: string }[] = [
   { level: 1, uk: 'Біг із тягарем', note: 'Мішок із піском на плечах і коло навколо двору.' },
   { level: 15, uk: 'Віджимання на кулаках', note: 'Кулаки на камінні: біль вчить тіло терпіти.' },
-  {
-    level: 30,
-    uk: 'Стійка під водоспадом',
-    note: "Крижана вода б'є по плечах, доки не потемніє в очах.",
-  },
-  {
-    level: 45,
-    uk: 'Загартування ударами',
-    note: "Напарник б'є дерев'яним мечем, а ти не відступаєш.",
-  },
+  { level: 30, uk: 'Стійка під водоспадом', note: "Крижана вода б'є по плечах, доки не потемніє в очах." },
+  { level: 45, uk: 'Загартування ударами', note: "Напарник б'є дерев'яним мечем, а ти не відступаєш." },
 ];
 for (const d of VIT_DRILLS) {
   const id = core(exerciseSlugs.take(d.uk));
@@ -310,11 +302,7 @@ for (const d of VIT_DRILLS) {
     level: d.level,
     skill: 'vit',
     cycle,
-    xp: xpOfCycle(
-      d.level,
-      cycle,
-      need((P.combatXp as unknown as { vit: number }).vit, 'combatXp.vit'),
-    ),
+    xp: xpOfCycle(d.level, cycle, need((P.combatXp as unknown as { vit: number }).vit, 'combatXp.vit')),
   });
 }
 

@@ -232,8 +232,10 @@ function parseLast(raw: unknown, t: number): LastAct | null | undefined {
   if (!Array.isArray(raw.statuses) || !raw.statuses.every(isStr)) return null;
   if (!Array.isArray(raw.combos) || !raw.combos.every(isStr)) return null;
   if (raw.avoidedBy !== null && !isStr(raw.avoidedBy)) return null;
+  if (raw.target !== undefined && !isStr(raw.target)) return null;
   return {
     avoidedBy: raw.avoidedBy,
+    ...(raw.target === undefined ? {} : { target: raw.target }),
     kind: raw.kind,
     id: raw.id,
     outcome: raw.outcome,
@@ -647,6 +649,11 @@ export function parseFight(raw: unknown, content: ContentDb): FightState | null 
     for (const a of raw.allies) {
       const body = parseCombatant(a, 'player', t, v);
       if (!body || body.ally === undefined) return null;
+      // Ids and numbers are unique (the screen keys its rows by them), and an ally is of a kind the kit holds.
+      const n = body.ally.n;
+      if (body.id === player.id || enemies.some((e) => e.id === body.id)) return null;
+      if (allies.some((x) => x.id === body.id || x.ally?.n === n)) return null;
+      if (!isInt(n) || n < 1 || !kit.techniques.some((x) => x.id === body.ally?.kind)) return null;
       const act = body.act;
       // An ally casts a technique of the kit and strikes plainly; it uses no item and takes no rest.
       if (act && act.kind !== 'basic' && act.kind !== 'technique') return null;
@@ -655,6 +662,11 @@ export function parseFight(raw: unknown, content: ContentDb): FightState | null 
     }
   }
   if (raw.allied !== undefined && (!isInt(raw.allied) || raw.allied < 0)) return null;
+  // The counter that numbers new allies is at least the largest number in use.
+  const allied = Math.max(
+    (raw.allied as number | undefined) ?? 0,
+    ...(allies ?? []).map((a) => a.ally?.n ?? 0),
+  );
   const w = rng as number[];
   const state: RngState = [w[0] ?? 0, w[1] ?? 0, w[2] ?? 0, w[3] ?? 0];
   const fault =
@@ -672,7 +684,7 @@ export function parseFight(raw: unknown, content: ContentDb): FightState | null 
     spawned: raw.spawned,
     player,
     ...(allies ? { allies } : {}),
-    ...(raw.allied === undefined ? {} : { allied: raw.allied as number }),
+    ...(raw.allied === undefined && allied === 0 ? {} : { allied }),
     enemies,
     kit,
     tier: raw.tier,

@@ -74,6 +74,7 @@ export function combatantStatus(
             combos: [...c.last.combos],
             atMs: Math.floor(c.last.at / WORK_PER_MS),
             avoidedBy: c.last.avoidedBy,
+            ...(c.last.target === undefined ? {} : { target: c.last.target }),
           },
     ...(c === fight.player ? { evasion: evasionView(fight, content, rules) } : {}),
   };

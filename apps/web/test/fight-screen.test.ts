@@ -79,6 +79,8 @@ const last = (patch: Partial<LastView>): LastView => ({
   statuses: [],
   combos: [],
   avoidedBy: null,
+  target: null,
+  onAlly: null,
   atMs: 1000,
   ageMs: 200,
   ...patch,
@@ -271,15 +273,16 @@ describe('F1: the outcomes that fly off a body', () => {
         [
           body({
             key: 'e',
-            action: { kind: 'attack', id: null, target: 'ally#1' },
-            last: last({ kind: 'attack', damage: 7, atMs: 1900, ageMs: 100 }),
+            // The attack has resolved: the enemy waits, and the blow names the body it struck.
+            action: null,
+            last: last({ kind: 'attack', damage: 7, target: 'ally#1', atMs: 1900, ageMs: 100 }),
           }),
           body({ key: 'f' }),
         ],
         [
           clone({
-            action: { kind: 'basic', id: null, target: 'f' },
-            last: last({ kind: 'basic', damage: 4, atMs: 1900, ageMs: 100 }),
+            action: null,
+            last: last({ kind: 'basic', damage: 4, target: 'f', atMs: 1900, ageMs: 100 }),
           }),
         ],
       ),
@@ -287,6 +290,29 @@ describe('F1: the outcomes that fly off a body', () => {
     expect(out['ally#1']?.[0]?.amount).toBe(7);
     expect(out.f?.[0]?.amount).toBe(4);
     expect(out.player).toBeUndefined();
+  });
+
+  it('puts a dodge of a clone on the clone and names it on the enemy card, not the character', () => {
+    const clone = body({ key: 'ally#1', side: 'player', entry: null, ally: 1 });
+    const miss = last({
+      kind: 'attack',
+      outcome: 'miss',
+      target: 'ally#1',
+      onAlly: 1,
+      atMs: 1900,
+      ageMs: 100,
+    });
+    const enemy = body({ key: 'e', action: null, last: miss });
+    const out = outcomesOf(scene(player(), [enemy], [clone]));
+    expect(out['ally#1']?.[0]?.kind).toBe('dodge');
+    expect(out.player).toBeUndefined();
+    const card = html(Fighter, { f: enemy });
+    expect(card).toContain('Клон №1 ухилився');
+    expect(card).not.toContain('Ти ухилився');
+    const own = html(Fighter, {
+      f: { ...enemy, last: { ...miss, target: 'player', onAlly: null } },
+    });
+    expect(own).toContain('Ти ухилився');
   });
 
   it('draws a combat clone as a small row with its name, its bars and what it does, and a fallen one as down', () => {
@@ -434,6 +460,42 @@ function fighter(): GameState {
 }
 
 describe('F1: the scene of a real fight', () => {
+  it('draws the blows an enemy lands on a clone on that clone, from the state the engine really produces', () => {
+    const state = fighter();
+    state.known['core:shadow_clone'] = true;
+    game.replaceState(state);
+    expect(
+      game.dispatch({ type: 'action.start', slot: 0, kind: 'fight', id: 'core:zone_wolf' }),
+    ).toEqual({
+      ok: true,
+    });
+    let onClone = 0;
+    let onCharacter = 0;
+    for (let i = 0; i < 1500 && onClone < 3; i++) {
+      game.devAdvance(100);
+      const scene = buildScene(game.state, game.content, defaultRules);
+      if (!scene) break;
+      const out = outcomesOf(scene);
+      for (const e of scene.enemies) {
+        const l = e.last;
+        if (!l || l.kind !== 'attack' || l.ageMs >= 1500 || l.outcome === 'none') continue;
+        const into = scene.allies.find((a) => a.key === l.target);
+        const key = into?.key ?? scene.player.key;
+        // The figure of this very blow sits on the body the blow struck, and on no other.
+        const mine = (k: string) =>
+          (out[k] ?? []).filter((o) => o.key === `${e.key}@${l.atMs}`).length;
+        expect(mine(key)).toBe(1);
+        for (const b of [scene.player, ...scene.allies]) {
+          if (b.key !== key) expect(mine(b.key)).toBe(0);
+        }
+        if (into) onClone++;
+        else onCharacter++;
+      }
+    }
+    expect(onClone).toBeGreaterThan(0);
+    expect(onCharacter).toBeGreaterThanOrEqual(0);
+  });
+
   beforeEach(() => {
     game.replaceState(fighter());
   });

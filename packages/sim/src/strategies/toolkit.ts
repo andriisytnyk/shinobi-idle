@@ -200,15 +200,7 @@ export function winRate(tk: Toolkit, entry: Enemy | Boss, studied = false): numb
     // A studied entry: what the Bingo book shows once the fight that teaches the mechanic is behind and the Intel is spent.
     if (studied) {
       const b = ready.bingo[entry.id];
-      ready.bingo[entry.id] = {
-        seen: 1,
-        wins: 0,
-        losses: 0,
-        timeouts: 0,
-        bounty: 0,
-        ...b,
-        bought: 3,
-      };
+      ready.bingo[entry.id] = { seen: 1, wins: 0, losses: 0, timeouts: 0, bounty: 0, ...b, bought: 3 };
     }
     const tk2: Toolkit = { ...tk, ctx: { ...tk.ctx, state: ready } };
     for (const c of [

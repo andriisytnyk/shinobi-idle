@@ -189,4 +189,47 @@
   .action > :global(.time-bar) {
     grid-column: 2;
   }
+
+  /* On a phone a clone is two lines: the name beside the bars, then what it does beside its progress. */
+  @media (max-width: 768px) {
+    .ally {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      column-gap: var(--space-2);
+      row-gap: 0;
+      padding: var(--space-1) var(--space-2);
+    }
+
+    .face {
+      display: none;
+    }
+
+    .bars {
+      flex-direction: row;
+      gap: var(--space-2);
+    }
+
+    .bars > :global(*) {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    .action {
+      grid-column: 1 / -1;
+      grid-template-columns: minmax(0, 1fr) minmax(var(--space-8), 35%);
+    }
+
+    .action > :global(.emblem) {
+      display: none;
+    }
+
+    .what {
+      grid-column: 1;
+    }
+
+    .action > :global(.time-bar) {
+      grid-column: 2;
+    }
+  }
 </style>

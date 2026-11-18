@@ -41,6 +41,10 @@ export interface LastView {
   statuses: readonly string[];
   combos: readonly string[];
   avoidedBy: string | null;
+  /** The body the action was aimed at, or an enemy's blow struck (its key); null when it named none. */
+  target: string | null;
+  /** The number of the ally that body is, when it is one; null for the character and for enemies. */
+  onAlly: number | null;
   atMs: number;
   ageMs: number;
 }
@@ -207,6 +211,8 @@ function fighterOf(
           statuses: last.statuses,
           combos: last.combos,
           avoidedBy: last.avoidedBy,
+          target: last.target ?? null,
+          onAlly: alliesOf(fight).find((a) => a.id === last.target)?.ally?.n ?? null,
           atMs: last.atMs,
           ageMs: Math.max(0, nowMs - last.atMs),
         }
@@ -256,12 +262,13 @@ export interface Outcome {
 }
 
 /**
- * The body an action of `actor` lands on: for an enemy the body of the player's side it was aimed at
+ * The body the last action of `actor` landed on: for an enemy the body of the player's side it struck
  * (the character when it names none that is there); for the player's side the enemy it names while
  * that one stands, else the first one standing.
  */
 function targetOfAction(scene: Scene, actor: FighterView): string {
-  const named = actor.action?.target ?? null;
+  // The body the resolved action struck, not the action now under way: the figure belongs to the former.
+  const named = actor.last?.target ?? null;
   if (actor.side === 'enemy') {
     const side = [scene.player, ...scene.allies];
     return side.find((b) => b.key === named)?.key ?? scene.player.key;

@@ -76,6 +76,8 @@ export interface LastAct {
   at: number;
   /** For an attack that missed: the defensive technique that did it (chosen among the known ones in proportion to their contribution); null for none. */
   avoidedBy: string | null;
+  /** The body an enemy's blow struck when it was not the character, or what an ally's action was aimed at (the id); absent otherwise. */
+  target?: string;
 }
 
 /** One fighter. The player and every enemy have this shape. */

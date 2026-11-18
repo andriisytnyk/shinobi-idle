@@ -103,9 +103,7 @@ function missesOf(runs: RunMetrics[]): Miss[] {
   add(
     `Проміжок без нового: не більше ${TARGETS.maxGapShare * 100}% ігрового часу й ${TARGETS.maxGapHours} год`,
     gapRuns,
-    gaps
-      ? `найдовший проміжок ${h(gaps.min)} / ${h(gaps.median)} / ${h(gaps.max)}; найгірший проти правила: ${[...runs].sort((a, b) => b.cadence.hours / b.cadence.allowed - a.cadence.hours / a.cadence.allowed).map((x) => `${h(x.cadence.hours)} при допустимих ${h(x.cadence.allowed)}`)[0]}`
-      : '',
+    gaps ? `найдовший проміжок ${h(gaps.min)} / ${h(gaps.median)} / ${h(gaps.max)}; найгірший проти правила: ${[...runs].sort((a, b) => b.cadence.hours / b.cadence.allowed - a.cadence.hours / a.cadence.allowed).map((x) => `${h(x.cadence.hours)} при допустимих ${h(x.cadence.allowed)}`)[0]}` : '',
   );
   const atChunin = runs.filter((r) => r.minLevelAtChunin !== null);
   const lowAtChunin = spread(atChunin.map((r) => r.minLevelAtChunin as number));
