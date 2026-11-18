@@ -84,6 +84,10 @@ describe('time', () => {
     expect(game.state.now - before).toBe(61_000);
     game.devSpeed = 0;
     expect(game.devSpeed).toBe(1);
+    // A custom multiplier, including a fraction, is kept as it is.
+    game.devSpeed = 2.5;
+    expect(game.devSpeed).toBe(2.5);
+    game.devSpeed = 1;
   });
 
   it('devApply runs a command on the live game state', () => {

@@ -42,6 +42,7 @@
 
   let skill = $state(skills[0]?.id ?? '');
   let skillLevel = $state(10);
+  let customSpeed = $state(3);
   let masteryKey = $state('');
   let masteryLevel = $state(10);
   let item = $state(items[0]?.id ?? '');
@@ -65,7 +66,7 @@
   let fixture = $state('');
 
   const cap = levelCap(content);
-  const speeds = [1, 10, 60, 600];
+  const speeds = [1, 2, 5, 10];
   const steps = [
     { text: 'dev.min1', ms: 60_000 },
     { text: 'dev.min10', ms: 600_000 },
@@ -189,6 +190,24 @@
             ×{n}
           </button>
         {/each}
+        <label class="field"
+          ><span>{dt('dev.speedCustom')}</span><input
+            type="number"
+            min="1"
+            max="1000"
+            step="0.5"
+            data-speed-custom
+            bind:value={customSpeed}
+          /></label
+        >
+        <button
+          type="button"
+          data-speed-set
+          class:on={!speeds.includes(game.devSpeed)}
+          onclick={() => (game.devSpeed = Math.min(1000, Number(customSpeed)))}
+        >
+          {dt('dev.speedSet')}
+        </button>
       </div>
     </details>
 

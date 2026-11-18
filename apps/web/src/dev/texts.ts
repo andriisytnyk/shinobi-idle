@@ -24,6 +24,8 @@ export const DEV_UK: Readonly<Record<string, string>> = {
   'dev.customMin': 'Своє, хвилин',
   'dev.advance': 'Перемотати',
   'dev.speed': 'Швидкість годинника',
+  'dev.speedCustom': 'Своя швидкість, ×',
+  'dev.speedSet': 'Задати',
 
   'dev.skills': 'Навички',
   'dev.skill': 'Навичка',
