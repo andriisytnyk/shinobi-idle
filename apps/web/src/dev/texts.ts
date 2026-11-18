@@ -1,0 +1,106 @@
+import { createTranslator } from '../lib/i18n.ts';
+
+/*
+ * The texts of the developer panel. They live here, not in the locale of the game, so that a
+ * production build (which has no panel) carries none of them.
+ */
+export const DEV_UK: Readonly<Record<string, string>> = {
+  'dev.open': 'Панель розробника',
+  'dev.title': 'Панель розробника',
+  'dev.warn': 'Лише для тестових збірок. У фінальній версії цієї панелі немає.',
+  'dev.close': 'Закрити',
+  'dev.ok': 'Виконано',
+  'dev.refused': 'Відмова: {reason}',
+  'dev.search': 'Пошук',
+  'dev.count': 'Кількість',
+  'dev.level': 'Рівень',
+
+  'dev.time': 'Час',
+  'dev.now': 'Час гри: {time}',
+  'dev.min1': '+1 хв',
+  'dev.min10': '+10 хв',
+  'dev.hour1': '+1 год',
+  'dev.hour8': '+8 год',
+  'dev.customMin': 'Своє, хвилин',
+  'dev.advance': 'Перемотати',
+  'dev.speed': 'Швидкість годинника',
+
+  'dev.skills': 'Навички',
+  'dev.skill': 'Навичка',
+  'dev.setLevel': 'Встановити рівень',
+  'dev.toCap': 'До максимуму',
+  'dev.mastery': 'Майстерність (техніка або дія)',
+  'dev.masteryKey': 'Ключ майстерності',
+  'dev.masterySet': 'Встановити',
+  'dev.masteryClear': 'Скинути',
+  'dev.pool': 'Пул навички',
+  'dev.pool50': 'Пул 50%',
+  'dev.pool100': 'Пул 100%',
+
+  'dev.items': 'Предмети й валюти',
+  'dev.item': 'Предмет',
+  'dev.give': 'Видати',
+  'dev.currency': 'Валюта',
+  'dev.technique': 'Техніка',
+  'dev.learn': 'Вивчити',
+  'dev.scroll': 'Прочитати сувій',
+
+  'dev.story': 'Сюжет',
+  'dev.quest': 'Ланцюг',
+  'dev.completeStep': 'Завершити поточний крок',
+  'dev.flag': 'Прапорець',
+  'dev.flagSet': 'Підняти',
+  'dev.flagClear': 'Прибрати',
+  'dev.rank': 'Ранг',
+  'dev.rankSet': 'Дати ранг',
+  'dev.examReady': 'Скласти умови іспиту',
+
+  'dev.map': 'Мапа',
+  'dev.surveyAll': 'Розвідати всі гекси',
+  'dev.revealPoints': 'Відкрити всі точки',
+  'dev.teleport': 'Телепорт',
+  'dev.performer': 'Хто',
+  'dev.performerSelf': 'Персонаж',
+  'dev.performerClone': 'Клон {n}',
+  'dev.cell': 'Клітина',
+
+  'dev.fights': 'Бої й набіги',
+  'dev.enemy': 'Ворог або бос',
+  'dev.bingo': 'Знання Бінго (0–3)',
+  'dev.bingoSet': 'Встановити знання',
+  'dev.win': 'Виграти бій',
+  'dev.lose': 'Програти бій',
+  'dev.raid': 'Набіг',
+  'dev.raidSpawn': 'Покликати зараз',
+
+  'dev.clones': 'Клони',
+  'dev.cloneCreate': 'Створити клона',
+  'dev.cloneNote': 'У клона ще немає власних життя й чакри; їх додасть його переробка.',
+  'dev.clearFatigue': 'Зняти втому (рани)',
+
+  'dev.saves': 'Збереження',
+  'dev.export': 'Показати збереження',
+  'dev.import': 'Завантажити збереження',
+  'dev.importLabel': 'Текст збереження',
+  'dev.fixture': 'Готове збереження',
+  'dev.jump': 'Перейти до нього',
+  'dev.newGame': 'Нова гра',
+  'dev.newGameConfirm': 'Почати нову гру? Поточну буде збережено як резервну.',
+
+  'dev.err.unknown': 'такого немає в даних',
+  'dev.err.badNumber': 'неправильне число',
+  'dev.err.noPool': 'у цієї навички немає пулу',
+  'dev.err.noScroll': 'для цієї техніки немає сувою',
+  'dev.err.tooDeep': 'умова задовга для автоматичного виконання',
+  'dev.err.cannotSatisfy': 'умову не можна виконати автоматично (наприклад, будівля)',
+  'dev.err.questNotStarted': 'ланцюг ще не розпочато, і його запуск не виконано',
+  'dev.err.questDone': 'ланцюг уже завершено',
+  'dev.err.stepStuck': 'крок не зрушив після виконання умови',
+  'dev.err.noSlot': 'такого виконавця немає',
+  'dev.err.badHex': 'туди не можна стати',
+  'dev.err.noFight': 'зараз немає бою',
+  'dev.err.noVillage': 'у гравця ще немає села',
+};
+
+/** The translator of the panel's texts. */
+export const dt = createTranslator(DEV_UK);
