@@ -39,7 +39,7 @@
   .dev {
     position: fixed;
     left: var(--space-2);
-    bottom: calc(var(--now-height) + var(--space-2));
+    bottom: calc(var(--now-live, var(--now-height)) + var(--space-2));
     z-index: var(--z-toast);
     max-width: calc(100% - var(--space-4));
     max-height: 60dvh;
@@ -58,7 +58,7 @@
     .dev {
       right: var(--space-2);
       left: auto;
-      bottom: calc(var(--now-height) + var(--tabbar-height) + var(--space-2));
+      bottom: calc(var(--now-live, var(--now-height)) + var(--tabbar-height) + var(--space-2));
     }
   }
 

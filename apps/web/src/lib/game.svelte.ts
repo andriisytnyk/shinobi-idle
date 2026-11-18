@@ -596,12 +596,19 @@ export function createGame(deps: GameDeps = {}) {
         }
         if (verdict) command = verdict;
       }
-      const result = coreDispatch(state, command, content, rules);
-      // After the command: a reveal it caused must not wait for the next update.
-      epoch++;
-      restamp();
-      if (result.ok && command.type === 'action.start' && command.kind === 'fight') log = [];
-      drainEvents();
+      let result: CommandResult;
+      try {
+        result = coreDispatch(state, command, content, rules);
+        // After the command: a reveal it caused must not wait for the next update.
+        epoch++;
+        restamp();
+        if (result.ok && command.type === 'action.start' && command.kind === 'fight') log = [];
+        drainEvents();
+      } catch (error) {
+        // A command that throws may leave the state half-changed, like the loop: the crash screen, no save.
+        stopOnCrash(error);
+        return { ok: false, reason: 'error.crashed' };
+      }
       touch();
       if (result.ok && SAVE_NOW.has(command.type)) void save();
       for (const hook of commandHooks) hook.after?.(command, result);
@@ -635,9 +642,14 @@ export function createGame(deps: GameDeps = {}) {
     devAdvance(ms: number): void {
       // Time that moves on changes the answers by itself (events, a new second); no time at all is how tests flush what they set by hand.
       if (ms === 0) epoch++;
-      advance(state, ms, content, rules);
-      drainEvents();
-      tel.observe(state);
+      try {
+        advance(state, ms, content, rules);
+        drainEvents();
+        tel.observe(state);
+      } catch (error) {
+        stopOnCrash(error);
+        return;
+      }
       touch();
     },
     /** The local telemetry: export file, clearing. It never touches the network. */

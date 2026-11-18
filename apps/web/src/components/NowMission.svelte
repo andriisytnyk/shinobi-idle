@@ -6,9 +6,11 @@
 
   interface Props {
     now: MissionNow;
+    /** The slot is a clone's: its «self» is the clone, not the player. */
+    clone?: boolean;
   }
 
-  let { now }: Props = $props();
+  let { now, clone = false }: Props = $props();
 
   const self = $derived(now.who === 'self');
 </script>
@@ -30,7 +32,7 @@
     {/each}
   </span>
   <span class="who" data-now-who={now.who}>
-    {#if self}{t('mission.who.self')}{:else}{t('mission.who.mate', {
+    {#if self}{t(clone ? 'mission.who.clone' : 'mission.who.self')}{:else}{t('mission.who.mate', {
         name: teammateName(now.who),
       })}{/if}
   </span>

@@ -140,7 +140,7 @@
   /* On a wide screen the toasts sit at the left of the page, clear of the side panel and the goal panel. */
   .toasts {
     position: fixed;
-    bottom: calc(var(--now-height) + var(--space-3));
+    bottom: calc(var(--now-live, var(--now-height)) + var(--space-3));
     left: calc(var(--sidebar-width) + var(--space-4));
     z-index: var(--z-toast);
     display: flex;
@@ -216,9 +216,9 @@
       min-height: var(--control-md);
     }
 
-    /* On a phone they stay at the top, clear of the bottom sheet and its action row. */
+    /* On a phone they stay at the top, clear of the bottom sheet and its action row, and below the top bar: its buttons are never covered. */
     .toasts {
-      top: var(--space-2);
+      top: calc(var(--top-live, 0px) + var(--space-2));
       right: var(--space-3);
       bottom: auto;
       left: var(--space-3);

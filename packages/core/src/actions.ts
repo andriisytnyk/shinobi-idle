@@ -98,7 +98,8 @@ export interface ActionKind {
     rules: Rules,
   ): void;
   /**
-   * What the slot does when this action finishes by itself (it returned 'stop'): another action
+   * What the slot does when this action finishes by itself (it returned 'stop') or aborts when its
+   * work is done (it returned 'abort', for example a survey that has nothing left to reveal): another action
    * (kind and id) that takes the slot over, or null to leave it idle. The figure of a clone stays on
    * the map while its slot holds an action, so a clone's walk that ends in standing still keeps it there.
    */

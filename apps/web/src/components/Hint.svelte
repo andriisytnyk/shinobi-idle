@@ -51,7 +51,11 @@
       >
         {expanded ? t('hint.less') : t('hint.more')}
       </button>
-      <button type="button" onclick={() => settings.dismissHint(id)}>{t('hint.dismiss')}</button>
+      <button type="button" class="dismiss" onclick={() => settings.dismissHint(id)}
+        ><span class="label">{t('hint.dismiss')}</span><span class="glyph" aria-hidden="true"
+          ><Icon name="lucide:x" size={16} /></span
+        ></button
+      >
     </div>
   </aside>
 {/if}
@@ -131,10 +135,27 @@
   }
 
   /* On a phone the collapsed line keeps only a short "more" and the dismiss mark. */
+  .glyph {
+    display: none;
+  }
+
+  /* On a phone the collapsed line keeps «more» and a cross: the title gets the room, not the words of the buttons. */
   @media (max-width: 768px) {
     .collapsed button {
       padding-inline: var(--space-2);
       font-size: var(--text-xs);
+    }
+
+    .collapsed .dismiss .label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+
+    .collapsed .dismiss .glyph {
+      display: inline-flex;
     }
   }
 </style>
