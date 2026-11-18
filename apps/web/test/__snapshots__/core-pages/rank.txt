@@ -225,12 +225,15 @@
                   <a class="entity-link" href="#/skill/alch">
                     Алхімія
                 <li>
-                  <a class="entity-link" href="#/mission/core:cat">
-                    Знайти кота
+                  <a class="entity-link" href="#/skill/vit">
+                    Живучість
               <details class="more-opens">
                 <summary>
-                  ще 15
+                  ще 16
                 <ul class="chips">
+                  <li>
+                    <a class="entity-link" href="#/mission/core:cat">
+                      Знайти кота
                   <li>
                     <a class="entity-link" href="#/mission/core:weed">
                       Прополоти поле

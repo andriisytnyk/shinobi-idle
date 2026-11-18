@@ -84,12 +84,9 @@ describe('two hours of continuous zone fighting without healing items', () => {
   });
 
   // The pack of poisoners, the regenerating serpent and the poisoners of the doton hand wear the player down between fights.
-  // balance: refit at stage 9, see #82
-  const refit = new Set(['leech (katon)', 'leech (doton)']);
   for (const { enemy, results } of rows) {
     for (const { n, r } of results) {
-      const open = refit.has(`${enemy.id.replace('core:', '')} (${n})`);
-      (open ? it.skip : it)(
+      it(
         `${enemy.id.replace('core:', '')} (${n}): ${enemy.traits.length === 0 ? 'no defeats' : 'at most 2 defeats'}`,
         () => {
           expect(r.defeats).toBeLessThanOrEqual(enemy.traits.length === 0 ? 0 : 2);

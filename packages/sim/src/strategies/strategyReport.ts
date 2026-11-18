@@ -98,12 +98,21 @@ function missesOf(runs: RunMetrics[]): Miss[] {
       ? `не досягнуто за ${h(Math.max(...runs.map((r) => r.hours)))}`
       : range(runs.map((r) => r.cap)),
   );
-  const gapRuns = runs.filter((r) => r.longestGap.hours >= TARGETS.maxGapHours);
+  const gapRuns = runs.filter((r) => r.cadence.hours > r.cadence.allowed);
   const gaps = spread(runs.map((r) => r.longestGap.hours));
   add(
-    `Жодних ${TARGETS.maxGapHours} год без віхи`,
+    `Проміжок без нового: не більше ${TARGETS.maxGapShare * 100}% ігрового часу й ${TARGETS.maxGapHours} год`,
     gapRuns,
-    gaps ? `найдовший проміжок ${h(gaps.min)} / ${h(gaps.median)} / ${h(gaps.max)}` : '',
+    gaps ? `найдовший проміжок ${h(gaps.min)} / ${h(gaps.median)} / ${h(gaps.max)}; найгірший проти правила: ${[...runs].sort((a, b) => b.cadence.hours / b.cadence.allowed - a.cadence.hours / a.cadence.allowed).map((x) => `${h(x.cadence.hours)} при допустимих ${h(x.cadence.allowed)}`)[0]}` : '',
+  );
+  const atChunin = runs.filter((r) => r.minLevelAtChunin !== null);
+  const lowAtChunin = spread(atChunin.map((r) => r.minLevelAtChunin as number));
+  add(
+    `Жодна навичка нижче ${TARGETS.minSkillAtEnd} на Чуніні`,
+    atChunin.filter((r) => (r.minLevelAtChunin as number) < TARGETS.minSkillAtEnd),
+    lowAtChunin
+      ? `найнижча навичка на Чуніні ${num(lowAtChunin.min, 0)} / ${num(lowAtChunin.median, 0)} / ${num(lowAtChunin.max, 0)}`
+      : 'Чуніна не досягнуто',
   );
   const low = runs.filter((r) => r.minLevel < TARGETS.minSkillAtEnd);
   const lows = spread(runs.map((r) => r.minLevel));
@@ -243,7 +252,7 @@ export function strategyReportMarkdown(result: MatrixResult, content: ContentDb)
 
   section(
     '2. Час до віх',
-    'Гіпотеза: Генін ≈ 1 год, Чунін за 12–15 год, стеля навичок за 20–25 год. Години ігрового часу.',
+    'Гіпотеза: Генін ≈ 1 год, Чунін за 20–50 год (рішення автора: для гри з офлайн-прогресом це норма). Стеля навичок і проміжки без віхи цілями не є: їх лише вимірюють. Години ігрового часу.',
     ['Генін', 'Техніка клонування', 'Жилет Чуніна', 'Стеля'],
     (runs, n) => [
       cell(
@@ -360,7 +369,7 @@ export function strategyReportMarkdown(result: MatrixResult, content: ContentDb)
   lines.push(
     '## Що не сходиться',
     '',
-    'Цілі взято з `docs/Shinobi Idle — модель балансу.md` і плану етапу 9: Генін ≈ 1 год (смуга 0,5–1,5), Чунін за 12–15 год, стеля навичок за 20–25 год, жодних 2 год без віхи, жодної навички нижче 20 наприкінці прогону. Кожна клітинка — мін / медіана / макс за сідами; «k/n» — скільки сідів схибили.',
+    'Цілі взято з `docs/Shinobi Idle — модель балансу.md` і плану етапу 9: Генін ≈ 1 год (смуга 0,5–1,5), Чунін за 20–50 год (рішення автора від 18.11: гра з офлайн-прогресом не стискається до 12–15 год); стеля навичок 20–25 год більше не ціль, її лише вимірюють; проміжок без нового — не більше 20% ігрового часу на той момент і не більше 8 год (мінімум 1 год допустимо завжди); на Чуніні жодна навичка сюжетного гравця не нижче 20, жодної навички нижче 20 наприкінці прогону. Кожна клітинка — мін / медіана / макс за сідами; «k/n» — скільки сідів схибили.',
     '',
   );
   const totals: string[] = [];
@@ -372,7 +381,7 @@ export function strategyReportMarkdown(result: MatrixResult, content: ContentDb)
     totals.push(
       `| ${label} | ${never}/${all.length} | ${all.filter((r) => r.chunin !== null && (r.chunin < TARGETS.chuninHours.min || r.chunin > TARGETS.chuninHours.max)).length} | ` +
         `${all.filter((r) => r.cap === null).length}/${all.length} | ` +
-        `${all.filter((r) => r.longestGap.hours >= TARGETS.maxGapHours).length}/${all.length} | ` +
+        `${all.filter((r) => r.cadence.hours > r.cadence.allowed).length}/${all.length} | ` +
         `${all.filter((r) => r.minLevel < TARGETS.minSkillAtEnd).length}/${all.length} |`,
     );
     details.push(`### ${label}`, '');
@@ -398,9 +407,9 @@ export function strategyReportMarkdown(result: MatrixResult, content: ContentDb)
   lines.push(
     '### Підсумок за стратегіями',
     '',
-    'Скільки прогонів із загальної кількості схибили ціль (колонка «Чунін поза смугою» — лише ті, що жилет отримали, але не за 12–15 год).',
+    'Скільки прогонів із загальної кількості схибили ціль (колонка «Чунін поза смугою» — лише ті, що жилет отримали, але не за 20–50 год).',
     '',
-    '| Стратегія | Жилета немає | Чунін поза смугою | Стелі немає | Є проміжок від 2 год | Є навичка нижче 20 |',
+    '| Стратегія | Жилета немає | Чунін поза смугою | Стелі немає | Проміжок понад правило | Є навичка нижче 20 |',
     '| --- | --- | --- | --- | --- | --- |',
     ...totals,
     '',

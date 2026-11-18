@@ -8,7 +8,7 @@ describe('slice size', () => {
     expect(content.techniques.length - training).toBe(47);
     expect(training).toBe(13);
     expect(content.seals.length).toBe(17);
-    expect(content.exercises.length).toBe(8);
+    expect(content.exercises.length).toBe(12);
     expect(content.practices.length).toBe(6);
     expect(content.obstacles.length).toBe(12);
     expect(content.herbs.length).toBe(11);

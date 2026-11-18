@@ -194,6 +194,11 @@ export const CORE_ICONS: Readonly<Record<string, Readonly<Record<string, string>
     'core:khodinnia_po_vodi': 'echo-ripples',
     'core:lopannia_vodianoi_kuli': 'bubbles',
     'core:lopannia_humovoi_kuli': 'balloons',
+    // Drills of Vitality
+    'core:bih_iz_tiaharem': 'weight-lifting-up',
+    'core:vidzhymannia_na_kulakakh': 'fist',
+    'core:stiika_pid_vodospadom': 'waterfall',
+    'core:zahartuvannia_udaramy': 'muscle-up',
   },
 
   // Meditation practices

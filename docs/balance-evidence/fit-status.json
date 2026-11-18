@@ -86,7 +86,7 @@
       "basic": false
     },
     "core:guard_pack": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
@@ -248,7 +248,7 @@
       "basic": false
     },
     "core:guard_pack": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
@@ -410,7 +410,7 @@
       "basic": true
     },
     "core:guard_pack": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
@@ -465,7 +465,7 @@
       "basic": true
     },
     "core:boss_twins": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
@@ -572,7 +572,7 @@
       "basic": false
     },
     "core:guard_pack": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
