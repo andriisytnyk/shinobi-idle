@@ -38,7 +38,7 @@ import { gainXp } from './progression.ts';
 import { pointStatus, pointsAtHex, performers, settlePoints } from './points.ts';
 import { regionOpenReq } from './regions.ts';
 import { actionFloor, activitySkill, currencyOf, moneyOf } from './vocab.ts';
-import { evalReq, skillLevel, type Req } from './requirements.ts';
+import { evalReq, reqMet, skillLevel, type Req } from './requirements.ts';
 import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 
@@ -538,18 +538,21 @@ const planned = new WeakMap<
 export function planStamp(state: GameState, content: ContentDb, slot: number): string {
   const scouting = scoutSkill(content);
   const level = scouting === null ? 0 : skillLevel(state, scouting, content);
-  const keys = Object.values(content.cellKeys)
-    .map((req) => (evalReq(state, req, content).met ? 1 : 0))
-    .join('');
-  const others = state.slots
-    .map((s, i) => (i !== slot && s.action?.kind === EXPLORE_KIND ? s.action.id : ''))
-    .join(',');
+  let keys = '';
+  for (const req of Object.values(content.cellKeys))
+    keys += reqMet(state, req, content) ? '1' : '0';
+  let others = '';
+  for (let i = 0; i < state.slots.length; i++) {
+    const s = state.slots[i];
+    if (i > 0) others += ',';
+    if (i !== slot && s?.action?.kind === EXPLORE_KIND) others += s.action.id;
+  }
   return [
     positionOf(state, slot),
     worldStamp(state),
     surveyRange(state, content, slot),
     level,
-    evalReq(state, graduateReq(content), content).met ? 1 : 0,
+    reqMet(state, graduateReq(content), content) ? 1 : 0,
     keys,
     others,
   ].join('|');
@@ -737,8 +740,23 @@ export function claimPoi(state: GameState, poiId: string, content: ContentDb): C
 
 // ---------- modifiers ----------
 
+const trainingKept = new WeakMap<ContentDb, string[]>();
+
+/** The ids of every training spot of the content. */
+function trainingIds(content: ContentDb): string[] {
+  let ids = trainingKept.get(content);
+  if (!ids) {
+    ids = [];
+    for (const [id, { poi }] of indexOf(content).pois) if (poi.kind === 'training') ids.push(id);
+    trainingKept.set(content, ids);
+  }
+  return ids;
+}
+
 /** The training spots a performer (the character or a clone) stands in, once each, when their cells have been explored. */
 function trainingHere(state: GameState, content: ContentDb): (Poi & { kind: 'training' })[] {
+  // The providers are asked all the time: with no training spot found there is nothing to look at.
+  if (!trainingIds(content).some((id) => state.world.pois[id])) return [];
   const out = new Map<string, Poi & { kind: 'training' }>();
   for (const { key } of performers(state, content)) {
     const cell = indexOf(content).cellByHex.get(key);

@@ -2,7 +2,7 @@ import type { ContentDb, Quest, QuestRewards } from '@shinobi/content';
 import { addCurrency, addItem, removeCurrency } from './bank.ts';
 import { bump, counterValue } from './counters.ts';
 import { emit } from './events.ts';
-import { evalReq } from './requirements.ts';
+import { reqMet } from './requirements.ts';
 import { currencyOf, rankIndex } from './vocab.ts';
 import type { System } from './system.ts';
 import type { GameState } from './state.ts';
@@ -36,7 +36,7 @@ function stepMet(state: GameState, quest: Quest, step: number, content: ContentD
   if (!progress || !objective) return false;
   if (objective.t === 'counter') return counted(state, objective) - progress.base >= objective.n;
   if (objective.t === 'pay') return counterValue(state, payKey(quest.id, step)) >= 1;
-  return evalReq(state, objective.req, content).met;
+  return reqMet(state, objective.req, content);
 }
 
 /** Raises the flags the steps up to and including `step` open; a flag is never taken back. */
@@ -119,7 +119,7 @@ export function updateQuests(state: GameState, content: ContentDb): void {
     for (const quest of content.quests) {
       let progress = state.quests[quest.id];
       if (!progress) {
-        if (quest.unlock && !evalReq(state, quest.unlock, content).met) continue;
+        if (quest.unlock && !reqMet(state, quest.unlock, content)) continue;
         progress = { step: 0, base: baselineFor(state, quest, 0), done: false };
         state.quests[quest.id] = progress;
         grantStep(state, quest, 0);

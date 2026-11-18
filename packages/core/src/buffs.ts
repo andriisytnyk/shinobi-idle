@@ -3,7 +3,13 @@ import { removeItem } from './bank.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
 import { indexOf } from './lookup.ts';
-import { bonusOf, type Modifier, type ModifierProvider } from './modifiers.ts';
+import {
+  NO_MODIFIERS,
+  bonusOf,
+  hasNone,
+  type Modifier,
+  type ModifierProvider,
+} from './modifiers.ts';
 import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 
@@ -17,6 +23,7 @@ function coveredSkills(skill: string, content: ContentDb): readonly string[] {
  * The modifier names the tonic item as its source, so the breakdown in `getMod` shows it.
  */
 export const tonicProvider: ModifierProvider = (state, content) => {
+  if (hasNone(state.buffs)) return NO_MODIFIERS;
   const out: Modifier[] = [];
   const items = indexOf(content).items;
   for (const [id, buff] of Object.entries(state.buffs)) {
