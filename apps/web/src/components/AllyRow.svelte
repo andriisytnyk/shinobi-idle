@@ -201,7 +201,7 @@
     grid-column: 2;
   }
 
-  /* On a phone a clone is two lines: the name beside the bars, then what it does beside its progress. */
+  /* On a phone a clone is three blocks: the name, the bars, then what it does beside its progress. */
   @media (max-width: 768px) {
     .ally {
       display: grid;
@@ -216,14 +216,14 @@
       display: none;
     }
 
-    .bars {
-      flex-direction: row;
-      gap: var(--space-2);
+    /* The name (with the role) takes a full row so the bars below keep the whole width. */
+    .head {
+      grid-column: 1 / -1;
     }
 
-    .bars > :global(*) {
-      flex: 1 1 0;
-      min-width: 0;
+    /* The bars sit one under the other, each over the full width, so the label and the figure both fit. */
+    .bars {
+      grid-column: 1 / -1;
     }
 
     .action {

@@ -71,6 +71,14 @@ describe('the role picker of the fight preparation', () => {
       expect(r.textContent).toContain(ROLE(id));
       expect(r.textContent).toContain(ukLocale[`cloneRole.${id}.desc`]);
     }
+    // The accessible name is the role's name; the line is its description.
+    for (const input of qa('[data-clone-role] input')) {
+      const id = input.closest('[data-clone-role]')?.getAttribute('data-clone-role') ?? '';
+      const ref = (attr: string) =>
+        document.getElementById(input.getAttribute(attr) ?? '')?.textContent ?? '';
+      expect(ref('aria-labelledby')).toBe(ROLE(id));
+      expect(ref('aria-describedby')).toBe(ukLocale[`cloneRole.${id}.desc`]);
+    }
     const checked = qa('[data-clone-role] input').filter((i) => (i as HTMLInputElement).checked);
     expect(checked).toHaveLength(1);
     expect(checked[0]?.closest('[data-clone-role]')?.getAttribute('data-clone-role')).toBe(

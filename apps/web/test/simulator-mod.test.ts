@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { content } from '@shinobi/content';
 import { createState, xpAt, type GameState } from '@shinobi/core';
+import { flushSync } from 'svelte';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BUILTIN_PACKS, enabledBuiltin } from '../src/lib/builtin-packs.ts';
 import { simulatorUi } from '../src/lib/builtin/simulator-ui.ts';
@@ -110,6 +111,23 @@ describe('F1: the official mod «Симулятор бою»', () => {
     expect(
       qa('[data-sim="prep"] [role="columnheader"]').filter((h) => h.textContent !== ''),
     ).toHaveLength(2);
+  }, 90_000);
+
+  it('restarts the forecast when the role of the clones changes', async () => {
+    booted = await bootApp([coreUi, simulatorUi], player(2), PREPARE);
+    const done = () => {
+      const cells = qa('[data-sim="prep"] .cell');
+      return cells.length > 5 && cells.every((c) => c.getAttribute('data-state') === 'done');
+    };
+    await vi.waitFor(() => expect(done()).toBe(true), { timeout: 60_000, interval: 100 });
+    const role = content.cloneRoles.find((r) => r.id !== game.state.loadouts.cloneRole);
+    expect(role).toBeDefined();
+    const r = game.dispatch({ type: 'loadout.cloneRole', role: role?.id ?? '' });
+    expect(r.ok).toBe(true);
+    flushSync();
+    // The old numbers are gone while a new forecast works.
+    await vi.waitFor(() => expect(done()).toBe(false), { timeout: 5_000, interval: 10 });
+    await vi.waitFor(() => expect(done()).toBe(true), { timeout: 60_000, interval: 100 });
   }, 90_000);
 
   it('gives its numbers while the game clock runs: a tick does not restart the forecast', async () => {

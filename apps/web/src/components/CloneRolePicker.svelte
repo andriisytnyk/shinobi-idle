@@ -41,11 +41,13 @@
             name="clone-role"
             value={role.id}
             checked={view.current === role.id}
+            aria-labelledby="clone-role-{role.id}-name"
+            aria-describedby="clone-role-{role.id}-desc"
             onchange={() => choose(role.id)}
           />
           <span class="text">
-            <span class="name">{nameOf(role.id)}</span>
-            <span class="desc">{descOf(role.id)}</span>
+            <span class="name" id="clone-role-{role.id}-name">{nameOf(role.id)}</span>
+            <span class="desc" id="clone-role-{role.id}-desc">{descOf(role.id)}</span>
           </span>
         </label>
       {/each}
