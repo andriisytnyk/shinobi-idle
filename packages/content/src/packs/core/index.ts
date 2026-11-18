@@ -31,6 +31,7 @@ import handEnemyCombat from './data/hand/enemy-combat.json' with { type: 'json' 
 import handCoat from './data/hand/coat.json' with { type: 'json' };
 import handExams from './data/hand/exams.json' with { type: 'json' };
 import handRaids from './data/hand/raids.json' with { type: 'json' };
+import handRenownRanks from './data/hand/renown-ranks.json' with { type: 'json' };
 import handGearFx from './data/hand/gear-fx.json' with { type: 'json' };
 import handHerbReqs from './data/hand/herb-reqs.json' with { type: 'json' };
 import handItemEcon from './data/hand/item-econ.json' with { type: 'json' };
@@ -183,6 +184,7 @@ const data: Record<string, unknown> = {
   gear: layerGear(z.array(gearBaseSchema).parse(gear), gearFxMapSchema.parse(handGearFx)),
   quests: handQuests,
   exams: handExams,
+  renownRanks: handRenownRanks,
   zones: handZones,
   raids: handRaids,
   operations: handOperations,

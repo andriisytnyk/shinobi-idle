@@ -132,13 +132,18 @@ export function gatesOf(): { rank: string; result: ReqResult | null; open: boole
     rankGroups(game.content).map((g) => {
       const unlocks = g.missions.map((m) => viewOf(m).unlock);
       const first = unlocks[0] ?? null;
-      const shared =
-        first !== null &&
-        unlocks.every((u) => u !== null && JSON.stringify(u.req) === JSON.stringify(first.req));
+      // A mission may ask for what the rank asks and something more (the mail also asks for a Renown rank):
+      // the rank's gate is then what all of them share, and a mission with more shows its own blocker.
+      const key = JSON.stringify(first?.req);
+      const asks = (u: { req: unknown }): boolean =>
+        JSON.stringify(u.req) === key ||
+        ((u.req as { t?: string; of?: unknown[] }).t === 'all' &&
+          ((u.req as { of: unknown[] }).of ?? []).some((x) => JSON.stringify(x) === key));
+      const shared = first !== null && unlocks.every((u) => u !== null && asks(u));
       return {
         rank: g.rank,
         result: shared ? first : null,
-        open: unlocks.every((u) => u === null || u.met),
+        open: shared ? (first?.met ?? true) : unlocks.every((u) => u === null || u.met),
       };
     }),
   );

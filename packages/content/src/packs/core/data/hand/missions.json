@@ -109,8 +109,11 @@
   },
   "core:mail": {
     "unlock": {
-      "t": "flag",
-      "id": "missions.c.unlocked"
+      "t": "all",
+      "of": [
+        { "t": "flag", "id": "missions.c.unlocked" },
+        { "t": "flag", "id": "missions.mail.unlocked" }
+      ]
     },
     "shares": [1],
     "pay": [2],
