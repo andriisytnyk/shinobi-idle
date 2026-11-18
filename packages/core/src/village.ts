@@ -359,6 +359,40 @@ export function addShinobiResource(
 export const villageProvider: ModifierProvider = (state, content) => {
   const village = state.village;
   if (!village) return [];
+  // The providers are asked all the time and the levels change rarely: the last answer is kept
+  // while every level, every damage mark (a damaged building gives nothing) and the content are as they were.
+  const kept = bonusesKept.get(village);
+  const { buildings } = content;
+  if (kept && kept.content === content && kept.levels.length === buildings.length) {
+    let same = true;
+    for (let i = 0; i < buildings.length; i++) {
+      const id = (buildings[i] as Building).id;
+      if (kept.levels[i] !== levelOf(village, id) || kept.damaged[i] !== isDamaged(village, id)) {
+        same = false;
+        break;
+      }
+    }
+    if (same) return kept.mods;
+  }
+  const mods = villageBonuses(village, content);
+  bonusesKept.set(village, {
+    content,
+    levels: buildings.map((b) => levelOf(village, b.id)),
+    damaged: buildings.map((b) => isDamaged(village, b.id)),
+    mods,
+  });
+  return mods;
+};
+
+/** The last bonuses of a village with the building levels they were made from. */
+const bonusesKept = new WeakMap<
+  VillageState,
+  { content: ContentDb; levels: number[]; damaged: boolean[]; mods: Modifier[] }
+>();
+
+const isDamaged = (village: VillageState, id: string): boolean => !!village.damage[id];
+
+function villageBonuses(village: VillageState, content: ContentDb): Modifier[] {
   const out: Modifier[] = [];
   for (const b of content.buildings) {
     const level = levelOf(village, b.id);
@@ -385,7 +419,7 @@ export const villageProvider: ModifierProvider = (state, content) => {
     }
   }
   return out;
-};
+}
 
 /** Ryo the Bureau, plus Shinobi Power, put into the treasury each tick. */
 export function treasuryIncome(state: GameState, content: ContentDb): number {

@@ -337,6 +337,22 @@ describe('the consequences', () => {
     expect(getMod(s, key, content).total).toBe(before);
   });
 
+  it('does not serve a cached bonus for a building damaged (or repaired) with its level unchanged', () => {
+    const s = called();
+    const market = content.buildings.find((b) => b.id === 'core:market')!;
+    const key = market.effects[0]!.key;
+    expect(village(s).levels[market.id]).toBeGreaterThan(0);
+    // Ask first so the village keeps its bonuses, then change only the damage mark.
+    const built = getMod(s, key, content).total;
+    expect(built).toBeLessThan(1);
+    expect(getMod(s, key, content).total).toBe(built);
+    village(s).damage[market.id] = 2;
+    expect(getMod(s, key, content).total).toBe(1);
+    expect(getMod(s, key, content).total).toBe(1);
+    delete village(s).damage[market.id];
+    expect(getMod(s, key, content).total).toBe(built);
+  });
+
   it('never damages a building that is not built, and a building already damaged only once', () => {
     const s = atTheGates();
     delete village(s).levels[raid.targets[0]!];

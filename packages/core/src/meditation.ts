@@ -4,7 +4,13 @@ import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
 import { cycleSeconds, cycleXp, masteryLevel } from './formulas.ts';
 import { indexOf } from './lookup.ts';
-import { bonusOf, type Modifier, type ModifierProvider } from './modifiers.ts';
+import {
+  NO_MODIFIERS,
+  bonusOf,
+  hasNone,
+  type Modifier,
+  type ModifierProvider,
+} from './modifiers.ts';
 import { nextFloat } from './rng.ts';
 import type { Rules } from './rules.ts';
 import type { GameState, MeditationEntry } from './state.ts';
@@ -140,6 +146,7 @@ export const isNatureLocked = (state: GameState, nature: string | undefined): bo
  * tied to a chakra nature the player does not own gives nothing until the nature is owned.
  */
 export const meditationProvider: ModifierProvider = (state, content) => {
+  if (hasNone(state.meditation)) return NO_MODIFIERS;
   const out: Modifier[] = [];
   const index = indexOf(content);
   for (const [practiceId, entry] of Object.entries(state.meditation)) {

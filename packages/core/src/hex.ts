@@ -104,7 +104,9 @@ export const worldRevision = (state: GameState): number => revisions.get(state) 
  * state does).
  */
 export const worldStamp = (state: GameState): string =>
-  `${revisions.get(state) ?? 0}|${Object.keys(state.world.surveyed).length}|${Object.keys(state.world.explores).length}`;
+  `${revisions.get(state) ?? 0}|${countKeys(state.world.surveyed)}|${countKeys(state.world.explores)}`;
+
+const countKeys = (record: object): number => Object.keys(record).length;
 
 // ---------- addresses ----------
 
