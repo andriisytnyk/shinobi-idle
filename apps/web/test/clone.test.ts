@@ -130,7 +130,7 @@ describe('the clone on a skill page', () => {
 });
 
 describe('the clone on the mission board', () => {
-  it('takes a mission with no combat stage, and says why it does not take one with a fight', async () => {
+  it('takes a mission with no combat stage and one with a fight, and says why only when the fight is busy', async () => {
     const quiet = content.missions.find(
       (m) => m.board && m.rank === 'V' && !m.stages.some((s) => s.t === 'combat'),
     );
@@ -142,10 +142,9 @@ describe('the clone on the mission board', () => {
     const fightButton = card(fight?.id ?? '')?.querySelector<HTMLButtonElement>(
       '[data-ui="clone-start"]',
     );
-    expect(fightButton?.disabled).toBe(true);
-    expect(card(fight?.id ?? '')?.querySelector('[data-clone-why]')?.textContent).toBe(
-      t('error.cloneNoFight'),
-    );
+    // No refusal for the clone: the fight is free, so the button is there and the old reason is gone.
+    expect(card(fight?.id ?? '')?.querySelector('[data-clone-why]')).toBeNull();
+    expect(fightButton).not.toBeNull();
     const button =
       card('core:v_clones')?.querySelector<HTMLButtonElement>('[data-ui="clone-start"]');
     expect(button?.disabled).toBe(false);
@@ -169,5 +168,28 @@ describe('the clone on the mission board', () => {
     button?.click();
     flushSync();
     expect(game.state.slots[1]?.action).toEqual({ kind: 'mission', id: 'core:v_clones' });
+  });
+});
+
+describe('the clone fights', () => {
+  it('has «Клоном» on the combat page, starts a zone fight in the clone slot and shows who fights', async () => {
+    const state = cloner();
+    booted = await bootApp([coreUi], state, '#/combat');
+    const enemy = q('[data-enemy] [data-ui="clone-start"]') as HTMLButtonElement | null;
+    expect(enemy).not.toBeNull();
+    enemy?.click();
+    flushSync();
+    expect(game.state.slots[1]?.action?.kind).toBe('fight');
+    expect(game.state.combat?.owner).toBe(1);
+    expect(q('[data-fighter="clone"]')?.textContent).toContain(t('combat.cloneYou'));
+    expect(q('[data-clone-fights]')?.textContent).toContain(t('combat.cloneFights'));
+    // The Now bar shows the clone's fight under the clone's mark.
+    expect(q('[data-slot="1"] [data-ui="clone-tag"]')).not.toBeNull();
+    expect(q('[data-slot="1"] [data-now-fight]')).not.toBeNull();
+    // Dispelling the clone ends the fight.
+    (q('.stop') as HTMLButtonElement | null)?.click();
+    flushSync();
+    expect(game.state.slots[1]?.action).toBeNull();
+    expect(game.state.combat).toBeNull();
   });
 });

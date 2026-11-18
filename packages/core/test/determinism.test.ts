@@ -127,7 +127,8 @@ describe('A2: split invariance and determinism', () => {
     it(`gives byte-identical saves for any chunking, ${name}`, () => {
       for (const [slots, at, share] of arrangements) {
         const whole = play(name, slots, at, TOTAL, TOTAL);
-        expect(whole.slots[at]?.share).toBe(share);
+        // The share the slot starts with (a fight itself runs at full speed; it may be over by the end of the run).
+        expect(play(name, slots, at, 0, 1).slots[at]?.share).toBe(share);
         const text = serialize(whole, 0);
         for (const chunk of [7, 999, 3600]) {
           expect(

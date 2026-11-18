@@ -1,6 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
 import { actionKindOf } from './actions.ts';
-import { cloneRefusal } from './clone.ts';
 import { evalReq, type ReqResult } from './requirements.ts';
 import type { Rules } from './rules.ts';
 import { isSkillUnlocked } from './selectors.ts';
@@ -38,9 +37,6 @@ export function startRefusal(
   // A skill that is still shut refuses every action it would train, whatever else holds.
   const skill = kind.skill?.(id, content);
   if (skill && !isSkillUnlocked(state, skill, content)) return { reason: 'error.skillLocked' };
-  // A clone does not fight: its slot refuses what can hold a fight.
-  const clone = cloneRefusal(state, slotIndex, kindName, id, content);
-  if (clone) return { reason: clone };
   const blocked = kind.blocked?.(state, id, content, rules, slotIndex);
   if (blocked) return { reason: blocked };
   // One action, one performer: the very same action does not run in two slots at once.

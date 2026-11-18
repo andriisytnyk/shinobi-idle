@@ -78,6 +78,11 @@ export interface ActionKind {
    * fed by the kinds of the clone technique's `slotLinks`.
    */
   flow?(id: string, content: ContentDb): ActionFlow | null;
+  /**
+   * Whether the action runs at full speed whatever share of the speed pool its slot has: a fight
+   * is not slowed by the clone's share (the clock of the fight and the cycles that pay its XP).
+   */
+  fullSpeed?: boolean;
   /** The skill the action trains, when it trains one; a locked skill refuses its actions. */
   skill?(id: string, content: ContentDb): string | null;
   /**
@@ -268,6 +273,13 @@ export function stopSlot(
  * Runs every slot's action. Progress is whole work units (ms x SHARE_FULL); a slot's share is how
  * many units a ms adds, and a cycle needs `intervalMs x SHARE_FULL`.
  */
+/** The work units a ms adds to the action in slot `index`: its share of the pool, or full speed for a kind that is not slowed. */
+function speedOf(state: GameState, index: number, rules: Rules): number {
+  const slot = state.slots[index];
+  if (!slot?.action) return 0;
+  return actionKindOf(rules, slot.action.kind)?.fullSpeed ? SHARE_FULL : slot.share;
+}
+
 export const actionSystem: System = {
   nextEventIn(state, content, rules) {
     let best: number | null = null;
@@ -277,15 +289,17 @@ export const actionSystem: System = {
       if (!kind) continue;
       const need =
         kind.intervalMs(state, slot.action.id, content, rules, index) * SHARE_FULL - slot.progress;
-      const wait = need <= 0 ? 0 : Math.ceil(need / slot.share);
+      const wait = need <= 0 ? 0 : Math.ceil(need / speedOf(state, index, rules));
       if (best === null || wait < best) best = wait;
     }
     return best;
   },
 
-  elapse(state, dt, content) {
+  elapse(state, dt, content, rules) {
     trackClone(state, dt, content);
-    for (const slot of state.slots) if (slot.action) slot.progress += dt * slot.share;
+    state.slots.forEach((slot, index) => {
+      if (slot.action) slot.progress += dt * speedOf(state, index, rules);
+    });
   },
 
   run(state, content, rules) {

@@ -1,4 +1,4 @@
-/** Shadow clones: a second action slot, the speed pool, the link bonus, the refusal of fights, telemetry and saving. */
+/** Shadow clones: a second action slot, the speed pool, the link bonus, fights (see clone-fights.test.ts), telemetry and saving. */
 import { content, type ContentDb } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
@@ -331,25 +331,20 @@ describe('what a clone may do', () => {
     for (const m of content.missions) {
       if (m.stages.some((s) => s.t === 'combat') || m.rank === 'OP') continue;
       const result = start(state, 1, 'mission', m.id);
-      if (!result.ok) expect(result.reason).not.toBe('error.cloneNoFight');
+      if (!result.ok) expect(result.reason).not.toBe('error.fightBusy');
     }
     expect(start(state, 1, 'mission', 'core:v_clones')).toEqual({ ok: true });
   });
 
-  it('refuses a fight, an operation and a mission with a combat stage, each with its own reason', () => {
+  it('no longer refuses a fight to the clone (the fight rules of the clone are in clone-fights.test.ts)', () => {
     const state = cloner();
     openWorld(state);
-    const refused = { ok: false, reason: 'error.cloneNoFight' };
-    expect(start(state, 1, 'fight', 'core:bandit')).toEqual(refused);
-    expect(start(state, 1, 'operation', content.operations[0]?.id ?? '')).toEqual(refused);
-    for (const m of content.missions.filter(
-      (x) => x.board && x.stages.some((s) => s.t === 'combat'),
-    )) {
-      expect(start(state, 1, 'mission', m.id), m.id).toEqual(refused);
-    }
-    expect(state.slots[1]?.action).toBeNull();
-    // The player's own slot is not refused for the same.
-    expect(start(state, 0, 'fight', 'core:bandit').ok).toBe(true);
+    expect(start(state, 1, 'fight', 'core:bandit').ok).toBe(true);
+    // One fight at a time: the player's own slot is refused while the clone fights.
+    expect(start(state, 0, 'fight', 'core:bandit')).toEqual({
+      ok: false,
+      reason: 'error.fightBusy',
+    });
   });
 
   it('runs a village mission to its end in the clone slot and pays the Workforce', () => {

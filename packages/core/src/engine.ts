@@ -14,6 +14,7 @@ import {
 import { setMedicSlot, setPouchSlot, usePouchSlot } from './combat/pouch.ts';
 import { buildObstacle } from './athletics.ts';
 import { studyEnemy } from './combat/bingo.ts';
+import { followChakraPool } from './combat/system.ts';
 import { combineParts } from './scrolls.ts';
 import type { EntityRef } from './entity.ts';
 import { emit } from './events.ts';
@@ -259,6 +260,8 @@ function startAction(
   slot.data = null;
   rebalanceShares(state, content);
   kind.start?.(state, slotIndex, id, content, rules);
+  // A clone that starts (or the end of one) changes the chakra pool of the fight under way.
+  followChakraPool(state, content);
   return { ok: true };
 }
 
@@ -335,6 +338,7 @@ function apply(
       if (!slot) return { ok: false, reason: 'error.invalidSlot' };
       if (!slot.action) return { ok: false, reason: 'error.noAction' };
       stopSlot(state, command.slot, 'manual', content, rules);
+      followChakraPool(state, content);
       return { ok: true };
     }
     case 'quest.pay':
@@ -347,6 +351,7 @@ function apply(
       const running = slots.filter((at) => state.slots[at]?.action);
       if (running.length === 0) return { ok: false, reason: 'error.noAction' };
       for (const at of running) stopSlot(state, at, 'dispelled', content, rules);
+      followChakraPool(state, content);
       return { ok: true };
     }
     case 'exam.start':

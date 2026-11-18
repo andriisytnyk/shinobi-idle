@@ -1,14 +1,17 @@
 <script lang="ts">
   import {
+    cloneCount,
     enemyStats,
     evalReq,
     fightSlotIndex,
+    isCloneSlot,
     zoneAvailable,
     zoneCellOf,
     type GameState,
   } from '@shinobi/core';
   import BattleReport from '../components/BattleReport.svelte';
   import BingoBook from '../components/BingoBook.svelte';
+  import CloneStart from '../components/CloneStart.svelte';
   import CombatLog from '../components/CombatLog.svelte';
   import FightScreen from '../components/FightScreen.svelte';
   import Hint from '../components/Hint.svelte';
@@ -53,6 +56,7 @@
         .map((o) => ({ id: o.id }));
       return {
         fighting: fightSlotIndex(gs) >= 0,
+        cloneFights: isCloneSlot(gs, content, fightSlotIndex(gs)),
         yard: yard.map((z) => ({
           id: z.id,
           enemy: z.enemy,
@@ -67,6 +71,9 @@
       };
     }),
   );
+
+  /** Whether a clone exists: the character's chakra pool is divided then. */
+  const cloned = $derived(game.read((gs: GameState) => cloneCount(gs, content) > 0));
 
   const start = (kind: 'fight' | 'operation', id: string) =>
     void game.dispatch({ type: 'action.start', slot: 0, kind, id });
@@ -138,11 +145,13 @@
             <button type="button" class="start" onclick={() => start('fight', zone.id)}
               >{t('combat.start')}</button
             >
+            <CloneStart kind="fight" id={zone.id} />
           </div>
         </li>
       {/each}
     </ul>
     <p class="idle">{t('combat.idle')}</p>
+    {#if cloned}<p class="clone-note" data-clone-split>{t('combat.cloneSplit')}</p>{/if}
 
     {#if listing.zones.length > 0}
       <h2>{t('combat.zones')}</h2>
@@ -167,6 +176,7 @@
                 aria-describedby={zone.available ? undefined : `why-zone-${zone.id}`}
                 onclick={() => start('fight', zone.id)}>{t('combat.zoneStart')}</button
               >
+              <CloneStart kind="fight" id={zone.id} disabled={!zone.available} />
             </div>
           </li>
         {/each}
@@ -185,6 +195,7 @@
               <button type="button" class="start" onclick={() => start('operation', op.id)}
                 >{t('combat.start')}</button
               >
+              <CloneStart kind="operation" id={op.id} />
             </div>
           </li>
         {/each}
@@ -195,7 +206,7 @@
   {#if section === 'fight' || (section === 'prepare' && listing.fighting)}
     <details class="log" data-fight-log>
       <summary>{t('combat.log')}</summary>
-      <CombatLog entries={game.combatLog} fighting={listing.fighting} />
+      <CombatLog entries={game.combatLog} fighting={listing.fighting} clone={listing.cloneFights} />
     </details>
   {/if}
 </SimplePage>
@@ -246,6 +257,12 @@
     font-family: var(--font-heading);
     font-size: var(--text-md);
     cursor: pointer;
+  }
+
+  .clone-note {
+    margin: 0;
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
   }
 
   .why {

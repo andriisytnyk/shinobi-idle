@@ -16,9 +16,11 @@
     outcomes?: readonly Outcome[];
     /** For an enemy: the player's action is aimed at it. On a phone the other bodies shrink to a line or two. */
     targeted?: boolean;
+    /** For the player's side: a clone fights, the body is the clone's. */
+    clone?: boolean;
   }
 
-  let { f, outcomes = [], targeted = false }: Props = $props();
+  let { f, outcomes = [], targeted = false, clone = false }: Props = $props();
 
   const player = $derived(f.side === 'player');
   const action = $derived(f.action);
@@ -104,8 +106,8 @@
         <Icon entity={{ kind: 'enemy', id: f.entry }} size={28} />
       {/if}
     </span>
-    <h3 class="name">
-      {#if player}{t('fight.you')}{:else if f.entry}<EntityLink
+    <h3 class="name" data-fighter={player ? (clone ? 'clone' : 'you') : undefined}>
+      {#if player}{t(clone ? 'combat.cloneYou' : 'fight.you')}{:else if f.entry}<EntityLink
           kind="enemy"
           id={f.entry}
         />{#if f.of > 1}&nbsp;<span class="nth">#{f.nth}</span>{/if}{/if}
