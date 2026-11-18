@@ -46,5 +46,33 @@
     "level": 50,
     "cycle": 12,
     "xp": 750.426
+  },
+  {
+    "id": "core:bih_iz_tiaharem",
+    "level": 1,
+    "skill": "vit",
+    "cycle": 3,
+    "xp": 1.512
+  },
+  {
+    "id": "core:vidzhymannia_na_kulakakh",
+    "level": 15,
+    "skill": "vit",
+    "cycle": 5.6,
+    "xp": 8.29
+  },
+  {
+    "id": "core:stiika_pid_vodospadom",
+    "level": 30,
+    "skill": "vit",
+    "cycle": 8.3,
+    "xp": 38.976
+  },
+  {
+    "id": "core:zahartuvannia_udaramy",
+    "level": 45,
+    "skill": "vit",
+    "cycle": 11.1,
+    "xp": 165.348
   }
 ]

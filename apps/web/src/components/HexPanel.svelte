@@ -291,7 +291,7 @@
                     {#if point.power.length > 0}
                       <span class="badge" data-point-power>{t('map.point.power')}</span>
                     {/if}
-                    {#if point.active}
+                    {#if point.active && point.power.length > 0}
                       <span class="badge here" data-point-active>{t('map.point.active')}</span>
                     {/if}
                   </p>

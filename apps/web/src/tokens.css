@@ -97,6 +97,9 @@
   --topbar-height: 3.25rem;
   --tabbar-height: 3.5rem;
   --now-height: 3.25rem;
+  /* The real heights of the top bar and the «Зараз» bar, measured by the app while it runs; these are the starting values. */
+  --top-live: 0px;
+  --now-live: var(--now-height);
 
   /* Text sizes, from the smallest label to the page title. `sm` is the body text. */
   --text-2xs: 0.7rem;

@@ -467,10 +467,16 @@
       padding: var(--space-2);
     }
 
+    /* A long name keeps its words whole: the pop drops below it instead of squeezing it into pieces. */
+    .head {
+      flex-wrap: wrap;
+    }
+
     .name {
-      flex: 1;
-      min-width: var(--icon-md);
+      flex: 1 1 var(--panel-min);
+      min-width: min(var(--panel-min), 100%);
       font-size: var(--text-sm);
+      overflow-wrap: break-word;
     }
 
     .pop {
