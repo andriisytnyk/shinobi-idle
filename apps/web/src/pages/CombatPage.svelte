@@ -232,11 +232,12 @@
 
   .tabs a {
     display: inline-flex;
-    flex: 1;
+    flex: 1 1 auto;
     align-items: center;
     justify-content: center;
     min-height: var(--control-md);
     padding: 0 var(--space-3);
+    white-space: nowrap;
     border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface);

@@ -8,6 +8,7 @@
   import { holderRef, rewardRows } from '../lib/missions.ts';
   import { game } from '../lib/store.ts';
   import { refusalParams, toasts } from '../lib/toasts.svelte.ts';
+  import BusyBy from './BusyBy.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import MissionRankStamp from './MissionRankStamp.svelte';
@@ -168,7 +169,9 @@
       {t('tile.clone')}
     </button>
     {#if clone.refusal?.reason === 'error.fightBusy'}
-      <p class="ct-why" id="why-clone-{mission.id}" data-clone-why>{t(clone.refusal.reason)}</p>
+      <p class="ct-why" id="why-clone-{mission.id}" data-clone-why>
+        <BusyBy reason={clone.refusal.reason} by={clone.refusal.by} />
+      </p>
     {/if}
   {/if}
 </li>

@@ -6,6 +6,10 @@
   /** The last good save as text: null before it was asked for, '' when there is none. */
   let exported = $state<string | null>(null);
   let copied = $state(false);
+  let heading = $state<HTMLElement>();
+
+  // The screen replaces the whole app: focus lands on its title, so a keyboard or a screen reader starts there.
+  $effect(() => heading?.focus());
 
   async function doExport(): Promise<void> {
     exported = (await game.exportStored()) ?? '';
@@ -22,7 +26,7 @@
 </script>
 
 <main class="gate" data-gate="crashed" role="alert">
-  <h1>{t('crash.title')}</h1>
+  <h1 tabindex="-1" bind:this={heading}>{t('crash.title')}</h1>
   <p>{t('crash.body')}</p>
   {#if crash}
     <details>
@@ -67,6 +71,10 @@
     font-family: var(--font-heading);
     font-size: var(--text-xl);
     font-weight: 400;
+  }
+
+  h1:focus {
+    outline: none;
   }
 
   p {

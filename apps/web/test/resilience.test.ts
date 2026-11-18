@@ -200,6 +200,38 @@ describe('the game loop that fails', () => {
   });
 });
 
+describe('a command or a developer step that throws', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  const broken = async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const kv = memoryStore();
+    const g = createGame({ clock: { now: () => T0 }, kv });
+    await g.start();
+    g.state.player.name = 'Добре';
+    await g.save();
+    const good = kv.data.get(SAVE_KEY);
+    (g.state as unknown as { slots: unknown }).slots = null;
+    return { g, kv, good };
+  };
+
+  it('a command that throws reaches the crash screen and writes nothing', async () => {
+    const { g, kv, good } = await broken();
+    const result = g.dispatch({ type: 'action.start', slot: 0, kind: 'fight', id: 'core:wolf' });
+    expect(result).toEqual({ ok: false, reason: 'error.crashed' });
+    expect(g.phase).toBe('crashed');
+    expect(g.crash?.message).toBeTruthy();
+    await g.save();
+    expect(kv.data.get(SAVE_KEY)).toBe(good);
+  });
+
+  it('the developer step goes the same way', async () => {
+    const { g } = await broken();
+    g.devAdvance(60_000);
+    expect(g.phase).toBe('crashed');
+  });
+});
+
 describe('the app: a part that fails to draw', () => {
   let booted: BootedApp | null = null;
   afterEach(() => {

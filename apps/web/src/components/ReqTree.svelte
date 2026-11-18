@@ -60,6 +60,16 @@
         )
       : '',
   );
+  /** The vague hint of a point that is only veiled: the requirement names it as «???», and this says where to look. */
+  const pointHint = $derived(
+    pointPlace && hasKey(`place.${pointPlace.id}.hint`)
+      ? game.read((gs) =>
+          pointStatus(gs, game.content, pointPlace) === 'veiled'
+            ? t(`place.${pointPlace.id}.hint`)
+            : null,
+        )
+      : null,
+  );
   const flagText = $derived(
     req.t === 'flag'
       ? hasKey(`req.flag.${req.id}`)
@@ -108,6 +118,7 @@
         {t('req.rank', { rank: rankName(req.rank) })}
       {:else if req.t === 'flag' && pointPlace}
         <span data-point-req>{t('req.pointFound', { name: pointName })}</span>
+        {#if pointHint}<span class="detail" data-point-req-hint>{pointHint}</span>{/if}
       {:else if req.t === 'flag' && flagRef}
         <EntityLink kind={flagRef.kind} id={flagRef.id} offered />
         <span class="detail">{t(flagRef.kind === 'poi' ? 'req.poiFound' : 'req.regionOpen')}</span>

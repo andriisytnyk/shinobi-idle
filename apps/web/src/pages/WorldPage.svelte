@@ -220,7 +220,7 @@
 
 <style>
   .world {
-    --sheet-bottom: var(--now-height);
+    --sheet-bottom: var(--now-live, var(--now-height));
     --_stage-h: max(26rem, calc(100dvh - 21rem));
   }
 

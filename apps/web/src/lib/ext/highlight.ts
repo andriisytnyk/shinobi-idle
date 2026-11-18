@@ -22,25 +22,25 @@ export function findTile(root: ParentNode, entity: string): HTMLElement | null {
 
 /**
  * Marks the tile of an entity on the parent page (`data-highlighted`) and brings it into view. A page
- * that draws its tiles late (a widget, a panel) is watched until the tile appears. Returns the cleanup.
+ * that draws its tiles late (a widget, a panel) is watched for as long as the sheet is open: a tile
+ * drawn again later (the list changed, the tile was remounted) is marked anew. Returns the cleanup.
  */
 export function highlightTile(root: HTMLElement, entity: string): () => void {
   let marked: HTMLElement | null = null;
-  const apply = (): boolean => {
+  const apply = (): void => {
     const tile = findTile(root, entity);
-    if (!tile) return false;
-    if (tile !== marked) {
-      marked?.removeAttribute('data-highlighted');
-      marked = tile;
-      tile.setAttribute('data-highlighted', '');
-      tile.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
-    }
-    return true;
+    if (!tile || tile === marked) return;
+    marked?.removeAttribute('data-highlighted');
+    marked = tile;
+    tile.setAttribute('data-highlighted', '');
+    tile.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
   };
   const watcher = new MutationObserver(() => {
-    if (apply()) watcher.disconnect();
+    // Cheap while the mark is in place: look for the tile only when there is none or it left the page.
+    if (!marked?.isConnected) apply();
   });
-  if (!apply()) watcher.observe(root, { childList: true, subtree: true });
+  apply();
+  watcher.observe(root, { childList: true, subtree: true });
   return () => {
     watcher.disconnect();
     marked?.removeAttribute('data-highlighted');
