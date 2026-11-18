@@ -92,7 +92,7 @@ function descend(startP: P): { p: P; l: number } {
 }
 // Restarts from perturbed starts (a seeded generator): the loss has local minima.
 let seed = 12345;
-const rnd = (): number => (seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296;
+const rnd = (): number => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
 {
   const first = descend(best);
   best = first.p;
@@ -100,10 +100,7 @@ const rnd = (): number => (seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0)
   for (let i = 0; i < 25; i++) {
     const start: P = {};
     for (const [n, [lo, hi]] of Object.entries(BOUNDS)) {
-      start[n] = Math.min(
-        hi,
-        Math.max(lo, best[n]! * (0.5 + rnd()) + (best[n]! === 0 ? rnd() : 0)),
-      );
+      start[n] = Math.min(hi, Math.max(lo, best[n]! * (0.5 + rnd()) + (best[n]! === 0 ? rnd() : 0)));
     }
     const got = descend(start);
     if (got.l < bl) {
