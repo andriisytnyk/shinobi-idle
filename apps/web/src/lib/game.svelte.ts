@@ -514,7 +514,7 @@ export function createGame(deps: GameDeps = {}) {
     await boot();
   }
 
-  return {
+  const game = {
     get state(): GameState {
       void version;
       return state;
@@ -655,31 +655,6 @@ export function createGame(deps: GameDeps = {}) {
       }
       touch();
     },
-    /**
-     * Developer tool (test builds): runs `change` on the live state, the way a command would: events
-     * are drained, the views refresh and a crash stops the loop. `change` goes through core helpers.
-     */
-    devApply(change: (state: GameState, content: ContentDb, rules: Rules) => void): void {
-      epoch++;
-      try {
-        change(state, content, rules);
-        drainEvents();
-        tel.observe(state);
-      } catch (error) {
-        stopOnCrash(error);
-        return;
-      }
-      touch();
-    },
-    /** Developer tool (test builds): the live clock's multiplier. */
-    get devSpeed(): number {
-      void version;
-      return speed;
-    },
-    set devSpeed(value: number) {
-      speed = Number.isFinite(value) && value >= 1 ? value : 1;
-      touch();
-    },
     /** The local telemetry: export file, clearing. It never touches the network. */
     telemetry: {
       file: (): TelemetryFile => tel.file(state),
@@ -807,6 +782,48 @@ export function createGame(deps: GameDeps = {}) {
       return true;
     },
   };
+
+  // The developer tools exist in test builds only: in a production build the flag is a constant
+  // `false`, and nothing below is in the bundle.
+  if (__DEV_PANEL__) {
+    Object.defineProperties(
+      game,
+      Object.getOwnPropertyDescriptors({
+        /**
+         * Developer tool: runs `change` on the live state, the way a command would: events are
+         * drained, the views refresh and a crash stops the loop. `change` goes through core helpers.
+         */
+        devApply(change: (state: GameState, content: ContentDb, rules: Rules) => void): void {
+          epoch++;
+          try {
+            change(state, content, rules);
+            drainEvents();
+            tel.observe(state);
+          } catch (error) {
+            stopOnCrash(error);
+            return;
+          }
+          touch();
+        },
+        /** Developer tool: the live clock's multiplier. */
+        get devSpeed(): number {
+          void version;
+          return speed;
+        },
+        set devSpeed(value: number) {
+          speed = Number.isFinite(value) && value >= 1 ? value : 1;
+          touch();
+        },
+      }),
+    );
+  }
+  return game as typeof game & DevTools;
+}
+
+/** What the developer panel adds to the game in a test build (absent from a production build). */
+export interface DevTools {
+  devApply(change: (state: GameState, content: ContentDb, rules: Rules) => void): void;
+  devSpeed: number;
 }
 
 export type Game = ReturnType<typeof createGame>;

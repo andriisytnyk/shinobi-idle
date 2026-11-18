@@ -32,7 +32,7 @@ void game.start().then(() => {
 pwa.init();
 
 // With ?dev=1 the game is reachable from the console for debugging.
-if (isDevMode()) Object.assign(window, { __shinobi: game });
+if (__DEV_PANEL__ && isDevMode()) Object.assign(window, { __shinobi: game });
 
 export default mount(App, {
   target,
