@@ -81,7 +81,7 @@ export const K = {
   // --- розвідка ---
   cellExplores: [24,84,156,240,360], cellLevelStep: 10,
   // --- клони ---
-  clone: { pool:1.0, link:0.10 },
+  clone: { life:{ default:7200, stand:21600, practice:2400, meditate:3600, fight:1200, operation:1200, mission:3600 }, lifeSkill:"med", lifeMastery:0.01, lifeSkillLevel:0.01, fatigue:{ share:0.5, slow:0.15, maxMs:21600000, decayPerLevel:0.02, meditating:1 } },
 };
 
 // ======================= ФОРМУЛИ =======================

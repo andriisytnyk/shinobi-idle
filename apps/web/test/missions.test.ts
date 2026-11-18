@@ -254,16 +254,15 @@ describe('a blocked mission shows the reason dispatch gives', () => {
     expect(agree(state)).toContain('error.missingIngredient');
   });
 
-  it('for a fight held by another slot, and for a mission running in another slot', () => {
+  it('for a fight in another slot (not a reason any more), and for a mission running in another slot', () => {
     const state = able();
     state.slots.push({ action: null, progress: 0, share: 0, data: null });
-    // A slot of the player's own: a clone's slot does not take fights.
+    // A slot of the player's own: the technique is not known, so slot 1 is no clone's.
     delete state.known['core:shadow_clone'];
     dispatch(state, { type: 'loadout.auto', on: true }, content);
     dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: 'core:dummy' }, content);
-    // Slot 1 is the free one now: a mission with a combat stage is refused there.
-    const reasons = agree(state);
-    expect(reasons).toContain('error.fightBusy');
+    // Every performer has its own fight: the board gives the answer dispatch gives, and it is not a busy fight.
+    expect(agree(state)).not.toContain('error.fightBusy');
     // A mission with no fight is refused for nothing.
     const quiet = content.missions.find(
       (m) => m.board && !m.team && !m.stages.some((s) => s.t === 'combat'),
@@ -319,25 +318,6 @@ describe('a blocked mission shows the reason dispatch gives', () => {
     booted = await bootApp([coreUi], player({ natures: ['katon'] }), '#/mission/core:fire');
     expect(q('[data-why]')?.getAttribute('data-why')).toBe('error.requirementsNotMet');
     expect(q('[data-ui="req-row"]')).not.toBeNull();
-  });
-
-  it('names the action that holds the fight, as a link, and says it must be stopped first', async () => {
-    const state = able();
-    state.slots.push({ action: null, progress: 0, share: 0, data: null });
-    // A slot of the player's own: a clone's slot does not take fights.
-    delete state.known['core:shadow_clone'];
-    dispatch(state, { type: 'loadout.auto', on: true }, content);
-    dispatch(
-      state,
-      { type: 'action.start', slot: 0, kind: MISSION_KIND, id: 'core:thief' },
-      content,
-    );
-    booted = await bootApp([coreUi], state, '#/mission/core:caravan');
-    const by = q('[data-by]');
-    expect(q('[data-why]')?.getAttribute('data-why')).toBe('error.fightBusy');
-    expect(by?.textContent).toContain(t('error.fightBusy'));
-    expect(by?.querySelector('a')?.getAttribute('href')).toBe('#/mission/core:thief');
-    expect(t('error.fightBusy')).toContain('місією з боєм');
   });
 });
 

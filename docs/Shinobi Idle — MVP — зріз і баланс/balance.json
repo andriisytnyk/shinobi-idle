@@ -444,8 +444,25 @@
   ],
   "cellLevelStep": 10,
   "clone": {
-   "pool": 1,
-   "link": 0.1
+   "life": {
+    "default": 7200,
+    "stand": 21600,
+    "practice": 2400,
+    "meditate": 3600,
+    "fight": 1200,
+    "operation": 1200,
+    "mission": 3600
+   },
+   "lifeSkill": "med",
+   "lifeMastery": 0.01,
+   "lifeSkillLevel": 0.01,
+   "fatigue": {
+    "share": 0.5,
+    "slow": 0.15,
+    "maxMs": 21600000,
+    "decayPerLevel": 0.02,
+    "meditating": 1
+   }
   }
  },
  "pace": {

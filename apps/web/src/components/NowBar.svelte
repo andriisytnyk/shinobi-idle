@@ -3,7 +3,11 @@
   import {
     actionInfo,
     cellInfo,
-    isCloneSlot,
+    dispelPreview,
+    fightOf,
+    fatigueLeftMs,
+    lifeLeftMs,
+    LIFE_FULL,
     hexKey,
     locationCell,
     positionHex,
@@ -72,6 +76,10 @@
     practice: { phase: PhaseName; seal: { id: string; glyph: string } | null } | null;
     /** What the player does in a fight: a key of the fight page and the technique being cast. */
     fight: { key: string; tech: string | null } | null;
+    /** A clone's chakra: the share left and the time it lasts at what it does now. */
+    life: { pct: number; leftMs: number } | null;
+    /** What the clone holds: skill XP by skill (as text parts) and the fatigue handing it over leaves, ms. */
+    know: { xp: { skill: string; n: number }[]; fatigueMs: number } | null;
   }
 
   const rows = $derived.by((): Row[] =>
@@ -114,7 +122,7 @@
           }
         }
         let fight: Row['fight'] = null;
-        const player = state.combat?.fight.player;
+        const player = fightOf(state, index)?.fight.player;
         if (slot.action.kind === 'fight' && player) {
           const doing = player.act;
           fight =
@@ -135,7 +143,22 @@
 
         out.push({
           slot: index,
-          clone: isCloneSlot(state, content, index),
+          clone: state.clones[index] !== undefined,
+          life: state.clones[index]
+            ? {
+                pct: Math.round((state.clones[index].life / LIFE_FULL) * 100),
+                leftMs: lifeLeftMs(state, index, content, game.rules),
+              }
+            : null,
+          know: (() => {
+            const held = dispelPreview(state, index, content);
+            return held
+              ? {
+                  xp: Object.entries(held.xp).map(([skill, n]) => ({ skill, n })),
+                  fatigueMs: held.fatigueMs,
+                }
+              : null;
+          })(),
           kind: slot.action.kind,
           ref,
           skill: info?.skill,
@@ -180,6 +203,9 @@
   /** On a phone the bar is one line; the toggle opens the other slots. */
   let expanded = $state(false);
 
+  /** The mind fatigue of the character: ms left, 0 when none. */
+  const fatigue = $derived(game.read((gs) => fatigueLeftMs(gs, game.content, game.rules)));
+
   const wait = $derived(game.read((gs) => senseiTestInfo(gs, game.rules, game.content)));
 
   const stop = (row: Row) =>
@@ -209,6 +235,11 @@
         </span>
       {/each}
     </div>
+  {/if}
+  {#if fatigue > 0}
+    <span class="chip" data-ui="fatigue" title={t('clone.fatigueTitle')}
+      >{t('clone.fatigue', { time: formatDuration(fatigue) })}</span
+    >
   {/if}
   <div class="buff-slot"><BuffStrip /></div>
   {#if rows.length === 0}
@@ -267,6 +298,24 @@
                 n: formatXp(row.xpPerHour),
               })}{/if}</span
           >
+          {#if row.life}
+            <span class="clone-life" data-ui="clone-life">
+              <progress max="100" value={row.life.pct} aria-label={t('clone.life')}></progress>
+              {t('clone.lifeLeft', { time: formatDuration(row.life.leftMs) })}
+            </span>
+          {/if}
+          {#if row.know}
+            <span class="clone-know" data-ui="clone-knowledge">
+              {#each row.know.xp as part (part.skill)}
+                {t('clone.knows', { n: formatXp(part.n), skill: t(`skill.${part.skill}.name`) })}
+              {:else}
+                {t('clone.knowsNothing')}
+              {/each}
+              {#if row.know.fatigueMs > 0}<span data-ui="clone-preview"
+                  >{t('clone.dispelPreview', { time: formatDuration(row.know.fatigueMs) })}</span
+                >{/if}
+            </span>
+          {/if}
           {#if row.walkLeft > 0}
             <span class="wait" data-walk-left
               >{t('world.walkLeft', { time: formatDuration(row.walkLeft) })}</span

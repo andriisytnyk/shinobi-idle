@@ -320,7 +320,25 @@ export interface RuleDisabledEvent extends EventBase {
   reason: string;
 }
 
+/** A shadow clone was made in a slot. */
+export interface CloneMadeEvent extends EventBase {
+  type: 'cloneMade';
+  slot: number;
+}
+/** A shadow clone was dispelled: by the player, by its chakra running out, or by death; what it knew went to the character. */
+export interface CloneDispelledEvent extends EventBase {
+  type: 'cloneDispelled';
+  slot: number;
+  cause: 'manual' | 'life' | 'death';
+  /** Skill XP handed over, by skill. */
+  xp: Record<string, number>;
+  /** Mind fatigue it left, in ms. */
+  fatigueMs: number;
+}
+
 export type GameEvent =
+  | CloneMadeEvent
+  | CloneDispelledEvent
   | LevelUpEvent
   | MasteryUpEvent
   | PoolCheckpointEvent

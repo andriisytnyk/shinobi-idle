@@ -15,7 +15,7 @@ import {
   FIGHT_KIND,
   OPERATION_KIND,
   MISSION_KIND,
-  isCombatKind,
+  holdsFight,
   newCombat,
   newOperation,
 } from './combat/system.ts';
@@ -45,6 +45,7 @@ import { STREAM_NAMES } from './rng.ts';
 import { defaultRules, type Rules } from './rules.ts';
 import {
   createState,
+  LIFE_FULL,
   SHARE_FULL,
   STATE_VERSION,
   type ActionSlot,
@@ -55,6 +56,9 @@ import { updateQuests } from './quests.ts';
 import { refreshRegions, regionFlag } from './regions.ts';
 import { isShownKey, seenLimit } from './reveal.ts';
 import { refreshUnlocks } from './unlocks.ts';
+import { FATIGUE_UNIT } from './clone-life.ts';
+import { STAND_ID, STAND_KIND, asPerformer } from './performer.ts';
+import { playerMaxChakra } from './combat/stats.ts';
 import {
   villageBuildCost,
   civilCap,
@@ -375,6 +379,37 @@ export const MIGRATIONS: readonly Migration[] = [
     }
     return { ...state, village: { ...village, raids, damage: {} } };
   },
+  // v19 -> v20: shadow clones redesign (a clone is a burst you pay for). Every clone slot that runs an action gets a
+  // clone: full chakra, an empty bag (the Bank was shared before; what it did not carry it cannot use now), the pouch
+  // slots of the character and, when the single fight of the old state was its fight, that fight. The speed pool is
+  // gone (shares are recomputed on load), and the mind is not tired.
+  (state) => {
+    const slots = Array.isArray(state.slots) ? state.slots : [];
+    const pouch = isRecord(state.pouch) ? state.pouch : {};
+    const held = Array.isArray(pouch.slots) ? pouch.slots : [];
+    const clones: Raw = {};
+    let combat: unknown = state.combat ?? null;
+    slots.forEach((s: unknown, i) => {
+      if (i < 1 || !isRecord(s) || !isRecord(s.action)) return;
+      const own = isRecord(combat) && combat.owner === i ? combat : null;
+      if (own) combat = null;
+      clones[i] = {
+        life: LIFE_FULL,
+        max: 0,
+        born: nonNegative(state.now),
+        bag: {},
+        purse: {},
+        pouch: {
+          slots: held.map((h: unknown) => ({ id: isRecord(h) ? h.id : '', n: 0 })),
+          medic: pouch.medic ?? null,
+        },
+        xp: {},
+        mastery: {},
+        fight: own,
+      };
+    });
+    return { ...state, clones, fatigue: 0, combat };
+  },
 ];
 
 /** Deepest nesting a slot's data may have. */
@@ -544,6 +579,53 @@ function sanitizeCombat(
     run,
     ...(pending ? { pending } : {}),
   };
+}
+
+/** The most XP, Mastery or money a clone body can hold on load: a doctored number cannot grow without bound. */
+const HELD_LIMIT = 1e15;
+
+/**
+ * The clones of a save, checked field by field. A body needs a slot that a known technique opens; its bag
+ * holds items of the content, its XP and Mastery the skills and keys of the content. The fight is restored
+ * with the other fights (it needs its slot's action), so it is empty here.
+ */
+function sanitizeClones(raw: unknown, state: GameState, content: ContentDb): GameState['clones'] {
+  const out: GameState['clones'] = {};
+  if (!isRecord(raw)) return out;
+  const index = indexOf(content);
+  const held = (x: unknown): number =>
+    typeof x === 'number' && Number.isFinite(x) && x > 0 ? Math.min(HELD_LIMIT, x) : 0;
+  for (const [key, v] of Object.entries(raw)) {
+    const slot = Number(key);
+    if (!Number.isInteger(slot) || slot < 1 || !state.slots[slot] || !isRecord(v)) continue;
+    const purse: Record<string, number> = {};
+    const saved = isRecord(v.purse) ? v.purse : {};
+    for (const currency of Object.keys(state.currencies))
+      purse[currency] = Object.hasOwn(saved, currency) ? Math.floor(held(saved[currency])) : 0;
+    out[slot] = {
+      life: Math.min(LIFE_FULL, Math.max(1, Math.floor(nonNegative(v.life)))),
+      max: Math.min(1e9, nonNegative(v.max)),
+      born: Math.min(state.now, Math.floor(nonNegative(v.born))),
+      bag: pick(v.bag, (id, n) =>
+        index.itemIds.has(id) && typeof n === 'number' && Number.isInteger(n) && n > 0
+          ? Math.min(HELD_LIMIT, n)
+          : undefined,
+      ),
+      purse,
+      pouch: sanitizePouch(v.pouch, content),
+      xp: pick(v.xp, (skill, n) => (index.skills.has(skill) && held(n) > 0 ? held(n) : undefined)),
+      mastery: pick(v.mastery, (mkey, m) => {
+        if (!index.masteryKeys.has(mkey) || !isRecord(m) || !index.skills.has(String(m.skill)))
+          return undefined;
+        const amount = held(m.amount);
+        const pool = held(m.pool);
+        return amount > 0 || pool > 0 ? { skill: String(m.skill), amount, pool } : undefined;
+      }),
+      fight: null,
+      ...(v.doomed === 'death' ? { doomed: 'death' as const } : {}),
+    };
+  }
+  return out;
 }
 
 /** A loadout read back: ids the content or the player no longer has are dropped. */
@@ -958,6 +1040,22 @@ export function deserialize(
       if (lost) emit(state, { type: 'actionStopped', slot: i, ...lost, reason: 'missing' });
     });
   }
+  // The clones: a body needs a slot a known technique opens, and a slot of a clone needs its body.
+  state.clones = sanitizeClones(raw.clones, state, content);
+  state.fatigue = Math.min(
+    Math.floor(nonNegative(raw.fatigue)),
+    content.balance.K.clone.fatigue.maxMs * FATIGUE_UNIT,
+  );
+  state.slots.forEach((slot, i) => {
+    if (i === 0) return;
+    if (!state.clones[i]) {
+      slot.action = null;
+      slot.progress = 0;
+      slot.data = null;
+    } else if (!slot.action) {
+      slot.action = { kind: STAND_KIND, id: STAND_ID };
+    }
+  });
   state.flags = pick(raw.flags, (_key, v) =>
     v === true || (typeof v === 'number' && Number.isFinite(v)) ? v : undefined,
   );
@@ -1073,54 +1171,56 @@ export function deserialize(
   for (const [at, slot] of state.slots.entries()) {
     const kind = slot.action && rules.actionKinds[slot.action.kind];
     if (slot.action && kind) {
+      const action = slot.action;
       slot.progress = Math.min(
         slot.progress,
-        kind.intervalMs(state, slot.action.id, content, rules, at) * SHARE_FULL,
+        asPerformer(state, at, () => kind.intervalMs(state, action.id, content, rules, at)) *
+          SHARE_FULL,
       );
     }
+  }
+  // The pool a clone was made with is the character's pool divided by the performers: a body saved without it takes it now.
+  for (const body of Object.values(state.clones)) {
+    if (!(body.max > 0)) body.max = playerMaxChakra(state, content);
   }
   // A figure belongs to a clone that works: one of a slot that is gone or idle is not on the map.
   for (const slot of Object.keys(state.world.figures ?? {}))
     if (!state.slots[Number(slot)]?.action) removeFigure(state, Number(slot));
   ensurePouch(state, content);
   syncLoadout(state, content);
-  // A fight needs both its slot and its state: it belongs to the slot its `owner` names, and only if that
-  // slot still runs an action that can hold a fight. Either one alone is dropped or rebuilt.
-  const holds = (i: number): boolean => {
-    const kind = state.slots[i]?.action?.kind;
-    return kind !== undefined && (isCombatKind(kind) || kind === MISSION_KIND);
-  };
-  const savedOwner = isRecord(raw.combat) ? raw.combat.owner : undefined;
-  const firstFight = state.slots.findIndex((s) => s.action !== null && isCombatKind(s.action.kind));
-  const owner =
-    typeof savedOwner === 'number' && Number.isInteger(savedOwner) && holds(savedOwner)
-      ? savedOwner
-      : firstFight;
-  /** A new fight for a slot that runs a plain fight or an operation. */
-  const rebuild = (i: number): CombatState | null => {
-    const action = state.slots[i]?.action;
-    if (action?.kind === FIGHT_KIND) {
-      const target = fightTarget(content, action.id);
-      return target ? newCombat(state, target.enemy, content, rules, i) : null;
-    }
-    if (action?.kind === OPERATION_KIND) {
-      const op = indexOf(content).operations.get(action.id);
-      // A fight that could not be carried over (an older save) goes on from the step of its run.
-      const saved = isRecord(raw.combat) ? sanitizeRun(raw.combat.run, action, content) : null;
-      return op ? newOperation(state, op, content, rules, i, saved?.step) : null;
-    }
-    return null;
-  };
-  const action = state.slots[owner]?.action ?? null;
-  state.combat = null;
-  if (action && owner >= 0) {
-    // A mission keeps its fight in the same place; the mission checks it against its run below.
-    const stand = action.kind === MISSION_KIND ? { kind: FIGHT_KIND, id: action.id } : action;
-    state.combat = sanitizeCombat(raw.combat, stand, owner, content) ?? rebuild(owner);
+  // A fight needs both its slot and its state: every performer has its own (the character's is `state.combat`,
+  // a clone's lives in its body), and only if the slot still runs an action that can hold a fight. Either one
+  // alone is dropped or rebuilt.
+  const savedFight = (i: number): unknown =>
+    i === 0
+      ? raw.combat
+      : isRecord(raw.clones) && isRecord(raw.clones[i])
+        ? (raw.clones[i] as Raw).fight
+        : undefined;
+  for (let i = 0; i < state.slots.length; i++) {
+    // A slot after the first with no clone holds nothing (its action was dropped above).
+    if (i > 0 && !state.clones[i]) continue;
+    asPerformer(state, i, () => {
+      state.combat = null;
+      const action = state.slots[i]?.action ?? null;
+      if (!action || !holdsFight(state, i)) return;
+      const saved = savedFight(i);
+      // A mission keeps its fight in the same place; the mission checks it against its run below.
+      const stand = action.kind === MISSION_KIND ? { kind: FIGHT_KIND, id: action.id } : action;
+      state.combat = sanitizeCombat(saved, stand, i, content);
+      if (state.combat) return;
+      // A plain fight or an operation whose state is lost starts afresh (an operation from the step of its run).
+      if (action.kind === FIGHT_KIND) {
+        const target = fightTarget(content, action.id);
+        if (target) state.combat = newCombat(state, target.enemy, content, rules, i);
+      } else if (action.kind === OPERATION_KIND) {
+        const op = indexOf(content).operations.get(action.id);
+        const run = isRecord(saved) ? sanitizeRun(saved.run, action, content) : null;
+        if (op) state.combat = newOperation(state, op, content, rules, i, run?.step);
+      }
+    });
   }
   repairMissions(state, content, rules);
-  // A mission that took the fight in a tampered save gave it up again: a plain fight gets its own back.
-  if (!state.combat && firstFight >= 0) state.combat = rebuild(firstFight);
   updateQuests(state, content);
   return state;
 }

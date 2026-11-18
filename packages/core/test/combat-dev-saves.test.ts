@@ -36,9 +36,15 @@ function strip(value: unknown): unknown {
   return value;
 }
 
+/** The branches that came with the clone redesign (state version 20): dev's states have none of them, and wrote version 19. */
+function withoutClones(save: Record<string, unknown>): Record<string, unknown> {
+  const { clones: _clones, fatigue: _fatigue, ...state } = save.state as Record<string, unknown>;
+  return { ...save, v: 19, state: { ...state, v: 19 } };
+}
+
 const digest = (text: string): string =>
   createHash('sha256')
-    .update(JSON.stringify(strip(JSON.parse(text))))
+    .update(JSON.stringify(strip(withoutClones(JSON.parse(text)))))
     .digest('hex')
     .slice(0, 32);
 

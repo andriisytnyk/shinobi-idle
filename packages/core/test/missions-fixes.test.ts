@@ -255,8 +255,8 @@ describe('fights in two slots', () => {
       { type: 'action.start', slot: 1, kind: 'practice', id: 'core:leaf_whirlwind' },
       content,
     );
-    // At half speed the first stage takes twice its time.
-    advance(state, (state.slots[0]?.data as { p: { ms: number } }).p.ms * 2 + 3000, content);
+    // Every performer works at full speed: the first stage takes its own time.
+    advance(state, (state.slots[0]?.data as { p: { ms: number } }).p.ms + 3000, content);
     expect(state.combat?.owner).toBe(0);
     const copy = deserialize(serialize(state), content);
     expect(copy.combat?.owner).toBe(0);
@@ -271,9 +271,10 @@ describe('fights in two slots', () => {
     startMission(state, 'core:weed', 0);
     dispatch(state, { type: 'action.start', slot: 1, kind: 'fight', id: 'core:bandit' }, content);
     advance(state, 30_000, content);
-    expect(state.combat?.owner).toBe(1);
+    // The clone's fight is the clone's own; the mission is the character's.
+    expect(state.clones[1]?.fight?.owner).toBe(1);
     const copy = deserialize(serialize(state), content);
-    expect(copy.combat?.owner).toBe(1);
+    expect(copy.clones[1]?.fight?.owner).toBe(1);
     expect(serialize(copy)).toBe(serialize(state));
   });
 
@@ -295,15 +296,17 @@ describe('fights in two slots', () => {
     }
   });
 
-  it('gives a plain fight its own back when a tampered owner pointed at a mission slot', () => {
+  it('gives a clone fight the owner of its slot, whatever the save says', () => {
     const state = twoSlots('core:weed');
     startMission(state, 'core:weed', 0);
     dispatch(state, { type: 'action.start', slot: 1, kind: 'fight', id: 'core:bandit' }, content);
     advance(state, 30_000, content);
-    const raw = JSON.parse(serialize(state)) as { state: { combat: { owner: number } } };
-    raw.state.combat.owner = 0;
+    const raw = JSON.parse(serialize(state)) as {
+      state: { clones: Record<string, { fight: { owner: number } }> };
+    };
+    (raw.state.clones['1'] as { fight: { owner: number } }).fight.owner = 0;
     const loaded = deserialize(JSON.stringify(raw), content);
-    expect(loaded.combat?.owner).toBe(1);
+    expect(loaded.clones[1]?.fight?.owner).toBe(1);
     expect(loaded.slots[0]?.data).toMatchObject({ s: 0 });
   });
 });

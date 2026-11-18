@@ -15,6 +15,7 @@ import { removeFigure } from './hex.ts';
 import { indexOf } from './lookup.ts';
 import { actionFloor, entitySkill } from './vocab.ts';
 import { trackClone } from './clone.ts';
+import { STAND_ID, STAND_KIND, asPerformer } from './performer.ts';
 import { nonNativeLevel } from './natures.ts';
 import { cycleFactor } from './modifiers.ts';
 import { spendTonicCharges } from './buffs.ts';
@@ -27,9 +28,8 @@ import type { System } from './system.ts';
 export type StopReason = ActionStoppedEvent['reason'];
 
 /**
- * What an action makes and uses, for rules that link two running actions (the clone technique's
- * `slotLinks`): the items it makes, the items it uses up, and the speed key a link raises for it
- * when it is the one that uses.
+ * What an action makes and uses: the items it makes, the items it uses up, and the speed key of the
+ * skill that uses them. Plain data about the action; no rule reads it for a speed bonus any more.
  */
 export interface ActionFlow {
   makes: string[];
@@ -79,9 +79,12 @@ export interface ActionKind {
    */
   flow?(id: string, content: ContentDb): ActionFlow | null;
   /**
-   * Whether the action runs at full speed whatever share of the speed pool its slot has: a fight
-   * is not slowed by the clone's share (the clock of the fight and the cycles that pay its XP).
+   * Whether the action `id` is unique by nature: no two performers can do it at once (one raid
+   * fight per raid, one instance of a mission, one hex surveyed by one performer). A kind without
+   * it can run in any number of performers.
    */
+  unique?(id: string, content: ContentDb): boolean;
+  /** Not used any more: every performer works at full speed (kept so that kinds written for the shared pool still compile). */
   fullSpeed?: boolean;
   /** The skill the action trains, when it trains one; a locked skill refuses its actions. */
   skill?(id: string, content: ContentDb): string | null;
@@ -217,22 +220,15 @@ export const drillKind = skillAction((_state, id, content) => {
 });
 
 /**
- * Splits the speed budget: active slots share it equally, the remainder goes to the first active
- * slot, idle slots get 0 (slot 0 keeps the full budget when nothing runs). One running slot has
- * SHARE_FULL; two or more share the pool of the content (K.clone.pool, SHARE_FULL by default).
+ * Splits the speed budget. Every performer works at full speed: a slot that runs an action has
+ * SHARE_FULL, an idle slot has 0 (slot 0 keeps the full budget when nothing runs). There is no shared
+ * pool: a clone's price is its chakra (`clone-life.ts`), not the character's speed.
  */
-export function rebalanceShares(state: GameState, content?: ContentDb): void {
-  const active = state.slots.filter((s) => s.action);
-  const takers = active.length > 0 ? active : state.slots.slice(0, 1);
-  const total =
-    takers.length > 1 && content
-      ? Math.round(SHARE_FULL * content.balance.K.clone.pool)
-      : SHARE_FULL;
-  for (const slot of state.slots) slot.share = 0;
-  const each = Math.floor(total / Math.max(1, takers.length));
-  for (const slot of takers) slot.share = each;
-  const [first] = takers;
-  if (first) first.share += total - each * takers.length;
+export function rebalanceShares(state: GameState, _content?: ContentDb): void {
+  const anyRuns = state.slots.some((s) => s.action);
+  state.slots.forEach((slot, index) => {
+    slot.share = slot.action || (index === 0 && !anyRuns) ? SHARE_FULL : 0;
+  });
 }
 
 /** Clears a slot, calls the kind's stop hook, tells the UI why and re-splits the speed budget. */
@@ -250,8 +246,10 @@ export function stopSlot(
   if (!slot?.action) return;
   const { kind, id } = slot.action;
   const impl = actionKindOf(rules, kind);
-  impl?.stop?.(state, index, id, content, rules, reason);
-  const missing = reason === 'requirements' ? impl?.missing?.(state, id, content, rules) : null;
+  const missing = asPerformer(state, index, () => {
+    impl?.stop?.(state, index, id, content, rules, reason);
+    return reason === 'requirements' ? impl?.missing?.(state, id, content, rules) : null;
+  });
   emit(state, {
     type: 'actionStopped',
     slot: index,
@@ -261,25 +259,40 @@ export function stopSlot(
     ...(missing ? { missing } : {}),
     ...(cause ? { cause } : {}),
   });
-  slot.action = next;
+  // A clone is still there when its action ends: it stands where it is, until the dispel or a new action.
+  const body = index > 0 ? state.clones[index] : undefined;
+  const stands =
+    body !== undefined &&
+    !body.doomed &&
+    next === null &&
+    reason !== 'replaced' &&
+    reason !== 'dispelled' &&
+    kind !== STAND_KIND &&
+    actionKindOf(rules, STAND_KIND)?.has(STAND_ID, content) === true;
+  slot.action = stands ? { kind: STAND_KIND, id: STAND_ID } : next;
   slot.progress = 0;
   slot.data = null;
-  // A clone that stops (dispelled, or done) leaves the map; one whose action is replaced stays where it stands.
-  if (index > 0 && reason !== 'replaced' && next === null) removeFigure(state, index);
+  // A clone that is dispelled leaves the map; one whose action is replaced stays where it stands.
+  if (index > 0 && reason !== 'replaced' && slot.action === null) removeFigure(state, index);
   rebalanceShares(state, content);
+}
+
+/** The ms the next cycle of the action in slot `index` takes at full speed (the performer's own modifiers apply). */
+function cycleMs(
+  state: GameState,
+  index: number,
+  kind: ActionKind,
+  id: string,
+  content: ContentDb,
+  rules: Rules,
+): number {
+  return asPerformer(state, index, () => kind.intervalMs(state, id, content, rules, index));
 }
 
 /**
  * Runs every slot's action. Progress is whole work units (ms x SHARE_FULL); a slot's share is how
  * many units a ms adds, and a cycle needs `intervalMs x SHARE_FULL`.
  */
-/** The work units a ms adds to the action in slot `index`: its share of the pool, or full speed for a kind that is not slowed. */
-function speedOf(state: GameState, index: number, rules: Rules): number {
-  const slot = state.slots[index];
-  if (!slot?.action) return 0;
-  return actionKindOf(rules, slot.action.kind)?.fullSpeed ? SHARE_FULL : slot.share;
-}
-
 export const actionSystem: System = {
   nextEventIn(state, content, rules) {
     let best: number | null = null;
@@ -288,73 +301,75 @@ export const actionSystem: System = {
       const kind = actionKindOf(rules, slot.action.kind);
       if (!kind) continue;
       const need =
-        kind.intervalMs(state, slot.action.id, content, rules, index) * SHARE_FULL - slot.progress;
-      const wait = need <= 0 ? 0 : Math.ceil(need / speedOf(state, index, rules));
+        cycleMs(state, index, kind, slot.action.id, content, rules) * SHARE_FULL - slot.progress;
+      const wait = need <= 0 ? 0 : Math.ceil(need / slot.share);
       if (best === null || wait < best) best = wait;
     }
     return best;
   },
 
-  elapse(state, dt, content, rules) {
+  elapse(state, dt, content) {
     trackClone(state, dt, content);
-    state.slots.forEach((slot, index) => {
-      if (slot.action) slot.progress += dt * speedOf(state, index, rules);
-    });
+    for (const slot of state.slots) {
+      if (slot.action) slot.progress += dt * slot.share;
+    }
   },
 
   run(state, content, rules) {
     state.slots.forEach((slot, index) => {
-      while (slot.action) {
-        const { kind: name, id } = slot.action;
-        const kind = actionKindOf(rules, name);
-        if (!kind || !kind.has(id, content))
-          return stopSlot(state, index, 'missing', content, rules);
-        const need = kind.intervalMs(state, id, content, rules, index) * SHARE_FULL;
-        if (slot.progress < need) return;
-        slot.progress -= need;
-        const result = kind.complete(state, id, content, rules, index);
-        if (result === 'abort') {
-          const lacking = kind.missing?.(state, id, content, rules);
-          const cause = kind.abortCause?.(state, id, content, rules);
-          const reason = lacking || cause ? 'requirements' : 'finished';
-          // A clone whose survey or auto-survey ends keeps its place: the kind may hand the slot to standing.
-          const after = kind.after?.(state, index, id, content, rules) ?? null;
-          const next =
-            after && actionKindOf(rules, after.kind)?.has(after.id, content) ? after : null;
-          return stopSlot(state, index, reason, content, rules, cause ?? undefined, next);
-        }
-        if (result === 'step') {
+      asPerformer(state, index, () => {
+        while (slot.action) {
+          const { kind: name, id } = slot.action;
+          const kind = actionKindOf(rules, name);
+          if (!kind || !kind.has(id, content))
+            return stopSlot(state, index, 'missing', content, rules);
+          const need = kind.intervalMs(state, id, content, rules, index) * SHARE_FULL;
+          if (slot.progress < need) return;
+          slot.progress -= need;
+          const result = kind.complete(state, id, content, rules, index);
+          if (result === 'abort') {
+            const lacking = kind.missing?.(state, id, content, rules);
+            const cause = kind.abortCause?.(state, id, content, rules);
+            const reason = lacking || cause ? 'requirements' : 'finished';
+            // A clone whose survey or auto-survey ends keeps its place: the kind may hand the slot to standing.
+            const after = kind.after?.(state, index, id, content, rules) ?? null;
+            const next =
+              after && actionKindOf(rules, after.kind)?.has(after.id, content) ? after : null;
+            return stopSlot(state, index, reason, content, rules, cause ?? undefined, next);
+          }
+          if (result === 'step') {
+            const req = kind.requirements(state, id, content, rules);
+            if (req && !reqMet(state, req, content)) {
+              const cause = kind.abortCause?.(state, id, content, rules);
+              return stopSlot(state, index, 'requirements', content, rules, cause ?? undefined);
+            }
+            continue;
+          }
+          const trained = kind.skill?.(id, content);
+          if (trained) spendTonicCharges(state, trained, content);
+          state.stats.completed++;
+          bump(state, actionsKey(name));
+          if (result === 'stop') {
+            const lacking = kind.missing?.(state, id, content, rules);
+            const after = lacking ? null : (kind.after?.(state, index, id, content, rules) ?? null);
+            const next =
+              after && actionKindOf(rules, after.kind)?.has(after.id, content) ? after : null;
+            return stopSlot(
+              state,
+              index,
+              lacking ? 'requirements' : 'finished',
+              content,
+              rules,
+              undefined,
+              next,
+            );
+          }
           const req = kind.requirements(state, id, content, rules);
           if (req && !reqMet(state, req, content)) {
-            const cause = kind.abortCause?.(state, id, content, rules);
-            return stopSlot(state, index, 'requirements', content, rules, cause ?? undefined);
+            return stopSlot(state, index, 'requirements', content, rules);
           }
-          continue;
         }
-        const trained = kind.skill?.(id, content);
-        if (trained) spendTonicCharges(state, trained, content);
-        state.stats.completed++;
-        bump(state, actionsKey(name));
-        if (result === 'stop') {
-          const lacking = kind.missing?.(state, id, content, rules);
-          const after = lacking ? null : (kind.after?.(state, index, id, content, rules) ?? null);
-          const next =
-            after && actionKindOf(rules, after.kind)?.has(after.id, content) ? after : null;
-          return stopSlot(
-            state,
-            index,
-            lacking ? 'requirements' : 'finished',
-            content,
-            rules,
-            undefined,
-            next,
-          );
-        }
-        const req = kind.requirements(state, id, content, rules);
-        if (req && !reqMet(state, req, content)) {
-          return stopSlot(state, index, 'requirements', content, rules);
-        }
-      }
+      });
     });
   },
 };

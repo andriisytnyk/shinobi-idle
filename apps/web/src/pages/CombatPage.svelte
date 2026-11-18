@@ -3,8 +3,7 @@
     cloneCount,
     enemyStats,
     evalReq,
-    fightSlotIndex,
-    isCloneSlot,
+    allFights,
     zoneAvailable,
     zoneCellOf,
     type GameState,
@@ -56,8 +55,8 @@
         .filter((o) => o.unlock === null || evalReq(gs, o.unlock, content).met)
         .map((o) => ({ id: o.id }));
       return {
-        fighting: fightSlotIndex(gs) >= 0,
-        cloneFights: isCloneSlot(gs, content, fightSlotIndex(gs)),
+        fighting: allFights(gs).length > 0,
+        cloneFights: allFights(gs).some((f) => f.slot > 0),
         yard: yard.map((z) => ({
           id: z.id,
           enemy: z.enemy,

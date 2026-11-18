@@ -73,6 +73,37 @@ export interface DormantPack {
   data: Record<string, Record<string, JsonValue>>;
 }
 
+/**
+ * A shadow clone: a performer of its own. It lives on chakra (`life`), carries its own bag and purse (it has no
+ * access to the Bank), keeps the XP and Mastery its actions earn until it is dispelled, and holds the fight it
+ * fights. Everything it holds goes to the character when it is dispelled.
+ */
+export interface CloneBody {
+  /** Chakra left as parts of `LIFE_FULL`: a whole number, so that time maths stays exact. 0 dispels the clone. */
+  life: number;
+  /** The clone's chakra pool when it was made (the character's pool divided by the number of performers), for the bar. */
+  max: number;
+  /** Game time the clone was made. */
+  born: number;
+  /** Items taken from the Bank at creation and everything the clone gets since; goes back to the Bank on dispel. */
+  bag: Record<string, number>;
+  /** Currencies the clone earned, by currency id (every currency of the content has an entry). */
+  purse: Record<string, number>;
+  /** The clone's own pouch of tools and pills, filled from its bag. */
+  pouch: PouchState;
+  /** Skill XP the clone's actions earned (modifiers already applied), by skill; the character gets it when the clone is dispelled. */
+  xp: Record<string, number>;
+  /** Mastery the clone earned, by mastery key: the amount (modifiers applied), the skill it trains and the pool share. */
+  mastery: Record<string, { skill: string; amount: number; pool: number }>;
+  /** The fight the clone fights, if its action holds one (the character's is `GameState.combat`). */
+  fight: CombatState | null;
+  /** Set when the clone is to be dispelled at the end of this moment (it fell in a fight). */
+  doomed?: 'death';
+}
+
+/** One whole life of a clone, in the units `CloneBody.life` is kept in. */
+export const LIFE_FULL = 1_000_000_000;
+
 export interface GameState {
   /** Save format version. */
   v: number;
@@ -106,8 +137,12 @@ export interface GameState {
   counters: Record<string, number>;
   /** Quest chains that have started, by quest id. */
   quests: Record<string, QuestProgress>;
-  /** The running fight, if a fight action holds a slot; plain JSON. */
+  /** The character's running fight (slot 0), if a fight action holds the slot; plain JSON. A clone's fight is `clones[slot].fight`. */
   combat: CombatState | null;
+  /** The shadow clones that exist, by the slot they work in. */
+  clones: Record<string, CloneBody>;
+  /** Mind fatigue left, in thousandths of ms (see `clone-life.ts`); while it lasts no clone can be made and the character is slower. */
+  fatigue: number;
   /** Running tonics by item id: the skill (or `allNatures`) they raise and the charges left. */
   buffs: Record<string, { skill: string; charges: number }>;
   /** Herb bushes as the player left them, by herb id: herbs left, size, and regrow work kept. */
@@ -144,7 +179,7 @@ export interface GameState {
   events: GameEvent[];
 }
 
-export const STATE_VERSION = 19;
+export const STATE_VERSION = 20;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
@@ -176,6 +211,8 @@ export function createState(seed: number, content: ContentDb): GameState {
     counters: {},
     quests: {},
     combat: null,
+    clones: {},
+    fatigue: 0,
     buffs: {},
     gear: {},
     bushes: {},

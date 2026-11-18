@@ -5,8 +5,9 @@ import {
   type Enemy,
   type Operation,
 } from '@shinobi/content';
-import { actionKindOf, stopSlot } from '../actions.ts';
-import { chakraDivisor, isCloneSlot } from '../clone.ts';
+import { stopSlot } from '../actions.ts';
+import { chakraDivisor } from '../clone.ts';
+import { actingBody, allFights, asPerformer, fightOf } from '../performer.ts';
 import { bump, defeatsKey, killsKey } from '../counters.ts';
 import { emit } from '../events.ts';
 import { MS_PER_SECOND, masteryLevel, masteryXpPerSecond } from '../formulas.ts';
@@ -47,43 +48,19 @@ export const MISSION_KIND = 'mission';
 /** The slot's work units for `ms` of game time. Fights run on work units, like action progress. */
 export const combatUnits = (ms: number): number => workOf(ms);
 
-/** Index of the slot running a fight or an operation, or -1. */
-export function fightSlotIndex(state: GameState): number {
-  const owner = state.combat?.owner ?? -1;
-  const kind = state.slots[owner]?.action?.kind;
-  return kind !== undefined && (isCombatKind(kind) || kind === MISSION_KIND) ? owner : -1;
-}
-
-/** Whether a fight is going that another slot owns: a slot that wants to fight must wait or be refused. */
-export function fightBusy(state: GameState, slot: number): boolean {
-  const owner = state.combat?.owner;
-  return owner !== undefined && owner !== slot && state.slots[owner]?.action != null;
+/** Whether the performer of `slot` runs an action that can hold a fight: a fight, an operation, a mission. */
+export function holdsFight(state: GameState, slot: number): boolean {
+  const kind = state.slots[slot]?.action?.kind;
+  return kind !== undefined && (isCombatKind(kind) || kind === MISSION_KIND);
 }
 
 /**
- * Whether another slot runs an action that can hold the fight: a fight, an operation, or a
- * mission that has a combat stage. Only one such action runs at a time.
+ * Index of the slot of `slot`'s performer when it runs a fight or an operation (or a mission stage that
+ * fights), or -1. Every performer has its own fight: the character's is `state.combat`, a clone's is its own.
  */
-export function fightCapableElsewhere(state: GameState, slot: number, content: ContentDb): boolean {
-  const missions = indexOf(content).missions;
-  return state.slots.some((other, index) => {
-    const action = other.action;
-    if (index === slot || !action) return false;
-    if (isCombatKind(action.kind)) return true;
-    return (
-      action.kind === MISSION_KIND &&
-      (missions.get(action.id)?.stages.some((st) => st.t === 'combat') ?? false)
-    );
-  });
+export function fightSlotIndex(state: GameState, slot = 0): number {
+  return fightOf(state, slot) !== null && holdsFight(state, slot) ? slot : -1;
 }
-
-/** The reason a fight-capable action cannot start in `slot` now (a localization key), or null. */
-export const fightBusyReason = (
-  state: GameState,
-  slot: number | undefined,
-  content: ContentDb,
-): string | null =>
-  slot !== undefined && fightCapableElsewhere(state, slot, content) ? 'error.fightBusy' : null;
 
 type Pools = { hp: number; chakra: number; stamina: number };
 
@@ -406,29 +383,41 @@ export function followChakraPool(state: GameState, content: ContentDb): void {
  */
 export const combatSystem: System = {
   nextEventIn(state, content, rules) {
-    const c = state.combat;
-    const slot = state.slots[fightSlotIndex(state)];
-    if (!c || !slot || slot.share <= 0) return null;
-    const wait = c.phase === 'fight' ? fightNextEventIn(c.fight, content, rules) : c.pause;
-    if (wait === null) return 0;
-    return Math.max(0, Math.ceil((wait - c.work) / SHARE_FULL));
+    let best: number | null = null;
+    for (const { slot: index, fight: c } of allFights(state)) {
+      const slot = state.slots[index];
+      if (!slot || !holdsFight(state, index) || slot.share <= 0) continue;
+      const wait = c.phase === 'fight' ? fightNextEventIn(c.fight, content, rules) : c.pause;
+      const left = wait === null ? 0 : Math.max(0, Math.ceil((wait - c.work) / SHARE_FULL));
+      if (best === null || left < best) best = left;
+    }
+    return best;
   },
 
   elapse(state, dt) {
-    const c = state.combat;
-    const slot = state.slots[fightSlotIndex(state)];
-    if (c && slot) c.work += dt * SHARE_FULL;
+    for (const { slot: index, fight: c } of allFights(state)) {
+      if (state.slots[index] && holdsFight(state, index)) c.work += dt * SHARE_FULL;
+    }
   },
 
   run(state, content, rules) {
+    // Every performer fights its own fight; each is run as its performer (its bag, pouch and knowledge).
+    for (const { slot } of allFights(state)) {
+      asPerformer(state, slot, () => runFight(state, slot, content, rules));
+    }
+  },
+};
+
+/** Runs the fight of the performer of slot `index` (the state holds it as `state.combat` for the time). */
+function runFight(state: GameState, index: number, content: ContentDb, rules: Rules): void {
+  {
     const c = state.combat;
     if (!c) return;
-    const index = fightSlotIndex(state);
-    if (index < 0) {
+    if (!holdsFight(state, index)) {
       state.combat = null;
       return;
     }
-    const clone = isCloneSlot(state, content, index);
+    const clone = index > 0;
     followChakraPool(state, content);
     for (;;) {
       const entry = entryOf(content, c.enemy);
@@ -505,6 +494,8 @@ export const combatSystem: System = {
         // The action that started the fight decides what follows (a mission's combat stage).
         if (result === 'defeat') {
           lose(state, c, key, content, rules, clone);
+          // A clone that fell is dispelled whatever its action is: the mission does not start the stage again.
+          if (clone) return doom(state, index);
         } else {
           bump(state, killsKey(c.enemy));
           emit(state, { type: 'enemyDefeated', enemy: c.enemy });
@@ -524,19 +515,19 @@ export const combatSystem: System = {
       }
       if (result === 'defeat') {
         lose(state, c, key, content, rules, clone);
-        // A clone that lost is dispelled and made anew: its action starts again (a zone fight with
-        // fresh pools, an operation from its first step), the pouch refilled from the shared bank.
-        if (clone) {
-          const action = state.slots[index]?.action;
-          if (!action) return;
-          actionKindOf(rules, action.kind)?.start?.(state, index, action.id, content, rules);
-          return;
-        }
+        // A clone that fell is dispelled, with no new try: what it knew returns except what the lost fight earned.
+        if (clone) return doom(state, index);
         // A defeat ends an operation run with the action: nothing of it is kept.
         return stopSlot(state, index, 'defeated', content, rules);
       }
       if (victory(state, c, content, rules, key, clone))
         return stopSlot(state, index, 'finished', content, rules);
     }
-  },
-};
+  }
+}
+
+/** The clone of the performer being computed fell: it is dispelled at the end of this moment (`cloneSystem`). */
+function doom(state: GameState, index: number): void {
+  const body = actingBody(state) ?? state.clones[index];
+  if (body) body.doomed = 'death';
+}

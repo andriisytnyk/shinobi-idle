@@ -290,7 +290,11 @@ describe('A2: determinism and split-invariance', () => {
     if (share < 1000) s.slots.push({ action: null, progress: 0, share: 0, data: null });
     stocked(s, { [MINT]: 4, 'core:water': 2 });
     ok(s, gather(MINT, 0));
-    if (share < 1000) ok(s, craft(ANTIDOTE, 1));
+    // The clone brews from its own pouch: what the Bank gave it at creation is all it has.
+    if (share < 1000) {
+      ok(s, { type: 'clone.create', slot: 1, items: { [MINT]: 2, 'core:water': 2 } });
+      ok(s, craft(ANTIDOTE, 1));
+    }
     return s;
   };
   for (const share of [1000, 500]) {
@@ -300,7 +304,7 @@ describe('A2: determinism and split-invariance', () => {
       const expected = serialize(whole);
       // The run really covered a regrow and a stop for lack of ingredients.
       expect(whole.bank[MINT] ?? 0).toBeGreaterThan(0);
-      if (share < 1000) expect(whole.slots[1]?.action).toBeNull();
+      if (share < 1000) expect(whole.slots[1]?.action).toEqual({ kind: 'stand', id: 'here' });
       expect(serialize(scenario(share))).toBe(serialize(scenario(share)));
       for (const chunk of CHUNKS) {
         const s = scenario(share);
@@ -663,6 +667,20 @@ describe('A12: saving', () => {
         data: { fine: [1, 'two', null] },
       },
     ];
+    // A slot after the first holds an action only while a clone is there.
+    raw.state.clones = {
+      1: {
+        life: 1e9,
+        max: 5,
+        born: 0,
+        bag: {},
+        purse: {},
+        pouch: { slots: [], medic: null },
+        xp: {},
+        mastery: {},
+        fight: null,
+      },
+    };
     raw.state.bushes = {
       [MINT]: { stock: 1e9, size: 1e9, carry: 5 },
       'core:ghost': { stock: 1, size: 2, carry: 0 },

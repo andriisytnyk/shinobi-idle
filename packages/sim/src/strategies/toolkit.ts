@@ -4,6 +4,7 @@ import {
   cellInfo,
   cellLevel,
   cloneSlots,
+  STAND_KIND,
   counterValue,
   defeatsKey,
   entryOf,
@@ -1001,6 +1002,10 @@ export function clonePlan(tk: Toolkit, mainSkill: string | null): Command[] {
   if (slotCount(state, content) < 2 || cloneSlots(state, content).length === 0) return [];
   const slot = 1;
   const current = state.slots[slot]?.action ?? null;
+  // A clone is a burst: one that has nothing left to do is dispelled (its knowledge goes to the character),
+  // and a tired mind makes none.
+  if (current?.kind === STAND_KIND) return [{ type: 'clone.dispel', slot }];
+  if (!state.clones[slot] && state.fatigue > 0) return [];
   const main = state.slots[0]?.action ?? null;
   const skills = trainableSkills(tk)
     .filter((s) => s !== mainSkill)
