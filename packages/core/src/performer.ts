@@ -1,5 +1,4 @@
 import type { PouchState, CombatState } from './combat/types.ts';
-import { setPerformerReader } from './modifiers.ts';
 import type { CloneBody, GameState } from './state.ts';
 
 /*
@@ -38,8 +37,6 @@ let held: Held | null = null;
 
 /** The slot whose action is being computed now (0, the character, outside any `asPerformer`). */
 export const actingPerformer = (): number => current.slot;
-// The kept modifier totals differ by performer.
-setPerformerReader(actingPerformer);
 
 /** The body of the clone whose action is being computed, or null when it is the character's. */
 export const actingBody = (state: GameState): CloneBody | null =>

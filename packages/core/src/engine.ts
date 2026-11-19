@@ -156,7 +156,7 @@ export function advance(
   if (!Number.isInteger(ms) || ms < 0) throw new RangeError(`advance needs whole ms, got ${ms}`);
   // What the modifiers read may have been changed by hand since the last call: nothing is kept from before.
   touchMods(state);
-  withKeptTotals(state, content, () => run(state, ms, content, rules));
+  withKeptTotals(state, content, rules, () => run(state, ms, content, rules));
 }
 
 function run(state: GameState, ms: number, content: ContentDb, rules: Rules): void {

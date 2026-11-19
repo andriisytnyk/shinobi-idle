@@ -134,9 +134,10 @@ export function raidPackFell(state: GameState, actionId: string, content: Conten
 export function raidsTick(state: GameState, village: VillageState, content: ContentDb): void {
   // Repairs first: a building a raid damages in this tick is out of work for the whole of `repair` ticks.
   for (const id of Object.keys(village.damage)) {
-    touchMods(state);
     village.damage[id] = (village.damage[id] ?? 0) - 1;
     if ((village.damage[id] ?? 0) <= 0) {
+      // The village provider reads only whether a building is damaged.
+      touchMods(state);
       delete village.damage[id];
       emit(state, { type: 'buildingRepaired', building: id });
     }

@@ -47,9 +47,12 @@ export const tonicProvider: ModifierProvider = (state, content) => {
 export function spendTonicCharges(state: GameState, skill: string, content: ContentDb): void {
   for (const [id, buff] of Object.entries(state.buffs)) {
     if (!coveredSkills(buff.skill, content).includes(skill)) continue;
-    touchMods(state);
     buff.charges -= 1;
-    if (buff.charges < 1) delete state.buffs[id];
+    // The tonic provider reads only whether a charge is left.
+    if (buff.charges < 1) {
+      touchMods(state);
+      delete state.buffs[id];
+    }
   }
 }
 

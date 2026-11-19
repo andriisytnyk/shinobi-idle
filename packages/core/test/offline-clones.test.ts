@@ -187,3 +187,41 @@ describe('A11: speed with clones', () => {
     expect(ms).toBeLessThan(CAP);
   });
 });
+
+/** The rules of the game with the core providers counted (and declared safe like the originals). */
+function counted(): { rules: Rules; calls: () => number } {
+  let calls = 0;
+  const modifierProviders = defaultRules.modifierProviders.map<Rules['modifierProviders'][number]>(
+    (p) =>
+      (...a) => {
+        calls++;
+        return p(...a);
+      },
+  );
+  markCacheable(modifierProviders);
+  return { rules: { ...defaultRules, modifierProviders }, calls: () => calls };
+}
+
+describe('A11: how often the providers are asked', () => {
+  // The providers are the cost that the kept totals take away. Counting calls is exact and does not move
+  // with the load of the machine, as a wall-clock ratio does. Without the kept totals a standing clone costs
+  // about 2.3 times the calls of the fight alone, a practising one 5.5 times and two fights 3.6 times.
+  const callsOf = (kind: Kind): number => {
+    const { rules, calls } = counted();
+    advance(scene(kind), 2 * HOUR, content, rules);
+    return calls();
+  };
+
+  it('stay near the fight alone with a clone beside it, and grow with the fights, not with the clone', () => {
+    const alone = callsOf('alone');
+    const ratios = {
+      standing: callsOf('standing') / alone,
+      practising: callsOf('practising') / alone,
+      'two fights': callsOf('two fights') / alone,
+    };
+    console.log(`A11 provider calls against the fight alone: ${JSON.stringify(ratios)}`);
+    expect(ratios.standing).toBeLessThan(1.4);
+    expect(ratios.practising).toBeLessThan(2.4);
+    expect(ratios['two fights']).toBeLessThan(2.8);
+  }, 120_000);
+});
