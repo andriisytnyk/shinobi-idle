@@ -2,12 +2,24 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CELL_KEYS, content, NATURE_IDS, SKILL_IDS, ukLocale } from '@shinobi/content';
+import type { ActionStoppedEvent } from '@shinobi/core';
 import { describe, expect, it } from 'vitest';
 import { BANK_TABS } from '../src/lib/crafts.ts';
 import { SIMULATOR_UK } from '../src/lib/builtin/simulator-ui.ts';
 import { HINTS } from '../src/lib/hints.ts';
 
 const src = fileURLToPath(new URL('../src', import.meta.url));
+
+/** Every reason the core can stop an action for: the record makes the compiler ask for a new one here. */
+const STOP_REASONS = {
+  manual: true,
+  dispelled: true,
+  requirements: true,
+  replaced: true,
+  missing: true,
+  finished: true,
+  defeated: true,
+} satisfies Record<ActionStoppedEvent['reason'], true>;
 
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
@@ -45,7 +57,7 @@ describe('interface strings', () => {
       'technique.src.': ['N', 'S', 'O', 'Q'],
       'item.kind.': ['ingredient', 'tool', 'misc', 'consumable'],
       'item.source.': ['crate', 'forge', 'market'],
-      'report.reason.': ['manual', 'requirements', 'replaced', 'missing', 'finished', 'defeated'],
+      'report.reason.': Object.keys(STOP_REASONS),
       'toast.stopped.': ['requirements', 'missing', 'finished', 'defeated'],
       'req.type.': ['quest', 'building'],
       'req.flag.': ['firstFight'],
