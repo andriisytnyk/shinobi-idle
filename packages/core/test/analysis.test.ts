@@ -102,9 +102,9 @@ describe('the session forecast against real play', () => {
     expect(ratio).toBeLessThan(1.6);
   });
 
-  // balance: refit at stage 9, see #82
-  it.skip('keeps the first fight apart from the yields: a boss that wins a fresh fight is not worth farming', () => {
-    const c = boss(44);
+  it('keeps the first fight apart from the yields: a boss that wins a fresh fight is not worth farming', () => {
+    // Level 45, not 44: the hunter of the fit that closed #82 wins a fresh fight 57% at 44 and 68% at 45.
+    const c = boss(45);
     const a = analyze(build(c, 64), c.target, {
       sessionMinutes: 30,
       maxSessions: 4,
@@ -363,7 +363,7 @@ describe('coverage, hints and secrecy', () => {
 });
 
 describe('comparing loadouts', () => {
-  // balance: refit at stage 9, see #82
+  // balance: refit at stage 9, see #82. Needs the author: the bind does not pay on this trait set (winsPerHour -4.25).
   it.skip('shows a better first fight and better sessions when the second loadout adds the answer to a known trait', () => {
     const state = fighter(6, 16, 'katon');
     know(state, 'core:marauder');
