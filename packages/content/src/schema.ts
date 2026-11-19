@@ -40,7 +40,7 @@ const resSlug = z.string().regex(/^[a-z0-9_]+(:[a-z0-9_]+)?$/);
  * legitimately and `reveal.mark` recorded it. `named`: an entity that is itself fully shown names it
  * (a zone that is open, a shop row, a started quest step, a mission the player may take).
  * `encountered`: an enemy or boss that was fought or has a Bingo level of 1 or more.
- * `explored`: a cell explored to level 1, a region with such a cell, a point of interest found.
+ * `explored`: a cell explored to level 1, a region with such a cell, a point of interest found, a work whose point is found.
  * `adjacent`: a region the player stands in or next to one with an explored cell. `parent`: the
  * region of a cell or the cell of a point of interest is shown by name. `actionable`: a region that is open (the player may go there). `questStarted`: the chain
  * has begun. `unlocked`: the entity's own `unlockReq`, `unlock` or `req` holds (none: holds).

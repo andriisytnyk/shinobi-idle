@@ -92,7 +92,7 @@
       "technique": "67bec4bfe02e",
       "item": "12ada2cf517d",
       "recipe": "3a3012f5b91e",
-      "fieldwork": "96bb57b84e93",
+      "fieldwork": "f678bf6ec9b1",
       "mission": "918e3f11e217",
       "enemy": "a6aaac091418",
       "boss": "84419ef552c9",
@@ -443,7 +443,7 @@
       "core:ore_chunk": "7f7bd31ae05e",
       "core:river_catch": "c159ad907705",
       "core:sulphur": "d675e7089add",
-      "core:iidka_dymova_bomba": "6d077e0a9226"
+      "core:iidka_dymova_bomba": "dffd1d0b3719"
     },
     "market": {
       "core:water": "e3f682cbd50f",
@@ -1881,8 +1881,8 @@
       "core:op_tournament": "fd901c0713f0"
     },
     "fieldworks": {
-      "core:search_war_fort_ruins": "68a334bc16d6",
-      "core:gather_hell_valley_sulphur": "890c3b669c55"
+      "core:search_war_fort_ruins": "e00d7f6d92b6",
+      "core:gather_hell_valley_sulphur": "ac0a7b8a0567"
     },
     "statuses": {
       "burn": "d68718519e4b",
@@ -7345,7 +7345,6 @@
       "map.point.opens": "cb8cf03ad2c5",
       "scout.works": "d5e999f554de",
       "scout.worksIntro": "7b7f9bb9d4a0",
-      "scout.worksNone": "074b6160e973",
       "entity.kind.fieldwork": "e3ebc59596f5",
       "quest.core:mission_board.step.2": "318023c1cf1f",
       "quest.core:mission_board.step.3": "4685fe733958",

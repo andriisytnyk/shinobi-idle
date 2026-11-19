@@ -309,9 +309,10 @@
                   {#if point.opens.length > 0}
                     <p class="small" data-point-opens>
                       {t('map.point.opens')}
-                      {#each point.opens as work, k (work)}{k > 0 ? ', ' : ''}{t(
-                          `fieldwork.${work}.name`,
-                        )}{/each}
+                      {#each point.opens as work, k (work)}{k > 0 ? ', ' : ''}<EntityLink
+                          kind="fieldwork"
+                          id={work}
+                        />{/each}
                     </p>
                   {/if}
                   {#if point.reward}

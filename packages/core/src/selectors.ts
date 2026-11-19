@@ -332,6 +332,14 @@ export function actionInfo(
 
 /** The action kind and ids a skill trains through; empty for skills with no actions yet. */
 function skillActionIds(skill: string, content: ContentDb): { kind: string; id: string }[] {
+  const works = [...content.fieldworks]
+    .filter((w) => fieldworkSkill(content, w) === skill)
+    .sort((a, b) => a.level - b.level)
+    .map((w) => ({ kind: FIELDWORK_KIND, id: w.id }));
+  return [...ownActionIds(skill, content), ...works];
+}
+
+function ownActionIds(skill: string, content: ContentDb): { kind: string; id: string }[] {
   const by = <T extends { id: string; level: number }>(kind: string, list: readonly T[]) =>
     [...list].sort((a, b) => a.level - b.level).map((e) => ({ kind, id: e.id }));
   const data = indexOf(content).skills.get(skill);
@@ -360,13 +368,6 @@ function skillActionIds(skill: string, content: ContentDb): { kind: string; id: 
         'gather',
         content.herbs.filter((h) => entitySkill(content, 'patch', h) === skill),
       );
-    case 'map':
-      return owns('map')
-        ? by(
-            FIELDWORK_KIND,
-            content.fieldworks.filter((w) => fieldworkSkill(content, w) === skill),
-          )
-        : [];
     case 'recipe':
     case 'station':
       return by(

@@ -4,6 +4,7 @@ import { createState, xpAt, type GameState } from '@shinobi/core';
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import ScoutPanel from '../src/components/ScoutPanel.svelte';
+import { masteryRef } from '../src/lib/entities.ts';
 import { MASK } from '../src/lib/reveal.ts';
 import { settings } from '../src/lib/settings.svelte.ts';
 import { game } from '../src/lib/store.ts';
@@ -81,8 +82,7 @@ describe('the work that found points open, on the Scouting page', () => {
 });
 
 describe('the point on the map says what it opens', () => {
-  it('names the work of a revealed point', () => {
-    const state = genin();
+  const openHex = (state: GameState): void => {
     const cell = content.cells.find((c) => `${c.hex[0]},${c.hex[1]}` === coord);
     if (cell) state.world.explores[cell.id] = FIRST;
     state.world.surveyed[coord] = true;
@@ -97,8 +97,30 @@ describe('the point on the map says what it opens', () => {
       new MouseEvent('click', { bubbles: true }),
     );
     flushSync();
+  };
+
+  it('masks the work exactly while the Scouting tile masks it, then links it', () => {
+    const state = genin();
+    openHex(state);
     const opens = q('[data-point-opens]');
     expect(opens?.textContent).toContain(name('map.point.opens'));
-    expect(opens?.textContent).toContain(name(`fieldwork.${SEARCH}.name`));
+    expect(opens?.querySelector('[data-masked]')).not.toBeNull();
+    expect(opens?.textContent).not.toContain(name(`fieldwork.${SEARCH}.name`));
+    unmount(app!);
+    app = null;
+    target.replaceChildren();
+    const found = genin();
+    found.world.pois[RUINS] = true;
+    openHex(found);
+    const link = q('[data-point-opens] a');
+    expect(link?.getAttribute('href')).toBe(`#/fieldwork/${SEARCH}`);
+    expect(link?.textContent).toContain(name(`fieldwork.${SEARCH}.name`));
+  });
+});
+
+describe('the mastery of a work', () => {
+  it('belongs to the work: its own name and page, no missing text', () => {
+    expect(masteryRef(SEARCH, content)).toEqual({ kind: 'fieldwork', id: SEARCH });
+    expect(ukLocale[`fieldwork.${SEARCH}.name`]).toBeDefined();
   });
 });

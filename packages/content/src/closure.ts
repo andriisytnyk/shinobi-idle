@@ -775,6 +775,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
       case 'questStarted':
         return list === 'quests';
       case 'explored':
+        if (list === 'fieldworks') return true;
         return list === 'cells' || list === 'regions' || kind === 'poi';
       case 'adjacent':
       case 'actionable':

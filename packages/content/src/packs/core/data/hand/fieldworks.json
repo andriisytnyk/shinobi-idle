@@ -25,7 +25,7 @@
     "xp": 11.514,
     "drops": [
       {
-        "chance": 0.3,
+        "chance": 0.01,
         "payout": {
           "items": [
             {
@@ -36,7 +36,7 @@
         }
       },
       {
-        "chance": 0.05,
+        "chance": 0.004,
         "payout": {
           "currencies": {
             "intel": 1
@@ -44,7 +44,7 @@
         }
       },
       {
-        "chance": 0.015,
+        "chance": 0.0003,
         "payout": {
           "items": [
             {
@@ -82,7 +82,7 @@
     "xp": 19.033,
     "drops": [
       {
-        "chance": 1,
+        "chance": 0.003,
         "payout": {
           "items": [
             {

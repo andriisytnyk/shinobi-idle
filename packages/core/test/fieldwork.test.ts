@@ -64,16 +64,18 @@ describe('what the points open', () => {
 });
 
 describe('what the work pays', () => {
-  it('gathering sulphur pays one sulphur and Scouting XP every cycle', () => {
+  it('gathering sulphur pays now and then one sulphur, and Scouting XP every cycle', () => {
     const s = genin();
     setLevel(s, 'scout', 15);
     find(s, VALLEY);
     const before = s.skills.scout?.xp ?? 0;
     expect(dispatch(s, work(SULPHUR_WORK), content)).toEqual({ ok: true });
-    advance(s, 10 * cycleMs(SULPHUR_WORK), content);
-    expect(s.bank[SULPHUR]).toBe(10);
+    advance(s, 1000 * cycleMs(SULPHUR_WORK), content);
+    // A drop of 0.3%: a few of 1000 cycles, nowhere near every one.
+    expect(s.bank[SULPHUR] ?? 0).toBeGreaterThan(0);
+    expect(s.bank[SULPHUR] ?? 0).toBeLessThan(30);
     const xp = content.fieldworks.find((w) => w.id === SULPHUR_WORK)?.xp ?? 0;
-    expect((s.skills.scout?.xp ?? 0) - before).toBeCloseTo(10 * xp, 3);
+    expect((s.skills.scout?.xp ?? 0) - before).toBeCloseTo(1000 * xp, 3);
     expect(s.mastery[SULPHUR_WORK]?.xp ?? 0).toBeGreaterThan(0);
   });
 
@@ -84,15 +86,15 @@ describe('what the work pays', () => {
       find(s, RUINS);
       s.bank['core:coin'] = 0;
       dispatch(s, work(SEARCH), content);
-      advance(s, 400 * cycleMs(SEARCH), content);
+      advance(s, 20 * HOUR, content);
       return s;
     };
     const a = run(7);
     const b = run(7);
     const coins = a.bank['core:coin'] ?? 0;
-    // A drop of 30%: some of 400 cycles, never all of them.
-    expect(coins).toBeGreaterThan(40);
-    expect(coins).toBeLessThan(250);
+    // A drop of 1%: about 9 an hour, so about 180 in 20 hours.
+    expect(coins).toBeGreaterThan(100);
+    expect(coins).toBeLessThan(280);
     expect(a.currencies['intel']).toBeGreaterThan(0);
     expect(JSON.stringify(serialize(a))).toBe(JSON.stringify(serialize(b)));
     expect(JSON.stringify(serialize(run(8)))).not.toBe(JSON.stringify(serialize(a)));
