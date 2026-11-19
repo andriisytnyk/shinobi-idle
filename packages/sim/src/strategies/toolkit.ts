@@ -249,7 +249,13 @@ function forecastRate(
     for (const slot of ready.slots) slot.action = null;
     const tk2: Toolkit = { ...tk, ctx: { ...tk.ctx, state: ready } };
     for (const c of prepareFight(tk2, prepareFor)) dispatch(ready, c, content, rules);
-    const job = startAnalysis(ready, target, { samples, seed: TUNING.estimateSeed }, content, rules);
+    const job = startAnalysis(
+      ready,
+      target,
+      { samples, seed: TUNING.estimateSeed },
+      content,
+      rules,
+    );
     if (job === null) rate = 0;
     else {
       // Only the first-play part is wanted (the sessions that follow it are a forecast of hours): step until its batches are done.
