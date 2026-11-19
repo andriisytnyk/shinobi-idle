@@ -1,0 +1,27 @@
+{
+  "note": "Kills in 2 game hours of zone fighting without healing items, katon and doton (packages/core/test/sustained.test.ts harness), dev at 3f559af (before the fight loop v2).",
+  "kills": {
+    "bandit": [877, 877],
+    "arsonist": [608, 634],
+    "wolf": [442, 452],
+    "wolfmask": [497, 518],
+    "centipede": [431, 432],
+    "tiger": [348, 344],
+    "merc_pack": [348, 332],
+    "heavy": [231, 249],
+    "marauder": [248, 274],
+    "poisoner": [338, 362],
+    "kumo": [313, 337],
+    "suna": [351, 350],
+    "hunter": [210, 214],
+    "hunter_caster": [301, 291],
+    "kiri_hunter": [218, 235],
+    "guard_pack": [205, 203],
+    "veteran": [213, 188],
+    "oro_aide": [298, 277],
+    "serpent": [289, 205],
+    "leech": [270, 293],
+    "fake_genin": [218, 195],
+    "foreign_genin": [262, 255]
+  }
+}
