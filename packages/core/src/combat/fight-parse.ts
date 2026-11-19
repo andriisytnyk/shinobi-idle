@@ -288,9 +288,22 @@ function parseCombatant(
       if (!isRecord(h) || !xp || !work || !isInt(h.last) || h.last < 0 || h.last > t) return null;
       if (h.style !== undefined && !isStr(h.style)) return null;
       if (![...Object.values(xp), ...Object.values(work)].every(nonNeg)) return null;
-      held = { xp, work, last: h.last, ...(h.style === undefined ? {} : { style: h.style }) };
+      if (h.xpAt !== undefined && !(isNum(h.xpAt) && h.xpAt >= 0 && h.xpAt <= t)) return null;
+      held = {
+        xp,
+        work,
+        last: h.last,
+        ...(h.style === undefined ? {} : { style: h.style }),
+        ...(h.xpAt === undefined ? {} : { xpAt: h.xpAt }),
+      };
     }
-    ally = { n: a.n, kind: a.kind, ...(held ? { held } : {}) };
+    if (a.out !== undefined && a.out !== 'dispelled' && a.out !== 'struck') return null;
+    ally = {
+      n: a.n,
+      kind: a.kind,
+      ...(held ? { held } : {}),
+      ...(a.out === undefined ? {} : { out: a.out }),
+    };
   }
   // A fighter waits or acts; only the character rests. A fight saved before the loop of waits and actions has none of this and is not read.
   const phases =
@@ -622,6 +635,7 @@ function parseLog(raw: unknown): FightLogLine[] | null {
       ...(isStr(l.by) ? { by: l.by } : {}),
       ...(isStr(l.via) ? { via: l.via } : {}),
       ...(isInt(l.ally) && l.ally >= 1 ? { ally: l.ally } : {}),
+      ...(isStr(l.allyKind) && isInt(l.ally) && l.ally >= 1 ? { allyKind: l.allyKind } : {}),
     });
   }
   return lines;
@@ -690,6 +704,9 @@ export function parseFight(raw: unknown, content: ContentDb): FightState | null 
   if (doing?.kind === 'item' && !pouch.some((x) => x.id === doing.id)) return null;
   if (doing?.kind === 'attack') return null;
   if (enemies.some((e) => e.act !== null && e.act.kind !== 'attack')) return null;
+  // The XP rate of the allies by the clock: absent in a fight that does not count it.
+  if (raw.allyXpRate !== undefined && !(isNum(raw.allyXpRate) && raw.allyXpRate >= 0)) return null;
+  const allyXpRate = (raw.allyXpRate as number | undefined) ?? 0;
   // The allies of the player's side: absent in a fight that never had one.
   let allies: Combatant[] | undefined;
   if (raw.allies !== undefined) {
@@ -739,6 +756,7 @@ export function parseFight(raw: unknown, content: ContentDb): FightState | null 
     player,
     ...(allies ? { allies } : {}),
     ...(raw.allied === undefined && allied === 0 ? {} : { allied }),
+    ...(allyXpRate > 0 ? { allyXpRate } : {}),
     enemies,
     kit,
     tier: raw.tier,

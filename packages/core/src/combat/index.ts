@@ -3,6 +3,7 @@ export * from './fight-ai.ts';
 export * from './fight-items.ts';
 export * from './fight-encounter.ts';
 export * from './fight-hooks.ts';
+export { allyNameKey, summonSpecOf } from './fight-allies.ts';
 export * from './fight-parse.ts';
 export * from './fight-data.ts';
 export * from './fight-effects.ts';

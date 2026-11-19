@@ -98,7 +98,7 @@ describe('technique combat data', () => {
     expect(effectOf('core:wave_of_inspiration')?.guaranteedCombo).toBe('shockWet');
     // The clone technique does not strike in a fight: it puts bodies on the caster's side.
     expect(effectOf('core:shadow_clone')).toEqual({
-      effect: { kind: 'summon', fx: 'combatClone' },
+      effect: { kind: 'summon', fx: 'combatClone', allyName: 'fight.ally' },
     });
     expect(Object.keys(K.techFx.combatClone ?? {}).sort()).toEqual(
       [

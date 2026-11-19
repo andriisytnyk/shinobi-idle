@@ -207,7 +207,12 @@ export const techniqueEffectSchema = z.discriminatedUnion('kind', [
   z.strictObject({ kind: z.literal('nextCast'), fx: idOf('fxNextCast') }),
   z.strictObject({ kind: z.literal('reveal'), fx: idOf('fxReveal') }),
   /** Puts bodies on the caster's side of a fight (allies); the row of `K.techFx` says how many, how strong, and what share of the caster's pools they take. */
-  z.strictObject({ kind: z.literal('summon'), fx: idOf('fxSummon') }),
+  z.strictObject({
+    kind: z.literal('summon'),
+    fx: idOf('fxSummon'),
+    /** The localisation key of the name of the bodies it makes, with `{n}` for their number in the fight; without one a body is named by the technique's name and its number. */
+    allyName: z.string().min(1).optional(),
+  }),
 ]);
 
 export const techniqueCombatSchema = z.strictObject({

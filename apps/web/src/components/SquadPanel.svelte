@@ -64,6 +64,15 @@
     squadUi.askClone();
   }
 
+  // The last clone is dispelled from the open phone sheet: nothing is left in it but the character, so it closes.
+  // (A sheet opened with no clone, to make one, stays: the count only falls to nothing from something.)
+  let clones = 0;
+  $effect(() => {
+    const now = list.filter((p) => p.clone).length;
+    if (compact && squadUi.sheet && clones > 0 && now === 0) squadUi.setSheet(false);
+    clones = now;
+  });
+
   function onKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape' && squadUi.sheet) {
       event.stopPropagation();

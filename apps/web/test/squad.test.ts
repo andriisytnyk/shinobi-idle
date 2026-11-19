@@ -153,7 +153,7 @@ describe('the squad panel', () => {
     expect(rows[0]?.querySelector('[data-ui="clone-knowledge"]')).toBeNull();
   });
 
-  it('keeps the whole Now bar on a phone, beside the strip of chips', async () => {
+  it('keeps a row per slot in the Now bar on a phone, with its stop, beside the strip of chips', async () => {
     vi.spyOn(window, 'matchMedia').mockImplementation(
       (query: string) =>
         ({
@@ -169,7 +169,12 @@ describe('the squad panel', () => {
     booted = await bootApp([coreUi], state, '#/skill/tai');
     expect(qa('[data-ui="squad-chip"]').length).toBe(2);
     expect(qa('[data-ui="now-slot"]').length).toBe(2);
-    expect(q('[data-ui="now-slot"][data-slot-index="1"] [data-ui="clone-life"]')).not.toBeNull();
+    const clone = q('[data-ui="now-slot"][data-slot-index="1"]');
+    expect(clone?.querySelector('button.stop')).not.toBeNull();
+    // The sheet behind the chips says the clone's life and what it holds; the bar does not say it again.
+    expect(clone?.querySelector('[data-ui="clone-life"]')).toBeNull();
+    expect(clone?.querySelector('[data-ui="clone-knowledge"]')).toBeNull();
+    expect(q('[data-ui="fatigue"]')).toBeNull();
     vi.restoreAllMocks();
   });
 
@@ -453,6 +458,14 @@ describe('the dispel preview', () => {
     expect(toasts.list.at(-1)?.key).toBe('squad.notice.dispelled');
   });
 
+  it('leaves out «Знання» when the clone holds nothing, and says so once', async () => {
+    await withClone(false);
+    q('[data-ui="squad-row"][data-performer="1"] [data-squad-stop]')?.click();
+    flushSync();
+    expect(q('[data-dispel-empty]')).not.toBeNull();
+    expect(q('[data-dispel-knowledge]')).toBeNull();
+  });
+
   it('shows what the dispel pays: the knowledge, the bag and the fatigue are the core’s own figures', async () => {
     await withClone();
     const paid = paidPreview(game.state, 1, content, game.rules);
@@ -507,6 +520,40 @@ describe('the dispel preview', () => {
     squadUi.askDispel(1);
     flushSync();
     expect(q('[data-ui="dispel-preview"]')?.dataset.performer).toBe('1');
+  });
+});
+
+describe('the phone sheet', () => {
+  const phone = () =>
+    vi.spyOn(window, 'matchMedia').mockImplementation(
+      (query: string) =>
+        ({
+          matches: query.includes('max-width'),
+          media: query,
+          addEventListener: () => {},
+          removeEventListener: () => {},
+        }) as unknown as MediaQueryList,
+    );
+
+  it('closes when the last clone is dispelled from it, and stays open for one that is still there', async () => {
+    phone();
+    const state = cloner();
+    start(state, 1, 'gather', 'core:mint');
+    booted = await bootApp([coreUi], state, '#/skill/herb');
+    squadUi.setSheet(true);
+    flushSync();
+    expect(q('[data-ui="squad-sheet"]')).not.toBeNull();
+    q('[data-ui="squad-row"][data-performer="1"] [data-squad-stop]')?.click();
+    flushSync();
+    q('[data-dispel-confirm]')?.click();
+    flushSync();
+    expect(game.state.clones[1]).toBeUndefined();
+    expect(q('[data-ui="squad-sheet"]')).toBeNull();
+    // A sheet opened with no clone, to make one, is left alone.
+    squadUi.setSheet(true);
+    flushSync();
+    expect(q('[data-ui="squad-sheet"]')).not.toBeNull();
+    vi.restoreAllMocks();
   });
 });
 

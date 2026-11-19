@@ -10,7 +10,7 @@ import { chakraDivisor } from '../clone.ts';
 import { actingBody, allFights, asPerformer, fightOf } from '../performer.ts';
 import { bump, defeatsKey, killsKey } from '../counters.ts';
 import { emit } from '../events.ts';
-import { MS_PER_SECOND, masteryLevel, masteryXpPerSecond } from '../formulas.ts';
+import { MS_PER_HOUR, MS_PER_SECOND, masteryLevel, masteryXpPerSecond, rate } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
 import { raidPackFell } from '../raid.ts';
 import { nextInt, nextSeed } from '../rng.ts';
@@ -141,7 +141,10 @@ export function newMissionCombat(
   // The pouch is topped up from the bank on the way into the fight, as for any fight.
   ensurePouch(state, content);
   refillPouch(state, content);
-  return blank(entry, startFight(state, entry, content, rules, undefined, support), null, owner);
+  const fight = startFight(state, entry, content, rules, undefined, support);
+  // A mission has no combat tick: the bodies of the character's side earn by the clock at the rate a fight's tick pays.
+  fight.allyXpRate = rate(entry.cl, content) / MS_PER_HOUR / WORK_PER_MS;
+  return blank(entry, fight, null, owner);
 }
 
 /** The enemy of an operation step; a step that draws from a pool draws on the combat stream. */

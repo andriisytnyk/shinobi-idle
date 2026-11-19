@@ -37,9 +37,14 @@
      * practice, the move in a fight, the stage of a mission, the time to arrival and the wait of an exam.
      */
     squad?: boolean;
+    /**
+     * The squad has a sheet of its own on a phone: it shows every clone's life and what it holds and the character's
+     * fatigue, so the bar does not say them again (it keeps the stop button and the detail of the action).
+     */
+    sheet?: boolean;
   }
 
-  let { squad = false }: Props = $props();
+  let { squad = false, sheet = false }: Props = $props();
 
   const VERB = ACTION_VERB;
 
@@ -245,7 +250,7 @@
       {/each}
     </div>
   {/if}
-  {#if fatigue > 0 && !squad}
+  {#if fatigue > 0 && !squad && !sheet}
     <span class="chip" data-ui="fatigue" title={t('clone.fatigueTitle')}
       >{t('clone.fatigue', { time: formatDuration(fatigue) })}</span
     >
@@ -313,13 +318,13 @@
                 n: formatXp(row.xpPerHour),
               })}{/if}</span
           >
-          {#if row.life && !squad}
+          {#if row.life && !squad && !sheet}
             <span class="clone-life" data-ui="clone-life">
               <progress max="100" value={row.life.pct} aria-label={t('clone.life')}></progress>
               {t('clone.lifeLeft', { time: formatDuration(row.life.leftMs) })}
             </span>
           {/if}
-          {#if row.know && !squad}
+          {#if row.know && !squad && !sheet}
             <span class="clone-know" data-ui="clone-knowledge">
               {#if row.know.xp.length > 0}<span class="know-lead">{t('clone.knowsLead')}</span>{/if}
               {#each row.know.xp as part (part.skill)}

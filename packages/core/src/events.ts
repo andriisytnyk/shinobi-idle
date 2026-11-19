@@ -73,6 +73,8 @@ export interface CombatLogEvent extends EventBase {
   by?: string;
   /** The number of the ally the line is about (the ally that acts, or the one an enemy attack was aimed at); absent for the character. */
   ally?: number;
+  /** The kind (summoning technique id) of that ally. */
+  allyKind?: string;
 }
 /** What a win paid: ryo, the bounty of a boss, trophies and scroll parts. */
 export interface LootEvent extends EventBase {

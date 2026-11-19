@@ -86,6 +86,8 @@ export interface AllyHeld {
   xp: Record<string, number>;
   work: Record<string, number>;
   last: number;
+  /** The fight clock time up to which the body's combat XP by time has been counted (mission fights only); absent when it is not counted or the body has left. */
+  xpAt?: number;
 }
 
 /** One fighter. The player and every enemy have this shape. */
@@ -156,6 +158,8 @@ export interface Combatant {
      * It moves to `FightTally.allyXp` / `allyWork` when the body falls, is dispelled or the fight ends.
      */
     held?: AllyHeld;
+    /** How the body left the fight: `dispelled` (its chakra and stamina ran out) or `struck` (struck down); absent while it stands, and in a fight saved before this was kept. */
+    out?: 'dispelled' | 'struck';
   };
 }
 
@@ -305,6 +309,8 @@ export interface FightLogLine {
    * enemy attack was aimed at. Absent when the line is of the character.
    */
   ally?: number;
+  /** The kind (the summoning technique's id) of the ally `ally` names, so a line can name the body by what summoned it. */
+  allyKind?: string;
   /** On a `miss` of an attack on the player: the defensive technique that avoided it. */
   via?: string;
 }
@@ -370,6 +376,11 @@ export interface FightState {
   allies?: Combatant[];
   /** Allies made so far, for numbering them. */
   allied?: number;
+  /**
+   * Combat XP per work unit of fight time that a living ally earns by the clock (before the combat-XP weights and its
+   * technique's `xpShare`). Set on the fights of missions, which have no combat tick of their own; absent in a zone or an operation.
+   */
+  allyXpRate?: number;
   enemies: Combatant[];
   kit: PlayerKit;
   /** Rank tier of the player. */

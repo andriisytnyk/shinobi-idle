@@ -45,15 +45,16 @@
       {#if preview.empty}
         <p data-dispel-empty>{t('squad.dispel.nothing')}</p>
       {/if}
-      {#if preview.held?.xp !== undefined || preview.held?.mastery !== undefined}
+      <!-- «Знання» is there only when the clone holds some: a clone that holds nothing says so above, once. -->
+      {#if (preview.held?.xp ?? 0) > 0 || (preview.held?.mastery ?? 0) > 0}
         <section data-dispel-knowledge>
           <h3>{t('squad.dispel.knowledge')}</h3>
           <ul>
-            {#if preview.held.xp !== undefined}
-              <li>{t('squad.dispel.xp', { n: formatInt(preview.held.xp) })}</li>
+            {#if (preview.held?.xp ?? 0) > 0}
+              <li>{t('squad.dispel.xp', { n: formatInt(preview.held?.xp ?? 0) })}</li>
             {/if}
-            {#if preview.held.mastery !== undefined}
-              <li>{t('squad.dispel.mastery', { n: formatInt(preview.held.mastery) })}</li>
+            {#if (preview.held?.mastery ?? 0) > 0}
+              <li>{t('squad.dispel.mastery', { n: formatInt(preview.held?.mastery ?? 0) })}</li>
             {/if}
           </ul>
         </section>

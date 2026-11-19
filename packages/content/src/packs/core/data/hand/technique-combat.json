@@ -114,7 +114,8 @@
   "core:shadow_clone": {
     "effect": {
       "kind": "summon",
-      "fx": "combatClone"
+      "fx": "combatClone",
+      "allyName": "fight.ally"
     }
   },
   "core:running_fire": {

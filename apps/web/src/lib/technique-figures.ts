@@ -1,5 +1,12 @@
 import type { ContentDb, Technique } from '@shinobi/content';
-import { techniqueNumbers, type GameState, type Rules, type TechniqueNumbers } from '@shinobi/core';
+import {
+  summonSpecOf,
+  techniqueNumbers,
+  type GameState,
+  type Rules,
+  type SummonSpec,
+  type TechniqueNumbers,
+} from '@shinobi/core';
 import { skillProgress } from './progress.ts';
 
 /** One factor of a figure: a text key for its name and its value (a multiplier, or a base amount for the first row). */
@@ -16,6 +23,8 @@ export interface TechniqueFigures {
   damage: Factor[] | null;
   /** What the cost is made of; `other` carries what the rows do not name (the chakra-control skill, gear, mods). */
   cost: Factor[];
+  /** What a summon technique makes (bodies, their health, damage and threat, the pools they take); null for any other technique. */
+  summon: SummonSpec | null;
   /** The mastery level these figures were computed for, and its cap. */
   mastery: { level: number; cap: number };
 }
@@ -70,5 +79,7 @@ export function techniqueFigures(
     }
   }
 
-  return { numbers, damage, cost, mastery: { level: masteryLevel, cap: K.masteryCap } };
+  const effect = tech.combat?.effect;
+  const summon = effect?.kind === 'summon' ? summonSpecOf(content, effect.fx, masteryLevel) : null;
+  return { numbers, damage, cost, summon, mastery: { level: masteryLevel, cap: K.masteryCap } };
 }

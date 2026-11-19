@@ -177,7 +177,9 @@
     {/if}
 
     <div class="now" bind:this={nowEl}>
-      <ErrorBoundary area="now"><NowBar squad={squadOn && !narrow} /></ErrorBoundary>
+      <ErrorBoundary area="now"
+        ><NowBar squad={squadOn && !narrow} sheet={squadOn && narrow} /></ErrorBoundary
+      >
     </div>
     {#if squadOn && narrow}
       <div class="chips"><ErrorBoundary area="squad"><SquadPanel compact /></ErrorBoundary></div>

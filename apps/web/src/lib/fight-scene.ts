@@ -47,6 +47,8 @@ export interface LastView {
   target: string | null;
   /** The number of the ally that body is, when it is one; null for the character and for enemies. */
   onAlly: number | null;
+  /** The kind (summoning technique id) of that ally; null with `onAlly`. */
+  onAllyKind: string | null;
   atMs: number;
   ageMs: number;
 }
@@ -59,6 +61,10 @@ export interface FighterView {
   entry: string | null;
   /** For an ally of the player's side (a combat clone): its number in the fight; null for every other body. */
   ally: number | null;
+  /** For an ally: the id of the technique that summoned it, which names it; null for every other body. */
+  allyKind: string | null;
+  /** For an ally that has left the fight: how (`dispelled`: its chakra and stamina ran out; `struck`: struck down); null while it stands and when the fight did not keep it. */
+  out: 'dispelled' | 'struck' | null;
   /** Which body of its kind this is (1-based) and how many the fight has of that kind. */
   nth: number;
   of: number;
@@ -190,6 +196,8 @@ function fighterOf(
     side: c.side,
     entry: c.side === 'enemy' ? c.entry : null,
     ally: c.ally?.n ?? null,
+    allyKind: c.ally?.kind ?? null,
+    out: c.ally?.out ?? null,
     nth,
     of,
     alive: c.hp > 0,
@@ -217,6 +225,7 @@ function fighterOf(
           avoidedBy: last.avoidedBy,
           target: last.target ?? null,
           onAlly: alliesOf(fight).find((a) => a.id === last.target)?.ally?.n ?? null,
+          onAllyKind: alliesOf(fight).find((a) => a.id === last.target)?.ally?.kind ?? null,
           atMs: last.atMs,
           ageMs: Math.max(0, nowMs - last.atMs),
         }
@@ -262,7 +271,9 @@ function sceneOf(state: GameState, content: ContentDb, rules: Rules): Scene | nu
     phase: combat.phase,
     player: fighterOf(state, fight.player, 1, 1, content, rules, share, nowMs),
     allies,
-    cloneRole: cloneRoleOf(content, fight.kit.cloneRole)?.id ?? null,
+    // The role the clones fight with is the one saved in the fight's kit, even if its pack is gone since (the row then names no role);
+    // a fight that saved none was begun with the default role.
+    cloneRole: fight.kit.cloneRole ?? cloneRoleOf(content, undefined)?.id ?? null,
     enemies,
     nowMs,
   };

@@ -66,7 +66,11 @@ const living = (fight: FightState) => alliesOf(fight).filter((a) => a.hp > 0);
 describe('the combat clone technique', () => {
   it('is a data effect of the technique, with its numbers in the balance object', () => {
     const t = content.techniques.find((x) => x.id === CLONE);
-    expect(t?.combat?.effect).toEqual({ kind: 'summon', fx: 'combatClone' });
+    expect(t?.combat?.effect).toEqual({
+      kind: 'summon',
+      fx: 'combatClone',
+      allyName: 'fight.ally',
+    });
     const kit = createFight(scripted([CLONE]), enemyAt(10), 1, content, rules).kit;
     const own = kit.techniques.find((x) => x.id === CLONE);
     expect(own?.damage).toBe(0);
