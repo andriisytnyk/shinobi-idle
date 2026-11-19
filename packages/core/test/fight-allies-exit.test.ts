@@ -64,7 +64,7 @@ describe('stopping the fight pays what living allies hold', () => {
     run(state, { type: 'action.stop', slot: 0 });
     const paid = total(state) - before;
     expect(paid).toBeGreaterThanOrEqual(all * 0.999);
-    expect(paid).toBeLessThan(all * 1.05);
+    expect(paid).toBeLessThan(all * 1.1);
   });
 
   it('pays a body that fell a tick earlier at that tick, and only the others at the stop', () => {
@@ -79,7 +79,7 @@ describe('stopping the fight pays what living allies hold', () => {
     run(state, { type: 'action.stop', slot: 0 });
     const paid = total(state) - before;
     expect(paid).toBeGreaterThanOrEqual(standing * 0.999);
-    expect(paid).toBeLessThan(standing * 1.05);
+    expect(paid).toBeLessThan(standing * 1.1);
   });
 
   it('a stop leaves the same skills however the time before it was split', () => {

@@ -41,33 +41,38 @@ describe('a heavy blow stuns the body it hits', () => {
     const boss = content.bosses.find((b) => b.id === 'core:boss_hunter');
     if (!boss) throw new Error('no boss_hunter');
     const r = withAi(castSeq(CLONE, DYNAMIC));
-    // The character summons the clones first; then they are the only bodies the boss aims at.
-    const fresh = createFight(
-      scripted([CLONE, DYNAMIC]),
-      encounterFor(boss, content),
-      5,
-      content,
-      r,
-    );
-    while ((fresh.tally.uses[CLONE] ?? 0) < 1 && fresh.result === 'ongoing') {
-      fightAdvance(fresh, fightNextEventIn(fresh, content, r) ?? 1, content, r);
+    // Whether a heavy blow lands on a clone depends on the seed (the character's interrupts can stop the cast): the seeds are run until it does.
+    let blowsOnClones = 0;
+    for (let seed = 1; seed <= 12; seed++) {
+      // The character summons the clones first; then they are the only bodies the boss aims at.
+      const fresh = createFight(
+        scripted([CLONE, DYNAMIC]),
+        encounterFor(boss, content),
+        seed,
+        content,
+        r,
+      );
+      while ((fresh.tally.uses[CLONE] ?? 0) < 1 && fresh.result === 'ongoing') {
+        fightAdvance(fresh, fightNextEventIn(fresh, content, r) ?? 1, content, r);
+      }
+      for (const a of alliesOf(fresh)) {
+        a.data.threat = 1e9;
+        a.hp = a.maxHp = 1e9;
+      }
+      fresh.player.hp = fresh.player.maxHp = 1e9;
+      // What the boss did before the clones stood is not what is looked at.
+      fresh.player.effects = [];
+      let onClone = 0;
+      let onCharacter = 0;
+      drive(fresh, r, 4000, () => {
+        // The character's health is untouched while no blow has landed on it: a stun then is a stun for a blow it never took.
+        if (stunned(fresh.player) && fresh.player.hp === fresh.player.maxHp) onCharacter++;
+        if (alliesOf(fresh).some(stunned)) onClone++;
+      });
+      expect(onCharacter, 'seed ' + seed).toBe(0);
+      blowsOnClones += onClone;
     }
-    for (const a of alliesOf(fresh)) {
-      a.data.threat = 1e9;
-      a.hp = a.maxHp = 1e9;
-    }
-    fresh.player.hp = fresh.player.maxHp = 1e9;
-    // What the boss did before the clones stood is not what is looked at.
-    fresh.player.effects = [];
-    let onClone = 0;
-    let onCharacter = 0;
-    drive(fresh, r, 4000, () => {
-      // The character's health is untouched while no blow has landed on it: a stun then is a stun for a blow it never took.
-      if (stunned(fresh.player) && fresh.player.hp === fresh.player.maxHp) onCharacter++;
-      if (alliesOf(fresh).some(stunned)) onClone++;
-    });
-    expect(onClone).toBeGreaterThan(0);
-    expect(onCharacter).toBe(0);
+    expect(blowsOnClones).toBeGreaterThan(0);
   });
 });
 
@@ -122,20 +127,26 @@ describe('the guard on hooks of other packs covers the allies', () => {
   });
 
   it('voids the fight, names the hook, and leaves a fight that can be saved and read back', () => {
-    const fight = createFight(
-      scripted([CLONE, DYNAMIC]),
-      { ...enemyAt(10), specials: ['evil:allybreak'] },
-      2,
-      content,
-      evilRules,
-    );
-    while ((fight.tally.uses[CLONE] ?? 0) < 1 && fight.result === 'ongoing') {
-      fightAdvance(fight, fightNextEventIn(fight, content, evilRules) ?? 1, content, evilRules);
-    }
-    for (const a of alliesOf(fight)) a.data.threat = 1e9;
-    fight.player.hp = fight.player.maxHp = 1e9;
-    for (const e of fight.enemies) e.hp = e.maxHp = 1e9;
-    fightAdvance(fight, sec(60), content, evilRules);
+    // The hook fires when an enemy hits a clone; whether one does in 60 s depends on the seed, so the first seed that does is taken.
+    const played = (seed: number) => {
+      const f = createFight(
+        scripted([CLONE, DYNAMIC]),
+        { ...enemyAt(10), specials: ['evil:allybreak'] },
+        seed,
+        content,
+        evilRules,
+      );
+      while ((f.tally.uses[CLONE] ?? 0) < 1 && f.result === 'ongoing') {
+        fightAdvance(f, fightNextEventIn(f, content, evilRules) ?? 1, content, evilRules);
+      }
+      for (const a of alliesOf(f)) a.data.threat = 1e9;
+      f.player.hp = f.player.maxHp = 1e9;
+      for (const e of f.enemies) e.hp = e.maxHp = 1e9;
+      fightAdvance(f, sec(60), content, evilRules);
+      return f;
+    };
+    let fight = played(1);
+    for (let seed = 2; seed <= 12 && fight.result !== 'void'; seed++) fight = played(seed);
     expect(fight.result).toBe('void');
     expect(fight.fault).toMatchObject({ pack: 'evil', hook: 'evil:allybreak' });
     for (const a of alliesOf(fight)) {

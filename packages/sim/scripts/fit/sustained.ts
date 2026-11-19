@@ -3,6 +3,7 @@
  * fighting without healing items against each regular enemy at its level, katon and doton, the player
  * restarting after a defeat; at most two defeats each. The penalty is the sum of the excess.
  */
+import { readFileSync } from 'node:fs';
 import { content, type NatureId } from '@shinobi/content';
 import {
   advance,
@@ -20,7 +21,11 @@ const regular = content.enemies.filter(
   (e) => e.id !== 'core:dummy' && content.zones.some((z) => z.enemy === e.id),
 );
 
-function grind(enemyId: string, nature: NatureId, hours: number): number {
+export function grindStats(
+  enemyId: string,
+  nature: NatureId,
+  hours: number,
+): { defeats: number; kills: number } {
   const enemy = content.enemies.find((e) => e.id === enemyId)!;
   const zone = content.zones.find((z) => z.enemy === enemyId);
   const state = createState(77, content);
@@ -49,18 +54,34 @@ function grind(enemyId: string, nature: NatureId, hours: number): number {
       start();
     }
   }
-  return defeats;
+  return { defeats, kills: state.counters[`kills.${enemyId}`] ?? 0 };
 }
+
+const PRE2 = JSON.parse(
+  readFileSync(
+    new URL(
+      '../../../../docs/balance-evidence/baseline-dev-3f559af-sustained-kills.json',
+      import.meta.url,
+    ),
+    'utf8',
+  ),
+).kills as Record<string, [number, number]>;
+/** Kills must stay within this share of the pre-v2 numbers (the design asks for about 10%). */
+export const KILLS_FLOOR = 0.9;
 
 export function sustainedScore(hours = 2): { penalty: number; lines: string[] } {
   let penalty = 0;
   const lines: string[] = [];
   for (const e of regular) {
-    const d = (['katon', 'doton'] as NatureId[]).map((n) => grind(e.id, n, hours));
-    const excess = d.reduce((s, x) => s + Math.max(0, x - 2), 0);
+    const name = e.id.replace('core:', '');
+    const r = (['katon', 'doton'] as NatureId[]).map((n) => grindStats(e.id, n, hours));
+    const excess = r.reduce((s, x) => s + Math.max(0, x.defeats - 2), 0);
     penalty += Math.min(excess, 30) * 0.2;
+    const ratio = r.map((x, i) => x.kills / PRE2[name]![i]!);
+    const short = ratio.reduce((s, x) => s + Math.max(0, KILLS_FLOOR - x), 0);
+    penalty += short * 4;
     lines.push(
-      `SUSTAINED ${e.id.replace('core:', '').padEnd(14)} defeats katon ${d[0]} doton ${d[1]} ${excess > 0 ? '<<<' : ''}`,
+      `SUSTAINED ${name.padEnd(14)} defeats katon ${r[0]!.defeats} doton ${r[1]!.defeats} kills x${ratio[0]!.toFixed(2)} x${ratio[1]!.toFixed(2)} ${excess > 0 || short > 0 ? '<<<' : ''}`,
     );
   }
   return { penalty, lines };

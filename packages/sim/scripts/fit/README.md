@@ -39,3 +39,12 @@ Knobs are multipliers on the numbers the content has when the harness starts (se
 One evaluation takes about 3-5 s; a round over ~30 knobs x 6 steps is about 10-15 minutes; a pass of 4 rounds
 about an hour. Run it from a terminal, stop it with Ctrl+C; `opt-best.json` is rewritten after every round.
 The AI tier thresholds (`ai.enemyTier`) and the rating formulas' structure are design, not knobs.
+
+## Added by the fight feel pass (B5)
+
+- Knobs: `pw` (all technique powers, `K.power`), `pwL` (powers of ranks E and D), `pwH` (B, A and S), `ls` (`K.levelScale`, the damage growth with the skill level), `bd0` and `bd1` (the strike's base damage and its growth per level), `rcD` (`rankCd` of ranks E and D). `bd` still scales both strike numbers.
+- Sustained kills: `sustained.ts` also scores the kills of the 2-hour zone harness against the numbers before the fight loop v2 (`docs/balance-evidence/baseline-dev-3f559af-sustained-kills.json`); a zone below `KILLS_FLOOR` (0.9) of them costs 4 per unit of shortfall. `kills.ts` prints the kills and defeats per zone: `pnpm --filter @shinobi/sim exec tsx scripts/fit/kills.ts`.
+- "Met stays met": `evaluate` adds a penalty for every target the recorded table met (`docs/balance-evidence/fit-status.json`) that is not met now (time with a 3-point margin for the run noise, win rate, strike share with a margin), because `packages/sim/test/fit.test.ts` holds those rows. The strike share is also penalised, at half weight, for rows with fewer than four techniques.
+- `OPT_ONLY=pwL,bd0,...` limits `opt.ts` to the named knobs (comma separated); `OPT_OUT=./name.json` writes the best knobs there instead of `opt-best.json`. The start knobs can be given as the fourth argument (JSON).
+- `regen.mjs '{"pw":1.1}'` applies knob multipliers on top of the numbers now in the docs, rebuilds `balance.json` and runs `pnpm content:import` (no need to touch `opt-best.json`).
+- After a pass that is kept: re-record the golden fixtures of `packages/core` (`UPDATE_GOLDEN=1` for `combat-golden` and `combat-golden-items`, `UPDATE_GOLDEN=expected` for `combat-dev-saves`, `DUMP=1` for `per-hit`, `RECORD_MISSIONS=1` for `missions-behaviour`), `scripts/snapshot.ts` of `packages/content`, the web page snapshots, `scripts/fit-record.ts` and `scripts/fit/table.ts`.

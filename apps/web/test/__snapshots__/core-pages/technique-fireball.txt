@@ -113,7 +113,7 @@
                 <dt>
                   Шкода
                 <dd data-figure="damage">
-                  18
+                  26
               <div>
                 <dt>
                   Час накладання
@@ -123,7 +123,7 @@
                 <dt>
                   Перезарядка
                 <dd data-figure="cooldown">
-                  5,1 с
+                  5,4 с
               <div>
                 <dt>
                   Ціна: чакра
@@ -139,7 +139,7 @@
                   <span>
                     Базова сила за рангом
                   <span class="num">
-                    17
+                    25
                 <li>
                   <span>
                     Роль
