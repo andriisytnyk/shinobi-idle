@@ -11,6 +11,7 @@ import { settings } from '../src/lib/settings.svelte.ts';
 import { game } from '../src/lib/store.ts';
 import { coreUi } from '../src/lib/ext/core-ui.ts';
 import { bootApp, type BootedApp } from './helpers/boot-app.ts';
+import { player } from './helpers/missions.ts';
 
 vi.mock('../src/lib/store.ts', async () => {
   const { createGame } = await import('../src/lib/game.svelte.ts');
@@ -96,6 +97,18 @@ describe('the «choose a nature» link', () => {
     booted = await bootApp([coreUi], genin(['katon']), '#/skills');
     expect(booted.target.textContent).not.toContain(t('req.natureLink'));
     expect(natureLinks()).toHaveLength(0);
+  });
+});
+
+describe('a mission that asks for a nature the character lacks', () => {
+  it('says that the nature is what is missing', async () => {
+    const state = player({ natures: ['katon'], base: 20, rankC: true });
+    booted = await bootApp([coreUi], state, '#/missions');
+    // A blocked card whose missing part is a nature the character does not own says so.
+    const hint = q('[data-mission][data-state="blocked"] [data-nature-lacking]');
+    expect(hint, 'a blocked card with the nature hint').not.toBeNull();
+    expect(hint?.textContent).toBe(t('req.needNature'));
+    expect(hint?.closest('[data-ui="req-row"]')?.getAttribute('data-met')).toBe('false');
   });
 });
 

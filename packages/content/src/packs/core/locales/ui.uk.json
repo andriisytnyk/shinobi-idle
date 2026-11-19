@@ -86,6 +86,7 @@
   "req.known": "відкрито",
   "req.unknown": "ще не відкрито",
   "req.nature": "Природа чакри:",
+  "req.needNature": "потрібна ця природа чакри",
   "req.rank": "Ранг: {rank}",
   "req.type.quest": "Доручення",
   "req.type.building": "Будівля",

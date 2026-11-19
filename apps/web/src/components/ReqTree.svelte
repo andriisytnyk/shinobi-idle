@@ -76,6 +76,16 @@
         })
       : null,
   );
+  /** A skill that is a chakra nature the character does not own: the level alone does not say that the nature is what is missing. */
+  const natureLacking = $derived(
+    req.t === 'skill' && !node.met
+      ? game.read(
+          (gs) =>
+            game.content.natures.some((n) => n.id === (req as { skill: string }).skill) &&
+            !gs.player.natures.includes((req as { skill: string }).skill as never),
+        )
+      : false,
+  );
   /** The link to the nature page is offered only while this nature can really be chosen now (the test, or an extra nature once Chakra Control allows it). */
   const natureChoosable = $derived(
     req.t === 'nature'
@@ -118,6 +128,7 @@
       {#if req.t === 'skill'}
         {#if ref}<EntityLink kind={ref.kind} id={ref.id} offered />{/if}
         <span class="detail">{t('req.level', { n: req.level })}</span>
+        {#if natureLacking}<span class="detail" data-nature-lacking>{t('req.needNature')}</span>{/if}
       {:else if req.t === 'technique'}
         {#if ref}<EntityLink kind={ref.kind} id={ref.id} offered />{/if}
         <span class="detail">{t(node.met ? 'req.known' : 'req.unknown')}</span>
