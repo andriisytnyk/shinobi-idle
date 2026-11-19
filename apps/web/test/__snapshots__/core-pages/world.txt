@@ -240,7 +240,7 @@
                     <path class="place" d="#36-15voc9y" data-place-role="outpost" transform="translate(0 -2) scale(1.1)">
                     <g aria-hidden="true" class="points" data-ui="map-point">
                       <g data-point-status="found" transform="translate(9 -13)">
-                        <path class="point found active" d="#44-1endzem" data-point-outpost="">
+                        <path class="point found" d="#44-1endzem" data-point-outpost="">
                     <g aria-hidden="true" class="pips">
                       <circle class="pip" cx="-10" cy="13" r="1.8">
                       <circle class="pip" cx="-5" cy="13" r="1.8">

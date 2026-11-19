@@ -950,6 +950,8 @@
                             <span class="label">
                               <span data-point-req="">
                                 Знайти точку інтересу: ???
+                              <span class="detail" data-point-req-hint="">
+                                Розвідай клітинку
                   <li>
                     <div class="row" data-entity="skill:herb" data-met="false" data-ui="req-row">
                       <span class="mark">

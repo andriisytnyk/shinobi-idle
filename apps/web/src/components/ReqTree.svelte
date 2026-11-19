@@ -60,14 +60,20 @@
         )
       : '',
   );
-  /** The vague hint of a point that is only veiled: the requirement names it as «???», and this says where to look. */
+  /** The vague hint of a point the player cannot name yet: «???» says where to look. A veiled point has its own hint; a hidden one says what the reveal rule asks. */
   const pointHint = $derived(
-    pointPlace && hasKey(`place.${pointPlace.id}.hint`)
-      ? game.read((gs) =>
-          pointStatus(gs, game.content, pointPlace) === 'veiled'
-            ? t(`place.${pointPlace.id}.hint`)
-            : null,
-        )
+    pointPlace
+      ? game.read((gs) => {
+          const status = pointStatus(gs, game.content, pointPlace);
+          if (status === 'veiled' && hasKey(`place.${pointPlace.id}.hint`))
+            return t(`place.${pointPlace.id}.hint`);
+          if (status === 'hidden') {
+            // The reveal rule of the point: a survey level of the hex says to survey; a point found alone says to look for where it is named.
+            const by = pointPlace.point?.revealedBy;
+            return t(by && by.survey === undefined ? 'reveal.hint.named' : 'reveal.hint.explored');
+          }
+          return null;
+        })
       : null,
   );
   const flagText = $derived(
