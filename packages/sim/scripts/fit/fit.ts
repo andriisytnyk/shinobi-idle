@@ -93,6 +93,8 @@ export const orig = {
   evaMax: K.evaLevel.max,
   eEva: [...K.eEva],
   power: { ...K.power },
+  levelScale: K.levelScale,
+  rankCd: { ...K.rankCd },
   rank: Object.fromEntries(content.techniques.map((t) => [t.id, t.rank])),
   role: Object.fromEntries(content.techniques.map((t) => [t.id, t.role])),
 };
@@ -101,6 +103,9 @@ export const DEFAULTS: Knobs = {
   cs: 1,
   pw: 1,
   pwL: 1,
+  ls: 1,
+  pwH: 1,
+  rcD: 1,
   bd0: 1,
   bd1: 1,
   bossHp: 1,
@@ -171,7 +176,9 @@ export function apply(k: Knobs): void {
       )),
   );
   for (const r of Object.keys(orig.power))
-    K.power[r] = orig.power[r] * (k.pw ?? 1) * (r === 'E' || r === 'D' ? (k.pwL ?? 1) : 1);
+    K.power[r] = orig.power[r] * (k.pw ?? 1) * (r === 'E' || r === 'D' ? (k.pwL ?? 1) : r === 'B' || r === 'A' || r === 'S' ? (k.pwH ?? 1) : 1);
+  for (const r of ['E', 'D']) K.rankCd[r] = orig.rankCd[r] * (k.rcD ?? 1);
+  K.levelScale = orig.levelScale * (k.ls ?? 1);
   K.basicCast = orig.basicCast * k.bc!;
   K.basicCost = orig.basicCost * k.bcost!;
   K.basicDmg[0] = orig.basicDmg[0] * k.bd! * (k.bd0 ?? 1);
