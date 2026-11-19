@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { BuildingInfo } from '@shinobi/core';
+  import { tickMs, type BuildingInfo } from '@shinobi/core';
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
@@ -24,6 +24,12 @@
   }
 
   let { info, page = false, focused = false }: Props = $props();
+  /** The build time as hours and minutes: the ticks of the village are not shown. */
+  const buildTime = $derived(
+    formatDuration(
+      (game.content.balance.K.buildTicks[info.nextLevel - 1] ?? 1) * tickMs(game.content),
+    ),
+  );
 
   const now = $derived(effectLines(info.effectsNow));
   const next = $derived(effectLines(info.effectsNext));
@@ -152,7 +158,7 @@
         {/each}
       </ul>
       <p class="ct-muted">
-        {t('village.cost.time', { n: game.content.balance.K.buildTicks[info.nextLevel - 1] ?? 1 })}
+        {t('village.cost.time', { time: buildTime })}
       </p>
     </div>
     <button
