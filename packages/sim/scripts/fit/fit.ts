@@ -65,6 +65,10 @@ const baseline: Record<string, any[]> = {};
 for (const y of ['A', 'B', 'C', 'D'])
   baseline[y] = JSON.parse(readFileSync(new URL(`baseline-dev-3f559af-${y}.json`, BASE), 'utf8'));
 
+const STATUS: Record<string, Record<string, { time: boolean; win: boolean; basic: boolean }>> = JSON.parse(
+  readFileSync(new URL('fit-status.json', BASE), 'utf8'),
+);
+
 const K: any = content.balance.K;
 export const orig = {
   cast: new Map(content.techniques.map((t) => [t.id, t.cast])),
@@ -233,6 +237,12 @@ export function evaluate(runs: number, entries?: string[]) {
       if (regular) p += Math.max(0, wmin - s.winRate) * 4;
       if (full) p += Math.max(0, basic - 0.4);
       else p += Math.max(0, basic - 0.4) * 0.5;
+      // A target the recorded table met must stay met (packages/sim/test/fit.test.ts): a margin for the run noise.
+      const was = STATUS[y]?.[e.id];
+      if (was?.time && dt !== null && Math.abs(dt - 1) > tb - 0.03)
+        p += 0.3 + (Math.abs(dt - 1) - (tb - 0.03)) * 3;
+      if (was?.win && regular && s.winRate < wmin + 0.01) p += 1;
+      if (was?.basic && full && basic > 0.37) p += 0.3 + (basic - 0.37) * 3;
       penalty += p;
       const bad =
         (dt !== null && Math.abs(dt - 1) > tb) ||
