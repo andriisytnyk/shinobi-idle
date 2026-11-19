@@ -8,6 +8,7 @@ import {
   STAND_KIND,
   counterValue,
   defeatsKey,
+  killsKey,
   dispatch,
   entryOf,
   evalReq,
@@ -26,12 +27,15 @@ import {
   listCourse,
   listSkillActions,
   missionBoard,
+  missionStatus,
   moneyOf,
   natureStatus,
   nextTierPrice,
   nextTierReq,
   planPouch,
   pouchUse,
+  startAnalysis,
+  stepAnalysis,
   rankIndex,
   scrollOf,
   shopEntries,
@@ -64,14 +68,16 @@ export const TUNING = {
   safeWinRate: 0.9,
   /** Estimated win rate a fight the story asks for needs before the bot walks into it. */
   storyWinRate: 0.5,
-  /** Estimated win rate (with the entry studied) from which the first fight with an unknown one is worth a look. */
-  scoutWinRate: 0.3,
   /** Estimated chance (the product over its stages) from which the story player walks into an operation. */
   opWinRate: 0.25,
   estimateRuns: 12,
+  /** Runs of an operation the forecast plays. */
+  operationRuns: 20,
   estimateSeed: 7,
   /** A zone, boss or operation the bot lost in is left alone this long. */
   banMs: 20 * MINUTE,
+  /** Each defeat in a row at the same place doubles that rest, up to this many times. */
+  banDoublings: 3,
   /** Zones whose enemy is above this multiple of the player's power (plus a margin) are not estimated at all. */
   reachFactor: 1.8,
   reachMargin: 6,
@@ -97,9 +103,13 @@ export interface Memory {
   bans: Map<string, number>;
   estimates: Map<string, number>;
   lastDefeats: Map<string, number>;
+  /** Defeats in a row at one place, for the rest it is given (each defeat doubles it: a bot that keeps losing is wrong about the odds). */
+  streak: Map<string, number>;
   examTriedAt: number;
   /** The last thing the story policy could not move on, for the report. */
   blocked: string | null;
+  /** Set by a plan that only trains because a fight or an operation is not yet within the character's reach. */
+  waiting: boolean;
   /** The building a quest step asked for at the last look; the village builds it before any other. */
   wantBuilding: string | null;
   /** The commands of the last decision that the game refused, counted by reason (filled by the runner's observer). */
@@ -114,8 +124,10 @@ export function createMemory(): Memory {
     bans: new Map(),
     estimates: new Map(),
     lastDefeats: new Map(),
+    streak: new Map(),
     examTriedAt: -Infinity,
     blocked: null,
+    waiting: false,
     wantBuilding: null,
     board: null,
     lastNow: 0,
@@ -190,34 +202,22 @@ function fingerprint(tk: Toolkit): string {
   ].join('.');
 }
 
-/** The estimated win rate against one enemy or boss, from the engine's own fight loop; cached until the character changes. */
-export function winRate(tk: Toolkit, entry: Enemy | Boss, studied = false): number {
+/**
+ * The estimated win rate against one enemy or boss, from the engine's own fight loop with what the character
+ * knows of the entry now (its Bingo level as it stands); cached until the character changes.
+ */
+export function winRate(tk: Toolkit, entry: Enemy | Boss): number {
   const { state, content, rules } = tk.ctx;
-  const key = `${entry.id}|${studied ? 'studied|' : ''}${bingoLevel(state, entry.id, content)}|${fingerprint(tk)}`;
+  const key = `${entry.id}|${bingoLevel(state, entry.id, content)}|${fingerprint(tk)}`;
   let rate = tk.mem.estimates.get(key);
   if (rate === undefined) {
     // What the player would fight with: the loadout, the pouch and the supplies as the fight's preparation leaves them.
     const ready = structuredClone(state) as GameState;
-    // A studied entry: what the Bingo book shows once the fight that teaches the mechanic is behind and the Intel is spent.
-    if (studied) {
-      const b = ready.bingo[entry.id];
-      ready.bingo[entry.id] = {
-        seen: 1,
-        wins: 0,
-        losses: 0,
-        timeouts: 0,
-        bounty: 0,
-        ...b,
-        bought: 3,
-      };
-    }
+    // The preparation is made for the character as it stands before the fight, not in the middle of another one.
+    ready.combat = null;
+    for (const slot of ready.slots) slot.action = null;
     const tk2: Toolkit = { ...tk, ctx: { ...tk.ctx, state: ready } };
-    for (const c of [
-      { type: 'loadout.prepare', encounter: entry.id } as Command,
-      ...prepareFight(tk2, entry.id),
-    ]) {
-      dispatch(ready, c, content, rules);
-    }
+    for (const c of prepareFight(tk2, entry.id)) dispatch(ready, c, content, rules);
     rate = runFights(
       fightSnapshot(ready, entry.id, content, rules),
       encounterOf(state, entry, content),
@@ -233,19 +233,60 @@ export function winRate(tk: Toolkit, entry: Enemy | Boss, studied = false): numb
 }
 
 /**
- * The estimated chance to clear a whole operation in one run: the stages are fought back to back with a
- * little rest between them, so it is taken as the product of the chances of its fights. `studied` assumes
- * every fight is known to the last level.
+ * Whether a player would go and look at an entry it knows little about. Only what the game shows is used: the
+ * entry's level against the character's power, not how the fight would go. A boss teaches its mechanic with
+ * the first fight, whatever came of it, so a first fight with one that is in reach is worth a loss.
  */
-export function operationRate(tk: Toolkit, opId: string, studied = false): number {
-  const { content } = tk.ctx;
+export function worthScouting(tk: Toolkit, entry: Enemy | Boss): boolean {
+  const { state, content } = tk.ctx;
+  return (
+    'special' in entry &&
+    bingoLevel(state, entry.id, content) < 2 &&
+    entry.cl <= power(tk) * TUNING.reachFactor + TUNING.reachMargin
+  );
+}
+
+/** The enemy of the last fight stage of an operation: the one its loadout is prepared for. */
+export function lastEnemyOf(content: ContentDb, opId: string): string | null {
   const op = content.operations.find((o) => o.id === opId);
-  if (!op) return 0;
-  let rate = 1;
-  for (const stage of op.stages) {
-    if (stage.t !== 'fight') continue;
-    const entry = entryOf(content, stage.enemy);
-    if (entry) rate *= winRate(tk, entry, studied);
+  const fights = (op?.stages ?? []).flatMap((s) => (s.t === 'fight' ? [s.enemy] : []));
+  return fights[fights.length - 1] ?? null;
+}
+
+/**
+ * The estimated chance to clear a whole operation in one run, from the game's own battle analysis (the forecast
+ * the player has on the operation's page): the stages are fought back to back with the loadout and pouch the
+ * preparation leaves, and the pools carried from one stage to the next. Cached until the character changes.
+ */
+export function operationRate(tk: Toolkit, opId: string): number {
+  const { state, content, rules } = tk.ctx;
+  const key = `op|${opId}|${fingerprint(tk)}`;
+  let rate = tk.mem.estimates.get(key);
+  if (rate === undefined) {
+    const ready = structuredClone(state) as GameState;
+    // The forecast is made for the character as it stands after the preparation, not in the middle of a fight.
+    ready.combat = null;
+    for (const slot of ready.slots) slot.action = null;
+    const tk2: Toolkit = { ...tk, ctx: { ...tk.ctx, state: ready } };
+    for (const c of prepareFight(tk2, lastEnemyOf(content, opId) ?? opId)) {
+      dispatch(ready, c, content, rules);
+    }
+    const job = startAnalysis(
+      ready,
+      { kind: 'operation', id: opId },
+      { samples: TUNING.operationRuns, seed: TUNING.estimateSeed },
+      content,
+      rules,
+    );
+    if (job === null) rate = 0;
+    else {
+      // Only the first-run part is wanted (the sessions that follow it are a forecast of hours): step until its batches are done.
+      let progress = stepAnalysis(job, 1, content, rules);
+      while (job.fresh.done < job.fresh.batches) progress = stepAnalysis(job, 1, content, rules);
+      rate = progress.result.fresh.winRate;
+    }
+    if (tk.mem.estimates.size > 4000) tk.mem.estimates.clear();
+    tk.mem.estimates.set(key, rate);
   }
   return rate;
 }
@@ -258,20 +299,27 @@ export function noteDefeats(tk: Toolkit): void {
     mem.bans.clear();
     mem.estimates.clear();
     mem.lastDefeats.clear();
+    mem.streak.clear();
     mem.examTriedAt = -Infinity;
     mem.board = null;
   }
   mem.lastNow = state.now;
+  const ban = (id: string): void => {
+    const run = (mem.streak.get(id) ?? 0) + 1;
+    mem.streak.set(id, run);
+    mem.bans.set(id, state.now + TUNING.banMs * 2 ** Math.min(run - 1, TUNING.banDoublings));
+  };
   for (const zone of content.zones) {
     const lost = state.counters[defeatsKey(zone.enemy)] ?? 0;
-    if (lost > (mem.lastDefeats.get(zone.id) ?? 0)) mem.bans.set(zone.id, state.now + TUNING.banMs);
+    if (lost > (mem.lastDefeats.get(zone.id) ?? 0)) ban(zone.id);
     mem.lastDefeats.set(zone.id, lost);
+    if ((state.counters[killsKey(zone.enemy)] ?? 0) > 0) mem.streak.delete(zone.id);
   }
   for (const op of content.operations) {
     for (const stage of op.stages) {
       if (stage.t !== 'fight') continue;
       const lost = state.counters[defeatsKey(stage.enemy)] ?? 0;
-      if (lost > (mem.lastDefeats.get(op.id) ?? 0)) mem.bans.set(op.id, state.now + TUNING.banMs);
+      if (lost > (mem.lastDefeats.get(op.id) ?? 0)) ban(op.id);
       mem.lastDefeats.set(op.id, Math.max(mem.lastDefeats.get(op.id) ?? 0, lost));
     }
   }
@@ -280,8 +328,20 @@ export function noteDefeats(tk: Toolkit): void {
 const banned = (tk: Toolkit, id: string): boolean => (tk.mem.bans.get(id) ?? 0) > tk.ctx.state.now;
 const wounded = (tk: Toolkit): boolean => tk.ctx.state.wounds.stacks >= TUNING.restFromWounds;
 
-/** Stocks the pouch from the shop for the enemy and sets the loadout, as a player does before a fight. */
-export function prepareFight(tk: Toolkit, encounter: string): Command[] {
+/**
+ * What a player does before a fight: buys the supplies for the enemy in the shop, then lets the game's own
+ * preparation set the loadout and pack the pouch (it packs everything the bank holds, so the buying comes first).
+ */
+export function prepareFight(
+  tk: Toolkit,
+  encounter: string,
+  loadoutFor: string = encounter,
+): Command[] {
+  return [...buySupplies(tk, encounter), { type: 'loadout.prepare', encounter: loadoutFor }];
+}
+
+/** The shop purchases that fill the pouch stacks the plan for this enemy wants. */
+function buySupplies(tk: Toolkit, encounter: string): Command[] {
   const { state, content } = tk.ctx;
   const out: Command[] = [];
   const stack = content.balance.K.pouchStack;
@@ -302,7 +362,6 @@ export function prepareFight(tk: Toolkit, encounter: string): Command[] {
     content,
   );
   let purse = ryo(tk);
-  const bought = new Set<string>();
   for (const { id } of plan) {
     if (!offered.includes(id)) continue;
     const held = state.pouch.slots.find((s) => s.id === id)?.n ?? 0;
@@ -312,14 +371,6 @@ export function prepareFight(tk: Toolkit, encounter: string): Command[] {
     if (n < 1) continue;
     purse -= n * price;
     out.push({ type: 'shop.buy', item: id, n });
-    bought.add(id);
-  }
-  const empty = state.pouch.slots.flatMap((s, i) => (s.id === '' ? [i] : []));
-  for (const { id } of plan) {
-    if (state.pouch.slots.some((s) => s.id === id)) continue;
-    if ((state.bank[id] ?? 0) < 1 && !bought.has(id)) continue;
-    const slot = empty.shift();
-    if (slot !== undefined) out.push({ type: 'pouch.set', slot, item: id });
   }
   return out;
 }
@@ -334,8 +385,7 @@ function fightPlan(tk: Toolkit, zone: Zone): Plan {
   if (run?.kind === KIND_FIGHT && run.id === zone.id) return [];
   return [
     ...(state.combat ? [{ type: 'action.stop', slot: 0 } as Command] : []),
-    { type: 'loadout.prepare', encounter: zone.id },
-    ...prepareFight(tk, zone.enemy),
+    ...prepareFight(tk, zone.enemy, zone.id),
     { type: 'action.start', slot: 0, kind: KIND_FIGHT, id: zone.id },
   ];
 }
@@ -623,7 +673,12 @@ const mission = (tk: Toolkit, id: string): Plan => {
   if (!entry) return null;
   const run = tk.ctx.state.slots[0]?.action ?? null;
   if (run?.kind === 'mission' && run.id === id) return [];
-  return entry.startable ? [{ type: 'action.start', slot: 0, kind: 'mission', id }] : null;
+  // The board is refreshed at a coarse rate; the game's own answer is read now, so a refused start is never repeated.
+  if (!entry.startable) return null;
+  const { state, content, rules } = tk.ctx;
+  return missionStatus(state, id, 0, content, rules).startable
+    ? [{ type: 'action.start', slot: 0, kind: 'mission', id }]
+    : null;
 };
 
 /** The mission that pays the most per hour (ryo, plus the XP of the skills it certainly trains), optionally limited. */
@@ -689,14 +744,14 @@ function fightFor(tk: Toolkit, enemy: string): Plan {
   }
   tk.mem.studyTargets.add(enemy);
   const rate = winRate(tk, entry);
-  // The first fight with an entry teaches its mechanic: go and look when a character who knew it would win.
-  const scouting =
-    bingoLevel(state, enemy, content) < 2 && winRate(tk, entry, true) >= TUNING.scoutWinRate;
+  // The first fight with a boss teaches its mechanic whatever comes of it: go and look when it is in reach.
+  const scouting = worthScouting(tk, entry);
   const strong =
     !banned(tk, zone.id) && !wounded(tk) && (rate >= TUNING.storyWinRate || scouting || maxed(tk));
   if (strong) return fightPlan(tk, zone);
   tk.mem.blocked = `fight ${enemy}: win rate ${rate.toFixed(2)}`;
-  return trainAny(tk);
+  tk.mem.waiting = true;
+  return trainForFight(tk);
 }
 
 /** Runs the operation until its clear flag stands. */
@@ -709,7 +764,8 @@ function operationPlan(tk: Toolkit, opId: string): Plan {
   if (run?.kind === 'operation' && run.id === opId) return [];
   if (banned(tk, opId) || wounded(tk)) {
     tk.mem.blocked = `operation ${opId}: resting after a defeat`;
-    return trainAny(tk);
+    tk.mem.waiting = true;
+    return trainForFight(tk);
   }
   const hardest = op.stages
     .flatMap((s) => (s.t === 'fight' ? [entryOf(content, s.enemy)] : []))
@@ -717,19 +773,17 @@ function operationPlan(tk: Toolkit, opId: string): Plan {
   for (const e of hardest) tk.mem.studyTargets.add(e.id);
   // The stages are fought back to back, so the chance is that of the whole run, not of the weakest stage.
   const rate = operationRate(tk, opId);
-  // A stage whose entry is still unknown teaches its mechanic with the first fight: go and look when a studied character would win.
-  const scouting =
-    hardest.some((e) => bingoLevel(state, e.id, content) < 2) &&
-    operationRate(tk, opId, true) >= TUNING.scoutWinRate;
   // A character with every skill at the cap has nothing left to train: it goes in and takes what comes.
-  if (rate < TUNING.opWinRate && !scouting) {
+  if (rate < TUNING.opWinRate) {
     tk.mem.blocked = `operation ${opId}: win rate of a run ${rate.toFixed(2)}${maxed(tk) ? ' with every skill at the cap' : ''}`;
-    if (!maxed(tk)) return trainAny(tk);
+    if (!maxed(tk)) {
+      tk.mem.waiting = true;
+      return trainForFight(tk);
+    }
   }
   return [
     ...(state.combat ? [{ type: 'action.stop', slot: 0 } as Command] : []),
-    { type: 'loadout.prepare', encounter: hardest[hardest.length - 1]?.id ?? opId },
-    ...prepareFight(tk, hardest[hardest.length - 1]?.id ?? opId),
+    ...prepareFight(tk, lastEnemyOf(content, opId) ?? opId),
     { type: 'action.start', slot: 0, kind: 'operation', id: opId },
   ];
 }
@@ -743,9 +797,14 @@ function leafPlan(tk: Toolkit, leaf: ReqResult, depth: number): Plan {
       return trainSkill(tk, req.skill) ?? (isNature(content, req.skill) ? null : trainAny(tk));
     case 'technique': {
       const scroll = scrollOf(req.id, content);
-      if (scroll !== null && (state.bank[scroll] ?? 0) > 0)
-        return [{ type: 'item.use', id: scroll }];
       const tech = content.techniques.find((t) => t.id === req.id);
+      // A scroll in the bank is read once the technique's own requirements hold; before that the game refuses it.
+      if (
+        scroll !== null &&
+        (state.bank[scroll] ?? 0) > 0 &&
+        (!tech || evalReq(state, learnReq(tech, content), content).met)
+      )
+        return [{ type: 'item.use', id: scroll }];
       if (scroll !== null) {
         const entry = shopEntries(content).find((s) => s.item === scroll);
         const open = entry ? evalReq(state, entry.req, content) : null;
@@ -852,8 +911,17 @@ function buildPlan(tk: Toolkit, building: string): Plan {
   const info = villageBuildings(state, content).find((b) => b.id === building);
   if (!info || info.nextLevel === null) return null;
   tk.mem.wantBuilding = building;
+  // One build at a time: while one is under way (the housekeeping spends the workforce on it) there is nothing to start.
+  if (state.village?.job) return null;
   if (info.build.ok) return [{ type: 'village.build', building }];
-  return bestMission(tk, (m) => m.rank === 'V' || m.forecast.ryoPerHour > 0, true);
+  // Missions bring what a build lacks (ryo, the village's resources); a wait for a stage or the queue is not theirs to shorten.
+  const lacking = info.needs.filter((n) => !n.met);
+  if (lacking.length > 0 && lacking.every((n) => n.kind === 'stage' || n.kind === 'queue'))
+    return null;
+  // Earning for a build is steady work, not a step the story is waiting on: it takes turns with the other waiting plans.
+  const plan = bestMission(tk, (m) => m.rank === 'V' || m.forecast.ryoPerHour > 0, true);
+  if (plan !== null) tk.mem.waiting = true;
+  return plan;
 }
 
 /** The plan for one quest objective. */
@@ -940,19 +1008,32 @@ export function storyPlan(tk: Toolkit): Plan {
   tk.mem.blocked = null;
   tk.mem.wantBuilding = null;
   const stuck: string[] = [];
+  // A step that is a fight or an operation the character is not yet ready for only has it train: the other
+  // quests' steps that can move on now come first, and the waiting one gets the time when nothing else can.
+  const waiting: { plan: Command[]; blocked: string | null }[] = [];
   for (const quest of content.quests) {
     const progress = state.quests[quest.id];
     if (!progress || progress.done) continue;
     const step = quest.steps[progress.step];
     if (!step) continue;
+    tk.mem.waiting = false;
+    tk.mem.blocked = null;
     const plan = objectivePlan(
       tk,
       step.objective as unknown as { t: string } & Record<string, unknown>,
     );
-    if (plan !== null) return plan;
-    stuck.push(`${quest.id} step ${progress.step + 1}`);
+    if (plan !== null && !tk.mem.waiting) return plan;
+    if (plan !== null) waiting.push({ plan, blocked: tk.mem.blocked });
+    else stuck.push(`${quest.id} step ${progress.step + 1}`);
   }
-  if (stuck.length > 0) tk.mem.blocked = `no way to work on: ${stuck.join(', ')}`;
+  tk.mem.waiting = false;
+  // The waiting plans take turns by the half hour (training for a fight, earning for a build), as a player rotates.
+  const turn = waiting[Math.floor(state.now / (30 * MINUTE)) % Math.max(1, waiting.length)];
+  if (turn) {
+    tk.mem.blocked = turn.blocked;
+    return turn.plan;
+  }
+  tk.mem.blocked = stuck.length > 0 ? `no way to work on: ${stuck.join(', ')}` : null;
   return null;
 }
 

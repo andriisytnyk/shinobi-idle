@@ -90,14 +90,6 @@ function missesOf(runs: RunMetrics[]): Miss[] {
       ? `не досягнуто за ${h(Math.max(...runs.map((r) => r.hours)))}`
       : range(runs.map((r) => r.chunin)),
   );
-  const cap = TARGETS.capHours;
-  add(
-    `Стеля навичок ${cap.min}–${cap.max} год`,
-    runs.filter((r) => outside(r.cap, cap.min, cap.max)),
-    runs.every((r) => r.cap === null)
-      ? `не досягнуто за ${h(Math.max(...runs.map((r) => r.hours)))}`
-      : range(runs.map((r) => r.cap)),
-  );
   const gapRuns = runs.filter((r) => r.cadence.hours > r.cadence.allowed);
   const gaps = spread(runs.map((r) => r.longestGap.hours));
   add(
@@ -254,8 +246,8 @@ export function strategyReportMarkdown(result: MatrixResult, content: ContentDb)
 
   section(
     '2. Час до віх',
-    'Гіпотеза: Генін ≈ 1 год, Чунін за 20–50 год (рішення автора: для гри з офлайн-прогресом це норма). Стеля навичок і проміжки без віхи цілями не є: їх лише вимірюють. Години ігрового часу.',
-    ['Генін', 'Техніка клонування', 'Жилет Чуніна', 'Стеля'],
+    'Гіпотеза: Генін ≈ 1 год, Чунін за 20–50 год (рішення автора: для гри з офлайн-прогресом це норма). Стеля навичок цілю не є (рішення автора 18.11) і тут не вимірюється: прогін кінчається жилетом. Години ігрового часу.',
+    ['Генін', 'Техніка клонування', 'Жилет Чуніна'],
     (runs, n) => [
       cell(
         runs.map((r) => r.genin),
@@ -269,16 +261,12 @@ export function strategyReportMarkdown(result: MatrixResult, content: ContentDb)
         runs.map((r) => r.chunin),
         n,
       ),
-      cell(
-        runs.map((r) => r.cap),
-        n,
-      ),
     ],
   );
 
   section(
     '3. Найдовший проміжок без віхи',
-    'Гіпотеза: жодних двох годин без віхи. Години; у колонці «після» — віха, після якої стався найдовший проміжок у медіанному прогоні.',
+    'Правило ритму (рішення автора 18.11): найдовший проміжок без нового — не більше 20% часу від початку гри й не більше 8 год. Тут — найдовший проміжок у годинах; у колонці «після» — віха, після якої він стався в медіанному прогоні.',
     ['Проміжок', 'Після віхи (медіанний прогін)'],
     (runs, n) => {
       const sorted = [...runs].sort((a, b) => a.longestGap.hours - b.longestGap.hours);
@@ -295,8 +283,8 @@ export function strategyReportMarkdown(result: MatrixResult, content: ContentDb)
 
   section(
     '4. Частка часу з клоном',
-    'Гіпотеза: клон справді працює більшість часу після того, як відкрився. У відсотках: від усього прогону й від часу з відкритим слотом.',
-    ['Від усього прогону, %', 'Від часу після відкриття, %'],
+    'Клон має бути корисним знаряддям, а не головною стратегією. Частка часу, коли клон існував (від усього прогону й від часу з відкритим слотом), частка досвіду навичок, яку принесли розсіяні клони (від усього досвіду, що має персонаж наприкінці), і частка дій: час роботи клона за ділянкою дії (не стояння) проти часу дії персонажа й клона разом.',
+    ['Від усього прогону, %', 'Від часу після відкриття, %', 'Частка досвіду, %', 'Частка дій, %'],
     (runs, n) => [
       cell(
         runs.map((r) => r.cloneShareRun),
@@ -310,7 +298,68 @@ export function strategyReportMarkdown(result: MatrixResult, content: ContentDb)
         1,
         100,
       ),
+      cell(
+        runs.map((r) => (r.totalXp > 0 ? r.cloneXp / r.totalXp : null)),
+        n,
+        1,
+        100,
+      ),
+      cell(
+        runs.map((r) => {
+          const all = r.actionMs.main + r.actionMs.clone;
+          return all > 0 ? r.actionMs.clone / all : null;
+        }),
+        n,
+        1,
+        100,
+      ),
     ],
+  );
+
+  section(
+    '4а. Бойові клони',
+    'Скільки боїв персонаж провів із тілами на своєму боці (бойові тіньові клони) і скільки досвіду за годину це дає. Множник — досвід за годину в боях із тілами, поділений на досвід за годину в боях без них (це XP усіх навичок, що надходить, поки слот 0 б’ється; кілька тіл можуть множити бойовий досвід, їх обмежує чакра). «—» — таких боїв не було.',
+    ['Боїв із тілами, %', 'Час боїв із тілами, %', 'XP/год з тілами', 'XP/год без тіл', 'Множник'],
+    (runs, n) => {
+      const plain = (r: RunMetrics) => ({
+        ms: r.fight.ms - r.fightAlly.ms,
+        xp: r.fight.xp - r.fightAlly.xp,
+        ryo: 0,
+      });
+      return [
+        cell(
+          runs.map((r) => (r.fights > 0 ? r.fightsWithAllies / r.fights : null)),
+          n,
+          1,
+          100,
+        ),
+        cell(
+          runs.map((r) => (r.fight.ms > 0 ? r.fightAlly.ms / r.fight.ms : null)),
+          n,
+          1,
+          100,
+        ),
+        cell(
+          runs.map((r) => perHour(r.fightAlly, 'xp')),
+          n,
+          0,
+        ),
+        cell(
+          runs.map((r) => perHour(plain(r), 'xp')),
+          n,
+          0,
+        ),
+        cell(
+          runs.map((r) => {
+            const a = perHour(r.fightAlly, 'xp');
+            const p = perHour(plain(r), 'xp');
+            return a !== null && p !== null && p > 0 ? a / p : null;
+          }),
+          n,
+          2,
+        ),
+      ];
+    },
   );
 
   section(
@@ -371,7 +420,7 @@ export function strategyReportMarkdown(result: MatrixResult, content: ContentDb)
   lines.push(
     '## Що не сходиться',
     '',
-    'Цілі взято з `docs/Shinobi Idle — модель балансу.md` і плану етапу 9: Генін ≈ 1 год (смуга 0,5–1,5), Чунін за 20–50 год (рішення автора від 18.11: гра з офлайн-прогресом не стискається до 12–15 год); стеля навичок 20–25 год більше не ціль, її лише вимірюють; проміжок без нового — не більше 20% ігрового часу на той момент і не більше 8 год (мінімум 1 год допустимо завжди); на Чуніні жодна навичка сюжетного гравця не нижче 20, жодної навички нижче 20 наприкінці прогону. Кожна клітинка — мін / медіана / макс за сідами; «k/n» — скільки сідів схибили.',
+    'Цілі взято з `docs/Shinobi Idle — модель балансу.md` і плану етапу 9: Генін ≈ 1 год (смуга 0,5–1,5), Чунін за 20–50 год (рішення автора від 18.11: гра з офлайн-прогресом не стискається до 12–15 год); стеля навичок не ціль, її лише вимірюють; цілі часу й ритму судять ботів, що йдуть за сюжетом до жилета (сюжетник), решту — мирного, колекціонера, бійця й офлайн-гравця — подано довідково; проміжок без нового — не більше 20% ігрового часу на той момент і не більше 8 год (мінімум 1 год допустимо завжди); на Чуніні жодна навичка сюжетного гравця не нижче 20, жодної навички нижче 20 наприкінці прогону. Кожна клітинка — мін / медіана / макс за сідами; «k/n» — скільки сідів схибили.',
     '',
   );
   const totals: string[] = [];
@@ -381,12 +430,18 @@ export function strategyReportMarkdown(result: MatrixResult, content: ContentDb)
     const all = rows.flatMap((r) => r.runs);
     const never = all.filter((r) => r.chunin === null).length;
     totals.push(
-      `| ${label} | ${never}/${all.length} | ${all.filter((r) => r.chunin !== null && (r.chunin < TARGETS.chuninHours.min || r.chunin > TARGETS.chuninHours.max)).length} | ` +
-        `${all.filter((r) => r.cap === null).length}/${all.length} | ` +
+      `| ${label}${STRATEGIES[id as keyof typeof STRATEGIES].judged ? '' : ' (довідково)'} | ${never}/${all.length} | ${all.filter((r) => r.chunin !== null && (r.chunin < TARGETS.chuninHours.min || r.chunin > TARGETS.chuninHours.max)).length} | ` +
         `${all.filter((r) => r.cadence.hours > r.cadence.allowed).length}/${all.length} | ` +
+        `${all.filter((r) => r.minLevelAtChunin !== null && r.minLevelAtChunin < TARGETS.minSkillAtEnd).length}/${all.filter((r) => r.minLevelAtChunin !== null).length} | ` +
         `${all.filter((r) => r.minLevel < TARGETS.minSkillAtEnd).length}/${all.length} |`,
     );
     details.push(`### ${label}`, '');
+    if (!STRATEGIES[id as keyof typeof STRATEGIES].judged) {
+      details.push(
+        'Цей бот не йде до жилета Чуніна за сюжетом, тож цілі часу й ритму його не судять; промахи подано для довідки.',
+        '',
+      );
+    }
     const stall = stallOf(all, content);
     if (stall) details.push(`Відкриті доручення на кінець прогону (без жилета): ${stall}.`, '');
     const chains = chainsLine(all, content);
@@ -411,7 +466,7 @@ export function strategyReportMarkdown(result: MatrixResult, content: ContentDb)
     '',
     'Скільки прогонів із загальної кількості схибили ціль (колонка «Чунін поза смугою» — лише ті, що жилет отримали, але не за 20–50 год).',
     '',
-    '| Стратегія | Жилета немає | Чунін поза смугою | Стелі немає | Проміжок понад правило | Є навичка нижче 20 |',
+    '| Стратегія | Жилета немає | Чунін поза смугою | Проміжок понад правило | Навичка нижче 20 на Чуніні | Навичка нижче 20 наприкінці |',
     '| --- | --- | --- | --- | --- | --- |',
     ...totals,
     '',

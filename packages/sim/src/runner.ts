@@ -49,6 +49,10 @@ export interface RunOptions {
   observer?: {
     command?(command: Command, result: CommandResult): void;
     step?(state: Readonly<GameState>, ms: number): void;
+    /** Every step after time has moved, the last one included (`step` sees the state before it). */
+    after?(state: Readonly<GameState>): void;
+    /** Every game event, in order, as the run drains them. */
+    event?(event: GameEvent): void;
   };
 }
 
@@ -149,7 +153,9 @@ export function runBot(bot: Bot, options: RunOptions): RunResult {
     options.observer?.step?.(state, step);
     advance(state, step, content, rules);
     const events = state.events.splice(0);
+    options.observer?.after?.(state);
     for (const event of events) {
+      options.observer?.event?.(event);
       const milestone = milestoneOf(event);
       if (milestone) timeline.push(milestone);
       if (event.type === 'levelUp' || event.type === 'questStep' || event.type === 'rankUp') {

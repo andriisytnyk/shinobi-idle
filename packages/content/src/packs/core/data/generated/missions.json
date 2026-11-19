@@ -21,7 +21,7 @@
     "pay": [],
     "resource": null,
     "ryo": 40,
-    "rep": 2
+    "rep": 1
   },
   {
     "id": "core:weed",
@@ -95,7 +95,7 @@
     ],
     "resource": null,
     "ryo": 70,
-    "rep": 2
+    "rep": 1
   },
   {
     "id": "core:drought",
@@ -247,7 +247,7 @@
     ],
     "resource": null,
     "ryo": 550,
-    "rep": 8
+    "rep": 4
   },
   {
     "id": "core:sealed",
@@ -324,7 +324,7 @@
     ],
     "resource": null,
     "ryo": 480,
-    "rep": 8
+    "rep": 4
   },
   {
     "id": "core:dig",
@@ -365,7 +365,7 @@
     ],
     "resource": null,
     "ryo": 620,
-    "rep": 8
+    "rep": 4
   },
   {
     "id": "core:v_spar",
@@ -383,7 +383,7 @@
     "pay": [],
     "resource": "syla_shynobi",
     "ryo": 0,
-    "rep": 4
+    "rep": 2
   },
   {
     "id": "core:v_walls",
@@ -400,7 +400,7 @@
     "pay": [],
     "resource": "okhorona",
     "ryo": 0,
-    "rep": 4
+    "rep": 2
   },
   {
     "id": "core:v_fence",
@@ -422,7 +422,7 @@
     "pay": [],
     "resource": "okhorona",
     "ryo": 0,
-    "rep": 4
+    "rep": 2
   },
   {
     "id": "core:v_clear",
@@ -442,7 +442,7 @@
     "pay": [],
     "resource": "dilianky",
     "ryo": 0,
-    "rep": 4
+    "rep": 2
   },
   {
     "id": "core:v_water",
@@ -464,7 +464,7 @@
     "pay": [],
     "resource": "zroshennia",
     "ryo": 0,
-    "rep": 4
+    "rep": 2
   },
   {
     "id": "core:v_sanit",
@@ -481,7 +481,7 @@
     "pay": [],
     "resource": "zdorovia",
     "ryo": 0,
-    "rep": 4
+    "rep": 2
   },
   {
     "id": "core:v_rubble",
@@ -507,7 +507,7 @@
     "pay": [],
     "resource": "kladka",
     "ryo": 0,
-    "rep": 4
+    "rep": 2
   },
   {
     "id": "core:v_clones",
@@ -524,7 +524,7 @@
     "pay": [],
     "resource": "robocha_syla",
     "ryo": 0,
-    "rep": 4
+    "rep": 2
   },
   {
     "id": "core:v_seal",
@@ -541,7 +541,7 @@
     "pay": [],
     "resource": "mistkist",
     "ryo": 0,
-    "rep": 4
+    "rep": 2
   },
   {
     "id": "core:op_hideout",
