@@ -138,6 +138,7 @@
   "report.xp": "+{n} досвіду",
   "report.levels": "+{n} {n, plural, one {рівень} few {рівні} many {рівнів} other {рівня}}",
   "report.mastery": "Майстерність",
+  "report.gained": "До Банку надійшло",
   "report.techniques": "Нові техніки",
   "report.stopped": "Дії, що зупинилися",
   "report.dispelled.manual": "Розвіяно.",

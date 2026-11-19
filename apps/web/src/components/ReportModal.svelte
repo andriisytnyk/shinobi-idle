@@ -41,6 +41,20 @@
     </ul>
   {/if}
 
+  {#if (report.gained?.items.length ?? 0) > 0 || (report.gained?.currencies.length ?? 0) > 0}
+    <h3>{t('report.gained')}</h3>
+    <ul data-report-gained>
+      {#each report.gained?.currencies ?? [] as row (row.id)}
+        <li data-report-currency={row.id}>+{formatInt(row.n)} {currencyName(row.id)}</li>
+      {/each}
+      {#each report.gained?.items ?? [] as row (row.id)}
+        <li data-report-item={row.id}>
+          +{formatInt(row.n)} × <EntityLink kind="item" id={row.id} />
+        </li>
+      {/each}
+    </ul>
+  {/if}
+
   {#if report.mastery.length > 0}
     <h3>{t('report.mastery')}</h3>
     <ul>

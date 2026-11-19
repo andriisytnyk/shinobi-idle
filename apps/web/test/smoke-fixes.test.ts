@@ -1,6 +1,9 @@
 // @vitest-environment happy-dom
-import { content } from '@shinobi/content';
+import { content, ukLocale } from '@shinobi/content';
 import { createState, xpAt, type GameState } from '@shinobi/core';
+import { flushSync, mount, unmount } from 'svelte';
+import ReportModal from '../src/components/ReportModal.svelte';
+import { buildReport } from '../src/lib/persistence.ts';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { t } from '../src/lib/i18n.ts';
 import { graduateRank, rankName } from '../src/lib/vocab.ts';
@@ -71,6 +74,39 @@ describe("a fieldwork's own page", () => {
     booted = await bootApp([coreUi], genin(), `#/fieldwork/${SEARCH}`);
     expect(q('[data-fieldwork-start]')).toBeNull();
     expect(booted.target.innerHTML).not.toContain('war_fort_ruins');
+  });
+});
+
+describe('the offline report', () => {
+  it('lists the items and the currency that reached the Bank while away', async () => {
+    booted = await bootApp([coreUi], student(), '');
+    const report = buildReport({
+      requestedMs: 4 * 3_600_000,
+      simulatedMs: 4 * 3_600_000,
+      capped: false,
+      skillXp: {},
+      levelsGained: {},
+      masteryLevelsGained: {},
+      techniquesLearned: [],
+      actionsStopped: [],
+      itemsGained: { 'core:mint': 7 },
+      currencyGained: { ryo: 120 },
+      reports: {},
+    });
+    // Loot alone is worth a report.
+    expect(report).not.toBeNull();
+    const host = document.createElement('div');
+    document.body.append(host);
+    const app = mount(ReportModal, { target: host, props: { report: report!, onClose: () => {} } });
+    flushSync();
+    const item = document.body.querySelector('[data-report-item="core:mint"]');
+    expect(item?.textContent).toContain('7');
+    expect(item?.textContent).toContain(ukLocale['item.core:mint.name']);
+    expect(document.body.querySelector('[data-report-currency="ryo"]')?.textContent).toContain(
+      '120',
+    );
+    unmount(app);
+    host.remove();
   });
 });
 
