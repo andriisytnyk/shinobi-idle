@@ -62,11 +62,21 @@ for (const [role, sc] of Object.entries(roleKey))
   set(new RegExp(`"${role}":\\{m:[0-9.]+,cd:([0-9.]+),c:`), (v) => r2(v * k.cds * sc, 2));
 for (const role of ['Захист', 'Посилення'])
   set(new RegExp(`"${role}":\\{m:[0-9.]+,cd:([0-9.]+),c:`), (v) => r2(v * k.cds, 2));
-const powScale = { E: (k.pwL ?? 1), D: (k.pwL ?? 1), C: 1, B: (k.pwH ?? 1), A: (k.pwH ?? 1), S: (k.pwH ?? 1) };
+const powScale = {
+  E: k.pwL ?? 1,
+  D: k.pwL ?? 1,
+  C: 1,
+  B: k.pwH ?? 1,
+  A: k.pwH ?? 1,
+  S: k.pwH ?? 1,
+};
 b = b.replace(/power: \{([^}]*)\}/, (whole, inner) =>
   whole.replace(
     inner,
-    inner.replace(/([A-Z]):([0-9.]+)/g, (_, r, v) => `${r}:${r2(Number(v) * (k.pw ?? 1) * powScale[r], 2)}`),
+    inner.replace(
+      /([A-Z]):([0-9.]+)/g,
+      (_, r, v) => `${r}:${r2(Number(v) * (k.pw ?? 1) * powScale[r], 2)}`,
+    ),
   ),
 );
 for (const r of ['E', 'D'])

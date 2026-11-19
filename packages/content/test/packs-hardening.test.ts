@@ -321,7 +321,7 @@ describe('balance patches', () => {
     const db = composeContent([corePack, patch('tweaker', 'K.power.E', 12)]);
     expect(db.balance.K.power['E']).toBe(12);
     expect(corePack.balance.K).toBeDefined();
-    expect(composeContent([corePack]).balance.K.power['E']).toBe(corePack.balance.K.power['E']);
+    expect(composeContent([corePack]).balance.K.power['E']).not.toBe(12);
   });
 
   it('refuses a missing path, an object, a clash and a bad value, naming the pack', () => {

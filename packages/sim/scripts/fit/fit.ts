@@ -65,9 +65,10 @@ const baseline: Record<string, any[]> = {};
 for (const y of ['A', 'B', 'C', 'D'])
   baseline[y] = JSON.parse(readFileSync(new URL(`baseline-dev-3f559af-${y}.json`, BASE), 'utf8'));
 
-const STATUS: Record<string, Record<string, { time: boolean; win: boolean; basic: boolean }>> = JSON.parse(
-  readFileSync(new URL('fit-status.json', BASE), 'utf8'),
-);
+const STATUS: Record<
+  string,
+  Record<string, { time: boolean; win: boolean; basic: boolean }>
+> = JSON.parse(readFileSync(new URL('fit-status.json', BASE), 'utf8'));
 
 const K: any = content.balance.K;
 export const orig = {
@@ -180,7 +181,14 @@ export function apply(k: Knobs): void {
       )),
   );
   for (const r of Object.keys(orig.power))
-    K.power[r] = orig.power[r] * (k.pw ?? 1) * (r === 'E' || r === 'D' ? (k.pwL ?? 1) : r === 'B' || r === 'A' || r === 'S' ? (k.pwH ?? 1) : 1);
+    K.power[r] =
+      orig.power[r] *
+      (k.pw ?? 1) *
+      (r === 'E' || r === 'D'
+        ? (k.pwL ?? 1)
+        : r === 'B' || r === 'A' || r === 'S'
+          ? (k.pwH ?? 1)
+          : 1);
   for (const r of ['E', 'D']) K.rankCd[r] = orig.rankCd[r] * (k.rcD ?? 1);
   K.levelScale = orig.levelScale * (k.ls ?? 1);
   K.basicCast = orig.basicCast * k.bc!;

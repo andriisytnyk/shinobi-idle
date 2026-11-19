@@ -21,7 +21,11 @@ const regular = content.enemies.filter(
   (e) => e.id !== 'core:dummy' && content.zones.some((z) => z.enemy === e.id),
 );
 
-export function grindStats(enemyId: string, nature: NatureId, hours: number): { defeats: number; kills: number } {
+export function grindStats(
+  enemyId: string,
+  nature: NatureId,
+  hours: number,
+): { defeats: number; kills: number } {
   const enemy = content.enemies.find((e) => e.id === enemyId)!;
   const zone = content.zones.find((z) => z.enemy === enemyId);
   const state = createState(77, content);
