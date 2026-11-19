@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { pointStatus, type ReqResult } from '@shinobi/core';
+  import { natureStatus, pointStatus, type ReqResult } from '@shinobi/core';
   import { humanId, webRef } from '../lib/entities.ts';
   import { currencyName, currencyOf, rankName } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
@@ -76,6 +76,15 @@
         })
       : null,
   );
+  /** The link to the nature page is offered only while this nature can really be chosen now (the test, or an extra nature once Chakra Control allows it). */
+  const natureChoosable = $derived(
+    req.t === 'nature'
+      ? game.read((gs) => {
+          const status = natureStatus(gs, game.content);
+          return status.canChoose && status.free.includes((req as { nature: string }).nature);
+        })
+      : false,
+  );
   const flagText = $derived(
     req.t === 'flag'
       ? hasKey(`req.flag.${req.id}`)
@@ -115,7 +124,9 @@
       {:else if req.t === 'nature'}
         <span class="detail">{t('req.nature')}</span>
         {#if ref}<EntityLink kind={ref.kind} id={ref.id} offered />{/if}
-        {#if !node.met}<a class="detail-link" href="#/nature">{t('req.natureLink')}</a>{/if}
+        {#if !node.met && natureChoosable}<a class="detail-link" href="#/nature"
+            >{t('req.natureLink')}</a
+          >{/if}
       {:else if req.t === 'item'}
         {#if ref}<EntityLink kind={ref.kind} id={ref.id} offered />{/if}
       {:else if req.t === 'currency'}
