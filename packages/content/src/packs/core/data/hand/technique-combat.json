@@ -1,0 +1,264 @@
+{
+  "core:leaf_whirlwind": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:dynamic_entry": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:leaf_gale": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:gate_of_opening": {
+    "effect": {
+      "kind": "stance",
+      "fx": "gateOpening"
+    }
+  },
+  "core:gate_of_healing": {
+    "effect": {
+      "kind": "stance",
+      "fx": "gateHealing"
+    }
+  },
+  "core:lion_combo": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:leaf_great_whirlwind": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:drunken_fist": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:leaf_rising_wind": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:front_lotus": {
+    "effect": {
+      "kind": "damage"
+    },
+    "requiresStance": true
+  },
+  "core:clone": {
+    "effect": {
+      "kind": "none"
+    },
+    "passive": {
+      "fx": "decoy"
+    }
+  },
+  "core:transformation": {
+    "effect": {
+      "kind": "none"
+    }
+  },
+  "core:body_replacement": {
+    "effect": {
+      "kind": "none"
+    },
+    "passive": {
+      "fx": "passiveNegate"
+    }
+  },
+  "core:body_flicker": {
+    "effect": {
+      "kind": "nextCast",
+      "fx": "nextCast"
+    }
+  },
+  "core:shadow_shuriken": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:enclosing": {
+    "effect": {
+      "kind": "none"
+    }
+  },
+  "core:sensing": {
+    "effect": {
+      "kind": "reveal",
+      "fx": "reveal"
+    }
+  },
+  "core:rope_escape": {
+    "effect": {
+      "kind": "cleanse",
+      "statuses": ["bind"]
+    }
+  },
+  "core:temporary_paralysis": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:hidden_shadow_snake_hands": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:shadow_clone": {
+    "effect": {
+      "kind": "summon",
+      "fx": "combatClone",
+      "allyName": "fight.ally"
+    }
+  },
+  "core:running_fire": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:great_fireball": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:phoenix_sage_fire": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:dragon_fire": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:fire_dragon_flame_bullet": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:gale_palm": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:great_breakthrough": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:sickle_weasel": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:vacuum_wave": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:four_pillar_bind": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:lightning_beast_tracking_fang": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:wave_of_inspiration": {
+    "effect": {
+      "kind": "damage"
+    },
+    "guaranteedCombo": "shockWet"
+  },
+  "core:false_darkness": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:double_suicide_decapitation": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:hiding_like_a_mole": {
+    "effect": {
+      "kind": "none"
+    }
+  },
+  "core:tearing_earth_turning_palm": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:earth_flow_river": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:earth_dragon_bullet": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:earth_style_wall": {
+    "effect": {
+      "kind": "none"
+    },
+    "passive": {
+      "fx": "shield"
+    }
+  },
+  "core:hiding_in_mist": {
+    "effect": {
+      "kind": "none"
+    },
+    "passive": {
+      "fx": "evasionBuff"
+    }
+  },
+  "core:water_clone": {
+    "effect": {
+      "kind": "none"
+    },
+    "passive": {
+      "fx": "decoy"
+    }
+  },
+  "core:wild_water_wave": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:water_prison": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:gunshot": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:starch_syrup_capturing_field": {
+    "effect": {
+      "kind": "damage"
+    }
+  },
+  "core:water_formation_wall": {
+    "effect": {
+      "kind": "none"
+    },
+    "passive": {
+      "fx": "shield"
+    }
+  }
+}

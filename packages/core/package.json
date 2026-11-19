@@ -1,0 +1,26 @@
+{
+  "name": "@shinobi/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./testmod": "./src/testmod/index.ts",
+    "./speed": "./test/speed.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:speed": "vitest run --mode speed --no-file-parallelism -t @speed",
+    "typecheck": "tsc --noEmit -p . && tsc --noEmit -p tsconfig.test.json"
+  },
+  "dependencies": {
+    "@shinobi/content": "workspace:*",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "eslint": "^9.39.0",
+    "typescript": "~5.9.3",
+    "vitest": "^3.2.0"
+  }
+}

@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [dev, test, main]
+  push:
+    branches: [dev]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - name: Generated content must match the docs data
+        run: |
+          pnpm content:import
+          git diff --exit-code
+      - name: Generated icons must match the icon mapping
+        run: |
+          pnpm icons:build
+          git diff --exit-code
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      # Wall-clock budgets run alone, in one worker, so other tests do not steal their CPU.
+      - run: pnpm test:speed
+      - run: pnpm build
+      - name: PWA manifest, icons and precache of the build
+        run: pnpm --filter @shinobi/web pwa:check

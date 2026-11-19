@@ -19,7 +19,7 @@ for (const sk of TECH_SK) {
   for (const x of by[sk].m.filter(x => x.l <= P.CAP || P.TECH.change[x.n])) {
     if (P.TECH.hide.includes(x.n)) continue;
     const ch = P.TECH.change[x.n] || {};
-    const t = { skill:sk, level:ch.l ?? x.l, uk:x.n, en:x.en, rank:ch.rk ?? x.rk, rankCanon:ch.rkc ?? !!x.rkc, role:x.role, tags:x.tags||[], state:x.state||"",
+    const t = { skill:sk, level:ch.l ?? x.l, uk:x.n, en:x.en, rank:ch.rk ?? x.rk, rankCanon:ch.rkc ?? !!x.rkc, role:x.role, tags:x.tags||[], state:ch.st ?? (x.state||""),
       src:ch.src ?? x.src, home:ch.home ?? x.home, home2:ch.home2||"", req:ch.d ?? x.d ?? "", note:x.g||"", patched:ch.why||"" };
     if (t.level <= P.CAP) techniques.push(t);
   }
@@ -34,12 +34,14 @@ for (const t of techniques) {
   t.tier = P.TECH.tier[t.uk] ?? 0;
   if (P.TECH.rankVerified.includes(t.uk)) t.rankCanon = true;
   t.noDamage = P.TECH.noDamage.includes(t.uk);
+  if (P.TECH.cast[t.uk] !== undefined) t.castOverride = P.TECH.cast[t.uk];
 }
 techniques.sort((a,b) => TECH_SK.indexOf(a.skill) - TECH_SK.indexOf(b.skill) || a.level - b.level);
 
 // ---------- інші майстерності ----------
 const simple = (id) => by[id].m.filter(x => x.l <= P.CAP).map(x => ({ level:x.l, uk:x.n, req:x.d||"", note:x.g||"" }));
 const exercises = simple("cc"), obstacles = simple("ath"), herbs = simple("herb");
+for (const o of obstacles) if (P.OBSTACLES[o.uk]) Object.assign(o, P.OBSTACLES[o.uk]);
 const idByName = Object.fromEntries(Object.entries(D.ITEMS).map(([k,v]) => [v[0],k]));
 herbs.forEach(h => h.id = idByName[h.uk]);
 const practices = by.med.m.filter(x => x.l <= P.CAP).map(x => {

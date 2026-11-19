@@ -1,0 +1,53 @@
+[
+  {
+    "id": "core:renown_courier",
+    "renown": 180,
+    "rewards": {
+      "items": [],
+      "flags": ["missions.mail.unlocked"],
+      "mods": [],
+      "opens": [{ "kind": "mission", "id": "core:mail" }]
+    }
+  },
+  {
+    "id": "core:renown_teacher",
+    "renown": 210,
+    "rewards": {
+      "items": [],
+      "scroll": { "library": 4 },
+      "flags": [],
+      "mods": [],
+      "opens": []
+    }
+  },
+  {
+    "id": "core:renown_merchants",
+    "renown": 240,
+    "rewards": {
+      "items": [],
+      "flags": [],
+      "mods": [{ "key": "shop.price", "op": "add", "value": -0.05 }],
+      "opens": []
+    }
+  },
+  {
+    "id": "core:renown_gift",
+    "renown": 270,
+    "rewards": {
+      "items": [{ "item": "core:chai_badorosti", "n": 2 }],
+      "flags": [],
+      "mods": [],
+      "opens": [{ "kind": "item", "id": "core:chai_badorosti" }]
+    }
+  },
+  {
+    "id": "core:renown_recommendation",
+    "renown": 300,
+    "rewards": {
+      "items": [],
+      "flags": ["renown.recommended"],
+      "mods": [],
+      "opens": [{ "kind": "exam", "id": "core:chunin_exam" }]
+    }
+  }
+]

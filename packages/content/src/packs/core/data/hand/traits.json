@@ -1,0 +1,92 @@
+[
+  {
+    "id": "armor",
+    "answer": "pierce",
+    "numbers": {
+      "from": "trait",
+      "keys": ["armor", "armorOff"]
+    },
+    "mods": [
+      {
+        "stat": "damageTaken",
+        "op": "mul",
+        "value": {
+          "path": "trait.armor",
+          "oneMinus": true
+        }
+      }
+    ],
+    "priority": 4
+  },
+  {
+    "id": "caster",
+    "answer": "interrupt",
+    "numbers": {
+      "from": "trait",
+      "keys": ["casterEvery", "casterCast", "casterMult"]
+    },
+    "hook": "trait:caster",
+    "casts": true
+  },
+  {
+    "id": "pack",
+    "answer": "area",
+    "numbers": {
+      "from": "pack",
+      "keys": ["n", "hp", "dmg"]
+    },
+    "swarm": "pack"
+  },
+  {
+    "id": "evasive",
+    "answer": "bind",
+    "numbers": {
+      "from": "trait",
+      "keys": ["evasive"]
+    },
+    "hook": "trait:evasive",
+    "priority": 2
+  },
+  {
+    "id": "regen",
+    "answer": "dot",
+    "numbers": {
+      "from": "trait",
+      "keys": ["regenPct"]
+    },
+    "regen": "trait.regenPct",
+    "priority": 3
+  },
+  {
+    "id": "illusionist",
+    "answer": "dispel",
+    "numbers": {
+      "from": "trait",
+      "keys": ["illusionEvery", "illusionDur", "illusionAcc"]
+    },
+    "hook": "trait:illusionist",
+    "inflicts": ["illusion"],
+    "priority": 1
+  },
+  {
+    "id": "hidden",
+    "answer": "reveal",
+    "numbers": {
+      "from": "trait",
+      "keys": ["hidden", "hiddenAcc", "hiddenFirst"]
+    },
+    "hook": "trait:hidden",
+    "priority": 1
+  },
+  {
+    "id": "poisoner",
+    "answer": "cleanse",
+    "numbers": {
+      "from": "trait",
+      "keys": ["poisonChance"]
+    },
+    "hook": "trait:poisoner",
+    "inflicts": ["poison"],
+    "priority": 2
+  }
+]

@@ -1,0 +1,131 @@
+[
+  {
+    "id": "tai",
+    "group": "train",
+    "activity": "tech",
+    "unlockReq": null
+  },
+  {
+    "id": "nin",
+    "group": "nin",
+    "activity": "tech",
+    "unlockReq": null
+  },
+  {
+    "id": "katon",
+    "group": "nin",
+    "activity": "tech",
+    "unlockReq": {
+      "t": "nature",
+      "nature": "katon"
+    }
+  },
+  {
+    "id": "futon",
+    "group": "nin",
+    "activity": "tech",
+    "unlockReq": {
+      "t": "nature",
+      "nature": "futon"
+    }
+  },
+  {
+    "id": "raiton",
+    "group": "nin",
+    "activity": "tech",
+    "unlockReq": {
+      "t": "nature",
+      "nature": "raiton"
+    }
+  },
+  {
+    "id": "doton",
+    "group": "nin",
+    "activity": "tech",
+    "unlockReq": {
+      "t": "nature",
+      "nature": "doton"
+    }
+  },
+  {
+    "id": "suiton",
+    "group": "nin",
+    "activity": "tech",
+    "unlockReq": {
+      "t": "nature",
+      "nature": "suiton"
+    }
+  },
+  {
+    "id": "cc",
+    "group": "train",
+    "activity": "drill",
+    "unlockReq": null
+  },
+  {
+    "id": "med",
+    "group": "train",
+    "activity": "insight",
+    "unlockReq": null
+  },
+  {
+    "id": "ath",
+    "group": "train",
+    "activity": "course",
+    "unlockReq": null
+  },
+  {
+    "id": "herb",
+    "group": "field",
+    "activity": "patch",
+    "unlockReq": {
+      "t": "rank",
+      "rank": "genin"
+    }
+  },
+  {
+    "id": "scout",
+    "group": "field",
+    "activity": "map",
+    "unlockReq": {
+      "t": "rank",
+      "rank": "genin"
+    }
+  },
+  {
+    "id": "prov",
+    "group": "craft",
+    "activity": "station",
+    "unlockReq": {
+      "t": "rank",
+      "rank": "genin"
+    }
+  },
+  {
+    "id": "alch",
+    "group": "craft",
+    "activity": "recipe",
+    "unlockReq": {
+      "t": "rank",
+      "rank": "genin"
+    }
+  },
+  {
+    "id": "vit",
+    "group": "combat",
+    "activity": "drill",
+    "unlockReq": {
+      "t": "any",
+      "of": [
+        {
+          "t": "flag",
+          "id": "firstFight"
+        },
+        {
+          "t": "rank",
+          "rank": "genin"
+        }
+      ]
+    }
+  }
+]

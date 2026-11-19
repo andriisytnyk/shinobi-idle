@@ -1,0 +1,32 @@
+<main class="main">
+  <div class="ui-page" data-page="core:bank" data-ui="page">
+    <article class="simple-page">
+      <h1>
+        Банк
+      <div class="tools">
+        <div aria-label="Розділи банку" class="tabs" role="tablist">
+          <button aria-selected="true" class="tab active" data-tab="all" role="tab" type="button">
+            Усе
+          <button aria-selected="false" class="tab" data-tab="ingredients" role="tab" type="button">
+            Трави й інгредієнти
+          <button aria-selected="false" class="tab" data-tab="products" role="tab" type="button">
+            Вироби
+          <button aria-selected="false" class="tab" data-tab="tools" role="tab" type="button">
+            Інструменти
+          <button aria-selected="false" class="tab" data-tab="scrolls" role="tab" type="button">
+            Сувої
+          <button aria-selected="false" class="tab" data-tab="trophies" role="tab" type="button">
+            Трофеї
+        <label class="search">
+          <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+            <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <path d="#17-n1mo7t">
+              <circle cx="11" cy="11" r="8">
+          <input aria-label="Пошук за назвою" data-search="" placeholder="Пошук за назвою" type="search">
+        <label class="goal-filter">
+          <input data-goal-filter="" type="checkbox">
+          <span>
+            Потрібне для мети
+      <p class="empty" data-empty="">
+        У банку поки порожньо.
+      <ul class="items">

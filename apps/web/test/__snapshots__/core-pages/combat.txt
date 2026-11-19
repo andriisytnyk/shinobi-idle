@@ -1,0 +1,40 @@
+<main class="main">
+  <div class="ui-page" data-page="core:combat" data-ui="page">
+    <article class="simple-page">
+      <h1>
+        Тренувальний бій
+      <nav aria-label="Розділи бою" class="tabs" data-combat-tabs="">
+        <a aria-current="page" class="active" data-combat-tab="fight" href="#/combat">
+          Бій
+        <a data-combat-tab="bingo" href="#/combat/bingo">
+          Бінґо-книга
+        <a data-combat-tab="report" href="#/combat/report">
+          Звіт бою
+      <h2>
+        З ким битися
+      <ul class="cards">
+        <li class="card" data-enemy="core:dummy">
+          <span class="icon">
+            <svg aria-hidden="true" class="icon" height="36" viewBox="0 0 512 512" width="36">
+              <path d="#2789-v6xrmf" fill="currentColor">
+          <div class="info">
+            <p class="name">
+              <a class="entity-link" href="#/enemy/core:dummy">
+                Тренувальний манекен
+            <p class="meta">
+              Бойовий рівень 2 · Здоров'я 40
+          <div class="buttons">
+            <a class="prepare" href="#/combat/prepare/zone/core:zone_dummy">
+              Підготуватися
+            <span class="split plain" data-for="fight" data-ui="start-split">
+              <button class="main ct-action" data-performer="0" data-start="true" type="button">
+                Почати бій
+      <p class="idle">
+        Бій не йде. Обери супротивника.
+      <details class="log" data-fight-log="">
+        <summary>
+          Журнал бою
+        <div aria-label="Журнал бою" aria-live="off" class="log" data-log="" role="log">
+          <p class="empty">
+            Журнал заповниться, щойно бій почнеться.
+          <ul>

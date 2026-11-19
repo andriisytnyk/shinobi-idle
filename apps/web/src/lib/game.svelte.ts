@@ -1,0 +1,834 @@
+import type { ContentDb, PackManifest } from '@shinobi/content';
+import {
+  advance,
+  advanceOffline,
+  createState,
+  defaultRules,
+  deserialize,
+  dispatch as coreDispatch,
+  revealHint,
+  revealOf,
+  shownKey,
+  type Command,
+  type RevealLevel,
+  type CommandResult,
+  type GameEvent,
+  type GameState,
+  type Rules,
+  serializeTelemetry,
+} from '@shinobi/core';
+import {
+  BACKUP_KEY,
+  BROKEN_SAVE_KEY,
+  SAVE_KEY,
+  assertSaneSave,
+  decodeStored,
+  LoadError,
+  backupSave,
+  buildReport,
+  exportRaw,
+  exportSave,
+  importSave,
+  listBackups,
+  loadGame,
+  newGame,
+  readBackup,
+  saveGame,
+  type AnbuReport,
+  type BackupEntry,
+  type Clock,
+  type KeyValue,
+  type LoadReason,
+} from './persistence.ts';
+import type { Signals } from './hints.ts';
+import { setActiveContent, setActiveState } from './active.ts';
+import { composeBoot } from './boot.ts';
+import { deepFreeze } from './freeze.ts';
+import { detach as detachData } from './read.ts';
+import { requestPersistentStorage } from './platform.ts';
+import { settings } from './settings.svelte.ts';
+import { createTelemetry, type TelemetryFile } from './telemetry.ts';
+import { setRevealReader, type RevealReader } from './reveal.ts';
+import type { TabLock } from './tab-lock.ts';
+import { lineSlot, trimLog } from './battle-log.ts';
+import { packsToasts, toastFor, toasts as defaultToasts } from './toasts.svelte.ts';
+
+/** How often the game loop runs. */
+export const TICK_MS = 100;
+/** Commands after which the game is saved at once: what a reload must not undo. */
+const SAVE_NOW: ReadonlySet<string> = new Set([
+  'nature.choose',
+  'nature.add',
+  'exam.start',
+  'item.use',
+  'item.coat',
+  'shop.buy',
+  'shop.sell',
+  'gear.buy',
+  'athletics.build',
+  'meditation.buy',
+]);
+
+/** How often the save is written. */
+export const SAVE_EVERY_MS = 10_000;
+/** A gap longer than this between two ticks means the tab slept: catch up through the offline path. */
+export const SLEEP_GAP_MS = 5_000;
+
+/** A line of the battle log the page keeps: events of the fight, numbered for keyed lists. */
+export type LogEvent = Extract<
+  GameEvent,
+  { type: 'combatLog' | 'enemyDefeated' | 'playerDefeated' }
+>;
+/** A rule a pack added that failed and was switched off for the session. */
+export interface RuleNotice {
+  pack: string;
+  rule: string;
+  reason: string;
+}
+export interface LogEntry {
+  id: number;
+  event: LogEvent;
+}
+
+/** Lines the battle log keeps for each fight (each performer slot). */
+export const LOG_LIMIT = 60;
+
+export type SaveStatus = 'idle' | 'saved' | 'error';
+
+/**
+ * `loading`: reading the save. `playing`: the loop and autosave run. `blocked`: another tab plays
+ * (or took over); this tab neither runs nor saves. `error`: the save could not be read; nothing
+ * runs and nothing is written until the player decides. `crashed`: the game loop threw; the loop is
+ * stopped and nothing is written, so the last good save stays as it is.
+ */
+export type Phase = 'loading' | 'playing' | 'blocked' | 'error' | 'crashed';
+
+/** What stopped the game loop. */
+export interface CrashInfo {
+  message: string;
+  stack: string;
+}
+
+/** Listeners that UI packs add around commands. `before` may replace the command or return `false` to cancel it. */
+export interface CommandHook {
+  before?(command: Command): Command | false | void;
+  after?(command: Command, result: CommandResult): void;
+}
+
+export interface GameDeps {
+  /** The composed content of this game; the pack `core` alone when omitted. */
+  content?: ContentDb;
+  rules?: Rules;
+  /** The manifests of the packs the content was composed from. */
+  packs?: readonly PackManifest[];
+  /** The packs the core left out because they failed to compose. */
+  failed?: readonly { pack: string; error: string }[];
+  clock?: Clock;
+  kv?: KeyValue;
+  lock?: TabLock | null;
+  toasts?: Pick<typeof defaultToasts, 'push'>;
+  /** Whether the local telemetry records; the settings page decides it by default. */
+  telemetryEnabled?: () => boolean;
+}
+
+/**
+ * The reactive game store. The state is plain JSON mutated in place by the core; the `version`
+ * counter is what the UI subscribes to: reading `state` reads the counter, so anything that uses
+ * the state re-runs after every tick.
+ */
+export function createGame(deps: GameDeps = {}) {
+  // The content is data that nobody changes at run time; packs get it too, so it is frozen once.
+  const base = deps.content === undefined || deps.rules === undefined ? composeBoot() : null;
+  const content = deepFreeze(deps.content ?? base?.content ?? composeBoot().content);
+  const rules = deps.rules ?? base?.rules ?? defaultRules;
+  const packs = deps.packs ?? content.packs;
+  const failed = deps.failed ?? [];
+  setActiveContent(content);
+  const clock = deps.clock ?? { now: () => 0 };
+  const kv = deps.kv ?? null;
+  const lock = deps.lock ?? null;
+  const toasts = deps.toasts ?? defaultToasts;
+  const tel = createTelemetry({
+    clock,
+    kv,
+    content,
+    enabled: deps.telemetryEnabled ?? (() => settings.telemetry),
+  });
+
+  let state = $state.raw<GameState>(createState(1, content));
+  setActiveState(() => state);
+  let version = $state(0);
+  let report = $state.raw<AnbuReport | null>(null);
+  let phase = $state<Phase>('loading');
+  let saveStatus = $state<SaveStatus>('idle');
+  let loadError = $state.raw<{ message: string; raw: string | null; reason: LoadReason } | null>(
+    null,
+  );
+  let hasBackup = $state(false);
+  let backups = $state.raw<BackupEntry[]>([]);
+  let crash = $state.raw<CrashInfo | null>(null);
+  let log = $state.raw<LogEntry[]>([]);
+  let logId = 0;
+  /** Set when the player has just graduated; the graduation modal clears it. */
+  let graduation = $state(false);
+  /** Set when the player has passed the exam that ends the story; the final screen clears it. */
+  let finale = $state(false);
+  /** One-off happenings of this session that hints wait for (a craft that ran out of ingredients). */
+  let signals = $state.raw<Signals>({});
+
+  // The reveal rule for the components: whatever reads it follows the stamp below.
+  // Many links on a page ask about the same few entities: answers are kept until the stamp moves.
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a cache that no view reads
+  const levels = new Map<string, Map<string, RevealLevel>>();
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a cache that no view reads
+  const hints = new Map<string, Map<string, string | null>>();
+  /** Bumped by whatever may change what is discovered at once: a command, a drained event, a new state. Between such moments answers are kept for a second of game time. */
+  let epoch = 0;
+  /**
+   * What views of the reveal rule subscribe to: it moves only when answers may have changed (a command,
+   * a drained event, a new state, a new game second), not on every tick, so a page full of links does
+   * not recompute them ten times a second.
+   */
+  let revealStamp = $state(0);
+  let stampedEpoch = -1;
+  let stampedSecond = -1;
+  /** Called with every update of the game: moves the stamp when the answers may be stale. */
+  const restamp = (): void => {
+    const second = Math.floor(state.now / 1000);
+    if (stampedEpoch !== epoch || stampedSecond !== second) {
+      stampedEpoch = epoch;
+      stampedSecond = second;
+      levels.clear();
+      hints.clear();
+      revealStamp++;
+    }
+  };
+  const fresh = (): void => {
+    void revealStamp;
+  };
+  function remember<T>(
+    cache: Map<string, Map<string, T>>,
+    ref: { kind: string; id: string },
+    make: () => T,
+  ): T {
+    let byId = cache.get(ref.kind);
+    if (!byId) {
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a cache that no view reads
+      byId = new Map();
+      cache.set(ref.kind, byId);
+    }
+    let value = byId.get(ref.id);
+    if (value === undefined) {
+      value = make();
+      byId.set(ref.id, value);
+    }
+    return value;
+  }
+  const reveal: RevealReader = {
+    level(ref) {
+      fresh();
+      return remember(levels, ref, () => revealOf(state, ref, content, rules));
+    },
+    hint(ref) {
+      fresh();
+      return remember(hints, ref, () => revealHint(state, ref, content, rules));
+    },
+    mark(refs) {
+      let changed = false;
+      for (const ref of refs) {
+        if (state.shown[shownKey(ref)] === true || revealOf(state, ref, content, rules) === 'full')
+          continue;
+        // Straight to the core, past the hooks of the packs: the mark is bookkeeping, not a player's command.
+        if (coreDispatch(state, { type: 'reveal.mark', refs: [ref] }, content, rules).ok)
+          changed = true;
+      }
+      if (changed) {
+        epoch++;
+        touch();
+      }
+    },
+  };
+  setRevealReader(reveal);
+
+  /** Revision of the save this tab last read or wrote; a stored revision above it means a newer save exists. */
+  let rev = 0;
+  let lastWall = clock.now();
+  /** Game seconds per wall second; 1 except when a test build's developer panel speeds the clock up. */
+  let speed = 1;
+  let timers: number[] = [];
+  const commandHooks: CommandHook[] = [];
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- plain bookkeeping that no view reads
+  const eventListeners = new Set<(event: GameEvent) => void>();
+  let detach: (() => void) | null = null;
+
+  const touch = () => {
+    version++;
+    restamp();
+  };
+
+  /** A rule of a pack that the core switched off: listed for the session, told once. */
+  let ruleNotices = $state.raw<RuleNotice[]>([]);
+  function noteRule(pack: string, rule: string, reason: string): boolean {
+    if (ruleNotices.some((n) => n.pack === pack && n.rule === rule)) return false;
+    ruleNotices = [...ruleNotices, { pack, rule, reason }];
+    return true;
+  }
+
+  /** Turns the events the core queued into toasts and empties the queue. */
+  function drainEvents(): void {
+    const events = state.events;
+    if (events.length === 0) return;
+    // The listeners below may ask the reveal rule about what the event brought: the answers are dropped first.
+    epoch++;
+    restamp();
+    state.events = [];
+    tel.fold(events);
+    for (const listener of eventListeners) for (const event of events) listener(event);
+    const lines: LogEntry[] = [];
+    let urgent = false;
+    for (const event of events) {
+      // Changes the player must not lose to a reload are saved at once, not on the next timer.
+      if (event.type === 'rankUp' || event.type === 'natureGained') urgent = true;
+      if (event.type === 'actionStopped' && event.missing && !signals.craftStopped) {
+        signals = { ...signals, craftStopped: true };
+      }
+      if (event.type === 'travelled' && !signals.travelled) {
+        signals = { ...signals, travelled: true };
+      }
+      if (
+        // The log tells what was cast and what hit; the starts, ends and breaks of every action are for the fight view.
+        (event.type === 'combatLog' &&
+          (event.act === 'hit' ||
+            event.act === 'miss' ||
+            (event.act === 'cast' &&
+              event.side === 'player' &&
+              content.techniques.some((x) => x.id === event.tech)))) ||
+        event.type === 'enemyDefeated' ||
+        event.type === 'playerDefeated'
+      ) {
+        lines.push({ id: ++logId, event });
+      } else if (event.type === 'rankUp' && content.exams.some((e) => e.rank === event.rank)) {
+        // An exam that ends the story (the Chunin one ends the slice) has its own screen instead of the promotion dialog.
+        if (content.exams.some((e) => e.rank === event.rank && e.finale === true)) finale = true;
+        else graduation = true;
+      }
+      if (event.type === 'ruleDisabled' && !noteRule(event.pack, event.rule, event.reason))
+        continue;
+      if (event.type === 'packsChanged') for (const p of packsToasts(event)) toasts.push(p);
+      const spec = toastFor(event, content);
+      if (spec) toasts.push(spec);
+    }
+    if (lines.length > 0) log = trimLog([...log, ...lines], LOG_LIMIT);
+    if (urgent) void save();
+  }
+
+  /** One pass of the loop: move the game to the wall clock, through the offline path after a sleep. */
+  function tick(): void {
+    const now = clock.now();
+    const delta = Math.floor(now - lastWall);
+    if (delta < 0) {
+      // The wall clock went backwards: resume from here instead of stalling until it catches up.
+      lastWall = now;
+      return;
+    }
+    if (delta === 0) return;
+    lastWall += delta;
+    try {
+      const asleep = delta > SLEEP_GAP_MS;
+      if (asleep) {
+        tel.beforeCatchUp(state);
+        const summary = advanceOffline(state, delta, content, rules);
+        tel.afterCatchUp(state, summary);
+        for (const r of summary.rulesDisabled ?? []) noteRule(r.pack, r.rule, r.reason);
+        const next = buildReport(summary);
+        if (next) report = next;
+      } else {
+        // A developer's speed-up (test builds) multiplies the game time that a stretch of the wall clock brings.
+        advance(state, speed === 1 ? delta : Math.floor(delta * speed), content, rules);
+      }
+      drainEvents();
+      if (!asleep) tel.observe(state);
+    } catch (error) {
+      stopOnCrash(error);
+      return;
+    }
+    touch();
+  }
+
+  /**
+   * An error inside the game loop: the state may be half-changed, so it is never written. The loop
+   * and every save trigger stop; the save in storage stays as the last good one.
+   */
+  function stopOnCrash(error: unknown): void {
+    halt();
+    crash = {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? (error.stack ?? '') : '',
+    };
+    phase = 'crashed';
+    console.error('The game loop failed', error);
+    touch();
+  }
+
+  async function refreshBackups(): Promise<void> {
+    try {
+      backups = kv ? await listBackups(kv) : [];
+    } catch {
+      backups = [];
+    }
+  }
+
+  async function refreshBackupFlag(): Promise<void> {
+    try {
+      hasBackup = kv ? (await kv.get(BACKUP_KEY)) !== undefined : false;
+    } catch {
+      hasBackup = false;
+    }
+  }
+
+  /** Writes the save; a refusal because a newer one is stored hands the game to the other tab. */
+  async function writeSave(force: boolean): Promise<void> {
+    if (!kv || phase === 'blocked' || phase === 'error' || phase === 'crashed') return;
+    try {
+      const result = await saveGame(kv, clock, state, rev, force);
+      if (result.ok) {
+        rev = result.rev;
+        saveStatus = 'saved';
+      } else {
+        halt();
+        phase = 'blocked';
+      }
+    } catch {
+      saveStatus = 'error';
+    }
+  }
+
+  /**
+   * Saves one after another. Two writes in flight would both carry the same revision, and the
+   * second would find the first one's newer revision in the store and take it for another tab.
+   */
+  let writing: Promise<void> = Promise.resolve();
+  function save(force = false): Promise<void> {
+    writing = writing.then(() => writeSave(force)).then(() => tel.save());
+    return writing;
+  }
+
+  function begin(): void {
+    if (timers.length > 0) return;
+    lastWall = clock.now();
+    timers.push(
+      window.setInterval(tick, TICK_MS),
+      window.setInterval(() => void save(), SAVE_EVERY_MS),
+    );
+    const onHide = () => {
+      if (document.visibilityState === 'hidden') void save();
+    };
+    const onPageHide = () => void save();
+    document.addEventListener('visibilitychange', onHide);
+    window.addEventListener('pagehide', onPageHide);
+    detach = () => {
+      document.removeEventListener('visibilitychange', onHide);
+      window.removeEventListener('pagehide', onPageHide);
+    };
+  }
+
+  /** Stops the loop and every save trigger. */
+  function halt(): void {
+    for (const id of timers) window.clearInterval(id);
+    timers = [];
+    detach?.();
+    detach = null;
+  }
+
+  function replaceState(next: GameState): void {
+    state = next;
+    // Telemetry compares with the new game from here on, not with the one that was dropped.
+    tel.rebase(next);
+    epoch++;
+    // The game that is given a state is the one that is played: the reveal rule reads from it.
+    setRevealReader(reveal);
+    log = [];
+    graduation = false;
+    finale = false;
+    signals = {};
+    lastWall = clock.now();
+    touch();
+  }
+
+  /** Loads the save; on success the game plays, on failure nothing runs and the error is shown. */
+  async function boot(): Promise<void> {
+    phase = 'loading';
+    loadError = null;
+    if (!kv) {
+      state = newGame(clock, content);
+      epoch++;
+      tel.start(state);
+      phase = 'playing';
+      begin();
+      touch();
+      return;
+    }
+    try {
+      await tel.load();
+      const loaded = await loadGame(kv, clock, content, rules, {
+        before: (s) => tel.beforeCatchUp(s),
+        after: (s, summary) => tel.afterCatchUp(s, summary),
+      });
+      state = loaded.state;
+      epoch++;
+      rev = loaded.rev;
+      report = loaded.report;
+      tel.start(state);
+      await refreshBackupFlag();
+      await refreshBackups();
+      phase = 'playing';
+      begin();
+      touch();
+      void requestPersistentStorage();
+    } catch (error) {
+      halt();
+      await refreshBackups();
+      loadError =
+        error instanceof LoadError
+          ? { message: error.message, raw: error.raw, reason: error.reason }
+          : {
+              message: error instanceof Error ? error.message : String(error),
+              raw: null,
+              reason: 'core' as const,
+            };
+      phase = 'error';
+    }
+  }
+
+  const onLost = () => {
+    halt();
+    phase = 'blocked';
+    touch();
+  };
+
+  /** Takes the single-tab lock (unless another tab holds it), then loads the save and starts the loop. */
+  async function start(): Promise<void> {
+    if (lock && !(await lock.acquire(onLost))) {
+      phase = 'blocked';
+      return;
+    }
+    await boot();
+  }
+
+  const game = {
+    get state(): GameState {
+      void version;
+      return state;
+    },
+    /**
+     * Reads from the game state through the update counter and returns a copy of what `fn`
+     * returns. Components use it inside `$derived`: the core changes its state in place, so a
+     * derived value that handed back the same array or object would never reach its readers.
+     */
+    read<T>(fn: (state: GameState) => T): T {
+      void version;
+      return detachData(fn(state));
+    },
+    get version(): number {
+      return version;
+    },
+    get report(): AnbuReport | null {
+      return report;
+    },
+    /** The newest lines of the battle log, oldest first. */
+    get combatLog(): LogEntry[] {
+      void version;
+      return log;
+    },
+    /** Happenings of this session that hints wait for. */
+    get signals(): Signals {
+      return signals;
+    },
+    /** Whether the graduation modal is due. */
+    get graduation(): boolean {
+      return graduation;
+    },
+    /** Whether the final screen of the slice is due (the last rank was just reached, or the player asked for it again). */
+    get finale(): boolean {
+      return finale;
+    },
+    get phase(): Phase {
+      return phase;
+    },
+    get ready(): boolean {
+      return phase === 'playing';
+    },
+    get saveStatus(): SaveStatus {
+      return saveStatus;
+    },
+    /** Why the save could not be read, and its raw text for export. */
+    get loadError() {
+      return loadError;
+    },
+    /** The copies of saves made before their format was upgraded, newest first. */
+    get backups(): readonly BackupEntry[] {
+      return backups;
+    },
+    /** What stopped the game loop; null while it runs. */
+    get crash(): CrashInfo | null {
+      return crash;
+    },
+    /** Whether a previous save is kept for «Відновити». */
+    get hasBackup(): boolean {
+      return hasBackup;
+    },
+    content,
+    rules,
+    /** The manifests of the packs this game was composed from, in load order. */
+    packs,
+    /** The packs the core left out, with the reason. */
+    failed,
+    /** Rules of packs switched off during this session. */
+    get ruleNotices(): readonly RuleNotice[] {
+      return ruleNotices;
+    },
+
+    /** Sends a command to the core and refreshes the views. */
+    dispatch(original: Command): CommandResult {
+      let command = original;
+      for (const hook of commandHooks) {
+        const verdict = hook.before?.(command);
+        if (verdict === false) {
+          // Said once, here, so that every caller is covered: the tiles, the Now bar, the map, the fight.
+          toasts.push({ key: 'error.cancelledByMod', params: {} });
+          return { ok: false, reason: 'error.cancelledByMod' };
+        }
+        if (verdict) command = verdict;
+      }
+      let result: CommandResult;
+      try {
+        result = coreDispatch(state, command, content, rules);
+        // After the command: a reveal it caused must not wait for the next update.
+        epoch++;
+        restamp();
+        if (result.ok && command.type === 'action.start' && command.kind === 'fight') {
+          // A new fight starts its own log; the lines of the other performers stay.
+          const slot = command.slot;
+          log = log.filter((line) => lineSlot(line) !== slot);
+        }
+        drainEvents();
+      } catch (error) {
+        // A command that throws may leave the state half-changed, like the loop: the crash screen, no save.
+        stopOnCrash(error);
+        return { ok: false, reason: 'error.crashed' };
+      }
+      touch();
+      if (result.ok && SAVE_NOW.has(command.type)) void save();
+      for (const hook of commandHooks) hook.after?.(command, result);
+      return result;
+    },
+    /** Adds a listener around commands; returns the function that removes it. */
+    addCommandHook(hook: CommandHook): () => void {
+      commandHooks.push(hook);
+      return () => {
+        const at = commandHooks.indexOf(hook);
+        if (at >= 0) commandHooks.splice(at, 1);
+      };
+    },
+    /** Calls `fn` for every event the core queues, as the queue is drained. */
+    onEvent(fn: (event: GameEvent) => void): () => void {
+      eventListeners.add(fn);
+      return () => eventListeners.delete(fn);
+    },
+    dismissGraduation(): void {
+      graduation = false;
+    },
+    dismissFinale(): void {
+      finale = false;
+    },
+    /** Opens the final screen again, from the rank page; only once the rank of an exam that ends the story is held. */
+    showFinale(): void {
+      if (content.exams.some((e) => e.rank === state.player.rank && e.finale === true))
+        finale = true;
+    },
+    /** Developer tool: moves game time forward through `advance`, like waiting would. */
+    devAdvance(ms: number): void {
+      // Time that moves on changes the answers by itself (events, a new second); no time at all is how tests flush what they set by hand.
+      if (ms === 0) epoch++;
+      try {
+        advance(state, ms, content, rules);
+        drainEvents();
+        tel.observe(state);
+      } catch (error) {
+        stopOnCrash(error);
+        return;
+      }
+      touch();
+    },
+    /** The local telemetry: export file, clearing. It never touches the network. */
+    telemetry: {
+      file: (): TelemetryFile => tel.file(state),
+      /** The size in bytes of the stored record. */
+      size: (): number => serializeTelemetry(tel.record).length,
+      sessions: (): number => tel.record.sessions.count,
+      clear: (): Promise<void> => tel.clear(state),
+      /** Writes the record now. */
+      save: (): Promise<void> => tel.save(),
+    },
+    dismissReport(): void {
+      report = null;
+    },
+    tick,
+    save: () => save(),
+    start,
+    /** Stops the loop and saving; releases the tab lock. */
+    stop(): void {
+      halt();
+      lock?.release();
+    },
+    /** From the «another tab» screen: take the game over here. */
+    async takeOver(): Promise<void> {
+      if (lock) await lock.takeOver(onLost);
+      await boot();
+    },
+    /** From the error screen: read the save again. */
+    retry: boot,
+    /** From the error screen, after confirmation: park the unreadable save and begin anew. */
+    async startNewAfterError(): Promise<void> {
+      if (kv) {
+        try {
+          if (loadError?.raw) await kv.set(BROKEN_SAVE_KEY, loadError.raw);
+          await kv.del(SAVE_KEY);
+        } catch {
+          // The new game still starts; the first save writes a fresh entry.
+        }
+      }
+      loadError = null;
+      state = newGame(clock, content);
+      epoch++;
+      rev = 0;
+      await tel.clear(state);
+      phase = 'playing';
+      begin();
+      touch();
+      await save();
+    },
+    /** The save in storage (the last good one) as base64 text; null when there is none or it cannot be read. */
+    async exportStored(): Promise<string | null> {
+      if (!kv) return null;
+      try {
+        const raw = await kv.get(SAVE_KEY);
+        return raw === undefined ? null : exportRaw(raw);
+      } catch {
+        return null;
+      }
+    },
+    /** A backup made before an upgrade as base64 text; null when it is gone. */
+    async exportBackup(key: string): Promise<string | null> {
+      if (!kv || !backups.some((b) => b.key === key)) return null;
+      try {
+        const raw = await kv.get(key);
+        return raw === undefined ? null : exportRaw(raw);
+      } catch {
+        return null;
+      }
+    },
+    /** Swaps a backup made before an upgrade in; the game it replaces becomes the one-generation backup. */
+    async restoreFrom(key: string): Promise<boolean> {
+      if (!kv || phase !== 'playing' || !backups.some((b) => b.key === key)) return false;
+      let previous: GameState;
+      try {
+        const raw = await kv.get(key);
+        if (raw === undefined) return false;
+        const { text } = decodeStored(raw);
+        assertSaneSave(text);
+        previous = deserialize(text, content, rules);
+      } catch {
+        return false;
+      }
+      await backupSave(kv);
+      replaceState(previous);
+      await save(true);
+      await refreshBackupFlag();
+      return true;
+    },
+    /** Replaces the whole state (tests). */
+    replaceState,
+    /** The save as base64 text. */
+    exportText(): string {
+      return exportSave(state, clock);
+    },
+    /** Reads pasted save text without changing anything. Throws when it is not a usable save. */
+    previewImport(text: string): GameState {
+      return importSave(text, content, rules);
+    },
+    /** Replaces the game with a pasted save, keeping the previous one as the backup. */
+    async importText(text: string): Promise<void> {
+      const next = importSave(text, content, rules);
+      if (kv) await backupSave(kv);
+      replaceState(next);
+      await tel.clear(state);
+      await save(true);
+      await refreshBackupFlag();
+    },
+    /** Begins a new game, keeping the previous save as the backup. */
+    async reset(): Promise<void> {
+      if (kv) await backupSave(kv);
+      replaceState(newGame(clock, content));
+      await tel.clear(state);
+      report = null;
+      await save(true);
+      await refreshBackupFlag();
+    },
+    /** Swaps the backup in; the game it replaces becomes the new backup. */
+    async restoreBackup(): Promise<boolean> {
+      if (!kv) return false;
+      const previous = await readBackup(kv, content, rules);
+      if (!previous) return false;
+      await backupSave(kv);
+      replaceState(previous);
+      await save(true);
+      await refreshBackupFlag();
+      return true;
+    },
+  };
+
+  // The developer tools exist in test builds only: in a production build the flag is a constant
+  // `false`, and nothing below is in the bundle.
+  if (__DEV_PANEL__) {
+    Object.defineProperties(
+      game,
+      Object.getOwnPropertyDescriptors({
+        /**
+         * Developer tool: runs `change` on the live state, the way a command would: events are
+         * drained, the views refresh and a crash stops the loop. `change` goes through core helpers.
+         */
+        devApply(change: (state: GameState, content: ContentDb, rules: Rules) => void): void {
+          epoch++;
+          try {
+            change(state, content, rules);
+            drainEvents();
+            tel.observe(state);
+          } catch (error) {
+            stopOnCrash(error);
+            return;
+          }
+          touch();
+        },
+        /** Developer tool: the live clock's multiplier. */
+        get devSpeed(): number {
+          void version;
+          return speed;
+        },
+        set devSpeed(value: number) {
+          speed = Number.isFinite(value) && value >= 1 ? value : 1;
+          touch();
+        },
+      }),
+    );
+  }
+  return game as typeof game & DevTools;
+}
+
+/** What the developer panel adds to the game in a test build (absent from a production build). */
+export interface DevTools {
+  devApply(change: (state: GameState, content: ContentDb, rules: Rules) => void): void;
+  devSpeed: number;
+}
+
+export type Game = ReturnType<typeof createGame>;

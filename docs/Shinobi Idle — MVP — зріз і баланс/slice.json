@@ -104,7 +104,7 @@
   }
  },
  "meta": {
-  "built": "2026-11-14",
+  "built": "2026-11-17",
   "cap": 50,
   "skills": [
    "tai",
@@ -121,8 +121,7 @@
    "scout",
    "prov",
    "alch",
-   "vit",
-   "eva"
+   "vit"
   ],
   "wheel": {
    "katon": "futon",
@@ -229,7 +228,8 @@
    "seals": 0,
    "sealsCanon": true,
    "tier": 0,
-   "noDamage": false
+   "noDamage": false,
+   "castOverride": 1.42
   },
   {
    "skill": "tai",
@@ -252,7 +252,8 @@
    "seals": 0,
    "sealsCanon": true,
    "tier": 0,
-   "noDamage": false
+   "noDamage": false,
+   "castOverride": 1.42
   },
   {
    "skill": "tai",
@@ -681,7 +682,8 @@
    "seals": 1,
    "sealsCanon": true,
    "tier": 0,
-   "noDamage": false
+   "noDamage": false,
+   "castOverride": 1.14
   },
   {
    "skill": "katon",
@@ -852,7 +854,8 @@
    "seals": 4,
    "sealsCanon": true,
    "tier": 1,
-   "noDamage": false
+   "noDamage": false,
+   "castOverride": 1.18
   },
   {
    "skill": "katon",
@@ -1433,7 +1436,8 @@
    "seals": 1,
    "sealsCanon": true,
    "tier": 0,
-   "noDamage": false
+   "noDamage": false,
+   "castOverride": 1.18
   },
   {
    "skill": "doton",
@@ -1460,7 +1464,8 @@
    "seals": 3,
    "sealsCanon": true,
    "tier": 1,
-   "noDamage": false
+   "noDamage": false,
+   "castOverride": 1.25
   },
   {
    "skill": "doton",
@@ -1708,7 +1713,8 @@
    "seals": 2,
    "sealsCanon": true,
    "tier": 0,
-   "noDamage": false
+   "noDamage": false,
+   "castOverride": 1.31
   },
   {
    "skill": "suiton",
@@ -1721,13 +1727,13 @@
    "tags": [
     "Захист"
    ],
-   "state": "Мокрий",
+   "state": "",
    "src": "N",
    "home": "Сенсей стихії",
    "home2": "",
    "req": "",
    "note": "Місія «Пожежа на рисовому складі»",
-   "patched": "",
+   "patched": "Захисна техніка пасивна й нічого не кидає в бій: стан «Мокрий», який вона накладала, прибрано разом із ручним кастом (правки зрізу, розд. 5, рядок 12)",
    "id": "core:water_formation_wall",
    "sealSeq": [
     "tiger",
@@ -1811,14 +1817,14 @@
   {
    "level": 10,
    "uk": "Медитація в русі",
-   "pair": "Тайдзюцу + Ухилення",
+   "pair": "Тайдзюцу + Живучість",
    "insight": [
     "+8% досвіду Тайдзюцу",
-    "+8% досвіду Ухилення",
+    "+8% досвіду Живучості",
     "+8% пулу витривалості"
    ],
    "enlight": [
-    "+2,5% шансу ухилитися",
+    "+2,5% рейтингу ухилення",
     "−5% витрат витривалості на тайдзюцу",
     "−10% часу загоєння Ран від брам"
    ]
@@ -1919,7 +1925,7 @@
    "level": 20,
    "uk": "Слот 3: Ухилення від кунаїв",
    "req": "",
-   "note": "+3% досвіду Ухилення / −1% точності"
+   "note": "+3% ухилення в бою / −1% точності"
   },
   {
    "level": 30,
@@ -2538,8 +2544,8 @@
    },
    {
     "pct": 25,
-    "text": "−5% перезарядки Підміни",
-    "patched": false
+    "text": "+5% рейтингу ухилення",
+    "patched": true
    },
    {
     "pct": 50,

@@ -1,0 +1,40 @@
+{
+  "name": "@shinobi/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:test": "vite build --mode test",
+    "preview": "vite preview",
+    "icons:build": "tsx scripts/build-icons.ts",
+    "icons:pwa": "tsx scripts/build-pwa-icons.ts",
+    "pwa:check": "tsx scripts/check-pwa.ts",
+    "test": "vitest run",
+    "typecheck": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "dependencies": {
+    "@fontsource/dela-gothic-one": "^5.0.0",
+    "@fontsource/noto-serif-jp": "^5.0.0",
+    "@fontsource/onest": "^5.0.0",
+    "@shinobi/content": "workspace:*",
+    "@shinobi/core": "workspace:*",
+    "idb-keyval": "^6.3.0"
+  },
+  "devDependencies": {
+    "@iconify/types": "^2.0.0",
+    "@sveltejs/vite-plugin-svelte": "^6.0.0",
+    "@types/node": "^24.0.0",
+    "happy-dom": "^21.0.4",
+    "sharp": "^0.35.5",
+    "svelte": "^5.0.0",
+    "svelte-check": "^4.3.0",
+    "tsx": "^4.23.15",
+    "typescript": "~5.9.3",
+    "vite": "^7.0.0",
+    "vite-plugin-pwa": "^2.0.0",
+    "vitest": "^3.2.0",
+    "workbox-window": "^7.4.1"
+  }
+}

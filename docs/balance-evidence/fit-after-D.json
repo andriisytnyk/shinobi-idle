@@ -1,0 +1,2490 @@
+[
+  {
+    "enemy": "core:dummy",
+    "boss": false,
+    "cl": 2,
+    "level": 2,
+    "requestedLevel": 2,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:leaf_whirlwind"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 10.65,
+      "p10": 7.06,
+      "p90": 14.11
+    },
+    "hpLeft": {
+      "mean": 98.8,
+      "share": 0.932
+    },
+    "maxHp": 106,
+    "damageShare": {
+      "basic": 0.617,
+      "core:leaf_whirlwind": 0.383
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 7.66,
+        "p10": 4.03,
+        "p90": 12.53
+      },
+      "hpLeft": {
+        "mean": 101.3,
+        "share": 0.956
+      },
+      "maxHp": 106,
+      "damageShare": {
+        "core:kunai": 0.511,
+        "core:leaf_whirlwind": 0.355,
+        "basic": 0.134
+      }
+    },
+    "model": {
+      "ttkSec": 10.03,
+      "hpLossShare": 0.095,
+      "playerDps": 3.95
+    },
+    "wins": 200,
+    "ratio": 1.062,
+    "flagged": false,
+    "reasons": []
+  },
+  {
+    "enemy": "core:bandit",
+    "boss": false,
+    "cl": 6,
+    "level": 6,
+    "requestedLevel": 6,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:leaf_whirlwind"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 16.84,
+      "p10": 12.33,
+      "p90": 22.95
+    },
+    "hpLeft": {
+      "mean": 123,
+      "share": 0.891
+    },
+    "maxHp": 138,
+    "damageShare": {
+      "basic": 0.672,
+      "core:leaf_whirlwind": 0.328
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 15.29,
+        "p10": 10.82,
+        "p90": 21.43
+      },
+      "hpLeft": {
+        "mean": 124.5,
+        "share": 0.902
+      },
+      "maxHp": 138,
+      "damageShare": {
+        "basic": 0.376,
+        "core:kunai": 0.344,
+        "core:leaf_whirlwind": 0.28
+      }
+    },
+    "model": {
+      "ttkSec": 16.46,
+      "hpLossShare": 0.163,
+      "playerDps": 4.79
+    },
+    "wins": 200,
+    "ratio": 1.023,
+    "flagged": false,
+    "reasons": []
+  },
+  {
+    "enemy": "core:arsonist",
+    "boss": false,
+    "cl": 9,
+    "level": 9,
+    "requestedLevel": 9,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:leaf_whirlwind"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 20.73,
+      "p10": 15.89,
+      "p90": 26.51
+    },
+    "hpLeft": {
+      "mean": 139.3,
+      "share": 0.86
+    },
+    "maxHp": 162,
+    "damageShare": {
+      "basic": 0.704,
+      "core:leaf_whirlwind": 0.296
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 18.77,
+        "p10": 12.53,
+        "p90": 24.93
+      },
+      "hpLeft": {
+        "mean": 141.3,
+        "share": 0.872
+      },
+      "maxHp": 162,
+      "damageShare": {
+        "basic": 0.451,
+        "core:leaf_whirlwind": 0.277,
+        "core:kunai": 0.272
+      }
+    },
+    "model": {
+      "ttkSec": 19.94,
+      "hpLossShare": 0.202,
+      "playerDps": 5.43
+    },
+    "wins": 200,
+    "ratio": 1.04,
+    "flagged": false,
+    "reasons": []
+  },
+  {
+    "enemy": "core:wolf",
+    "boss": false,
+    "cl": 10,
+    "level": 10,
+    "requestedLevel": 10,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:leaf_whirlwind",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 22.39,
+      "p10": 14.61,
+      "p90": 32.13
+    },
+    "hpLeft": {
+      "mean": 153.1,
+      "share": 0.901
+    },
+    "maxHp": 170,
+    "damageShare": {
+      "core:dynamic_entry": 0.266,
+      "core:shadow_shuriken": 0.248,
+      "basic": 0.248,
+      "core:leaf_whirlwind": 0.238
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 3.26,
+        "p10": 3.26,
+        "p90": 3.26
+      },
+      "hpLeft": {
+        "mean": 168.6,
+        "share": 0.992
+      },
+      "maxHp": 170,
+      "damageShare": {
+        "core:tag": 1
+      }
+    },
+    "model": {
+      "ttkSec": 16.84,
+      "hpLossShare": 0.205,
+      "playerDps": 8.41
+    },
+    "wins": 200,
+    "ratio": 1.33,
+    "flagged": false,
+    "reasons": []
+  },
+  {
+    "enemy": "core:wolfmask",
+    "boss": false,
+    "cl": 13,
+    "level": 13,
+    "requestedLevel": 13,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:leaf_whirlwind",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 20.22,
+      "p10": 12.82,
+      "p90": 27.5
+    },
+    "hpLeft": {
+      "mean": 171.8,
+      "share": 0.886
+    },
+    "maxHp": 194,
+    "damageShare": {
+      "basic": 0.275,
+      "core:dynamic_entry": 0.255,
+      "core:leaf_whirlwind": 0.254,
+      "core:shadow_shuriken": 0.216
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 18.82,
+        "p10": 13.02,
+        "p90": 25.91
+      },
+      "hpLeft": {
+        "mean": 171.9,
+        "share": 0.886
+      },
+      "maxHp": 194,
+      "damageShare": {
+        "core:dynamic_entry": 0.248,
+        "core:leaf_whirlwind": 0.232,
+        "core:kunai": 0.214,
+        "core:shadow_shuriken": 0.21,
+        "basic": 0.096
+      }
+    },
+    "model": {
+      "ttkSec": 16.09,
+      "hpLossShare": 0.165,
+      "playerDps": 9.16
+    },
+    "wins": 200,
+    "ratio": 1.257,
+    "flagged": false,
+    "reasons": []
+  },
+  {
+    "enemy": "core:centipede",
+    "boss": false,
+    "cl": 15,
+    "level": 15,
+    "requestedLevel": 15,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:leaf_gale",
+      "core:leaf_whirlwind",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 26.45,
+      "p10": 18.03,
+      "p90": 37.84
+    },
+    "hpLeft": {
+      "mean": 176.5,
+      "share": 0.84
+    },
+    "maxHp": 210,
+    "damageShare": {
+      "basic": 0.243,
+      "core:leaf_whirlwind": 0.214,
+      "core:leaf_gale": 0.21,
+      "core:dynamic_entry": 0.169,
+      "core:shadow_shuriken": 0.165
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 24.04,
+        "p10": 14.99,
+        "p90": 33.34
+      },
+      "hpLeft": {
+        "mean": 180.9,
+        "share": 0.862
+      },
+      "maxHp": 210,
+      "damageShare": {
+        "core:leaf_whirlwind": 0.208,
+        "core:leaf_gale": 0.196,
+        "core:kunai": 0.173,
+        "core:dynamic_entry": 0.159,
+        "core:shadow_shuriken": 0.155,
+        "basic": 0.108
+      }
+    },
+    "model": {
+      "ttkSec": 15.68,
+      "hpLossShare": 0.162,
+      "playerDps": 10.65
+    },
+    "wins": 200,
+    "ratio": 1.687,
+    "flagged": true,
+    "reasons": [
+      "ratio"
+    ]
+  },
+  {
+    "enemy": "core:tiger",
+    "boss": false,
+    "cl": 20,
+    "level": 20,
+    "requestedLevel": 20,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:leaf_gale",
+      "core:running_fire",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 33.93,
+      "p10": 22.88,
+      "p90": 47.09
+    },
+    "hpLeft": {
+      "mean": 198.1,
+      "share": 0.793
+    },
+    "maxHp": 250,
+    "damageShare": {
+      "basic": 0.284,
+      "core:dynamic_entry": 0.225,
+      "core:leaf_gale": 0.211,
+      "core:shadow_shuriken": 0.172,
+      "core:running_fire": 0.108
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 32.08,
+        "p10": 19.71,
+        "p90": 47.29
+      },
+      "hpLeft": {
+        "mean": 199.2,
+        "share": 0.797
+      },
+      "maxHp": 250,
+      "damageShare": {
+        "core:dynamic_entry": 0.208,
+        "core:leaf_gale": 0.191,
+        "basic": 0.18,
+        "core:shadow_shuriken": 0.168,
+        "core:kunai": 0.151,
+        "core:running_fire": 0.102
+      }
+    },
+    "model": {
+      "ttkSec": 18.04,
+      "hpLossShare": 0.188,
+      "playerDps": 11.97
+    },
+    "wins": 200,
+    "ratio": 1.881,
+    "flagged": true,
+    "reasons": [
+      "ratio"
+    ]
+  },
+  {
+    "enemy": "core:thief",
+    "boss": false,
+    "cl": 16,
+    "level": 16,
+    "requestedLevel": 16,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:leaf_gale",
+      "core:leaf_whirlwind",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 35.32,
+      "p10": 19.81,
+      "p90": 51.24
+    },
+    "hpLeft": {
+      "mean": 165.9,
+      "share": 0.761
+    },
+    "maxHp": 218,
+    "damageShare": {
+      "basic": 0.27,
+      "core:leaf_whirlwind": 0.208,
+      "core:leaf_gale": 0.2,
+      "core:shadow_shuriken": 0.163,
+      "core:dynamic_entry": 0.159
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 17.58,
+        "p10": 13.7,
+        "p90": 19.71
+      },
+      "hpLeft": {
+        "mean": 196.7,
+        "share": 0.902
+      },
+      "maxHp": 218,
+      "damageShare": {
+        "core:leaf_whirlwind": 0.273,
+        "core:leaf_gale": 0.251,
+        "core:dynamic_entry": 0.179,
+        "core:shadow_shuriken": 0.15,
+        "core:kunai": 0.144,
+        "basic": 0.002
+      }
+    },
+    "model": {
+      "ttkSec": 16.2,
+      "hpLossShare": 0.167,
+      "playerDps": 10.92
+    },
+    "wins": 200,
+    "ratio": 2.181,
+    "flagged": true,
+    "reasons": [
+      "ratio"
+    ]
+  },
+  {
+    "enemy": "core:merc_pack",
+    "boss": false,
+    "cl": 19,
+    "level": 19,
+    "requestedLevel": 19,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:leaf_gale",
+      "core:leaf_whirlwind",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 31.61,
+      "p10": 23.24,
+      "p90": 41.34
+    },
+    "hpLeft": {
+      "mean": 204.1,
+      "share": 0.843
+    },
+    "maxHp": 242,
+    "damageShare": {
+      "basic": 0.258,
+      "core:leaf_whirlwind": 0.209,
+      "core:leaf_gale": 0.2,
+      "core:dynamic_entry": 0.17,
+      "core:shadow_shuriken": 0.163
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 11.58,
+        "p10": 8.65,
+        "p90": 15.58
+      },
+      "hpLeft": {
+        "mean": 226.4,
+        "share": 0.936
+      },
+      "maxHp": 242,
+      "damageShare": {
+        "core:tag": 0.757,
+        "core:leaf_whirlwind": 0.062,
+        "core:leaf_gale": 0.052,
+        "core:dynamic_entry": 0.047,
+        "core:kunai": 0.041,
+        "core:shadow_shuriken": 0.04,
+        "basic": 0.001
+      }
+    },
+    "model": {
+      "ttkSec": 21.13,
+      "hpLossShare": 0.263,
+      "playerDps": 11.71
+    },
+    "wins": 200,
+    "ratio": 1.496,
+    "flagged": false,
+    "reasons": []
+  },
+  {
+    "enemy": "core:heavy",
+    "boss": false,
+    "cl": 24,
+    "level": 24,
+    "requestedLevel": 24,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:leaf_gale",
+      "core:leaf_whirlwind",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 36.81,
+      "p10": 27.94,
+      "p90": 47.75
+    },
+    "hpLeft": {
+      "mean": 217,
+      "share": 0.77
+    },
+    "maxHp": 282,
+    "damageShare": {
+      "basic": 0.291,
+      "core:leaf_gale": 0.196,
+      "core:leaf_whirlwind": 0.193,
+      "core:dynamic_entry": 0.16,
+      "core:shadow_shuriken": 0.16
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 34.9,
+        "p10": 24.9,
+        "p90": 46.17
+      },
+      "hpLeft": {
+        "mean": 222.5,
+        "share": 0.789
+      },
+      "maxHp": 282,
+      "damageShare": {
+        "core:leaf_whirlwind": 0.193,
+        "core:leaf_gale": 0.184,
+        "basic": 0.174,
+        "core:dynamic_entry": 0.162,
+        "core:shadow_shuriken": 0.156,
+        "core:kunai": 0.132
+      }
+    },
+    "model": {
+      "ttkSec": 19.58,
+      "hpLossShare": 0.205,
+      "playerDps": 13.03
+    },
+    "wins": 200,
+    "ratio": 1.88,
+    "flagged": true,
+    "reasons": [
+      "ratio"
+    ]
+  },
+  {
+    "enemy": "core:marauder",
+    "boss": false,
+    "cl": 22,
+    "level": 22,
+    "requestedLevel": 22,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:leaf_gale",
+      "core:leaf_whirlwind",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 43.32,
+      "p10": 26.16,
+      "p90": 59.44
+    },
+    "hpLeft": {
+      "mean": 187.7,
+      "share": 0.706
+    },
+    "maxHp": 266,
+    "damageShare": {
+      "basic": 0.307,
+      "core:leaf_whirlwind": 0.195,
+      "core:leaf_gale": 0.186,
+      "core:shadow_shuriken": 0.158,
+      "core:dynamic_entry": 0.154
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 20.91,
+        "p10": 17.81,
+        "p90": 25.42
+      },
+      "hpLeft": {
+        "mean": 234.9,
+        "share": 0.883
+      },
+      "maxHp": 266,
+      "damageShare": {
+        "core:leaf_whirlwind": 0.238,
+        "core:leaf_gale": 0.238,
+        "core:dynamic_entry": 0.201,
+        "core:shadow_shuriken": 0.17,
+        "core:kunai": 0.143,
+        "basic": 0.008
+      }
+    },
+    "model": {
+      "ttkSec": 18.84,
+      "hpLossShare": 0.197,
+      "playerDps": 12.5
+    },
+    "wins": 200,
+    "ratio": 2.299,
+    "flagged": true,
+    "reasons": [
+      "ratio"
+    ]
+  },
+  {
+    "enemy": "core:poisoner",
+    "boss": false,
+    "cl": 24,
+    "level": 24,
+    "requestedLevel": 24,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:leaf_gale",
+      "core:leaf_whirlwind",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 27.93,
+      "p10": 19.81,
+      "p90": 37.84
+    },
+    "hpLeft": {
+      "mean": 216.4,
+      "share": 0.767
+    },
+    "maxHp": 282,
+    "damageShare": {
+      "basic": 0.263,
+      "core:leaf_whirlwind": 0.206,
+      "core:leaf_gale": 0.198,
+      "core:shadow_shuriken": 0.169,
+      "core:dynamic_entry": 0.164
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 26.28,
+        "p10": 18.23,
+        "p90": 33.34
+      },
+      "hpLeft": {
+        "mean": 219.8,
+        "share": 0.779
+      },
+      "maxHp": 282,
+      "damageShare": {
+        "core:leaf_whirlwind": 0.202,
+        "core:leaf_gale": 0.185,
+        "core:kunai": 0.165,
+        "core:dynamic_entry": 0.163,
+        "core:shadow_shuriken": 0.161,
+        "basic": 0.123
+      }
+    },
+    "model": {
+      "ttkSec": 19.58,
+      "hpLossShare": 0.205,
+      "playerDps": 13.03
+    },
+    "wins": 200,
+    "ratio": 1.426,
+    "flagged": false,
+    "reasons": []
+  },
+  {
+    "enemy": "core:kumo",
+    "boss": false,
+    "cl": 28,
+    "level": 28,
+    "requestedLevel": 28,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:leaf_gale",
+      "core:leaf_whirlwind",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 29.48,
+      "p10": 21.53,
+      "p90": 39.62
+    },
+    "hpLeft": {
+      "mean": 249.3,
+      "share": 0.794
+    },
+    "maxHp": 314,
+    "damageShare": {
+      "basic": 0.27,
+      "core:leaf_whirlwind": 0.201,
+      "core:leaf_gale": 0.199,
+      "core:dynamic_entry": 0.167,
+      "core:shadow_shuriken": 0.163
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 29.42,
+        "p10": 21.53,
+        "p90": 39.62
+      },
+      "hpLeft": {
+        "mean": 254.2,
+        "share": 0.81
+      },
+      "maxHp": 314,
+      "damageShare": {
+        "basic": 0.267,
+        "core:leaf_whirlwind": 0.2,
+        "core:leaf_gale": 0.198,
+        "core:dynamic_entry": 0.164,
+        "core:shadow_shuriken": 0.162,
+        "core:kunai": 0.01
+      }
+    },
+    "model": {
+      "ttkSec": 20.88,
+      "hpLossShare": 0.219,
+      "playerDps": 14.1
+    },
+    "wins": 200,
+    "ratio": 1.412,
+    "flagged": false,
+    "reasons": []
+  },
+  {
+    "enemy": "core:suna",
+    "boss": false,
+    "cl": 26,
+    "level": 26,
+    "requestedLevel": 26,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:leaf_gale",
+      "core:running_fire",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 28.99,
+      "p10": 20.97,
+      "p90": 38.37
+    },
+    "hpLeft": {
+      "mean": 247,
+      "share": 0.829
+    },
+    "maxHp": 298,
+    "damageShare": {
+      "basic": 0.249,
+      "core:dynamic_entry": 0.219,
+      "core:shadow_shuriken": 0.217,
+      "core:leaf_gale": 0.203,
+      "core:running_fire": 0.112
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 27.7,
+        "p10": 19.38,
+        "p90": 37.11
+      },
+      "hpLeft": {
+        "mean": 248.3,
+        "share": 0.833
+      },
+      "maxHp": 298,
+      "damageShare": {
+        "core:dynamic_entry": 0.224,
+        "core:leaf_gale": 0.201,
+        "core:shadow_shuriken": 0.195,
+        "core:kunai": 0.165,
+        "basic": 0.109,
+        "core:running_fire": 0.106
+      }
+    },
+    "model": {
+      "ttkSec": 20.26,
+      "hpLossShare": 0.212,
+      "playerDps": 13.57
+    },
+    "wins": 200,
+    "ratio": 1.431,
+    "flagged": false,
+    "reasons": []
+  },
+  {
+    "enemy": "core:hunter",
+    "boss": false,
+    "cl": 30,
+    "level": 30,
+    "requestedLevel": 30,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:great_fireball",
+      "core:leaf_gale",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 42.28,
+      "p10": 24.47,
+      "p90": 61.76
+    },
+    "hpLeft": {
+      "mean": 233.9,
+      "share": 0.709
+    },
+    "maxHp": 330,
+    "damageShare": {
+      "core:great_fireball": 0.332,
+      "basic": 0.224,
+      "core:shadow_shuriken": 0.157,
+      "core:dynamic_entry": 0.146,
+      "core:leaf_gale": 0.142
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 19.95,
+        "p10": 15.44,
+        "p90": 25.64
+      },
+      "hpLeft": {
+        "mean": 292,
+        "share": 0.885
+      },
+      "maxHp": 330,
+      "damageShare": {
+        "core:great_fireball": 0.414,
+        "core:leaf_gale": 0.203,
+        "core:shadow_shuriken": 0.155,
+        "core:dynamic_entry": 0.148,
+        "core:kunai": 0.079,
+        "basic": 0.001
+      }
+    },
+    "model": {
+      "ttkSec": 18.33,
+      "hpLossShare": 0.192,
+      "playerDps": 17.13
+    },
+    "wins": 200,
+    "ratio": 2.307,
+    "flagged": true,
+    "reasons": [
+      "ratio"
+    ]
+  },
+  {
+    "enemy": "core:hunter_caster",
+    "boss": false,
+    "cl": 32,
+    "level": 32,
+    "requestedLevel": 32,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:great_fireball",
+      "core:leaf_gale",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 25.69,
+      "p10": 16.86,
+      "p90": 35.51
+    },
+    "hpLeft": {
+      "mean": 282.2,
+      "share": 0.816
+    },
+    "maxHp": 346,
+    "damageShare": {
+      "core:great_fireball": 0.33,
+      "core:dynamic_entry": 0.187,
+      "core:shadow_shuriken": 0.168,
+      "basic": 0.159,
+      "core:leaf_gale": 0.155
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 25.36,
+        "p10": 16.86,
+        "p90": 35.34
+      },
+      "hpLeft": {
+        "mean": 288.3,
+        "share": 0.833
+      },
+      "maxHp": 346,
+      "damageShare": {
+        "core:great_fireball": 0.34,
+        "core:dynamic_entry": 0.175,
+        "core:shadow_shuriken": 0.164,
+        "core:leaf_gale": 0.151,
+        "basic": 0.151,
+        "core:kunai": 0.018
+      }
+    },
+    "model": {
+      "ttkSec": 18.8,
+      "hpLossShare": 0.198,
+      "playerDps": 17.75
+    },
+    "wins": 200,
+    "ratio": 1.367,
+    "flagged": false,
+    "reasons": []
+  },
+  {
+    "enemy": "core:kiri_hunter",
+    "boss": false,
+    "cl": 34,
+    "level": 34,
+    "requestedLevel": 34,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:great_fireball",
+      "core:sensing",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 32.03,
+      "p10": 22.89,
+      "p90": 42.96
+    },
+    "hpLeft": {
+      "mean": 284,
+      "share": 0.785
+    },
+    "maxHp": 362,
+    "damageShare": {
+      "basic": 0.357,
+      "core:great_fireball": 0.277,
+      "core:dynamic_entry": 0.185,
+      "core:shadow_shuriken": 0.182
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 30.74,
+        "p10": 21.31,
+        "p90": 41.38
+      },
+      "hpLeft": {
+        "mean": 288.9,
+        "share": 0.798
+      },
+      "maxHp": 362,
+      "damageShare": {
+        "core:great_fireball": 0.265,
+        "basic": 0.207,
+        "core:dynamic_entry": 0.195,
+        "core:shadow_shuriken": 0.179,
+        "core:kunai": 0.154
+      }
+    },
+    "model": {
+      "ttkSec": 19.23,
+      "hpLossShare": 0.202,
+      "playerDps": 18.36
+    },
+    "wins": 200,
+    "ratio": 1.665,
+    "flagged": true,
+    "reasons": [
+      "ratio"
+    ]
+  },
+  {
+    "enemy": "core:guard_pack",
+    "boss": false,
+    "cl": 33,
+    "level": 33,
+    "requestedLevel": 33,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:great_fireball",
+      "core:running_fire",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 43.4,
+      "p10": 32.63,
+      "p90": 55.82
+    },
+    "hpLeft": {
+      "mean": 275.1,
+      "share": 0.777
+    },
+    "maxHp": 354,
+    "damageShare": {
+      "core:great_fireball": 0.282,
+      "basic": 0.266,
+      "core:running_fire": 0.168,
+      "core:dynamic_entry": 0.144,
+      "core:shadow_shuriken": 0.14
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 23.49,
+        "p10": 16.66,
+        "p90": 31.24
+      },
+      "hpLeft": {
+        "mean": 305.1,
+        "share": 0.862
+      },
+      "maxHp": 354,
+      "damageShare": {
+        "core:tag": 0.482,
+        "core:great_fireball": 0.135,
+        "core:running_fire": 0.124,
+        "core:shadow_shuriken": 0.079,
+        "core:kunai": 0.078,
+        "core:dynamic_entry": 0.063,
+        "basic": 0.038
+      }
+    },
+    "model": {
+      "ttkSec": 22.82,
+      "hpLossShare": 0.287,
+      "playerDps": 18.06
+    },
+    "wins": 200,
+    "ratio": 1.902,
+    "flagged": true,
+    "reasons": [
+      "ratio"
+    ]
+  },
+  {
+    "enemy": "core:veteran",
+    "boss": false,
+    "cl": 36,
+    "level": 36,
+    "requestedLevel": 36,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:great_fireball",
+      "core:phoenix_sage_fire",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 31.29,
+      "p10": 22.07,
+      "p90": 41.31
+    },
+    "hpLeft": {
+      "mean": 297.9,
+      "share": 0.788
+    },
+    "maxHp": 378,
+    "damageShare": {
+      "core:great_fireball": 0.289,
+      "core:phoenix_sage_fire": 0.244,
+      "basic": 0.194,
+      "core:dynamic_entry": 0.141,
+      "core:shadow_shuriken": 0.133
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 29.79,
+        "p10": 21.18,
+        "p90": 39.73
+      },
+      "hpLeft": {
+        "mean": 305.1,
+        "share": 0.807
+      },
+      "maxHp": 378,
+      "damageShare": {
+        "core:great_fireball": 0.291,
+        "core:phoenix_sage_fire": 0.217,
+        "core:shadow_shuriken": 0.137,
+        "core:dynamic_entry": 0.134,
+        "core:kunai": 0.114,
+        "basic": 0.107
+      }
+    },
+    "model": {
+      "ttkSec": 18.63,
+      "hpLossShare": 0.196,
+      "playerDps": 20.01
+    },
+    "wins": 200,
+    "ratio": 1.68,
+    "flagged": true,
+    "reasons": [
+      "ratio"
+    ]
+  },
+  {
+    "enemy": "core:oro_aide",
+    "boss": false,
+    "cl": 36,
+    "level": 36,
+    "requestedLevel": 36,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:great_fireball",
+      "core:phoenix_sage_fire",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 24.3,
+      "p10": 16.77,
+      "p90": 33.54
+    },
+    "hpLeft": {
+      "mean": 299.2,
+      "share": 0.792
+    },
+    "maxHp": 378,
+    "damageShare": {
+      "core:great_fireball": 0.288,
+      "core:phoenix_sage_fire": 0.238,
+      "basic": 0.182,
+      "core:shadow_shuriken": 0.147,
+      "core:dynamic_entry": 0.145
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 22.84,
+        "p10": 14.69,
+        "p90": 32.23
+      },
+      "hpLeft": {
+        "mean": 304.2,
+        "share": 0.805
+      },
+      "maxHp": 378,
+      "damageShare": {
+        "core:great_fireball": 0.299,
+        "core:phoenix_sage_fire": 0.22,
+        "core:shadow_shuriken": 0.142,
+        "core:dynamic_entry": 0.142,
+        "core:kunai": 0.136,
+        "basic": 0.061
+      }
+    },
+    "model": {
+      "ttkSec": 18.63,
+      "hpLossShare": 0.196,
+      "playerDps": 20.01
+    },
+    "wins": 200,
+    "ratio": 1.305,
+    "flagged": false,
+    "reasons": []
+  },
+  {
+    "enemy": "core:serpent",
+    "boss": false,
+    "cl": 38,
+    "level": 38,
+    "requestedLevel": 38,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:great_fireball",
+      "core:phoenix_sage_fire",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 26.91,
+      "p10": 17.57,
+      "p90": 39.53
+    },
+    "hpLeft": {
+      "mean": 323,
+      "share": 0.82
+    },
+    "maxHp": 394,
+    "damageShare": {
+      "core:great_fireball": 0.288,
+      "core:phoenix_sage_fire": 0.242,
+      "basic": 0.193,
+      "core:dynamic_entry": 0.143,
+      "core:shadow_shuriken": 0.134
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 25.43,
+        "p10": 16.48,
+        "p90": 35.03
+      },
+      "hpLeft": {
+        "mean": 329.4,
+        "share": 0.836
+      },
+      "maxHp": 394,
+      "damageShare": {
+        "core:great_fireball": 0.291,
+        "core:phoenix_sage_fire": 0.219,
+        "core:dynamic_entry": 0.139,
+        "core:shadow_shuriken": 0.138,
+        "core:kunai": 0.131,
+        "basic": 0.082
+      }
+    },
+    "model": {
+      "ttkSec": 18.99,
+      "hpLossShare": 0.199,
+      "playerDps": 20.66
+    },
+    "wins": 200,
+    "ratio": 1.417,
+    "flagged": false,
+    "reasons": []
+  },
+  {
+    "enemy": "core:leech",
+    "boss": false,
+    "cl": 36,
+    "level": 36,
+    "requestedLevel": 36,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:great_fireball",
+      "core:leaf_great_whirlwind",
+      "core:phoenix_sage_fire"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 28.43,
+      "p10": 20.38,
+      "p90": 38.16
+    },
+    "hpLeft": {
+      "mean": 289.4,
+      "share": 0.765
+    },
+    "maxHp": 378,
+    "damageShare": {
+      "basic": 0.227,
+      "core:great_fireball": 0.224,
+      "core:leaf_great_whirlwind": 0.219,
+      "core:phoenix_sage_fire": 0.195,
+      "core:dynamic_entry": 0.136
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 14.17,
+        "p10": 10.86,
+        "p90": 19.27
+      },
+      "hpLeft": {
+        "mean": 333,
+        "share": 0.881
+      },
+      "maxHp": 378,
+      "damageShare": {
+        "core:tag": 0.601,
+        "core:leaf_great_whirlwind": 0.18,
+        "core:kunai": 0.081,
+        "core:great_fireball": 0.057,
+        "core:dynamic_entry": 0.042,
+        "core:phoenix_sage_fire": 0.035,
+        "basic": 0.004
+      }
+    },
+    "model": {
+      "ttkSec": 22.36,
+      "hpLossShare": 0.282,
+      "playerDps": 20.01
+    },
+    "wins": 200,
+    "ratio": 1.272,
+    "flagged": false,
+    "reasons": []
+  },
+  {
+    "enemy": "core:fake_genin",
+    "boss": false,
+    "cl": 39,
+    "level": 39,
+    "requestedLevel": 39,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:great_fireball",
+      "core:phoenix_sage_fire",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 34.95,
+      "p10": 19.52,
+      "p90": 54.52
+    },
+    "hpLeft": {
+      "mean": 306.6,
+      "share": 0.763
+    },
+    "maxHp": 402,
+    "damageShare": {
+      "core:great_fireball": 0.31,
+      "basic": 0.217,
+      "core:phoenix_sage_fire": 0.196,
+      "core:shadow_shuriken": 0.147,
+      "core:dynamic_entry": 0.13
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 34.76,
+        "p10": 17.94,
+        "p90": 54.99
+      },
+      "hpLeft": {
+        "mean": 306.6,
+        "share": 0.763
+      },
+      "maxHp": 402,
+      "damageShare": {
+        "core:great_fireball": 0.286,
+        "core:phoenix_sage_fire": 0.171,
+        "core:dynamic_entry": 0.148,
+        "basic": 0.136,
+        "core:shadow_shuriken": 0.136,
+        "core:kunai": 0.122
+      }
+    },
+    "model": {
+      "ttkSec": 19.16,
+      "hpLossShare": 0.201,
+      "playerDps": 20.99
+    },
+    "wins": 200,
+    "ratio": 1.824,
+    "flagged": true,
+    "reasons": [
+      "ratio"
+    ]
+  },
+  {
+    "enemy": "core:foreign_genin",
+    "boss": false,
+    "cl": 40,
+    "level": 40,
+    "requestedLevel": 40,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "none",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:great_fireball",
+      "core:phoenix_sage_fire",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 1,
+    "outcomes": {
+      "victory": 200,
+      "defeat": 0,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 30.75,
+      "p10": 20.98,
+      "p90": 41.31
+    },
+    "hpLeft": {
+      "mean": 325.1,
+      "share": 0.793
+    },
+    "maxHp": 410,
+    "damageShare": {
+      "basic": 0.236,
+      "core:great_fireball": 0.233,
+      "core:phoenix_sage_fire": 0.198,
+      "core:dynamic_entry": 0.171,
+      "core:shadow_shuriken": 0.161
+    },
+    "withPouch": {
+      "winRate": 1,
+      "outcomes": {
+        "victory": 200,
+        "defeat": 0,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 29.21,
+        "p10": 21.18,
+        "p90": 36.49
+      },
+      "hpLeft": {
+        "mean": 331.8,
+        "share": 0.809
+      },
+      "maxHp": 410,
+      "damageShare": {
+        "core:great_fireball": 0.234,
+        "core:phoenix_sage_fire": 0.175,
+        "core:shadow_shuriken": 0.166,
+        "core:dynamic_entry": 0.161,
+        "core:kunai": 0.141,
+        "basic": 0.124
+      }
+    },
+    "model": {
+      "ttkSec": 19.33,
+      "hpLossShare": 0.203,
+      "playerDps": 21.31
+    },
+    "wins": 200,
+    "ratio": 1.591,
+    "flagged": false,
+    "reasons": []
+  },
+  {
+    "enemy": "core:boss_wolf",
+    "boss": true,
+    "cl": 22,
+    "level": 22,
+    "requestedLevel": 22,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "model",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:leaf_gale",
+      "core:running_fire",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 0.08,
+    "outcomes": {
+      "victory": 16,
+      "defeat": 184,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 121.45,
+      "p10": 110.57,
+      "p90": 138.01
+    },
+    "hpLeft": {
+      "mean": 20.2,
+      "share": 0.076
+    },
+    "maxHp": 266,
+    "damageShare": {
+      "basic": 0.314,
+      "core:running_fire": 0.274,
+      "core:dynamic_entry": 0.16,
+      "core:leaf_gale": 0.136,
+      "core:shadow_shuriken": 0.116
+    },
+    "withPouch": {
+      "winRate": 0.2,
+      "outcomes": {
+        "victory": 40,
+        "defeat": 160,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 120.69,
+        "p10": 102.52,
+        "p90": 141.85
+      },
+      "hpLeft": {
+        "mean": 41.2,
+        "share": 0.155
+      },
+      "maxHp": 266,
+      "damageShare": {
+        "core:tag": 0.254,
+        "basic": 0.203,
+        "core:running_fire": 0.163,
+        "core:dynamic_entry": 0.125,
+        "core:leaf_gale": 0.108,
+        "core:shadow_shuriken": 0.108,
+        "core:kunai": 0.039
+      }
+    },
+    "model": {
+      "ttkSec": 74.84,
+      "hpLossShare": 1.284,
+      "playerDps": 12.5
+    },
+    "wins": 16,
+    "ratio": 1.623,
+    "flagged": true,
+    "reasons": [
+      "ratio",
+      "win"
+    ]
+  },
+  {
+    "enemy": "core:boss_ren1",
+    "boss": true,
+    "cl": 26,
+    "level": 26,
+    "requestedLevel": 26,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "model",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:leaf_gale",
+      "core:leaf_whirlwind",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 0.12,
+    "outcomes": {
+      "victory": 24,
+      "defeat": 176,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": {
+      "mean": 123.77,
+      "p10": 108.97,
+      "p90": 143.57
+    },
+    "hpLeft": {
+      "mean": 33.7,
+      "share": 0.113
+    },
+    "maxHp": 298,
+    "damageShare": {
+      "basic": 0.389,
+      "core:leaf_whirlwind": 0.168,
+      "core:leaf_gale": 0.161,
+      "core:shadow_shuriken": 0.142,
+      "core:dynamic_entry": 0.14
+    },
+    "withPouch": {
+      "winRate": 0.13,
+      "outcomes": {
+        "victory": 26,
+        "defeat": 174,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 118.99,
+        "p10": 105.6,
+        "p90": 137.1
+      },
+      "hpLeft": {
+        "mean": 48.1,
+        "share": 0.161
+      },
+      "maxHp": 298,
+      "damageShare": {
+        "basic": 0.342,
+        "core:leaf_whirlwind": 0.163,
+        "core:leaf_gale": 0.159,
+        "core:dynamic_entry": 0.142,
+        "core:shadow_shuriken": 0.139,
+        "core:kunai": 0.056
+      }
+    },
+    "model": {
+      "ttkSec": 70,
+      "hpLossShare": 1.048,
+      "playerDps": 13.57
+    },
+    "wins": 24,
+    "ratio": 1.768,
+    "flagged": true,
+    "reasons": [
+      "ratio",
+      "win"
+    ]
+  },
+  {
+    "enemy": "core:boss_fighter",
+    "boss": true,
+    "cl": 32,
+    "level": 32,
+    "requestedLevel": 32,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "model",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:great_fireball",
+      "core:leaf_gale",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 0,
+    "outcomes": {
+      "victory": 0,
+      "defeat": 200,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": null,
+    "hpLeft": null,
+    "maxHp": 346,
+    "damageShare": {
+      "core:great_fireball": 0.308,
+      "basic": 0.286,
+      "core:shadow_shuriken": 0.147,
+      "core:dynamic_entry": 0.136,
+      "core:leaf_gale": 0.122
+    },
+    "withPouch": {
+      "winRate": 0,
+      "outcomes": {
+        "victory": 0,
+        "defeat": 200,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": null,
+      "hpLeft": null,
+      "maxHp": 346,
+      "damageShare": {
+        "core:great_fireball": 0.331,
+        "basic": 0.155,
+        "core:leaf_gale": 0.151,
+        "core:dynamic_entry": 0.15,
+        "core:shadow_shuriken": 0.146,
+        "core:kunai": 0.067
+      }
+    },
+    "model": {
+      "ttkSec": 67.67,
+      "hpLossShare": 1.059,
+      "playerDps": 17.75
+    },
+    "wins": 0,
+    "ratio": null,
+    "flagged": true,
+    "reasons": [
+      "noWins",
+      "win"
+    ]
+  },
+  {
+    "enemy": "core:boss_hunter",
+    "boss": true,
+    "cl": 36,
+    "level": 36,
+    "requestedLevel": 36,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "model",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:great_fireball",
+      "core:phoenix_sage_fire",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 0,
+    "outcomes": {
+      "victory": 0,
+      "defeat": 200,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": null,
+    "hpLeft": null,
+    "maxHp": 378,
+    "damageShare": {
+      "basic": 0.298,
+      "core:great_fireball": 0.224,
+      "core:phoenix_sage_fire": 0.213,
+      "core:dynamic_entry": 0.139,
+      "core:shadow_shuriken": 0.126
+    },
+    "withPouch": {
+      "winRate": 0.01,
+      "outcomes": {
+        "victory": 2,
+        "defeat": 198,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": {
+        "mean": 131.26,
+        "p10": 130.72,
+        "p90": 131.8
+      },
+      "hpLeft": {
+        "mean": 16.8,
+        "share": 0.045
+      },
+      "maxHp": 378,
+      "damageShare": {
+        "basic": 0.259,
+        "core:great_fireball": 0.25,
+        "core:phoenix_sage_fire": 0.225,
+        "core:shadow_shuriken": 0.123,
+        "core:dynamic_entry": 0.122,
+        "core:kunai": 0.021
+      }
+    },
+    "model": {
+      "ttkSec": 67.07,
+      "hpLossShare": 1.05,
+      "playerDps": 20.01
+    },
+    "wins": 0,
+    "ratio": null,
+    "flagged": true,
+    "reasons": [
+      "noWins",
+      "win"
+    ]
+  },
+  {
+    "enemy": "core:boss_twins",
+    "boss": true,
+    "cl": 38,
+    "level": 38,
+    "requestedLevel": 38,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "model",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:great_fireball",
+      "core:phoenix_sage_fire",
+      "core:sensing"
+    ],
+    "runs": 200,
+    "winRate": 0,
+    "outcomes": {
+      "victory": 0,
+      "defeat": 200,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": null,
+    "hpLeft": null,
+    "maxHp": 394,
+    "damageShare": {
+      "basic": 0.329,
+      "core:great_fireball": 0.296,
+      "core:phoenix_sage_fire": 0.23,
+      "core:dynamic_entry": 0.145
+    },
+    "withPouch": {
+      "winRate": 0,
+      "outcomes": {
+        "victory": 0,
+        "defeat": 200,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": null,
+      "hpLeft": null,
+      "maxHp": 394,
+      "damageShare": {
+        "core:great_fireball": 0.292,
+        "basic": 0.235,
+        "core:phoenix_sage_fire": 0.231,
+        "core:dynamic_entry": 0.143,
+        "core:kunai": 0.099
+      }
+    },
+    "model": {
+      "ttkSec": 68.37,
+      "hpLossShare": 1.07,
+      "playerDps": 20.66
+    },
+    "wins": 0,
+    "ratio": null,
+    "flagged": true,
+    "reasons": [
+      "noWins",
+      "win"
+    ]
+  },
+  {
+    "enemy": "core:boss_mist",
+    "boss": true,
+    "cl": 40,
+    "level": 40,
+    "requestedLevel": 40,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "model",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:great_fireball",
+      "core:sensing",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 0,
+    "outcomes": {
+      "victory": 0,
+      "defeat": 200,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": null,
+    "hpLeft": null,
+    "maxHp": 410,
+    "damageShare": {
+      "basic": 0.45,
+      "core:great_fireball": 0.238,
+      "core:dynamic_entry": 0.156,
+      "core:shadow_shuriken": 0.155
+    },
+    "withPouch": {
+      "winRate": 0,
+      "outcomes": {
+        "victory": 0,
+        "defeat": 200,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": null,
+      "hpLeft": null,
+      "maxHp": 410,
+      "damageShare": {
+        "basic": 0.374,
+        "core:great_fireball": 0.238,
+        "core:dynamic_entry": 0.16,
+        "core:shadow_shuriken": 0.157,
+        "core:kunai": 0.071
+      }
+    },
+    "model": {
+      "ttkSec": 67.5,
+      "hpLossShare": 1.005,
+      "playerDps": 21.31
+    },
+    "wins": 0,
+    "ratio": null,
+    "flagged": true,
+    "reasons": [
+      "noWins",
+      "win"
+    ]
+  },
+  {
+    "enemy": "core:boss_nameless",
+    "boss": true,
+    "cl": 44,
+    "level": 44,
+    "requestedLevel": 44,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "model",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:great_fireball",
+      "core:phoenix_sage_fire",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 0,
+    "outcomes": {
+      "victory": 0,
+      "defeat": 200,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": null,
+    "hpLeft": null,
+    "maxHp": 442,
+    "damageShare": {
+      "basic": 0.302,
+      "core:great_fireball": 0.264,
+      "core:phoenix_sage_fire": 0.191,
+      "core:shadow_shuriken": 0.124,
+      "core:dynamic_entry": 0.118
+    },
+    "withPouch": {
+      "winRate": 0,
+      "outcomes": {
+        "victory": 0,
+        "defeat": 200,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": null,
+      "hpLeft": null,
+      "maxHp": 442,
+      "damageShare": {
+        "core:great_fireball": 0.266,
+        "basic": 0.213,
+        "core:phoenix_sage_fire": 0.199,
+        "core:dynamic_entry": 0.13,
+        "core:shadow_shuriken": 0.122,
+        "core:kunai": 0.071
+      }
+    },
+    "model": {
+      "ttkSec": 87.62,
+      "hpLossShare": 1.673,
+      "playerDps": 22.62
+    },
+    "wins": 0,
+    "ratio": null,
+    "flagged": true,
+    "reasons": [
+      "noWins",
+      "win"
+    ]
+  },
+  {
+    "enemy": "core:boss_ren2",
+    "boss": true,
+    "cl": 42,
+    "level": 42,
+    "requestedLevel": 42,
+    "rank": "genin",
+    "natures": [
+      "katon"
+    ],
+    "pouch": "none",
+    "food": "model",
+    "loadout": [
+      "core:dynamic_entry",
+      "core:great_fireball",
+      "core:phoenix_sage_fire",
+      "core:shadow_shuriken"
+    ],
+    "runs": 200,
+    "winRate": 0,
+    "outcomes": {
+      "victory": 0,
+      "defeat": 200,
+      "fled": 0,
+      "timeout": 0
+    },
+    "timeSec": null,
+    "hpLeft": null,
+    "maxHp": 426,
+    "damageShare": {
+      "basic": 0.375,
+      "core:great_fireball": 0.189,
+      "core:phoenix_sage_fire": 0.153,
+      "core:dynamic_entry": 0.142,
+      "core:shadow_shuriken": 0.141
+    },
+    "withPouch": {
+      "winRate": 0,
+      "outcomes": {
+        "victory": 0,
+        "defeat": 200,
+        "fled": 0,
+        "timeout": 0
+      },
+      "timeSec": null,
+      "hpLeft": null,
+      "maxHp": 426,
+      "damageShare": {
+        "basic": 0.316,
+        "core:great_fireball": 0.185,
+        "core:phoenix_sage_fire": 0.147,
+        "core:dynamic_entry": 0.143,
+        "core:shadow_shuriken": 0.138,
+        "core:kunai": 0.071
+      }
+    },
+    "model": {
+      "ttkSec": 81.35,
+      "hpLossShare": 1.466,
+      "playerDps": 21.97
+    },
+    "wins": 0,
+    "ratio": null,
+    "flagged": true,
+    "reasons": [
+      "noWins",
+      "win"
+    ]
+  }
+]

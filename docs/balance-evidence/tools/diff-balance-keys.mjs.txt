@@ -1,0 +1,17 @@
+import fs from 'node:fs';
+const [,, a, b] = process.argv;
+const A = JSON.parse(fs.readFileSync(a, 'utf8')), B = JSON.parse(fs.readFileSync(b, 'utf8'));
+const flat = (o, p = '', out = {}) => {
+  if (o !== null && typeof o === 'object') {
+    if (Array.isArray(o) && o.every((x) => typeof x !== 'object')) out[p] = JSON.stringify(o);
+    else for (const [k, v] of Object.entries(o)) flat(v, p ? `${p}.${k}` : k, out);
+  } else out[p] = JSON.stringify(o);
+  return out;
+};
+const fa = flat(A), fb = flat(B);
+const keys = [...new Set([...Object.keys(fa), ...Object.keys(fb)])].sort();
+const rows = [];
+for (const k of keys) if (fa[k] !== fb[k]) rows.push([k, fa[k] ?? '—', fb[k] ?? '—']);
+console.log('| Key | origin/dev | this PR |\n| --- | --- | --- |');
+for (const [k, x, y] of rows) console.log(`| \`${k}\` | ${x} | ${y} |`);
+console.error(rows.length, 'changed keys of', keys.length);

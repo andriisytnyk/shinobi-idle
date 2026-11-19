@@ -1,0 +1,98 @@
+[
+  {
+    "id": "core:op_hideout",
+    "unlock": {
+      "t": "flag",
+      "id": "op.hideout.unlocked"
+    },
+    "clearFlag": "op.hideout.cleared",
+    "regen": "opRegen",
+    "rewards": {
+      "first": {
+        "ryo": 1500,
+        "rep": 40,
+        "parts": [
+          {
+            "technique": "core:water_prison",
+            "chance": "mission"
+          }
+        ]
+      },
+      "repeat": {
+        "ryo": 0,
+        "rep": 0,
+        "parts": [
+          {
+            "technique": "core:water_prison",
+            "chance": "mission"
+          }
+        ]
+      }
+    },
+    "stages": [
+      {
+        "t": "approach",
+        "shortenedBy": {
+          "t": "skill",
+          "skill": "scout",
+          "level": 20
+        }
+      },
+      {
+        "t": "fight",
+        "enemy": "core:guard_pack"
+      },
+      {
+        "t": "fight",
+        "enemy": "core:boss_twins"
+      },
+      {
+        "t": "fight",
+        "enemy": "core:boss_mist"
+      }
+    ]
+  },
+  {
+    "id": "core:op_forest_of_death",
+    "unlock": {
+      "t": "flag",
+      "id": "op.forest_of_death.unlocked"
+    },
+    "clearFlag": "op.forest_of_death.cleared",
+    "regen": "opRegen",
+    "rewards": null,
+    "stages": [
+      {
+        "t": "days",
+        "days": 5,
+        "fightsPerDay": 3,
+        "pool": ["core:serpent", "core:leech", "core:fake_genin"],
+        "finale": "core:boss_nameless"
+      }
+    ]
+  },
+  {
+    "id": "core:op_tournament",
+    "unlock": {
+      "t": "flag",
+      "id": "op.tournament.unlocked"
+    },
+    "clearFlag": "op.tournament.cleared",
+    "regen": "opRegen",
+    "rewards": null,
+    "stages": [
+      {
+        "t": "fight",
+        "enemy": "core:foreign_genin"
+      },
+      {
+        "t": "fight",
+        "enemy": "core:foreign_genin"
+      },
+      {
+        "t": "fight",
+        "enemy": "core:boss_ren2"
+      }
+    ]
+  }
+]

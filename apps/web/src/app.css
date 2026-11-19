@@ -1,0 +1,63 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-text);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  /* Tabular numerals keep counters from jumping. */
+  font-variant-numeric: tabular-nums;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* The wrapper PageHost puts around every page takes no part in the layout. */
+[data-ui='page'] {
+  display: contents;
+}
+
+a {
+  color: var(--accent);
+}
+
+:focus-visible {
+  outline: var(--border-thick) solid var(--accent);
+  outline-offset: var(--focus-offset);
+}
+
+/* The tile that the open sheet is about. */
+[data-highlighted] {
+  outline: var(--border-thick) solid var(--accent);
+  outline-offset: var(--focus-offset);
+}
+
+button {
+  font-family: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/*
+ * The look of the core pack's own entities. A pack colours its currencies and natures the same way:
+ * with a rule on the stable `data-ui` and `data-entity` attributes, or with a token that its data names.
+ */
+[data-ui='topbar-currency'][data-entity='currency:intel'] dt {
+  color: var(--chakra);
+}

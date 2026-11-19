@@ -1,0 +1,288 @@
+{
+  "core:pool_tai_10": [
+    {
+      "key": "cost.skill.tai",
+      "op": "add",
+      "value": -0.05
+    }
+  ],
+  "core:pool_tai_25": [
+    {
+      "key": "interrupt.chance",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_tai_50": [
+    {
+      "key": "damage.vs.melee",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_tai_95": [],
+  "core:pool_nin_10": [
+    {
+      "key": "mission.duration.nin",
+      "op": "add",
+      "value": -0.05
+    }
+  ],
+  "core:pool_nin_25": [
+    {
+      "key": "evasion",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_nin_50": [
+    {
+      "key": "clone.pool",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_nin_95": [],
+  "core:pool_katon_10": [
+    {
+      "key": "burn.duration",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_katon_25": [
+    {
+      "key": "cost.skill.katon",
+      "op": "add",
+      "value": -0.05
+    }
+  ],
+  "core:pool_katon_50": [
+    {
+      "key": "burn.damage",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_katon_95": [],
+  "core:pool_futon_10": [
+    {
+      "key": "armor.pierce",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_futon_25": [
+    {
+      "key": "cast.skill.futon",
+      "op": "add",
+      "value": -0.05
+    }
+  ],
+  "core:pool_futon_50": [
+    {
+      "key": "damage.vs.armor",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_futon_95": [],
+  "core:pool_raiton_10": [
+    {
+      "key": "stun.duration",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_raiton_25": [
+    {
+      "key": "interrupt.chance",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_raiton_50": [
+    {
+      "key": "cooldown.skill.raiton",
+      "op": "add",
+      "value": -0.05
+    }
+  ],
+  "core:pool_raiton_95": [],
+  "core:pool_doton_10": [
+    {
+      "key": "shield.strength",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_doton_25": [
+    {
+      "key": "bind.duration",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_doton_50": [
+    {
+      "key": "cost.skill.doton.defense",
+      "op": "add",
+      "value": -0.05
+    }
+  ],
+  "core:pool_doton_95": [],
+  "core:pool_suiton_10": [
+    {
+      "key": "wet.duration",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_suiton_25": [
+    {
+      "key": "wet.slow",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_suiton_50": [
+    {
+      "key": "cost.skill.suiton",
+      "op": "add",
+      "value": -0.05
+    }
+  ],
+  "core:pool_suiton_95": [],
+  "core:pool_herb_10": [
+    {
+      "key": "bush.stock",
+      "op": "add",
+      "value": 5
+    }
+  ],
+  "core:pool_herb_25": [
+    {
+      "key": "bush.regrow",
+      "op": "add",
+      "value": -0.1
+    }
+  ],
+  "core:pool_herb_50": [
+    {
+      "key": "gather.double",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_herb_95": [],
+  "core:pool_alch_10": [
+    {
+      "key": "interval.skill.alch",
+      "op": "add",
+      "value": -0.05
+    }
+  ],
+  "core:pool_alch_25": [
+    {
+      "key": "craft.keep",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_alch_50": [
+    {
+      "key": "craft.double",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_alch_95": [],
+  "core:pool_prov_10": [
+    {
+      "key": "speed.skill.prov",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_prov_25": [
+    {
+      "key": "craft.perfect",
+      "op": "add",
+      "value": 0.03
+    }
+  ],
+  "core:pool_prov_50": [
+    {
+      "key": "tonic.charges",
+      "op": "add",
+      "value": 0.25
+    }
+  ],
+  "core:pool_prov_95": [],
+  "core:pool_cc_10": [
+    {
+      "key": "xp.skill.cc",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_cc_25": [
+    {
+      "key": "cost.technique",
+      "op": "add",
+      "value": -0.02
+    }
+  ],
+  "core:pool_cc_50": [
+    {
+      "key": "speed.practice",
+      "op": "add",
+      "value": 0.02
+    }
+  ],
+  "core:pool_cc_95": [],
+  "core:pool_med_10": [
+    {
+      "key": "mastery.xp.skill.med",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_med_25": [
+    {
+      "key": "meditation.insightChance",
+      "op": "add",
+      "value": 0.05
+    }
+  ],
+  "core:pool_med_50": [
+    {
+      "key": "chakra.regen",
+      "op": "add",
+      "value": 0.1
+    }
+  ],
+  "core:pool_med_95": [],
+  "core:pool_ath_10": [
+    {
+      "key": "obstacle.cost",
+      "op": "add",
+      "value": -0.05
+    }
+  ],
+  "core:pool_ath_25": [
+    {
+      "key": "obstacle.bonus",
+      "op": "add",
+      "value": 0.02
+    }
+  ],
+  "core:pool_ath_50": [
+    {
+      "key": "obstacle.penalty",
+      "op": "add",
+      "value": -0.25
+    }
+  ],
+  "core:pool_ath_95": []
+}

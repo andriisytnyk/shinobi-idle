@@ -1,0 +1,280 @@
+[
+  {
+    "id": "core:dummy",
+    "region": "academy",
+    "cl": 2,
+    "traits": [],
+    "nature": null,
+    "carries": null,
+    "hp": 40,
+    "dmg": 4.9
+  },
+  {
+    "id": "core:bandit",
+    "region": "forest",
+    "cl": 6,
+    "traits": [],
+    "nature": null,
+    "carries": null,
+    "hp": 79,
+    "dmg": 6.7
+  },
+  {
+    "id": "core:arsonist",
+    "region": "forest",
+    "cl": 9,
+    "traits": [],
+    "nature": "katon",
+    "carries": null,
+    "hp": 108,
+    "dmg": 8.1
+  },
+  {
+    "id": "core:wolf",
+    "region": "forest",
+    "cl": 10,
+    "traits": [
+      "pack"
+    ],
+    "nature": null,
+    "carries": null,
+    "hp": 118,
+    "dmg": 8.5
+  },
+  {
+    "id": "core:wolfmask",
+    "region": "forest",
+    "cl": 13,
+    "traits": [],
+    "nature": null,
+    "carries": null,
+    "hp": 147,
+    "dmg": 9.9
+  },
+  {
+    "id": "core:centipede",
+    "region": "forest",
+    "cl": 15,
+    "traits": [
+      "regen"
+    ],
+    "nature": null,
+    "carries": null,
+    "hp": 167,
+    "dmg": 10.8
+  },
+  {
+    "id": "core:tiger",
+    "region": "forest",
+    "cl": 20,
+    "traits": [
+      "regen"
+    ],
+    "nature": null,
+    "carries": null,
+    "hp": 216,
+    "dmg": 13
+  },
+  {
+    "id": "core:thief",
+    "region": "mission",
+    "cl": 16,
+    "traits": [
+      "evasive"
+    ],
+    "nature": null,
+    "carries": null,
+    "hp": 177,
+    "dmg": 11.2
+  },
+  {
+    "id": "core:merc_pack",
+    "region": "plains",
+    "cl": 19,
+    "traits": [
+      "pack"
+    ],
+    "nature": null,
+    "carries": null,
+    "hp": 206,
+    "dmg": 12.6
+  },
+  {
+    "id": "core:heavy",
+    "region": "plains",
+    "cl": 24,
+    "traits": [
+      "armor"
+    ],
+    "nature": "doton",
+    "carries": null,
+    "hp": 255,
+    "dmg": 14.8
+  },
+  {
+    "id": "core:marauder",
+    "region": "plains",
+    "cl": 22,
+    "traits": [
+      "evasive"
+    ],
+    "nature": null,
+    "carries": null,
+    "hp": 236,
+    "dmg": 13.9
+  },
+  {
+    "id": "core:poisoner",
+    "region": "plains",
+    "cl": 24,
+    "traits": [
+      "poisoner"
+    ],
+    "nature": null,
+    "carries": null,
+    "hp": 255,
+    "dmg": 14.8
+  },
+  {
+    "id": "core:kumo",
+    "region": "plains",
+    "cl": 28,
+    "traits": [
+      "caster"
+    ],
+    "nature": "raiton",
+    "carries": "core:wave_of_inspiration",
+    "hp": 294,
+    "dmg": 16.6
+  },
+  {
+    "id": "core:suna",
+    "region": "plains",
+    "cl": 26,
+    "traits": [],
+    "nature": "futon",
+    "carries": null,
+    "hp": 275,
+    "dmg": 15.7
+  },
+  {
+    "id": "core:hunter",
+    "region": "valley",
+    "cl": 30,
+    "traits": [
+      "evasive"
+    ],
+    "nature": null,
+    "carries": null,
+    "hp": 314,
+    "dmg": 17.5
+  },
+  {
+    "id": "core:hunter_caster",
+    "region": "valley",
+    "cl": 32,
+    "traits": [
+      "caster"
+    ],
+    "nature": "katon",
+    "carries": null,
+    "hp": 334,
+    "dmg": 18.4
+  },
+  {
+    "id": "core:kiri_hunter",
+    "region": "valley",
+    "cl": 34,
+    "traits": [
+      "hidden"
+    ],
+    "nature": "suiton",
+    "carries": null,
+    "hp": 353,
+    "dmg": 19.3
+  },
+  {
+    "id": "core:guard_pack",
+    "region": "valley",
+    "cl": 33,
+    "traits": [
+      "pack",
+      "armor"
+    ],
+    "nature": null,
+    "carries": null,
+    "hp": 343,
+    "dmg": 18.9
+  },
+  {
+    "id": "core:veteran",
+    "region": "valley",
+    "cl": 36,
+    "traits": [
+      "armor"
+    ],
+    "nature": "doton",
+    "carries": null,
+    "hp": 373,
+    "dmg": 20.2
+  },
+  {
+    "id": "core:oro_aide",
+    "region": "valley",
+    "cl": 36,
+    "traits": [
+      "poisoner"
+    ],
+    "nature": null,
+    "carries": "core:hidden_shadow_snake_hands",
+    "hp": 373,
+    "dmg": 20.2
+  },
+  {
+    "id": "core:serpent",
+    "region": "exam",
+    "cl": 38,
+    "traits": [
+      "regen"
+    ],
+    "nature": null,
+    "carries": null,
+    "hp": 392,
+    "dmg": 21.1
+  },
+  {
+    "id": "core:leech",
+    "region": "exam",
+    "cl": 36,
+    "traits": [
+      "pack",
+      "poisoner"
+    ],
+    "nature": null,
+    "carries": null,
+    "hp": 373,
+    "dmg": 20.2
+  },
+  {
+    "id": "core:fake_genin",
+    "region": "exam",
+    "cl": 39,
+    "traits": [
+      "illusionist"
+    ],
+    "nature": null,
+    "carries": null,
+    "hp": 402,
+    "dmg": 21.6
+  },
+  {
+    "id": "core:foreign_genin",
+    "region": "exam",
+    "cl": 40,
+    "traits": [],
+    "nature": "wheel",
+    "carries": null,
+    "hp": 412,
+    "dmg": 22
+  }
+]

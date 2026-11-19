@@ -1,0 +1,99 @@
+<main class="main">
+  <div class="ui-page" data-page="core:quests" data-ui="page">
+    <article class="simple-page">
+      <h1>
+        Журнал доручень
+      <nav aria-label="Розділи журналу" class="journal" data-journal-tabs="">
+        <a aria-current="page" class="active" data-journal="quests" href="#/quests">
+          Доручення
+        <a data-journal="missions" href="#/missions">
+          Місії
+      <section>
+        <h2>
+          Поточні
+        <div class="chain" data-done="false" data-quest="core:graduation">
+          <p class="summary-line">
+            <span class="name">
+              <a class="entity-link" href="#/quest/core:graduation">
+                Випуск
+            <span class="count">
+              Кроки 0 з 5
+          <p class="desc">
+            Шість років тому Дев'ятихвостий спалив околиці, де живе родина теслі. Ти перший шинобі в родині, і до Академії тебе привела проста думка: щоб околиці більше ніхто не палив.
+          <ol class="steps">
+            <li aria-current="step" class="step" data-status="current">
+              <div class="step-head">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#14-mnqmls" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="status">
+                  Поточний крок
+              <p class="text">
+                Інструктор починає з тіла, а не з печаток: досягни Тайдзюцу 5 і Атлетики 5.
+              <div class="objective">
+                <div class="group" data-met="false">
+                  <ul class="rows">
+                    <li>
+                      <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/skill/tai">
+                            Тайдзюцу
+                          <span class="detail">
+                            рів. 5
+                        <span class="count">
+                          1/5
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 20%;">
+                    <li>
+                      <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/skill/ath">
+                            Атлетика
+                          <span class="detail">
+                            рів. 5
+                        <span class="count">
+                          1/5
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 20%;">
+            <li class="step" data-status="pending">
+              <div class="step-head">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="status">
+                  Попереду
+              <p class="text" data-step-hidden="">
+                ???
+            <li class="step" data-status="pending">
+              <div class="step-head">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="status">
+                  Попереду
+              <p class="text" data-step-hidden="">
+                ???
+            <li class="step" data-status="pending">
+              <div class="step-head">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="status">
+                  Попереду
+              <p class="text" data-step-hidden="">
+                ???
+            <li class="step" data-status="pending">
+              <div class="step-head">
+                <span class="mark">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                <span class="status">
+                  Попереду
+              <p class="text" data-step-hidden="">
+                ???

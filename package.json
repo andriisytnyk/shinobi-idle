@@ -1,0 +1,43 @@
+{
+  "name": "shinobi-idle",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "packageManager": "pnpm@10.33.4",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @shinobi/web run dev",
+    "build": "pnpm -r --if-present build",
+    "test": "pnpm -r --workspace-concurrency=1 --if-present test",
+    "test:speed": "pnpm -r --workspace-concurrency=1 --if-present test:speed",
+    "lint": "eslint .",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "format": "prettier --write .",
+    "content:import": "pnpm --filter @shinobi/content run import",
+    "icons:build": "pnpm --filter @shinobi/web run icons:build",
+    "content:check": "pnpm --filter @shinobi/content run check",
+    "sim": "pnpm --filter @shinobi/sim run sim"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@iconify-json/game-icons": "^1.2.4",
+    "@iconify-json/lucide": "^1.2.155",
+    "@types/node": "^24.0.0",
+    "eslint": "^9.39.0",
+    "eslint-plugin-svelte": "^3.0.0",
+    "globals": "^16.0.0",
+    "prettier": "^3.6.0",
+    "prettier-plugin-svelte": "^4.0.0",
+    "svelte": "^5.0.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.40.0",
+    "vitest": "^3.2.0"
+  }
+}

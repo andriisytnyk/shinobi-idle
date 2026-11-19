@@ -1,0 +1,1144 @@
+<main class="main">
+  <div class="ui-page" data-page="core:entity.skill" data-ui="page">
+    <article class="skill-page" data-entity="skill:herb" data-skill="herb" data-ui="entity-page">
+      <header class="plate" data-ui="entity-header">
+        <h1>
+          <span class="plate-icon" style="color: var(--steel);">
+            <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+              <path d="#3373-1yazdhi" fill="currentColor">
+          Травництво
+        <span class="level">
+          Рів. 1
+      <p class="lore">
+        Травництво вчить збирати лікарські трави для мазей, пілюль і отрут.
+      <p class="unlock">
+        Генін.
+      <section data-ui="entity-section">
+        <h2>
+          Дії
+        <ul class="tiles">
+          <li class="ct-tile" data-action="core:mint" data-entity="item:core:mint" data-herb="core:mint" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="clover" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#342-1nbqtma" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/item/core:mint">
+                    Цілюща м'ята
+                <span class="ct-corner">
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+                  <button aria-label="Закріпити як мету" class="pin" data-entity="item:core:mint" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                      <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  1
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      2,5 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      5 184 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
+            <div class="bush" data-bush="" data-empty="false">
+              <p class="line">
+                <span>
+                  Кущ
+                <span data-stock="">
+                  6/6
+              <span aria-hidden="true" class="ct-bar">
+                <span class="ct-fill stock" style="width: 100%;">
+              <p class="ct-note">
+                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+            <div class="ct-actions">
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button class="main ct-action" data-performer="0" data-start="true" type="button">
+                  Почати
+          <li class="ct-tile" data-action="core:nettle" data-entity="item:core:nettle" data-herb="core:nettle" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="vine-leaf" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#1611-1skmruf" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/item/core:nettle">
+                    Кропива
+                <span class="ct-corner">
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:nettle" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                      <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  5
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      2,9 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      7 053 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
+            <div class="bush" data-bush="" data-empty="false">
+              <p class="line">
+                <span>
+                  Кущ
+                <span data-stock="">
+                  6/6
+              <span aria-hidden="true" class="ct-bar">
+                <span class="ct-fill stock" style="width: 100%;">
+              <p class="ct-note">
+                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+            <div class="req">
+              <p class="ct-locked">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:herb" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/herb">
+                          Травництво
+                        <span class="detail">
+                          рів. 5
+                      <span class="count">
+                        1/5
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 20%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="item:core:nettle" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:nettle" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
+            <p class="ct-why" data-why="level" id="why-core:nettle">
+              Рівень замалий: потрібен 5.
+          <li class="ct-tile" data-action="core:hogweed" data-entity="item:core:hogweed" data-herb="core:hogweed" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="spoted-flower" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#2793-6758lb" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/item/core:hogweed">
+                    Отруйний борщівник
+                <span class="ct-corner">
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:hogweed" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                      <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  10
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      3,5 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      10 363 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
+            <div class="bush" data-bush="" data-empty="false">
+              <p class="line">
+                <span>
+                  Кущ
+                <span data-stock="">
+                  6/6
+              <span aria-hidden="true" class="ct-bar">
+                <span class="ct-fill stock" style="width: 100%;">
+              <p class="ct-note">
+                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+            <div class="req">
+              <p class="ct-locked">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:herb" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/herb">
+                          Травництво
+                        <span class="detail">
+                          рів. 10
+                      <span class="count">
+                        1/10
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 10%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="item:core:hogweed" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:hogweed" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
+            <p class="ct-why" data-why="level" id="why-core:hogweed">
+              Рівень замалий: потрібен 10.
+          <li class="ct-tile" data-action="core:bloodgrass" data-entity="item:core:bloodgrass" data-herb="core:bloodgrass" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="vines" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#2699-bf6zjk" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/item/core:bloodgrass">
+                    Кровотрав
+                <span class="ct-corner">
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:bloodgrass" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                      <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  15
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4,1 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      15 227 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
+            <div class="bush" data-bush="" data-empty="false">
+              <p class="line">
+                <span>
+                  Кущ
+                <span data-stock="">
+                  6/6
+              <span aria-hidden="true" class="ct-bar">
+                <span class="ct-fill stock" style="width: 100%;">
+              <p class="ct-note">
+                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+            <div class="req">
+              <p class="ct-locked">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:herb" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/herb">
+                          Травництво
+                        <span class="detail">
+                          рів. 15
+                      <span class="count">
+                        1/15
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 6.666666666666667%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="item:core:bloodgrass" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:bloodgrass" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
+            <p class="ct-why" data-why="level" id="why-core:bloodgrass">
+              Рівень замалий: потрібен 15.
+          <li class="ct-tile" data-action="core:poppy" data-entity="item:core:poppy" data-herb="core:poppy" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="poppy" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#1475-1nold0k" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/item/core:poppy">
+                    Сонний мак
+                <span class="ct-corner">
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:poppy" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                      <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  20
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4,6 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      22 373 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
+            <div class="bush" data-bush="" data-empty="false">
+              <p class="line">
+                <span>
+                  Кущ
+                <span data-stock="">
+                  6/6
+              <span aria-hidden="true" class="ct-bar">
+                <span class="ct-fill stock" style="width: 100%;">
+              <p class="ct-note">
+                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+            <div class="req">
+              <p class="ct-locked">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:herb" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/herb">
+                          Травництво
+                        <span class="detail">
+                          рів. 20
+                      <span class="count">
+                        1/20
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 5%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="item:core:poppy" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:poppy" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
+            <p class="ct-why" data-why="level" id="why-core:poppy">
+              Рівень замалий: потрібен 20.
+          <li class="ct-tile" data-action="core:ironroot" data-entity="item:core:ironroot" data-herb="core:ironroot" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="plant-roots" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#2567-1cdczec" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/item/core:ironroot">
+                    Залізний корінь
+                <span class="ct-corner">
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:ironroot" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                      <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  25
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      5,2 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      32 873 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
+            <div class="bush" data-bush="" data-empty="false">
+              <p class="line">
+                <span>
+                  Кущ
+                <span data-stock="">
+                  6/6
+              <span aria-hidden="true" class="ct-bar">
+                <span class="ct-fill stock" style="width: 100%;">
+              <p class="ct-note">
+                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+            <div class="req">
+              <p class="ct-locked">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:herb" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/herb">
+                          Травництво
+                        <span class="detail">
+                          рів. 25
+                      <span class="count">
+                        1/25
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 4%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="item:core:ironroot" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:ironroot" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
+            <p class="ct-why" data-why="level" id="why-core:ironroot">
+              Рівень замалий: потрібен 25.
+          <li class="ct-tile" data-action="core:silvermoss" data-entity="item:core:silvermoss" data-herb="core:silvermoss" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="solid-leaf" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#341-n6fed8" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/item/core:silvermoss">
+                    Сріблястий мох
+                <span class="ct-corner">
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:silvermoss" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                      <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  30
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      5,8 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      48 301 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
+            <div class="bush" data-bush="" data-empty="false">
+              <p class="line">
+                <span>
+                  Кущ
+                <span data-stock="">
+                  6/6
+              <span aria-hidden="true" class="ct-bar">
+                <span class="ct-fill stock" style="width: 100%;">
+              <p class="ct-note">
+                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+            <div class="req">
+              <p class="ct-locked">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:herb" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/herb">
+                          Травництво
+                        <span class="detail">
+                          рів. 30
+                      <span class="count">
+                        1/30
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 3.3333333333333335%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="item:core:silvermoss" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:silvermoss" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
+            <p class="ct-why" data-why="level" id="why-core:silvermoss">
+              Рівень замалий: потрібен 30.
+          <li class="ct-tile" data-action="core:edelweiss" data-entity="item:core:edelweiss" data-herb="core:edelweiss" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="flower-star" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#831-9ho3s9" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/item/core:edelweiss">
+                    Гірський едельвейс
+                <span class="ct-corner">
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:edelweiss" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                      <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  35
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      6,3 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      70 970 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
+            <div class="bush" data-bush="" data-empty="false">
+              <p class="line">
+                <span>
+                  Кущ
+                <span data-stock="">
+                  6/6
+              <span aria-hidden="true" class="ct-bar">
+                <span class="ct-fill stock" style="width: 100%;">
+              <p class="ct-note">
+                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+            <div class="req">
+              <p class="ct-locked">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:cc" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/cc">
+                          Контроль чакри
+                        <span class="detail">
+                          рів. 15
+                      <span class="count">
+                        1/15
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 6.666666666666667%;">
+                  <li>
+                    <div class="row" data-entity="skill:herb" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/herb">
+                          Травництво
+                        <span class="detail">
+                          рів. 35
+                      <span class="count">
+                        1/35
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 2.857142857142857%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="item:core:edelweiss" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:edelweiss" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
+            <p class="ct-why" data-why="level" id="why-core:edelweiss">
+              Рівень замалий: потрібен 15.
+          <li class="ct-tile" data-action="core:fireflower" data-entity="item:core:fireflower" data-herb="core:fireflower" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="fire-flower" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#1391-r7ivy4" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/item/core:fireflower">
+                    Вогняна квітка
+                <span class="ct-corner">
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:fireflower" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                      <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  40
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      6,9 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      104 278 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
+            <div class="bush" data-bush="" data-empty="false">
+              <p class="line">
+                <span>
+                  Кущ
+                <span data-stock="">
+                  6/6
+              <span aria-hidden="true" class="ct-bar">
+                <span class="ct-fill stock" style="width: 100%;">
+              <p class="ct-note">
+                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+            <div class="req">
+              <p class="ct-locked">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:herb" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/herb">
+                          Травництво
+                        <span class="detail">
+                          рів. 40
+                      <span class="count">
+                        1/40
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 2.5%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="item:core:fireflower" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:fireflower" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
+            <p class="ct-why" data-why="level" id="why-core:fireflower">
+              Рівень замалий: потрібен 40.
+          <li class="ct-tile" data-action="core:lotus" data-entity="item:core:lotus" data-herb="core:lotus" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="lotus" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#1476-v4t3xk" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/item/core:lotus">
+                    Водяний лотос
+                <span class="ct-corner">
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:lotus" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                      <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  45
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      7,4 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      153 218 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
+            <div class="bush" data-bush="" data-empty="false">
+              <p class="line">
+                <span>
+                  Кущ
+                <span data-stock="">
+                  6/6
+              <span aria-hidden="true" class="ct-bar">
+                <span class="ct-fill stock" style="width: 100%;">
+              <p class="ct-note">
+                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+            <div class="req">
+              <p class="ct-locked">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="group" data-met="false">
+                      <p class="caption">
+                        Потрібно все:
+                      <ul class="rows">
+                        <li>
+                          <div class="row" data-entity="skill:cc" data-met="false" data-ui="req-row">
+                            <span class="mark">
+                              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                                <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                            <span class="label">
+                              <a class="entity-link" href="#/skill/cc">
+                                Контроль чакри
+                              <span class="detail">
+                                рів. 30
+                            <span class="count">
+                              1/30
+                            <span aria-hidden="true" class="bar">
+                              <span class="fill" style="width: 3.3333333333333335%;">
+                        <li>
+                          <div class="row" data-met="false" data-ui="req-row">
+                            <span class="mark">
+                              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                                <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                            <span class="label">
+                              <span data-point-req="">
+                                Знайти точку інтересу: ???
+                              <span class="detail" data-point-req-hint="">
+                                Розвідай клітинку
+                  <li>
+                    <div class="row" data-entity="skill:herb" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/herb">
+                          Травництво
+                        <span class="detail">
+                          рів. 45
+                      <span class="count">
+                        1/45
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 2.2222222222222223%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="item:core:lotus" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:lotus" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
+            <p class="ct-why" data-why="level" id="why-core:lotus">
+              Рівень замалий: потрібен 30.
+          <li class="ct-tile" data-action="core:shadowshroom" data-entity="item:core:shadowshroom" data-herb="core:shadowshroom" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="spotted-mushroom" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#2389-7ju6vx" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/item/core:shadowshroom">
+                    Тіньовий гриб
+                <span class="ct-corner">
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:shadowshroom" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                      <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  50
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      8 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      225 128 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
+            <div class="bush" data-bush="" data-empty="false">
+              <p class="line">
+                <span>
+                  Кущ
+                <span data-stock="">
+                  6/6
+              <span aria-hidden="true" class="ct-bar">
+                <span class="ct-fill stock" style="width: 100%;">
+              <p class="ct-note">
+                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+            <div class="req">
+              <p class="ct-locked">
+                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                    <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                    <path d="#24-1tb3nx8">
+                Поки закрито
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:herb" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/herb">
+                          Травництво
+                        <span class="detail">
+                          рів. 50
+                      <span class="count">
+                        1/50
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 2%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="item:core:shadowshroom" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="gather" data-ui="start-split">
+                <button aria-describedby="why-core:shadowshroom" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
+            <p class="ct-why" data-why="level" id="why-core:shadowshroom">
+              Рівень замалий: потрібен 50.
+      <section data-gear-section="" data-ui="entity-section">
+        <h2>
+          Тренувальне спорядження
+        <section class="gear" data-entity="gear:core:serp_i_rukavytsi_travnyka" data-gear="core:serp_i_rukavytsi_travnyka" data-owned="0">
+          <h3 class="name">
+            <span class="icon">
+              <svg aria-hidden="true" class="icon" height="24" viewBox="0 0 512 512" width="24">
+                <path d="#1376-1js6kpl" fill="currentColor">
+            <a class="entity-link" href="#/gear/core:serp_i_rukavytsi_travnyka">
+              Серп і рукавиці травника
+            <span class="tiers" data-tiers="">
+              рівні: 0 з 2
+          <p class="effect">
+            −5% часу збору за тир
+          <p class="next" data-next="">
+            Наступний рівень I. Ціна — Рьо: 300.
+          <a class="shop-link ct-link" data-shop-link="" href="#/shop">
+            До крамниці
+      <section aria-label="Пул Майстерності" class="pool" data-entity="skill:herb" data-ui="pool-bar">
+        <h2>
+          Пул Майстерності
+        <p class="amount">
+          0 / 22 000
+        <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="bar" role="progressbar">
+          <span class="fill" style="width: 0%;">
+          <span class="tick" style="left: 10%;">
+          <span class="tick" style="left: 25%;">
+          <span class="tick" style="left: 50%;">
+          <span class="tick" style="left: 95%;">
+        <ul class="checkpoints">
+          <li data-checkpoint="core:pool_herb_10">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              10%
+            <span class="text">
+              +5 до запасу всіх кущів
+            <span class="state" data-active="false">
+              Ще не діє
+          <li data-checkpoint="core:pool_herb_25">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              25%
+            <span class="text">
+              −10% часу відростання
+            <span class="state" data-active="false">
+              Ще не діє
+          <li data-checkpoint="core:pool_herb_50">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              50%
+            <span class="text">
+              +5% шансу подвійного збору
+            <span class="state" data-active="false">
+              Ще не діє
+          <li data-checkpoint="core:pool_herb_95">
+            <span class="pct">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
+                  <path d="#24-1tb3nx8">
+              95%
+            <span class="text">
+              +5% досвіду Алхімії й Провіанту

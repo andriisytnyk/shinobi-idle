@@ -1,0 +1,35 @@
+[
+  {
+    "id": "fanBurn",
+    "nature": "futon",
+    "onState": "burn",
+    "effect": {
+      "kind": "boost"
+    }
+  },
+  {
+    "id": "shockWet",
+    "nature": "raiton",
+    "onState": "wet",
+    "effect": {
+      "kind": "lengthen"
+    }
+  },
+  {
+    "id": "mudEva",
+    "nature": "doton",
+    "onState": "wet",
+    "effect": {
+      "kind": "status",
+      "status": "bind"
+    }
+  },
+  {
+    "id": "steam",
+    "nature": "katon",
+    "onState": "wet",
+    "effect": {
+      "kind": "burst"
+    }
+  }
+]

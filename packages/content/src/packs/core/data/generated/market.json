@@ -1,0 +1,42 @@
+[
+  {
+    "item": "core:water",
+    "supplier": null,
+    "marketLevel": 1
+  },
+  {
+    "item": "core:rice",
+    "supplier": "core:farms",
+    "marketLevel": 1
+  },
+  {
+    "item": "core:salt",
+    "supplier": "core:mine",
+    "marketLevel": 1
+  },
+  {
+    "item": "core:oil",
+    "supplier": "core:farms",
+    "marketLevel": 1
+  },
+  {
+    "item": "core:noodles",
+    "supplier": "core:farms",
+    "marketLevel": 2
+  },
+  {
+    "item": "core:meat",
+    "supplier": "core:hunt",
+    "marketLevel": 1
+  },
+  {
+    "item": "core:saltpeter",
+    "supplier": "core:mine",
+    "marketLevel": 2
+  },
+  {
+    "item": "core:spice",
+    "supplier": null,
+    "marketLevel": 3
+  }
+]
