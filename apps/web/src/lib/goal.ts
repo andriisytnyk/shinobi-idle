@@ -35,10 +35,18 @@ export function techniqueGoal(id: string, content: ContentDb): Req | null {
     { t: 'technique', id },
     { t: 'skill', skill: tech.skill, level: tech.level },
   ];
-  if (tech.src === 'N' && tech.mentor === 'other') {
-    of.push({ t: 'rank', rank: graduateRank(content) ?? '' });
-  }
+  const rank = techniqueRankReq(id, content);
+  if (rank) of.push(rank);
   return { t: 'all', of };
+}
+
+/** The rank a technique taught by a mentor outside the Academy asks for; null when it asks for none. */
+export function techniqueRankReq(id: string, content: ContentDb): Req | null {
+  const tech = content.techniques.find((t) => t.id === id);
+  if (tech && tech.src === 'N' && tech.mentor === 'other') {
+    return { t: 'rank', rank: graduateRank(content) ?? '' };
+  }
+  return null;
 }
 
 /**
