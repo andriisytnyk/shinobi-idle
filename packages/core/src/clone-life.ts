@@ -10,7 +10,13 @@ import { emit } from './events.ts';
 import { MS_PER_HOUR, MS_PER_SECOND, masteryLevel, rate } from './formulas.ts';
 import { placeAt, removeFigure } from './hex.ts';
 import { indexOf } from './lookup.ts';
-import { bonusOf, touchMods, type Modifier, type ModifierProvider } from './modifiers.ts';
+import {
+  bonusOf,
+  keptValue,
+  touchMods,
+  type Modifier,
+  type ModifierProvider,
+} from './modifiers.ts';
 import { STAND_ID, STAND_KIND, asPerformer, actingPerformer } from './performer.ts';
 import { takeInsight } from './meditation.ts';
 import { masteryGain, takeMastery, takeXp, xpGain, xpRoom } from './progression.ts';
@@ -63,9 +69,13 @@ export function lifeExtension(
 
 /** The life a ms takes from the clone in `slot` now, in parts of `LIFE_FULL` (a whole number, at least 1). */
 export function lifeRate(state: GameState, slot: number, content: ContentDb, rules: Rules): number {
-  const seconds = lifeSeconds(state.slots[slot]?.action?.kind, content);
-  const ext = lifeExtension(state, slot, content, rules);
-  return Math.max(1, Math.round(LIFE_FULL / (seconds * MS_PER_SECOND * ext)));
+  const kind = state.slots[slot]?.action?.kind;
+  // Asked at every event of every fight: kept while what it reads is as it was (the totals, the levels, the action).
+  return keptValue(rules, state, `life|${slot}|${kind}`, () => {
+    const seconds = lifeSeconds(kind, content);
+    const ext = lifeExtension(state, slot, content, rules);
+    return Math.max(1, Math.round(LIFE_FULL / (seconds * MS_PER_SECOND * ext)));
+  });
 }
 
 /** The ms the clone in `slot` has left at its present rate (what it does now), or 0. */

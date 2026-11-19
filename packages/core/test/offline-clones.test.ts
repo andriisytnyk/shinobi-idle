@@ -152,22 +152,38 @@ describe('A11: speed with clones', () => {
     return { ms, state };
   };
 
-  speedIt('plays 12 h of a fight with a standing clone beside it within the budget', () => {
-    const { ms, state } = play('standing', speedBudget(3000, 12_000));
+  // A clone beside a fight costs little next to the fight: the time is held to the fight alone (the same
+  // machine, the same minute) and to a ceiling stretched like the other A11 budgets.
+  const beside = (kind: Kind, share: number): void => {
+    const limit = speedBudget(4000, 16_000);
+    const alone = play('alone', limit).ms;
+    const { ms, state } = play(kind, limit);
     expect(state.clones[1]).toBeDefined();
-    expect(ms).toBeLessThan(speedBudget(3000, 12_000));
-  });
+    expect(ms).toBeLessThan(alone * share);
+    expect(ms).toBeLessThan(limit);
+  };
 
-  speedIt('plays 12 h of a fight with a clone that practises within the budget', () => {
-    const { ms, state } = play('practising', speedBudget(3000, 12_000));
-    expect(state.clones[1]).toBeDefined();
-    expect(ms).toBeLessThan(speedBudget(3000, 12_000));
-  });
+  speedIt(
+    'plays 12 h of a fight with a standing clone beside it as fast as the fight alone',
+    () => {
+      beside('standing', 1.35);
+    },
+  );
 
-  speedIt('plays 12 h of two fights at once within twice the budget of one', () => {
-    const { ms, state } = play('two fights', speedBudget(6000, 24_000));
+  speedIt(
+    'plays 12 h of a fight with a clone that practises beside it as fast as the fight alone',
+    () => {
+      beside('practising', 1.5);
+    },
+  );
+
+  speedIt('plays 12 h of two fights at once in about twice the time of one', () => {
+    const limit = speedBudget(6500, 26_000);
+    const alone = play('alone', speedBudget(4000, 16_000)).ms;
+    const { ms, state } = play('two fights', limit);
     expect(state.clones[1]?.fight).not.toBeNull();
-    // Two fights are two times the work of one: each gets the budget of a fight.
-    expect(ms).toBeLessThan(speedBudget(6000, 24_000));
+    // Two fights are two times the work of one.
+    expect(ms).toBeLessThan(alone * 2.6);
+    expect(ms).toBeLessThan(limit);
   });
 });

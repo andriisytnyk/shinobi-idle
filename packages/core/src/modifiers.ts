@@ -95,6 +95,8 @@ interface KeptTotals {
   stamp: number;
   /** By performer, then by the keys asked for. */
   byKey: Map<string, Held>[];
+  /** What a caller worked out from the totals and the state (`keptValue`), by the name it gave. */
+  values: Map<string, number>;
 }
 
 let kept: KeptTotals | null = null;
@@ -121,7 +123,7 @@ export function verifyModCache(on: boolean): void {
 /** Runs `fn` with the totals of `state` kept (see above); calls nest. */
 export function withKeptTotals<T>(state: GameState, content: ContentDb, fn: () => T): T {
   const before = kept;
-  kept = { state, content, stamp: stamps.get(state) ?? 0, byKey: [] };
+  kept = { state, content, stamp: stamps.get(state) ?? 0, byKey: [], values: new Map() };
   try {
     return fn();
   } finally {
@@ -168,6 +170,7 @@ export function totalsOf(
   if (cache.stamp !== stamp) {
     cache.stamp = stamp;
     cache.byKey.length = 0;
+    cache.values.clear();
   }
   const who = performerOf();
   const mine = (cache.byKey[who] ??= new Map());
@@ -191,6 +194,39 @@ export function totalsOf(
   }
   const out = sweep(rules, state, keys, content);
   mine.set(id, { totals: out, providers: rules.modifierProviders, kinds: rules.actionKinds });
+  return out;
+}
+
+/**
+ * A number worked out from the state and the modifiers, kept like the totals: until something they read
+ * changes (`touchMods`), and only while `advance` runs with the providers of the core. `id` names what is
+ * worked out and what it is of (the performer included when it differs by performer).
+ */
+export function keptValue(
+  rules: ModRules,
+  state: GameState,
+  id: string,
+  compute: () => number,
+): number {
+  const cache = kept;
+  if (!cache || cache.state !== state || !listKept(rules.modifierProviders)) return compute();
+  const stamp = stamps.get(state) ?? 0;
+  if (cache.stamp !== stamp) {
+    cache.stamp = stamp;
+    cache.byKey.length = 0;
+    cache.values.clear();
+  }
+  const name = `${performerOf()}|${id}`;
+  const at = cache.values.get(name);
+  if (at !== undefined) {
+    if (verify) {
+      const fresh = compute();
+      if (fresh !== at) throw new Error(`kept value is stale for ${name}: ${at} against ${fresh}`);
+    }
+    return at;
+  }
+  const out = compute();
+  cache.values.set(name, out);
   return out;
 }
 
