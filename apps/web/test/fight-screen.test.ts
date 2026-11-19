@@ -36,6 +36,8 @@ function body(patch: Partial<FighterView> = {}): FighterView {
     side: 'enemy',
     entry: 'core:wolf',
     ally: null,
+    allyKind: null,
+    out: null,
     nth: 1,
     of: 1,
     alive: true,
@@ -81,6 +83,7 @@ const last = (patch: Partial<LastView>): LastView => ({
   avoidedBy: null,
   target: null,
   onAlly: null,
+  onAllyKind: null,
   atMs: 1000,
   ageMs: 200,
   ...patch,
@@ -308,7 +311,7 @@ describe('F1: the outcomes that fly off a body', () => {
     expect(out['ally#1']?.[0]?.kind).toBe('dodge');
     expect(out.player).toBeUndefined();
     const card = html(Fighter, { f: enemy });
-    expect(card).toContain('Клон №1 ухилився');
+    expect(card).toContain('Клон №1: ухилення');
     expect(card).not.toContain('Ти ухилився');
     const own = html(Fighter, {
       f: { ...enemy, last: { ...miss, target: 'player', onAlly: null } },
@@ -387,16 +390,23 @@ describe('the battle log names the body acting', () => {
     });
     const out = html(CombatLog, {
       entries: [
-        line(1, { ally: 2, by: 'ally#2' }),
-        line(2, { ally: 2, act: 'hit', dmg: 6 }),
-        line(3, { ally: 1, act: 'hit', tech: null, dmg: 3 }),
-        line(4, { side: 'enemy', act: 'hit', tech: null, ally: 1, dmg: 5 }),
+        line(1, { ally: 2, allyKind: 'core:shadow_clone', by: 'ally#2' }),
+        line(2, { ally: 2, allyKind: 'core:shadow_clone', act: 'hit', dmg: 6 }),
+        line(3, { ally: 1, allyKind: 'core:shadow_clone', act: 'hit', tech: null, dmg: 3 }),
+        line(4, {
+          side: 'enemy',
+          act: 'hit',
+          tech: null,
+          ally: 1,
+          allyKind: 'core:shadow_clone',
+          dmg: 5,
+        }),
         line(5, { side: 'enemy', act: 'miss', tech: null }),
       ],
     });
     expect(out).toContain('Клон №2');
     expect(out).toContain('Клон №1');
-    expect(out).toContain('влучає по клону №1');
+    expect(out).toContain('влучає по цілі: Клон №1');
     expect(out).toContain('промахується');
     expect(out).not.toContain('Ти готуєш');
   });

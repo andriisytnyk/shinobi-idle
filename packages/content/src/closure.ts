@@ -364,6 +364,9 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
       const fx = t.combat.effect;
       if (fx.kind === 'cleanse') refs('combat.effect.statuses', fx.statuses, 'statuses');
       if ('fx' in fx) needNumber('combat.effect.fx', `techFx.${fx.fx}`);
+      // The name of the bodies a summon makes is a localisation key: a missing text would show a key in a fight.
+      if (fx.kind === 'summon' && fx.allyName !== undefined && !db.locales.uk[fx.allyName])
+        problem('combat.effect.allyName', `missing locale key ${fx.allyName}`);
       // A defensive technique adds by a row of `K.passiveFx`: a key without a row would stop every fight of the player.
       if (t.combat.passive)
         needNumber('combat.passive.fx', `passiveFx.${t.combat.passive.fx}.evasion`);

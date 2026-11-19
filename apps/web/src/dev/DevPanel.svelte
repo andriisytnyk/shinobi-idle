@@ -2,6 +2,7 @@
   import { deserialize, levelCap, slotCount } from '@shinobi/core';
   import { fallbackText, hasKey, t } from '../lib/i18n.ts';
   import { formatDuration } from '../lib/format.ts';
+  import { squadUi } from '../lib/squad-ui.svelte.ts';
   import { game } from '../lib/store.ts';
   import { MAX_LIFE_MIN, cloneTechniques } from './clones.ts';
   import { runDev, type DevCommand, type DevResult } from './commands.ts';
@@ -160,7 +161,14 @@
   }
 </script>
 
-<button type="button" class="opener" data-dev-open onclick={() => (open = !open)}>
+<!-- The phone's squad sheet stands where the button does: the button waits until it closes. -->
+<button
+  type="button"
+  class="opener"
+  data-dev-open
+  hidden={squadUi.sheet}
+  onclick={() => (open = !open)}
+>
   {dt('dev.open')}
 </button>
 

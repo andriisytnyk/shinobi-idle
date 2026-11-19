@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { allyName } from '../lib/ally-name.ts';
   import { formatInt } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
   import type { FighterView, Outcome } from '../lib/fight-scene.ts';
@@ -25,6 +26,7 @@
   let { f, outcomes = [], role = null }: Props = $props();
 
   const nth = $derived(f.ally ?? f.nth);
+  const name = $derived(allyName(f.allyKind, nth));
   const roleName = $derived(
     role !== null && hasKey(`cloneRole.${role}.name`) ? t(`cloneRole.${role}.name`) : null,
   );
@@ -49,10 +51,12 @@
     <span class="face"><Icon name="fist" size={20} /></span>
     <h3 class="name" data-fighter="ally">
       {#if roleName}<span data-ally-role={role}
-          >{t('cloneRole.label', { n: nth, role: roleName })}</span
-        >{:else}{t('fight.ally', { n: nth })}{/if}
+          >{t('cloneRole.label', { name, role: roleName })}</span
+        >{:else}{name}{/if}
     </h3>
-    {#if !f.alive}<span class="down-tag">{t('fight.down')}</span>{/if}
+    {#if !f.alive}<span class="down-tag" data-out={f.out ?? 'struck'}
+        >{t(f.out === 'dispelled' ? 'fight.dispelled' : 'fight.down')}</span
+      >{/if}
     {#if pop}
       <span class="pop" data-ui="fight-outcome" data-kind="pop" data-outcome={pop.kind}>
         {#if pop.kind === 'damage'}<span class="dmg"

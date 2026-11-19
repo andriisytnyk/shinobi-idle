@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { allyName } from '../lib/ally-name.ts';
   import { formatInt, formatSeconds } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
   import { entityAttr, idAttr } from '../lib/reveal.ts';
@@ -242,7 +243,7 @@
           >{player
             ? t('fight.out.foeDodged')
             : f.last.onAlly !== null
-              ? t('fight.out.allyDodged', { n: f.last.onAlly })
+              ? t('fight.out.allyDodged', { name: allyName(f.last.onAllyKind, f.last.onAlly) })
               : t(
                   'fight.out.youDodged',
                 )}{#if f.last.avoidedBy}&nbsp;{#if hasKey(dodgeKey(f.last.avoidedBy))}({t(

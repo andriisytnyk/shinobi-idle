@@ -166,12 +166,41 @@
       <section data-ui="entity-section" data-figures>
         <h2>{t('technique.numbers')}</h2>
         <dl class="figures">
-          <div>
-            <dt>{t('technique.damage')}</dt>
-            <dd data-figure="damage">
-              {figures.damage ? formatInt(figures.numbers.damage) : t('technique.noDamage')}
-            </dd>
-          </div>
+          {#if figures.summon}
+            <!-- A summon does no damage itself: its numbers are the bodies it puts on the caster's side. -->
+            <div>
+              <dt>{t('technique.summon.count')}</dt>
+              <dd data-figure="summon-count">
+                {t('technique.summon.countValue', {
+                  n: figures.summon.count,
+                  max: figures.summon.max,
+                })}
+              </dd>
+            </div>
+            <div>
+              <dt>{t('technique.summon.hp')}</dt>
+              <dd data-figure="summon-hp">{pct(figures.summon.hp)}%</dd>
+            </div>
+            <div>
+              <dt>{t('technique.summon.dmg')}</dt>
+              <dd data-figure="summon-dmg">{pct(figures.summon.dmg)}%</dd>
+            </div>
+            <div>
+              <dt>{t('technique.summon.threat')}</dt>
+              <dd data-figure="summon-threat">{formatFactor(figures.summon.threat)}</dd>
+            </div>
+            <div>
+              <dt>{t('technique.summon.share')}</dt>
+              <dd data-figure="summon-share">{pct(figures.summon.share)}%</dd>
+            </div>
+          {:else}
+            <div>
+              <dt>{t('technique.damage')}</dt>
+              <dd data-figure="damage">
+                {figures.damage ? formatInt(figures.numbers.damage) : t('technique.noDamage')}
+              </dd>
+            </div>
+          {/if}
           <div>
             <dt>{t('technique.cast')}</dt>
             <dd data-figure="cast">{formatSeconds(figures.numbers.castMs)}</dd>

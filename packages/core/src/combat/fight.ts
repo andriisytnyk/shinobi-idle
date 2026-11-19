@@ -1,7 +1,7 @@
 import type { AiTier, ContentDb, SkillId, Technique } from '@shinobi/content';
 import { createStream, nextFloatFrom } from '../rng.ts';
 import { addEffect, findEffect, isSuppressed, removeEffect, statOf } from './fight-effects.ts';
-import { sharesOf } from './fight-allies.ts';
+import { sharesOf, summonSpecOf } from './fight-allies.ts';
 import { cloneRoleOf, copiesHand, pickCloneHand } from './fight-roles.ts';
 import { figure, need } from './need.ts';
 import { answersTraitData, balanceOf, beatenBy, fightData, type TraitMod } from './fight-data.ts';
@@ -286,23 +286,9 @@ function kitEffect(tech: Technique, snap: PlayerSnapshot, content: ContentDb): K
     case 'reveal':
       fx.durationMs = figure(row(effect.fx), 'durationMs', `techFx.${effect.fx}`);
       break;
-    case 'summon': {
-      const gate = row(effect.fx);
-      const path = `techFx.${effect.fx}`;
-      const max = Math.max(1, Math.floor(figure(gate, 'max', path)));
-      const step = Math.max(1, figure(gate, 'masteryStep', path));
-      const grown = Math.floor(figure(gate, 'count', path) + (snap.mastery[tech.id] ?? 1) / step);
-      fx.summon = {
-        count: Math.min(max, Math.max(1, grown)),
-        max,
-        share: figure(gate, 'share', path),
-        hp: figure(gate, 'hp', path),
-        dmg: figure(gate, 'dmg', path),
-        threat: figure(gate, 'threat', path),
-        casts: Math.max(1, Math.floor(figure(gate, 'casts', path))),
-      };
+    case 'summon':
+      fx.summon = summonSpecOf(content, effect.fx, snap.mastery[tech.id] ?? 1);
       break;
-    }
     default:
       break;
   }
@@ -846,6 +832,8 @@ function note(
       resolving.damage += dmg;
     } else if (act === 'miss') resolving.miss = true;
   }
+  const kind =
+    ally === undefined ? undefined : fight.allies?.find((a) => a.ally?.n === ally)?.ally?.kind;
   fight.log?.push({
     side,
     act,
@@ -854,6 +842,7 @@ function note(
     ...(by === undefined ? {} : { by }),
     ...(via === undefined ? {} : { via }),
     ...(ally === undefined ? {} : { ally }),
+    ...(kind === undefined ? {} : { allyKind: kind }),
   });
 }
 
@@ -950,6 +939,7 @@ export function hurt(ctx: FightCtx, target: Combatant, amount: number, src: stri
     target.effects = [];
     // A dispelled ally does not come back in this fight; what it had left returns to the character.
     if (target.ally !== undefined) {
+      target.ally.out = 'struck';
       target.act = null;
       target.phase = 'wait';
       releaseAlly(ctx, target);
@@ -1749,7 +1739,16 @@ function summonAllies(ctx: FightCtx, tech: KitTechnique, spec: SummonSpec): void
       decoyUntil: null,
       fleeAt: null,
       fled: false,
-      ally: { n: number, kind: tech.id, held: { xp: {}, work: {}, last: fight.t } },
+      ally: {
+        n: number,
+        kind: tech.id,
+        held: {
+          xp: {},
+          work: {},
+          last: fight.t,
+          ...(fight.allyXpRate ? { xpAt: fight.t } : {}),
+        },
+      },
     });
   }
 }
@@ -1765,6 +1764,7 @@ function releaseAlly(ctx: FightCtx, ally: Combatant): void {
   const player = ctx.fight.player;
   const held = ally.ally?.held;
   if (held) {
+    accrueAllyXp(ctx, ally, held);
     // The XP and Mastery the body earned wait in the tally for the game to pay them, once.
     const tally = ctx.fight.tally;
     // The numbers come from the technique that summoned the body: what passes on, and how much of it tires the mind.
@@ -1787,10 +1787,29 @@ function releaseAlly(ctx: FightCtx, ally: Combatant): void {
   ally.stamina = 0;
 }
 
+/**
+ * In a fight that counts its allies' combat XP by the clock (a mission's), what the body earned since the last count is
+ * added to what it holds, by the skill of its style and the weights of combat XP, as a fight's own tick does.
+ */
+function accrueAllyXp(ctx: FightCtx, ally: Combatant, held: AllyHeld): void {
+  const rate = ctx.fight.allyXpRate;
+  if (!rate || held.xpAt === undefined) return;
+  const dt = Math.max(0, ctx.fight.t - held.xpAt);
+  // A body that has left earns no more.
+  held.xpAt = alive(ally) ? ctx.fight.t : undefined;
+  if (dt <= 0) return;
+  const share = sharesOf(ctx.content, ally.ally?.kind ?? '').xp;
+  for (const [key, mult] of Object.entries(ctx.content.balance.K.combatXp)) {
+    const skill = key === 'style' ? (held.style ?? fightData(ctx.content).basicSkill) : key;
+    if (skill) held.xp[skill] = (held.xp[skill] ?? 0) + mult * dt * rate * share;
+  }
+}
+
 /** An ally leaves the fight without being struck down: its chakra runs dry. It does not come back. */
 function dispelAlly(ctx: FightCtx, ally: Combatant): void {
   if (!alive(ally)) return;
   ally.hp = 0;
+  if (ally.ally) ally.ally.out = 'dispelled';
   leave(ctx, ally);
   ally.effects = [];
   ally.act = null;
@@ -1804,7 +1823,14 @@ const sum = (r: Record<string, number> | undefined): number =>
 /** The fight ends: the allies that still stand give back what they have left, and hand over what they earned. */
 export function releaseAllies(ctx: FightCtx): void {
   for (const a of alliesOf(ctx.fight)) {
-    if (a.chakra > 0 || a.stamina > 0 || sum(a.ally?.held?.xp) > 0 || sum(a.ally?.held?.work) > 0) {
+    const counting = a.ally?.held?.xpAt !== undefined;
+    if (
+      a.chakra > 0 ||
+      a.stamina > 0 ||
+      counting ||
+      sum(a.ally?.held?.xp) > 0 ||
+      sum(a.ally?.held?.work) > 0
+    ) {
       releaseAlly(ctx, a);
     }
   }

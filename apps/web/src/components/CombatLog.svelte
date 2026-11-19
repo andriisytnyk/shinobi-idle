@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { LogEntry } from '../lib/game.svelte.ts';
+  import { allyName } from '../lib/ally-name.ts';
   import { t } from '../lib/i18n.ts';
   import { formatInt } from '../lib/format.ts';
   import EntityLink from './EntityLink.svelte';
@@ -43,7 +44,7 @@
           <span
             >{event.ally !== undefined
               ? t(event.act === 'hit' ? 'log.enemyHitAlly' : 'log.enemyMissAlly', {
-                  n: event.ally,
+                  name: allyName(event.allyKind, event.ally),
                 })
               : t(
                   event.act === 'hit'
@@ -58,7 +59,7 @@
             >{/if}
         {:else if event.ally !== undefined}
           <!-- A combat clone acting: the line names the body. -->
-          <strong class="who">{t('fight.ally', { n: event.ally })}</strong>
+          <strong class="who">{allyName(event.allyKind, event.ally)}</strong>
           <span
             >{t(
               event.act === 'cast'
