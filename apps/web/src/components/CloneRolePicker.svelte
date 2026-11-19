@@ -53,7 +53,9 @@
       {/each}
     </div>
     <!-- Narrow screens only: the line of the chosen role, once, under the chips (the radios still point at their own lines). -->
-    <p class="current" data-clone-role-line aria-hidden="true">{view.current ? descOf(view.current) : ''}</p>
+    <p class="current" data-clone-role-line aria-hidden="true">
+      {view.current ? descOf(view.current) : ''}
+    </p>
     {#if message}<p class="message" role="status">{t(message)}</p>{/if}
   </section>
 {/if}
