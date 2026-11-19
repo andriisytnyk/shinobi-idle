@@ -48,7 +48,10 @@ export interface OfflineSummary {
 }
 
 /** The positive differences of two balances, per key. */
-function gainOf(before: Record<string, number>, after: Record<string, number>): Record<string, number> {
+function gainOf(
+  before: Record<string, number>,
+  after: Record<string, number>,
+): Record<string, number> {
   const out: Record<string, number> = {};
   for (const key of Object.keys(after)) {
     const n = (after[key] ?? 0) - (before[key] ?? 0);

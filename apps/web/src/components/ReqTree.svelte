@@ -128,7 +128,8 @@
       {#if req.t === 'skill'}
         {#if ref}<EntityLink kind={ref.kind} id={ref.id} offered />{/if}
         <span class="detail">{t('req.level', { n: req.level })}</span>
-        {#if natureLacking}<span class="detail" data-nature-lacking>{t('req.needNature')}</span>{/if}
+        {#if natureLacking}<span class="detail" data-nature-lacking>{t('req.needNature')}</span
+          >{/if}
       {:else if req.t === 'technique'}
         {#if ref}<EntityLink kind={ref.kind} id={ref.id} offered />{/if}
         <span class="detail">{t(node.met ? 'req.known' : 'req.unknown')}</span>

@@ -27,7 +27,7 @@
   /** The build time as hours and minutes: the ticks of the village are not shown. */
   const buildTime = $derived(
     formatDuration(
-      (game.content.balance.K.buildTicks[info.nextLevel - 1] ?? 1) * tickMs(game.content),
+      (game.content.balance.K.buildTicks[(info.nextLevel ?? 1) - 1] ?? 1) * tickMs(game.content),
     ),
   );
 

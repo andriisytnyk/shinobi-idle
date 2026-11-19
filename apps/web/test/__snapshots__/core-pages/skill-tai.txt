@@ -150,6 +150,13 @@
                         1/10
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 10%;">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
               <p class="pin-caption">
                 <button class="link" data-entity="technique:core:dynamic_entry" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
@@ -234,6 +241,13 @@
                         1/15
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 6.666666666666667%;">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
               <p class="pin-caption">
                 <button class="link" data-entity="technique:core:leaf_gale" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
@@ -318,6 +332,13 @@
                         1/20
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 5%;">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
               <p class="pin-caption">
                 <button class="link" data-entity="technique:core:gate_of_opening" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
@@ -402,6 +423,13 @@
                         1/25
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 4%;">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
               <p class="pin-caption">
                 <button class="link" data-entity="technique:core:gate_of_healing" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
@@ -570,6 +598,13 @@
                         1/35
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 2.857142857142857%;">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
               <p class="pin-caption">
                 <button class="link" data-entity="technique:core:leaf_great_whirlwind" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
@@ -738,6 +773,13 @@
                         1/45
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 2.2222222222222223%;">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
               <p class="pin-caption">
                 <button class="link" data-entity="technique:core:leaf_rising_wind" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
@@ -822,6 +864,13 @@
                         1/50
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 2%;">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
               <p class="pin-caption">
                 <button class="link" data-entity="technique:core:front_lotus" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету

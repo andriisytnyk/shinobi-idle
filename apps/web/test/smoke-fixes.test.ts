@@ -79,7 +79,8 @@ describe("a fieldwork's own page", () => {
 });
 
 describe('the «choose a nature» link', () => {
-  const natureLinks = () => qa('a[href="#/nature"]').filter((a) => a.classList.contains('detail-link'));
+  const natureLinks = () =>
+    qa('a[href="#/nature"]').filter((a) => a.classList.contains('detail-link'));
   const genin = (natures: string[]): GameState => {
     const state = createState(1, content);
     state.player.name = 'Тест';
