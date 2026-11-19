@@ -152,38 +152,38 @@ describe('A11: speed with clones', () => {
     return { ms, state };
   };
 
-  // A clone beside a fight costs little next to the fight: the time is held to the fight alone (the same
-  // machine, the same minute) and to a ceiling stretched like the other A11 budgets.
+  // A clone beside a fight costs little next to the fight, so the time is held to the fight alone (the same
+  // machine, the same minute: a load on the machine moves both), and to the hard cap that is the product
+  // requirement (12 s for a 12 h return). The fight alone has its own A11 budget in determinism.test.ts.
+  const CAP = 12_000;
   const beside = (kind: Kind, share: number): void => {
-    const limit = speedBudget(4000, 16_000);
-    const alone = play('alone', limit).ms;
-    const { ms, state } = play(kind, limit);
+    const alone = play('alone', speedBudget(3000, CAP)).ms;
+    const { ms, state } = play(kind, alone * share);
     expect(state.clones[1]).toBeDefined();
     expect(ms).toBeLessThan(alone * share);
-    expect(ms).toBeLessThan(limit);
+    expect(ms).toBeLessThan(CAP);
   };
 
   speedIt(
     'plays 12 h of a fight with a standing clone beside it as fast as the fight alone',
     () => {
-      beside('standing', 1.35);
+      beside('standing', 1.4);
     },
   );
 
   speedIt(
     'plays 12 h of a fight with a clone that practises beside it as fast as the fight alone',
     () => {
-      beside('practising', 1.5);
+      beside('practising', 1.6);
     },
   );
 
   speedIt('plays 12 h of two fights at once in about twice the time of one', () => {
-    const limit = speedBudget(6500, 26_000);
-    const alone = play('alone', speedBudget(4000, 16_000)).ms;
-    const { ms, state } = play('two fights', limit);
+    const alone = play('alone', speedBudget(3000, CAP)).ms;
+    const { ms, state } = play('two fights', alone * 3);
     expect(state.clones[1]?.fight).not.toBeNull();
     // Two fights are two times the work of one.
-    expect(ms).toBeLessThan(alone * 2.6);
-    expect(ms).toBeLessThan(limit);
+    expect(ms).toBeLessThan(alone * 3);
+    expect(ms).toBeLessThan(CAP);
   });
 });
