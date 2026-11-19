@@ -1,5 +1,6 @@
 import type { Cell, ContentDb, Hex } from '@shinobi/content';
 import { indexOf } from './lookup.ts';
+import { touchMods } from './modifiers.ts';
 import { skillLevel } from './requirements.ts';
 import type { GameState } from './state.ts';
 import { activitySkill } from './vocab.ts';
@@ -92,6 +93,7 @@ const revisions = new WeakMap<GameState, number>();
  * (a hex was surveyed to a new level). The engine calls it where it changes them.
  */
 export const touchWorld = (state: GameState): void => {
+  touchMods(state);
   revisions.set(state, (revisions.get(state) ?? 0) + 1);
 };
 
@@ -144,12 +146,14 @@ export const positionOf = (state: GameState, slot = 0): string =>
 
 /** Puts the performer of `slot` on the hex at `address`. */
 export function placeAt(state: GameState, slot: number, address: string): void {
+  touchMods(state);
   if (slot > 0) (state.world.figures ??= {})[slot] = address;
   else state.world.location = address;
 }
 
 /** Takes the figure of the performer of `slot` off the map (a clone that was dispelled or has nothing left to do). */
 export function removeFigure(state: GameState, slot: number): void {
+  touchMods(state);
   const figures = state.world.figures;
   if (!figures || !(slot in figures)) return;
   delete figures[slot];

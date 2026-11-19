@@ -4,7 +4,7 @@ import { currencyOf, isAcademyRank, moneyOf } from './vocab.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
 import { MS_PER_MINUTE } from './formulas.ts';
-import type { Modifier, ModifierProvider } from './modifiers.ts';
+import { touchMods, type Modifier, type ModifierProvider } from './modifiers.ts';
 import type { System } from './system.ts';
 import type { GameState } from './state.ts';
 import { raidsTick, startRaids } from './raid.ts';
@@ -136,6 +136,7 @@ export function villageBuildCost(
  */
 export function syncVillage(state: GameState, content: ContentDb): void {
   if (isAcademyRank(content, state.player.rank)) return;
+  if (!state.village) touchMods(state);
   const village = (state.village ??= createVillage(content));
   const stage = stageForRep(content, reputationOf(state, content));
   while (village.stage < stage) {
@@ -171,6 +172,7 @@ function finishJob(state: GameState, village: VillageState): void {
   const job = village.job;
   if (!job) return;
   const level = levelOf(village, job.building) + 1;
+  touchMods(state);
   village.levels[job.building] = level;
   village.job = null;
   emit(state, { type: 'buildingBuilt', building: job.building, level });

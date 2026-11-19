@@ -1,5 +1,7 @@
 import type { ContentDb } from '@shinobi/content';
+import { originOf } from './combat/fight-origin.ts';
 import type { EntityRef } from './entity.ts';
+import { actingPerformer } from './performer.ts';
 import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 
@@ -72,11 +74,194 @@ export function computeMods(
 
 const GROUPS: readonly ModifierGroup[] = ['character', 'village', 'items'];
 
+// ---------- the totals kept while `advance` runs ----------
+
+/**
+ * While `advance` runs, the totals the core providers give are kept for as long as nothing they read
+ * has changed. A game hour of fighting asks for the same totals hundreds of thousands of times (every
+ * event of every performer), and what the providers read (buffs, gear, levels, places, village, fatigue,
+ * the performers on the map) changes at a handful of places, each of which calls `touchMods`. The answer
+ * is kept only for the providers of the core (`markCacheable`): a provider of a pack may read anything.
+ * Outside `advance` nothing is kept, so a caller that changes the state by hand reads fresh totals.
+ */
+interface Held {
+  totals: number[];
+}
+
+interface KeptTotals {
+  state: GameState;
+  content: ContentDb;
+  /** The rules the totals are kept for: a call with others is answered afresh. */
+  providers: readonly ModifierProvider[];
+  kinds: ModRules['actionKinds'];
+  /** Counts `touchMods`; the totals below are of this count. */
+  stamp: number;
+  /** By performer, then by the keys asked for. */
+  byKey: Map<string, Held>[];
+  /** What a caller worked out from the totals and the state (`keptValue`), by the name it gave. */
+  values: Map<string, number>;
+}
+
+let kept: KeptTotals | null = null;
+const stamps = new WeakMap<GameState, number>();
+const cacheable = new WeakSet<ModifierProvider>();
+const keepableRules = new WeakMap<object, boolean>();
+let verify = false;
+
+/** Says what the providers read has changed: the kept totals of the state are dropped. */
+export function touchMods(state: GameState): void {
+  stamps.set(state, (stamps.get(state) ?? 0) + 1);
+}
+
+/**
+ * Registers providers that read only what `touchMods` is called for: their totals may be kept.
+ * (The one registry filled at import time: `rules.ts` registers the providers of `defaultRules`.)
+ */
+export function markCacheable(providers: readonly ModifierProvider[]): void {
+  for (const p of providers) cacheable.add(p);
+}
+
+/** For tests: every kept total that is used is worked out again and compared; a difference throws. */
+export function verifyModCache(on: boolean): void {
+  verify = on;
+}
+
+/**
+ * Whether totals may be kept for a rule set: every provider is declared safe and no rule at all comes
+ * from a pack. A pack's system, action kind, hex hook or fight hook may write what a core provider reads
+ * without any `touchMods`, so one such rule switches the keeping off for the whole game (a modded game
+ * is slower, never wrong).
+ */
+function keepable(rules: Rules): boolean {
+  let ok = keepableRules.get(rules);
+  if (ok === undefined) {
+    const fromPack = (list: readonly object[] | undefined): boolean =>
+      (list ?? []).some((e) => originOf(e) !== undefined);
+    ok =
+      rules.modifierProviders.every((p) => cacheable.has(p)) &&
+      !fromPack(rules.systems) &&
+      !fromPack(Object.values(rules.actionKinds)) &&
+      !fromPack(rules.hexEntered) &&
+      !fromPack(rules.fightHooks);
+    keepableRules.set(rules, ok);
+  }
+  return ok;
+}
+
+/** Runs `fn` with the totals of `state` kept for `rules` (see above); calls nest. */
+export function withKeptTotals<T>(
+  state: GameState,
+  content: ContentDb,
+  rules: Rules,
+  fn: () => T,
+): T {
+  const before = kept;
+  kept = keepable(rules)
+    ? {
+        state,
+        content,
+        providers: rules.modifierProviders,
+        kinds: rules.actionKinds,
+        stamp: stamps.get(state) ?? 0,
+        byKey: [],
+        values: new Map(),
+      }
+    : null;
+  try {
+    return fn();
+  } finally {
+    kept = before;
+  }
+}
+
+/** The kept totals when they are kept for exactly these rules, state and content (dropped first if something was touched). */
+function keptFor(rules: ModRules, state: GameState, content: ContentDb | null): KeptTotals | null {
+  const cache = kept;
+  if (
+    !cache ||
+    cache.state !== state ||
+    (content !== null && cache.content !== content) ||
+    cache.providers !== rules.modifierProviders ||
+    cache.kinds !== rules.actionKinds
+  )
+    return null;
+  const stamp = stamps.get(state) ?? 0;
+  if (cache.stamp !== stamp) {
+    cache.stamp = stamp;
+    cache.byKey.length = 0;
+    cache.values.clear();
+  }
+  return cache;
+}
+
 /**
  * The totals of several keys, as `computeMod(...).total` gives them, without building the parts:
  * the providers are asked once and each modifier is folded into the groups of its key as it comes.
+ * Kept while `advance` runs (see above); the array is frozen.
  */
 export function totalsOf(
+  rules: ModRules,
+  state: GameState,
+  keys: readonly string[],
+  content: ContentDb,
+): number[] {
+  const cache = keptFor(rules, state, content);
+  if (!cache) return sweep(rules, state, keys, content);
+  const who = actingPerformer();
+  const mine = (cache.byKey[who] ??= new Map());
+  const id =
+    keys.length === 1
+      ? (keys[0] as string)
+      : keys.length === 2
+        ? `${keys[0]}|${keys[1]}`
+        : keys.join('|');
+  const at = mine.get(id);
+  if (at) {
+    if (verify) {
+      const fresh = sweep(rules, state, keys, content);
+      if (fresh.some((v, i) => v !== at.totals[i])) {
+        throw new Error(
+          `kept modifier totals are stale for ${who}|${id}: ${at.totals} against ${fresh}`,
+        );
+      }
+    }
+    return at.totals;
+  }
+  const out = sweep(rules, state, keys, content);
+  // Frozen: a caller that wrote to a kept array would corrupt every later answer.
+  Object.freeze(out);
+  mine.set(id, { totals: out });
+  return out;
+}
+
+/**
+ * A number worked out from the state and the modifiers, kept like the totals: until something they read
+ * changes (`touchMods`), and only while `advance` runs with the providers of the core. `id` names what is
+ * worked out and what it is of (the performer included when it differs by performer).
+ */
+export function keptValue(
+  rules: ModRules,
+  state: GameState,
+  id: string,
+  compute: () => number,
+): number {
+  const cache = keptFor(rules, state, null);
+  if (!cache) return compute();
+  const name = `${actingPerformer()}|${id}`;
+  const at = cache.values.get(name);
+  if (at !== undefined) {
+    if (verify) {
+      const fresh = compute();
+      if (fresh !== at) throw new Error(`kept value is stale for ${name}: ${at} against ${fresh}`);
+    }
+    return at;
+  }
+  const out = compute();
+  cache.values.set(name, out);
+  return out;
+}
+
+function sweep(
   rules: ModRules,
   state: GameState,
   keys: readonly string[],
@@ -141,7 +326,7 @@ export function bonusOf(
   key: string,
   content: ContentDb,
 ): number {
-  return computeMod(rules, state, key, content).total - 1;
+  return (totalsOf(rules, state, [key], content)[0] ?? 1) - 1;
 }
 
 const cycleKeysKept = new Map<string, Map<string, readonly string[]>>();

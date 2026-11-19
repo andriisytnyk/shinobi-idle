@@ -12,7 +12,7 @@ import {
   rate,
 } from '../formulas.ts';
 import { indexOf } from '../lookup.ts';
-import { computeMod } from '../modifiers.ts';
+import { computeMod, touchMods } from '../modifiers.ts';
 import { gainXp, grantMastery } from '../progression.ts';
 import { skillLevel, type Req } from '../requirements.ts';
 import { nextFloat } from '../rng.ts';
@@ -145,6 +145,7 @@ function spendRation(state: GameState, content: ContentDb): number {
     const fx = items.get(id)?.fx;
     if (fx?.kind !== 'ration' || buff.charges < 1) continue;
     buff.charges -= 1;
+    touchMods(state);
     if (buff.charges < 1) delete state.buffs[id];
     return fx.duration;
   }
