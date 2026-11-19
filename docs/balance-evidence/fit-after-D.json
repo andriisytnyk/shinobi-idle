@@ -2171,8 +2171,8 @@
       "p90": 127.88
     },
     "hpLeft": {
-      "mean": 30.4,
-      "share": 0.08
+      "mean": 13.8,
+      "share": 0.037
     },
     "maxHp": 378,
     "damageShare": {
@@ -2196,8 +2196,8 @@
         "p90": 147.89
       },
       "hpLeft": {
-        "mean": 83,
-        "share": 0.22
+        "mean": 69,
+        "share": 0.183
       },
       "maxHp": 378,
       "damageShare": {
@@ -2211,7 +2211,7 @@
     },
     "model": {
       "ttkSec": 67.3,
-      "hpLossShare": 1.106,
+      "hpLossShare": 1.159,
       "playerDps": 16.29
     },
     "wins": 1,
@@ -2445,29 +2445,22 @@
       "core:shadow_shuriken"
     ],
     "runs": 200,
-    "winRate": 0.01,
+    "winRate": 0,
     "outcomes": {
-      "victory": 2,
-      "defeat": 198,
+      "victory": 0,
+      "defeat": 200,
       "fled": 0,
       "timeout": 0
     },
-    "timeSec": {
-      "mean": 137.81,
-      "p10": 136.27,
-      "p90": 139.35
-    },
-    "hpLeft": {
-      "mean": 26.8,
-      "share": 0.063
-    },
+    "timeSec": null,
+    "hpLeft": null,
     "maxHp": 426,
     "damageShare": {
-      "basic": 0.557,
-      "core:great_fireball": 0.145,
-      "core:dynamic_entry": 0.107,
-      "core:phoenix_sage_fire": 0.096,
-      "core:shadow_shuriken": 0.095
+      "basic": 0.524,
+      "core:great_fireball": 0.157,
+      "core:dynamic_entry": 0.111,
+      "core:phoenix_sage_fire": 0.106,
+      "core:shadow_shuriken": 0.102
     },
     "withPouch": {
       "winRate": 0,
@@ -2481,25 +2474,24 @@
       "hpLeft": null,
       "maxHp": 426,
       "damageShare": {
-        "basic": 0.492,
-        "core:great_fireball": 0.137,
-        "core:dynamic_entry": 0.106,
-        "core:phoenix_sage_fire": 0.099,
-        "core:shadow_shuriken": 0.098,
-        "core:kunai": 0.069
+        "basic": 0.448,
+        "core:great_fireball": 0.149,
+        "core:dynamic_entry": 0.11,
+        "core:phoenix_sage_fire": 0.109,
+        "core:shadow_shuriken": 0.106,
+        "core:kunai": 0.08
       }
     },
     "model": {
-      "ttkSec": 83.53,
-      "hpLossShare": 1.309,
+      "ttkSec": 96.06,
+      "hpLossShare": 1.731,
       "playerDps": 17.88
     },
-    "wins": 2,
-    "ratio": 1.65,
+    "wins": 0,
+    "ratio": null,
     "flagged": true,
     "reasons": [
-      "fewWins",
-      "ratio",
+      "noWins",
       "win"
     ]
   }

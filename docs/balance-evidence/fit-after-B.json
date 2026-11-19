@@ -2285,8 +2285,8 @@
       "p90": 127.88
     },
     "hpLeft": {
-      "mean": 30.4,
-      "share": 0.08
+      "mean": 13.8,
+      "share": 0.037
     },
     "maxHp": 378,
     "damageShare": {
@@ -2310,8 +2310,8 @@
         "p90": 147.89
       },
       "hpLeft": {
-        "mean": 83,
-        "share": 0.22
+        "mean": 69,
+        "share": 0.183
       },
       "maxHp": 378,
       "damageShare": {
@@ -2325,7 +2325,7 @@
     },
     "model": {
       "ttkSec": 67.3,
-      "hpLossShare": 1.092,
+      "hpLossShare": 1.144,
       "playerDps": 16.29
     },
     "wins": 1,
@@ -2611,66 +2611,66 @@
       "core:shadow_shuriken"
     ],
     "runs": 200,
-    "winRate": 0.355,
+    "winRate": 0.09,
     "outcomes": {
-      "victory": 71,
-      "defeat": 129,
+      "victory": 18,
+      "defeat": 182,
       "fled": 0,
       "timeout": 0
     },
     "timeSec": {
-      "mean": 113.11,
-      "p10": 103.09,
-      "p90": 122.99
+      "mean": 126.47,
+      "p10": 114.53,
+      "p90": 135.89
     },
     "hpLeft": {
-      "mean": 69.7,
-      "share": 0.164
+      "mean": 31.5,
+      "share": 0.074
     },
     "maxHp": 426,
     "damageShare": {
-      "basic": 0.633,
-      "core:lightning_beast_tracking_fang": 0.108,
-      "core:dynamic_entry": 0.089,
-      "core:shadow_shuriken": 0.075,
-      "core:great_fireball": 0.051,
-      "core:phoenix_sage_fire": 0.045
+      "basic": 0.619,
+      "core:lightning_beast_tracking_fang": 0.112,
+      "core:dynamic_entry": 0.09,
+      "core:shadow_shuriken": 0.076,
+      "core:great_fireball": 0.055,
+      "core:phoenix_sage_fire": 0.049
     },
     "withPouch": {
-      "winRate": 0.41,
+      "winRate": 0.07,
       "outcomes": {
-        "victory": 82,
-        "defeat": 118,
+        "victory": 14,
+        "defeat": 186,
         "fled": 0,
         "timeout": 0
       },
       "timeSec": {
-        "mean": 117.51,
-        "p10": 105.77,
-        "p90": 131.26
+        "mean": 130.11,
+        "p10": 118.68,
+        "p90": 144.16
       },
       "hpLeft": {
-        "mean": 58.7,
-        "share": 0.138
+        "mean": 52.9,
+        "share": 0.124
       },
       "maxHp": 426,
       "damageShare": {
-        "basic": 0.584,
-        "core:lightning_beast_tracking_fang": 0.108,
-        "core:dynamic_entry": 0.088,
-        "core:shadow_shuriken": 0.078,
-        "core:great_fireball": 0.049,
-        "core:kunai": 0.047,
-        "core:phoenix_sage_fire": 0.046
+        "basic": 0.567,
+        "core:lightning_beast_tracking_fang": 0.111,
+        "core:dynamic_entry": 0.089,
+        "core:shadow_shuriken": 0.079,
+        "core:great_fireball": 0.053,
+        "core:kunai": 0.051,
+        "core:phoenix_sage_fire": 0.049
       }
     },
     "model": {
-      "ttkSec": 73.7,
-      "hpLossShare": 1.066,
+      "ttkSec": 84.76,
+      "hpLossShare": 1.409,
       "playerDps": 20.26
     },
-    "wins": 71,
-    "ratio": 1.535,
+    "wins": 18,
+    "ratio": 1.492,
     "flagged": true,
     "reasons": [
       "win"
