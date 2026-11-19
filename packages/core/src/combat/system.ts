@@ -257,7 +257,8 @@ export function previewAllyEarnings(
   content: ContentDb,
   rules: Rules,
 ): { xp: Record<string, number>; mastery: Record<string, { skill: string; amount: number }> } {
-  const copy = structuredClone(c.fight);
+  // A fight is plain data (it is saved as JSON), so a round trip is a deep copy.
+  const copy = JSON.parse(JSON.stringify(c.fight)) as typeof c.fight;
   releaseAllies(makeCtx(copy, content, rules));
   const xp = { ...copy.tally.allyXp };
   const mastery: Record<string, { skill: string; amount: number }> = {};
