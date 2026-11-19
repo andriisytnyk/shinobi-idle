@@ -1,6 +1,7 @@
 import type { ContentDb, Raid } from '@shinobi/content';
 import { addCurrency } from './bank.ts';
 import { emit } from './events.ts';
+import { touchMods } from './modifiers.ts';
 import { reqMet } from './requirements.ts';
 import type { GameState } from './state.ts';
 import { currencyOf } from './vocab.ts';
@@ -90,6 +91,7 @@ function finish(state: GameState, raid: Raid, village: VillageState, content: Co
   const hit = raid.targets
     .filter((id) => (village.levels[id] ?? 0) > 0 && !village.damage[id])
     .slice(0, breached);
+  touchMods(state);
   for (const id of hit) village.damage[id] = raid.repair;
   const share = (run.repelled + run.byVillage * raid.autoShare) / raid.packs;
   const ryo = Math.floor(raid.reward.ryo * share);
@@ -132,6 +134,7 @@ export function raidPackFell(state: GameState, actionId: string, content: Conten
 export function raidsTick(state: GameState, village: VillageState, content: ContentDb): void {
   // Repairs first: a building a raid damages in this tick is out of work for the whole of `repair` ticks.
   for (const id of Object.keys(village.damage)) {
+    touchMods(state);
     village.damage[id] = (village.damage[id] ?? 0) - 1;
     if ((village.damage[id] ?? 0) <= 0) {
       delete village.damage[id];

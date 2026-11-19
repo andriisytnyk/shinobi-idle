@@ -42,6 +42,7 @@ import {
   takeNotices,
   validWait,
 } from './guard.ts';
+import { touchMods, withKeptTotals } from './modifiers.ts';
 import { defaultRules, type Rules } from './rules.ts';
 import type { System } from './system.ts';
 import type { GameState } from './state.ts';
@@ -153,6 +154,12 @@ export function advance(
   rules: Rules = defaultRules,
 ): void {
   if (!Number.isInteger(ms) || ms < 0) throw new RangeError(`advance needs whole ms, got ${ms}`);
+  // What the modifiers read may have been changed by hand since the last call: nothing is kept from before.
+  touchMods(state);
+  withKeptTotals(state, content, () => run(state, ms, content, rules));
+}
+
+function run(state: GameState, ms: number, content: ContentDb, rules: Rules): void {
   // The state may have changed since the last call (a loaded save, a command that was not
   // followed by time), so quest objectives are checked before any time passes.
   updateQuests(state, content);
@@ -339,6 +346,7 @@ export function dispatch(
   content: ContentDb,
   rules: Rules = defaultRules,
 ): CommandResult {
+  touchMods(state);
   const result = apply(state, command, content, rules);
   // A mark is bookkeeping for the reveal rule: it changes nothing a quest or a village could read.
   if (result.ok && command.type !== 'reveal.mark') updateQuests(state, content);

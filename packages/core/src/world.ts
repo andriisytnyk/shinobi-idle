@@ -33,7 +33,7 @@ import {
   type Reach,
 } from './hex.ts';
 import { graduateReq, indexOf } from './lookup.ts';
-import { computeMod, type Modifier, type ModifierProvider } from './modifiers.ts';
+import { computeMod, touchMods, type Modifier, type ModifierProvider } from './modifiers.ts';
 import { gainXp } from './progression.ts';
 import { STAND_ID, STAND_KIND, actingPerformer } from './performer.ts';
 import { pointStatus, pointsAtHex, performers, settlePoints } from './points.ts';
@@ -275,6 +275,7 @@ export function plainXp(content: ContentDb): number {
 function discover(state: GameState, cell: Cell): void {
   for (const poi of cell.pois) {
     if (state.world.pois[poi.id]) continue;
+    touchMods(state);
     state.world.pois[poi.id] = true;
     state.flags[poiFlag(poi.id)] = true;
     if (poi.kind === 'deposit') {

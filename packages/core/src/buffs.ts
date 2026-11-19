@@ -7,6 +7,7 @@ import {
   NO_MODIFIERS,
   bonusOf,
   hasNone,
+  touchMods,
   type Modifier,
   type ModifierProvider,
 } from './modifiers.ts';
@@ -46,6 +47,7 @@ export const tonicProvider: ModifierProvider = (state, content) => {
 export function spendTonicCharges(state: GameState, skill: string, content: ContentDb): void {
   for (const [id, buff] of Object.entries(state.buffs)) {
     if (!coveredSkills(buff.skill, content).includes(skill)) continue;
+    touchMods(state);
     buff.charges -= 1;
     if (buff.charges < 1) delete state.buffs[id];
   }
