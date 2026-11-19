@@ -794,6 +794,34 @@ export const placeSchema = z.strictObject({
   rare: findSchema.optional(),
 });
 
+/**
+ * Work that a found point of interest opens (a search of ruins, the gathering of a deposit). It is
+ * an ordinary skill action of the field skill that owns the activity `map` (or `skill`): it asks
+ * for the flag `point.<place>` (the point found, once; the hero need not stand there) and the skill
+ * `level`. A cycle of `cycle` seconds pays `xp` and then rolls each of `drops`: a drop with
+ * `chance` 1 is paid every cycle, a smaller one now and then. Names and descriptions:
+ * `fieldwork.<id>.name` and `.desc`.
+ */
+export const fieldworkDropSchema = z.strictObject({
+  chance: z.number().gt(0).max(1),
+  payout: payoutSchema,
+});
+
+export const fieldworkSchema = z.strictObject({
+  ...revealField,
+  id: coreId,
+  /** The place whose found point opens the work. */
+  point: coreId,
+  /** The skill that does the work; omitted: the first skill with the activity `map`. */
+  skill: skillId.optional(),
+  level,
+  /** Seconds of one cycle before modifiers. */
+  cycle: z.number().positive(),
+  /** Skill XP one completed cycle pays before modifiers. */
+  xp: z.number().positive(),
+  drops: z.array(fieldworkDropSchema).min(1),
+});
+
 export const regionSchema = z.object({
   ...revealField,
   id: coreId,
@@ -1940,6 +1968,8 @@ export const contentDbSchema = z.object({
   zones: z.array(zoneSchema),
   raids: z.array(raidSchema),
   operations: z.array(operationSchema),
+  /** Work that found points of interest open (see `fieldworkSchema`). */
+  fieldworks: z.array(fieldworkSchema),
   statuses: z.array(statusSchema),
   traits: z.array(traitSchema),
   combos: z.array(comboSchema),
@@ -1964,6 +1994,7 @@ export const generatedDbSchema = contentDbSchema
     links: true,
     resources: true,
     operations: true,
+    fieldworks: true,
     statuses: true,
     traits: true,
     combos: true,
@@ -2060,6 +2091,7 @@ export type RenownRank = z.infer<typeof renownRankSchema>;
 export type Zone = z.infer<typeof zoneSchema>;
 export type Raid = z.infer<typeof raidSchema>;
 export type Operation = z.infer<typeof operationSchema>;
+export type Fieldwork = z.infer<typeof fieldworkSchema>;
 export type OperationStage = z.infer<typeof operationStageSchema>;
 export type Status = z.infer<typeof statusSchema>;
 export type StatusEffectData = z.infer<typeof statusEffectSchema>;

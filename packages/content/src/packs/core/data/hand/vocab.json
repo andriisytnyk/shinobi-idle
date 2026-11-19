@@ -331,6 +331,11 @@
       }
     },
     {
+      "id": "fieldwork",
+      "list": "fieldworks",
+      "reveal": { "full": ["always"] }
+    },
+    {
       "id": "mission",
       "list": "missions",
       "reveal": {

@@ -47,6 +47,8 @@ import handShopTools from './data/hand/shop-tools.json' with { type: 'json' };
 import handMissions from './data/hand/missions.json' with { type: 'json' };
 import handTeam from './data/hand/team.json' with { type: 'json' };
 import handOperations from './data/hand/operations.json' with { type: 'json' };
+import handRecipes from './data/hand/recipes.json' with { type: 'json' };
+import handFieldworks from './data/hand/fieldworks.json' with { type: 'json' };
 import handQuests from './data/hand/quests.json' with { type: 'json' };
 import handSkillFight from './data/hand/skill-fight.json' with { type: 'json' };
 import handStatuses from './data/hand/statuses.json' with { type: 'json' };
@@ -157,7 +159,7 @@ const data: Record<string, unknown> = {
   market,
   shop: layerShop(z.array(marketEntrySchema).parse(market), shopToolsSchema.parse(handShopTools)),
   coat: coatListSchema.parse(handCoat),
-  recipes,
+  recipes: [...recipes, ...handRecipes],
   missions: layerMissions(
     z.array(missionBaseSchema).parse(missions),
     missionExtraMapSchema.parse(handMissions),
@@ -189,6 +191,7 @@ const data: Record<string, unknown> = {
   zones: handZones,
   raids: handRaids,
   operations: handOperations,
+  fieldworks: handFieldworks,
   statuses: handStatuses,
   traits: handTraits,
   combos: handCombos,

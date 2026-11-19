@@ -13,7 +13,15 @@ import {
   techniqueCastSeconds,
 } from './formulas.ts';
 import { builtObstacles, COURSE_KIND, courseSkill, lapBaseMs, lapXp } from './athletics.ts';
-import { bushOf, bushSize, gatherAverageSeconds, herbSkill, regrowMs } from './field.ts';
+import {
+  bushOf,
+  bushSize,
+  FIELDWORK_KIND,
+  fieldworkSkill,
+  gatherAverageSeconds,
+  herbSkill,
+  regrowMs,
+} from './field.ts';
 import { getMod } from './mod.ts';
 import { nonNativeLevel } from './natures.ts';
 import { evalReq, skillLevel, type Req, type ReqResult } from './requirements.ts';
@@ -205,6 +213,19 @@ function factsOf(
         extraMs: regrowMs(state, content, rules) / size,
       };
     }
+    case FIELDWORK_KIND: {
+      const w = index.fieldworks.get(id);
+      const skill = w ? fieldworkSkill(content, w) : null;
+      if (!w || skill === null) return null;
+      return {
+        skill,
+        level: w.level,
+        baseMs: ms(w.cycle),
+        rewardXp: w.xp,
+        masteryParts: [{ key: id, seconds: w.cycle }],
+        outputs: w.drops.flatMap((d) => d.payout.items ?? []),
+      };
+    }
     case 'craft': {
       const r = index.recipes.get(id);
       if (!r) return null;
@@ -339,6 +360,13 @@ function skillActionIds(skill: string, content: ContentDb): { kind: string; id: 
         'gather',
         content.herbs.filter((h) => entitySkill(content, 'patch', h) === skill),
       );
+    case 'map':
+      return owns('map')
+        ? by(
+            FIELDWORK_KIND,
+            content.fieldworks.filter((w) => fieldworkSkill(content, w) === skill),
+          )
+        : [];
     case 'recipe':
     case 'station':
       return by(

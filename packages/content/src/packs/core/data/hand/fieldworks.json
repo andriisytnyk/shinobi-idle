@@ -1,0 +1,97 @@
+[
+  {
+    "id": "core:search_war_fort_ruins",
+    "reveal": {
+      "name": [
+        {
+          "req": {
+            "t": "flag",
+            "id": "point.core:war_fort_ruins"
+          }
+        }
+      ],
+      "full": [
+        {
+          "req": {
+            "t": "flag",
+            "id": "point.core:war_fort_ruins"
+          }
+        }
+      ]
+    },
+    "point": "core:war_fort_ruins",
+    "level": 10,
+    "cycle": 4,
+    "xp": 11.514,
+    "drops": [
+      {
+        "chance": 0.3,
+        "payout": {
+          "items": [
+            {
+              "item": "core:coin",
+              "n": 1
+            }
+          ]
+        }
+      },
+      {
+        "chance": 0.05,
+        "payout": {
+          "currencies": {
+            "intel": 1
+          }
+        }
+      },
+      {
+        "chance": 0.015,
+        "payout": {
+          "items": [
+            {
+              "item": "core:scrollpart_fire_dragon_flame_bullet",
+              "n": 1
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "core:gather_hell_valley_sulphur",
+    "reveal": {
+      "name": [
+        {
+          "req": {
+            "t": "flag",
+            "id": "point.core:hell_valley"
+          }
+        }
+      ],
+      "full": [
+        {
+          "req": {
+            "t": "flag",
+            "id": "point.core:hell_valley"
+          }
+        }
+      ]
+    },
+    "point": "core:hell_valley",
+    "level": 15,
+    "cycle": 4.5,
+    "xp": 19.033,
+    "drops": [
+      {
+        "chance": 1,
+        "payout": {
+          "items": [
+            {
+              "item": "core:sulphur",
+              "n": 1
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

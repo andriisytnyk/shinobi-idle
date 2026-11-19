@@ -500,6 +500,7 @@ describe('hidden points and points with a requirement', () => {
         power: [],
         travel: null,
         reward: null,
+        opens: [],
         active: false,
       },
     ]);
@@ -991,6 +992,7 @@ describe('the list of hexes shows the points the player knows', () => {
         power: [{ key: 'xp.skill.tai', op: 'add', value: 0.05 }],
         travel: null,
         reward: { xp: { skill: 'tai', amount: 40 } },
+        opens: [],
         active: true,
       },
     ]);

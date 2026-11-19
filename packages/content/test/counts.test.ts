@@ -12,7 +12,8 @@ describe('slice size', () => {
     expect(content.practices.length).toBe(6);
     expect(content.obstacles.length).toBe(12);
     expect(content.herbs.length).toBe(11);
-    expect(content.recipes.length).toBe(22);
+    // The 21 of the slice and the one that uses sulphur (the work that Hell Valley opens).
+    expect(content.recipes.length).toBe(22 + 1);
     expect(content.missions.length).toBe(22);
     expect(content.cells.length).toBe(36);
     expect(content.enemies.length).toBe(24);

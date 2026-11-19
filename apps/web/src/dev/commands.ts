@@ -90,7 +90,7 @@ const isCount = (n: unknown): n is number => Number.isInteger(n) && (n as number
 export const MAX_GRANT = 1e9;
 const isGrant = (n: unknown): n is number => isCount(n) && n > 0 && n <= MAX_GRANT;
 
-/** The keys a Mastery can be set for: the same things the game keeps one of (the techniques, drills, practices, obstacles, herbs, recipes). */
+/** The keys a Mastery can be set for: the same things the game keeps one of (the techniques, drills, practices, obstacles, herbs, the work of found points, recipes). */
 export function masteryKeysOf(content: ContentDb): Set<string> {
   return new Set([
     ...content.techniques.map((x) => x.id),
@@ -98,6 +98,7 @@ export function masteryKeysOf(content: ContentDb): Set<string> {
     ...content.practices.map((x) => x.id),
     ...content.obstacles.map((x) => x.id),
     ...content.herbs.map((x) => x.id),
+    ...content.fieldworks.map((x) => x.id),
     ...content.recipes.map((x) => x.id),
   ]);
 }

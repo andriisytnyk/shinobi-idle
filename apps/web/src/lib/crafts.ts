@@ -4,6 +4,7 @@ import {
   bushSize,
   craftBonusChance,
   craftTier,
+  fieldworkSkill,
   regrowMs,
   shopEntries,
   type GameState,
@@ -20,13 +21,23 @@ const herbSkill = (content: ContentDb): string | null => skillByActivity(content
 
 /** Where an item can be had from, as a shortcut link: its label key (no entity name in it) and target. */
 export interface ItemSource {
-  kind: 'herb' | 'shop' | 'craft' | 'item';
+  kind: 'herb' | 'shop' | 'craft' | 'work' | 'item';
   href: string;
   /** Localization key of the link text. */
   labelKey: string;
 }
 
-/** The place to get an item: the herb page, the shop, the recipe that makes it, or the item's own page. */
+/** The skill page of the work (a found point opens it) whose drops include the item; the sure drops first. */
+function workSkillOf(id: string, content: ContentDb): string | null {
+  const drops = (chance: (c: number) => boolean) =>
+    content.fieldworks.find((w) =>
+      w.drops.some((d) => chance(d.chance) && d.payout.items?.some((i) => i.item === id)),
+    );
+  const work = drops((c) => c >= 1) ?? drops(() => true);
+  return work ? fieldworkSkill(content, work) : null;
+}
+
+/** The place to get an item: the herb page, the shop, the recipe that makes it, the work that yields it, or the item's own page. */
 export function itemSource(id: string, content: ContentDb): ItemSource {
   const gatherer = herbSkill(content);
   if (gatherer && content.herbs.some((h) => h.id === id)) {
@@ -47,6 +58,14 @@ export function itemSource(id: string, content: ContentDb): ItemSource {
       labelKey: 'craft.src.craft',
     };
   }
+  const worker = workSkillOf(id, content);
+  if (worker !== null) {
+    return {
+      kind: 'work',
+      href: hrefFor({ kind: 'skill', id: worker }),
+      labelKey: 'craft.src.work',
+    };
+  }
   return { kind: 'item', href: hrefFor({ kind: 'item', id }), labelKey: 'craft.src.item' };
 }
 
@@ -60,7 +79,9 @@ export function itemPlace(id: string, content: ContentDb): string | null {
     return hrefFor({ kind: 'skill', id: gatherer });
   if (shopEntries(content).some((s) => s.item === id)) return '#/shop';
   const recipe = content.recipes.find((r) => r.output.item === id);
-  return recipe ? hrefFor({ kind: 'skill', id: recipe.skill }) : null;
+  if (recipe) return hrefFor({ kind: 'skill', id: recipe.skill });
+  const worker = workSkillOf(id, content);
+  return worker === null ? null : hrefFor({ kind: 'skill', id: worker });
 }
 
 /** The building a requirement tree names first, or null. */

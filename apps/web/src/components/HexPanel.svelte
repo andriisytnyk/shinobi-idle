@@ -306,6 +306,14 @@
                   {#if point.travel !== null}
                     <p class="small dim">{t('map.point.outpostHint')}</p>
                   {/if}
+                  {#if point.opens.length > 0}
+                    <p class="small" data-point-opens>
+                      {t('map.point.opens')}
+                      {#each point.opens as work, k (work)}{k > 0 ? ', ' : ''}{t(
+                          `fieldwork.${work}.name`,
+                        )}{/each}
+                    </p>
+                  {/if}
                   {#if point.reward}
                     <p class="small" data-point-reward>
                       {t('map.point.reward')}

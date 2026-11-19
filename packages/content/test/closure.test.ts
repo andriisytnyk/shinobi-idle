@@ -102,8 +102,14 @@ describe('items: source and consumer', () => {
   const madeFromIds = new Set(content.items.flatMap((i) => i.madeFrom.map((x) => x.item)));
   const byId = new Map(content.items.map((i) => [i.id, i]));
 
+  const worked = new Set(
+    content.fieldworks.flatMap((w) =>
+      w.drops.flatMap((d) => d.payout.items?.map((i) => i.item) ?? []),
+    ),
+  );
   const hasSource = (id: string) =>
     herbIds.has(id) ||
+    worked.has(id) ||
     marketIds.has(id) ||
     payItems.has(id) ||
     crafted.has(id) ||

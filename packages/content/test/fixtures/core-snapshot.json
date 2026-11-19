@@ -92,6 +92,7 @@
       "technique": "67bec4bfe02e",
       "item": "12ada2cf517d",
       "recipe": "3a3012f5b91e",
+      "fieldwork": "96bb57b84e93",
       "mission": "918e3f11e217",
       "enemy": "a6aaac091418",
       "boss": "84419ef552c9",
@@ -440,7 +441,9 @@
       "core:gai_lesson": "7c69f7e61771",
       "core:timber_scraps": "9504e46a5692",
       "core:ore_chunk": "7f7bd31ae05e",
-      "core:river_catch": "c159ad907705"
+      "core:river_catch": "c159ad907705",
+      "core:sulphur": "d675e7089add",
+      "core:iidka_dymova_bomba": "6d077e0a9226"
     },
     "market": {
       "core:water": "e3f682cbd50f",
@@ -494,7 +497,8 @@
       "core:chai_badorosti": "4bbda9a5361b",
       "core:iakitori_shynobi": "5f013d1eafa4",
       "core:tonik_stykhii": "21adca04e774",
-      "core:piliulia_vidnovlennia_chakry": "970b89fccc70"
+      "core:piliulia_vidnovlennia_chakry": "970b89fccc70",
+      "core:iidka_dymova_bomba": "3033e6011ff5"
     },
     "missions": {
       "core:cat": "3f35327e6830",
@@ -1876,6 +1880,10 @@
       "core:op_forest_of_death": "9781d1996b59",
       "core:op_tournament": "fd901c0713f0"
     },
+    "fieldworks": {
+      "core:search_war_fort_ruins": "68a334bc16d6",
+      "core:gather_hell_valley_sulphur": "890c3b669c55"
+    },
     "statuses": {
       "burn": "d68718519e4b",
       "wet": "3cf917614d37",
@@ -2779,6 +2787,7 @@
       "technique",
       "item",
       "recipe",
+      "fieldwork",
       "mission",
       "enemy",
       "boss",
@@ -3127,7 +3136,9 @@
       "core:gai_lesson",
       "core:timber_scraps",
       "core:ore_chunk",
-      "core:river_catch"
+      "core:river_catch",
+      "core:sulphur",
+      "core:iidka_dymova_bomba"
     ],
     "market": [
       "core:water",
@@ -3181,7 +3192,8 @@
       "core:chai_badorosti",
       "core:iakitori_shynobi",
       "core:tonik_stykhii",
-      "core:piliulia_vidnovlennia_chakry"
+      "core:piliulia_vidnovlennia_chakry",
+      "core:iidka_dymova_bomba"
     ],
     "missions": [
       "core:cat",
@@ -4563,6 +4575,10 @@
       "core:op_forest_of_death",
       "core:op_tournament"
     ],
+    "fieldworks": [
+      "core:search_war_fort_ruins",
+      "core:gather_hell_valley_sulphur"
+    ],
     "statuses": [
       "burn",
       "wet",
@@ -5817,6 +5833,16 @@
       "state.bind.held": "47fa32bb4394",
       "raid.core:raid_grey_bands.name": "bb02a67ab3a3",
       "raid.core:raid_grey_bands.desc": "8e0de69e0e2d",
+      "fieldwork.core:search_war_fort_ruins.name": "dbffed651e31",
+      "fieldwork.core:search_war_fort_ruins.desc": "16c56c7abedd",
+      "fieldwork.core:gather_hell_valley_sulphur.name": "919402b82a7a",
+      "fieldwork.core:gather_hell_valley_sulphur.desc": "b64c2e12ba44",
+      "item.core:sulphur.name": "1c76ae7ca76d",
+      "item.core:sulphur.desc": "cdd0b2f2ccd0",
+      "item.core:iidka_dymova_bomba.name": "e500654a1f61",
+      "item.core:iidka_dymova_bomba.desc": "e33c81cf04f1",
+      "recipe.core:iidka_dymova_bomba.name": "e500654a1f61",
+      "recipe.core:iidka_dymova_bomba.desc": "e33c81cf04f1",
       "app.title": "c845241e3af9",
       "app.loading": "4dee15570aa3",
       "error.unknownCommand": "dc43d124002f",
@@ -6471,6 +6497,7 @@
       "craft.src.herb": "adb3b9566cc5",
       "craft.src.shop": "a41db49c0cbc",
       "craft.src.craft": "5b7091db414a",
+      "craft.src.work": "6d4c9b3b5064",
       "craft.src.item": "137a256980b5",
       "craft.haveNeed": "dd1a12742771",
       "craft.needs": "b5386e16bf26",
@@ -7315,6 +7342,11 @@
       "cloneRole.group": "6fc9ab62e72c",
       "cloneRole.label": "fec20f17d9b3",
       "error.unknownCloneRole": "a75afab5d840",
+      "map.point.opens": "cb8cf03ad2c5",
+      "scout.works": "d5e999f554de",
+      "scout.worksIntro": "7b7f9bb9d4a0",
+      "scout.worksNone": "074b6160e973",
+      "entity.kind.fieldwork": "e3ebc59596f5",
       "quest.core:mission_board.step.2": "318023c1cf1f",
       "quest.core:mission_board.step.3": "4685fe733958",
       "quest.core:mission_board.step.4": "1e3a06225f1e",
@@ -7558,6 +7590,7 @@
       "core:meat": "meat",
       "core:saltpeter": "powder-bag",
       "core:spice": "hot-spices",
+      "core:sulphur": "stone-pile",
       "core:kunai": "thrown-knife",
       "core:shuriken": "ninja-star",
       "core:senbon": "sewing-needle",
@@ -7608,6 +7641,7 @@
       "core:tsiliushcha_maz": "heart-bottle",
       "core:paralitychna_otruta": "round-potion",
       "core:dymova_bomba": "smoke-bomb",
+      "core:iidka_dymova_bomba": "poison-cloud",
       "core:sonnyi_poroshok": "powder",
       "core:krovospynna_maz": "bandage-roll",
       "core:slozohinna_bomba": "stun-grenade",
@@ -7663,11 +7697,16 @@
       "core:bih_po_vodi": "splashy-stream",
       "core:plavannia_proty_techii": "swimfins"
     },
+    "fieldwork": {
+      "core:search_war_fort_ruins": "ancient-columns",
+      "core:gather_hell_valley_sulphur": "stone-pile"
+    },
     "recipe": {
       "core:antidote": "pestle-mortar",
       "core:tsiliushcha_maz": "heart-bottle",
       "core:paralitychna_otruta": "round-potion",
       "core:dymova_bomba": "smoke-bomb",
+      "core:iidka_dymova_bomba": "poison-cloud",
       "core:sonnyi_poroshok": "powder",
       "core:krovospynna_maz": "bandage-roll",
       "core:slozohinna_bomba": "stun-grenade",
