@@ -46,7 +46,10 @@
     <h3>{t('report.gained')}</h3>
     <ul data-report-gained>
       {#each report.gained?.currencies ?? [] as row (row.id)}
-        <li data-report-currency={idAttr('currency', row.id)}>+{formatInt(row.n)} {currencyName(row.id)}</li>
+        <li data-report-currency={idAttr('currency', row.id)}>
+          +{formatInt(row.n)}
+          {currencyName(row.id)}
+        </li>
       {/each}
       {#each report.gained?.items ?? [] as row (row.id)}
         <li data-report-item={idAttr('item', row.id)}>
