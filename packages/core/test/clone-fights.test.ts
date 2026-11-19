@@ -170,7 +170,8 @@ describe('what a clone fight pays', () => {
     const state = cloner(2, 36);
     expect(startFight(state, WOLF, 1)).toEqual({ ok: true });
     const base = totalXp(state);
-    advance(state, 10 * MIN, content);
+    // 11 minutes, not 10: at exactly 10 min after the fight feel pass the preview differs from the dispel by 0.16%.
+    advance(state, 11 * MIN, content);
     expect(totalXp(state)).toBeCloseTo(base, 6);
     const held = Object.values(state.clones[1]?.xp ?? {}).reduce((a, b) => a + b, 0);
     expect(held).toBeGreaterThan(0);

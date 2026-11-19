@@ -173,7 +173,8 @@ describe('interrupts: a genin answers a cast it knows, a chunin any (both when t
       let sum = 0;
       for (let seed = 1; seed <= 30; seed++) {
         const snap = { ...scripted(['core:dynamic_entry', 'core:leaf_great_whirlwind']), tier };
-        const fight = createFight(snap, enemyAt(34, ['caster']), seed, content, defaultRules);
+        // Level 40, not 34: after the fight feel pass a level-34 caster dies before its first cast.
+        const fight = createFight(snap, enemyAt(40, ['caster']), seed, content, defaultRules);
         fight.player.hp = fight.player.maxHp = 1e9;
         fightAdvance(fight, sec(60), content, defaultRules);
         sum += fight.tally.interrupts;

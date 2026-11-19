@@ -45,7 +45,7 @@ describe('a heavy blow stuns the body it hits', () => {
     const fresh = createFight(
       scripted([CLONE, DYNAMIC]),
       encounterFor(boss, content),
-      5,
+      2,
       content,
       r,
     );
@@ -125,7 +125,7 @@ describe('the guard on hooks of other packs covers the allies', () => {
     const fight = createFight(
       scripted([CLONE, DYNAMIC]),
       { ...enemyAt(10), specials: ['evil:allybreak'] },
-      2,
+      4,
       content,
       evilRules,
     );

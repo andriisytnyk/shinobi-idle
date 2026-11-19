@@ -89,7 +89,7 @@
                 <dt>
                   Перезарядка
                 <dd data-figure="cooldown">
-                  13,4 с
+                  14,4 с
               <div>
                 <dt>
                   Ціна: чакра
