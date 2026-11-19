@@ -586,9 +586,16 @@
     cursor: pointer;
   }
 
+  /* On a phone the tab is a small one in the right corner above the bottom navigation, so it covers little of the page. */
   @media (max-width: 768px) {
     .opener {
-      bottom: calc(var(--now-live, var(--now-height)) + var(--tabbar-height) + var(--space-2));
+      right: var(--space-2);
+      left: auto;
+      bottom: calc(var(--now-live, var(--now-height)) + var(--tabbar-height) + var(--space-1));
+      min-height: var(--control-sm);
+      padding: 0 var(--space-2);
+      font-size: var(--text-2xs);
+      opacity: 0.75;
     }
   }
 

@@ -322,8 +322,17 @@ describe('the split start button', () => {
     expect(chevron()).toBeNull();
   });
 
-  it('names the performer on the button and starts the action with it', async () => {
+  it('does not name the performer while there is no clone to choose', async () => {
     booted = await bootApp([coreUi], cloner(), '#/skill/herb');
+    expect(main()?.textContent?.replace(/\s+/g, ' ').trim()).toBe(t('tile.start'));
+    // The menu stays: a new clone can still be made from it.
+    expect(chevron()).not.toBeNull();
+  });
+
+  it('names the performer on the button and starts the action with it', async () => {
+    const state = cloner();
+    start(state, 1, 'drill', drill());
+    booted = await bootApp([coreUi], state, '#/skill/herb');
     expect(main()?.textContent?.replace(/\s+/g, ' ').trim()).toBe(
       `${t('tile.start')} · ${t('squad.you')}`,
     );
