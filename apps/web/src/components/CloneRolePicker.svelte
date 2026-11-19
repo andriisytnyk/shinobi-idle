@@ -125,6 +125,18 @@
     font-size: var(--text-xs);
   }
 
+  /* A narrow screen: the roles sit two to a row, and only the chosen one tells its line (the others stay readable to a screen reader through aria-describedby). */
+  @media (max-width: 600px) {
+    .choice {
+      flex-basis: calc(50% - var(--space-2));
+      align-items: center;
+    }
+
+    .choice:not(.on) .desc {
+      display: none;
+    }
+  }
+
   .message {
     margin: 0;
     color: var(--danger);

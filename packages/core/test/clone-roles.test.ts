@@ -9,6 +9,7 @@ import {
   STATE_VERSION,
   advance,
   alliesOf,
+  battleReport,
   cloneRoleOf,
   createFight,
   createState,
@@ -19,6 +20,7 @@ import {
   fightNextEventIn,
   parseFight,
   pickCloneHand,
+  recordFight,
   serialize,
   workOf,
   type CombatAi,
@@ -126,6 +128,20 @@ describe('the hand of the clones by role', () => {
     const hand = pickCloneHand(content, role, [stamina, chakra], [stamina, chakra], pools);
     // On raw costs the stamina technique (30 < 40) would be picked.
     expect(ids(hand)).toEqual(['t:chakra']);
+  });
+
+  it('reports the habituation to techniques that only the clones cast', () => {
+    const snap: PlayerSnapshot = { ...snapshot('core:role_assault'), loadout: [ENTRY, CLONE] };
+    const fight = createFight(snap, enemyAt(20), 1, content, rules);
+    const only = (fight.kit.cloneHand ?? []).find(
+      (t) => !fight.kit.techniques.some((x) => x.id === t.id),
+    );
+    expect(only).toBeDefined();
+    if (!only) return;
+    fight.uses[only.id] = 12;
+    const state = createState(1, content);
+    recordFight(state, 'k', fight, 'win', content, true);
+    expect(battleReport(state, 'k').habLow[only.id]).toBeLessThan(1);
   });
 
   it('is chosen from what the character knows, the loadout or not, and the character keeps their own hand', () => {

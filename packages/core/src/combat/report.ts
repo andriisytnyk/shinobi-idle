@@ -125,7 +125,11 @@ export function recordFight(
   r.basic += round(t.basic);
   r.interrupts += round(t.interrupts);
   r.taken += round(t.taken);
-  for (const tech of fight.kit.techniques) {
+  // The enemies get used to what the clones cast too: techniques that only the clones' hand holds count.
+  const cast = new Map<string, (typeof fight.kit.techniques)[number]>();
+  for (const tech of [...fight.kit.techniques, ...(fight.kit.cloneHand ?? [])])
+    if (!cast.has(tech.id)) cast.set(tech.id, tech);
+  for (const tech of cast.values()) {
     const n = fight.uses[tech.id] ?? 0;
     if (n === 0) continue;
     const mult = Math.round(habituation(n, tech.habituationMult, content) * 1000) / 1000;
