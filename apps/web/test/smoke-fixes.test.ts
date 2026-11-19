@@ -35,6 +35,45 @@ function student(): GameState {
   return state;
 }
 
+const RUINS = 'core:war_fort_ruins';
+const SEARCH = 'core:search_war_fort_ruins';
+
+describe("a fieldwork's own page", () => {
+  const genin = (): GameState => {
+    const state = createState(1, content);
+    state.player.name = 'Тест';
+    state.player.rank = 'genin';
+    return state;
+  };
+
+  it('has the start of its Scouting tile once the point is found and the level is there', async () => {
+    const state = genin();
+    state.skills.scout = { xp: xpAt(10) };
+    state.world.pois[RUINS] = true;
+    booted = await bootApp([coreUi], state, `#/fieldwork/${SEARCH}`);
+    const start = q('[data-fieldwork-start] [data-ui="start-split"] [data-start]');
+    expect(start).not.toBeNull();
+    start?.click();
+    expect(game.state.slots[0]?.action).toEqual({ kind: 'fieldwork', id: SEARCH });
+  });
+
+  it('shows the same lock as the tile while the level is short', async () => {
+    const state = genin();
+    state.world.pois[RUINS] = true;
+    booted = await bootApp([coreUi], state, `#/fieldwork/${SEARCH}`);
+    const tile = q('[data-fieldwork-start] [data-ui="action-tile"]');
+    expect(tile?.classList.contains('locked')).toBe(true);
+    expect(tile?.querySelector('[data-ui="start-split"]')).toBeNull();
+    expect(tile?.querySelector('[data-ui="req-row"][data-met="false"]')).not.toBeNull();
+  });
+
+  it('keeps the reveal rule: no start while the point is not found', async () => {
+    booted = await bootApp([coreUi], genin(), `#/fieldwork/${SEARCH}`);
+    expect(q('[data-fieldwork-start]')).toBeNull();
+    expect(booted.target.innerHTML).not.toContain('war_fort_ruins');
+  });
+});
+
 describe('a locked technique tile on the skill page', () => {
   it('lists the rank that is not met, not only the level that is', async () => {
     const state = student();
