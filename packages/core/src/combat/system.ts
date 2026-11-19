@@ -246,6 +246,35 @@ export function releaseFight(
   payAllies(state, c, content, rules, slot > 0);
 }
 
+/**
+ * What `releaseFight` would pay for the allies of the fight in `c` (the XP and the Mastery the standing bodies hold
+ * or have earned by the clock, plus what the tally holds for bodies that already left), computed on a copy: the fight
+ * is left as it is. The amounts are those that reach the character's pending knowledge, before the modifiers.
+ */
+export function previewAllyEarnings(
+  state: GameState,
+  c: CombatState,
+  content: ContentDb,
+  rules: Rules,
+): { xp: Record<string, number>; mastery: Record<string, { skill: string; amount: number }> } {
+  const copy = structuredClone(c.fight);
+  releaseAllies(makeCtx(copy, content, rules));
+  const xp = { ...copy.tally.allyXp };
+  const mastery: Record<string, { skill: string; amount: number }> = {};
+  for (const [id, units] of Object.entries(copy.tally.allyWork ?? {})) {
+    const tech = indexOf(content).techniques.get(id);
+    if (!tech || !(units > 0)) continue;
+    mastery[id] = {
+      skill: tech.skill,
+      amount:
+        (masteryXpPerSecond(masteryLevel(state, id, content), content) * units) /
+        WORK_PER_MS /
+        MS_PER_SECOND,
+    };
+  }
+  return { xp, mastery };
+}
+
 /** Pays mastery XP for the technique time the fight has tallied since the last payment. */
 function settle(
   state: GameState,

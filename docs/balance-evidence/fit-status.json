@@ -83,7 +83,7 @@
     "core:kiri_hunter": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:guard_pack": {
       "time": true,
@@ -138,12 +138,12 @@
     "core:boss_hunter": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_twins": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_mist": {
       "time": true,
@@ -156,9 +156,9 @@
       "basic": true
     },
     "core:boss_ren2": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     }
   },
   "B": {
@@ -213,9 +213,9 @@
       "basic": true
     },
     "core:marauder": {
-      "time": true,
+      "time": false,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:poisoner": {
       "time": true,
@@ -245,7 +245,7 @@
     "core:kiri_hunter": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:guard_pack": {
       "time": true,
@@ -278,7 +278,7 @@
       "basic": true
     },
     "core:foreign_genin": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
@@ -300,12 +300,12 @@
     "core:boss_hunter": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_twins": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_mist": {
       "time": false,
@@ -400,7 +400,7 @@
       "basic": true
     },
     "core:hunter_caster": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
@@ -450,7 +450,7 @@
       "basic": true
     },
     "core:boss_ren1": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
@@ -465,14 +465,14 @@
       "basic": true
     },
     "core:boss_twins": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
     "core:boss_mist": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_nameless": {
       "time": true,
@@ -480,9 +480,9 @@
       "basic": true
     },
     "core:boss_ren2": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     }
   },
   "D": {
@@ -569,7 +569,7 @@
     "core:kiri_hunter": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:guard_pack": {
       "time": true,
@@ -624,12 +624,12 @@
     "core:boss_hunter": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_twins": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_mist": {
       "time": false,
@@ -644,7 +644,7 @@
     "core:boss_ren2": {
       "time": false,
       "win": true,
-      "basic": false
+      "basic": true
     }
   }
 }
