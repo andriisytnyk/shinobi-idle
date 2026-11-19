@@ -23,19 +23,19 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 6.09,
-      "p10": 4.02,
-      "p90": 7.71
+      "mean": 5.24,
+      "p10": 3.27,
+      "p90": 9.3
     },
     "hpLeft": {
-      "mean": 103.2,
-      "share": 0.974
+      "mean": 103.1,
+      "share": 0.973
     },
     "maxHp": 106,
     "damageShare": {
-      "core:kunai": 0.656,
-      "core:leaf_whirlwind": 0.228,
-      "basic": 0.116
+      "core:kunai": 0.547,
+      "core:leaf_whirlwind": 0.362,
+      "basic": 0.091
     },
     "withPouch": {
       "winRate": 1,
@@ -46,30 +46,32 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 6.09,
-        "p10": 4.02,
-        "p90": 7.71
+        "mean": 5.24,
+        "p10": 3.27,
+        "p90": 9.3
       },
       "hpLeft": {
-        "mean": 103.2,
-        "share": 0.974
+        "mean": 103.1,
+        "share": 0.973
       },
       "maxHp": 106,
       "damageShare": {
-        "core:kunai": 0.656,
-        "core:leaf_whirlwind": 0.228,
-        "basic": 0.116
+        "core:kunai": 0.547,
+        "core:leaf_whirlwind": 0.362,
+        "basic": 0.091
       }
     },
     "model": {
-      "ttkSec": 6.6,
-      "hpLossShare": 0.059,
-      "playerDps": 6
+      "ttkSec": 9.28,
+      "hpLossShare": 0.083,
+      "playerDps": 4.27
     },
     "wins": 200,
-    "ratio": 0.921,
-    "flagged": false,
-    "reasons": []
+    "ratio": 0.565,
+    "flagged": true,
+    "reasons": [
+      "ratio"
+    ]
   },
   {
     "enemy": "core:bandit",
@@ -95,19 +97,19 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 10.25,
-      "p10": 7.71,
-      "p90": 14
+      "mean": 12.29,
+      "p10": 9.3,
+      "p90": 15.59
     },
     "hpLeft": {
-      "mean": 129.9,
-      "share": 0.941
+      "mean": 127.8,
+      "share": 0.926
     },
     "maxHp": 138,
     "damageShare": {
-      "basic": 0.452,
       "core:kunai": 0.393,
-      "core:leaf_whirlwind": 0.155
+      "basic": 0.369,
+      "core:leaf_whirlwind": 0.239
     },
     "withPouch": {
       "winRate": 1,
@@ -118,28 +120,28 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 10.25,
-        "p10": 7.71,
-        "p90": 14
+        "mean": 12.29,
+        "p10": 9.3,
+        "p90": 15.59
       },
       "hpLeft": {
-        "mean": 129.9,
-        "share": 0.941
+        "mean": 127.8,
+        "share": 0.926
       },
       "maxHp": 138,
       "damageShare": {
-        "basic": 0.452,
         "core:kunai": 0.393,
-        "core:leaf_whirlwind": 0.155
+        "basic": 0.369,
+        "core:leaf_whirlwind": 0.239
       }
     },
     "model": {
-      "ttkSec": 11.2,
-      "hpLossShare": 0.105,
-      "playerDps": 7.03
+      "ttkSec": 15.18,
+      "hpLossShare": 0.142,
+      "playerDps": 5.19
     },
     "wins": 200,
-    "ratio": 0.915,
+    "ratio": 0.81,
     "flagged": false,
     "reasons": []
   },
@@ -167,19 +169,19 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 13.41,
-      "p10": 9.3,
-      "p90": 17.18
+      "mean": 15.12,
+      "p10": 10.89,
+      "p90": 20.36
     },
     "hpLeft": {
-      "mean": 148.7,
-      "share": 0.918
+      "mean": 147,
+      "share": 0.907
     },
     "maxHp": 162,
     "damageShare": {
-      "basic": 0.534,
+      "basic": 0.449,
       "core:kunai": 0.311,
-      "core:leaf_whirlwind": 0.155
+      "core:leaf_whirlwind": 0.24
     },
     "withPouch": {
       "winRate": 1,
@@ -190,28 +192,28 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 13.41,
-        "p10": 9.3,
-        "p90": 17.18
+        "mean": 15.12,
+        "p10": 10.89,
+        "p90": 20.36
       },
       "hpLeft": {
-        "mean": 148.7,
-        "share": 0.918
+        "mean": 147,
+        "share": 0.907
       },
       "maxHp": 162,
       "damageShare": {
-        "basic": 0.534,
+        "basic": 0.449,
         "core:kunai": 0.311,
-        "core:leaf_whirlwind": 0.155
+        "core:leaf_whirlwind": 0.24
       }
     },
     "model": {
-      "ttkSec": 13.82,
-      "hpLossShare": 0.132,
-      "playerDps": 7.83
+      "ttkSec": 18.36,
+      "hpLossShare": 0.175,
+      "playerDps": 5.89
     },
     "wins": 200,
-    "ratio": 0.97,
+    "ratio": 0.823,
     "flagged": false,
     "reasons": []
   },
@@ -276,12 +278,12 @@
       }
     },
     "model": {
-      "ttkSec": 17.7,
-      "hpLossShare": 0.204,
-      "playerDps": 8
+      "ttkSec": 16.27,
+      "hpLossShare": 0.187,
+      "playerDps": 8.7
     },
     "wins": 200,
-    "ratio": 0.141,
+    "ratio": 0.154,
     "flagged": true,
     "reasons": [
       "ratio"
@@ -313,21 +315,21 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 17.89,
-      "p10": 14.3,
-      "p90": 23.14
+      "mean": 15.11,
+      "p10": 11.44,
+      "p90": 20.02
     },
     "hpLeft": {
-      "mean": 174.3,
-      "share": 0.898
+      "mean": 176.8,
+      "share": 0.911
     },
     "maxHp": 194,
     "damageShare": {
-      "basic": 0.32,
       "core:kunai": 0.24,
-      "core:dynamic_entry": 0.152,
-      "core:leaf_whirlwind": 0.148,
-      "core:shadow_shuriken": 0.14
+      "core:dynamic_entry": 0.224,
+      "core:leaf_whirlwind": 0.212,
+      "core:shadow_shuriken": 0.173,
+      "basic": 0.151
     },
     "withPouch": {
       "winRate": 1,
@@ -338,30 +340,30 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 17.89,
-        "p10": 14.3,
-        "p90": 23.14
+        "mean": 15.11,
+        "p10": 11.44,
+        "p90": 20.02
       },
       "hpLeft": {
-        "mean": 174.3,
-        "share": 0.898
+        "mean": 176.8,
+        "share": 0.911
       },
       "maxHp": 194,
       "damageShare": {
-        "basic": 0.32,
         "core:kunai": 0.24,
-        "core:dynamic_entry": 0.152,
-        "core:leaf_whirlwind": 0.148,
-        "core:shadow_shuriken": 0.14
+        "core:dynamic_entry": 0.224,
+        "core:leaf_whirlwind": 0.212,
+        "core:shadow_shuriken": 0.173,
+        "basic": 0.151
       }
     },
     "model": {
-      "ttkSec": 16.93,
-      "hpLossShare": 0.164,
-      "playerDps": 8.71
+      "ttkSec": 15.53,
+      "hpLossShare": 0.15,
+      "playerDps": 9.49
     },
     "wins": 200,
-    "ratio": 1.057,
+    "ratio": 0.973,
     "flagged": false,
     "reasons": []
   },
@@ -392,22 +394,22 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 25.6,
-      "p10": 17.35,
-      "p90": 36.15
+      "mean": 19,
+      "p10": 13.22,
+      "p90": 24.85
     },
     "hpLeft": {
-      "mean": 178.2,
-      "share": 0.849
+      "mean": 186,
+      "share": 0.886
     },
     "maxHp": 210,
     "damageShare": {
-      "basic": 0.297,
-      "core:kunai": 0.181,
-      "core:leaf_whirlwind": 0.141,
-      "core:leaf_gale": 0.136,
-      "core:dynamic_entry": 0.132,
-      "core:shadow_shuriken": 0.113
+      "core:leaf_whirlwind": 0.197,
+      "core:kunai": 0.191,
+      "core:leaf_gale": 0.188,
+      "core:dynamic_entry": 0.149,
+      "basic": 0.146,
+      "core:shadow_shuriken": 0.129
     },
     "withPouch": {
       "winRate": 1,
@@ -418,31 +420,31 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 25.6,
-        "p10": 17.35,
-        "p90": 36.15
+        "mean": 19,
+        "p10": 13.22,
+        "p90": 24.85
       },
       "hpLeft": {
-        "mean": 178.2,
-        "share": 0.849
+        "mean": 186,
+        "share": 0.886
       },
       "maxHp": 210,
       "damageShare": {
-        "basic": 0.297,
-        "core:kunai": 0.181,
-        "core:leaf_whirlwind": 0.141,
-        "core:leaf_gale": 0.136,
-        "core:dynamic_entry": 0.132,
-        "core:shadow_shuriken": 0.113
+        "core:leaf_whirlwind": 0.197,
+        "core:kunai": 0.191,
+        "core:leaf_gale": 0.188,
+        "core:dynamic_entry": 0.149,
+        "basic": 0.146,
+        "core:shadow_shuriken": 0.129
       }
     },
     "model": {
-      "ttkSec": 18.6,
-      "hpLossShare": 0.181,
-      "playerDps": 8.98
+      "ttkSec": 15.3,
+      "hpLossShare": 0.149,
+      "playerDps": 10.92
     },
     "wins": 200,
-    "ratio": 1.377,
+    "ratio": 1.242,
     "flagged": false,
     "reasons": []
   },
@@ -474,23 +476,23 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 30.52,
-      "p10": 20.41,
-      "p90": 40.69
+      "mean": 22.34,
+      "p10": 14.69,
+      "p90": 29.06
     },
     "hpLeft": {
-      "mean": 204.6,
-      "share": 0.818
+      "mean": 216.7,
+      "share": 0.867
     },
     "maxHp": 250,
     "damageShare": {
-      "basic": 0.309,
-      "core:kunai": 0.154,
-      "core:leaf_whirlwind": 0.129,
-      "core:leaf_gale": 0.122,
-      "core:dynamic_entry": 0.114,
-      "core:shadow_shuriken": 0.109,
-      "core:running_fire": 0.064
+      "core:leaf_whirlwind": 0.179,
+      "core:leaf_gale": 0.164,
+      "core:kunai": 0.164,
+      "core:dynamic_entry": 0.142,
+      "core:shadow_shuriken": 0.135,
+      "basic": 0.123,
+      "core:running_fire": 0.094
     },
     "withPouch": {
       "winRate": 1,
@@ -501,32 +503,32 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 30.52,
-        "p10": 20.41,
-        "p90": 40.69
+        "mean": 22.34,
+        "p10": 14.69,
+        "p90": 29.06
       },
       "hpLeft": {
-        "mean": 204.6,
-        "share": 0.818
+        "mean": 216.7,
+        "share": 0.867
       },
       "maxHp": 250,
       "damageShare": {
-        "basic": 0.309,
-        "core:kunai": 0.154,
-        "core:leaf_whirlwind": 0.129,
-        "core:leaf_gale": 0.122,
-        "core:dynamic_entry": 0.114,
-        "core:shadow_shuriken": 0.109,
-        "core:running_fire": 0.064
+        "core:leaf_whirlwind": 0.179,
+        "core:leaf_gale": 0.164,
+        "core:kunai": 0.164,
+        "core:dynamic_entry": 0.142,
+        "core:shadow_shuriken": 0.135,
+        "basic": 0.123,
+        "core:running_fire": 0.094
       }
     },
     "model": {
-      "ttkSec": 22.14,
-      "hpLossShare": 0.217,
-      "playerDps": 9.75
+      "ttkSec": 17.47,
+      "hpLossShare": 0.171,
+      "playerDps": 12.36
     },
     "wins": 200,
-    "ratio": 1.378,
+    "ratio": 1.279,
     "flagged": false,
     "reasons": []
   },
@@ -557,22 +559,22 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 21.64,
-      "p10": 18.76,
-      "p90": 27.53
+      "mean": 14.82,
+      "p10": 12.36,
+      "p90": 18.76
     },
     "hpLeft": {
-      "mean": 193.3,
-      "share": 0.887
+      "mean": 201.6,
+      "share": 0.925
     },
     "maxHp": 218,
     "damageShare": {
+      "core:leaf_whirlwind": 0.268,
       "core:kunai": 0.259,
-      "core:leaf_whirlwind": 0.188,
-      "core:leaf_gale": 0.178,
-      "core:shadow_shuriken": 0.156,
-      "basic": 0.141,
-      "core:dynamic_entry": 0.078
+      "core:leaf_gale": 0.232,
+      "core:shadow_shuriken": 0.155,
+      "core:dynamic_entry": 0.079,
+      "basic": 0.007
     },
     "withPouch": {
       "winRate": 1,
@@ -583,31 +585,31 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 21.64,
-        "p10": 18.76,
-        "p90": 27.53
+        "mean": 14.82,
+        "p10": 12.36,
+        "p90": 18.76
       },
       "hpLeft": {
-        "mean": 193.3,
-        "share": 0.887
+        "mean": 201.6,
+        "share": 0.925
       },
       "maxHp": 218,
       "damageShare": {
+        "core:leaf_whirlwind": 0.268,
         "core:kunai": 0.259,
-        "core:leaf_whirlwind": 0.188,
-        "core:leaf_gale": 0.178,
-        "core:shadow_shuriken": 0.156,
-        "basic": 0.141,
-        "core:dynamic_entry": 0.078
+        "core:leaf_gale": 0.232,
+        "core:shadow_shuriken": 0.155,
+        "core:dynamic_entry": 0.079,
+        "basic": 0.007
       }
     },
     "model": {
-      "ttkSec": 19.21,
-      "hpLossShare": 0.187,
-      "playerDps": 9.2
+      "ttkSec": 15.8,
+      "hpLossShare": 0.154,
+      "playerDps": 11.19
     },
     "wins": 200,
-    "ratio": 1.126,
+    "ratio": 0.938,
     "flagged": false,
     "reasons": []
   },
@@ -638,23 +640,23 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 12.77,
-      "p10": 10.33,
-      "p90": 17.49
+      "mean": 9.42,
+      "p10": 7.32,
+      "p90": 13.18
     },
     "hpLeft": {
-      "mean": 224.7,
-      "share": 0.929
+      "mean": 230.9,
+      "share": 0.954
     },
     "maxHp": 242,
     "damageShare": {
       "core:tag": 0.757,
-      "core:kunai": 0.093,
-      "core:leaf_whirlwind": 0.06,
-      "core:shadow_shuriken": 0.026,
-      "core:dynamic_entry": 0.026,
-      "core:leaf_gale": 0.023,
-      "basic": 0.015
+      "core:leaf_whirlwind": 0.056,
+      "core:leaf_gale": 0.055,
+      "core:dynamic_entry": 0.054,
+      "core:shadow_shuriken": 0.038,
+      "core:kunai": 0.037,
+      "basic": 0.004
     },
     "withPouch": {
       "winRate": 1,
@@ -665,32 +667,32 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 12.77,
-        "p10": 10.33,
-        "p90": 17.49
+        "mean": 9.42,
+        "p10": 7.32,
+        "p90": 13.18
       },
       "hpLeft": {
-        "mean": 224.7,
-        "share": 0.929
+        "mean": 230.9,
+        "share": 0.954
       },
       "maxHp": 242,
       "damageShare": {
         "core:tag": 0.757,
-        "core:kunai": 0.093,
-        "core:leaf_whirlwind": 0.06,
-        "core:shadow_shuriken": 0.026,
-        "core:dynamic_entry": 0.026,
-        "core:leaf_gale": 0.023,
-        "basic": 0.015
+        "core:leaf_whirlwind": 0.056,
+        "core:leaf_gale": 0.055,
+        "core:dynamic_entry": 0.054,
+        "core:shadow_shuriken": 0.038,
+        "core:kunai": 0.037,
+        "basic": 0.004
       }
     },
     "model": {
-      "ttkSec": 25.07,
-      "hpLossShare": 0.294,
-      "playerDps": 9.87
+      "ttkSec": 20.6,
+      "hpLossShare": 0.242,
+      "playerDps": 12.01
     },
     "wins": 200,
-    "ratio": 0.509,
+    "ratio": 0.458,
     "flagged": true,
     "reasons": [
       "ratio"
@@ -724,23 +726,23 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 36.68,
-      "p10": 29.06,
-      "p90": 45
+      "mean": 28.53,
+      "p10": 20.09,
+      "p90": 35.92
     },
     "hpLeft": {
-      "mean": 218.4,
-      "share": 0.774
+      "mean": 233.5,
+      "share": 0.828
     },
     "maxHp": 282,
     "damageShare": {
-      "basic": 0.32,
-      "core:kunai": 0.136,
-      "core:leaf_whirlwind": 0.13,
-      "core:leaf_gale": 0.128,
-      "core:dynamic_entry": 0.112,
-      "core:shadow_shuriken": 0.109,
-      "core:running_fire": 0.064
+      "core:dynamic_entry": 0.17,
+      "core:shadow_shuriken": 0.169,
+      "core:leaf_whirlwind": 0.162,
+      "core:leaf_gale": 0.16,
+      "core:kunai": 0.137,
+      "basic": 0.118,
+      "core:running_fire": 0.084
     },
     "withPouch": {
       "winRate": 1,
@@ -751,32 +753,32 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 36.68,
-        "p10": 29.06,
-        "p90": 45
+        "mean": 28.53,
+        "p10": 20.09,
+        "p90": 35.92
       },
       "hpLeft": {
-        "mean": 218.4,
-        "share": 0.774
+        "mean": 233.5,
+        "share": 0.828
       },
       "maxHp": 282,
       "damageShare": {
-        "basic": 0.32,
-        "core:kunai": 0.136,
-        "core:leaf_whirlwind": 0.13,
-        "core:leaf_gale": 0.128,
-        "core:dynamic_entry": 0.112,
-        "core:shadow_shuriken": 0.109,
-        "core:running_fire": 0.064
+        "core:dynamic_entry": 0.17,
+        "core:shadow_shuriken": 0.169,
+        "core:leaf_whirlwind": 0.162,
+        "core:leaf_gale": 0.16,
+        "core:kunai": 0.137,
+        "basic": 0.118,
+        "core:running_fire": 0.084
       }
     },
     "model": {
-      "ttkSec": 24.06,
-      "hpLossShare": 0.237,
-      "playerDps": 10.61
+      "ttkSec": 18.98,
+      "hpLossShare": 0.187,
+      "playerDps": 13.45
     },
     "wins": 200,
-    "ratio": 1.525,
+    "ratio": 1.503,
     "flagged": false,
     "reasons": []
   },
@@ -808,23 +810,23 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 29.7,
-      "p10": 21.76,
-      "p90": 37.65
+      "mean": 18.61,
+      "p10": 15.12,
+      "p90": 21.5
     },
     "hpLeft": {
-      "mean": 219.9,
-      "share": 0.827
+      "mean": 238.1,
+      "share": 0.895
     },
     "maxHp": 266,
     "damageShare": {
-      "core:kunai": 0.22,
-      "core:leaf_whirlwind": 0.175,
-      "core:leaf_gale": 0.171,
-      "core:shadow_shuriken": 0.156,
-      "basic": 0.122,
-      "core:dynamic_entry": 0.083,
-      "core:running_fire": 0.072
+      "core:leaf_whirlwind": 0.233,
+      "core:leaf_gale": 0.229,
+      "core:shadow_shuriken": 0.187,
+      "core:kunai": 0.148,
+      "core:dynamic_entry": 0.098,
+      "core:running_fire": 0.097,
+      "basic": 0.009
     },
     "withPouch": {
       "winRate": 1,
@@ -835,32 +837,32 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 29.7,
-        "p10": 21.76,
-        "p90": 37.65
+        "mean": 18.61,
+        "p10": 15.12,
+        "p90": 21.5
       },
       "hpLeft": {
-        "mean": 219.9,
-        "share": 0.827
+        "mean": 238.1,
+        "share": 0.895
       },
       "maxHp": 266,
       "damageShare": {
-        "core:kunai": 0.22,
-        "core:leaf_whirlwind": 0.175,
-        "core:leaf_gale": 0.171,
-        "core:shadow_shuriken": 0.156,
-        "basic": 0.122,
-        "core:dynamic_entry": 0.083,
-        "core:running_fire": 0.072
+        "core:leaf_whirlwind": 0.233,
+        "core:leaf_gale": 0.229,
+        "core:shadow_shuriken": 0.187,
+        "core:kunai": 0.148,
+        "core:dynamic_entry": 0.098,
+        "core:running_fire": 0.097,
+        "basic": 0.009
       }
     },
     "model": {
-      "ttkSec": 23.14,
-      "hpLossShare": 0.228,
-      "playerDps": 10.18
+      "ttkSec": 18.25,
+      "hpLossShare": 0.18,
+      "playerDps": 12.91
     },
     "wins": 200,
-    "ratio": 1.283,
+    "ratio": 1.02,
     "flagged": false,
     "reasons": []
   },
@@ -892,23 +894,23 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 28.06,
-      "p10": 20.35,
-      "p90": 36.24
+      "mean": 21.1,
+      "p10": 14.89,
+      "p90": 28.42
     },
     "hpLeft": {
-      "mean": 218.9,
-      "share": 0.776
+      "mean": 236,
+      "share": 0.837
     },
     "maxHp": 282,
     "damageShare": {
-      "basic": 0.252,
-      "core:kunai": 0.178,
-      "core:leaf_whirlwind": 0.142,
-      "core:leaf_gale": 0.137,
-      "core:shadow_shuriken": 0.123,
-      "core:dynamic_entry": 0.115,
-      "core:running_fire": 0.054
+      "core:leaf_whirlwind": 0.179,
+      "core:leaf_gale": 0.179,
+      "core:kunai": 0.172,
+      "core:dynamic_entry": 0.171,
+      "core:shadow_shuriken": 0.158,
+      "basic": 0.071,
+      "core:running_fire": 0.071
     },
     "withPouch": {
       "winRate": 1,
@@ -919,32 +921,32 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 28.06,
-        "p10": 20.35,
-        "p90": 36.24
+        "mean": 21.1,
+        "p10": 14.89,
+        "p90": 28.42
       },
       "hpLeft": {
-        "mean": 218.9,
-        "share": 0.776
+        "mean": 236,
+        "share": 0.837
       },
       "maxHp": 282,
       "damageShare": {
-        "basic": 0.252,
-        "core:kunai": 0.178,
-        "core:leaf_whirlwind": 0.142,
-        "core:leaf_gale": 0.137,
-        "core:shadow_shuriken": 0.123,
-        "core:dynamic_entry": 0.115,
-        "core:running_fire": 0.054
+        "core:leaf_whirlwind": 0.179,
+        "core:leaf_gale": 0.179,
+        "core:kunai": 0.172,
+        "core:dynamic_entry": 0.171,
+        "core:shadow_shuriken": 0.158,
+        "basic": 0.071,
+        "core:running_fire": 0.071
       }
     },
     "model": {
-      "ttkSec": 24.06,
-      "hpLossShare": 0.237,
-      "playerDps": 10.61
+      "ttkSec": 18.98,
+      "hpLossShare": 0.187,
+      "playerDps": 13.45
     },
     "wins": 200,
-    "ratio": 1.166,
+    "ratio": 1.112,
     "flagged": false,
     "reasons": []
   },
@@ -976,23 +978,23 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 30.48,
-      "p10": 21.8,
-      "p90": 38.44
+      "mean": 24.43,
+      "p10": 17.41,
+      "p90": 31.26
     },
     "hpLeft": {
-      "mean": 257.2,
-      "share": 0.819
+      "mean": 269.8,
+      "share": 0.859
     },
     "maxHp": 314,
     "damageShare": {
-      "basic": 0.424,
-      "core:leaf_whirlwind": 0.137,
-      "core:leaf_gale": 0.132,
-      "core:dynamic_entry": 0.127,
-      "core:shadow_shuriken": 0.11,
-      "core:running_fire": 0.056,
-      "core:kunai": 0.013
+      "basic": 0.255,
+      "core:leaf_whirlwind": 0.183,
+      "core:leaf_gale": 0.178,
+      "core:dynamic_entry": 0.159,
+      "core:shadow_shuriken": 0.138,
+      "core:running_fire": 0.074,
+      "core:kunai": 0.014
     },
     "withPouch": {
       "winRate": 1,
@@ -1003,32 +1005,32 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 30.48,
-        "p10": 21.8,
-        "p90": 38.44
+        "mean": 24.43,
+        "p10": 17.41,
+        "p90": 31.26
       },
       "hpLeft": {
-        "mean": 257.2,
-        "share": 0.819
+        "mean": 269.8,
+        "share": 0.859
       },
       "maxHp": 314,
       "damageShare": {
-        "basic": 0.424,
-        "core:leaf_whirlwind": 0.137,
-        "core:leaf_gale": 0.132,
-        "core:dynamic_entry": 0.127,
-        "core:shadow_shuriken": 0.11,
-        "core:running_fire": 0.056,
-        "core:kunai": 0.013
+        "basic": 0.255,
+        "core:leaf_whirlwind": 0.183,
+        "core:leaf_gale": 0.178,
+        "core:dynamic_entry": 0.159,
+        "core:shadow_shuriken": 0.138,
+        "core:running_fire": 0.074,
+        "core:kunai": 0.014
       }
     },
     "model": {
-      "ttkSec": 25.69,
-      "hpLossShare": 0.254,
-      "playerDps": 11.46
+      "ttkSec": 20.25,
+      "hpLossShare": 0.2,
+      "playerDps": 14.54
     },
     "wins": 200,
-    "ratio": 1.187,
+    "ratio": 1.206,
     "flagged": false,
     "reasons": []
   },
@@ -1060,23 +1062,23 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 28.58,
-      "p10": 21.87,
-      "p90": 36.24
+      "mean": 21.68,
+      "p10": 14.89,
+      "p90": 28.42
     },
     "hpLeft": {
-      "mean": 246,
-      "share": 0.825
+      "mean": 258.8,
+      "share": 0.869
     },
     "maxHp": 298,
     "damageShare": {
-      "basic": 0.262,
-      "core:kunai": 0.168,
-      "core:leaf_whirlwind": 0.139,
-      "core:leaf_gale": 0.131,
-      "core:dynamic_entry": 0.113,
-      "core:shadow_shuriken": 0.111,
-      "core:running_fire": 0.076
+      "core:dynamic_entry": 0.176,
+      "core:leaf_whirlwind": 0.165,
+      "core:leaf_gale": 0.165,
+      "core:kunai": 0.164,
+      "core:shadow_shuriken": 0.159,
+      "core:running_fire": 0.096,
+      "basic": 0.076
     },
     "withPouch": {
       "winRate": 1,
@@ -1087,32 +1089,32 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 28.58,
-        "p10": 21.87,
-        "p90": 36.24
+        "mean": 21.68,
+        "p10": 14.89,
+        "p90": 28.42
       },
       "hpLeft": {
-        "mean": 246,
-        "share": 0.825
+        "mean": 258.8,
+        "share": 0.869
       },
       "maxHp": 298,
       "damageShare": {
-        "basic": 0.262,
-        "core:kunai": 0.168,
-        "core:leaf_whirlwind": 0.139,
-        "core:leaf_gale": 0.131,
-        "core:dynamic_entry": 0.113,
-        "core:shadow_shuriken": 0.111,
-        "core:running_fire": 0.076
+        "core:dynamic_entry": 0.176,
+        "core:leaf_whirlwind": 0.165,
+        "core:leaf_gale": 0.165,
+        "core:kunai": 0.164,
+        "core:shadow_shuriken": 0.159,
+        "core:running_fire": 0.096,
+        "basic": 0.076
       }
     },
     "model": {
-      "ttkSec": 24.9,
-      "hpLossShare": 0.246,
-      "playerDps": 11.03
+      "ttkSec": 19.64,
+      "hpLossShare": 0.194,
+      "playerDps": 13.99
     },
     "wins": 200,
-    "ratio": 1.147,
+    "ratio": 1.104,
     "flagged": false,
     "reasons": []
   },
@@ -1144,23 +1146,23 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 28.36,
-      "p10": 19.97,
-      "p90": 39.39
+      "mean": 16.77,
+      "p10": 13.81,
+      "p90": 19.72
     },
     "hpLeft": {
-      "mean": 277.8,
-      "share": 0.842
+      "mean": 300.5,
+      "share": 0.911
     },
     "maxHp": 330,
     "damageShare": {
-      "core:great_fireball": 0.376,
-      "core:leaf_whirlwind": 0.149,
-      "core:kunai": 0.135,
-      "core:dynamic_entry": 0.129,
-      "core:shadow_shuriken": 0.119,
-      "core:leaf_gale": 0.071,
-      "basic": 0.021
+      "core:great_fireball": 0.374,
+      "core:leaf_whirlwind": 0.199,
+      "core:dynamic_entry": 0.12,
+      "core:leaf_gale": 0.111,
+      "core:shadow_shuriken": 0.111,
+      "core:kunai": 0.083,
+      "basic": 0.002
     },
     "withPouch": {
       "winRate": 1,
@@ -1171,32 +1173,32 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 28.36,
-        "p10": 19.97,
-        "p90": 39.39
+        "mean": 16.77,
+        "p10": 13.81,
+        "p90": 19.72
       },
       "hpLeft": {
-        "mean": 277.8,
-        "share": 0.842
+        "mean": 300.5,
+        "share": 0.911
       },
       "maxHp": 330,
       "damageShare": {
-        "core:great_fireball": 0.376,
-        "core:leaf_whirlwind": 0.149,
-        "core:kunai": 0.135,
-        "core:dynamic_entry": 0.129,
-        "core:shadow_shuriken": 0.119,
-        "core:leaf_gale": 0.071,
-        "basic": 0.021
+        "core:great_fireball": 0.374,
+        "core:leaf_whirlwind": 0.199,
+        "core:dynamic_entry": 0.12,
+        "core:leaf_gale": 0.111,
+        "core:shadow_shuriken": 0.111,
+        "core:kunai": 0.083,
+        "basic": 0.002
       }
     },
     "model": {
-      "ttkSec": 22.75,
-      "hpLossShare": 0.225,
-      "playerDps": 13.8
+      "ttkSec": 16.92,
+      "hpLossShare": 0.167,
+      "playerDps": 18.55
     },
     "wins": 200,
-    "ratio": 1.247,
+    "ratio": 0.991,
     "flagged": false,
     "reasons": []
   },
@@ -1228,23 +1230,23 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 27.24,
-      "p10": 20.84,
-      "p90": 34.85
+      "mean": 19.84,
+      "p10": 14.01,
+      "p90": 26.25
     },
     "hpLeft": {
-      "mean": 289.7,
-      "share": 0.837
+      "mean": 305.7,
+      "share": 0.884
     },
     "maxHp": 346,
     "damageShare": {
-      "basic": 0.308,
-      "core:great_fireball": 0.28,
-      "core:leaf_whirlwind": 0.113,
-      "core:leaf_gale": 0.108,
-      "core:shadow_shuriken": 0.093,
-      "core:dynamic_entry": 0.092,
-      "core:kunai": 0.005
+      "core:great_fireball": 0.336,
+      "core:leaf_whirlwind": 0.149,
+      "basic": 0.148,
+      "core:leaf_gale": 0.14,
+      "core:dynamic_entry": 0.112,
+      "core:shadow_shuriken": 0.111,
+      "core:kunai": 0.003
     },
     "withPouch": {
       "winRate": 1,
@@ -1255,32 +1257,32 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 27.24,
-        "p10": 20.84,
-        "p90": 34.85
+        "mean": 19.84,
+        "p10": 14.01,
+        "p90": 26.25
       },
       "hpLeft": {
-        "mean": 289.7,
-        "share": 0.837
+        "mean": 305.7,
+        "share": 0.884
       },
       "maxHp": 346,
       "damageShare": {
-        "basic": 0.308,
-        "core:great_fireball": 0.28,
-        "core:leaf_whirlwind": 0.113,
-        "core:leaf_gale": 0.108,
-        "core:shadow_shuriken": 0.093,
-        "core:dynamic_entry": 0.092,
-        "core:kunai": 0.005
+        "core:great_fireball": 0.336,
+        "core:leaf_whirlwind": 0.149,
+        "basic": 0.148,
+        "core:leaf_gale": 0.14,
+        "core:dynamic_entry": 0.112,
+        "core:shadow_shuriken": 0.111,
+        "core:kunai": 0.003
       }
     },
     "model": {
-      "ttkSec": 23.35,
-      "hpLossShare": 0.231,
-      "playerDps": 14.29
+      "ttkSec": 17.37,
+      "hpLossShare": 0.172,
+      "playerDps": 19.21
     },
     "wins": 200,
-    "ratio": 1.167,
+    "ratio": 1.142,
     "flagged": false,
     "reasons": []
   },
@@ -1312,22 +1314,22 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 32.07,
-      "p10": 25.21,
-      "p90": 39.1
+      "mean": 23.87,
+      "p10": 17.18,
+      "p90": 30.76
     },
     "hpLeft": {
-      "mean": 291,
-      "share": 0.804
+      "mean": 311.6,
+      "share": 0.861
     },
     "maxHp": 362,
     "damageShare": {
-      "basic": 0.267,
-      "core:great_fireball": 0.2,
-      "core:kunai": 0.156,
-      "core:leaf_gale": 0.128,
-      "core:shadow_shuriken": 0.125,
-      "core:dynamic_entry": 0.123
+      "core:great_fireball": 0.246,
+      "core:leaf_gale": 0.169,
+      "core:dynamic_entry": 0.161,
+      "core:shadow_shuriken": 0.153,
+      "core:kunai": 0.149,
+      "basic": 0.122
     },
     "withPouch": {
       "winRate": 1,
@@ -1338,31 +1340,31 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 32.07,
-        "p10": 25.21,
-        "p90": 39.1
+        "mean": 23.87,
+        "p10": 17.18,
+        "p90": 30.76
       },
       "hpLeft": {
-        "mean": 291,
-        "share": 0.804
+        "mean": 311.6,
+        "share": 0.861
       },
       "maxHp": 362,
       "damageShare": {
-        "basic": 0.267,
-        "core:great_fireball": 0.2,
-        "core:kunai": 0.156,
-        "core:leaf_gale": 0.128,
-        "core:shadow_shuriken": 0.125,
-        "core:dynamic_entry": 0.123
+        "core:great_fireball": 0.246,
+        "core:leaf_gale": 0.169,
+        "core:dynamic_entry": 0.161,
+        "core:shadow_shuriken": 0.153,
+        "core:kunai": 0.149,
+        "basic": 0.122
       }
     },
     "model": {
-      "ttkSec": 23.91,
-      "hpLossShare": 0.237,
-      "playerDps": 14.77
+      "ttkSec": 17.79,
+      "hpLossShare": 0.176,
+      "playerDps": 19.86
     },
     "wins": 200,
-    "ratio": 1.341,
+    "ratio": 1.342,
     "flagged": false,
     "reasons": []
   },
@@ -1394,24 +1396,24 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 26.16,
-      "p10": 20.17,
-      "p90": 33.95
+      "mean": 18.82,
+      "p10": 13.24,
+      "p90": 24.5
     },
     "hpLeft": {
-      "mean": 305.6,
-      "share": 0.863
+      "mean": 319.1,
+      "share": 0.901
     },
     "maxHp": 354,
     "damageShare": {
       "core:tag": 0.482,
-      "core:great_fireball": 0.134,
-      "core:kunai": 0.089,
-      "core:running_fire": 0.086,
-      "core:shadow_shuriken": 0.06,
-      "core:leaf_gale": 0.06,
-      "core:dynamic_entry": 0.057,
-      "basic": 0.032
+      "core:great_fireball": 0.13,
+      "core:running_fire": 0.125,
+      "core:kunai": 0.088,
+      "core:shadow_shuriken": 0.065,
+      "core:dynamic_entry": 0.061,
+      "core:leaf_gale": 0.046,
+      "basic": 0.002
     },
     "withPouch": {
       "winRate": 1,
@@ -1422,33 +1424,33 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 26.16,
-        "p10": 20.17,
-        "p90": 33.95
+        "mean": 18.82,
+        "p10": 13.24,
+        "p90": 24.5
       },
       "hpLeft": {
-        "mean": 305.6,
-        "share": 0.863
+        "mean": 319.1,
+        "share": 0.901
       },
       "maxHp": 354,
       "damageShare": {
         "core:tag": 0.482,
-        "core:great_fireball": 0.134,
-        "core:kunai": 0.089,
-        "core:running_fire": 0.086,
-        "core:shadow_shuriken": 0.06,
-        "core:leaf_gale": 0.06,
-        "core:dynamic_entry": 0.057,
-        "basic": 0.032
+        "core:great_fireball": 0.13,
+        "core:running_fire": 0.125,
+        "core:kunai": 0.088,
+        "core:shadow_shuriken": 0.065,
+        "core:dynamic_entry": 0.061,
+        "core:leaf_gale": 0.046,
+        "basic": 0.002
       }
     },
     "model": {
-      "ttkSec": 28.36,
-      "hpLossShare": 0.337,
-      "playerDps": 14.53
+      "ttkSec": 21.1,
+      "hpLossShare": 0.251,
+      "playerDps": 19.53
     },
     "wins": 200,
-    "ratio": 0.922,
+    "ratio": 0.892,
     "flagged": false,
     "reasons": []
   },
@@ -1480,23 +1482,23 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 34.79,
-      "p10": 27.98,
-      "p90": 42.75
+      "mean": 24.33,
+      "p10": 17.05,
+      "p90": 32.26
     },
     "hpLeft": {
-      "mean": 295.9,
-      "share": 0.783
+      "mean": 322.3,
+      "share": 0.853
     },
     "maxHp": 378,
     "damageShare": {
-      "core:great_fireball": 0.247,
-      "core:phoenix_sage_fire": 0.184,
-      "basic": 0.172,
-      "core:kunai": 0.115,
-      "core:dynamic_entry": 0.1,
-      "core:leaf_gale": 0.098,
-      "core:shadow_shuriken": 0.085
+      "core:great_fireball": 0.268,
+      "core:phoenix_sage_fire": 0.211,
+      "core:dynamic_entry": 0.123,
+      "core:leaf_gale": 0.117,
+      "core:kunai": 0.116,
+      "core:shadow_shuriken": 0.095,
+      "basic": 0.07
     },
     "withPouch": {
       "winRate": 1,
@@ -1507,32 +1509,32 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 34.79,
-        "p10": 27.98,
-        "p90": 42.75
+        "mean": 24.33,
+        "p10": 17.05,
+        "p90": 32.26
       },
       "hpLeft": {
-        "mean": 295.9,
-        "share": 0.783
+        "mean": 322.3,
+        "share": 0.853
       },
       "maxHp": 378,
       "damageShare": {
-        "core:great_fireball": 0.247,
-        "core:phoenix_sage_fire": 0.184,
-        "basic": 0.172,
-        "core:kunai": 0.115,
-        "core:dynamic_entry": 0.1,
-        "core:leaf_gale": 0.098,
-        "core:shadow_shuriken": 0.085
+        "core:great_fireball": 0.268,
+        "core:phoenix_sage_fire": 0.211,
+        "core:dynamic_entry": 0.123,
+        "core:leaf_gale": 0.117,
+        "core:kunai": 0.116,
+        "core:shadow_shuriken": 0.095,
+        "basic": 0.07
       }
     },
     "model": {
-      "ttkSec": 22.7,
-      "hpLossShare": 0.225,
-      "playerDps": 16.42
+      "ttkSec": 17.28,
+      "hpLossShare": 0.171,
+      "playerDps": 21.57
     },
     "wins": 200,
-    "ratio": 1.533,
+    "ratio": 1.408,
     "flagged": false,
     "reasons": []
   },
@@ -1564,23 +1566,23 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 26.7,
-      "p10": 19.91,
-      "p90": 33.51
+      "mean": 18.34,
+      "p10": 13.16,
+      "p90": 23.92
     },
     "hpLeft": {
-      "mean": 296.3,
-      "share": 0.784
+      "mean": 322.3,
+      "share": 0.853
     },
     "maxHp": 378,
     "damageShare": {
-      "core:great_fireball": 0.25,
-      "core:phoenix_sage_fire": 0.192,
-      "core:kunai": 0.147,
-      "core:dynamic_entry": 0.113,
-      "basic": 0.107,
-      "core:leaf_gale": 0.103,
-      "core:shadow_shuriken": 0.088
+      "core:great_fireball": 0.273,
+      "core:phoenix_sage_fire": 0.226,
+      "core:kunai": 0.145,
+      "core:dynamic_entry": 0.123,
+      "core:leaf_gale": 0.113,
+      "core:shadow_shuriken": 0.088,
+      "basic": 0.032
     },
     "withPouch": {
       "winRate": 1,
@@ -1591,32 +1593,32 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 26.7,
-        "p10": 19.91,
-        "p90": 33.51
+        "mean": 18.34,
+        "p10": 13.16,
+        "p90": 23.92
       },
       "hpLeft": {
-        "mean": 296.3,
-        "share": 0.784
+        "mean": 322.3,
+        "share": 0.853
       },
       "maxHp": 378,
       "damageShare": {
-        "core:great_fireball": 0.25,
-        "core:phoenix_sage_fire": 0.192,
-        "core:kunai": 0.147,
-        "core:dynamic_entry": 0.113,
-        "basic": 0.107,
-        "core:leaf_gale": 0.103,
-        "core:shadow_shuriken": 0.088
+        "core:great_fireball": 0.273,
+        "core:phoenix_sage_fire": 0.226,
+        "core:kunai": 0.145,
+        "core:dynamic_entry": 0.123,
+        "core:leaf_gale": 0.113,
+        "core:shadow_shuriken": 0.088,
+        "basic": 0.032
       }
     },
     "model": {
-      "ttkSec": 22.7,
-      "hpLossShare": 0.225,
-      "playerDps": 16.42
+      "ttkSec": 17.28,
+      "hpLossShare": 0.171,
+      "playerDps": 21.57
     },
     "wins": 200,
-    "ratio": 1.176,
+    "ratio": 1.062,
     "flagged": false,
     "reasons": []
   },
@@ -1648,23 +1650,23 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 29.98,
-      "p10": 21.23,
-      "p90": 38.74
+      "mean": 20.18,
+      "p10": 13.16,
+      "p90": 29.57
     },
     "hpLeft": {
-      "mean": 321.2,
-      "share": 0.815
+      "mean": 346.4,
+      "share": 0.879
     },
     "maxHp": 394,
     "damageShare": {
-      "core:great_fireball": 0.248,
-      "core:phoenix_sage_fire": 0.188,
-      "core:kunai": 0.135,
-      "basic": 0.131,
-      "core:dynamic_entry": 0.106,
-      "core:leaf_gale": 0.104,
-      "core:shadow_shuriken": 0.089
+      "core:great_fireball": 0.264,
+      "core:phoenix_sage_fire": 0.213,
+      "core:kunai": 0.138,
+      "core:dynamic_entry": 0.124,
+      "core:leaf_gale": 0.121,
+      "core:shadow_shuriken": 0.093,
+      "basic": 0.047
     },
     "withPouch": {
       "winRate": 1,
@@ -1675,32 +1677,32 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 29.98,
-        "p10": 21.23,
-        "p90": 38.74
+        "mean": 20.18,
+        "p10": 13.16,
+        "p90": 29.57
       },
       "hpLeft": {
-        "mean": 321.2,
-        "share": 0.815
+        "mean": 346.4,
+        "share": 0.879
       },
       "maxHp": 394,
       "damageShare": {
-        "core:great_fireball": 0.248,
-        "core:phoenix_sage_fire": 0.188,
-        "core:kunai": 0.135,
-        "basic": 0.131,
-        "core:dynamic_entry": 0.106,
-        "core:leaf_gale": 0.104,
-        "core:shadow_shuriken": 0.089
+        "core:great_fireball": 0.264,
+        "core:phoenix_sage_fire": 0.213,
+        "core:kunai": 0.138,
+        "core:dynamic_entry": 0.124,
+        "core:leaf_gale": 0.121,
+        "core:shadow_shuriken": 0.093,
+        "basic": 0.047
       }
     },
     "model": {
-      "ttkSec": 23.15,
-      "hpLossShare": 0.229,
-      "playerDps": 16.95
+      "ttkSec": 17.63,
+      "hpLossShare": 0.175,
+      "playerDps": 22.26
     },
     "wins": 200,
-    "ratio": 1.295,
+    "ratio": 1.145,
     "flagged": false,
     "reasons": []
   },
@@ -1732,24 +1734,24 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 13.92,
-      "p10": 9.47,
-      "p90": 18.77
+      "mean": 11.89,
+      "p10": 9.22,
+      "p90": 15.91
     },
     "hpLeft": {
-      "mean": 336.6,
-      "share": 0.89
+      "mean": 343.1,
+      "share": 0.908
     },
     "maxHp": 378,
     "damageShare": {
       "core:tag": 0.601,
-      "core:leaf_great_whirlwind": 0.128,
-      "core:kunai": 0.08,
-      "core:great_fireball": 0.063,
-      "core:phoenix_sage_fire": 0.055,
-      "core:dynamic_entry": 0.039,
-      "core:shadow_shuriken": 0.029,
-      "basic": 0.005
+      "core:leaf_great_whirlwind": 0.188,
+      "core:kunai": 0.059,
+      "core:great_fireball": 0.047,
+      "core:dynamic_entry": 0.038,
+      "core:shadow_shuriken": 0.036,
+      "core:phoenix_sage_fire": 0.031,
+      "basic": 0.001
     },
     "withPouch": {
       "winRate": 1,
@@ -1760,33 +1762,33 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 13.92,
-        "p10": 9.47,
-        "p90": 18.77
+        "mean": 11.89,
+        "p10": 9.22,
+        "p90": 15.91
       },
       "hpLeft": {
-        "mean": 336.6,
-        "share": 0.89
+        "mean": 343.1,
+        "share": 0.908
       },
       "maxHp": 378,
       "damageShare": {
         "core:tag": 0.601,
-        "core:leaf_great_whirlwind": 0.128,
-        "core:kunai": 0.08,
-        "core:great_fireball": 0.063,
-        "core:phoenix_sage_fire": 0.055,
-        "core:dynamic_entry": 0.039,
-        "core:shadow_shuriken": 0.029,
-        "basic": 0.005
+        "core:leaf_great_whirlwind": 0.188,
+        "core:kunai": 0.059,
+        "core:great_fireball": 0.047,
+        "core:dynamic_entry": 0.038,
+        "core:shadow_shuriken": 0.036,
+        "core:phoenix_sage_fire": 0.031,
+        "basic": 0.001
       }
     },
     "model": {
-      "ttkSec": 27.24,
-      "hpLossShare": 0.324,
-      "playerDps": 16.42
+      "ttkSec": 20.74,
+      "hpLossShare": 0.247,
+      "playerDps": 21.57
     },
     "wins": 200,
-    "ratio": 0.511,
+    "ratio": 0.574,
     "flagged": true,
     "reasons": [
       "ratio"
@@ -1820,23 +1822,23 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 36.28,
-      "p10": 23.23,
-      "p90": 51.09
+      "mean": 26.99,
+      "p10": 15.78,
+      "p90": 41.92
     },
     "hpLeft": {
-      "mean": 306,
-      "share": 0.761
+      "mean": 331,
+      "share": 0.823
     },
     "maxHp": 402,
     "damageShare": {
-      "core:great_fireball": 0.229,
-      "core:phoenix_sage_fire": 0.211,
-      "basic": 0.201,
-      "core:kunai": 0.125,
-      "core:dynamic_entry": 0.089,
-      "core:leaf_gale": 0.076,
-      "core:shadow_shuriken": 0.069
+      "core:great_fireball": 0.27,
+      "core:phoenix_sage_fire": 0.171,
+      "core:kunai": 0.143,
+      "core:dynamic_entry": 0.119,
+      "basic": 0.107,
+      "core:leaf_gale": 0.097,
+      "core:shadow_shuriken": 0.093
     },
     "withPouch": {
       "winRate": 1,
@@ -1847,32 +1849,32 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 36.28,
-        "p10": 23.23,
-        "p90": 51.09
+        "mean": 26.99,
+        "p10": 15.78,
+        "p90": 41.92
       },
       "hpLeft": {
-        "mean": 306,
-        "share": 0.761
+        "mean": 331,
+        "share": 0.823
       },
       "maxHp": 402,
       "damageShare": {
-        "core:great_fireball": 0.229,
-        "core:phoenix_sage_fire": 0.211,
-        "basic": 0.201,
-        "core:kunai": 0.125,
-        "core:dynamic_entry": 0.089,
-        "core:leaf_gale": 0.076,
-        "core:shadow_shuriken": 0.069
+        "core:great_fireball": 0.27,
+        "core:phoenix_sage_fire": 0.171,
+        "core:kunai": 0.143,
+        "core:dynamic_entry": 0.119,
+        "basic": 0.107,
+        "core:leaf_gale": 0.097,
+        "core:shadow_shuriken": 0.093
       }
     },
     "model": {
-      "ttkSec": 23.37,
-      "hpLossShare": 0.232,
-      "playerDps": 17.21
+      "ttkSec": 17.79,
+      "hpLossShare": 0.176,
+      "playerDps": 22.61
     },
     "wins": 200,
-    "ratio": 1.552,
+    "ratio": 1.517,
     "flagged": false,
     "reasons": []
   },
@@ -1904,23 +1906,23 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 33.12,
-      "p10": 27.98,
-      "p90": 40.5
+      "mean": 23.42,
+      "p10": 17.05,
+      "p90": 31.16
     },
     "hpLeft": {
-      "mean": 326.2,
-      "share": 0.796
+      "mean": 352.6,
+      "share": 0.86
     },
     "maxHp": 410,
     "damageShare": {
-      "basic": 0.182,
-      "core:great_fireball": 0.176,
-      "core:phoenix_sage_fire": 0.15,
-      "core:kunai": 0.142,
-      "core:dynamic_entry": 0.119,
-      "core:shadow_shuriken": 0.116,
-      "core:leaf_gale": 0.115
+      "core:great_fireball": 0.198,
+      "core:phoenix_sage_fire": 0.171,
+      "core:leaf_gale": 0.152,
+      "core:kunai": 0.14,
+      "core:dynamic_entry": 0.138,
+      "core:shadow_shuriken": 0.12,
+      "basic": 0.08
     },
     "withPouch": {
       "winRate": 1,
@@ -1931,32 +1933,32 @@
         "timeout": 0
       },
       "timeSec": {
-        "mean": 33.12,
-        "p10": 27.98,
-        "p90": 40.5
+        "mean": 23.42,
+        "p10": 17.05,
+        "p90": 31.16
       },
       "hpLeft": {
-        "mean": 326.2,
-        "share": 0.796
+        "mean": 352.6,
+        "share": 0.86
       },
       "maxHp": 410,
       "damageShare": {
-        "basic": 0.182,
-        "core:great_fireball": 0.176,
-        "core:phoenix_sage_fire": 0.15,
-        "core:kunai": 0.142,
-        "core:dynamic_entry": 0.119,
-        "core:shadow_shuriken": 0.116,
-        "core:leaf_gale": 0.115
+        "core:great_fireball": 0.198,
+        "core:phoenix_sage_fire": 0.171,
+        "core:leaf_gale": 0.152,
+        "core:kunai": 0.14,
+        "core:dynamic_entry": 0.138,
+        "core:shadow_shuriken": 0.12,
+        "basic": 0.08
       }
     },
     "model": {
-      "ttkSec": 23.58,
-      "hpLossShare": 0.234,
-      "playerDps": 17.47
+      "ttkSec": 17.95,
+      "hpLossShare": 0.178,
+      "playerDps": 22.95
     },
     "wins": 200,
-    "ratio": 1.405,
+    "ratio": 1.305,
     "flagged": false,
     "reasons": []
   },
@@ -1980,69 +1982,69 @@
       "core:shadow_shuriken"
     ],
     "runs": 200,
-    "winRate": 0.605,
+    "winRate": 0.72,
     "outcomes": {
-      "victory": 121,
-      "defeat": 79,
+      "victory": 144,
+      "defeat": 56,
       "fled": 0,
       "timeout": 0
     },
     "timeSec": {
-      "mean": 111.84,
-      "p10": 100.06,
-      "p90": 125.99
+      "mean": 100.27,
+      "p10": 90.02,
+      "p90": 110.3
     },
     "hpLeft": {
-      "mean": 53.9,
-      "share": 0.203
+      "mean": 67.3,
+      "share": 0.253
     },
     "maxHp": 266,
     "damageShare": {
-      "basic": 0.323,
-      "core:tag": 0.253,
-      "core:running_fire": 0.106,
-      "core:dynamic_entry": 0.075,
-      "core:leaf_whirlwind": 0.071,
-      "core:leaf_gale": 0.068,
-      "core:shadow_shuriken": 0.063,
-      "core:kunai": 0.04
+      "core:tag": 0.226,
+      "basic": 0.213,
+      "core:running_fire": 0.148,
+      "core:leaf_whirlwind": 0.1,
+      "core:leaf_gale": 0.095,
+      "core:dynamic_entry": 0.091,
+      "core:shadow_shuriken": 0.088,
+      "core:kunai": 0.038
     },
     "withPouch": {
-      "winRate": 0.605,
+      "winRate": 0.72,
       "outcomes": {
-        "victory": 121,
-        "defeat": 79,
+        "victory": 144,
+        "defeat": 56,
         "fled": 0,
         "timeout": 0
       },
       "timeSec": {
-        "mean": 111.84,
-        "p10": 100.06,
-        "p90": 125.99
+        "mean": 100.27,
+        "p10": 90.02,
+        "p90": 110.3
       },
       "hpLeft": {
-        "mean": 53.9,
-        "share": 0.203
+        "mean": 67.3,
+        "share": 0.253
       },
       "maxHp": 266,
       "damageShare": {
-        "basic": 0.323,
-        "core:tag": 0.253,
-        "core:running_fire": 0.106,
-        "core:dynamic_entry": 0.075,
-        "core:leaf_whirlwind": 0.071,
-        "core:leaf_gale": 0.068,
-        "core:shadow_shuriken": 0.063,
-        "core:kunai": 0.04
+        "core:tag": 0.226,
+        "basic": 0.213,
+        "core:running_fire": 0.148,
+        "core:leaf_whirlwind": 0.1,
+        "core:leaf_gale": 0.095,
+        "core:dynamic_entry": 0.091,
+        "core:shadow_shuriken": 0.088,
+        "core:kunai": 0.038
       }
     },
     "model": {
-      "ttkSec": 85.88,
-      "hpLossShare": 1.39,
-      "playerDps": 10.52
+      "ttkSec": 69.3,
+      "hpLossShare": 1.122,
+      "playerDps": 13.5
     },
-    "wins": 121,
-    "ratio": 1.302,
+    "wins": 144,
+    "ratio": 1.447,
     "flagged": false,
     "reasons": []
   },
@@ -2066,67 +2068,67 @@
       "core:shadow_shuriken"
     ],
     "runs": 200,
-    "winRate": 0.495,
+    "winRate": 0.425,
     "outcomes": {
-      "victory": 99,
-      "defeat": 101,
+      "victory": 85,
+      "defeat": 115,
       "fled": 0,
       "timeout": 0
     },
     "timeSec": {
-      "mean": 110.5,
-      "p10": 95.47,
-      "p90": 121.72
+      "mean": 103.5,
+      "p10": 91.8,
+      "p90": 117.03
     },
     "hpLeft": {
-      "mean": 44.5,
-      "share": 0.149
+      "mean": 53.9,
+      "share": 0.181
     },
     "maxHp": 298,
     "damageShare": {
-      "basic": 0.508,
-      "core:dynamic_entry": 0.109,
-      "core:leaf_whirlwind": 0.103,
-      "core:leaf_gale": 0.1,
-      "core:shadow_shuriken": 0.089,
-      "core:kunai": 0.057,
-      "core:running_fire": 0.034
+      "basic": 0.353,
+      "core:leaf_gale": 0.144,
+      "core:leaf_whirlwind": 0.14,
+      "core:dynamic_entry": 0.132,
+      "core:shadow_shuriken": 0.13,
+      "core:kunai": 0.053,
+      "core:running_fire": 0.048
     },
     "withPouch": {
-      "winRate": 0.495,
+      "winRate": 0.425,
       "outcomes": {
-        "victory": 99,
-        "defeat": 101,
+        "victory": 85,
+        "defeat": 115,
         "fled": 0,
         "timeout": 0
       },
       "timeSec": {
-        "mean": 110.5,
-        "p10": 95.47,
-        "p90": 121.72
+        "mean": 103.5,
+        "p10": 91.8,
+        "p90": 117.03
       },
       "hpLeft": {
-        "mean": 44.5,
-        "share": 0.149
+        "mean": 53.9,
+        "share": 0.181
       },
       "maxHp": 298,
       "damageShare": {
-        "basic": 0.508,
-        "core:dynamic_entry": 0.109,
-        "core:leaf_whirlwind": 0.103,
-        "core:leaf_gale": 0.1,
-        "core:shadow_shuriken": 0.089,
-        "core:kunai": 0.057,
-        "core:running_fire": 0.034
+        "basic": 0.353,
+        "core:leaf_gale": 0.144,
+        "core:leaf_whirlwind": 0.14,
+        "core:dynamic_entry": 0.132,
+        "core:shadow_shuriken": 0.13,
+        "core:kunai": 0.053,
+        "core:running_fire": 0.048
       }
     },
     "model": {
-      "ttkSec": 79.28,
-      "hpLossShare": 1.072,
-      "playerDps": 11.03
+      "ttkSec": 67.87,
+      "hpLossShare": 0.958,
+      "playerDps": 13.99
     },
-    "wins": 99,
-    "ratio": 1.394,
+    "wins": 85,
+    "ratio": 1.525,
     "flagged": true,
     "reasons": [
       "win"
@@ -2152,70 +2154,69 @@
       "core:shadow_shuriken"
     ],
     "runs": 200,
-    "winRate": 0.01,
+    "winRate": 0.09,
     "outcomes": {
-      "victory": 2,
-      "defeat": 198,
+      "victory": 18,
+      "defeat": 182,
       "fled": 0,
       "timeout": 0
     },
     "timeSec": {
-      "mean": 177.28,
-      "p10": 170.15,
-      "p90": 184.4
+      "mean": 137.72,
+      "p10": 113.19,
+      "p90": 161.09
     },
     "hpLeft": {
-      "mean": 17,
-      "share": 0.049
+      "mean": 53.6,
+      "share": 0.155
     },
     "maxHp": 346,
     "damageShare": {
-      "core:great_fireball": 0.296,
-      "basic": 0.214,
-      "core:dynamic_entry": 0.117,
-      "core:shadow_shuriken": 0.116,
-      "core:leaf_whirlwind": 0.116,
-      "core:leaf_gale": 0.079,
-      "core:kunai": 0.062
+      "core:great_fireball": 0.292,
+      "basic": 0.195,
+      "core:leaf_whirlwind": 0.132,
+      "core:shadow_shuriken": 0.112,
+      "core:dynamic_entry": 0.112,
+      "core:leaf_gale": 0.11,
+      "core:kunai": 0.046
     },
     "withPouch": {
-      "winRate": 0.01,
+      "winRate": 0.09,
       "outcomes": {
-        "victory": 2,
-        "defeat": 198,
+        "victory": 18,
+        "defeat": 182,
         "fled": 0,
         "timeout": 0
       },
       "timeSec": {
-        "mean": 177.28,
-        "p10": 170.15,
-        "p90": 184.4
+        "mean": 137.72,
+        "p10": 113.19,
+        "p90": 161.09
       },
       "hpLeft": {
-        "mean": 17,
-        "share": 0.049
+        "mean": 53.6,
+        "share": 0.155
       },
       "maxHp": 346,
       "damageShare": {
-        "core:great_fireball": 0.296,
-        "basic": 0.214,
-        "core:dynamic_entry": 0.117,
-        "core:shadow_shuriken": 0.116,
-        "core:leaf_whirlwind": 0.116,
-        "core:leaf_gale": 0.079,
-        "core:kunai": 0.062
+        "core:great_fireball": 0.292,
+        "basic": 0.195,
+        "core:leaf_whirlwind": 0.132,
+        "core:shadow_shuriken": 0.112,
+        "core:dynamic_entry": 0.112,
+        "core:leaf_gale": 0.11,
+        "core:kunai": 0.046
       }
     },
     "model": {
-      "ttkSec": 80.79,
-      "hpLossShare": 1.193,
-      "playerDps": 14.29
+      "ttkSec": 62.53,
+      "hpLossShare": 0.923,
+      "playerDps": 19.21
     },
-    "wins": 2,
-    "ratio": 2.194,
+    "wins": 18,
+    "ratio": 2.202,
     "flagged": true,
     "reasons": [
-      "fewWins",
       "ratio",
       "win"
     ]
@@ -2240,67 +2241,67 @@
       "core:shadow_shuriken"
     ],
     "runs": 200,
-    "winRate": 0.085,
+    "winRate": 0.08,
     "outcomes": {
-      "victory": 17,
-      "defeat": 183,
+      "victory": 16,
+      "defeat": 184,
       "fled": 0,
       "timeout": 0
     },
     "timeSec": {
-      "mean": 109.47,
-      "p10": 91.51,
-      "p90": 125.08
+      "mean": 117.44,
+      "p10": 97.63,
+      "p90": 135.17
     },
     "hpLeft": {
-      "mean": 62.5,
-      "share": 0.165
+      "mean": 58.2,
+      "share": 0.154
     },
     "maxHp": 378,
     "damageShare": {
-      "basic": 0.349,
-      "core:great_fireball": 0.205,
-      "core:phoenix_sage_fire": 0.163,
-      "core:dynamic_entry": 0.106,
-      "core:shadow_shuriken": 0.091,
-      "core:leaf_gale": 0.072,
-      "core:kunai": 0.013
+      "core:great_fireball": 0.227,
+      "basic": 0.225,
+      "core:phoenix_sage_fire": 0.194,
+      "core:dynamic_entry": 0.125,
+      "core:shadow_shuriken": 0.117,
+      "core:leaf_gale": 0.103,
+      "core:kunai": 0.011
     },
     "withPouch": {
-      "winRate": 0.085,
+      "winRate": 0.08,
       "outcomes": {
-        "victory": 17,
-        "defeat": 183,
+        "victory": 16,
+        "defeat": 184,
         "fled": 0,
         "timeout": 0
       },
       "timeSec": {
-        "mean": 109.47,
-        "p10": 91.51,
-        "p90": 125.08
+        "mean": 117.44,
+        "p10": 97.63,
+        "p90": 135.17
       },
       "hpLeft": {
-        "mean": 62.5,
-        "share": 0.165
+        "mean": 58.2,
+        "share": 0.154
       },
       "maxHp": 378,
       "damageShare": {
-        "basic": 0.349,
-        "core:great_fireball": 0.205,
-        "core:phoenix_sage_fire": 0.163,
-        "core:dynamic_entry": 0.106,
-        "core:shadow_shuriken": 0.091,
-        "core:leaf_gale": 0.072,
-        "core:kunai": 0.013
+        "core:great_fireball": 0.227,
+        "basic": 0.225,
+        "core:phoenix_sage_fire": 0.194,
+        "core:dynamic_entry": 0.125,
+        "core:shadow_shuriken": 0.117,
+        "core:leaf_gale": 0.103,
+        "core:kunai": 0.011
       }
     },
     "model": {
-      "ttkSec": 66.75,
-      "hpLossShare": 1.084,
-      "playerDps": 16.42
+      "ttkSec": 62.21,
+      "hpLossShare": 0.919,
+      "playerDps": 21.57
     },
-    "wins": 17,
-    "ratio": 1.64,
+    "wins": 16,
+    "ratio": 1.888,
     "flagged": true,
     "reasons": [
       "ratio",
@@ -2327,54 +2328,68 @@
       "core:shadow_shuriken"
     ],
     "runs": 200,
-    "winRate": 0,
+    "winRate": 0.01,
     "outcomes": {
-      "victory": 0,
-      "defeat": 200,
+      "victory": 2,
+      "defeat": 198,
       "fled": 0,
       "timeout": 0
     },
-    "timeSec": null,
-    "hpLeft": null,
+    "timeSec": {
+      "mean": 90.46,
+      "p10": 85.66,
+      "p90": 95.26
+    },
+    "hpLeft": {
+      "mean": 18.4,
+      "share": 0.047
+    },
     "maxHp": 394,
     "damageShare": {
-      "basic": 0.32,
-      "core:great_fireball": 0.214,
-      "core:phoenix_sage_fire": 0.167,
-      "core:kunai": 0.104,
-      "core:dynamic_entry": 0.1,
-      "core:shadow_shuriken": 0.096
+      "core:great_fireball": 0.255,
+      "basic": 0.207,
+      "core:phoenix_sage_fire": 0.198,
+      "core:dynamic_entry": 0.131,
+      "core:shadow_shuriken": 0.127,
+      "core:kunai": 0.081
     },
     "withPouch": {
-      "winRate": 0,
+      "winRate": 0.01,
       "outcomes": {
-        "victory": 0,
-        "defeat": 200,
+        "victory": 2,
+        "defeat": 198,
         "fled": 0,
         "timeout": 0
       },
-      "timeSec": null,
-      "hpLeft": null,
+      "timeSec": {
+        "mean": 90.46,
+        "p10": 85.66,
+        "p90": 95.26
+      },
+      "hpLeft": {
+        "mean": 18.4,
+        "share": 0.047
+      },
       "maxHp": 394,
       "damageShare": {
-        "basic": 0.32,
-        "core:great_fireball": 0.214,
-        "core:phoenix_sage_fire": 0.167,
-        "core:kunai": 0.104,
-        "core:dynamic_entry": 0.1,
-        "core:shadow_shuriken": 0.096
+        "core:great_fireball": 0.255,
+        "basic": 0.207,
+        "core:phoenix_sage_fire": 0.198,
+        "core:dynamic_entry": 0.131,
+        "core:shadow_shuriken": 0.127,
+        "core:kunai": 0.081
       }
     },
     "model": {
-      "ttkSec": 80.11,
-      "hpLossShare": 1.183,
-      "playerDps": 16.95
+      "ttkSec": 63.45,
+      "hpLossShare": 0.937,
+      "playerDps": 22.26
     },
-    "wins": 0,
-    "ratio": null,
+    "wins": 2,
+    "ratio": 1.426,
     "flagged": true,
     "reasons": [
-      "noWins",
+      "fewWins",
       "win"
     ]
   },
@@ -2398,68 +2413,69 @@
       "core:shadow_shuriken"
     ],
     "runs": 200,
-    "winRate": 0.02,
+    "winRate": 0.01,
     "outcomes": {
-      "victory": 4,
-      "defeat": 196,
+      "victory": 2,
+      "defeat": 198,
       "fled": 0,
       "timeout": 0
     },
     "timeSec": {
-      "mean": 108.27,
-      "p10": 96.93,
-      "p90": 116.05
+      "mean": 109.96,
+      "p10": 109.06,
+      "p90": 110.86
     },
     "hpLeft": {
-      "mean": 44.1,
-      "share": 0.108
+      "mean": 51.9,
+      "share": 0.127
     },
     "maxHp": 410,
     "damageShare": {
-      "basic": 0.523,
-      "core:great_fireball": 0.128,
-      "core:dynamic_entry": 0.101,
-      "core:shadow_shuriken": 0.097,
-      "core:phoenix_sage_fire": 0.09,
-      "core:kunai": 0.061
+      "basic": 0.367,
+      "core:great_fireball": 0.172,
+      "core:dynamic_entry": 0.141,
+      "core:shadow_shuriken": 0.134,
+      "core:phoenix_sage_fire": 0.129,
+      "core:kunai": 0.057
     },
     "withPouch": {
-      "winRate": 0.02,
+      "winRate": 0.01,
       "outcomes": {
-        "victory": 4,
-        "defeat": 196,
+        "victory": 2,
+        "defeat": 198,
         "fled": 0,
         "timeout": 0
       },
       "timeSec": {
-        "mean": 108.27,
-        "p10": 96.93,
-        "p90": 116.05
+        "mean": 109.96,
+        "p10": 109.06,
+        "p90": 110.86
       },
       "hpLeft": {
-        "mean": 44.1,
-        "share": 0.108
+        "mean": 51.9,
+        "share": 0.127
       },
       "maxHp": 410,
       "damageShare": {
-        "basic": 0.523,
-        "core:great_fireball": 0.128,
-        "core:dynamic_entry": 0.101,
-        "core:shadow_shuriken": 0.097,
-        "core:phoenix_sage_fire": 0.09,
-        "core:kunai": 0.061
+        "basic": 0.367,
+        "core:great_fireball": 0.172,
+        "core:dynamic_entry": 0.141,
+        "core:shadow_shuriken": 0.134,
+        "core:phoenix_sage_fire": 0.129,
+        "core:kunai": 0.057
       }
     },
     "model": {
-      "ttkSec": 79.15,
-      "hpLossShare": 1.112,
-      "playerDps": 17.47
+      "ttkSec": 62.68,
+      "hpLossShare": 0.881,
+      "playerDps": 22.95
     },
-    "wins": 4,
-    "ratio": 1.368,
+    "wins": 2,
+    "ratio": 1.754,
     "flagged": true,
     "reasons": [
       "fewWins",
+      "ratio",
       "win"
     ]
   },
@@ -2483,67 +2499,67 @@
       "core:shadow_shuriken"
     ],
     "runs": 200,
-    "winRate": 0.005,
+    "winRate": 0.02,
     "outcomes": {
       "victory": 0,
-      "defeat": 199,
-      "fled": 1,
+      "defeat": 196,
+      "fled": 4,
       "timeout": 0
     },
     "timeSec": {
-      "mean": 122.02,
-      "p10": 122.02,
-      "p90": 122.02
+      "mean": 123.57,
+      "p10": 103.74,
+      "p90": 140.47
     },
     "hpLeft": {
-      "mean": 220.4,
-      "share": 0.499
+      "mean": 85.1,
+      "share": 0.192
     },
     "maxHp": 442,
     "damageShare": {
-      "basic": 0.308,
-      "core:great_fireball": 0.216,
-      "core:phoenix_sage_fire": 0.131,
-      "core:leaf_gale": 0.087,
-      "core:dynamic_entry": 0.086,
-      "core:kunai": 0.086,
-      "core:shadow_shuriken": 0.086
+      "core:great_fireball": 0.255,
+      "basic": 0.204,
+      "core:phoenix_sage_fire": 0.159,
+      "core:shadow_shuriken": 0.118,
+      "core:leaf_gale": 0.113,
+      "core:dynamic_entry": 0.097,
+      "core:kunai": 0.054
     },
     "withPouch": {
-      "winRate": 0.005,
+      "winRate": 0.02,
       "outcomes": {
         "victory": 0,
-        "defeat": 199,
-        "fled": 1,
+        "defeat": 196,
+        "fled": 4,
         "timeout": 0
       },
       "timeSec": {
-        "mean": 122.02,
-        "p10": 122.02,
-        "p90": 122.02
+        "mean": 123.57,
+        "p10": 103.74,
+        "p90": 140.47
       },
       "hpLeft": {
-        "mean": 220.4,
-        "share": 0.499
+        "mean": 85.1,
+        "share": 0.192
       },
       "maxHp": 442,
       "damageShare": {
-        "basic": 0.308,
-        "core:great_fireball": 0.216,
-        "core:phoenix_sage_fire": 0.131,
-        "core:leaf_gale": 0.087,
-        "core:dynamic_entry": 0.086,
-        "core:kunai": 0.086,
-        "core:shadow_shuriken": 0.086
+        "core:great_fireball": 0.255,
+        "basic": 0.204,
+        "core:phoenix_sage_fire": 0.159,
+        "core:shadow_shuriken": 0.118,
+        "core:leaf_gale": 0.113,
+        "core:dynamic_entry": 0.097,
+        "core:kunai": 0.054
       }
     },
     "model": {
-      "ttkSec": 105.39,
-      "hpLossShare": 1.946,
-      "playerDps": 18.52
+      "ttkSec": 81.45,
+      "hpLossShare": 1.468,
+      "playerDps": 24.33
     },
-    "wins": 1,
-    "ratio": 1.158,
+    "wins": 4,
+    "ratio": 1.517,
     "flagged": true,
     "reasons": [
       "fewWins",
@@ -2570,56 +2586,71 @@
       "core:shadow_shuriken"
     ],
     "runs": 200,
-    "winRate": 0,
+    "winRate": 0.005,
     "outcomes": {
-      "victory": 0,
-      "defeat": 200,
+      "victory": 1,
+      "defeat": 199,
       "fled": 0,
       "timeout": 0
     },
-    "timeSec": null,
-    "hpLeft": null,
+    "timeSec": {
+      "mean": 138.35,
+      "p10": 138.35,
+      "p90": 138.35
+    },
+    "hpLeft": {
+      "mean": 35.6,
+      "share": 0.083
+    },
     "maxHp": 426,
     "damageShare": {
-      "basic": 0.456,
-      "core:great_fireball": 0.136,
-      "core:phoenix_sage_fire": 0.099,
-      "core:dynamic_entry": 0.089,
-      "core:leaf_gale": 0.081,
-      "core:shadow_shuriken": 0.072,
-      "core:kunai": 0.066
+      "basic": 0.296,
+      "core:great_fireball": 0.167,
+      "core:dynamic_entry": 0.131,
+      "core:phoenix_sage_fire": 0.129,
+      "core:leaf_gale": 0.122,
+      "core:shadow_shuriken": 0.099,
+      "core:kunai": 0.056
     },
     "withPouch": {
-      "winRate": 0,
+      "winRate": 0.005,
       "outcomes": {
-        "victory": 0,
-        "defeat": 200,
+        "victory": 1,
+        "defeat": 199,
         "fled": 0,
         "timeout": 0
       },
-      "timeSec": null,
-      "hpLeft": null,
+      "timeSec": {
+        "mean": 138.35,
+        "p10": 138.35,
+        "p90": 138.35
+      },
+      "hpLeft": {
+        "mean": 35.6,
+        "share": 0.083
+      },
       "maxHp": 426,
       "damageShare": {
-        "basic": 0.456,
-        "core:great_fireball": 0.136,
-        "core:phoenix_sage_fire": 0.099,
-        "core:dynamic_entry": 0.089,
-        "core:leaf_gale": 0.081,
-        "core:shadow_shuriken": 0.072,
-        "core:kunai": 0.066
+        "basic": 0.296,
+        "core:great_fireball": 0.167,
+        "core:dynamic_entry": 0.131,
+        "core:phoenix_sage_fire": 0.129,
+        "core:leaf_gale": 0.122,
+        "core:shadow_shuriken": 0.099,
+        "core:kunai": 0.056
       }
     },
     "model": {
-      "ttkSec": 95.44,
-      "hpLossShare": 1.622,
-      "playerDps": 17.99
+      "ttkSec": 75.58,
+      "hpLossShare": 1.285,
+      "playerDps": 23.64
     },
-    "wins": 0,
-    "ratio": null,
+    "wins": 1,
+    "ratio": 1.831,
     "flagged": true,
     "reasons": [
-      "noWins",
+      "fewWins",
+      "ratio",
       "win"
     ]
   }

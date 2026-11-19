@@ -26,49 +26,49 @@
       "basic": true
     },
     "core:centipede": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:tiger": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:thief": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:merc_pack": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:heavy": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:marauder": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:poisoner": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:kumo": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:suna": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:hunter": {
       "time": true,
@@ -76,14 +76,14 @@
       "basic": true
     },
     "core:hunter_caster": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
     "core:kiri_hunter": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:guard_pack": {
       "time": true,
@@ -91,7 +91,7 @@
       "basic": true
     },
     "core:veteran": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
@@ -111,39 +111,39 @@
       "basic": true
     },
     "core:fake_genin": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
     "core:foreign_genin": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
     "core:boss_wolf": {
       "time": false,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_ren1": {
       "time": false,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_fighter": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_hunter": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_twins": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_mist": {
       "time": true,
@@ -151,14 +151,14 @@
       "basic": false
     },
     "core:boss_nameless": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
     "core:boss_ren2": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     }
   },
   "B": {
@@ -183,54 +183,54 @@
       "basic": true
     },
     "core:wolfmask": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:centipede": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:tiger": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:thief": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:merc_pack": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:heavy": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:marauder": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:poisoner": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:kumo": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:suna": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:hunter": {
       "time": true,
@@ -238,14 +238,14 @@
       "basic": true
     },
     "core:hunter_caster": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
     "core:kiri_hunter": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:guard_pack": {
       "time": true,
@@ -253,7 +253,7 @@
       "basic": true
     },
     "core:veteran": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
@@ -273,49 +273,49 @@
       "basic": true
     },
     "core:fake_genin": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
     "core:foreign_genin": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
     "core:boss_wolf": {
       "time": false,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_ren1": {
       "time": false,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_fighter": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_hunter": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_twins": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_mist": {
       "time": false,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_nameless": {
       "time": false,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_ren2": {
       "time": false,
@@ -325,12 +325,12 @@
   },
   "C": {
     "core:dummy": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
     "core:bandit": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
@@ -355,7 +355,7 @@
       "basic": true
     },
     "core:tiger": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
@@ -365,7 +365,7 @@
       "basic": true
     },
     "core:merc_pack": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
@@ -380,27 +380,27 @@
       "basic": true
     },
     "core:poisoner": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
     "core:kumo": {
-      "time": true,
+      "time": false,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:suna": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
     "core:hunter": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
     "core:hunter_caster": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
@@ -415,7 +415,7 @@
       "basic": true
     },
     "core:veteran": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
@@ -435,7 +435,7 @@
       "basic": true
     },
     "core:fake_genin": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
@@ -445,17 +445,17 @@
       "basic": true
     },
     "core:boss_wolf": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
     "core:boss_ren1": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_fighter": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
@@ -465,14 +465,14 @@
       "basic": true
     },
     "core:boss_twins": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
     "core:boss_mist": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_nameless": {
       "time": true,
@@ -480,14 +480,14 @@
       "basic": true
     },
     "core:boss_ren2": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     }
   },
   "D": {
     "core:dummy": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
@@ -512,49 +512,49 @@
       "basic": true
     },
     "core:centipede": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:tiger": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:thief": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:merc_pack": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:heavy": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:marauder": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:poisoner": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:kumo": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:suna": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:hunter": {
       "time": true,
@@ -562,14 +562,14 @@
       "basic": true
     },
     "core:hunter_caster": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
     "core:kiri_hunter": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:guard_pack": {
       "time": true,
@@ -577,7 +577,7 @@
       "basic": true
     },
     "core:veteran": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
@@ -597,7 +597,7 @@
       "basic": true
     },
     "core:fake_genin": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
@@ -609,27 +609,27 @@
     "core:boss_wolf": {
       "time": false,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_ren1": {
       "time": false,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_fighter": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_hunter": {
-      "time": false,
+      "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_twins": {
       "time": true,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_mist": {
       "time": false,
@@ -644,7 +644,7 @@
     "core:boss_ren2": {
       "time": false,
       "win": true,
-      "basic": false
+      "basic": true
     }
   }
 }

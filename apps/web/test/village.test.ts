@@ -97,6 +97,22 @@ describe('the village page', () => {
     expect(target.querySelector('[data-queue-empty]')).not.toBeNull();
   });
 
+  it('says the build time as a time, not as «тіків»', () => {
+    v().res.wood = 1000;
+    v().res.stone = 1000;
+    v().treasury = 1000;
+    mountVillage();
+    const ticks = K.buildTicks[0]!;
+    const minutes = ticks * K.tickMin;
+    const expected = minutes % 60 === 0 ? `${minutes / 60} год` : `${minutes} хв`;
+    expect(text(card('library'))).toContain(`Будується ${expected}`);
+    expect(target.innerHTML).not.toMatch(/тік/);
+    target.querySelector<HTMLButtonElement>(`[data-build="${id('library')}"]`)?.click();
+    flushSync();
+    expect(text(target.querySelector('[data-queue-left]'))).toMatch(/^Лишилося \d+ (хв|год|с)/);
+    expect(text(target.querySelector('[data-queue-left]'))).not.toMatch(/тік/);
+  });
+
   it('cancelling refunds, and workforce appears only when charges exist', () => {
     v().res.wood = 1000;
     v().res.stone = 1000;

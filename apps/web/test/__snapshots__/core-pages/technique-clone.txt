@@ -89,7 +89,7 @@
                 <dt>
                   Перезарядка
                 <dd data-figure="cooldown">
-                  13,4 с
+                  14,4 с
               <div>
                 <dt>
                   Ціна: чакра
@@ -475,6 +475,13 @@
                         1/5
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 20%;">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
               <p class="pin-caption">
                 <button class="link" data-entity="technique:core:body_flicker" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
@@ -559,6 +566,13 @@
                         1/10
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 10%;">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
               <p class="pin-caption">
                 <button class="link" data-entity="technique:core:shadow_shuriken" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
@@ -732,6 +746,13 @@
                         1/20
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 5%;">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
               <p class="pin-caption">
                 <button class="link" data-entity="technique:core:sensing" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету

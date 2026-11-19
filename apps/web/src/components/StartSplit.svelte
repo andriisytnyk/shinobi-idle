@@ -56,6 +56,8 @@
   const content = game.content;
   const list = $derived(game.read((gs) => performersOf(gs, content, game.rules)));
   const squad = $derived(game.read((gs) => hasSquad(gs, content)));
+  /** The performer is named on the button only when there is somebody to choose from: a clone exists besides the character. */
+  const choice = $derived(list.length > 1);
   /** Whether a new clone could take this action now. */
   const canClone = $derived(game.read((gs) => newCloneSlot(gs, content) !== null));
 
@@ -69,7 +71,7 @@
   const who = $derived(performer.clone ? t('squad.clone', { n: performer.n }) : t('squad.you'));
   /** «Почати · Клон 2 · 5 хв»: the action, who does it, then what the action adds (a time, a price). */
   const caption = $derived(
-    [t(stopping ? 'tile.stop' : label), squad ? who : '', suffix && !stopping ? suffix : '']
+    [t(stopping ? 'tile.stop' : label), choice ? who : '', suffix && !stopping ? suffix : '']
       .filter((part) => part !== '')
       .join(' · '),
   );

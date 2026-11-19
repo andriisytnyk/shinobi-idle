@@ -1,7 +1,19 @@
 import { content } from '@shinobi/content';
+import type { Enemy } from '@shinobi/content';
+import {
+  bingoLevel,
+  blankBingo,
+  createState,
+  defaultRules,
+  entryOf,
+  type GameState,
+} from '@shinobi/core';
 import { describe, expect, it } from 'vitest';
 import {
+  createMemory,
   measureRun,
+  type Toolkit,
+  winRate,
   naturesTriples,
   runMatrixSerial,
   spread,
@@ -126,6 +138,42 @@ describe('the balance report', () => {
     expect(strategyReportMarkdown(result, content)).toBe(strategyReportMarkdown(result, content));
     expect(strategyReportJson(result)).toBe(strategyReportJson(result));
     expect(JSON.parse(strategyReportJson(result)).rows).toHaveLength(4);
+  });
+});
+
+describe('the fight forecast of a bot', () => {
+  const toolkitFor = (seed: number): Toolkit => {
+    const state = createState(seed, content);
+    return {
+      ctx: { state, content, rules: defaultRules },
+      mem: createMemory(),
+      triple: triples[0] ?? [],
+      fightsToTrain: true,
+    };
+  };
+  const zone = content.zones.find((z) => entryOf(content, z.enemy));
+  const entry = entryOf(content, zone?.enemy ?? '') as Enemy;
+
+  it('is unknown at Bingo level 0: the bot sees no numbers of the enemy', () => {
+    const tk = toolkitFor(1);
+    expect(bingoLevel(tk.ctx.state, entry.id, content)).toBe(0);
+    expect(winRate(tk, entry)).toBeNull();
+    // Whatever the enemy really is, nothing of it reaches the decision at level 0.
+    expect(winRate(tk, { ...entry, hp: entry.hp * 1000 })).toBeNull();
+  });
+
+  it('is the game forecast once the enemy is seen (level 1), and the same on a rerun', () => {
+    const seen = (): Toolkit => {
+      const tk = toolkitFor(1);
+      (tk.ctx.state as GameState).bingo[entry.id] = { ...blankBingo(), seen: 1 };
+      return tk;
+    };
+    expect(bingoLevel(seen().ctx.state, entry.id, content)).toBe(1);
+    const rate = winRate(seen(), entry);
+    expect(rate).not.toBeNull();
+    expect(rate as number).toBeGreaterThanOrEqual(0);
+    expect(rate as number).toBeLessThanOrEqual(1);
+    expect(winRate(seen(), entry)).toBe(rate);
   });
 });
 

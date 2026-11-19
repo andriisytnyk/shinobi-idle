@@ -3,10 +3,17 @@ import { DEFAULTS, apply, evaluate, orig, type Knobs } from './fit.ts';
 
 const BOUNDS: Record<string, [number, number]> = {
   cs: [0.85, 1.4],
-  wg: [0.15, 1.5],
+  pw: [0.7, 3],
+  pwL: [0.5, 3],
+  ls: [0.3, 1.5],
+  pwH: [0.4, 2],
+  rcD: [0.2, 2],
+  bd0: [0.2, 2],
+  bd1: [0.2, 2],
+  wg: [0.5, 1],
   cds: [0.2, 2],
-  w0: [0.15, 1.5],
-  w1: [0.1, 1.5],
+  w0: [0.5, 1],
+  w1: [0.5, 1],
   bc: [0.3, 2],
   bd: [0.2, 1.5],
   bcost: [0, 3],
@@ -52,7 +59,9 @@ const score = (k: Knobs) => {
 let bestScore = score(best);
 console.log('start', bestScore.toFixed(2));
 for (let r = 0; r < rounds; r++) {
-  for (const name of Object.keys(BOUNDS)) {
+  for (const name of Object.keys(BOUNDS).filter(
+    (n) => !process.env.OPT_ONLY || process.env.OPT_ONLY.split(',').includes(n),
+  )) {
     for (const f of [0.6, 0.8, 0.92, 1.08, 1.25, 1.6]) {
       const [lo, hi] = BOUNDS[name]!;
       const v = Math.min(hi, Math.max(lo, (best[name] ?? 1) * f));
@@ -71,5 +80,8 @@ for (let r = 0; r < rounds; r++) {
     bestScore.toFixed(2),
     JSON.stringify(best, (_, v) => (typeof v === 'number' ? Math.round(v * 1000) / 1000 : v)),
   );
-  writeFileSync(new URL('./opt-best.json', import.meta.url), JSON.stringify(best));
+  writeFileSync(
+    new URL(process.env.OPT_OUT ?? './opt-best.json', import.meta.url),
+    JSON.stringify(best),
+  );
 }

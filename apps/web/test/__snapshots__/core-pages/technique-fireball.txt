@@ -113,7 +113,7 @@
                 <dt>
                   Шкода
                 <dd data-figure="damage">
-                  18
+                  26
               <div>
                 <dt>
                   Час накладання
@@ -123,7 +123,7 @@
                 <dt>
                   Перезарядка
                 <dd data-figure="cooldown">
-                  5,1 с
+                  5,4 с
               <div>
                 <dt>
                   Ціна: чакра
@@ -139,7 +139,7 @@
                   <span>
                     Базова сила за рангом
                   <span class="num">
-                    17
+                    25
                 <li>
                   <span>
                     Роль
@@ -239,6 +239,8 @@
                         Катон
                       <span class="detail">
                         рів. 30
+                      <span class="detail" data-nature-lacking="">
+                        потрібна ця природа чакри
                     <span class="count">
                       1/30
                     <span aria-hidden="true" class="bar">
@@ -390,6 +392,13 @@
                         1/1
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 100%;">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
               <p class="pin-caption">
                 <button class="link" data-entity="technique:core:nature_transformation_burn_a_leaf" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
@@ -487,10 +496,19 @@
                           Катон
                         <span class="detail">
                           рів. 10
+                        <span class="detail" data-nature-lacking="">
+                          потрібна ця природа чакри
                       <span class="count">
                         1/10
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 10%;">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
               <p class="pin-caption">
                 <button class="link" data-entity="technique:core:fire_breath_control_drill" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
@@ -588,10 +606,19 @@
                           Катон
                         <span class="detail">
                           рів. 20
+                        <span class="detail" data-nature-lacking="">
+                          потрібна ця природа чакри
                       <span class="count">
                         1/20
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 5%;">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
               <p class="pin-caption">
                 <button class="link" data-entity="technique:core:running_fire" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
@@ -704,10 +731,19 @@
                           Катон
                         <span class="detail">
                           рів. 30
+                        <span class="detail" data-nature-lacking="">
+                          потрібна ця природа чакри
                       <span class="count">
                         1/30
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 3.3333333333333335%;">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
               <p class="pin-caption">
                 <button class="link" data-entity="technique:core:great_fireball" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
@@ -820,10 +856,19 @@
                           Катон
                         <span class="detail">
                           рів. 35
+                        <span class="detail" data-nature-lacking="">
+                          потрібна ця природа чакри
                       <span class="count">
                         1/35
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 2.857142857142857%;">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
               <p class="pin-caption">
                 <button class="link" data-entity="technique:core:phoenix_sage_fire" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
@@ -930,6 +975,8 @@
                           Катон
                         <span class="detail">
                           рів. 40
+                        <span class="detail" data-nature-lacking="">
+                          потрібна ця природа чакри
                       <span class="count">
                         1/40
                       <span aria-hidden="true" class="bar">
@@ -1049,6 +1096,8 @@
                           Катон
                         <span class="detail">
                           рів. 50
+                        <span class="detail" data-nature-lacking="">
+                          потрібна ця природа чакри
                       <span class="count">
                         1/50
                       <span aria-hidden="true" class="bar">

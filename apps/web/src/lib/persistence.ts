@@ -63,7 +63,12 @@ export interface AnbuReport {
   dispelled?: CloneDispelledEvent[];
   /** Raids that arrived or ended while away. */
   raids: RaidAway[];
+  /** Items and currency that reached the Bank while away (the net gain). */
+  gained?: { items: { id: string; n: number }[]; currencies: { id: string; n: number }[] };
 }
+
+const rowsOf = (gain: Record<string, number> | undefined): { id: string; n: number }[] =>
+  Object.entries(gain ?? {}).map(([id, n]) => ({ id, n }));
 
 /** An absence shorter than this is applied without a report. */
 export const REPORT_MIN_MS = 60_000;
@@ -79,7 +84,11 @@ export function buildReport(summary: OfflineSummary): AnbuReport | null {
     key,
     levels,
   }));
+  const items = rowsOf(summary.itemsGained);
+  const currencies = rowsOf(summary.currencyGained);
   const quiet =
+    items.length === 0 &&
+    currencies.length === 0 &&
     skills.length === 0 &&
     mastery.length === 0 &&
     summary.techniquesLearned.length === 0 &&
@@ -97,6 +106,7 @@ export function buildReport(summary: OfflineSummary): AnbuReport | null {
     stopped: summary.actionsStopped,
     dispelled: summary.clonesDispelled ?? [],
     raids: summary.raids ?? [],
+    gained: { items, currencies },
   };
 }
 

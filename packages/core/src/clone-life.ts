@@ -4,7 +4,7 @@ import { addCurrency, addItem, removeItem } from './bank.ts';
 import { cloneTechniqueOf, growSlots, slotCount } from './clone.ts';
 import { playerMaxChakra } from './combat/stats.ts';
 import { refillPouch } from './combat/pouch.ts';
-import { followChakraPool } from './combat/system.ts';
+import { followChakraPool, previewAllyEarnings } from './combat/system.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
 import { MS_PER_HOUR, MS_PER_SECOND, masteryLevel, rate } from './formulas.ts';
@@ -317,6 +317,18 @@ export function dispelPreview(
         xp[skill] = (xp[skill] ?? 0) + xpGain(state, skill, amount, content, rules);
       // Mastery too is paid after its modifiers (`grantMastery`), on top of what the clone holds.
       for (const [key, m] of Object.entries(pending.mastery)) {
+        const held = (mastery[key] ??= { skill: m.skill, amount: 0 });
+        held.amount += masteryGain(state, m.skill, m.amount, content, rules);
+      }
+    });
+  }
+  // The bodies of the clone's own shadow clones hold XP and Mastery too: the dispel releases them and pays it with the rest.
+  if (body.fight) {
+    const allies = previewAllyEarnings(state, body.fight, content, rules);
+    asPerformer(state, slot, () => {
+      for (const [skill, amount] of Object.entries(allies.xp))
+        xp[skill] = (xp[skill] ?? 0) + xpGain(state, skill, amount, content, rules);
+      for (const [key, m] of Object.entries(allies.mastery)) {
         const held = (mastery[key] ??= { skill: m.skill, amount: 0 });
         held.amount += masteryGain(state, m.skill, m.amount, content, rules);
       }

@@ -62,10 +62,30 @@ for (const [role, sc] of Object.entries(roleKey))
   set(new RegExp(`"${role}":\\{m:[0-9.]+,cd:([0-9.]+),c:`), (v) => r2(v * k.cds * sc, 2));
 for (const role of ['Захист', 'Посилення'])
   set(new RegExp(`"${role}":\\{m:[0-9.]+,cd:([0-9.]+),c:`), (v) => r2(v * k.cds, 2));
+const powScale = {
+  E: k.pwL ?? 1,
+  D: k.pwL ?? 1,
+  C: 1,
+  B: k.pwH ?? 1,
+  A: k.pwH ?? 1,
+  S: k.pwH ?? 1,
+};
+b = b.replace(/power: \{([^}]*)\}/, (whole, inner) =>
+  whole.replace(
+    inner,
+    inner.replace(
+      /([A-Z]):([0-9.]+)/g,
+      (_, r, v) => `${r}:${r2(Number(v) * (k.pw ?? 1) * powScale[r], 2)}`,
+    ),
+  ),
+);
+for (const r of ['E', 'D'])
+  set(new RegExp(`rankCd: \\{[^}]*?\\b${r}:([0-9.]+)`), (v) => r2(v * (k.rcD ?? 1), 2));
+set(/levelScale: ([0-9.]+),/, (v) => r2(v * (k.ls ?? 1), 4));
 set(/basicCast: ([0-9.]+),/, (v) => r2(v * k.bc, 3));
 set(/basicCost: ([0-9.]+),/, (v) => r2(v * k.bcost, 2));
-set(/basicDmg: \[([0-9.]+),/, (v) => r2(v * k.bd, 2));
-set(/basicDmg: \[[0-9.]+,([0-9.]+)\]/, (v) => r2(v * k.bd, 3));
+set(/basicDmg: \[([0-9.]+),/, (v) => r2(v * k.bd * (k.bd0 ?? 1), 2));
+set(/basicDmg: \[[0-9.]+,([0-9.]+)\]/, (v) => r2(v * k.bd * (k.bd1 ?? 1), 3));
 set(/evaBase: ([0-9.]+),/, (v) => r2(v * k.evaBase, 1));
 set(/rating: \{ accTier:([0-9.]+),/, (v) => r2(v * k.accTier, 1));
 set(/evaTier:([0-9.]+),/, (v) => r2(v * k.evaTier, 1));

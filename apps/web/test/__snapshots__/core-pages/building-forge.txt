@@ -74,7 +74,7 @@
                   Ціна наступного рівня:
                 <ul>
                 <p class="ct-muted">
-                  Будується 1 тіків
+                  Будується 5 хв
               <button aria-describedby="why-core:forge" class="ct-button" data-build="core:forge" disabled="" type="button">
                 Збудувати
               <div class="why">

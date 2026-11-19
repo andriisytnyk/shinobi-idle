@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { pointStatus, type ReqResult } from '@shinobi/core';
+  import { natureStatus, pointStatus, type ReqResult } from '@shinobi/core';
   import { humanId, webRef } from '../lib/entities.ts';
   import { currencyName, currencyOf, rankName } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
@@ -76,6 +76,25 @@
         })
       : null,
   );
+  /** A skill that is a chakra nature the character does not own: the level alone does not say that the nature is what is missing. */
+  const natureLacking = $derived(
+    req.t === 'skill' && !node.met
+      ? game.read(
+          (gs) =>
+            game.content.natures.some((n) => n.id === (req as { skill: string }).skill) &&
+            !gs.player.natures.includes((req as { skill: string }).skill as never),
+        )
+      : false,
+  );
+  /** The link to the nature page is offered only while this nature can really be chosen now (the test, or an extra nature once Chakra Control allows it). */
+  const natureChoosable = $derived(
+    req.t === 'nature'
+      ? game.read((gs) => {
+          const status = natureStatus(gs, game.content);
+          return status.canChoose && status.free.includes((req as { nature: string }).nature);
+        })
+      : false,
+  );
   const flagText = $derived(
     req.t === 'flag'
       ? hasKey(`req.flag.${req.id}`)
@@ -109,13 +128,17 @@
       {#if req.t === 'skill'}
         {#if ref}<EntityLink kind={ref.kind} id={ref.id} offered />{/if}
         <span class="detail">{t('req.level', { n: req.level })}</span>
+        {#if natureLacking}<span class="detail" data-nature-lacking>{t('req.needNature')}</span
+          >{/if}
       {:else if req.t === 'technique'}
         {#if ref}<EntityLink kind={ref.kind} id={ref.id} offered />{/if}
         <span class="detail">{t(node.met ? 'req.known' : 'req.unknown')}</span>
       {:else if req.t === 'nature'}
         <span class="detail">{t('req.nature')}</span>
         {#if ref}<EntityLink kind={ref.kind} id={ref.id} offered />{/if}
-        {#if !node.met}<a class="detail-link" href="#/nature">{t('req.natureLink')}</a>{/if}
+        {#if !node.met && natureChoosable}<a class="detail-link" href="#/nature"
+            >{t('req.natureLink')}</a
+          >{/if}
       {:else if req.t === 'item'}
         {#if ref}<EntityLink kind={ref.kind} id={ref.id} offered />{/if}
       {:else if req.t === 'currency'}

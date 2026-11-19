@@ -16,6 +16,7 @@ import QuestsPage from '../../pages/QuestsPage.svelte';
 import RankPage from '../../pages/RankPage.svelte';
 import SettingsPage from '../../pages/SettingsPage.svelte';
 import ShopPage from '../../pages/ShopPage.svelte';
+import FieldworkPage from '../../pages/FieldworkPage.svelte';
 import SkillPage from '../../pages/SkillPage.svelte';
 import SkillsPage from '../../pages/SkillsPage.svelte';
 import BuildingSheet from '../../sheets/BuildingSheet.svelte';
@@ -219,6 +220,8 @@ export const coreUi: UiPack = {
     entity('mission', byId(MissionPage), 'missions', 'self', true);
     entity('exam', { svelte: RankPage }, 'rank', undefined, true);
     entity('skill', byId(SkillPage), 'skills');
+    // The page a point of interest links to: the work's own description, with the same start as its tile on the Scouting page.
+    entity('fieldwork', byId(FieldworkPage), 'world', undefined, true);
     // The details of these kinds open as a sheet over a parent page (the highlighted tile stays in view);
     // a parent that depends on the entity is data of the kind, and its home is where an entity the player
     // has not discovered opens (the real parent would give it away).

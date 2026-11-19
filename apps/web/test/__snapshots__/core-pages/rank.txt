@@ -88,6 +88,8 @@
                             Катон
                           <span class="detail">
                             рів. 40
+                          <span class="detail" data-nature-lacking="">
+                            потрібна ця природа чакри
                         <span class="count">
                           1/40
                         <span aria-hidden="true" class="bar">
@@ -102,6 +104,8 @@
                             Футон
                           <span class="detail">
                             рів. 40
+                          <span class="detail" data-nature-lacking="">
+                            потрібна ця природа чакри
                         <span class="count">
                           1/40
                         <span aria-hidden="true" class="bar">
@@ -116,6 +120,8 @@
                             Райтон
                           <span class="detail">
                             рів. 40
+                          <span class="detail" data-nature-lacking="">
+                            потрібна ця природа чакри
                         <span class="count">
                           1/40
                         <span aria-hidden="true" class="bar">
@@ -130,6 +136,8 @@
                             Дотон
                           <span class="detail">
                             рів. 40
+                          <span class="detail" data-nature-lacking="">
+                            потрібна ця природа чакри
                         <span class="count">
                           1/40
                         <span aria-hidden="true" class="bar">
@@ -144,6 +152,8 @@
                             Суйтон
                           <span class="detail">
                             рів. 40
+                          <span class="detail" data-nature-lacking="">
+                            потрібна ця природа чакри
                         <span class="count">
                           1/40
                         <span aria-hidden="true" class="bar">

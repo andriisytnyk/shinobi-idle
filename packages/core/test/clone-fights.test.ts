@@ -166,6 +166,19 @@ describe('several fights at once', () => {
 });
 
 describe('what a clone fight pays', () => {
+  it('previews the XP of the clone and of the bodies it summoned as the dispel pays it, at any minute', () => {
+    for (const minutes of [5, 6, 8, 10, 11]) {
+      const state = cloner(2, 36);
+      expect(startFight(state, WOLF, 1)).toEqual({ ok: true });
+      const base = totalXp(state);
+      advance(state, minutes * MIN, content);
+      const preview = dispelPreview(state, 1, content, defaultRules);
+      const shown = Object.values(preview?.xp ?? {}).reduce((a, b) => a + b, 0);
+      dispatch(state, { type: 'clone.dispel' }, content);
+      expect(totalXp(state) - base, `${minutes} min`).toBeCloseTo(shown, 4);
+    }
+  });
+
   it('keeps the earnings of a won fight in the clone and hands them over with the rest', () => {
     const state = cloner(2, 36);
     expect(startFight(state, WOLF, 1)).toEqual({ ok: true });

@@ -65,6 +65,11 @@ const baseline: Record<string, any[]> = {};
 for (const y of ['A', 'B', 'C', 'D'])
   baseline[y] = JSON.parse(readFileSync(new URL(`baseline-dev-3f559af-${y}.json`, BASE), 'utf8'));
 
+const STATUS: Record<
+  string,
+  Record<string, { time: boolean; win: boolean; basic: boolean }>
+> = JSON.parse(readFileSync(new URL('fit-status.json', BASE), 'utf8'));
+
 const K: any = content.balance.K;
 export const orig = {
   cast: new Map(content.techniques.map((t) => [t.id, t.cast])),
@@ -92,12 +97,22 @@ export const orig = {
   evaMin: K.evaLevel.min,
   evaMax: K.evaLevel.max,
   eEva: [...K.eEva],
+  power: { ...K.power },
+  levelScale: K.levelScale,
+  rankCd: { ...K.rankCd },
   rank: Object.fromEntries(content.techniques.map((t) => [t.id, t.rank])),
   role: Object.fromEntries(content.techniques.map((t) => [t.id, t.role])),
 };
 export type Knobs = Record<string, number>;
 export const DEFAULTS: Knobs = {
   cs: 1,
+  pw: 1,
+  pwL: 1,
+  ls: 1,
+  pwH: 1,
+  rcD: 1,
+  bd0: 1,
+  bd1: 1,
   bossHp: 1,
   bossDmg: 1,
   rhSlow: 1,
@@ -165,10 +180,21 @@ export function apply(k: Knobs): void {
         Math.round(orig.wait[i]! * (i === 0 ? k.w0! : i === 1 ? k.wg! : k.w1!)),
       )),
   );
+  for (const r of Object.keys(orig.power))
+    K.power[r] =
+      orig.power[r] *
+      (k.pw ?? 1) *
+      (r === 'E' || r === 'D'
+        ? (k.pwL ?? 1)
+        : r === 'B' || r === 'A' || r === 'S'
+          ? (k.pwH ?? 1)
+          : 1);
+  for (const r of ['E', 'D']) K.rankCd[r] = orig.rankCd[r] * (k.rcD ?? 1);
+  K.levelScale = orig.levelScale * (k.ls ?? 1);
   K.basicCast = orig.basicCast * k.bc!;
   K.basicCost = orig.basicCost * k.bcost!;
-  K.basicDmg[0] = orig.basicDmg[0] * k.bd!;
-  K.basicDmg[1] = orig.basicDmg[1] * k.bd!;
+  K.basicDmg[0] = orig.basicDmg[0] * k.bd! * (k.bd0 ?? 1);
+  K.basicDmg[1] = orig.basicDmg[1] * k.bd! * (k.bd1 ?? 1);
   K.evaBase = orig.evaBase * k.evaBase!;
   K.rating.evaTier = orig.evaTier * k.evaTier!;
   K.rating.accTier = orig.accTier * k.accTier!;
@@ -218,6 +244,13 @@ export function evaluate(runs: number, entries?: string[]) {
       else if (b.timeSec || s.timeSec) p += b.winRate > 0.1 || s.winRate > 0.1 ? 0.6 : 0;
       if (regular) p += Math.max(0, wmin - s.winRate) * 4;
       if (full) p += Math.max(0, basic - 0.4);
+      else p += Math.max(0, basic - 0.4) * 0.5;
+      // A target the recorded table met must stay met (packages/sim/test/fit.test.ts): a margin for the run noise.
+      const was = STATUS[y]?.[e.id];
+      if (was?.time && dt !== null && Math.abs(dt - 1) > tb - 0.03)
+        p += 0.3 + (Math.abs(dt - 1) - (tb - 0.03)) * 3;
+      if (was?.win && regular && s.winRate < wmin + 0.01) p += 1;
+      if (was?.basic && full && basic > 0.37) p += 0.3 + (basic - 0.37) * 3;
       penalty += p;
       const bad =
         (dt !== null && Math.abs(dt - 1) > tb) ||
