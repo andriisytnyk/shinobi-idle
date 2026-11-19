@@ -1,6 +1,8 @@
 import { content as defaultContent, type ContentDb } from '@shinobi/content';
 import {
   advance,
+  type Command,
+  type CommandResult,
   createState,
   defaultRules,
   dispatch,
@@ -13,6 +15,9 @@ import type { Bot } from './bot.ts';
 /** Skill levels worth a line in the timeline. */
 export const MILESTONE_LEVELS: readonly number[] = [5, 10, 20, 30, 40, 50];
 
+/** Game time per step while the player is away, ms. */
+const AWAY_STEP_MS = 300_000;
+
 /** Rejected commands tolerated before a run is declared failed. */
 export const DEFAULT_REJECT_LIMIT = 100;
 
@@ -20,7 +25,8 @@ export type Milestone =
   | { at: number; type: 'skill'; id: string; level: number }
   | { at: number; type: 'questStep'; id: string; step: number }
   | { at: number; type: 'questDone'; id: string }
-  | { at: number; type: 'rank'; id: string };
+  | { at: number; type: 'rank'; id: string }
+  | { at: number; type: 'renownRank'; id: string };
 
 export interface RunOptions {
   seed: number;
@@ -32,8 +38,22 @@ export interface RunOptions {
   stepMs?: number;
   /** Hard game-time limit in ms. */
   limitMs: number;
+  /**
+   * A player who is not always looking: awake for `awakeMs` at the start of every `periodMs`, away
+   * for the rest. While away the bot is not asked and time runs in larger steps, as it does offline.
+   */
+  away?: { periodMs: number; awakeMs: number };
   /** Rejected commands after which the run stops as failed. */
   rejectLimit?: number;
+  /** Watches the run without changing it: every command with its result, and every step before time moves. */
+  observer?: {
+    command?(command: Command, result: CommandResult): void;
+    step?(state: Readonly<GameState>, ms: number): void;
+    /** Every step after time has moved, the last one included (`step` sees the state before it). */
+    after?(state: Readonly<GameState>): void;
+    /** Every game event, in order, as the run drains them. */
+    event?(event: GameEvent): void;
+  };
 }
 
 export interface RunResult {
@@ -66,6 +86,8 @@ function milestoneOf(event: GameEvent): Milestone | null {
       return { at: event.at, type: 'questStep', id: event.quest, step: event.step };
     case 'questDone':
       return { at: event.at, type: 'questDone', id: event.quest };
+    case 'renownRank':
+      return { at: event.at, type: 'renownRank', id: event.rank };
     case 'rankUp':
       return { at: event.at, type: 'rank', id: event.rank };
     default:
@@ -100,30 +122,47 @@ export function runBot(bot: Bot, options: RunOptions): RunResult {
   const timeline: Milestone[] = [];
   let rejected = 0;
   let firstRejection: string | null = null;
-  let goalAt: number | null = bot.goal.reached(state) ? state.now : null;
+  let goalAt: number | null = bot.goal.reached(state, content) ? state.now : null;
   let changed = true;
+  let lastDecision = -Infinity;
 
+  const away = options.away;
+  let wasAwake = true;
   while (goalAt === null && state.now < options.limitMs && rejected <= rejectLimit) {
-    if (changed || state.slots.some((slot) => !slot.action)) {
+    const awake = away === undefined || state.now % away.periodMs < away.awakeMs;
+    if (awake && !wasAwake) changed = true;
+    wasAwake = awake;
+    const due = bot.reviewMs !== undefined && state.now - lastDecision >= bot.reviewMs;
+    if (awake && (changed || due || state.slots.some((slot) => !slot.action))) {
       changed = false;
+      lastDecision = state.now;
       for (const command of bot.decide({ state, content, rules }) ?? []) {
         const result = dispatch(state, command, content, rules);
+        options.observer?.command?.(command, result);
         if (!result.ok) {
           rejected++;
           firstRejection ??= result.reason;
         }
       }
     }
-    advance(state, Math.min(stepMs, options.limitMs - state.now), content, rules);
+    const untilWake = away ? away.periodMs - (state.now % away.periodMs) : Infinity;
+    const step = Math.min(
+      awake ? stepMs : Math.min(AWAY_STEP_MS, untilWake),
+      options.limitMs - state.now,
+    );
+    options.observer?.step?.(state, step);
+    advance(state, step, content, rules);
     const events = state.events.splice(0);
+    options.observer?.after?.(state);
     for (const event of events) {
+      options.observer?.event?.(event);
       const milestone = milestoneOf(event);
       if (milestone) timeline.push(milestone);
       if (event.type === 'levelUp' || event.type === 'questStep' || event.type === 'rankUp') {
         changed = true;
       }
     }
-    if (bot.goal.reached(state)) goalAt = events[events.length - 1]?.at ?? state.now;
+    if (bot.goal.reached(state, content)) goalAt = events[events.length - 1]?.at ?? state.now;
   }
 
   return {

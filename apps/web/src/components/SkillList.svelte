@@ -1,10 +1,12 @@
 <script lang="ts">
-  import { content, localeKey, SKILL_GROUPS, type SkillGroup } from '@shinobi/content';
   import { skillUnlockStatus } from '@shinobi/core';
   import { t } from '../lib/i18n.ts';
+  import { tryUi } from '../lib/ext/runtime.svelte.ts';
+  import Slot from '../lib/ext/Slot.svelte';
   import { markerOf } from '../lib/nav.ts';
   import { nextStep } from '../lib/next-step.ts';
   import { skillProgress } from '../lib/progress.ts';
+  import { groupName, isNature, natureColor } from '../lib/vocab.ts';
   import { currentRoute } from '../lib/router.svelte.ts';
   import { settings } from '../lib/settings.svelte.ts';
   import { game } from '../lib/store.ts';
@@ -12,32 +14,40 @@
   import Icon from './Icon.svelte';
   import ReqTree from './ReqTree.svelte';
 
-  const NATURE_SKILLS: readonly string[] = ['katon', 'futon', 'raiton', 'doton', 'suiton'];
+  const content = game.content;
 
-  let collapsed = $state<Partial<Record<SkillGroup, boolean>>>({});
+  let collapsed = $state<Record<string, boolean | undefined>>({});
 
+  const ui = tryUi();
   const route = $derived(currentRoute());
-  const markedSkill = $derived(markerOf(nextStep(game.state, content)?.target ?? null).skill);
+  const native = $derived(game.read((gs) => gs.player.natures[0] ?? null));
+  const markedSkill = $derived(
+    game.read((gs) => markerOf(nextStep(gs, content)?.target ?? null, ui?.registry ?? null).skill),
+  );
   const activeSkill = $derived(
     route.page === 'entity' && route.ref.kind === 'skill' ? route.ref.id : null,
   );
 
   /** Groups come from the content, in the order the style document lists them. */
   const groups = $derived(
-    SKILL_GROUPS.map((id) => ({
-      id,
-      skills: content.skills
-        .filter((s) => s.group === id)
-        .map((skill) => ({
-          skill,
-          lock: skillUnlockStatus(game.state, skill.id, content),
-          progress: skillProgress(game.state, skill.id),
+    game.read((gs) =>
+      content.skillGroups
+        .map(({ id }) => ({
+          id,
+          skills: content.skills
+            .filter((s) => s.group === id)
+            .map((skill) => ({
+              skill,
+              lock: skillUnlockStatus(gs, skill.id, content),
+              progress: skillProgress(gs, skill.id),
+            }))
+            .filter((row) => !(settings.hideLocked && row.lock && !row.lock.met)),
         }))
-        .filter((row) => !(settings.hideLocked && row.lock && !row.lock.met)),
-    })).filter((g) => g.skills.length > 0),
+        .filter((g) => g.skills.length > 0),
+    ),
   );
 
-  const toggle = (id: SkillGroup) => {
+  const toggle = (id: string) => {
     collapsed[id] = !collapsed[id];
   };
 </script>
@@ -54,7 +64,7 @@
         <span class="chevron" class:open={!collapsed[group.id]}
           ><Icon name="lucide:chevron-right" size={14} /></span
         >
-        {t(localeKey('group', group.id, 'name'))}
+        {groupName(group.id)}
       </button>
       {#if !collapsed[group.id]}
         <ul>
@@ -65,8 +75,10 @@
               class:active={activeSkill === skill.id}
               class:locked
               data-skill={skill.id}
-              style:--skill-color={NATURE_SKILLS.includes(skill.id)
-                ? `var(--nature-${skill.id})`
+              data-ui="skill-row"
+              data-entity="skill:{skill.id}"
+              style:--skill-color={isNature(content, skill.id)
+                ? natureColor(content, skill.id)
                 : 'var(--steel)'}
             >
               <span class="skill-icon"
@@ -78,7 +90,9 @@
                     data-marker
                     role="img"
                     aria-label={t('nav.next')}
-                  ></span>{/if}</span
+                  ></span>{/if}{#if native === skill.id}<span class="native" data-native
+                    >{t('skill.native')}</span
+                  >{/if}</span
               >
               {#if locked}
                 <span class="skill-level" role="img" aria-label={t('skill.locked')}
@@ -93,6 +107,7 @@
                   <span class="xp-fill" style:width="{progress.fraction * 100}%"></span>
                 </span>
               {/if}
+              <Slot name="sidebar.skill" ctx={{ skill: skill.id }} />
             </li>
           {/each}
         </ul>
@@ -113,21 +128,21 @@
     align-items: center;
     gap: var(--space-2);
     width: 100%;
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-2);
     border: 0;
     background: none;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 0.8rem;
-    letter-spacing: 0.04em;
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
     text-align: left;
     cursor: pointer;
   }
 
   .chevron {
     display: inline-flex;
-    transition: transform 0.15s;
+    transition: transform var(--duration-fast);
   }
 
   .chevron.open {
@@ -141,17 +156,18 @@
   }
 
   .skill {
+    --_grid-template-columns: 1.5rem;
     position: relative;
     display: grid;
-    grid-template-columns: 1.5rem 1fr auto;
+    grid-template-columns: var(--_grid-template-columns) 1fr auto;
     grid-template-areas:
       'icon name level'
       'bar bar bar';
     align-items: center;
     column-gap: var(--space-2);
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     padding: var(--space-2);
-    border-left: 3px solid transparent;
+    border-left: var(--border-heavy) solid transparent;
     border-radius: var(--radius-sm);
   }
 
@@ -171,7 +187,7 @@
   .skill-icon {
     grid-area: icon;
     display: inline-flex;
-    color: var(--skill-color);
+    color: var(--skill-color, var(--steel));
   }
 
   .locked .skill-icon {
@@ -193,22 +209,22 @@
     grid-area: level;
     display: inline-flex;
     color: var(--fg-dim);
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
     font-variant-numeric: tabular-nums;
   }
 
   .condition {
     grid-area: bar;
     position: relative;
-    z-index: 1;
-    font-size: 0.8rem;
+    z-index: var(--z-raised);
+    font-size: var(--text-xs);
   }
 
   .xp-bar {
     grid-area: bar;
-    height: 3px;
+    height: var(--bar-thin);
     margin-top: var(--space-1);
-    border-radius: 2px;
+    border-radius: var(--radius-xs);
     background: var(--line);
     overflow: hidden;
   }
@@ -218,10 +234,19 @@
     height: 100%;
     background: var(--accent);
   }
+  .native {
+    margin-left: var(--space-2);
+    padding: 0 var(--space-1);
+    border: var(--border-thin) solid var(--skill-color, var(--steel));
+    border-radius: var(--radius-sm);
+    color: var(--fg-dim);
+    font-size: var(--text-2xs);
+  }
+
   .marker {
     display: inline-block;
-    width: 0.6rem;
-    height: 0.6rem;
+    width: var(--icon-xs);
+    height: var(--icon-xs);
     margin-left: var(--space-2);
     border-radius: 50%;
     background: var(--accent);

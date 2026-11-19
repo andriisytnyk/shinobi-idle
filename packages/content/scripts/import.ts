@@ -1,7 +1,7 @@
 /**
  * Imports the MVP slice (docs/.../slice.json, balance.json) into normalized, typed content:
- *   src/data/generated/*.json   structured data, no display text
- *   src/locales/uk.json         every display string, keyed `<kind>.<id>.<field>`
+ *   src/packs/core/data/generated/*.json   structured data, no display text
+ *   src/packs/core/locales/uk.json       every display string, keyed `<kind>.<id>.<field>`
  * The import is idempotent: running it twice leaves the files byte-identical.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -18,38 +18,40 @@ import {
   STATE_IDS,
   TAG_IDS,
   TRAIT_IDS,
+  type NatureId,
   type RoleId,
   type StateId,
   type TagId,
   type TraitId,
 } from '../src/constants.ts';
-import { BALANCE_EXT } from '../src/balance-ext.ts';
+import { BALANCE_EXT, BALANCE_OVERRIDE, withOverrides } from '../src/packs/core/balance-ext.ts';
 import { localeKey, type LocaleKind } from '../src/keys.ts';
 import {
   balanceParamsSchema,
   generatedDbSchema,
   type BossBase,
-  type Building,
-  type Cell,
+  type BuildingBase,
+  type CellBase,
   type GeneratedDb,
   type EnemyBase,
   type Exercise,
-  type Gear,
-  type Herb,
+  type GearBase,
+  type HerbBase,
   type Item,
   type MarketEntry,
-  type Mission,
-  type MissionPay,
+  type MissionBase,
+  type MissionBasePay,
   type MissionStage,
-  type Obstacle,
-  type PoolCheckpoint,
-  type Practice,
+  type ObstacleBase,
+  type PoolCheckpointBase,
+  type PracticeBase,
   type Recipe,
   type Region,
   type Seal,
   type Skill,
   type TechniqueBase,
 } from '../src/schema.ts';
+import { z } from 'zod';
 import { rawBalance, rawMap, rawSlice } from './raw.ts';
 import { IdRegistry, type IdTable } from './translit.ts';
 
@@ -57,11 +59,12 @@ const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
 const docs = resolve(root, '..', '..', 'docs');
 const sliceDir = join(docs, 'Shinobi Idle — MVP — зріз і баланс');
+const mapDir = join(sliceDir, 'map');
 const mapPath = join(docs, 'Shinobi Idle — дані й скрипти', 'concept', 'map_data_v3.json');
-const outData = join(root, 'src', 'data', 'generated');
-const outLocale = join(root, 'src', 'locales', 'uk.json');
+const outData = join(root, 'src', 'packs', 'core', 'data', 'generated');
+const outLocale = join(root, 'src', 'packs', 'core', 'locales', 'uk.json');
 
-const registryPath = join(root, 'src', 'data', 'id-registry.json');
+const registryPath = join(root, 'src', 'packs', 'core', 'id-registry.json');
 const assignIds = process.argv.includes('--assign-ids');
 
 const readJson = (path: string): unknown => JSON.parse(readFileSync(path, 'utf8'));
@@ -75,6 +78,28 @@ const ids = new IdRegistry(
 );
 
 // ---------- helpers ----------
+
+/** The numbers of the balance model that action pace is generated from. */
+const P = bal.params as Record<string, number> & {
+  cycleMax: Record<string, number>;
+  practiceFocus: { base: number; perLevel: number };
+};
+const round3 = (x: number): number => Math.round(x * 1000) / 1000;
+/** Skill XP per hour of an action unlocked at `level` (the pace of the balance model). */
+const paceRate = (level: number): number =>
+  P.rateBase! * P.rateGrowth! ** Math.max(1, Math.min(P.cap!, level));
+/**
+ * Cycle in seconds of an action of `kind` unlocked at `level`: it grows linearly from the first-tier
+ * cycle `K.<kind>` at level 1 to `K.cycleMax.<kind>` at the skill cap, in steps of a tenth of a second.
+ */
+const cycleAt = (kind: 'drill' | 'meditate' | 'gather' | 'obstacle' | 'craft', level: number) => {
+  const first = P[kind]!;
+  const last = need(P.cycleMax[kind], `balance cycleMax ${kind}`);
+  return Math.round((first + ((last - first) * (level - 1)) / (P.cap! - 1)) * 10) / 10;
+};
+/** XP one cycle pays: the pace of the level times the cycle, so XP per hour follows the model's pace table. */
+const xpOfCycle = (level: number, seconds: number, mult = 1): number =>
+  round3((paceRate(level) * seconds * mult) / 3600);
 
 const locale: Record<string, string> = {};
 const text = (kind: LocaleKind, id: string, field: string, value: string | null | undefined) => {
@@ -164,9 +189,18 @@ const skills: Skill[] = SKILL_IDS.map((id) => {
   const unlockReq: Skill['unlockReq'] = open
     ? null
     : fight
-      ? { t: 'flag', id: FIRST_FIGHT_FLAG }
-      : { t: 'rank', rank: 'genin' };
-  return { id, group, activity: n.mt ?? 'none', unlockReq };
+      ? {
+          t: 'any',
+          of: [
+            { t: 'flag', id: FIRST_FIGHT_FLAG },
+            { t: 'rank', rank: 'genin' },
+          ],
+        }
+      : (NATURE_IDS as readonly string[]).includes(id)
+        ? { t: 'nature', nature: id as NatureId }
+        : { t: 'rank', rank: 'genin' };
+  // Vitality grows in fights and, slower, in bodily drills (see VIT_DRILLS).
+  return { id, group, activity: fight ? 'drill' : (n.mt ?? 'none'), unlockReq };
 });
 for (const nat of NATURE_IDS)
   need(
@@ -184,6 +218,39 @@ const seals: Seal[] = Object.entries(slice.seals).map(([key, s]) => {
 
 const english: Record<string, string> = {};
 const techByUk = new Map<string, string>();
+/** The base cast of a technique: its hand-set number, else the cast of its rank times that of its role (a drill has no rank: the band of its level, as the balance model has it). */
+const castOf = (t: {
+  rank: string;
+  role: string;
+  level: number;
+  castOverride?: number | undefined;
+}): number => {
+  if (t.castOverride !== undefined) return t.castOverride;
+  const byRank = need(
+    bal.params.castByRank as Record<string, number> | undefined,
+    'balance castByRank',
+  );
+  const byRole = need(
+    bal.params.castByRole as Record<string, number> | undefined,
+    'balance castByRole',
+  );
+  const rank = t.rank === '—' ? (t.level < 30 ? 'D' : t.level < 50 ? 'C' : 'B') : t.rank;
+  return (
+    need(byRank[rank], `cast of rank ${rank}`) * need(byRole[t.role], `cast of role ${t.role}`)
+  );
+};
+/** Skill XP of one practice cycle: the pace of the technique's level times its cycle at mastery 1 (the cast shortened by it, the focus of its level). */
+const practiceXpOf = (t: Parameters<typeof castOf>[0]): number => {
+  const cast = Math.max(P.castFloor!, castOf(t) * (1 - P.masteryCast! / BALANCE_EXT.masteryCap));
+  const focus = P.practiceFocus.base + P.practiceFocus.perLevel * Math.max(0, t.level - 1);
+  return xpOfCycle(t.level, Math.max(P.practiceMin!, cast * P.practiceCast! + focus));
+};
+/**
+ * Techniques that summon bodies instead of dealing damage (amendment row 19: the combat clone). The slice lists the
+ * clone as a damaging area series; as data it deals nothing and answers no trait, so its page, the prepared
+ * loadout and the fight AI read it as what it is.
+ */
+const SUMMONS: ReadonlySet<string> = new Set(['core:shadow_clone']);
 const techniques: TechniqueBase[] = slice.techniques.map((t) => {
   techByUk.set(t.uk, t.id);
   text('technique', t.id, 'name', t.uk);
@@ -199,14 +266,16 @@ const techniques: TechniqueBase[] = slice.techniques.map((t) => {
     rank: t.rank === '—' ? null : (t.rank as TechniqueBase['rank']),
     rankCanon: t.rankCanon,
     role: need(ROLE_BY_UK[t.role], `unknown role "${t.role}"`),
-    tags: t.tags.map(tag),
+    tags: SUMMONS.has(t.id) ? [] : t.tags.map(tag),
     state: t.state === '' ? null : need(STATE_BY_UK[t.state], `unknown state "${t.state}"`),
     src: t.src as TechniqueBase['src'],
     mentor: t.src === 'N' ? (t.home === 'Академія' ? 'academy' : 'other') : null,
     sealSeq: t.sealSeq.map(core),
     sealsCanon: t.sealsCanon,
     tier: t.tier as TechniqueBase['tier'],
-    noDamage: t.noDamage,
+    noDamage: SUMMONS.has(t.id) ? true : t.noDamage,
+    cast: Math.round(castOf(t) * 1000) / 1000,
+    practiceXp: practiceXpOf(t),
   };
 });
 const techId = (uk: string) => need(techByUk.get(uk), `technique "${uk}" is not in the slice`);
@@ -218,43 +287,81 @@ const exercises: Exercise[] = slice.exercises.map((e) => {
   const id = core(exerciseSlugs.take(e.uk));
   text('exercise', id, 'name', e.uk);
   text('exercise', id, 'desc', e.note);
-  return { id, level: e.level };
+  const cycle = cycleAt('drill', e.level);
+  return { id, level: e.level, cycle, xp: xpOfCycle(e.level, cycle) };
 });
+// Vitality outside fights (stage 9 decision, docs/Shinobi Idle — модель балансу.md, section 2): a few bodily drills
+// that pay the skill at the share of the zone pace a fight pays it (K.combatXp.vit), so a peaceful player can raise it.
+const VIT_DRILLS: { level: number; uk: string; note: string }[] = [
+  { level: 1, uk: 'Біг із тягарем', note: 'Мішок із піском на плечах і коло навколо двору.' },
+  { level: 15, uk: 'Віджимання на кулаках', note: 'Кулаки на камінні: біль вчить тіло терпіти.' },
+  {
+    level: 30,
+    uk: 'Стійка під водоспадом',
+    note: "Крижана вода б'є по плечах, доки не потемніє в очах.",
+  },
+  {
+    level: 45,
+    uk: 'Загартування ударами',
+    note: "Напарник б'є дерев'яним мечем, а ти не відступаєш.",
+  },
+];
+for (const d of VIT_DRILLS) {
+  const id = core(exerciseSlugs.take(d.uk));
+  text('exercise', id, 'name', d.uk);
+  text('exercise', id, 'desc', d.note);
+  const cycle = cycleAt('drill', d.level);
+  exercises.push({
+    id,
+    level: d.level,
+    skill: 'vit',
+    cycle,
+    xp: xpOfCycle(
+      d.level,
+      cycle,
+      need((P.combatXp as unknown as { vit: number }).vit, 'combatXp.vit'),
+    ),
+  });
+}
 
 const obstacleSlugs = { take: (k: string) => ids.take('obstacle', k) };
-const obstacles: Obstacle[] = slice.obstacles.map((o) => {
+const obstacles: ObstacleBase[] = slice.obstacles.map((o) => {
   const m = /^Слот (\d+): (.+)$/.exec(o.uk);
   if (!m) throw new Error(`Import: obstacle "${o.uk}" has no slot number`);
   const id = core(obstacleSlugs.take(m[2] ?? o.uk));
   text('obstacle', id, 'name', m[2]);
   text('obstacle', id, 'desc', o.note);
-  return { id, level: o.level, slot: Number(m[1]) };
+  const cycle = cycleAt('obstacle', o.level);
+  return { id, level: o.level, slot: Number(m[1]), cycle, xp: xpOfCycle(o.level, cycle) };
 });
 
 const skillByName = new Map(
   skills.map((s) => [need(locale[localeKey('skill', s.id, 'name')], s.id), s.id]),
 );
 const practiceSlugs = { take: (k: string) => ids.take('practice', k) };
-const practices: Practice[] = slice.practices.map((p) => {
+const practices: PracticeBase[] = slice.practices.map((p) => {
   const id = core(practiceSlugs.take(p.uk));
   const pair = p.pair.split(' + ').map((n) => need(skillByName.get(n), `practice skill "${n}"`));
   p.insight.forEach((s, i) => text('practice', id, `insight.${i}`, s));
   p.enlight.forEach((s, i) => text('practice', id, `enlight.${i}`, s));
   text('practice', id, 'name', p.uk);
+  const cycle = cycleAt('meditate', p.level);
   return {
     id,
     level: p.level,
-    pair: pair as Practice['pair'],
+    pair: pair as PracticeBase['pair'],
     insight: p.insight.length,
     enlight: p.enlight.length,
+    cycle,
+    xp: xpOfCycle(p.level, cycle),
   };
 });
 
-const pools: PoolCheckpoint[] = Object.entries(slice.pools).flatMap(([skill, list]) =>
+const pools: PoolCheckpointBase[] = Object.entries(slice.pools).flatMap(([skill, list]) =>
   list.map((p) => {
     const id = core(`pool_${skill}_${p.pct}`);
     text('pool', id, 'desc', p.text);
-    return { id, skill: skill as PoolCheckpoint['skill'], pct: p.pct };
+    return { id, skill: skill as PoolCheckpointBase['skill'], pct: p.pct };
   }),
 );
 
@@ -272,7 +379,17 @@ const addItem = (item: Item, name: string, desc: string | undefined) => {
 const itemName = (id: string) => need(map.ITEMS[id], `item ${id} missing in map data`)[0];
 const itemDesc = (id: string) => need(map.ITEMS[id], `item ${id} missing in map data`)[2];
 
-const herbs: Herb[] = slice.herbs.map((h) => ({ id: core(h.id), level: h.level }));
+/** A herb pays for its cycle and for its share of the regrow pause of a bush of the first size, so XP per hour is the pace of its level. */
+const herbs: HerbBase[] = slice.herbs.map((h) => {
+  const cycle = cycleAt('gather', h.level);
+  const { regrowMs, stockBase } = BALANCE_EXT.field;
+  return {
+    id: core(h.id),
+    level: h.level,
+    cycle,
+    xp: xpOfCycle(h.level, cycle + regrowMs / 1000 / (stockBase + 1)),
+  };
+});
 
 // Recipe ids come from the Ukrainian name; the antidote keeps a readable id because missions use it.
 const recipeSlugs = { take: (k: string, forced?: string) => ids.take('recipe', k, forced) };
@@ -288,6 +405,8 @@ const recipes: Recipe[] = slice.recipes.map((r) => {
     ingredients: r.ing.map(([item, n]) => ({ item: core(item), n })),
     output: { item: id, n: r.out },
     tags: r.tags.map(tag),
+    cycle: cycleAt('craft', r.level),
+    xp: xpOfCycle(r.level, cycleAt('craft', r.level), P.craftXpMult),
   };
 });
 const recipeByUk = new Map(slice.recipes.map((r, i) => [r.uk, need(recipes[i], r.uk)]));
@@ -369,7 +488,7 @@ const resource = (uk: string): string => {
   }
   return slug;
 };
-const buildings: Building[] = slice.buildings.map(([raw, name, desc, hasT6, res]) => {
+const buildings: BuildingBase[] = slice.buildings.map(([raw, name, desc, hasT6, res]) => {
   const id = core(raw);
   buildingByName.set(name, id);
   text('building', id, 'name', name);
@@ -386,13 +505,13 @@ const market: MarketEntry[] = slice.market.map(([raw, supplier, lvl]) => ({
 }));
 
 const gearSlugs = { take: (k: string) => ids.take('gear', k) };
-const gear: Gear[] = slice.gear.map(([name, skill, tiers, effect]) => {
+const gear: GearBase[] = slice.gear.map(([name, skill, tiers, effect]) => {
   const id = core(gearSlugs.take(name));
   text('gear', id, 'name', name);
   text('gear', id, 'desc', effect);
   return {
     id,
-    skill: skill as Gear['skill'],
+    skill: skill as GearBase['skill'],
     tiers: tiers.map(([tier, level, req]) => {
       let building: { id: string; level: number } | null = null;
       if (req) {
@@ -448,7 +567,7 @@ const bosses: BossBase[] = slice.bosses.map((row) => {
 
 const enemyIds = new Set([...enemies, ...bosses].map((e) => e.id));
 const balMission = new Map(bal.missions.map((m) => [m.id, m]));
-const missions: Mission[] = slice.missions.map((m) => {
+const missions: MissionBase[] = slice.missions.map((m) => {
   const id = core(m.id);
   const b = need(balMission.get(m.id), `balance entry for mission ${m.id}`);
   text('mission', id, 'name', m.name);
@@ -477,7 +596,7 @@ const missions: Mission[] = slice.missions.map((m) => {
         return { t: 'items', item: core(s.item), n: s.n };
     }
   });
-  const pay: MissionPay[] = (m.pay ?? []).map((p) => {
+  const pay: MissionBasePay[] = (m.pay ?? []).map((p) => {
     if (p === 'intel') return { kind: 'intel' };
     if (p.startsWith('scrollpart:'))
       return { kind: 'scrollPart', technique: techId(p.slice('scrollpart:'.length)) };
@@ -485,7 +604,7 @@ const missions: Mission[] = slice.missions.map((m) => {
   });
   return {
     id,
-    rank: m.rk as Mission['rank'],
+    rank: m.rk as MissionBase['rank'],
     team: m.team,
     minutes: m.min,
     stages,
@@ -498,8 +617,15 @@ const missions: Mission[] = slice.missions.map((m) => {
 
 // ---------- regions and cells ----------
 
+// The map data of the docs: where each cell of the slice stands, the grid and the named places.
+const hexPair = z.tuple([z.number().int(), z.number().int()]);
+const sliceCells = z
+  .array(z.object({ cell: z.string(), hex: hexPair }))
+  .parse(readJson(join(mapDir, 'slice-cells.json')));
+const cellHex = new Map(sliceCells.map((c) => [c.cell, c.hex]));
+
 const cellSlugs = { take: (k: string) => ids.take('cell', k) };
-const cells: Cell[] = [];
+const cells: CellBase[] = [];
 const regions: Region[] = slice.regions.map((r) => {
   const id = core(r.id);
   text('region', id, 'name', r.name);
@@ -510,8 +636,9 @@ const regions: Region[] = slice.regions.map((r) => {
     cells.push({
       id: cid,
       region: id,
+      hex: need(cellHex.get(`${r.id}#${index + 1}`), `no hex for the cell ${r.id}#${index + 1}`),
       index,
-      key: key as Cell['key'],
+      key: key as CellBase['key'],
       story: /^Сюжет/.test(note ?? ''),
     });
     return cid;
@@ -519,16 +646,72 @@ const regions: Region[] = slice.regions.map((r) => {
   return { id, scout: r.scout, cells: cellIds };
 });
 
+// ---------- the hex grid, countries and places ----------
+
+/** Ids of the map data have hyphens (core:far-east); ids of the content use underscores. */
+const slugId = (id: string): string => id.replace(/-/g, '_');
+const worldHex = z
+  .object({
+    hexes: z.array(
+      z.object({
+        q: z.number().int(),
+        r: z.number().int(),
+        country: z.string(),
+        playable: z.boolean().optional(),
+        terrain: z.string().optional(),
+      }),
+    ),
+  })
+  .parse(readJson(join(mapDir, 'world-hex.json')));
+/** The docs call open sea a country; the content leaves it out. */
+const hexes = worldHex.hexes.map((h) => ({
+  q: h.q,
+  r: h.r,
+  ...(h.country === 'sea' ? {} : { country: slugId(h.country) }),
+  ...(h.playable === true
+    ? { terrain: need(h.terrain, `the playable hex ${h.q},${h.r} has no terrain`) }
+    : {}),
+}));
+const countries = z
+  .array(z.object({ id: z.string(), name: z.string(), token: z.string() }))
+  .parse(readJson(join(mapDir, 'countries.json')))
+  .map((c) => {
+    text('country', slugId(c.id), 'name', c.name);
+    return { id: slugId(c.id), token: c.token };
+  });
+const places = z
+  .array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      kind: z.string(),
+      role: z.string(),
+      hex: hexPair,
+      description: z.string(),
+    }),
+  )
+  .parse(readJson(join(mapDir, 'fire-places.json')))
+  .map((p) => {
+    text('place', slugId(p.id), 'name', p.name);
+    text('place', slugId(p.id), 'desc', p.description);
+    return { id: slugId(p.id), hex: p.hex, kind: p.kind, role: p.role };
+  });
+
 // ---------- balance ----------
 
 const roleKeys = new Map(Object.entries(ROLE_BY_UK));
 const rawParams = bal.params;
 const rawRole = rawParams.role as Record<string, unknown>;
 const params = balanceParamsSchema.parse({
-  ...BALANCE_EXT,
-  ...rawParams,
+  ...withOverrides({ ...BALANCE_EXT, ...rawParams }, BALANCE_OVERRIDE),
   role: Object.fromEntries(
     Object.entries(rawRole).map(([uk, v]) => [need(roleKeys.get(uk), `balance role "${uk}"`), v]),
+  ),
+  castByRole: Object.fromEntries(
+    Object.entries(rawParams.castByRole as Record<string, number>).map(([uk, v]) => [
+      need(roleKeys.get(uk), `balance castByRole "${uk}"`),
+      v,
+    ]),
   ),
 });
 const balance = { K: params, pace: bal.pace, capHours: bal.capHours, milestones: bal.milestones };
@@ -550,6 +733,9 @@ const db: GeneratedDb = generatedDbSchema.parse({
   missions,
   regions,
   cells,
+  hexes,
+  countries,
+  places,
   enemies,
   bosses,
   buildings,
@@ -562,7 +748,13 @@ if (ids.dirty) writeFileSync(registryPath, json(ids.table));
 mkdirSync(outData, { recursive: true });
 mkdirSync(dirname(outLocale), { recursive: true });
 for (const [name, value] of Object.entries(db))
-  writeFileSync(join(outData, `${name}.json`), json(value));
+  writeFileSync(
+    join(outData, `${name}.json`),
+    // The grid has over a thousand entries: one line each keeps the file readable and small.
+    name === 'hexes'
+      ? `[\n${(value as unknown[]).map((h) => `  ${JSON.stringify(h)}`).join(',\n')}\n]\n`
+      : json(value),
+  );
 const sorted = Object.fromEntries(
   Object.entries(locale).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)),
 );

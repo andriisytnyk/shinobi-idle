@@ -1,0 +1,39 @@
+[
+  {
+    "id": "core:raid_grey_bands",
+    "trigger": {
+      "t": "quest",
+      "id": "core:outskirts",
+      "step": 3
+    },
+    "enemy": "core:merc_pack",
+    "packs": 6,
+    "lead": 6,
+    "hold": 12,
+    "defence": [
+      {
+        "t": "building",
+        "id": "core:barrier",
+        "per": 20
+      },
+      {
+        "t": "resource",
+        "id": "okhorona",
+        "per": 2
+      },
+      {
+        "t": "resource",
+        "id": "syla_shynobi",
+        "per": 1
+      }
+    ],
+    "perPack": 20,
+    "autoShare": 0.5,
+    "targets": ["core:sawmill", "core:mine", "core:farms", "core:bureau", "core:market"],
+    "repair": 12,
+    "reward": {
+      "ryo": 300,
+      "rep": 10
+    }
+  }
+]

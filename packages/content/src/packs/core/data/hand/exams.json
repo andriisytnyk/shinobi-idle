@@ -1,0 +1,139 @@
+[
+  {
+    "id": "core:genin_exam",
+    "rank": "genin",
+    "checklist": {
+      "t": "all",
+      "of": [
+        {
+          "t": "skill",
+          "skill": "tai",
+          "level": 10
+        },
+        {
+          "t": "skill",
+          "skill": "nin",
+          "level": 10
+        },
+        {
+          "t": "skill",
+          "skill": "cc",
+          "level": 10
+        },
+        {
+          "t": "technique",
+          "id": "core:clone"
+        },
+        {
+          "t": "technique",
+          "id": "core:transformation"
+        },
+        {
+          "t": "technique",
+          "id": "core:body_replacement"
+        }
+      ]
+    },
+    "reduceBy": ["tai", "nin", "cc"],
+    "rewards": {
+      "items": [
+        {
+          "item": "core:graduate_scroll",
+          "n": 1
+        },
+        {
+          "item": "core:medpouch",
+          "n": 1
+        }
+      ],
+      "goal": {
+        "kind": "technique",
+        "id": "core:shadow_clone"
+      }
+    }
+  },
+  {
+    "id": "core:chunin_exam",
+    "rank": "chunin",
+    "checklist": {
+      "t": "all",
+      "of": [
+        {
+          "t": "skill",
+          "skill": "vit",
+          "level": 40
+        },
+        {
+          "t": "any",
+          "of": [
+            {
+              "t": "skill",
+              "skill": "tai",
+              "level": 40
+            },
+            {
+              "t": "skill",
+              "skill": "nin",
+              "level": 40
+            },
+            {
+              "t": "skill",
+              "skill": "katon",
+              "level": 40
+            },
+            {
+              "t": "skill",
+              "skill": "futon",
+              "level": 40
+            },
+            {
+              "t": "skill",
+              "skill": "raiton",
+              "level": 40
+            },
+            {
+              "t": "skill",
+              "skill": "doton",
+              "level": 40
+            },
+            {
+              "t": "skill",
+              "skill": "suiton",
+              "level": 40
+            }
+          ]
+        },
+        {
+          "t": "skill",
+          "skill": "scout",
+          "level": 20
+        },
+        {
+          "t": "skill",
+          "skill": "ath",
+          "level": 25
+        },
+        {
+          "t": "currency",
+          "role": "renown",
+          "n": 300
+        }
+      ]
+    },
+    "then": {
+      "t": "quest",
+      "id": "core:name_on_stone"
+    },
+    "reduceBy": ["scout"],
+    "rewards": {
+      "items": [
+        {
+          "item": "core:chunin_vest",
+          "n": 1
+        }
+      ],
+      "goal": null
+    },
+    "finale": true
+  }
+]

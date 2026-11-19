@@ -12,17 +12,16 @@ import {
   STATE_VERSION,
   xpAt,
 } from '../src/index.ts';
-import { genin, HOUR, start } from './helpers.ts';
+import { genin, HOUR, start, withNatures } from './helpers.ts';
 
 function played() {
-  const state = genin(9);
+  const state = withNatures(genin(9), 'suiton', 'katon');
   dispatch(state, start('practice', 'core:leaf_whirlwind'), content);
   advance(state, 1_234_567, content);
   state.bank['core:mint'] = 2;
   state.currencies.ryo = 55;
   state.flags['gate'] = true;
   state.player.name = 'Test';
-  state.player.natures = ['suiton', 'katon'];
   return state;
 }
 
@@ -77,7 +76,7 @@ describe('A10: save', () => {
     const state = deserialize(JSON.stringify(old), content);
     expect(state.v).toBe(STATE_VERSION);
     expect(state.stats).toEqual({ completed: 0 });
-    expect(state.skills.tai.xp).toBe(played().skills.tai.xp);
+    expect(state.skills.tai!.xp).toBe(played().skills.tai!.xp);
     expect(state.slots[0]?.action).toEqual({ kind: 'practice', id: 'core:leaf_whirlwind' });
   });
 
@@ -99,15 +98,16 @@ describe('A10: save', () => {
     s.rng.combat = [1, 2];
     s.slots = [{ action: { kind: 'practice', id: 'core:ghost' }, progress: 5, share: -1 }, 7];
     const state = deserialize(JSON.stringify(raw), content);
-    expect(Object.keys(state.skills)).toHaveLength(16);
-    expect(state.skills.tai.xp).toBe(xpAt(content.balance.K.cap));
-    expect(state.pools.tai.xp).toBeLessThan(1e15);
-    expect(Object.keys(state.pools)).toHaveLength(16);
+    expect(Object.keys(state.skills)).toHaveLength(15);
+    expect(state.skills.tai!.xp).toBe(xpAt(content.balance.K.cap));
+    expect(state.pools.tai!.xp).toBeLessThan(1e15);
+    expect(Object.keys(state.pools)).toHaveLength(15);
     expect(state.mastery['core:clone']).toEqual({ xp: 0 });
     expect(state.mastery['core:ghost']).toBeUndefined();
     expect(state.known['core:ghost']).toBeUndefined();
     expect(state.bank).toEqual({});
-    expect(state.flags).toEqual({ gate: true });
+    // The played game held two natures, which opened the rival's duel before the save was edited.
+    expect(state.flags).toEqual({ gate: true, 'boss.ren1.unlocked': true });
     expect(state.player.rank).toBe('student');
     expect(state.player.natures).toEqual(['katon']);
     expect(state.rng.combat).toEqual(createState(0, content).rng.combat);
@@ -141,7 +141,7 @@ describe('advanceOffline', () => {
     expect(summary.simulatedMs).toBe(12 * HOUR);
     expect(summary.capped).toBe(true);
     expect(state.now).toBe(12 * HOUR);
-    expect(summary.skillXp.tai).toBe(state.skills.tai.xp);
+    expect(summary.skillXp.tai).toBe(state.skills.tai!.xp);
     expect(summary.levelsGained.tai).toBeGreaterThan(10);
     expect(summary.masteryLevelsGained['core:leaf_whirlwind']).toBeGreaterThan(20);
     expect(Object.keys(summary.skillXp)).toEqual(['tai']);

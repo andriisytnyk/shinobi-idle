@@ -1,0 +1,648 @@
+[
+  {
+    "id": "core:hidden-leaf",
+    "name": "Селище Прихованого Листя (Коноха)",
+    "kind": "hidden-village",
+    "role": "settlement",
+    "hex": [
+      10,
+      17
+    ],
+    "terrain": "settlement",
+    "previewLabel": "Селище Прихованого Листя (Коноха)",
+    "labelled": true,
+    "description": "Твоє село: Академія, Бюро місій, ринок і Вежа Каґе. Усе, що лежить на мапі довкола, починається від його брам.",
+    "invented": false,
+    "status": "canon",
+    "era": "Засноване за життя Першого Хокаґе, тобто за кілька десятиліть до гри; існує всю гру.",
+    "sources": [
+      {
+        "label": "Narutopedia: Konohagakure",
+        "url": "https://naruto.fandom.com/wiki/Konohagakure"
+      },
+      {
+        "label": "Narutopedia: Land of Fire",
+        "url": "https://naruto.fandom.com/wiki/Land_of_Fire"
+      }
+    ],
+    "placeRef": "core:hidden-leaf",
+    "absorbsCell": null,
+    "sliceCellName": null,
+    "sliceNote": null,
+    "note": null
+  },
+  {
+    "id": "core:tanzaku",
+    "name": "Місто Танзаку",
+    "kind": "town",
+    "role": "settlement",
+    "hex": [
+      6,
+      16
+    ],
+    "terrain": "settlement",
+    "previewLabel": "Місто Танзаку",
+    "labelled": true,
+    "description": "Галасливе місто азарту й забав на заході, куди їдуть розважитися. Над ним стоїть старий замок, улюблена пам’ятка мандрівників.",
+    "invented": false,
+    "status": "canon",
+    "era": "Місто й замок Танзаку діють у першій частині серії; замок гине вже після іспиту на Чуніна.",
+    "sources": [
+      {
+        "label": "Narutopedia: Tanzaku Quarters",
+        "url": "https://naruto.fandom.com/wiki/Tanzaku_Quarters"
+      }
+    ],
+    "placeRef": "core:tanzaku",
+    "absorbsCell": null,
+    "sliceCellName": null,
+    "sliceNote": null,
+    "note": "Замок Танзаку входить у це місце, окремого гекса не має (щоб не роздувати щільність). Джерело ставить місто «на південний захід» від Листя; на мапі воно на заході."
+  },
+  {
+    "id": "core:shukuba",
+    "name": "Місто Сюкуба",
+    "kind": "town",
+    "role": "settlement",
+    "hex": [
+      7,
+      17
+    ],
+    "terrain": "settlement",
+    "previewLabel": "Місто Сюкуба",
+    "labelled": true,
+    "description": "Станційне містечко за кілька годин ходу від Листя: готелі, харчевні й чутки. Тут охоче зупиняються всі, хто прямує на захід.",
+    "invented": false,
+    "status": "canon",
+    "era": "Діє в першій частині серії (його відвідують, шукаючи Цунаде); отже, існує вже в епоху гри.",
+    "sources": [
+      {
+        "label": "Narutopedia: Shukuba Town",
+        "url": "https://naruto.fandom.com/wiki/Shukuba_Town"
+      }
+    ],
+    "placeRef": "core:shukuba",
+    "absorbsCell": "plains#2",
+    "sliceCellName": "Містечко на рівнинах",
+    "sliceNote": "Місія «Отруєна криниця»",
+    "note": "Назва «Містечко на рівнинах» клітинки plains#2 збігається з Сюкубою (рішення кроку 1)."
+  },
+  {
+    "id": "core:valley-of-the-end",
+    "name": "Долина Завершення",
+    "kind": "valley",
+    "role": "training",
+    "hex": [
+      12,
+      11
+    ],
+    "terrain": "river",
+    "previewLabel": "Долина Завершення",
+    "labelled": true,
+    "description": "Глибока розколина на північному кордоні, прорізана поєдинком двох засновників. Над водоспадом стоять статуї; тут добре тренувати удар.",
+    "invented": false,
+    "status": "canon",
+    "era": "Утворилася невдовзі після заснування Листя, задовго до епохи гри.",
+    "sources": [
+      {
+        "label": "Narutopedia: Valley of the End",
+        "url": "https://naruto.fandom.com/wiki/Valley_of_the_End"
+      },
+      {
+        "label": "Narutopedia: Land of Fire",
+        "url": "https://naruto.fandom.com/wiki/Land_of_Fire"
+      }
+    ],
+    "placeRef": "core:valley-of-the-end",
+    "absorbsCell": "valley#2",
+    "sliceCellName": "Статуї засновників",
+    "sliceNote": "Місце тренування: +10% досвіду Тайдзюцу",
+    "note": null
+  },
+  {
+    "id": "core:fire-temple",
+    "name": "Храм Вогню",
+    "kind": "temple",
+    "role": "training",
+    "hex": [
+      12,
+      18
+    ],
+    "terrain": "plains",
+    "previewLabel": "Храм Вогню",
+    "labelled": true,
+    "description": "Монастир ченців-шинобі, оточений лісами; про нього знає вся країна. Монахи охоче вчать тих, хто приходить із повагою.",
+    "invented": false,
+    "status": "canon",
+    "era": "Діє до другої частини серії (ченці й настоятель живі); у першій частині — давно діючий монастир.",
+    "sources": [
+      {
+        "label": "Narutopedia: Fire Temple",
+        "url": "https://naruto.fandom.com/wiki/Fire_Temple"
+      }
+    ],
+    "placeRef": null,
+    "absorbsCell": "plains#3",
+    "sliceCellName": "Храм Вогню",
+    "sliceNote": "Місце тренування: +10% досвіду Катону",
+    "note": "Джерело не називає відстані від Листя; на цей гекс його ставить клітинка plains#3 зрізу."
+  },
+  {
+    "id": "core:training-ground-44",
+    "name": "Полігон №44 «Ліс смерті»",
+    "kind": "training-ground",
+    "role": "training",
+    "hex": [
+      10,
+      16
+    ],
+    "terrain": "road",
+    "previewLabel": "Полігон №44",
+    "labelled": true,
+    "description": "Обгороджений ліс на околиці села, повний отруйних рослин і великих звірів. Саме тут перевіряють генінів перед званням Чуніна.",
+    "invented": false,
+    "status": "canon",
+    "era": "Полігон і вежа діють уже до іспиту на Чуніна, на якому його вперше показано.",
+    "sources": [
+      {
+        "label": "Narutopedia: Forty-Fourth Training Ground",
+        "url": "https://naruto.fandom.com/wiki/Forty-Fourth_Training_Ground"
+      }
+    ],
+    "placeRef": null,
+    "absorbsCell": "forest#5",
+    "sliceCellName": "Полігон №44 «Ліс смерті»",
+    "sliceNote": "Місце тренування: +10% досвіду Травництва; зона: звірі",
+    "note": "Джерело ставить полігон на околиці села, північніше Полігону №43."
+  },
+  {
+    "id": "core:nara-forest",
+    "name": "Ліс клану Нара",
+    "kind": "forest",
+    "role": "landmark",
+    "hex": [
+      9,
+      16
+    ],
+    "terrain": "forest",
+    "previewLabel": "Ліс Нара",
+    "labelled": true,
+    "description": "Заповідний ліс клану Нара край села: олені, яких тут доглядають, і правило, що чужим без дозволу вхід заборонено. Згарище складу стоїть на самій його межі.",
+    "invented": false,
+    "status": "canon",
+    "era": "Земля клану Нара, давніша за гру; змін до іспиту на Чуніна не зазнає.",
+    "sources": [
+      {
+        "label": "Narutopedia: Nara Clan Forest",
+        "url": "https://naruto.fandom.com/wiki/Nara_Clan_Forest"
+      }
+    ],
+    "placeRef": null,
+    "absorbsCell": "forest#3",
+    "sliceCellName": "Згарище складу",
+    "sliceNote": "Сюжет: сіра пов'язка",
+    "note": "Лише назва й заборона входу взяті з джерела; клітинка «Згарище складу» лишається з власним змістом."
+  },
+  {
+    "id": "core:kikyo-pass",
+    "name": "Перевал і замок Кікьо",
+    "kind": "castle-pass",
+    "role": "landmark",
+    "hex": [
+      12,
+      13
+    ],
+    "terrain": "forest",
+    "previewLabel": "Перевал Кікьо",
+    "labelled": true,
+    "description": "Гірський перевал, де наприкінці Третьої війни Листя зазнало важкої битви. Поряд на пагорбі стоїть старий замок з дахами у формі риб.",
+    "invented": false,
+    "status": "canon",
+    "era": "Битва — кінець Третьої війни (до гри), замок діє в першій частині серії.",
+    "sources": [
+      {
+        "label": "Narutopedia: Kikyō Pass",
+        "url": "https://naruto.fandom.com/wiki/Kikyō_Pass"
+      },
+      {
+        "label": "Narutopedia: Kikyō Castle",
+        "url": "https://naruto.fandom.com/wiki/Kikyō_Castle"
+      }
+    ],
+    "placeRef": null,
+    "absorbsCell": "valley#10",
+    "sliceCellName": "Старе поле бою",
+    "sliceNote": "Старовинні монети",
+    "note": "Джерело каже лише «біля кордону Листя»; клітинка «Старе поле бою» (старовинні монети) дає місце. Перевал і замок об’єднано в одне місце."
+  },
+  {
+    "id": "core:jofuku-forest",
+    "name": "Ліс Джофуку",
+    "kind": "forest-haunted",
+    "role": "landmark",
+    "hex": [
+      9,
+      12
+    ],
+    "terrain": "hills",
+    "previewLabel": "Ліс Джофуку",
+    "labelled": true,
+    "description": "Туманний гірський ліс на межі країни, де ростуть лікувальні квіти. Місцеві кажуть, що там водяться привиди, і без потреби туди не ходять.",
+    "invented": false,
+    "status": "canon",
+    "era": "Гора й ліс — природні об’єкти, які показано в аніме-вставках; жодних подій, що змінюють їх, до іспиту немає.",
+    "sources": [
+      {
+        "label": "Narutopedia: Jofuku Forest",
+        "url": "https://naruto.fandom.com/wiki/Jofuku_Forest"
+      },
+      {
+        "label": "Narutopedia: Mount Jofuku",
+        "url": "https://naruto.fandom.com/wiki/Mount_Jofuku"
+      }
+    ],
+    "placeRef": null,
+    "absorbsCell": "valley#7",
+    "sliceCellName": "Туманний яр",
+    "sliceNote": "Зона: мисливці-нін Туману; трофеї",
+    "note": "Лише аніме; положення «на межі країни» наближене до північного кордону. Якщо автор не бере аніме-контент — прибрати."
+  },
+  {
+    "id": "core:bamboo-village",
+    "name": "Бамбукове село",
+    "kind": "village",
+    "role": "settlement",
+    "hex": [
+      16,
+      12
+    ],
+    "terrain": "settlement",
+    "previewLabel": "Бамбукове село",
+    "labelled": true,
+    "description": "Тихе село на гирлі річки, де ставлять бамбукові хатини й сушать рибу. Звідси йде східний тракт до скелястого берега.",
+    "invented": false,
+    "status": "map-only",
+    "era": "Не встановлено: у каноні Бамбукове село лежить у Країні Гарячої Води й показане в романі, написаному після війни.",
+    "sources": [
+      {
+        "label": "Narutopedia: Bamboo Village",
+        "url": "https://naruto.fandom.com/wiki/Bamboo_Village"
+      }
+    ],
+    "placeRef": "core:bamboo-village",
+    "absorbsCell": null,
+    "sliceCellName": null,
+    "sliceNote": null,
+    "note": "Залишено, бо автор прийняв гекс; назва й опис — мапи-орієнтира й наші. Автору вирішити: лишити вигадане село під цією назвою чи перейменувати."
+  },
+  {
+    "id": "core:hell-valley",
+    "name": "Пекельна долина",
+    "kind": "valley",
+    "role": "landmark",
+    "hex": [
+      17,
+      13
+    ],
+    "terrain": "coast",
+    "previewLabel": "Пекельна долина",
+    "labelled": true,
+    "description": "Скеляста улоговина біля берега, де з-під землі б’є гаряча каламутна вода. Пахне сіркою, а місцеві обходять її стороною.",
+    "invented": false,
+    "status": "map-only",
+    "era": "Не встановлено: у каноні Пекельна долина лежить на острові Нанакуса на схід від Країни Вогню.",
+    "sources": [
+      {
+        "label": "Narutopedia: Hell Valley",
+        "url": "https://naruto.fandom.com/wiki/Hell_Valley"
+      }
+    ],
+    "placeRef": "core:hell-valley",
+    "absorbsCell": null,
+    "sliceCellName": null,
+    "sliceNote": null,
+    "note": "Залишено, бо автор прийняв гекс; опис наш. Автору вирішити: лишити як вигадане місце чи перейменувати."
+  },
+  {
+    "id": "core:west-gate-post",
+    "name": "Західна застава",
+    "kind": "outpost",
+    "role": "outpost",
+    "hex": [
+      9,
+      17
+    ],
+    "terrain": "road",
+    "previewLabel": "Західна застава",
+    "labelled": false,
+    "description": "Дерев’яна будка вартових на західному тракті за кілька кроків від брами. Тут перевіряють вози й записують тих, хто йде до Сюкуби.",
+    "invented": true,
+    "status": "invented",
+    "era": "Вигадане; діє від початку гри.",
+    "sources": [],
+    "placeRef": null,
+    "absorbsCell": "forest#1",
+    "sliceCellName": "Околиці села",
+    "sliceNote": "Застава",
+    "note": null
+  },
+  {
+    "id": "core:rice-hamlet",
+    "name": "Рисарський хутір",
+    "kind": "hamlet",
+    "role": "landmark",
+    "hex": [
+      11,
+      17
+    ],
+    "terrain": "road",
+    "previewLabel": "Рисарський хутір",
+    "labelled": false,
+    "description": "Кілька хат серед терасних полів, що годують село. Господарі щовесни просять шинобі відігнати птахів і щурів.",
+    "invented": true,
+    "status": "invented",
+    "era": "Вигадане; діє від початку гри.",
+    "sources": [],
+    "placeRef": null,
+    "absorbsCell": "forest#2",
+    "sliceCellName": "Рисові поля",
+    "sliceNote": null,
+    "note": null
+  },
+  {
+    "id": "core:charcoal-camp",
+    "name": "Табір вуглярів",
+    "kind": "camp",
+    "role": "deposit",
+    "hex": [
+      8,
+      14
+    ],
+    "terrain": "forest",
+    "previewLabel": "Табір вуглярів",
+    "labelled": true,
+    "description": "Курені, де випалюють деревне вугілля для кузень села. Серед повалених дубів нишпорять розбійники, що вигадують собі сховки.",
+    "invented": true,
+    "status": "invented",
+    "era": "Вигадане; діє від початку гри.",
+    "sources": [],
+    "placeRef": null,
+    "absorbsCell": "forest#10",
+    "sliceCellName": "Тернові зарості",
+    "sliceNote": "Родовище: стара діброва (Лісопилка +1); сховок розбійників",
+    "note": null
+  },
+  {
+    "id": "core:fishers-camp",
+    "name": "Рибальська стоянка",
+    "kind": "camp",
+    "role": "deposit",
+    "hex": [
+      7,
+      14
+    ],
+    "terrain": "lake",
+    "previewLabel": "Рибальська стоянка",
+    "labelled": false,
+    "description": "Кілька човнів і сітки на лісовому озері. Рибалки знають кожну яму, де береться найкраща риба.",
+    "invented": true,
+    "status": "invented",
+    "era": "Вигадане; діє від початку гри.",
+    "sources": [],
+    "placeRef": null,
+    "absorbsCell": "forest#11",
+    "sliceCellName": "Лісове озеро",
+    "sliceNote": "Родовище: рибні ями (Угіддя +1)",
+    "note": null
+  },
+  {
+    "id": "core:caravan-yard",
+    "name": "Караванний двір",
+    "kind": "camp",
+    "role": "zone",
+    "hex": [
+      10,
+      19
+    ],
+    "terrain": "road",
+    "previewLabel": "Караванний двір",
+    "labelled": true,
+    "description": "Колодязь і вигін, де торговці стають на ніч. Найманці в сірих пов’язках стежать за кожним возом, що рушає далі.",
+    "invented": true,
+    "status": "invented",
+    "era": "Вигадане; діє від початку гри.",
+    "sources": [],
+    "placeRef": null,
+    "absorbsCell": "plains#4",
+    "sliceCellName": "Караванний шлях",
+    "sliceNote": "Зона: найманці «Сірих пов'язок»",
+    "note": null
+  },
+  {
+    "id": "core:mercenary-den",
+    "name": "Табір найманців",
+    "kind": "lair",
+    "role": "zone",
+    "hex": [
+      9,
+      19
+    ],
+    "terrain": "plains",
+    "previewLabel": "Табір найманців",
+    "labelled": true,
+    "description": "Табір важких найманців у степових заростях, подалі від доріг. Вони служать тому, хто платить, а село до них не належить.",
+    "invented": true,
+    "status": "invented",
+    "era": "Вигадане; діє від початку гри.",
+    "sources": [],
+    "placeRef": null,
+    "absorbsCell": "plains#5",
+    "sliceCellName": "Табір найманців",
+    "sliceNote": "Зона: важкі найманці, дезертир Хмари (носій Хвилі натхнення)",
+    "note": null
+  },
+  {
+    "id": "core:war-fort-ruins",
+    "name": "Руїни фортеці Другої війни",
+    "kind": "ruins",
+    "role": "landmark",
+    "hex": [
+      6,
+      20
+    ],
+    "terrain": "plains",
+    "previewLabel": "Руїни фортеці",
+    "labelled": true,
+    "description": "Розбита прикордонна фортеця з часів Другої війни. Мури обвалилися, а вцілілі підвали досі бережуть те, що забули евакуювати.",
+    "invented": true,
+    "status": "invented",
+    "era": "Вигадане; діє від початку гри.",
+    "sources": [],
+    "placeRef": null,
+    "absorbsCell": "plains#7",
+    "sliceCellName": "Руїни прикордонної фортеці",
+    "sliceNote": "Сюжет: розкопки, бос Мандрівний боєць",
+    "note": null
+  },
+  {
+    "id": "core:fort-cellar",
+    "name": "Підвали фортеці",
+    "kind": "cellar",
+    "role": "vault",
+    "hex": [
+      7,
+      19
+    ],
+    "terrain": "plains",
+    "previewLabel": "Підвали фортеці",
+    "labelled": false,
+    "description": "Засипаний хід під валом веде до комори, де військові ховали цінні сувої.",
+    "invented": true,
+    "status": "invented",
+    "era": "Вигадане; діє від початку гри.",
+    "sources": [],
+    "placeRef": null,
+    "absorbsCell": "plains#8",
+    "sliceCellName": "Сховище фортеці",
+    "sliceNote": "Цілий сувій Полум'яної кулі вогняного дракона",
+    "note": null
+  },
+  {
+    "id": "core:salt-pans",
+    "name": "Соляні промисли",
+    "kind": "saltworks",
+    "role": "deposit",
+    "hex": [
+      12,
+      20
+    ],
+    "terrain": "plains",
+    "previewLabel": "Соляні промисли",
+    "labelled": true,
+    "description": "Неглибокі басейни на березі, де вода випаровується до солі. Усю країну забезпечують сіллю з цього берега.",
+    "invented": true,
+    "status": "invented",
+    "era": "Вигадане; діє від початку гри.",
+    "sources": [],
+    "placeRef": null,
+    "absorbsCell": "plains#9",
+    "sliceCellName": "Соляні копальні",
+    "sliceNote": "Родовище: сіль (Шахта +1)",
+    "note": null
+  },
+  {
+    "id": "core:deserted-farm",
+    "name": "Покинутий хутір",
+    "kind": "house",
+    "role": "landmark",
+    "hex": [
+      7,
+      21
+    ],
+    "terrain": "coast",
+    "previewLabel": "Покинутий хутір",
+    "labelled": false,
+    "description": "Господарі виїхали ще до війни, а хата стоїть, як стояла. Двері хитаються, а в дворі хтось раз у раз розпалює багаття.",
+    "invented": true,
+    "status": "invented",
+    "era": "Вигадане; діє від початку гри.",
+    "sources": [],
+    "placeRef": null,
+    "absorbsCell": "plains#12",
+    "sliceCellName": "Покинутий хутір",
+    "sliceNote": "Зона: мародери",
+    "note": null
+  },
+  {
+    "id": "core:hunter-lodge",
+    "name": "Хатина мисливця",
+    "kind": "house",
+    "role": "landmark",
+    "hex": [
+      10,
+      12
+    ],
+    "terrain": "hills",
+    "previewLabel": "Хатина мисливця",
+    "labelled": false,
+    "description": "Самотня хатина над стежкою на північ. Мисливець за головами обирає її для засідок: вікна дивляться на всю стежку.",
+    "invented": true,
+    "status": "invented",
+    "era": "Вигадане; діє від початку гри.",
+    "sources": [],
+    "placeRef": null,
+    "absorbsCell": "valley#4",
+    "sliceCellName": "Стежка мисливця",
+    "sliceNote": "Сюжет: бос Мисливець за головами",
+    "note": null
+  },
+  {
+    "id": "core:waterfall-shrine",
+    "name": "Руїни святилища біля водоспаду",
+    "kind": "shrine",
+    "role": "training",
+    "hex": [
+      11,
+      11
+    ],
+    "terrain": "hills",
+    "previewLabel": "Руїни святилища",
+    "labelled": true,
+    "description": "Напівзруйноване святилище під стіною води: дах провалився, а камінь для сидіння лишився. Тут добре сидіти нерухомо, доки вода шумить.",
+    "invented": true,
+    "status": "invented",
+    "era": "Вигадане; діє від початку гри.",
+    "sources": [],
+    "placeRef": null,
+    "absorbsCell": "valley#6",
+    "sliceCellName": "Святе місце біля водоспаду",
+    "sliceNote": "Місце тренування: +10% досвіду Медитації",
+    "note": null
+  },
+  {
+    "id": "core:wayside-teahouse",
+    "name": "Чайний будинок на розвилці",
+    "kind": "tea-house",
+    "role": "settlement",
+    "hex": [
+      14,
+      15
+    ],
+    "terrain": "road",
+    "previewLabel": "Чайний будинок",
+    "labelled": true,
+    "description": "Хатина з навісом там, де східний тракт розходиться до узбережжя. Господиня подає чай мандрівникам і знає всі новини з обох боків лісу.",
+    "invented": true,
+    "status": "invented",
+    "era": "Вигадане; діє від початку гри.",
+    "sources": [],
+    "placeRef": null,
+    "absorbsCell": null,
+    "sliceCellName": null,
+    "sliceNote": null,
+    "note": "Закриває порожній відтинок довжиною 4 гекси східного тракту."
+  },
+  {
+    "id": "core:fishing-village",
+    "name": "Рибальське село Хамабе",
+    "kind": "village",
+    "role": "settlement",
+    "hex": [
+      15,
+      17
+    ],
+    "terrain": "coast",
+    "previewLabel": "Село Хамабе",
+    "labelled": true,
+    "description": "Кілька хат і сушарок для риби на самому березі. У штормову погоду всі човни витягнуті на пісок, а чоловіки сидять по хатах.",
+    "invented": true,
+    "status": "invented",
+    "era": "Вигадане; діє від початку гри.",
+    "sources": [],
+    "placeRef": null,
+    "absorbsCell": null,
+    "sliceCellName": null,
+    "sliceNote": null,
+    "note": "Дає східному узбережжю, де шість гексів поспіль без жодного місця, чим зацікавитися."
+  }
+]

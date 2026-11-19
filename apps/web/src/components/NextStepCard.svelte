@@ -1,12 +1,14 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import { t } from '../lib/i18n.ts';
   import { nextStep } from '../lib/next-step.ts';
   import { game } from '../lib/store.ts';
   import EntityLink from './EntityLink.svelte';
+  import NatureOffer from './NatureOffer.svelte';
   import QuestObjective from './QuestObjective.svelte';
 
-  const step = $derived(nextStep(game.state, content));
+  const content = game.content;
+
+  const step = $derived(game.read((gs) => nextStep(gs, content)));
 </script>
 
 {#if step}
@@ -17,21 +19,22 @@
     <a class="go" href={step.target} data-go>{t('next.go')}</a>
   </section>
 {:else}
+  <NatureOffer />
   <p class="empty">{t('next.done')}</p>
 {/if}
 
 <style>
   .next {
     padding: var(--space-3);
-    border: 1px dashed var(--accent);
-    border-radius: var(--radius);
+    border: var(--border-thin) dashed var(--accent);
+    border-radius: var(--radius-md);
   }
 
   .quest {
     margin: 0;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 0.9rem;
+    font-size: var(--text-xs);
   }
 
   .quest :global(a) {
@@ -49,9 +52,9 @@
   .go {
     display: inline-flex;
     align-items: center;
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-4);
-    border: 1px solid var(--accent);
+    border: var(--border-thin) solid var(--accent);
     border-radius: var(--radius-sm);
     background: var(--accent);
     color: var(--ink-900);

@@ -1,0 +1,2642 @@
+[
+  {
+    "n": 1,
+    "id": "core:valley-of-the-end",
+    "name": "Долина Завершення",
+    "country": "core:fire",
+    "hex": [
+      12,
+      11
+    ],
+    "source": "author-map",
+    "origin": "canon",
+    "canonNames": "Valley of the End; Shūmatsu no Tani (終末の谷)",
+    "poiKind": "power",
+    "visual": "Глибока розколина з водоспадом; по боках дві великі кам'яні постаті обличчям одна до одної над водою.",
+    "references": "Каньйон з водоспадом (Ґранд-Каньйон, Нікко); колосальні скельні скульптури Лешаня"
+  },
+  {
+    "n": 2,
+    "id": "core:bamboo-village",
+    "name": "Бамбукове село",
+    "country": "core:fire",
+    "hex": [
+      16,
+      12
+    ],
+    "source": "author-map",
+    "origin": "map",
+    "canonNames": "Bamboo Village (позначка на мапі автора)",
+    "poiKind": "discovery",
+    "visual": "Рибальське село з бамбукових хатин на гирлі річки, сушарки з рибою.",
+    "references": "Бамбукові й рибальські села Південного Китаю"
+  },
+  {
+    "n": 3,
+    "id": "core:hell-valley",
+    "name": "Пекельна долина",
+    "country": "core:fire",
+    "hex": [
+      17,
+      13
+    ],
+    "source": "author-map",
+    "origin": "map",
+    "canonNames": "Hell Valley (позначка на мапі автора)",
+    "poiKind": "action",
+    "visual": "Скеляста улоговина, з землі б'є гаряча каламутна вода, пара, жовті плями сірки.",
+    "references": "Джіґокудані (Ноборібецу), гейзерні поля Йеллоустоуна"
+  },
+  {
+    "n": 4,
+    "id": "core:tanzaku",
+    "name": "Місто Танзаку",
+    "country": "core:fire",
+    "hex": [
+      6,
+      16
+    ],
+    "source": "author-map",
+    "origin": "canon",
+    "canonNames": "Tanzaku Quarters; Tanzaku Gai (タンザク街)",
+    "poiKind": "action",
+    "visual": "Строкате місто розваг: тісні вулиці, ліхтарі й вивіски, на пагорбі позаду старий замок.",
+    "references": "Нічні квартали Дотонборі в Осаці; японський замок на пагорбі"
+  },
+  {
+    "n": 5,
+    "id": "core:shukuba",
+    "name": "Місто Сюкуба",
+    "country": "core:fire",
+    "hex": [
+      7,
+      17
+    ],
+    "source": "author-map",
+    "origin": "canon",
+    "canonNames": "Shukuba Town; Shukuba (宿場町)",
+    "poiKind": "outpost",
+    "visual": "Станційне містечко: довга вулиця з двоповерховими готелями й конюшнями вздовж тракту.",
+    "references": "Поштова станція Цумаґо-дзюку (Японія)"
+  },
+  {
+    "n": 6,
+    "id": "core:hidden-leaf",
+    "name": "Селище Прихованого Листя (Коноха)",
+    "country": "core:fire",
+    "hex": [
+      10,
+      17
+    ],
+    "source": "author-map",
+    "origin": "canon",
+    "canonNames": "Konohagakure; Konoha (木ノ葉隠れの里)",
+    "poiKind": "outpost",
+    "visual": "Велике село в долині, оточене лісистими скелями; у центрі кругла вежа Каґе з червоним дахом, навколо щільні дахи з темної черепиці. Найбільша й найдетальніша точка карти. Власний герб-символ не малювати.",
+    "references": "Японське замкове місто між гір (Хімеджі, Мацумото)"
+  },
+  {
+    "n": 7,
+    "id": "core:waterfall-shrine",
+    "name": "Руїни святилища біля водоспаду",
+    "country": "core:fire",
+    "hex": [
+      11,
+      11
+    ],
+    "source": "mvp",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "power",
+    "visual": "Напівзруйноване святилище під струменем води; мох, камінь для сидіння.",
+    "references": "Нача-но-таки (Японія), Кеґон"
+  },
+  {
+    "n": 8,
+    "id": "core:jofuku-forest",
+    "name": "Ліс Джофуку",
+    "country": "core:fire",
+    "hex": [
+      9,
+      12
+    ],
+    "source": "mvp",
+    "origin": "canon",
+    "canonNames": "Jofuku Forest; Mount Jofuku (ジョフク山)",
+    "poiKind": "action",
+    "visual": "Туманний гірський ліс, великі стовбури в серпанку; лікарські квіти біля скель.",
+    "references": "Ліс Якусіма, Алішань (Тайвань)"
+  },
+  {
+    "n": 9,
+    "id": "core:hunter-lodge",
+    "name": "Хатина мисливця",
+    "country": "core:fire",
+    "hex": [
+      10,
+      12
+    ],
+    "source": "mvp",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Самотня хатина на пагорбі над стежкою.",
+    "references": "Мисливська хатина Карпат"
+  },
+  {
+    "n": 10,
+    "id": "core:kikyo-pass",
+    "name": "Перевал і замок Кікьо",
+    "country": "core:fire",
+    "hex": [
+      12,
+      13
+    ],
+    "source": "mvp",
+    "origin": "canon",
+    "canonNames": "Kikyō Pass; Kikyō Castle (桔梗峠, 桔梗城)",
+    "poiKind": "outpost",
+    "visual": "Перевал між двома схилами з невеликим замком на пагорбі; дахи з рибоподібними прикрасами.",
+    "references": "Замок Мацумото, перевали Ечіґо"
+  },
+  {
+    "n": 11,
+    "id": "core:fishers-camp",
+    "name": "Рибальська стоянка",
+    "country": "core:fire",
+    "hex": [
+      7,
+      14
+    ],
+    "source": "mvp",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Кілька човнів і мереж на лісовому озері.",
+    "references": "Озеро Кавагутіко"
+  },
+  {
+    "n": 12,
+    "id": "core:charcoal-camp",
+    "name": "Табір вуглярів",
+    "country": "core:fire",
+    "hex": [
+      8,
+      14
+    ],
+    "source": "mvp",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Курені й димарі, купи колод у лісі.",
+    "references": "Вугільні пічки Японії (сумі-ґама)"
+  },
+  {
+    "n": 13,
+    "id": "core:wayside-teahouse",
+    "name": "Чайний будинок на розвилці",
+    "country": "core:fire",
+    "hex": [
+      14,
+      15
+    ],
+    "source": "mvp",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Хатина з навісом на розвилці дороги, лавки з бамбука.",
+    "references": "Придорожні чайні Токкайдо"
+  },
+  {
+    "n": 14,
+    "id": "core:nara-forest",
+    "name": "Ліс клану Нара",
+    "country": "core:fire",
+    "hex": [
+      9,
+      16
+    ],
+    "source": "mvp",
+    "origin": "canon",
+    "canonNames": "Nara Clan Forest (奈良一族の森)",
+    "poiKind": "discovery",
+    "visual": "Світлий хвойний ліс із галявиною, де пасуться олені; білий паркан.",
+    "references": "Парк оленів у Нарі"
+  },
+  {
+    "n": 15,
+    "id": "core:training-ground-44",
+    "name": "Полігон №44 «Ліс смерті»",
+    "country": "core:fire",
+    "hex": [
+      10,
+      16
+    ],
+    "source": "mvp",
+    "origin": "canon",
+    "canonNames": "Forty-Fourth Training Ground; Training Ground 44 (第44演習場)",
+    "poiKind": "power",
+    "visual": "Густий ліс за високою дерев'яною огорожею з воротами; темно-зелений.",
+    "references": "Ліс Аокіґахара"
+  },
+  {
+    "n": 16,
+    "id": "core:west-gate-post",
+    "name": "Західна застава",
+    "country": "core:fire",
+    "hex": [
+      9,
+      17
+    ],
+    "source": "mvp",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Дерев'яна будка вартових і шлагбаум біля дороги.",
+    "references": "Дерев'яна застава періоду Едо"
+  },
+  {
+    "n": 17,
+    "id": "core:rice-hamlet",
+    "name": "Рисарський хутір",
+    "country": "core:fire",
+    "hex": [
+      11,
+      17
+    ],
+    "source": "mvp",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Кілька хат серед рисових терас, світло-зелена й жовта мозаїка.",
+    "references": "Тераси Ґалуні, Юаньян, Теґаллаланґ (Балі)"
+  },
+  {
+    "n": 18,
+    "id": "core:fishing-village",
+    "name": "Рибальське село Хамабе",
+    "country": "core:fire",
+    "hex": [
+      15,
+      17
+    ],
+    "source": "mvp",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Кілька хат на березі, сушарки з рибою, човни на піску.",
+    "references": "Рибальські села Іне (Японія)"
+  },
+  {
+    "n": 19,
+    "id": "core:fire-temple",
+    "name": "Храм Вогню",
+    "country": "core:fire",
+    "hex": [
+      12,
+      18
+    ],
+    "source": "mvp",
+    "origin": "canon",
+    "canonNames": "Fire Temple; Hi no Tera (火の寺)",
+    "poiKind": "power",
+    "visual": "Монастир серед лісу: кілька дерев'яних павільйонів і пагода, довга сходи з воріт-торі.",
+    "references": "Хорю-дзі (Нара), Ейхей-дзі"
+  },
+  {
+    "n": 20,
+    "id": "core:fort-cellar",
+    "name": "Підвали фортеці",
+    "country": "core:fire",
+    "hex": [
+      7,
+      19
+    ],
+    "source": "mvp",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "hidden",
+    "visual": "Засипаний хід у валу, видно лише напівзасипаний лаз із дерев'яною брамою.",
+    "references": "Підземні сховища; тунелі Кучі"
+  },
+  {
+    "n": 21,
+    "id": "core:mercenary-den",
+    "name": "Табір найманців",
+    "country": "core:fire",
+    "hex": [
+      9,
+      19
+    ],
+    "source": "mvp",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "requirement",
+    "visual": "Табір важких темних наметів у степових заростях, дим.",
+    "references": "Кочів'я Монголії; табір вікінгів"
+  },
+  {
+    "n": 22,
+    "id": "core:caravan-yard",
+    "name": "Караванний двір",
+    "country": "core:fire",
+    "hex": [
+      10,
+      19
+    ],
+    "source": "mvp",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Вигін із колодязем, вози, кілька наметів.",
+    "references": "Караван-сарай Шовкового шляху"
+  },
+  {
+    "n": 23,
+    "id": "core:war-fort-ruins",
+    "name": "Руїни фортеці Другої війни",
+    "country": "core:fire",
+    "hex": [
+      6,
+      20
+    ],
+    "source": "mvp",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Розбита кам'яна фортеця на пагорбі: вцілілі вежі, обвалені мури.",
+    "references": "Руїни замку Такеда, Хіта-ґахара"
+  },
+  {
+    "n": 24,
+    "id": "core:salt-pans",
+    "name": "Соляні промисли",
+    "country": "core:fire",
+    "hex": [
+      12,
+      20
+    ],
+    "source": "mvp",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Ряди неглибоких мілких басейнів на березі, білі кристали, сонце.",
+    "references": "Соляні промисли Ґерранд (Франція)"
+  },
+  {
+    "n": 25,
+    "id": "core:deserted-farm",
+    "name": "Покинутий хутір",
+    "country": "core:fire",
+    "hex": [
+      7,
+      21
+    ],
+    "source": "mvp",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Покинутий хутір: хата з провислим дахом, нечищений двір.",
+    "references": "Покинуті хутори Хонсю (хайкьо)"
+  },
+  {
+    "n": 26,
+    "id": "core:southern-ford-post",
+    "name": "Південна застава над кордоном",
+    "country": "core:fire",
+    "hex": [
+      5,
+      22
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Дерев'яна сторожова вежа й частокіл біля дороги, що йде в Країну Річок.",
+    "references": "Дерев'яні сторожові башти епохи Едо, застава Хаконе"
+  },
+  {
+    "n": 27,
+    "id": "core:smugglers-cove",
+    "name": "Контрабандистська бухта",
+    "country": "core:fire",
+    "hex": [
+      12,
+      23
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "hidden",
+    "visual": "Прихована бухта з морськими печерами й кількома човнами, видно лише з води.",
+    "references": "Печери Капрі, затока Навайо"
+  },
+  {
+    "n": 28,
+    "id": "core:south-lighthouse",
+    "name": "Південний маяк",
+    "country": "core:fire",
+    "hex": [
+      9,
+      25
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Білий кам'яний маяк на скелястому мисі, під ним дрібна пристань. Одна вежа, помітна, але менша за село.",
+    "references": "Старий кам'яний маяк на мисі (Cabo de São Vicente, Вікторія-Рок)"
+  },
+  {
+    "n": 29,
+    "id": "core:hidden-stone",
+    "name": "Селище Прихованого Каменю",
+    "country": "core:earth",
+    "hex": [
+      4,
+      8
+    ],
+    "source": "author-map",
+    "origin": "canon",
+    "canonNames": "Iwagakure; Iwa (岩隠れの里)",
+    "poiKind": "outpost",
+    "visual": "Село в скелі: башти й будинки, що виростають із жовто-коричневих кам'яних стовпів і виступів. Візуально може займати кілька гексів.",
+    "references": "Каппадокія, Мачу-Пікчу, фортеця Масада"
+  },
+  {
+    "n": 30,
+    "id": "core:kannabi-bridge",
+    "name": "Міст Каннабі",
+    "country": "core:earth",
+    "hex": [
+      6,
+      10
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Kannabi Bridge; Kannabibashi (神無毘橋)",
+    "poiKind": "outpost",
+    "visual": "Широкий кам'яний міст через вузьку ущелину між двома скелями, частково розбитий. Канон: на кордоні Вогню й Землі.",
+    "references": "Кам'яні мости-арки над ущелинами (Чжаочжоу, Рамбур)"
+  },
+  {
+    "n": 31,
+    "id": "core:northern-ridge",
+    "name": "Північний хребет",
+    "country": "core:earth",
+    "hex": [
+      2,
+      0
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Ряд гострих гранітних вершин із снігом на гребенях, сіро-блакитний. Лежить уздовж краю карти.",
+    "references": "Хребет Торрес-дель-Пайне, Гран-Сассо"
+  },
+  {
+    "n": 32,
+    "id": "core:sky-monastery",
+    "name": "Монастир на скелі",
+    "country": "core:earth",
+    "hex": [
+      8,
+      0
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "hidden",
+    "visual": "Кілька червоних дахів, вбудованих у вертикальну скелю; тонка сходина вгору.",
+    "references": "Метеори (Греція), Таксанг (Бутан)"
+  },
+  {
+    "n": 33,
+    "id": "core:obsidian-mine",
+    "name": "Обсидіанова копальня",
+    "country": "core:earth",
+    "hex": [
+      5,
+      1
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Чорний розріз у схилі з дерев'яними риштованнями й вагонетками; блиск скла.",
+    "references": "Обсидіановий купол (США), Ліпарі"
+  },
+  {
+    "n": 34,
+    "id": "core:coast-lookout",
+    "name": "Прибережний сторожовий пост",
+    "country": "core:earth",
+    "hex": [
+      10,
+      1
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Кам'яна вежа на скелястому мисі над морем, дим сигнального вогню.",
+    "references": "Береговий форт Міура, мис Ґібралтар"
+  },
+  {
+    "n": 35,
+    "id": "core:canyon-of-echoes",
+    "name": "Каньйон Відлуння",
+    "country": "core:earth",
+    "hex": [
+      1,
+      2
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "power",
+    "visual": "Вузький звивистий каньйон із вигладженими червоними стінами; світло смугами.",
+    "references": "Антілоп-Каньйон (США)"
+  },
+  {
+    "n": 36,
+    "id": "core:clay-quarry",
+    "name": "Глиняний кар'єр",
+    "country": "core:earth",
+    "hex": [
+      7,
+      2
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Рудувата яма зі сходинками, підводи з глиною, схили дзеркало червоні.",
+    "references": "Глиняні кар'єри Руссільйон (Франція)"
+  },
+  {
+    "n": 37,
+    "id": "core:stone-pillar-forest",
+    "name": "Ліс кам'яних стовпів",
+    "country": "core:earth",
+    "hex": [
+      3,
+      3
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Густа смуга високих вузьких стовпів з жовто-сірого каменю, що нагадують ліс.",
+    "references": "Шилінь (Юньнань), Чжанцзяцзе"
+  },
+  {
+    "n": 38,
+    "id": "core:third-war-fortress",
+    "name": "Фортеця Третьої війни",
+    "country": "core:earth",
+    "hex": [
+      9,
+      3
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "requirement",
+    "visual": "Кам'яна фортеця на плато з вцілілою башею і стінами, збройні склади всередині.",
+    "references": "Масада, замок Гогензальцбург"
+  },
+  {
+    "n": 39,
+    "id": "core:wind-watchtower",
+    "name": "Дозорна вежа Вітрів",
+    "country": "core:earth",
+    "hex": [
+      -1,
+      4
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Висока кам'яна вежа на голій гряді; прапор, що тріпоче.",
+    "references": "Дозорна вежа Великого китайського муру"
+  },
+  {
+    "n": 40,
+    "id": "core:iron-ore-camp",
+    "name": "Табір залізорудників",
+    "country": "core:earth",
+    "hex": [
+      5,
+      4
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Відкрита червона шахта з дерев'яними риштуваннями й довгою стежкою вниз.",
+    "references": "Кар'єр Месабі (США)"
+  },
+  {
+    "n": 41,
+    "id": "core:bandit-ravine",
+    "name": "Яр розбійників",
+    "country": "core:earth",
+    "hex": [
+      0,
+      5
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "hidden",
+    "visual": "Глибокий яр із кількома напівзамаскованими печерами й мотузяним мостом.",
+    "references": "Каньйон Ранґсар (Китай), Ронда"
+  },
+  {
+    "n": 42,
+    "id": "core:dry-riverbed",
+    "name": "Висохле русло",
+    "country": "core:earth",
+    "hex": [
+      8,
+      5
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Широке розтріскане русло, видно колишню течію, білі камінці.",
+    "references": "Вади Рам, каньйон Тара"
+  },
+  {
+    "n": 43,
+    "id": "core:rock-arch",
+    "name": "Кам'яна арка",
+    "country": "core:earth",
+    "hex": [
+      -2,
+      6
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Величезна природна арка із червоного каменю.",
+    "references": "Делікат-Арк (Юта)"
+  },
+  {
+    "n": 44,
+    "id": "core:ore-road-inn",
+    "name": "Заїзд на рудній дорозі",
+    "country": "core:earth",
+    "hex": [
+      3,
+      6
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Двоповерховий дерев'яний заїзд із конюшнею серед кам'янистої дороги.",
+    "references": "Заїзд на Токкайдо"
+  },
+  {
+    "n": 45,
+    "id": "core:old-burial-mounds",
+    "name": "Кургани забутих",
+    "country": "core:earth",
+    "hex": [
+      9,
+      6
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Низка кам'яних курганів із плитами й пошарпаними прапорцями.",
+    "references": "Курганні поховання кофун (Японія)"
+  },
+  {
+    "n": 46,
+    "id": "core:stone-garden",
+    "name": "Кам'яний сад",
+    "country": "core:earth",
+    "hex": [
+      0,
+      7
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "power",
+    "visual": "Тихий сад із вигладженого каменю й піску, сухі хвилі, кілька великих валунів.",
+    "references": "Рьоан-дзі (Кіото)"
+  },
+  {
+    "n": 47,
+    "id": "core:mining-town",
+    "name": "Шахтарське містечко",
+    "country": "core:earth",
+    "hex": [
+      6,
+      7
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Тісне містечко на схилі: каркаси копалень, дим із труб, візки.",
+    "references": "Бісбі (Арізона), Потосі (Болівія)"
+  },
+  {
+    "n": 48,
+    "id": "core:great-fissure",
+    "name": "Велика ущелина",
+    "country": "core:earth",
+    "hex": [
+      -2,
+      8
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "requirement",
+    "visual": "Довга темна тріщина в землі, з дна якої мерехтить червоним.",
+    "references": "Ущелина Крик (Ісландія, Альманнаґья)"
+  },
+  {
+    "n": 49,
+    "id": "core:earth-shrine",
+    "name": "Святилище Землі",
+    "country": "core:earth",
+    "hex": [
+      7,
+      8
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "power",
+    "visual": "Мале кам'яне святилище з червоними ворітьми-торі біля підніжжя скелі.",
+    "references": "Святилище Фусімі Інарі, Нікко"
+  },
+  {
+    "n": 50,
+    "id": "core:salt-cave",
+    "name": "Соляна печера",
+    "country": "core:earth",
+    "hex": [
+      1,
+      9
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Вхід у печеру з білими соляними натьоками, візки солекопів.",
+    "references": "Велічка (Польща), Хомур (Іран)"
+  },
+  {
+    "n": 51,
+    "id": "core:cliff-trail",
+    "name": "Скельна стежка",
+    "country": "core:earth",
+    "hex": [
+      5,
+      9
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Сходи, вирізані в скелі й підвішений місток над прірвою.",
+    "references": "Хуа-Шань (Китай), Тропа Кайтеріто"
+  },
+  {
+    "n": 52,
+    "id": "core:statue-quarry",
+    "name": "Кар'єр велетенських статуй",
+    "country": "core:earth",
+    "hex": [
+      3,
+      10
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Схил із недообтесаними гігантськими кам'яними обличчями, що виглядають із породи.",
+    "references": "Рано-Раракув (Острів Пасхи)"
+  },
+  {
+    "n": 53,
+    "id": "core:rockfall-pass",
+    "name": "Перевал Обвалів",
+    "country": "core:earth",
+    "hex": [
+      1,
+      11
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "requirement",
+    "visual": "Вузький перевал, заваляний уламками, що тримаються ледь-ледь.",
+    "references": "Каракорумське шосе"
+  },
+  {
+    "n": 54,
+    "id": "core:southern-watch",
+    "name": "Південний сторожовий пост",
+    "country": "core:earth",
+    "hex": [
+      4,
+      11
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Кам'яна застава й сходи до ущелини, прикордонна лінія з Дощем.",
+    "references": "Форти Джайпура (Нахаргарх)"
+  },
+  {
+    "n": 55,
+    "id": "core:stone-arch-bridge",
+    "name": "Кам'яний міст-арка",
+    "country": "core:earth",
+    "hex": [
+      2,
+      12
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Природний міст з каменю над невеликою річкою.",
+    "references": "Рейнбоу-Брідж (Юта), Натурбрюке"
+  },
+  {
+    "n": 56,
+    "id": "core:pottery-village",
+    "name": "Село кераміки",
+    "country": "core:wind",
+    "hex": [
+      1,
+      19
+    ],
+    "source": "author-map",
+    "origin": "map",
+    "canonNames": "(позначка на мапі автора)",
+    "poiKind": "action",
+    "visual": "Кілька глиняних хат, печі й полиці зі сушеним посудом на краю пустелі.",
+    "references": "Гончарні села Марокко (Сафі, Тамеслохт)"
+  },
+  {
+    "n": 57,
+    "id": "core:hidden-sand",
+    "name": "Селище Прихованого Піску",
+    "country": "core:wind",
+    "hex": [
+      -5,
+      22
+    ],
+    "source": "author-map",
+    "origin": "canon",
+    "canonNames": "Sunagakure; Suna (砂隠れの里)",
+    "poiKind": "outpost",
+    "visual": "Село в піщаній улоговині за колом високих піщаних стін; глинобитні будинки з плоскими дахами, широка центральна будівля. Тепла охра.",
+    "references": "Айт-Бенхадду (Марокко), Хіва, Ґардая"
+  },
+  {
+    "n": 58,
+    "id": "core:sasori-hideout",
+    "name": "Сховок Сасорі",
+    "country": "core:wind",
+    "hex": [
+      1,
+      15
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Sasori's Hideout (サソリのアジト); exact location in canon unclear",
+    "poiKind": "hidden",
+    "visual": "Темна печера в скелі, замаскована під звичайне урвище, з маленьким мостом у ущелині.",
+    "references": "Скельні печери Бамійана"
+  },
+  {
+    "n": 59,
+    "id": "core:kazekage-tower",
+    "name": "Вежа Казекаґе",
+    "country": "core:wind",
+    "hex": [
+      -5,
+      21
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Kazekage Residence; Kazekage Mansion (風影邸); Suna Government Building",
+    "poiKind": "requirement",
+    "visual": "Велика вежа-палац із глини з плоским дахом і башточкою, за мурами Суни. Один гекс, одразу над селом.",
+    "references": "Айт-Бенхадду, Касба Тауріт"
+  },
+  {
+    "n": 60,
+    "id": "core:suna-walls",
+    "name": "Кільцеві мури Суни",
+    "country": "core:wind",
+    "hex": [
+      -6,
+      22
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Sunagakure Walls; Suna's Great Wall (砂隠れの壁)",
+    "poiKind": "outpost",
+    "visual": "Дуга високого глиняного муру навколо піщаної улоговини з однією воротами.",
+    "references": "Стіни Хіви (Ічан-Кала)"
+  },
+  {
+    "n": 61,
+    "id": "core:wind-mesa",
+    "name": "Вітряна скеля",
+    "country": "core:wind",
+    "hex": [
+      -6,
+      13
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Висока меса з червоного пісковика, звітрена в смуги.",
+    "references": "Монумент-Веллі (США)"
+  },
+  {
+    "n": 62,
+    "id": "core:suna-north-post",
+    "name": "Північний форпост Суни",
+    "country": "core:wind",
+    "hex": [
+      -3,
+      13
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Квадратна глиняна башта й прапор на краю пустелі.",
+    "references": "Форт Джайсалмер"
+  },
+  {
+    "n": 63,
+    "id": "core:green-well-oasis",
+    "name": "Оаза Зеленого колодязя",
+    "country": "core:wind",
+    "hex": [
+      -6,
+      15
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Невелике озерце з пальмами й саду серед піску; рідкісні трави.",
+    "references": "Сіва (Єгипет), Ейн-Геді"
+  },
+  {
+    "n": 64,
+    "id": "core:witness-stones",
+    "name": "Кам'яні свідки",
+    "country": "core:wind",
+    "hex": [
+      -2,
+      15
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Кілька високих стовпів із піску й каменю, вертикальні, поодинокі.",
+    "references": "Скелі-худу (Брайс-Каньйон, США)"
+  },
+  {
+    "n": 65,
+    "id": "core:copper-mine",
+    "name": "Мідні копальні",
+    "country": "core:wind",
+    "hex": [
+      0,
+      15
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Зелено-руді відвали й дерев'яні риштування над неглибокими шахтами.",
+    "references": "Тімна (Ізраїль)"
+  },
+  {
+    "n": 66,
+    "id": "core:singing-dunes",
+    "name": "Співучі дюни",
+    "country": "core:wind",
+    "hex": [
+      -8,
+      16
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Високі плавні дюни золотого кольору з чітким гребенем.",
+    "references": "Мінґша-шань (Дуньхуан)"
+  },
+  {
+    "n": 67,
+    "id": "core:silk-caravanserai",
+    "name": "Караванна стоянка",
+    "country": "core:wind",
+    "hex": [
+      -4,
+      16
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Квадратний двір із колодязем і аркадами, верблюди.",
+    "references": "Караван-сарай Зейн-од-Дін (Іран)"
+  },
+  {
+    "n": 68,
+    "id": "core:buried-city",
+    "name": "Занесене піском місто",
+    "country": "core:wind",
+    "hex": [
+      -7,
+      17
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Напівзанесені колони й стіни, пісок у вулицях.",
+    "references": "Пальміра, Петра"
+  },
+  {
+    "n": 69,
+    "id": "core:mud-fortress",
+    "name": "Глиняна фортеця",
+    "country": "core:wind",
+    "hex": [
+      -2,
+      17
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Квадратна глиняна фортеця з чотирма вежами й вузькими вікнами.",
+    "references": "Касба Тауріт, Ксар Айт-Бенхадду"
+  },
+  {
+    "n": 70,
+    "id": "core:roadside-well",
+    "name": "Придорожній колодязь",
+    "country": "core:wind",
+    "hex": [
+      1,
+      17
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Кам'яний колодязь із навісом і поїлкою біля дороги.",
+    "references": "Колодязі Тімбукту"
+  },
+  {
+    "n": 71,
+    "id": "core:salt-lake",
+    "name": "Соляне озеро",
+    "country": "core:wind",
+    "hex": [
+      -9,
+      18
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Біла сіль, плоска й дзеркальна, місцями рожева вода.",
+    "references": "Салар-де-Уюні, озеро Ретба"
+  },
+  {
+    "n": 72,
+    "id": "core:sand-beacon",
+    "name": "Піщана сигнальна вежа",
+    "country": "core:wind",
+    "hex": [
+      -5,
+      18
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Циліндрична цегляна вежа на піщаному пагорбі з димовим сигналом.",
+    "references": "Сигнальні вежі Дуньхуана"
+  },
+  {
+    "n": 73,
+    "id": "core:giant-bones",
+    "name": "Кістки велетня",
+    "country": "core:wind",
+    "hex": [
+      -8,
+      19
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Скелет велетенського звіра, напіввідкритий із піску.",
+    "references": "Скам'янілості Гобі, Вальдемар"
+  },
+  {
+    "n": 74,
+    "id": "core:sand-wall-battlefield",
+    "name": "Поле битви біля стіни",
+    "country": "core:wind",
+    "hex": [
+      -4,
+      20
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Поле зі зламаними списами, полотнами й обгорілими тілами вози.",
+    "references": "Поле Бородіно"
+  },
+  {
+    "n": 75,
+    "id": "core:nomad-camp",
+    "name": "Табір кочівників",
+    "country": "core:wind",
+    "hex": [
+      -1,
+      20
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Кілька барвистих наметів, загони верблюдів.",
+    "references": "Бедуїнські табори Ваді-Рам"
+  },
+  {
+    "n": 76,
+    "id": "core:sunken-temple",
+    "name": "Підземний храм у пісках",
+    "country": "core:wind",
+    "hex": [
+      -10,
+      21
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "power",
+    "visual": "Вирубаний у пісковику храм із колонами, видно сходи вниз.",
+    "references": "Абу-Сімбел, Лалібела"
+  },
+  {
+    "n": 77,
+    "id": "core:scorpion-gorge",
+    "name": "Скорпіонова ущелина",
+    "country": "core:wind",
+    "hex": [
+      -7,
+      21
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "requirement",
+    "visual": "Вузька вертикальна щілина в пісковику, у тіні — рудувато-чорне.",
+    "references": "Антілоп-Каньйон"
+  },
+  {
+    "n": 78,
+    "id": "core:wind-pinnacles",
+    "name": "Скелі-вітрорізи",
+    "country": "core:wind",
+    "hex": [
+      -11,
+      23
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Рівнина з тонких жовтих шпилів у піску.",
+    "references": "Піннакл-Дезерт (Австралія)"
+  },
+  {
+    "n": 79,
+    "id": "core:sandworm-lair",
+    "name": "Лігво піщаного звіра",
+    "country": "core:wind",
+    "hex": [
+      -8,
+      24
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "hidden",
+    "visual": "Велика лійка в піску з темним вузьким центром.",
+    "references": "Лійки мурашиного лева; кратери пустелі Атакама"
+  },
+  {
+    "n": 80,
+    "id": "core:kazekage-tomb",
+    "name": "Гробниця старого Казекаґе",
+    "country": "core:wind",
+    "hex": [
+      -4,
+      24
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "hidden",
+    "visual": "Піщаний курган із кам'яним входом і двома стражами-колонами.",
+    "references": "Долина Царів, піраміда Джосера"
+  },
+  {
+    "n": 81,
+    "id": "core:dry-harbor",
+    "name": "Сухий причал",
+    "country": "core:wind",
+    "hex": [
+      -1,
+      24
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Рибальське портове село з саманними хатами, човни на мілководді.",
+    "references": "Ессуейра (Марокко)"
+  },
+  {
+    "n": 82,
+    "id": "core:ship-in-dunes",
+    "name": "Корабель серед дюн",
+    "country": "core:wind",
+    "hex": [
+      -12,
+      25
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Старий розбитий корабель, напівзасипаний піском.",
+    "references": "Аральське море (Мойнак)"
+  },
+  {
+    "n": 83,
+    "id": "core:wind-ritual-circle",
+    "name": "Коло ритуалу вітру",
+    "country": "core:wind",
+    "hex": [
+      -6,
+      25
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "power",
+    "visual": "Коло з гладких кам'яних стовпів і піщаний вихор у центрі.",
+    "references": "Стоунгендж, Каллаліш"
+  },
+  {
+    "n": 84,
+    "id": "core:mirage-plain",
+    "name": "Рівнина міражів",
+    "country": "core:wind",
+    "hex": [
+      -9,
+      26
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "hidden",
+    "visual": "Плоска спекотна рівнина, на горизонті — мерехтіння, що нагадує місто.",
+    "references": "Салар-де-Уюні в сонці"
+  },
+  {
+    "n": 85,
+    "id": "core:south-coast-tower",
+    "name": "Прибережна башта",
+    "country": "core:wind",
+    "hex": [
+      -3,
+      26
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Одинока башта з глини над берегом.",
+    "references": "Береговий форт Рас-ель-Хадд"
+  },
+  {
+    "n": 86,
+    "id": "core:hidden-cloud",
+    "name": "Селище Прихованої Хмари",
+    "country": "core:lightning",
+    "hex": [
+      24,
+      7
+    ],
+    "source": "author-map",
+    "origin": "canon",
+    "canonNames": "Kumogakure; Kumo (雲隠れの里)",
+    "poiKind": "outpost",
+    "visual": "Місто на вершині гірського плато: білі й сині будинки, чий верх тоне в хмарах; грозові хмари довкола.",
+    "references": "Потала (Лхаса), Паро (Бутан), Мачу-Пікчу в хмарах"
+  },
+  {
+    "n": 87,
+    "id": "core:alliance-hq",
+    "name": "Штаб Альянсу шінобі",
+    "country": "core:lightning",
+    "hex": [
+      27,
+      7
+    ],
+    "source": "author-map",
+    "origin": "canon",
+    "canonNames": "Allied Shinobi Forces Headquarters (忍連合本部)",
+    "poiKind": "requirement",
+    "visual": "Велика польова фортеця-намет із прапорами й сторожовими вежами; багато наметів навколо.",
+    "references": "Римський польовий табір; ставка монгольського хана"
+  },
+  {
+    "n": 88,
+    "id": "core:turtle-island",
+    "name": "Черепашачий острів",
+    "country": "core:lightning",
+    "hex": [
+      27,
+      9
+    ],
+    "source": "author-map",
+    "origin": "canon",
+    "canonNames": "Turtle Island; Kame no Shima (亀の島)",
+    "poiKind": "hidden",
+    "visual": "Острів у формі велетенського панцира черепахи: порослий лісом, в обіймах туману.",
+    "references": "острів Санта-Крус (Галапагоси) із горбатим силуетом"
+  },
+  {
+    "n": 89,
+    "id": "core:valley-of-clouds-lightning",
+    "name": "Долина Хмар і Блискавок",
+    "country": "core:lightning",
+    "hex": [
+      22,
+      6
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Valley of Clouds and Lightning; Kumorai-kyō (雲雷峡)",
+    "poiKind": "power",
+    "visual": "Глибока долина з дикими скелями й постійними грозовими хмарами, блискавки б'ють у скелі.",
+    "references": "Тіан-Шань, Цзюйчжайґоу"
+  },
+  {
+    "n": 90,
+    "id": "core:raikage-tower",
+    "name": "Вежа Райкаґе",
+    "country": "core:lightning",
+    "hex": [
+      23,
+      7
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Raikage Tower; Raikage's Office (雷影ビル)",
+    "poiKind": "requirement",
+    "visual": "Біла вежа на кручі, поряд із Кумо, з прапорами й громовідводом.",
+    "references": "Потала, Бутанські дзонґи"
+  },
+  {
+    "n": 91,
+    "id": "core:cape-of-thunder",
+    "name": "Мис Громів",
+    "country": "core:lightning",
+    "hex": [
+      28,
+      0
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Скеляста коса в морі, над нею клуби грозових хмар.",
+    "references": "Мис Фінистерре, Лофотенські острови"
+  },
+  {
+    "n": 92,
+    "id": "core:storm-observatory",
+    "name": "Грозова обсерваторія",
+    "country": "core:lightning",
+    "hex": [
+      32,
+      2
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "power",
+    "visual": "Кам'яна вежа з металевими стрижнями на схилі.",
+    "references": "Обсерваторія Піку-дю-Міді"
+  },
+  {
+    "n": 93,
+    "id": "core:coastal-lookout-lightning",
+    "name": "Берегова застава",
+    "country": "core:lightning",
+    "hex": [
+      26,
+      3
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Дерев'яна вежа й причал біля скелястої затоки.",
+    "references": "Рибальські села Лофотенів"
+  },
+  {
+    "n": 94,
+    "id": "core:storm-canyon",
+    "name": "Каньйон Бурі",
+    "country": "core:lightning",
+    "hex": [
+      30,
+      4
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Темний вузький каньйон із вирами, грозові хмари вгорі.",
+    "references": "Каньйон Тара"
+  },
+  {
+    "n": 95,
+    "id": "core:thunder-pass",
+    "name": "Грозовий перевал",
+    "country": "core:lightning",
+    "hex": [
+      22,
+      5
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "requirement",
+    "visual": "Вузька гірська стежка вздовж урвища, ледь видні прапорці.",
+    "references": "Перевал Хараті, Рохтанг"
+  },
+  {
+    "n": 96,
+    "id": "core:silver-peak-shrine",
+    "name": "Святилище Срібної вершини",
+    "country": "core:lightning",
+    "hex": [
+      28,
+      5
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "power",
+    "visual": "Мале святилище на вершині, залізні дзвоники й ліхтарі.",
+    "references": "Святилище на горі Фудзі"
+  },
+  {
+    "n": 97,
+    "id": "core:ore-camp-lightning",
+    "name": "Рудничний табір",
+    "country": "core:lightning",
+    "hex": [
+      30,
+      6
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Темні печери в схилі, візки, дерев'яні мостини.",
+    "references": "Рудники Ґанґзі"
+  },
+  {
+    "n": 98,
+    "id": "core:cloud-harbor",
+    "name": "Гавань Хмар",
+    "country": "core:lightning",
+    "hex": [
+      21,
+      8
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Рибальське село з пірсом і сушарками під хмарами.",
+    "references": "Рибальські села Лофотенів"
+  },
+  {
+    "n": 99,
+    "id": "core:thunder-plateau",
+    "name": "Громове плато",
+    "country": "core:lightning",
+    "hex": [
+      26,
+      8
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Рівне кам'яне плато з вигорілими плямами від блискавок.",
+    "references": "Пустеля Кумта"
+  },
+  {
+    "n": 100,
+    "id": "core:hidden-mist",
+    "name": "Селище Прихованого Туману",
+    "country": "core:water",
+    "hex": [
+      25,
+      18
+    ],
+    "source": "author-map",
+    "origin": "canon",
+    "canonNames": "Kirigakure; Kiri (霧隠れの里)",
+    "poiKind": "outpost",
+    "visual": "Село на острові в тумані: видно лише дахи й вежі; бліді блакитно-сірі тони; мотузкові мости.",
+    "references": "Затока Халонг, Хуаншань у тумані"
+  },
+  {
+    "n": 101,
+    "id": "core:mizukage-tower",
+    "name": "Вежа Мідзукаґе",
+    "country": "core:water",
+    "hex": [
+      25,
+      17
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Mizukage's Office; Mizukage Tower (水影邸)",
+    "poiKind": "requirement",
+    "visual": "Круглий будинок на скелі, видно з туману лише дах; один гекс.",
+    "references": "Ханґчжоу, пагода Лейфен"
+  },
+  {
+    "n": 102,
+    "id": "core:hozuki-castle",
+    "name": "Замок Хозукі",
+    "country": "core:water",
+    "hex": [
+      27,
+      17
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Hōzuki Castle (鬼灯城); canon places it in the Land of Water, exact spot not fixed",
+    "poiKind": "hidden",
+    "visual": "Біла вежа-замок із темним дахом, оточений глибоким озером.",
+    "references": "Замок Хімеджі, Мацуе"
+  },
+  {
+    "n": 103,
+    "id": "core:silent-monk-rock",
+    "name": "Скеля мовчазного монаха",
+    "country": "core:water",
+    "hex": [
+      33,
+      10
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "hidden",
+    "visual": "Одинока висока скеля в морі із маленькою пагодою на вершині.",
+    "references": "Тайванська скеля Ліньфу, Мон-Сен-Мішель"
+  },
+  {
+    "n": 104,
+    "id": "core:island-lighthouse",
+    "name": "Острівний маяк",
+    "country": "core:water",
+    "hex": [
+      21,
+      19
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Одинока біла вежа на крихітній скелі, довкола — туман.",
+    "references": "Маяк Еддістоун"
+  },
+  {
+    "n": 105,
+    "id": "core:mist-fishing-village",
+    "name": "Рибальське село на палях",
+    "country": "core:water",
+    "hex": [
+      28,
+      19
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Хатини на дерев'яних палях над мілиною, сітки й човни.",
+    "references": "Села Ха-Лонг, Табон"
+  },
+  {
+    "n": 106,
+    "id": "core:gato-mansion",
+    "name": "Садиба Ґато",
+    "country": "core:waves",
+    "hex": [
+      23,
+      11
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Gatō's Mansion; Gatō Company hideout (ガトーの屋敷)",
+    "poiKind": "requirement",
+    "visual": "Великий білий особняк із високим парканом, вартові на воротах.",
+    "references": "Західні особняки Шанхаю, Колоніальний Гонконг"
+  },
+  {
+    "n": 107,
+    "id": "core:tazunas-village",
+    "name": "Село Тадзуни",
+    "country": "core:waves",
+    "hex": [
+      24,
+      11
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Tazuna's village (Land of Waves; unnamed in canon)",
+    "poiKind": "action",
+    "visual": "Бідне село з дерев'яних хатин на березі, мережі й рибальські човни, поряд недобудований причал.",
+    "references": "Рибальські села Ха-Лонґ, Ґуйчжоу"
+  },
+  {
+    "n": 108,
+    "id": "core:zabuza-forest",
+    "name": "Ліс Забузи й Хаку",
+    "country": "core:waves",
+    "hex": [
+      25,
+      11
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Zabuza and Haku's hideout in the Land of Waves forest (再不斬の隠れ家); precise spot is not fixed",
+    "poiKind": "hidden",
+    "visual": "Тінистий ліс із напівзруйнованою хатою біля озерця; шліф туману між стовбурами.",
+    "references": "Ліс Арасіяма (Кіото)"
+  },
+  {
+    "n": 109,
+    "id": "core:uzushio-ruins",
+    "name": "Руїни Вихрового селища",
+    "country": "core:waves",
+    "hex": [
+      23,
+      12
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Uzushiogakure; Uzu (渦潮隠れの里), Land of Whirlpools; on the author map the Land of Waves is the former Land of Whirlpools, so the ruins stand on its islands",
+    "poiKind": "requirement",
+    "visual": "Зруйноване село на скелястому острові, потріскані стіни, вихор у морі довкола.",
+    "references": "Руїни Ґункан-дзіма (Хашіма), Піраміда Йонаґуні"
+  },
+  {
+    "n": 110,
+    "id": "core:great-naruto-bridge",
+    "name": "Великий міст Наруто",
+    "country": "core:waves",
+    "hex": [
+      16,
+      18
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Great Naruto Bridge; Ōnaruto-bashi (ナルト大橋; Tazuna's Bridge)",
+    "poiKind": "outpost",
+    "visual": "Довгий підвісний міст на двох високих кам'яних опорах, що веде від берега Вогню в море; пілони, троси. Займає гекс повністю.",
+    "references": "Мости Акасі-Кайкьо, Сеттай; Ґолден-Ґейт (не копіювати)"
+  },
+  {
+    "n": 111,
+    "id": "core:waves-harbor",
+    "name": "Гавань Хвиль",
+    "country": "core:waves",
+    "hex": [
+      22,
+      13
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Невеликий порт із кількома човнами й хвилерізом.",
+    "references": "Порти Адріатики; Кірібаті"
+  },
+  {
+    "n": 112,
+    "id": "core:myoboku-mountain",
+    "name": "Гора Мьобоку",
+    "country": "core:forests",
+    "hex": [
+      19,
+      23
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Mount Myōboku; Myōbokuzan (妙木山); location in canon is unknown",
+    "poiKind": "hidden",
+    "visual": "Темна зелена гора, що тягнеться вгору, поросла велетенськими деревами й гігантськими жабами-скульптурами в гущавині.",
+    "references": "Чжанцзяцзе, узбережжя На-Паолі (Кауаї)"
+  },
+  {
+    "n": 113,
+    "id": "core:shikkotsu-forest",
+    "name": "Ліс Шіккоцу",
+    "country": "core:forests",
+    "hex": [
+      18,
+      24
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Shikkotsu Forest; Shikkotsu no Mori (湿骨林); location in canon is unknown",
+    "poiKind": "hidden",
+    "visual": "Вологий ліс-болото з велетенськими слимаками й сніданком туману, вузлуваті корені.",
+    "references": "Дощовий ліс Дейнтрі (Австралія), болота Сундарбан"
+  },
+  {
+    "n": 114,
+    "id": "core:old-oak-isle",
+    "name": "Острів Старого Дуба",
+    "country": "core:forests",
+    "hex": [
+      16,
+      20
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "power",
+    "visual": "Один величезний дуб над невеликою галявиною, рвані корені над водою.",
+    "references": "Дуб Ґорі (Токіо), мангрові острови Таїланду"
+  },
+  {
+    "n": 115,
+    "id": "core:forest-hunters-camp",
+    "name": "Мисливський табір",
+    "country": "core:forests",
+    "hex": [
+      14,
+      21
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Кілька дерев'яних наметів і сушарки під деревами.",
+    "references": "Табір мисливців Амазонії"
+  },
+  {
+    "n": 116,
+    "id": "core:akatsuki-hideout",
+    "name": "Сховок Акацукі",
+    "country": "core:rivers",
+    "hex": [
+      3,
+      19
+    ],
+    "source": "author-map",
+    "origin": "map",
+    "canonNames": "(позначка на мапі автора)",
+    "poiKind": "hidden",
+    "visual": "Печера в урвищі, прикрита кам'яними плитами; ледь помітна темна пляма в світлому каньйоні.",
+    "references": "Скельні печери Каппадокії"
+  },
+  {
+    "n": 117,
+    "id": "core:hidden-valley-village",
+    "name": "Селище Прихованої Долини",
+    "country": "core:rivers",
+    "hex": [
+      3,
+      21
+    ],
+    "source": "author-map",
+    "origin": "map",
+    "canonNames": "(позначка на мапі автора)",
+    "poiKind": "discovery",
+    "visual": "Село на дні вузької заліснененої долини, дахи ледь видно з-під дерев.",
+    "references": "Долина Хунза, альпійські села Швейцарії"
+  },
+  {
+    "n": 118,
+    "id": "core:rivers-border-ford",
+    "name": "Прикордонний брід",
+    "country": "core:rivers",
+    "hex": [
+      4,
+      15
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Мілкий брід із кам'яною дамбою й будкою вартових.",
+    "references": "Брід Равенсбурґ, річкові броди Піренеїв"
+  },
+  {
+    "n": 119,
+    "id": "core:river-mills",
+    "name": "Річкові млини",
+    "country": "core:rivers",
+    "hex": [
+      3,
+      17
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Кілька водяних млинів на малій річці, великі колеса.",
+    "references": "Млини Кіндердейк (Нідерланди)"
+  },
+  {
+    "n": 120,
+    "id": "core:rivers-east-post",
+    "name": "Східна застава",
+    "country": "core:rivers",
+    "hex": [
+      5,
+      19
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Дерев'яна башта над берегом річки й шлагбаум на дорозі до Вогню.",
+    "references": "Застава Токайдо"
+  },
+  {
+    "n": 121,
+    "id": "core:rivers-rice-terraces",
+    "name": "Рисові тераси",
+    "country": "core:rivers",
+    "hex": [
+      2,
+      20
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Зелені тераси вздовж пагорба, водні дзеркала.",
+    "references": "Рисові тераси Хані (Юньнань)"
+  },
+  {
+    "n": 122,
+    "id": "core:river-port",
+    "name": "Річковий порт",
+    "country": "core:rivers",
+    "hex": [
+      4,
+      22
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Дерев'яні причали з баржами на широкій річці.",
+    "references": "Порти Мекон, Сучжоу"
+  },
+  {
+    "n": 123,
+    "id": "core:old-fort-bridge",
+    "name": "Старий мостовий форт",
+    "country": "core:rivers",
+    "hex": [
+      1,
+      23
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Кам'яна арка-міст із сторожовою вежею з одного боку.",
+    "references": "Міст Валентре (Каор)"
+  },
+  {
+    "n": 124,
+    "id": "core:tenchi-bridge",
+    "name": "Міст Тенчі",
+    "country": "core:rain",
+    "hex": [
+      5,
+      13
+    ],
+    "source": "author-map",
+    "origin": "canon",
+    "canonNames": "Tenchi Bridge; Tenchikyō (天地橋)",
+    "poiKind": "action",
+    "visual": "Довгий кам'яний міст-арка над глибокою ущелиною, на обох кінцях сторожові ворота.",
+    "references": "Кам'яні мости-арки Китаю (Чжаочжоу), Рамбур"
+  },
+  {
+    "n": 125,
+    "id": "core:hidden-rain",
+    "name": "Селище Прихованого Дощу",
+    "country": "core:rain",
+    "hex": [
+      3,
+      14
+    ],
+    "source": "author-map",
+    "origin": "canon",
+    "canonNames": "Amegakure; Ame (雨隠れの里)",
+    "poiKind": "outpost",
+    "visual": "Місто високих сталевих веж, що тягнуться вгору в сірій мряці; між ними труби й місточки; небо темне. Холодна сталь.",
+    "references": "Коулун-Волед-Сіті; Шанхайський Пудун у дощ"
+  },
+  {
+    "n": 126,
+    "id": "core:rain-central-tower",
+    "name": "Центральна вежа Аме",
+    "country": "core:rain",
+    "hex": [
+      4,
+      13
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Amegakure central tower; Pain's tower (雨隠れの塔)",
+    "poiKind": "requirement",
+    "visual": "Найвища сталева вежа Країни Дощу, що пронизує хмари, оповита мереживом труб і мостів.",
+    "references": "Шанхайська вежа в дощ, Токійське Скай-трі"
+  },
+  {
+    "n": 127,
+    "id": "core:rain-pass",
+    "name": "Дощовий перевал",
+    "country": "core:rain",
+    "hex": [
+      6,
+      11
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Мокрий вузький перевал між двома кручами, зсуви грязі.",
+    "references": "Перевал Нанґа (Японія)"
+  },
+  {
+    "n": 128,
+    "id": "core:flooded-quarter",
+    "name": "Затоплений квартал",
+    "country": "core:rain",
+    "hex": [
+      2,
+      15
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Напівзатоплені вулиці зі старою заржавілою сталлю, рефлекси вогнів у воді.",
+    "references": "Затоплене місто Фуфу, Венеція в дощ"
+  },
+  {
+    "n": 129,
+    "id": "core:hidden-waterfall",
+    "name": "Селище Прихованого Водоспаду",
+    "country": "core:waterfall",
+    "hex": [
+      9,
+      8
+    ],
+    "source": "author-map",
+    "origin": "canon",
+    "canonNames": "Takigakure; Taki (滝隠れの里)",
+    "poiKind": "outpost",
+    "visual": "Село ярусами біля великого водоспаду; дерев'яні хатини з зеленими дахами, невеликі мости.",
+    "references": "Водоспад Кеґон, водоспад Нанбу"
+  },
+  {
+    "n": 130,
+    "id": "core:heroes-water-spring",
+    "name": "Джерело Героїв",
+    "country": "core:waterfall",
+    "hex": [
+      10,
+      8
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Hero's Water; Eiyū no Mizu (英雄の水); anime/filler canon, kept next to Takigakure",
+    "poiKind": "power",
+    "visual": "Мале священне джерело під водоспадом, кам'яна чаша й мотузка з паперовими вістрями.",
+    "references": "Святилища Накачі, джерела Кьото"
+  },
+  {
+    "n": 131,
+    "id": "core:north-cascade",
+    "name": "Північний каскад",
+    "country": "core:waterfall",
+    "hex": [
+      11,
+      5
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Багатоступінчатий каскад із блакитної води серед зелені.",
+    "references": "Плітвіцькі озера, Ґуйчжоу Хуанґґошу"
+  },
+  {
+    "n": 132,
+    "id": "core:suspension-trail",
+    "name": "Підвісна стежка",
+    "country": "core:waterfall",
+    "hex": [
+      11,
+      7
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Дерев'яний місток уздовж урвища і бамбукові перила.",
+    "references": "Кікуко-кьо (Японія)"
+  },
+  {
+    "n": 133,
+    "id": "core:cave-behind-the-falls",
+    "name": "Печера за водоспадом",
+    "country": "core:waterfall",
+    "hex": [
+      10,
+      10
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "hidden",
+    "visual": "Вхід у печеру, прихований завісою води.",
+    "references": "Печера Фінґала, Дзадзо-Нава"
+  },
+  {
+    "n": 134,
+    "id": "core:kusagakure-remains",
+    "name": "Селище Прихованої Трави",
+    "country": "core:disputed",
+    "hex": [
+      12,
+      8
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Kusagakure; Kusa (草隠れの里); the Land of Grass is not on our map, the place is a plausible fit",
+    "poiKind": "requirement",
+    "visual": "Тихе село серед високих трав, невеликі вежі з трави й солом'яні дахи.",
+    "references": "Села-стога Хоккайдо; Хоккайдо Бієй"
+  },
+  {
+    "n": 135,
+    "id": "core:no-mans-fort",
+    "name": "Нічия фортеця",
+    "country": "core:disputed",
+    "hex": [
+      13,
+      6
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Кам'яна фортеця з обгорілими стінами, над нею прапор, що змінювали кілька разів.",
+    "references": "Форт Мальборк, Масада"
+  },
+  {
+    "n": 136,
+    "id": "core:fugitive-camp",
+    "name": "Табір втікачів",
+    "country": "core:disputed",
+    "hex": [
+      11,
+      10
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "hidden",
+    "visual": "Прихований у лісі табір із наметів і жеврінь багаття.",
+    "references": "Партизанські табори"
+  },
+  {
+    "n": 137,
+    "id": "core:mountains-graveyard",
+    "name": "Цвинтар Гір",
+    "country": "core:sound",
+    "hex": [
+      18,
+      3
+    ],
+    "source": "author-map",
+    "origin": "map",
+    "canonNames": "Mountains' Graveyard (позначка на мапі автора)",
+    "poiKind": "hidden",
+    "visual": "Поле тонких кам'яних шпилів і уламків на високогір'ї; сіро-коричневе, місцями туман.",
+    "references": "Цинґі-де-Бемарага (Мадагаскар), Чжанцзяцзе"
+  },
+  {
+    "n": 138,
+    "id": "core:hidden-sound",
+    "name": "Селище Прихованого Звуку",
+    "country": "core:sound",
+    "hex": [
+      13,
+      9
+    ],
+    "source": "author-map",
+    "origin": "canon",
+    "canonNames": "Otogakure; Oto (音隠れの里)",
+    "poiKind": "outpost",
+    "visual": "Село в скелястій улоговині з кількома високими вежами-стовпами; темні дахи, багряні ліхтарі.",
+    "references": "Монастирі Метеори, тайські храми Ват Рон Кхун"
+  },
+  {
+    "n": 139,
+    "id": "core:orochimaru-northern-hideout",
+    "name": "Північне лігво",
+    "country": "core:sound",
+    "hex": [
+      16,
+      4
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Orochimaru's Northern Hideout; Orochimaru's Hideout (大蛇丸のアジト)",
+    "poiKind": "requirement",
+    "visual": "Вхід у гору, закритий величезними дверима зі змієподібними прикрасами; факели.",
+    "references": "Храми Анґкору, пагода Свеґон"
+  },
+  {
+    "n": 140,
+    "id": "core:singing-cliffs",
+    "name": "Співучі скелі",
+    "country": "core:sound",
+    "hex": [
+      15,
+      4
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "power",
+    "visual": "Скелі з отворами, що свистять на вітрі; бліді тони.",
+    "references": "Співучі скелі в Ґебрідах, Цзюйчжайґоу"
+  },
+  {
+    "n": 141,
+    "id": "core:wakeful-caves",
+    "name": "Печери піснеспівців",
+    "country": "core:sound",
+    "hex": [
+      17,
+      5
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "hidden",
+    "visual": "Темні печери з кам'яними сходами й малими лампами.",
+    "references": "Печери Аджанта"
+  },
+  {
+    "n": 142,
+    "id": "core:bell-steles",
+    "name": "Поле дзвонових стел",
+    "country": "core:sound",
+    "hex": [
+      15,
+      6
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Високі кам'яні стели з бронзовими дзвонами; вітер, що дзвенить.",
+    "references": "мегаліти Карнака (Франція)"
+  },
+  {
+    "n": 143,
+    "id": "core:hidden-hot-spring",
+    "name": "Селище Прихованого Гарячого Джерела",
+    "country": "core:steam",
+    "hex": [
+      15,
+      10
+    ],
+    "source": "author-map",
+    "origin": "canon",
+    "canonNames": "Yugakure; Yu (湯隠れの里)",
+    "poiKind": "outpost",
+    "visual": "Село гірських купалень: дерев'яні готелі з вигнутими дахами, над ними пара; розсипані басейни.",
+    "references": "Кіносакі-онсен, Беппу, Кусацу"
+  },
+  {
+    "n": 144,
+    "id": "core:onsen-inn-steam",
+    "name": "Готель при гарячому джерелі",
+    "country": "core:steam",
+    "hex": [
+      16,
+      8
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Дерев'яний готель із басейном і парою над дахом; вишита ліхтарями вивіска.",
+    "references": "Онсен Курокава, Біфу"
+  },
+  {
+    "n": 145,
+    "id": "core:sulfur-mine",
+    "name": "Сірчаний рудник",
+    "country": "core:steam",
+    "hex": [
+      16,
+      9
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Жовті відвали й дерев'яні риштування над парою.",
+    "references": "Іджен (Ява)"
+  },
+  {
+    "n": 146,
+    "id": "core:geyser-field",
+    "name": "Поле гейзерів",
+    "country": "core:steam",
+    "hex": [
+      14,
+      10
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "power",
+    "visual": "Пласка рівнина, де б'ють високі стовпи пари й кипляча жовта вода.",
+    "references": "Гейзерна долина (Камчатка), Ель-Татьо"
+  },
+  {
+    "n": 147,
+    "id": "core:hidden-frost",
+    "name": "Селище Прихованого Морозу",
+    "country": "core:frost",
+    "hex": [
+      17,
+      9
+    ],
+    "source": "author-map",
+    "origin": "canon",
+    "canonNames": "Shimogakure; Shimo (霜隠れの里)",
+    "poiKind": "outpost",
+    "visual": "Село засніжених дахів і щільних дерев'яних будинків у мерзлій долині; біле й блакитне.",
+    "references": "Сіракава-ґо взимку, рибальські села Норвегії"
+  },
+  {
+    "n": 148,
+    "id": "core:glacier-pass",
+    "name": "Льодовий перевал",
+    "country": "core:frost",
+    "hex": [
+      18,
+      8
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "requirement",
+    "visual": "Вузький перевал між льодовиками, блакитний лід, снігові вітри.",
+    "references": "Леднік Періто-Морено"
+  },
+  {
+    "n": 149,
+    "id": "core:frozen-lake",
+    "name": "Замерзле озеро",
+    "country": "core:frost",
+    "hex": [
+      19,
+      9
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "power",
+    "visual": "Велике біле озеро з тріщинами льоду й порожніми рибальськими будками.",
+    "references": "Байкал взимку"
+  },
+  {
+    "n": 150,
+    "id": "core:frost-south-post",
+    "name": "Південний форпост Морозу",
+    "country": "core:frost",
+    "hex": [
+      17,
+      10
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "outpost",
+    "visual": "Низька бастіонна башта з білого каменю й сніговою шапкою.",
+    "references": "Форт Ґаспе"
+  },
+  {
+    "n": 151,
+    "id": "core:hidden-rock-village",
+    "name": "Селище Прихованої Скелі",
+    "country": "core:rock",
+    "hex": [
+      1,
+      13
+    ],
+    "source": "author-map",
+    "origin": "map",
+    "canonNames": "(позначка на мапі автора)",
+    "poiKind": "outpost",
+    "visual": "Село з кам'яних будинків під нависаючою скелею, сірі кольори.",
+    "references": "Сасі-ді-Матера (Італія)"
+  },
+  {
+    "n": 152,
+    "id": "core:ryuchi-cave",
+    "name": "Печера Рюті",
+    "country": "core:rock",
+    "hex": [
+      -4,
+      12
+    ],
+    "source": "canon",
+    "origin": "canon",
+    "canonNames": "Ryūchi Cave; Ryūchidō (龍地洞); location in canon is not fixed",
+    "poiKind": "hidden",
+    "visual": "Вхід у велику печеру з зеленими нетрями й вузькими стежками, змієподібні скульптури по краях.",
+    "references": "Печери Ґунунґ-Мулу (Борнео), Шон Дунг (Вʼєтнам)"
+  },
+  {
+    "n": 153,
+    "id": "core:gravestone-ridge",
+    "name": "Надгробні скелі",
+    "country": "core:rock",
+    "hex": [
+      -5,
+      10
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Ряди плоских плит, що стирчать із землі, як надгробки.",
+    "references": "Скелі Бастай (Саксонська Швейцарія), Гоблін-Веллі"
+  },
+  {
+    "n": 154,
+    "id": "core:landslide-pass",
+    "name": "Обвальний перевал",
+    "country": "core:rock",
+    "hex": [
+      -2,
+      10
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "requirement",
+    "visual": "Перевал із осипищем уламків і хиткими мостами.",
+    "references": "Перевал Тор-Ла"
+  },
+  {
+    "n": 155,
+    "id": "core:stone-maze",
+    "name": "Кам'яний лабіринт",
+    "country": "core:rock",
+    "hex": [
+      -1,
+      12
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "hidden",
+    "visual": "Мережа вузьких ущелин між високими стінами.",
+    "references": "Лабіринт Кеньйонлендс (США)"
+  },
+  {
+    "n": 156,
+    "id": "core:purple-stone-mine",
+    "name": "Рудник пурпурних каменів",
+    "country": "core:rock",
+    "hex": [
+      1,
+      14
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Крута шахта, відвали пурпурного каменю.",
+    "references": "Копальні аметисту Бразилії"
+  },
+  {
+    "n": 157,
+    "id": "core:bamboo-cliff-monastery",
+    "name": "Бамбуковий монастир",
+    "country": "core:far-east",
+    "hex": [
+      38,
+      4
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "hidden",
+    "visual": "Монастир з пагодою на кручі, оточений бамбуковими заростями.",
+    "references": "Бамбуковий ліс Саґа, Мон-Сен-Мішель"
+  },
+  {
+    "n": 158,
+    "id": "core:eastern-trade-port",
+    "name": "Східний торговий порт",
+    "country": "core:far-east",
+    "hex": [
+      36,
+      6
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Тропічний порт із дерев'яними пірсами, вітрильниками й складами.",
+    "references": "Порти Малакки, Нагасакі"
+  },
+  {
+    "n": 159,
+    "id": "core:smoking-volcano",
+    "name": "Вулкан Старого Диму",
+    "country": "core:far-east",
+    "hex": [
+      35,
+      8
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "power",
+    "visual": "Конусоподібний вулкан із димом і лавовими полями.",
+    "references": "Сакурадзіма, Меріпі"
+  },
+  {
+    "n": 160,
+    "id": "core:tea-terraces",
+    "name": "Чайні тераси",
+    "country": "core:far-east",
+    "hex": [
+      37,
+      9
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Рівні лінії чайних кущів на схилах, дерев'яні будки.",
+    "references": "Чайні тераси Шізуока, Дарджилінґ"
+  },
+  {
+    "n": 161,
+    "id": "core:moon-shrine-ruins",
+    "name": "Руїни місячного святилища",
+    "country": "core:far-east",
+    "hex": [
+      34,
+      10
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "hidden",
+    "visual": "Кам'яні сходи й розбитий круглий вівтар у лісі, кругла плита нагорі.",
+    "references": "Руїни Борободур, Кхмерські храми"
+  },
+  {
+    "n": 162,
+    "id": "core:pirate-cove",
+    "name": "Піратська бухта",
+    "country": "core:far-east",
+    "hex": [
+      36,
+      11
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "requirement",
+    "visual": "Закрита бухта з кількома кораблями й дерев'яними вежами.",
+    "references": "Тортуґа, Пуерто-Принцеса"
+  },
+  {
+    "n": 163,
+    "id": "core:stilt-village",
+    "name": "Село на палях",
+    "country": "core:far-east",
+    "hex": [
+      33,
+      14
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "discovery",
+    "visual": "Хатини на довгих палях над мілким морем, містки.",
+    "references": "Села Баджау, Ґанвіе"
+  },
+  {
+    "n": 164,
+    "id": "core:coral-lagoon",
+    "name": "Коралова лагуна",
+    "country": "core:far-east",
+    "hex": [
+      32,
+      16
+    ],
+    "source": "invented",
+    "origin": "invented",
+    "canonNames": "",
+    "poiKind": "action",
+    "visual": "Світло-бірюзова лагуна з рифами й білим піском.",
+    "references": "Ґрейт-Барр'єр-Риф, Бора-Бора"
+  },
+  {
+    "n": 165,
+    "id": "core:colosseum",
+    "name": "Колізей",
+    "country": "sea",
+    "hex": [
+      27,
+      11
+    ],
+    "source": "author-map",
+    "origin": "map",
+    "canonNames": "(позначка на мапі автора)",
+    "poiKind": "power",
+    "visual": "Великий кам'яний амфітеатр на скелястому острівці в морі; круглий, без даху.",
+    "references": "Колізей у Римі, амфітеатр в Німі"
+  }
+]

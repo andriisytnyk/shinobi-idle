@@ -1,0 +1,1026 @@
+{
+  "K": {
+    "cap": 50,
+    "rateBase": 4800,
+    "rateGrowth": 1.08,
+    "nativeXp": 1.25,
+    "craftXpMult": 4,
+    "mastery": {
+      "perSecond": 0.128,
+      "base": 8
+    },
+    "cycleMax": {
+      "drill": 12,
+      "meditate": 3,
+      "gather": 8,
+      "obstacle": 7.5,
+      "craft": 2.5
+    },
+    "poolShare": 0.25,
+    "poolCapPerItem": 2000,
+    "practiceFocus": {
+      "base": 0.8,
+      "perLevel": 0.06
+    },
+    "practiceCast": 0.82,
+    "practiceMin": 2,
+    "drill": 3,
+    "meditate": 3,
+    "obstacle": 2.5,
+    "gather": 2.5,
+    "craft": 2.5,
+    "explore": 5,
+    "castByRank": {
+      "E": 0.944,
+      "D": 1.133,
+      "C": 0.947,
+      "B": 2.186,
+      "A": 1.748,
+      "S": 2.622
+    },
+    "castByRole": {
+      "projectile": 1,
+      "series": 1.25,
+      "area": 1.2,
+      "control": 0.9,
+      "defense": 1,
+      "buff": 0.7,
+      "signature": 1.5,
+      "drill": 1
+    },
+    "masteryCast": 0.5,
+    "castFloor": 0.4,
+    "nonNativeCast": 0.3,
+    "power": {
+      "E": 10,
+      "D": 10,
+      "C": 17,
+      "B": 27,
+      "A": 42,
+      "S": 65
+    },
+    "tierMult": {
+      "0": 1,
+      "1": 1.12,
+      "-1": 0.88
+    },
+    "role": {
+      "projectile": {
+        "m": 1,
+        "cd": 4.64,
+        "c": 1
+      },
+      "series": {
+        "m": 1.15,
+        "cd": 7.69,
+        "c": 1.1
+      },
+      "area": {
+        "m": 0.75,
+        "cd": 18.97,
+        "c": 1.2
+      },
+      "control": {
+        "m": 0.3,
+        "cd": 20.67,
+        "c": 0.9
+      },
+      "defense": {
+        "m": 0,
+        "cd": 13.35,
+        "c": 0.9
+      },
+      "buff": {
+        "m": 0,
+        "cd": 27.82,
+        "c": 1
+      },
+      "signature": {
+        "m": 1.7,
+        "cd": 16.68,
+        "c": 1.3
+      },
+      "drill": {
+        "m": 0,
+        "cd": 0,
+        "c": 0
+      }
+    },
+    "rankCd": {
+      "E": 0.9,
+      "D": 1,
+      "C": 1.1,
+      "B": 1.25,
+      "A": 1.4,
+      "S": 1.6
+    },
+    "chakraCost": {
+      "E": 5,
+      "D": 6,
+      "C": 12,
+      "B": 22,
+      "A": 38,
+      "S": 60
+    },
+    "staminaCost": {
+      "E": 5,
+      "D": 6,
+      "C": 10,
+      "B": 16,
+      "A": 26,
+      "S": 40
+    },
+    "levelScale": 0.035,
+    "masteryDmg": 0.1,
+    "masteryCost": 0.25,
+    "burn": {
+      "share": 0.3,
+      "dur": 6
+    },
+    "wet": {
+      "slow": 0.15,
+      "dur": 8
+    },
+    "evaLevel": {
+      "min": 0.046,
+      "max": 1.014
+    },
+    "rhythm": {
+      "slow": 0.29,
+      "dur": 3.5
+    },
+    "stun": {
+      "C": 1,
+      "B": 1.5,
+      "D": 0.7
+    },
+    "bind": {
+      "dur": 4.23
+    },
+    "poison": {
+      "pctPerSec": 0.008,
+      "dur": 8
+    },
+    "combo": {
+      "base": 0.15,
+      "perLevel": 0.004,
+      "perMastery": 0.001,
+      "cap": 0.6,
+      "fanBurn": 1.5,
+      "shockWet": 2,
+      "mudEva": 0.5,
+      "steam": 0.4
+    },
+    "techFx": {
+      "gateOpening": {
+        "taiDamage": 0.03,
+        "staminaPerSec": 2,
+        "woundsAfter": 1
+      },
+      "gateHealing": {
+        "taiDamage": 0.05,
+        "staminaPerSec": 3,
+        "woundsAfter": 1
+      },
+      "nextCast": {
+        "castMult": 0.5
+      },
+      "reveal": {
+        "durationMs": 20000
+      },
+      "combatClone": {
+        "count": 2,
+        "masteryStep": 50,
+        "max": 3,
+        "share": 0.4,
+        "hp": 0.3,
+        "dmg": 0.5,
+        "threat": 0.6,
+        "casts": 1,
+        "xpShare": 1,
+        "passShare": 1,
+        "fatigueShare": 1
+      }
+    },
+    "bossFx": {
+      "wolfPack": {
+        "count": 4,
+        "everyMs": 20000,
+        "hp": 0.12,
+        "dmg": 0.05,
+        "leaderHp": 0.97,
+        "leaderDmg": 0.97
+      },
+      "rivalDuel": {
+        "techniques": 1,
+        "everyMs": 9000,
+        "mult": 0.05,
+        "sigEveryMs": 16000,
+        "sigMult": 0.3,
+        "sigOpenMs": 2000,
+        "hp": 0.92,
+        "dmg": 0.92
+      },
+      "rivalTournament": {
+        "techniques": 2,
+        "everyMs": 9000,
+        "mult": 0.05,
+        "sigEveryMs": 16000,
+        "sigMult": 0.3,
+        "sigOpenMs": 2000,
+        "hp": 1,
+        "dmg": 1,
+        "habituationMult": 2
+      },
+      "drunkenEvasion": {
+        "maxMult": 2,
+        "hp": 1,
+        "dmg": 1
+      },
+      "heavyCast": {
+        "everyMs": 20000,
+        "castMs": 2500,
+        "damageMult": 2,
+        "stunMs": 500,
+        "hp": 0.85,
+        "dmg": 1.05
+      },
+      "twins": {
+        "count": 2,
+        "hpEach": 0.5,
+        "dmgEach": 0.5,
+        "mistMult": 1.6
+      },
+      "mistRehide": {
+        "everyMs": 25000,
+        "hp": 0.97,
+        "dmg": 0.95
+      },
+      "illusion": {
+        "everyMs": 8000,
+        "fleeAtHp": 0.3,
+        "hp": 1.25,
+        "dmg": 1.25
+      }
+    },
+    "ryoDrop": [
+      1.2,
+      2
+    ],
+    "dropChance": {
+      "band": 0.25,
+      "pelt": 0.4,
+      "fang": 0.3,
+      "coin": 0.03,
+      "gem": 0.01
+    },
+    "sell": {
+      "band": 15,
+      "pelt": 8,
+      "fang": 20,
+      "coin": 40,
+      "gem": 250
+    },
+    "wheel": 0.3,
+    "habituation": 0.15,
+    "habituationCap": 0.6,
+    "signatureHabituation": 0.5,
+    "hpBase": 90,
+    "hpPerVit": 8,
+    "chakraBase": 120,
+    "chakraPerMed": 0.005,
+    "chakraRegen": [
+      0.6,
+      0.02
+    ],
+    "staminaBase": 100,
+    "staminaPerAth": 0.01,
+    "staminaRegen": [
+      1,
+      0.02
+    ],
+    "accBase": 40,
+    "accPerLevel": 5,
+    "evaBase": 188.4,
+    "rating": {
+      "accTier": 16.6,
+      "evaTier": 13,
+      "knowledge": 32.3,
+      "enemyAccTier": 0,
+      "enemyEvaTier": 0
+    },
+    "passiveFx": {
+      "shield": {
+        "evasion": 28
+      },
+      "decoy": {
+        "evasion": 28
+      },
+      "evasionBuff": {
+        "evasion": 28
+      },
+      "passiveNegate": {
+        "evasion": 28
+      }
+    },
+    "hitMin": 0.05,
+    "hitMax": 0.95,
+    "basicCast": 1.341,
+    "basicCost": 0.31,
+    "rest": {
+      "s": 1.5,
+      "share": 0.08
+    },
+    "basicDmg": [
+      14.21,
+      0.8
+    ],
+    "dodgeStamina": 2,
+    "ccCostPerLevel": 0.0015,
+    "pillAction": 0.5,
+    "pouchStack": 4,
+    "pillAt": 0.45,
+    "food": [
+      [
+        1,
+        30
+      ],
+      [
+        5,
+        40
+      ],
+      [
+        20,
+        50
+      ],
+      [
+        30,
+        80
+      ],
+      [
+        35,
+        100
+      ],
+      [
+        45,
+        120
+      ]
+    ],
+    "toolTag": [
+      8,
+      0.4
+    ],
+    "zoneHpRegen": 0.8,
+    "opRegen": 0.25,
+    "respawn": 3,
+    "wound": {
+      "stat": 0.05,
+      "max": 4,
+      "healMin": 10,
+      "healFloorMin": 2.5
+    },
+    "eHp": [
+      20,
+      9.8
+    ],
+    "eDmg": [
+      4,
+      0.45
+    ],
+    "eInterval": 2.6,
+    "eAcc": [
+      219.3,
+      0
+    ],
+    "eEva": [
+      31,
+      4.3
+    ],
+    "boss": {
+      "hp": 3.46,
+      "dmg": 1.49
+    },
+    "pack": {
+      "n": 3,
+      "hp": 0.4,
+      "dmg": 0.4
+    },
+    "trait": {
+      "armor": 0.22,
+      "armorOff": 6,
+      "casterEvery": 12,
+      "casterCast": 3,
+      "casterMult": 3,
+      "evasive": 1.59,
+      "regenPct": 0.01,
+      "illusionEvery": 10,
+      "illusionDur": 6,
+      "illusionAcc": 0.25,
+      "hidden": 8,
+      "hiddenAcc": 0.07,
+      "hiddenFirst": 2,
+      "poisonChance": 0.35
+    },
+    "combatXp": {
+      "style": 0.7,
+      "vit": 0.35
+    },
+    "ryoPerMin": {
+      "D": 12,
+      "C": 22,
+      "V": 0,
+      "OP": 0
+    },
+    "repPerMission": {
+      "D": 1,
+      "C": 4,
+      "V": 2
+    },
+    "missionXpShare": 0.85,
+    "missionRateCap": {
+      "D": 25,
+      "C": 45,
+      "V": 40
+    },
+    "shinobiResPerMission": 3,
+    "scroll": {
+      "1": 250,
+      "2": 400,
+      "3": 900,
+      "4": 1600,
+      "5": 3500
+    },
+    "gearTier": [
+      300,
+      1500,
+      5000
+    ],
+    "obstacleBase": 150,
+    "goods": {
+      "water": 1,
+      "rice": 3,
+      "salt": 3,
+      "oil": 4,
+      "noodles": 4,
+      "meat": 5,
+      "saltpeter": 6,
+      "spice": 8,
+      "kunai": 2,
+      "shuriken": 2,
+      "senbon": 3,
+      "wire": 6,
+      "wiretrap": 20,
+      "tag": 30,
+      "medpouch": 2500
+    },
+    "travel": [
+      15,
+      30,
+      45
+    ],
+    "bounty": {
+      "boss_wolf": 400,
+      "boss_fighter": 900,
+      "boss_hunter": 1500,
+      "boss_twins": 2000,
+      "boss_mist": 2500
+    },
+    "bountyRepeat": 0.2,
+    "rep": {
+      "stage2": 120,
+      "exam": 300,
+      "boss": 15,
+      "questFinal": 30
+    },
+    "intel": {
+      "perCellLevel": 1,
+      "mail": 2,
+      "track": [
+        3,
+        5
+      ],
+      "caravanSkip": 1,
+      "bingoLevel": 2,
+      "writtenTestPerIntel": 0.1,
+      "writtenTestMaxIntel": 5
+    },
+    "partsPerScroll": 10,
+    "partDrop": {
+      "boss": 2,
+      "carrier": 0.12,
+      "mission": 0.15
+    },
+    "tickMin": 5,
+    "engine": {
+      "packEventsPerHour": 3600,
+      "minActionMs": 1000,
+      "modMin": 0.01,
+      "modMax": 100
+    },
+    "village": {
+      "start": {
+        "core:tower": 1,
+        "core:bureau": 1,
+        "core:store": 1,
+        "core:sawmill": 1,
+        "core:mine": 1,
+        "core:farms": 1,
+        "core:market": 1
+      },
+      "lateFromLevel": 4,
+      "lateShare": 0.5
+    },
+    "prod": 20,
+    "costBase": 20,
+    "costMult": [
+      1,
+      2.2,
+      4.8,
+      10.5,
+      23,
+      50
+    ],
+    "treasuryBase": 25,
+    "buildTicks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      8
+    ],
+    "bureauIncome": 20,
+    "storeCap": [
+      200,
+      200
+    ],
+    "shinobiCap": [
+      30,
+      10
+    ],
+    "shinobiT6": 30,
+    "towerStageMax": [
+      3,
+      6
+    ],
+    "cellExplores": [
+      24,
+      84,
+      156,
+      240,
+      360
+    ],
+    "cellLevelStep": 10,
+    "clone": {
+      "life": {
+        "default": 7200,
+        "stand": 21600,
+        "practice": 2400,
+        "meditate": 3600,
+        "fight": 1200,
+        "operation": 1200,
+        "mission": 3600
+      },
+      "lifeSkill": "med",
+      "lifeMastery": 0.01,
+      "lifeSkillLevel": 0.01,
+      "fatigue": {
+        "share": 0.5,
+        "slow": 0.15,
+        "maxMs": 21600000,
+        "decayPerLevel": 0.02,
+        "meditating": 1
+      }
+    },
+    "academyCap": 10,
+    "academySlow": 0.25,
+    "field": {
+      "stockBase": 5,
+      "regrowMs": 5000
+    },
+    "craftRules": {
+      "masteryTiers": [
+        1,
+        20,
+        50,
+        90
+      ],
+      "bonusPerTier": 0.25
+    },
+    "tonic": {
+      "capMult": 2
+    },
+    "shop": {
+      "craftSellFactor": 0.35,
+      "herbBase": 2,
+      "herbPerLevel": 0
+    },
+    "gearFx": {
+      "mannequin": 0.03,
+      "sickle": 0.05,
+      "alembic": 0.03,
+      "stations": 0.05,
+      "maps": 0.03
+    },
+    "itemFx": {
+      "sleep": {
+        "chance": 0.5
+      }
+    },
+    "combat": {
+      "xpTickMs": 1000,
+      "regenMs": 1000,
+      "hitEven": 0.5,
+      "fightCapMs": 240000,
+      "maxEnemies": 8,
+      "timerFires": 1000,
+      "timerMinMs": 100,
+      "hookEventsPerSec": 500,
+      "hookStatMax": 10,
+      "interruptLost": 0.5
+    },
+    "bindEva": 0.3,
+    "loadout": {
+      "slots": {
+        "genin": 4,
+        "chunin": 5
+      },
+      "natures": {
+        "genin": 1,
+        "chunin": 2
+      },
+      "saved": 5,
+      "nameMax": 24,
+      "areaBodies": 2
+    },
+    "signature": {
+      "minMastery": 25,
+      "xpBonus": 0.1
+    },
+    "pouch": {
+      "slots": 3,
+      "vest": 1,
+      "vestRank": "chunin"
+    },
+    "ai": {
+      "enemyTier": {
+        "genin": 8,
+        "chunin": 35
+      }
+    },
+    "woundHp": 0.1,
+    "bingo": {
+      "studiedWins": {
+        "enemy": 25,
+        "boss": 3
+      },
+      "rareBelow": 0.05
+    },
+    "analysis": {
+      "samples": 400,
+      "opSamples": 200,
+      "seed": 7,
+      "budgetMs": 5000,
+      "hintOptions": 3,
+      "sessionMinutes": {
+        "zone": 15,
+        "boss": 60,
+        "operation": 60
+      },
+      "sessionHours": {
+        "zone": 5,
+        "boss": 16,
+        "operation": 16
+      },
+      "minSessions": 4,
+      "afterShare": 0.25,
+      "horizonMinutes": 240,
+      "confidenceZ": 1.64,
+      "batch": {
+        "zone": 50,
+        "operation": 20
+      },
+      "verdict": {
+        "collapseBelow": 0.5,
+        "hopelessBelow": 0.1,
+        "stableMedian": 0.8,
+        "stableCollapse": 0.15
+      }
+    },
+    "report": {
+      "defeats": 5
+    },
+    "operation": {
+      "approachMs": 30000,
+      "approachShort": 0.5
+    },
+    "mission": {
+      "perLevel": 0.01,
+      "floor": 0.5,
+      "masteryTime": 0.003,
+      "slowAlt": 2,
+      "minFactor": 0.2,
+      "maxDefeats": 3,
+      "defaultStyle": "tai",
+      "fightSkills": [
+        "vit"
+      ],
+      "success": {
+        "base": 0.9,
+        "perLevel": 0.01,
+        "perMastery": 0.002,
+        "cap": 0.99
+      }
+    },
+    "team": {
+      "levelShare": 0.8,
+      "mastery": 10,
+      "support": {
+        "everyMs": 9000,
+        "damage": 0.6
+      },
+      "states": {
+        "katon": "burn",
+        "suiton": "wet",
+        "raiton": "stun",
+        "futon": null,
+        "doton": null
+      }
+    },
+    "crate": {
+      "goods": {
+        "core:oil": [
+          2,
+          4
+        ],
+        "core:salt": [
+          2,
+          4
+        ],
+        "core:spice": [
+          1,
+          2
+        ]
+      },
+      "gem": {
+        "item": "core:gem",
+        "chance": 0.05
+      }
+    },
+    "toolFx": {
+      "dot": {
+        "pct": 0.012,
+        "durS": 10
+      },
+      "resist": 0.6
+    },
+    "illusionResist": 0.005,
+    "senseiTest": {
+      "base": 300,
+      "perLevel": 0.01,
+      "floor": 120
+    },
+    "natures": {
+      "second": 20,
+      "third": 40,
+      "max": 3,
+      "penaltyEnd": 50
+    },
+    "offlineCapHours": 12,
+    "scouting": {
+      "plainMaxLevel": 3,
+      "athPerLevel": 0.001,
+      "athCap": 0.1
+    },
+    "map": {
+      "terrain": {
+        "road": {
+          "walkMin": 2,
+          "survey": 0.6
+        },
+        "settlement": {
+          "walkMin": 2,
+          "survey": 0.8
+        },
+        "plains": {
+          "walkMin": 3,
+          "survey": 0.8
+        },
+        "coast": {
+          "walkMin": 3,
+          "survey": 1
+        },
+        "forest": {
+          "walkMin": 4,
+          "survey": 1.2
+        },
+        "river": {
+          "walkMin": 4,
+          "survey": 1.2
+        },
+        "hills": {
+          "walkMin": 5,
+          "survey": 1.4
+        },
+        "lake": {
+          "walkMin": 6,
+          "survey": 1
+        }
+      },
+      "range": [
+        {
+          "scout": 0,
+          "range": 2
+        },
+        {
+          "scout": 10,
+          "range": 3
+        },
+        {
+          "scout": 25,
+          "range": 4
+        },
+        {
+          "scout": 40,
+          "range": 5
+        }
+      ],
+      "outpostRange": 1,
+      "startRadius": 2,
+      "plainSurvey": [
+        6,
+        18
+      ],
+      "plainScout": 1,
+      "walk": {
+        "athLevel": 3,
+        "scoutLevel": 2
+      },
+      "travel": {
+        "ryoPerMinute": 1.5,
+        "min": 5
+      },
+      "mastery": [
+        {
+          "hexes": 30,
+          "mods": [
+            {
+              "key": "xp.skill.scout",
+              "op": "add",
+              "value": 0.05
+            }
+          ]
+        },
+        {
+          "hexes": 60,
+          "mods": [
+            {
+              "key": "travel.price",
+              "op": "add",
+              "value": -0.1
+            }
+          ]
+        },
+        {
+          "hexes": "all",
+          "mods": [
+            {
+              "key": "interval.explore",
+              "op": "add",
+              "value": -0.05
+            }
+          ]
+        }
+      ]
+    },
+    "masteryCap": 99,
+    "meditation": {
+      "insightChance": 0.05,
+      "enlightChance": 0.02,
+      "insightLevels": 8,
+      "enlightLevels": 5,
+      "insightGates": [
+        1,
+        40,
+        80
+      ],
+      "enlightGates": [
+        20,
+        60,
+        99
+      ]
+    },
+    "athletics": {
+      "freeSlot": 1,
+      "pillarCount": 5,
+      "pillarXp": 0.05
+    }
+  },
+  "pace": {
+    "tai": [
+      13,
+      29,
+      48,
+      72,
+      108
+    ],
+    "nin": [
+      11,
+      26,
+      46,
+      75,
+      112
+    ],
+    "cc": [
+      11,
+      26,
+      50,
+      80,
+      117
+    ],
+    "med": [
+      13,
+      33,
+      56,
+      86,
+      123
+    ],
+    "ath": [
+      13,
+      33,
+      56,
+      86,
+      123
+    ],
+    "herb": [
+      11,
+      26,
+      46,
+      69,
+      99
+    ],
+    "scout": [
+      13,
+      31,
+      53,
+      81,
+      115
+    ],
+    "prov": [
+      3,
+      7,
+      11,
+      19,
+      26
+    ],
+    "alch": [
+      3,
+      7,
+      11,
+      17,
+      25
+    ],
+    "katon": [
+      13,
+      33,
+      56,
+      80,
+      117
+    ],
+    "futon": [
+      13,
+      33,
+      56,
+      80,
+      117
+    ],
+    "raiton": [
+      13,
+      33,
+      56,
+      80,
+      134
+    ],
+    "doton": [
+      13,
+      33,
+      56,
+      80,
+      110
+    ],
+    "suiton": [
+      13,
+      33,
+      56,
+      86,
+      116
+    ]
+  },
+  "capHours": 24.1,
+  "milestones": {
+    "genin": 1,
+    "clones": 5.1,
+    "chunin": 14.3,
+    "cap": 24.1
+  }
+}

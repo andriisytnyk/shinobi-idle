@@ -5,6 +5,14 @@ export interface SettingsData {
   hints: boolean;
   /** Ids of hints the player has dismissed. */
   dismissedHints: string[];
+  /** Id of the chosen interface theme (`<packId>:<id>`); an unknown id means the base theme. */
+  theme: string;
+  /** Values of the settings that UI packs registered, by `<packId>:<id>`. */
+  ext: Record<string, boolean | string>;
+  /** Ids of the built-in UI packs the player switched on; they start with the next boot. */
+  builtinPacks: string[];
+  /** Whether the local telemetry records the game (it never leaves the device unless exported). */
+  telemetry: boolean;
 }
 
 export const SETTINGS_KEY = 'shinobi.settings';
@@ -13,6 +21,10 @@ const defaults = (): SettingsData => ({
   hideLocked: false,
   hints: true,
   dismissedHints: [],
+  theme: 'core:base',
+  ext: {},
+  builtinPacks: [],
+  telemetry: true,
 });
 
 /** The slice of `localStorage` the settings use. */
@@ -33,8 +45,18 @@ export function parseSettings(text: string | null): SettingsData {
     if (!isRecord(raw)) return out;
     if (typeof raw.hideLocked === 'boolean') out.hideLocked = raw.hideLocked;
     if (typeof raw.hints === 'boolean') out.hints = raw.hints;
+    if (typeof raw.telemetry === 'boolean') out.telemetry = raw.telemetry;
     if (Array.isArray(raw.dismissedHints)) {
       out.dismissedHints = raw.dismissedHints.filter((h): h is string => typeof h === 'string');
+    }
+    if (typeof raw.theme === 'string') out.theme = raw.theme;
+    if (Array.isArray(raw.builtinPacks)) {
+      out.builtinPacks = raw.builtinPacks.filter((p): p is string => typeof p === 'string');
+    }
+    if (isRecord(raw.ext)) {
+      for (const [key, value] of Object.entries(raw.ext)) {
+        if (typeof value === 'boolean' || typeof value === 'string') out.ext[key] = value;
+      }
     }
   } catch {
     // A damaged settings blob falls back to the defaults.
@@ -72,6 +94,9 @@ export function createSettings(storage: TextStorage | null = browserStorage()) {
     }
   };
 
+  /** Bumped by every change of the theme or of a pack setting. */
+  let revision = $state(0);
+
   return {
     get hideLocked() {
       return data.hideLocked;
@@ -87,12 +112,51 @@ export function createSettings(storage: TextStorage | null = browserStorage()) {
       data.hints = value;
       persist();
     },
+    /** Whether the local telemetry records the game. */
+    get telemetry() {
+      return data.telemetry;
+    },
+    set telemetry(value: boolean) {
+      data.telemetry = value;
+      persist();
+    },
     /** Whether a hint with this id should still be shown. */
     hintVisible(id: string): boolean {
       return data.hints && !data.dismissedHints.includes(id);
     },
     dismissHint(id: string) {
       if (!data.dismissedHints.includes(id)) data.dismissedHints = [...data.dismissedHints, id];
+      persist();
+    },
+    /** The chosen theme id. */
+    get theme() {
+      return data.theme;
+    },
+    set theme(value: string) {
+      data.theme = value;
+      revision++;
+      persist();
+    },
+    /** Changes whenever the theme or a pack setting does; effects read it to follow them. */
+    get revision(): number {
+      return revision;
+    },
+    /** The stored value of a pack setting, or `undefined` when it was never changed. */
+    ext(key: string): boolean | string | undefined {
+      return data.ext[key];
+    },
+    setExt(key: string, value: boolean | string) {
+      data.ext = { ...data.ext, [key]: value };
+      revision++;
+      persist();
+    },
+    /** The built-in UI packs that are switched on (they start with the next boot). */
+    get builtinPacks(): readonly string[] {
+      return data.builtinPacks;
+    },
+    setBuiltinPack(id: string, on: boolean) {
+      const rest = data.builtinPacks.filter((p) => p !== id);
+      data.builtinPacks = on ? [...rest, id] : rest;
       persist();
     },
     /** Shows every hint again. */

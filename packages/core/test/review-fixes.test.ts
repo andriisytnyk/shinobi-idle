@@ -1,14 +1,14 @@
 import { content } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
+  masteryLevel,
+  masteryXpPerHour,
   advance,
   defaultRules,
   deserialize,
   dispatch,
   poolCapacity,
   serialize,
-  SHARE_FULL,
-  xpAt,
   type GameState,
 } from '../src/index.ts';
 import { HOUR, genin, setLevel } from './helpers.ts';
@@ -60,13 +60,16 @@ describe('mastery from combat and items feeds the pool', () => {
   it('pays about masteryPerHour in an hour of fighting, and the pool share of it', () => {
     const state = genin(3);
     setLevel(state, 'vit', 40);
+    setLevel(state, 'cc', 10);
     dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: 'core:dummy' }, content);
     advance(state, HOUR, content);
     // Every technique the player knows shares the XP; the total is what the balance fixes.
     const mastery = Object.values(state.mastery).reduce((sum, m) => sum + m.xp, 0);
-    expect(mastery / K.masteryPerHour).toBeGreaterThan(0.95);
-    expect(mastery / K.masteryPerHour).toBeLessThan(1.05);
-    expect(state.pools.tai.xp).toBeCloseTo(
+    // An hour pays at least the rate of mastery 1 and at most that of the highest level reached.
+    const top = Math.max(...Object.keys(state.mastery).map((k) => masteryLevel(state, k, content)));
+    expect(mastery).toBeGreaterThan(0.95 * masteryXpPerHour(1, content));
+    expect(mastery).toBeLessThan(1.05 * masteryXpPerHour(top, content));
+    expect(state.pools.tai!.xp).toBeCloseTo(
       Math.min(poolCapacity('tai', content), mastery * K.poolShare),
       6,
     );
@@ -76,19 +79,21 @@ describe('mastery from combat and items feeds the pool', () => {
     const state = genin(4);
     state.bank[SCROLL] = 1;
     dispatch(state, { type: 'item.use', id: SCROLL, target: 'core:clone' }, content);
-    expect(state.mastery['core:clone']?.xp).toBe(K.masteryPerHour);
-    expect(state.pools.nin.xp).toBeCloseTo(
-      Math.min(poolCapacity('nin', content), K.masteryPerHour * K.poolShare),
+    const hour = masteryXpPerHour(1, content);
+    expect(state.mastery['core:clone']?.xp).toBe(hour);
+    expect(state.pools.nin!.xp).toBeCloseTo(
+      Math.min(poolCapacity('nin', content), hour * K.poolShare),
       6,
     );
   });
 });
 
-describe('combat runs at the slot share', () => {
+describe('fights of the character and of clones run at full speed', () => {
   /** A fight in slot `at` with drills in the other slots, so the fight gets 1/slots of the speed. */
   function shared(seed: number, slots: number, at: number): GameState {
     const state = genin(seed);
     setLevel(state, 'vit', 40);
+    setLevel(state, 'cc', 10);
     while (state.slots.length < slots) {
       state.slots.push({ action: null, progress: 0, share: 0, data: null });
     }
@@ -96,33 +101,16 @@ describe('combat runs at the slot share', () => {
       const start =
         i === at
           ? ({ type: 'action.start', slot: i, kind: 'fight', id: 'core:dummy' } as const)
-          : ({ type: 'action.start', slot: i, kind: 'drill', id: 'core:lystok_na_lobi' } as const);
+          : ({
+              type: 'action.start',
+              slot: i,
+              kind: 'drill',
+              id: ['core:lystok_na_lobi', 'core:kunai_na_doloni', 'core:chakra_v_stopakh'][i] ?? '',
+            } as const);
       expect(dispatch(state, start, content)).toEqual({ ok: true });
     }
     return state;
   }
-  const kills = (s: GameState) => s.counters['kills.core:dummy'] ?? 0;
-  const ticks = (s: GameState) => s.counters['actions.fight'] ?? 0;
-
-  it('halves kills and XP at a 500 share', () => {
-    const full = shared(5, 1, 0);
-    const half = shared(5, 2, 0);
-    expect(half.slots[0]?.share).toBe(SHARE_FULL / 2);
-    advance(full, HOUR, content);
-    advance(half, HOUR, content);
-    expect(ticks(half) * 2).toBe(ticks(full));
-    // Kills are not exactly linear (the longer run levels up and hits harder), but an hour at
-    // half share is the same fight as half an hour at full share, kill for kill (checked below).
-    expect(kills(half)).toBeLessThan(kills(full));
-    const vit0 = xpAt(40);
-    // Vitality and Evasion are trained only by the fight, so their totals halve exactly.
-    expect(half.skills.vit.xp - vit0).toBeCloseTo((full.skills.vit.xp - vit0) / 2, 6);
-    expect(half.skills.eva.xp).toBeCloseTo(full.skills.eva.xp / 2, 6);
-    // The same clock gives the same fight: half an hour at full speed matches an hour at half.
-    const thirty = shared(5, 1, 0);
-    advance(thirty, HOUR / 2, content);
-    expect(kills(thirty)).toBe(kills(half));
-  });
 
   for (const [slots, at] of [
     [2, 0],
@@ -137,7 +125,8 @@ describe('combat runs at the slot share', () => {
       };
       const whole = run(120_000);
       for (const chunk of [1, 7, 999, 3600]) expect(run(chunk)).toBe(whole);
-      expect(deserialize(whole, content).combat?.clock).toBeGreaterThan(0);
+      const back = deserialize(whole, content);
+      expect((at === 0 ? back.combat : back.clones[at]?.fight)?.fight.t).toBeGreaterThan(0);
     });
   }
 });

@@ -1,0 +1,16 @@
+// Run: copy to packages/core/test/measure-tipping.test.ts, then pnpm --filter @shinobi/core exec vitest run test/measure-tipping.test.ts (delete the copy afterwards; too slow for the suite).
+/* The hunter boss: the verdict and win rate of the analysis by player level, 150 broths. Prints a table. */
+import { describe, it } from 'vitest';
+import { analyze, boss, build } from './analysis-helpers.ts';
+
+describe('tipping level of the hunter boss', () => {
+  it('prints the table', { timeout: 600_000 }, () => {
+    const rows: string[] = [];
+    for (let level = 38; level <= 52; level++) {
+      const c = boss(level);
+      const a = analyze(build(c, 20), c.target);
+      rows.push(`${level}\t${a.fresh.winRate.toFixed(3)}\t${a.session?.verdict ?? '-'}\t${a.session?.winRate.median.toFixed(3) ?? '-'}`);
+    }
+    console.log('TIPPING level\tfreshWin\tverdict\tsessionMedian\n' + rows.join('\n'));
+  });
+});

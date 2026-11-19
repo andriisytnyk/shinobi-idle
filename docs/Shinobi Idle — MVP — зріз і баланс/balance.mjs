@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const SL = JSON.parse(fs.readFileSync(path.join(here,"slice.json"),"utf8"));
 const NAT = ["katon","futon","raiton","doton","suiton"];
-const NAME = { tai:"Тайдзюцу",nin:"Ніндзюцу",katon:"Катон",futon:"Футон",raiton:"Райтон",doton:"Дотон",suiton:"Суйтон",cc:"Контроль чакри",med:"Медитація",ath:"Атлетика",herb:"Травництво",scout:"Розвідка",prov:"Провіант",alch:"Алхімія",vit:"Живучість",eva:"Ухилення" };
+const NAME = { tai:"Тайдзюцу",nin:"Ніндзюцу",katon:"Катон",futon:"Футон",raiton:"Райтон",doton:"Дотон",suiton:"Суйтон",cc:"Контроль чакри",med:"Медитація",ath:"Атлетика",herb:"Травництво",scout:"Розвідка",prov:"Провіант",alch:"Алхімія",vit:"Живучість" };
 
 // ======================= ПАРАМЕТРИ (усе, що крутиться під час підгонки) =======================
 export const K = {
@@ -14,43 +14,59 @@ export const K = {
   // --- досвід ---
   rateBase: 4800, rateGrowth: 1.08,          // номінальний досвід за годину дії, відкритої на рівні a: rateBase × rateGrowth^a
   nativeXp: 1.25, craftXpMult: 4,            // рідна природа; ремесла (бо їх обмежують трави)
-  masteryPerHour: 10500,                     // досвід Майстерності за годину дії (стала)
-  poolShare: 0.25, poolCapPerItem: 1500,     // частка в пул; місткість пулу на одну майстерність зрізу
+  // Майстерність за секунду дії на рівні Майстерності L: perSecond × (base + L). Форма — формула Melvor (початок: (відкриті × частка + L × N/10) × с × 0.5):
+  // перший доданок замінено сталою base, N/10 — одиницею; perSecond підігнано так, щоб рівень 25 настав за 45 хв дії.
+  mastery: { perSecond: 0.128, base: 8 },
+  poolShare: 0.25, poolCapPerItem: 2000,     // частка в пул; місткість пулу на одну майстерність зрізу
   // --- інтервали дій, с ---
-  practiceRecovery: 1.2, practiceMin: 2.0, drill: 3.0, meditate: 3.0, obstacle: 2.5, gather: 2.5, craft: 2.5, explore: 5.0,
+  practiceFocus: { base:0.8, perLevel:0.06 }, practiceCast: 0.82, practiceMin: 2.0, drill: 3.0, meditate: 3.0, obstacle: 2.5, gather: 2.5, craft: 2.5, explore: 5.0,
+  // Цикл дії росте з рівнем дії лінійно від K.<вид> (рівень 1) до cycleMax.<вид> (стеля навички). Ремесла (artisan у Melvor) і Медитація — стала.
+  cycleMax: { drill: 12.0, meditate: 3.0, gather: 8.0, obstacle: 7.5, craft: 2.5 },
   // --- техніки ---
-  castBase: 0.4, castPerSeal: 0.15, masteryCast: 0.5, castFloor: 0.4, nonNativeCast: 0.30,
+  // Каст — число самої техніки й не залежить від печаток (рішення автора 15.11): базовий каст рангу × множник ролі, для окремих технік — вручну (patch.mjs, TECH.cast).
+  castByRank: { E:0.944, D:1.133, C:0.947, B:2.186, A:1.748, S:2.622 },
+  castByRole: { "Снаряд":1.0, "Серія":1.25, "Площа":1.2, "Контроль":0.9, "Захист":1.0, "Посилення":0.7, "Сигнатурна":1.5, "Тренування":1.0 },
+  masteryCast: 0.5, castFloor: 0.4, nonNativeCast: 0.30,
   power: { E:10, D:10, C:17, B:27, A:42, S:65 },
   tierMult: { "-1":0.88, "0":1, "1":1.12 },
   role: { // множник шкоди, перезарядка (с), множник вартості
-    "Снаряд":{m:1.0,cd:6,c:1.0}, "Серія":{m:1.15,cd:8,c:1.1}, "Площа":{m:0.75,cd:9,c:1.2}, "Контроль":{m:0.30,cd:11,c:0.9},
-    "Захист":{m:0,cd:12,c:0.9}, "Посилення":{m:0,cd:25,c:1.0}, "Сигнатурна":{m:1.7,cd:15,c:1.3}, "Тренування":{m:0,cd:0,c:0} },
+    "Снаряд":{m:1.0,cd:4.64,c:1.0}, "Серія":{m:1.15,cd:7.69,c:1.1}, "Площа":{m:0.75,cd:18.97,c:1.2}, "Контроль":{m:0.30,cd:20.67,c:0.9},
+    "Захист":{m:0,cd:13.35,c:0.9}, "Посилення":{m:0,cd:27.82,c:1.0}, "Сигнатурна":{m:1.7,cd:16.68,c:1.3}, "Тренування":{m:0,cd:0,c:0} },
   rankCd: { E:0.9, D:1.0, C:1.1, B:1.25, A:1.4, S:1.6 },
   chakraCost: { E:5, D:6, C:12, B:22, A:38, S:60 }, staminaCost: { E:5, D:6, C:10, B:16, A:26, S:40 },
   levelScale: 0.035,                         // шкода техніки × (1 + levelScale × рівень навички)
   masteryDmg: 0.10, masteryCost: 0.25,
   // --- стани ---
-  burn: { share:0.30, dur:6 }, wet: { slow:0.15, dur:8 }, stun: { C:1.0, B:1.5, D:0.7 }, bind: { dur:4 }, poison: { pctPerSec:0.02, dur:8 },
+  burn: { share:0.30, dur:6 }, wet: { slow:0.15, dur:8 }, evaLevel: { min:0.046, max:1.014 }, rhythm: { slow:0.29, dur:3.5 }, stun: { C:1.0, B:1.5, D:0.7 }, bind: { dur:4.23 }, poison: { pctPerSec:0.008, dur:8 },
   combo: { base:0.15, perLevel:0.004, perMastery:0.001, cap:0.60, fanBurn:1.5, shockWet:2.0, mudEva:0.5, steam:0.40 },
   wheel: 0.30, habituation: 0.15, habituationCap: 0.60, signatureHabituation: 0.5,
   // --- гравець ---
   hpBase: 90, hpPerVit: 8, chakraBase: 120, chakraPerMed: 0.005, chakraRegen: [0.6,0.02], staminaBase: 100, staminaPerAth: 0.01, staminaRegen: [1.0,0.02],
-  accBase: 40, accPerLevel: 5, evaBase: 30, evaPerLevel: 5, hitMin: 0.05, hitMax: 0.95,
-  basicInterval: 2.4, basicDmg: [8,0.45], dodgeStamina: 2, ccCostPerLevel: 0.0015,
+  accBase: 40, accPerLevel: 5, evaBase: 188.4, hitMin: 0.05, hitMax: 0.95,
+  // Ухилення — один автоматичний кидок (правки зрізу, розд. 5, рядки 11–13). Рейтинг ухилення = evaBase + внесок рангу + захисні техніки + спорядження й бонуси + знання з Бінґо-книги; навички «Ухилення» немає.
+  // rating: внесок одного рангу гравця (тіру ШІ) в точність і ухилення, і рейтинг за рівень знань про ворога. Числа тимчасові до підгонки (етап 4 завдання C1): evaTier підібрано так, щоб типовий персонаж ухилявся приблизно як раніше.
+  rating: { accTier:16.6, evaTier:13, knowledge:32.3, enemyAccTier:0, enemyEvaTier:0 },
+  // passiveFx: захисна техніка пасивна; evasion — внесок, коли її ефективний рівень дорівнює бойовому рівню нападника (див. defence).
+  passiveFx: { shield:{ evasion:28 }, decoy:{ evasion:28 }, evasionBuff:{ evasion:28 }, passiveNegate:{ evasion:28 } },
+  // evaLevel: захисна техніка працює на дієвому рівні = рівень її навички × Майстерність ÷ masteryCap; внесок = evasion × межі(дієвий рівень ÷ бойовий рівень нападника; min; max).
+  // Звичайний удар — дія зі своїм кастом і малою вартістю витривалості; «переводить подих», коли не вистачає ні на техніку, ні на удар: rest.s секунд і частка rest.share від обох пулів.
+  basicCast: 1.341, basicCost: 0.31, rest: { s:1.5, share:0.08 },
+  modelWait: 0.6, // лише для спрощеного симулятора нижче: вичікування гравця між діями; має дорівнювати waitMs тіру genin з ai.json
+  basicDmg: [14.21,0.8], dodgeStamina: 2, ccCostPerLevel: 0.0015,
   pillAction: 0.5, pouchStack: 4, pillAt: 0.45,   // пілюля — дія 0,5 с; у слоті підсумка до 10 штук; автовживання нижче 45% HP
   food: [[1,30],[5,40],[20,50],[30,80],[35,100],[45,120]], // рівень ремесла → HP за одну страву чи мазь (із рецептів)
   toolTag: [8,0.4],
-  zoneHpRegen: 0.35, opRegen: 0.25, respawn: 3,
+  zoneHpRegen: 0.8, opRegen: 0.25, respawn: 3,
   wound: { stat:0.05, max:4, healMin:10, healFloorMin:2.5 },
   // --- вороги ---
-  eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [40,4.5], eEva: [30,4.2],
-  boss: { hp:3.2, dmg:1.5 }, pack: { n:3, hp:0.4, dmg:0.4 },
-  trait: { armor:0.30, armorOff:6, casterEvery:12, casterCast:3, casterMult:3, evasive:2.0, regenPct:0.01, illusionEvery:10, illusionDur:6, illusionAcc:0.25,
-    hidden:8, hiddenAcc:0.4, hiddenFirst:2.0, poisonChance:0.35 },
+  eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [219.3,0], eEva: [31.0,4.3],
+  boss: { hp:3.46, dmg:1.49 }, pack: { n:3, hp:0.4, dmg:0.4 },
+  trait: { armor:0.22, armorOff:6, casterEvery:12, casterCast:3, casterMult:3, evasive:1.59, regenPct:0.01, illusionEvery:10, illusionDur:6, illusionAcc:0.25,
+    hidden:8, hiddenAcc:0.07, hiddenFirst:2.0, poisonChance:0.35 },
   // --- бій: досвід за годину бою в зоні рівня Z, частки від rate(Z) ---
-  combatXp: { style:0.70, vit:0.35, eva:0.30 },
+  combatXp: { style:0.70, vit:0.35 },
   // --- місії ---
-  ryoPerMin: { D:12, C:22, V:0, OP:0 }, repPerMission: { D:2, C:8, V:4 }, missionXpShare: 0.85, missionRateCap: { D:25, C:45, V:40 },
+  ryoPerMin: { D:12, C:22, V:0, OP:0 }, repPerMission: { D:1, C:4, V:2 }, missionXpShare: 0.85, missionRateCap: { D:25, C:45, V:40 },
   shinobiResPerMission: 3,
   // --- економіка ---
   scroll: { 1:250, 2:400, 3:900, 4:1600, 5:3500 }, gearTier: [300,1500,5000], obstacleBase: 150,
@@ -60,12 +76,12 @@ export const K = {
   intel: { perCellLevel:1, mail:2, track:[3,5], caravanSkip:1, bingoLevel:2, writtenTestPerIntel:0.10, writtenTestMaxIntel:5 },
   partsPerScroll: 10, partDrop: { boss:2.0, carrier:0.12, mission:0.15 },
   // --- село ---
-  tickMin: 5, prod: 10, costBase: 20, costMult: [1,2.2,4.8,10.5,23,50], treasuryBase: 100, buildTicks: [1,2,3,4,5,8],
+  tickMin: 5, prod: 20, costBase: 20, costMult: [1,2.2,4.8,10.5,23,50], treasuryBase: 25, buildTicks: [1,2,3,4,5,8],
   bureauIncome: 20, storeCap: [200,200], shinobiCap: [30,10], shinobiT6: 30, towerStageMax: [3,6],
   // --- розвідка ---
   cellExplores: [24,84,156,240,360], cellLevelStep: 10,
   // --- клони ---
-  clone: { pool:1.0, link:0.10 },
+  clone: { life:{ default:7200, stand:21600, practice:2400, meditate:3600, fight:1200, operation:1200, mission:3600 }, lifeSkill:"med", lifeMastery:0.01, lifeSkillLevel:0.01, fatigue:{ share:0.5, slow:0.15, maxMs:21600000, decayPerLevel:0.02, meditating:1 } },
 };
 
 // ======================= ФОРМУЛИ =======================
@@ -80,22 +96,22 @@ export function minutesTo(target, levels, mult=1) {
 }
 export function tech(t, skillLevel, mastery=20, native=true) {
   const R=K.role[t.role], rk=K.power[t.rank]?t.rank:(t.level<30?"D":t.level<50?"C":"B");
-  const seals=Math.max(t.seals? Math.round(t.seals*(1-K.masteryCast*mastery/99)):0, t.seals?1:0);
-  let cast=K.castBase+K.castPerSeal*seals; if(!native) cast*=1+K.nonNativeCast*Math.max(0,1-skillLevel/50);
+  const seals=t.seals||0;
+  let cast=Math.max(K.castFloor,(t.castOverride??K.castByRank[rk]*K.castByRole[t.role])*(1-K.masteryCast*mastery/99)); if(!native) cast*=1+K.nonNativeCast*Math.max(0,1-skillLevel/50);
   const dmg=(t.noDamage?0:1)*K.power[rk]*R.m*K.tierMult[t.tier]*(1+K.levelScale*skillLevel)*(1+K.masteryDmg*mastery/99);
   const tai=t.skill==="tai"; const cost=(tai?K.staminaCost[rk]:K.chakraCost[rk])*R.c*(1-K.masteryCost*mastery/99);
   return { name:t.uk, skill:t.skill, role:t.role, tags:t.tags, state:t.state, rank:rk, seals, cast:round(cast,2), cd:round(R.cd*K.rankCd[rk],1), cost:round(cost), res:tai?"stamina":"chakra", dmg:round(dmg), aoe:t.role==="Площа", hits:t.role==="Серія"?3:1 };
 }
-export const player = ({style,tai,nin,vit,eva,med,ath=25,cc=25}) => ({
+export const player = ({style,tai,nin,vit,tier=1,med,ath=25,cc=25}) => ({
   hp:K.hpBase+K.hpPerVit*vit, chakra:K.chakraBase*(1+K.chakraPerMed*med), chakraRegen:K.chakraRegen[0]+K.chakraRegen[1]*med,
   stamina:K.staminaBase*(1+K.staminaPerAth*ath), staminaRegen:K.staminaRegen[0]+K.staminaRegen[1]*ath,
-  acc:K.accBase+K.accPerLevel*style, evaR:K.evaBase+K.evaPerLevel*eva, basic:K.basicDmg[0]+K.basicDmg[1]*Math.max(tai,nin), costMult:1-K.ccCostPerLevel*cc, med });
+  acc:K.accBase+K.accPerLevel*style, evaR:K.evaBase+K.rating.evaTier*tier+K.passiveFx.shield.evasion*0.3, basic:K.basicDmg[0]+K.basicDmg[1]*Math.max(tai,nin), costMult:1-K.ccCostPerLevel*cc, med });
 export const enemy = (cl,traits=[],nature=null,boss=false) => ({ cl, traits, nature, boss,
   hp:(K.eHp[0]+K.eHp[1]*cl)*(boss?K.boss.hp:1), dmg:(K.eDmg[0]+K.eDmg[1]*cl)*(boss?K.boss.dmg:1), interval:K.eInterval, acc:K.eAcc[0]+K.eAcc[1]*cl, evaR:K.eEva[0]+K.eEva[1]*cl });
 const hit = (acc,eva) => Math.min(K.hitMax,Math.max(K.hitMin, acc>=eva ? 1-0.5*eva/acc : 0.5*acc/eva));
-const combatLevel = b => (b.vit+b.eva+b.med)/6 + 0.5*b.style;
+const combatLevel = b => (2*b.vit+b.med)/6 + 0.5*b.style;
 // типовий білд гравця під бойовий рівень c
-export function build(c) { const style=Math.min(50,Math.round(c*1.12)); const d=Math.min(50,Math.max(1,Math.round((c-style/2)*2))); return { style, tai:Math.max(1,style-4), nin:Math.max(1,style-6), vit:d, eva:d, med:d, ath:Math.min(50,d), cc:Math.min(50,d) }; }
+export function build(c) { const style=Math.min(50,Math.round(c*1.12)); const d=Math.min(50,Math.max(1,Math.round((c-style/2)*2))); return { style, tai:Math.max(1,style-4), nin:Math.max(1,style-6), vit:d, tier:c<10?0:c<40?1:2, med:d, ath:Math.min(50,d), cc:Math.min(50,d) }; }
 
 // ======================= СИМУЛЯТОР БОЮ (спрощений: 1 гравець проти ворога чи зграї) =======================
 function rng(seed){ let a=seed>>>0; return ()=>{ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
@@ -147,7 +163,7 @@ export function fight(b, nature, en, opts={}) {
       continue; }
     // вибір дії
     const ready=load.filter(k=>(cds.get(k.name)||0)<=0&&(k.res==="chakra"?ch:st)>=k.cost*P.costMult);
-    const use=k=>{ pending=k; busy=k.cast; cds.set(k.name,k.cd+k.cast); if(k.res==="chakra") ch-=k.cost*P.costMult; else st-=k.cost; };
+    const use=k=>{ pending=k; busy=k.cast+K.modelWait; cds.set(k.name,k.cd+k.cast); if(k.res==="chakra") ch-=k.cost*P.costMult; else st-=k.cost; };
     const tool=(tag)=>{ if(!toolTags.includes(tag)) return false; busy=0.5; const f=alive()[0];
       if(tag==="Переривання"){ casting=0; casterAt=K.trait.casterEvery; } if(tag==="Сковування") alive().forEach(x=>x.bind=K.bind.dur); if(tag==="Виявлення") hidden=0;
       if(tag==="Розсіювання") illusion=0; if(tag==="Очищення") poison=0; if(tag==="Тривала шкода"){ f.burn=10; f.burnDps=en.hp*0.012; }
@@ -166,7 +182,7 @@ export function fight(b, nature, en, opts={}) {
     if(done) continue;
     const best=ready.filter(k=>k.dmg>0&&!(k===reserve&&casterAt<k.cd+k.cast+0.5)).sort((x,y)=>{ const s=k=>k.dmg*(k.aoe?alive().length:1)*(1-Math.min(K.habituationCap,K.habituation*(uses.get(k.name)||0))); return s(y)-s(x); })[0];
     if(best){ use(best); continue; }
-    if(t>=basicAt){ basicAt=t+K.basicInterval; const f=alive().sort((a,b)=>a.hp-b.hp)[0]; let accM=1; if(hidden>0)accM*=K.trait.hiddenAcc; if(illusion>0)accM*=K.trait.illusionAcc;
+    if(t>=basicAt){ basicAt=t+K.basicCast+K.modelWait; busy=K.basicCast+K.modelWait; const f=alive().sort((a,b)=>a.hp-b.hp)[0]; let accM=1; if(hidden>0)accM*=K.trait.hiddenAcc; if(illusion>0)accM*=K.trait.illusionAcc;
       const eva=en.evaR*(en.traits.includes("Ухильний")&&f.bind<=0?K.trait.evasive:1)*(f.bind>0?0.3:1); if(R()<hit(P.acc*accM,eva)) dealTo(f,P.basic,false); }
   }
   return {win:false,t,hpLost:lost/P.hp,load:load.map(x=>x.name),timeout:true};
@@ -192,17 +208,21 @@ const combatH=L=>{ let t=0; for(let l=1;l<L;l++) t+=(xpAt(l+1)-xpAt(l))/(rate(l)
 row("Живучість (лише бій)",...[10,20,30,40,50].map(L=>Math.round(combatH(L)*60)),"години бою в зоні свого рівня");
 const total=Object.keys(levelsOf).reduce((s,k)=>s+J.pace[k][4],0); const natAvg=NAT.reduce((s,k)=>s+J.pace[k][4],0)/5;
 J.capHours=round((total-natAvg*2+ combatH(50)*60)/60,1);
-md.push(`\nСтеля 50 в усіх 16 навичках (три природи з п'яти, Живучість і Ухилення набираються в бою): **≈ ${J.capHours} год** чистої дії. Ціль MVP — 20–25 год.`);
+md.push(`\nСтеля 50 в усіх 15 навичках (три природи з п'ятьох, Живучість набирається в бою): **≈ ${J.capHours} год** чистої дії. Ціль MVP — 20–25 год.`);
 
 H("2. Майстерність і пул");
-md.push(`Майстерність росте зі сталою швидкістю ${K.masteryPerHour.toLocaleString("uk")} досвіду за годину дії; ${K.poolShare*100}% іде в пул навички. Місткість пулу в зрізі — ${K.poolCapPerItem} на кожну майстерність навички.\n`);
-head("Майстерність","Годин дії","Що дає техніці"); for(const m of [10,25,40,50]) row(m,round(xpAt(m)/K.masteryPerHour,1),m===25?"Коронна техніка; печаток −13%":`Печаток −${Math.round(K.masteryCast*m/99*100)}%, вартість −${Math.round(K.masteryCost*m/99*100)}%, шкода +${Math.round(K.masteryDmg*m/99*100)}%`);
+md.push(`Майстерність за секунду дії на рівні Майстерності L — ${K.mastery.perSecond} × (${K.mastery.base} + L); за дію — це, помножене на її цикл. Форма за Melvor: що вищий рівень Майстерності цієї дії, то більше вона дає. ${K.poolShare*100}% іде в пул навички. Місткість пулу в зрізі — ${K.poolCapPerItem} на кожну майстерність навички.
+`);
+export const masteryRate = L => K.mastery.perSecond*(K.mastery.base+L)*3600; // досвіду Майстерності за годину дії на рівні L
+export function masteryHours(xp){ let x=0,t=0; while(x<xp){ x+=masteryRate(Math.max(1,levelOf(x)))/3600*5; t+=5; } return t/3600; }
+const levelOf=x=>{ let L=1; while(L<99&&xpAt(L+1)<=x) L++; return L; };
+head("Майстерність","Годин дії","Що дає техніці"); for(const m of [10,25,40,50,99]) row(m,round(masteryHours(xpAt(m)),1),m===25?"Коронна техніка; печаток −13%":`Печаток −${Math.round(K.masteryCast*m/99*100)}%, вартість −${Math.round(K.masteryCost*m/99*100)}%, шкода +${Math.round(K.masteryDmg*m/99*100)}%`);
 md.push(""); head("Навичка","Майстерностей","Місткість пулу","10%, год дії","25%, год дії","50%, год дії");
 const mcount={tai:10,nin:12,katon:7,futon:7,raiton:7,doton:8,suiton:9,cc:8,med:6,ath:12,herb:11,prov:11,alch:11};
-for(const [sk,nn] of Object.entries(mcount)){ const cap=nn*K.poolCapPerItem; const hrs=p=>round(cap*p/(K.masteryPerHour*K.poolShare),1); row(NAME[sk],nn,cap.toLocaleString("uk"),hrs(.1),hrs(.25),hrs(.5)); }
+for(const [sk,nn] of Object.entries(mcount)){ const cap=nn*K.poolCapPerItem; const hrs=p=>round(masteryHours(cap*p/K.poolShare),1); row(NAME[sk],nn,cap.toLocaleString("uk"),hrs(.1),hrs(.25),hrs(.5)); }
 
 H("3. Техніки зрізу");
-md.push("Шкода = сила рангу × множник ролі × сила в межах рангу × (1 + "+K.levelScale+" × рівень навички) × (1 + "+K.masteryDmg+" × Майстерність ÷ 99). Каст = "+K.castBase+" с + "+K.castPerSeal+" с × печатки. Значення в таблиці — на рівні відкриття техніки, Майстерність 1.\n");
+md.push("Шкода = сила рангу × множник ролі × сила в межах рангу × (1 + "+K.levelScale+" × рівень навички) × (1 + "+K.masteryDmg+" × Майстерність ÷ 99). Каст = базовий каст рангу × множник ролі (або число самої техніки); Майстерність скорочує його до −"+K.masteryCast*100+"%, не нижче "+K.castFloor+" с; печатки на каст не впливають. Значення в таблиці — на рівні відкриття техніки, Майстерність 1.\n");
 head("Навичка","Рів.","Техніка","Ранг","Роль","Печ.","Каст, с","Перез., с","Вартість","Шкода","Шкода на 50","Відповідь","Стан");
 J.techniques=[];
 for(const t of SL.techniques){ if(t.role==="Тренування") continue; const a=tech(t,t.level,1), z=tech(t,50,1); J.techniques.push({id:t.id,...a,level:t.level,dmg50:z.dmg});
@@ -225,9 +245,9 @@ H("5. Характеристики гравця й ворогів");
 head("Характеристика","Формула");
 row("HP",`${K.hpBase} + ${K.hpPerVit} × Живучість`); row("Чакра",`${K.chakraBase} × (1 + ${K.chakraPerMed} × Медитація); відновлення ${K.chakraRegen[0]} + ${K.chakraRegen[1]} × Медитація за с`);
 row("Витривалість",`${K.staminaBase} × (1 + ${K.staminaPerAth} × Атлетика); відновлення ${K.staminaRegen[0]} + ${K.staminaRegen[1]} × Атлетика за с`);
-row("Точність",`${K.accBase} + ${K.accPerLevel} × рівень навички техніки`); row("Ухилення",`${K.evaBase} + ${K.evaPerLevel} × Ухилення; кожне ухилення коштує ${K.dodgeStamina} витривалості`);
+row("Точність",`${K.accBase} + ${K.accPerLevel} × рівень навички техніки + ${K.rating.accTier} × ранг нападника`); row("Ухилення",`рейтинг = ${K.evaBase} + ${K.rating.evaTier} × ранг гравця + внески вивчених захисних технік (${K.passiveFx.shield.evasion} за техніку × межі(дієвий рівень ÷ бойовий рівень нападника; ${K.evaLevel.min}; ${K.evaLevel.max})) + спорядження й бонуси + ${K.rating.knowledge} за рівень знань про ворога; вдале ухилення нічого не коштує`);
 row("Шанс влучити","як у Melvor: якщо точність ≥ ухилення, то 1 − ухилення ÷ (2 × точність), інакше точність ÷ (2 × ухилення); у межах 5–95%");
-row("Базова атака",`кожні ${K.basicInterval} с, ${K.basicDmg[0]} + ${K.basicDmg[1]} × більший із рівнів Тайдзюцу й Ніндзюцу`);
+row("Базова атака",`дія: вичікування рангу й каст ${K.basicCast} с, ${K.basicCost} витривалості, ${K.basicDmg[0]} + ${K.basicDmg[1]} × більший із рівнів Тайдзюцу й Ніндзюцу`);
 row("Вартість технік",`−${K.ccCostPerLevel*100}% за рівень Контролю чакри`);
 row("Між боями",`зона: HP +${K.zoneHpRegen*100}% максимуму, чакра й витривалість повністю; операція: усе +${K.opRegen*100}%`);
 row("Рани",`−${K.wound.stat*100}% бойових характеристик за стак, до ${K.wound.max}; стак гоїться ${K.wound.healMin} хв, не швидше ${K.wound.healFloorMin} хв`);
@@ -300,7 +320,7 @@ H("11. Орієнтовний час до віх");
 const g=(sk,L)=>minutesTo(L,levelsOf[sk],sk==="prov"||sk==="alch"?K.craftXpMult:1);
 const genin=g("tai",10)+g("nin",10)+g("cc",10)+g("ath",5)+g("med",5)+8+5;
 const clones=g("nin",50)+g("med",40)+g("scout",20)+g("ath",15);
-const fightH=combatH(36)*60; // Живучість 36 у боях; стиль і Ухилення ростуть разом
+const fightH=combatH(36)*60; // Живучість 36 у боях; стиль росте разом
 const chunin=genin+fightH+g("med",34)+g("scout",25)+g("ath",25)+g("cc",30)+g("herb",45)+g("alch",45)+g("prov",25)+g("nin",30)+ 240 /*місії: Репутація 300 і рьо*/ + 60 /*іспит*/;
 head("Віха","Що враховано","Годин"); J.milestones={ genin:round(genin/60,1), clones:round((genin+clones)/60,1), chunin:round(chunin/60,1), cap:J.capHours };
 row("Генін","Тайдзюцу, Ніндзюцу, Контроль 10; Атлетика й Медитація 5; 10 манекенів; тест сенсея",J.milestones.genin);

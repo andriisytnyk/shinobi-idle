@@ -22,8 +22,10 @@ export default defineConfig(
     '**/node_modules/**',
     '**/dist/**',
     '**/coverage/**',
+    // Local working copies of automation agents; never part of the project.
+    '.claude/**',
     'docs/**',
-    'packages/content/src/data/generated/**',
+    'packages/content/src/packs/core/data/generated/**',
     'apps/web/src/lib/icons.generated.ts',
   ]),
   js.configs.recommended,
@@ -47,7 +49,15 @@ export default defineConfig(
   },
   {
     files: ['apps/web/**/*.{ts,svelte}'],
-    languageOptions: { globals: { ...globals.browser } },
+    languageOptions: {
+      // `__APP_VERSION__`, `__BUILD_DATE__` and `__DEV_PANEL__` are injected by Vite `define`.
+      globals: {
+        ...globals.browser,
+        __APP_VERSION__: 'readonly',
+        __BUILD_DATE__: 'readonly',
+        __DEV_PANEL__: 'readonly',
+      },
+    },
   },
   {
     // Architecture rule 1: the core is deterministic and knows nothing about the platform.

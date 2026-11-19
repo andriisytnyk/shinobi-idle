@@ -1,0 +1,19 @@
+The hunter boss on dev 3f559af: the analysis of a prepared fighter (150 broths) by player level.
+level	fresh win rate	session verdict	session median win rate
+38	0.107	hopeless	0.000
+39	0.170	hopeless	0.000
+40	0.273	hopeless	0.000
+41	0.460	hopeless	0.029
+42	0.557	hopeless	0.030
+43	0.660	hopeless	0.045
+44	0.770	risky	0.138
+45	0.875	risky	0.184
+46	0.922	risky	0.641
+47	0.953	risky	0.797
+48	0.973	risky	1.000
+49	0.995	stable	1.000
+50	1.000	stable	1.000
+51	1.000	stable	1.000
+52	1.000	stable	1.000
+Tipping: hopeless to risky at 44, risky to stable at 49 (the card's "around 46" is the middle of the risky band where the session median passes 0.5).
+Measured with packages/core/test/analysis-helpers.ts (boss(level), build(c, 20), analyze).

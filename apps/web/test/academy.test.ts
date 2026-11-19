@@ -1,20 +1,21 @@
-import { content, localeKey, ukLocale } from '@shinobi/content';
+import { content, ukLocale } from '@shinobi/content';
 import { bump, createState, evalReq, updateQuests, xpAt, type GameState } from '@shinobi/core';
 import type { Component } from 'svelte';
 import { render } from 'svelte/server';
 import { beforeEach, describe, expect, it } from 'vitest';
 import CombatLog from '../src/components/CombatLog.svelte';
-import DevTools from '../src/components/DevTools.svelte';
 import GoalPanel from '../src/components/GoalPanel.svelte';
 import HintHost from '../src/components/HintHost.svelte';
 import NowBar from '../src/components/NowBar.svelte';
 import MainNav from '../src/components/MainNav.svelte';
 import TabBar from '../src/components/TabBar.svelte';
+import DevPanel from '../src/dev/DevPanel.svelte';
 import { isDevMode } from '../src/lib/dev.ts';
 import { migrateLocalGoal } from '../src/lib/goal-migration.ts';
 import { HINTS, nextStateHint } from '../src/lib/hints.ts';
 import type { LogEntry } from '../src/lib/game.svelte.ts';
 import { markerOf } from '../src/lib/nav.ts';
+import { coreRegistry, inApp } from './helpers/core-registry.ts';
 import { nextStep, objectiveTarget, withoutRankRows } from '../src/lib/next-step.ts';
 import { hrefFor, type EntityRef } from '../src/lib/route.ts';
 import { SETTINGS_KEY, settings, type TextStorage } from '../src/lib/settings.svelte.ts';
@@ -29,7 +30,7 @@ const html = <P extends Record<string, unknown>>(component: Component<P>, props:
   render(component, { props }).body;
 
 const name = (ref: EntityRef) =>
-  ukLocale[localeKey(ref.kind === 'status' ? 'state' : ref.kind, ref.id, 'name')] ?? ref.id;
+  ukLocale[`${ref.kind === 'status' ? 'state' : ref.kind}.${ref.id}.name`] ?? ref.id;
 
 const anchor = (ref: EntityRef) =>
   new RegExp(
@@ -40,7 +41,7 @@ const QUEST = 'core:graduation';
 const SCROLL = 'core:graduate_scroll';
 
 function setLevel(state: GameState, skill: 'tai' | 'nin' | 'cc' | 'ath' | 'med', level: number) {
-  state.skills[skill].xp = xpAt(level);
+  state.skills[skill]!.xp = xpAt(level);
 }
 
 /** A game at step 4 of the chain with three dummies down. */
@@ -130,9 +131,14 @@ describe('A4: Academy page', () => {
     expect(running).not.toContain('class="take ');
   });
 
-  it('shows the passed state after graduation', () => {
+  it('shows the next exam to a Genin and the passed state at the last rank', () => {
+    const next = createState(1, content);
+    next.player.rank = 'genin';
+    game.replaceState(next);
+    expect(html(RankPage, {})).not.toContain('data-passed');
+    expect(html(RankPage, {})).toContain('data-exam="core:chunin_exam"');
     const state = createState(1, content);
-    state.player.rank = 'genin';
+    state.player.rank = 'chunin';
     game.replaceState(state);
     expect(html(RankPage, {})).toContain('data-passed');
   });
@@ -145,19 +151,21 @@ describe('A4: combat screen', () => {
     expect(body).toContain('data-enemy="core:dummy"');
     expect(body).toContain('Бойовий рівень');
     expect(body).toContain('Почати бій');
-    expect(body).not.toContain('core:bandit');
+    // Nothing undiscovered: no region zone, no boss zone, no raw id of a boss.
+    expect(body).not.toContain('data-enemy="core:bandit"');
+    expect(body).not.toContain('data-zone=');
+    expect(body).not.toContain('core:boss_');
   });
 
-  it('shows bars, what each side does and the kills while fighting', () => {
+  it('shows the arena with bars and what each side does while fighting', () => {
     expect(
-      game.dispatch({ type: 'action.start', slot: 0, kind: 'fight', id: 'core:dummy' }).ok,
+      game.dispatch({ type: 'action.start', slot: 0, kind: 'fight', id: 'core:zone_dummy' }).ok,
     ).toBe(true);
     game.devAdvance(30_000);
     const body = html(CombatPage, {});
-    expect(body).toContain('data-fighting="core:dummy"');
-    expect(body).toContain('data-player-doing');
-    expect(body).toContain('data-enemy-doing');
-    expect(body).toContain('data-kills');
+    expect(body).toContain('data-ui="fight-arena"');
+    expect((body.match(/data-ui="fighter"/g) ?? []).length).toBe(2);
+    expect((body.match(/data-ui="fight-action"/g) ?? []).length).toBeGreaterThanOrEqual(1);
     expect(body).toContain('Зупинити бій');
     expect((body.match(/role="progressbar"/g) ?? []).length).toBeGreaterThanOrEqual(4);
   });
@@ -201,7 +209,7 @@ describe('A4: combat screen', () => {
   });
 
   it('feeds the log from the core events of a real fight', () => {
-    game.dispatch({ type: 'action.start', slot: 0, kind: 'fight', id: 'core:dummy' });
+    game.dispatch({ type: 'action.start', slot: 0, kind: 'fight', id: 'core:zone_dummy' });
     game.devAdvance(30_000);
     expect(game.combatLog.length).toBeGreaterThan(0);
     const body = html(CombatLog, { entries: game.combatLog });
@@ -244,25 +252,28 @@ describe('suggested next step', () => {
   });
 
   it('marks the destination in the tab bar, the sidebar menu and nowhere else', () => {
-    expect(markerOf('#/skill/tai')).toEqual({ nav: 'skills', skill: 'tai' });
-    expect(markerOf('#/combat').nav).toBe('combat');
-    expect(markerOf(null)).toEqual({ nav: null, skill: null });
+    expect(markerOf('#/skill/tai', coreRegistry)).toEqual({ nav: 'skills', skill: 'tai' });
+    expect(markerOf('#/combat', coreRegistry).nav).toBe('combat');
+    expect(markerOf(null, coreRegistry)).toEqual({ nav: null, skill: null });
 
     game.replaceState(atStepFour());
-    const tabs = html(TabBar, {});
+    const tabs = inApp(TabBar);
     expect(tabs.match(/data-marker/g)).toHaveLength(1);
     expect(tabs).toMatch(/data-tab="combat"[\s\S]*?data-marker/);
-    const nav = html(MainNav, {});
+    const nav = inApp(MainNav);
     expect(nav.match(/data-marker/g)).toHaveLength(1);
     expect(nav).toMatch(/data-nav="combat"[\s\S]*?data-marker/);
   });
 
-  it('has the journal and the bank in the main navigation', () => {
-    for (const body of [html(TabBar, {}), html(MainNav, {})]) {
+  it('has the journal, the map and the fight on the tabs, and the bank in the side menu', () => {
+    for (const body of [inApp(TabBar), inApp(MainNav)]) {
       expect(body).toContain('href="#/quests"');
       expect(body).toContain('href="#/combat"');
-      expect(body).toContain('href="#/bank"');
+      expect(body).toContain('href="#/world"');
     }
+    // On a phone the bank is reached from «Ще» and the top bar.
+    expect(inApp(MainNav)).toContain('href="#/bank"');
+    expect(inApp(TabBar)).not.toContain('href="#/bank"');
   });
 });
 
@@ -340,21 +351,17 @@ describe('A5: hints', () => {
 });
 
 describe('A6: developer tools', () => {
-  it('are absent without ?dev=1', () => {
+  it('are switched on by ?dev=1 only', () => {
     for (const search of ['', '?dev=0', '?dev', '?x=1', '?dev=true']) {
       expect(isDevMode(search), search).toBe(false);
-      expect(html(DevTools, { search }), search).not.toContain('data-dev-tools');
     }
-    expect(html(DevTools, {})).not.toContain('data-dev-tools');
-  });
-
-  it('show the time buttons and the dump button with ?dev=1', () => {
     expect(isDevMode('?dev=1')).toBe(true);
     expect(isDevMode('?foo=2&dev=1')).toBe(true);
-    const body = html(DevTools, { search: '?dev=1' });
-    expect(body).toContain('data-dev-tools');
-    for (const ms of [60_000, 600_000, 3_600_000]) expect(body).toContain(`data-advance="${ms}"`);
-    expect(body).toContain('data-dump');
+  });
+
+  it('show the panel opener', () => {
+    const body = html(DevPanel, {});
+    expect(body).toContain('data-dev-open');
   });
 
   it('advance game time through the core, not by editing the state', () => {
@@ -362,7 +369,7 @@ describe('A6: developer tools', () => {
     game.dispatch({ type: 'action.start', slot: 0, kind: 'practice', id: 'core:leaf_whirlwind' });
     game.devAdvance(60_000);
     expect(game.state.now).toBe(before + 60_000);
-    expect(game.state.skills.tai.xp).toBeGreaterThan(0);
+    expect(game.state.skills.tai!.xp).toBeGreaterThan(0);
   });
 });
 
@@ -495,13 +502,15 @@ describe('waiting for the sensei test', () => {
 });
 
 describe('navigation and the log', () => {
-  it('has five tabs and no sections that do not exist yet', () => {
-    const body = html(TabBar, {});
+  it('has five tabs, and the missions only in the sidebar', () => {
+    const body = inApp(TabBar);
     expect(body.match(/data-tab=/g)).toHaveLength(5);
-    for (const text of [body, html(MainNav, {})]) {
-      expect(text).not.toContain('#/missions');
-      expect(text).not.toContain('#/village');
-    }
+    // The missions are a section of the journal on a phone, a menu item beside the quests elsewhere.
+    expect(body).not.toContain('#/missions');
+    expect(inApp(MainNav)).toContain('#/missions');
+    // The village is a page of its own: in the sidebar menu, inside «Ще» on a phone, never a tab.
+    expect(body).not.toContain('#/village');
+    expect(inApp(MainNav)).toContain('#/village');
   });
 
   it('says the fight continues when the log is empty mid-fight', () => {

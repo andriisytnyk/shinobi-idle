@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import { getMod, type Modifier } from '@shinobi/core';
   import { isEntityKind } from '../lib/entities.ts';
   import { formatBonus } from '../lib/format.ts';
-  import { hasKey, t } from '../lib/i18n.ts';
+  import { fallbackText, hasKey, t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import EntityLink from './EntityLink.svelte';
+
+  const content = game.content;
 
   interface Props {
     /** Modifier keys that feed the figure, e.g. `xp.all` and `xp.skill.tai`. */
@@ -21,13 +22,21 @@
   let open = $state(false);
 
   const parts = $derived.by((): Modifier[] =>
-    keys.flatMap((key) => getMod(game.state, key, content, game.rules).parts),
+    game.read((gs) => keys.flatMap((key) => getMod(gs, key, content, game.rules).parts)),
   );
   const total = $derived(
-    keys.reduce((acc, key) => acc * getMod(game.state, key, content, game.rules).total, 1),
+    game.read((gs) =>
+      keys.reduce((acc, key) => acc * getMod(gs, key, content, game.rules).total, 1),
+    ),
   );
 
-  const valueText = (m: Modifier) => (m.op === 'add' ? formatBonus(1 + m.value) : `×${m.value}`);
+  /** A flat key counts units (`+5`); the others are shares (`+5%`) or factors. */
+  const valueText = (m: Modifier) =>
+    m.op === 'mul'
+      ? `×${m.value}`
+      : content.modifierKeys[m.key]?.flat
+        ? `${m.value < 0 ? '−' : '+'}${Math.abs(m.value)}`
+        : formatBonus(1 + m.value);
   const sourceKey = (m: Modifier) => (typeof m.source === 'string' ? m.source : null);
 </script>
 
@@ -47,7 +56,7 @@
               <EntityLink kind={part.source.kind} id={part.source.id} />
             {:else}
               {@const key = sourceKey(part)}
-              {key !== null && hasKey(key) ? t(key) : key}
+              {key !== null ? (hasKey(key) ? t(key) : fallbackText(key)) : ''}
             {/if}
           </span>
           <span>{valueText(part)}</span>
@@ -57,7 +66,11 @@
       {/each}
       {#if parts.length > 0}
         <span class="line total"
-          ><span>{t('mod.total')}</span><span>{formatBonus(total)}</span></span
+          ><span>{t('mod.total')}</span><span
+            >{keys.every((k) => content.modifierKeys[k]?.flat)
+              ? `+${Math.round((total - 1) * 100) / 100}`
+              : formatBonus(total)}</span
+          ></span
         >
       {/if}
     </span>
@@ -74,7 +87,7 @@
   .figure {
     padding: 0;
     border: 0;
-    border-bottom: 1px dotted var(--fg-dim);
+    border-bottom: var(--border-thin) dotted var(--fg-dim);
     background: none;
     color: inherit;
     font: inherit;
@@ -91,13 +104,13 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
-    min-width: 12rem;
+    min-width: var(--card-min);
     margin-top: var(--space-1);
     padding: var(--space-2);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface);
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
   }
 
   .line {
@@ -112,7 +125,7 @@
 
   .total {
     padding-top: var(--space-1);
-    border-top: 1px solid var(--line);
+    border-top: var(--border-thin) solid var(--line);
     font-weight: 600;
   }
 
@@ -121,7 +134,8 @@
     .figure {
       display: inline-flex;
       align-items: center;
-      min-height: 2.75rem;
+      min-width: var(--control-md);
+      min-height: var(--control-md);
     }
   }
 </style>

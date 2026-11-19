@@ -1,331 +1,62 @@
 /**
- * Icon registry: maps every game entity (`kind` + `id`) to an icon name of the
- * game-icons.net collection (`@iconify-json/game-icons`, CC BY 3.0).
+ * Icon lookup: an icon is an icon name of the game-icons.net collection
+ * (`@iconify-json/game-icons`, CC BY 3.0) by entity kind and id. Every pack brings its own table;
+ * `composeContent` merges them into `content.icons`, which is what the UI reads.
  *
- * The map is hand-written. A test fails when a content entity has no entry or an entry names an
- * icon that the collection does not contain. `pnpm icons:build` extracts the used icons.
+ * Tests fail when an entity of the pack `core` has no entry or an entry names an icon that the
+ * collection does not contain. `pnpm icons:build` extracts the icons of the app bundle (`core`).
  */
+import type { IdTypes } from '@shinobi/content/typing';
+import vocab from './packs/core/data/hand/vocab.json' with { type: 'json' };
+import { CORE_ICONS } from './packs/core/icons.ts';
+import type { IconTable } from './schema.ts';
 
-/** Entity kinds that carry an icon. `status`, `trait`, `nature` and `currency` are not content tables. */
-export const ICON_KINDS = [
-  'skill',
-  'technique',
-  'item',
-  'status',
-  'trait',
-  'nature',
-  'currency',
-  'enemy',
-  'boss',
-  'building',
-  'region',
-  'gear',
-] as const;
+/** The kind of an icon: an entity kind or one of the vocabularies (`status`, `trait`, `nature`, `currency`). */
+export type IconKind = IdTypes['iconKind'];
 
-export type IconKind = (typeof ICON_KINDS)[number];
+/**
+ * Icon kinds of the pack `core`.
+ * @deprecated The kinds are whatever the composed icon tables name: read `Object.keys(content.icons)`.
+ */
+export const ICON_KINDS = Object.keys(CORE_ICONS) as readonly IconKind[];
 
 export interface IconRef {
   kind: IconKind;
   id: string;
 }
 
-/** Currency ids as they appear in `state.currencies`. */
-export const CURRENCY_IDS = ['ryo', 'rep', 'intel'] as const;
+/**
+ * Currency ids as they appear in `state.currencies`.
+ * @deprecated Read `content.currencies`.
+ */
+export const CURRENCY_IDS = vocab.currencies.map((c) => c.id) as readonly string[] as readonly (
+  'ryo' | 'rep' | 'intel'
+)[];
 
-export const ICON_MAP: Readonly<Record<IconKind, Readonly<Record<string, string>>>> = {
-  skill: {
-    tai: 'high-kick',
-    nin: 'ninja-mask',
-    katon: 'flame',
-    futon: 'tornado',
-    raiton: 'lightning-helix',
-    doton: 'rock',
-    suiton: 'water-drop',
-    cc: 'concentration-orb',
-    med: 'meditation',
-    ath: 'run',
-    herb: 'herbs-bundle',
-    scout: 'binoculars',
-    prov: 'cooking-pot',
-    alch: 'erlenmeyer',
-    vit: 'heart-beats',
-    eva: 'evasion',
-  },
+/**
+ * Icon names of the built-in pack.
+ * @deprecated Read `content.icons`, which merges the icon tables of every pack.
+ */
+export const ICON_MAP = CORE_ICONS as Readonly<Record<IconKind, Readonly<Record<string, string>>>>;
 
-  technique: {
-    // Taijutsu: kicks, punches, gates, lotus
-    'core:leaf_whirlwind': 'leaf-swirl',
-    'core:dynamic_entry': 'boot-kick',
-    'core:leaf_gale': 'soccer-kick',
-    'core:gate_of_opening': 'open-gate',
-    'core:gate_of_healing': 'heaven-gate',
-    'core:lion_combo': 'lion',
-    'core:leaf_great_whirlwind': 'half-tornado',
-    'core:drunken_fist': 'sake-bottle',
-    'core:leaf_rising_wind': 'high-punch',
-    'core:front_lotus': 'lotus-flower',
-    // Ninjutsu: clones, masks, ropes, shadows, binding
-    'core:clone': 'two-shadows',
-    'core:transformation': 'drama-masks',
-    'core:body_replacement': 'log',
-    'core:body_flicker': 'teleport',
-    'core:shadow_shuriken': 'flying-shuriken',
-    'core:enclosing': 'wax-seal',
-    'core:sensing': 'movement-sensor',
-    'core:rope_escape': 'rope-coil',
-    'core:temporary_paralysis': 'manacles',
-    'core:hidden_shadow_snake_hands': 'shadow-grasp',
-    'core:chakra_halving_drill': 'divided-spiral',
-    'core:shadow_clone': 'shadow-follower',
-    // Katon: fire
-    'core:nature_transformation_burn_a_leaf': 'flamed-leaf',
-    'core:fire_breath_control_drill': 'fire-breath',
-    'core:running_fire': 'fire-dash',
-    'core:great_fireball': 'fireball',
-    'core:phoenix_sage_fire': 'fire-ace',
-    'core:dragon_fire': 'dragon-breath',
-    'core:fire_dragon_flame_bullet': 'burning-round-shot',
-    // Futon: wind
-    'core:nature_transformation_cut_a_leaf': 'falling-leaf',
-    'core:nature_transformation_split_a_waterfall': 'waterfall',
-    'core:wind_chakra_flow_drill': 'windy-stripes',
-    'core:gale_palm': 'wind-slap',
-    'core:great_breakthrough': 'wind-hole',
-    'core:sickle_weasel': 'sickle',
-    'core:vacuum_wave': 'crossed-air-flows',
-    // Raiton: lightning
-    'core:nature_transformation_crumple_a_leaf': 'curled-leaf',
-    'core:lightning_discharge_drill': 'lightning-arc',
-    'core:lightning_chakra_flow_drill': 'lightning-saber',
-    'core:four_pillar_bind': 'lightning-dome',
-    'core:lightning_beast_tracking_fang': 'bestial-fangs',
-    'core:wave_of_inspiration': 'lightning-frequency',
-    'core:false_darkness': 'lightning-mask',
-    // Doton: earth
-    'core:nature_transformation_crumble_a_leaf': 'dust-cloud',
-    'core:double_suicide_decapitation': 'ground-sprout',
-    'core:earth_softening_drill': 'quicksand',
-    'core:hiding_like_a_mole': 'mole',
-    'core:tearing_earth_turning_palm': 'earth-crack',
-    'core:earth_flow_river': 'stone-path',
-    'core:earth_dragon_bullet': 'boulder-dash',
-    'core:earth_style_wall': 'stone-wall',
-    // Suiton: water
-    'core:nature_transformation_dampen_a_leaf': 'droplet-splash',
-    'core:hiding_in_mist': 'fog',
-    'core:river_water_guiding_drill': 'river',
-    'core:water_clone': 'water-splash',
-    'core:wild_water_wave': 'big-wave',
-    'core:water_prison': 'bubble-field',
-    'core:gunshot': 'water-gun',
-    'core:starch_syrup_capturing_field': 'dripping-honey',
-    'core:water_formation_wall': 'waves',
-  },
-
-  item: {
-    // Herbs
-    'core:mint': 'clover',
-    'core:nettle': 'vine-leaf',
-    'core:hogweed': 'spoted-flower',
-    'core:bloodgrass': 'vines',
-    'core:poppy': 'poppy',
-    'core:ironroot': 'plant-roots',
-    'core:silvermoss': 'solid-leaf',
-    'core:edelweiss': 'flower-star',
-    'core:fireflower': 'fire-flower',
-    'core:lotus': 'lotus',
-    'core:shadowshroom': 'spotted-mushroom',
-    // Ingredients
-    'core:water': 'water-bottle',
-    'core:rice': 'bowl-of-rice',
-    'core:salt': 'salt-shaker',
-    'core:oil': 'oil-can',
-    'core:noodles': 'noodles',
-    'core:meat': 'meat',
-    'core:saltpeter': 'powder-bag',
-    'core:spice': 'hot-spices',
-    // Tools
-    'core:kunai': 'thrown-knife',
-    'core:shuriken': 'ninja-star',
-    'core:senbon': 'sewing-needle',
-    'core:wire': 'wire-coil',
-    'core:wiretrap': 'tripwire',
-    'core:tag': 'paper-bomb',
-    'core:psenbon': 'skull-with-syringe',
-    'core:parsenbon': 'needle-jaws',
-    'core:medpouch': 'medical-pack',
-    // Misc
-    'core:crate': 'wooden-crate',
-    'core:gem': 'gems',
-    'core:band': 'headband-knot',
-    'core:pelt': 'fur-shirt',
-    'core:coin': 'crown-coin',
-    'core:fang': 'saber-tooth',
-    'core:note': 'folded-paper',
-    'core:scrollpart': 'scroll-unfurled',
-    'core:notes': 'notebook',
-    'core:graduate_scroll': 'tied-scroll',
-    // Technique scrolls and their parts
-    'core:scroll_lion_combo': 'tied-scroll',
-    'core:scroll_drunken_fist': 'tied-scroll',
-    'core:scrollpart_drunken_fist': 'scroll-unfurled',
-    'core:scroll_enclosing': 'tied-scroll',
-    'core:scroll_temporary_paralysis': 'tied-scroll',
-    'core:scroll_hidden_shadow_snake_hands': 'tied-scroll',
-    'core:scrollpart_hidden_shadow_snake_hands': 'scroll-unfurled',
-    'core:scroll_shadow_clone': 'tied-scroll',
-    'core:scroll_dragon_fire': 'tied-scroll',
-    'core:scroll_fire_dragon_flame_bullet': 'tied-scroll',
-    'core:scroll_vacuum_wave': 'tied-scroll',
-    'core:scroll_wave_of_inspiration': 'tied-scroll',
-    'core:scrollpart_wave_of_inspiration': 'scroll-unfurled',
-    'core:scroll_false_darkness': 'tied-scroll',
-    'core:scrollpart_false_darkness': 'scroll-unfurled',
-    'core:scroll_earth_dragon_bullet': 'tied-scroll',
-    'core:scroll_water_prison': 'tied-scroll',
-    'core:scrollpart_water_prison': 'scroll-unfurled',
-    'core:scroll_gunshot': 'tied-scroll',
-    'core:scroll_starch_syrup_capturing_field': 'tied-scroll',
-    // Consumables (recipe outputs)
-    'core:antidote': 'fizzing-flask',
-    'core:tsiliushcha_maz': 'heart-bottle',
-    'core:paralitychna_otruta': 'round-potion',
-    'core:dymova_bomba': 'smoke-bomb',
-    'core:sonnyi_poroshok': 'powder',
-    'core:krovospynna_maz': 'bandage-roll',
-    'core:slozohinna_bomba': 'stun-grenade',
-    'core:hirska_maz': 'honey-jar',
-    'core:nervova_otruta': 'potion-of-madness',
-    'core:niukhalna_sil': 'spray',
-    'core:maz_vid_opikiv': 'medicines',
-    'core:onihiri': 'sushis',
-    'core:tonik_iasnoho_rozumu': 'magic-potion',
-    'core:piliulia_viiskovoho_paika': 'pill',
-    'core:sushenyi_paiok': 'ham-shank',
-    'core:krovotvorna_piliulia': 'medicine-pills',
-    'core:tonik_kontsentratsii': 'standing-potion',
-    'core:bulion_ramenu': 'bowl-spiral',
-    'core:chai_badorosti': 'teapot',
-    'core:iakitori_shynobi': 'steak',
-    'core:tonik_stykhii': 'potion-ball',
-    'core:piliulia_vidnovlennia_chakry': 'pill-drop',
-  },
-
-  status: {
-    burn: 'burn',
-    wet: 'splash',
-    stun: 'star-swirl',
-    bind: 'crossed-chains',
-    poison: 'poison-cloud',
-  },
-
-  // `shield` is out of the slice but kept so the full list of nine traits is covered.
-  trait: {
-    armor: 'armor-vest',
-    caster: 'wizard-staff',
-    pack: 'wolf-howl',
-    evasive: 'dodge',
-    regen: 'regeneration',
-    illusionist: 'psychic-waves',
-    hidden: 'invisible',
-    poisoner: 'poison-bottle',
-    shield: 'shield',
-  },
-
-  nature: {
-    katon: 'fire',
-    futon: 'whirlwind',
-    raiton: 'lightning-trio',
-    doton: 'stone-pile',
-    suiton: 'drop',
-  },
-
-  currency: {
-    ryo: 'two-coins',
-    rep: 'laurels',
-    intel: 'spy',
-  },
-
-  enemy: {
-    'core:dummy': 'target-dummy',
-    'core:bandit': 'bandit',
-    'core:arsonist': 'flamethrower-soldier',
-    'core:wolf': 'wolf-head',
-    'core:wolfmask': 'robber-mask',
-    'core:centipede': 'centipede',
-    'core:tiger': 'tiger-head',
-    'core:thief': 'robber',
-    'core:merc_pack': 'viking-helmet',
-    'core:heavy': 'brute',
-    'core:marauder': 'barbarian',
-    'core:poisoner': 'hooded-assassin',
-    'core:kumo': 'thunder-skull',
-    'core:suna': 'sandstorm',
-    'core:hunter': 'hunter-eyes',
-    'core:hunter_caster': 'wizard-face',
-    'core:kiri_hunter': 'ninja-armor',
-    'core:guard_pack': 'guards',
-    'core:veteran': 'samurai-helmet',
-    'core:oro_aide': 'snake-totem',
-    'core:serpent': 'sea-serpent',
-    'core:leech': 'leeching-worm',
-    'core:fake_genin': 'double-face-mask',
-    'core:foreign_genin': 'ninja-heroic-stance',
-  },
-
-  boss: {
-    'core:boss_wolf': 'direwolf',
-    'core:boss_ren1': 'crossed-swords',
-    'core:boss_fighter': 'beer-stein',
-    'core:boss_hunter': 'crosshair-arrow',
-    'core:boss_twins': 'gemini',
-    'core:boss_mist': 'skull-mask',
-    'core:boss_nameless': 'burning-skull',
-    'core:boss_ren2': 'sword-spin',
-  },
-
-  building: {
-    'core:tower': 'pagoda',
-    'core:bureau': 'scroll-quill',
-    'core:grounds': 'archery-target',
-    'core:shrine': 'shinto-shrine',
-    'core:academy': 'school-bag',
-    'core:library': 'book-pile',
-    'core:hospital': 'hospital',
-    'core:forge': 'anvil',
-    'core:lab': 'round-bottom-flask',
-    'core:market': 'price-tag',
-    'core:store': 'warehouse',
-    'core:barrier': 'barrier',
-    'core:farms': 'farmer',
-    'core:hunt': 'hunting-horn',
-    'core:mine': 'mine-wagon',
-    'core:sawmill': 'circular-sawblade',
-  },
-
-  region: {
-    'core:forest': 'pine-tree',
-    'core:plains': 'windmill',
-    'core:valley': 'monument-valley',
-  },
-
-  gear: {
-    'core:trenuvalni_manekeny': 'punching-bag',
-    'core:serp_i_rukavytsi_travnyka': 'gardening-shears',
-    'core:perehinnyi_kub': 'spiral-bottle',
-    'core:stantsii_proviantu': 'camp-cooking-pot',
-    'core:karty_i_kompas': 'compass',
-  },
-};
-
-/** The game-icons name for an entity, or `undefined` when it has no entry. */
-export function iconFor(kind: IconKind, id: string): string | undefined {
-  return Object.hasOwn(ICON_MAP[kind], id) ? ICON_MAP[kind][id] : undefined;
+/**
+ * The game-icons name for an entity, or `undefined` when it has no entry (the caller falls back to
+ * a generic icon). `icons` is the table to read: pass `content.icons` to include the icons of
+ * every pack; it defaults to the table of the pack `core`.
+ */
+export function iconFor(
+  kind: IconKind,
+  id: string,
+  icons: Readonly<IconTable> = ICON_MAP,
+): string | undefined {
+  const table = Object.hasOwn(icons, kind) ? icons[kind] : undefined;
+  return table !== undefined && Object.hasOwn(table, id) ? table[id] : undefined;
 }
 
-/** Every game-icons name the mapping uses, sorted and de-duplicated. */
-export function mappedIconNames(): string[] {
+/** Every game-icons name the table uses, sorted and de-duplicated (default: the pack `core`). */
+export function mappedIconNames(icons: Readonly<IconTable> = ICON_MAP): string[] {
   const names = new Set<string>();
-  for (const kind of ICON_KINDS) for (const name of Object.values(ICON_MAP[kind])) names.add(name);
+  for (const table of Object.values(icons))
+    for (const name of Object.values(table)) names.add(name);
   return [...names].sort();
 }

@@ -1,17 +1,116 @@
 <script lang="ts">
   import { t } from '../lib/i18n.ts';
   import { toasts } from '../lib/toasts.svelte.ts';
+  import { resourceName } from '../lib/vocab.ts';
   import EntityLink from './EntityLink.svelte';
+  import RewardList from './RewardList.svelte';
   import Icon from './Icon.svelte';
+
+  /** On a phone three toasts at most are shown; the older ones are counted in a chip. */
+  let phone = $state(
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches,
+  );
+  $effect(() => {
+    const query = window.matchMedia('(max-width: 768px)');
+    const update = () => (phone = query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  });
+  const cap = $derived(phone ? 3 : 6);
+  // Persistent toasts (an update waiting) are always shown; the newest ordinary ones fill the rest.
+  const shown = $derived.by(() => {
+    const ordinary = toasts.list.filter((toast) => !toast.persistent);
+    const room = Math.max(0, cap - (toasts.list.length - ordinary.length));
+    const keep = new Set(ordinary.slice(Math.max(0, ordinary.length - room)).map((x) => x.id));
+    return toasts.list.filter((toast) => toast.persistent || keep.has(toast.id));
+  });
+  const hidden = $derived(toasts.list.length - shown.length);
+
+  // The host is last in the page, far from the start of the tab order. A toast with an action
+  // takes the focus when it appears, unless the player is typing in a field.
+  let host: HTMLElement | undefined = $state();
+  let focused = 0;
+  $effect(() => {
+    const toast = shown.find((x) => x.persistent && x.action);
+    if (!toast || toast.id === focused || !host) return;
+    focused = toast.id;
+    const active = document.activeElement;
+    const typing =
+      active instanceof HTMLElement &&
+      (active.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName));
+    if (typing) return;
+    host.querySelector<HTMLElement>(`[data-toast-id="${toast.id}"] [data-toast-action]`)?.focus();
+  });
 </script>
 
-<div class="toasts" role="status" aria-live="polite">
-  {#each toasts.list as toast (toast.id)}
-    <div class="toast" data-toast={toast.key}>
+<div class="toasts" role="status" aria-live="polite" bind:this={host}>
+  {#if hidden > 0}<p class="more" data-toasts-more>{t('toast.more', { n: hidden })}</p>{/if}
+  {#each shown as toast (toast.id)}
+    <div
+      class="toast"
+      data-toast={toast.key}
+      data-toast-id={toast.id}
+      data-ui="toast"
+      role={toast.persistent ? 'alert' : undefined}
+      style:pointer-events={toast.persistent || toast.action ? 'auto' : 'none'}
+    >
       <span>
+        {#if toast.subject}<EntityLink kind={toast.subject.kind} id={toast.subject.id} />{/if}
         {t(toast.key, toast.params)}
         {#if toast.ref}<EntityLink kind={toast.ref.kind} id={toast.ref.id} />{/if}
+        {#if toast.gains}
+          <span class="gains" data-gains>
+            <RewardList
+              money={toast.gains.ryo}
+              currencies={toast.gains.currencies}
+              items={toast.gains.items}
+              xp={toast.gains.xp ?? null}
+            />
+            {#if toast.gains.resource}
+              {@const res = toast.gains.resource}
+              {#if res.added > 0}
+                <span data-resource="added"
+                  >{t('toast.mission.resourceAdded', {
+                    name: resourceName(res.slug),
+                    n: res.added,
+                  })}</span
+                >
+              {/if}
+              {#if res.lost > 0}
+                <span data-resource="lost"
+                  >{t('toast.mission.resourceLost', {
+                    name: resourceName(res.slug),
+                    n: res.lost,
+                  })}</span
+                >
+              {/if}
+              {#if res.waiting > 0}
+                <span data-resource="waiting"
+                  >{t('toast.mission.resourceWaiting', {
+                    name: resourceName(res.slug),
+                    n: res.waiting,
+                  })}</span
+                >
+              {/if}
+            {/if}
+          </span>
+        {/if}
       </span>
+      {#if toast.action}
+        {@const action = toast.action}
+        <button
+          type="button"
+          class="action"
+          data-toast-action
+          onclick={async () => {
+            // `false` means the action was refused: the toast stays for another try.
+            if ((await action.run()) !== false) toasts.dismiss(toast.id);
+          }}
+        >
+          {t(action.labelKey)}
+        </button>
+      {/if}
       <button type="button" aria-label={t('modal.close')} onclick={() => toasts.dismiss(toast.id)}>
         <Icon name="lucide:x" size={14} />
       </button>
@@ -20,15 +119,34 @@
 </div>
 
 <style>
+  .gains {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
+  }
+
+  .more {
+    align-self: flex-start;
+    margin: 0;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-pill);
+    background: var(--surface-raised);
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
+  }
+
+  /* On a wide screen the toasts sit at the left of the page, clear of the side panel and the goal panel. */
   .toasts {
     position: fixed;
-    right: var(--space-4);
-    bottom: calc(var(--now-height) + var(--space-3));
-    z-index: 20;
+    bottom: calc(var(--now-live, var(--now-height)) + var(--space-3));
+    left: calc(var(--sidebar-width) + var(--space-4));
+    z-index: var(--z-toast);
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
-    width: min(22rem, calc(100vw - 2 * var(--space-4)));
+    width: min(var(--toast-width), calc(100vw - 2 * var(--space-4)));
     pointer-events: none;
   }
 
@@ -38,15 +156,43 @@
     justify-content: space-between;
     gap: var(--space-2);
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--accent);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--accent);
+    border-radius: var(--radius-md);
     background: var(--surface-raised);
+  }
+
+  /*
+   * A toast floats over the page and must never take a click meant for what lies under it (the first click on a
+   * button the toast column covers was lost). An ordinary toast lets clicks through its body; only its links and
+   * buttons take them. A toast that waits for an answer (a persistent one, one with an action) is solid.
+   */
+  .toast :global(a),
+  .toast button {
     pointer-events: auto;
   }
 
   .toast :global(a) {
     color: var(--accent);
     font-weight: 600;
+  }
+
+  button.action {
+    flex: none;
+    padding: var(--space-1) var(--space-3);
+    border: var(--border-thin) solid var(--accent);
+    border-radius: var(--radius-md);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  button.action:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  button:focus-visible {
+    outline: var(--border-thick) solid var(--accent);
+    outline-offset: var(--focus-offset);
   }
 
   button {
@@ -59,16 +205,24 @@
   }
 
   @media (max-width: 768px) {
+    button.action {
+      min-height: var(--control-md);
+    }
+
     button {
       align-items: center;
       justify-content: center;
-      min-width: 2.75rem;
-      min-height: 2.75rem;
+      min-width: var(--control-md);
+      min-height: var(--control-md);
     }
 
+    /* On a phone they stay at the top, clear of the bottom sheet and its action row, and below the top bar: its buttons are never covered. */
     .toasts {
+      top: calc(var(--top-live, 0px) + var(--space-2));
       right: var(--space-3);
-      bottom: calc(var(--now-height) + var(--tabbar-height) + var(--space-2));
+      bottom: auto;
+      left: var(--space-3);
+      width: auto;
     }
   }
 </style>

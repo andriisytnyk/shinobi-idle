@@ -53,6 +53,7 @@
 <div class="backdrop">
   <div
     class="dialog"
+    data-ui="modal"
     class:paper
     role="dialog"
     aria-modal="true"
@@ -77,7 +78,7 @@
   .backdrop {
     position: fixed;
     inset: 0;
-    z-index: 30;
+    z-index: var(--z-modal);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -89,19 +90,21 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
-    width: min(36rem, 100%);
+    width: min(var(--modal-width), 100%);
     max-height: 100%;
     padding: var(--space-4);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface);
     color: var(--fg);
   }
 
   .dialog.paper {
+    --_border-top: 0.75rem;
+    --_border-bottom: 0.75rem;
     border-color: var(--paper-ink);
-    border-top: 0.75rem solid var(--ink-600);
-    border-bottom: 0.75rem solid var(--ink-600);
+    border-top: var(--_border-top) solid var(--ink-600);
+    border-bottom: var(--_border-bottom) solid var(--ink-600);
     background: var(--paper);
     color: var(--paper-ink);
   }
@@ -109,7 +112,7 @@
   h2 {
     margin: 0;
     font-family: var(--font-heading);
-    font-size: 1.3rem;
+    font-size: var(--text-lg);
     font-weight: 400;
   }
 
@@ -124,9 +127,9 @@
   }
 
   .actions :global(button) {
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-4);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);

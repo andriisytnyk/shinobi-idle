@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { LogEntry } from '../lib/game.svelte.ts';
+  import { allyName } from '../lib/ally-name.ts';
   import { t } from '../lib/i18n.ts';
   import { formatInt } from '../lib/format.ts';
   import EntityLink from './EntityLink.svelte';
@@ -9,9 +10,11 @@
     entries: readonly LogEntry[];
     /** A fight is running, so an empty log means the page was opened mid-fight. */
     fighting?: boolean;
+    /** The fight is a clone's: the lines name the clone, not the player. */
+    clone?: boolean;
   }
 
-  let { entries, fighting = false }: Props = $props();
+  let { entries, fighting = false, clone = false }: Props = $props();
 
   /** The newest line is shown last; the list keeps itself scrolled to it. */
   let box: HTMLElement | undefined = $state();
@@ -34,17 +37,56 @@
         {#if event.type === 'enemyDefeated'}
           <span>{t('log.enemyDefeated')}</span> <EntityLink kind="enemy" id={event.enemy} />
         {:else if event.type === 'playerDefeated'}
-          <span>{t('log.playerDefeated')}</span> <EntityLink kind="enemy" id={event.enemy} />
+          <span>{t(event.clone ? 'log.cloneDefeated' : 'log.playerDefeated')}</span>
+          <EntityLink kind="enemy" id={event.enemy} />
         {:else if event.side === 'enemy'}
           <EntityLink kind="enemy" id={event.enemy} />
-          <span>{t(event.act === 'hit' ? 'log.enemyHit' : 'log.enemyMiss')}</span>
+          <span
+            >{event.ally !== undefined
+              ? t(event.act === 'hit' ? 'log.enemyHitAlly' : 'log.enemyMissAlly', {
+                  name: allyName(event.allyKind, event.ally),
+                })
+              : t(
+                  event.act === 'hit'
+                    ? clone
+                      ? 'log.enemyHitClone'
+                      : 'log.enemyHit'
+                    : 'log.enemyMiss',
+                )}</span
+          >
+          {#if event.act === 'hit'}<span class="dmg"
+              >{t('log.damage', { n: formatInt(event.dmg) })}</span
+            >{/if}
+        {:else if event.ally !== undefined}
+          <!-- A combat clone acting: the line names the body. -->
+          <strong class="who">{allyName(event.allyKind, event.ally)}</strong>
+          <span
+            >{t(
+              event.act === 'cast'
+                ? 'log.allyCast'
+                : event.tech
+                  ? event.act === 'hit'
+                    ? 'log.allyHit'
+                    : 'log.allyMiss'
+                  : event.act === 'hit'
+                    ? 'log.allyBasicHit'
+                    : 'log.allyBasicMiss',
+            )}</span
+          >
+          {#if event.tech}<EntityLink kind="technique" id={event.tech} />{/if}
           {#if event.act === 'hit'}<span class="dmg"
               >{t('log.damage', { n: formatInt(event.dmg) })}</span
             >{/if}
         {:else if event.tech}
           <span
             >{t(
-              event.act === 'cast' ? 'log.cast' : event.act === 'hit' ? 'log.hit' : 'log.miss',
+              event.act === 'cast'
+                ? clone
+                  ? 'log.cloneCast'
+                  : 'log.cast'
+                : event.act === 'hit'
+                  ? 'log.hit'
+                  : 'log.miss',
             )}</span
           >
           <EntityLink kind="technique" id={event.tech} />
@@ -64,10 +106,11 @@
 
 <style>
   .log {
-    max-height: 16rem;
+    --_max-height: 16rem;
+    max-height: var(--_max-height);
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface);
     overflow-y: auto;
   }
@@ -79,12 +122,13 @@
   }
 
   li {
+    --_padding: 2px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0 var(--space-1);
-    padding: 2px 0;
-    font-size: 0.9rem;
+    padding: var(--_padding) 0;
+    font-size: var(--text-xs);
     overflow-wrap: anywhere;
   }
 
@@ -100,6 +144,10 @@
   li :global(a) {
     color: var(--accent);
     font-weight: 600;
+  }
+
+  .who {
+    color: var(--heading);
   }
 
   .dmg {

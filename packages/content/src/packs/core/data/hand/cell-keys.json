@@ -1,0 +1,19 @@
+{
+  "rock": { "t": "skill", "skill": "cc", "level": 15 },
+  "brush": {
+    "t": "any",
+    "of": [
+      { "t": "technique", "id": "core:running_fire" },
+      { "t": "technique", "id": "core:sickle_weasel" }
+    ]
+  },
+  "water": { "t": "skill", "skill": "cc", "level": 30 },
+  "mist": {
+    "t": "any",
+    "of": [
+      { "t": "technique", "id": "core:great_breakthrough" },
+      { "t": "technique", "id": "core:sickle_weasel" }
+    ]
+  },
+  "rubble": { "t": "technique", "id": "core:hiding_like_a_mole" }
+}

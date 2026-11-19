@@ -1,0 +1,296 @@
+{
+  "core:tykha_kimnata": {
+    "insight": [
+      [
+        {
+          "key": "xp.skill.cc",
+          "op": "add",
+          "value": 0.08
+        }
+      ],
+      [
+        {
+          "key": "xp.skill.nin",
+          "op": "add",
+          "value": 0.08
+        }
+      ],
+      [
+        {
+          "key": "interval.skill.cc",
+          "op": "add",
+          "value": -0.08
+        }
+      ]
+    ],
+    "enlight": [
+      [
+        {
+          "key": "cost.chakra.nonelemental",
+          "op": "add",
+          "value": -0.05
+        }
+      ],
+      [
+        {
+          "key": "clone.pool",
+          "op": "add",
+          "value": 0.05
+        }
+      ],
+      [
+        {
+          "key": "mastery.xp.skill.nin",
+          "op": "add",
+          "value": 0.05
+        }
+      ]
+    ]
+  },
+  "core:medytatsiia_v_rusi": {
+    "insight": [
+      [
+        {
+          "key": "xp.skill.tai",
+          "op": "add",
+          "value": 0.08
+        }
+      ],
+      [
+        {
+          "key": "xp.skill.vit",
+          "op": "add",
+          "value": 0.08
+        }
+      ],
+      [
+        {
+          "key": "pool.stamina",
+          "op": "add",
+          "value": 0.08
+        }
+      ]
+    ],
+    "enlight": [
+      [
+        {
+          "key": "evasion",
+          "op": "add",
+          "value": 0.025
+        }
+      ],
+      [
+        {
+          "key": "cost.skill.tai",
+          "op": "add",
+          "value": -0.05
+        }
+      ],
+      [
+        {
+          "key": "wound.heal.gates",
+          "op": "add",
+          "value": -0.1
+        }
+      ]
+    ]
+  },
+  "core:lisove_sviatylyshche": {
+    "insight": [
+      [
+        {
+          "key": "xp.skill.herb",
+          "op": "add",
+          "value": 0.08
+        }
+      ],
+      [
+        {
+          "key": "xp.skill.alch",
+          "op": "add",
+          "value": 0.08
+        }
+      ],
+      [
+        {
+          "key": "bush.stock",
+          "op": "add",
+          "value": 8
+        }
+      ]
+    ],
+    "enlight": [
+      [
+        {
+          "key": "gather.double",
+          "op": "add",
+          "value": 0.05
+        }
+      ],
+      [
+        {
+          "key": "heal.food",
+          "op": "add",
+          "value": 0.05
+        }
+      ],
+      [
+        {
+          "key": "craft.keep.alch",
+          "op": "add",
+          "value": 0.05
+        }
+      ]
+    ]
+  },
+  "core:bilia_vohnyshcha": {
+    "insight": [
+      [
+        {
+          "key": "xp.skill.katon",
+          "op": "add",
+          "value": 0.08,
+          "nature": "katon"
+        }
+      ],
+      [
+        {
+          "key": "xp.skill.prov",
+          "op": "add",
+          "value": 0.08
+        }
+      ],
+      [
+        {
+          "key": "interval.skill.prov",
+          "op": "add",
+          "value": -0.08
+        }
+      ]
+    ],
+    "enlight": [
+      [
+        {
+          "key": "craft.perfect",
+          "op": "add",
+          "value": 0.025
+        }
+      ],
+      [
+        {
+          "key": "burn.duration",
+          "op": "add",
+          "value": 0.1,
+          "nature": "katon"
+        }
+      ],
+      [
+        {
+          "key": "tonic.charges",
+          "op": "add",
+          "value": 0.1
+        }
+      ]
+    ]
+  },
+  "core:pid_vodospadom": {
+    "insight": [
+      [
+        {
+          "key": "xp.skill.suiton",
+          "op": "add",
+          "value": 0.08,
+          "nature": "suiton"
+        }
+      ],
+      [
+        {
+          "key": "xp.skill.ath",
+          "op": "add",
+          "value": 0.08
+        }
+      ],
+      [
+        {
+          "key": "obstacle.cost",
+          "op": "add",
+          "value": -0.08
+        }
+      ]
+    ],
+    "enlight": [
+      [
+        {
+          "key": "wet.duration",
+          "op": "add",
+          "value": 0.1,
+          "nature": "suiton"
+        }
+      ],
+      [
+        {
+          "key": "obstacle.bonus",
+          "op": "add",
+          "value": 0.025
+        }
+      ],
+      [
+        {
+          "key": "mission.duration",
+          "op": "add",
+          "value": -0.05
+        }
+      ]
+    ]
+  },
+  "core:sad_kameniv": {
+    "insight": [
+      [
+        {
+          "key": "xp.skill.doton",
+          "op": "add",
+          "value": 0.08,
+          "nature": "doton"
+        }
+      ],
+      [
+        {
+          "key": "xp.skill.vit",
+          "op": "add",
+          "value": 0.08
+        }
+      ],
+      [
+        {
+          "key": "pool.hp",
+          "op": "add",
+          "value": 0.08
+        }
+      ]
+    ],
+    "enlight": [
+      [
+        {
+          "key": "shield.strength",
+          "op": "add",
+          "value": 0.1,
+          "nature": "doton"
+        }
+      ],
+      [
+        {
+          "key": "wound.heal",
+          "op": "add",
+          "value": -0.1
+        }
+      ],
+      [
+        {
+          "key": "defense",
+          "op": "add",
+          "value": 0.05
+        }
+      ]
+    ]
+  }
+}

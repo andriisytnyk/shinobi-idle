@@ -1,0 +1,15 @@
+{
+  "core:trenuvalni_manekeny": { "key": "xp.skill.tai", "perTier": "mannequin", "effect": "bonus" },
+  "core:serp_i_rukavytsi_travnyka": {
+    "key": "interval.skill.herb",
+    "perTier": "sickle",
+    "effect": "reduction"
+  },
+  "core:perehinnyi_kub": { "key": "craft.keep.alch", "perTier": "alembic", "effect": "bonus" },
+  "core:stantsii_proviantu": {
+    "key": "interval.skill.prov",
+    "perTier": "stations",
+    "effect": "speed"
+  },
+  "core:karty_i_kompas": { "key": "interval.explore", "perTier": "maps", "effect": "reduction" }
+}

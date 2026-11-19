@@ -1,0 +1,88 @@
+[
+  {
+    "id": "core:boss_wolf",
+    "cl": 22,
+    "traits": [
+      "pack"
+    ],
+    "nature": "doton",
+    "carries": null,
+    "hp": 815,
+    "dmg": 20.7
+  },
+  {
+    "id": "core:boss_ren1",
+    "cl": 26,
+    "traits": [],
+    "nature": "wheel",
+    "carries": null,
+    "hp": 951,
+    "dmg": 23.4
+  },
+  {
+    "id": "core:boss_fighter",
+    "cl": 32,
+    "traits": [
+      "evasive"
+    ],
+    "nature": null,
+    "carries": "core:drunken_fist",
+    "hp": 1154,
+    "dmg": 27.4
+  },
+  {
+    "id": "core:boss_hunter",
+    "cl": 36,
+    "traits": [
+      "caster",
+      "evasive"
+    ],
+    "nature": "raiton",
+    "carries": "core:false_darkness",
+    "hp": 1290,
+    "dmg": 30.1
+  },
+  {
+    "id": "core:boss_twins",
+    "cl": 38,
+    "traits": [
+      "hidden",
+      "poisoner"
+    ],
+    "nature": null,
+    "carries": null,
+    "hp": 1358,
+    "dmg": 31.4
+  },
+  {
+    "id": "core:boss_mist",
+    "cl": 40,
+    "traits": [
+      "hidden"
+    ],
+    "nature": "suiton",
+    "carries": "core:water_prison",
+    "hp": 1426,
+    "dmg": 32.8
+  },
+  {
+    "id": "core:boss_nameless",
+    "cl": 44,
+    "traits": [
+      "illusionist"
+    ],
+    "nature": "katon",
+    "carries": null,
+    "hp": 1561,
+    "dmg": 35.5
+  },
+  {
+    "id": "core:boss_ren2",
+    "cl": 42,
+    "traits": [],
+    "nature": "wheel",
+    "carries": null,
+    "hp": 1493,
+    "dmg": 34.1
+  }
+]

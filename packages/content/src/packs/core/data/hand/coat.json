@@ -1,0 +1,4 @@
+[
+  { "poison": "core:nervova_otruta", "base": "core:senbon", "product": "core:psenbon" },
+  { "poison": "core:paralitychna_otruta", "base": "core:senbon", "product": "core:parsenbon" }
+]

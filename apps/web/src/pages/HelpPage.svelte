@@ -25,7 +25,7 @@
   .settings-link {
     display: inline-flex;
     align-items: center;
-    min-height: 2.75rem;
+    min-height: var(--control-md);
   }
 
   .hints {
@@ -37,15 +37,15 @@
   .entry {
     margin-bottom: var(--space-3);
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface);
   }
 
   h2 {
     margin: 0 0 var(--space-1);
     color: var(--heading);
-    font-size: 1rem;
+    font-size: var(--text-sm);
   }
 
   p {

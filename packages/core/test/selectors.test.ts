@@ -12,7 +12,7 @@ import {
   skillUnlockStatus,
   xpAt,
 } from '../src/index.ts';
-import { genin, HOUR, setLevel, start } from './helpers.ts';
+import { genin, HOUR, setLevel, start, withNatures } from './helpers.ts';
 
 describe('skill unlock rules', () => {
   it('opens tai, nin, cc, med and ath from the first day', () => {
@@ -23,7 +23,7 @@ describe('skill unlock rules', () => {
     }
   });
 
-  it('keeps every other skill shut for a student except vit and eva, which wait for a fight', () => {
+  it('keeps every other skill shut for a student except vit, which waits for a fight', () => {
     const state = createState(1, content);
     const shut = SKILL_IDS.filter((id) => !isSkillUnlocked(state, id, content));
     expect(shut).toEqual([
@@ -37,21 +37,33 @@ describe('skill unlock rules', () => {
       'prov',
       'alch',
       'vit',
-      'eva',
     ]);
-    expect(skillUnlockStatus(state, 'vit', content)?.req).toEqual({ t: 'flag', id: 'firstFight' });
-    expect(skillUnlockStatus(state, 'katon', content)?.req).toEqual({ t: 'rank', rank: 'genin' });
+    expect(skillUnlockStatus(state, 'vit', content)?.req).toEqual({
+      t: 'any',
+      of: [
+        { t: 'flag', id: 'firstFight' },
+        { t: 'rank', rank: 'genin' },
+      ],
+    });
+    expect(skillUnlockStatus(state, 'katon', content)?.req).toEqual({
+      t: 'nature',
+      nature: 'katon',
+    });
   });
 
-  it('opens the rank-gated skills at genin and vit and eva with the firstFight flag', () => {
+  it('opens the rank-gated skills at genin and vit with the firstFight flag or at genin', () => {
     const state = createState(1, content);
     state.player.rank = 'genin';
+    expect(isSkillUnlocked(state, 'katon', content)).toBe(false);
+    withNatures(state, 'katon');
     expect(isSkillUnlocked(state, 'katon', content)).toBe(true);
     expect(isSkillUnlocked(state, 'alch', content)).toBe(true);
-    expect(isSkillUnlocked(state, 'vit', content)).toBe(false);
-    state.flags.firstFight = true;
+    // A Genin who never fought trains Vitality with the bodily drills.
     expect(isSkillUnlocked(state, 'vit', content)).toBe(true);
-    expect(isSkillUnlocked(state, 'eva', content)).toBe(true);
+    const student = createState(1, content);
+    expect(isSkillUnlocked(student, 'vit', content)).toBe(false);
+    student.flags.firstFight = true;
+    expect(isSkillUnlocked(student, 'vit', content)).toBe(true);
   });
 });
 
@@ -81,8 +93,8 @@ describe('listSkillActions', () => {
     advance(state, HOUR, content);
     // Whole cycles only, so allow one cycle of slack.
     const perCycle = (info.xpPerHour * info.intervalMs) / HOUR;
-    expect(state.skills.tai.xp).toBeGreaterThan(info.xpPerHour - perCycle - 1);
-    expect(state.skills.tai.xp).toBeLessThanOrEqual(info.xpPerHour + 1);
+    expect(state.skills.tai!.xp).toBeGreaterThan(info.xpPerHour - perCycle - 1);
+    expect(state.skills.tai!.xp).toBeLessThanOrEqual(info.xpPerHour + 1);
   });
 
   it('marks an action unavailable with its requirement tree when the level is too low', () => {
@@ -108,16 +120,16 @@ describe('listSkillActions', () => {
     const state = createState(1, content);
     const first = listSkillActions(state, 'katon', content)[0];
     expect(first?.available).toBe(false);
-    expect(first?.req?.children[0]?.req).toEqual({ t: 'rank', rank: 'genin' });
+    expect(first?.req?.children[0]?.req).toEqual({ t: 'nature', nature: 'katon' });
   });
 
-  it('lists drills, practices and obstacles for cc, med and ath, and nothing for skills with no actions yet', () => {
+  it('lists drills, practices and the course for cc, med and ath, and nothing for skills with no actions yet', () => {
     const state = createState(1, content);
     expect(listSkillActions(state, 'cc', content).map((a) => a.kind)).toContain('drill');
     expect(listSkillActions(state, 'med', content).every((a) => a.kind === 'meditate')).toBe(true);
-    expect(listSkillActions(state, 'ath', content).every((a) => a.kind === 'obstacle')).toBe(true);
-    expect(listSkillActions(state, 'herb', content)).toEqual([]);
-    expect(listSkillActions(state, 'vit', content)).toEqual([]);
+    expect(listSkillActions(state, 'ath', content).every((a) => a.kind === 'course')).toBe(true);
+    expect(listSkillActions(state, 'scout', content)).toEqual([]);
+    expect(listSkillActions(state, 'vit', content).every((a) => a.kind === 'drill')).toBe(true);
   });
 
   it('reports mastery level and progress', () => {

@@ -1,0 +1,398 @@
+[
+  {
+    "id": "core:okolytsi_sela",
+    "region": "core:forest",
+    "hex": [
+      9,
+      17
+    ],
+    "index": 0,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:rysovi_polia",
+    "region": "core:forest",
+    "hex": [
+      11,
+      17
+    ],
+    "index": 1,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:zharyshche_skladu",
+    "region": "core:forest",
+    "hex": [
+      9,
+      16
+    ],
+    "index": 2,
+    "key": null,
+    "story": true
+  },
+  {
+    "id": "core:uzlissia",
+    "region": "core:forest",
+    "hex": [
+      11,
+      15
+    ],
+    "index": 3,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:polihon_44_lis_smerti",
+    "region": "core:forest",
+    "hex": [
+      10,
+      16
+    ],
+    "index": 4,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:prykordonnyi_lis_okolytsia",
+    "region": "core:forest",
+    "hex": [
+      10,
+      15
+    ],
+    "index": 5,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:prykordonnyi_lis_khashchi",
+    "region": "core:forest",
+    "hex": [
+      10,
+      14
+    ],
+    "index": 6,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:prykordonnyi_lis_brid",
+    "region": "core:forest",
+    "hex": [
+      12,
+      14
+    ],
+    "index": 7,
+    "key": null,
+    "story": true
+  },
+  {
+    "id": "core:skelia_nad_vodospadom",
+    "region": "core:forest",
+    "hex": [
+      10,
+      13
+    ],
+    "index": 8,
+    "key": "rock",
+    "story": true
+  },
+  {
+    "id": "core:ternovi_zarosti",
+    "region": "core:forest",
+    "hex": [
+      8,
+      14
+    ],
+    "index": 9,
+    "key": "brush",
+    "story": false
+  },
+  {
+    "id": "core:lisove_ozero",
+    "region": "core:forest",
+    "hex": [
+      7,
+      14
+    ],
+    "index": 10,
+    "key": "water",
+    "story": false
+  },
+  {
+    "id": "core:staryi_trakt",
+    "region": "core:forest",
+    "hex": [
+      8,
+      17
+    ],
+    "index": 11,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:pivdennyi_trakt",
+    "region": "core:plains",
+    "hex": [
+      10,
+      18
+    ],
+    "index": 0,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:mistechko_na_rivnynakh",
+    "region": "core:plains",
+    "hex": [
+      7,
+      17
+    ],
+    "index": 1,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:khram_vohniu",
+    "region": "core:plains",
+    "hex": [
+      12,
+      18
+    ],
+    "index": 2,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:karavannyi_shliakh",
+    "region": "core:plains",
+    "hex": [
+      10,
+      19
+    ],
+    "index": 3,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:tabir_naimantsiv",
+    "region": "core:plains",
+    "hex": [
+      9,
+      19
+    ],
+    "index": 4,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:sukhe_richyshche",
+    "region": "core:plains",
+    "hex": [
+      8,
+      19
+    ],
+    "index": 5,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:ruiny_prykordonnoi_fortetsi",
+    "region": "core:plains",
+    "hex": [
+      6,
+      20
+    ],
+    "index": 6,
+    "key": null,
+    "story": true
+  },
+  {
+    "id": "core:skhovyshche_fortetsi",
+    "region": "core:plains",
+    "hex": [
+      7,
+      19
+    ],
+    "index": 7,
+    "key": "rubble",
+    "story": false
+  },
+  {
+    "id": "core:soliani_kopalni",
+    "region": "core:plains",
+    "hex": [
+      12,
+      20
+    ],
+    "index": 8,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:stepovi_zarosti",
+    "region": "core:plains",
+    "hex": [
+      8,
+      20
+    ],
+    "index": 9,
+    "key": "brush",
+    "story": false
+  },
+  {
+    "id": "core:kamiani_pahorby",
+    "region": "core:plains",
+    "hex": [
+      11,
+      20
+    ],
+    "index": 10,
+    "key": "rock",
+    "story": false
+  },
+  {
+    "id": "core:pokynutyi_khutir",
+    "region": "core:plains",
+    "hex": [
+      7,
+      21
+    ],
+    "index": 11,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:pivnichnyi_trakt",
+    "region": "core:valley",
+    "hex": [
+      11,
+      12
+    ],
+    "index": 0,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:statui_zasnovnykiv",
+    "region": "core:valley",
+    "hex": [
+      12,
+      11
+    ],
+    "index": 1,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:bereh_riky",
+    "region": "core:valley",
+    "hex": [
+      12,
+      12
+    ],
+    "index": 2,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:stezhka_myslyvtsia",
+    "region": "core:valley",
+    "hex": [
+      10,
+      12
+    ],
+    "index": 3,
+    "key": null,
+    "story": true
+  },
+  {
+    "id": "core:skhovok_pid_vodospadom",
+    "region": "core:valley",
+    "hex": [
+      13,
+      11
+    ],
+    "index": 4,
+    "key": null,
+    "story": true
+  },
+  {
+    "id": "core:sviate_mistse_bilia_vodospadu",
+    "region": "core:valley",
+    "hex": [
+      11,
+      11
+    ],
+    "index": 5,
+    "key": "water",
+    "story": false
+  },
+  {
+    "id": "core:tumannyi_iar",
+    "region": "core:valley",
+    "hex": [
+      9,
+      12
+    ],
+    "index": 6,
+    "key": "mist",
+    "story": false
+  },
+  {
+    "id": "core:kamiani_ustupy",
+    "region": "core:valley",
+    "hex": [
+      10,
+      11
+    ],
+    "index": 7,
+    "key": "rock",
+    "story": false
+  },
+  {
+    "id": "core:zavalena_pechera",
+    "region": "core:valley",
+    "hex": [
+      9,
+      11
+    ],
+    "index": 8,
+    "key": "rubble",
+    "story": false
+  },
+  {
+    "id": "core:stare_pole_boiu",
+    "region": "core:valley",
+    "hex": [
+      12,
+      13
+    ],
+    "index": 9,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:prykordonna_zastava",
+    "region": "core:valley",
+    "hex": [
+      8,
+      12
+    ],
+    "index": 10,
+    "key": null,
+    "story": false
+  },
+  {
+    "id": "core:verkhivia_riky",
+    "region": "core:valley",
+    "hex": [
+      13,
+      12
+    ],
+    "index": 11,
+    "key": null,
+    "story": false
+  }
+]

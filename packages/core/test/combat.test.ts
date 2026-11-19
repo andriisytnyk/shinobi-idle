@@ -1,6 +1,8 @@
 import { content } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
+  masteryLevel,
+  masteryXpPerHour,
   advance,
   basicAttack,
   createState,
@@ -17,7 +19,7 @@ import {
   defaultRules,
   type GameState,
 } from '../src/index.ts';
-import { HOUR, genin, setLevel } from './helpers.ts';
+import { HOUR, genin, openWorld, setLevel } from './helpers.ts';
 
 const DUMMY = 'core:dummy';
 const fight = (id = DUMMY) => ({ type: 'action.start', slot: 0, kind: 'fight', id }) as const;
@@ -44,7 +46,8 @@ describe('combat formulas', () => {
     expect(playerMaxStamina(state, content)).toBeCloseTo(K.staminaBase * (1 + K.staminaPerAth));
     const basic = basicAttack(state, content);
     expect(basic.damage).toBeCloseTo(K.basicDmg[0] + K.basicDmg[1]);
-    expect(basic.intervalMs).toBe(Math.round(K.basicInterval * 1000));
+    expect(basic.castMs).toBe(Math.round(K.basicCast * 1000));
+    expect(basic.cost).toBe(K.basicCost);
   });
 
   it('uses the higher of Taijutsu and Ninjutsu for a basic attack', () => {
@@ -72,7 +75,7 @@ describe('combat formulas', () => {
   });
 
   it('matches the documented technique numbers', () => {
-    // Dynamic Entry at level 10 (no mastery): 13.5 damage, 0.4 s cast, 6 s cooldown.
+    // Dynamic Entry at level 10 (no mastery): its damage, the cooldown of its role and rank.
     const s = genin();
     setLevel(s, 'tai', 10);
     const entry = content.techniques.find(
@@ -82,9 +85,9 @@ describe('combat formulas', () => {
     const n = techniqueNumbers(s, entry, content, defaultRules);
     s.mastery[entry.id] = { xp: 0 };
     expect(n.damage).toBeCloseTo(
-      K.power.D * (1 + K.levelScale * 10) * (1 + K.masteryDmg / K.masteryCap),
+      K.power.D! * (1 + K.levelScale * 10) * (1 + K.masteryDmg / K.masteryCap),
     );
-    expect(n.cooldownMs).toBe(6000);
+    expect(n.cooldownMs).toBe(Math.round((K.role.projectile?.cd ?? 0) * (K.rankCd.D ?? 1) * 1000));
     expect(n.pool).toBe('stamina');
     // Mastery 99 raises damage by the full masteryDmg and cuts cost by masteryCost.
     s.mastery[entry.id] = { xp: xpAt(K.masteryCap) };
@@ -138,13 +141,15 @@ describe('fight action', () => {
     expect(dispatch(state, fight(), content)).toEqual({ ok: true });
     expect(state.combat?.enemy).toBe(DUMMY);
     advance(state, 5000, content);
-    expect(state.combat?.hp).toBeGreaterThan(0);
+    expect(state.combat?.fight.player.hp).toBeGreaterThan(0);
     dispatch(state, { type: 'action.stop', slot: 0 }, content);
     expect(state.combat).toBeNull();
   });
 
   it('stops with a defeated event when the player falls', () => {
     const state = createState(4, content);
+    state.player.rank = 'genin';
+    openWorld(state);
     const boss = content.enemies.reduce((a, b) => (a.cl > b.cl ? a : b));
     dispatch(state, fight(boss.id), content);
     advance(state, 10 * 60 * 1000, content);
@@ -167,9 +172,9 @@ describe('fight action', () => {
     expect(state.counters['actions.fight']).toBeGreaterThan(200);
   });
 
-  it('uses only the combat stream', () => {
+  it('uses only the combat and loot streams', () => {
     const state = createState(6, content);
-    const others = (s: GameState) => JSON.stringify([s.rng.action, s.rng.loot, s.rng.world]);
+    const others = (s: GameState) => JSON.stringify([s.rng.action, s.rng.world]);
     const before = others(state);
     const combatBefore = JSON.stringify(state.rng.combat);
     dispatch(state, fight(), content);
@@ -181,21 +186,26 @@ describe('fight action', () => {
   it('casts the technique, pays its cost and puts it on cooldown', () => {
     const state = createState(7, content);
     dispatch(state, fight(), content);
-    advance(state, 1, content);
-    const c = state.combat;
-    expect(c?.cast).toBe('core:leaf_whirlwind');
-    expect(c?.stamina).toBeLessThan(playerMaxStamina(state, content));
-    advance(state, 1000, content);
-    expect(state.combat?.cd['core:leaf_whirlwind']).toBeGreaterThan(state.now);
+    // The player waits for the moment first, then casts.
+    advance(state, (content.ai.tiers[0]?.waitMs ?? 0) + 100, content);
+    const player = state.combat?.fight.player;
+    expect(player?.act?.id).toBe('core:leaf_whirlwind');
+    expect(player?.stamina).toBeLessThan(playerMaxStamina(state, content));
+    advance(state, 4000, content);
+    expect(state.combat?.fight.player.cd['core:leaf_whirlwind']).toBeGreaterThan(
+      state.combat?.fight.t ?? Infinity,
+    );
   });
 });
 
 describe('A4: combat XP follows the formula', () => {
-  it('pays style, Vitality and Evasion XP by the hour within 5%', () => {
+  it('pays style and Vitality XP by the hour within 5%', () => {
     const state = genin(8);
     setLevel(state, 'vit', 40);
-    setLevel(state, 'eva', 40);
-    const before = { tai: state.skills.tai.xp, vit: state.skills.vit.xp, eva: state.skills.eva.xp };
+    const before = {
+      tai: state.skills.tai!.xp,
+      vit: state.skills.vit!.xp,
+    };
     dispatch(state, fight(), content);
     advance(state, HOUR, content);
     const dummy = content.enemies.find((e) => e.id === DUMMY);
@@ -205,9 +215,8 @@ describe('A4: combat XP follows the formula', () => {
       expect(got / want).toBeLessThan(1.05);
     };
     // The dummy is beaten with Leaf Whirlwind (Taijutsu) and basic attacks (Taijutsu).
-    near(state.skills.tai.xp - before.tai, K.combatXp.style * r);
-    near(state.skills.vit.xp - before.vit, K.combatXp.vit * r);
-    near(state.skills.eva.xp - before.eva, K.combatXp.eva * r);
+    near(state.skills.tai!.xp - before.tai, K.combatXp.style * r);
+    near(state.skills.vit!.xp - before.vit, (K.combatXp.vit ?? 0) * r);
   });
 
   it('pays mastery XP for time since the previous action, to techniques only', () => {
@@ -217,7 +226,8 @@ describe('A4: combat XP follows the formula', () => {
     const mastery = state.mastery['core:leaf_whirlwind']?.xp ?? 0;
     expect(mastery).toBeGreaterThan(0);
     // The XP per hour of fight time is at most the practice rate.
-    expect(mastery).toBeLessThanOrEqual((K.masteryPerHour * 10) / 60 + 1);
+    const level = masteryLevel(state, 'core:leaf_whirlwind', content);
+    expect(mastery).toBeLessThanOrEqual((masteryXpPerHour(level, content) * 10) / 60 + 1);
     expect(Object.keys(state.mastery)).toEqual(['core:leaf_whirlwind']);
   });
 
@@ -229,7 +239,7 @@ describe('A4: combat XP follows the formula', () => {
     dispatch(state, fight(), content);
     advance(state, 60_000, content);
     expect(state.combat?.style).toBeDefined();
-    expect(state.skills.katon.xp).toBeGreaterThan(xpAt(30));
+    expect(state.skills.katon!.xp).toBeGreaterThan(xpAt(30));
   });
 });
 

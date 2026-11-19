@@ -25,6 +25,8 @@ export const rawTechnique = z.object({
   sealsCanon: z.boolean(),
   tier: num,
   noDamage: z.boolean(),
+  /** Cast time in seconds when the slice sets it by hand. */
+  castOverride: z.number().positive().optional(),
 });
 
 const rawSimple = z.object({ level: num, uk: str, req: str, note: str });

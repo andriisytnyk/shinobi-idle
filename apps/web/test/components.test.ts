@@ -25,9 +25,9 @@ import { hrefFor, parseHash, type EntityRef } from '../src/lib/route.ts';
 import { settings } from '../src/lib/settings.svelte.ts';
 import { game } from '../src/lib/store.ts';
 import EntityPage from '../src/pages/EntityPage.svelte';
-import ItemPage from '../src/pages/ItemPage.svelte';
+import ItemSheet from '../src/sheets/ItemSheet.svelte';
 import SkillPage from '../src/pages/SkillPage.svelte';
-import TechniquePage from '../src/pages/TechniquePage.svelte';
+import TechniqueSheet from '../src/sheets/TechniqueSheet.svelte';
 
 // The components are rendered to HTML on the server side of Svelte: no browser is needed, and the
 // markup shows exactly which names are links and where they point.
@@ -35,7 +35,7 @@ const html = <P extends Record<string, unknown>>(component: Component<P>, props:
   render(component, { props }).body;
 
 const name = (ref: EntityRef) =>
-  ukLocale[localeKey(ref.kind === 'status' ? 'state' : ref.kind, ref.id, 'name')] ?? ref.id;
+  ukLocale[`${ref.kind === 'status' ? 'state' : ref.kind}.${ref.id}.name`] ?? ref.id;
 
 /** `<a ... href="#/kind/id" ...>Name</a>` for an entity, whatever classes Svelte adds. */
 const anchor = (ref: EntityRef) =>
@@ -108,7 +108,7 @@ describe('A5: requirement rows', () => {
 
   it('shows progress and marks met rows', () => {
     const state = fresh();
-    state.skills.tai.xp = xpAt(7);
+    state.skills.tai!.xp = xpAt(7);
     const body = html(ReqTree, {
       node: evalReq(state, { t: 'skill', skill: 'tai', level: 10 }, content),
     });
@@ -177,7 +177,7 @@ describe('skill page', () => {
     game.replaceState(fresh('student'));
     const body = html(SkillPage, { id: 'katon' });
     expect(body).toContain('data-locked');
-    expect(body).toContain('Ранг: Генін');
+    expect(body).toContain('Природа чакри:');
   });
 });
 
@@ -185,9 +185,10 @@ describe('technique page', () => {
   const id = 'core:great_fireball';
 
   it('A8: shows the seal strip with glyphs and Ukrainian names in order', () => {
-    const body = html(TechniquePage, { id });
+    const body = html(TechniqueSheet, { id });
     const glyphs = [...body.matchAll(/class="glyph[^"]*" lang="ja">([^<]+)</g)].map((m) => m[1]);
-    expect(glyphs).toEqual(['巳', '未', '申', '亥', '午', '寅']);
+    // The strip of the page comes first; the tile below it repeats the seals in compact form.
+    expect(glyphs.slice(0, 6)).toEqual(['巳', '未', '申', '亥', '午', '寅']);
     const names = ['Змія', 'Баран', 'Мавпа', 'Кабан', 'Кінь', 'Тигр'];
     const seals = content.techniques.find((t) => t.id === id)?.sealSeq ?? [];
     expect(seals).toHaveLength(6);
@@ -198,7 +199,7 @@ describe('technique page', () => {
   });
 
   it('links the mission that asks for it and prints no mission name as plain text', () => {
-    const body = html(TechniquePage, { id });
+    const body = html(TechniqueSheet, { id });
     const mission = { kind: 'mission', id: 'core:v_sanit' } as const;
     expect(name(mission)).toBe('Санітарна варта');
     expect(body).toMatch(anchor(mission));
@@ -207,18 +208,18 @@ describe('technique page', () => {
   });
 
   it('links the status it applies and the traits its tags answer', () => {
-    const body = html(TechniquePage, { id });
+    const body = html(TechniqueSheet, { id });
     expect(body).toContain('href="#/status/burn"');
     expect(body).toContain('href="#/trait/');
   });
 
   it('links its source building', () => {
-    const body = html(TechniquePage, { id: 'core:leaf_whirlwind' });
+    const body = html(TechniqueSheet, { id: 'core:leaf_whirlwind' });
     expect(body).toMatch(anchor({ kind: 'building', id: 'core:academy' }));
   });
 
   it('shows name, rank stamp, role, status, requirements and the pin button', () => {
-    const body = html(TechniquePage, { id });
+    const body = html(TechniqueSheet, { id });
     expect(body).toContain('Техніка великої вогняної кулі');
     expect(body).toContain('Ранг техніки');
     expect(body).toContain(
@@ -232,7 +233,7 @@ describe('technique page', () => {
 
 describe('item page', () => {
   it('links the skill that grows it and the recipes that use it', () => {
-    const body = html(ItemPage, { id: 'core:mint' });
+    const body = html(ItemSheet, { id: 'core:mint' });
     expect(body).toMatch(anchor({ kind: 'skill', id: 'herb' }));
     const used = content.recipes.find((r) => r.ingredients.some((i) => i.item === 'core:mint'));
     if (!used) throw new Error('no recipe uses mint');
@@ -292,7 +293,8 @@ describe('now bar', () => {
     const body = html(NowBar, {});
     expect(body).toMatch(anchor({ kind: 'technique', id: info.id }));
     expect(body).toContain('Зупинити');
-    expect(body).toContain('role="progressbar"');
+    expect(body).not.toContain('role="progressbar"');
+    expect(body).toContain('data-now-phase');
   });
 });
 
@@ -302,7 +304,7 @@ describe('A6: locked skills in the sidebar', () => {
     let body = html(SkillList, {});
     const katon = new RegExp('data-skill="katon"[\\s\\S]*?</li>').exec(body)?.[0] ?? '';
     expect(katon).toContain('Навичка закрита');
-    expect(katon).toContain('Ранг: Генін');
+    expect(katon).toContain('Природа чакри:');
     expect(body).toContain('data-skill="tai"');
 
     settings.hideLocked = true;
@@ -312,12 +314,21 @@ describe('A6: locked skills in the sidebar', () => {
     expect(body).toContain('data-skill="tai"');
   });
 
-  it('open up once the rank is reached', () => {
+  it('keep the nature skills shut at genin until the nature is owned, and mark the native one', () => {
+    const row = (body: string, skill: string) =>
+      new RegExp(`data-skill="${skill}"[\\s\\S]*?</li>`).exec(body)?.[0] ?? '';
     game.replaceState(fresh('genin'));
-    const body = html(SkillList, {});
-    expect(new RegExp('data-skill="katon"[\\s\\S]*?</li>').exec(body)?.[0]).not.toContain(
-      'data-lock',
-    );
+    let body = html(SkillList, {});
+    expect(row(body, 'katon')).toContain('data-lock');
+    expect(body).not.toContain('data-native');
+
+    const state = fresh('genin');
+    dispatch(state, { type: 'nature.choose', nature: 'katon' }, content);
+    game.replaceState(state);
+    body = html(SkillList, {});
+    expect(row(body, 'katon')).not.toContain('data-lock');
+    expect(row(body, 'katon')).toContain('data-native');
+    expect(row(body, 'futon')).toContain('data-lock');
   });
 });
 

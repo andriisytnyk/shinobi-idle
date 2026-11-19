@@ -31,6 +31,29 @@
   --nature-doton: #a9805b;
   --nature-suiton: #3b8fd9;
 
+  /* World map: the colour of each terrain, and of the fog that hides land not yet surveyed */
+  --terrain-road: #a89a7c;
+  --terrain-settlement: #b8845c;
+  --terrain-plains: #8fa65a;
+  --terrain-coast: #cdbb86;
+  --terrain-forest: #3f6f3a;
+  --terrain-river: #4f89a8;
+  --terrain-hills: #8a7a5e;
+  --terrain-lake: #3b6f9e;
+  --map-fog: #232731;
+  --map-fog-line: #2f3440;
+  --map-sea: #171a21;
+
+  /* Progress of a running cycle, 0..1; animated by lib/time-progress.ts, read by bars, the seal strip and the emblem flash */
+  --tp: 0;
+
+  /* Skill groups: the tint of an action's emblem (techniques take their nature's colour) */
+  --group-train: #d98a3d;
+  --group-nin: #8b5cc6;
+  --group-field: #5e8c3a;
+  --group-craft: #c9a24a;
+  --group-combat: #c8372d;
+
   /* Rank stamps: D grey, C green, B blue, A purple, S red with gold */
   --rank-d: #8b929c;
   --rank-c: #5e8c3a;
@@ -61,16 +84,84 @@
   --space-2: 0.5rem;
   --space-3: 0.75rem;
   --space-4: 1rem;
+  --space-5: 1.25rem;
   --space-6: 1.5rem;
-  --radius: 0.5rem;
+  --space-7: 2rem;
+  --space-8: 3rem;
   --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
 
   /* Layout */
   --sidebar-width: 17rem;
   --meta-width: 18rem;
+  --squad-width: 16rem;
   --topbar-height: 3.25rem;
   --tabbar-height: 3.5rem;
   --now-height: 3.25rem;
+  /* The real heights of the top bar and the «Зараз» bar, measured by the app while it runs; these are the starting values. */
+  --top-live: 0px;
+  --now-live: var(--now-height);
+
+  /* Text sizes, from the smallest label to the page title. `sm` is the body text. */
+  --text-2xs: 0.7rem;
+  --text-xs: 0.85rem;
+  --text-sm: 1rem;
+  --text-md: 1.1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.45rem;
+  --text-2xl: 1.6rem;
+  --text-display: 1.8rem;
+  --font-mono: monospace;
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-loose: 1.7;
+  --tracking-wide: 0.04em;
+
+  /* Radii */
+  --radius-xs: 2px;
+  --radius-pill: 999px;
+
+  /* Border widths: hairlines, outlines and markers, and the heavy edge of an active item */
+  --border-thin: 1px;
+  --border-thick: 2px;
+  --border-heavy: 4px;
+  --focus-offset: 2px;
+
+  /* Controls: the minimum size of anything the player taps or clicks. A theme that changes
+     these changes every button, field, select, link and nav item at once. */
+  --control-xs: 2rem;
+  --control-sm: 2.25rem;
+  --control-md: 2.75rem;
+
+  /* Marker dots and small boxes */
+  --icon-xs: 0.6rem;
+  --icon-md: 1.25rem;
+
+  /* Thickness of progress bars */
+  --bar-thin: 4px;
+  --bar-md: 6px;
+  --bar-thick: 9px;
+
+  /* Layout measures, by role: the narrowest column of a grid of cards, a card, a chip,
+     a dialog, a toast, a line of text */
+  --tile-min: 16rem;
+  --card-min: 12rem;
+  --panel-min: 8rem;
+  --modal-width: 36rem;
+  --toast-width: 22rem;
+  --measure: 24rem;
+
+  /* Stacking order */
+  --z-raised: 1;
+  --z-overlay: 10;
+  --z-popover: 11;
+  --z-popover-top: 12;
+  --z-toast: 20;
+  --z-modal: 30;
+
+  /* Transitions */
+  --duration-fast: 0.15s;
+  --duration-base: 0.2s;
 
   /* Dim layer behind dialogs */
   --scrim: rgb(0 0 0 / 0.6);

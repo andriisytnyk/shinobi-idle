@@ -1,0 +1,72 @@
+{
+  "core:boss_wolf": {
+    "kind": "packRespawn",
+    "fx": "wolfPack",
+    "hook": "special:packRespawn",
+    "companions": {
+      "fx": "wolfPack",
+      "hook": "special:packMember"
+    },
+    "numbers": ["everyMs", "count"]
+  },
+  "core:boss_ren1": {
+    "kind": "rival",
+    "fx": "rivalDuel",
+    "hook": "special:rival.duel",
+    "nature": "beatsPlayerFirst",
+    "signature": true,
+    "numbers": ["techniques", "everyMs", "sigEveryMs", "sigOpenMs", "sigMult", "mult"]
+  },
+  "core:boss_fighter": {
+    "kind": "evasionByMissingHp",
+    "fx": "drunkenEvasion",
+    "hook": "special:evasionByMissingHp",
+    "numbers": ["maxMult"]
+  },
+  "core:boss_hunter": {
+    "kind": "heavyCast",
+    "fx": "heavyCast",
+    "hook": "special:heavyCast",
+    "adds": ["caster"],
+    "stun": true,
+    "numbers": ["everyMs", "castMs", "damageMult", "stunMs"]
+  },
+  "core:boss_twins": {
+    "kind": "twins",
+    "fx": "twins",
+    "hook": "special:twins",
+    "bodies": true,
+    "poisonMist": true,
+    "numbers": ["count", "mistMult"]
+  },
+  "core:boss_mist": {
+    "kind": "rehide",
+    "fx": "mistRehide",
+    "hook": "special:rehide",
+    "bindPlayer": true,
+    "numbers": ["everyMs"]
+  },
+  "core:boss_nameless": {
+    "kind": "illusion",
+    "fx": "illusion",
+    "hook": "special:illusion",
+    "fleeAt": "fleeAtHp",
+    "numbers": ["everyMs"]
+  },
+  "core:boss_ren2": {
+    "kind": "rival",
+    "fx": "rivalTournament",
+    "hook": "special:rival.tournament",
+    "nature": "beatsPlayerFirst",
+    "signature": true,
+    "numbers": [
+      "techniques",
+      "everyMs",
+      "sigEveryMs",
+      "sigOpenMs",
+      "sigMult",
+      "mult",
+      "habituationMult"
+    ]
+  }
+}

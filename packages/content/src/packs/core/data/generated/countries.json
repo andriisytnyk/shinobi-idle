@@ -1,0 +1,66 @@
+[
+  {
+    "id": "core:fire",
+    "token": "hanko"
+  },
+  {
+    "id": "core:earth",
+    "token": "doton"
+  },
+  {
+    "id": "core:wind",
+    "token": "futon"
+  },
+  {
+    "id": "core:lightning",
+    "token": "raiton"
+  },
+  {
+    "id": "core:water",
+    "token": "suiton"
+  },
+  {
+    "id": "core:waves",
+    "token": "chakra"
+  },
+  {
+    "id": "core:forests",
+    "token": "leaf"
+  },
+  {
+    "id": "core:rivers",
+    "token": "steel"
+  },
+  {
+    "id": "core:rain",
+    "token": "steel"
+  },
+  {
+    "id": "core:waterfall",
+    "token": "chakra"
+  },
+  {
+    "id": "core:disputed",
+    "token": "text-dim"
+  },
+  {
+    "id": "core:sound",
+    "token": "orange"
+  },
+  {
+    "id": "core:steam",
+    "token": "katon"
+  },
+  {
+    "id": "core:frost",
+    "token": "steel"
+  },
+  {
+    "id": "core:rock",
+    "token": "ink-600"
+  },
+  {
+    "id": "core:far_east",
+    "token": "ink-600"
+  }
+]

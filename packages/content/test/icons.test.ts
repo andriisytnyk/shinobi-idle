@@ -37,33 +37,38 @@ const required: Record<IconKind, string[]> = {
   building: content.buildings.map((b) => b.id),
   region: content.regions.map((r) => r.id),
   gear: content.gear.map((g) => g.id),
+  exercise: content.exercises.map((e) => e.id),
+  practice: content.practices.map((p) => p.id),
+  obstacle: content.obstacles.map((o) => o.id),
+  recipe: content.recipes.map((r) => r.id),
 };
 
 describe('icon registry', () => {
   it('covers the expected number of entities', () => {
-    expect(required.skill).toHaveLength(16);
+    expect(required.skill).toHaveLength(15);
     expect(required.technique).toHaveLength(60);
-    expect(required.status).toHaveLength(5);
+    expect(required.status).toHaveLength(6);
     expect(required.trait).toHaveLength(9);
     expect(required.nature).toHaveLength(5);
     expect(required.currency).toHaveLength(3);
   });
 
+  const need = (kind: string): string[] => required[kind] ?? [];
   for (const kind of ICON_KINDS) {
     it(`maps every ${kind} to an icon that exists in game-icons`, () => {
-      const missing = required[kind].filter((id) => iconFor(kind, id) === undefined);
+      const missing = need(kind).filter((id) => iconFor(kind, id) === undefined);
       expect(missing, `${kind} entities without an icon`).toEqual([]);
-      const unknown = required[kind].filter((id) => !exists(iconFor(kind, id) ?? ''));
+      const unknown = need(kind).filter((id) => !exists(iconFor(kind, id) ?? ''));
       expect(unknown, `${kind} entities whose icon is not in the collection`).toEqual([]);
     });
 
     it(`has no stale ${kind} entries`, () => {
-      const stale = Object.keys(ICON_MAP[kind]).filter((id) => !required[kind].includes(id));
+      const stale = Object.keys(ICON_MAP[kind] ?? {}).filter((id) => !need(kind).includes(id));
       expect(stale).toEqual([]);
     });
   }
 
-  it('gives each of the 16 skills a different icon', () => {
+  it('gives each of the 15 skills a different icon', () => {
     const icons = SKILL_IDS.map((id) => iconFor('skill', id));
     expect(new Set(icons).size).toBe(SKILL_IDS.length);
   });
@@ -75,4 +80,25 @@ describe('icon registry', () => {
       expect(distinct.size / own.length).toBeGreaterThanOrEqual(0.7);
     });
   }
+
+  it('uses one pictogram for at most two actions of a skill', () => {
+    const bySkill = new Map<string, string[]>();
+    const add = (skill: string, kind: IconKind, id: string) => {
+      const list = bySkill.get(skill) ?? [];
+      list.push(iconFor(kind, id) ?? '');
+      bySkill.set(skill, list);
+    };
+    for (const t of content.techniques) add(t.skill, 'technique', t.id);
+    for (const e of content.exercises) add('cc', 'exercise', e.id);
+    for (const p of content.practices) add('med', 'practice', p.id);
+    for (const o of content.obstacles) add('ath', 'obstacle', o.id);
+    for (const h of content.herbs) add('herb', 'item', h.id);
+    for (const r of content.recipes) add(r.skill, 'recipe', r.id);
+    for (const [skill, names] of bySkill) {
+      const counts = new Map<string, number>();
+      for (const n of names) counts.set(n, (counts.get(n) ?? 0) + 1);
+      const over = [...counts].filter(([, c]) => c > 2).map(([n]) => n);
+      expect(over, `skill ${skill}`).toEqual([]);
+    }
+  });
 });

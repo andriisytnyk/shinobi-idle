@@ -1,10 +1,11 @@
-import { content } from '@shinobi/content';
+import type { ContentDb } from '@shinobi/content';
 import type { Command, CommandResult, GameState } from '@shinobi/core';
 import { legacyGoalTechnique } from './goal.ts';
 import { SETTINGS_KEY, type TextStorage } from './settings.svelte.ts';
 
 interface GoalHost {
   state: GameState;
+  content: ContentDb;
   dispatch(command: Command): CommandResult;
 }
 
@@ -27,7 +28,7 @@ export function migrateLocalGoal(storage: TextStorage | null, game: GoalHost): b
 
   let moved = false;
   const id = game.state.goal === null ? legacyGoalTechnique(raw.goal) : null;
-  if (id !== null && content.techniques.some((t) => t.id === id)) {
+  if (id !== null && game.content.techniques.some((t) => t.id === id)) {
     moved = game.dispatch({ type: 'goal.set', ref: { kind: 'technique', id } }).ok;
   }
   delete raw.goal;

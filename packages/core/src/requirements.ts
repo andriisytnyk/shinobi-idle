@@ -1,18 +1,22 @@
-import type { ContentDb, NatureId, SkillId } from '@shinobi/content';
+import { PLAYER_RANK_IDS, type ContentDb } from '@shinobi/content';
 import type { EntityRef } from './entity.ts';
 import { indexOf } from './lookup.ts';
-import type { GameState, Rank } from './state.ts';
+import type { GameState } from './state.ts';
+import { buildingLevel } from './village-state.ts';
+import { currencyOf, ownsNature, rankIndex, skillEntry } from './vocab.ts';
 import { levelAt, levelCap } from './xp.ts';
 
+/** The condition tree; the ids in it are open strings. */
 export type Req =
-  | { t: 'skill'; skill: SkillId; level: number }
+  | { t: 'skill'; skill: string; level: number }
   | { t: 'technique'; id: string }
-  | { t: 'rank'; rank: Rank }
-  | { t: 'nature'; nature: NatureId }
+  | { t: 'rank'; rank: string }
+  | { t: 'nature'; nature: string }
   | { t: 'item'; id: string; n: number }
   | { t: 'quest'; id: string; step?: number | undefined }
   | { t: 'building'; id: string; level: number }
   | { t: 'flag'; id: string; n?: number | undefined }
+  | { t: 'currency'; role: string; n: number }
   | { t: 'all'; of: Req[] }
   | { t: 'any'; of: Req[] };
 
@@ -27,22 +31,51 @@ export interface ReqResult {
   children: ReqResult[];
 }
 
-export const RANK_ORDER: readonly Rank[] = ['student', 'genin', 'chunin'];
+/**
+ * The player ranks of the built-in pack in order.
+ * @deprecated A game has the ranks of its composed packs: use `rankIndex(content, rank)` and
+ * `content.playerRanks`. Kept for the fight code, which still reads it.
+ */
+export const RANK_ORDER: readonly string[] = PLAYER_RANK_IDS;
 
-export function skillLevel(state: GameState, skill: SkillId, content: ContentDb): number {
-  return levelAt(state.skills[skill].xp, levelCap(content));
+/** The level of a skill; a skill the state does not have (a pack that is missing) is at level 1. */
+export function skillLevel(state: GameState, skill: string, content: ContentDb): number {
+  return levelAt(skillEntry(state, skill)?.xp ?? 0, levelCap(content));
 }
 
+/** The prefix of the flags that read a point of interest found (see `pointFlag`): they are not stored, `world.pois` is. */
+const POINT_FLAG = 'point.';
+
 const flagValue = (state: GameState, id: string): number => {
+  if (id.startsWith(POINT_FLAG))
+    return state.world.pois[id.slice(POINT_FLAG.length)] === true ? 1 : 0;
   const v = state.flags[id];
   return v === undefined ? 0 : v === true ? 1 : v;
 };
 
-// Buildings get their own state branch in a later stage; until then they read flags.
-const buildingLevel = (state: GameState, id: string) => flagValue(state, `building.${id}`);
-
 function leaf(req: Req, current: number, target: number, ref: EntityRef | null): ReqResult {
   return { req, met: current >= target, current, target, ref, children: [] };
+}
+
+/**
+ * Whether a requirement tree holds: `evalReq(state, req, content).met` without building the
+ * result tree, for the checks that run all the time and need only the answer.
+ */
+export function reqMet(state: GameState, req: Req, content: ContentDb): boolean {
+  switch (req.t) {
+    case 'skill':
+      return skillLevel(state, req.skill, content) >= req.level;
+    case 'flag':
+      return flagValue(state, req.id) >= (req.n ?? 1);
+    case 'all':
+      for (const r of req.of) if (!reqMet(state, r, content)) return false;
+      return true;
+    case 'any':
+      for (const r of req.of) if (reqMet(state, r, content)) return true;
+      return false;
+    default:
+      return evalReq(state, req, content).met;
+  }
 }
 
 /** Evaluates a requirement tree against the state. */
@@ -55,10 +88,18 @@ export function evalReq(state: GameState, req: Req, content: ContentDb): ReqResu
       });
     case 'technique':
       return leaf(req, state.known[req.id] ? 1 : 0, 1, { kind: 'technique', id: req.id });
-    case 'rank':
-      return leaf(req, RANK_ORDER.indexOf(state.player.rank), RANK_ORDER.indexOf(req.rank), null);
+    case 'rank': {
+      // A rank the content does not know can never be held.
+      const target = rankIndex(content, req.rank);
+      return leaf(
+        req,
+        rankIndex(content, state.player.rank),
+        target < 0 ? content.playerRanks.length : target,
+        null,
+      );
+    }
     case 'nature':
-      return leaf(req, state.player.natures.includes(req.nature) ? 1 : 0, 1, {
+      return leaf(req, ownsNature(state, req.nature) ? 1 : 0, 1, {
         kind: 'skill',
         id: req.nature,
       });
@@ -78,6 +119,11 @@ export function evalReq(state: GameState, req: Req, content: ContentDb): ReqResu
       });
     case 'flag':
       return leaf(req, flagValue(state, req.id), req.n ?? 1, null);
+    case 'currency': {
+      // A role no currency has can never be met.
+      const id = currencyOf(content, req.role);
+      return leaf(req, id === null ? 0 : (state.currencies[id] ?? 0), req.n, null);
+    }
     case 'all':
     case 'any': {
       const children = req.of.map((r) => evalReq(state, r, content));

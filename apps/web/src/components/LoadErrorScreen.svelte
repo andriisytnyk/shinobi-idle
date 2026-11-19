@@ -5,12 +5,25 @@
   const error = $derived(game.loadError);
   let showRaw = $state(false);
   let confirming = $state(false);
+  /** The newest copy made before an upgrade, as text; null before it was asked for. */
+  let backupText = $state<string | null>(null);
+  const newest = $derived(game.backups[0]);
+
+  async function exportBackup(): Promise<void> {
+    backupText = newest ? ((await game.exportBackup(newest.key)) ?? '') : '';
+  }
 </script>
 
 <main class="gate" data-gate="error">
   <h1>{t('gate.error.title')}</h1>
   <p>{t('gate.error.body')}</p>
-  {#if error}<pre class="message">{error.message}</pre>{/if}
+  {#if error}
+    <p data-reason={error.reason}>{t(`gate.error.reason.${error.reason}`)}</p>
+    <details>
+      <summary>{t('gate.error.details')}</summary>
+      <pre class="message">{error.message}</pre>
+    </details>
+  {/if}
 
   <div class="row">
     <button type="button" class="primary" onclick={() => void game.retry()}>
@@ -19,8 +32,23 @@
     {#if error?.raw}
       <button type="button" onclick={() => (showRaw = !showRaw)}>{t('gate.error.export')}</button>
     {/if}
+    {#if newest}
+      <button type="button" data-export-backup onclick={() => void exportBackup()}>
+        {t('gate.error.exportBackup')}
+      </button>
+    {/if}
     <button type="button" onclick={() => (confirming = true)}>{t('gate.error.newGame')}</button>
   </div>
+
+  {#if backupText !== null}
+    {#if backupText === ''}
+      <p>{t('settings.backupExportFailed')}</p>
+    {:else}
+      <p>{t('gate.error.backupHint')}</p>
+      <textarea readonly rows="6" aria-label={t('gate.error.exportBackup')} value={backupText}
+      ></textarea>
+    {/if}
+  {/if}
 
   {#if showRaw && error?.raw}
     <textarea readonly rows="6" aria-label={t('gate.error.export')} value={error.raw}></textarea>
@@ -55,12 +83,12 @@
     margin: 0;
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.5rem;
+    font-size: var(--text-xl);
     font-weight: 400;
   }
 
   p {
-    max-width: 36rem;
+    max-width: var(--modal-width);
     margin: 0;
     color: var(--fg-dim);
   }
@@ -69,7 +97,7 @@
     max-width: 100%;
     margin: 0;
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--danger);
+    border: var(--border-thin) solid var(--danger);
     border-radius: var(--radius-sm);
     white-space: pre-wrap;
     word-break: break-word;
@@ -83,9 +111,9 @@
   }
 
   button {
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     padding: var(--space-2) var(--space-4);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-raised);
     color: var(--fg);
@@ -106,14 +134,15 @@
   }
 
   textarea {
-    width: min(40rem, 100%);
+    --_width: 40rem;
+    width: min(var(--_width), 100%);
     padding: var(--space-2);
-    border: 1px solid var(--line);
+    border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface);
     color: var(--fg);
-    font-family: monospace;
-    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
   }
 
   .confirm {
@@ -122,7 +151,7 @@
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-3);
-    border: 1px solid var(--danger);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--danger);
+    border-radius: var(--radius-md);
   }
 </style>

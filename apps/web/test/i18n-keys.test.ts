@@ -1,8 +1,10 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { content, SKILL_IDS, ukLocale } from '@shinobi/content';
+import { CELL_KEYS, content, NATURE_IDS, SKILL_IDS, ukLocale } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
+import { BANK_TABS } from '../src/lib/crafts.ts';
+import { SIMULATOR_UK } from '../src/lib/builtin/simulator-ui.ts';
 import { HINTS } from '../src/lib/hints.ts';
 
 const src = fileURLToPath(new URL('../src', import.meta.url));
@@ -29,7 +31,8 @@ describe('interface strings', () => {
       const missing: string[] = [];
       for (const m of text.matchAll(LITERAL_KEY)) {
         const key = m[1] ?? m[2] ?? m[3];
-        if (key !== undefined && !(key in ukLocale)) missing.push(key);
+        // The texts of a built-in pack live in the pack, under its own prefix.
+        if (key !== undefined && !(key in ukLocale) && !(key in SIMULATOR_UK)) missing.push(key);
       }
       expect(missing).toEqual([]);
     });
@@ -50,7 +53,13 @@ describe('interface strings', () => {
       'hint.': HINTS.map((h) => h.id),
       'hint.title.': HINTS.map((h) => h.id),
       'log.': ['cast', 'hit', 'miss', 'basicHit', 'basicMiss', 'enemyHit', 'enemyMiss'],
-      'combat.doing.': ['ready', 'cast', 'recover', 'attack', 'respawn'],
+      'now.phase.': ['focus', 'seal', 'release'],
+      'combat.doing.': ['wait', 'cast', 'basic', 'item', 'rest'],
+      'fight.action.': ['wait', 'cast', 'basic', 'item', 'rest', 'held'],
+      'prep.verdict.': ['stable', 'risky', 'hopeless'],
+      'prep.verdictNote.': ['stable', 'risky', 'hopeless'],
+      'prep.part.': ['base', 'tier', 'technique', 'modifiers', 'knowledge', 'effects'],
+      'bingo.levelDesc.': ['1', '2', '3'],
       'entity.kind.': [
         'skill',
         'technique',
@@ -68,7 +77,25 @@ describe('interface strings', () => {
         'obstacle',
         'status',
         'trait',
+        'cell',
+        'poi',
+        'combo',
       ],
+      'nature.character.': NATURE_IDS,
+      'world.key.': CELL_KEYS,
+      'world.poi.kind.': [
+        'outpost',
+        'training',
+        'zone',
+        'story',
+        'deposit',
+        'cache',
+        'vault',
+        'mission',
+      ],
+      'shop.section.': ['market', 'forge', 'sell', 'gear'],
+      'bank.tab.': BANK_TABS,
+      'craft.src.': ['herb', 'shop', 'craft', 'item'],
     };
     const missing: string[] = [];
     for (const [prefix, ids] of Object.entries(families)) {

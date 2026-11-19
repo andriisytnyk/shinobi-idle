@@ -3,11 +3,11 @@
  * scrolls, statuses, traits and combos. A failing test names the offending entity.
  */
 import { describe, expect, it } from 'vitest';
-import handBossSpecials from '../src/data/hand/boss-specials.json' with { type: 'json' };
-import handEnemyCombat from '../src/data/hand/enemy-combat.json' with { type: 'json' };
-import handItemEcon from '../src/data/hand/item-econ.json' with { type: 'json' };
-import handTechniqueCombat from '../src/data/hand/technique-combat.json' with { type: 'json' };
-import idRegistry from '../src/data/id-registry.json' with { type: 'json' };
+import handBossSpecials from '../src/packs/core/data/hand/boss-specials.json' with { type: 'json' };
+import handEnemyCombat from '../src/packs/core/data/hand/enemy-combat.json' with { type: 'json' };
+import handItemEcon from '../src/packs/core/data/hand/item-econ.json' with { type: 'json' };
+import handTechniqueCombat from '../src/packs/core/data/hand/technique-combat.json' with { type: 'json' };
+import idRegistry from '../src/packs/core/id-registry.json' with { type: 'json' };
 import {
   COMBO_IDS,
   content,
@@ -18,6 +18,7 @@ import {
   type Item,
   type RoleId,
   type Technique,
+  validateClosure,
 } from '../src/index.ts';
 
 const K = content.balance.K;
@@ -41,11 +42,11 @@ describe('technique combat data', () => {
 
   const ALLOWED: Record<RoleId, readonly string[]> = {
     projectile: ['damage'],
-    series: ['damage'],
+    series: ['damage', 'summon'],
     area: ['damage'],
     signature: ['damage'],
     control: ['damage', 'none', 'reveal'],
-    defense: ['shield', 'decoy', 'evasionBuff', 'cleanse', 'passiveNegate'],
+    defense: ['none', 'cleanse'],
     buff: ['stance', 'nextCast', 'none'],
     drill: [],
   };
@@ -66,19 +67,24 @@ describe('technique combat data', () => {
   const effectOf = (id: string) => techById.get(id)?.combat;
 
   it('matches the slice for the defensive techniques', () => {
+    // They do nothing in the hand: each is passive and names the row of the passive numbers it adds by.
     for (const id of ['core:earth_style_wall', 'core:water_formation_wall'])
-      expect(effectOf(id)?.effect).toEqual({ kind: 'shield', fx: 'shield' });
+      expect(effectOf(id)).toEqual({ effect: { kind: 'none' }, passive: { fx: 'shield' } });
     for (const id of ['core:clone', 'core:water_clone'])
-      expect(effectOf(id)?.effect).toEqual({ kind: 'decoy', fx: 'decoy' });
-    expect(effectOf('core:hiding_in_mist')?.effect).toEqual({
-      kind: 'evasionBuff',
-      fx: 'evasionBuff',
+      expect(effectOf(id)).toEqual({ effect: { kind: 'none' }, passive: { fx: 'decoy' } });
+    expect(effectOf('core:hiding_in_mist')).toEqual({
+      effect: { kind: 'none' },
+      passive: { fx: 'evasionBuff' },
     });
     expect(effectOf('core:rope_escape')?.effect).toEqual({ kind: 'cleanse', statuses: ['bind'] });
     expect(effectOf('core:body_replacement')).toEqual({
-      effect: { kind: 'passiveNegate', fx: 'passiveNegate' },
-      outOfLoadout: true,
+      effect: { kind: 'none' },
+      passive: { fx: 'passiveNegate' },
     });
+    // Every defensive technique is passive and names a row of the passive numbers that exists.
+    for (const t of techById.values()) {
+      if (t.combat?.passive) expect(Object.keys(K.passiveFx)).toContain(t.combat.passive.fx);
+    }
   });
 
   it('matches the slice for the buffs and utility techniques', () => {
@@ -91,10 +97,25 @@ describe('technique combat data', () => {
       expect(effectOf(id)?.effect).toEqual({ kind: 'none' });
     expect(effectOf('core:front_lotus')?.requiresStance).toBe(true);
     expect(effectOf('core:wave_of_inspiration')?.guaranteedCombo).toBe('shockWet');
-    expect(effectOf('core:shadow_clone')).toMatchObject({
-      effect: { kind: 'damage' },
-      hitsAll: true,
+    // The clone technique does not strike in a fight: it puts bodies on the caster's side.
+    expect(effectOf('core:shadow_clone')).toEqual({
+      effect: { kind: 'summon', fx: 'combatClone', allyName: 'fight.ally' },
     });
+    expect(Object.keys(K.techFx.combatClone ?? {}).sort()).toEqual(
+      [
+        'casts',
+        'count',
+        'dmg',
+        'hp',
+        'masteryStep',
+        'max',
+        'fatigueShare',
+        'passShare',
+        'share',
+        'threat',
+        'xpShare',
+      ].sort(),
+    );
   });
 
   it('names only effect numbers that exist in the balance object', () => {
@@ -134,6 +155,8 @@ describe('boss specials', () => {
     expect(special('core:boss_ren1')).toEqual({
       kind: 'rival',
       fx: 'rivalDuel',
+      hook: 'special:rival.duel',
+      numbers: ['techniques', 'everyMs', 'sigEveryMs', 'sigOpenMs', 'sigMult', 'mult'],
       signature: true,
       nature: 'beatsPlayerFirst',
     });
@@ -147,7 +170,9 @@ describe('boss specials', () => {
       fx: 'rivalTournament',
       signature: true,
     });
-    expect(K.bossFx.rivalTournament.techniques).toBeGreaterThan(K.bossFx.rivalDuel.techniques);
+    expect(K.bossFx.rivalTournament?.techniques ?? 0).toBeGreaterThan(
+      K.bossFx.rivalDuel?.techniques ?? 0,
+    );
   });
 });
 
@@ -299,7 +324,8 @@ describe('scrolls, parts and tools', () => {
       expect(s, `${t.id} has no scroll item`).toBeDefined();
       expect(s?.id).toBe(`core:scroll_${slug(t.id)}`);
     }
-    expect(content.items.filter((i) => i.scroll)).toHaveLength(scrolled.length);
+    // The one scroll more is the quest's: it teaches the chakra drill, which is a training technique.
+    expect(content.items.filter((i) => i.scroll)).toHaveLength(scrolled.length + 1);
   });
 
   it('has a library level and a price for every library scroll, matching the technique home', () => {
@@ -327,7 +353,8 @@ describe('scrolls, parts and tools', () => {
       ).toBe(true);
       expect(scrollOf(t)?.scroll?.source).toEqual({ t: 'parts' });
     }
-    expect(content.items.filter((i) => i.part)).toHaveLength(carried.length);
+    // Plus the part of the fire dragon scroll that the dig mission pays.
+    expect(content.items.filter((i) => i.part)).toHaveLength(carried.length + 1);
   });
 
   it('has the generic notes item', () => {
@@ -362,16 +389,19 @@ describe('scrolls, parts and tools', () => {
 });
 
 describe('statuses, traits and combos', () => {
-  it('lists the five statuses with their numbers in the balance object', () => {
+  it('lists the six statuses with their numbers in the balance object', () => {
     expect(content.statuses.map((s) => s.id)).toEqual([...STATUS_IDS]);
-    for (const s of content.statuses) expect(K, s.id).toHaveProperty(s.id);
+    // The interrupt status keeps its numbers under `rhythm`.
+    for (const s of content.statuses)
+      expect(K, s.id).toHaveProperty(s.id === 'interrupt' ? 'rhythm' : s.id);
   });
 
   it('lists the eight traits with their answer tag and numbers', () => {
     expect(content.traits.map((t) => t.id)).toEqual([...TRAIT_IDS]);
     for (const t of content.traits) {
       expect(t.answer, t.id).toBe(TRAIT_ANSWER[t.id]);
-      const source = K[t.numbers.from] as Record<string, unknown>;
+      const source =
+        (K as unknown as Record<string, Record<string, unknown>>)[t.numbers.from] ?? {};
       for (const key of t.numbers.keys) expect(source, `${t.id}: ${key}`).toHaveProperty(key);
     }
   });
@@ -398,5 +428,21 @@ describe('hand-written maps', () => {
       ),
     ).toEqual([]);
     expect(orphans(handItemEcon, itemById.keys())).toEqual([]);
+  });
+});
+
+describe('the name of summoned bodies', () => {
+  const closure = (db: typeof content) =>
+    validateClosure(db, { owner: () => 'testmod', iconOwner: () => 'testmod', described: {} });
+
+  it('is a locale key: a missing one is a closure problem', () => {
+    const copy = JSON.parse(JSON.stringify(content)) as typeof content;
+    const clone = copy.techniques.find((t) => t.id === 'core:shadow_clone');
+    if (clone?.combat?.effect.kind !== 'summon') throw new Error('no summon');
+    expect(closure(copy).some((p) => p.message.includes('allyName'))).toBe(false);
+    clone.combat.effect.allyName = 'fight.noSuchName';
+    expect(
+      closure(copy).some((p) => p.message.includes('missing locale key fight.noSuchName')),
+    ).toBe(true);
   });
 });

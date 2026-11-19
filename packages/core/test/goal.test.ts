@@ -49,6 +49,20 @@ describe('goal commands', () => {
     expect(state.goal).toBeNull();
   });
 
+  it('goal.set accepts the entities a tile stands for: recipe, exercise, practice, obstacle', () => {
+    const state = createState(1, content);
+    const refs = [
+      { kind: 'recipe', id: content.recipes[0]?.id ?? '' },
+      { kind: 'exercise', id: content.exercises[0]?.id ?? '' },
+      { kind: 'practice', id: content.practices[0]?.id ?? '' },
+      { kind: 'obstacle', id: content.obstacles[0]?.id ?? '' },
+    ] as const;
+    for (const ref of refs) {
+      expect(dispatch(state, { type: 'goal.set', ref }, content)).toEqual({ ok: true });
+      expect(state.goal).toEqual(ref);
+    }
+  });
+
   it('keeps the pinned goal through a save and load', () => {
     const state = createState(1, content);
     dispatch(state, { type: 'goal.set', ref: { kind: 'technique', id: CLONE } }, content);
@@ -84,20 +98,23 @@ describe('locked skills', () => {
     expect(result).toEqual({ ok: false, reason: 'error.skillLocked' });
     expect(state.slots[0]?.action).toBeNull();
     state.player.rank = 'genin';
+    expect(dispatch(state, start('practice', tech.id), content)).toEqual({
+      ok: false,
+      reason: 'error.skillLocked',
+    });
+    expect(dispatch(state, { type: 'nature.choose', nature: 'katon' }, content).ok).toBe(true);
     expect(dispatch(state, start('practice', tech.id), content).ok).toBe(true);
   });
 });
 
 describe('the first fight', () => {
-  it('sets the flag that opens Vitality and Evasion', () => {
+  it('sets the flag that opens Vitality', () => {
     const state = createState(1, content);
     expect(state.flags.firstFight).toBeUndefined();
     expect(isSkillUnlocked(state, 'vit', content)).toBe(false);
-    expect(isSkillUnlocked(state, 'eva', content)).toBe(false);
     expect(dispatch(state, start('fight', DUMMY), content).ok).toBe(true);
     expect(state.flags.firstFight).toBe(true);
     expect(isSkillUnlocked(state, 'vit', content)).toBe(true);
-    expect(isSkillUnlocked(state, 'eva', content)).toBe(true);
     expect(evalReq(state, { t: 'flag', id: 'firstFight' }, content).met).toBe(true);
   });
 });

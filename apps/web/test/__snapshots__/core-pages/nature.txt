@@ -1,0 +1,393 @@
+<main class="main">
+  <div class="ui-page" data-page="core:nature" data-ui="page">
+    <article class="simple-page">
+      <h1>
+        Природи чакри
+      <section class="lead" data-nature-stage="test">
+        <p>
+          Сенсей дає папірець чакри. Обери природу сам або довірся паперу, як у каноні. Вибір остаточний, тож спершу подивись, що кожна природа відкриває й що лишає закритим.
+        <button class="random" data-random="" type="button">
+          Довірити паперу
+      <ul class="cards" data-cards="">
+        <li class="card" data-native="false" data-nature="katon" data-owned="false" style="--nature-color: var(--nature-katon);">
+          <header>
+            <span class="icon">
+              <svg aria-hidden="true" class="icon" height="28" viewBox="0 0 512 512" width="28">
+                <path d="#675-1ha53yd" fill="currentColor">
+            <div class="title">
+              <h3>
+                <a class="entity-link" href="#/skill/katon">
+                  Катон
+              <p class="character">
+                Горіння й площа.
+          <dl>
+            <div class="row" data-row="missions">
+              <dt>
+                Відкриває місії села
+              <dd>
+                <a class="entity-link" href="#/mission/core:v_clear">
+                  Розчищення ділянок
+                <a class="entity-link" href="#/mission/core:v_sanit">
+                  Санітарна варта
+            <div class="row" data-row="buildings">
+              <dt>
+                Допомагає дійти до рівня 6 будівель
+              <dd>
+                <a class="entity-link" href="#/building/core:grounds">
+                  Полігони
+                <a class="entity-link" href="#/building/core:shrine">
+                  Святилище
+                <a class="entity-link" href="#/building/core:hospital">
+                  Госпіталь
+            <div class="row" data-row="cells">
+              <dt>
+                Відкриває ключові клітинки мапи
+              <dd>
+                <a class="entity-link" href="#/cell/core:ternovi_zarosti">
+                  Тернові зарості
+                <span class="entity-link masked" data-masked="" title="Розвідай клітинку">
+                  ???
+            <div class="row" data-row="traits">
+              <dt>
+                Відповідає на риси ворогів
+              <dd>
+                <a class="entity-link" href="#/trait/pack">
+                  Зграя
+                <a class="entity-link" href="#/trait/regen">
+                  Регенерація
+            <div class="row" data-row="wheel">
+              <dt>
+                Колесо природ
+              <dd>
+                <span class="pair">
+                  Сильна проти
+                  <a class="entity-link" href="#/skill/futon">
+                    Футон
+                <span class="pair">
+                  Слабка проти
+                  <a class="entity-link" href="#/skill/suiton">
+                    Суйтон
+            <div class="row" data-row="team">
+              <dt>
+                Команда
+              <dd>
+                <span class="pair">
+                  Якщо вона рідна, природа Рена —
+                  <a class="entity-link" href="#/skill/suiton">
+                    Суйтон
+                <span class="pair">
+                  а природа Аї —
+                  <a class="entity-link" href="#/skill/raiton">
+                    Райтон
+            <div class="row" data-row="combos">
+              <dt>
+                Бере участь у комбо станів
+              <dd>
+                <a class="entity-link" href="#/combo/fanBurn">
+                  Футон по Горінню
+                <a class="entity-link" href="#/combo/steam">
+                  Катон по Мокрому
+          <button class="pick" data-pick="katon" type="button">
+            Обрати
+        <li class="card" data-native="false" data-nature="futon" data-owned="false" style="--nature-color: var(--nature-futon);">
+          <header>
+            <span class="icon">
+              <svg aria-hidden="true" class="icon" height="28" viewBox="0 0 512 512" width="28">
+                <path d="#2198-rgudd8" fill="currentColor">
+            <div class="title">
+              <h3>
+                <a class="entity-link" href="#/skill/futon">
+                  Футон
+              <p class="character">
+                Пробиття.
+          <dl>
+            <div class="row" data-row="missions">
+              <dt>
+                Відкриває місії села
+              <dd>
+                <a class="entity-link" href="#/mission/core:v_clear">
+                  Розчищення ділянок
+            <div class="row" data-row="buildings">
+              <dt>
+                Допомагає дійти до рівня 6 будівель
+              <dd>
+                <a class="entity-link" href="#/building/core:grounds">
+                  Полігони
+                <a class="entity-link" href="#/building/core:shrine">
+                  Святилище
+            <div class="row" data-row="cells">
+              <dt>
+                Відкриває ключові клітинки мапи
+              <dd>
+                <a class="entity-link" href="#/cell/core:ternovi_zarosti">
+                  Тернові зарості
+                <span class="entity-link masked" data-masked="" title="Розвідай клітинку">
+                  ???
+                <span class="entity-link masked" data-masked="" title="Розвідай клітинку">
+                  ???
+            <div class="row" data-row="traits">
+              <dt>
+                Відповідає на риси ворогів
+              <dd>
+                <a class="entity-link" href="#/trait/armor">
+                  Броня
+                <a class="entity-link" href="#/trait/pack">
+                  Зграя
+                <a class="entity-link" href="#/trait/hidden">
+                  Прихований
+            <div class="row" data-row="wheel">
+              <dt>
+                Колесо природ
+              <dd>
+                <span class="pair">
+                  Сильна проти
+                  <a class="entity-link" href="#/skill/raiton">
+                    Райтон
+                <span class="pair">
+                  Слабка проти
+                  <a class="entity-link" href="#/skill/katon">
+                    Катон
+            <div class="row" data-row="team">
+              <dt>
+                Команда
+              <dd>
+                <span class="pair">
+                  Якщо вона рідна, природа Рена —
+                  <a class="entity-link" href="#/skill/katon">
+                    Катон
+                <span class="pair">
+                  а природа Аї —
+                  <a class="entity-link" href="#/skill/raiton">
+                    Райтон
+            <div class="row" data-row="combos">
+              <dt>
+                Бере участь у комбо станів
+              <dd>
+                <a class="entity-link" href="#/combo/fanBurn">
+                  Футон по Горінню
+          <button class="pick" data-pick="futon" type="button">
+            Обрати
+        <li class="card" data-native="false" data-nature="raiton" data-owned="false" style="--nature-color: var(--nature-raiton);">
+          <header>
+            <span class="icon">
+              <svg aria-hidden="true" class="icon" height="28" viewBox="0 0 512 512" width="28">
+                <path d="#372-3t3ccv" fill="currentColor">
+            <div class="title">
+              <h3>
+                <a class="entity-link" href="#/skill/raiton">
+                  Райтон
+              <p class="character">
+                Оглушення й переривання.
+          <dl>
+            <div class="row" data-row="missions">
+              <dt>
+                Відкриває місії села
+              <dd>
+                <a class="entity-link" href="#/mission/core:v_fence">
+                  Заряджені загородження
+            <div class="row" data-row="buildings">
+              <dt>
+                Допомагає дійти до рівня 6 будівель
+              <dd>
+                <a class="entity-link" href="#/building/core:barrier">
+                  Бар'єр
+            <div class="row" data-row="cells">
+              <dt>
+                Відкриває ключові клітинки мапи
+              <dd>
+                <span class="none">
+                  —
+            <div class="row" data-row="traits">
+              <dt>
+                Відповідає на риси ворогів
+              <dd>
+                <a class="entity-link" href="#/trait/armor">
+                  Броня
+                <a class="entity-link" href="#/trait/caster">
+                  Кастер
+                <a class="entity-link" href="#/trait/evasive">
+                  Ухильний
+            <div class="row" data-row="wheel">
+              <dt>
+                Колесо природ
+              <dd>
+                <span class="pair">
+                  Сильна проти
+                  <a class="entity-link" href="#/skill/doton">
+                    Дотон
+                <span class="pair">
+                  Слабка проти
+                  <a class="entity-link" href="#/skill/futon">
+                    Футон
+            <div class="row" data-row="team">
+              <dt>
+                Команда
+              <dd>
+                <span class="pair">
+                  Якщо вона рідна, природа Рена —
+                  <a class="entity-link" href="#/skill/futon">
+                    Футон
+                <span class="pair">
+                  а природа Аї —
+                  <a class="entity-link" href="#/skill/suiton">
+                    Суйтон
+            <div class="row" data-row="combos">
+              <dt>
+                Бере участь у комбо станів
+              <dd>
+                <a class="entity-link" href="#/combo/shockWet">
+                  Райтон по Мокрому
+          <button class="pick" data-pick="raiton" type="button">
+            Обрати
+        <li class="card" data-native="false" data-nature="doton" data-owned="false" style="--nature-color: var(--nature-doton);">
+          <header>
+            <span class="icon">
+              <svg aria-hidden="true" class="icon" height="28" viewBox="0 0 512 512" width="28">
+                <path d="#448-1vra7a9" fill="currentColor">
+            <div class="title">
+              <h3>
+                <a class="entity-link" href="#/skill/doton">
+                  Дотон
+              <p class="character">
+                Щити й сковування.
+          <dl>
+            <div class="row" data-row="missions">
+              <dt>
+                Відкриває місії села
+              <dd>
+                <a class="entity-link" href="#/mission/core:v_walls">
+                  Зведення стін
+                <a class="entity-link" href="#/mission/core:v_clear">
+                  Розчищення ділянок
+            <div class="row" data-row="buildings">
+              <dt>
+                Допомагає дійти до рівня 6 будівель
+              <dd>
+                <a class="entity-link" href="#/building/core:grounds">
+                  Полігони
+                <a class="entity-link" href="#/building/core:shrine">
+                  Святилище
+                <a class="entity-link" href="#/building/core:barrier">
+                  Бар'єр
+            <div class="row" data-row="cells">
+              <dt>
+                Відкриває ключові клітинки мапи
+              <dd>
+                <span class="entity-link masked" data-masked="" title="Розвідай клітинку">
+                  ???
+                <span class="entity-link masked" data-masked="" title="Розвідай клітинку">
+                  ???
+            <div class="row" data-row="traits">
+              <dt>
+                Відповідає на риси ворогів
+              <dd>
+                <a class="entity-link" href="#/trait/pack">
+                  Зграя
+                <a class="entity-link" href="#/trait/evasive">
+                  Ухильний
+            <div class="row" data-row="wheel">
+              <dt>
+                Колесо природ
+              <dd>
+                <span class="pair">
+                  Сильна проти
+                  <a class="entity-link" href="#/skill/suiton">
+                    Суйтон
+                <span class="pair">
+                  Слабка проти
+                  <a class="entity-link" href="#/skill/raiton">
+                    Райтон
+            <div class="row" data-row="team">
+              <dt>
+                Команда
+              <dd>
+                <span class="pair">
+                  Якщо вона рідна, природа Рена —
+                  <a class="entity-link" href="#/skill/raiton">
+                    Райтон
+                <span class="pair">
+                  а природа Аї —
+                  <a class="entity-link" href="#/skill/suiton">
+                    Суйтон
+            <div class="row" data-row="combos">
+              <dt>
+                Бере участь у комбо станів
+              <dd>
+                <a class="entity-link" href="#/combo/mudEva">
+                  Дотон по Мокрому
+          <button class="pick" data-pick="doton" type="button">
+            Обрати
+        <li class="card" data-native="false" data-nature="suiton" data-owned="false" style="--nature-color: var(--nature-suiton);">
+          <header>
+            <span class="icon">
+              <svg aria-hidden="true" class="icon" height="28" viewBox="0 0 512 512" width="28">
+                <path d="#110-1yym8op" fill="currentColor">
+            <div class="title">
+              <h3>
+                <a class="entity-link" href="#/skill/suiton">
+                  Суйтон
+              <p class="character">
+                Мокрий стан і сповільнення.
+          <dl>
+            <div class="row" data-row="missions">
+              <dt>
+                Відкриває місії села
+              <dd>
+                <a class="entity-link" href="#/mission/core:v_water">
+                  Зрошення полів села
+            <div class="row" data-row="buildings">
+              <dt>
+                Допомагає дійти до рівня 6 будівель
+              <dd>
+                <a class="entity-link" href="#/building/core:farms">
+                  Ферми
+            <div class="row" data-row="cells">
+              <dt>
+                Відкриває ключові клітинки мапи
+              <dd>
+                <span class="none">
+                  —
+            <div class="row" data-row="traits">
+              <dt>
+                Відповідає на риси ворогів
+              <dd>
+                <a class="entity-link" href="#/trait/pack">
+                  Зграя
+                <a class="entity-link" href="#/trait/evasive">
+                  Ухильний
+            <div class="row" data-row="wheel">
+              <dt>
+                Колесо природ
+              <dd>
+                <span class="pair">
+                  Сильна проти
+                  <a class="entity-link" href="#/skill/katon">
+                    Катон
+                <span class="pair">
+                  Слабка проти
+                  <a class="entity-link" href="#/skill/doton">
+                    Дотон
+            <div class="row" data-row="team">
+              <dt>
+                Команда
+              <dd>
+                <span class="pair">
+                  Якщо вона рідна, природа Рена —
+                  <a class="entity-link" href="#/skill/doton">
+                    Дотон
+                <span class="pair">
+                  а природа Аї —
+                  <a class="entity-link" href="#/skill/raiton">
+                    Райтон
+            <div class="row" data-row="combos">
+              <dt>
+                Бере участь у комбо станів
+              <dd>
+                <a class="entity-link" href="#/combo/shockWet">
+                  Райтон по Мокрому
+                <a class="entity-link" href="#/combo/mudEva">
+                  Дотон по Мокрому
+                <a class="entity-link" href="#/combo/steam">
+                  Катон по Мокрому
+          <button class="pick" data-pick="suiton" type="button">
+            Обрати

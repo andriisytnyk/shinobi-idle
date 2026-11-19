@@ -1,19 +1,22 @@
 <script lang="ts">
-  import { content } from '@shinobi/content';
   import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
+  import JournalTabs from '../components/JournalTabs.svelte';
   import QuestObjective from '../components/QuestObjective.svelte';
   import { entityDesc } from '../lib/entities.ts';
   import { hasKey, t } from '../lib/i18n.ts';
   import { stepStatus } from '../lib/next-step.ts';
+  import { MASK } from '../lib/reveal.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
 
+  const content = game.content;
+
   /** Chains that have started: those under way first, finished ones after. */
-  const started = $derived(content.quests.filter((q) => game.state.quests[q.id]));
-  const active = $derived(started.filter((q) => !game.state.quests[q.id]?.done));
-  const finished = $derived(started.filter((q) => game.state.quests[q.id]?.done));
+  const started = $derived(game.read((gs) => content.quests.filter((q) => gs.quests[q.id])));
+  const active = $derived(game.read((gs) => started.filter((q) => !gs.quests[q.id]?.done)));
+  const finished = $derived(game.read((gs) => started.filter((q) => gs.quests[q.id]?.done)));
 </script>
 
 {#snippet chain(quest: (typeof content.quests)[number], done: boolean)}
@@ -56,8 +59,13 @@
               )}</span
             >
           </div>
-          <p class="text">{t(step.textKey)}</p>
-          <div class="objective"><QuestObjective {quest} index={i} /></div>
+          {#if status === 'pending'}
+            <!-- The steps a chain has not reached stay unread: the story is not spoiled. -->
+            <p class="text" data-step-hidden>{MASK}</p>
+          {:else}
+            <p class="text">{t(step.textKey)}</p>
+            <div class="objective"><QuestObjective {quest} index={i} /></div>
+          {/if}
         </li>
       {/each}
     </ol>
@@ -68,6 +76,7 @@
 {/snippet}
 
 <SimplePage title={t('quests.title')}>
+  <JournalTabs current="quests" />
   <Hint id="quests" />
 
   {#if started.length === 0}
@@ -104,7 +113,7 @@
     margin: var(--space-4) 0 var(--space-2);
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--text-md);
     font-weight: 400;
   }
 
@@ -114,8 +123,8 @@
 
   .chain {
     padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface);
   }
 
@@ -131,7 +140,7 @@
   .name {
     color: var(--heading);
     font-family: var(--font-heading);
-    font-size: 1.1rem;
+    font-size: var(--text-md);
   }
 
   .name :global(a) {
@@ -142,13 +151,13 @@
     .name :global(a) {
       display: inline-flex;
       align-items: center;
-      min-height: 2.75rem;
+      min-height: var(--control-md);
     }
   }
 
   .count {
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
   }
 
   .desc {
@@ -165,8 +174,8 @@
   .step {
     margin-bottom: var(--space-2);
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--line);
-    border-left-width: 4px;
+    border: var(--border-thin) solid var(--line);
+    border-left-width: var(--border-heavy);
     border-radius: var(--radius-sm);
     color: var(--fg-dim);
   }
@@ -185,7 +194,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
   }
 
   .step[data-status='current'] .mark {
@@ -207,8 +216,8 @@
 
   .folded {
     margin-bottom: var(--space-2);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
     background: var(--surface);
   }
 
@@ -217,14 +226,14 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-2);
-    min-height: 2.75rem;
+    min-height: var(--control-md);
     padding: var(--space-1) var(--space-3);
     cursor: pointer;
   }
 
   .folded .chain {
     border: 0;
-    border-top: 1px solid var(--line);
+    border-top: var(--border-thin) solid var(--line);
     border-radius: 0;
   }
 </style>

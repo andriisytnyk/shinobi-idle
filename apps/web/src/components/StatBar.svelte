@@ -7,14 +7,16 @@
     max: number;
     /** Which colour token fills the bar. */
     tone: 'hp' | 'chakra' | 'stamina' | 'enemy';
+    /** On a phone: one line (label, bar, value) instead of two. */
+    dense?: boolean;
   }
 
-  let { label, value, max, tone }: Props = $props();
+  let { label, value, max, tone, dense = false }: Props = $props();
 
   const fraction = $derived(max > 0 ? Math.min(1, Math.max(0, value / max)) : 0);
 </script>
 
-<div class="stat" data-tone={tone}>
+<div class="stat" class:dense data-tone={tone}>
   <span class="label">{label}</span>
   <div
     class="bar"
@@ -31,8 +33,9 @@
 
 <style>
   .stat {
+    --_grid-template-columns: 7rem;
     display: grid;
-    grid-template-columns: 7rem minmax(0, 1fr) auto;
+    grid-template-columns: var(--_grid-template-columns) minmax(0, 1fr) auto;
     align-items: center;
     gap: var(--space-2);
     --tone: var(--hp);
@@ -52,12 +55,12 @@
 
   .label {
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--text-xs);
   }
 
   .bar {
-    height: 10px;
-    border-radius: 5px;
+    height: var(--bar-thick);
+    border-radius: var(--radius-sm);
     background: var(--line);
     overflow: hidden;
   }
@@ -69,8 +72,9 @@
   }
 
   .value {
-    min-width: 5rem;
-    font-size: 0.85rem;
+    --_min-width: 5rem;
+    min-width: var(--_min-width);
+    font-size: var(--text-xs);
     text-align: right;
     font-variant-numeric: tabular-nums;
   }
@@ -93,6 +97,30 @@
 
     .value {
       grid-area: value;
+    }
+  }
+
+  /* A dense bar on a phone: label, bar and value on one line. */
+  @media (max-width: 768px) {
+    .stat.dense {
+      --_label-width: 5.5rem;
+      grid-template-columns: var(--_label-width) minmax(0, 1fr) auto;
+      grid-template-areas: none;
+      gap: var(--space-2);
+    }
+
+    .stat.dense .label,
+    .stat.dense .bar,
+    .stat.dense .value {
+      grid-area: auto;
+    }
+
+    .stat.dense .bar {
+      height: var(--bar-md);
+    }
+
+    .stat.dense .value {
+      --_min-width: 4rem;
     }
   }
 </style>
