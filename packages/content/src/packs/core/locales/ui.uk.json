@@ -145,6 +145,7 @@
   "report.dispelled.death": "Розвіявся: клона побито.",
   "report.dispelled.xp": "Знання, що перейшли до тебе: +{n}.",
   "report.reason.manual": "зупинено вручну",
+  "report.reason.dispelled": "клона розвіяно",
   "report.reason.requirements": "вимоги більше не виконані",
   "report.reason.replaced": "замінено іншою дією",
   "report.reason.missing": "дії більше немає в грі",
