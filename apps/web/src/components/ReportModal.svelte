@@ -1,5 +1,6 @@
 <script lang="ts">
   import { actionRef, masteryRef } from '../lib/entities.ts';
+  import { idAttr } from '../lib/reveal.ts';
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { hasSquad, reportSections } from '../lib/squad.ts';
@@ -45,10 +46,10 @@
     <h3>{t('report.gained')}</h3>
     <ul data-report-gained>
       {#each report.gained?.currencies ?? [] as row (row.id)}
-        <li data-report-currency={row.id}>+{formatInt(row.n)} {currencyName(row.id)}</li>
+        <li data-report-currency={idAttr('currency', row.id)}>+{formatInt(row.n)} {currencyName(row.id)}</li>
       {/each}
       {#each report.gained?.items ?? [] as row (row.id)}
-        <li data-report-item={row.id}>
+        <li data-report-item={idAttr('item', row.id)}>
           +{formatInt(row.n)} × <EntityLink kind="item" id={row.id} />
         </li>
       {/each}
