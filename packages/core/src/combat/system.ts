@@ -542,6 +542,7 @@ function runFight(state: GameState, index: number, content: ContentDb, rules: Ru
         c.carry += c.fight.t - c.fight.tally.lastUseAt;
         payPending(state, c, content, rules);
         const p = c.fight.player;
+        const allyXpRate = c.fight.allyXpRate;
         c.fight = startFight(
           state,
           entry,
@@ -550,6 +551,8 @@ function runFight(state: GameState, index: number, content: ContentDb, rules: Ru
           { hp: p.hp, chakra: p.chakra, stamina: p.stamina },
           c.fight.encounter.support,
         );
+        // A mission's bodies keep earning by the clock in the fight that replaces this one.
+        if (allyXpRate !== undefined) c.fight.allyXpRate = allyXpRate;
         c.paid = {};
         continue;
       }
@@ -560,6 +563,7 @@ function runFight(state: GameState, index: number, content: ContentDb, rules: Ru
         c.carry += c.fight.t - c.fight.tally.lastUseAt;
         payPending(state, c, content, rules);
         const p = c.fight.player;
+        const allyXpRate = c.fight.allyXpRate;
         c.fight = startFight(
           state,
           entry,
@@ -568,6 +572,8 @@ function runFight(state: GameState, index: number, content: ContentDb, rules: Ru
           { hp: p.hp, chakra: p.chakra, stamina: p.stamina },
           c.fight.encounter.support,
         );
+        // A mission's bodies keep earning by the clock in the fight that replaces this one.
+        if (allyXpRate !== undefined) c.fight.allyXpRate = allyXpRate;
         c.paid = {};
         continue;
       }

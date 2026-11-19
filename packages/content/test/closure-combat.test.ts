@@ -18,6 +18,7 @@ import {
   type Item,
   type RoleId,
   type Technique,
+  validateClosure,
 } from '../src/index.ts';
 
 const K = content.balance.K;
@@ -427,5 +428,21 @@ describe('hand-written maps', () => {
       ),
     ).toEqual([]);
     expect(orphans(handItemEcon, itemById.keys())).toEqual([]);
+  });
+});
+
+describe('the name of summoned bodies', () => {
+  const closure = (db: typeof content) =>
+    validateClosure(db, { owner: () => 'testmod', iconOwner: () => 'testmod', described: {} });
+
+  it('is a locale key: a missing one is a closure problem', () => {
+    const copy = JSON.parse(JSON.stringify(content)) as typeof content;
+    const clone = copy.techniques.find((t) => t.id === 'core:shadow_clone');
+    if (clone?.combat?.effect.kind !== 'summon') throw new Error('no summon');
+    expect(closure(copy).some((p) => p.message.includes('allyName'))).toBe(false);
+    clone.combat.effect.allyName = 'fight.noSuchName';
+    expect(
+      closure(copy).some((p) => p.message.includes('missing locale key fight.noSuchName')),
+    ).toBe(true);
   });
 });

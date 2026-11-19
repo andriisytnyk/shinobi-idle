@@ -311,7 +311,7 @@ describe('F1: the outcomes that fly off a body', () => {
     expect(out['ally#1']?.[0]?.kind).toBe('dodge');
     expect(out.player).toBeUndefined();
     const card = html(Fighter, { f: enemy });
-    expect(card).toContain('Клон №1 ухилився');
+    expect(card).toContain('Клон №1: ухилення');
     expect(card).not.toContain('Ти ухилився');
     const own = html(Fighter, {
       f: { ...enemy, last: { ...miss, target: 'player', onAlly: null } },
