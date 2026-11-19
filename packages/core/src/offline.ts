@@ -39,8 +39,25 @@ export interface OfflineSummary {
   clonesDispelled?: CloneDispelledEvent[];
   /** Raids that arrived or ended while away, one row per raid (the village page has the detail). */
   raids?: RaidAway[];
+  /** Items that reached the Bank while away: the net gain per item (what crafts and sales used up is netted off). Not saved. */
+  itemsGained?: Record<string, number>;
+  /** Currency that reached the Bank while away: the net gain per currency. Not saved. */
+  currencyGained?: Record<string, number>;
   /** The battle report of the time away, by target. */
   reports: Record<string, TargetReport>;
+}
+
+/** The positive differences of two balances, per key. */
+function gainOf(
+  before: Record<string, number>,
+  after: Record<string, number>,
+): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const key of Object.keys(after)) {
+    const n = (after[key] ?? 0) - (before[key] ?? 0);
+    if (n > 0) out[key] = n;
+  }
+  return out;
 }
 
 /** Folds a raid event of the time away into the rows: one row per raid, its end replacing its arrival. */
@@ -88,6 +105,9 @@ export function advanceOffline(
     Object.keys(state.mastery).map((key) => [key, masteryLevel(state, key, content)]),
   );
 
+  const bankBefore = { ...state.bank };
+  const currenciesBefore = { ...state.currencies };
+
   const queued = state.events;
   state.events = [];
   // The time away gets a report of its own; afterwards it is folded into the running one.
@@ -112,6 +132,8 @@ export function advanceOffline(
     rulesDisabled: [],
     raids: [],
     clonesDispelled: [],
+    itemsGained: gainOf(bankBefore, state.bank),
+    currencyGained: gainOf(currenciesBefore, state.currencies),
     reports,
   };
   for (const e of away) {

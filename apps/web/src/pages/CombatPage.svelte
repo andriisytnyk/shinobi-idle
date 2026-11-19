@@ -22,6 +22,7 @@
   import { formatInt } from '../lib/format.ts';
   import { fightView } from '../lib/fight-view.svelte.ts';
   import { hasKey, t } from '../lib/i18n.ts';
+  import { entityName } from '../lib/entities.ts';
   import type { PrepTarget } from '../lib/prep.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
@@ -78,6 +79,22 @@
   const shownFight = $derived(fightView.shown(listing.fighters));
   const logEntries = () => game.combatLog.filter((e) => (e.event.slot ?? 0) === shownFight);
 
+  /**
+   * The heading of the fight shown: «Тренувальний бій» is the fight in the Academy yard; a fight in a zone
+   * or an operation is named by its enemy or operation. Null when no fight runs, or the training one.
+   */
+  const fightName = $derived(
+    game.read((gs: GameState) => {
+      if (!listing.fighting) return null;
+      const action = gs.slots[shownFight]?.action;
+      if (!action) return null;
+      if (action.kind === 'operation') return opName(action.id);
+      const zone = action.kind === 'fight' ? content.zones.find((z) => z.id === action.id) : null;
+      if (!zone || zone.region === 'academy') return null;
+      return entityName({ kind: zone.region === 'boss' ? 'boss' : 'enemy', id: zone.enemy });
+    }),
+  );
+
   /** Whether a clone exists: the character's chakra pool is divided then. */
   const cloned = $derived(game.read((gs: GameState) => cloneCount(gs, content) > 0));
 
@@ -86,15 +103,17 @@
 </script>
 
 <SimplePage
-  title={t(
-    section === 'bingo'
-      ? 'combat.tab.bingo'
-      : section === 'report'
-        ? 'combat.tab.report'
-        : section === 'prepare'
-          ? 'combat.prepare'
-          : 'combat.title',
-  )}
+  title={section === 'fight' && fightName !== null
+    ? fightName
+    : t(
+        section === 'bingo'
+          ? 'combat.tab.bingo'
+          : section === 'report'
+            ? 'combat.tab.report'
+            : section === 'prepare'
+              ? 'combat.prepare'
+              : 'combat.title',
+      )}
   compact={listing.fighting}
 >
   <nav class="tabs" aria-label={t('combat.sections')} data-combat-tabs>
@@ -122,6 +141,13 @@
     <BingoBook />
   {:else if section === 'report'}
     <BattleReport />
+  {:else if section === 'prepare' && target && listing.selfFighting}
+    <!-- A preparation is asked for while a fight runs: it is shown, with a way back to the fight. -->
+    <p class="running-note" data-prepare-running>
+      {t('combat.prepare.running')}
+      <a href="#/combat" data-prepare-running-link>{t('combat.prepare.toFight')}</a>
+    </p>
+    <PrepScreen {target} />
   {:else if listing.selfFighting}
     <!-- The arena comes first: on a phone the hint above it would push the fight off the screen. -->
     <FightScreen />
@@ -259,6 +285,12 @@
     font-family: var(--font-heading);
     font-size: var(--text-md);
     cursor: pointer;
+  }
+
+  .running-note {
+    margin: 0 0 var(--space-3);
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
   }
 
   .clone-note {

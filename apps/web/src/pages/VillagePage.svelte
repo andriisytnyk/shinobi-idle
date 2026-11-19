@@ -209,8 +209,6 @@
           <p class="ct-muted" data-queue-left>
             {t('village.queue.left', {
               time: formatDuration(queue.msLeft),
-              ticks: queue.ticksLeft,
-              total: queue.ticksTotal,
             })}
           </p>
           <div class="actions">

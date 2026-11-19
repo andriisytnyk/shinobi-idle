@@ -1,9 +1,9 @@
 <script lang="ts">
   import { entityAttr, idAttr } from '../lib/reveal.ts';
-  import type { ActionInfo } from '@shinobi/core';
+  import { evalReq, type ActionInfo } from '@shinobi/core';
   import { actionRef } from '../lib/entities.ts';
   import { formatSeconds, formatXp } from '../lib/format.ts';
-  import { canPin } from '../lib/goal.ts';
+  import { canPin, techniqueRankReq } from '../lib/goal.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import { practiceView, slotTiming } from '../lib/timing.ts';
@@ -45,6 +45,18 @@
       : null,
   );
   /** The strip also shows on a tile that is idle, so the player sees what the technique asks for. */
+  /**
+   * What the locked tile lists. A technique's rank (the mentor teaches it only to a Genin) is not part of
+   * the action's own requirements, so it is added here: the tile names what is NOT met, as the technique page does.
+   */
+  const lockReq = $derived.by(() => {
+    const base = info.req;
+    if (!base || !technique) return base;
+    const rank = techniqueRankReq(technique.id, content);
+    if (!rank) return base;
+    const of = base.req.t === 'all' ? base.req.of : [base.req];
+    return game.read((gs) => evalReq(gs, { t: 'all', of: [...of, rank] }, content));
+  });
   const stripSeals = $derived(technique?.sealSeq ?? []);
   const flash = $derived(
     view ? { timing: view.timing, from: view.phases.sealsEnd, to: view.phases.releaseEnd } : null,
@@ -122,10 +134,10 @@
     <div class="ct-actions">
       <StartSplit kind={info.kind} id={info.id} />
     </div>
-  {:else if info.req}
+  {:else if lockReq}
     <div class="req">
       <p class="locked-label"><Icon name="lucide:lock" size={14} /> {t('tile.locked')}</p>
-      <ReqTree node={info.req} />
+      <ReqTree node={lockReq} />
       {#if canPin(ref.kind)}
         <p class="pin-caption"><PinGoal kind={ref.kind} id={ref.id} variant="link" /></p>
       {/if}
