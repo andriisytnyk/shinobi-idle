@@ -222,7 +222,7 @@ export const BALANCE_EXT = {
     },
     drunkenEvasion: { maxMult: 2, hp: 1, dmg: 1 },
     /** A heavy cast: `castMs` wind-up every `everyMs`, `damageMult` x damage, stuns the player for `stunMs` when it lands. */
-    heavyCast: { everyMs: 20000, castMs: 2500, damageMult: 2, stunMs: 500, hp: 0.925, dmg: 1.0 },
+    heavyCast: { everyMs: 20000, castMs: 2500, damageMult: 2, stunMs: 500, hp: 1.0, dmg: 1.0 },
     /** Two bodies: each has `hpEach` of the boss health and `dmgEach` of its damage; while both live the mist poisons the player for `mistMult` x the poison strength. */
     twins: { count: 2, hpEach: 0.5, dmgEach: 0.5, mistMult: 1.6 },
     mistRehide: { everyMs: 25000, hp: 0.97, dmg: 0.95 },

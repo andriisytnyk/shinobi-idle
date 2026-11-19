@@ -52,12 +52,12 @@
   "castFloor": 0.4,
   "nonNativeCast": 0.3,
   "power": {
-   "E": 14.5,
-   "D": 14.5,
-   "C": 23,
-   "B": 36.5,
-   "A": 57,
-   "S": 88
+   "E": 16,
+   "D": 16,
+   "C": 25,
+   "B": 40,
+   "A": 63,
+   "S": 97
   },
   "tierMult": {
    "0": 1,
@@ -582,11 +582,11 @@
    "cd": 8.3,
    "cost": 6.6,
    "res": "stamina",
-   "dmg": 17.3,
+   "dmg": 19.1,
    "aoe": false,
    "hits": 3,
    "level": 1,
-   "dmg50": 45.9
+   "dmg50": 50.7
   },
   {
    "id": "core:dynamic_entry",
@@ -603,11 +603,11 @@
    "cd": 4.9,
    "cost": 6,
    "res": "stamina",
-   "dmg": 19.6,
+   "dmg": 21.6,
    "aoe": false,
    "hits": 1,
    "level": 10,
-   "dmg50": 39.9
+   "dmg50": 44
   },
   {
    "id": "core:leaf_gale",
@@ -624,11 +624,11 @@
    "cd": 8.3,
    "cost": 6.6,
    "res": "stamina",
-   "dmg": 25.5,
+   "dmg": 28.1,
    "aoe": false,
    "hits": 3,
    "level": 15,
-   "dmg50": 45.9
+   "dmg50": 50.7
   },
   {
    "id": "core:gate_of_opening",
@@ -681,11 +681,11 @@
    "cd": 9.1,
    "cost": 11,
    "res": "stamina",
-   "dmg": 60.8,
+   "dmg": 66.1,
    "aoe": false,
    "hits": 3,
    "level": 30,
-   "dmg50": 81.5
+   "dmg50": 88.6
   },
   {
    "id": "core:leaf_great_whirlwind",
@@ -702,11 +702,11 @@
    "cd": 19.1,
    "cost": 12,
    "res": "stamina",
-   "dmg": 38.4,
+   "dmg": 41.8,
    "aoe": true,
    "hits": 1,
    "level": 35,
-   "dmg50": 47.5
+   "dmg50": 51.6
   },
   {
    "id": "core:drunken_fist",
@@ -721,11 +721,11 @@
    "cd": 9.1,
    "cost": 11,
    "res": "stamina",
-   "dmg": 71.2,
+   "dmg": 77.4,
    "aoe": false,
    "hits": 3,
    "level": 40,
-   "dmg50": 81.5
+   "dmg50": 88.6
   },
   {
    "id": "core:leaf_rising_wind",
@@ -740,11 +740,11 @@
    "cd": 9.1,
    "cost": 11,
    "res": "stamina",
-   "dmg": 68.2,
+   "dmg": 74.1,
    "aoe": false,
    "hits": 3,
    "level": 45,
-   "dmg50": 72.8
+   "dmg50": 79.1
   },
   {
    "id": "core:front_lotus",
@@ -759,11 +759,11 @@
    "cd": 22.5,
    "cost": 20.7,
    "res": "stamina",
-   "dmg": 191.3,
+   "dmg": 209.7,
    "aoe": false,
    "hits": 1,
    "level": 50,
-   "dmg50": 191.3
+   "dmg50": 209.7
   },
   {
    "id": "core:clone",
@@ -858,11 +858,11 @@
    "cd": 4.9,
    "cost": 6,
    "res": "chakra",
-   "dmg": 19.6,
+   "dmg": 21.6,
    "aoe": false,
    "hits": 1,
    "level": 10,
-   "dmg50": 39.9
+   "dmg50": 44
   },
   {
    "id": "core:enclosing",
@@ -938,11 +938,11 @@
    "cd": 22.3,
    "cost": 5.4,
    "res": "chakra",
-   "dmg": 8.9,
+   "dmg": 9.8,
    "aoe": false,
    "hits": 1,
    "level": 30,
-   "dmg50": 12
+   "dmg50": 13.2
   },
   {
    "id": "core:hidden_shadow_snake_hands",
@@ -959,11 +959,11 @@
    "cd": 24.6,
    "cost": 10.8,
    "res": "chakra",
-   "dmg": 15.4,
+   "dmg": 16.7,
    "aoe": false,
    "hits": 1,
    "level": 35,
-   "dmg50": 19
+   "dmg50": 20.6
   },
   {
    "id": "core:shadow_clone",
@@ -980,11 +980,11 @@
    "cd": 10.4,
    "cost": 24.1,
    "res": "chakra",
-   "dmg": 115.5,
+   "dmg": 126.6,
    "aoe": false,
    "hits": 3,
    "level": 50,
-   "dmg50": 115.5
+   "dmg50": 126.6
   },
   {
    "id": "core:running_fire",
@@ -1001,11 +1001,11 @@
    "cd": 17.3,
    "cost": 7.2,
    "res": "chakra",
-   "dmg": 16.3,
+   "dmg": 18,
    "aoe": true,
    "hits": 1,
    "level": 20,
-   "dmg50": 26.3
+   "dmg50": 29.1
   },
   {
    "id": "core:great_fireball",
@@ -1022,11 +1022,11 @@
    "cd": 5.4,
    "cost": 12,
    "res": "chakra",
-   "dmg": 47.2,
+   "dmg": 51.3,
    "aoe": false,
    "hits": 1,
    "level": 30,
-   "dmg50": 63.3
+   "dmg50": 68.8
   },
   {
    "id": "core:phoenix_sage_fire",
@@ -1043,11 +1043,11 @@
    "cd": 9.1,
    "cost": 13.2,
    "res": "chakra",
-   "dmg": 51.8,
+   "dmg": 56.3,
    "aoe": false,
    "hits": 3,
    "level": 35,
-   "dmg50": 64.1
+   "dmg50": 69.6
   },
   {
    "id": "core:dragon_fire",
@@ -1064,11 +1064,11 @@
    "cd": 5.4,
    "cost": 12,
    "res": "chakra",
-   "dmg": 61.9,
+   "dmg": 67.3,
    "aoe": false,
    "hits": 1,
    "level": 40,
-   "dmg50": 70.9
+   "dmg50": 77.1
   },
   {
    "id": "core:fire_dragon_flame_bullet",
@@ -1085,11 +1085,11 @@
    "cd": 21.7,
    "cost": 26.3,
    "res": "chakra",
-   "dmg": 84.4,
+   "dmg": 92.5,
    "aoe": true,
    "hits": 1,
    "level": 50,
-   "dmg50": 84.4
+   "dmg50": 92.5
   },
   {
    "id": "core:gale_palm",
@@ -1106,11 +1106,11 @@
    "cd": 5.4,
    "cost": 12,
    "res": "chakra",
-   "dmg": 41.5,
+   "dmg": 45.1,
    "aoe": false,
    "hits": 1,
    "level": 30,
-   "dmg50": 55.7
+   "dmg50": 60.6
   },
   {
    "id": "core:great_breakthrough",
@@ -1128,11 +1128,11 @@
    "cd": 19.1,
    "cost": 14.4,
    "res": "chakra",
-   "dmg": 38.4,
+   "dmg": 41.8,
    "aoe": true,
    "hits": 1,
    "level": 35,
-   "dmg50": 47.5
+   "dmg50": 51.6
   },
   {
    "id": "core:sickle_weasel",
@@ -1150,11 +1150,11 @@
    "cd": 19.1,
    "cost": 14.4,
    "res": "chakra",
-   "dmg": 46.4,
+   "dmg": 50.5,
    "aoe": true,
    "hits": 1,
    "level": 40,
-   "dmg50": 53.2
+   "dmg50": 57.8
   },
   {
    "id": "core:vacuum_wave",
@@ -1172,11 +1172,11 @@
    "cd": 21.7,
    "cost": 26.3,
    "res": "chakra",
-   "dmg": 75.4,
+   "dmg": 82.6,
    "aoe": true,
    "hits": 1,
    "level": 50,
-   "dmg50": 75.4
+   "dmg50": 82.6
   },
   {
    "id": "core:four_pillar_bind",
@@ -1193,11 +1193,11 @@
    "cd": 24.6,
    "cost": 10.8,
    "res": "chakra",
-   "dmg": 14.2,
+   "dmg": 15.4,
    "aoe": false,
    "hits": 1,
    "level": 30,
-   "dmg50": 19
+   "dmg50": 20.6
   },
   {
    "id": "core:lightning_beast_tracking_fang",
@@ -1214,11 +1214,11 @@
    "cd": 5.4,
    "cost": 12,
    "res": "chakra",
-   "dmg": 51.2,
+   "dmg": 55.7,
    "aoe": false,
    "hits": 1,
    "level": 35,
-   "dmg50": 63.3
+   "dmg50": 68.8
   },
   {
    "id": "core:wave_of_inspiration",
@@ -1235,11 +1235,11 @@
    "cd": 5.4,
    "cost": 12,
    "res": "chakra",
-   "dmg": 55.3,
+   "dmg": 60.1,
    "aoe": false,
    "hits": 1,
    "level": 40,
-   "dmg50": 63.3
+   "dmg50": 68.8
   },
   {
    "id": "core:false_darkness",
@@ -1257,11 +1257,11 @@
    "cd": 6.1,
    "cost": 21.9,
    "res": "chakra",
-   "dmg": 112.5,
+   "dmg": 123.3,
    "aoe": false,
    "hits": 1,
    "level": 50,
-   "dmg50": 112.5
+   "dmg50": 123.3
   },
   {
    "id": "core:double_suicide_decapitation",
@@ -1278,11 +1278,11 @@
    "cd": 22.3,
    "cost": 5.4,
    "res": "chakra",
-   "dmg": 5.9,
+   "dmg": 6.5,
    "aoe": false,
    "hits": 1,
    "level": 10,
-   "dmg50": 12
+   "dmg50": 13.2
   },
   {
    "id": "core:hiding_like_a_mole",
@@ -1318,11 +1318,11 @@
    "cd": 19.1,
    "cost": 14.4,
    "res": "chakra",
-   "dmg": 38.4,
+   "dmg": 41.8,
    "aoe": true,
    "hits": 1,
    "level": 35,
-   "dmg50": 47.5
+   "dmg50": 51.6
   },
   {
    "id": "core:earth_flow_river",
@@ -1339,11 +1339,11 @@
    "cd": 24.6,
    "cost": 10.8,
    "res": "chakra",
-   "dmg": 16.6,
+   "dmg": 18,
    "aoe": false,
    "hits": 1,
    "level": 40,
-   "dmg50": 19
+   "dmg50": 20.6
   },
   {
    "id": "core:earth_dragon_bullet",
@@ -1358,11 +1358,11 @@
    "cd": 5.4,
    "cost": 12,
    "res": "chakra",
-   "dmg": 66.4,
+   "dmg": 72.2,
    "aoe": false,
    "hits": 1,
    "level": 45,
-   "dmg50": 70.9
+   "dmg50": 77.1
   },
   {
    "id": "core:earth_style_wall",
@@ -1436,11 +1436,11 @@
    "cd": 5.4,
    "cost": 12,
    "res": "chakra",
-   "dmg": 41.5,
+   "dmg": 45.1,
    "aoe": false,
    "hits": 1,
    "level": 30,
-   "dmg50": 55.7
+   "dmg50": 60.6
   },
   {
    "id": "core:water_prison",
@@ -1457,11 +1457,11 @@
    "cd": 24.6,
    "cost": 10.8,
    "res": "chakra",
-   "dmg": 15.4,
+   "dmg": 16.7,
    "aoe": false,
    "hits": 1,
    "level": 35,
-   "dmg50": 19
+   "dmg50": 20.6
   },
   {
    "id": "core:gunshot",
@@ -1478,11 +1478,11 @@
    "cd": 19.1,
    "cost": 14.4,
    "res": "chakra",
-   "dmg": 41.4,
+   "dmg": 45,
    "aoe": true,
    "hits": 1,
    "level": 40,
-   "dmg50": 47.5
+   "dmg50": 51.6
   },
   {
    "id": "core:starch_syrup_capturing_field",
@@ -1499,11 +1499,11 @@
    "cd": 24.6,
    "cost": 10.8,
    "res": "chakra",
-   "dmg": 17.8,
+   "dmg": 19.3,
    "aoe": false,
    "hits": 1,
    "level": 45,
-   "dmg50": 19
+   "dmg50": 20.6
   },
   {
    "id": "core:water_formation_wall",
@@ -1734,8 +1734,8 @@
    "label": "Звичайний ворог свого рівня (10)",
    "nature": "katon",
    "win": 100,
-   "ttk": 29,
-   "hpLost": 29,
+   "ttk": 28,
+   "hpLost": 28,
    "load": [
     "Листяний вихор"
    ]
@@ -1744,8 +1744,8 @@
    "label": "Звичайний ворог свого рівня (10)",
    "nature": "doton",
    "win": 100,
-   "ttk": 27,
-   "hpLost": 27,
+   "ttk": 26,
+   "hpLost": 26,
    "load": [
     "Листяний вихор",
     "Техніка подвійного самогубчого обезглавлення"
@@ -1755,8 +1755,8 @@
    "label": "Звичайний ворог свого рівня (10)",
    "nature": "suiton",
    "win": 100,
-   "ttk": 29,
-   "hpLost": 29,
+   "ttk": 28,
+   "hpLost": 28,
    "load": [
     "Листяний вихор"
    ]
@@ -1765,8 +1765,8 @@
    "label": "Звичайний ворог свого рівня (20)",
    "nature": "katon",
    "win": 100,
-   "ttk": 35,
-   "hpLost": 38,
+   "ttk": 32,
+   "hpLost": 34,
    "load": [
     "Динамічний вхід",
     "Техніка тіньового сюрікена",
@@ -1778,8 +1778,8 @@
    "label": "Звичайний ворог свого рівня (20)",
    "nature": "doton",
    "win": 100,
-   "ttk": 35,
-   "hpLost": 38,
+   "ttk": 32,
+   "hpLost": 34,
    "load": [
     "Динамічний вхід",
     "Техніка тіньового сюрікена",
@@ -1791,8 +1791,8 @@
    "label": "Звичайний ворог свого рівня (20)",
    "nature": "suiton",
    "win": 100,
-   "ttk": 35,
-   "hpLost": 38,
+   "ttk": 32,
+   "hpLost": 34,
    "load": [
     "Динамічний вхід",
     "Техніка тіньового сюрікена",
@@ -1804,8 +1804,8 @@
    "label": "Звичайний ворог свого рівня (30)",
    "nature": "katon",
    "win": 100,
-   "ttk": 25,
-   "hpLost": 27,
+   "ttk": 23,
+   "hpLost": 25,
    "load": [
     "Техніка великої вогняної кулі",
     "Левове комбо",
@@ -1817,8 +1817,8 @@
    "label": "Звичайний ворог свого рівня (30)",
    "nature": "doton",
    "win": 100,
-   "ttk": 31,
-   "hpLost": 35,
+   "ttk": 29,
+   "hpLost": 32,
    "load": [
     "Левове комбо",
     "Динамічний вхід",
@@ -1830,8 +1830,8 @@
    "label": "Звичайний ворог свого рівня (30)",
    "nature": "suiton",
    "win": 100,
-   "ttk": 29,
-   "hpLost": 28,
+   "ttk": 26,
+   "hpLost": 25,
    "load": [
     "Буйна водяна хвиля",
     "Левове комбо",
@@ -1843,8 +1843,8 @@
    "label": "Звичайний ворог свого рівня (40)",
    "nature": "katon",
    "win": 100,
-   "ttk": 22,
-   "hpLost": 24,
+   "ttk": 20,
+   "hpLost": 22,
    "load": [
     "Техніка вогню дракона",
     "Техніка великої вогняної кулі",
@@ -1856,8 +1856,8 @@
    "label": "Звичайний ворог свого рівня (40)",
    "nature": "doton",
    "win": 100,
-   "ttk": 26,
-   "hpLost": 28,
+   "ttk": 24,
+   "hpLost": 26,
    "load": [
     "Куля земляного дракона",
     "Левове комбо",
@@ -1869,8 +1869,8 @@
    "label": "Звичайний ворог свого рівня (40)",
    "nature": "suiton",
    "win": 100,
-   "ttk": 27,
-   "hpLost": 28,
+   "ttk": 25,
+   "hpLost": 25,
    "load": [
     "Буйна водяна хвиля",
     "Левове комбо",
@@ -1881,9 +1881,9 @@
   {
    "label": "Ворог на 5 рівнів сильніший (20 проти 25)",
    "nature": "katon",
-   "win": 93,
-   "ttk": 55,
-   "hpLost": 69,
+   "win": 96,
+   "ttk": 49,
+   "hpLost": 62,
    "load": [
     "Динамічний вхід",
     "Техніка тіньового сюрікена",
@@ -1895,8 +1895,8 @@
    "label": "Ворог на 5 рівнів сильніший (35 проти 40)",
    "nature": "katon",
    "win": 100,
-   "ttk": 30,
-   "hpLost": 39,
+   "ttk": 28,
+   "hpLost": 36,
    "load": [
     "Техніка великої вогняної кулі",
     "Левове комбо",
@@ -1909,8 +1909,8 @@
    "nature": "futon",
    "with": {
     "win": 100,
-    "ttk": 31,
-    "hpLost": 35,
+    "ttk": 28,
+    "hpLost": 31,
     "load": [
      "Шквальна долоня",
      "Левове комбо",
@@ -1920,8 +1920,8 @@
    },
    "without": {
     "win": 100,
-    "ttk": 45,
-    "hpLost": 52,
+    "ttk": 41,
+    "hpLost": 47,
     "load": [
      "Левове комбо",
      "Динамічний вхід",
@@ -1935,8 +1935,8 @@
    "nature": "katon",
    "with": {
     "win": 100,
-    "ttk": 31,
-    "hpLost": 35,
+    "ttk": 28,
+    "hpLost": 32,
     "load": [
      "Техніка великої вогняної кулі",
      "Левове комбо",
@@ -1946,8 +1946,8 @@
    },
    "without": {
     "win": 100,
-    "ttk": 31,
-    "hpLost": 35,
+    "ttk": 28,
+    "hpLost": 32,
     "load": [
      "Техніка великої вогняної кулі",
      "Левове комбо",
@@ -1961,8 +1961,8 @@
    "nature": "raiton",
    "with": {
     "win": 100,
-    "ttk": 30,
-    "hpLost": 31,
+    "ttk": 28,
+    "hpLost": 28,
     "load": [
      "Ікло блискавичного звіра",
      "Левове комбо",
@@ -1972,8 +1972,8 @@
    },
    "without": {
     "win": 100,
-    "ttk": 31,
-    "hpLost": 59,
+    "ttk": 30,
+    "hpLost": 57,
     "load": [
      "Левове комбо",
      "Пута чотирьох стовпів",
@@ -1986,8 +1986,8 @@
    "nature": "doton",
    "with": {
     "win": 100,
-    "ttk": 34,
-    "hpLost": 55,
+    "ttk": 31,
+    "hpLost": 52,
     "load": [
      "Листяний вихор",
      "Левове комбо",
@@ -1996,9 +1996,9 @@
     ]
    },
    "without": {
-    "win": 98,
-    "ttk": 32,
-    "hpLost": 64,
+    "win": 99,
+    "ttk": 31,
+    "hpLost": 62,
     "load": [
      "Левове комбо",
      "Долоня, що розриває землю",
@@ -2012,8 +2012,8 @@
    "nature": "katon",
    "with": {
     "win": 100,
-    "ttk": 35,
-    "hpLost": 29,
+    "ttk": 31,
+    "hpLost": 26,
     "load": [
      "Вогняна доріжка",
      "Техніка великої вогняної кулі",
@@ -2023,8 +2023,8 @@
    },
    "without": {
     "win": 100,
-    "ttk": 33,
-    "hpLost": 26,
+    "ttk": 31,
+    "hpLost": 25,
     "load": [
      "Техніка великої вогняної кулі",
      "Левове комбо",
@@ -2038,8 +2038,8 @@
    "nature": "suiton",
    "with": {
     "win": 100,
-    "ttk": 26,
-    "hpLost": 22,
+    "ttk": 25,
+    "hpLost": 20,
     "load": [
      "Буйна водяна хвиля",
      "Левове комбо",
@@ -2049,8 +2049,8 @@
    },
    "without": {
     "win": 100,
-    "ttk": 44,
-    "hpLost": 33,
+    "ttk": 40,
+    "hpLost": 30,
     "load": [
      "Буйна водяна хвиля",
      "Левове комбо",
@@ -2063,9 +2063,9 @@
    "trait": "Ухильний",
    "nature": "doton",
    "with": {
-    "win": 99,
-    "ttk": 45,
-    "hpLost": 51,
+    "win": 100,
+    "ttk": 41,
+    "hpLost": 46,
     "load": [
      "Техніка подвійного самогубчого обезглавлення",
      "Левове комбо",
@@ -2074,9 +2074,9 @@
     ]
    },
    "without": {
-    "win": 93,
-    "ttk": 56,
-    "hpLost": 63,
+    "win": 97,
+    "ttk": 52,
+    "hpLost": 59,
     "load": [
      "Левове комбо",
      "Динамічний вхід",
@@ -2090,8 +2090,8 @@
    "nature": "katon",
    "with": {
     "win": 100,
-    "ttk": 27,
-    "hpLost": 29,
+    "ttk": 25,
+    "hpLost": 27,
     "load": [
      "Техніка тимчасового паралічу",
      "Техніка великої вогняної кулі",
@@ -2101,8 +2101,8 @@
    },
    "without": {
     "win": 100,
-    "ttk": 38,
-    "hpLost": 44,
+    "ttk": 35,
+    "hpLost": 41,
     "load": [
      "Техніка великої вогняної кулі",
      "Левове комбо",
@@ -2116,8 +2116,8 @@
    "nature": "katon",
    "with": {
     "win": 100,
-    "ttk": 25,
-    "hpLost": 28,
+    "ttk": 22,
+    "hpLost": 25,
     "load": [
      "Техніка вогню фенікса-мудреця",
      "Техніка великої вогняної кулі",
@@ -2126,9 +2126,9 @@
     ]
    },
    "without": {
-    "win": 90,
-    "ttk": 56,
-    "hpLost": 63,
+    "win": 96,
+    "ttk": 49,
+    "hpLost": 55,
     "load": [
      "Левове комбо",
      "Динамічний вхід",
@@ -2142,8 +2142,8 @@
    "nature": "futon",
    "with": {
     "win": 100,
-    "ttk": 23,
-    "hpLost": 26,
+    "ttk": 22,
+    "hpLost": 24,
     "load": [
      "Шквальна долоня",
      "Левове комбо",
@@ -2152,9 +2152,9 @@
     ]
    },
    "without": {
-    "win": 87,
-    "ttk": 52,
-    "hpLost": 58,
+    "win": 96,
+    "ttk": 45,
+    "hpLost": 50,
     "load": [
      "Шквальна долоня",
      "Левове комбо",
@@ -2168,8 +2168,8 @@
    "nature": "katon",
    "with": {
     "win": 100,
-    "ttk": 24,
-    "hpLost": 27,
+    "ttk": 22,
+    "hpLost": 25,
     "load": [
      "Техніка великої вогняної кулі",
      "Левове комбо",
@@ -2179,8 +2179,8 @@
    },
    "without": {
     "win": 100,
-    "ttk": 30,
-    "hpLost": 33,
+    "ttk": 28,
+    "hpLost": 30,
     "load": [
      "Техніка великої вогняної кулі",
      "Левове комбо",
@@ -2194,8 +2194,8 @@
    "nature": "futon",
    "with": {
     "win": 100,
-    "ttk": 31,
-    "hpLost": 36,
+    "ttk": 29,
+    "hpLost": 33,
     "load": [
      "Великий прорив",
      "Шквальна долоня",
@@ -2204,9 +2204,9 @@
     ]
    },
    "without": {
-    "win": 99,
-    "ttk": 46,
-    "hpLost": 60,
+    "win": 100,
+    "ttk": 42,
+    "hpLost": 56,
     "load": [
      "Шквальна долоня",
      "Левове комбо",
@@ -2220,8 +2220,8 @@
    "nature": "katon",
    "with": {
     "win": 100,
-    "ttk": 24,
-    "hpLost": 28,
+    "ttk": 22,
+    "hpLost": 26,
     "load": [
      "Техніка великої вогняної кулі",
      "Левове комбо",
@@ -2231,8 +2231,8 @@
    },
    "without": {
     "win": 100,
-    "ttk": 23,
-    "hpLost": 32,
+    "ttk": 21,
+    "hpLost": 30,
     "load": [
      "Техніка великої вогняної кулі",
      "Левове комбо",
@@ -2246,9 +2246,9 @@
    "pcl": 22,
    "nature": "katon",
    "prepared": {
-    "win": 99,
-    "ttk": 96,
-    "hpLost": 136,
+    "win": 100,
+    "ttk": 93,
+    "hpLost": 131,
     "load": [
      "Вогняна доріжка",
      "Динамічний вхід",
@@ -2257,9 +2257,9 @@
     ]
    },
    "noFood": {
-    "win": 3,
-    "ttk": 87,
-    "hpLost": 93,
+    "win": 6,
+    "ttk": 84,
+    "hpLost": 95,
     "load": [
      "Вогняна доріжка",
      "Динамічний вхід",
@@ -2285,8 +2285,8 @@
    "nature": "raiton",
    "prepared": {
     "win": 99,
-    "ttk": 104,
-    "hpLost": 144,
+    "ttk": 102,
+    "hpLost": 139,
     "load": [
      "Динамічний вхід",
      "Техніка тіньового сюрікена",
@@ -2295,9 +2295,9 @@
     ]
    },
    "noFood": {
-    "win": 2,
-    "ttk": 99,
-    "hpLost": 98,
+    "win": 4,
+    "ttk": 95,
+    "hpLost": 96,
     "load": [
      "Динамічний вхід",
      "Техніка тіньового сюрікена",
@@ -2323,8 +2323,8 @@
    "nature": "suiton",
    "prepared": {
     "win": 99,
-    "ttk": 104,
-    "hpLost": 144,
+    "ttk": 102,
+    "hpLost": 139,
     "load": [
      "Динамічний вхід",
      "Техніка тіньового сюрікена",
@@ -2333,9 +2333,9 @@
     ]
    },
    "noFood": {
-    "win": 2,
-    "ttk": 99,
-    "hpLost": 98,
+    "win": 4,
+    "ttk": 95,
+    "hpLost": 96,
     "load": [
      "Динамічний вхід",
      "Техніка тіньового сюрікена",
@@ -2360,9 +2360,9 @@
    "pcl": 32,
    "nature": "doton",
    "prepared": {
-    "win": 1,
-    "ttk": 173,
-    "hpLost": 166,
+    "win": 2,
+    "ttk": 159,
+    "hpLost": 186,
     "load": [
      "Техніка подвійного самогубчого обезглавлення",
      "Левове комбо",
@@ -2398,9 +2398,9 @@
    "pcl": 32,
    "nature": "katon",
    "prepared": {
-    "win": 24,
-    "ttk": 125,
-    "hpLost": 184,
+    "win": 40,
+    "ttk": 118,
+    "hpLost": 182,
     "load": [
      "Техніка тимчасового паралічу",
      "Техніка великої вогняної кулі",
@@ -2436,9 +2436,9 @@
    "pcl": 36,
    "nature": "futon",
    "prepared": {
-    "win": 1,
-    "ttk": 120,
-    "hpLost": 194,
+    "win": 2,
+    "ttk": 119,
+    "hpLost": 197,
     "load": [
      "Листяний вихор",
      "Техніка тимчасового паралічу",
@@ -2474,9 +2474,9 @@
    "pcl": 36,
    "nature": "doton",
    "prepared": {
-    "win": 0,
-    "ttk": 142,
-    "hpLost": 209,
+    "win": 1,
+    "ttk": 144,
+    "hpLost": 202,
     "load": [
      "Листяний вихор",
      "Земляна ріка",
@@ -2511,9 +2511,9 @@
    "pcl": 38,
    "nature": "futon",
    "prepared": {
-    "win": 2,
-    "ttk": 143,
-    "hpLost": 200,
+    "win": 6,
+    "ttk": 140,
+    "hpLost": 195,
     "load": [
      "Техніка серповидної ласки",
      "Шквальна долоня",
@@ -2549,9 +2549,9 @@
    "pcl": 38,
    "nature": "katon",
    "prepared": {
-    "win": 44,
-    "ttk": 116,
-    "hpLost": 188,
+    "win": 56,
+    "ttk": 110,
+    "hpLost": 183,
     "load": [
      "Сенсорна техніка",
      "Техніка вогню дракона",
@@ -2561,8 +2561,8 @@
    },
    "noFood": {
     "win": 0,
-    "ttk": null,
-    "hpLost": null,
+    "ttk": 107,
+    "hpLost": 98,
     "load": [
      "Сенсорна техніка",
      "Техніка вогню дракона",
@@ -2587,9 +2587,9 @@
    "pcl": 40,
    "nature": "doton",
    "prepared": {
-    "win": 54,
-    "ttk": 119,
-    "hpLost": 180,
+    "win": 65,
+    "ttk": 113,
+    "hpLost": 174,
     "load": [
      "Сенсорна техніка",
      "Куля земляного дракона",
@@ -2599,7 +2599,7 @@
    },
    "noFood": {
     "win": 1,
-    "ttk": 95,
+    "ttk": 91,
     "hpLost": 80,
     "load": [
      "Сенсорна техніка",
@@ -2625,8 +2625,8 @@
    "pcl": 40,
    "nature": "katon",
    "prepared": {
-    "win": 24,
-    "ttk": 133,
+    "win": 35,
+    "ttk": 128,
     "hpLost": 185,
     "load": [
      "Сенсорна техніка",
@@ -2663,9 +2663,9 @@
    "pcl": 44,
    "nature": "suiton",
    "prepared": {
-    "win": 30,
-    "ttk": 131,
-    "hpLost": 177,
+    "win": 42,
+    "ttk": 125,
+    "hpLost": 173,
     "load": [
      "Буйна водяна хвиля",
      "Левове комбо",
@@ -2675,7 +2675,7 @@
    },
    "noFood": {
     "win": 0,
-    "ttk": 125,
+    "ttk": 118,
     "hpLost": 97,
     "load": [
      "Буйна водяна хвиля",
@@ -2701,9 +2701,9 @@
    "pcl": 44,
    "nature": "futon",
    "prepared": {
-    "win": 7,
-    "ttk": 146,
-    "hpLost": 185,
+    "win": 13,
+    "ttk": 136,
+    "hpLost": 180,
     "load": [
      "Шквальна долоня",
      "Левове комбо",
@@ -2739,9 +2739,9 @@
    "pcl": 40,
    "nature": "suiton",
    "prepared": {
-    "win": 2,
-    "ttk": 157,
-    "hpLost": 190,
+    "win": 4,
+    "ttk": 152,
+    "hpLost": 189,
     "load": [
      "Буйна водяна хвиля",
      "Левове комбо",

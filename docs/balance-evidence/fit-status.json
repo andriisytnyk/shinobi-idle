@@ -116,7 +116,7 @@
       "basic": true
     },
     "core:foreign_genin": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
@@ -128,7 +128,7 @@
     "core:boss_ren1": {
       "time": false,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_fighter": {
       "time": true,
@@ -213,7 +213,7 @@
       "basic": true
     },
     "core:marauder": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
@@ -290,7 +290,7 @@
     "core:boss_ren1": {
       "time": false,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_fighter": {
       "time": true,
@@ -385,7 +385,7 @@
       "basic": true
     },
     "core:kumo": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
@@ -435,7 +435,7 @@
       "basic": true
     },
     "core:fake_genin": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
@@ -450,7 +450,7 @@
       "basic": true
     },
     "core:boss_ren1": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
@@ -614,7 +614,7 @@
     "core:boss_ren1": {
       "time": false,
       "win": true,
-      "basic": false
+      "basic": true
     },
     "core:boss_fighter": {
       "time": true,
