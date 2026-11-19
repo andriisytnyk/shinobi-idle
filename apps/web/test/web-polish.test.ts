@@ -1,6 +1,13 @@
 // @vitest-environment happy-dom
 import { content } from '@shinobi/content';
-import { dispatch, growSlots, MISSION_KIND, createState, syncVillage } from '@shinobi/core';
+import {
+  dispatch,
+  growSlots,
+  MISSION_KIND,
+  createState,
+  pointStatus,
+  syncVillage,
+} from '@shinobi/core';
 import { flushSync, mount, unmount } from 'svelte';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import CrashScreen from '../src/components/CrashScreen.svelte';
@@ -239,10 +246,15 @@ describe('a requirement about a point that is only veiled', () => {
     expect(target.querySelector('[data-point-req-hint]')?.textContent).toBe(
       t(`place.${valley}.hint`),
     );
-    // A point nothing is known of keeps both the name and the hint to itself.
+    // A hidden point keeps its name to itself but gives the hint of its reveal rule, as other hidden entities do.
     game.replaceState(player());
     flushSync();
-    expect(target.querySelector('[data-point-req-hint]')).toBeNull();
+    expect(place && pointStatus(game.state, content, place)).toBe('hidden');
+    expect(target.textContent).toContain(t('req.pointHidden'));
+    const by = place?.point?.revealedBy;
+    expect(target.querySelector('[data-point-req-hint]')?.textContent).toBe(
+      t(by && by.survey === undefined ? 'reveal.hint.named' : 'reveal.hint.explored'),
+    );
     unmount(app);
     target.remove();
   });

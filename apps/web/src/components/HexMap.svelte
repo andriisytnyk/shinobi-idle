@@ -431,7 +431,7 @@
                   {:else}
                     <path
                       class="point {point.status}"
-                      class:active={point.active}
+                      class:active={point.active && point.power.length > 0}
                       d={point.travel !== null ? POINT_FLAG : POINT_DIAMOND}
                       data-point-outpost={point.travel !== null ? '' : undefined}
                     />
