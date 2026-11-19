@@ -129,6 +129,28 @@ export function gainPoolXp(
 }
 
 /**
+ * The Mastery `amount` comes to once the mastery XP modifiers are applied: what `grantMastery`
+ * gives, so that previews cannot disagree with the grant. Reads the modifiers of the performer
+ * the state is computed for.
+ */
+export function masteryGain(
+  state: GameState,
+  skill: string,
+  amount: number,
+  content: ContentDb,
+  rules?: Rules,
+): number {
+  const mods = rules ?? NO_MOD_RULES;
+  const [all = 1, own = 1] = totalsOf(
+    mods,
+    state,
+    ['mastery.xp.all', `mastery.xp.skill.${skill}`],
+    content,
+  );
+  return amount * all * own;
+}
+
+/**
  * The one way mastery is earned: `amount`, with the mastery XP modifiers `mastery.xp.all` and
  * `mastery.xp.skill.<skill>` applied, goes to the mastery key, and the pool share of the unmodified
  * amount to the skill's pool. Practice, combat and item use all call this.
@@ -141,14 +163,7 @@ export function grantMastery(
   content: ContentDb,
   rules?: Rules,
 ): void {
-  const mods = rules ?? NO_MOD_RULES;
-  const [all = 1, own = 1] = totalsOf(
-    mods,
-    state,
-    ['mastery.xp.all', `mastery.xp.skill.${skill}`],
-    content,
-  );
-  const earned = amount * all * own;
+  const earned = masteryGain(state, skill, amount, content, rules);
   const body = actingBody(state);
   if (body) {
     // A clone keeps what it earns until it is dispelled (`takeMastery`).

@@ -371,6 +371,10 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
         // A clone has no stance, so a technique that needs one is not offered to it.
         every.filter((t) => !barredForAllies(t) && !t.requiresStance),
         every,
+        {
+          chakra: maxChakraOf(snap.levels, content),
+          stamina: maxStaminaOf(snap.levels, content),
+        },
       );
     }
     if (role.threat !== 1) kit.cloneThreat = role.threat;

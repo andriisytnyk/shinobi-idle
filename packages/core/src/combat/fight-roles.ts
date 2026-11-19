@@ -63,16 +63,19 @@ export function pickCloneHand(
   role: CloneRole,
   candidates: readonly KitTechnique[],
   known: readonly KitTechnique[],
+  /** The size of each pool: a cost is read as its share of its own pool, so chakra and stamina share one scale. */
+  pools: Readonly<Record<'chakra' | 'stamina', number>>,
 ): KitTechnique[] {
   if (role.hand.mode !== 'pick') return [...candidates];
   const { size, weights } = role.hand;
   const bestDamage = Math.max(0, ...candidates.map((t) => t.damage));
-  const bestCost = Math.max(0, ...candidates.map((t) => t.cost));
+  const share = (t: KitTechnique): number => (pools[t.pool] > 0 ? t.cost / pools[t.pool] : 0);
+  const bestCost = Math.max(0, ...candidates.map(share));
   const opened = candidates.map((t) => combosOpened(content, t, known));
   const bestOpened = Math.max(0, ...opened);
   const scored = candidates.map((tech, i) => {
     const damage = bestDamage > 0 ? tech.damage / bestDamage : 0;
-    const cheap = bestCost > 0 ? 1 - tech.cost / bestCost : 0;
+    const cheap = bestCost > 0 ? 1 - share(tech) / bestCost : 0;
     const score =
       weights.damage * damage +
       weights.status * (appliesStatus(content, tech) ? 1 : 0) +

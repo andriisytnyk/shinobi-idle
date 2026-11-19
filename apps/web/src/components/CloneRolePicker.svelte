@@ -52,6 +52,8 @@
         </label>
       {/each}
     </div>
+    <!-- Narrow screens only: the line of the chosen role, once, under the chips (the radios still point at their own lines). -->
+    <p class="current" data-clone-role-line aria-hidden="true">{view.current ? descOf(view.current) : ''}</p>
     {#if message}<p class="message" role="status">{t(message)}</p>{/if}
   </section>
 {/if}
@@ -123,6 +125,29 @@
   .desc {
     color: var(--fg-dim);
     font-size: var(--text-xs);
+  }
+
+  .current {
+    display: none;
+    margin: 0;
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
+  }
+
+  /* A narrow screen: the roles are chips, two to a row, and the line of the chosen one is told once below them (a screen reader still gets each line through aria-describedby). */
+  @media (max-width: 600px) {
+    .choice {
+      flex-basis: calc(50% - var(--space-2));
+      align-items: center;
+    }
+
+    .desc {
+      display: none;
+    }
+
+    .current {
+      display: block;
+    }
   }
 
   .message {
