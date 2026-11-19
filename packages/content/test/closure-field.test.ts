@@ -77,6 +77,12 @@ describe('A10: every ingredient is obtainable', () => {
   );
   const crafted = new Set(content.recipes.map((r) => r.output.item));
   const crate = new Set(content.items.filter((i) => i.extraSources.length > 0).map((i) => i.id));
+  // The work that a found point opens pays items too (sulphur from Hell Valley).
+  const worked = new Set(
+    content.fieldworks.flatMap((w) =>
+      w.drops.flatMap((d) => d.payout.items?.map((i) => i.item) ?? []),
+    ),
+  );
 
   it('every recipe ingredient is a herb, a shop good, a mission payment, a drop or a product', () => {
     for (const r of content.recipes) {
@@ -87,16 +93,20 @@ describe('A10: every ingredient is obtainable', () => {
           paid.has(i.item) ||
           dropped.has(i.item) ||
           crafted.has(i.item) ||
-          crate.has(i.item);
+          crate.has(i.item) ||
+          worked.has(i.item);
         expect(got, `${r.id}: ${itemName(i.item)} has no source`).toBe(true);
       }
     }
   });
 
-  it('every ingredient a shop could be asked for is sold by it or grows in the field', () => {
+  it('every ingredient a shop could be asked for is sold by it, grows in the field or is worked at a found point', () => {
     for (const r of content.recipes) {
       for (const i of r.ingredients) {
-        expect(herbs.has(i.item) || shop.has(i.item), `${r.id}: ${itemName(i.item)}`).toBe(true);
+        expect(
+          herbs.has(i.item) || shop.has(i.item) || worked.has(i.item),
+          `${r.id}: ${itemName(i.item)}`,
+        ).toBe(true);
       }
     }
   });

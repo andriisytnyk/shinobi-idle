@@ -41,6 +41,7 @@ const required: Record<IconKind, string[]> = {
   practice: content.practices.map((p) => p.id),
   obstacle: content.obstacles.map((o) => o.id),
   recipe: content.recipes.map((r) => r.id),
+  fieldwork: content.fieldworks.map((w) => w.id),
 };
 
 describe('icon registry', () => {

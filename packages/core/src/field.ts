@@ -12,6 +12,7 @@ import { indexOf } from './lookup.ts';
 import { bonusOf, computeMod, cycleFactor } from './modifiers.ts';
 import { gainXp, grantMastery } from './progression.ts';
 import type { Req } from './requirements.ts';
+import { pay, pointFlag } from './points.ts';
 import { nextFloat } from './rng.ts';
 import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
@@ -223,5 +224,72 @@ export const craftKind: ActionKind = {
     const seconds = cycleSeconds('craft', recipe, content);
     const mastery = masteryXpPerAction(masteryLevel(state, id, content), seconds, content);
     grantMastery(state, id, recipe.skill, mastery, content, rules);
+  },
+};
+
+// ---------- work that a found point opens ----------
+
+/** The name of the action kind of work that a found point of interest opens (a ruin search, a deposit gathered). */
+export const FIELDWORK_KIND = 'fieldwork';
+
+/** The skill that does a work: the one it names, else the first skill with the activity `map`. */
+export const fieldworkSkill = (
+  content: ContentDb,
+  work: { skill?: string | undefined },
+): string | null => entitySkill(content, 'map', work);
+
+/** The works a place opens, in the order of the content. */
+export const fieldworksAt = (content: ContentDb, placeId: string): string[] =>
+  content.fieldworks.filter((w) => w.point === placeId).map((w) => w.id);
+
+export const fieldworkKind: ActionKind = {
+  flow: (id, content) => {
+    const work = indexOf(content).fieldworks.get(id);
+    const skill = work ? fieldworkSkill(content, work) : null;
+    if (!work || skill === null) return null;
+    return {
+      makes: work.drops.flatMap((d) => d.payout.items?.map((i) => i.item) ?? []),
+      uses: [],
+      speed: `speed.skill.${skill}`,
+    };
+  },
+  has: (id, content) => {
+    const work = indexOf(content).fieldworks.get(id);
+    return work !== undefined && fieldworkSkill(content, work) !== null;
+  },
+  skill: (id, content) => {
+    const work = indexOf(content).fieldworks.get(id);
+    return work ? fieldworkSkill(content, work) : null;
+  },
+  // The point found (once found it stays open: the hero need not stand there) and the skill level.
+  requirements(_state, id, content) {
+    const work = indexOf(content).fieldworks.get(id);
+    const skill = work ? fieldworkSkill(content, work) : null;
+    if (!work || skill === null) return null;
+    return {
+      t: 'all',
+      of: [
+        { t: 'flag', id: pointFlag(work.point) },
+        { t: 'skill', skill, level: work.level },
+      ],
+    };
+  },
+  intervalMs(state, id, content, rules) {
+    const work = indexOf(content).fieldworks.get(id);
+    if (!work) return 1;
+    const mod = cycleFactor(rules, state, fieldworkSkill(content, work) ?? '', content);
+    return Math.max(actionFloor(content), Math.round(work.cycle * MS_PER_SECOND * mod));
+  },
+  complete(state, id, content, rules) {
+    const work = indexOf(content).fieldworks.get(id);
+    const skill = work ? fieldworkSkill(content, work) : null;
+    if (!work || skill === null) return;
+    gainXp(state, skill, work.xp, content, rules);
+    // Every drop is rolled once per cycle; a chance of 1 is paid without a roll.
+    for (const drop of work.drops)
+      if (drop.chance >= 1 || nextFloat(state.rng, 'loot') < drop.chance)
+        pay(state, content, rules, drop.payout);
+    const mastery = masteryXpPerAction(masteryLevel(state, id, content), work.cycle, content);
+    grantMastery(state, id, skill, mastery, content, rules);
   },
 };

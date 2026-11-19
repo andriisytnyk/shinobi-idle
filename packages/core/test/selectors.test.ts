@@ -128,7 +128,10 @@ describe('listSkillActions', () => {
     expect(listSkillActions(state, 'cc', content).map((a) => a.kind)).toContain('drill');
     expect(listSkillActions(state, 'med', content).every((a) => a.kind === 'meditate')).toBe(true);
     expect(listSkillActions(state, 'ath', content).every((a) => a.kind === 'course')).toBe(true);
-    expect(listSkillActions(state, 'scout', content)).toEqual([]);
+    // Scouting trains by exploring; the only actions it lists are the work that found points open.
+    expect(listSkillActions(state, 'scout', content).every((a) => a.kind === 'fieldwork')).toBe(
+      true,
+    );
     expect(listSkillActions(state, 'vit', content).every((a) => a.kind === 'drill')).toBe(true);
   });
 

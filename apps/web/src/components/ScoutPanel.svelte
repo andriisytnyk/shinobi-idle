@@ -1,12 +1,19 @@
 <script lang="ts">
   import type { SkillId } from '@shinobi/content';
-  import { exploreIntervalMs, mapMastery, rangeNow, stepTimeHere } from '@shinobi/core';
+  import {
+    exploreIntervalMs,
+    listSkillActions,
+    mapMastery,
+    rangeNow,
+    stepTimeHere,
+  } from '@shinobi/core';
   import { actionRef } from '../lib/entities.ts';
   import { formatDuration, formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { skillProgress } from '../lib/progress.ts';
   import { currencyOf, held } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
+  import ActionTile from './ActionTile.svelte';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ModBreakdown from './ModBreakdown.svelte';
@@ -46,6 +53,8 @@
     }),
   );
   const current = $derived(data.action);
+  /** The work that found points open (a ruin search, a deposit): locked with what it asks for until the point is found. */
+  const works = $derived(game.read((gs) => listSkillActions(gs, skill, content, game.rules)));
 </script>
 
 <section class="explore-panel" data-scout-panel>
@@ -105,6 +114,17 @@
       {/each}
     </ul>
   </section>
+  {#if works.length > 0}
+    <section class="works" data-scout-works data-ui="entity-section">
+      <h3>{t('scout.works')}</h3>
+      <p class="small dim">{t('scout.worksIntro')}</p>
+      <ul class="tiles">
+        {#each works as info (info.kind + info.id)}
+          <ActionTile {info} />
+        {/each}
+      </ul>
+    </section>
+  {/if}
   <p class="small dim">{t('scout.intelHint')}</p>
   <a class="open" href="#/world" data-open-world
     ><Icon name="lucide:map" size={18} /> {t('scout.open')}</a
@@ -190,6 +210,19 @@
 
   .tier.reached {
     color: var(--fg);
+  }
+
+  .works h3 {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--tile-min), 1fr));
+    gap: var(--space-3);
+    margin: 0 0 var(--space-3);
+    padding: 0;
   }
 
   .open {

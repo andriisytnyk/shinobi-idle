@@ -98,6 +98,11 @@ describe('explicit cycle and XP per action', () => {
       const perHour = ((r.xp ?? 0) * 3600) / (r.cycle ?? 1);
       expect(perHour / (rate(r.level, content) * K.craftXpMult), r.id).toBeCloseTo(1, 3);
     }
+    // The work that found points open follows the pace of its level too (it has no regrow pause).
+    for (const w of content.fieldworks) {
+      const perHour = (w.xp * 3600) / w.cycle;
+      expect(perHour / rate(w.level, content), w.id).toBeCloseTo(1, 3);
+    }
     const pause = K.field.regrowMs / 1000 / (K.field.stockBase + 1);
     for (const h of content.herbs) {
       const perHour = ((h.xp ?? 0) * 3600) / ((h.cycle ?? 1) + pause);

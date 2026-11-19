@@ -370,6 +370,11 @@ function termHolds(ctx: Ctx, term: RevealTerm, entry: Entry): boolean {
     case 'explored':
       if (entry.list === 'cells') return cellExplored(ctx, id);
       if (entry.list === 'regions') return regionExplored(ctx, id);
+      // A work that a point opens is shown once that point is found.
+      if (entry.list === 'fieldworks') {
+        const point = indexOf(content).fieldworks.get(id)?.point;
+        return point !== undefined && state.world.pois[point] === true;
+      }
       return entry.ref.kind === 'poi' && state.world.pois[id] === true;
     case 'adjacent': {
       if (entry.list !== 'regions') return false;

@@ -95,7 +95,7 @@ describe('interface strings', () => {
       ],
       'shop.section.': ['market', 'forge', 'sell', 'gear'],
       'bank.tab.': BANK_TABS,
-      'craft.src.': ['herb', 'shop', 'craft', 'item'],
+      'craft.src.': ['herb', 'shop', 'craft', 'work', 'item'],
     };
     const missing: string[] = [];
     for (const [prefix, ids] of Object.entries(families)) {

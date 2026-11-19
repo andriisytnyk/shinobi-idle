@@ -542,6 +542,15 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
       problem('point.travel', `the travel group "${group}" has one point: there is nowhere to go`);
     }
   }
+  for (const w of db.fieldworks) {
+    at('fieldworks', w.id);
+    if (!placeOf.get(w.point)?.point)
+      problem('point', `"${w.point}" is not a place with a point of interest`);
+    if (w.skill !== undefined) ref('skill', w.skill, 'skills');
+    else if (!db.skills.some((x) => x.activity === 'map'))
+      problem('skill', 'no skill has the activity map');
+    w.drops.forEach((d, n) => payout(`drops[${n}].payout`, d.payout));
+  }
   needNumber('map.walk', 'map.walk');
   needNumber('map.travel', 'map.travel');
   db.balance.K.map.mastery.forEach((tier, n) => {
@@ -766,6 +775,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
       case 'questStarted':
         return list === 'quests';
       case 'explored':
+        if (list === 'fieldworks') return true;
         return list === 'cells' || list === 'regions' || kind === 'poi';
       case 'adjacent':
       case 'actionable':

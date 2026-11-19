@@ -326,5 +326,19 @@
     "tags": [],
     "extraSources": [],
     "madeFrom": []
+  },
+  {
+    "id": "core:sulphur",
+    "kind": "ingredient",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
+  },
+  {
+    "id": "core:iidka_dymova_bomba",
+    "kind": "consumable",
+    "tags": [],
+    "extraSources": [],
+    "madeFrom": []
   }
 ]

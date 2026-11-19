@@ -117,5 +117,12 @@
   "core:note": {
     "kind": "bingoNote",
     "levels": 1
+  },
+  "core:iidka_dymova_bomba": {
+    "kind": "bomb",
+    "target": "enemy",
+    "stat": "accuracy",
+    "mult": 0.9,
+    "durationMs": 3000
   }
 }

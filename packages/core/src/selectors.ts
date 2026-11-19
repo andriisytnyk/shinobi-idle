@@ -13,7 +13,15 @@ import {
   techniqueCastSeconds,
 } from './formulas.ts';
 import { builtObstacles, COURSE_KIND, courseSkill, lapBaseMs, lapXp } from './athletics.ts';
-import { bushOf, bushSize, gatherAverageSeconds, herbSkill, regrowMs } from './field.ts';
+import {
+  bushOf,
+  bushSize,
+  FIELDWORK_KIND,
+  fieldworkSkill,
+  gatherAverageSeconds,
+  herbSkill,
+  regrowMs,
+} from './field.ts';
 import { getMod } from './mod.ts';
 import { nonNativeLevel } from './natures.ts';
 import { evalReq, skillLevel, type Req, type ReqResult } from './requirements.ts';
@@ -205,6 +213,19 @@ function factsOf(
         extraMs: regrowMs(state, content, rules) / size,
       };
     }
+    case FIELDWORK_KIND: {
+      const w = index.fieldworks.get(id);
+      const skill = w ? fieldworkSkill(content, w) : null;
+      if (!w || skill === null) return null;
+      return {
+        skill,
+        level: w.level,
+        baseMs: ms(w.cycle),
+        rewardXp: w.xp,
+        masteryParts: [{ key: id, seconds: w.cycle }],
+        outputs: w.drops.flatMap((d) => d.payout.items ?? []),
+      };
+    }
     case 'craft': {
       const r = index.recipes.get(id);
       if (!r) return null;
@@ -311,6 +332,14 @@ export function actionInfo(
 
 /** The action kind and ids a skill trains through; empty for skills with no actions yet. */
 function skillActionIds(skill: string, content: ContentDb): { kind: string; id: string }[] {
+  const works = [...content.fieldworks]
+    .filter((w) => fieldworkSkill(content, w) === skill)
+    .sort((a, b) => a.level - b.level)
+    .map((w) => ({ kind: FIELDWORK_KIND, id: w.id }));
+  return [...ownActionIds(skill, content), ...works];
+}
+
+function ownActionIds(skill: string, content: ContentDb): { kind: string; id: string }[] {
   const by = <T extends { id: string; level: number }>(kind: string, list: readonly T[]) =>
     [...list].sort((a, b) => a.level - b.level).map((e) => ({ kind, id: e.id }));
   const data = indexOf(content).skills.get(skill);

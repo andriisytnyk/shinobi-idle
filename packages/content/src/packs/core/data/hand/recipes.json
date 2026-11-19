@@ -1,0 +1,24 @@
+[
+  {
+    "id": "core:iidka_dymova_bomba",
+    "skill": "alch",
+    "level": 16,
+    "ingredients": [
+      {
+        "item": "core:sulphur",
+        "n": 1
+      },
+      {
+        "item": "core:nettle",
+        "n": 2
+      }
+    ],
+    "output": {
+      "item": "core:iidka_dymova_bomba",
+      "n": 3
+    },
+    "tags": [],
+    "cycle": 2.5,
+    "xp": 45.679
+  }
+]
