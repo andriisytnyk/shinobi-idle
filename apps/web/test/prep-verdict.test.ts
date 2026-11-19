@@ -3,6 +3,7 @@ import { content, ukLocale } from '@shinobi/content';
 import { createState, xpAt, type GameState } from '@shinobi/core';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { coreUi } from '../src/lib/ext/core-ui.ts';
+import { entriesOf } from '../src/lib/prep.ts';
 import { game } from '../src/lib/store.ts';
 import { bootApp, type BootedApp } from './helpers/boot-app.ts';
 
@@ -96,6 +97,24 @@ describe('F1-fix1: a target that is not open yet, and the page around the screen
     expect(needs).not.toBeNull();
     expect(needs?.querySelector('[data-ui="req-row"]')).not.toBeNull();
     expect(needs?.textContent).not.toContain('Вимоги до цієї дії не виконано');
+  }, 60_000);
+
+  it('shows the unlock requirement of an operation that is not open yet', async () => {
+    const state = withKnowledge(2);
+    delete state.flags['op.hideout.unlocked'];
+    const hideout = content.operations.find((o) => o.id === 'core:op_hideout');
+    for (const id of entriesOf({ kind: 'operation', id: 'core:op_hideout' }, content))
+      state.bingo[id] = { seen: 1, wins: 1, losses: 0, timeouts: 0, bought: 0, bounty: 0 };
+    expect(hideout).toBeDefined();
+    booted = await bootApp([coreUi], state, '#/combat/prepare/operation/core:op_hideout');
+    await vi.waitFor(
+      () => expect(q('[data-ui="prep-verdict"]')?.getAttribute('data-forecast')).toBe('done'),
+      { timeout: 30_000, interval: 50 },
+    );
+    const needs = q('[data-prep-locked]');
+    expect(needs).not.toBeNull();
+    expect(needs?.querySelector('[data-ui="req-row"]')).not.toBeNull();
+    expect(q('[data-ui="prep-verdict"]')?.querySelector('[data-verdict-word]')).toBeNull();
   }, 60_000);
 
   it('does not end with the log of an old fight, and names the page for what it is', async () => {

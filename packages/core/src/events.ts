@@ -1,3 +1,4 @@
+import { touchMods } from './modifiers.ts';
 import type { GameState } from './state.ts';
 
 /** The queue keeps the newest events only (battle log lines first to go); the UI drains it long before this matters. */
@@ -404,6 +405,8 @@ type WithoutAt<T> = T extends unknown ? Omit<T, 'at'> : never;
 
 /** Appends an event stamped with the current game time, dropping the oldest beyond the cap. */
 export function emit(state: GameState, event: WithoutAt<GameEvent>): void {
+  // An event says something happened that the modifiers may read (a level, a find, a rank): the battle log says nothing of the kind.
+  if (event.type !== 'combatLog') touchMods(state);
   state.events.push({ ...event, at: state.now } as GameEvent);
   // Battle log lines are the cheapest to lose: they go first so a long fight cannot push out a
   // level, a learned technique or a stopped action that an offline report still needs.

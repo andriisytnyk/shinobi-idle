@@ -16903,7 +16903,7 @@
      "interrupt": 15
     },
     {},
-    345.99999999999994,
+    346,
     0
    ],
    [
@@ -16973,7 +16973,7 @@
     {
      "steam": 1
     },
-    346.00000000000006,
+    346,
     0
    ],
    [
@@ -17109,7 +17109,7 @@
     {
      "steam": 1
     },
-    252.8232,
+    264.8624,
     1
    ],
    [
@@ -17179,7 +17179,7 @@
      "interrupt": 13
     },
     {},
-    94.80869999999999,
+    99.32339999999999,
     1
    ],
    [
@@ -17294,7 +17294,7 @@
     {
      "fanBurn": 1
     },
-    345.99999999999994,
+    346,
     0
    ],
    [
@@ -17334,7 +17334,7 @@
      "fanBurn": 1,
      "steam": 1
     },
-    316.02899999999994,
+    331.078,
     1
    ],
    [
@@ -17494,7 +17494,7 @@
     {
      "steam": 1
     },
-    345.99999999999994,
+    346,
     0
    ],
    [
@@ -17529,7 +17529,7 @@
      "stun": 3
     },
     {},
-    316.029,
+    331.078,
     1
    ],
    [
@@ -17598,7 +17598,7 @@
     {
      "steam": 1
     },
-    284.4261,
+    297.9702,
     1
    ],
    [
@@ -17635,7 +17635,7 @@
      "steam": 1,
      "fanBurn": 1
     },
-    316.029,
+    331.078,
     1
    ],
    [
@@ -17673,7 +17673,7 @@
     {
      "fanBurn": 1
     },
-    221.2203,
+    231.75459999999998,
     1
    ],
    [
@@ -17705,7 +17705,7 @@
      "stun": 2
     },
     {},
-    345.99999999999994,
+    346,
     0
    ],
    [
@@ -17740,7 +17740,7 @@
      "wet": 1
     },
     {},
-    221.2203,
+    231.75459999999998,
     1
    ],
    [
@@ -17776,7 +17776,7 @@
      "fanBurn": 1,
      "shockWet": 1
     },
-    346.00000000000006,
+    346,
     0
    ],
    [
@@ -17813,7 +17813,7 @@
      "wet": 2
     },
     {},
-    252.8232,
+    264.8624,
     1
    ],
    [
@@ -20901,7 +20901,7 @@
   "core:boss_ren2": [
    [
     2,
-    121031,
+    91600,
     {
      "core:lion_combo": 123.10661066666663,
      "core:drunken_fist": 139.89387575757573,
@@ -20914,35 +20914,34 @@
      "core:sickle_weasel": 38.53364242424243,
      "core:dragon_fire": 71.92946585858586,
      "core:great_breakthrough": 34.40503787878788,
-     "core:leaf_whirlwind": 132.25261363636363,
-     "core:leaf_gale": 88.16840909090908,
-     "core:shadow_shuriken": 64.58898989898991,
-     "core:running_fire": 41.67461999999996,
-     "core:double_suicide_decapitation": 17.000136363636365,
+     "core:leaf_whirlwind": 96.98524999999998,
+     "core:leaf_gale": 76.4126212121212,
+     "core:shadow_shuriken": 44.71545454545455,
+     "core:running_fire": 30.98881999999999,
+     "core:double_suicide_decapitation": 13.76201515151515,
      "core:leaf_great_whirlwind": 22.808784090909086,
      "core:four_pillar_bind": 13.762015151515152,
-     "core:dynamic_entry": 71.55696969696969,
+     "core:dynamic_entry": 61.33454545454544,
      "core:earth_flow_river": 13.762015151515152,
-     "basic": 291.66,
-     "core:temporary_paralysis": 5.216803030303029
+     "basic": 145.82999999999998
     },
     {
-     "burn": 5,
-     "interrupt": 29,
+     "burn": 4,
+     "interrupt": 22,
      "stun": 3,
      "wet": 1,
-     "bind": 6
+     "bind": 4
     },
     {
      "fanBurn": 3,
      "steam": 1
     },
-    385.99999999999994,
+    386,
     0
    ],
    [
     2,
-    122321,
+    112631,
     {
      "core:lion_combo": 167.87265090909088,
      "core:dragon_fire": 56.516008888888905,
@@ -20956,28 +20955,28 @@
      "core:leaf_great_whirlwind": 68.42635227272726,
      "core:leaf_gale": 108.74103787878786,
      "core:shadow_shuriken": 64.58898989898991,
-     "core:leaf_whirlwind": 79.35156818181818,
-     "core:dynamic_entry": 99.66863636363634,
+     "core:leaf_whirlwind": 67.5957803030303,
+     "core:dynamic_entry": 89.4462121212121,
      "core:double_suicide_decapitation": 17.000136363636365,
      "core:earth_flow_river": 13.762015151515152,
-     "core:running_fire": 25.467823333333328,
-     "core:temporary_paralysis": 15.650409090909086,
-     "basic": 243.05
+     "core:running_fire": 16.206796666666662,
+     "core:temporary_paralysis": 12.669378787878784,
+     "basic": 194.44
     },
     {
-     "burn": 5,
-     "interrupt": 28,
+     "burn": 4,
+     "interrupt": 26,
      "stun": 1,
      "wet": 1,
-     "bind": 7
+     "bind": 6
     },
     {},
-    385.99999999999994,
+    386.00000000000006,
     0
    ],
    [
     2,
-    133894,
+    111432,
     {
      "core:lion_combo": 162.27689587878785,
      "core:drunken_fist": 139.89387575757573,
@@ -20987,23 +20986,23 @@
      "core:sickle_weasel": 38.53364242424243,
      "core:dragon_fire": 46.7541528080808,
      "core:gunshot": 34.40503787878788,
-     "core:leaf_whirlwind": 108.74103787878786,
-     "core:leaf_gale": 76.4126212121212,
-     "core:shadow_shuriken": 121.72540404040403,
-     "core:running_fire": 57.88141666666663,
-     "core:dynamic_entry": 69.00136363636362,
+     "core:leaf_whirlwind": 96.98524999999998,
+     "core:leaf_gale": 64.65683333333332,
+     "core:shadow_shuriken": 91.91510101010101,
+     "core:running_fire": 48.620389999999986,
+     "core:dynamic_entry": 48.556515151515136,
      "core:leaf_great_whirlwind": 22.808784090909086,
      "core:earth_flow_river": 13.762015151515152,
-     "core:temporary_paralysis": 10.43360606060606,
-     "basic": 340.27000000000004,
+     "core:temporary_paralysis": 7.452575757575756,
+     "basic": 243.05,
      "core:double_suicide_decapitation": 5.666712121212121
     },
     {
-     "burn": 6,
-     "interrupt": 29,
+     "burn": 5,
+     "interrupt": 22,
      "stun": 1,
      "wet": 1,
-     "bind": 4
+     "bind": 3
     },
     {},
     386.00000000000006,
@@ -21011,9 +21010,9 @@
    ],
    [
     2,
-    86483,
+    73357,
     {
-     "core:lion_combo": 139.89387575757573,
+     "core:lion_combo": 117.5108556363636,
      "core:lightning_beast_tracking_fang": 45.873383838383845,
      "core:wave_of_inspiration": 45.873383838383845,
      "core:gale_palm": 40.36857777777778,
@@ -21024,28 +21023,27 @@
      "core:leaf_great_whirlwind": 55.39276136363635,
      "core:great_fireball": 41.74477929292928,
      "core:leaf_gale": 73.47367424242422,
-     "core:shadow_shuriken": 72.04156565656567,
+     "core:shadow_shuriken": 62.104797979797986,
      "core:double_suicide_decapitation": 8.09530303030303,
      "core:four_pillar_bind": 13.762015151515152,
-     "core:dynamic_entry": 30.667272727272724,
-     "core:leaf_whirlwind": 35.26736363636363,
+     "core:dynamic_entry": 20.44484848484848,
+     "core:leaf_whirlwind": 23.511575757575756,
      "core:running_fire": 16.206796666666662,
-     "core:temporary_paralysis": 7.452575757575756,
-     "basic": 145.82999999999998
+     "core:temporary_paralysis": 7.452575757575756
     },
     {
-     "interrupt": 17,
+     "interrupt": 14,
      "stun": 3,
      "burn": 2,
      "bind": 3
     },
     {},
-    385.99999999999994,
+    386.00000000000006,
     0
    ],
    [
     1,
-    100833,
+    127519,
     {
      "core:lion_combo": 145.48963078787875,
      "core:drunken_fist": 78.3405704242424,
@@ -21062,34 +21060,34 @@
      "core:tearing_earth_turning_palm": 34.40503787878788,
      "core:gunshot": 34.40503787878788,
      "core:leaf_great_whirlwind": 45.61756818181817,
-     "core:leaf_whirlwind": 96.98524999999998,
-     "core:leaf_gale": 85.2294621212121,
-     "core:shadow_shuriken": 72.04156565656567,
+     "core:leaf_whirlwind": 117.82107629292918,
+     "core:leaf_gale": 108.74103787878786,
+     "core:shadow_shuriken": 91.91510101010101,
      "core:running_fire": 39.35936333333334,
-     "core:dynamic_entry": 58.778939393939375,
+     "core:dynamic_entry": 69.00136363636362,
      "core:four_pillar_bind": 13.762015151515152,
-     "core:temporary_paralysis": 7.452575757575756,
-     "basic": 242.30399194949433,
+     "core:temporary_paralysis": 10.43360606060606,
+     "basic": 388.88000000000005,
      "core:double_suicide_decapitation": 5.666712121212121
     },
     {
      "burn": 6,
-     "interrupt": 23,
+     "interrupt": 30,
      "stun": 3,
      "wet": 2,
-     "bind": 3
+     "bind": 4
     },
     {
      "fanBurn": 2
     },
-    271.26195000000007,
+    353.15235,
     1
    ],
    [
     2,
-    75930,
+    73330,
     {
-     "core:lion_combo": 162.27689587878785,
+     "core:lion_combo": 139.89387575757573,
      "core:great_fireball": 59.635398989899,
      "core:lightning_beast_tracking_fang": 45.873383838383845,
      "core:wave_of_inspiration": 45.873383838383845,
@@ -21110,8 +21108,7 @@
      "core:four_pillar_bind": 13.762015151515152,
      "core:dynamic_entry": 20.44484848484848,
      "core:earth_flow_river": 13.762015151515152,
-     "core:temporary_paralysis": 7.452575757575756,
-     "basic": 48.61
+     "core:temporary_paralysis": 7.452575757575756
     },
     {
      "burn": 4,
@@ -21128,7 +21125,7 @@
    ],
    [
     2,
-    93938,
+    71064,
     {
      "core:drunken_fist": 145.48963078787875,
      "core:dragon_fire": 103.27016169696971,
@@ -21139,28 +21136,27 @@
      "core:sickle_weasel": 38.53364242424243,
      "core:leaf_great_whirlwind": 55.39276136363635,
      "core:great_fireball": 41.74477929292928,
-     "core:leaf_whirlwind": 96.98524999999998,
-     "core:dynamic_entry": 66.44575757575757,
-     "core:shadow_shuriken": 44.71545454545455,
+     "core:leaf_whirlwind": 85.2294621212121,
+     "core:dynamic_entry": 46.00090909090908,
+     "core:shadow_shuriken": 24.841919191919192,
      "core:leaf_gale": 32.328416666666655,
      "core:four_pillar_bind": 13.762015151515152,
      "core:earth_flow_river": 13.762015151515152,
-     "core:running_fire": 24.75543666666666,
-     "basic": 97.22
+     "core:running_fire": 15.58345833333333
     },
     {
-     "burn": 6,
-     "interrupt": 17,
+     "burn": 5,
+     "interrupt": 12,
      "stun": 2,
      "bind": 2
     },
     {},
-    385.99999999999994,
+    386.00000000000006,
     0
    ],
    [
     2,
-    108583,
+    105983,
     {
      "core:lion_combo": 100.72359054545451,
      "core:phoenix_sage_fire": 60.35102377777776,
@@ -21180,7 +21176,7 @@
      "core:four_pillar_bind": 13.762015151515152,
      "core:earth_flow_river": 13.762015151515152,
      "core:running_fire": 25.467823333333328,
-     "basic": 291.66,
+     "basic": 243.05,
      "core:temporary_paralysis": 5.216803030303029
     },
     {
@@ -21190,12 +21186,12 @@
      "bind": 5
     },
     {},
-    386,
+    386.00000000000006,
     0
    ],
    [
-    1,
-    123279,
+    2,
+    129000,
     {
      "core:drunken_fist": 139.89387575757573,
      "core:dragon_fire": 111.36222660606064,
@@ -21212,18 +21208,18 @@
      "core:running_fire": 41.67461999999996,
      "core:leaf_whirlwind": 79.35156818181818,
      "core:leaf_gale": 67.5957803030303,
-     "core:dynamic_entry": 91.50244449494879,
+     "core:dynamic_entry": 99.66863636363634,
      "core:double_suicide_decapitation": 8.09530303030303,
      "core:leaf_great_whirlwind": 22.808784090909086,
      "core:four_pillar_bind": 13.762015151515152,
      "core:earth_flow_river": 13.762015151515152,
-     "core:shadow_shuriken": 59.62060606060607,
-     "basic": 340.27000000000004,
+     "core:shadow_shuriken": 69.55737373737375,
+     "basic": 388.88000000000005,
      "core:temporary_paralysis": 8.197833333333332
     },
     {
      "burn": 7,
-     "interrupt": 28,
+     "interrupt": 29,
      "stun": 3,
      "wet": 1,
      "bind": 5
@@ -21231,12 +21227,12 @@
     {
      "fanBurn": 3
     },
-    327.5616,
-    1
+    386,
+    0
    ],
    [
-    1,
-    117586,
+    2,
+    109832,
     {
      "core:lion_combo": 167.87265090909088,
      "core:drunken_fist": 78.3405704242424,
@@ -21257,27 +21253,27 @@
      "core:leaf_gale": 55.83999242424241,
      "core:double_suicide_decapitation": 17.000136363636365,
      "core:four_pillar_bind": 13.762015151515152,
-     "core:shadow_shuriken": 43.29871902020115,
+     "core:shadow_shuriken": 29.810303030303032,
      "basic": 291.66,
      "core:temporary_paralysis": 5.216803030303029
     },
     {
      "burn": 7,
-     "interrupt": 23,
+     "interrupt": 21,
      "stun": 3,
      "bind": 5
     },
     {
      "fanBurn": 1
     },
-    346.32815,
-    1
+    386.0000000000001,
+    0
    ],
    [
     2,
-    53705,
+    46296,
     {
-     "core:drunken_fist": 100.72359054545451,
+     "core:drunken_fist": 78.3405704242424,
      "core:dragon_fire": 56.516008888888905,
      "core:earth_dragon_bullet": 87.34292282828285,
      "core:phoenix_sage_fire": 48.74505766666666,
@@ -21285,24 +21281,21 @@
      "core:lightning_beast_tracking_fang": 45.873383838383845,
      "core:wave_of_inspiration": 45.873383838383845,
      "core:wild_water_wave": 40.36857777777778,
-     "core:lion_combo": 61.55330533333331,
+     "core:lion_combo": 39.1702852121212,
      "core:great_breakthrough": 34.40503787878788,
      "core:tearing_earth_turning_palm": 34.40503787878788,
      "core:gunshot": 34.40503787878788,
      "core:running_fire": 23.152566666666658,
      "core:leaf_whirlwind": 20.57262878787878,
-     "core:leaf_gale": 32.328416666666655,
-     "core:shadow_shuriken": 17.389343434343434,
-     "core:leaf_great_whirlwind": 22.808784090909086,
-     "core:four_pillar_bind": 13.762015151515152,
-     "core:dynamic_entry": 10.22242424242424
+     "core:leaf_gale": 20.57262878787878,
+     "core:shadow_shuriken": 17.389343434343434
     },
     {
      "burn": 5,
-     "interrupt": 7,
-     "stun": 3,
+     "interrupt": 5,
+     "stun": 2,
      "wet": 2,
-     "bind": 2
+     "bind": 1
     },
     {
      "mudEva": 1
@@ -21312,7 +21305,7 @@
    ],
    [
     2,
-    91328,
+    82513,
     {
      "core:lion_combo": 139.89387575757573,
      "core:drunken_fist": 139.89387575757573,
@@ -21328,16 +21321,16 @@
      "core:leaf_great_whirlwind": 55.39276136363635,
      "core:leaf_whirlwind": 73.47367424242422,
      "core:leaf_gale": 73.47367424242422,
-     "core:running_fire": 46.839423333333336,
-     "core:dynamic_entry": 58.778939393939375,
+     "core:running_fire": 39.35936333333334,
+     "core:dynamic_entry": 48.556515151515136,
      "core:four_pillar_bind": 13.762015151515152,
      "core:earth_flow_river": 13.762015151515152,
      "core:shadow_shuriken": 19.873535353535356,
      "basic": 48.61
     },
     {
-     "burn": 6,
-     "interrupt": 17,
+     "burn": 5,
+     "interrupt": 16,
      "stun": 3,
      "wet": 1,
      "bind": 2
@@ -21345,12 +21338,12 @@
     {
      "fanBurn": 2
     },
-    385.99999999999994,
+    386,
     0
    ],
    [
     2,
-    97900,
+    90589,
     {
      "core:lion_combo": 184.65991599999998,
      "core:drunken_fist": 184.65991599999998,
@@ -21364,29 +21357,29 @@
      "core:gunshot": 34.40503787878788,
      "core:leaf_great_whirlwind": 45.61756818181817,
      "core:leaf_gale": 85.2294621212121,
-     "core:dynamic_entry": 104.77984848484846,
-     "core:running_fire": 48.620389999999986,
-     "core:leaf_whirlwind": 35.26736363636363,
+     "core:dynamic_entry": 94.55742424242422,
+     "core:running_fire": 46.839423333333336,
+     "core:leaf_whirlwind": 23.511575757575756,
      "core:four_pillar_bind": 13.762015151515152,
-     "core:shadow_shuriken": 29.810303030303032,
+     "core:shadow_shuriken": 19.873535353535356,
      "core:temporary_paralysis": 7.452575757575756,
-     "basic": 194.44,
+     "basic": 145.82999999999998,
      "core:double_suicide_decapitation": 5.666712121212121
     },
     {
      "burn": 5,
-     "interrupt": 20,
+     "interrupt": 17,
      "stun": 2,
      "wet": 1,
      "bind": 3
     },
     {},
-    385.9999999999999,
+    386,
     0
    ],
    [
-    1,
-    103492,
+    2,
+    116043,
     {
      "core:lion_combo": 123.10661066666663,
      "core:drunken_fist": 100.72359054545451,
@@ -21402,35 +21395,35 @@
      "core:great_breakthrough": 34.40503787878788,
      "core:tearing_earth_turning_palm": 34.40503787878788,
      "core:gunshot": 34.40503787878788,
-     "core:leaf_whirlwind": 76.4126212121212,
+     "core:leaf_whirlwind": 88.16840909090908,
      "core:leaf_gale": 96.98524999999998,
-     "core:dynamic_entry": 94.55742424242422,
-     "core:shadow_shuriken": 65.81688402020254,
+     "core:dynamic_entry": 104.77984848484846,
+     "core:shadow_shuriken": 84.46252525252525,
      "core:running_fire": 32.41359333333332,
-     "core:double_suicide_decapitation": 13.76201515151515,
+     "core:double_suicide_decapitation": 17.000136363636365,
      "core:leaf_great_whirlwind": 35.84237499999999,
      "core:four_pillar_bind": 13.762015151515152,
      "core:earth_flow_river": 13.762015151515152,
      "core:temporary_paralysis": 12.669378787878784,
-     "basic": 243.05
+     "basic": 291.66
     },
     {
      "burn": 5,
-     "interrupt": 26,
+     "interrupt": 29,
      "stun": 3,
      "wet": 2,
-     "bind": 7
+     "bind": 8
     },
     {
      "fanBurn": 1,
      "mudEva": 1
     },
-    293.4406,
-    1
+    386,
+    0
    ],
    [
     2,
-    89657,
+    80034,
     {
      "core:drunken_fist": 145.48963078787875,
      "core:dragon_fire": 66.79164686868688,
@@ -21442,30 +21435,29 @@
      "core:sickle_weasel": 38.53364242424243,
      "core:tearing_earth_turning_palm": 34.40503787878788,
      "core:great_fireball": 41.74477929292928,
-     "core:leaf_gale": 76.4126212121212,
+     "core:leaf_gale": 64.65683333333332,
      "core:shadow_shuriken": 34.77868686868687,
      "core:running_fire": 39.35936333333334,
-     "core:leaf_whirlwind": 55.83999242424241,
+     "core:leaf_whirlwind": 44.08420454545453,
      "core:dynamic_entry": 30.667272727272724,
      "core:leaf_great_whirlwind": 13.033590909090908,
      "core:temporary_paralysis": 7.452575757575756,
-     "basic": 145.82999999999998,
-     "core:double_suicide_decapitation": 5.666712121212121
+     "basic": 97.22
     },
     {
      "burn": 4,
-     "interrupt": 15,
+     "interrupt": 13,
      "stun": 1,
      "wet": 1,
-     "bind": 2
+     "bind": 1
     },
     {},
-    385.99999999999994,
+    386,
     0
    ],
    [
-    1,
-    112154,
+    2,
+    108969,
     {
      "core:lion_combo": 162.27689587878785,
      "core:drunken_fist": 123.10661066666663,
@@ -21482,18 +21474,18 @@
      "core:leaf_great_whirlwind": 32.58397727272727,
      "core:running_fire": 48.620389999999986,
      "core:leaf_whirlwind": 67.5957803030303,
-     "core:leaf_gale": 67.5957803030303,
+     "core:leaf_gale": 55.83999242424241,
      "core:dynamic_entry": 79.22378787878786,
      "core:four_pillar_bind": 13.762015151515152,
      "core:earth_flow_river": 13.762015151515152,
-     "core:shadow_shuriken": 49.68383838383839,
+     "core:shadow_shuriken": 39.74707070707071,
      "core:temporary_paralysis": 12.669378787878784,
-     "basic": 298.0407205454548,
+     "basic": 291.66,
      "core:double_suicide_decapitation": 3.2381212121212126
     },
     {
      "burn": 6,
-     "interrupt": 23,
+     "interrupt": 21,
      "stun": 2,
      "wet": 2,
      "bind": 6
@@ -21501,12 +21493,12 @@
     {
      "mudEva": 1
     },
-    339.50395000000003,
-    1
+    386,
+    0
    ],
    [
-    1,
-    100943,
+    2,
+    114450,
     {
      "core:drunken_fist": 162.27689587878785,
      "core:dragon_fire": 123.94988313131317,
@@ -21522,33 +21514,33 @@
      "core:tearing_earth_turning_palm": 34.40503787878788,
      "core:gunshot": 34.40503787878788,
      "core:leaf_great_whirlwind": 55.39276136363635,
-     "core:leaf_whirlwind": 88.16840909090908,
+     "core:leaf_whirlwind": 99.92419696969696,
      "core:leaf_gale": 88.16840909090908,
-     "core:shadow_shuriken": 81.97833333333334,
-     "core:dynamic_entry": 69.00136363636362,
-     "core:double_suicide_decapitation": 13.76201515151515,
+     "core:shadow_shuriken": 101.85186868686868,
+     "core:dynamic_entry": 89.4462121212121,
+     "core:double_suicide_decapitation": 17.000136363636365,
      "core:four_pillar_bind": 13.762015151515152,
      "core:earth_flow_river": 13.762015151515152,
      "core:running_fire": 16.206796666666662,
-     "basic": 147.42056113131252
+     "basic": 291.66
     },
     {
      "burn": 6,
-     "interrupt": 26,
+     "interrupt": 31,
      "stun": 3,
      "wet": 2,
-     "bind": 4
+     "bind": 5
     },
     {
      "steam": 1,
      "fanBurn": 1
     },
-    262.73170000000005,
-    1
+    386,
+    0
    ],
    [
-    1,
-    111825,
+    2,
+    101773,
     {
      "core:lion_combo": 184.65991599999998,
      "core:drunken_fist": 123.10661066666663,
@@ -21559,63 +21551,61 @@
      "core:earth_dragon_bullet": 35.964732929292936,
      "core:tearing_earth_turning_palm": 34.40503787878788,
      "core:gunshot": 34.40503787878788,
-     "core:leaf_whirlwind": 108.74103787878786,
+     "core:leaf_whirlwind": 96.98524999999998,
      "core:leaf_gale": 88.16840909090908,
-     "core:dynamic_entry": 104.77984848484846,
-     "core:double_suicide_decapitation": 17.000136363636365,
+     "core:dynamic_entry": 94.55742424242422,
+     "core:double_suicide_decapitation": 13.76201515151515,
      "core:leaf_great_whirlwind": 22.808784090909086,
      "core:four_pillar_bind": 13.762015151515152,
      "core:earth_flow_river": 13.762015151515152,
-     "core:shadow_shuriken": 59.62060606060607,
+     "core:shadow_shuriken": 39.74707070707071,
      "core:temporary_paralysis": 12.669378787878784,
-     "basic": 336.76019582828286,
+     "basic": 243.05,
      "core:running_fire": 9.261026666666668
     },
     {
      "burn": 5,
-     "interrupt": 28,
+     "interrupt": 24,
      "stun": 2,
      "wet": 1,
-     "bind": 7
+     "bind": 6
     },
     {},
-    378.74309999999997,
-    1
+    386.00000000000006,
+    0
    ],
    [
     2,
-    77887,
+    61828,
     {
-     "core:drunken_fist": 100.72359054545451,
+     "core:drunken_fist": 78.3405704242424,
      "core:earth_dragon_bullet": 51.378189898989916,
      "core:phoenix_sage_fire": 60.35102377777776,
      "core:lightning_beast_tracking_fang": 45.873383838383845,
      "core:gale_palm": 40.36857777777778,
      "core:wild_water_wave": 40.36857777777778,
-     "core:lion_combo": 128.70236569696965,
+     "core:lion_combo": 106.31934557575754,
      "core:sickle_weasel": 38.53364242424243,
      "core:dragon_fire": 61.140045979797975,
      "core:tearing_earth_turning_palm": 34.40503787878788,
      "core:gunshot": 34.40503787878788,
      "core:great_fireball": 41.74477929292928,
      "core:leaf_whirlwind": 73.47367424242422,
-     "core:leaf_gale": 85.2294621212121,
-     "core:dynamic_entry": 74.11257575757574,
-     "core:shadow_shuriken": 62.104797979797986,
-     "core:running_fire": 39.35936333333334,
+     "core:leaf_gale": 73.47367424242422,
+     "core:dynamic_entry": 53.66772727272726,
+     "core:shadow_shuriken": 52.16803030303031,
+     "core:running_fire": 23.152566666666658,
      "core:double_suicide_decapitation": 8.09530303030303,
-     "core:leaf_great_whirlwind": 35.84237499999999,
+     "core:leaf_great_whirlwind": 22.808784090909086,
      "core:four_pillar_bind": 13.762015151515152,
-     "core:earth_flow_river": 13.762015151515152,
-     "core:temporary_paralysis": 7.452575757575756,
-     "basic": 48.61
+     "core:earth_flow_river": 13.762015151515152
     },
     {
-     "burn": 5,
-     "interrupt": 19,
+     "burn": 4,
+     "interrupt": 15,
      "stun": 2,
      "wet": 2,
-     "bind": 4
+     "bind": 3
     },
     {
      "steam": 1
@@ -21625,7 +21615,7 @@
    ],
    [
     2,
-    92879,
+    81893,
     {
      "core:drunken_fist": 139.89387575757573,
      "core:earth_dragon_bullet": 87.34292282828285,
@@ -21637,29 +21627,29 @@
      "core:great_breakthrough": 34.40503787878788,
      "core:tearing_earth_turning_palm": 34.40503787878788,
      "core:leaf_great_whirlwind": 68.42635227272726,
-     "core:dynamic_entry": 84.33499999999998,
-     "core:shadow_shuriken": 81.97833333333334,
+     "core:dynamic_entry": 63.8901515151515,
+     "core:shadow_shuriken": 72.04156565656567,
      "core:running_fire": 23.152566666666658,
      "core:leaf_whirlwind": 55.83999242424241,
-     "core:leaf_gale": 44.08420454545453,
-     "core:double_suicide_decapitation": 13.76201515151515,
+     "core:leaf_gale": 32.328416666666655,
+     "core:double_suicide_decapitation": 8.09530303030303,
      "core:four_pillar_bind": 13.762015151515152,
-     "basic": 194.44
+     "basic": 97.22
     },
     {
      "burn": 4,
-     "interrupt": 20,
+     "interrupt": 16,
      "stun": 2,
      "wet": 1,
-     "bind": 3
+     "bind": 2
     },
     {},
-    385.99999999999994,
+    386,
     0
    ],
    [
-    1,
-    124851,
+    2,
+    109729,
     {
      "core:lion_combo": 162.27689587878785,
      "core:dragon_fire": 59.0849183838384,
@@ -21674,31 +21664,31 @@
      "core:tearing_earth_turning_palm": 34.40503787878788,
      "core:gunshot": 34.40503787878788,
      "core:leaf_great_whirlwind": 68.42635227272726,
-     "core:leaf_whirlwind": 99.92419696969696,
-     "core:leaf_gale": 96.98524999999998,
-     "core:dynamic_entry": 97.11303030303029,
-     "core:shadow_shuriken": 64.58898989898991,
-     "core:running_fire": 57.88141666666663,
+     "core:leaf_whirlwind": 88.16840909090908,
+     "core:leaf_gale": 85.2294621212121,
+     "core:dynamic_entry": 86.89060606060605,
+     "core:shadow_shuriken": 54.65222222222223,
+     "core:running_fire": 48.620389999999986,
      "core:four_pillar_bind": 13.762015151515152,
      "core:earth_flow_river": 13.762015151515152,
-     "basic": 279.1190428585858,
+     "basic": 243.05,
      "core:double_suicide_decapitation": 8.904833333333332,
-     "core:temporary_paralysis": 8.197833333333332
+     "core:temporary_paralysis": 5.216803030303029
     },
     {
-     "burn": 6,
-     "interrupt": 27,
+     "burn": 5,
+     "interrupt": 23,
      "stun": 2,
      "wet": 2,
-     "bind": 6
+     "bind": 5
     },
     {},
-    368.5068,
-    1
+    386.00000000000006,
+    0
    ],
    [
     2,
-    84245,
+    76921,
     {
      "core:lion_combo": 123.10661066666663,
      "core:dragon_fire": 103.27016169696971,
@@ -21710,30 +21700,30 @@
      "core:gunshot": 34.40503787878788,
      "core:leaf_great_whirlwind": 68.42635227272726,
      "core:leaf_gale": 73.47367424242422,
-     "core:shadow_shuriken": 72.04156565656567,
+     "core:shadow_shuriken": 62.104797979797986,
      "core:drunken_fist": 89.53208048484846,
      "core:running_fire": 39.35936333333334,
-     "core:leaf_whirlwind": 44.08420454545453,
-     "core:dynamic_entry": 48.556515151515136,
+     "core:leaf_whirlwind": 32.328416666666655,
+     "core:dynamic_entry": 38.3340909090909,
      "core:double_suicide_decapitation": 8.09530303030303,
      "core:four_pillar_bind": 13.762015151515152,
      "core:temporary_paralysis": 7.452575757575756,
-     "basic": 97.22
+     "basic": 48.61
     },
     {
      "burn": 6,
-     "interrupt": 18,
+     "interrupt": 15,
      "stun": 3,
      "wet": 1,
      "bind": 3
     },
     {},
-    385.99999999999994,
+    386,
     0
    ],
    [
-    1,
-    158608,
+    2,
+    153740,
     {
      "core:drunken_fist": 100.72359054545451,
      "core:dragon_fire": 66.79164686868688,
@@ -21741,10 +21731,10 @@
      "core:gale_palm": 40.36857777777778,
      "core:wild_water_wave": 40.36857777777778,
      "core:gunshot": 34.40503787878788,
-     "core:leaf_gale": 123.43577272727273,
+     "core:leaf_gale": 111.67998484848485,
      "core:dynamic_entry": 115.0022727272727,
-     "core:shadow_shuriken": 126.69378787878786,
-     "core:double_suicide_decapitation": 23.476378787878794,
+     "core:shadow_shuriken": 116.75702020202019,
+     "core:double_suicide_decapitation": 20.23825757575758,
      "core:leaf_whirlwind": 94.04630303030302,
      "core:leaf_great_whirlwind": 22.808784090909086,
      "core:four_pillar_bind": 13.762015151515152,
@@ -21752,22 +21742,22 @@
      "core:earth_flow_river": 13.762015151515152,
      "core:running_fire": 43.98987666666662,
      "core:temporary_paralysis": 15.650409090909086,
-     "basic": 521.906723707071
+     "basic": 486.1000000000001
     },
     {
      "burn": 5,
      "wet": 2,
-     "interrupt": 38,
-     "bind": 10,
+     "interrupt": 36,
+     "bind": 9,
      "stun": 1
     },
     {},
-    366.80075,
-    1
+    386.00000000000006,
+    0
    ],
    [
     2,
-    105403,
+    77654,
     {
      "core:lion_combo": 184.65991599999998,
      "core:earth_dragon_bullet": 87.34292282828285,
@@ -21779,29 +21769,28 @@
      "core:dragon_fire": 46.7541528080808,
      "core:tearing_earth_turning_palm": 34.40503787878788,
      "core:leaf_great_whirlwind": 68.42635227272726,
-     "core:leaf_whirlwind": 96.98524999999998,
-     "core:leaf_gale": 96.98524999999998,
-     "core:dynamic_entry": 84.33499999999998,
-     "core:shadow_shuriken": 74.52575757575758,
-     "core:running_fire": 48.620389999999986,
+     "core:leaf_whirlwind": 73.47367424242422,
+     "core:leaf_gale": 73.47367424242422,
+     "core:dynamic_entry": 63.8901515151515,
+     "core:shadow_shuriken": 44.71545454545455,
+     "core:running_fire": 39.35936333333334,
      "core:drunken_fist": 67.14906036363635,
      "core:earth_flow_river": 13.762015151515152,
-     "basic": 194.44,
-     "core:temporary_paralysis": 5.216803030303029
+     "basic": 48.61
     },
     {
-     "burn": 6,
-     "interrupt": 26,
+     "burn": 5,
+     "interrupt": 17,
      "stun": 2,
-     "bind": 2
+     "bind": 1
     },
     {},
-    385.99999999999994,
+    386.00000000000006,
     0
    ],
    [
-    1,
-    116317,
+    2,
+    121346,
     {
      "core:drunken_fist": 100.72359054545451,
      "core:earth_dragon_bullet": 87.34292282828285,
@@ -21817,17 +21806,17 @@
      "core:gunshot": 34.40503787878788,
      "core:leaf_great_whirlwind": 55.39276136363635,
      "core:leaf_gale": 85.2294621212121,
-     "core:dynamic_entry": 104.77984848484846,
-     "core:shadow_shuriken": 81.97833333333334,
-     "core:leaf_whirlwind": 87.02343293939414,
+     "core:dynamic_entry": 115.0022727272727,
+     "core:shadow_shuriken": 91.91510101010101,
+     "core:leaf_whirlwind": 91.10735606060607,
      "core:double_suicide_decapitation": 11.333424242424243,
      "core:earth_flow_river": 13.762015151515152,
-     "core:running_fire": 32.94788333333332,
-     "basic": 291.66
+     "core:running_fire": 34.72884999999997,
+     "basic": 340.27000000000004
     },
     {
      "burn": 6,
-     "interrupt": 28,
+     "interrupt": 30,
      "stun": 2,
      "wet": 1,
      "bind": 3
@@ -21835,12 +21824,12 @@
     {
      "steam": 1
     },
-    327.56160000000006,
-    1
+    386.00000000000006,
+    0
    ],
    [
     2,
-    128808,
+    99328,
     {
      "core:lion_combo": 162.27689587878785,
      "core:drunken_fist": 139.89387575757573,
@@ -21855,28 +21844,28 @@
      "core:tearing_earth_turning_palm": 34.40503787878788,
      "core:leaf_great_whirlwind": 68.42635227272726,
      "core:great_fireball": 41.74477929292928,
-     "core:leaf_whirlwind": 88.16840909090908,
-     "core:leaf_gale": 120.49682575757575,
-     "core:dynamic_entry": 115.0022727272727,
-     "core:shadow_shuriken": 94.39929292929293,
-     "core:running_fire": 48.620389999999986,
-     "core:double_suicide_decapitation": 11.333424242424243,
-     "basic": 194.44
+     "core:leaf_whirlwind": 64.65683333333332,
+     "core:leaf_gale": 96.98524999999998,
+     "core:dynamic_entry": 94.55742424242422,
+     "core:shadow_shuriken": 64.58898989898991,
+     "core:running_fire": 39.35936333333334,
+     "core:double_suicide_decapitation": 8.09530303030303,
+     "basic": 97.22
     },
     {
-     "burn": 6,
-     "interrupt": 32,
+     "burn": 5,
+     "interrupt": 23,
      "stun": 1,
      "wet": 1,
-     "bind": 2
+     "bind": 1
     },
     {},
-    385.99999999999994,
+    386.00000000000006,
     0
    ],
    [
-    1,
-    96662,
+    2,
+    108527,
     {
      "core:lion_combo": 184.65991599999998,
      "core:drunken_fist": 162.27689587878785,
@@ -21892,31 +21881,31 @@
      "core:tearing_earth_turning_palm": 34.40503787878788,
      "core:gunshot": 34.40503787878788,
      "core:leaf_great_whirlwind": 68.42635227272726,
-     "core:leaf_whirlwind": 88.16840909090908,
-     "core:dynamic_entry": 104.77984848484846,
-     "core:shadow_shuriken": 64.58898989898991,
+     "core:leaf_whirlwind": 99.92419696969696,
+     "core:dynamic_entry": 115.0022727272727,
+     "core:shadow_shuriken": 74.52575757575758,
      "core:running_fire": 39.35936333333334,
-     "core:leaf_gale": 55.83999242424241,
-     "core:double_suicide_decapitation": 13.76201515151515,
+     "core:leaf_gale": 67.5957803030303,
+     "core:double_suicide_decapitation": 17.000136363636365,
      "core:four_pillar_bind": 13.762015151515152,
      "core:earth_flow_river": 13.762015151515152,
-     "core:temporary_paralysis": 7.452575757575756,
-     "basic": 184.52391909090903
+     "core:temporary_paralysis": 12.669378787878784,
+     "basic": 243.05
     },
     {
      "burn": 5,
-     "interrupt": 25,
+     "interrupt": 29,
      "stun": 3,
      "wet": 2,
-     "bind": 5
+     "bind": 7
     },
     {},
-    315.6192500000001,
-    1
+    386,
+    0
    ],
    [
-    1,
-    114843,
+    2,
+    139230,
     {
      "core:drunken_fist": 184.65991599999998,
      "core:dragon_fire": 66.79164686868688,
@@ -21930,32 +21919,33 @@
      "core:gunshot": 34.40503787878788,
      "core:leaf_great_whirlwind": 45.61756818181817,
      "core:great_fireball": 54.58932676767675,
-     "core:leaf_gale": 108.74103787878786,
-     "core:dynamic_entry": 104.77984848484846,
-     "core:running_fire": 24.60747436363598,
+     "core:leaf_gale": 120.49682575757575,
+     "core:dynamic_entry": 115.0022727272727,
+     "core:running_fire": 39.89365333333331,
      "core:leaf_whirlwind": 67.5957803030303,
-     "core:shadow_shuriken": 57.13641414141415,
+     "core:shadow_shuriken": 86.94671717171717,
      "core:double_suicide_decapitation": 13.76201515151515,
      "core:four_pillar_bind": 13.762015151515152,
      "core:earth_flow_river": 13.762015151515152,
-     "basic": 291.66
+     "basic": 388.88000000000005,
+     "core:temporary_paralysis": 2.9810303030303027
     },
     {
-     "burn": 3,
-     "interrupt": 26,
+     "burn": 5,
+     "interrupt": 31,
      "stun": 2,
      "wet": 2,
-     "bind": 4
+     "bind": 5
     },
     {
      "steam": 1
     },
-    281.4982500000001,
-    1
+    386,
+    0
    ],
    [
     2,
-    101299,
+    77316,
     {
      "core:drunken_fist": 139.89387575757573,
      "core:dragon_fire": 103.27016169696971,
@@ -21967,31 +21957,30 @@
      "core:great_breakthrough": 34.40503787878788,
      "core:gunshot": 34.40503787878788,
      "core:leaf_great_whirlwind": 32.58397727272727,
-     "core:leaf_whirlwind": 108.74103787878786,
-     "core:leaf_gale": 76.4126212121212,
-     "core:shadow_shuriken": 64.58898989898991,
+     "core:leaf_whirlwind": 85.2294621212121,
+     "core:leaf_gale": 64.65683333333332,
+     "core:shadow_shuriken": 44.71545454545455,
      "core:lion_combo": 67.14906036363635,
-     "core:dynamic_entry": 69.00136363636362,
+     "core:dynamic_entry": 48.556515151515136,
      "core:earth_flow_river": 13.762015151515152,
      "core:running_fire": 16.206796666666662,
      "core:temporary_paralysis": 7.452575757575756,
-     "basic": 145.82999999999998,
-     "core:double_suicide_decapitation": 5.666712121212121
+     "basic": 48.61
     },
     {
      "burn": 4,
-     "interrupt": 24,
+     "interrupt": 17,
      "stun": 1,
      "wet": 1,
-     "bind": 3
+     "bind": 2
     },
     {},
-    386,
+    386.0000000000001,
     0
    ],
    [
     2,
-    101745,
+    94740,
     {
      "core:lion_combo": 145.48963078787875,
      "core:drunken_fist": 139.89387575757573,
@@ -22002,25 +21991,25 @@
      "core:great_breakthrough": 34.40503787878788,
      "core:tearing_earth_turning_palm": 34.40503787878788,
      "core:leaf_great_whirlwind": 68.42635227272726,
-     "core:leaf_gale": 76.4126212121212,
+     "core:leaf_gale": 64.65683333333332,
      "core:dynamic_entry": 94.55742424242422,
-     "core:running_fire": 32.41359333333332,
-     "core:leaf_whirlwind": 55.83999242424241,
+     "core:running_fire": 32.05739999999999,
+     "core:leaf_whirlwind": 44.08420454545453,
      "core:four_pillar_bind": 13.762015151515152,
      "core:earth_flow_river": 13.762015151515152,
      "core:shadow_shuriken": 39.74707070707071,
-     "core:temporary_paralysis": 12.669378787878784,
-     "basic": 243.05
+     "core:temporary_paralysis": 7.452575757575756,
+     "basic": 145.82999999999998
     },
     {
      "burn": 5,
-     "interrupt": 21,
+     "interrupt": 19,
      "stun": 2,
      "wet": 1,
-     "bind": 4
+     "bind": 3
     },
     {},
-    385.99999999999994,
+    386,
     0
    ]
   ]
@@ -22032,7 +22021,7 @@
  },
  "analyses": {
   "zone": "d86181ea223437c090755ae6",
-  "boss": "a3606dde96aa42581e4f1bda",
+  "boss": "89a17e2834ccabcc1aa4c62c",
   "operation": "f1d59b8fda554563eddf4bf5"
  }
 }

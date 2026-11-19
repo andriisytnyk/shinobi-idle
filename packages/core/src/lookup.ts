@@ -5,6 +5,7 @@ import type {
   Enemy,
   Exam,
   Exercise,
+  Fieldwork,
   Gear,
   Herb,
   Hex,
@@ -49,6 +50,8 @@ export interface ContentIndex {
   items: Map<string, Item>;
   missions: Map<string, Mission>;
   herbs: Map<string, Herb>;
+  /** The work that found points open, by id. */
+  fieldworks: Map<string, Fieldwork>;
   recipes: Map<string, Recipe>;
   /** Recipe by the item it makes. */
   recipeByOutput: Map<string, Recipe>;
@@ -150,6 +153,7 @@ function build(content: ContentDb): ContentIndex {
     ...practices.keys(),
     ...obstacles.keys(),
     ...content.herbs.map((h) => h.id),
+    ...content.fieldworks.map((w) => w.id),
     ...content.recipes.map((r) => r.id),
   ]);
   const masteryCount = new Map<string, number>();
@@ -219,6 +223,7 @@ function build(content: ContentDb): ContentIndex {
     items: byId(content.items),
     missions: byId(content.missions),
     herbs: byId(content.herbs),
+    fieldworks: byId(content.fieldworks),
     recipes: byId(content.recipes),
     recipeByOutput: new Map(content.recipes.map((r) => [r.output.item, r])),
     gear: byId(content.gear),

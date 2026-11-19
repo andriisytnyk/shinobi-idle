@@ -228,8 +228,8 @@
         "sigEveryMs": 16000,
         "sigMult": 0.3,
         "sigOpenMs": 2000,
-        "hp": 1,
-        "dmg": 1,
+        "hp": 1.15,
+        "dmg": 1.15,
         "habituationMult": 2
       },
       "drunkenEvasion": {
@@ -243,7 +243,7 @@
         "damageMult": 2,
         "stunMs": 500,
         "hp": 0.85,
-        "dmg": 1.05
+        "dmg": 1.1
       },
       "twins": {
         "count": 2,

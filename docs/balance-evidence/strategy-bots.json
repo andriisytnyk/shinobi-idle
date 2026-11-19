@@ -38,7 +38,7 @@
      ],
      "seed": 1,
      "ended": "done",
-     "hours": 27.429027777777776,
+     "hours": 29.707916666666666,
      "levelsAt3h": {
       "tai": 12,
       "nin": 10,
@@ -53,167 +53,47 @@
       "vit": 5
      },
      "genin": 0.8445833333333334,
-     "clone": 13.431111111111111,
-     "chunin": 27.429027777777776,
-     "cap": null,
+     "clone": 13.426944444444445,
+     "chunin": 29.707916666666666,
+     "cap": 27.721944444444443,
      "longestGap": {
-      "hours": 1.8926011111111112,
-      "after": "ранг Репутації «Дарунок села»"
+      "hours": 1.6226586111111112,
+      "after": "Алхімія 50"
      },
      "cadence": {
       "hours": 0.9200161111111111,
       "allowed": 2,
       "after": "«Вовки Прикордонного лісу» завершено"
      },
-     "cloneShareRun": 0.4712600094182461,
-     "cloneShareOpen": 0.9234376941013047,
+     "cloneShareRun": 0.51251153592617,
+     "cloneShareOpen": 0.9351806386118765,
      "mission": {
-      "ms": 46637000,
-      "xp": 624669.4311835555,
-      "ryo": 12795
+      "ms": 51596000,
+      "xp": 581145.0427597946,
+      "ryo": 16457
      },
      "practice": {
-      "ms": 45430500,
-      "xp": 529515.2907799535,
+      "ms": 46904500,
+      "xp": 612529.2118839596,
       "ryo": 200
      },
      "fight": {
-      "ms": 6676500,
-      "xp": 94706.7480364919,
-      "ryo": 26890
+      "ms": 8447500,
+      "xp": 123654.74535624574,
+      "ryo": 32647
      },
      "fightAlly": {
-      "ms": 2828500,
-      "xp": 64070.29540248233,
-      "ryo": 24501
+      "ms": 4047500,
+      "xp": 87778.00413014775,
+      "ryo": 30258
      },
-     "fights": 318,
-     "fightsWithAllies": 246,
-     "cloneXp": 322790.6528831747,
-     "totalXp": 1248891.470000001,
-     "actionMs": {
-      "main": 98744500,
-      "clone": 46536500
-     },
-     "levels": {
-      "tai": 50,
-      "nin": 50,
-      "katon": 50,
-      "futon": 50,
-      "raiton": 49,
-      "cc": 50,
-      "med": 50,
-      "ath": 50,
-      "herb": 50,
-      "scout": 50,
-      "prov": 46,
-      "alch": 45,
-      "vit": 50
-     },
-     "minLevel": 45,
-     "minLevelAtChunin": 45,
-     "rank": "chunin",
-     "rejected": 26,
-     "firstRejection": "error.missingIngredient",
-     "blocked": null,
-     "quests": {
-      "core:graduation": "done",
-      "core:mission_board": "done",
-      "core:outskirts": "done",
-      "core:shadow_clones": "done",
-      "core:rival": "done",
-      "core:border_wolves": "done",
-      "core:eternal_rivalry": "done",
-      "core:grey_bands": "done",
-      "core:name_on_stone": "done"
-     },
-     "defeats": {
-      "core:boss_wolf": 1,
-      "core:boss_fighter": 1,
-      "core:boss_hunter": 1,
-      "core:boss_twins": 1
-     },
-     "questsDoneAt": {
-      "core:graduation": 0.8445833333333334,
-      "core:mission_board": 1.2531666666666668,
-      "core:border_wolves": 4.270122777777778,
-      "core:eternal_rivalry": 7.477693611111111,
-      "core:shadow_clones": 13.431111111111111,
-      "core:grey_bands": 17.15525472222222,
-      "core:outskirts": 27.094583333333333,
-      "core:name_on_stone": 27.395687777777777,
-      "core:rival": 27.395687777777777
-     },
-     "opsCleared": [
-      "core:op_hideout",
-      "core:op_tournament"
-     ]
-    },
-    {
-     "strategy": "story",
-     "triple": [
-      "katon",
-      "futon",
-      "raiton"
-     ],
-     "seed": 2,
-     "ended": "done",
-     "hours": 28.180972222222223,
-     "levelsAt3h": {
-      "tai": 12,
-      "nin": 11,
-      "katon": 6,
-      "cc": 15,
-      "med": 10,
-      "ath": 22,
-      "herb": 14,
-      "scout": 11,
-      "prov": 6,
-      "alch": 7,
-      "vit": 5
-     },
-     "genin": 0.845,
-     "clone": 14.174861111111111,
-     "chunin": 28.180972222222223,
-     "cap": 27.60763888888889,
-     "longestGap": {
-      "hours": 2.0867572222222224,
-      "after": "Алхімія 40"
-     },
-     "cadence": {
-      "hours": 1.118,
-      "allowed": 2,
-      "after": "Травництво 20"
-     },
-     "cloneShareRun": 0.46174661784202303,
-     "cloneShareOpen": 0.9290565031137202,
-     "mission": {
-      "ms": 50719000,
-      "xp": 585548.3010324184,
-      "ryo": 13822
-     },
-     "practice": {
-      "ms": 43631500,
-      "xp": 634221.099079089,
-      "ryo": 200
-     },
-     "fight": {
-      "ms": 7100500,
-      "xp": 97559.59988849258,
-      "ryo": 27851
-     },
-     "fightAlly": {
-      "ms": 2668000,
-      "xp": 62568.6973078326,
-      "ryo": 25890
-     },
-     "fights": 322,
-     "fightsWithAllies": 228,
-     "cloneXp": 310076.00910020364,
+     "fights": 423,
+     "fightsWithAllies": 351,
+     "cloneXp": 308346.6803700066,
      "totalXp": 1317329,
      "actionMs": {
-      "main": 101451500,
-      "clone": 46847000
+      "main": 106948500,
+      "clone": 54814000
      },
      "levels": {
       "tai": 50,
@@ -233,8 +113,127 @@
      "minLevel": 50,
      "minLevelAtChunin": 50,
      "rank": "chunin",
-     "rejected": 0,
-     "firstRejection": null,
+     "rejected": 26,
+     "firstRejection": "error.missingIngredient",
+     "blocked": null,
+     "quests": {
+      "core:graduation": "done",
+      "core:mission_board": "done",
+      "core:outskirts": "done",
+      "core:shadow_clones": "done",
+      "core:rival": "done",
+      "core:border_wolves": "done",
+      "core:eternal_rivalry": "done",
+      "core:grey_bands": "done",
+      "core:name_on_stone": "done"
+     },
+     "defeats": {
+      "core:boss_wolf": 1,
+      "core:boss_fighter": 1,
+      "core:boss_hunter": 1
+     },
+     "questsDoneAt": {
+      "core:graduation": 0.8445833333333334,
+      "core:mission_board": 1.2531666666666668,
+      "core:border_wolves": 4.270122777777778,
+      "core:eternal_rivalry": 7.477693611111111,
+      "core:shadow_clones": 13.426944444444445,
+      "core:grey_bands": 18.972648888888887,
+      "core:outskirts": 29.344583333333333,
+      "core:name_on_stone": 29.674543611111112,
+      "core:rival": 29.674543611111112
+     },
+     "opsCleared": [
+      "core:op_hideout",
+      "core:op_tournament"
+     ]
+    },
+    {
+     "strategy": "story",
+     "triple": [
+      "katon",
+      "futon",
+      "raiton"
+     ],
+     "seed": 2,
+     "ended": "done",
+     "hours": 28.266666666666666,
+     "levelsAt3h": {
+      "tai": 12,
+      "nin": 11,
+      "katon": 6,
+      "cc": 15,
+      "med": 10,
+      "ath": 22,
+      "herb": 14,
+      "scout": 11,
+      "prov": 6,
+      "alch": 7,
+      "vit": 5
+     },
+     "genin": 0.845,
+     "clone": 14.189583333333333,
+     "chunin": 28.266666666666666,
+     "cap": 25.97888888888889,
+     "longestGap": {
+      "hours": 1.2840777777777779,
+      "after": "ранг Репутації «Дарунок села»"
+     },
+     "cadence": {
+      "hours": 1.118,
+      "allowed": 2,
+      "after": "Травництво 20"
+     },
+     "cloneShareRun": 0.45241728577044027,
+     "cloneShareOpen": 0.9084501603275615,
+     "mission": {
+      "ms": 51239500,
+      "xp": 643312.4827670291,
+      "ryo": 14389
+     },
+     "practice": {
+      "ms": 43272000,
+      "xp": 572605.497769472,
+      "ryo": 200
+     },
+     "fight": {
+      "ms": 7247500,
+      "xp": 101411.01946349899,
+      "ryo": 29689
+     },
+     "fightAlly": {
+      "ms": 2792500,
+      "xp": 66102.86485467775,
+      "ryo": 27728
+     },
+     "fights": 327,
+     "fightsWithAllies": 233,
+     "cloneXp": 338104.79088858486,
+     "totalXp": 1317329,
+     "actionMs": {
+      "main": 101759500,
+      "clone": 46040000
+     },
+     "levels": {
+      "tai": 50,
+      "nin": 50,
+      "katon": 50,
+      "futon": 50,
+      "raiton": 50,
+      "cc": 50,
+      "med": 50,
+      "ath": 50,
+      "herb": 50,
+      "scout": 50,
+      "prov": 50,
+      "alch": 50,
+      "vit": 50
+     },
+     "minLevel": 50,
+     "minLevelAtChunin": 50,
+     "rank": "chunin",
+     "rejected": 3,
+     "firstRejection": "error.notEnoughRyo",
      "blocked": null,
      "quests": {
       "core:graduation": "done",
@@ -258,11 +257,11 @@
       "core:mission_board": 1.2808055555555555,
       "core:border_wolves": 4.431206111111111,
       "core:eternal_rivalry": 8.443177777777779,
-      "core:shadow_clones": 14.174861111111111,
-      "core:grey_bands": 17.133393333333334,
-      "core:outskirts": 27.845,
-      "core:name_on_stone": 28.147633333333335,
-      "core:rival": 28.147633333333335
+      "core:shadow_clones": 14.189583333333333,
+      "core:grey_bands": 17.16255138888889,
+      "core:outskirts": 27.928333333333335,
+      "core:name_on_stone": 28.23331,
+      "core:rival": 28.23331
      },
      "opsCleared": [
       "core:op_hideout",
@@ -278,7 +277,7 @@
      ],
      "seed": 3,
      "ended": "done",
-     "hours": 26.357222222222223,
+     "hours": 26.69333333333333,
      "levelsAt3h": {
       "tai": 12,
       "nin": 10,
@@ -293,62 +292,62 @@
       "vit": 5
      },
      "genin": 0.8452777777777778,
-     "clone": 13.377777777777778,
-     "chunin": 26.357222222222223,
+     "clone": 13.376944444444444,
+     "chunin": 26.69333333333333,
      "cap": null,
      "longestGap": {
-      "hours": 2.368564722222222,
-      "after": "Алхімія 40"
+      "hours": 1.6000922222222222,
+      "after": "Футон 50"
      },
      "cadence": {
-      "hours": 2.368564722222222,
-      "allowed": 5.20238888888889,
-      "after": "Алхімія 40"
+      "hours": 0.7877788888888889,
+      "allowed": 2,
+      "after": "Футон 10"
      },
-     "cloneShareRun": 0.45679013763885085,
-     "cloneShareOpen": 0.9275989598938492,
+     "cloneShareRun": 0.4649516837329337,
+     "cloneShareOpen": 0.9320177100064666,
      "mission": {
-      "ms": 47259500,
-      "xp": 680885.7562280602,
-      "ryo": 12300
+      "ms": 45924000,
+      "xp": 692866.399465827,
+      "ryo": 11816
      },
      "practice": {
-      "ms": 44126500,
-      "xp": 432786.2653619378,
-      "ryo": 800
+      "ms": 45206000,
+      "xp": 458356.97309388994,
+      "ryo": 200
      },
      "fight": {
-      "ms": 3499500,
-      "xp": 40668.415486895596,
-      "ryo": 12552
+      "ms": 4965500,
+      "xp": 70944.28847321536,
+      "ryo": 18496
      },
      "fightAlly": {
-      "ms": 855500,
-      "xp": 23455.790236880013,
-      "ryo": 9798
+      "ms": 1792000,
+      "xp": 47078.58613784972,
+      "ryo": 15742
      },
-     "fights": 145,
-     "fightsWithAllies": 77,
-     "cloneXp": 261069.1535821673,
-     "totalXp": 1154340.4370768936,
+     "fights": 219,
+     "fightsWithAllies": 150,
+     "cloneXp": 321497.21283894475,
+     "totalXp": 1222167.6610329323,
      "actionMs": {
-      "main": 94886000,
-      "clone": 43345000
+      "main": 96096000,
+      "clone": 44682500
      },
      "levels": {
       "tai": 50,
       "nin": 50,
       "katon": 50,
-      "futon": 49,
-      "raiton": 49,
-      "cc": 48,
+      "futon": 50,
+      "raiton": 50,
+      "cc": 50,
       "med": 50,
       "ath": 50,
       "herb": 50,
       "scout": 50,
-      "prov": 44,
+      "prov": 45,
       "alch": 44,
-      "vit": 44
+      "vit": 47
      },
      "minLevel": 44,
      "minLevelAtChunin": 44,
@@ -370,18 +369,19 @@
      "defeats": {
       "core:boss_wolf": 1,
       "core:boss_fighter": 1,
-      "core:boss_hunter": 1
+      "core:boss_hunter": 1,
+      "core:boss_mist": 2
      },
      "questsDoneAt": {
       "core:graduation": 0.8452777777777778,
       "core:mission_board": 1.2562222222222221,
       "core:border_wolves": 4.2432244444444445,
       "core:eternal_rivalry": 7.4681325,
-      "core:shadow_clones": 13.377777777777778,
-      "core:grey_bands": 14.88034,
-      "core:outskirts": 26.011944444444445,
-      "core:name_on_stone": 26.323831666666667,
-      "core:rival": 26.323831666666667
+      "core:shadow_clones": 13.376944444444444,
+      "core:grey_bands": 16.03653111111111,
+      "core:outskirts": 26.345277777777778,
+      "core:name_on_stone": 26.659964166666665,
+      "core:rival": 26.659964166666665
      },
      "opsCleared": [
       "core:op_hideout",
@@ -407,7 +407,7 @@
      ],
      "seed": 1,
      "ended": "done",
-     "hours": 27.429027777777776,
+     "hours": 29.707916666666666,
      "levelsAt3h": {
       "tai": 12,
       "nin": 10,
@@ -422,167 +422,47 @@
       "vit": 5
      },
      "genin": 0.8445833333333334,
-     "clone": 13.431111111111111,
-     "chunin": 27.429027777777776,
-     "cap": null,
+     "clone": 13.426944444444445,
+     "chunin": 29.707916666666666,
+     "cap": 27.721944444444443,
      "longestGap": {
-      "hours": 1.2779233333333333,
-      "after": "Травництво 50"
+      "hours": 1.6226586111111112,
+      "after": "Алхімія 50"
      },
      "cadence": {
       "hours": 0.9200161111111111,
       "allowed": 2,
       "after": "«Вовки Прикордонного лісу» завершено"
      },
-     "cloneShareRun": 0.47119924654031364,
-     "cloneShareOpen": 0.923318628764201,
+     "cloneShareRun": 0.51251153592617,
+     "cloneShareOpen": 0.9351806386118765,
      "mission": {
-      "ms": 46636500,
-      "xp": 624668.0451835556,
-      "ryo": 12795
+      "ms": 51601500,
+      "xp": 581147.9848597947,
+      "ryo": 16457
      },
      "practice": {
-      "ms": 45431000,
-      "xp": 530596.9577799534,
+      "ms": 46899000,
+      "xp": 612526.2697839595,
       "ryo": 200
      },
      "fight": {
-      "ms": 6676500,
-      "xp": 94706.7480364919,
-      "ryo": 26890
+      "ms": 8447500,
+      "xp": 123654.74535624574,
+      "ryo": 32647
      },
      "fightAlly": {
-      "ms": 2828500,
-      "xp": 64070.29540248233,
-      "ryo": 24501
+      "ms": 4047500,
+      "xp": 87778.00413014775,
+      "ryo": 30258
      },
-     "fights": 318,
-     "fightsWithAllies": 246,
-     "cloneXp": 323875.1023831744,
-     "totalXp": 1249971.7510000009,
-     "actionMs": {
-      "main": 98744500,
-      "clone": 46530500
-     },
-     "levels": {
-      "tai": 50,
-      "nin": 50,
-      "katon": 50,
-      "futon": 50,
-      "doton": 50,
-      "cc": 50,
-      "med": 50,
-      "ath": 50,
-      "herb": 50,
-      "scout": 50,
-      "prov": 46,
-      "alch": 45,
-      "vit": 50
-     },
-     "minLevel": 45,
-     "minLevelAtChunin": 45,
-     "rank": "chunin",
-     "rejected": 26,
-     "firstRejection": "error.missingIngredient",
-     "blocked": null,
-     "quests": {
-      "core:graduation": "done",
-      "core:mission_board": "done",
-      "core:outskirts": "done",
-      "core:shadow_clones": "done",
-      "core:rival": "done",
-      "core:border_wolves": "done",
-      "core:eternal_rivalry": "done",
-      "core:grey_bands": "done",
-      "core:name_on_stone": "done"
-     },
-     "defeats": {
-      "core:boss_wolf": 1,
-      "core:boss_fighter": 1,
-      "core:boss_hunter": 1,
-      "core:boss_twins": 1
-     },
-     "questsDoneAt": {
-      "core:graduation": 0.8445833333333334,
-      "core:mission_board": 1.2531666666666668,
-      "core:border_wolves": 4.270122777777778,
-      "core:eternal_rivalry": 7.477693611111111,
-      "core:shadow_clones": 13.431111111111111,
-      "core:grey_bands": 17.15525472222222,
-      "core:outskirts": 27.094583333333333,
-      "core:name_on_stone": 27.395687777777777,
-      "core:rival": 27.395687777777777
-     },
-     "opsCleared": [
-      "core:op_hideout",
-      "core:op_tournament"
-     ]
-    },
-    {
-     "strategy": "story",
-     "triple": [
-      "katon",
-      "futon",
-      "doton"
-     ],
-     "seed": 2,
-     "ended": "done",
-     "hours": 28.186805555555555,
-     "levelsAt3h": {
-      "tai": 12,
-      "nin": 11,
-      "katon": 6,
-      "cc": 15,
-      "med": 10,
-      "ath": 22,
-      "herb": 14,
-      "scout": 11,
-      "prov": 6,
-      "alch": 7,
-      "vit": 5
-     },
-     "genin": 0.845,
-     "clone": 14.174861111111111,
-     "chunin": 28.186805555555555,
-     "cap": 27.603194444444444,
-     "longestGap": {
-      "hours": 2.0867572222222224,
-      "after": "Алхімія 40"
-     },
-     "cadence": {
-      "hours": 1.118,
-      "allowed": 2,
-      "after": "Травництво 20"
-     },
-     "cloneShareRun": 0.4622029318288206,
-     "cloneShareOpen": 0.9297798901730666,
-     "mission": {
-      "ms": 50833000,
-      "xp": 585620.7667824185,
-      "ryo": 13822
-     },
-     "practice": {
-      "ms": 43517500,
-      "xp": 634148.6333290889,
-      "ryo": 200
-     },
-     "fight": {
-      "ms": 7121500,
-      "xp": 97559.59988849258,
-      "ryo": 27851
-     },
-     "fightAlly": {
-      "ms": 2692000,
-      "xp": 62568.6973078326,
-      "ryo": 25890
-     },
-     "fights": 322,
-     "fightsWithAllies": 228,
-     "cloneXp": 310744.34824420355,
+     "fights": 423,
+     "fightsWithAllies": 351,
+     "cloneXp": 308350.8355700065,
      "totalXp": 1317329,
      "actionMs": {
-      "main": 101472500,
-      "clone": 46903000
+      "main": 106948500,
+      "clone": 54814000
      },
      "levels": {
       "tai": 50,
@@ -602,8 +482,127 @@
      "minLevel": 50,
      "minLevelAtChunin": 50,
      "rank": "chunin",
-     "rejected": 0,
-     "firstRejection": null,
+     "rejected": 26,
+     "firstRejection": "error.missingIngredient",
+     "blocked": null,
+     "quests": {
+      "core:graduation": "done",
+      "core:mission_board": "done",
+      "core:outskirts": "done",
+      "core:shadow_clones": "done",
+      "core:rival": "done",
+      "core:border_wolves": "done",
+      "core:eternal_rivalry": "done",
+      "core:grey_bands": "done",
+      "core:name_on_stone": "done"
+     },
+     "defeats": {
+      "core:boss_wolf": 1,
+      "core:boss_fighter": 1,
+      "core:boss_hunter": 1
+     },
+     "questsDoneAt": {
+      "core:graduation": 0.8445833333333334,
+      "core:mission_board": 1.2531666666666668,
+      "core:border_wolves": 4.270122777777778,
+      "core:eternal_rivalry": 7.477693611111111,
+      "core:shadow_clones": 13.426944444444445,
+      "core:grey_bands": 18.972648888888887,
+      "core:outskirts": 29.344583333333333,
+      "core:name_on_stone": 29.674543611111112,
+      "core:rival": 29.674543611111112
+     },
+     "opsCleared": [
+      "core:op_hideout",
+      "core:op_tournament"
+     ]
+    },
+    {
+     "strategy": "story",
+     "triple": [
+      "katon",
+      "futon",
+      "doton"
+     ],
+     "seed": 2,
+     "ended": "done",
+     "hours": 28.28375,
+     "levelsAt3h": {
+      "tai": 12,
+      "nin": 11,
+      "katon": 6,
+      "cc": 15,
+      "med": 10,
+      "ath": 22,
+      "herb": 14,
+      "scout": 11,
+      "prov": 6,
+      "alch": 7,
+      "vit": 5
+     },
+     "genin": 0.845,
+     "clone": 14.189583333333333,
+     "chunin": 28.28375,
+     "cap": 26.002083333333335,
+     "longestGap": {
+      "hours": 1.118,
+      "after": "Травництво 20"
+     },
+     "cadence": {
+      "hours": 1.118,
+      "allowed": 2,
+      "after": "Травництво 20"
+     },
+     "cloneShareRun": 0.4527449801859136,
+     "cloneShareOpen": 0.9085550168509431,
+     "mission": {
+      "ms": 51156000,
+      "xp": 641955.8130241571,
+      "ryo": 13832
+     },
+     "practice": {
+      "ms": 43308500,
+      "xp": 572606.6567694726,
+      "ryo": 200
+     },
+     "fight": {
+      "ms": 7356000,
+      "xp": 102766.53020637031,
+      "ryo": 30095
+     },
+     "fightAlly": {
+      "ms": 2900500,
+      "xp": 67397.54693735804,
+      "ryo": 28134
+     },
+     "fights": 328,
+     "fightsWithAllies": 234,
+     "cloneXp": 338103.6318885847,
+     "totalXp": 1317329,
+     "actionMs": {
+      "main": 101821000,
+      "clone": 46101000
+     },
+     "levels": {
+      "tai": 50,
+      "nin": 50,
+      "katon": 50,
+      "futon": 50,
+      "doton": 50,
+      "cc": 50,
+      "med": 50,
+      "ath": 50,
+      "herb": 50,
+      "scout": 50,
+      "prov": 50,
+      "alch": 50,
+      "vit": 50
+     },
+     "minLevel": 50,
+     "minLevelAtChunin": 50,
+     "rank": "chunin",
+     "rejected": 3,
+     "firstRejection": "error.notEnoughRyo",
      "blocked": null,
      "quests": {
       "core:graduation": "done",
@@ -627,11 +626,11 @@
       "core:mission_board": 1.2808055555555555,
       "core:border_wolves": 4.431206111111111,
       "core:eternal_rivalry": 8.443177777777779,
-      "core:shadow_clones": 14.174861111111111,
-      "core:grey_bands": 17.133393333333334,
-      "core:outskirts": 27.845,
-      "core:name_on_stone": 28.15338861111111,
-      "core:rival": 28.15338861111111
+      "core:shadow_clones": 14.189583333333333,
+      "core:grey_bands": 17.16255138888889,
+      "core:outskirts": 27.928333333333335,
+      "core:name_on_stone": 28.250358055555555,
+      "core:rival": 28.250358055555555
      },
      "opsCleared": [
       "core:op_hideout",
@@ -647,7 +646,7 @@
      ],
      "seed": 3,
      "ended": "done",
-     "hours": 26.364305555555557,
+     "hours": 26.693194444444444,
      "levelsAt3h": {
       "tai": 12,
       "nin": 10,
@@ -662,53 +661,53 @@
       "vit": 5
      },
      "genin": 0.8452777777777778,
-     "clone": 13.377777777777778,
-     "chunin": 26.364305555555557,
+     "clone": 13.376944444444444,
+     "chunin": 26.693194444444444,
      "cap": null,
      "longestGap": {
-      "hours": 1.8492775,
-      "after": "Алхімія 40"
+      "hours": 1.6042816666666666,
+      "after": "Футон 50"
      },
      "cadence": {
       "hours": 0.7877788888888889,
       "allowed": 2,
       "after": "Футон 10"
      },
-     "cloneShareRun": 0.45330638542220913,
-     "cloneShareOpen": 0.920269702576388,
+     "cloneShareRun": 0.46497755878266933,
+     "cloneShareOpen": 0.9320744495551592,
      "mission": {
-      "ms": 47162500,
-      "xp": 733679.8326905618,
-      "ryo": 12900
+      "ms": 46024500,
+      "xp": 692495.813515827,
+      "ryo": 11816
      },
      "practice": {
-      "ms": 44005500,
-      "xp": 423607.7306869384,
+      "ms": 45105500,
+      "xp": 459170.9330438901,
       "ryo": 200
      },
      "fight": {
-      "ms": 3743000,
-      "xp": 48237.63398859196,
-      "ryo": 14787
+      "ms": 4965000,
+      "xp": 70892.1377014466,
+      "ryo": 18496
      },
      "fightAlly": {
-      "ms": 1072000,
-      "xp": 30400.501160615066,
-      "ryo": 12033
+      "ms": 1790500,
+      "xp": 47026.43536608049,
+      "ryo": 15742
      },
-     "fights": 150,
-     "fightsWithAllies": 82,
-     "cloneXp": 313863.23004466866,
-     "totalXp": 1205525.1973660921,
+     "fights": 219,
+     "fightsWithAllies": 150,
+     "cloneXp": 321035.47008894477,
+     "totalXp": 1222558.8842611637,
      "actionMs": {
-      "main": 94911500,
-      "clone": 43026000
+      "main": 96095500,
+      "clone": 44685000
      },
      "levels": {
       "tai": 50,
       "nin": 50,
       "katon": 50,
-      "futon": 49,
+      "futon": 50,
       "doton": 50,
       "cc": 50,
       "med": 50,
@@ -717,7 +716,7 @@
       "scout": 50,
       "prov": 45,
       "alch": 44,
-      "vit": 45
+      "vit": 47
      },
      "minLevel": 44,
      "minLevelAtChunin": 44,
@@ -739,18 +738,19 @@
      "defeats": {
       "core:boss_wolf": 1,
       "core:boss_fighter": 1,
-      "core:boss_hunter": 1
+      "core:boss_hunter": 1,
+      "core:boss_mist": 2
      },
      "questsDoneAt": {
       "core:graduation": 0.8452777777777778,
       "core:mission_board": 1.2562222222222221,
       "core:border_wolves": 4.2432244444444445,
       "core:eternal_rivalry": 7.4681325,
-      "core:shadow_clones": 13.377777777777778,
-      "core:grey_bands": 14.88034,
-      "core:outskirts": 26.011944444444445,
-      "core:name_on_stone": 26.330866666666665,
-      "core:rival": 26.330866666666665
+      "core:shadow_clones": 13.376944444444444,
+      "core:grey_bands": 16.03653111111111,
+      "core:outskirts": 26.345277777777778,
+      "core:name_on_stone": 26.659825277777777,
+      "core:rival": 26.659825277777777
      },
      "opsCleared": [
       "core:op_hideout",
@@ -776,7 +776,7 @@
      ],
      "seed": 1,
      "ended": "done",
-     "hours": 27.43722222222222,
+     "hours": 28.904166666666665,
      "levelsAt3h": {
       "tai": 12,
       "nin": 10,
@@ -791,11 +791,11 @@
       "vit": 5
      },
      "genin": 0.8445833333333334,
-     "clone": 13.431111111111111,
-     "chunin": 27.43722222222222,
-     "cap": null,
+     "clone": 13.426944444444445,
+     "chunin": 28.904166666666665,
+     "cap": 27.56486111111111,
      "longestGap": {
-      "hours": 2.348423888888889,
+      "hours": 1.6268969444444445,
       "after": "Суйтон 50"
      },
      "cadence": {
@@ -803,35 +803,35 @@
       "allowed": 2,
       "after": "«Вовки Прикордонного лісу» завершено"
      },
-     "cloneShareRun": 0.47516217830603197,
-     "cloneShareOpen": 0.9308172821387489,
+     "cloneShareRun": 0.5029316323098362,
+     "cloneShareOpen": 0.9392395814637998,
      "mission": {
-      "ms": 46572000,
-      "xp": 650073.0770778995,
-      "ryo": 12188
+      "ms": 49302500,
+      "xp": 607900.1040940451,
+      "ryo": 14045
      },
      "practice": {
-      "ms": 45495500,
-      "xp": 532833.9500299514,
+      "ms": 46375000,
+      "xp": 585774.1505497091,
       "ryo": 200
      },
      "fight": {
-      "ms": 6706000,
-      "xp": 101538.80989214986,
-      "ryo": 26966
+      "ms": 8377000,
+      "xp": 123654.74535624574,
+      "ryo": 32647
      },
      "fightAlly": {
-      "ms": 2854000,
-      "xp": 69882.47461312328,
-      "ryo": 24577
+      "ms": 3982000,
+      "xp": 87778.00413014775,
+      "ryo": 30258
      },
-     "fights": 313,
-     "fightsWithAllies": 241,
-     "cloneXp": 304235.53015546786,
-     "totalXp": 1284445.8370000008,
+     "fights": 413,
+     "fightsWithAllies": 341,
+     "cloneXp": 281678.9863857563,
+     "totalXp": 1317329,
      "actionMs": {
-      "main": 98774000,
-      "clone": 46936000
+      "main": 104055000,
+      "clone": 52334000
      },
      "levels": {
       "tai": 50,
@@ -844,12 +844,379 @@
       "ath": 50,
       "herb": 50,
       "scout": 50,
-      "prov": 48,
-      "alch": 47,
+      "prov": 50,
+      "alch": 50,
       "vit": 50
      },
-     "minLevel": 47,
-     "minLevelAtChunin": 47,
+     "minLevel": 50,
+     "minLevelAtChunin": 50,
+     "rank": "chunin",
+     "rejected": 26,
+     "firstRejection": "error.missingIngredient",
+     "blocked": null,
+     "quests": {
+      "core:graduation": "done",
+      "core:mission_board": "done",
+      "core:outskirts": "4",
+      "core:shadow_clones": "done",
+      "core:rival": "done",
+      "core:border_wolves": "done",
+      "core:eternal_rivalry": "done",
+      "core:grey_bands": "done",
+      "core:name_on_stone": "done"
+     },
+     "defeats": {
+      "core:boss_wolf": 1,
+      "core:boss_fighter": 1,
+      "core:boss_hunter": 1
+     },
+     "questsDoneAt": {
+      "core:graduation": 0.8445833333333334,
+      "core:mission_board": 1.2531666666666668,
+      "core:border_wolves": 4.270122777777778,
+      "core:eternal_rivalry": 7.477693611111111,
+      "core:shadow_clones": 13.426944444444445,
+      "core:grey_bands": 18.972648888888887,
+      "core:name_on_stone": 28.870716666666667,
+      "core:rival": 28.870716666666667
+     },
+     "opsCleared": [
+      "core:op_hideout",
+      "core:op_tournament"
+     ]
+    },
+    {
+     "strategy": "story",
+     "triple": [
+      "katon",
+      "futon",
+      "suiton"
+     ],
+     "seed": 2,
+     "ended": "done",
+     "hours": 28.274583333333332,
+     "levelsAt3h": {
+      "tai": 12,
+      "nin": 11,
+      "katon": 6,
+      "cc": 15,
+      "med": 10,
+      "ath": 22,
+      "herb": 14,
+      "scout": 11,
+      "prov": 6,
+      "alch": 7,
+      "vit": 5
+     },
+     "genin": 0.845,
+     "clone": 14.189583333333333,
+     "chunin": 28.274583333333332,
+     "cap": 26.030277777777776,
+     "longestGap": {
+      "hours": 1.8980583333333334,
+      "after": "Живучість 50"
+     },
+     "cadence": {
+      "hours": 1.118,
+      "allowed": 2,
+      "after": "Травництво 20"
+     },
+     "cloneShareRun": 0.4540774841951694,
+     "cloneShareOpen": 0.9115265649035617,
+     "mission": {
+      "ms": 50992500,
+      "xp": 652577.5815719003,
+      "ryo": 13877
+     },
+     "practice": {
+      "ms": 43333500,
+      "xp": 557743.9539512955,
+      "ryo": 200
+     },
+     "fight": {
+      "ms": 7461500,
+      "xp": 107007.46447680416,
+      "ryo": 31940
+     },
+     "fightAlly": {
+      "ms": 2989500,
+      "xp": 71496.54766734614,
+      "ryo": 29979
+     },
+     "fights": 326,
+     "fightsWithAllies": 232,
+     "cloneXp": 310865.79737981805,
+     "totalXp": 1317329,
+     "actionMs": {
+      "main": 101788000,
+      "clone": 46222000
+     },
+     "levels": {
+      "tai": 50,
+      "nin": 50,
+      "katon": 50,
+      "futon": 50,
+      "suiton": 50,
+      "cc": 50,
+      "med": 50,
+      "ath": 50,
+      "herb": 50,
+      "scout": 50,
+      "prov": 50,
+      "alch": 50,
+      "vit": 50
+     },
+     "minLevel": 50,
+     "minLevelAtChunin": 50,
+     "rank": "chunin",
+     "rejected": 3,
+     "firstRejection": "error.notEnoughRyo",
+     "blocked": null,
+     "quests": {
+      "core:graduation": "done",
+      "core:mission_board": "done",
+      "core:outskirts": "done",
+      "core:shadow_clones": "done",
+      "core:rival": "done",
+      "core:border_wolves": "done",
+      "core:eternal_rivalry": "done",
+      "core:grey_bands": "done",
+      "core:name_on_stone": "done"
+     },
+     "defeats": {
+      "core:boss_wolf": 1,
+      "core:boss_fighter": 3,
+      "core:boss_hunter": 1,
+      "core:boss_mist": 1
+     },
+     "questsDoneAt": {
+      "core:graduation": 0.845,
+      "core:mission_board": 1.2808055555555555,
+      "core:border_wolves": 4.431206111111111,
+      "core:eternal_rivalry": 8.443177777777779,
+      "core:shadow_clones": 14.189583333333333,
+      "core:grey_bands": 17.16255138888889,
+      "core:outskirts": 27.928333333333335,
+      "core:name_on_stone": 28.241208333333333,
+      "core:rival": 28.241208333333333
+     },
+     "opsCleared": [
+      "core:op_hideout",
+      "core:op_tournament"
+     ]
+    },
+    {
+     "strategy": "story",
+     "triple": [
+      "katon",
+      "futon",
+      "suiton"
+     ],
+     "seed": 3,
+     "ended": "done",
+     "hours": 24.87638888888889,
+     "levelsAt3h": {
+      "tai": 12,
+      "nin": 10,
+      "katon": 6,
+      "cc": 15,
+      "med": 10,
+      "ath": 22,
+      "herb": 13,
+      "scout": 11,
+      "prov": 7,
+      "alch": 7,
+      "vit": 5
+     },
+     "genin": 0.8452777777777778,
+     "clone": 13.376944444444444,
+     "chunin": 24.87638888888889,
+     "cap": null,
+     "longestGap": {
+      "hours": 1.2470861111111111,
+      "after": "Суйтон 10"
+     },
+     "cadence": {
+      "hours": 0.7877788888888889,
+      "allowed": 2,
+      "after": "Футон 10"
+     },
+     "cloneShareRun": 0.4268540673329239,
+     "cloneShareOpen": 0.9234000676361177,
+     "mission": {
+      "ms": 41194000,
+      "xp": 725159.1091655445,
+      "ryo": 9750
+     },
+     "practice": {
+      "ms": 43411500,
+      "xp": 364528.99037388916,
+      "ryo": 200
+     },
+     "fight": {
+      "ms": 4949000,
+      "xp": 70117.55069677689,
+      "ryo": 22414
+     },
+     "fightAlly": {
+      "ms": 1768500,
+      "xp": 46221.66079121537,
+      "ryo": 19660
+     },
+     "fights": 210,
+     "fightsWithAllies": 141,
+     "cloneXp": 294692.86746894126,
+     "totalXp": 1159805.6502362106,
+     "actionMs": {
+      "main": 89555000,
+      "clone": 38229000
+     },
+     "levels": {
+      "tai": 50,
+      "nin": 50,
+      "katon": 50,
+      "futon": 50,
+      "suiton": 49,
+      "cc": 48,
+      "med": 50,
+      "ath": 50,
+      "herb": 50,
+      "scout": 50,
+      "prov": 43,
+      "alch": 41,
+      "vit": 46
+     },
+     "minLevel": 41,
+     "minLevelAtChunin": 41,
+     "rank": "chunin",
+     "rejected": 0,
+     "firstRejection": null,
+     "blocked": null,
+     "quests": {
+      "core:graduation": "done",
+      "core:mission_board": "done",
+      "core:outskirts": "4",
+      "core:shadow_clones": "done",
+      "core:rival": "done",
+      "core:border_wolves": "done",
+      "core:eternal_rivalry": "done",
+      "core:grey_bands": "done",
+      "core:name_on_stone": "done"
+     },
+     "defeats": {
+      "core:boss_wolf": 1,
+      "core:boss_fighter": 1,
+      "core:boss_hunter": 1,
+      "core:boss_mist": 2
+     },
+     "questsDoneAt": {
+      "core:graduation": 0.8452777777777778,
+      "core:mission_board": 1.2562222222222221,
+      "core:border_wolves": 4.2432244444444445,
+      "core:eternal_rivalry": 7.4681325,
+      "core:shadow_clones": 13.376944444444444,
+      "core:grey_bands": 16.03653111111111,
+      "core:name_on_stone": 24.842999444444445,
+      "core:rival": 24.842999444444445
+     },
+     "opsCleared": [
+      "core:op_hideout",
+      "core:op_tournament"
+     ]
+    }
+   ]
+  },
+  {
+   "strategy": "story",
+   "triple": [
+    "katon",
+    "raiton",
+    "doton"
+   ],
+   "runs": [
+    {
+     "strategy": "story",
+     "triple": [
+      "katon",
+      "raiton",
+      "doton"
+     ],
+     "seed": 1,
+     "ended": "done",
+     "hours": 27.1525,
+     "levelsAt3h": {
+      "tai": 12,
+      "nin": 10,
+      "katon": 6,
+      "cc": 15,
+      "med": 10,
+      "ath": 22,
+      "herb": 13,
+      "scout": 11,
+      "prov": 7,
+      "alch": 7,
+      "vit": 5
+     },
+     "genin": 0.8445833333333334,
+     "clone": 13.426944444444445,
+     "chunin": 27.1525,
+     "cap": null,
+     "longestGap": {
+      "hours": 1.2293538888888889,
+      "after": "Контроль чакри 40"
+     },
+     "cadence": {
+      "hours": 0.9200161111111111,
+      "allowed": 2,
+      "after": "«Вовки Прикордонного лісу» завершено"
+     },
+     "cloneShareRun": 0.46848303307450717,
+     "cloneShareOpen": 0.926773820124666,
+     "mission": {
+      "ms": 46096500,
+      "xp": 539039.6517704914,
+      "ryo": 13034
+     },
+     "practice": {
+      "ms": 45368000,
+      "xp": 585723.5408020705,
+      "ryo": 200
+     },
+     "fight": {
+      "ms": 6284000,
+      "xp": 91567.09042743863,
+      "ryo": 26621
+     },
+     "fightAlly": {
+      "ms": 2745000,
+      "xp": 66422.7574967561,
+      "ryo": 24232
+     },
+     "fights": 308,
+     "fightsWithAllies": 237,
+     "cloneXp": 327347.83155257395,
+     "totalXp": 1216330.2830000005,
+     "actionMs": {
+      "main": 97749000,
+      "clone": 45795000
+     },
+     "levels": {
+      "tai": 50,
+      "nin": 50,
+      "katon": 50,
+      "raiton": 50,
+      "doton": 50,
+      "cc": 50,
+      "med": 50,
+      "ath": 50,
+      "herb": 50,
+      "scout": 50,
+      "prov": 44,
+      "alch": 42,
+      "vit": 50
+     },
+     "minLevel": 42,
+     "minLevelAtChunin": 42,
      "rank": "chunin",
      "rejected": 0,
      "firstRejection": null,
@@ -869,18 +1236,18 @@
       "core:boss_wolf": 1,
       "core:boss_fighter": 1,
       "core:boss_hunter": 1,
-      "core:boss_twins": 1
+      "core:boss_mist": 1
      },
      "questsDoneAt": {
       "core:graduation": 0.8445833333333334,
       "core:mission_board": 1.2531666666666668,
       "core:border_wolves": 4.270122777777778,
       "core:eternal_rivalry": 7.477693611111111,
-      "core:shadow_clones": 13.431111111111111,
-      "core:grey_bands": 17.15525472222222,
-      "core:outskirts": 27.094583333333333,
-      "core:name_on_stone": 27.403793888888888,
-      "core:rival": 27.403793888888888
+      "core:shadow_clones": 13.426944444444445,
+      "core:grey_bands": 16.88699611111111,
+      "core:outskirts": 26.844583333333333,
+      "core:name_on_stone": 27.119059444444446,
+      "core:rival": 27.119059444444446
      },
      "opsCleared": [
       "core:op_hideout",
@@ -891,12 +1258,12 @@
      "strategy": "story",
      "triple": [
       "katon",
-      "futon",
-      "suiton"
+      "raiton",
+      "doton"
      ],
      "seed": 2,
      "ended": "done",
-     "hours": 28.198888888888888,
+     "hours": 28.441388888888888,
      "levelsAt3h": {
       "tai": 12,
       "nin": 11,
@@ -911,54 +1278,54 @@
       "vit": 5
      },
      "genin": 0.845,
-     "clone": 14.174861111111111,
-     "chunin": 28.198888888888888,
-     "cap": 27.65375,
+     "clone": 14.189583333333333,
+     "chunin": 28.441388888888888,
+     "cap": 27.96361111111111,
      "longestGap": {
-      "hours": 1.3006666666666666,
-      "after": "Розвідка 50"
+      "hours": 2.2728558333333333,
+      "after": "Алхімія 40"
      },
      "cadence": {
       "hours": 1.118,
       "allowed": 2,
       "after": "Травництво 20"
      },
-     "cloneShareRun": 0.463878472359037,
-     "cloneShareOpen": 0.9327461202499678,
+     "cloneShareRun": 0.45999608356366406,
+     "cloneShareOpen": 0.9179838616939374,
      "mission": {
-      "ms": 50566500,
-      "xp": 583585.9213223881,
-      "ryo": 13483
+      "ms": 50409500,
+      "xp": 513497.8211722352,
+      "ryo": 13853
      },
      "practice": {
-      "ms": 43691000,
-      "xp": 633873.4131702457,
+      "ms": 45126500,
+      "xp": 614947.7237814986,
       "ryo": 200
      },
      "fight": {
-      "ms": 7258000,
-      "xp": 99869.66550736615,
-      "ryo": 28592
+      "ms": 6852500,
+      "xp": 188883.4550462661,
+      "ryo": 31215
      },
      "fightAlly": {
-      "ms": 2815000,
-      "xp": 64757.1056063241,
-      "ryo": 26631
+      "ms": 2737000,
+      "xp": 159557.85973343038,
+      "ryo": 29254
      },
-     "fights": 321,
-     "fightsWithAllies": 227,
-     "cloneXp": 279730.7224190443,
+     "fights": 300,
+     "fightsWithAllies": 206,
+     "cloneXp": 322195.494964112,
      "totalXp": 1317329,
      "actionMs": {
-      "main": 101516000,
-      "clone": 47093000
+      "main": 102389000,
+      "clone": 47100000
      },
      "levels": {
       "tai": 50,
       "nin": 50,
       "katon": 50,
-      "futon": 50,
-      "suiton": 50,
+      "raiton": 50,
+      "doton": 50,
       "cc": 50,
       "med": 50,
       "ath": 50,
@@ -996,379 +1363,11 @@
       "core:mission_board": 1.2808055555555555,
       "core:border_wolves": 4.431206111111111,
       "core:eternal_rivalry": 8.443177777777779,
-      "core:shadow_clones": 14.174861111111111,
-      "core:grey_bands": 17.133393333333334,
-      "core:outskirts": 27.845,
-      "core:name_on_stone": 28.1655,
-      "core:rival": 28.1655
-     },
-     "opsCleared": [
-      "core:op_hideout",
-      "core:op_tournament"
-     ]
-    },
-    {
-     "strategy": "story",
-     "triple": [
-      "katon",
-      "futon",
-      "suiton"
-     ],
-     "seed": 3,
-     "ended": "done",
-     "hours": 24.99597222222222,
-     "levelsAt3h": {
-      "tai": 12,
-      "nin": 10,
-      "katon": 6,
-      "cc": 15,
-      "med": 10,
-      "ath": 22,
-      "herb": 13,
-      "scout": 11,
-      "prov": 7,
-      "alch": 7,
-      "vit": 5
-     },
-     "genin": 0.8452777777777778,
-     "clone": 13.377777777777778,
-     "chunin": 24.99597222222222,
-     "cap": null,
-     "longestGap": {
-      "hours": 1.1999166666666667,
-      "after": "Розвідка 40"
-     },
-     "cadence": {
-      "hours": 0.7877788888888889,
-      "allowed": 2,
-      "after": "Футон 10"
-     },
-     "cloneShareRun": 0.4290404898566991,
-     "cloneShareOpen": 0.9230594493789673,
-     "mission": {
-      "ms": 44096000,
-      "xp": 668014.9831950194,
-      "ryo": 10762
-     },
-     "practice": {
-      "ms": 42075500,
-      "xp": 372929.0590369372,
-      "ryo": 200
-     },
-     "fight": {
-      "ms": 3813500,
-      "xp": 51617.78896211216,
-      "ryo": 19797
-     },
-     "fightAlly": {
-      "ms": 1130500,
-      "xp": 33771.68063864199,
-      "ryo": 17043
-     },
-     "fights": 144,
-     "fightsWithAllies": 76,
-     "cloneXp": 233101.84498216823,
-     "totalXp": 1092561.8311940688,
-     "actionMs": {
-      "main": 89985500,
-      "clone": 38609000
-     },
-     "levels": {
-      "tai": 50,
-      "nin": 50,
-      "katon": 50,
-      "futon": 50,
-      "suiton": 45,
-      "cc": 43,
-      "med": 50,
-      "ath": 50,
-      "herb": 50,
-      "scout": 50,
-      "prov": 43,
-      "alch": 44,
-      "vit": 44
-     },
-     "minLevel": 43,
-     "minLevelAtChunin": 43,
-     "rank": "chunin",
-     "rejected": 0,
-     "firstRejection": null,
-     "blocked": null,
-     "quests": {
-      "core:graduation": "done",
-      "core:mission_board": "done",
-      "core:outskirts": "4",
-      "core:shadow_clones": "done",
-      "core:rival": "done",
-      "core:border_wolves": "done",
-      "core:eternal_rivalry": "done",
-      "core:grey_bands": "done",
-      "core:name_on_stone": "done"
-     },
-     "defeats": {
-      "core:boss_wolf": 1,
-      "core:boss_fighter": 1,
-      "core:boss_hunter": 1
-     },
-     "questsDoneAt": {
-      "core:graduation": 0.8452777777777778,
-      "core:mission_board": 1.2562222222222221,
-      "core:border_wolves": 4.2432244444444445,
-      "core:eternal_rivalry": 7.4681325,
-      "core:shadow_clones": 13.377777777777778,
-      "core:grey_bands": 14.88034,
-      "core:name_on_stone": 24.96256138888889,
-      "core:rival": 24.96256138888889
-     },
-     "opsCleared": [
-      "core:op_hideout",
-      "core:op_tournament"
-     ]
-    }
-   ]
-  },
-  {
-   "strategy": "story",
-   "triple": [
-    "katon",
-    "raiton",
-    "doton"
-   ],
-   "runs": [
-    {
-     "strategy": "story",
-     "triple": [
-      "katon",
-      "raiton",
-      "doton"
-     ],
-     "seed": 1,
-     "ended": "done",
-     "hours": 29.06736111111111,
-     "levelsAt3h": {
-      "tai": 12,
-      "nin": 10,
-      "katon": 6,
-      "cc": 15,
-      "med": 10,
-      "ath": 22,
-      "herb": 13,
-      "scout": 11,
-      "prov": 7,
-      "alch": 7,
-      "vit": 5
-     },
-     "genin": 0.8445833333333334,
-     "clone": 13.431111111111111,
-     "chunin": 29.06736111111111,
-     "cap": null,
-     "longestGap": {
-      "hours": 2.061834166666667,
-      "after": "Алхімія 40"
-     },
-     "cadence": {
-      "hours": 0.9200161111111111,
-      "allowed": 2,
-      "after": "«Вовки Прикордонного лісу» завершено"
-     },
-     "cloneShareRun": 0.5084112191509186,
-     "cloneShareOpen": 0.9451225517627309,
-     "mission": {
-      "ms": 47793500,
-      "xp": 448139.8516508953,
-      "ryo": 14807
-     },
-     "practice": {
-      "ms": 48791500,
-      "xp": 747739.8099320702,
-      "ryo": 200
-     },
-     "fight": {
-      "ms": 8057000,
-      "xp": 117182.39241703482,
-      "ryo": 33050
-     },
-     "fightAlly": {
-      "ms": 4043000,
-      "xp": 89278.28248778789,
-      "ryo": 30661
-     },
-     "fights": 417,
-     "fightsWithAllies": 345,
-     "cloneXp": 273109.29752216855,
-     "totalXp": 1313062.0540000002,
-     "actionMs": {
-      "main": 104642500,
-      "clone": 53203000
-     },
-     "levels": {
-      "tai": 50,
-      "nin": 50,
-      "katon": 50,
-      "raiton": 50,
-      "doton": 50,
-      "cc": 50,
-      "med": 50,
-      "ath": 50,
-      "herb": 50,
-      "scout": 50,
-      "prov": 50,
-      "alch": 49,
-      "vit": 50
-     },
-     "minLevel": 49,
-     "minLevelAtChunin": 49,
-     "rank": "chunin",
-     "rejected": 0,
-     "firstRejection": null,
-     "blocked": null,
-     "quests": {
-      "core:graduation": "done",
-      "core:mission_board": "done",
-      "core:outskirts": "done",
-      "core:shadow_clones": "done",
-      "core:rival": "done",
-      "core:border_wolves": "done",
-      "core:eternal_rivalry": "done",
-      "core:grey_bands": "done",
-      "core:name_on_stone": "done"
-     },
-     "defeats": {
-      "core:boss_wolf": 1,
-      "core:boss_fighter": 1,
-      "core:boss_hunter": 1,
-      "core:boss_mist": 1
-     },
-     "questsDoneAt": {
-      "core:graduation": 0.8445833333333334,
-      "core:mission_board": 1.2531666666666668,
-      "core:border_wolves": 4.270122777777778,
-      "core:eternal_rivalry": 7.477693611111111,
-      "core:shadow_clones": 13.431111111111111,
-      "core:grey_bands": 18.816175833333332,
-      "core:outskirts": 28.76125,
-      "core:name_on_stone": 29.033940277777777,
-      "core:rival": 29.033940277777777
-     },
-     "opsCleared": [
-      "core:op_hideout",
-      "core:op_tournament"
-     ]
-    },
-    {
-     "strategy": "story",
-     "triple": [
-      "katon",
-      "raiton",
-      "doton"
-     ],
-     "seed": 2,
-     "ended": "done",
-     "hours": 28.753055555555555,
-     "levelsAt3h": {
-      "tai": 12,
-      "nin": 11,
-      "katon": 6,
-      "cc": 15,
-      "med": 10,
-      "ath": 22,
-      "herb": 14,
-      "scout": 11,
-      "prov": 6,
-      "alch": 7,
-      "vit": 5
-     },
-     "genin": 0.845,
-     "clone": 14.174861111111111,
-     "chunin": 28.753055555555555,
-     "cap": null,
-     "longestGap": {
-      "hours": 3.967466111111111,
-      "after": "Алхімія 40"
-     },
-     "cadence": {
-      "hours": 3.967466111111111,
-      "allowed": 5.572640055555556,
-      "after": "Алхімія 40"
-     },
-     "cloneShareRun": 0.47895627517848344,
-     "cloneShareOpen": 0.9446613187504168,
-     "mission": {
-      "ms": 51452500,
-      "xp": 566275.63488687,
-      "ryo": 14263
-     },
-     "practice": {
-      "ms": 46074000,
-      "xp": 525541.835139262,
-      "ryo": 200
-     },
-     "fight": {
-      "ms": 5984000,
-      "xp": 152948.81046588861,
-      "ryo": 22959
-     },
-     "fightAlly": {
-      "ms": 2010500,
-      "xp": 124050.35712066136,
-      "ryo": 20998
-     },
-     "fights": 270,
-     "fightsWithAllies": 176,
-     "cloneXp": 248775.9857431728,
-     "totalXp": 1244766.2804920208,
-     "actionMs": {
-      "main": 103511000,
-      "clone": 49579000
-     },
-     "levels": {
-      "tai": 50,
-      "nin": 50,
-      "katon": 50,
-      "raiton": 50,
-      "doton": 50,
-      "cc": 50,
-      "med": 50,
-      "ath": 50,
-      "herb": 50,
-      "scout": 50,
-      "prov": 46,
-      "alch": 46,
-      "vit": 48
-     },
-     "minLevel": 46,
-     "minLevelAtChunin": 46,
-     "rank": "chunin",
-     "rejected": 0,
-     "firstRejection": null,
-     "blocked": null,
-     "quests": {
-      "core:graduation": "done",
-      "core:mission_board": "done",
-      "core:outskirts": "done",
-      "core:shadow_clones": "done",
-      "core:rival": "done",
-      "core:border_wolves": "done",
-      "core:eternal_rivalry": "done",
-      "core:grey_bands": "done",
-      "core:name_on_stone": "done"
-     },
-     "defeats": {
-      "core:boss_wolf": 1,
-      "core:boss_fighter": 3,
-      "core:boss_hunter": 1,
-      "core:boss_mist": 1
-     },
-     "questsDoneAt": {
-      "core:graduation": 0.845,
-      "core:mission_board": 1.2808055555555555,
-      "core:border_wolves": 4.431206111111111,
-      "core:eternal_rivalry": 8.443177777777779,
-      "core:shadow_clones": 14.174861111111111,
-      "core:grey_bands": 17.357367222222223,
+      "core:shadow_clones": 14.189583333333333,
+      "core:grey_bands": 17.370830555555557,
       "core:outskirts": 28.095,
-      "core:name_on_stone": 28.71969861111111,
-      "core:rival": 28.71969861111111
+      "core:name_on_stone": 28.407925555555554,
+      "core:rival": 28.407925555555554
      },
      "opsCleared": [
       "core:op_hideout",
@@ -1384,7 +1383,7 @@
      ],
      "seed": 3,
      "ended": "done",
-     "hours": 25.093194444444446,
+     "hours": 25.09402777777778,
      "levelsAt3h": {
       "tai": 12,
       "nin": 10,
@@ -1399,8 +1398,8 @@
       "vit": 5
      },
      "genin": 0.8452777777777778,
-     "clone": 13.377777777777778,
-     "chunin": 25.093194444444446,
+     "clone": 13.376944444444444,
+     "chunin": 25.09402777777778,
      "cap": null,
      "longestGap": {
       "hours": 1.241861111111111,
@@ -1411,34 +1410,34 @@
       "allowed": 2,
       "after": "Райтон 10"
      },
-     "cloneShareRun": 0.4325251202461934,
-     "cloneShareOpen": 0.9264234686014392,
+     "cloneShareRun": 0.432512361839083,
+     "cloneShareOpen": 0.9262951293813638,
      "mission": {
-      "ms": 44698000,
-      "xp": 639527.8406481073,
+      "ms": 44697500,
+      "xp": 639489.4638084573,
       "ryo": 12134
      },
      "practice": {
       "ms": 42037000,
-      "xp": 378509.76323879726,
+      "xp": 378509.7632387972,
       "ryo": 200
      },
      "fight": {
-      "ms": 3600000,
-      "xp": 116399.44058960257,
+      "ms": 3603500,
+      "xp": 116630.09742941865,
       "ryo": 12215
      },
      "fightAlly": {
-      "ms": 957000,
-      "xp": 99149.42948014598,
+      "ms": 965500,
+      "xp": 99367.23194163211,
       "ryo": 9461
      },
      "fights": 147,
      "fightsWithAllies": 79,
      "cloneXp": 294036.1570721674,
-     "totalXp": 1134437.0444765072,
+     "totalXp": 1134629.324476673,
      "actionMs": {
-      "main": 90335500,
+      "main": 90338500,
       "clone": 39073500
      },
      "levels": {
@@ -1484,10 +1483,10 @@
       "core:mission_board": 1.2562222222222221,
       "core:border_wolves": 4.2432244444444445,
       "core:eternal_rivalry": 7.4681325,
-      "core:shadow_clones": 13.377777777777778,
-      "core:grey_bands": 14.727547777777778,
-      "core:name_on_stone": 25.059828055555556,
-      "core:rival": 25.059828055555556
+      "core:shadow_clones": 13.376944444444444,
+      "core:grey_bands": 14.726992222222222,
+      "core:name_on_stone": 25.060568055555557,
+      "core:rival": 25.060568055555557
      },
      "opsCleared": [
       "core:op_hideout",
@@ -1513,7 +1512,7 @@
      ],
      "seed": 1,
      "ended": "done",
-     "hours": 28.051805555555557,
+     "hours": 27.149166666666666,
      "levelsAt3h": {
       "tai": 12,
       "nin": 10,
@@ -1528,47 +1527,167 @@
       "vit": 5
      },
      "genin": 0.8445833333333334,
-     "clone": 13.431111111111111,
-     "chunin": 28.051805555555557,
-     "cap": 27.83972222222222,
+     "clone": 13.426944444444445,
+     "chunin": 27.149166666666666,
+     "cap": null,
      "longestGap": {
-      "hours": 1.5161188888888888,
-      "after": "Алхімія 40"
+      "hours": 1.2421936111111112,
+      "after": "ранг Репутації «Дарунок села»"
      },
      "cadence": {
       "hours": 0.9200161111111111,
       "allowed": 2,
       "after": "«Вовки Прикордонного лісу» завершено"
      },
-     "cloneShareRun": 0.49270433176711737,
-     "cloneShareOpen": 0.9453207686973373,
+     "cloneShareRun": 0.4709847754688603,
+     "cloneShareOpen": 0.9318347975708502,
      "mission": {
-      "ms": 45038000,
-      "xp": 467877.75800089585,
-      "ryo": 11341
+      "ms": 45978500,
+      "xp": 583319.4937625476,
+      "ryo": 11691
      },
      "practice": {
-      "ms": 47869000,
-      "xp": 732268.8495820694,
+      "ms": 45486000,
+      "xp": 585419.9066280039,
       "ryo": 200
      },
      "fight": {
-      "ms": 8079000,
-      "xp": 117182.39241703482,
-      "ryo": 33057
+      "ms": 6272000,
+      "xp": 96224.70294708981,
+      "ryo": 26612
      },
      "fightAlly": {
-      "ms": 4071000,
-      "xp": 89278.28248778789,
-      "ryo": 30668
+      "ms": 2737500,
+      "xp": 70915.44673437375,
+      "ryo": 24223
      },
-     "fights": 403,
-     "fightsWithAllies": 331,
-     "cloneXp": 251795.07963248238,
+     "fights": 300,
+     "fightsWithAllies": 229,
+     "cloneXp": 300139.91232850635,
+     "totalXp": 1264964.1033376413,
+     "actionMs": {
+      "main": 97737000,
+      "clone": 46034000
+     },
+     "levels": {
+      "tai": 50,
+      "nin": 50,
+      "katon": 50,
+      "raiton": 50,
+      "suiton": 50,
+      "cc": 50,
+      "med": 50,
+      "ath": 50,
+      "herb": 50,
+      "scout": 50,
+      "prov": 47,
+      "alch": 47,
+      "vit": 49
+     },
+     "minLevel": 47,
+     "minLevelAtChunin": 47,
+     "rank": "chunin",
+     "rejected": 0,
+     "firstRejection": null,
+     "blocked": null,
+     "quests": {
+      "core:graduation": "done",
+      "core:mission_board": "done",
+      "core:outskirts": "done",
+      "core:shadow_clones": "done",
+      "core:rival": "done",
+      "core:border_wolves": "done",
+      "core:eternal_rivalry": "done",
+      "core:grey_bands": "done",
+      "core:name_on_stone": "done"
+     },
+     "defeats": {
+      "core:boss_wolf": 1,
+      "core:boss_fighter": 1,
+      "core:boss_hunter": 1,
+      "core:boss_mist": 1
+     },
+     "questsDoneAt": {
+      "core:graduation": 0.8445833333333334,
+      "core:mission_board": 1.2531666666666668,
+      "core:border_wolves": 4.270122777777778,
+      "core:eternal_rivalry": 7.477693611111111,
+      "core:shadow_clones": 13.426944444444445,
+      "core:grey_bands": 16.88699611111111,
+      "core:outskirts": 26.844583333333333,
+      "core:name_on_stone": 27.11574611111111,
+      "core:rival": 27.11574611111111
+     },
+     "opsCleared": [
+      "core:op_hideout",
+      "core:op_tournament"
+     ]
+    },
+    {
+     "strategy": "story",
+     "triple": [
+      "katon",
+      "raiton",
+      "suiton"
+     ],
+     "seed": 2,
+     "ended": "done",
+     "hours": 28.449166666666667,
+     "levelsAt3h": {
+      "tai": 12,
+      "nin": 11,
+      "katon": 6,
+      "cc": 15,
+      "med": 10,
+      "ath": 22,
+      "herb": 14,
+      "scout": 11,
+      "prov": 6,
+      "alch": 7,
+      "vit": 5
+     },
+     "genin": 0.845,
+     "clone": 14.189583333333333,
+     "chunin": 28.449166666666667,
+     "cap": 27.983472222222222,
+     "longestGap": {
+      "hours": 1.5337016666666667,
+      "after": "ранг Репутації «Дарунок села»"
+     },
+     "cadence": {
+      "hours": 1.118,
+      "allowed": 2,
+      "after": "Травництво 20"
+     },
+     "cloneShareRun": 0.45925203823583977,
+     "cloneShareOpen": 0.9162496177034938,
+     "mission": {
+      "ms": 50321000,
+      "xp": 608148.7944748326,
+      "ryo": 13558
+     },
+     "practice": {
+      "ms": 44952500,
+      "xp": 514663.30749990436,
+      "ryo": 200
+     },
+     "fight": {
+      "ms": 7143000,
+      "xp": 194516.898025263,
+      "ryo": 33815
+     },
+     "fightAlly": {
+      "ms": 2988500,
+      "xp": 164859.78651438613,
+      "ryo": 31854
+     },
+     "fights": 299,
+     "fightsWithAllies": 205,
+     "cloneXp": 312554.9996381093,
      "totalXp": 1317329,
      "actionMs": {
-      "main": 100986500,
-      "clone": 49757500
+      "main": 102417000,
+      "clone": 47037000
      },
      "levels": {
       "tai": 50,
@@ -1594,125 +1713,6 @@
      "quests": {
       "core:graduation": "done",
       "core:mission_board": "done",
-      "core:outskirts": "4",
-      "core:shadow_clones": "done",
-      "core:rival": "done",
-      "core:border_wolves": "done",
-      "core:eternal_rivalry": "done",
-      "core:grey_bands": "done",
-      "core:name_on_stone": "done"
-     },
-     "defeats": {
-      "core:boss_wolf": 1,
-      "core:boss_fighter": 1,
-      "core:boss_hunter": 1,
-      "core:boss_mist": 1
-     },
-     "questsDoneAt": {
-      "core:graduation": 0.8445833333333334,
-      "core:mission_board": 1.2531666666666668,
-      "core:border_wolves": 4.270122777777778,
-      "core:eternal_rivalry": 7.477693611111111,
-      "core:shadow_clones": 13.431111111111111,
-      "core:grey_bands": 18.816175833333332,
-      "core:name_on_stone": 28.01835638888889,
-      "core:rival": 28.01835638888889
-     },
-     "opsCleared": [
-      "core:op_hideout",
-      "core:op_tournament"
-     ]
-    },
-    {
-     "strategy": "story",
-     "triple": [
-      "katon",
-      "raiton",
-      "suiton"
-     ],
-     "seed": 2,
-     "ended": "done",
-     "hours": 28.574166666666667,
-     "levelsAt3h": {
-      "tai": 12,
-      "nin": 11,
-      "katon": 6,
-      "cc": 15,
-      "med": 10,
-      "ath": 22,
-      "herb": 14,
-      "scout": 11,
-      "prov": 6,
-      "alch": 7,
-      "vit": 5
-     },
-     "genin": 0.845,
-     "clone": 14.174861111111111,
-     "chunin": 28.574166666666667,
-     "cap": 27.89875,
-     "longestGap": {
-      "hours": 3.7560816666666668,
-      "after": "Алхімія 40"
-     },
-     "cadence": {
-      "hours": 3.7560816666666668,
-      "allowed": 5.485127722222223,
-      "after": "Алхімія 40"
-     },
-     "cloneShareRun": 0.4724122604917029,
-     "cloneShareOpen": 0.9374609500843983,
-     "mission": {
-      "ms": 50935000,
-      "xp": 549915.1135792984,
-      "ryo": 14152
-     },
-     "practice": {
-      "ms": 45169000,
-      "xp": 601456.5129650887,
-      "ryo": 200
-     },
-     "fight": {
-      "ms": 6762500,
-      "xp": 165957.37345561295,
-      "ryo": 32815
-     },
-     "fightAlly": {
-      "ms": 2692500,
-      "xp": 137022.70829586202,
-      "ryo": 30854
-     },
-     "fights": 288,
-     "fightsWithAllies": 194,
-     "cloneXp": 266177.30093734094,
-     "totalXp": 1317329,
-     "actionMs": {
-      "main": 102867000,
-      "clone": 48597000
-     },
-     "levels": {
-      "tai": 50,
-      "nin": 50,
-      "katon": 50,
-      "raiton": 50,
-      "suiton": 50,
-      "cc": 50,
-      "med": 50,
-      "ath": 50,
-      "herb": 50,
-      "scout": 50,
-      "prov": 50,
-      "alch": 50,
-      "vit": 50
-     },
-     "minLevel": 50,
-     "minLevelAtChunin": 50,
-     "rank": "chunin",
-     "rejected": 26,
-     "firstRejection": "error.missingIngredient",
-     "blocked": null,
-     "quests": {
-      "core:graduation": "done",
-      "core:mission_board": "done",
       "core:outskirts": "done",
       "core:shadow_clones": "done",
       "core:rival": "done",
@@ -1732,11 +1732,11 @@
       "core:mission_board": 1.2808055555555555,
       "core:border_wolves": 4.431206111111111,
       "core:eternal_rivalry": 8.443177777777779,
-      "core:shadow_clones": 14.174861111111111,
-      "core:grey_bands": 17.357367222222223,
+      "core:shadow_clones": 14.189583333333333,
+      "core:grey_bands": 17.370830555555557,
       "core:outskirts": 28.095,
-      "core:name_on_stone": 28.540785,
-      "core:rival": 28.540785
+      "core:name_on_stone": 28.415704166666668,
+      "core:rival": 28.415704166666668
      },
      "opsCleared": [
       "core:op_hideout",
@@ -1752,7 +1752,7 @@
      ],
      "seed": 3,
      "ended": "done",
-     "hours": 24.220833333333335,
+     "hours": 24.221944444444443,
      "levelsAt3h": {
       "tai": 12,
       "nin": 10,
@@ -1767,8 +1767,8 @@
       "vit": 5
      },
      "genin": 0.8452777777777778,
-     "clone": 13.377777777777778,
-     "chunin": 24.220833333333335,
+     "clone": 13.376944444444444,
+     "chunin": 24.221944444444443,
      "cap": null,
      "longestGap": {
       "hours": 1.241861111111111,
@@ -1779,35 +1779,35 @@
       "allowed": 2,
       "after": "Райтон 10"
      },
-     "cloneShareRun": 0.41367787143758245,
-     "cloneShareOpen": 0.9240589727167926,
+     "cloneShareRun": 0.4137351001731671,
+     "cloneShareOpen": 0.9240634957225552,
      "mission": {
-      "ms": 41458500,
-      "xp": 647888.8576921746,
+      "ms": 41458000,
+      "xp": 647850.4808525245,
       "ryo": 10359
      },
      "practice": {
       "ms": 42117500,
-      "xp": 366906.1992387968,
+      "xp": 366906.19923879683,
       "ryo": 200
      },
      "fight": {
-      "ms": 3618500,
-      "xp": 44963.836087092874,
+      "ms": 3623000,
+      "xp": 45229.9682015322,
       "ryo": 12243
      },
      "fightAlly": {
-      "ms": 971000,
-      "xp": 27675.924500210152,
+      "ms": 980500,
+      "xp": 27929.202236319776,
       "ryo": 9489
      },
      "fights": 141,
      "fightsWithAllies": 73,
      "cloneXp": 222153.07559216872,
-     "totalXp": 1059758.8930180643,
+     "totalXp": 1059986.6482928535,
      "actionMs": {
-      "main": 87195000,
-      "clone": 36071500
+      "main": 87199000,
+      "clone": 36078000
      },
      "levels": {
       "tai": 50,
@@ -1852,10 +1852,10 @@
       "core:mission_board": 1.2562222222222221,
       "core:border_wolves": 4.2432244444444445,
       "core:eternal_rivalry": 7.4681325,
-      "core:shadow_clones": 13.377777777777778,
-      "core:grey_bands": 14.727547777777778,
-      "core:name_on_stone": 24.187481944444446,
-      "core:rival": 24.187481944444446
+      "core:shadow_clones": 13.376944444444444,
+      "core:grey_bands": 14.726992222222222,
+      "core:name_on_stone": 24.18854361111111,
+      "core:rival": 24.18854361111111
      },
      "opsCleared": [
       "core:op_hideout",
@@ -1881,7 +1881,7 @@
      ],
      "seed": 1,
      "ended": "done",
-     "hours": 27.132361111111113,
+     "hours": 26.788333333333334,
      "levelsAt3h": {
       "tai": 12,
       "nin": 10,
@@ -1896,47 +1896,47 @@
       "vit": 5
      },
      "genin": 0.8445833333333334,
-     "clone": 13.389305555555556,
-     "chunin": 27.132361111111113,
+     "clone": 13.389166666666666,
+     "chunin": 26.788333333333334,
      "cap": null,
      "longestGap": {
-      "hours": 1.2067427777777777,
-      "after": "Контроль чакри 50"
+      "hours": 1.3291241666666667,
+      "after": "Суйтон 10"
      },
      "cadence": {
       "hours": 0.9200161111111111,
       "allowed": 2,
       "after": "«Вовки Прикордонного лісу» завершено"
      },
-     "cloneShareRun": 0.47619050641658944,
-     "cloneShareOpen": 0.9401237392622537,
+     "cloneShareRun": 0.46327752545677015,
+     "cloneShareOpen": 0.926209299915003,
      "mission": {
-      "ms": 46686500,
-      "xp": 568280.2601363946,
-      "ryo": 11446
+      "ms": 47100000,
+      "xp": 700781.9952354752,
+      "ryo": 11741
      },
      "practice": {
-      "ms": 45351000,
-      "xp": 587525.3220810745,
+      "ms": 44207000,
+      "xp": 463689.16982558905,
       "ryo": 200
      },
      "fight": {
-      "ms": 5638500,
-      "xp": 76319.93104498296,
-      "ryo": 20865
+      "ms": 5130500,
+      "xp": 74910.94310679285,
+      "ryo": 17616
      },
      "fightAlly": {
-      "ms": 2272000,
-      "xp": 53986.03261364717,
-      "ryo": 17929
+      "ms": 1948500,
+      "xp": 52969.64207538898,
+      "ryo": 14680
      },
-     "fights": 262,
-     "fightsWithAllies": 191,
-     "cloneXp": 276537.7289565065,
-     "totalXp": 1232125.513262452,
+     "fights": 225,
+     "fightsWithAllies": 154,
+     "cloneXp": 333093.40374704427,
+     "totalXp": 1239382.1081678572,
      "actionMs": {
-      "main": 97676500,
-      "clone": 46514000
+      "main": 96438000,
+      "clone": 44679500
      },
      "levels": {
       "tai": 50,
@@ -1950,14 +1950,14 @@
       "herb": 50,
       "scout": 50,
       "prov": 46,
-      "alch": 45,
-      "vit": 48
+      "alch": 46,
+      "vit": 47
      },
-     "minLevel": 45,
-     "minLevelAtChunin": 45,
+     "minLevel": 46,
+     "minLevelAtChunin": 46,
      "rank": "chunin",
-     "rejected": 0,
-     "firstRejection": null,
+     "rejected": 26,
+     "firstRejection": "error.missingIngredient",
      "blocked": null,
      "quests": {
       "core:graduation": "done",
@@ -1980,10 +1980,10 @@
       "core:mission_board": 1.2531666666666668,
       "core:border_wolves": 4.270122777777778,
       "core:eternal_rivalry": 7.477693611111111,
-      "core:shadow_clones": 13.389305555555556,
-      "core:grey_bands": 16.989600555555555,
-      "core:name_on_stone": 27.09898111111111,
-      "core:rival": 27.09898111111111
+      "core:shadow_clones": 13.389166666666666,
+      "core:grey_bands": 16.051026666666665,
+      "core:name_on_stone": 26.754958333333335,
+      "core:rival": 26.754958333333335
      },
      "opsCleared": [
       "core:op_hideout",
@@ -1999,7 +1999,7 @@
      ],
      "seed": 2,
      "ended": "done",
-     "hours": 29.527638888888887,
+     "hours": 28.77722222222222,
      "levelsAt3h": {
       "tai": 12,
       "nin": 11,
@@ -2014,47 +2014,47 @@
       "vit": 5
      },
      "genin": 0.845,
-     "clone": 14.189861111111112,
-     "chunin": 29.527638888888887,
-     "cap": 26.75875,
+     "clone": 14.188472222222222,
+     "chunin": 28.77722222222222,
+     "cap": 27.70875,
      "longestGap": {
-      "hours": 1.91165,
-      "after": "ранг Репутації «Дарунок села»"
+      "hours": 1.2992172222222222,
+      "after": "Дотон 50"
      },
      "cadence": {
       "hours": 1.118,
       "allowed": 2,
       "after": "Травництво 20"
      },
-     "cloneShareRun": 0.4804544894378619,
-     "cloneShareOpen": 0.9249505940307158,
+     "cloneShareRun": 0.46915508986659976,
+     "cloneShareOpen": 0.9254377707327754,
      "mission": {
-      "ms": 54091500,
-      "xp": 507743.0098120759,
-      "ryo": 15832
+      "ms": 52237000,
+      "xp": 556182.4899611663,
+      "ryo": 13941
      },
      "practice": {
-      "ms": 45138500,
-      "xp": 619752.3249761411,
+      "ms": 44240500,
+      "xp": 569170.5875832291,
       "ryo": 200
      },
      "fight": {
-      "ms": 7069000,
-      "xp": 189833.665211783,
-      "ryo": 30975
+      "ms": 7120000,
+      "xp": 191975.92245560468,
+      "ryo": 32288
      },
      "fightAlly": {
-      "ms": 2858500,
-      "xp": 65834.90552747296,
-      "ryo": 29014
+      "ms": 2926500,
+      "xp": 162128.95326500467,
+      "ryo": 30327
      },
-     "fights": 320,
-     "fightsWithAllies": 226,
-     "cloneXp": 337442.99991457706,
+     "fights": 315,
+     "fightsWithAllies": 221,
+     "cloneXp": 313779.42006917036,
      "totalXp": 1317329,
      "actionMs": {
-      "main": 106299500,
-      "clone": 51074000
+      "main": 103598000,
+      "clone": 48606000
      },
      "levels": {
       "tai": 50,
@@ -2075,12 +2075,12 @@
      "minLevelAtChunin": 50,
      "rank": "chunin",
      "rejected": 1,
-     "firstRejection": "error.notEnoughRyo",
+     "firstRejection": "error.missingIngredient",
      "blocked": null,
      "quests": {
       "core:graduation": "done",
       "core:mission_board": "done",
-      "core:outskirts": "done",
+      "core:outskirts": "4",
       "core:shadow_clones": "done",
       "core:rival": "done",
       "core:border_wolves": "done",
@@ -2091,19 +2091,17 @@
      "defeats": {
       "core:boss_wolf": 1,
       "core:boss_fighter": 3,
-      "core:boss_hunter": 1,
-      "core:boss_mist": 1
+      "core:boss_hunter": 1
      },
      "questsDoneAt": {
       "core:graduation": 0.845,
       "core:mission_board": 1.2808055555555555,
       "core:border_wolves": 4.431206111111111,
       "core:eternal_rivalry": 8.443177777777779,
-      "core:shadow_clones": 14.189861111111112,
-      "core:grey_bands": 18.424029722222222,
-      "core:outskirts": 29.178333333333335,
-      "core:name_on_stone": 29.494245,
-      "core:rival": 29.494245
+      "core:shadow_clones": 14.188472222222222,
+      "core:grey_bands": 18.072905,
+      "core:name_on_stone": 28.743855,
+      "core:rival": 28.743855
      },
      "opsCleared": [
       "core:op_hideout",
@@ -2119,7 +2117,7 @@
      ],
      "seed": 3,
      "ended": "done",
-     "hours": 24.305694444444445,
+     "hours": 24.262083333333333,
      "levelsAt3h": {
       "tai": 12,
       "nin": 10,
@@ -2134,65 +2132,65 @@
       "vit": 5
      },
      "genin": 0.8452777777777778,
-     "clone": 13.366666666666667,
-     "chunin": 24.305694444444445,
+     "clone": 13.457777777777778,
+     "chunin": 24.262083333333333,
      "cap": null,
      "longestGap": {
-      "hours": 1.000531111111111,
-      "after": "Катон 50"
+      "hours": 1.1685802777777778,
+      "after": "Травництво 40"
      },
      "cadence": {
       "hours": 0.7870844444444445,
       "allowed": 2,
       "after": "Дотон 10"
      },
-     "cloneShareRun": 0.4083496665733339,
-     "cloneShareOpen": 0.9073221518264115,
+     "cloneShareRun": 0.3994549336813844,
+     "cloneShareOpen": 0.8970135876900927,
      "mission": {
-      "ms": 41603500,
-      "xp": 707659.5644279302,
-      "ryo": 10282
+      "ms": 42244000,
+      "xp": 690143.6358975423,
+      "ryo": 10314
      },
      "practice": {
-      "ms": 42352500,
-      "xp": 361417.3036258971,
+      "ms": 41397000,
+      "xp": 379400.75880995183,
       "ryo": 200
      },
      "fight": {
-      "ms": 3544000,
-      "xp": 44571.043088502716,
-      "ryo": 12176
+      "ms": 3702000,
+      "xp": 47566.830073563615,
+      "ryo": 11897
      },
      "fightAlly": {
-      "ms": 928000,
-      "xp": 27413.70614307205,
-      "ryo": 9422
+      "ms": 1052500,
+      "xp": 30367.664959865797,
+      "ryo": 10426
      },
-     "fights": 142,
-     "fightsWithAllies": 73,
-     "cloneXp": 302641.14832528704,
-     "totalXp": 1113647.91114233,
+     "fights": 150,
+     "fightsWithAllies": 81,
+     "cloneXp": 254934.8296825005,
+     "totalXp": 1117111.2247810578,
      "actionMs": {
-      "main": 87500500,
-      "clone": 35732000
+      "main": 87343500,
+      "clone": 34891500
      },
      "levels": {
       "tai": 50,
       "nin": 50,
       "katon": 50,
-      "doton": 50,
-      "suiton": 42,
+      "doton": 49,
+      "suiton": 48,
       "cc": 50,
-      "med": 50,
+      "med": 45,
       "ath": 50,
       "herb": 50,
       "scout": 50,
       "prov": 44,
-      "alch": 42,
-      "vit": 42
+      "alch": 43,
+      "vit": 44
      },
-     "minLevel": 42,
-     "minLevelAtChunin": 42,
+     "minLevel": 43,
+     "minLevelAtChunin": 43,
      "rank": "chunin",
      "rejected": 0,
      "firstRejection": null,
@@ -2219,10 +2217,10 @@
       "core:mission_board": 1.2562222222222221,
       "core:border_wolves": 4.2432244444444445,
       "core:eternal_rivalry": 7.4681325,
-      "core:shadow_clones": 13.366666666666667,
-      "core:grey_bands": 14.723114166666667,
-      "core:name_on_stone": 24.272300555555557,
-      "core:rival": 24.272300555555557
+      "core:shadow_clones": 13.457777777777778,
+      "core:grey_bands": 14.752606111111112,
+      "core:name_on_stone": 24.228663055555554,
+      "core:rival": 24.228663055555554
      },
      "opsCleared": [
       "core:op_hideout",
@@ -2248,7 +2246,7 @@
      ],
      "seed": 1,
      "ended": "done",
-     "hours": 31.30027777777778,
+     "hours": 31.305694444444445,
      "levelsAt3h": {
       "tai": 12,
       "nin": 10,
@@ -2264,7 +2262,7 @@
      },
      "genin": 0.8445833333333334,
      "clone": 12.361527777777777,
-     "chunin": 31.30027777777778,
+     "chunin": 31.305694444444445,
      "cap": 25.960694444444446,
      "longestGap": {
       "hours": 2.651266666666667,
@@ -2275,8 +2273,8 @@
       "allowed": 2.472280888888889,
       "after": "Ніндзюцу 40"
      },
-     "cloneShareRun": 0.5734803471747677,
-     "cloneShareOpen": 0.9477971971047016,
+     "cloneShareRun": 0.5735541457225123,
+     "cloneShareOpen": 0.947812123344917,
      "mission": {
       "ms": 49845000,
       "xp": 350370.8812142943,
@@ -2288,12 +2286,12 @@
       "ryo": 100
      },
      "fight": {
-      "ms": 8564500,
+      "ms": 8584000,
       "xp": 173992.2499919007,
       "ryo": 32927
      },
      "fightAlly": {
-      "ms": 4215500,
+      "ms": 4235000,
       "xp": 139956.93404178164,
       "ryo": 31532
      },
@@ -2302,8 +2300,8 @@
      "cloneXp": 296866.92286341893,
      "totalXp": 1317329,
      "actionMs": {
-      "main": 112681000,
-      "clone": 64622500
+      "main": 112700500,
+      "clone": 64642000
      },
      "levels": {
       "tai": 50,
@@ -2349,8 +2347,8 @@
       "core:eternal_rivalry": 7.477693611111111,
       "core:shadow_clones": 12.361527777777777,
       "core:grey_bands": 18.435715277777778,
-      "core:name_on_stone": 31.266904444444446,
-      "core:rival": 31.266904444444446
+      "core:name_on_stone": 31.27229138888889,
+      "core:rival": 31.27229138888889
      },
      "opsCleared": [
       "core:op_hideout",
@@ -2366,7 +2364,7 @@
      ],
      "seed": 2,
      "ended": "done",
-     "hours": 31.357222222222223,
+     "hours": 31.33222222222222,
      "levelsAt3h": {
       "tai": 12,
       "nin": 11,
@@ -2381,11 +2379,11 @@
       "vit": 5
      },
      "genin": 0.845,
-     "clone": 12.681666666666667,
-     "chunin": 31.357222222222223,
-     "cap": 27.6175,
+     "clone": 12.677222222222222,
+     "chunin": 31.33222222222222,
+     "cap": 27.669583333333332,
      "longestGap": {
-      "hours": 2.7455,
+      "hours": 2.6521666666666666,
       "after": "ранг Репутації «Дарунок села»"
      },
      "cadence": {
@@ -2393,35 +2391,35 @@
       "allowed": 2,
       "after": "Травництво 20"
      },
-     "cloneShareRun": 0.5673629502329784,
-     "cloneShareOpen": 0.9526316932413137,
+     "cloneShareRun": 0.5665011170608887,
+     "cloneShareOpen": 0.9514735400101254,
      "mission": {
-      "ms": 51774000,
-      "xp": 366277.52651396504,
-      "ryo": 15032
+      "ms": 51401000,
+      "xp": 361060.77234868606,
+      "ryo": 15442
      },
      "practice": {
-      "ms": 52483000,
-      "xp": 692243.7700482343,
-      "ryo": 183
+      "ms": 52698000,
+      "xp": 752923.2510783798,
+      "ryo": 155
      },
      "fight": {
-      "ms": 8628500,
-      "xp": 258807.70343780066,
-      "ryo": 32695
+      "ms": 8696500,
+      "xp": 203344.9765729341,
+      "ryo": 32523
      },
      "fightAlly": {
-      "ms": 3721500,
-      "xp": 84259.28682604438,
-      "ryo": 30788
+      "ms": 3823500,
+      "xp": 165606.99094804615,
+      "ryo": 30616
      },
-     "fights": 405,
-     "fightsWithAllies": 310,
-     "cloneXp": 206676.3515521226,
+     "fights": 407,
+     "fightsWithAllies": 312,
+     "cloneXp": 202220.5400673226,
      "totalXp": 1317329,
      "actionMs": {
-      "main": 112886000,
-      "clone": 64049000
+      "main": 112796000,
+      "clone": 63900500
      },
      "levels": {
       "tai": 50,
@@ -2466,10 +2464,10 @@
       "core:mission_board": 1.2808055555555555,
       "core:border_wolves": 4.431206111111111,
       "core:eternal_rivalry": 8.443316666666666,
-      "core:shadow_clones": 12.681666666666667,
-      "core:grey_bands": 20.793756388888887,
-      "core:name_on_stone": 31.323781944444445,
-      "core:rival": 31.323781944444445
+      "core:shadow_clones": 12.677222222222222,
+      "core:grey_bands": 20.8019875,
+      "core:name_on_stone": 31.298841944444444,
+      "core:rival": 31.298841944444444
      },
      "opsCleared": [
       "core:op_hideout",
@@ -2485,7 +2483,7 @@
      ],
      "seed": 3,
      "ended": "done",
-     "hours": 29.21236111111111,
+     "hours": 31.604166666666668,
      "levelsAt3h": {
       "tai": 12,
       "nin": 10,
@@ -2500,47 +2498,47 @@
       "vit": 5
      },
      "genin": 0.8452777777777778,
-     "clone": 12.443888888888889,
-     "chunin": 29.21236111111111,
-     "cap": 27.905277777777776,
+     "clone": 12.387777777777778,
+     "chunin": 31.604166666666668,
+     "cap": 27.939722222222223,
      "longestGap": {
-      "hours": 1.6395116666666667,
+      "hours": 2.3172333333333333,
       "after": "ранг Репутації «Дарунок села»"
      },
      "cadence": {
-      "hours": 1.1701686111111111,
-      "allowed": 2.488770666666667,
+      "hours": 1.0902436111111111,
+      "allowed": 2.477527888888889,
       "after": "Ніндзюцу 40"
      },
-     "cloneShareRun": 0.5221382976194439,
-     "cloneShareOpen": 0.9096173042995701,
+     "cloneShareRun": 0.5792946693034497,
+     "cloneShareOpen": 0.9527349484670203,
      "mission": {
-      "ms": 53228500,
-      "xp": 636805.8483756363,
-      "ryo": 17412
+      "ms": 54889000,
+      "xp": 435076.1507560803,
+      "ryo": 18272
      },
      "practice": {
-      "ms": 46509500,
-      "xp": 599139.961198829,
+      "ms": 52377000,
+      "xp": 739693.5982061097,
       "ryo": 100
      },
      "fight": {
-      "ms": 5426000,
-      "xp": 81383.19042553476,
-      "ryo": 34505
+      "ms": 6508500,
+      "xp": 142559.25103781003,
+      "ryo": 29351
      },
      "fightAlly": {
-      "ms": 2331500,
-      "xp": 59490.50658992084,
-      "ryo": 33307
+      "ms": 2827000,
+      "xp": 112512.75391731202,
+      "ryo": 28153
      },
-     "fights": 206,
-     "fightsWithAllies": 134,
-     "cloneXp": 421859.5971891113,
+     "fights": 306,
+     "fightsWithAllies": 235,
+     "cloneXp": 319076.00402580993,
      "totalXp": 1317329,
      "actionMs": {
-      "main": 105164500,
-      "clone": 54912500
+      "main": 113775000,
+      "clone": 65910500
      },
      "levels": {
       "tai": 50,
@@ -2577,17 +2575,18 @@
      "defeats": {
       "core:boss_wolf": 1,
       "core:boss_fighter": 1,
-      "core:boss_hunter": 3
+      "core:boss_hunter": 2,
+      "core:boss_mist": 3
      },
      "questsDoneAt": {
       "core:graduation": 0.8452777777777778,
       "core:mission_board": 1.2562222222222221,
       "core:border_wolves": 4.2432244444444445,
       "core:eternal_rivalry": 7.4681325,
-      "core:shadow_clones": 12.443888888888889,
-      "core:grey_bands": 14.060140833333334,
-      "core:name_on_stone": 29.178925,
-      "core:rival": 29.178925
+      "core:shadow_clones": 12.387777777777778,
+      "core:grey_bands": 16.33003888888889,
+      "core:name_on_stone": 31.570831388888887,
+      "core:rival": 31.570831388888887
      },
      "opsCleared": [
       "core:op_hideout",
@@ -2613,7 +2612,7 @@
      ],
      "seed": 1,
      "ended": "done",
-     "hours": 30.855416666666667,
+     "hours": 30.860416666666666,
      "levelsAt3h": {
       "tai": 12,
       "nin": 10,
@@ -2629,7 +2628,7 @@
      },
      "genin": 0.8445833333333334,
      "clone": 12.361527777777777,
-     "chunin": 30.855416666666667,
+     "chunin": 30.860416666666666,
      "cap": 26.006944444444443,
      "longestGap": {
       "hours": 2.3187333333333333,
@@ -2640,8 +2639,8 @@
       "allowed": 2.472280888888889,
       "after": "Ніндзюцу 40"
      },
-     "cloneShareRun": 0.5705322404224001,
-     "cloneShareOpen": 0.9518825437832317,
+     "cloneShareRun": 0.5706018227232836,
+     "cloneShareOpen": 0.9518955492822392,
      "mission": {
       "ms": 48130000,
       "xp": 350413.37757429393,
@@ -2653,12 +2652,12 @@
       "ryo": 100
      },
      "fight": {
-      "ms": 8555000,
+      "ms": 8573000,
       "xp": 173992.2499919007,
       "ryo": 32927
      },
      "fightAlly": {
-      "ms": 4204500,
+      "ms": 4222500,
       "xp": 139956.93404178164,
       "ryo": 31532
      },
@@ -2667,8 +2666,8 @@
      "cloneXp": 276675.954428597,
      "totalXp": 1317329,
      "actionMs": {
-      "main": 111079500,
-      "clone": 63376000
+      "main": 111097500,
+      "clone": 63394000
      },
      "levels": {
       "tai": 50,
@@ -2714,8 +2713,8 @@
       "core:eternal_rivalry": 7.477693611111111,
       "core:shadow_clones": 12.361527777777777,
       "core:grey_bands": 18.435715277777778,
-      "core:name_on_stone": 30.82200111111111,
-      "core:rival": 30.82200111111111
+      "core:name_on_stone": 30.827030277777776,
+      "core:rival": 30.827030277777776
      },
      "opsCleared": [
       "core:op_hideout",
@@ -2731,7 +2730,7 @@
      ],
      "seed": 2,
      "ended": "done",
-     "hours": 29.721666666666668,
+     "hours": 30.29875,
      "levelsAt3h": {
       "tai": 12,
       "nin": 11,
@@ -2746,11 +2745,11 @@
       "vit": 5
      },
      "genin": 0.845,
-     "clone": 12.681666666666667,
-     "chunin": 29.721666666666668,
-     "cap": 27.69972222222222,
+     "clone": 12.677222222222222,
+     "chunin": 30.29875,
+     "cap": 27.90375,
      "longestGap": {
-      "hours": 2.393972222222222,
+      "hours": 2.064991666666667,
       "after": "Розвідка 50"
      },
      "cadence": {
@@ -2758,35 +2757,35 @@
       "allowed": 2,
       "after": "Травництво 20"
      },
-     "cloneShareRun": 0.5452532009944111,
-     "cloneShareOpen": 0.9510465897235263,
+     "cloneShareRun": 0.553735605154228,
+     "cloneShareOpen": 0.9521022738916256,
      "mission": {
-      "ms": 46859500,
-      "xp": 376841.78160662093,
-      "ryo": 13474
+      "ms": 48197000,
+      "xp": 403946.0228905267,
+      "ryo": 13978
      },
      "practice": {
-      "ms": 52196500,
-      "xp": 773446.7746703484,
+      "ms": 52881000,
+      "xp": 802026.9152145474,
       "ryo": 200
      },
      "fight": {
-      "ms": 7941500,
-      "xp": 167040.44372303065,
-      "ryo": 30357
+      "ms": 7997000,
+      "xp": 111356.0618949258,
+      "ryo": 30238
      },
      "fightAlly": {
-      "ms": 3278000,
-      "xp": 72754.70561119769,
-      "ryo": 28450
+      "ms": 3362000,
+      "xp": 72923.44979135174,
+      "ryo": 28331
      },
      "fights": 358,
-     "fightsWithAllies": 263,
-     "cloneXp": 200560.6660020239,
+     "fightsWithAllies": 262,
+     "cloneXp": 208172.264644224,
      "totalXp": 1317329,
      "actionMs": {
-      "main": 106998000,
-      "clone": 58342500
+      "main": 109075500,
+      "clone": 60400500
      },
      "levels": {
       "tai": 50,
@@ -2831,10 +2830,10 @@
       "core:mission_board": 1.2808055555555555,
       "core:border_wolves": 4.431206111111111,
       "core:eternal_rivalry": 8.443316666666666,
-      "core:shadow_clones": 12.681666666666667,
-      "core:grey_bands": 20.06529861111111,
-      "core:name_on_stone": 29.68826333333333,
-      "core:rival": 29.68826333333333
+      "core:shadow_clones": 12.677222222222222,
+      "core:grey_bands": 20.0636,
+      "core:name_on_stone": 30.265291666666666,
+      "core:rival": 30.265291666666666
      },
      "opsCleared": [
       "core:op_hideout",
@@ -2850,7 +2849,7 @@
      ],
      "seed": 3,
      "ended": "done",
-     "hours": 26.326944444444443,
+     "hours": 30.517083333333332,
      "levelsAt3h": {
       "tai": 12,
       "nin": 10,
@@ -2865,47 +2864,47 @@
       "vit": 5
      },
      "genin": 0.8452777777777778,
-     "clone": 12.443888888888889,
-     "chunin": 26.326944444444443,
-     "cap": null,
+     "clone": 12.387777777777778,
+     "chunin": 30.517083333333332,
+     "cap": 29.51597222222222,
      "longestGap": {
-      "hours": 1.6127463888888889,
-      "after": "Медитація 50"
+      "hours": 1.5466863888888889,
+      "after": "Алхімія 50"
      },
      "cadence": {
-      "hours": 1.1701686111111111,
-      "allowed": 2.488770666666667,
+      "hours": 1.0902436111111111,
+      "allowed": 2.477527888888889,
       "after": "Ніндзюцу 40"
      },
-     "cloneShareRun": 0.4714968821549532,
-     "cloneShareOpen": 0.894116729026191,
+     "cloneShareRun": 0.5653420169941245,
+     "cloneShareOpen": 0.9516409435306555,
      "mission": {
-      "ms": 44088500,
-      "xp": 614471.617659874,
-      "ryo": 12882
+      "ms": 50761500,
+      "xp": 426898.6997032899,
+      "ryo": 14818
      },
      "practice": {
-      "ms": 45855500,
-      "xp": 548917.5588044876,
+      "ms": 52454000,
+      "xp": 742271.8746710233,
       "ryo": 100
      },
      "fight": {
-      "ms": 4832500,
-      "xp": 75178.02581495748,
-      "ryo": 17673
+      "ms": 6645500,
+      "xp": 148158.4256256868,
+      "ryo": 30480
      },
      "fightAlly": {
-      "ms": 1741500,
-      "xp": 52365.5908604319,
-      "ryo": 16475
+      "ms": 2938500,
+      "xp": 117870.89332322194,
+      "ryo": 29282
      },
-     "fights": 196,
-     "fightsWithAllies": 125,
-     "cloneXp": 391921.6705616573,
-     "totalXp": 1238567.202279319,
+     "fights": 298,
+     "fightsWithAllies": 226,
+     "cloneXp": 302340.33157118125,
+     "totalXp": 1317329,
      "actionMs": {
-      "main": 94777000,
-      "clone": 44689000
+      "main": 109861500,
+      "clone": 62110500
      },
      "levels": {
       "tai": 50,
@@ -2918,12 +2917,12 @@
       "ath": 50,
       "herb": 50,
       "scout": 50,
-      "prov": 46,
-      "alch": 46,
-      "vit": 47
+      "prov": 50,
+      "alch": 50,
+      "vit": 50
      },
-     "minLevel": 46,
-     "minLevelAtChunin": 46,
+     "minLevel": 50,
+     "minLevelAtChunin": 50,
      "rank": "chunin",
      "rejected": 0,
      "firstRejection": null,
@@ -2942,17 +2941,18 @@
      "defeats": {
       "core:boss_wolf": 1,
       "core:boss_fighter": 1,
-      "core:boss_hunter": 3
+      "core:boss_hunter": 2,
+      "core:boss_mist": 3
      },
      "questsDoneAt": {
       "core:graduation": 0.8452777777777778,
       "core:mission_board": 1.2562222222222221,
       "core:border_wolves": 4.2432244444444445,
       "core:eternal_rivalry": 7.4681325,
-      "core:shadow_clones": 12.443888888888889,
-      "core:grey_bands": 14.060140833333334,
-      "core:name_on_stone": 26.293500277777778,
-      "core:rival": 26.293500277777778
+      "core:shadow_clones": 12.387777777777778,
+      "core:grey_bands": 16.33003888888889,
+      "core:name_on_stone": 30.48364,
+      "core:rival": 30.48364
      },
      "opsCleared": [
       "core:op_hideout",
@@ -2978,7 +2978,7 @@
      ],
      "seed": 1,
      "ended": "done",
-     "hours": 29.513194444444444,
+     "hours": 27.668194444444445,
      "levelsAt3h": {
       "tai": 12,
       "nin": 10,
@@ -2993,47 +2993,47 @@
       "vit": 5
      },
      "genin": 0.8445833333333334,
-     "clone": 12.413472222222222,
-     "chunin": 29.513194444444444,
-     "cap": 27.07777777777778,
+     "clone": 12.389305555555556,
+     "chunin": 27.668194444444445,
+     "cap": 25.64388888888889,
      "longestGap": {
-      "hours": 2.1039,
-      "after": "Живучість 50"
+      "hours": 2.064623611111111,
+      "after": "ранг Репутації «Слово наставника»"
      },
      "cadence": {
-      "hours": 0.9200161111111111,
-      "allowed": 2,
-      "after": "«Вовки Прикордонного лісу» завершено"
+      "hours": 2.064623611111111,
+      "allowed": 4.1340155,
+      "after": "ранг Репутації «Слово наставника»"
      },
-     "cloneShareRun": 0.5531758206075437,
-     "cloneShareOpen": 0.954751506684644,
+     "cloneShareRun": 0.5146042337019542,
+     "cloneShareOpen": 0.9318851719874918,
      "mission": {
-      "ms": 46132000,
-      "xp": 498491.70354016556,
-      "ryo": 13005
+      "ms": 44052000,
+      "xp": 587529.5489533227,
+      "ryo": 12258
      },
      "practice": {
-      "ms": 52995000,
-      "xp": 606915.0518740863,
+      "ms": 48697000,
+      "xp": 628573.79521148,
       "ryo": 200
      },
      "fight": {
-      "ms": 7120000,
-      "xp": 211922.24458574812,
-      "ryo": 28959
+      "ms": 6856000,
+      "xp": 101225.65583519729,
+      "ryo": 30463
      },
      "fightAlly": {
-      "ms": 3087000,
-      "xp": 178169.55438363214,
-      "ryo": 27574
+      "ms": 3175000,
+      "xp": 72268.91807621805,
+      "ryo": 27527
      },
-     "fights": 318,
-     "fightsWithAllies": 245,
-     "cloneXp": 232708.73811034724,
+     "fights": 295,
+     "fightsWithAllies": 224,
+     "cloneXp": 305027.30335057375,
      "totalXp": 1317329,
      "actionMs": {
-      "main": 106247500,
-      "clone": 58775500
+      "main": 99605500,
+      "clone": 51259000
      },
      "levels": {
       "tai": 50,
@@ -3053,8 +3053,8 @@
      "minLevel": 50,
      "minLevelAtChunin": 50,
      "rank": "chunin",
-     "rejected": 26,
-     "firstRejection": "error.missingIngredient",
+     "rejected": 0,
+     "firstRejection": null,
      "blocked": null,
      "quests": {
       "core:graduation": "done",
@@ -3070,18 +3070,17 @@
      "defeats": {
       "core:boss_wolf": 1,
       "core:boss_fighter": 1,
-      "core:boss_hunter": 3,
-      "core:boss_mist": 2
+      "core:boss_hunter": 1
      },
      "questsDoneAt": {
       "core:graduation": 0.8445833333333334,
       "core:mission_board": 1.2531666666666668,
       "core:border_wolves": 4.270122777777778,
       "core:eternal_rivalry": 7.477693611111111,
-      "core:shadow_clones": 12.413472222222222,
-      "core:grey_bands": 19.500968333333333,
-      "core:name_on_stone": 29.479833055555556,
-      "core:rival": 29.479833055555556
+      "core:shadow_clones": 12.389305555555556,
+      "core:grey_bands": 18.60545388888889,
+      "core:name_on_stone": 27.634723055555554,
+      "core:rival": 27.634723055555554
      },
      "opsCleared": [
       "core:op_hideout",
@@ -3097,7 +3096,7 @@
      ],
      "seed": 2,
      "ended": "done",
-     "hours": 28.455833333333334,
+     "hours": 29.493472222222223,
      "levelsAt3h": {
       "tai": 12,
       "nin": 11,
@@ -3112,47 +3111,47 @@
       "vit": 5
      },
      "genin": 0.845,
-     "clone": 12.680555555555555,
-     "chunin": 28.455833333333334,
-     "cap": 27.76388888888889,
+     "clone": 12.676111111111112,
+     "chunin": 29.493472222222223,
+     "cap": 25.83513888888889,
      "longestGap": {
-      "hours": 2.1510019444444444,
-      "after": "Алхімія 40"
+      "hours": 2.3265333333333333,
+      "after": "ранг Репутації «Дарунок села»"
      },
      "cadence": {
       "hours": 1.118,
       "allowed": 2,
       "after": "Травництво 20"
      },
-     "cloneShareRun": 0.5212384494489511,
-     "cloneShareOpen": 0.9402227113451075,
+     "cloneShareRun": 0.537765117516588,
+     "cloneShareOpen": 0.9431063798158319,
      "mission": {
-      "ms": 46031000,
-      "xp": 530673.5564505492,
-      "ryo": 11299
+      "ms": 47609000,
+      "xp": 526704.0504213407,
+      "ryo": 12934
      },
      "practice": {
-      "ms": 47326500,
-      "xp": 657826.0346800331,
+      "ms": 50034000,
+      "xp": 666027.8006292393,
       "ryo": 200
      },
      "fight": {
-      "ms": 9083000,
-      "xp": 128829.4088694177,
-      "ryo": 34023
+      "ms": 8533000,
+      "xp": 124597.14894941999,
+      "ryo": 31642
      },
      "fightAlly": {
-      "ms": 4017500,
-      "xp": 86032.38320179656,
-      "ryo": 32116
+      "ms": 3697500,
+      "xp": 83946.50216870866,
+      "ryo": 29735
      },
-     "fights": 418,
-     "fightsWithAllies": 324,
-     "cloneXp": 273005.736306179,
+     "fights": 393,
+     "fightsWithAllies": 299,
+     "cloneXp": 241623.19681957783,
      "totalXp": 1317329,
      "actionMs": {
-      "main": 102441000,
-      "clone": 53398000
+      "main": 106176500,
+      "clone": 57100500
      },
      "levels": {
       "tai": 50,
@@ -3196,10 +3195,10 @@
       "core:mission_board": 1.2808055555555555,
       "core:border_wolves": 4.431206111111111,
       "core:eternal_rivalry": 8.443316666666666,
-      "core:shadow_clones": 12.680555555555555,
-      "core:grey_bands": 18.954849444444445,
-      "core:name_on_stone": 28.422368333333335,
-      "core:rival": 28.422368333333335
+      "core:shadow_clones": 12.676111111111112,
+      "core:grey_bands": 20.79820888888889,
+      "core:name_on_stone": 29.460006666666665,
+      "core:rival": 29.460006666666665
      },
      "opsCleared": [
       "core:op_hideout",
@@ -3215,7 +3214,7 @@
      ],
      "seed": 3,
      "ended": "done",
-     "hours": 25.228472222222223,
+     "hours": 25.093611111111112,
      "levelsAt3h": {
       "tai": 12,
       "nin": 10,
@@ -3230,65 +3229,65 @@
       "vit": 5
      },
      "genin": 0.8452777777777778,
-     "clone": 12.435972222222222,
-     "chunin": 25.228472222222223,
+     "clone": 12.41625,
+     "chunin": 25.093611111111112,
      "cap": null,
      "longestGap": {
-      "hours": 1.2287566666666667,
-      "after": "Суйтон 40"
+      "hours": 1.3196933333333334,
+      "after": "Контроль чакри 50"
      },
      "cadence": {
-      "hours": 1.1428052777777777,
-      "allowed": 2.4871754444444445,
-      "after": "Ніндзюцу 40"
+      "hours": 0.7870844444444445,
+      "allowed": 2,
+      "after": "Дотон 10"
      },
-     "cloneShareRun": 0.4711084147650637,
-     "cloneShareOpen": 0.9290870084467896,
+     "cloneShareRun": 0.4573532661035899,
+     "cloneShareOpen": 0.9052865891736144,
      "mission": {
-      "ms": 42287500,
-      "xp": 574920.034910334,
-      "ryo": 9787
+      "ms": 40091000,
+      "xp": 683326.4867463865,
+      "ryo": 9830
      },
      "practice": {
-      "ms": 44615500,
-      "xp": 445413.22879488516,
+      "ms": 45879000,
+      "xp": 421955.64584891737,
       "ryo": 100
      },
      "fight": {
-      "ms": 3919000,
-      "xp": 48119.43153138785,
-      "ryo": 12076
+      "ms": 4366500,
+      "xp": 65227.05487514596,
+      "ryo": 21939
      },
      "fightAlly": {
-      "ms": 1054500,
-      "xp": 27853.42805229273,
-      "ryo": 10878
+      "ms": 1572000,
+      "xp": 46016.24315569189,
+      "ryo": 20741
      },
-     "fights": 151,
-     "fightsWithAllies": 80,
-     "cloneXp": 286131.0924114558,
-     "totalXp": 1068452.695236607,
+     "fights": 145,
+     "fightsWithAllies": 75,
+     "cloneXp": 299138.3378671689,
+     "totalXp": 1170509.1874704498,
      "actionMs": {
-      "main": 90822500,
-      "clone": 42788500
+      "main": 90337000,
+      "clone": 41318000
      },
      "levels": {
       "tai": 50,
       "nin": 50,
-      "futon": 50,
+      "futon": 47,
       "doton": 50,
-      "suiton": 45,
-      "cc": 46,
+      "suiton": 47,
+      "cc": 50,
       "med": 50,
       "ath": 50,
       "herb": 50,
       "scout": 50,
-      "prov": 39,
-      "alch": 39,
-      "vit": 43
+      "prov": 45,
+      "alch": 45,
+      "vit": 46
      },
-     "minLevel": 39,
-     "minLevelAtChunin": 39,
+     "minLevel": 45,
+     "minLevelAtChunin": 45,
      "rank": "chunin",
      "rejected": 0,
      "firstRejection": null,
@@ -3314,10 +3313,10 @@
       "core:mission_board": 1.2562222222222221,
       "core:border_wolves": 4.2432244444444445,
       "core:eternal_rivalry": 7.4681325,
-      "core:shadow_clones": 12.435972222222222,
-      "core:grey_bands": 15.379754444444444,
-      "core:name_on_stone": 25.195060277777777,
-      "core:rival": 25.195060277777777
+      "core:shadow_clones": 12.41625,
+      "core:grey_bands": 16.54854361111111,
+      "core:name_on_stone": 25.060186944444446,
+      "core:rival": 25.060186944444446
      },
      "opsCleared": [
       "core:op_hideout",
@@ -3343,7 +3342,7 @@
      ],
      "seed": 1,
      "ended": "done",
-     "hours": 42.85402777777778,
+     "hours": 37.428333333333335,
      "levelsAt3h": {
       "tai": 12,
       "nin": 10,
@@ -3358,65 +3357,65 @@
       "vit": 5
      },
      "genin": 0.8445833333333334,
-     "clone": 41.34930555555555,
-     "chunin": 42.85402777777778,
+     "clone": 33.42041666666667,
+     "chunin": 37.428333333333335,
      "cap": null,
      "longestGap": {
-      "hours": 4.004333888888889,
-      "after": "Алхімія 20"
+      "hours": 3.0318225,
+      "after": "ранг Репутації «Довіра торговців»"
      },
      "cadence": {
-      "hours": 4.004333888888889,
-      "allowed": 3.1046514444444444,
-      "after": "Алхімія 20"
+      "hours": 1.8667791666666667,
+      "allowed": 2.7790582222222224,
+      "after": "«Сірі пов'язки» крок 7"
      },
-     "cloneShareRun": 0.03510949638469092,
-     "cloneShareOpen": 0.9999076979878161,
+     "cloneShareRun": 0.09958983093615947,
+     "cloneShareOpen": 0.9300296635131857,
      "mission": {
-      "ms": 91818500,
-      "xp": 221006.2145391057,
+      "ms": 70783000,
+      "xp": 208423.41990873287,
       "ryo": 2039
      },
      "practice": {
-      "ms": 55357500,
-      "xp": 459912.2016791867,
+      "ms": 56270500,
+      "xp": 586402.0721035113,
       "ryo": 850
      },
      "fight": {
-      "ms": 7098000,
-      "xp": 89629.38083484756,
-      "ryo": 20588
+      "ms": 7688000,
+      "xp": 105197.56878040025,
+      "ryo": 21525
      },
      "fightAlly": {
-      "ms": 985500,
-      "xp": 27880.794355068705,
-      "ryo": 12782
+      "ms": 2344500,
+      "xp": 59927.69331564102,
+      "ryo": 15275
      },
-     "fights": 222,
-     "fightsWithAllies": 52,
-     "cloneXp": 0,
-     "totalXp": 770547.79705314,
+     "fights": 284,
+     "fightsWithAllies": 145,
+     "cloneXp": 93929.15984512144,
+     "totalXp": 900023.0607926445,
      "actionMs": {
-      "main": 154274500,
-      "clone": 5416500
+      "main": 134742000,
+      "clone": 13419000
      },
      "levels": {
       "tai": 50,
       "nin": 50,
-      "raiton": 47,
-      "doton": 42,
-      "suiton": 48,
-      "cc": 40,
+      "raiton": 49,
+      "doton": 50,
+      "suiton": 46,
+      "cc": 50,
       "med": 40,
-      "ath": 41,
-      "herb": 44,
+      "ath": 45,
+      "herb": 41,
       "scout": 41,
-      "prov": 39,
-      "alch": 39,
-      "vit": 44
+      "prov": 37,
+      "alch": 37,
+      "vit": 47
      },
-     "minLevel": 39,
-     "minLevelAtChunin": 39,
+     "minLevel": 37,
+     "minLevelAtChunin": 37,
      "rank": "chunin",
      "rejected": 0,
      "firstRejection": null,
@@ -3435,7 +3434,7 @@
      "defeats": {
       "core:boss_wolf": 1,
       "core:boss_fighter": 1,
-      "core:boss_hunter": 3,
+      "core:boss_hunter": 1,
       "core:boss_mist": 1
      },
      "questsDoneAt": {
@@ -3443,11 +3442,11 @@
       "core:mission_board": 1.2531666666666668,
       "core:border_wolves": 4.270122777777778,
       "core:eternal_rivalry": 7.477693611111111,
-      "core:shadow_clones": 41.34930555555555,
-      "core:grey_bands": 42.45033055555555,
-      "core:outskirts": 42.76125,
-      "core:name_on_stone": 42.82061222222222,
-      "core:rival": 42.82061222222222
+      "core:shadow_clones": 33.42041666666667,
+      "core:outskirts": 34.84458333333333,
+      "core:grey_bands": 36.68815166666667,
+      "core:name_on_stone": 37.394932222222224,
+      "core:rival": 37.394932222222224
      },
      "opsCleared": [
       "core:op_hideout",
@@ -3463,7 +3462,7 @@
      ],
      "seed": 2,
      "ended": "done",
-     "hours": 25.170833333333334,
+     "hours": 26.14388888888889,
      "levelsAt3h": {
       "tai": 12,
       "nin": 11,
@@ -3478,65 +3477,65 @@
       "vit": 5
      },
      "genin": 0.845,
-     "clone": 12.680555555555555,
-     "chunin": 25.170833333333334,
+     "clone": 12.676111111111112,
+     "chunin": 26.14388888888889,
      "cap": null,
      "longestGap": {
-      "hours": 1.8143113888888889,
-      "after": "Травництво 40"
+      "hours": 2.2468055555555555,
+      "after": "Атлетика 40"
      },
      "cadence": {
       "hours": 1.118,
       "allowed": 2,
       "after": "Травництво 20"
      },
-     "cloneShareRun": 0.436525685592893,
-     "cloneShareOpen": 0.8797014344490159,
+     "cloneShareRun": 0.47268627680146197,
+     "cloneShareOpen": 0.9175869771471,
      "mission": {
-      "ms": 43439000,
-      "xp": 381738.87376120134,
-      "ryo": 2601
+      "ms": 40776000,
+      "xp": 314206.72018396814,
+      "ryo": 5226
      },
      "practice": {
-      "ms": 42274000,
-      "xp": 405946.23695175897,
-      "ryo": 250
+      "ms": 46093500,
+      "xp": 600005.6590809393,
+      "ryo": 100
      },
      "fight": {
-      "ms": 4901500,
-      "xp": 65381.73984080428,
-      "ryo": 13503
+      "ms": 7248000,
+      "xp": 108239.64665111373,
+      "ryo": 22323
      },
      "fightAlly": {
-      "ms": 1362500,
-      "xp": 41583.07731162617,
-      "ryo": 11596
+      "ms": 3097500,
+      "xp": 79216.46077394253,
+      "ryo": 20416
      },
-     "fights": 154,
-     "fightsWithAllies": 60,
-     "cloneXp": 292200.4136481742,
-     "totalXp": 853066.8505537646,
+     "fights": 300,
+     "fightsWithAllies": 206,
+     "cloneXp": 180125.4197184525,
+     "totalXp": 1022452.0259160212,
      "actionMs": {
-      "main": 90615000,
-      "clone": 39557000
+      "main": 94118000,
+      "clone": 44489000
      },
      "levels": {
       "tai": 50,
       "nin": 50,
       "raiton": 50,
-      "doton": 39,
-      "suiton": 49,
-      "cc": 50,
-      "med": 40,
-      "ath": 41,
+      "doton": 50,
+      "suiton": 48,
+      "cc": 42,
+      "med": 43,
+      "ath": 50,
       "herb": 50,
       "scout": 41,
-      "prov": 34,
-      "alch": 35,
-      "vit": 42
+      "prov": 44,
+      "alch": 40,
+      "vit": 49
      },
-     "minLevel": 34,
-     "minLevelAtChunin": 34,
+     "minLevel": 40,
+     "minLevelAtChunin": 40,
      "rank": "chunin",
      "rejected": 0,
      "firstRejection": null,
@@ -3555,17 +3554,18 @@
      "defeats": {
       "core:boss_wolf": 1,
       "core:boss_fighter": 1,
-      "core:boss_hunter": 4
+      "core:boss_hunter": 4,
+      "core:boss_mist": 1
      },
      "questsDoneAt": {
       "core:graduation": 0.845,
       "core:mission_board": 1.2808055555555555,
       "core:border_wolves": 4.431206111111111,
       "core:eternal_rivalry": 8.443316666666666,
-      "core:shadow_clones": 12.680555555555555,
-      "core:grey_bands": 24.04911,
-      "core:name_on_stone": 25.13741138888889,
-      "core:rival": 25.13741138888889
+      "core:shadow_clones": 12.676111111111112,
+      "core:grey_bands": 22.751540555555554,
+      "core:name_on_stone": 26.110532222222222,
+      "core:rival": 26.110532222222222
      },
      "opsCleared": [
       "core:op_hideout",
@@ -3581,7 +3581,7 @@
      ],
      "seed": 3,
      "ended": "done",
-     "hours": 40.59916666666667,
+     "hours": 44.42777777777778,
      "levelsAt3h": {
       "tai": 12,
       "nin": 10,
@@ -3596,65 +3596,65 @@
       "vit": 5
      },
      "genin": 0.8452777777777778,
-     "clone": 39.420138888888886,
-     "chunin": 40.59916666666667,
+     "clone": 43.371805555555554,
+     "chunin": 44.42777777777778,
      "cap": null,
      "longestGap": {
-      "hours": 5.163195555555555,
-      "after": "ранг Репутації «Рекомендація Хокаґе»"
+      "hours": 4.224494444444445,
+      "after": "Травництво 40"
      },
      "cadence": {
-      "hours": 2.6687008333333333,
-      "allowed": 2.792354555555556,
-      "after": "Ніндзюцу 40"
+      "hours": 2.3889519444444445,
+      "allowed": 2.7812804444444446,
+      "after": "Алхімія 20"
      },
-     "cloneShareRun": 0.02903726814316112,
-     "cloneShareOpen": 0.999882200494758,
+     "cloneShareRun": 0.023765161935725896,
+     "cloneShareOpen": 0.9998684729711956,
      "mission": {
-      "ms": 86715000,
-      "xp": 216743.10712602056,
+      "ms": 97325500,
+      "xp": 193222.91794252655,
       "ryo": 2039
      },
      "practice": {
-      "ms": 53716000,
-      "xp": 401952.75730276806,
+      "ms": 56249000,
+      "xp": 431783.4025444858,
       "ryo": 100
      },
      "fight": {
-      "ms": 5725500,
-      "xp": 66853.5398748939,
-      "ryo": 15688
+      "ms": 6365000,
+      "xp": 70651.80912595364,
+      "ryo": 13774
      },
      "fightAlly": {
-      "ms": 683500,
-      "xp": 21318.014694020618,
-      "ryo": 9322
+      "ms": 521000,
+      "xp": 13373.027872395585,
+      "ryo": 6657
      },
-     "fights": 174,
-     "fightsWithAllies": 28,
+     "fights": 187,
+     "fightsWithAllies": 24,
      "cloneXp": 0,
-     "totalXp": 685549.4043036825,
+     "totalXp": 695658.129612966,
      "actionMs": {
-      "main": 146157000,
-      "clone": 4244000
+      "main": 159940000,
+      "clone": 3801000
      },
      "levels": {
       "tai": 50,
       "nin": 50,
       "raiton": 40,
-      "doton": 40,
-      "suiton": 48,
+      "doton": 50,
+      "suiton": 33,
       "cc": 40,
       "med": 40,
       "ath": 39,
       "herb": 44,
       "scout": 41,
-      "prov": 38,
-      "alch": 38,
+      "prov": 39,
+      "alch": 39,
       "vit": 42
      },
-     "minLevel": 38,
-     "minLevelAtChunin": 38,
+     "minLevel": 33,
+     "minLevelAtChunin": 33,
      "rank": "chunin",
      "rejected": 0,
      "firstRejection": null,
@@ -3673,17 +3673,17 @@
      "defeats": {
       "core:boss_wolf": 1,
       "core:boss_fighter": 1,
-      "core:boss_hunter": 2
+      "core:boss_hunter": 4
      },
      "questsDoneAt": {
       "core:graduation": 0.8452777777777778,
       "core:mission_board": 1.2562222222222221,
       "core:border_wolves": 4.2432244444444445,
       "core:eternal_rivalry": 7.4681325,
-      "core:shadow_clones": 39.420138888888886,
-      "core:grey_bands": 39.460655833333334,
-      "core:name_on_stone": 40.565800555555555,
-      "core:rival": 40.565800555555555
+      "core:shadow_clones": 43.371805555555554,
+      "core:grey_bands": 43.41324111111111,
+      "core:name_on_stone": 44.39438361111111,
+      "core:rival": 44.39438361111111
      },
      "opsCleared": [
       "core:op_hideout",
@@ -10563,7 +10563,7 @@
      ],
      "seed": 1,
      "ended": "done",
-     "hours": 28.630694444444444,
+     "hours": 28.632638888888888,
      "levelsAt3h": {
       "tai": 12,
       "nin": 34,
@@ -10580,7 +10580,7 @@
      },
      "genin": 0.8445833333333334,
      "clone": 14.729583333333334,
-     "chunin": 28.630694444444444,
+     "chunin": 28.632638888888888,
      "cap": null,
      "longestGap": {
       "hours": 1.5511797222222221,
@@ -10591,8 +10591,8 @@
       "allowed": 2,
       "after": "Тайдзюцу 40"
      },
-     "cloneShareRun": 0.4235606987450337,
-     "cloneShareOpen": 0.8723645791703301,
+     "cloneShareRun": 0.4235998447769882,
+     "cloneShareOpen": 0.8723824299214801,
      "mission": {
       "ms": 72971500,
       "xp": 836324.8048616596,
@@ -10604,22 +10604,22 @@
       "ryo": 100
      },
      "fight": {
-      "ms": 1373000,
-      "xp": 16046.054606463538,
+      "ms": 1380000,
+      "xp": 16294.38152882749,
       "ryo": 10236
      },
      "fightAlly": {
-      "ms": 444500,
-      "xp": 11677.907677621406,
+      "ms": 451500,
+      "xp": 11926.234599985357,
       "ryo": 8694
      },
      "fights": 71,
      "fightsWithAllies": 28,
      "cloneXp": 283110.2615799983,
-     "totalXp": 1038810.2299090427,
+     "totalXp": 1039058.5568314067,
      "actionMs": {
-      "main": 103070500,
-      "clone": 43659500
+      "main": 103077500,
+      "clone": 43666500
      },
      "levels": {
       "tai": 50,
@@ -10665,8 +10665,8 @@
       "core:shadow_clones": 14.729583333333334,
       "core:grey_bands": 25.55572972222222,
       "core:outskirts": 26.17791666666667,
-      "core:name_on_stone": 28.597356944444446,
-      "core:rival": 28.597356944444446
+      "core:name_on_stone": 28.5992025,
+      "core:rival": 28.5992025
      },
      "opsCleared": [
       "core:op_hideout",
@@ -10794,7 +10794,7 @@
      ],
      "seed": 3,
      "ended": "done",
-     "hours": 27.72833333333333,
+     "hours": 28.574166666666667,
      "levelsAt3h": {
       "tai": 25,
       "nin": 35,
@@ -10810,7 +10810,7 @@
      },
      "genin": 0.8452777777777778,
      "clone": 14.878194444444444,
-     "chunin": 27.72833333333333,
+     "chunin": 28.574166666666667,
      "cap": null,
      "longestGap": {
       "hours": 1.8033508333333332,
@@ -10821,35 +10821,35 @@
       "allowed": 2,
       "after": "Ніндзюцу 40"
      },
-     "cloneShareRun": 0.382220081745507,
-     "cloneShareOpen": 0.8247635239567234,
+     "cloneShareRun": 0.3951265128758494,
+     "cloneShareOpen": 0.8243599395604952,
      "mission": {
-      "ms": 71481000,
-      "xp": 780490.422720032,
-      "ryo": 18870
+      "ms": 73287500,
+      "xp": 844576.2436800319,
+      "ryo": 19710
      },
      "practice": {
-      "ms": 27055500,
-      "xp": 170608.02293820883,
+      "ms": 28200500,
+      "xp": 175947.73493820912,
       "ryo": 100
      },
      "fight": {
-      "ms": 1285000,
-      "xp": 17132.67320006151,
-      "ryo": 8213
+      "ms": 1378500,
+      "xp": 19766.48930242945,
+      "ryo": 8365
      },
      "fightAlly": {
-      "ms": 435000,
-      "xp": 12762.61694490019,
-      "ryo": 6651
+      "ms": 517500,
+      "xp": 15266.340819339559,
+      "ryo": 6803
      },
-     "fights": 72,
-     "fightsWithAllies": 29,
-     "cloneXp": 217246.90057999548,
-     "totalXp": 968231.1188583024,
+     "fights": 75,
+     "fightsWithAllies": 32,
+     "cloneXp": 281332.7215399953,
+     "totalXp": 1040290.4679206704,
      "actionMs": {
-      "main": 99822000,
-      "clone": 38156000
+      "main": 102867000,
+      "clone": 40648000
      },
      "levels": {
       "tai": 50,
@@ -10858,13 +10858,13 @@
       "futon": 50,
       "suiton": 50,
       "cc": 46,
-      "med": 40,
+      "med": 50,
       "ath": 50,
       "herb": 50,
       "scout": 50,
       "prov": 1,
       "alch": 5,
-      "vit": 42
+      "vit": 43
      },
      "minLevel": 1,
      "minLevelAtChunin": 1,
@@ -10884,7 +10884,8 @@
       "core:name_on_stone": "done"
      },
      "defeats": {
-      "core:boss_fighter": 1
+      "core:boss_fighter": 1,
+      "core:boss_ren2": 1
      },
      "questsDoneAt": {
       "core:graduation": 0.8452777777777778,
@@ -10894,8 +10895,8 @@
       "core:shadow_clones": 14.878194444444444,
       "core:grey_bands": 24.832485555555557,
       "core:outskirts": 25.42861111111111,
-      "core:name_on_stone": 27.694929722222223,
-      "core:rival": 27.694929722222223
+      "core:name_on_stone": 28.5407775,
+      "core:rival": 28.5407775
      },
      "opsCleared": [
       "core:op_hideout",
@@ -11263,7 +11264,7 @@
      ],
      "seed": 1,
      "ended": "done",
-     "hours": 28.630972222222223,
+     "hours": 28.632916666666667,
      "levelsAt3h": {
       "tai": 12,
       "nin": 34,
@@ -11280,7 +11281,7 @@
      },
      "genin": 0.8445833333333334,
      "clone": 14.729583333333334,
-     "chunin": 28.630972222222223,
+     "chunin": 28.632916666666667,
      "cap": null,
      "longestGap": {
       "hours": 1.5511797222222221,
@@ -11291,8 +11292,8 @@
       "allowed": 2,
       "after": "Тайдзюцу 40"
      },
-     "cloneShareRun": 0.4235614403593622,
-     "cloneShareOpen": 0.8723571385752823,
+     "cloneShareRun": 0.42360058596118494,
+     "cloneShareOpen": 0.8723749900103892,
      "mission": {
       "ms": 72972500,
       "xp": 836324.8048616595,
@@ -11304,22 +11305,22 @@
       "ryo": 100
      },
      "fight": {
-      "ms": 1373000,
-      "xp": 16046.054606463538,
+      "ms": 1380000,
+      "xp": 16294.38152882749,
       "ryo": 10236
      },
      "fightAlly": {
-      "ms": 444500,
-      "xp": 11677.907677621406,
+      "ms": 451500,
+      "xp": 11926.234599985357,
       "ryo": 8694
      },
      "fights": 71,
      "fightsWithAllies": 28,
      "cloneXp": 283110.2615799983,
-     "totalXp": 1038810.2299090427,
+     "totalXp": 1039058.5568314067,
      "actionMs": {
-      "main": 103071500,
-      "clone": 43660000
+      "main": 103078500,
+      "clone": 43667000
      },
      "levels": {
       "tai": 50,
@@ -11365,8 +11366,8 @@
       "core:shadow_clones": 14.729583333333334,
       "core:grey_bands": 25.5560075,
       "core:outskirts": 26.17791666666667,
-      "core:name_on_stone": 28.59763472222222,
-      "core:rival": 28.59763472222222
+      "core:name_on_stone": 28.59948027777778,
+      "core:rival": 28.59948027777778
      },
      "opsCleared": [
       "core:op_hideout",
@@ -11494,7 +11495,7 @@
      ],
      "seed": 3,
      "ended": "done",
-     "hours": 27.72833333333333,
+     "hours": 28.574166666666667,
      "levelsAt3h": {
       "tai": 25,
       "nin": 35,
@@ -11510,7 +11511,7 @@
      },
      "genin": 0.8452777777777778,
      "clone": 14.878194444444444,
-     "chunin": 27.72833333333333,
+     "chunin": 28.574166666666667,
      "cap": null,
      "longestGap": {
       "hours": 1.8033508333333332,
@@ -11521,35 +11522,35 @@
       "allowed": 2,
       "after": "Ніндзюцу 40"
      },
-     "cloneShareRun": 0.382220081745507,
-     "cloneShareOpen": 0.8247635239567234,
+     "cloneShareRun": 0.3951265128758494,
+     "cloneShareOpen": 0.8243599395604952,
      "mission": {
-      "ms": 71481000,
-      "xp": 780490.422720032,
-      "ryo": 18870
+      "ms": 73287500,
+      "xp": 844576.2436800319,
+      "ryo": 19710
      },
      "practice": {
-      "ms": 27055500,
-      "xp": 170608.02293820883,
+      "ms": 28200500,
+      "xp": 175947.73493820912,
       "ryo": 100
      },
      "fight": {
-      "ms": 1285000,
-      "xp": 17132.67320006151,
-      "ryo": 8213
+      "ms": 1378500,
+      "xp": 19766.48930242945,
+      "ryo": 8365
      },
      "fightAlly": {
-      "ms": 435000,
-      "xp": 12762.61694490019,
-      "ryo": 6651
+      "ms": 517500,
+      "xp": 15266.340819339559,
+      "ryo": 6803
      },
-     "fights": 72,
-     "fightsWithAllies": 29,
-     "cloneXp": 217246.90057999548,
-     "totalXp": 968231.1188583024,
+     "fights": 75,
+     "fightsWithAllies": 32,
+     "cloneXp": 281332.7215399953,
+     "totalXp": 1040290.4679206704,
      "actionMs": {
-      "main": 99822000,
-      "clone": 38156000
+      "main": 102867000,
+      "clone": 40648000
      },
      "levels": {
       "tai": 50,
@@ -11558,13 +11559,13 @@
       "raiton": 50,
       "suiton": 50,
       "cc": 46,
-      "med": 40,
+      "med": 50,
       "ath": 50,
       "herb": 50,
       "scout": 50,
       "prov": 1,
       "alch": 5,
-      "vit": 42
+      "vit": 43
      },
      "minLevel": 1,
      "minLevelAtChunin": 1,
@@ -11584,7 +11585,8 @@
       "core:name_on_stone": "done"
      },
      "defeats": {
-      "core:boss_fighter": 1
+      "core:boss_fighter": 1,
+      "core:boss_ren2": 1
      },
      "questsDoneAt": {
       "core:graduation": 0.8452777777777778,
@@ -11594,8 +11596,8 @@
       "core:shadow_clones": 14.878194444444444,
       "core:grey_bands": 24.832485555555557,
       "core:outskirts": 25.42861111111111,
-      "core:name_on_stone": 27.694929722222223,
-      "core:rival": 27.694929722222223
+      "core:name_on_stone": 28.5407775,
+      "core:rival": 28.5407775
      },
      "opsCleared": [
       "core:op_hideout",
@@ -11732,7 +11734,7 @@
      ],
      "seed": 2,
      "ended": "done",
-     "hours": 26.961111111111112,
+     "hours": 26.96263888888889,
      "levelsAt3h": {
       "tai": 12,
       "nin": 35,
@@ -11749,7 +11751,7 @@
      },
      "genin": 0.845,
      "clone": 19.930833333333332,
-     "chunin": 26.961111111111112,
+     "chunin": 26.96263888888889,
      "cap": null,
      "longestGap": {
       "hours": 1.7868577777777779,
@@ -11760,8 +11762,8 @@
       "allowed": 2,
       "after": "Дотон 50"
      },
-     "cloneShareRun": 0.20969991757675666,
-     "cloneShareOpen": 0.804199059623059,
+     "cloneShareRun": 0.20974469816773209,
+     "cloneShareOpen": 0.8042416006636512,
      "mission": {
       "ms": 72560000,
       "xp": 701366.7092642752,
@@ -11773,22 +11775,22 @@
       "ryo": 100
      },
      "fight": {
-      "ms": 1590000,
-      "xp": 18968.529261082163,
+      "ms": 1595500,
+      "xp": 19181.380908822743,
       "ryo": 10590
      },
      "fightAlly": {
-      "ms": 505000,
-      "xp": 13427.581273308431,
+      "ms": 510500,
+      "xp": 13640.43292104901,
       "ryo": 9033
      },
      "fights": 80,
      "fightsWithAllies": 30,
      "cloneXp": 79792.05149999658,
-     "totalXp": 830528.9072229486,
+     "totalXp": 830741.7588706892,
      "actionMs": {
-      "main": 97060000,
-      "clone": 20354500
+      "main": 97065500,
+      "clone": 20360000
      },
      "levels": {
       "tai": 50,
@@ -11834,8 +11836,8 @@
       "core:eternal_rivalry": 18.90428888888889,
       "core:shadow_clones": 19.930833333333332,
       "core:grey_bands": 23.856520833333335,
-      "core:name_on_stone": 26.927714444444444,
-      "core:rival": 26.927714444444444
+      "core:name_on_stone": 26.92919861111111,
+      "core:rival": 26.92919861111111
      },
      "opsCleared": [
       "core:op_hideout",
@@ -11851,7 +11853,7 @@
      ],
      "seed": 3,
      "ended": "done",
-     "hours": 25.961111111111112,
+     "hours": 25.964444444444446,
      "levelsAt3h": {
       "tai": 25,
       "nin": 35,
@@ -11867,7 +11869,7 @@
      },
      "genin": 0.8452777777777778,
      "clone": 14.878194444444444,
-     "chunin": 25.961111111111112,
+     "chunin": 25.964444444444446,
      "cap": null,
      "longestGap": {
       "hours": 1.8033508333333332,
@@ -11878,8 +11880,8 @@
       "allowed": 2,
       "after": "Ніндзюцу 40"
      },
-     "cloneShareRun": 0.35092985234324847,
-     "cloneShareOpen": 0.8220335100317054,
+     "cloneShareRun": 0.35101318041766516,
+     "cloneShareOpen": 0.8220870197065935,
      "mission": {
       "ms": 63993500,
       "xp": 798228.8203192556,
@@ -11891,22 +11893,22 @@
       "ryo": 100
      },
      "fight": {
-      "ms": 1482500,
-      "xp": 21518.914715366634,
+      "ms": 1494500,
+      "xp": 21816.907022203282,
       "ryo": 10405
      },
      "fightAlly": {
-      "ms": 582500,
-      "xp": 17026.915610128606,
+      "ms": 594500,
+      "xp": 17324.907916965254,
       "ryo": 8843
      },
      "fights": 75,
      "fightsWithAllies": 32,
      "cloneXp": 181534.63604999342,
-     "totalXp": 927126.3502717477,
+     "totalXp": 927424.3425785843,
      "actionMs": {
-      "main": 93460000,
-      "clone": 32799500
+      "main": 93472000,
+      "clone": 32811500
      },
      "levels": {
       "tai": 50,
@@ -11953,8 +11955,8 @@
       "core:shadow_clones": 14.878194444444444,
       "core:outskirts": 23.261944444444445,
       "core:grey_bands": 23.578635277777778,
-      "core:name_on_stone": 25.92775333333333,
-      "core:rival": 25.92775333333333
+      "core:name_on_stone": 25.930993611111113,
+      "core:rival": 25.930993611111113
      },
      "opsCleared": [
       "core:op_hideout",
@@ -11980,7 +11982,7 @@
      ],
      "seed": 1,
      "ended": "done",
-     "hours": 27.572777777777777,
+     "hours": 28.589166666666667,
      "levelsAt3h": {
       "tai": 12,
       "nin": 34,
@@ -11997,7 +11999,7 @@
      },
      "genin": 0.8445833333333334,
      "clone": 14.807638888888889,
-     "chunin": 27.572777777777777,
+     "chunin": 28.589166666666667,
      "cap": null,
      "longestGap": {
       "hours": 2.417437777777778,
@@ -12008,12 +12010,12 @@
       "allowed": 2,
       "after": "Тайдзюцу 40"
      },
-     "cloneShareRun": 0.3940518828957708,
-     "cloneShareOpen": 0.8511544680063976,
+     "cloneShareRun": 0.41021780783319245,
+     "cloneShareOpen": 0.8509786046136636,
      "mission": {
-      "ms": 62108000,
-      "xp": 689936.776210038,
-      "ryo": 16753
+      "ms": 65673500,
+      "xp": 759019.2484916076,
+      "ryo": 17467
      },
      "practice": {
       "ms": 35462000,
@@ -12021,37 +12023,37 @@
       "ryo": 100
      },
      "fight": {
-      "ms": 1691500,
-      "xp": 24381.5469095955,
-      "ryo": 10387
+      "ms": 1785000,
+      "xp": 26820.586397836578,
+      "ryo": 10515
      },
      "fightAlly": {
-      "ms": 756500,
-      "xp": 19856.913041615684,
-      "ryo": 8893
+      "ms": 838500,
+      "xp": 22175.99841195991,
+      "ryo": 9021
      },
-     "fights": 73,
-     "fightsWithAllies": 30,
-     "cloneXp": 292638.23937999655,
-     "totalXp": 924012.8973293535,
+     "fights": 76,
+     "fightsWithAllies": 33,
+     "cloneXp": 356709.81932999636,
+     "totalXp": 995534.4090991642,
      "actionMs": {
-      "main": 99262000,
-      "clone": 39116500
+      "main": 102921000,
+      "clone": 42222500
      },
      "levels": {
       "tai": 50,
       "nin": 50,
       "futon": 49,
-      "raiton": 45,
+      "raiton": 46,
       "doton": 50,
       "cc": 50,
-      "med": 40,
+      "med": 50,
       "ath": 50,
       "herb": 50,
-      "scout": 44,
+      "scout": 45,
       "prov": 1,
       "alch": 5,
-      "vit": 43
+      "vit": 44
      },
      "minLevel": 1,
      "minLevelAtChunin": 1,
@@ -12062,7 +12064,7 @@
      "quests": {
       "core:graduation": "done",
       "core:mission_board": "done",
-      "core:outskirts": "1",
+      "core:outskirts": "2",
       "core:shadow_clones": "done",
       "core:rival": "done",
       "core:border_wolves": "done",
@@ -12074,7 +12076,7 @@
       "core:boss_wolf": 1,
       "core:boss_fighter": 1,
       "core:boss_nameless": 1,
-      "core:boss_ren2": 1
+      "core:boss_ren2": 2
      },
      "questsDoneAt": {
       "core:graduation": 0.8445833333333334,
@@ -12083,8 +12085,8 @@
       "core:eternal_rivalry": 10.672376666666667,
       "core:shadow_clones": 14.807638888888889,
       "core:grey_bands": 25.557346944444443,
-      "core:name_on_stone": 27.539410555555556,
-      "core:rival": 27.539410555555556
+      "core:name_on_stone": 28.555768333333333,
+      "core:rival": 28.555768333333333
      },
      "opsCleared": [
       "core:op_hideout",
@@ -12100,7 +12102,7 @@
      ],
      "seed": 2,
      "ended": "done",
-     "hours": 25.8925,
+     "hours": 25.895694444444445,
      "levelsAt3h": {
       "tai": 12,
       "nin": 35,
@@ -12117,7 +12119,7 @@
      },
      "genin": 0.845,
      "clone": 16.550694444444446,
-     "chunin": 25.8925,
+     "chunin": 25.895694444444445,
      "cap": null,
      "longestGap": {
       "hours": 2.868333333333333,
@@ -12128,8 +12130,8 @@
       "allowed": 2,
       "after": "Живучість 10"
      },
-     "cloneShareRun": 0.2981282760988274,
-     "cloneShareOpen": 0.8263163200071364,
+     "cloneShareRun": 0.29821485768226164,
+     "cloneShareOpen": 0.8263756911004102,
      "mission": {
       "ms": 60272500,
       "xp": 536990.14147332,
@@ -12141,22 +12143,22 @@
       "ryo": 100
      },
      "fight": {
-      "ms": 1353000,
-      "xp": 19895.553606084628,
+      "ms": 1364500,
+      "xp": 20087.120089051044,
       "ryo": 12140
      },
      "fightAlly": {
-      "ms": 513000,
-      "xp": 15945.827144123497,
+      "ms": 524500,
+      "xp": 16137.393627089914,
       "ryo": 10583
      },
      "fights": 70,
      "fightsWithAllies": 26,
      "cloneXp": 148574.27010249806,
-     "totalXp": 735723.9836748729,
+     "totalXp": 735915.5501578393,
      "actionMs": {
-      "main": 93213000,
-      "clone": 27790500
+      "main": 93224500,
+      "clone": 27802000
      },
      "levels": {
       "tai": 50,
@@ -12202,8 +12204,8 @@
       "core:eternal_rivalry": 11.924365555555555,
       "core:shadow_clones": 16.550694444444446,
       "core:grey_bands": 23.780778055555555,
-      "core:name_on_stone": 25.859045277777778,
-      "core:rival": 25.859045277777778
+      "core:name_on_stone": 25.862274444444445,
+      "core:rival": 25.862274444444445
      },
      "opsCleared": [
       "core:op_hideout",
@@ -12219,7 +12221,7 @@
      ],
      "seed": 3,
      "ended": "done",
-     "hours": 28.87,
+     "hours": 28.87375,
      "levelsAt3h": {
       "tai": 25,
       "nin": 35,
@@ -12235,7 +12237,7 @@
      },
      "genin": 0.8452777777777778,
      "clone": 14.878194444444444,
-     "chunin": 28.87,
+     "chunin": 28.87375,
      "cap": null,
      "longestGap": {
       "hours": 1.8033508333333332,
@@ -12246,8 +12248,8 @@
       "allowed": 2,
       "after": "Ніндзюцу 40"
      },
-     "cloneShareRun": 0.40099290882500094,
-     "cloneShareOpen": 0.82738894789609,
+     "cloneShareRun": 0.4010707053215387,
+     "cloneShareOpen": 0.8274351976818037,
      "mission": {
       "ms": 66982500,
       "xp": 775215.0036449026,
@@ -12259,22 +12261,22 @@
       "ryo": 100
      },
      "fight": {
-      "ms": 1466500,
-      "xp": 19964.573414088773,
+      "ms": 1480000,
+      "xp": 20143.132296359945,
       "ryo": 10732
      },
      "fightAlly": {
-      "ms": 612000,
-      "xp": 16016.8149925599,
+      "ms": 625500,
+      "xp": 16195.373874831072,
       "ryo": 9170
      },
      "fights": 70,
      "fightsWithAllies": 27,
      "cloneXp": 349206.8660349921,
-     "totalXp": 972555.0510311149,
+     "totalXp": 972733.609913386,
      "actionMs": {
-      "main": 103932000,
-      "clone": 41678500
+      "main": 103945500,
+      "clone": 41692000
      },
      "levels": {
       "tai": 50,
@@ -12319,8 +12321,8 @@
       "core:eternal_rivalry": 10.64394888888889,
       "core:shadow_clones": 14.878194444444444,
       "core:grey_bands": 28.560700555555556,
-      "core:name_on_stone": 28.83663222222222,
-      "core:rival": 28.83663222222222
+      "core:name_on_stone": 28.840363333333332,
+      "core:rival": 28.840363333333332
      },
      "opsCleared": [
       "core:op_hideout",
@@ -12346,7 +12348,7 @@
      ],
      "seed": 1,
      "ended": "done",
-     "hours": 26.582638888888887,
+     "hours": 26.585416666666667,
      "levelsAt3h": {
       "tai": 12,
       "nin": 34,
@@ -12363,7 +12365,7 @@
      },
      "genin": 0.8445833333333334,
      "clone": 14.807638888888889,
-     "chunin": 26.582638888888887,
+     "chunin": 26.585416666666667,
      "cap": null,
      "longestGap": {
       "hours": 2.417437777777778,
@@ -12374,11 +12376,11 @@
       "allowed": 2,
       "after": "Тайдзюцу 40"
      },
-     "cloneShareRun": 0.37795164972961676,
-     "cloneShareOpen": 0.8532443500825666,
+     "cloneShareRun": 0.378011420212627,
+     "cloneShareOpen": 0.8532671698113208,
      "mission": {
-      "ms": 60235000,
-      "xp": 676742.0623991152,
+      "ms": 60246500,
+      "xp": 676791.727783588,
       "ryo": 15661
      },
      "practice": {
@@ -12387,22 +12389,22 @@
       "ryo": 100
      },
      "fight": {
-      "ms": 1597000,
-      "xp": 21169.05071739085,
+      "ms": 1595500,
+      "xp": 21107.560241376876,
       "ryo": 10787
      },
      "fightAlly": {
-      "ms": 664000,
-      "xp": 16742.637824674195,
+      "ms": 662500,
+      "xp": 16681.14734866022,
       "ryo": 9293
      },
      "fights": 72,
      "fightsWithAllies": 29,
-     "cloneXp": 236851.32306051132,
-     "totalXp": 856298.4031193309,
+     "cloneXp": 236900.98844498413,
+     "totalXp": 856286.5780277897,
      "actionMs": {
-      "main": 95697500,
-      "clone": 36171000
+      "main": 95707500,
+      "clone": 36180500
      },
      "levels": {
       "tai": 50,
@@ -12448,8 +12450,8 @@
       "core:eternal_rivalry": 10.672376666666667,
       "core:shadow_clones": 14.807638888888889,
       "core:grey_bands": 25.54167222222222,
-      "core:name_on_stone": 26.5492825,
-      "core:rival": 26.5492825
+      "core:name_on_stone": 26.552009444444444,
+      "core:rival": 26.552009444444444
      },
      "opsCleared": [
       "core:op_hideout",
@@ -12465,7 +12467,7 @@
      ],
      "seed": 2,
      "ended": "done",
-     "hours": 25.8925,
+     "hours": 25.895694444444445,
      "levelsAt3h": {
       "tai": 12,
       "nin": 35,
@@ -12482,7 +12484,7 @@
      },
      "genin": 0.845,
      "clone": 16.550694444444446,
-     "chunin": 25.8925,
+     "chunin": 25.895694444444445,
      "cap": null,
      "longestGap": {
       "hours": 2.868333333333333,
@@ -12493,8 +12495,8 @@
       "allowed": 2,
       "after": "Живучість 10"
      },
-     "cloneShareRun": 0.2981282760988274,
-     "cloneShareOpen": 0.8263163200071364,
+     "cloneShareRun": 0.29821485768226164,
+     "cloneShareOpen": 0.8263756911004102,
      "mission": {
       "ms": 60272500,
       "xp": 536990.14147332,
@@ -12506,22 +12508,22 @@
       "ryo": 100
      },
      "fight": {
-      "ms": 1353000,
-      "xp": 19895.553606084628,
+      "ms": 1364500,
+      "xp": 20087.120089051044,
       "ryo": 12140
      },
      "fightAlly": {
-      "ms": 513000,
-      "xp": 15945.827144123497,
+      "ms": 524500,
+      "xp": 16137.393627089914,
       "ryo": 10583
      },
      "fights": 70,
      "fightsWithAllies": 26,
      "cloneXp": 148574.27010249806,
-     "totalXp": 735723.9836748729,
+     "totalXp": 735915.5501578393,
      "actionMs": {
-      "main": 93213000,
-      "clone": 27790500
+      "main": 93224500,
+      "clone": 27802000
      },
      "levels": {
       "tai": 50,
@@ -12567,8 +12569,8 @@
       "core:eternal_rivalry": 11.924365555555555,
       "core:shadow_clones": 16.550694444444446,
       "core:grey_bands": 23.780778055555555,
-      "core:name_on_stone": 25.859045277777778,
-      "core:rival": 25.859045277777778
+      "core:name_on_stone": 25.862274444444445,
+      "core:rival": 25.862274444444445
      },
      "opsCleared": [
       "core:op_hideout",
@@ -12584,7 +12586,7 @@
      ],
      "seed": 3,
      "ended": "done",
-     "hours": 27.03388888888889,
+     "hours": 27.03763888888889,
      "levelsAt3h": {
       "tai": 25,
       "nin": 35,
@@ -12600,7 +12602,7 @@
      },
      "genin": 0.8452777777777778,
      "clone": 14.878194444444444,
-     "chunin": 27.03388888888889,
+     "chunin": 27.03763888888889,
      "cap": null,
      "longestGap": {
       "hours": 1.8033508333333332,
@@ -12611,8 +12613,8 @@
       "allowed": 2,
       "after": "Ніндзюцу 40"
      },
-     "cloneShareRun": 0.37234994143153655,
-     "cloneShareOpen": 0.82809476582763,
+     "cloneShareRun": 0.3724369936970581,
+     "cloneShareOpen": 0.8281477817882762,
      "mission": {
       "ms": 62816000,
       "xp": 655758.4271942484,
@@ -12624,22 +12626,22 @@
       "ryo": 100
      },
      "fight": {
-      "ms": 1430500,
-      "xp": 19536.23702953147,
+      "ms": 1444000,
+      "xp": 19689.963219566234,
       "ryo": 8671
      },
      "fightAlly": {
-      "ms": 576000,
-      "xp": 15424.00566232443,
+      "ms": 589500,
+      "xp": 15577.731852359197,
       "ryo": 7109
      },
      "fights": 70,
      "fightsWithAllies": 27,
      "cloneXp": 251899.54100999236,
-     "totalXp": 903538.5229942602,
+     "totalXp": 903692.249184295,
      "actionMs": {
-      "main": 97322000,
-      "clone": 36239500
+      "main": 97335500,
+      "clone": 36253000
      },
      "levels": {
       "tai": 50,
@@ -12685,8 +12687,8 @@
       "core:shadow_clones": 14.878194444444444,
       "core:outskirts": 25.42861111111111,
       "core:grey_bands": 26.5535125,
-      "core:name_on_stone": 27.00047,
-      "core:rival": 27.00047
+      "core:name_on_stone": 27.004194722222223,
+      "core:rival": 27.004194722222223
      },
      "opsCleared": [
       "core:op_hideout",
@@ -12823,7 +12825,7 @@
      ],
      "seed": 2,
      "ended": "done",
-     "hours": 26.95888888888889,
+     "hours": 26.96125,
      "levelsAt3h": {
       "tai": 12,
       "nin": 35,
@@ -12840,7 +12842,7 @@
      },
      "genin": 0.845,
      "clone": 19.931527777777777,
-     "chunin": 26.95888888888889,
+     "chunin": 26.96125,
      "cap": null,
      "longestGap": {
       "hours": 1.7868577777777779,
@@ -12851,8 +12853,8 @@
       "allowed": 2,
       "after": "Дотон 50"
      },
-     "cloneShareRun": 0.20960901372460125,
-     "cloneShareOpen": 0.8041177935450718,
+     "cloneShareRun": 0.20967823161842356,
+     "cloneShareOpen": 0.8041835855692101,
      "mission": {
       "ms": 72557500,
       "xp": 701366.709264275,
@@ -12864,22 +12866,22 @@
       "ryo": 100
      },
      "fight": {
-      "ms": 1593000,
-      "xp": 19010.90779870357,
+      "ms": 1601500,
+      "xp": 19223.759446444034,
       "ryo": 10590
      },
      "fightAlly": {
-      "ms": 505000,
-      "xp": 13454.364752637048,
+      "ms": 513500,
+      "xp": 13667.21640037751,
       "ryo": 9033
      },
      "fights": 80,
      "fightsWithAllies": 30,
      "cloneXp": 79792.05149999658,
-     "totalXp": 830571.2857605699,
+     "totalXp": 830784.1374083103,
      "actionMs": {
-      "main": 97052000,
-      "clone": 20344000
+      "main": 97060500,
+      "clone": 20352500
      },
      "levels": {
       "tai": 50,
@@ -12925,8 +12927,8 @@
       "core:eternal_rivalry": 18.90428888888889,
       "core:shadow_clones": 19.931527777777777,
       "core:grey_bands": 23.856514166666667,
-      "core:name_on_stone": 26.925417222222222,
-      "core:rival": 26.925417222222222
+      "core:name_on_stone": 26.92783638888889,
+      "core:rival": 26.92783638888889
      },
      "opsCleared": [
       "core:op_hideout",
@@ -12942,7 +12944,7 @@
      ],
      "seed": 3,
      "ended": "done",
-     "hours": 24.949444444444445,
+     "hours": 24.95138888888889,
      "levelsAt3h": {
       "tai": 25,
       "nin": 35,
@@ -12958,7 +12960,7 @@
      },
      "genin": 0.8452777777777778,
      "clone": 14.878194444444444,
-     "chunin": 24.949444444444445,
+     "chunin": 24.95138888888889,
      "cap": null,
      "longestGap": {
       "hours": 1.8033508333333332,
@@ -12969,8 +12971,8 @@
       "allowed": 2,
       "after": "Ніндзюцу 40"
      },
-     "cloneShareRun": 0.3196668262486361,
-     "cloneShareOpen": 0.7919086232813427,
+     "cloneShareRun": 0.31971984414138604,
+     "cloneShareOpen": 0.7919487914845506,
      "mission": {
       "ms": 58350000,
       "xp": 585708.3319547179,
@@ -12982,22 +12984,22 @@
       "ryo": 100
      },
      "fight": {
-      "ms": 1435000,
-      "xp": 19847.857356032786,
+      "ms": 1442000,
+      "xp": 20096.18427839662,
       "ryo": 11139
      },
      "fightAlly": {
-      "ms": 579500,
-      "xp": 15926.950706124073,
+      "ms": 586500,
+      "xp": 16175.277628487907,
       "ryo": 9577
      },
      "fights": 72,
      "fightsWithAllies": 29,
      "cloneXp": 125467.1024999964,
-     "totalXp": 765962.4599410668,
+     "totalXp": 766210.7868634306,
      "actionMs": {
-      "main": 89818000,
-      "clone": 28713000
+      "main": 89825000,
+      "clone": 28720000
      },
      "levels": {
       "tai": 50,
@@ -13042,8 +13044,8 @@
       "core:eternal_rivalry": 10.64394888888889,
       "core:shadow_clones": 14.878194444444444,
       "core:grey_bands": 20.9055,
-      "core:name_on_stone": 24.916098333333334,
-      "core:rival": 24.916098333333334
+      "core:name_on_stone": 24.917988055555554,
+      "core:rival": 24.917988055555554
      },
      "opsCleared": [
       "core:op_hideout",
@@ -13180,7 +13182,7 @@
      ],
      "seed": 2,
      "ended": "done",
-     "hours": 26.95888888888889,
+     "hours": 26.96125,
      "levelsAt3h": {
       "tai": 12,
       "nin": 35,
@@ -13197,7 +13199,7 @@
      },
      "genin": 0.845,
      "clone": 19.931527777777777,
-     "chunin": 26.95888888888889,
+     "chunin": 26.96125,
      "cap": null,
      "longestGap": {
       "hours": 1.7868577777777779,
@@ -13208,8 +13210,8 @@
       "allowed": 2,
       "after": "Дотон 50"
      },
-     "cloneShareRun": 0.20960901372460125,
-     "cloneShareOpen": 0.8041177935450718,
+     "cloneShareRun": 0.20967823161842356,
+     "cloneShareOpen": 0.8041835855692101,
      "mission": {
       "ms": 72557500,
       "xp": 701366.709264275,
@@ -13221,22 +13223,22 @@
       "ryo": 100
      },
      "fight": {
-      "ms": 1593000,
-      "xp": 19010.90779870357,
+      "ms": 1601500,
+      "xp": 19223.759446444034,
       "ryo": 10590
      },
      "fightAlly": {
-      "ms": 505000,
-      "xp": 13454.364752637048,
+      "ms": 513500,
+      "xp": 13667.21640037751,
       "ryo": 9033
      },
      "fights": 80,
      "fightsWithAllies": 30,
      "cloneXp": 79792.05149999658,
-     "totalXp": 830571.2857605699,
+     "totalXp": 830784.1374083103,
      "actionMs": {
-      "main": 97052000,
-      "clone": 20344000
+      "main": 97060500,
+      "clone": 20352500
      },
      "levels": {
       "tai": 50,
@@ -13282,8 +13284,8 @@
       "core:eternal_rivalry": 18.90428888888889,
       "core:shadow_clones": 19.931527777777777,
       "core:grey_bands": 23.856514166666667,
-      "core:name_on_stone": 26.925417222222222,
-      "core:rival": 26.925417222222222
+      "core:name_on_stone": 26.92783638888889,
+      "core:rival": 26.92783638888889
      },
      "opsCleared": [
       "core:op_hideout",
@@ -13299,7 +13301,7 @@
      ],
      "seed": 3,
      "ended": "done",
-     "hours": 29.884166666666665,
+     "hours": 29.88888888888889,
      "levelsAt3h": {
       "tai": 25,
       "nin": 35,
@@ -13315,7 +13317,7 @@
      },
      "genin": 0.8452777777777778,
      "clone": 14.878194444444444,
-     "chunin": 29.884166666666665,
+     "chunin": 29.88888888888889,
      "cap": null,
      "longestGap": {
       "hours": 2.970555,
@@ -13326,8 +13328,8 @@
       "allowed": 2,
       "after": "Ніндзюцу 40"
      },
-     "cloneShareRun": 0.4177000548413783,
-     "cloneShareOpen": 0.8318433401516063,
+     "cloneShareRun": 0.41779205390334573,
+     "cloneShareOpen": 0.8318962406432451,
      "mission": {
       "ms": 78213000,
       "xp": 751136.5073478961,
@@ -13339,22 +13341,22 @@
       "ryo": 100
      },
      "fight": {
-      "ms": 1354000,
-      "xp": 17778.59890413665,
+      "ms": 1371000,
+      "xp": 17979.62546033595,
       "ryo": 8213
      },
      "fightAlly": {
-      "ms": 530500,
-      "xp": 14184.142644230335,
+      "ms": 547500,
+      "xp": 14385.169200429635,
       "ryo": 6651
      },
      "fights": 67,
      "fightsWithAllies": 24,
      "cloneXp": 279217.23023499636,
-     "totalXp": 985655.986002502,
+     "totalXp": 985857.0125587013,
      "actionMs": {
-      "main": 107583000,
-      "clone": 44939500
+      "main": 107600000,
+      "clone": 44956500
      },
      "levels": {
       "tai": 50,
@@ -13399,8 +13401,8 @@
       "core:shadow_clones": 14.878194444444444,
       "core:outskirts": 26.261944444444445,
       "core:grey_bands": 26.6624225,
-      "core:name_on_stone": 29.850713333333335,
-      "core:rival": 29.850713333333335
+      "core:name_on_stone": 29.855517777777777,
+      "core:rival": 29.855517777777777
      },
      "opsCleared": [
       "core:op_hideout",

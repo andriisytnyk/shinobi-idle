@@ -230,7 +230,13 @@ export async function addBackup(
   // The text goes in first: an index never points at a copy that is not there.
   await kv.set(entry.key, raw);
   const next = [entry, ...known.filter((e) => e.key !== entry.key)];
-  await kv.set(BACKUPS_INDEX_KEY, JSON.stringify(next.slice(0, BACKUPS_KEEP)));
+  try {
+    await kv.set(BACKUPS_INDEX_KEY, JSON.stringify(next.slice(0, BACKUPS_KEEP)));
+  } catch (error) {
+    // No index entry for the text: drop it, so a full disk does not leave a copy nothing points at.
+    await kv.del(entry.key).catch(() => undefined);
+    throw error;
+  }
   for (const old of next.slice(BACKUPS_KEEP)) await kv.del(old.key);
   return entry;
 }

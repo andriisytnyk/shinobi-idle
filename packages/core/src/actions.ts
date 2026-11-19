@@ -17,7 +17,7 @@ import { actionFloor, entitySkill } from './vocab.ts';
 import { trackClone } from './clone.ts';
 import { STAND_ID, STAND_KIND, asPerformer } from './performer.ts';
 import { nonNativeLevel } from './natures.ts';
-import { cycleFactor } from './modifiers.ts';
+import { cycleFactor, touchMods } from './modifiers.ts';
 import { spendTonicCharges } from './buffs.ts';
 import { gainXp, grantMastery } from './progression.ts';
 import { reqMet, skillLevel, type Req } from './requirements.ts';
@@ -226,6 +226,8 @@ export const drillKind = skillAction((_state, id, content) => {
  * pool: a clone's price is its chakra (`clone-life.ts`), not the character's speed.
  */
 export function rebalanceShares(state: GameState, _content?: ContentDb): void {
+  // Who acts has changed (the places of power are the performers' own): what the modifiers read has.
+  touchMods(state);
   const anyRuns = state.slots.some((s) => s.action);
   state.slots.forEach((slot, index) => {
     slot.share = slot.action || (index === 0 && !anyRuns) ? SHARE_FULL : 0;

@@ -137,6 +137,8 @@ export function masteryRef(key: string, content: ContentDb): EntityRef {
   if (content.exercises.some((e) => e.id === key)) return { kind: 'exercise', id: key };
   if (content.practices.some((p) => p.id === key)) return { kind: 'practice', id: key };
   if (content.obstacles.some((o) => o.id === key)) return { kind: 'obstacle', id: key };
+  // A work that a found point opens has its own mastery too.
+  if (content.fieldworks.some((w) => w.id === key)) return { kind: 'fieldwork', id: key };
   // Gathering and crafting have a mastery of their own, kept under the item or recipe they make.
   if (!content.techniques.some((x) => x.id === key)) {
     if (content.recipes.some((r) => r.id === key)) return { kind: 'recipe', id: key };

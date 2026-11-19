@@ -40,6 +40,7 @@ import {
   type Reach,
 } from './hex.ts';
 import { regionOpenReq } from './regions.ts';
+import { fieldworksAt } from './field.ts';
 import { performers, pointStatus, pointsAtHex, type PointStatus } from './points.ts';
 import { jumpBlocked, travelPrice } from './travel.ts';
 
@@ -281,6 +282,8 @@ export interface PointInfo {
   travel: string | null;
   /** What the discovery paid; only once found. */
   reward: Payout | null;
+  /** The work (fieldworks) that finding the point opens, once it is revealed beyond a hint. */
+  opens: string[];
   /** Whether a performer (the character or a clone) stands on it now. */
   active: boolean;
 }
@@ -307,6 +310,7 @@ export function pointInfos(
           power: [],
           travel: null,
           reward: null,
+          opens: [],
           active: false,
         },
       ];
@@ -318,6 +322,7 @@ export function pointInfos(
         power: place.point.power ?? [],
         travel: place.point.travel ?? null,
         reward: status === 'found' ? place.point.reward : null,
+        opens: fieldworksAt(content, place.id),
         active: status === 'found' && here.has(key),
       },
     ];

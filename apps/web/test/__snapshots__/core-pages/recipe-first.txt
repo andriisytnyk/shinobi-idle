@@ -643,6 +643,149 @@
               <p class="ct-pin-caption">
                 <button class="link" data-entity="recipe:core:dymova_bomba" data-pinned="false" data-ui="pin-goal" type="button">
                   Закріпити як мету
+          <li class="ct-tile" data-action="core:iidka_dymova_bomba" data-entity="recipe:core:iidka_dymova_bomba" data-recipe="core:iidka_dymova_bomba" data-ui="action-tile">
+            <div class="ct-top">
+              <span class="emblem md" data-emblem-icon="poison-cloud" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+                <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
+                  <path d="#455-jsl2ps" fill="currentColor">
+              <div class="ct-head">
+                <h3 class="ct-name">
+                  <a class="entity-link" href="#/recipe/core:iidka_dymova_bomba">
+                    Їдка димова бомба
+                <span class="ct-corner">
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
+                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
+                  <button aria-label="Закріпити як мету" class="pin always" data-entity="recipe:core:iidka_dymova_bomba" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                      <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+            <dl class="ct-facts">
+              <div>
+                <dt>
+                  Потрібен рівень
+                <dd>
+                  16
+              <div data-ui="action-interval">
+                <dt>
+                  Цикл
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      2,5 с
+              <div data-ui="action-xp">
+                <dt>
+                  Досвід
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      65 778 дос./год
+              <div data-ui="action-mastery">
+                <dt>
+                  Майстерність
+                <dd>
+                  <span class="mod">
+                    <button aria-expanded="false" class="figure" type="button">
+                      4 147 дос./год
+            <div>
+              <p class="ct-caption">
+                Потрібно
+              <ul class="ct-list" data-inputs="">
+                <li class="input missing" data-entity="item:core:sulphur" data-input="core:sulphur" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#1167-nm9kq2" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:sulphur">
+                      Сірка
+                  <span aria-label="є 0, потрібно 1" class="count">
+                    0/1
+                  <a class="source" data-source="work" href="#/skill/scout">
+                    Добувати
+                <li class="input missing" data-entity="item:core:nettle" data-input="core:nettle" data-missing="true" data-ui="ingredient-row">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#1611-1skmruf" fill="currentColor">
+                  <span class="name">
+                    <a class="entity-link" href="#/item/core:nettle">
+                      Кропива
+                  <span aria-label="є 0, потрібно 2" class="count">
+                    0/2
+                  <a class="source" data-source="herb" href="#/skill/herb">
+                    Збирати
+            <div>
+              <p class="ct-caption">
+                Виходить
+              <ul class="ct-list" data-outputs="">
+                <li class="output" data-output="core:iidka_dymova_bomba">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 512 512" width="18">
+                    <path d="#455-jsl2ps" fill="currentColor">
+                  <span class="qty">
+                    ×3
+                  <a class="entity-link" href="#/item/core:iidka_dymova_bomba">
+                    Їдка димова бомба
+                  <span class="ct-muted">
+                    У банку: 0
+            <p class="ct-note" data-tier="">
+              Ступінь 1 з 4: шанс додаткової одиниці 0%.
+              Наступний ступінь — з Майстерності 20.
+            <div class="ct-actions">
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:iidka_dymova_bomba" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
+            <p class="ct-why" data-why="level" id="why-core:iidka_dymova_bomba">
+              Рівень замалий: потрібен 16.
+            <div class="req">
+              <div class="group" data-met="false">
+                <ul class="rows">
+                  <li>
+                    <div class="row met" data-met="true" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        Ранг: Генін
+                  <li>
+                    <div class="row" data-entity="skill:alch" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/skill/alch">
+                          Алхімія
+                        <span class="detail">
+                          рів. 16
+                      <span class="count">
+                        1/16
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 6.25%;">
+                  <li>
+                    <div class="row" data-entity="item:core:sulphur" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:sulphur">
+                          Сірка
+                      <span class="count">
+                        0/1
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+                  <li>
+                    <div class="row" data-entity="item:core:nettle" data-met="false" data-ui="req-row">
+                      <span class="mark">
+                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <span class="label">
+                        <a class="entity-link" href="#/item/core:nettle">
+                          Кропива
+                      <span class="count">
+                        0/2
+                      <span aria-hidden="true" class="bar">
+                        <span class="fill" style="width: 0%;">
+              <p class="ct-pin-caption">
+                <button class="link" data-entity="recipe:core:iidka_dymova_bomba" data-pinned="false" data-ui="pin-goal" type="button">
+                  Закріпити як мету
           <li class="ct-tile" data-action="core:sonnyi_poroshok" data-entity="recipe:core:sonnyi_poroshok" data-recipe="core:sonnyi_poroshok" data-ui="action-tile">
             <div class="ct-top">
               <span class="emblem md" data-emblem-icon="powder" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
@@ -1726,7 +1869,7 @@
         <h2>
           Пул Майстерності
         <p class="amount">
-          0 / 22 000
+          0 / 24 000
         <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="bar" role="progressbar">
           <span class="fill" style="width: 0%;">
           <span class="tick" style="left: 10%;">

@@ -250,6 +250,18 @@ const data = {
       tags: [],
     },
   ],
+  /** A work of another skill than the first scouting one: a pack may let any skill work a found point. */
+  fieldworks: [
+    {
+      id: 'testmod:scrap_sifting',
+      point: 'core:war_fort_ruins',
+      skill: 'testmod:forge',
+      level: 1,
+      cycle: 5,
+      xp: 3,
+      drops: [{ chance: 0.5, payout: { items: [{ item: 'testmod:pellet', n: 1 }] } }],
+    },
+  ],
   gear: [
     {
       id: 'testmod:anvil',
@@ -522,6 +534,9 @@ export const testmodPack: ContentPack = {
   },
   locales: {
     uk: {
+      'fieldwork.testmod:scrap_sifting.name': 'Тестове перебирання брухту',
+      'fieldwork.testmod:scrap_sifting.desc':
+        'Тестова робота пакета: доводить, що мод додає роботу на місці даними.',
       'skill.testmod:forge.name': 'Тестова кузня',
       'skill.testmod:forge.desc':
         'Тестова навичка пакета перевірки: вона лише доводить, що мод додає навички даними.',

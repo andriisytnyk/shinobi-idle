@@ -110,6 +110,7 @@ export const CORE_ICONS: Readonly<Record<string, Readonly<Record<string, string>
     'core:meat': 'meat',
     'core:saltpeter': 'powder-bag',
     'core:spice': 'hot-spices',
+    'core:sulphur': 'stone-pile',
     // Tools
     'core:kunai': 'thrown-knife',
     'core:shuriken': 'ninja-star',
@@ -164,6 +165,7 @@ export const CORE_ICONS: Readonly<Record<string, Readonly<Record<string, string>
     'core:tsiliushcha_maz': 'heart-bottle',
     'core:paralitychna_otruta': 'round-potion',
     'core:dymova_bomba': 'smoke-bomb',
+    'core:iidka_dymova_bomba': 'poison-cloud',
     'core:sonnyi_poroshok': 'powder',
     'core:krovospynna_maz': 'bandage-roll',
     'core:slozohinna_bomba': 'stun-grenade',
@@ -227,12 +229,19 @@ export const CORE_ICONS: Readonly<Record<string, Readonly<Record<string, string>
     'core:plavannia_proty_techii': 'swimfins',
   },
 
+  // Work that found points open
+  fieldwork: {
+    'core:search_war_fort_ruins': 'ancient-columns',
+    'core:gather_hell_valley_sulphur': 'stone-pile',
+  },
+
   // Alchemy and provisions recipes; the picture matches the item the recipe makes (the antidote takes a mortar)
   recipe: {
     'core:antidote': 'pestle-mortar',
     'core:tsiliushcha_maz': 'heart-bottle',
     'core:paralitychna_otruta': 'round-potion',
     'core:dymova_bomba': 'smoke-bomb',
+    'core:iidka_dymova_bomba': 'poison-cloud',
     'core:sonnyi_poroshok': 'powder',
     'core:krovospynna_maz': 'bandage-roll',
     'core:slozohinna_bomba': 'stun-grenade',

@@ -95,9 +95,17 @@ const part = (a: { kind: string; id: string }): string => `${a.kind}=${a.id}`;
 
 /** The counter key of a pair of actions run together, the two in a fixed order. */
 export function pairKey(a: { kind: string; id: string }, b: { kind: string; id: string }): string {
+  // The same pair is asked for at every step of a long fight: the last answer is kept.
+  const last = lastPair;
+  if (last && last.ak === a.kind && last.ai === a.id && last.bk === b.kind && last.bi === b.id)
+    return last.key;
   const [x, y] = [part(a), part(b)].sort();
-  return `${CLONE_PAIR_PREFIX}${x}|${y}`;
+  const key = `${CLONE_PAIR_PREFIX}${x}|${y}`;
+  lastPair = { ak: a.kind, ai: a.id, bk: b.kind, bi: b.id, key };
+  return key;
 }
+
+let lastPair: { ak: string; ai: string; bk: string; bi: string; key: string } | null = null;
 
 /** Adds `dt` ms of game time to the clone telemetry: how long the clone technique was known with a slot open, how long a clone existed, and which pairs ran together. */
 export function trackClone(state: GameState, dt: number, content: ContentDb): void {

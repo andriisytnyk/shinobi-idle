@@ -42,6 +42,7 @@ lines.push(
   `${content.items.filter((i) => i.scroll).length} scrolls (${content.items.filter((i) => i.part).length} scroll-part items)`,
   `${content.zones.length} zones`,
   `${content.operations.length} operations`,
+  `${content.fieldworks.length} fieldworks`,
   `${content.statuses.length} statuses`,
   `${content.traits.length} traits`,
   `${content.combos.length} combos`,

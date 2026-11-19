@@ -13,10 +13,10 @@ import { fightKind, operationKind } from './combat/kind.ts';
 import { combatSystem } from './combat/system.ts';
 import { woundSystem } from './combat/wounds.ts';
 import { senseiTestKind } from './exam.ts';
-import { craftKind, gatherKind } from './field.ts';
+import { FIELDWORK_KIND, craftKind, fieldworkKind, gatherKind } from './field.ts';
 import { gearProvider } from './gear.ts';
 import { meditateKind, meditationProvider } from './meditation.ts';
-import type { ModifierProvider } from './modifiers.ts';
+import { markCacheable, type ModifierProvider } from './modifiers.ts';
 import { natureProvider } from './natures.ts';
 import { missionKind, MISSION_KIND } from './missions/index.ts';
 import { questSystem } from './quests.ts';
@@ -80,6 +80,7 @@ export const defaultRules: Rules = {
     [MISSION_KIND]: missionKind,
     gather: gatherKind,
     craft: craftKind,
+    [FIELDWORK_KIND]: fieldworkKind,
     senseiTest: senseiTestKind,
     [EXPLORE_KIND]: exploreKind,
     [WALK_KIND]: walkKind,
@@ -104,6 +105,8 @@ export const defaultRules: Rules = {
   fightHooks: defaultFightHooks,
   hexEntered: [walkHook],
 };
+// The totals of these may be kept while `advance` runs (see `totalsOf`).
+markCacheable(defaultRules.modifierProviders);
 
 // ---------- rules from packs ----------
 

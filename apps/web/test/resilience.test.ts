@@ -99,6 +99,15 @@ describe('backup before an upgrade', () => {
     expect(keys.sort()).toEqual(list.map((e) => e.key).sort());
   });
 
+  it('leaves no orphan text when the index write fails', async () => {
+    const kv = memoryStore();
+    const set = kv.set.bind(kv);
+    kv.set = (key: string, value: string) =>
+      key === BACKUPS_INDEX_KEY ? Promise.reject(new Error('quota')) : set(key, value);
+    await expect(addBackup(kv, 'text', 10, T0)).rejects.toThrow('quota');
+    expect([...kv.data.keys()].filter((k) => k.startsWith('save.backup.v'))).toEqual([]);
+  });
+
   it('keeps the old save untouched and the backup in place when the upgrade throws', async () => {
     const kv = memoryStore();
     const stored = encodeStored(4, JSON.stringify({ ...fixture, v: 6 }));
