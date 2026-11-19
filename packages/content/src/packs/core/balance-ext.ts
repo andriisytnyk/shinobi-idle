@@ -206,8 +206,8 @@ export const BALANCE_EXT = {
       sigEveryMs: 16000,
       sigMult: 0.3,
       sigOpenMs: 2000,
-      hp: 0.92,
-      dmg: 0.92,
+      hp: 0.96,
+      dmg: 0.96,
     },
     rivalTournament: {
       techniques: 2,
@@ -222,11 +222,11 @@ export const BALANCE_EXT = {
     },
     drunkenEvasion: { maxMult: 2, hp: 1, dmg: 1 },
     /** A heavy cast: `castMs` wind-up every `everyMs`, `damageMult` x damage, stuns the player for `stunMs` when it lands. */
-    heavyCast: { everyMs: 20000, castMs: 2500, damageMult: 2, stunMs: 500, hp: 0.85, dmg: 1.1 },
+    heavyCast: { everyMs: 20000, castMs: 2500, damageMult: 2, stunMs: 500, hp: 0.925, dmg: 1.0 },
     /** Two bodies: each has `hpEach` of the boss health and `dmgEach` of its damage; while both live the mist poisons the player for `mistMult` x the poison strength. */
     twins: { count: 2, hpEach: 0.5, dmgEach: 0.5, mistMult: 1.6 },
     mistRehide: { everyMs: 25000, hp: 0.97, dmg: 0.95 },
-    illusion: { everyMs: 8000, fleeAtHp: 0.3, hp: 1.25, dmg: 1.25 },
+    illusion: { everyMs: 8000, fleeAtHp: 0.3, hp: 1.22, dmg: 1.22 },
   },
   /** Loadout: slots and distinct natures by rank (a student has no limit), and the number of saved loadouts. */
   loadout: {

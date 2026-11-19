@@ -218,8 +218,8 @@
         "sigEveryMs": 16000,
         "sigMult": 0.3,
         "sigOpenMs": 2000,
-        "hp": 0.92,
-        "dmg": 0.92
+        "hp": 0.96,
+        "dmg": 0.96
       },
       "rivalTournament": {
         "techniques": 2,
@@ -242,8 +242,8 @@
         "castMs": 2500,
         "damageMult": 2,
         "stunMs": 500,
-        "hp": 0.85,
-        "dmg": 1.1
+        "hp": 0.925,
+        "dmg": 1
       },
       "twins": {
         "count": 2,
@@ -259,8 +259,8 @@
       "illusion": {
         "everyMs": 8000,
         "fleeAtHp": 0.3,
-        "hp": 1.25,
-        "dmg": 1.25
+        "hp": 1.22,
+        "dmg": 1.22
       }
     },
     "ryoDrop": [
@@ -397,7 +397,7 @@
       4.3
     ],
     "boss": {
-      "hp": 3.46,
+      "hp": 3.6,
       "dmg": 1.49
     },
     "pack": {

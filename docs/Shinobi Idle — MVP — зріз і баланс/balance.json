@@ -288,7 +288,7 @@
    4.3
   ],
   "boss": {
-   "hp": 3.46,
+   "hp": 3.6,
    "dmg": 1.49
   },
   "pack": {
@@ -1675,56 +1675,56 @@
   {
    "id": "boss_wolf",
    "cl": 22,
-   "hp": 815,
+   "hp": 848,
    "dmg": 20.7,
    "boss": true
   },
   {
    "id": "boss_ren1",
    "cl": 26,
-   "hp": 951,
+   "hp": 989,
    "dmg": 23.4,
    "boss": true
   },
   {
    "id": "boss_fighter",
    "cl": 32,
-   "hp": 1154,
+   "hp": 1201,
    "dmg": 27.4,
    "boss": true
   },
   {
    "id": "boss_hunter",
    "cl": 36,
-   "hp": 1290,
+   "hp": 1342,
    "dmg": 30.1,
    "boss": true
   },
   {
    "id": "boss_twins",
    "cl": 38,
-   "hp": 1358,
+   "hp": 1413,
    "dmg": 31.4,
    "boss": true
   },
   {
    "id": "boss_mist",
    "cl": 40,
-   "hp": 1426,
+   "hp": 1483,
    "dmg": 32.8,
    "boss": true
   },
   {
    "id": "boss_nameless",
    "cl": 44,
-   "hp": 1561,
+   "hp": 1624,
    "dmg": 35.5,
    "boss": true
   },
   {
    "id": "boss_ren2",
    "cl": 42,
-   "hp": 1493,
+   "hp": 1554,
    "dmg": 34.1,
    "boss": true
   }
@@ -2247,8 +2247,8 @@
    "nature": "katon",
    "prepared": {
     "win": 100,
-    "ttk": 91,
-    "hpLost": 126,
+    "ttk": 95,
+    "hpLost": 133,
     "load": [
      "Вогняна доріжка",
      "Листяний вихор",
@@ -2257,8 +2257,8 @@
     ]
    },
    "noFood": {
-    "win": 8,
-    "ttk": 85,
+    "win": 5,
+    "ttk": 86,
     "hpLost": 92,
     "load": [
      "Вогняна доріжка",
@@ -2284,9 +2284,9 @@
    "pcl": 22,
    "nature": "raiton",
    "prepared": {
-    "win": 99,
-    "ttk": 100,
-    "hpLost": 138,
+    "win": 100,
+    "ttk": 103,
+    "hpLost": 143,
     "load": [
      "Листяний вихор",
      "Листяний шквал",
@@ -2295,9 +2295,9 @@
     ]
    },
    "noFood": {
-    "win": 3,
-    "ttk": 91,
-    "hpLost": 93,
+    "win": 2,
+    "ttk": 96,
+    "hpLost": 95,
     "load": [
      "Листяний вихор",
      "Листяний шквал",
@@ -2322,9 +2322,9 @@
    "pcl": 22,
    "nature": "suiton",
    "prepared": {
-    "win": 99,
-    "ttk": 100,
-    "hpLost": 138,
+    "win": 100,
+    "ttk": 103,
+    "hpLost": 143,
     "load": [
      "Листяний вихор",
      "Листяний шквал",
@@ -2333,9 +2333,9 @@
     ]
    },
    "noFood": {
-    "win": 3,
-    "ttk": 91,
-    "hpLost": 93,
+    "win": 2,
+    "ttk": 96,
+    "hpLost": 95,
     "load": [
      "Листяний вихор",
      "Листяний шквал",
@@ -2360,9 +2360,9 @@
    "pcl": 32,
    "nature": "doton",
    "prepared": {
-    "win": 6,
-    "ttk": 146,
-    "hpLost": 188,
+    "win": 4,
+    "ttk": 155,
+    "hpLost": 191,
     "load": [
      "Техніка подвійного самогубчого обезглавлення",
      "Левове комбо",
@@ -2398,9 +2398,9 @@
    "pcl": 32,
    "nature": "katon",
    "prepared": {
-    "win": 77,
-    "ttk": 103,
-    "hpLost": 169,
+    "win": 69,
+    "ttk": 108,
+    "hpLost": 173,
     "load": [
      "Техніка тимчасового паралічу",
      "Левове комбо",
@@ -2410,8 +2410,8 @@
    },
    "noFood": {
     "win": 0,
-    "ttk": 101,
-    "hpLost": 96,
+    "ttk": null,
+    "hpLost": null,
     "load": [
      "Техніка тимчасового паралічу",
      "Левове комбо",
@@ -2436,9 +2436,9 @@
    "pcl": 36,
    "nature": "futon",
    "prepared": {
-    "win": 2,
-    "ttk": 117,
-    "hpLost": 194,
+    "win": 1,
+    "ttk": 123,
+    "hpLost": 198,
     "load": [
      "Листяний вихор",
      "Техніка тимчасового паралічу",
@@ -2474,9 +2474,9 @@
    "pcl": 36,
    "nature": "doton",
    "prepared": {
-    "win": 6,
-    "ttk": 144,
-    "hpLost": 194,
+    "win": 4,
+    "ttk": 147,
+    "hpLost": 193,
     "load": [
      "Листяний вихор",
      "Земляна ріка",
@@ -2511,8 +2511,8 @@
    "pcl": 38,
    "nature": "futon",
    "prepared": {
-    "win": 10,
-    "ttk": 136,
+    "win": 5,
+    "ttk": 141,
     "hpLost": 195,
     "load": [
      "Техніка серповидної ласки",
@@ -2549,9 +2549,9 @@
    "pcl": 38,
    "nature": "katon",
    "prepared": {
-    "win": 51,
-    "ttk": 113,
-    "hpLost": 185,
+    "win": 40,
+    "ttk": 117,
+    "hpLost": 187,
     "load": [
      "Сенсорна техніка",
      "Левове комбо",
@@ -2587,9 +2587,9 @@
    "pcl": 40,
    "nature": "doton",
    "prepared": {
-    "win": 62,
-    "ttk": 114,
-    "hpLost": 176,
+    "win": 54,
+    "ttk": 120,
+    "hpLost": 180,
     "load": [
      "Сенсорна техніка",
      "Левове комбо",
@@ -2599,7 +2599,7 @@
    },
    "noFood": {
     "win": 1,
-    "ttk": 91,
+    "ttk": 95,
     "hpLost": 80,
     "load": [
      "Сенсорна техніка",
@@ -2625,9 +2625,9 @@
    "pcl": 40,
    "nature": "katon",
    "prepared": {
-    "win": 48,
-    "ttk": 123,
-    "hpLost": 182,
+    "win": 38,
+    "ttk": 127,
+    "hpLost": 185,
     "load": [
      "Сенсорна техніка",
      "Левове комбо",
@@ -2637,8 +2637,8 @@
    },
    "noFood": {
     "win": 0,
-    "ttk": 89,
-    "hpLost": 80,
+    "ttk": 93,
+    "hpLost": 89,
     "load": [
      "Сенсорна техніка",
      "Левове комбо",
@@ -2663,9 +2663,9 @@
    "pcl": 44,
    "nature": "suiton",
    "prepared": {
-    "win": 43,
-    "ttk": 126,
-    "hpLost": 176,
+    "win": 32,
+    "ttk": 132,
+    "hpLost": 177,
     "load": [
      "Левове комбо",
      "П'яний кулак",
@@ -2701,9 +2701,9 @@
    "pcl": 44,
    "nature": "futon",
    "prepared": {
-    "win": 13,
-    "ttk": 137,
-    "hpLost": 181,
+    "win": 8,
+    "ttk": 143,
+    "hpLost": 180,
     "load": [
      "Левове комбо",
      "П'яний кулак",
@@ -2739,9 +2739,9 @@
    "pcl": 40,
    "nature": "suiton",
    "prepared": {
-    "win": 4,
-    "ttk": 152,
-    "hpLost": 186,
+    "win": 2,
+    "ttk": 151,
+    "hpLost": 183,
     "load": [
      "Левове комбо",
      "П'яний кулак",

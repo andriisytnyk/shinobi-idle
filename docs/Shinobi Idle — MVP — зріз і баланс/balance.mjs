@@ -60,7 +60,7 @@ export const K = {
   wound: { stat:0.05, max:4, healMin:10, healFloorMin:2.5 },
   // --- вороги ---
   eHp: [20,9.8], eDmg: [4,0.45], eInterval: 2.6, eAcc: [219.3,0], eEva: [31,4.3],
-  boss: { hp:3.46, dmg:1.49 }, pack: { n:3, hp:0.4, dmg:0.4 },
+  boss: { hp:3.6, dmg:1.49 }, pack: { n:3, hp:0.4, dmg:0.4 },
   trait: { armor:0.22, armorOff:6, casterEvery:12, casterCast:3, casterMult:3, evasive:1.59, regenPct:0.01, illusionEvery:10, illusionDur:6, illusionAcc:0.25,
     hidden:8, hiddenAcc:0.07, hiddenFirst:2.0, poisonChance:0.35 },
   // --- бій: досвід за годину бою в зоні рівня Z, частки від rate(Z) ---
