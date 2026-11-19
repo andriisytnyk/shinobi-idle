@@ -466,6 +466,8 @@
   "graduation.bank": "До банку",
   "graduation.close": "Далі",
   "combat.title": "Тренувальний бій",
+  "combat.prepare.running": "Зараз іде бій; це підготовка до іншого.",
+  "combat.prepare.toFight": "До бою",
   "combat.enemies": "З ким битися",
   "combat.empty": "Поки немає з ким битися.",
   "combat.level": "Бойовий рівень {n}",

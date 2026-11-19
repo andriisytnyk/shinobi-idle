@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { content, ukLocale } from '@shinobi/content';
-import { createState, xpAt, type GameState } from '@shinobi/core';
+import { createState, dispatch, xpAt, type GameState } from '@shinobi/core';
 import { flushSync, mount, unmount } from 'svelte';
 import ReportModal from '../src/components/ReportModal.svelte';
 import { buildReport } from '../src/lib/persistence.ts';
@@ -74,6 +74,55 @@ describe("a fieldwork's own page", () => {
     booted = await bootApp([coreUi], genin(), `#/fieldwork/${SEARCH}`);
     expect(q('[data-fieldwork-start]')).toBeNull();
     expect(booted.target.innerHTML).not.toContain('war_fort_ruins');
+  });
+});
+
+describe('the fight screen', () => {
+  const YARD = content.zones.find((z) => z.region === 'academy')!;
+  const fighter = (): GameState => {
+    const state = createState(11, content);
+    state.player.name = 'Тест';
+    state.player.rank = 'genin';
+    for (const skill of Object.keys(state.skills)) state.skills[skill as 'tai']!.xp = xpAt(14);
+    for (const x of content.techniques) if (x.rank === 'D') state.known[x.id] = true;
+    for (const cell of content.cells) state.world.explores[cell.id] = 9999;
+    state.flags['region.forest.unlocked'] = true;
+    state.bingo['core:wolf'] = {
+      seen: 1,
+      wins: 1,
+      losses: 0,
+      timeouts: 0,
+      bought: 0,
+      bounty: 0,
+    };
+    return state;
+  };
+  const fight = (state: GameState, zone: string): void => {
+    const r = dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: zone }, content);
+    expect(r.ok).toBe(true);
+  };
+
+  it('is headed «Тренувальний бій» only for the training fight', async () => {
+    const state = fighter();
+    fight(state, YARD.id);
+    booted = await bootApp([coreUi], state, '#/combat');
+    expect(q('h1')?.textContent).toBe(ukLocale['combat.title'] ?? t('combat.title'));
+  });
+
+  it('names the enemy in the heading of a zone fight', async () => {
+    const state = fighter();
+    fight(state, 'core:zone_wolf');
+    booted = await bootApp([coreUi], state, '#/combat');
+    expect(q('h1')?.textContent).toBe(t('enemy.core:wolf.name'));
+  });
+
+  it('shows the preparation of another target while a fight runs, with a way back to the fight', async () => {
+    const state = fighter();
+    fight(state, YARD.id);
+    booted = await bootApp([coreUi], state, '#/combat/prepare/zone/core:zone_wolf');
+    expect(q('[data-ui="prep-verdict"]')).not.toBeNull();
+    expect(q('[data-prepare-running]')).not.toBeNull();
+    expect(q('[data-prepare-running-link]')?.getAttribute('href')).toBe('#/combat');
   });
 });
 
