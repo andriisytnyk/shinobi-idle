@@ -78,7 +78,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    Репутація: 2
+                    Репутація: 1
             <div class="why" data-why="error.missionNeedsTeam" id="why-core:cat">
               <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
                 <span class="mark">
@@ -198,7 +198,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    Репутація: 2
+                    Репутація: 1
               <li>
                 <span class="reward" data-entity="item:core:rice" data-reward="item" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
@@ -568,7 +568,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    Репутація: 8
+                    Репутація: 4
               <li>
                 <span class="reward" data-reward="item" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -750,7 +750,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    Репутація: 8
+                    Репутація: 4
               <li>
                 <span class="reward" data-entity="item:core:spice" data-reward="item" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
@@ -819,7 +819,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    Репутація: 8
+                    Репутація: 4
               <li>
                 <span class="reward" data-entity="item:core:scrollpart_fire_dragon_flame_bullet" data-reward="item" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
@@ -893,7 +893,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    Репутація: 4
+                    Репутація: 2
               <li>
                 <span class="reward" data-entity="resource:syla_shynobi" data-reward="resource" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -963,7 +963,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    Репутація: 4
+                    Репутація: 2
               <li>
                 <span class="reward" data-entity="resource:okhorona" data-reward="resource" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -1029,7 +1029,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    Репутація: 4
+                    Репутація: 2
               <li>
                 <span class="reward" data-entity="resource:okhorona" data-reward="resource" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -1095,7 +1095,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    Репутація: 4
+                    Репутація: 2
               <li>
                 <span class="reward" data-entity="resource:dilianky" data-reward="resource" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -1161,7 +1161,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    Репутація: 4
+                    Репутація: 2
               <li>
                 <span class="reward" data-entity="resource:zroshennia" data-reward="resource" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -1231,7 +1231,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    Репутація: 4
+                    Репутація: 2
               <li>
                 <span class="reward" data-entity="resource:zdorovia" data-reward="resource" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -1297,7 +1297,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    Репутація: 4
+                    Репутація: 2
               <li>
                 <span class="reward" data-entity="resource:kladka" data-reward="resource" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -1367,7 +1367,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    Репутація: 4
+                    Репутація: 2
               <li>
                 <span class="reward" data-entity="resource:robocha_syla" data-reward="resource" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -1433,7 +1433,7 @@
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
                     <path d="#3201-oefg9l" fill="currentColor">
                   <span>
-                    Репутація: 4
+                    Репутація: 2
               <li>
                 <span class="reward" data-entity="resource:mistkist" data-reward="resource" data-ui="mission-reward">
                   <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">

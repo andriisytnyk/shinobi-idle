@@ -102,6 +102,26 @@ describe('the balance report', () => {
     expect(md).toMatch(/Чунін 20–50 год \| 1\/1 \| не досягнуто за 2\.0 год/);
   });
 
+  it('measures what the author asked: no skill-cap target, the clone share of XP and actions, combat clones', () => {
+    const md = strategyReportMarkdown(result, content);
+    // The cap is measured (a column) but is no target any more (author, 18.11).
+    expect(md).not.toContain('Стеля навичок 20–25');
+    expect(md).not.toMatch(/\| Стеля навичок/);
+    expect(md).toContain('## 4. Частка часу з клоном');
+    expect(md).toContain('Частка досвіду, %');
+    expect(md).toContain('Частка дій, %');
+    expect(md).toContain('## 4а. Бойові клони');
+    expect(md).toContain('Множник');
+    // The pace targets judge the bots that follow the story; the rest are listed for reference.
+    expect(md).toContain('Колекціонер (довідково)');
+    expect(md).not.toContain('Сюжетник (довідково)');
+    for (const row of result.rows)
+      for (const run of row.runs) {
+        expect(run.fights).toBeGreaterThanOrEqual(run.fightsWithAllies);
+        expect(run.actionMs.main).toBeGreaterThan(0);
+      }
+  });
+
   it('is written the same way twice', () => {
     expect(strategyReportMarkdown(result, content)).toBe(strategyReportMarkdown(result, content));
     expect(strategyReportJson(result)).toBe(strategyReportJson(result));

@@ -3,9 +3,6 @@ import {
   buyPrice,
   evalReq,
   isAcademyRank,
-  isNature,
-  levelCap,
-  xpAt,
   learnReq,
   listSkillActions,
   moneyOf,
@@ -61,6 +58,8 @@ export interface Strategy {
   description: string;
   /** Whether a fight may be started just to train (a peaceful player never does). */
   fightsToTrain: boolean;
+  /** Whether the pace targets (Chunin hours, cadence, lowest skill at the vest) judge this bot: the story bot, which follows every step of the story and trains the lowest skill in turn. The peaceful bot reaches the vest too but keeps to missions and never trains the crafts, so its numbers are listed for reference. */
+  judged: boolean;
   sessions?: Sessions;
   /** The main activity: the plan for slot 0 once the Academy is behind the player. */
   main(tk: Toolkit): Plan;
@@ -171,13 +170,17 @@ export const STRATEGIES: Readonly<Record<StrategyId, Strategy>> = {
     label: 'Сюжетник',
     description: 'Іде за ланцюжками доручень і іспитом; між кроками тренує найнижчу навичку.',
     fightsToTrain: true,
-    main: (tk) => storyPlan(tk) ?? trainAny(tk),
+    judged: true,
+    // A quarter of the time goes to the lowest skill, as a player who spreads his training does (the story asks for only some).
+    main: (tk) =>
+      (phase(tk, 30 * MINUTE, 4) === 3 ? trainAny(tk) : null) ?? storyPlan(tk) ?? trainAny(tk),
   },
   collector: {
     id: 'collector',
     label: 'Колекціонер',
     description: 'Майстерності й колекції: сувої, найменш опановані дії, розвідка всіх клітин.',
     fightsToTrain: true,
+    judged: false,
     main(tk) {
       const slice = phase(tk, 20 * MINUTE, 4);
       if (slice === 3) return exploreAny(tk) ?? lowestMastery(tk) ?? trainAny(tk);
@@ -189,6 +192,7 @@ export const STRATEGIES: Readonly<Record<StrategyId, Strategy>> = {
     label: 'Лише бій',
     description: 'Бої й операції, коли можливо; з сюжету бере лише вбивства.',
     fightsToTrain: true,
+    judged: false,
     main: (tk) => operations(tk) ?? killSteps(tk) ?? fightBest(tk) ?? trainAny(tk),
   },
   peaceful: {
@@ -196,6 +200,7 @@ export const STRATEGIES: Readonly<Record<StrategyId, Strategy>> = {
     label: 'Мирний',
     description: 'Місії, ремесла й тренування; боїв лише стільки, скільки змушує сюжет.',
     fightsToTrain: false,
+    judged: false,
     main(tk) {
       if (phase(tk, 30 * MINUTE, 2) === 0) {
         return bestMission(tk) ?? storyPlan(tk) ?? trainAny(tk);
@@ -208,6 +213,7 @@ export const STRATEGIES: Readonly<Record<StrategyId, Strategy>> = {
     label: 'Офлайн-гравець',
     description: 'Сесія 10 хвилин раз на 8 годин; перед виходом ставить тривалу дію.',
     fightsToTrain: true,
+    judged: false,
     sessions: { periodMs: 8 * HOUR, awakeMs: 10 * MINUTE },
     main(tk) {
       const sessions = this.sessions;
@@ -234,15 +240,11 @@ export function createStrategyBot(strategy: Strategy, triple: readonly NatureId[
   return {
     name: `${strategy.id}:${triple.join('+')}`,
     description: strategy.description,
-    // Nothing is left to measure once the last rank is held and every skill the character can train is at the cap.
+    // Nothing is left to measure once the last rank is held: the skill cap is not a target (author, 18.11).
     goal: {
-      label: 'жилет і стеля',
+      label: 'жилет Чуніна',
       reached: (state, content) =>
-        state.player.rank === content.playerRanks[content.playerRanks.length - 1]?.id &&
-        state.player.natures.length > 0 &&
-        content.skills
-          .filter((s) => !isNature(content, s.id) || state.player.natures.includes(s.id))
-          .every((s) => (state.skills[s.id]?.xp ?? 0) >= xpAt(levelCap(content))),
+        state.player.rank === content.playerRanks[content.playerRanks.length - 1]?.id,
     },
     reviewMs: TUNING.reviewMs,
     memory: mem,
@@ -275,7 +277,22 @@ export function createStrategyBot(strategy: Strategy, triple: readonly NatureId[
           : (state.slots[0]?.action ?? null);
       const mainSkill = slot0 ? skillOfAction(tk, slot0) : null;
       out.push(...clonePlan(tk, mainSkill));
-      return out.length > 0 ? out : null;
+      // A scroll is read once: the housekeeping and the story plan may both ask for the same one.
+      // A village runs one build at a time: the first is the only one the game takes.
+      const read = new Set<string>();
+      let built = false;
+      const unique = out.filter((c) => {
+        if (c.type === 'village.build') {
+          if (built) return false;
+          built = true;
+          return true;
+        }
+        if (c.type !== 'item.use') return true;
+        if (read.has(c.id)) return false;
+        read.add(c.id);
+        return true;
+      });
+      return unique.length > 0 ? unique : null;
     },
   };
 }

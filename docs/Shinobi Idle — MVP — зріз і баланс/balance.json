@@ -323,9 +323,9 @@
    "OP": 0
   },
   "repPerMission": {
-   "D": 2,
-   "C": 8,
-   "V": 4
+   "D": 1,
+   "C": 4,
+   "V": 2
   },
   "missionXpShare": 0.85,
   "missionRateCap": {
@@ -2778,7 +2778,7 @@
    "id": "cat",
    "min": 3,
    "ryo": 40,
-   "rep": 2
+   "rep": 1
   },
   {
    "id": "weed",
@@ -2790,7 +2790,7 @@
    "id": "fire",
    "min": 6,
    "ryo": 70,
-   "rep": 2
+   "rep": 1
   },
   {
    "id": "drought",
@@ -2820,7 +2820,7 @@
    "id": "caravan",
    "min": 25,
    "ryo": 550,
-   "rep": 8
+   "rep": 4
   },
   {
    "id": "sealed",
@@ -2838,67 +2838,67 @@
    "id": "well",
    "min": 22,
    "ryo": 480,
-   "rep": 8
+   "rep": 4
   },
   {
    "id": "dig",
    "min": 28,
    "ryo": 620,
-   "rep": 8
+   "rep": 4
   },
   {
    "id": "v_spar",
    "min": 4,
    "ryo": 0,
-   "rep": 4
+   "rep": 2
   },
   {
    "id": "v_walls",
    "min": 10,
    "ryo": 0,
-   "rep": 4
+   "rep": 2
   },
   {
    "id": "v_fence",
    "min": 8,
    "ryo": 0,
-   "rep": 4
+   "rep": 2
   },
   {
    "id": "v_clear",
    "min": 8,
    "ryo": 0,
-   "rep": 4
+   "rep": 2
   },
   {
    "id": "v_water",
    "min": 8,
    "ryo": 0,
-   "rep": 4
+   "rep": 2
   },
   {
    "id": "v_sanit",
    "min": 8,
    "ryo": 0,
-   "rep": 4
+   "rep": 2
   },
   {
    "id": "v_rubble",
    "min": 8,
    "ryo": 0,
-   "rep": 4
+   "rep": 2
   },
   {
    "id": "v_clones",
    "min": 10,
    "ryo": 0,
-   "rep": 4
+   "rep": 2
   },
   {
    "id": "v_seal",
    "min": 6,
    "ryo": 0,
-   "rep": 4
+   "rep": 2
   },
   {
    "id": "op_hideout",

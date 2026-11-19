@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { content as builtIn } from '@shinobi/content';
@@ -68,7 +68,10 @@ export async function runStrategiesCli(args: string[]): Promise<CliResult> {
   mkdirSync(dir, { recursive: true });
   const md = `${dir.replace(/[\\/]+$/, '')}/${REPORT}.md`;
   const json = `${dir.replace(/[\\/]+$/, '')}/${REPORT}.json`;
-  writeFileSync(md, `${strategyReportMarkdown(result, builtIn)}\n`);
+  // A note of what changed and why, kept beside the report, goes on top of it.
+  const notesFile = `${dir.replace(/[\\/]+$/, '')}/${REPORT}-notes.md`;
+  const notes = existsSync(notesFile) ? `${readFileSync(notesFile, 'utf8').trimEnd()}\n\n` : '';
+  writeFileSync(md, `${notes}${strategyReportMarkdown(result, builtIn)}\n`);
   writeFileSync(json, `${strategyReportJson(result)}\n`);
   const runs = result.rows.reduce((n, r) => n + r.runs.length, 0);
   return {

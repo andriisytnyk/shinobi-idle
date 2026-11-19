@@ -45,6 +45,29 @@ describe('academy bot', () => {
     );
   });
 
+  it('lets an observer see the state after the last step, and every event', () => {
+    let afterAt = -1;
+    let afterCalls = 0;
+    let steps = 0;
+    const kinds = new Set<string>();
+    const run = runBot(academyBot, {
+      seed: 1,
+      limitMs: 240 * MINUTE,
+      observer: {
+        step: () => steps++,
+        after: (state) => {
+          afterAt = state.now;
+          afterCalls++;
+        },
+        event: (event) => kinds.add(event.type),
+      },
+    });
+    // `step` sees the state before time moves, `after` the one the step made, the step that ends the run included.
+    expect(afterCalls).toBe(steps);
+    expect(afterAt).toBe(run.endedAt);
+    expect(kinds.has('rankUp')).toBe(true);
+  });
+
   it('decides with the rules the run uses, not the defaults', () => {
     // Without the drill kind the selectors list no Chakra Control action, so the bot has nothing
     // to start for it; with default rules it would try, and the game would refuse.

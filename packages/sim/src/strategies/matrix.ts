@@ -8,6 +8,7 @@ import {
   levelAt,
   levelCap,
   moneyOf,
+  STAND_KIND,
   type GameState,
   type Rules,
 } from '@shinobi/core';
@@ -20,7 +21,6 @@ const HOUR = 3_600_000;
 export const TARGETS = {
   geninHours: { min: 0.5, max: 1.5 },
   chuninHours: { min: 20, max: 50 },
-  capHours: { min: 20, max: 25 },
   /** Cadence (author, 18.11): a stretch without anything new is at most this share of the game time at its end, and at most `maxGapHours`; stretches under `minAllowedHours` are always fine. */
   maxGapShare: 0.2,
   maxGapHours: 8,
@@ -77,10 +77,20 @@ export interface RunMetrics {
   mission: KindTotals;
   practice: KindTotals;
   fight: KindTotals;
+  /** The part of `fight` fought with bodies of the character's own at its side (combat shadow clones). */
+  fightAlly: KindTotals;
+  /** Fights begun in slot 0, and how many of them had an ally at some point. */
+  fights: number;
+  fightsWithAllies: number;
+  /** Skill XP the clones handed over when dispelled (after what the game keeps), and all skill XP the character holds at the end. */
+  cloneXp: number;
+  totalXp: number;
+  /** Game ms an action ran in slot 0, and in a clone's slot (a clone that only stands does not count). */
+  actionMs: { main: number; clone: number };
   /** Final levels (trainable skills) and the lowest among them. */
   levels: Record<string, number>;
   minLevel: number;
-  /** The lowest skill level (trainable skills) the moment the last rank was taken; null when it never was. */
+  /** The lowest skill level (trainable skills) the moment the last rank was taken (the step it was taken in is looked at); null when it never was. */
   minLevelAtChunin: number | null;
   rank: string;
   rejected: number;
@@ -146,9 +156,17 @@ export function measureRun(options: MatrixRun): RunMetrics {
     mission: { ms: 0, xp: 0, ryo: 0 },
     practice: { ms: 0, xp: 0, ryo: 0 },
     fight: { ms: 0, xp: 0, ryo: 0 },
+    fightAlly: { ms: 0, xp: 0, ryo: 0 },
   };
+  let fights = 0;
+  let fightsWithAllies = 0;
+  let cloneXp = 0;
+  const actionMs = { main: 0, clone: 0 };
+  let seenFight: object | null = null;
+  let seenAlly = false;
   let prev: {
     kind: 'mission' | 'practice' | 'fight' | null;
+    ally: boolean;
     xp: number;
     ryo: number;
     now: number;
@@ -165,13 +183,18 @@ export function measureRun(options: MatrixRun): RunMetrics {
     rejectLimit: Number.MAX_SAFE_INTEGER,
     ...(options.strategy.sessions ? { away: options.strategy.sessions } : {}),
     observer: {
-      step(state) {
+      step(state, ms) {
         if (prev) {
-          const bucket = prev.kind ? kinds[prev.kind] : null;
-          if (bucket) {
-            bucket.ms += state.now - prev.now;
-            bucket.xp += totalXp(state) - prev.xp;
-            bucket.ryo += Math.max(0, (state.currencies[money] ?? 0) - prev.ryo);
+          const dt = state.now - prev.now;
+          const dxp = totalXp(state) - prev.xp;
+          const dryo = Math.max(0, (state.currencies[money] ?? 0) - prev.ryo);
+          const buckets = [prev.kind ? kinds[prev.kind] : null];
+          if (prev.kind === 'fight' && prev.ally) buckets.push(kinds.fightAlly);
+          for (const b of buckets) {
+            if (!b) continue;
+            b.ms += dt;
+            b.xp += dxp;
+            b.ryo += dryo;
           }
         }
         const action = state.slots[0]?.action ?? null;
@@ -182,12 +205,38 @@ export function measureRun(options: MatrixRun): RunMetrics {
               ? 'fight'
               : 'practice'
           : null;
-        prev = { kind, xp: totalXp(state), ryo: state.currencies[money] ?? 0, now: state.now };
+        // A fight is counted once, when its object appears; it has allies when one was ever made in it.
+        const fight = state.combat?.phase === 'fight' ? state.combat.fight : null;
+        if (fight !== seenFight) {
+          if (seenFight !== null) {
+            fights++;
+            if (seenAlly) fightsWithAllies++;
+          }
+          seenFight = fight;
+          seenAlly = false;
+        }
+        if (fight && (fight.allied ?? 0) > 0) seenAlly = true;
+        prev = {
+          kind,
+          ally: kind === 'fight' && fight !== null && (fight.allied ?? 0) > 0,
+          xp: totalXp(state),
+          ryo: state.currencies[money] ?? 0,
+          now: state.now,
+        };
+        if (action) actionMs.main += ms;
+        for (let at = 1; at < state.slots.length; at++) {
+          const held = state.slots[at]?.action;
+          if (held && held.kind !== STAND_KIND) actionMs.clone += ms;
+        }
         if (levelsAt3h === null && state.now >= TARGETS.firstHours * HOUR) {
           levelsAt3h = Object.fromEntries(
             trainable(state, content).map((id) => [id, levelAt(state.skills[id]?.xp ?? 0, cap)]),
           );
         }
+        if (cloneAt === null && cloneSlots(state, content).length > 0) cloneAt = state.now;
+      },
+      // Looked at after time has moved, so the step that ends the run (the vest, the cap) is seen too.
+      after(state) {
         if (
           minAtChunin === null &&
           state.player.rank === content.playerRanks[content.playerRanks.length - 1]?.id
@@ -196,7 +245,6 @@ export function measureRun(options: MatrixRun): RunMetrics {
             ...trainable(state, content).map((id) => levelAt(state.skills[id]?.xp ?? 0, cap)),
           );
         }
-        if (cloneAt === null && cloneSlots(state, content).length > 0) cloneAt = state.now;
         if (
           capAt === null &&
           state.player.natures.length > 0 &&
@@ -205,12 +253,19 @@ export function measureRun(options: MatrixRun): RunMetrics {
           capAt = state.now;
         }
       },
+      event(event) {
+        if (event.type === 'cloneDispelled') {
+          cloneXp += Object.values(event.xp).reduce((a, b) => a + b, 0);
+        }
+      },
     },
   });
 
-  // The goal holds only when every skill is at the cap, so a run that ended on it has reached the cap by then (the
-  // observer does not look again after the last step).
-  if (capAt === null && result.ended === 'done') capAt = result.endedAt;
+  // The fight still going at the end counts too.
+  if (seenFight !== null) {
+    fights++;
+    if (seenAlly) fightsWithAllies++;
+  }
 
   const state = result.state;
   const levels = Object.fromEntries(
@@ -277,6 +332,12 @@ export function measureRun(options: MatrixRun): RunMetrics {
     mission: kinds.mission,
     practice: kinds.practice,
     fight: kinds.fight,
+    fightAlly: kinds.fightAlly,
+    fights,
+    fightsWithAllies,
+    cloneXp,
+    totalXp: totalXp(state),
+    actionMs,
     levels,
     minLevel: Math.min(...Object.values(levels)),
     minLevelAtChunin: minAtChunin,
