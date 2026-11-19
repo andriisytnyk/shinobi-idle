@@ -18,6 +18,7 @@ import {
   fightAdvance,
   fightNextEventIn,
   parseFight,
+  pickCloneHand,
   serialize,
   workOf,
   type CombatAi,
@@ -97,6 +98,34 @@ describe('the hand of the clones by role', () => {
     expect(own(ENTRY)?.cost).toBeLessThan(own(FIST)?.cost ?? 0);
     expect(kit.cloneThreat).toBe(cloneRoleOf(content, 'core:role_distract')?.threat);
     expect(kit.cloneThreat).toBeGreaterThan(1);
+  });
+
+  it('reads the cost of a technique as a share of its own pool, so chakra and stamina compare fairly', () => {
+    const distract = cloneRoleOf(content, 'core:role_distract');
+    expect(distract?.hand.mode).toBe('pick');
+    if (!distract) return;
+    const base = kitOf().techniques[0];
+    if (!base) throw new Error('no technique in the kit');
+    // Same damage, no status, no combos: only the price tells them apart.
+    const tech = (id: string, pool: 'chakra' | 'stamina', cost: number) => ({
+      ...base,
+      id,
+      pool,
+      cost,
+      damage: 10,
+      fx: { ...base.fx, statuses: [] },
+    });
+    // 30 stamina is 30% of a pool of 100; 40 chakra is 4% of a pool of 1000: the chakra one is far cheaper.
+    const stamina = tech('t:stamina', 'stamina', 30);
+    const chakra = tech('t:chakra', 'chakra', 40);
+    const pools = { chakra: 1000, stamina: 100 };
+    const role = {
+      ...distract,
+      hand: { ...distract.hand, size: 1, weights: { damage: 0, status: 0, opens: 0, cheap: 1 } },
+    };
+    const hand = pickCloneHand(content, role, [stamina, chakra], [stamina, chakra], pools);
+    // On raw costs the stamina technique (30 < 40) would be picked.
+    expect(ids(hand)).toEqual(['t:chakra']);
   });
 
   it('is chosen from what the character knows, the loadout or not, and the character keeps their own hand', () => {

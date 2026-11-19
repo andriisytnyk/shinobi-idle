@@ -189,6 +189,27 @@ describe('what a clone fight pays', () => {
     expect(totalXp(state) - base).toBeCloseTo(shown, 4);
   });
 
+  it('previews the pending Mastery of a fight in progress as the dispel pays it', () => {
+    const state = cloner(2, 36);
+    expect(startFight(state, WOLF, 1)).toEqual({ ok: true });
+    const sum = (m: Record<string, { amount: number }>): number =>
+      Object.values(m).reduce((a, b) => a + b.amount, 0);
+    for (let i = 0; i < 400 && state.clones[1]; i++) {
+      advance(state, 1000, content);
+      if (sum(state.clones[1]?.fight?.pending?.mastery ?? {}) > 0) break;
+    }
+    const body = state.clones[1];
+    const pending = body?.fight?.pending?.mastery ?? {};
+    // The fight holds Mastery it has not paid yet; the preview must count it.
+    expect(sum(pending)).toBeGreaterThan(0);
+    const preview = dispelPreview(state, 1, content, defaultRules);
+    expect(sum(preview?.mastery ?? {})).toBeGreaterThan(sum(body?.mastery ?? {}));
+    const masteryOf = (): number => Object.values(state.mastery).reduce((a, m) => a + m.xp, 0);
+    const before = masteryOf();
+    dispatch(state, { type: 'clone.dispel' }, content);
+    expect(masteryOf() - before).toBeCloseTo(sum(preview?.mastery ?? {}), 6);
+  });
+
   it('death: a lost fight dispels the clone, with no new try and nothing from the lost fight', () => {
     const state = cloner(6, 1);
     state.skills.nin!.xp = 0;

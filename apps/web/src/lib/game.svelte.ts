@@ -50,6 +50,7 @@ import { settings } from './settings.svelte.ts';
 import { createTelemetry, type TelemetryFile } from './telemetry.ts';
 import { setRevealReader, type RevealReader } from './reveal.ts';
 import type { TabLock } from './tab-lock.ts';
+import { lineSlot, trimLog } from './battle-log.ts';
 import { packsToasts, toastFor, toasts as defaultToasts } from './toasts.svelte.ts';
 
 /** How often the game loop runs. */
@@ -89,7 +90,7 @@ export interface LogEntry {
   event: LogEvent;
 }
 
-/** Lines the battle log keeps. */
+/** Lines the battle log keeps for each fight (each performer slot). */
 export const LOG_LIMIT = 60;
 
 export type SaveStatus = 'idle' | 'saved' | 'error';
@@ -317,7 +318,7 @@ export function createGame(deps: GameDeps = {}) {
       const spec = toastFor(event, content);
       if (spec) toasts.push(spec);
     }
-    if (lines.length > 0) log = [...log, ...lines].slice(-LOG_LIMIT);
+    if (lines.length > 0) log = trimLog([...log, ...lines], LOG_LIMIT);
     if (urgent) void save();
   }
 
@@ -605,7 +606,11 @@ export function createGame(deps: GameDeps = {}) {
         // After the command: a reveal it caused must not wait for the next update.
         epoch++;
         restamp();
-        if (result.ok && command.type === 'action.start' && command.kind === 'fight') log = [];
+        if (result.ok && command.type === 'action.start' && command.kind === 'fight') {
+          // A new fight starts its own log; the lines of the other performers stay.
+          const slot = command.slot;
+          log = log.filter((line) => lineSlot(line) !== slot);
+        }
         drainEvents();
       } catch (error) {
         // A command that throws may leave the state half-changed, like the loop: the crash screen, no save.
