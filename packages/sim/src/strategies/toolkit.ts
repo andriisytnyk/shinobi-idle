@@ -34,6 +34,7 @@ import {
   nextTierReq,
   planPouch,
   pouchUse,
+  opSteps,
   startAnalysis,
   stepAnalysis,
   rankIndex,
@@ -58,7 +59,6 @@ import {
 } from '@shinobi/core';
 import type { BotContext } from '../bot.ts';
 import { combatSkills, KIND_CRAFT, KIND_FIGHT, KIND_GATHER, styleSkills } from '../constants.ts';
-import { encounterOf, fightSnapshot, runFights } from '../fights.ts';
 
 const MINUTE = 60_000;
 
@@ -203,33 +203,78 @@ function fingerprint(tk: Toolkit): string {
 }
 
 /**
- * The estimated win rate against one enemy or boss, from the engine's own fight loop with what the character
- * knows of the entry now (its Bingo level as it stands); cached until the character changes.
+ * How well the player knows what a target puts in front of it: the least Bingo level of its entries, as the
+ * preparation screen reads it (`knowledgeOfTarget` in the web app). The screen shows a forecast from level 1.
  */
-export function winRate(tk: Toolkit, entry: Enemy | Boss): number {
+function knowledgeOf(tk: Toolkit, ids: readonly string[]): number {
+  const { state, content } = tk.ctx;
+  if (ids.length === 0) return 0;
+  return Math.min(...ids.map((id) => bingoLevel(state, id, content)));
+}
+
+/** The entries of an operation, as its preparation screen counts them: every fight stage and every draw pool. */
+function operationEntries(content: ContentDb, opId: string): string[] {
+  const op = content.operations.find((o) => o.id === opId);
+  const ids = new Set<string>();
+  for (const step of op ? opSteps(op) : []) {
+    if (step.t === 'fight') ids.add(step.enemy);
+    else if (step.t === 'draw') for (const id of step.pool) ids.add(id);
+  }
+  return [...ids];
+}
+
+/**
+ * The first-play win rate of the game's own battle analysis (the forecast the preparation screen shows), for
+ * the character as the preparation leaves it, or `null` when the screen would show nothing: while an entry of
+ * the target is still unknown (Bingo level 0) the game gives no forecast, and the bot has none either.
+ * Cached until the character changes.
+ */
+function forecastRate(
+  tk: Toolkit,
+  target: { kind: 'zone' | 'boss' | 'operation'; id: string },
+  entries: readonly string[],
+  prepareFor: string,
+  samples: number,
+): number | null {
   const { state, content, rules } = tk.ctx;
-  const key = `${entry.id}|${bingoLevel(state, entry.id, content)}|${fingerprint(tk)}`;
+  const known = knowledgeOf(tk, entries);
+  if (known < 1) return null;
+  const key = `${target.kind}|${target.id}|${known}|${fingerprint(tk)}`;
   let rate = tk.mem.estimates.get(key);
   if (rate === undefined) {
-    // What the player would fight with: the loadout, the pouch and the supplies as the fight's preparation leaves them.
+    // What the player would fight with: the loadout, the pouch and the supplies as the preparation leaves them,
+    // for the character as it stands before the fight, not in the middle of another one.
     const ready = structuredClone(state) as GameState;
-    // The preparation is made for the character as it stands before the fight, not in the middle of another one.
     ready.combat = null;
     for (const slot of ready.slots) slot.action = null;
     const tk2: Toolkit = { ...tk, ctx: { ...tk.ctx, state: ready } };
-    for (const c of prepareFight(tk2, entry.id)) dispatch(ready, c, content, rules);
-    rate = runFights(
-      fightSnapshot(ready, entry.id, content, rules),
-      encounterOf(state, entry, content),
-      TUNING.estimateRuns,
-      TUNING.estimateSeed,
-      content,
-      rules,
-    ).winRate;
+    for (const c of prepareFight(tk2, prepareFor)) dispatch(ready, c, content, rules);
+    const job = startAnalysis(ready, target, { samples, seed: TUNING.estimateSeed }, content, rules);
+    if (job === null) rate = 0;
+    else {
+      // Only the first-play part is wanted (the sessions that follow it are a forecast of hours): step until its batches are done.
+      let progress = stepAnalysis(job, 1, content, rules);
+      while (job.fresh.done < job.fresh.batches) progress = stepAnalysis(job, 1, content, rules);
+      rate = progress.result.fresh.winRate;
+    }
     if (tk.mem.estimates.size > 4000) tk.mem.estimates.clear();
     tk.mem.estimates.set(key, rate);
   }
   return rate;
+}
+
+/**
+ * The forecast win rate against one enemy or boss, from the game's own battle analysis at the knowledge the
+ * character has of it; `null` while the entry is unknown (Bingo level 0), when the game shows no forecast.
+ */
+export function winRate(tk: Toolkit, entry: Enemy | Boss): number | null {
+  return forecastRate(
+    tk,
+    { kind: 'special' in entry ? 'boss' : 'zone', id: entry.id },
+    [entry.id],
+    entry.id,
+    TUNING.estimateRuns,
+  );
 }
 
 /**
@@ -254,41 +299,31 @@ export function lastEnemyOf(content: ContentDb, opId: string): string | null {
 }
 
 /**
- * The estimated chance to clear a whole operation in one run, from the game's own battle analysis (the forecast
+ * The forecast chance to clear a whole operation in one run, from the game's own battle analysis (the forecast
  * the player has on the operation's page): the stages are fought back to back with the loadout and pouch the
- * preparation leaves, and the pools carried from one stage to the next. Cached until the character changes.
+ * preparation leaves, and the pools carried from one stage to the next. `null` while an entry of the operation
+ * is unknown (the page shows no forecast then).
  */
-export function operationRate(tk: Toolkit, opId: string): number {
-  const { state, content, rules } = tk.ctx;
-  const key = `op|${opId}|${fingerprint(tk)}`;
-  let rate = tk.mem.estimates.get(key);
-  if (rate === undefined) {
-    const ready = structuredClone(state) as GameState;
-    // The forecast is made for the character as it stands after the preparation, not in the middle of a fight.
-    ready.combat = null;
-    for (const slot of ready.slots) slot.action = null;
-    const tk2: Toolkit = { ...tk, ctx: { ...tk.ctx, state: ready } };
-    for (const c of prepareFight(tk2, lastEnemyOf(content, opId) ?? opId)) {
-      dispatch(ready, c, content, rules);
-    }
-    const job = startAnalysis(
-      ready,
-      { kind: 'operation', id: opId },
-      { samples: TUNING.operationRuns, seed: TUNING.estimateSeed },
-      content,
-      rules,
-    );
-    if (job === null) rate = 0;
-    else {
-      // Only the first-run part is wanted (the sessions that follow it are a forecast of hours): step until its batches are done.
-      let progress = stepAnalysis(job, 1, content, rules);
-      while (job.fresh.done < job.fresh.batches) progress = stepAnalysis(job, 1, content, rules);
-      rate = progress.result.fresh.winRate;
-    }
-    if (tk.mem.estimates.size > 4000) tk.mem.estimates.clear();
-    tk.mem.estimates.set(key, rate);
-  }
-  return rate;
+export function operationRate(tk: Toolkit, opId: string): number | null {
+  const { content } = tk.ctx;
+  return forecastRate(
+    tk,
+    { kind: 'operation', id: opId },
+    operationEntries(content, opId),
+    lastEnemyOf(content, opId) ?? opId,
+    TUNING.operationRuns,
+  );
+}
+
+/**
+ * Whether a target the game shows no forecast for is worth a first look: the levels of its entries (shown on the
+ * combat page) against the character's power, with the same margin as a boss scouting. The first look gives the
+ * Bingo level 1, and the forecast with it. This is the bot's conservative stand-in for a verdict it cannot read.
+ */
+export function worthLooking(tk: Toolkit, ids: readonly string[]): boolean {
+  const { content } = tk.ctx;
+  const reach = power(tk) * TUNING.reachFactor + TUNING.reachMargin;
+  return ids.every((id) => (entryOf(content, id)?.cl ?? Infinity) <= reach);
 }
 
 /** Notes the defeats since the last look: the place the player lost in rests for a while. */
@@ -404,7 +439,11 @@ export function fightBest(tk: Toolkit, min: number = TUNING.safeWinRate): Plan {
   for (const c of candidates) {
     if (c.entry.cl > reach || banned(tk, c.zone.id)) continue;
     if (fightPlan(tk, c.zone) === null) continue;
-    if (winRate(tk, c.entry) >= min) return fightPlan(tk, c.zone);
+    // No forecast yet (the entry is unknown): a plain enemy is walked up to only when it is no stronger than the
+    // character's power (no margin), the conservative stand-in for a verdict the bot cannot read; the sighting
+    // gives the Bingo level 1 and the forecast with it.
+    const rate = winRate(tk, c.entry);
+    if (rate === null ? c.entry.cl <= power(tk) : rate >= min) return fightPlan(tk, c.zone);
   }
   return null;
 }
@@ -746,10 +785,14 @@ function fightFor(tk: Toolkit, enemy: string): Plan {
   const rate = winRate(tk, entry);
   // The first fight with a boss teaches its mechanic whatever comes of it: go and look when it is in reach.
   const scouting = worthScouting(tk, entry);
+  // Unknown entry (no forecast shown): go and look when it is in reach by level, as worthLooking states.
+  const looking = rate === null && worthLooking(tk, [entry.id]);
   const strong =
-    !banned(tk, zone.id) && !wounded(tk) && (rate >= TUNING.storyWinRate || scouting || maxed(tk));
+    !banned(tk, zone.id) &&
+    !wounded(tk) &&
+    ((rate !== null && rate >= TUNING.storyWinRate) || scouting || looking || maxed(tk));
   if (strong) return fightPlan(tk, zone);
-  tk.mem.blocked = `fight ${enemy}: win rate ${rate.toFixed(2)}`;
+  tk.mem.blocked = `fight ${enemy}: win rate ${rate === null ? 'unknown' : rate.toFixed(2)}`;
   tk.mem.waiting = true;
   return trainForFight(tk);
 }
@@ -774,8 +817,11 @@ function operationPlan(tk: Toolkit, opId: string): Plan {
   // The stages are fought back to back, so the chance is that of the whole run, not of the weakest stage.
   const rate = operationRate(tk, opId);
   // A character with every skill at the cap has nothing left to train: it goes in and takes what comes.
-  if (rate < TUNING.opWinRate) {
-    tk.mem.blocked = `operation ${opId}: win rate of a run ${rate.toFixed(2)}${maxed(tk) ? ' with every skill at the cap' : ''}`;
+  // No forecast (an entry is unknown): the first look is taken when the levels are in reach, as worthLooking states.
+  if (
+    rate === null ? !worthLooking(tk, operationEntries(content, opId)) : rate < TUNING.opWinRate
+  ) {
+    tk.mem.blocked = `operation ${opId}: win rate of a run ${rate === null ? 'unknown' : rate.toFixed(2)}${maxed(tk) ? ' with every skill at the cap' : ''}`;
     if (!maxed(tk)) {
       tk.mem.waiting = true;
       return trainForFight(tk);
