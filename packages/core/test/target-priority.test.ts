@@ -367,7 +367,7 @@ describe('the setting in the game', () => {
   });
 
   it('marks the enemy the side aims at, for the screen', () => {
-    const { fight, leader } = wolfFight(content);
+    const { fight, leader } = wolfFight(content, 'leader');
     expect(aimedEnemy(fight, content, rules)).toBe(leader);
     const adds = wolfFight(content, 'adds');
     expect(adds.pack).toContain(aimedEnemy(adds.fight, content, rules));

@@ -41,7 +41,7 @@ describe('the session forecast against real play', () => {
   const cases: { c: Case; played: number; verdict: 'stable' | 'risky' | 'hopeless' }[] = [
     { c: zone(false), played: 2, verdict: 'stable' },
     { c: zone(true), played: 2, verdict: 'stable' },
-    { c: boss(46), played: 8, verdict: 'risky' },
+    { c: boss(48), played: 8, verdict: 'risky' },
     { c: hideout, played: 3, verdict: 'risky' },
   ];
   for (const [i, { c, played: games, verdict }] of cases.entries()) {
