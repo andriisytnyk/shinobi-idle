@@ -113,6 +113,21 @@ export function reportMissing(key: string): void {
   if (import.meta.env?.DEV) console.warn(`Missing text: ${key}`);
 }
 
+/** Texts that came out with a `{name}` no parameter filled, as `key: {name}`, in the order met. */
+const unfilled = new Set<string>();
+export const unfilledPlaceholders = (): readonly string[] => [...unfilled];
+export const clearUnfilledPlaceholders = (): void => unfilled.clear();
+
+/** Says once per key and placeholder, in the dev build only, that a text was shown with one unfilled. */
+export function reportUnfilled(key: string, text: string): void {
+  for (const [, name] of text.matchAll(/\{([A-Za-z_]\w*)\}/g)) {
+    const id = `${key}: {${name}}`;
+    if (unfilled.has(id)) continue;
+    unfilled.add(id);
+    if (import.meta.env?.DEV) console.warn(`Unfilled placeholder: ${id}`);
+  }
+}
+
 /**
  * Translates a key with `{name}` interpolation and Ukrainian plural support. A key without a text
  * shows a readable stand-in (see `fallbackText`) and is reported once in the dev build.
@@ -124,7 +139,9 @@ export function t(key: string, params: Params = {}): string {
     reportMissing(key);
     return fallbackText(key);
   }
-  return format(template, params, table);
+  const text = format(template, params, table);
+  if (text.includes('{')) reportUnfilled(key, text);
+  return text;
 }
 
 /** Whether a key has a translation. */

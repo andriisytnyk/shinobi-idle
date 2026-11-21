@@ -3,6 +3,7 @@ import { advance, createState, xpAt, type GameState } from '@shinobi/core';
 import { render } from 'svelte/server';
 import type { Component } from 'svelte';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { clearUnfilledPlaceholders, unfilledPlaceholders } from '../src/lib/i18n.ts';
 import { hrefFor } from '../src/lib/route.ts';
 import { game } from '../src/lib/store.ts';
 import SkillPage from '../src/pages/SkillPage.svelte';
@@ -58,6 +59,18 @@ describe('Athletics page: the course', () => {
     expect(body).toContain('Замінити');
     expect(body).not.toContain('data-course-empty');
     expect(body).not.toMatch(/<button[^>]*disabled[^>]*>\s*Пройти смугу/);
+  });
+
+  it('names the price under a paid obstacle the player cannot afford, with no placeholder left', () => {
+    const state = fresh('genin');
+    state.skills.ath!.xp = xpAt(40);
+    state.course['1'] = 'core:strybky_po_dakhakh';
+    game.replaceState(state);
+    clearUnfilledPlaceholders();
+    const body = html(SkillPage, { id: 'ath' });
+    expect(body).toMatch(/Бракує рьо: за такий шлях треба заплатити [^<{]*\d/);
+    expect(body).not.toMatch(/\{[A-Za-z_]\w*\}/);
+    expect(unfilledPlaceholders()).toEqual([]);
   });
 
   it('lights the pillar line from five built obstacles', () => {
