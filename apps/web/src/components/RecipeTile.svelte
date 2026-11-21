@@ -48,12 +48,11 @@
   data-entity={entityAttr({ kind: 'recipe', id: info.id })}
 >
   <div class="ct-top">
-    <ActionEmblem kind="recipe" id={info.id} skill={info.skill} />
+    <ActionEmblem kind="recipe" id={info.id} skill={info.skill} size="sm" />
     <div class="ct-head">
       <h3 class="ct-name"><EntityLink kind="recipe" id={info.id} offered /></h3>
       <span class="ct-corner">
         <PerformerMarks kind={info.kind} id={info.id} />
-        <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
         <PinGoal kind="recipe" id={info.id} always={!info.available} />
       </span>
     </div>
@@ -91,6 +90,9 @@
           display={t('tile.mxphValue', { n: formatXp(info.masteryPerHour) })}
         />
       </dd>
+    </div>
+    <div class="ct-ring">
+      <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} size={36} />
     </div>
   </dl>
 
@@ -132,6 +134,14 @@
     <TimeBar {timing} part="action-progress" />
   {/if}
 
+  {#if block && !mine}
+    <p class="ct-why" id="why-{info.id}" data-why={block.kind}>{blockText(block)}</p>
+    {#if info.req && block.kind !== 'missing'}
+      <div class="req">
+        <ReqTree node={info.req} />
+      </div>
+    {/if}
+  {/if}
   <div class="ct-actions">
     <StartSplit
       kind={info.kind}
@@ -140,15 +150,6 @@
       describedBy={block && !running ? `why-${info.id}` : undefined}
     />
   </div>
-  {#if block && !mine}
-    <p class="ct-why" id="why-{info.id}" data-why={block.kind}>{blockText(block)}</p>
-    {#if info.req && block.kind !== 'missing'}
-      <div class="req">
-        <ReqTree node={info.req} />
-        <p class="ct-pin-caption"><PinGoal kind="recipe" id={info.id} variant="link" /></p>
-      </div>
-    {/if}
-  {/if}
 </li>
 
 <style>

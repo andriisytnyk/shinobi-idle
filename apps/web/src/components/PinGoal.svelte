@@ -65,6 +65,7 @@
     data-entity="{kind}:{id}"
     data-pinned={pinned}
     aria-label={label}
+    aria-pressed={pinned}
     title={label}
     onclick={toggle}
   >
@@ -112,9 +113,20 @@
     }
   }
 
+  /* A pin that is always there reads as a button: a frame and a raised face, unlike a bare status icon. */
+  .pin.always {
+    border-color: var(--line);
+    background: var(--surface-raised);
+  }
+
   .pin:hover {
     border-color: var(--accent);
+    background: var(--surface-raised);
     color: var(--accent);
+  }
+
+  .pin:active {
+    transform: translateY(1px);
   }
 
   .pin[data-pinned='true'] {

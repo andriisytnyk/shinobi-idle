@@ -106,7 +106,7 @@
         <ul class="tiles">
           <li class="ct-tile" data-action="core:antidote" data-entity="recipe:core:antidote" data-highlighted="" data-recipe="core:antidote" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="pestle-mortar" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="pestle-mortar" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#1092-7cd30b" fill="currentColor">
               <div class="ct-head">
@@ -114,13 +114,7 @@
                   <a class="entity-link" href="#/recipe/core:antidote">
                     Протиотрута
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="recipe:core:antidote" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="recipe:core:antidote" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -150,6 +144,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -196,15 +197,15 @@
             <p class="ct-note" data-tier="">
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
+            <p class="ct-why" data-why="missing" id="why-core:antidote">
+              Бракує інгредієнтів.
             <div class="ct-actions">
               <span class="split plain" data-for="craft" data-ui="start-split">
                 <button aria-describedby="why-core:antidote" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
                   Почати
-            <p class="ct-why" data-why="missing" id="why-core:antidote">
-              Бракує інгредієнтів.
           <li class="ct-tile" data-action="core:tsiliushcha_maz" data-entity="recipe:core:tsiliushcha_maz" data-recipe="core:tsiliushcha_maz" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="heart-bottle" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="heart-bottle" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#1245-i1pns4" fill="currentColor">
               <div class="ct-head">
@@ -212,13 +213,7 @@
                   <a class="entity-link" href="#/recipe/core:tsiliushcha_maz">
                     Цілюща мазь
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="recipe:core:tsiliushcha_maz" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="recipe:core:tsiliushcha_maz" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -248,6 +243,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -294,10 +296,6 @@
             <p class="ct-note" data-tier="">
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
-            <div class="ct-actions">
-              <span class="split plain" data-for="craft" data-ui="start-split">
-                <button aria-describedby="why-core:tsiliushcha_maz" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                  Почати
             <p class="ct-why" data-why="level" id="why-core:tsiliushcha_maz">
               Рівень замалий: потрібен 5.
             <div class="req">
@@ -348,12 +346,13 @@
                         0/1
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="recipe:core:tsiliushcha_maz" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:tsiliushcha_maz" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile" data-action="core:paralitychna_otruta" data-entity="recipe:core:paralitychna_otruta" data-recipe="core:paralitychna_otruta" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="round-potion" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="round-potion" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#804-1w00djv" fill="currentColor">
               <div class="ct-head">
@@ -361,13 +360,7 @@
                   <a class="entity-link" href="#/recipe/core:paralitychna_otruta">
                     Паралітична отрута
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="recipe:core:paralitychna_otruta" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="recipe:core:paralitychna_otruta" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -397,6 +390,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -437,10 +437,6 @@
             <p class="ct-note" data-tier="">
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
-            <div class="ct-actions">
-              <span class="split plain" data-for="craft" data-ui="start-split">
-                <button aria-describedby="why-core:paralitychna_otruta" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                  Почати
             <p class="ct-why" data-why="level" id="why-core:paralitychna_otruta">
               Рівень замалий: потрібен 10.
             <div class="req">
@@ -491,12 +487,13 @@
                         0/1
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="recipe:core:paralitychna_otruta" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:paralitychna_otruta" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile" data-action="core:dymova_bomba" data-entity="recipe:core:dymova_bomba" data-recipe="core:dymova_bomba" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="smoke-bomb" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="smoke-bomb" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#4321-10f8c8b" fill="currentColor">
               <div class="ct-head">
@@ -504,13 +501,7 @@
                   <a class="entity-link" href="#/recipe/core:dymova_bomba">
                     Димова бомба
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="recipe:core:dymova_bomba" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="recipe:core:dymova_bomba" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -540,6 +531,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -586,10 +584,6 @@
             <p class="ct-note" data-tier="">
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
-            <div class="ct-actions">
-              <span class="split plain" data-for="craft" data-ui="start-split">
-                <button aria-describedby="why-core:dymova_bomba" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                  Почати
             <p class="ct-why" data-why="level" id="why-core:dymova_bomba">
               Рівень замалий: потрібен 15.
             <div class="req">
@@ -640,12 +634,13 @@
                         0/2
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="recipe:core:dymova_bomba" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:dymova_bomba" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile" data-action="core:iidka_dymova_bomba" data-entity="recipe:core:iidka_dymova_bomba" data-recipe="core:iidka_dymova_bomba" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="poison-cloud" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="poison-cloud" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#455-jsl2ps" fill="currentColor">
               <div class="ct-head">
@@ -653,13 +648,7 @@
                   <a class="entity-link" href="#/recipe/core:iidka_dymova_bomba">
                     Їдка димова бомба
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="recipe:core:iidka_dymova_bomba" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="recipe:core:iidka_dymova_bomba" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -689,6 +678,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -729,10 +725,6 @@
             <p class="ct-note" data-tier="">
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
-            <div class="ct-actions">
-              <span class="split plain" data-for="craft" data-ui="start-split">
-                <button aria-describedby="why-core:iidka_dymova_bomba" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                  Почати
             <p class="ct-why" data-why="level" id="why-core:iidka_dymova_bomba">
               Рівень замалий: потрібен 16.
             <div class="req">
@@ -783,12 +775,13 @@
                         0/2
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="recipe:core:iidka_dymova_bomba" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:iidka_dymova_bomba" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile" data-action="core:sonnyi_poroshok" data-entity="recipe:core:sonnyi_poroshok" data-recipe="core:sonnyi_poroshok" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="powder" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="powder" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#2795-1aheut1" fill="currentColor">
               <div class="ct-head">
@@ -796,13 +789,7 @@
                   <a class="entity-link" href="#/recipe/core:sonnyi_poroshok">
                     Сонний порошок
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="recipe:core:sonnyi_poroshok" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="recipe:core:sonnyi_poroshok" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -832,6 +819,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -862,10 +856,6 @@
             <p class="ct-note" data-tier="">
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
-            <div class="ct-actions">
-              <span class="split plain" data-for="craft" data-ui="start-split">
-                <button aria-describedby="why-core:sonnyi_poroshok" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                  Почати
             <p class="ct-why" data-why="level" id="why-core:sonnyi_poroshok">
               Рівень замалий: потрібен 20.
             <div class="req">
@@ -904,12 +894,13 @@
                         0/3
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="recipe:core:sonnyi_poroshok" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:sonnyi_poroshok" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile" data-action="core:krovospynna_maz" data-entity="recipe:core:krovospynna_maz" data-recipe="core:krovospynna_maz" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="bandage-roll" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="bandage-roll" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#2043-nrdkti" fill="currentColor">
               <div class="ct-head">
@@ -917,13 +908,7 @@
                   <a class="entity-link" href="#/recipe/core:krovospynna_maz">
                     Кровоспинна мазь
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="recipe:core:krovospynna_maz" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="recipe:core:krovospynna_maz" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -953,6 +938,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -999,10 +991,6 @@
             <p class="ct-note" data-tier="">
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
-            <div class="ct-actions">
-              <span class="split plain" data-for="craft" data-ui="start-split">
-                <button aria-describedby="why-core:krovospynna_maz" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                  Почати
             <p class="ct-why" data-why="level" id="why-core:krovospynna_maz">
               Рівень замалий: потрібен 25.
             <div class="req">
@@ -1053,12 +1041,13 @@
                         0/1
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="recipe:core:krovospynna_maz" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:krovospynna_maz" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile" data-action="core:slozohinna_bomba" data-entity="recipe:core:slozohinna_bomba" data-recipe="core:slozohinna_bomba" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="stun-grenade" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="stun-grenade" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#996-2czncp" fill="currentColor">
               <div class="ct-head">
@@ -1066,13 +1055,7 @@
                   <a class="entity-link" href="#/recipe/core:slozohinna_bomba">
                     Сльозогінна бомба
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="recipe:core:slozohinna_bomba" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="recipe:core:slozohinna_bomba" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -1102,6 +1085,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -1148,10 +1138,6 @@
             <p class="ct-note" data-tier="">
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
-            <div class="ct-actions">
-              <span class="split plain" data-for="craft" data-ui="start-split">
-                <button aria-describedby="why-core:slozohinna_bomba" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                  Почати
             <p class="ct-why" data-why="level" id="why-core:slozohinna_bomba">
               Рівень замалий: потрібен 30.
             <div class="req">
@@ -1202,12 +1188,13 @@
                         0/1
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="recipe:core:slozohinna_bomba" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:slozohinna_bomba" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile" data-action="core:hirska_maz" data-entity="recipe:core:hirska_maz" data-recipe="core:hirska_maz" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="honey-jar" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="honey-jar" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#2138-1fy6hr3" fill="currentColor">
               <div class="ct-head">
@@ -1215,13 +1202,7 @@
                   <a class="entity-link" href="#/recipe/core:hirska_maz">
                     Гірська мазь
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="recipe:core:hirska_maz" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="recipe:core:hirska_maz" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -1251,6 +1232,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -1297,10 +1285,6 @@
             <p class="ct-note" data-tier="">
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
-            <div class="ct-actions">
-              <span class="split plain" data-for="craft" data-ui="start-split">
-                <button aria-describedby="why-core:hirska_maz" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                  Почати
             <p class="ct-why" data-why="level" id="why-core:hirska_maz">
               Рівень замалий: потрібен 35.
             <div class="req">
@@ -1351,12 +1335,13 @@
                         0/1
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="recipe:core:hirska_maz" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:hirska_maz" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile" data-action="core:nervova_otruta" data-entity="recipe:core:nervova_otruta" data-recipe="core:nervova_otruta" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="potion-of-madness" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="potion-of-madness" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#1642-1t5nrp" fill="currentColor">
               <div class="ct-head">
@@ -1364,13 +1349,7 @@
                   <a class="entity-link" href="#/recipe/core:nervova_otruta">
                     Нервова отрута
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="recipe:core:nervova_otruta" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="recipe:core:nervova_otruta" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -1400,6 +1379,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -1440,10 +1426,6 @@
             <p class="ct-note" data-tier="">
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
-            <div class="ct-actions">
-              <span class="split plain" data-for="craft" data-ui="start-split">
-                <button aria-describedby="why-core:nervova_otruta" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                  Почати
             <p class="ct-why" data-why="level" id="why-core:nervova_otruta">
               Рівень замалий: потрібен 40.
             <div class="req">
@@ -1494,12 +1476,13 @@
                         0/2
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="recipe:core:nervova_otruta" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:nervova_otruta" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile" data-action="core:niukhalna_sil" data-entity="recipe:core:niukhalna_sil" data-recipe="core:niukhalna_sil" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="spray" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="spray" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#2304-rb3lw" fill="currentColor">
               <div class="ct-head">
@@ -1507,13 +1490,7 @@
                   <a class="entity-link" href="#/recipe/core:niukhalna_sil">
                     Нюхальна сіль
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="recipe:core:niukhalna_sil" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="recipe:core:niukhalna_sil" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -1543,6 +1520,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -1605,10 +1589,6 @@
             <p class="ct-note" data-tier="">
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
-            <div class="ct-actions">
-              <span class="split plain" data-for="craft" data-ui="start-split">
-                <button aria-describedby="why-core:niukhalna_sil" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                  Почати
             <p class="ct-why" data-why="level" id="why-core:niukhalna_sil">
               Рівень замалий: потрібен 45.
             <div class="req">
@@ -1671,12 +1651,13 @@
                         0/1
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="recipe:core:niukhalna_sil" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:niukhalna_sil" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile" data-action="core:maz_vid_opikiv" data-entity="recipe:core:maz_vid_opikiv" data-recipe="core:maz_vid_opikiv" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="medicines" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="medicines" data-emblem-kind="recipe" data-ui="action-emblem" style="--_tint: var(--group-craft, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#728-1v8zlty" fill="currentColor">
               <div class="ct-head">
@@ -1684,13 +1665,7 @@
                   <a class="entity-link" href="#/recipe/core:maz_vid_opikiv">
                     Мазь від опіків
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="recipe:core:maz_vid_opikiv" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="recipe:core:maz_vid_opikiv" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -1720,6 +1695,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div>
               <p class="ct-caption">
                 Потрібно
@@ -1766,10 +1748,6 @@
             <p class="ct-note" data-tier="">
               Ступінь 1 з 4: шанс додаткової одиниці 0%.
               Наступний ступінь — з Майстерності 20.
-            <div class="ct-actions">
-              <span class="split plain" data-for="craft" data-ui="start-split">
-                <button aria-describedby="why-core:maz_vid_opikiv" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                  Почати
             <p class="ct-why" data-why="level" id="why-core:maz_vid_opikiv">
               Рівень замалий: потрібен 50.
             <div class="req">
@@ -1820,9 +1798,10 @@
                         0/1
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 0%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="recipe:core:maz_vid_opikiv" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <div class="ct-actions">
+              <span class="split plain" data-for="craft" data-ui="start-split">
+                <button aria-describedby="why-core:maz_vid_opikiv" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
       <section data-gear-section="" data-ui="entity-section">
         <h2>
           Тренувальне спорядження
