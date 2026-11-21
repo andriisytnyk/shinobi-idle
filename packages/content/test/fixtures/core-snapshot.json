@@ -1915,9 +1915,9 @@
       "core:role_distract": "0881f23b9c30"
     },
     "targetPriorities": {
-      "core:prio_auto": "696639bdf576",
+      "core:prio_auto": "9387b5244223",
       "core:prio_adds": "9054f3b3a13a",
-      "core:prio_leader": "012c907d42b9",
+      "core:prio_leader": "8bd59301da25",
       "core:prio_weakest": "1704c3e53d08"
     },
     "ai": {
@@ -5882,10 +5882,6 @@
       "level.short": "a9bfad4aa7c2",
       "meta.title": "1deb015b0b7c",
       "meta.close": "1455299dece6",
-      "meta.pinFull": "9c932b1d0d8b",
-      "error.goalCap": "1e250f211414",
-      "quests.surveyed": "2f8cdf40cd64",
-      "toast.goalRefused": "c6c39a8318bc",
       "meta.story": "f52e129a0cb3",
       "meta.pinned": "a191251ecc13",
       "meta.empty": "38d83ea005f9",
@@ -5902,6 +5898,8 @@
       "meta.done": "4a1948f7a8e6",
       "meta.unpin": "a664bc8da39a",
       "meta.pin": "4ebbc2abd8f2",
+      "toast.goalRefused": "c6c39a8318bc",
+      "meta.pinFull": "9c932b1d0d8b",
       "meta.suggest": "8270aab13b5d",
       "hint.dismiss": "e454a2be6d72",
       "hint.skillPage": "85d4e93f4c1b",
@@ -6273,6 +6271,7 @@
       "nav.pages": "75c6d1e5209c",
       "error.skillLocked": "8e3c5862d9fb",
       "error.invalidGoal": "a15f8eca8759",
+      "error.goalCap": "1e250f211414",
       "error.invalidName": "916cef9a2bfc",
       "error.missingIngredient": "2d2314954078",
       "error.tonicFull": "caaca06d8e74",
@@ -7040,6 +7039,7 @@
       "error.surveyRank": "de68bbc597cb",
       "quests.killsMany": "4d3ebfff06fd",
       "quests.explored": "3d40cfc34230",
+      "quests.surveyed": "2f8cdf40cd64",
       "quests.pay": "cf9245bcf753",
       "quests.payButton": "07732c91d66d",
       "error.questNotActive": "ad05c60fdc27",

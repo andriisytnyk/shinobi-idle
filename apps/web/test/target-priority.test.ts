@@ -42,7 +42,7 @@ afterEach(() => {
 });
 
 describe('the target priority of the fight preparation', () => {
-  it('offers the four settings, the automatic one chosen, with its line', async () => {
+  it('offers the four settings, the leader-first one chosen, with its line', async () => {
     booted = await bootApp([coreUi], fighter(), PREPARE);
     const select = q('[data-ui="target-priority"] select') as HTMLSelectElement | null;
     expect(select).not.toBeNull();
@@ -59,9 +59,9 @@ describe('the target priority of the fight preparation', () => {
       'Спершу ватажок',
       'Найслабший',
     ]);
-    expect(select?.value).toBe('core:prio_auto');
+    expect(select?.value).toBe('core:prio_leader');
     expect(q('[data-target-priority-line]')?.textContent).toContain(
-      ukLocale['targetPriority.core:prio_auto.desc'],
+      ukLocale['targetPriority.core:prio_leader.desc'],
     );
   });
 
@@ -82,7 +82,7 @@ describe('the target priority of the fight preparation', () => {
     state.loadouts.targetPriority = 'core:prio_removed';
     booted = await bootApp([coreUi], state, PREPARE);
     expect((q('[data-ui="target-priority"] select') as HTMLSelectElement).value).toBe(
-      'core:prio_auto',
+      'core:prio_leader',
     );
   });
 });

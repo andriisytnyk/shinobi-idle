@@ -1982,59 +1982,59 @@
       "core:shadow_shuriken"
     ],
     "runs": 200,
-    "winRate": 0.7,
+    "winRate": 0.72,
     "outcomes": {
-      "victory": 140,
-      "defeat": 60,
+      "victory": 144,
+      "defeat": 56,
       "fled": 0,
       "timeout": 0
     },
     "timeSec": {
-      "mean": 102.74,
-      "p10": 91.29,
-      "p90": 113.48
+      "mean": 100.27,
+      "p10": 90.02,
+      "p90": 110.3
     },
     "hpLeft": {
-      "mean": 54.8,
-      "share": 0.206
+      "mean": 67.3,
+      "share": 0.253
     },
     "maxHp": 266,
     "damageShare": {
-      "basic": 0.22,
-      "core:tag": 0.216,
-      "core:running_fire": 0.147,
-      "core:leaf_whirlwind": 0.101,
+      "core:tag": 0.226,
+      "basic": 0.213,
+      "core:running_fire": 0.148,
+      "core:leaf_whirlwind": 0.1,
       "core:leaf_gale": 0.095,
-      "core:dynamic_entry": 0.093,
-      "core:shadow_shuriken": 0.09,
+      "core:dynamic_entry": 0.091,
+      "core:shadow_shuriken": 0.088,
       "core:kunai": 0.038
     },
     "withPouch": {
-      "winRate": 0.7,
+      "winRate": 0.72,
       "outcomes": {
-        "victory": 140,
-        "defeat": 60,
+        "victory": 144,
+        "defeat": 56,
         "fled": 0,
         "timeout": 0
       },
       "timeSec": {
-        "mean": 102.74,
-        "p10": 91.29,
-        "p90": 113.48
+        "mean": 100.27,
+        "p10": 90.02,
+        "p90": 110.3
       },
       "hpLeft": {
-        "mean": 54.8,
-        "share": 0.206
+        "mean": 67.3,
+        "share": 0.253
       },
       "maxHp": 266,
       "damageShare": {
-        "basic": 0.22,
-        "core:tag": 0.216,
-        "core:running_fire": 0.147,
-        "core:leaf_whirlwind": 0.101,
+        "core:tag": 0.226,
+        "basic": 0.213,
+        "core:running_fire": 0.148,
+        "core:leaf_whirlwind": 0.1,
         "core:leaf_gale": 0.095,
-        "core:dynamic_entry": 0.093,
-        "core:shadow_shuriken": 0.09,
+        "core:dynamic_entry": 0.091,
+        "core:shadow_shuriken": 0.088,
         "core:kunai": 0.038
       }
     },
@@ -2043,8 +2043,8 @@
       "hpLossShare": 1.122,
       "playerDps": 13.5
     },
-    "wins": 140,
-    "ratio": 1.483,
+    "wins": 144,
+    "ratio": 1.447,
     "flagged": false,
     "reasons": []
   },

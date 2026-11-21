@@ -1,6 +1,6 @@
 [
-  { "id": "core:prio_auto", "default": true, "rule": "auto" },
+  { "id": "core:prio_auto", "rule": "auto" },
   { "id": "core:prio_adds", "rule": "adds" },
-  { "id": "core:prio_leader", "rule": "leader" },
+  { "id": "core:prio_leader", "default": true, "rule": "leader" },
   { "id": "core:prio_weakest", "rule": "weakest" }
 ]

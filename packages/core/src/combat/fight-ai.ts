@@ -240,14 +240,14 @@ function mostValuable(view: FightView): ViewEnemy | undefined {
 
 /** The body the target priority of the view names, or undefined to leave the choice to the engine. */
 export function chosenTarget(view: FightView): ViewEnemy | undefined {
-  if (view.enemies.length < 2) return undefined;
+  if (view.enemies.length < 2 && view.priority !== 'leader') return undefined;
   const leader = view.enemies.find((e) => e.leader);
   const helpers = view.enemies.filter((e) => !e.leader);
   switch (view.priority) {
     case 'weakest':
       return weakest(view.enemies);
     case 'leader':
-      return leader ?? mostValuable(view);
+      return leader;
     case 'adds':
       return leader && helpers.length > 0 ? weakest(helpers) : leader ? leader : mostValuable(view);
     default:
@@ -258,11 +258,6 @@ export function chosenTarget(view: FightView): ViewEnemy | undefined {
 /** Attacks go to the body the player's target priority names; everything else is left to the engine's choice. */
 function aimed(view: FightView, decision: Decision): Decision {
   if (decision.type === 'wait' || decision.target !== undefined) return decision;
-  // An area technique strikes every body: it keeps its own rule and has no one to be aimed at.
-  if (decision.type === 'technique') {
-    const used = view.techniques.find((r) => r.tech.id === decision.id);
-    if (used?.tech.hitsAll) return decision;
-  }
   const target = chosenTarget(view);
   return target ? { ...decision, target: target.id } : decision;
 }

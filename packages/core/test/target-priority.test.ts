@@ -55,7 +55,7 @@ function withRespawns(respawns: boolean, id = WOLF): ContentDb {
 
 const snap = (priority?: keyof typeof PRIORITY): PlayerSnapshot => ({
   ...scripted(['core:leaf_whirlwind', 'core:front_lotus']),
-  ...(priority === undefined ? {} : { targetPriority: PRIORITY[priority] }),
+  targetPriority: PRIORITY[priority ?? 'auto'],
 });
 
 function wolfFight(
@@ -265,9 +265,8 @@ describe('the settings', () => {
     const kit = (priority?: keyof typeof PRIORITY) =>
       createFight(snap(priority), encounterFor(bossOf(content, WOLF), content), 3, content, rules)
         .kit;
-    expect('targetPriority' in kit()).toBe(false);
-    expect('targetPriority' in kit('auto')).toBe(false);
-    expect(kit('leader').targetPriority).toBe(PRIORITY.leader);
+    expect('targetPriority' in kit('leader')).toBe(false);
+    expect(kit('auto').targetPriority).toBe(PRIORITY.auto);
     // A setting the content does not have plays the default one, and is not written.
     const gone = createFight(
       { ...snap(), targetPriority: 'testmod:gone' },
@@ -277,7 +276,7 @@ describe('the settings', () => {
       rules,
     );
     expect('targetPriority' in gone.kit).toBe(false);
-    expect(JSON.stringify(gone)).toBe(JSON.stringify(wolfFight(content).fight));
+    expect(JSON.stringify(gone)).toBe(JSON.stringify(wolfFight(content, 'leader').fight));
   });
 });
 
@@ -331,7 +330,7 @@ describe('the setting in the game', () => {
     seen.clear();
     run(state, { type: 'loadout.targetPriority', priority: null });
     analyzeFight(state, target, { samples: 3, maxSessions: 1 }, content, spy);
-    expect([...seen]).toEqual(['auto']);
+    expect([...seen]).toEqual(['leader']);
   });
 
   it('is saved with the loadout, and a save without it plays the default one, with no new version', () => {
