@@ -3,8 +3,10 @@ import {
   counterValue,
   evalReq,
   examFor,
+  exploredKey,
   missionDoneKey,
   NATURES_GAINED,
+  surveyedKey,
   type GameState,
   type ReqResult,
 } from '@shinobi/core';
@@ -16,6 +18,17 @@ export type StepStatus = 'done' | 'current' | 'pending';
 /** The enemy a `kills.<enemy>` counter counts, or null for any other counter. */
 export function counterEnemy(counter: string): string | null {
   return counter.startsWith('kills.') ? counter.slice('kills.'.length) : null;
+}
+
+/** The region an `explored.<region>` (cells explored) or `surveyed.<region>` (hexes surveyed to level 1) counter counts, with which of the two it is; null for any other counter. */
+export function counterRegion(counter: string): { region: string; surveyed: boolean } | null {
+  const surveyed = surveyedKey('');
+  const explored = exploredKey('');
+  if (counter.startsWith(surveyed))
+    return { region: counter.slice(surveyed.length), surveyed: true };
+  if (counter.startsWith(explored))
+    return { region: counter.slice(explored.length), surveyed: false };
+  return null;
 }
 
 /** The mission a `missions.done.<mission>` counter counts, or null for any other counter. */
@@ -139,6 +152,19 @@ function pageFor(state: GameState, node: ReqResult, content: ContentDb): string 
   }
 }
 
+/**
+ * The page where an enemy is fought: the fights page when its zone is open; the region page of the
+ * zone while the zone is shut (the region is what opens it); the fights page for an enemy no zone holds.
+ */
+export function enemyPlace(state: GameState, enemy: string, content: ContentDb): string {
+  const zone = content.zones.find((z) => z.enemy === enemy);
+  if (!zone || !zone.unlock || evalReq(state, zone.unlock, content).met) return '#/combat';
+  const region = content.regions.find(
+    (r) => r.id === zone.region || r.id.slice(r.id.lastIndexOf(':') + 1) === zone.region,
+  );
+  return region ? hrefFor({ kind: 'region', id: region.id }) : '#/world';
+}
+
 /** The page where a quest step's objective is done. */
 export function objectiveTarget(
   state: GameState,
@@ -148,16 +174,16 @@ export function objectiveTarget(
   // A payment is made on the journal page, from the step's own button.
   if (objective.t === 'pay') return '#/quests';
   if (objective.t === 'counter') {
-    if (counterEnemy(objective.counter) !== null) return '#/combat';
+    const enemy = counterEnemy(objective.counter);
+    if (enemy !== null) return enemyPlace(state, enemy, content);
     const mission = counterMission(objective.counter);
     if (mission !== null) return hrefFor({ kind: 'mission', id: mission });
     if (objective.counter === NATURES_GAINED) return '#/nature';
     // The other mission counters (by rank, in total) are worked on the board.
     if (objective.counter.startsWith('missions.')) return '#/missions';
     // Cells of a region explored: the world page on that region.
-    if (objective.counter.startsWith('explored.')) {
-      return hrefFor({ kind: 'region', id: objective.counter.slice('explored.'.length) });
-    }
+    const where = counterRegion(objective.counter);
+    if (where) return hrefFor({ kind: 'region', id: where.region });
     return '#/quests';
   }
   const open = firstUnmet(evalReq(state, objective.req, content));
@@ -173,21 +199,33 @@ export interface NextStep {
   target: string;
 }
 
+/** The active step of one quest chain, or null when it has not started or is done. */
+export function stepOf(state: GameState, quest: Quest, content: ContentDb): NextStep | null {
+  const progress = state.quests[quest.id];
+  if (!progress || progress.done) return null;
+  const step = quest.steps[progress.step];
+  if (!step) return null;
+  return {
+    quest,
+    index: progress.step,
+    objective: step.objective,
+    target: objectiveTarget(state, step.objective, content),
+  };
+}
+
+/** The active step of every chain that is under way, in content order (the main chain first). */
+export function activeSteps(state: GameState, content: ContentDb): NextStep[] {
+  const steps: NextStep[] = [];
+  for (const quest of content.quests) {
+    const step = stepOf(state, quest, content);
+    if (step) steps.push(step);
+  }
+  return steps;
+}
+
 /** The active step of the first quest chain that is under way, or null when every chain is done. */
 export function nextStep(state: GameState, content: ContentDb): NextStep | null {
-  for (const quest of content.quests) {
-    const progress = state.quests[quest.id];
-    if (!progress || progress.done) continue;
-    const step = quest.steps[progress.step];
-    if (!step) continue;
-    return {
-      quest,
-      index: progress.step,
-      objective: step.objective,
-      target: objectiveTarget(state, step.objective, content),
-    };
-  }
-  return null;
+  return activeSteps(state, content)[0] ?? null;
 }
 
 /** Which place in the navigation a hash belongs to; a skill page also names the skill. */

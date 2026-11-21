@@ -266,7 +266,7 @@ describe('A5: the bank filter «потрібне для мети»', () => {
   it('shows the goal item even when none is held, and nothing else', () => {
     game.state.bank[MINT] = 3;
     game.state.bank[NETTLE] = 2;
-    game.dispatch({ type: 'goal.set', ref: { kind: 'item', id: OIL } });
+    game.dispatch({ type: 'goal.pin', ref: { kind: 'item', id: OIL } });
     expect(goalItemIds(game.state, content, game.rules)).toEqual([OIL]);
     app = mount(BankPage, { target });
     flushSync();
@@ -278,9 +278,9 @@ describe('A5: the bank filter «потрібне для мети»', () => {
     flushSync();
     expect(ids()).toEqual([OIL]);
 
-    game.dispatch({ type: 'goal.set', ref: { kind: 'item', id: NETTLE } });
+    game.dispatch({ type: 'goal.pin', ref: { kind: 'item', id: NETTLE } });
     flushSync();
-    expect(ids()).toEqual([NETTLE]);
+    expect(ids().sort()).toEqual([NETTLE, OIL].sort());
   });
 
   it('tabs and search narrow the list', () => {

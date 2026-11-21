@@ -1,5 +1,6 @@
 import type { ContentDb } from '@shinobi/content';
 import type { DormantPack, JsonValue } from './state.ts';
+import { GOAL_CAP } from './goal.ts';
 import { PLACES, type Place } from './dormant-places.ts';
 import { isNature, packOfId, rankIndex } from './vocab.ts';
 
@@ -306,12 +307,15 @@ function stashPlace(raw: Raw, place: Place, loaded: ReadonlySet<string>, stash: 
       });
       return setAt(raw, path, { ...at, slots });
     }
-    case 'goal': {
-      const id = isRecord(at) ? at.id : undefined;
-      const away = awayPack(loaded, id);
-      if (away === undefined) return raw;
-      stash(away, path, '0', at);
-      return setAt(raw, path, null);
+    case 'goals': {
+      if (!Array.isArray(at)) return raw;
+      const kept: unknown[] = [];
+      at.forEach((goal: unknown, index) => {
+        const away = awayPack(loaded, isRecord(goal) ? goal.id : undefined);
+        if (away === undefined) kept.push(goal);
+        else stash(away, path, String(index), goal);
+      });
+      return setAt(raw, path, kept);
     }
   }
 }
@@ -346,6 +350,7 @@ function restorePlace(
   place: Place,
   pack: string,
   entries: Record<string, JsonValue>,
+  leftover?: Record<string, JsonValue>,
 ): Raw {
   const at = getAt(raw, place.path);
   const { path } = place;
@@ -441,11 +446,24 @@ function restorePlace(
       }
       return setAt(next, path, { ...(asRecord(getAt(next, path)) ?? pouch), slots });
     }
-    case 'goal': {
-      const goal = entries['0'];
-      return (at === null || at === undefined) && isRecord(goal) && mine(goal.id)
-        ? setAt(raw, path, goal)
-        : raw;
+    case 'goals': {
+      if (!Array.isArray(at)) return raw;
+      const list = [...at];
+      const back = Object.entries(entries)
+        .map(([index, goal]) => [Number(index), goal] as const)
+        .filter(
+          ([index, goal]) =>
+            Number.isInteger(index) && index >= 0 && isRecord(goal) && mine(goal.id),
+        )
+        .sort((x, y) => x[0] - y[0]);
+      for (const [index, goal] of back) {
+        const g = goal as Raw;
+        if (list.some((x) => isRecord(x) && x.kind === g.kind && x.id === g.id)) continue;
+        // The goals the player pinned meanwhile win: a returning one goes back only where there is room.
+        if (list.length < GOAL_CAP) list.splice(Math.min(index, list.length), 0, g);
+        else if (leftover) leftover[String(index)] = goal as JsonValue;
+      }
+      return setAt(raw, path, list);
     }
   }
 }
@@ -470,9 +488,10 @@ export function restoreDormant(
     if (!held) continue;
     restored.push({ ...held, packId: pack.id });
     delete dormant[pack.id];
+    const left: Record<string, JsonValue> = {};
     for (const place of PLACES) {
       const entries = held.data[place.path];
-      if (entries) out = restorePlace(out, place, pack.id, entries);
+      if (entries) out = restorePlace(out, place, pack.id, entries, left);
       const nested = held.data[`${place.path}${NESTED}`];
       const live = asRecord(getAt(out, place.path));
       if (nested && live) {
@@ -483,6 +502,10 @@ export function restoreDormant(
         }
         out = setAt(out, place.path, merged);
       }
+    }
+    // Goals that found no room stay dormant and come back when the list has room again.
+    if (Object.keys(left).length > 0) {
+      dormant[pack.id] = { version: held.version, rank: null, natures: [], data: { goals: left } };
     }
   }
   return { raw: out, restored };

@@ -399,21 +399,21 @@ describe('A3: the pinned goal moves from local settings into the game', () => {
   it('migrates an old local goal once and keeps the other settings', () => {
     const storage = storageWith(legacy);
     expect(migrateLocalGoal(storage, game)).toBe(true);
-    expect(game.state.goal).toEqual({ kind: 'technique', id: 'core:great_fireball' });
+    expect(game.state.goals).toEqual([{ kind: 'technique', id: 'core:great_fireball' }]);
     const stored = JSON.parse(storage.data.get(SETTINGS_KEY) ?? '{}') as Record<string, unknown>;
     expect('goal' in stored).toBe(false);
     expect(stored).toMatchObject({ hideLocked: true, hints: false, dismissedHints: ['skillPage'] });
     // A second run finds nothing to move.
-    game.dispatch({ type: 'goal.clear' });
+    game.dispatch({ type: 'goal.unpin', ref: { kind: 'technique', id: 'core:great_fireball' } });
     expect(migrateLocalGoal(storage, game)).toBe(false);
-    expect(game.state.goal).toBeNull();
+    expect(game.state.goals).toEqual([]);
   });
 
   it('lets a goal already in the game win and still drops the local copy', () => {
-    game.dispatch({ type: 'goal.set', ref: { kind: 'technique', id: 'core:clone' } });
+    game.dispatch({ type: 'goal.pin', ref: { kind: 'technique', id: 'core:clone' } });
     const storage = storageWith(legacy);
     expect(migrateLocalGoal(storage, game)).toBe(false);
-    expect(game.state.goal).toEqual({ kind: 'technique', id: 'core:clone' });
+    expect(game.state.goals).toEqual([{ kind: 'technique', id: 'core:clone' }]);
     expect(storage.data.get(SETTINGS_KEY)).not.toContain('goal');
   });
 
@@ -424,7 +424,7 @@ describe('A3: the pinned goal moves from local settings into the game', () => {
     broken.data.set(SETTINGS_KEY, '{nope');
     expect(migrateLocalGoal(broken, game)).toBe(false);
     expect(migrateLocalGoal(storageWith({ goal: { t: 'rank', rank: 'genin' } }), game)).toBe(false);
-    expect(game.state.goal).toBeNull();
+    expect(game.state.goals).toEqual([]);
   });
 });
 
@@ -440,7 +440,7 @@ describe('graduation', () => {
     game.devAdvance(3_600_000);
     expect(game.state.player.rank).toBe('genin');
     expect(game.graduation).toBe(true);
-    expect(game.state.goal).toEqual({ kind: 'technique', id: 'core:shadow_clone' });
+    expect(game.state.goals).toEqual([{ kind: 'technique', id: 'core:shadow_clone' }]);
     expect(game.state.bank[SCROLL]).toBe(1);
     game.dismissGraduation();
     expect(game.graduation).toBe(false);

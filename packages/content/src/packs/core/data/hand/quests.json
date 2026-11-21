@@ -2,6 +2,7 @@
   {
     "id": "core:graduation",
     "chain": "core:graduation",
+    "main": true,
     "unlock": null,
     "steps": [
       {
@@ -131,6 +132,7 @@
   {
     "id": "core:mission_board",
     "chain": "core:mission_board",
+    "main": true,
     "unlock": {
       "t": "rank",
       "rank": "genin"
@@ -198,8 +200,9 @@
         "textKey": "quest.core:mission_board.step.5",
         "objective": {
           "t": "counter",
-          "counter": "explored.core:forest",
-          "n": 5
+          "counter": "surveyed.core:forest",
+          "n": 5,
+          "total": true
         }
       }
     ],
@@ -214,6 +217,7 @@
   {
     "id": "core:border_wolves",
     "chain": "core:border_wolves",
+    "main": true,
     "unlock": {
       "t": "quest",
       "id": "core:mission_board"
@@ -306,6 +310,7 @@
   {
     "id": "core:grey_bands",
     "chain": "core:grey_bands",
+    "main": true,
     "unlock": {
       "t": "quest",
       "id": "core:border_wolves"
@@ -400,6 +405,7 @@
   {
     "id": "core:name_on_stone",
     "chain": "core:name_on_stone",
+    "main": true,
     "unlock": {
       "t": "quest",
       "id": "core:grey_bands"

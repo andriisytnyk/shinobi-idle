@@ -307,7 +307,7 @@ describe('what the app prints during a run (R1, T3)', () => {
     };
     await walkPages();
     // Pin a goal so the goal panel names something, and let the game run so toasts and the Now bar speak.
-    game.dispatch({ type: 'goal.set', ref: { kind: 'quest', id: 'core:graduation' } });
+    game.dispatch({ type: 'goal.pin', ref: { kind: 'quest', id: 'core:graduation' } });
     game.dispatch({ type: 'action.start', slot: 0, kind: 'drill', id: content.exercises[0]!.id });
     for (let i = 0; i < 6; i++) {
       app.advance(600_000);

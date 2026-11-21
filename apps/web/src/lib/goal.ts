@@ -1,5 +1,6 @@
 import type { ContentDb } from '@shinobi/content';
 import {
+  canBeGoal,
   COURSE_ID,
   COURSE_KIND,
   isSkillUnlocked,
@@ -11,21 +12,11 @@ import {
   type Rules,
 } from '@shinobi/core';
 import { reqItemIds } from './crafts.ts';
-import { nextStep } from './next-step.ts';
+import { activeSteps } from './next-step.ts';
 import { graduateRank, isAcademyRank } from './vocab.ts';
 
-/** The entity kinds a tile can pin as the goal: the kinds the core accepts that a tile stands for. */
-const PINNABLE_TILE_KINDS: ReadonlySet<string> = new Set([
-  'technique',
-  'exercise',
-  'practice',
-  'obstacle',
-  'recipe',
-  'item',
-]);
-
-/** Whether a tile of this entity kind has a pin. */
-export const canPin = (kind: string): boolean => PINNABLE_TILE_KINDS.has(kind);
+/** Whether an entity of this kind can be pinned: the kinds the core accepts as a goal. */
+export const canPin = (kind: string, content: ContentDb): boolean => canBeGoal(kind, content);
 
 /** The requirement tree of the goal "learn this technique": the technique, its level and its rank. */
 export function techniqueGoal(id: string, content: ContentDb): Req | null {
@@ -103,6 +94,14 @@ export function goalTree(
     const mission = content.missions.find((m) => m.id === ref.id);
     return mission ? missionGoalReq(state, mission, content, rules) : null;
   }
+  // A quest asks the objective of its active step, when that is a requirement tree.
+  if (ref.kind === 'quest') {
+    const quest = content.quests.find((q) => q.id === ref.id);
+    const progress = quest ? state.quests[quest.id] : undefined;
+    const objective =
+      quest && progress && !progress.done ? quest.steps[progress.step]?.objective : undefined;
+    return objective?.t === 'req' ? objective.req : null;
+  }
   // An exam asks its checklist; once the written test is passed, the rest of it.
   if (ref.kind === 'exam') {
     const exam = content.exams.find((e) => e.id === ref.id);
@@ -131,20 +130,29 @@ export function goalTree(
 }
 
 /**
- * The requirement tree the goal panel shows now: the pinned goal's tree; with nothing pinned, the
- * objective of the quest step under way; with no quest, the suggested technique. Null when none.
+ * The requirement trees the goal panel shows now: the active step of the main story, then each
+ * pinned goal's tree; with nothing pinned, the suggested technique. Empty when none.
  */
-export function shownGoalReq(state: GameState, content: ContentDb, rules: Rules): Req | null {
-  if (state.goal) return goalTree(state, state.goal, content, rules);
-  const step = nextStep(state, content);
-  if (step) return step.objective.t === 'req' ? step.objective.req : null;
-  const suggestion = suggestGoal(state, content);
-  return suggestion ? techniqueGoal(suggestion, content) : null;
+export function shownGoalReqs(state: GameState, content: ContentDb, rules: Rules): Req[] {
+  const trees: Req[] = [];
+  for (const step of activeSteps(state, content)) {
+    if (step.quest.main === true && step.objective.t === 'req') trees.push(step.objective.req);
+  }
+  for (const goal of state.goals) {
+    const tree = goalTree(state, goal, content, rules);
+    if (tree) trees.push(tree);
+  }
+  if (state.goals.length === 0) {
+    const suggestion = suggestGoal(state, content);
+    const tree = suggestion ? techniqueGoal(suggestion, content) : null;
+    if (tree) trees.push(tree);
+  }
+  return trees;
 }
 
-/** Ids of the items the shown goal's requirement tree asks for. */
+/** Ids of the items the shown goals' requirement trees ask for. */
 export function goalItemIds(state: GameState, content: ContentDb, rules: Rules): string[] {
-  return reqItemIds(shownGoalReq(state, content, rules));
+  return [...new Set(shownGoalReqs(state, content, rules).flatMap((req) => reqItemIds(req)))];
 }
 
 /** The technique a goal pinned by an older version of the app pointed at: its first technique row. */

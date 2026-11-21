@@ -1,5 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
-import type { GameEvent } from '@shinobi/core';
+import { GOAL_CAP, type GameEvent } from '@shinobi/core';
 import { actionRef, masteryRef } from './entities.ts';
 import { t, type Params } from './i18n.ts';
 import { missionToast } from './mission-toasts.ts';
@@ -44,6 +44,8 @@ export function toastFor(event: GameEvent, content: ContentDb): ToastSpec | null
   const mission = missionToast(event, content);
   if (mission !== undefined) return mission;
   switch (event.type) {
+    case 'goalRefused':
+      return { key: 'toast.goalRefused', params: { n: GOAL_CAP } };
     case 'levelUp':
       return {
         key: 'toast.levelUp',

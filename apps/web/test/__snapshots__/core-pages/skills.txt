@@ -4,10 +4,11 @@
       <h1>
         Навички
       <div class="mobile-skills">
-        <section aria-label="Наступний крок" class="next" data-next-step="">
-          <p class="quest">
-            <a class="entity-link" href="#/quest/core:graduation">
-              Випуск
+        <section aria-label="Наступний крок" class="next" data-next-step="" data-quest="core:graduation">
+          <div class="head">
+            <p class="quest">
+              <a class="entity-link" href="#/quest/core:graduation">
+                Випуск
           <p class="text">
             Інструктор починає з тіла, а не з печаток: досягни Тайдзюцу 5 і Атлетики 5.
           <div class="objective">

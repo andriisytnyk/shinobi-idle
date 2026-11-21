@@ -10,7 +10,7 @@ interface GoalHost {
 }
 
 /**
- * Moves the goal that older versions kept in the local settings into `state.goal`, once. A goal
+ * Moves the goal that older versions kept in the local settings into `state.goals`, once. A goal
  * already in the game wins; the local value is removed either way. Returns whether the game got
  * a goal from it.
  */
@@ -27,9 +27,9 @@ export function migrateLocalGoal(storage: TextStorage | null, game: GoalHost): b
   if (!('goal' in raw)) return false;
 
   let moved = false;
-  const id = game.state.goal === null ? legacyGoalTechnique(raw.goal) : null;
+  const id = game.state.goals.length === 0 ? legacyGoalTechnique(raw.goal) : null;
   if (id !== null && game.content.techniques.some((t) => t.id === id)) {
-    moved = game.dispatch({ type: 'goal.set', ref: { kind: 'technique', id } }).ok;
+    moved = game.dispatch({ type: 'goal.pin', ref: { kind: 'technique', id } }).ok;
   }
   delete raw.goal;
   try {
