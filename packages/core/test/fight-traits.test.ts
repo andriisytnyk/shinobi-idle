@@ -556,6 +556,9 @@ describe('the default AI decision rules, on hand-made views', () => {
     cast: null,
     nextCastIn: null,
     leader: false,
+    cl: 10,
+    dps: 5,
+    respawns: false,
     ...o,
   });
   const mk = (
@@ -580,6 +583,7 @@ describe('the default AI decision rules, on hand-made views', () => {
     enemies,
     habituation: {},
     ai: chunin,
+    priority: 'auto',
     visibleTraits: content.ai.visibleTraits,
     vocab: aiVocab,
     pouch: [],

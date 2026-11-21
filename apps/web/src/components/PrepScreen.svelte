@@ -37,6 +37,7 @@
   import { game } from '../lib/store.ts';
   import ActionEmblem from './ActionEmblem.svelte';
   import CloneRolePicker from './CloneRolePicker.svelte';
+  import TargetPriorityPicker from './TargetPriorityPicker.svelte';
   import EntityLink from './EntityLink.svelte';
   import NatureLink from './NatureLink.svelte';
   import ReqTree from './ReqTree.svelte';
@@ -63,6 +64,7 @@
         gs.loadouts.active,
         gs.loadouts.auto,
         gs.loadouts.cloneRole,
+        gs.loadouts.targetPriority,
         gs.pouch.slots,
         gs.pouch.medic,
         gs.wounds.stacks,
@@ -126,6 +128,7 @@
         gs.loadouts.active,
         gs.loadouts.auto,
         gs.loadouts.cloneRole,
+        gs.loadouts.targetPriority,
         // The pouch as the fight sees it: what the bank adds counts, the rest of the bank does not (it changes while the player gathers).
         gs.pouch.slots.map((s) => [
           s.id,
@@ -289,6 +292,7 @@
   </section>
 
   <CloneRolePicker />
+  <TargetPriorityPicker />
 
   <section class="block" data-ui="prep-defence">
     <h3>{t('prep.defence')}</h3>

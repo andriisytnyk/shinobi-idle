@@ -1,4 +1,4 @@
-import type { AiTier, ContentDb, Rank, SkillId } from '@shinobi/content';
+import type { AiTier, ContentDb, Rank, SkillId, TargetRule } from '@shinobi/content';
 import type { RngState } from '../rng.ts';
 import type { EvasionPart } from './numbers.ts';
 
@@ -253,6 +253,8 @@ export interface PlayerKit {
   cloneThreat?: number;
   /** The id of the role the clones were given, written only when it is not the default one (absent: the default). */
   cloneRole?: string;
+  /** The id of the target priority the player chose, written only when it is not the default one (absent: the default). */
+  targetPriority?: string;
 }
 
 /** What happened in a fight; battle analysis averages these over many fights. */
@@ -487,8 +489,17 @@ export interface ViewEnemy {
   } | null;
   /** Work units until a waiting caster of this body starts its cast; null when none. */
   nextCastIn: number | null;
-  /** The body the fight turns on, which the AI aims at first. */
+  /** The body the fight turns on: while it lives, the helpers it keeps calling back are not worth a blow. */
   leader: boolean;
+  /** The enemy's combat level, which the screen shows. */
+  cl: number;
+  /**
+   * What the player can tell of the damage this body deals to the player's side, per second: what its level
+   * promises before it has acted, and its blows as the player has watched them after; over its attack cycle.
+   */
+  dps: number;
+  /** The body is one the leader calls back while he lives (known once the player knows the mechanic), so killing it buys little. */
+  respawns: boolean;
 }
 
 /** What the player AI sees when it must choose. Everything in it is a copy. */
@@ -517,6 +528,8 @@ export interface FightView {
   habituation: Readonly<Record<string, number>>;
   /** The tier of the AI that plays: its ordered rule list and how the rules behave. */
   ai: AiTier;
+  /** The rule of the target priority the player chose (`content.targetPriorities`). */
+  priority: TargetRule;
   /** Traits that show on sight. */
   visibleTraits: readonly string[];
   /** What the traits of the content are, as the rules need them. */

@@ -508,6 +508,22 @@ export function setCloneRole(
   return { ok: true };
 }
 
+/** Chooses the target priority of the fight: an id the content has, or null for the default one. */
+export function setTargetPriority(
+  state: GameState,
+  priority: string | null,
+  content: ContentDb,
+): CommandResult {
+  if (
+    priority !== null &&
+    !(typeof priority === 'string' && content.targetPriorities.some((r) => r.id === priority))
+  ) {
+    return { ok: false, reason: 'error.unknownTargetPriority' };
+  }
+  state.loadouts.targetPriority = priority;
+  return { ok: true };
+}
+
 export function saveLoadout(state: GameState, name: string, content: ContentDb): CommandResult {
   const l = state.loadouts;
   const clean = typeof name === 'string' ? name.trim() : '';

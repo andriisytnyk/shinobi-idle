@@ -11,6 +11,7 @@ export { disabledCount, voidCount } from './fight-guard.ts';
 export * from './fight-status.ts';
 export * from './fight-sim.ts';
 export * from './fight-roles.ts';
+export * from './fight-priority.ts';
 export * from './fight-team.ts';
 export * from './fight-team-id.ts';
 export * from './fight-types.ts';

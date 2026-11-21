@@ -68,6 +68,8 @@ export interface LoadoutState {
   basis: string;
   /** The role all the combat clones take in a fight (`content.cloneRoles`); null: the default role. */
   cloneRole: string | null;
+  /** The target priority of the fight (`content.targetPriorities`); null: the default one. */
+  targetPriority: string | null;
   saved: Record<string, { techniques: string[]; signature: string | null }>;
 }
 

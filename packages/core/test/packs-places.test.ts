@@ -118,6 +118,7 @@ describe('one round trip per place', () => {
       active: ['core:a', ghost('x'), 'core:b', ghost('y')],
       signature: ghost('x'),
       cloneRole: ghost('role'),
+      targetPriority: ghost('priority'),
       saved: { main: { techniques: ['core:a', ghost('x')], signature: null } },
     },
     pouch: {
@@ -154,6 +155,7 @@ describe('one round trip per place', () => {
     expect(out.goals).toEqual([]);
     expect((out.loadouts as Raw).signature).toBeNull();
     expect((out.loadouts as Raw).cloneRole).toBeNull();
+    expect((out.loadouts as Raw).targetPriority).toBeNull();
   });
 
   it('gives every place back as it was', () => {

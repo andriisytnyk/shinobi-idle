@@ -1769,7 +1769,7 @@
       "core:foreign_genin": "b5479a3b52b7"
     },
     "bosses": {
-      "core:boss_wolf": "92a853918be9",
+      "core:boss_wolf": "45ed8db96317",
       "core:boss_ren1": "63b89607a94e",
       "core:boss_fighter": "f4ad4820702e",
       "core:boss_hunter": "252ddb389f39",
@@ -1913,6 +1913,12 @@
       "core:role_assault": "d18d42c9a5cb",
       "core:role_support": "509521e2beea",
       "core:role_distract": "0881f23b9c30"
+    },
+    "targetPriorities": {
+      "core:prio_auto": "696639bdf576",
+      "core:prio_adds": "9054f3b3a13a",
+      "core:prio_leader": "012c907d42b9",
+      "core:prio_weakest": "1704c3e53d08"
     },
     "ai": {
       "ai": "33bc39cb9845"
@@ -4609,6 +4615,12 @@
       "core:role_assault",
       "core:role_support",
       "core:role_distract"
+    ],
+    "targetPriorities": [
+      "core:prio_auto",
+      "core:prio_adds",
+      "core:prio_leader",
+      "core:prio_weakest"
     ],
     "ai": [
       "ai"
@@ -7388,6 +7400,21 @@
       "cloneRole.group": "6fc9ab62e72c",
       "cloneRole.label": "fec20f17d9b3",
       "error.unknownCloneRole": "a75afab5d840",
+      "targetPriority.core:prio_auto.name": "6af1963143c0",
+      "targetPriority.core:prio_auto.desc": "dda943a7ec46",
+      "targetPriority.core:prio_adds.name": "dcf110824cb3",
+      "targetPriority.core:prio_adds.desc": "42fd435783a5",
+      "targetPriority.core:prio_leader.name": "57b426a59570",
+      "targetPriority.core:prio_leader.desc": "23cb2ffbc8de",
+      "targetPriority.core:prio_weakest.name": "ff451388b9fc",
+      "targetPriority.core:prio_weakest.desc": "e25a7126ddde",
+      "targetPriority.title": "ac65c66e9fdc",
+      "targetPriority.note": "6efe4d9b76eb",
+      "targetPriority.group": "33f46fb28b59",
+      "targetPriority.label": "f5a22baa78ad",
+      "error.unknownTargetPriority": "bd8041c78704",
+      "fight.target.mark": "27cad15ea82c",
+      "fight.target.hint": "74f76b4c5471",
       "map.point.opens": "cb8cf03ad2c5",
       "scout.works": "d5e999f554de",
       "scout.worksIntro": "7b7f9bb9d4a0",

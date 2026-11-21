@@ -895,7 +895,14 @@ export const bossSpecialSchema = z.strictObject({
   hook: z.string().min(1),
   nature: z.literal('beatsPlayerFirst').optional(),
   adds: z.array(traitId).optional(),
-  companions: z.strictObject({ fx: z.string().min(1), hook: z.string().min(1) }).optional(),
+  companions: z
+    .strictObject({
+      fx: z.string().min(1),
+      hook: z.string().min(1),
+      /** The leader calls the companions back while he lives: the player's AI gives them no priority. */
+      respawns: z.boolean().optional(),
+    })
+    .optional(),
   bodies: z.boolean().optional(),
   fleeAt: z.string().min(1).optional(),
   /** The keys of `K.bossFx[fx]` the hook reads: the closure proves they exist, so the hook never falls back to a default. */
@@ -1469,6 +1476,21 @@ export const cloneRoleSchema = z.strictObject({
   ]),
 });
 
+/**
+ * A setting of the target priority: which enemy the player's side attacks first. The player picks one
+ * (`state.loadouts.targetPriority`); a fight reads it when it begins. `rule` is the behaviour: `auto`
+ * the target that removes the most damage per second of fighting, `adds` the helpers before the
+ * leader, `leader` the leader before the helpers, `weakest` the enemy with the least health. The
+ * name and the one-line description are the locale keys `targetPriority.<id>.name` and `.desc`.
+ */
+export const TARGET_RULES = ['auto', 'adds', 'leader', 'weakest'] as const;
+export const targetPrioritySchema = z.strictObject({
+  id: coreId,
+  /** The setting a fight uses when none is chosen or the chosen one is gone; exactly one of the content has it. */
+  default: z.boolean().optional(),
+  rule: z.enum(TARGET_RULES),
+});
+
 // ---------- balance ----------
 
 const pair = z.tuple([z.number(), z.number()]);
@@ -1983,6 +2005,7 @@ export const contentDbSchema = z.object({
   traits: z.array(traitSchema),
   combos: z.array(comboSchema),
   cloneRoles: z.array(cloneRoleSchema),
+  targetPriorities: z.array(targetPrioritySchema),
   ai: aiSchema,
 });
 
@@ -2008,6 +2031,7 @@ export const generatedDbSchema = contentDbSchema
     traits: true,
     combos: true,
     cloneRoles: true,
+    targetPriorities: true,
     ai: true,
     team: true,
     skillGroups: true,
@@ -2110,6 +2134,8 @@ export type RoleEntity = z.infer<typeof roleSchema>;
 export type TraitEntity = z.infer<typeof traitSchema>;
 export type Combo = z.infer<typeof comboSchema>;
 export type CloneRole = z.infer<typeof cloneRoleSchema>;
+export type TargetPriority = z.infer<typeof targetPrioritySchema>;
+export type TargetRule = (typeof TARGET_RULES)[number];
 export type AiTier = z.infer<typeof aiTierSchema>;
 export type AiData = z.infer<typeof aiSchema>;
 export type AiRuleId = (typeof AI_RULE_IDS)[number];
