@@ -81,12 +81,12 @@ describe('the preparation numbers', () => {
 
 describe('the balance overrides', () => {
   it('win over the imported value, and are the values the content carries', () => {
-    expect(Object.keys(BALANCE_OVERRIDE)).toEqual(['zoneHpRegen']);
+    expect(Object.keys(BALANCE_OVERRIDE)).toEqual([]);
     for (const [key, value] of Object.entries(BALANCE_OVERRIDE)) {
       expect((K as unknown as Record<string, unknown>)[key], key).toBe(value);
     }
     // The documented value is lower: the override is what makes the difference.
-    expect(withOverrides({ zoneHpRegen: 0.35 }, BALANCE_OVERRIDE).zoneHpRegen).toBe(0.8);
+    expect(withOverrides({ zoneHpRegen: 0.35 }, { zoneHpRegen: 0.8 }).zoneHpRegen).toBe(0.8);
   });
 
   it('fail for a key that is not a parameter, so a typo cannot shadow nothing', () => {

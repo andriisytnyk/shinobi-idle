@@ -97,6 +97,8 @@ export interface CloneBody {
   mastery: Record<string, { skill: string; amount: number; pool: number }>;
   /** Insights and Enlightenments the clone's meditation earned, by practice; the character gets them when the clone is dispelled. */
   insight?: Record<string, { insight: number; enlight: number }>;
+  /** The clone's health: it starts full, carries over between its fights and regenerates like the character's. */
+  hp: number;
   /** The fight the clone fights, if its action holds one (the character's is `GameState.combat`). */
   fight: CombatState | null;
   /** Set when the clone is to be dispelled at the end of this moment (it fell in a fight). */
@@ -118,7 +120,8 @@ export interface GameState {
   /** Game time in whole milliseconds. */
   now: number;
   rng: RngStreams;
-  player: { name: string; rank: Rank; natures: NatureId[] };
+  /** The character; `hp` is its health, which carries over between fights and actions (see `combat/vitality.ts`). */
+  player: { name: string; rank: Rank; natures: NatureId[]; hp: number };
   skills: Record<SkillId, { xp: number }>;
   /** Keyed by mastery id. */
   mastery: Record<string, { xp: number }>;
@@ -181,7 +184,7 @@ export interface GameState {
   events: GameEvent[];
 }
 
-export const STATE_VERSION = 21;
+export const STATE_VERSION = 22;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
@@ -200,7 +203,13 @@ export function createState(seed: number, content: ContentDb): GameState {
     dormant: {},
     now: 0,
     rng: createStreams(seed),
-    player: { name: '', rank: content.playerRanks[0]?.id ?? '', natures: [] },
+    // A new character is at full health: Vitality 1, no Wounds.
+    player: {
+      name: '',
+      rank: content.playerRanks[0]?.id ?? '',
+      natures: [],
+      hp: content.balance.K.hpBase + content.balance.K.hpPerVit,
+    },
     skills,
     mastery: {},
     pools,

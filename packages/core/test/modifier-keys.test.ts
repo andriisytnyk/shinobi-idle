@@ -202,6 +202,21 @@ describe('A4: each wired key changes its mechanic by exactly the modifier', () =
         defaultRules.actionKinds.practice?.intervalMs(s, 'core:clone', content, defaultRules) ?? 0;
       expect(fast).toBe(Math.round(plain / 1.02));
     },
+    'hp.regen': () => {
+      // A flat key: +0.5 is half a point of health more every second, out of a fight.
+      const gained = (rules: Rules): number => {
+        const s = genin();
+        s.player.hp = 10;
+        advance(s, 40_000, content, rules);
+        return s.player.hp - 10;
+      };
+      const [base, perLevel] = K.hpRegen;
+      expect(gained(plainRules)).toBeCloseTo(40 * ((base ?? 0) + (perLevel ?? 0)), 5);
+      expect(gained(withProvider(test('hp.regen', 0.5)))).toBeCloseTo(
+        gained(plainRules) + 40 * 0.5,
+        5,
+      );
+    },
     'cost.chakra': () => {
       const s = genin();
       const tech = content.techniques.find(

@@ -59,6 +59,7 @@ import { refreshUnlocks } from './unlocks.ts';
 import { FATIGUE_UNIT } from './clone-life.ts';
 import { STAND_ID, STAND_KIND, asPerformer } from './performer.ts';
 import { playerMaxChakra } from './combat/stats.ts';
+import { performerMaxHp, setPerformerHp } from './combat/vitality.ts';
 import {
   villageBuildCost,
   civilCap,
@@ -420,6 +421,10 @@ export const MIGRATIONS: readonly Migration[] = [
     const loadouts = isRecord(state.loadouts) ? state.loadouts : {};
     return { ...state, loadouts: { ...loadouts, cloneRole: null } };
   },
+  // v21 -> v22: health became the performer's own state (it carries over between fights and regenerates). The
+  // fields are not written here: a save without `player.hp` or a clone's `hp` is read as full health, the maximum
+  // of the character's Vitality and Wounds, which is what every performer had at the start of a fight before.
+  (state) => state,
 ];
 
 /** Deepest nesting a slot's data may have. */
@@ -631,6 +636,8 @@ function sanitizeClones(raw: unknown, state: GameState, content: ContentDb): Gam
       purse,
       pouch: sanitizePouch(v.pouch, content),
       xp: pick(v.xp, (skill, n) => (index.skills.has(skill) && held(n) > 0 ? held(n) : undefined)),
+      // A body without health (an older save) is at full health: the maximum is applied once the Wounds are read.
+      hp: typeof v.hp === 'number' && Number.isFinite(v.hp) ? Math.max(0, v.hp) : Infinity,
       mastery: pick(v.mastery, (mkey, m) => {
         if (!index.masteryKeys.has(mkey) || !isRecord(m) || !index.skills.has(String(m.skill)))
           return undefined;
@@ -1213,6 +1220,14 @@ export function deserialize(
   for (const body of Object.values(state.clones)) {
     if (!(body.max > 0)) body.max = playerMaxChakra(state, content);
   }
+  // Health: a saved number within [0, maximum]; none (an older save, or doctored) is full health.
+  const fullHp = performerMaxHp(state, content);
+  const savedHp = isRecord(raw.player) ? raw.player.hp : undefined;
+  state.player.hp =
+    typeof savedHp === 'number' && Number.isFinite(savedHp)
+      ? Math.min(fullHp, Math.max(0, savedHp))
+      : fullHp;
+  for (const body of Object.values(state.clones)) body.hp = Math.min(fullHp, body.hp);
   // A figure belongs to a clone that works: one of a slot that is gone or idle is not on the map.
   for (const slot of Object.keys(state.world.figures ?? {}))
     if (!state.slots[Number(slot)]?.action) removeFigure(state, Number(slot));
@@ -1238,6 +1253,10 @@ export function deserialize(
       // A mission keeps its fight in the same place; the mission checks it against its run below.
       const stand = action.kind === MISSION_KIND ? { kind: FIGHT_KIND, id: action.id } : action;
       state.combat = sanitizeCombat(saved, stand, i, content);
+      // A fight in progress has the live health; the state is brought to it (a save of an older version kept none).
+      if (state.combat?.phase === 'fight') {
+        setPerformerHp(state, state.combat.fight.player.hp, content);
+      }
       if (state.combat) return;
       // A plain fight or an operation whose state is lost starts afresh (an operation from the step of its run).
       if (action.kind === FIGHT_KIND) {

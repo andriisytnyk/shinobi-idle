@@ -58,6 +58,7 @@ import {
   accuracyTierTerm,
   basicAttackOf,
   chakraRegenOf,
+  hpRegenOf,
   enemyStats,
   evasionOf,
   evasionParts,
@@ -354,6 +355,9 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
     med: snap.levels.med ?? 1,
     chakraRegen: chakraRegenOf(snap.levels, content),
     staminaRegen: staminaRegenOf(snap.levels, content),
+    hpRegen:
+      Math.max(0, hpRegenOf(snap.levels, content) + (snap.hpRegenBonus ?? 0)) *
+      K.combat.hpRegenShare,
     evasion: evasionParts(snap, content),
   };
   // The role of the clones. The default role copies the character's hand and leaves the kit as it always was.
@@ -2108,6 +2112,8 @@ function handle(ctx: FightCtx): void {
     const scale = K.combat.regenMs / TICK_MS;
     player.chakra = Math.min(player.maxChakra, player.chakra + fight.kit.chakraRegen * scale);
     player.stamina = Math.min(player.maxStamina, player.stamina + fight.kit.staminaRegen * scale);
+    // Health regenerates at the same steps, on the same per-second rate that runs outside the fight.
+    if (player.hp > 0) player.hp = Math.min(player.maxHp, player.hp + fight.kit.hpRegen * scale);
   }
 
   if (checkResult(fight)) return;

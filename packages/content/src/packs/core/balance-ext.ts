@@ -1,10 +1,7 @@
 /**
  * Values that win over the documented ones until the documents are updated.
  */
-export const BALANCE_OVERRIDE: Partial<Record<string, number>> = {
-  /** HP regained between the fights of a zone: with no healing item at all, grinding an enemy of the player's level for two hours needs this much (see sustained.test.ts). */
-  zoneHpRegen: 0.8,
-};
+export const BALANCE_OVERRIDE: Partial<Record<string, number>> = {};
 
 /**
  * Puts the overrides over `base`. A key that `base` does not have is a typo, not a new
@@ -42,6 +39,7 @@ export const BALANCE_EXT = {
   combat: {
     xpTickMs: 1000,
     regenMs: 1000,
+    hpRegenShare: 0.25,
     hitEven: 0.5,
     fightCapMs: 240000,
     maxEnemies: 8,

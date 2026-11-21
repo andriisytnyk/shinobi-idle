@@ -29,7 +29,7 @@ import { fightSim } from './fight-sim.ts';
 import type { Encounter, FightState } from './fight-types.ts';
 import { itemAnswers } from './fight-items.ts';
 import { answersTrait, planTarget } from './loadout.ts';
-import { secMs, type PlayerSnapshot } from './numbers.ts';
+import { hpRegenOf, secMs, type PlayerSnapshot } from './numbers.ts';
 import { snapshotPlayer } from './snapshot.ts';
 import { FIGHT_KIND, MISSION_KIND, OPERATION_KIND, isCombatKind } from './system.ts';
 import { STAND_ID, STAND_KIND } from '../performer.ts';
@@ -342,7 +342,11 @@ function runZone(
     seed,
     content,
     rules,
-    content.balance.K.zoneHpRegen,
+    {
+      share: content.balance.K.zoneHpRegen,
+      hpPerSecond: Math.max(0, hpRegenOf(snap.levels, content) + (snap.hpRegenBonus ?? 0)),
+      seconds: content.balance.K.respawn,
+    },
   );
   return {
     simulatedMs: () => sim.simulatedMs,
@@ -377,6 +381,7 @@ function runOperation(
   const rng = createStream(seed, 'analysis.pick');
   const total: Figures = { runs, wins: 0, allMs: 0, winMs: 0, wounds: 0, items: {} };
   const respawn = secMs(K.respawn);
+  const regenPerSecond = Math.max(0, hpRegenOf(snap.levels, content) + (snap.hpRegenBonus ?? 0));
   let played = 0;
   let simulatedMs = 0;
   const play = (r: number): void => {
@@ -429,7 +434,8 @@ function runOperation(
       pouch = fight.pouch.map((s) => ({ ...s }));
       const p = fight.player;
       pools = {
-        hp: Math.min(p.maxHp, p.hp + K[op.regen] * p.maxHp),
+        // The share the operation gives back, and what regenerates in the pause before the next step.
+        hp: Math.min(p.maxHp, p.hp + K[op.regen] * p.maxHp + regenPerSecond * K.respawn),
         chakra: Math.min(p.maxChakra, p.chakra + K[op.regen] * p.maxChakra),
         stamina: Math.min(p.maxStamina, p.stamina + K[op.regen] * p.maxStamina),
       };

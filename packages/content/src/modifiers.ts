@@ -98,6 +98,10 @@ export const CORE_MODIFIER_KEYS: Readonly<Table> = (() => {
   add('heal.food', 'HP restored by salves and food');
   add('wound.heal', 'Time to heal Wounds (-0.05 is 5% shorter)', { wired: true });
   add('wound.heal.gates', 'Time to heal Wounds taken from the Gates');
+  add('hp.regen', 'Health regenerated per second, in HP (0.1 is one more HP every ten seconds)', {
+    flat: true,
+    wired: true,
+  });
   add('pool.hp', 'Size of the HP pool');
   add('pool.chakra', 'Size of the chakra pool');
   add('pool.stamina', 'Size of the stamina pool');

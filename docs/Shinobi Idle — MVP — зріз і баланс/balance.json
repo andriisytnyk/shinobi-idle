@@ -261,7 +261,12 @@
    8,
    0.4
   ],
-  "zoneHpRegen": 0.8,
+  "zoneHpRegen": 0,
+  "hpRegen": [
+   0.06,
+   0.018
+  ],
+  "defeatHp": 0.2,
   "opRegen": 0.25,
   "respawn": 3,
   "wound": {

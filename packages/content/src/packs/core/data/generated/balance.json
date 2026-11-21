@@ -370,7 +370,12 @@
       8,
       0.4
     ],
-    "zoneHpRegen": 0.8,
+    "zoneHpRegen": 0,
+    "hpRegen": [
+      0.06,
+      0.018
+    ],
+    "defeatHp": 0.2,
     "opRegen": 0.25,
     "respawn": 3,
     "wound": {
@@ -630,6 +635,7 @@
     "combat": {
       "xpTickMs": 1000,
       "regenMs": 1000,
+      "hpRegenShare": 0.25,
       "hitEven": 0.5,
       "fightCapMs": 240000,
       "maxEnemies": 8,

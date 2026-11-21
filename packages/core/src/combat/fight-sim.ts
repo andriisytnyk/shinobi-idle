@@ -34,6 +34,14 @@ export interface FightSummary {
   };
 }
 
+/** What happens between two fights of a zone: a lump share of the maximum health, and the regeneration over the pause. */
+export interface BetweenFights {
+  share: number;
+  hpPerSecond: number;
+  /** The length of the pause between two fights, in seconds. */
+  seconds: number;
+}
+
 /** The seed of fight `i` of a run, drawn from its own stream so fights are independent. */
 function fightSeed(seed: number, i: number): number {
   return nextUint32(createStream(seed, `sim.${i}`));
@@ -64,8 +72,9 @@ export interface FightSim {
 /**
  * Runs `n` fights of the player against the enemy and aggregates them. Every fight has its own
  * seed derived from `seed`. Reads its arguments only; no game state, no shared mutable state.
- * With `regen` the fights follow one another as in a zone: a won fight is followed by one that
- * starts with the health that is left plus that share of the maximum, a lost one by a fresh start.
+ * With `between` the fights follow one another as in a zone: a won fight is followed by one that
+ * starts with the health that is left plus what regenerates in the pause (`hpPerSecond` over `seconds`)
+ * and a lump `share` of the maximum (0 in the data), a lost one by a fresh start from `snap`.
  */
 export function simulateFights(
   snap: PlayerSnapshot,
@@ -74,9 +83,9 @@ export function simulateFights(
   seed: number,
   content: ContentDb,
   rules: FightRules,
-  regen?: number,
+  between?: BetweenFights,
 ): FightSummary {
-  const sim = fightSim(snap, encounter, n, seed, content, rules, regen);
+  const sim = fightSim(snap, encounter, n, seed, content, rules, between);
   sim.step(n);
   return sim.summary();
 }
@@ -89,7 +98,7 @@ export function fightSim(
   seed: number,
   content: ContentDb,
   rules: FightRules,
-  regen?: number,
+  between?: BetweenFights,
 ): FightSim {
   let carried: number | undefined;
   const times: number[] = [];
@@ -141,8 +150,13 @@ export function fightSim(
       n;
     // A zone fight that follows a win starts with the health left and a share more; any other starts fresh.
     carried =
-      won && regen !== undefined
-        ? Math.min(fight.player.maxHp, fight.player.hp + regen * fight.player.maxHp)
+      won && between !== undefined
+        ? Math.min(
+            fight.player.maxHp,
+            fight.player.hp +
+              between.share * fight.player.maxHp +
+              between.hpPerSecond * between.seconds,
+          )
         : undefined;
     if (!won) return;
     times.push(fightTimeMs(fight));
