@@ -1087,6 +1087,8 @@ export const questSchema = z.strictObject({
   chain: coreId,
   /** When the chain starts; `null` means from the first moment. */
   unlock: reqSchema.nullable(),
+  /** A chain of the main story: the goal panel always shows its active step and it cannot be unpinned. */
+  main: z.boolean().optional(),
   steps: z.array(questStepSchema).min(1),
   rewards: questRewardsSchema,
 });

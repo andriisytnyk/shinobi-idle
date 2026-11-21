@@ -1,20 +1,17 @@
 <script lang="ts">
-  import { evalReq, natureStatus } from '@shinobi/core';
-  import { webRef } from '../lib/entities.ts';
+  import { natureStatus } from '@shinobi/core';
   import { senseiTestInfo } from '../lib/exam-test.ts';
   import { formatDuration } from '../lib/format.ts';
-  import { goalTree, suggestGoal } from '../lib/goal.ts';
-  import { entityAttr, revealHintKey, revealLevel } from '../lib/reveal.ts';
+  import { suggestGoal } from '../lib/goal.ts';
   import { t } from '../lib/i18n.ts';
-  import { nextStep } from '../lib/next-step.ts';
+  import { activeSteps } from '../lib/next-step.ts';
   import { game } from '../lib/store.ts';
   import Slot from '../lib/ext/Slot.svelte';
   import EntityLink from './EntityLink.svelte';
-  import GoalMissions from './GoalMissions.svelte';
+  import GoalItem from './GoalItem.svelte';
   import Hint from './Hint.svelte';
   import NatureOffer from './NatureOffer.svelte';
-  import NextStepCard from './NextStepCard.svelte';
-  import ReqTree from './ReqTree.svelte';
+  import QuestStepCard from './QuestStepCard.svelte';
 
   const content = game.content;
 
@@ -25,27 +22,23 @@
   let { onClose }: Props = $props();
 
   const wait = $derived(game.read((gs) => senseiTestInfo(gs, game.rules, content)));
-  const goal = $derived(game.read((gs) => gs.goal));
-  const goalRef = $derived(webRef(goal));
-  /** A pinned goal that is hidden shows as a bare row with its hint. What opens something is no spoiler, so a goal shown by name keeps its tree. */
-  const goalFull = $derived(goalRef === null || revealLevel(goalRef) !== 'hidden');
-  const goalHint = $derived(goalRef && !goalFull ? revealHintKey(goalRef) : null);
-  const result = $derived(
-    game.read((gs) => {
-      const req = goal ? goalTree(gs, goal, content, game.rules) : null;
-      return req ? evalReq(gs, req, content) : null;
-    }),
+  /** The goals the player pinned, in pin order. */
+  const goals = $derived(game.read((gs) => [...gs.goals]));
+  /** The active step of each chain of the main story: always shown, first, and never unpinned. */
+  const story = $derived(
+    game.read((gs) => activeSteps(gs, content).filter((s) => s.quest.main === true)),
   );
-  const quest = $derived(game.read((gs) => (goal ? null : nextStep(gs, content))));
-  /** With nothing pinned and no quest under way, the nearest technique is suggested. */
-  const suggestion = $derived(game.read((gs) => (goal || quest ? null : suggestGoal(gs, content))));
-  /** The quest card already leads to the nature test, so the test is offered separately only when it does not. */
+  /** With nothing pinned the nearest technique is suggested, below the story. */
+  const suggestion = $derived(
+    game.read((gs) => (gs.goals.length > 0 ? null : suggestGoal(gs, content))),
+  );
+  /** A story card already leads to the nature test, so the test is offered separately only when none does. */
   const offerNature = $derived(
-    game.read((gs) => !(quest && natureStatus(gs, content).stage === 'test')),
+    game.read((gs) => !(story.length > 0 && natureStatus(gs, content).stage === 'test')),
   );
 
   function pinSuggestion(): void {
-    if (suggestion) game.dispatch({ type: 'goal.set', ref: { kind: 'technique', id: suggestion } });
+    if (suggestion) game.dispatch({ type: 'goal.pin', ref: { kind: 'technique', id: suggestion } });
   }
 </script>
 
@@ -65,41 +58,24 @@
     </p>
   {/if}
 
-  {#if goal}
-    <div class="tree" data-goal>
-      {#if !goalFull && goalRef}
-        <p class="target" data-ui="goal-row" data-goal-unrevealed>
-          <EntityLink kind={goalRef.kind} id={goalRef.id} />
-          {#if goalHint}<span class="hint">{t(goalHint)}</span>{/if}
-        </p>
-      {:else}
-        {#if goal.kind === 'mission'}
-          <p
-            class="target"
-            data-goal-mission
-            data-entity={entityAttr({ kind: 'mission', id: goal.id })}
-          >
-            <EntityLink kind="mission" id={goal.id} />
-          </p>
-        {/if}
-        {#if result}
-          <ReqTree node={result} part="goal-row" />
-        {:else if goalRef}
-          <p class="target" data-ui="goal-row" data-entity={entityAttr(goalRef)}>
-            <EntityLink kind={goalRef.kind} id={goalRef.id} />
-          </p>
-        {/if}
-      {/if}
-    </div>
-    {#if goalFull && goal.kind === 'item'}<GoalMissions item={goal.id} />{/if}
-    {#if goalFull && result?.met}<p class="done">{t('meta.done')}</p>{/if}
-    <button type="button" class="unpin" onclick={() => game.dispatch({ type: 'goal.clear' })}>
-      {t('meta.unpin')}
-    </button>
-  {:else if quest}
-    <div data-suggestion="quest"><NextStepCard /></div>
+  {#if story.length > 0}
+    <section class="story" data-story aria-label={t('meta.story')}>
+      <h3>{t('meta.story')}</h3>
+      {#each story as step (step.quest.id)}
+        <QuestStepCard {step} />
+      {/each}
+    </section>
+  {/if}
+
+  {#if goals.length > 0}
+    <section class="pinned" data-pinned-goals aria-label={t('meta.pinned')}>
+      <h3>{t('meta.pinned')}</h3>
+      {#each goals as goal (`${goal.kind}:${goal.id}`)}
+        <GoalItem {goal} />
+      {/each}
+    </section>
   {:else}
-    <p class="empty">{t('meta.empty')}</p>
+    {#if story.length === 0}<p class="empty">{t('meta.empty')}</p>{/if}
     {#if suggestion}
       <div class="suggest" data-suggestion>
         <p>{t('meta.suggest')}</p>
@@ -149,6 +125,25 @@
     font-weight: 400;
   }
 
+  h3 {
+    margin: 0 0 var(--space-2);
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .story {
+    display: grid;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+
+  .pinned {
+    display: grid;
+    gap: var(--space-3);
+  }
+
   .empty {
     margin: 0 0 var(--space-3);
     color: var(--fg-dim);
@@ -162,12 +157,6 @@
     font-weight: 600;
   }
 
-  .done {
-    margin: var(--space-2) 0;
-    color: var(--success);
-    font-weight: 600;
-  }
-
   .suggest {
     padding: var(--space-3);
     border: var(--border-thin) dashed var(--line);
@@ -178,19 +167,12 @@
     margin: 0 0 var(--space-2);
   }
 
-  .hint {
-    margin-left: var(--space-2);
-    color: var(--fg-dim);
-    font-size: var(--text-xs);
-  }
-
   .target :global(a) {
     color: var(--accent);
     font-weight: 600;
   }
 
-  .pin,
-  .unpin {
+  .pin {
     min-height: var(--control-md);
     margin-top: var(--space-3);
     padding: var(--space-1) var(--space-3);

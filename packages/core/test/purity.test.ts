@@ -39,7 +39,8 @@ describe('A9: core source hygiene', () => {
       'hex.ts': [6], // the six sides of a hex, the widest coordinate in a hex key
       'save.ts': [4, 6, 200, 1500, 2000], // four words of an rng stream; nesting depth of slot data; the longest id of a clone role a save may hold; the pool capacities per item of versions 17 and 18 (the v17 -> v18 migration)
       'combat/report.ts': [1000, 100, 64], // three decimals of a multiplier, percent of a pool, longest id read from a save
-      'state.ts': [1000, 4, 22], // share scale, rng words, save version
+      'state.ts': [1000, 4, 23], // share scale, rng words, save version
+      'goal.ts': [5], // the most goals pinned at once: a limit of the panel, not game balance
       'clone-life.ts': [1000], // fatigue is kept in thousandths of a ms
       'reveal.ts': [64], // most refs one mark carries
       'shown.ts': [4000], // ceiling of the shown set for writes that do not know the content

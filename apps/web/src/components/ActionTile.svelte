@@ -85,7 +85,7 @@
         <h3 class="name"><EntityLink kind={ref.kind} id={ref.id} /></h3>
         <span class="corner">
           <PerformerMarks kind={info.kind} id={info.id} />
-          {#if canPin(ref.kind)}<PinGoal
+          {#if canPin(ref.kind, content)}<PinGoal
               kind={ref.kind}
               id={ref.id}
               always={!info.available}

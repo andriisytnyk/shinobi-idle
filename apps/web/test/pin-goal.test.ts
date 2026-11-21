@@ -61,7 +61,7 @@ async function pinAndUnpin(hash: string, ref: string, shownInPanel: string): Pro
   pin?.click();
   flush();
   const [kind, ...rest] = ref.split(':');
-  expect(game.state.goal).toEqual({ kind, id: rest.join(':') });
+  expect(game.state.goals).toEqual([{ kind, id: rest.join(':') }]);
   expect(pinOf(root, ref)?.getAttribute('aria-label')).toBe(UNPIN);
   expect(pinOf(root, ref)?.dataset.pinned).toBe('true');
   const panel = goalPanel();
@@ -69,7 +69,7 @@ async function pinAndUnpin(hash: string, ref: string, shownInPanel: string): Pro
   expect(panel?.querySelector(`[data-entity="${shownInPanel}"]`), shownInPanel).not.toBeNull();
   pinOf(root, ref)?.click();
   flush();
-  expect(game.state.goal).toBeNull();
+  expect(game.state.goals).toEqual([]);
   expect(pinOf(root, ref)?.getAttribute('aria-label')).toBe(PIN);
 }
 
@@ -118,7 +118,7 @@ describe('the pin on a tile', () => {
     expect(pin).not.toBeNull();
     pin?.click();
     flush();
-    expect(game.state.goal).toEqual({ kind: 'practice', id: practice.id });
+    expect(game.state.goals).toEqual([{ kind: 'practice', id: practice.id }]);
     expect(goalPanel()?.querySelector('[data-goal]')).not.toBeNull();
   });
 
@@ -133,11 +133,11 @@ describe('the pin on a tile', () => {
     expect(pin?.getAttribute('aria-label')).toBe(PIN);
     pin?.click();
     flush();
-    expect(game.state.goal).not.toBeNull();
+    expect(game.state.goals.length).toBe(1);
     expect(pin?.dataset.pinned).toBe('true');
   });
 
-  it('pinning another entity replaces the goal; the first pin shows unpinned again', async () => {
+  it('pinning another entity adds it to the goals; both show pinned, and each lets go on its own', async () => {
     const { skill } = skillWith('practice');
     booted = await bootApp([coreUi], fresh(), `#/skill/${skill}`);
     const pins = [
@@ -150,9 +150,16 @@ describe('the pin on a tile', () => {
     flush();
     pins[1]?.click();
     flush();
-    expect(game.state.goal?.id).toBe(pins[1]?.dataset.entity?.split(/:(.+)/)[1]);
+    expect(game.state.goals.map((g) => g.id)).toEqual(
+      pins.slice(0, 2).map((p) => p.dataset.entity?.split(/:(.+)/)[1]),
+    );
+    expect(pins[0]?.dataset.pinned).toBe('true');
+    expect(pins[1]?.dataset.pinned).toBe('true');
+    pins[0]?.click();
+    flush();
     expect(pins[0]?.dataset.pinned).toBe('false');
     expect(pins[1]?.dataset.pinned).toBe('true');
+    expect(game.state.goals).toHaveLength(1);
   });
 
   it('is a button that the keyboard reaches, with a visible focus ring', async () => {
@@ -183,7 +190,7 @@ describe('the pin on a tile', () => {
     expect(pins[0]!.getAttribute('aria-label')).toBe(PIN);
     pins[0]!.click();
     flush();
-    expect(game.state.goal).not.toBeNull();
+    expect(game.state.goals.length).toBe(1);
   });
 
   it('is on the technique page next to the header and under the requirements', async () => {

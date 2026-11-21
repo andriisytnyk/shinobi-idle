@@ -128,7 +128,7 @@ describe('one round trip per place', () => {
       ],
       medic: null,
     },
-    goal: { kind: 'item', id: ghost('item') },
+    goals: [{ kind: 'item', id: ghost('item') }],
   });
 
   it('empties every place of the pack and keeps the rest', () => {
@@ -151,7 +151,7 @@ describe('one round trip per place', () => {
     expect(out.bank).toEqual({ 'core:bun': 2 });
     expect((out.loadouts as Raw).active).toEqual(['core:a', 'core:b']);
     expect((out.pouch as { slots: unknown[] }).slots[1]).toEqual({ id: '', n: 0 });
-    expect(out.goal).toBeNull();
+    expect(out.goals).toEqual([]);
     expect((out.loadouts as Raw).signature).toBeNull();
     expect((out.loadouts as Raw).cloneRole).toBeNull();
   });
@@ -187,7 +187,7 @@ describe('one round trip per place', () => {
           skills: { tai: { xp: 999 }, 'ghost:s': { xp: 1 }, 'other:s': { xp: 5 } },
           bank: { 'core:bun': 999, 'ghost:item': 1 },
           course: { '1': 'core:obstacle', '3': 'ghost:o' },
-          goal: { '0': { kind: 'item', id: 'core:bun' } },
+          goals: { '0': { kind: 'item', id: 'core:bun' } },
           'loadouts.active': { '0': 'core:a', '1': 'ghost:x' },
           pouch: { '0': { id: 'core:bun', n: 50 } },
         },
@@ -197,7 +197,7 @@ describe('one round trip per place', () => {
       skills: { tai: { xp: 1 } },
       bank: { 'core:bun': 1 },
       course: {},
-      goal: null,
+      goals: [],
       loadouts: { active: [] },
       pouch: { slots: [{ id: '', n: 0 }] },
     };
@@ -205,7 +205,7 @@ describe('one round trip per place', () => {
     expect(back.skills).toEqual({ tai: { xp: 1 }, 'ghost:s': { xp: 1 } });
     expect(back.bank).toEqual({ 'core:bun': 1, 'ghost:item': 1 });
     expect(back.course).toEqual({ '3': 'ghost:o' });
-    expect(back.goal).toBeNull();
+    expect(back.goals).toEqual([]);
     expect((back.loadouts as Raw).active).toEqual(['ghost:x']);
     expect((back.pouch as { slots: unknown[] }).slots[0]).toEqual({ id: '', n: 0 });
   });
@@ -232,5 +232,38 @@ describe('the pouch of a player who loses a pack', () => {
     expect(units).toBe(10);
     expect(back.pouch.slots[0]?.id).toBe('testmod:elixir');
     void setSkill;
+  });
+});
+
+describe('a pinned goal of a pack that comes back', () => {
+  const mod = { kind: 'item', id: 'testmod:elixir' };
+  const own = (n: number) => ({ kind: 'technique', id: `core:t${n}` });
+
+  it('goes back where there is room, and never pushes out a goal pinned meanwhile', () => {
+    const dormant: Record<string, DormantPack> = {
+      testmod: { version: '1', rank: null, natures: [], data: { goals: { '0': mod } } },
+    };
+    const full = { goals: [own(1), own(2), own(3), own(4), own(5)] };
+    const back = restoreDormant(full, modContent, dormant);
+    expect(back.raw.goals).toEqual(full.goals);
+    // It stays dormant and comes back once there is room.
+    expect(dormant.testmod?.data.goals).toEqual({ '0': mod });
+    const room = restoreDormant({ goals: [own(1)] }, modContent, dormant);
+    expect(room.raw.goals).toEqual([mod, own(1)]);
+    expect(dormant.testmod).toBeUndefined();
+  });
+
+  it('is kept through a save with a full list', () => {
+    const state = modGenin();
+    state.goals = [{ kind: 'item', id: 'testmod:elixir' }];
+    const away = deserialize(serialize(state), plainContent, plainRules);
+    expect(away.goals).toEqual([]);
+    for (const tech of plainContent.techniques.slice(0, 5)) {
+      away.goals.push({ kind: 'technique', id: tech.id });
+    }
+    expect(away.goals).toHaveLength(5);
+    const back = deserialize(serialize(away), modContent, modRules);
+    expect(back.goals.map((g) => g.id)).toEqual(away.goals.map((g) => g.id));
+    expect(back.dormant.testmod?.data.goals).toBeDefined();
   });
 });
