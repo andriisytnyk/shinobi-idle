@@ -260,6 +260,7 @@ describe('F1: what an action did stays under its fighter', () => {
 describe('F1: the outcomes that fly off a body', () => {
   const scene = (p: FighterView, enemies: FighterView[], allies: FighterView[] = []): Scene => ({
     slot: 0,
+    hand: [],
     phase: 'fight',
     player: p,
     allies,
@@ -415,6 +416,7 @@ describe('the battle log names the body acting', () => {
 describe('F1-fix1: the body the player is aiming at', () => {
   const scene = (p: FighterView, enemies: FighterView[]): Scene => ({
     slot: 0,
+    hand: [],
     phase: 'fight',
     player: p,
     allies: [],

@@ -1186,6 +1186,37 @@ export function pickTarget(
 
 // ---------- the player's side ----------
 
+/** One technique of a hand as a screen reads it: what it costs and why it may not be cast now. */
+export interface HandSlot {
+  id: string;
+  skill: string;
+  pool: 'chakra' | 'stamina';
+  cost: number;
+  /** Fight work units until it is off cooldown; 0 when it is. */
+  cooldownLeft: number;
+  cooldownMs: number;
+  affordable: boolean;
+  stanceOk: boolean;
+  /** False when the fight no longer lets it be cast (a summon at its limit). */
+  castable: boolean;
+}
+
+/** The hand of the body `actor` (its techniques in hand order) with the reasons each may wait; reads the fight, changes nothing. */
+export function handStatus(fight: FightState, actor: Combatant): HandSlot[] {
+  const stance = activeStance(actor);
+  return handOf(fight, actor).map((tech) => ({
+    id: tech.id,
+    skill: tech.skill,
+    pool: tech.pool,
+    cost: tech.cost,
+    cooldownLeft: Math.max(0, (actor.cd[tech.id] ?? 0) - fight.t),
+    cooldownMs: tech.cooldownMs,
+    affordable: (tech.pool === 'chakra' ? actor.chakra : actor.stamina) >= tech.cost,
+    stanceOk: !tech.requiresStance || stance !== null,
+    castable: castable(fight, tech),
+  }));
+}
+
 const viewEffects = (fight: FightState, c: Combatant): ViewEffect[] =>
   c.effects.map((e) => ({
     id: e.id,
