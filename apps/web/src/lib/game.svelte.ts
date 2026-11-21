@@ -51,6 +51,7 @@ import { createTelemetry, type TelemetryFile } from './telemetry.ts';
 import { setRevealReader, type RevealReader } from './reveal.ts';
 import type { TabLock } from './tab-lock.ts';
 import { lineSlot, trimLog } from './battle-log.ts';
+import { missionView, trainedSkills } from './missions.ts';
 import { packsToasts, toastFor, toasts as defaultToasts } from './toasts.svelte.ts';
 
 /** How often the game loop runs. */
@@ -316,6 +317,15 @@ export function createGame(deps: GameDeps = {}) {
         continue;
       if (event.type === 'packsChanged') for (const p of packsToasts(event)) toasts.push(p);
       const spec = toastFor(event, content);
+      // A finished mission names the skills it trained: the forecast's expected XP of one run (core's event does not carry the XP).
+      if (spec?.gains && event.type === 'missionDone') {
+        const mission = content.missions.find((m) => m.id === event.mission);
+        if (mission) {
+          const xp = trainedSkills(missionView(state, mission, content, rules).forecast);
+          if (xp.length > 0)
+            spec.gains.xpList = xp.map((x) => ({ skill: x.skill, amount: x.perRun }));
+        }
+      }
       if (spec) toasts.push(spec);
     }
     if (lines.length > 0) log = trimLog([...log, ...lines], LOG_LIMIT);

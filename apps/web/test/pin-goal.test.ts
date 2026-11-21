@@ -172,13 +172,16 @@ describe('the pin on a tile', () => {
     expect(app).toMatch(/:focus-visible\s*\{[^}]*outline:/);
   });
 
-  it('puts a caption link under the requirement tree of a locked tile', async () => {
+  it('gives a locked tile one pin control: the corner button, not a second caption link', async () => {
     booted = await bootApp([coreUi], fresh(), '#/skill/herb');
-    const locked = booted.target.querySelector('li[data-ui="action-tile"] .req');
-    expect(locked, 'a locked tile with a requirement tree').not.toBeNull();
-    const caption = locked?.querySelector<HTMLButtonElement>('button[data-ui="pin-goal"]');
-    expect(caption?.textContent?.trim()).toBe(PIN);
-    caption?.click();
+    const tile = [...booted.target.querySelectorAll('li[data-ui="action-tile"]')].find((li) =>
+      li.querySelector('.req, .ct-locked, [data-ui="req-row"]'),
+    );
+    expect(tile, 'a locked tile with a requirement tree').toBeDefined();
+    const pins = tile!.querySelectorAll<HTMLButtonElement>('button[data-ui="pin-goal"]');
+    expect(pins.length).toBe(1);
+    expect(pins[0]!.getAttribute('aria-label')).toBe(PIN);
+    pins[0]!.click();
     flush();
     expect(game.state.goal).not.toBeNull();
   });

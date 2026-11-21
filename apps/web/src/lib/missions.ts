@@ -262,3 +262,27 @@ export function hourChain(
   const runs = expectedMs > 0 ? MS_PER_HOUR / expectedMs : 0;
   return { base, total: combineParts(parts), perMission, runs, perHour: perMission * runs };
 }
+
+// ---------- the skills a mission trains ----------
+
+/** One skill a mission trains, with what core's forecast says it adds. */
+export interface TrainedSkill {
+  skill: string;
+  /** XP per hour of running the mission over and over. */
+  perHour: number;
+  /** XP of one expected run (the same figure over the run's expected length). */
+  perRun: number;
+}
+
+/** The skills a mission trains by the stages the character does itself, biggest first; empty while a stage has no way. Read from the forecast, nothing is worked out here. */
+export function trainedSkills(forecast: MissionForecast): TrainedSkill[] {
+  if (!forecast.doable) return [];
+  return Object.entries(forecast.xpPerHour)
+    .filter(([, perHour]) => perHour > 0)
+    .map(([skill, perHour]) => ({
+      skill,
+      perHour,
+      perRun: (perHour * forecast.expectedMs) / MS_PER_HOUR,
+    }))
+    .sort((a, b) => b.perHour - a.perHour);
+}
