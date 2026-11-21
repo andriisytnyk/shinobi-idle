@@ -701,6 +701,7 @@
   "shop.section.sell": "Продаж",
   "shop.section.gear": "Тренувальне спорядження",
   "shop.price": "Ціна за штуку — {currency}: {n}",
+  "shop.discount": "знижка −{pct}%",
   "shop.sellPrice": "Викуп за штуку — {currency}: {n}",
   "shop.owned": "У банку: {n}",
   "shop.qty": "Кількість",
