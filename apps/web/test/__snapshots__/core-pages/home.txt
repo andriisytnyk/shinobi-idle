@@ -27,6 +27,17 @@
             Intel
         <dd>
           0
+      <div class="stat hp primary" data-topbar-hp="" title="Здоров'я не повертається між боями саме: воно відновлюється поволі, їжею й пілюлями.">
+        <dt>
+          <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+            <path d="#150-1avmict" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+          <span class="label">
+            Здоров'я
+        <dd data-hp="">
+          <span class="hp-value" data-hp-value="">
+            98 / 98
+          <span class="hp-regen" data-hp-regen="">
+            +0,06/с
       <div class="stat rank primary">
         <dt>
           <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">

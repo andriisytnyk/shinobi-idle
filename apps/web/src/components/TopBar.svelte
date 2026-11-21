@@ -56,7 +56,7 @@
         <dd>{numbers.format(held(game.state, currency.id))}</dd>
       </div>
     {/each}
-    <div class="stat hp primary" data-ui="topbar-hp" title={t('vitals.title')}>
+    <div class="stat hp primary" data-topbar-hp title={t('vitals.title')}>
       <dt>
         <Icon name="lucide:heart" size={16} /><span class="label">{t('vitals.hp')}</span>
       </dt>
