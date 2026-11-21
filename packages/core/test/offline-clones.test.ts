@@ -175,7 +175,9 @@ describe('A11: speed with clones', () => {
   speedIt(
     'plays 12 h of a fight with a clone that practises beside it as fast as the fight alone',
     () => {
-      beside('practising', 1.6);
+      // 1.6 until #173: shorter rank E and D cooldowns made the fight alone cheaper, and CI measured the
+      // clone that practises beside it at 1.65-1.68 of it in three runs (0.36-0.77 s for 12 h, far below CAP).
+      beside('practising', 1.8);
     },
   );
 
