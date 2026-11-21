@@ -50,6 +50,11 @@ export function setPerformerHp(state: GameState, hp: number, content: ContentDb)
   holder(state).hp = Math.min(performerMaxHp(state, content), Math.max(0, hp));
 }
 
+/** Writes the live health of the fight in progress to the state, as it is (the fight keeps it within its own maximum): the cheap path of every fight step. */
+export function keepPerformerHp(state: GameState, hp: number): void {
+  holder(state).hp = Math.max(0, hp);
+}
+
 /**
  * The health of the performer of `slot` right now, and the most it can be: what a fight in progress has, or what is
  * stored (the regeneration that has run since the last event is already counted). The state is read, not changed.
@@ -74,22 +79,15 @@ export function regenerated(hp: number, perSecond: number, ms: number, max: numb
   return Math.min(max, units / HP_UNIT);
 }
 
+/** Regenerates the performer being computed (a clone inside asPerformer), max being the maximum now. */
 function regenOf(
   state: GameState,
-  slot: number,
   dt: number,
   content: ContentDb,
   rules: Rules,
+  max: number,
 ): void {
-  const fight = fightOf(state, slot);
-  // The live number of a fight in progress is the fight's: it regenerates on the fight's own steps.
-  if (fight?.phase === 'fight') return;
-  const max = performerMaxHp(state, content);
   const own = holder(state);
-  if (own.hp >= max) {
-    own.hp = max;
-    return;
-  }
   own.hp = regenerated(own.hp, performerHpRegen(state, content, rules), dt, max);
 }
 
@@ -101,11 +99,20 @@ export const vitalitySystem: System = {
   nextEventIn: () => null,
 
   elapse(state, dt, content, rules) {
-    regenOf(state, 0, dt, content, rules);
+    const max = performerMaxHp(state, content);
+    // A performer already at full health (the common case) costs a comparison; one in a fight regenerates on the fight's own steps.
+    const needs = (hp: number, slot: number): boolean =>
+      hp < max && fightOf(state, slot)?.phase !== 'fight';
+    const { player } = state;
+    if (player.hp > max) player.hp = max;
+    if (needs(player.hp, 0)) regenOf(state, dt, content, rules, max);
     for (const key of Object.keys(state.clones)) {
       const slot = Number(key);
-      if (state.clones[slot]) {
-        asPerformer(state, slot, () => regenOf(state, slot, dt, content, rules));
+      const body = state.clones[slot];
+      if (!body) continue;
+      if (body.hp > max) body.hp = max;
+      if (needs(body.hp, slot)) {
+        asPerformer(state, slot, () => regenOf(state, dt, content, rules, max));
       }
     }
   },

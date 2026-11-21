@@ -37,7 +37,7 @@ import {
 import { CHAKRA_DIVISOR_KEY, secMs } from './numbers.ts';
 import { ensurePouch, refillPouch, syncPouch } from './pouch.ts';
 import { snapshotPlayer } from './snapshot.ts';
-import { performerHp, setPerformerHp } from './vitality.ts';
+import { keepPerformerHp, performerHp, setPerformerHp } from './vitality.ts';
 import type { CombatState, RunState } from './types.ts';
 import { WORK_PER_MS, workOf } from './units.ts';
 import { addWounds, shortenWounds } from './wounds.ts';
@@ -575,7 +575,7 @@ function runFight(state: GameState, index: number, content: ContentDb, rules: Ru
       }
       c.work = fightAdvance(c.fight, c.work, content, rules);
       // The state keeps the health the fight has, so that whatever ends the fight leaves it where it is.
-      setPerformerHp(state, c.fight.player.hp, content);
+      keepPerformerHp(state, c.fight.player.hp);
       settle(state, c, content, rules, clone);
       const key = reportKey(state, index);
       recordItems(state, key, syncAndCount(state, c));
