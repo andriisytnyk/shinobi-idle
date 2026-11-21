@@ -197,7 +197,7 @@ export const BALANCE_EXT = {
    */
   bossFx: {
     /** The leader of the wolves calls `count` wolves back every `everyMs` while he lives; a wolf has `hp` and `dmg` of an ordinary enemy of the leader's level. */
-    wolfPack: { count: 4, everyMs: 20000, hp: 0.12, dmg: 0.05, leaderHp: 0.97, leaderDmg: 0.97 },
+    wolfPack: { count: 4, everyMs: 20000, hp: 0.12, dmg: 0.05, leaderHp: 1.0, leaderDmg: 1.0 },
     /** The rival casts `techniques` techniques of the nature that beats the player's, one every `everyMs` (each hits for `mult` x his damage), and a signature every `sigEveryMs` for `sigMult` x. */
     rivalDuel: {
       techniques: 1,
@@ -206,8 +206,8 @@ export const BALANCE_EXT = {
       sigEveryMs: 16000,
       sigMult: 0.3,
       sigOpenMs: 2000,
-      hp: 0.96,
-      dmg: 0.96,
+      hp: 1.04,
+      dmg: 1.04,
     },
     rivalTournament: {
       techniques: 2,
@@ -216,8 +216,8 @@ export const BALANCE_EXT = {
       sigEveryMs: 16000,
       sigMult: 0.3,
       sigOpenMs: 2000,
-      hp: 1.15,
-      dmg: 1.15,
+      hp: 1.07,
+      dmg: 1.07,
       habituationMult: 2,
     },
     drunkenEvasion: { maxMult: 2, hp: 1, dmg: 1 },
@@ -226,7 +226,7 @@ export const BALANCE_EXT = {
     /** Two bodies: each has `hpEach` of the boss health and `dmgEach` of its damage; while both live the mist poisons the player for `mistMult` x the poison strength. */
     twins: { count: 2, hpEach: 0.5, dmgEach: 0.5, mistMult: 1.6 },
     mistRehide: { everyMs: 25000, hp: 0.97, dmg: 0.95 },
-    illusion: { everyMs: 8000, fleeAtHp: 0.3, hp: 1.22, dmg: 1.22 },
+    illusion: { everyMs: 8000, fleeAtHp: 0.3, hp: 1.28, dmg: 1.28 },
   },
   /** Loadout: slots and distinct natures by rank (a student has no limit), and the number of saved loadouts. */
   loadout: {

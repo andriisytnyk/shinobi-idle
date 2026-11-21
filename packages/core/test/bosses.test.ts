@@ -130,6 +130,16 @@ describe('A9: bosses against a prepared player', () => {
         expect(dot(r.unfav).length, id).toBeGreaterThan(0);
         expect(dot(r.fav), id).toEqual([]);
         expect(r.full, id).toBeGreaterThanOrEqual(r.unfavourable - 0.15);
+      } else if (id === 'core:boss_hunter') {
+        // Moved by B6 (shorter cooldowns of ranks E and D): the Hunter's casts make the planner fill
+        // two slots with the Rank D interrupts of any nature (dynamic entry, shadow shuriken), and
+        // since they are cast every 3 s the wheel acts only on the one remaining slot. The
+        // favourable nature still wins, by at least 10 points instead of 20.
+        const loadout = (nature: NatureId) =>
+          playerFor(r.boss, nature, { prep: 'prepared', tier: TIER }).loadout ?? [];
+        const shared = loadout(r.fav).filter((tid) => loadout(r.unfav).includes(tid));
+        expect(shared.length, id).toBeGreaterThanOrEqual(2);
+        expect(r.full - r.unfavourable, id).toBeGreaterThanOrEqual(0.1);
       } else {
         expect(r.full - r.unfavourable, id).toBeGreaterThanOrEqual(0.2);
       }
