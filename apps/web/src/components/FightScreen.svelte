@@ -8,6 +8,7 @@
   import AllyRow from './AllyRow.svelte';
   import FightSwitcher from './FightSwitcher.svelte';
   import Fighter from './Fighter.svelte';
+  import FightHand from './FightHand.svelte';
 
   const content = game.content;
 
@@ -53,6 +54,7 @@
   <section class="arena" data-ui="fight-arena" data-phase={scene.phase}>
     <div class="side" data-side="player">
       <Fighter f={scene.player} outcomes={outcomes[scene.player.key] ?? []} {clone} />
+      <div class="hand-box"><FightHand hand={scene.hand} timing={scene.player.timing} /></div>
       {#if scene.allies.length > 0}
         <ul class="allies" data-ui="fight-allies" aria-label={t('fight.allies')}>
           {#each scene.allies as a (a.key)}
@@ -110,6 +112,10 @@
     list-style: none;
   }
 
+  .hand-box {
+    min-width: 0;
+  }
+
   .banner {
     margin: 0;
     padding: var(--space-2) var(--space-3);
@@ -156,6 +162,10 @@
     }
 
     .allies {
+      order: -3;
+    }
+
+    .hand-box {
       order: -3;
     }
   }
