@@ -70,7 +70,7 @@ export const hideout: Case = {
   name: 'the hideout operation',
   target: { kind: 'operation', id: 'core:op_hideout' },
   level: 50,
-  bank: Object.fromEntries(Object.keys(wellStocked(50)).map((id) => [id, 20 * K.pouchStack])),
+  bank: Object.fromEntries(Object.keys(wellStocked(50)).map((id) => [id, 200])),
   knows: ['core:guard_pack', 'core:boss_twins', 'core:boss_mist'],
   prepare: (s) => {
     unlock(s, 'op.hideout.unlocked');

@@ -1914,6 +1914,11 @@
       "core:role_support": "509521e2beea",
       "core:role_distract": "0881f23b9c30"
     },
+    "pouchKinds": {
+      "core:pk_food": "93c5284a83c3",
+      "core:pk_combat": "aeaf1ad0228a",
+      "core:pk_cure": "dbcb86d4fa47"
+    },
     "ai": {
       "ai": "33bc39cb9845"
     }
@@ -2155,7 +2160,6 @@
     "K.dodgeStamina": 2,
     "K.ccCostPerLevel": 0.0015,
     "K.pillAction": 0.5,
-    "K.pouchStack": 4,
     "K.pillAt": 0.45,
     "K.food": [
       [
@@ -2411,8 +2415,6 @@
     "K.loadout.areaBodies": 2,
     "K.signature.minMastery": 25,
     "K.signature.xpBonus": 0.1,
-    "K.pouch.slots": 3,
-    "K.pouch.vest": 1,
     "K.pouch.vestRank": "chunin",
     "K.ai.enemyTier.genin": 8,
     "K.ai.enemyTier.chunin": 35,
@@ -4610,6 +4612,11 @@
       "core:role_support",
       "core:role_distract"
     ],
+    "pouchKinds": [
+      "core:pk_food",
+      "core:pk_combat",
+      "core:pk_cure"
+    ],
     "ai": [
       "ai"
     ]
@@ -5870,10 +5877,6 @@
       "level.short": "a9bfad4aa7c2",
       "meta.title": "1deb015b0b7c",
       "meta.close": "1455299dece6",
-      "meta.pinFull": "9c932b1d0d8b",
-      "error.goalCap": "1e250f211414",
-      "quests.surveyed": "2f8cdf40cd64",
-      "toast.goalRefused": "c6c39a8318bc",
       "meta.story": "f52e129a0cb3",
       "meta.pinned": "a191251ecc13",
       "meta.empty": "38d83ea005f9",
@@ -5890,6 +5893,8 @@
       "meta.done": "4a1948f7a8e6",
       "meta.unpin": "a664bc8da39a",
       "meta.pin": "4ebbc2abd8f2",
+      "toast.goalRefused": "c6c39a8318bc",
+      "meta.pinFull": "9c932b1d0d8b",
       "meta.suggest": "8270aab13b5d",
       "hint.dismiss": "e454a2be6d72",
       "hint.skillPage": "85d4e93f4c1b",
@@ -6023,6 +6028,7 @@
       "technique.source": "4bb0e313401d",
       "technique.requirements": "4f0a5a0c27be",
       "technique.mastery": "1b1a5366fd47",
+      "technique.notKnown": "3884d1c86069",
       "technique.src.N": "a620877ee8d8",
       "technique.src.S": "4f0e72111faa",
       "technique.src.O": "078d83194422",
@@ -6261,6 +6267,7 @@
       "nav.pages": "75c6d1e5209c",
       "error.skillLocked": "8e3c5862d9fb",
       "error.invalidGoal": "a15f8eca8759",
+      "error.goalCap": "1e250f211414",
       "error.invalidName": "916cef9a2bfc",
       "error.missingIngredient": "2d2314954078",
       "error.tonicFull": "caaca06d8e74",
@@ -6424,6 +6431,7 @@
       "error.passiveTechnique": "4c7300bdcb07",
       "error.invalidLoadout": "aec8d7a11fe6",
       "error.itemInPouch": "a1e9a419961d",
+      "error.wrongSlotKind": "2394cebc4856",
       "error.noLoadoutYet": "2c7ce9146083",
       "error.noMedicPouch": "4ee17e708883",
       "error.noSuchLoadout": "289a7095a747",
@@ -6561,7 +6569,6 @@
       "shop.section.gear": "3dd36abc5c30",
       "shop.price": "677ab149cc4d",
       "shop.discount": "278c426c00c7",
-      "technique.notKnown": "3884d1c86069",
       "shop.sellPrice": "bb6f4e9f0717",
       "shop.owned": "59ff90798127",
       "shop.qty": "20f686d3a2f1",
@@ -7043,6 +7050,7 @@
       "error.surveyRank": "de68bbc597cb",
       "quests.killsMany": "4d3ebfff06fd",
       "quests.explored": "3d40cfc34230",
+      "quests.surveyed": "2f8cdf40cd64",
       "quests.pay": "cf9245bcf753",
       "quests.payButton": "07732c91d66d",
       "error.questNotActive": "ad05c60fdc27",
@@ -7191,7 +7199,19 @@
       "prep.evasionTotal": "662c488cf8d3",
       "prep.pouch": "6e6b35d69124",
       "prep.pouchSlot": "5cd1192ac4d5",
-      "prep.pouchNote": "48531c20123e",
+      "prep.pouchNote": "83613abebda6",
+      "prep.pouchPerFight": "d2a0aee863bd",
+      "prep.pouchBank": "39439ea48302",
+      "prep.pouchCarried": "cea985dd9d2a",
+      "prep.pouchPick": "b30d2114d251",
+      "prep.pouchNone": "0b40e581b8b6",
+      "prep.pouchEmpty": "143f89cf9bfc",
+      "pouchKind.core:pk_food.name": "d3b23ba6b2d3",
+      "pouchKind.core:pk_food.desc": "540f90ea3195",
+      "pouchKind.core:pk_combat.name": "84f229a434dd",
+      "pouchKind.core:pk_combat.desc": "ad71e79a99d5",
+      "pouchKind.core:pk_cure.name": "5a7c953d31db",
+      "pouchKind.core:pk_cure.desc": "f9c5bffb6df4",
       "prep.noPouch": "43fe006e1346",
       "prep.verdict": "167d739d1d47",
       "prep.unknown": "81ce70adcf42",
@@ -8101,7 +8121,6 @@
       "dodgeStamina",
       "ccCostPerLevel",
       "pillAction",
-      "pouchStack",
       "pillAt",
       "food",
       "toolTag",
@@ -8696,8 +8715,6 @@
       "xpBonus"
     ],
     "K.pouch": [
-      "slots",
-      "vest",
       "vestRank"
     ],
     "K.ai": [

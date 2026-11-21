@@ -242,8 +242,8 @@ export const BALANCE_EXT = {
   },
   /** The signature technique: the mastery it needs and its extra mastery XP share. */
   signature: { minMastery: 25, xpBonus: 0.1 },
-  /** Pouch slots: the base count and the extra slots the chunin vest gives. */
-  pouch: { slots: 3, vest: 1, vestRank: 'chunin' },
+  /** The rank from which the vest gives the extra pouch slots (the kinds of slot, their counts and per-fight amounts are the `pouchKinds`). */
+  pouch: { vestRank: 'chunin' },
   /** The player's AI: the combat level from which an enemy waits by a higher AI tier. */
   ai: { enemyTier: { genin: 8, chunin: 35 } },
   /** Health share below which a won fight still costs a Wound. */

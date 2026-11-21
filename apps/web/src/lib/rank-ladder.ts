@@ -65,7 +65,8 @@ export function perksOf(content: ContentDb, rank: string): RankPerk[] {
   const natures = K.loadout.natures[rank];
   if (natures !== undefined && natures > before(K.loadout.natures))
     perks.push({ kind: 'natures', n: natures });
-  if (K.pouch.vestRank === rank && K.pouch.vest > 0) perks.push({ kind: 'pouch', n: K.pouch.vest });
+  const vest = content.pouchKinds.reduce((n, k) => n + (k.vest ?? 0), 0);
+  if (K.pouch.vestRank === rank && vest > 0) perks.push({ kind: 'pouch', n: vest });
   return perks;
 }
 

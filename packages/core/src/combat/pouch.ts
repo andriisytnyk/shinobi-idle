@@ -1,5 +1,5 @@
 import { isAcademyRank, rankIndex } from '../vocab.ts';
-import type { ContentDb } from '@shinobi/content';
+import type { ContentDb, Item, PouchKind } from '@shinobi/content';
 import { addItem } from '../bank.ts';
 import type { CommandResult } from '../engine.ts';
 import { emit } from '../events.ts';
@@ -9,21 +9,72 @@ import type { GameState } from '../state.ts';
 import { makeCtx } from './fight.ts';
 import { pouchUse, useSlotByHand } from './fight-items.ts';
 import type { FightState } from './fight-types.ts';
+import type { PouchState } from './types.ts';
 
 /*
- * The pouch: slots of one item each, up to the stack cap. It is packed from the bank, refilled
- * between the fights of a zone and never inside an operation. The fight carries its own copy of
- * the counts and the game copies them back after every step, so the state is always current.
+ * The pouch: typed slots. Every slot has a kind (`content.pouchKinds`: which uses of items it takes
+ * and how many units of its item it carries into a fight) and holds one item of its kind. Before
+ * every fight (a zone fight, a stage of an operation or a mission, a boss) the slot is filled up to
+ * the kind's per-fight amount from the Bank, or from the bag of a clone; inside a fight nothing
+ * refills. The fight carries its own copy of the counts and the game copies them back after every
+ * step, so the state is always current.
  */
 
-/** Slots of the pouch: the base count, and the extra the chunin vest gives. */
-export function pouchSlotCount(state: GameState, content: ContentDb): number {
-  // A student carries no pouch; it comes with the rank of Genin, the vest adds a slot.
-  if (isAcademyRank(content, state.player.rank)) return 0;
-  const p = content.balance.K.pouch;
+/** The kinds of pouch slot by id. */
+const kindIndex = new WeakMap<ContentDb, Map<string, PouchKind>>();
+
+/** The kind of pouch slot with this id (the content's own list; a mod can add kinds). */
+export function pouchKind(content: ContentDb, id: string): PouchKind | undefined {
+  let map = kindIndex.get(content);
+  if (!map) {
+    map = new Map(content.pouchKinds.map((k) => [k.id, k]));
+    kindIndex.set(content, map);
+  }
+  return map.get(id);
+}
+
+/** Units a slot of this kind carries into a fight (0 for a kind the content does not know). */
+export function perFight(content: ContentDb, kind: string): number {
+  return pouchKind(content, kind)?.perFight ?? 0;
+}
+
+/** Whether an item can sit in a slot of the kind: its use in a fight is one the kind takes. */
+export function itemFitsKind(item: Item, kind: PouchKind, content: ContentDb): boolean {
+  const use = pouchUse(item, content);
+  return use !== null && (kind.uses as readonly string[]).includes(use);
+}
+
+/** The first kind of slot that takes the item, or undefined when none does (the item cannot ride in the pouch). */
+export function kindOfItem(item: Item, content: ContentDb): PouchKind | undefined {
+  return content.pouchKinds.find((k) => itemFitsKind(item, k, content));
+}
+
+/** The most slots the pouch can ever have: every kind's slots and its vest slots. */
+export function maxPouchSlots(content: ContentDb): number {
+  return content.pouchKinds.reduce((n, k) => n + k.slots + (k.vest ?? 0), 0);
+}
+
+/**
+ * The kind of every slot of the pouch, in order: the base slots by kind in the order of the content,
+ * then (from the rank of the vest on) the vest's extra slots by kind. A new slot is always added at
+ * the end, so a rank never moves the slot a fight in progress is using.
+ */
+export function pouchLayout(state: GameState, content: ContentDb): string[] {
+  // A student carries no pouch; it comes with the rank of Genin, the vest adds slots.
+  if (isAcademyRank(content, state.player.rank)) return [];
+  const out: string[] = [];
+  for (const k of content.pouchKinds) for (let i = 0; i < k.slots; i++) out.push(k.id);
   // The vest comes with its rank and stays with every rank above it.
-  const vest = rankIndex(content, state.player.rank) >= rankIndex(content, p.vestRank);
-  return p.slots + (vest ? p.vest : 0);
+  const vest =
+    rankIndex(content, state.player.rank) >= rankIndex(content, content.balance.K.pouch.vestRank);
+  if (vest)
+    for (const k of content.pouchKinds) for (let i = 0; i < (k.vest ?? 0); i++) out.push(k.id);
+  return out;
+}
+
+/** Slots of the pouch. */
+export function pouchSlotCount(state: GameState, content: ContentDb): number {
+  return pouchLayout(state, content).length;
 }
 
 /** The highest medic pouch upgrade in the bank, 0 when none. */
@@ -35,23 +86,43 @@ export function medicTier(state: GameState, content: ContentDb): number {
   return tier;
 }
 
-/** Makes the slot list match the rank: a lost slot returns its units to the bank. */
+/**
+ * Makes the slot list match the rank and the kinds: a slot the layout no longer has returns its
+ * units to the bank, a missing one is added empty.
+ */
 export function ensurePouch(state: GameState, content: ContentDb): void {
-  const want = pouchSlotCount(state, content);
+  const want = pouchLayout(state, content);
   const p = state.pouch;
-  while (p.slots.length > want) {
-    const slot = p.slots.pop();
-    if (slot && slot.id !== '') addItem(state, slot.id, slot.n);
+  if (p.slots.length === want.length && p.slots.every((s, i) => s.kind === want[i])) return;
+  const old = p.slots;
+  const used = new Set<number>();
+  const next: PouchState['slots'] = [];
+  const at = new Map<number, number>();
+  for (const kind of want) {
+    const from = old.findIndex((s, i) => !used.has(i) && s.kind === kind);
+    const held = from >= 0 ? old[from] : undefined;
+    if (held) {
+      used.add(from);
+      at.set(from, next.length);
+      next.push(held);
+    } else next.push({ kind, id: '', n: 0 });
   }
-  while (p.slots.length < want) p.slots.push({ id: '', n: 0 });
-  if (p.medic !== null && p.medic >= p.slots.length) p.medic = null;
+  old.forEach((slot, i) => {
+    if (!used.has(i) && slot.id !== '') addItem(state, slot.id, slot.n);
+  });
+  p.slots = next;
+  p.medic = p.medic === null ? null : (at.get(p.medic) ?? null);
 }
 
-/** Tops every slot up from the bank, to the stack cap. */
+/** Fills every slot up to the per-fight amount of its kind, as far as the bank goes; what a smaller amount leaves over goes back. */
 export function refillPouch(state: GameState, content: ContentDb): void {
-  const cap = content.balance.K.pouchStack;
   for (const slot of state.pouch.slots) {
     if (slot.id === '') continue;
+    const cap = perFight(content, slot.kind);
+    if (slot.n > cap) {
+      addItem(state, slot.id, slot.n - cap);
+      slot.n = cap;
+    }
     const take = Math.min(cap - slot.n, state.bank[slot.id] ?? 0);
     if (take <= 0) continue;
     slot.n += take;
@@ -69,7 +140,7 @@ export function syncPouch(state: GameState, fight: FightState): void {
   });
 }
 
-/** Puts `item` (or nothing) in a slot: what was there goes back to the bank, the stack is taken from the bank. */
+/** Puts `item` (or nothing) in a slot: what was there goes back to the bank, the per-fight amount is taken from the bank. */
 export function setPouchSlot(
   state: GameState,
   slot: number,
@@ -83,7 +154,11 @@ export function setPouchSlot(
   if (state.combat) return { ok: false, reason: 'error.fighting' };
   if (item !== null) {
     const def = indexOf(content).items.get(item);
-    if (!def || pouchUse(def) === null) return { ok: false, reason: 'error.notPouchItem' };
+    if (!def || pouchUse(def, content) === null) return { ok: false, reason: 'error.notPouchItem' };
+    const kind = pouchKind(content, held.kind);
+    if (!kind || !itemFitsKind(def, kind, content)) {
+      return { ok: false, reason: 'error.wrongSlotKind' };
+    }
     if (state.pouch.slots.some((s, i) => i !== slot && s.id === item)) {
       return { ok: false, reason: 'error.itemInPouch' };
     }
@@ -116,7 +191,7 @@ export function setMedicSlot(
   const held = state.pouch.slots[slot];
   if (!held || held.id === '') return { ok: false, reason: 'error.emptySlot' };
   const def = indexOf(content).items.get(held.id);
-  const use = def ? pouchUse(def) : null;
+  const use = def ? pouchUse(def, content) : null;
   if (use !== 'heal' && use !== 'restore') return { ok: false, reason: 'error.itemNotUsable' };
   state.pouch.medic = slot;
   return { ok: true };

@@ -32,6 +32,7 @@ import {
   natureStatus,
   nextTierPrice,
   nextTierReq,
+  perFight,
   planPouch,
   pouchUse,
   opSteps,
@@ -385,28 +386,31 @@ export function prepareFight(
 function buySupplies(tk: Toolkit, encounter: string): Command[] {
   const { state, content } = tk.ctx;
   const out: Command[] = [];
-  const stack = content.balance.K.pouchStack;
+  const kinds = state.pouch.slots.map((s) => s.kind);
+  const most = Math.max(0, ...content.pouchKinds.map((k) => k.perFight));
   const target = targetOf(state, encounter, content);
   const offered = shopEntries(content).flatMap((s) => {
     const item = content.items.find((i) => i.id === s.item);
-    return item && pouchUse(item) !== null && evalReq(state, s.req, content).met ? [item.id] : [];
+    return item && pouchUse(item, content) !== null && evalReq(state, s.req, content).met
+      ? [item.id]
+      : [];
   });
   const hypothetical = { ...state.bank };
-  for (const id of offered) hypothetical[id] = Math.max(hypothetical[id] ?? 0, stack);
+  for (const id of offered) hypothetical[id] = Math.max(hypothetical[id] ?? 0, most);
   const plan = planPouch(
     {
       bank: hypothetical,
-      slots: state.pouch.slots.length,
+      slots: kinds,
       traits: target?.traits ?? [],
       loadout: state.loadouts.active,
     },
     content,
   );
   let purse = ryo(tk);
-  for (const { id } of plan) {
-    if (!offered.includes(id)) continue;
+  for (const [i, { id }] of plan.entries()) {
+    if (id === '' || !offered.includes(id)) continue;
     const held = state.pouch.slots.find((s) => s.id === id)?.n ?? 0;
-    const need = stack - held - (state.bank[id] ?? 0);
+    const need = perFight(content, kinds[i] ?? '') - held - (state.bank[id] ?? 0);
     const price = buyPrice(id, content) ?? 0;
     const n = price > 0 ? Math.min(need, Math.floor(purse / price)) : 0;
     if (n < 1) continue;

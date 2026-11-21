@@ -314,6 +314,10 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     at('cloneRoles', r.id);
     problem('default', `a second default clone role (the first is ${defaults[0]?.id ?? ''})`);
   }
+  for (const k of db.pouchKinds) {
+    at('pouchKinds', k.id);
+    if (k.slots + (k.vest ?? 0) < 1) problem('slots', 'a pouch kind with no slot at all');
+  }
   for (const t of db.traits) {
     at('traits', t.id);
     ref('answer', t.answer, 'tags');

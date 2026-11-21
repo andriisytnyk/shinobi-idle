@@ -73,6 +73,8 @@ const data = {
       },
     },
   ],
+  /** A kind of pouch slot of the pack: one more slot, for what cures (the elixir), two units into every fight. */
+  pouchKinds: [{ id: 'testmod:pk_phials', uses: ['cleanse'], perFight: 2, slots: 1 }],
   /** A tag that cracks a shell: the body takes more damage while the crack lasts and the trait stops. */
   tags: [
     {
@@ -563,6 +565,8 @@ export const testmodPack: ContentPack = {
       'state.testmod:chilled.name': 'Тестове охолодження',
       'status.testmod:chill.name': 'Тестовий холод',
       'status.testmod:chill.desc': 'Тестовий стан, що показує: мод додає власні стани бою.',
+      'pouchKind.testmod:pk_phials.name': 'Тестові флакони',
+      'pouchKind.testmod:pk_phials.desc': 'Тестовий вид слота підсумка, який додає пакет.',
       'cloneRole.testmod:role_decoy.name': 'Тестова приманка',
       'cloneRole.testmod:role_decoy.desc':
         'Тестова роль клонів: найдешевша техніка й потрійна увага ворогів.',

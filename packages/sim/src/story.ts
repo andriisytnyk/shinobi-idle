@@ -10,7 +10,9 @@ import {
   counterValue,
   defaultRules,
   dispatch,
+  itemFitsKind,
   killsKey,
+  pouchKind,
   raidFlag,
   missionDoneKey,
   refreshUnlocks,
@@ -222,7 +224,18 @@ export function playSlice(options: StoryOptions = {}): StoryRun {
       const want = [...answers.techniques, ...rest].slice(0, state.loadouts.active.length);
       cmd({ type: 'loadout.set', techniques: want });
     }
-    answers.items.forEach((item, slot) => cmd({ type: 'pouch.set', slot, item }));
+    // Each answer goes to a slot of a kind that takes it, a slot of its own.
+    const used = new Set<number>();
+    for (const item of answers.items) {
+      const def = content.items.find((i) => i.id === item);
+      const slot = state.pouch.slots.findIndex((s, i) => {
+        const kind = pouchKind(content, s.kind);
+        return def !== undefined && kind !== undefined && !used.has(i) && itemFitsKind(def, kind, content);
+      });
+      if (slot < 0) continue;
+      used.add(slot);
+      cmd({ type: 'pouch.set', slot, item });
+    }
   };
   /** Fights in a zone (or against a raid at the gates, named by its id) until `done` holds; a lost fight is counted and the fight is simply started again. */
   const fight = (zone: string, done: () => boolean, maxMs = 6 * HOUR): void => {

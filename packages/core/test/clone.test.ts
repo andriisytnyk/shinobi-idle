@@ -30,6 +30,7 @@ import {
   slotCount,
   xpAt,
   type GameState,
+  STATE_VERSION,
 } from '../src/index.ts';
 import { player } from './missions-helpers.ts';
 
@@ -407,7 +408,7 @@ describe('saving', () => {
   });
 
   it('is on the version of the redesign', () => {
-    expect(createState(1, content).v).toBe(23);
+    expect(createState(1, content).v).toBe(STATE_VERSION);
   });
 });
 

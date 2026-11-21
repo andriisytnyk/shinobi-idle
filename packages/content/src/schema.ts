@@ -448,7 +448,7 @@ export const itemSchema = z.strictObject({
   buy: z.string().min(1).optional(),
   /** Key of the sell price in `K.sell`. */
   sell: idOf('trophy').optional(),
-  /** A tool that rides in the pouch; a pouch slot holds `K.pouchStack` of them. */
+  /** A tool that rides in the pouch; a slot of the right kind takes the kind's `perFight` of them into a fight. */
   pouch: z.boolean().optional(),
   /** A medic pouch upgrade: owning it (tier 1 to 3) lets the pouch use a healing slot on its own. */
   medic: z.number().int().min(1).max(3).optional(),
@@ -1364,6 +1364,32 @@ export const tagOpSchema = z.discriminatedUnion('op', [
 /** The uses a tool of the pouch can have in a fight besides the ones its effect names. */
 export const POUCH_USES = ['sweep', 'snare', 'venom'] as const;
 
+/** Every use an item of the pouch can have (an effect names the first ones, a tag the `POUCH_USES`, a plain tool is `throw`). */
+export const POUCH_ALL_USES = [
+  'heal',
+  'restore',
+  'cleanse',
+  'dispel',
+  'bomb',
+  'sleep',
+  'throw',
+  ...POUCH_USES,
+] as const;
+
+/**
+ * A kind of pouch slot: which uses of items it accepts, how many units of its item the character
+ * takes into every fight (refilled from the Bank before each fight, never during one), and how many
+ * slots of the kind there are (`vest` more once the rank of the vest is reached). The name and the
+ * one-line description are the locale keys `pouchKind.<id>.name` and `.desc`.
+ */
+export const pouchKindSchema = z.strictObject({
+  id: coreId,
+  uses: z.array(z.enum(POUCH_ALL_USES)).min(1),
+  perFight: z.number().int().min(1).max(99),
+  slots: z.number().int().min(0).max(6),
+  vest: z.number().int().min(0).max(6).optional(),
+});
+
 /** A tag of techniques and tools: what it makes them do in a fight, besides answering traits. */
 export const tagSchema = z.strictObject({
   id: z.string().regex(/^[A-Za-z0-9_]+(:[a-z0-9_]+)?$/, 'expected an id'),
@@ -1573,7 +1599,6 @@ export const balanceParamsSchema = z.object({
   dodgeStamina: z.number(),
   ccCostPerLevel: z.number(),
   pillAction: z.number(),
-  pouchStack: z.number(),
   pillAt: z.number(),
   food: z.array(pair),
   toolTag: pair,
@@ -1721,7 +1746,7 @@ export const balanceParamsSchema = z.object({
     areaBodies: z.number(),
   }),
   signature: z.object({ minMastery: z.number().int(), xpBonus: z.number() }),
-  pouch: z.object({ slots: z.number().int(), vest: z.number().int(), vestRank: playerRankId }),
+  pouch: z.object({ vestRank: playerRankId }),
   /** `enemyTier`: the lowest combat level of an enemy that waits by each AI tier (the lowest tier needs none). */
   ai: z.object({
     enemyTier: z.record(z.string(), z.number().int().min(0)),
@@ -1983,6 +2008,7 @@ export const contentDbSchema = z.object({
   traits: z.array(traitSchema),
   combos: z.array(comboSchema),
   cloneRoles: z.array(cloneRoleSchema),
+  pouchKinds: z.array(pouchKindSchema),
   ai: aiSchema,
 });
 
@@ -2008,6 +2034,7 @@ export const generatedDbSchema = contentDbSchema
     traits: true,
     combos: true,
     cloneRoles: true,
+    pouchKinds: true,
     ai: true,
     team: true,
     skillGroups: true,
@@ -2110,6 +2137,7 @@ export type RoleEntity = z.infer<typeof roleSchema>;
 export type TraitEntity = z.infer<typeof traitSchema>;
 export type Combo = z.infer<typeof comboSchema>;
 export type CloneRole = z.infer<typeof cloneRoleSchema>;
+export type PouchKind = z.infer<typeof pouchKindSchema>;
 export type AiTier = z.infer<typeof aiTierSchema>;
 export type AiData = z.infer<typeof aiSchema>;
 export type AiRuleId = (typeof AI_RULE_IDS)[number];

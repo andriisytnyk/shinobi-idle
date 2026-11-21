@@ -71,9 +71,9 @@ export interface LoadoutState {
   saved: Record<string, { techniques: string[]; signature: string | null }>;
 }
 
-/** The pouch: a stack of one item per slot (an empty slot has an empty id), and the slot the medic pouch uses. */
+/** The pouch: one slot per kind of slot (`content.pouchKinds`) holding one item (an empty slot has an empty id) and the units of it carried now, and the slot the medic pouch uses. */
 export interface PouchState {
-  slots: { id: string; n: number }[];
+  slots: { kind: string; id: string; n: number }[];
   medic: number | null;
 }
 

@@ -10,7 +10,7 @@ import { answersTraitData, beatenBy, dotShareOf, fightData } from './fight-data.
 import { itemAnswers, itemView, pouchUse } from './fight-items.ts';
 import { need } from './need.ts';
 import { techniqueFigures, type PlayerSnapshot } from './numbers.ts';
-import { ensurePouch, medicTier, refillPouch } from './pouch.ts';
+import { ensurePouch, itemFitsKind, medicTier, perFight, pouchKind, refillPouch } from './pouch.ts';
 import { knowledgeOf } from './bingo.ts';
 import { planningSnapshot } from './snapshot.ts';
 import { entryOf, fightTarget } from './zones.ts';
@@ -250,7 +250,8 @@ export const autoLoadout = (
 
 export interface PouchPlanInput {
   bank: Readonly<Record<string, number>>;
-  slots: number;
+  /** The kind of every slot of the pouch, in order (`pouchLayout`). */
+  slots: readonly string[];
   traits: readonly string[];
   /** Techniques of the loadout: a trait one of them answers needs no tool. */
   loadout: readonly string[];
@@ -259,18 +260,26 @@ export interface PouchPlanInput {
 /**
  * What to carry: the strongest healing item first, then a tool for each known trait that no
  * technique of the loadout answers, then a guard against heavy casts, a restoring pill and a
- * throwing tool to fill the rest. Each slot takes a full stack, as far as the bank goes.
+ * throwing tool to fill the rest. Each item goes to the first free slot of a kind that takes it and
+ * the slot takes the kind's per-fight amount, as far as the bank goes. The answer has one entry per
+ * slot of `input.slots`, an empty one (`id: ''`) where nothing was found for the slot.
  */
 export function planPouch(input: PouchPlanInput, content: ContentDb): { id: string; n: number }[] {
   const index = indexOf(content);
-  const cap = content.balance.K.pouchStack;
   const owned = content.items.filter(
     (i) => (input.bank[i.id] ?? 0) > 0 && pouchUse(i, content) !== null,
   );
-  const slots: { id: string; n: number }[] = [];
+  const slots: { id: string; n: number }[] = input.slots.map(() => ({ id: '', n: 0 }));
   const take = (item: Item | undefined): void => {
-    if (!item || slots.length >= input.slots || slots.some((s) => s.id === item.id)) return;
-    slots.push({ id: item.id, n: Math.min(cap, input.bank[item.id] ?? 0) });
+    if (!item || slots.some((s) => s.id === item.id)) return;
+    const at = input.slots.findIndex((kindId, i) => {
+      const kind = pouchKind(content, kindId);
+      return slots[i]?.id === '' && kind !== undefined && itemFitsKind(item, kind, content);
+    });
+    const slot = slots[at];
+    if (!slot) return;
+    slot.id = item.id;
+    slot.n = Math.min(perFight(content, input.slots[at] ?? ''), input.bank[item.id] ?? 0);
   };
   let heal: Item | undefined;
   for (const i of owned) {
@@ -340,7 +349,7 @@ export function prepareFor(
   limits: LoadoutLimits | null,
   target: { traits: readonly string[]; nature: string | null },
   bank: Readonly<Record<string, number>>,
-  slots: number,
+  slots: readonly string[],
   signature: string | null,
   content: ContentDb,
 ): { techniques: string[]; pouch: { id: string; n: number }[] } {
@@ -586,7 +595,7 @@ export function prepareLoadout(
     limits,
     target,
     state.bank,
-    state.pouch.slots.length,
+    state.pouch.slots.map((s) => s.kind),
     state.loadouts.signature,
     content,
   );

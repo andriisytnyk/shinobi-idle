@@ -6,6 +6,7 @@ import {
   examFor,
   isAcademyRank,
   isNature,
+  kindOfItem,
   killsKey,
   moneyOf,
   pouchUse,
@@ -192,11 +193,12 @@ export function stockFromShop(state: GameState, content: ContentDb, rules: Rules
   const money = moneyOf(content);
   const kept = state.currencies[money] ?? 0;
   state.currencies[money] = SHOPPING_RYO;
-  const stack = content.balance.K.pouchStack;
   for (const entry of content.shop) {
     const item = content.items.find((i) => i.id === entry.item);
-    if (!item || (pouchUse(item) === null && item.medic === undefined)) continue;
-    const n = item.medic === undefined ? stack : 1;
+    if (!item || (pouchUse(item, content) === null && item.medic === undefined)) continue;
+    // A slot carries the per-fight amount of its kind into a fight: that much of each item, the medic pouch once.
+    const n = item.medic === undefined ? (kindOfItem(item, content)?.perFight ?? 0) : 1;
+    if (n < 1) continue;
     dispatch(state, { type: 'shop.buy', item: entry.item, n }, content, rules);
   }
   state.currencies[money] = kept;
@@ -215,7 +217,7 @@ export interface Equipment {
 /**
  * The meal the balance model carries at a level: the healing item whose healing is the largest
  * not above the model's `K.food` step for that level (the smallest one when all are above), and a
- * full pouch stack of it (`K.pouchStack`, as in the model). Read from the balance data and the
+ * per-fight amount of the slot kind that takes it. Read from the balance data and the
  * items' effects; null when the content has no healing item.
  */
 export function modelFood(level: number, content: ContentDb): { item: string; n: number } | null {
@@ -223,12 +225,13 @@ export function modelFood(level: number, content: ContentDb): { item: string; n:
   const step = [...K.food].reverse().find(([from]) => from <= level) ?? K.food[0];
   if (!step) return null;
   const meals = content.items.flatMap((i) =>
-    i.fx?.kind === 'heal' && pouchUse(i) === 'heal' ? [{ id: i.id, hp: i.fx.hp }] : [],
+    i.fx?.kind === 'heal' && pouchUse(i, content) === 'heal' ? [{ id: i.id, hp: i.fx.hp }] : [],
   );
   const byId = (a: { id: string }, b: { id: string }) => (a.id < b.id ? -1 : 1);
   const below = meals.filter((m) => m.hp <= step[1]).sort((a, b) => b.hp - a.hp || byId(a, b));
   const pick = below[0] ?? [...meals].sort((a, b) => a.hp - b.hp || byId(a, b))[0];
-  return pick ? { item: pick.id, n: K.pouchStack } : null;
+  const item = pick ? content.items.find((i) => i.id === pick.id) : undefined;
+  return pick && item ? { item: pick.id, n: kindOfItem(item, content)?.perFight ?? 0 } : null;
 }
 
 /**

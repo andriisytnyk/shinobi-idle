@@ -23,7 +23,6 @@ import { entryOf } from '../combat/zones.ts';
 import { drainPendingResources } from '../village.ts';
 import { MISSION_KIND, newMissionCombat, releaseFight } from '../combat/system.ts';
 import { asPerformer } from '../performer.ts';
-import { refillPouch } from '../combat/pouch.ts';
 import { payOnStop } from '../combat/pending.ts';
 import type { TeamSupport } from '../combat/fight-types.ts';
 import { SELF, planStage, stageBaseMs, stageReq, teammates, type StagePlan } from './plan.ts';
@@ -594,8 +593,6 @@ export const missionKind: ActionKind = {
       }
       return;
     }
-    // After a won fight the pouch is topped up from the bank, as after any fight.
-    refillPouch(state, content);
     if (run.w === 0) {
       // Won within the stage's time: the stage ends when its time does.
       store(state, at, { ...run, f: 2, st: style });

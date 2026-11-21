@@ -44,7 +44,8 @@
    */
   const digest = $derived(
     api.read((gs) => {
-      const cap = api.content.balance.K.pouchStack;
+      const cap = (kind: string): number =>
+        api.content.pouchKinds.find((k) => k.id === kind)?.perFight ?? 0;
       return JSON.stringify([
         ctx.target,
         ctx.hand,
@@ -56,7 +57,7 @@
         gs.loadouts.cloneRole,
         gs.pouch.slots.map((slot) => [
           slot.id,
-          slot.id === '' ? 0 : Math.min(cap, slot.n + (gs.bank[slot.id] ?? 0)),
+          slot.id === '' ? 0 : Math.min(cap(slot.kind), slot.n + (gs.bank[slot.id] ?? 0)),
         ]),
         Object.keys(gs.skills).map((k) => api.core.skillLevel(gs, k, api.content)),
       ]);

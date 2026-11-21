@@ -17,6 +17,7 @@ import {
   playerMaxChakra,
   serialize,
   type GameState,
+  STATE_VERSION,
 } from '../src/index.ts';
 import { analyze, boss, build } from './analysis-helpers.ts';
 import { HOUR } from './helpers.ts';
@@ -298,7 +299,7 @@ describe('a version 19 save', () => {
     advance(state, 4 * MIN, content);
     const old = asV19(state);
     const loaded = deserialize(old, content);
-    expect(loaded.v).toBe(23);
+    expect(loaded.v).toBe(STATE_VERSION);
     expect(loaded.combat).toBeNull();
     expect(loaded.clones[1]?.fight?.owner).toBe(1);
     expect(loaded.clones[1]?.life).toBeGreaterThan(0);

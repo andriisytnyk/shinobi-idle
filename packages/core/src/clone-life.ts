@@ -3,7 +3,7 @@ import { actionKindOf, rebalanceShares, stopSlot } from './actions.ts';
 import { addCurrency, addItem, removeItem } from './bank.ts';
 import { cloneTechniqueOf, growSlots, slotCount } from './clone.ts';
 import { playerMaxChakra } from './combat/stats.ts';
-import { refillPouch } from './combat/pouch.ts';
+import { perFight, refillPouch } from './combat/pouch.ts';
 import { followChakraPool, previewAllyEarnings } from './combat/system.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
@@ -168,13 +168,12 @@ const NO_MODS: Modifier[] = [];
 
 // ---------- making a clone ----------
 
-/** The default pouch: the stacks the character's own pouch holds, as much of each as the Bank has. */
+/** The default pouch: what the character's own slots carry into a fight (the per-fight amount of each kind), as much of each as the Bank has. */
 export function defaultPouch(state: GameState, content: ContentDb): Record<string, number> {
-  const cap = content.balance.K.pouchStack;
   const out: Record<string, number> = {};
   for (const slot of state.pouch.slots) {
     const have = state.bank[slot.id] ?? 0;
-    if (slot.id !== '' && have > 0) out[slot.id] = Math.min(cap, have);
+    if (slot.id !== '' && have > 0) out[slot.id] = Math.min(perFight(content, slot.kind), have);
   }
   return out;
 }
@@ -189,7 +188,10 @@ export function probeBody(state: GameState, content: ContentDb): CloneBody {
     born: state.now,
     bag: defaultPouch(state, content),
     purse,
-    pouch: { slots: state.pouch.slots.map((s) => ({ id: s.id, n: 0 })), medic: state.pouch.medic },
+    pouch: {
+      slots: state.pouch.slots.map((s) => ({ kind: s.kind, id: s.id, n: 0 })),
+      medic: state.pouch.medic,
+    },
     xp: {},
     mastery: {},
     fight: null,
@@ -254,7 +256,7 @@ export function createClone(
     bag: {},
     purse,
     pouch: {
-      slots: state.pouch.slots.map((s) => ({ id: s.id, n: 0 })),
+      slots: state.pouch.slots.map((s) => ({ kind: s.kind, id: s.id, n: 0 })),
       medic: state.pouch.medic,
     },
     xp: {},

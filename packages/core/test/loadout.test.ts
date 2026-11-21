@@ -403,10 +403,11 @@ describe('loadout.prepare against a known trait', () => {
 
   it('packs the pouch from the bank and refuses to do so mid-fight', () => {
     const state = fighter(1, 36, 'katon');
-    stock(state, { [ids.heal]: 6 });
+    stock(state, { [ids.heal]: 14 });
     run(state, { type: 'loadout.prepare', encounter: 'core:zone_kumo' });
-    expect(state.pouch.slots[0]).toEqual({ id: ids.heal, n: K.pouchStack });
-    expect(state.bank[ids.heal]).toBe(2);
+    // The food slot takes its per-fight amount from the bank.
+    expect(state.pouch.slots[0]).toEqual({ kind: 'core:pk_food', id: ids.heal, n: 10 });
+    expect(state.bank[ids.heal]).toBe(4);
     dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: 'core:bandit' }, content);
     expect(dispatch(state, { type: 'loadout.prepare', encounter: 'core:kumo' }, content)).toEqual({
       ok: false,

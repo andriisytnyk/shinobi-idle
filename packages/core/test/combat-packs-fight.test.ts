@@ -187,7 +187,7 @@ describe('a trait that a pack adds', () => {
     const snap = { ...player(known), tier: 2 };
     const limits = loadoutLimits(2, mod);
     const target = { traits: ['testmod:shelled'], nature: null };
-    const plan = prepareFor(snap, limits, target, { 'core:tag': 5 }, 4, null, mod);
+    const plan = prepareFor(snap, limits, target, { 'core:tag': 5 }, GENIN_POUCH, null, mod);
     const answer = mod.traits.find((t) => (t.id as string) === 'testmod:shelled')?.answer;
     expect(answer).toBe('area');
     expect(
@@ -203,13 +203,16 @@ describe('a trait that a pack adds', () => {
       limits,
       { traits: [], nature: null },
       { 'core:tag': 5 },
-      4,
+      GENIN_POUCH,
       null,
       mod,
     );
     expect(none.pouch.map((p) => p.id)).not.toContain('core:tag');
   });
 });
+
+/** The kinds of the slots of a chunin's pouch: one per kind, and the vest adds a combat slot. */
+const GENIN_POUCH = ['core:pk_food', 'core:pk_combat', 'core:pk_combat', 'core:pk_cure'];
 
 describe('a nature that a pack adds', () => {
   it('is strong against one core nature and weak against another, and the multiplier applies both ways', () => {

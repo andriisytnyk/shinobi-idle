@@ -29,10 +29,10 @@ export function healItemFor(c: number): string {
 
 /** Every item a prepared player might carry: four of the level's healing item and four of each tool. */
 export function wellStocked(c: number): Record<string, number> {
-  const bank: Record<string, number> = { [healItemFor(c)]: K.pouchStack };
+  const bank: Record<string, number> = { [healItemFor(c)]: 10 };
   for (const i of content.items) {
     if (i.pouch === true || ['cleanse', 'dispel', 'bomb'].includes(i.fx?.kind ?? '')) {
-      bank[i.id] = K.pouchStack;
+      bank[i.id] = 10;
     }
   }
   return bank;
@@ -101,7 +101,9 @@ export function playerFor(entry: Entry, nature: NatureId, opts: PlayerOptions): 
   }
   const target = planTarget(entry, everything, nature, content);
   // The chunin vest adds a pouch slot.
-  const slots = K.pouch.slots + (tier >= 2 ? K.pouch.vest : 0);
+  const slots = [...content.pouchKinds.flatMap((k) => Array<string>(k.slots).fill(k.id))];
+  if (tier >= 2)
+    slots.push(...content.pouchKinds.flatMap((k) => Array<string>(k.vest ?? 0).fill(k.id)));
   const plan = prepareFor(snap, limits, target, wellStocked(c), slots, null, content);
   snap.loadout = plan.techniques;
   if (opts.prep === 'prepared') {

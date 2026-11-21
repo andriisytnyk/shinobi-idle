@@ -30,10 +30,10 @@ type Scenario = (state: GameState, at: number) => void;
 
 const scenarios: Record<string, Scenario> = {
   'a zone fight with tools from the pouch': (state, at) => {
-    stock(state, { [ids.heal]: 12, [ids.kunai]: 12, [ids.tag]: 12, [ids.medpouch]: 1 });
+    stock(state, { [ids.heal]: 12, [ids.antidote]: 12, [ids.tag]: 12, [ids.medpouch]: 1 });
     run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
     run(state, { type: 'pouch.set', slot: 1, item: ids.tag });
-    run(state, { type: 'pouch.set', slot: 2, item: ids.kunai });
+    run(state, { type: 'pouch.set', slot: 2, item: ids.antidote });
     run(state, { type: 'pouch.medic', slot: 0 });
     // A weak player in a pack zone: the tags and the pills are in constant use.
     for (const skill of ['tai', 'nin', 'katon', 'vit'] as const) setLevel(state, skill, 14);
@@ -338,7 +338,11 @@ describe('A12: saves', () => {
       saved: { x: { techniques: ['core:nope'], signature: null } },
     };
     raw.state.pouch = {
-      slots: [{ id: 'core:rice', n: 99 }, { id: 'core:kunai', n: 99 }, 5],
+      slots: [
+        { kind: 'core:pk_food', id: 'core:rice', n: 99 },
+        { kind: 'core:pk_combat', id: 'core:kunai', n: 99 },
+        5,
+      ],
       medic: 7,
     };
     raw.state.wounds = { stacks: 99, left: 10 ** 12 };
@@ -347,7 +351,10 @@ describe('A12: saves', () => {
     expect(loaded.loadouts.signature).toBeNull();
     expect(loaded.loadouts.saved.x?.techniques).toEqual([]);
     expect(loaded.pouch.slots.map((s) => s.id)).toEqual(['', 'core:kunai', '']);
-    expect(loaded.pouch.slots[1]?.n).toBe(content.balance.K.pouchStack);
+    // A slot carries the per-fight amount of its kind; the rest goes back to the Bank, with what the wrong slot held.
+    expect(loaded.pouch.slots[1]?.n).toBe(4);
+    expect(loaded.bank['core:kunai']).toBe(95);
+    expect(loaded.bank['core:rice']).toBe(99);
     expect(loaded.pouch.medic).toBeNull();
     expect(loaded.wounds.stacks).toBe(content.balance.K.wound.max);
     expect(loaded.wounds.left).toBeLessThanOrEqual(content.balance.K.wound.healMin * 60_000);

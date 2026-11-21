@@ -243,7 +243,7 @@ describe('the medic pouch and the pouch of a student', () => {
     for (const key of ['loadouts', 'pouch', 'wounds', 'seen']) delete raw.state[key];
     const loaded = deserialize(JSON.stringify(raw), content);
     expect(loaded.bank[ids.medpouch]).toBe(1);
-    expect(loaded.pouch.slots).toHaveLength(K.pouch.slots);
+    expect(loaded.pouch.slots).toHaveLength(content.pouchKinds.reduce((n, k) => n + k.slots, 0));
     const student = createState(1, content);
     expect(student.pouch.slots).toHaveLength(0);
     expect(dispatch(student, { type: 'pouch.set', slot: 0, item: ids.kunai }, content).ok).toBe(

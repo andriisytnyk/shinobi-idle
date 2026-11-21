@@ -13,7 +13,9 @@ import {
   planningSnapshot,
   playerEvasionParts,
   prepareFor,
-  pouchSlotCount,
+  pouchLayout,
+  pouchKind,
+  itemFitsKind,
   pouchUse,
   revealAt,
   targetOf,
@@ -140,7 +142,7 @@ export function suggestFor(
     loadoutLimits(rank, content),
     planFacts(state, target, content),
     ownedBank(state),
-    pouchSlotCount(state, content),
+    pouchLayout(state, content),
     state.loadouts.signature,
     content,
   );
@@ -263,10 +265,19 @@ export function reasonsOf(
   return out;
 }
 
-/** The items the player may pack into the pouch: those in the bank (or already in a slot) that a fight can use. */
-export function pouchChoices(state: GameState, content: ContentDb): string[] {
+/**
+ * The items the player may pack into a slot of the kind: those in the bank (or already in a slot) whose use in a fight
+ * the kind takes. Without a kind, every item a fight can use.
+ */
+export function pouchChoices(state: GameState, content: ContentDb, kindId?: string): string[] {
   const held = new Set(state.pouch.slots.map((s) => s.id).filter((id) => id !== ''));
+  const kind = kindId === undefined ? undefined : pouchKind(content, kindId);
   return content.items
-    .filter((i) => pouchUse(i, content) !== null && ((state.bank[i.id] ?? 0) > 0 || held.has(i.id)))
+    .filter(
+      (i) =>
+        pouchUse(i, content) !== null &&
+        (kind === undefined || itemFitsKind(i, kind, content)) &&
+        ((state.bank[i.id] ?? 0) > 0 || held.has(i.id)),
+    )
     .map((i) => i.id);
 }
