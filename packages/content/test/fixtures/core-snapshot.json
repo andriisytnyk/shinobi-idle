@@ -2239,7 +2239,7 @@
     "K.repPerMission.D": 1,
     "K.repPerMission.C": 4,
     "K.repPerMission.V": 2,
-    "K.missionXpShare": 0.85,
+    "K.missionXpShare": 0.3,
     "K.missionRateCap.D": 25,
     "K.missionRateCap.C": 45,
     "K.missionRateCap.V": 40,
