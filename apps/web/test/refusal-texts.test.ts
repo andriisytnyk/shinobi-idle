@@ -48,7 +48,7 @@ describe('t() calls without parameters', () => {
       readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
         e.isDirectory()
           ? files(join(dir, e.name))
-          : /\.(svelte|ts)$/.test(e.name)
+          : /(?<!\.test)\.(svelte|ts)$/.test(e.name)
             ? [join(dir, e.name)]
             : [],
       );
