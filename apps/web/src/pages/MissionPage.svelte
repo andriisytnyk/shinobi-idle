@@ -1,6 +1,7 @@
 <script lang="ts">
   import { MISSION_KIND, NEEDS_TEAM } from '@shinobi/core';
   import BusyBy from '../components/BusyBy.svelte';
+  import MissionTeamMark from '../components/MissionTeamMark.svelte';
   import EntityLink from '../components/EntityLink.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
@@ -133,10 +134,7 @@
         {t('mission.client')}: {t(clientKey)}
       </p>{/if}
     {#if desc}<p class="desc" data-desc>{desc}</p>{/if}
-    <p class="team" data-team={mission.team}>
-      <Icon name="lucide:users" size={16} />
-      {t(mission.team ? 'mission.team.yes' : 'mission.team.no')}
-    </p>
+    <p class="team"><MissionTeamMark team={mission.team} text /></p>
 
     <section class="actions" data-ui="entity-section" data-mission-actions>
       <div class="buttons">
@@ -158,9 +156,7 @@
         </p>
       {:else if refusal}
         <div class="why" id="why-mission" data-why={refusal.reason}>
-          {#if refusal.blocker}<ReqTree
-              node={refusal.blocker.first ?? refusal.blocker.result}
-            />{/if}
+          {#if refusal.blocker}<ReqTree node={refusal.blocker.result} />{/if}
           {#if by}
             <p class="ct-why" data-by>
               {t(refusal.reason)}

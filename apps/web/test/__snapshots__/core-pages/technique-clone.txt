@@ -196,7 +196,7 @@
         <ul class="tiles">
           <li class="tile" data-action="core:clone" data-entity="technique:core:clone" data-highlighted="" data-ui="action-tile">
             <div class="top">
-              <span class="emblem md" data-emblem-icon="two-shadows" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+              <span class="emblem sm" data-emblem-icon="two-shadows" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#2502-176lnnz" fill="currentColor">
                 <span class="rank">
@@ -208,13 +208,7 @@
                     <a class="entity-link" href="#/technique/core:clone">
                       Техніка клонування
                   <span class="corner">
-                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                        <circle class="track" cx="22" cy="22" r="18">
-                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                      <span class="level">
-                        1
-                    <button aria-label="Закріпити як мету" class="pin" data-entity="technique:core:clone" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <button aria-label="Закріпити як мету" aria-pressed="false" class="pin" data-entity="technique:core:clone" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                       <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                         <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <div class="live compact" data-fraction="0.000" data-mode="still" data-seal-strip="" style="--tp: 0;">
@@ -253,13 +247,20 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="ct-actions">
               <span class="split plain" data-for="practice" data-ui="start-split">
                 <button class="main ct-action" data-performer="0" data-start="true" type="button">
                   Почати
           <li class="tile" data-action="core:transformation" data-entity="technique:core:transformation" data-ui="action-tile">
             <div class="top">
-              <span class="emblem md" data-emblem-icon="drama-masks" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+              <span class="emblem sm" data-emblem-icon="drama-masks" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#2682-9um7bu" fill="currentColor">
                 <span class="rank">
@@ -271,13 +272,7 @@
                     <a class="entity-link" href="#/technique/core:transformation">
                       Техніка перевтілення
                   <span class="corner">
-                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                        <circle class="track" cx="22" cy="22" r="18">
-                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                      <span class="level">
-                        1
-                    <button aria-label="Закріпити як мету" class="pin" data-entity="technique:core:transformation" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <button aria-label="Закріпити як мету" aria-pressed="false" class="pin" data-entity="technique:core:transformation" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                       <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                         <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <div class="live compact" data-fraction="0.000" data-mode="still" data-seal-strip="" style="--tp: 0;">
@@ -316,13 +311,20 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="ct-actions">
               <span class="split plain" data-for="practice" data-ui="start-split">
                 <button class="main ct-action" data-performer="0" data-start="true" type="button">
                   Почати
           <li class="tile" data-action="core:body_replacement" data-entity="technique:core:body_replacement" data-ui="action-tile">
             <div class="top">
-              <span class="emblem md" data-emblem-icon="log" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+              <span class="emblem sm" data-emblem-icon="log" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#1733-utj717" fill="currentColor">
                 <span class="rank">
@@ -334,13 +336,7 @@
                     <a class="entity-link" href="#/technique/core:body_replacement">
                       Техніка підміни
                   <span class="corner">
-                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                        <circle class="track" cx="22" cy="22" r="18">
-                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                      <span class="level">
-                        1
-                    <button aria-label="Закріпити як мету" class="pin" data-entity="technique:core:body_replacement" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <button aria-label="Закріпити як мету" aria-pressed="false" class="pin" data-entity="technique:core:body_replacement" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                       <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                         <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <div class="live compact" data-fraction="0.000" data-mode="still" data-seal-strip="" style="--tp: 0;">
@@ -385,13 +381,20 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="ct-actions">
               <span class="split plain" data-for="practice" data-ui="start-split">
                 <button class="main ct-action" data-performer="0" data-start="true" type="button">
                   Почати
           <li class="tile locked" data-action="core:body_flicker" data-entity="technique:core:body_flicker" data-ui="action-tile">
             <div class="top">
-              <span class="emblem md" data-emblem-icon="teleport" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+              <span class="emblem sm" data-emblem-icon="teleport" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#2066-lsxwmk" fill="currentColor">
                 <span class="rank">
@@ -403,13 +406,7 @@
                     <a class="entity-link" href="#/technique/core:body_flicker">
                       Техніка мерехтіння тіла
                   <span class="corner">
-                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                        <circle class="track" cx="22" cy="22" r="18">
-                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                      <span class="level">
-                        1
-                    <button aria-label="Закріпити як мету" class="pin always" data-entity="technique:core:body_flicker" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="technique:core:body_flicker" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                       <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                         <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <div class="live compact" data-fraction="0.000" data-mode="still" data-seal-strip="" style="--tp: 0;">
@@ -442,6 +439,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -482,12 +486,9 @@
                           <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                       <span class="label">
                         Ранг: Генін
-              <p class="pin-caption">
-                <button class="link" data-entity="technique:core:body_flicker" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
           <li class="tile locked" data-action="core:shadow_shuriken" data-entity="technique:core:shadow_shuriken" data-ui="action-tile">
             <div class="top">
-              <span class="emblem md" data-emblem-icon="flying-shuriken" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+              <span class="emblem sm" data-emblem-icon="flying-shuriken" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#1422-dh73bx" fill="currentColor">
                 <span class="rank">
@@ -499,13 +500,7 @@
                     <a class="entity-link" href="#/technique/core:shadow_shuriken">
                       Техніка тіньового сюрікена
                   <span class="corner">
-                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                        <circle class="track" cx="22" cy="22" r="18">
-                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                      <span class="level">
-                        1
-                    <button aria-label="Закріпити як мету" class="pin always" data-entity="technique:core:shadow_shuriken" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="technique:core:shadow_shuriken" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                       <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                         <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="facts">
@@ -533,6 +528,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -573,12 +575,9 @@
                           <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                       <span class="label">
                         Ранг: Генін
-              <p class="pin-caption">
-                <button class="link" data-entity="technique:core:shadow_shuriken" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
           <li class="tile locked" data-action="core:enclosing" data-entity="technique:core:enclosing" data-ui="action-tile">
             <div class="top">
-              <span class="emblem md" data-emblem-icon="wax-seal" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+              <span class="emblem sm" data-emblem-icon="wax-seal" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#1983-15y0elb" fill="currentColor">
                 <span class="rank">
@@ -590,13 +589,7 @@
                     <a class="entity-link" href="#/technique/core:enclosing">
                       Техніка запечатування
                   <span class="corner">
-                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                        <circle class="track" cx="22" cy="22" r="18">
-                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                      <span class="level">
-                        1
-                    <button aria-label="Закріпити як мету" class="pin always" data-entity="technique:core:enclosing" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="technique:core:enclosing" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                       <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                         <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="facts">
@@ -624,6 +617,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -657,12 +657,9 @@
                         1/15
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 6.666666666666667%;">
-              <p class="pin-caption">
-                <button class="link" data-entity="technique:core:enclosing" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
           <li class="tile locked" data-action="core:sensing" data-entity="technique:core:sensing" data-ui="action-tile">
             <div class="top">
-              <span class="emblem md" data-emblem-icon="movement-sensor" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+              <span class="emblem sm" data-emblem-icon="movement-sensor" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#2076-1vradep" fill="currentColor">
                 <span class="rank">
@@ -674,13 +671,7 @@
                     <a class="entity-link" href="#/technique/core:sensing">
                       Сенсорна техніка
                   <span class="corner">
-                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                        <circle class="track" cx="22" cy="22" r="18">
-                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                      <span class="level">
-                        1
-                    <button aria-label="Закріпити як мету" class="pin always" data-entity="technique:core:sensing" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="technique:core:sensing" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                       <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                         <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <div class="live compact" data-fraction="0.000" data-mode="still" data-seal-strip="" style="--tp: 0;">
@@ -713,6 +704,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -753,12 +751,9 @@
                           <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                       <span class="label">
                         Ранг: Генін
-              <p class="pin-caption">
-                <button class="link" data-entity="technique:core:sensing" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
           <li class="tile locked" data-action="core:rope_escape" data-entity="technique:core:rope_escape" data-ui="action-tile">
             <div class="top">
-              <span class="emblem md" data-emblem-icon="rope-coil" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+              <span class="emblem sm" data-emblem-icon="rope-coil" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#4825-1xh8lr1" fill="currentColor">
                 <span class="rank">
@@ -770,13 +765,7 @@
                     <a class="entity-link" href="#/technique/core:rope_escape">
                       Техніка звільнення від мотузок
                   <span class="corner">
-                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                        <circle class="track" cx="22" cy="22" r="18">
-                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                      <span class="level">
-                        1
-                    <button aria-label="Закріпити як мету" class="pin always" data-entity="technique:core:rope_escape" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="technique:core:rope_escape" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                       <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                         <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="facts">
@@ -804,6 +793,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -837,12 +833,9 @@
                         1/25
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 4%;">
-              <p class="pin-caption">
-                <button class="link" data-entity="technique:core:rope_escape" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
           <li class="tile locked" data-action="core:temporary_paralysis" data-entity="technique:core:temporary_paralysis" data-ui="action-tile">
             <div class="top">
-              <span class="emblem md" data-emblem-icon="manacles" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+              <span class="emblem sm" data-emblem-icon="manacles" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#5260-1fz6x15" fill="currentColor">
                 <span class="rank">
@@ -854,13 +847,7 @@
                     <a class="entity-link" href="#/technique/core:temporary_paralysis">
                       Техніка тимчасового паралічу
                   <span class="corner">
-                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                        <circle class="track" cx="22" cy="22" r="18">
-                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                      <span class="level">
-                        1
-                    <button aria-label="Закріпити як мету" class="pin always" data-entity="technique:core:temporary_paralysis" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="technique:core:temporary_paralysis" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                       <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                         <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <div class="live compact" data-fraction="0.000" data-mode="still" data-seal-strip="" style="--tp: 0;">
@@ -893,6 +880,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -926,12 +920,9 @@
                         1/30
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 3.3333333333333335%;">
-              <p class="pin-caption">
-                <button class="link" data-entity="technique:core:temporary_paralysis" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
           <li class="tile locked" data-action="core:hidden_shadow_snake_hands" data-entity="technique:core:hidden_shadow_snake_hands" data-ui="action-tile">
             <div class="top">
-              <span class="emblem md" data-emblem-icon="shadow-grasp" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+              <span class="emblem sm" data-emblem-icon="shadow-grasp" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#1864-901rap" fill="currentColor">
                 <span class="rank">
@@ -943,13 +934,7 @@
                     <a class="entity-link" href="#/technique/core:hidden_shadow_snake_hands">
                       Приховані тіньові руки-змії
                   <span class="corner">
-                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                        <circle class="track" cx="22" cy="22" r="18">
-                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                      <span class="level">
-                        1
-                    <button aria-label="Закріпити як мету" class="pin always" data-entity="technique:core:hidden_shadow_snake_hands" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="technique:core:hidden_shadow_snake_hands" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                       <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                         <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="facts">
@@ -977,6 +962,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -1010,12 +1002,9 @@
                         1/35
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 2.857142857142857%;">
-              <p class="pin-caption">
-                <button class="link" data-entity="technique:core:hidden_shadow_snake_hands" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
           <li class="tile locked" data-action="core:chakra_halving_drill" data-entity="technique:core:chakra_halving_drill" data-ui="action-tile">
             <div class="top">
-              <span class="emblem md" data-emblem-icon="divided-spiral" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+              <span class="emblem sm" data-emblem-icon="divided-spiral" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#3382-1ou8ds7" fill="currentColor">
               <div class="main">
@@ -1024,13 +1013,7 @@
                     <a class="entity-link" href="#/technique/core:chakra_halving_drill">
                       Вправа: поділ чакри
                   <span class="corner">
-                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                        <circle class="track" cx="22" cy="22" r="18">
-                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                      <span class="level">
-                        1
-                    <button aria-label="Закріпити як мету" class="pin always" data-entity="technique:core:chakra_halving_drill" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="technique:core:chakra_halving_drill" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                       <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                         <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <div class="live compact" data-fraction="0.000" data-mode="still" data-seal-strip="" style="--tp: 0;">
@@ -1063,6 +1046,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -1096,12 +1086,9 @@
                         1/40
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 2.5%;">
-              <p class="pin-caption">
-                <button class="link" data-entity="technique:core:chakra_halving_drill" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
           <li class="tile locked" data-action="core:shadow_clone" data-entity="technique:core:shadow_clone" data-ui="action-tile">
             <div class="top">
-              <span class="emblem md" data-emblem-icon="shadow-follower" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
+              <span class="emblem sm" data-emblem-icon="shadow-follower" data-emblem-kind="technique" data-ui="action-emblem" style="--_tint: var(--steel);">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#981-1kuue8n" fill="currentColor">
                 <span class="rank">
@@ -1113,13 +1100,7 @@
                     <a class="entity-link" href="#/technique/core:shadow_clone">
                       Техніка тіньового клонування
                   <span class="corner">
-                    <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                      <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                        <circle class="track" cx="22" cy="22" r="18">
-                        <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                      <span class="level">
-                        1
-                    <button aria-label="Закріпити як мету" class="pin always" data-entity="technique:core:shadow_clone" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                    <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="technique:core:shadow_clone" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                       <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                         <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
                 <div class="live compact" data-fraction="0.000" data-mode="still" data-seal-strip="" style="--tp: 0;">
@@ -1152,6 +1133,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="req">
               <p class="locked-label">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -1185,9 +1173,6 @@
                         1/50
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 2%;">
-              <p class="pin-caption">
-                <button class="link" data-entity="technique:core:shadow_clone" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
       <section aria-label="Пул Майстерності" class="pool" data-entity="skill:nin" data-ui="pool-bar">
         <h2>
           Пул Майстерності

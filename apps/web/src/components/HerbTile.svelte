@@ -51,12 +51,11 @@
   data-entity={entityAttr({ kind: 'item', id: info.id })}
 >
   <div class="ct-top">
-    <ActionEmblem kind="item" id={info.id} skill={info.skill} />
+    <ActionEmblem kind="item" id={info.id} skill={info.skill} size="sm" />
     <div class="ct-head">
       <h3 class="ct-name"><EntityLink kind="item" id={info.id} offered /></h3>
       <span class="ct-corner">
         <PerformerMarks kind={info.kind} id={info.id} />
-        <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
         <PinGoal kind="item" id={info.id} always={!info.available} />
       </span>
     </div>
@@ -94,6 +93,9 @@
           display={t('tile.mxphValue', { n: formatXp(info.masteryPerHour) })}
         />
       </dd>
+    </div>
+    <div class="ct-ring">
+      <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} size={36} />
     </div>
   </dl>
 
@@ -141,10 +143,12 @@
     <div class="req">
       <p class="ct-locked"><Icon name="lucide:lock" size={14} /> {t('tile.locked')}</p>
       <ReqTree node={info.req} />
-      <p class="ct-pin-caption"><PinGoal kind="item" id={info.id} variant="link" /></p>
     </div>
   {/if}
 
+  {#if block}
+    <p class="ct-why" id="why-{info.id}" data-why={block.kind}>{blockText(block)}</p>
+  {/if}
   <div class="ct-actions">
     <StartSplit
       kind={info.kind}
@@ -153,9 +157,6 @@
       describedBy={block ? `why-${info.id}` : undefined}
     />
   </div>
-  {#if block}
-    <p class="ct-why" id="why-{info.id}" data-why={block.kind}>{blockText(block)}</p>
-  {/if}
 </li>
 
 <style>

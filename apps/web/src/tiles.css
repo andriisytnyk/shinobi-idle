@@ -12,9 +12,9 @@
 .ct-tile {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
   min-width: 0;
-  padding: var(--space-3);
+  padding: var(--space-2);
   border: var(--border-thin) solid var(--line);
   border-radius: var(--radius-md);
   background: var(--surface-raised);
@@ -28,15 +28,15 @@
 /* An action tile: the emblem sits left of the head (title and mastery ring). */
 .ct-top {
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
+  align-items: flex-start;
+  gap: var(--space-2);
 }
 
 .ct-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
 .ct-top > .ct-head {
@@ -49,17 +49,18 @@
   flex: none;
   align-items: center;
   gap: var(--space-1);
-}
-
-.ct-pin-caption {
-  margin: var(--space-1) 0 0;
+  margin-left: auto;
 }
 
 .ct-name {
   display: flex;
+  flex: 1;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
+  min-width: 0;
   margin: 0;
+  overflow-wrap: break-word;
   font-size: var(--text-sm);
   font-weight: 600;
 }
@@ -74,11 +75,17 @@
 }
 
 .ct-facts {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  display: grid;
+  --_fact-min: 6rem;
+  grid-template-columns: repeat(auto-fit, minmax(var(--_fact-min), 1fr));
+  align-items: center;
   gap: var(--space-1) var(--space-2);
   margin: 0;
+}
+
+.ct-ring {
+  display: flex;
+  justify-content: flex-start;
 }
 
 .ct-facts dt {
@@ -149,9 +156,12 @@
 }
 
 /* The start button and the clone's beside it: the pair shares the row. */
+/* The row sits at the bottom of the card (the free height goes above it) and is as tall as its button: it never grows. */
 .ct-actions {
   display: flex;
+  flex: none;
   gap: var(--space-2);
+  margin-top: auto;
 }
 
 .ct-actions > button {

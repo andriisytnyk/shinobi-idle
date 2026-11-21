@@ -1,7 +1,15 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { setActiveContent } from './active.ts';
 import { composeBoot } from './boot.ts';
-import { clearMissingKeys, createTranslator, fallbackText, missingKeys, t } from './i18n.ts';
+import {
+  clearMissingKeys,
+  clearUnfilledPlaceholders,
+  unfilledPlaceholders,
+  createTranslator,
+  fallbackText,
+  missingKeys,
+  t,
+} from './i18n.ts';
 
 beforeAll(() => setActiveContent(composeBoot().content));
 
@@ -15,6 +23,19 @@ describe('t', () => {
     expect(missingKeys()).toEqual(['no.such_key', 'skill.testmod:forge.name']);
     expect(warn).toHaveBeenCalledTimes(2);
     warn.mockRestore();
+  });
+
+  it('reports a placeholder no parameter filled, once, and stays quiet when all are filled', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    clearUnfilledPlaceholders();
+    t('course.notEnoughRyo', { price: 'Рьо: 5' });
+    expect(unfilledPlaceholders()).toEqual([]);
+    expect(t('course.notEnoughRyo')).toContain('{price}');
+    t('course.notEnoughRyo');
+    expect(unfilledPlaceholders()).toEqual(['course.notEnoughRyo: {price}']);
+    expect(warn).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
+    clearUnfilledPlaceholders();
   });
 
   it('makes a stand-in from the id part of a key, without the field', () => {

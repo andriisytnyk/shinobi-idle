@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { formatInt } from '../lib/format.ts';
   import { t } from '../lib/i18n.ts';
   import { toasts } from '../lib/toasts.svelte.ts';
   import { resourceName } from '../lib/vocab.ts';
@@ -67,6 +68,12 @@
               items={toast.gains.items}
               xp={toast.gains.xp ?? null}
             />
+            {#each toast.gains.xpList ?? [] as x (x.skill)}
+              <span data-reward="xp" data-skill={x.skill}
+                >{t('toast.mission.xp', { n: formatInt(Math.max(1, Math.round(x.amount))) })}
+                <EntityLink kind="skill" id={x.skill} /></span
+              >
+            {/each}
             {#if toast.gains.resource}
               {@const res = toast.gains.resource}
               {#if res.added > 0}
