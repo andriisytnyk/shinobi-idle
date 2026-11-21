@@ -12,8 +12,10 @@ import {
   hexKey,
   hexOfAddress,
   hexesWithin,
+  hexKeyReqs,
   inSurveyReach,
   isEnterable,
+  routeKeyCost,
   isPlayable,
   isSurveyed,
   linkedKeys,
@@ -188,8 +190,8 @@ export function exploreReq(state: GameState, cell: Cell, content: ContentDb): Re
   const level = cellLevel(state, cell, content);
   if (!region || level >= cellMaxLevel(cell, content)) return null;
   const parts: Req[] = [regionOpenReq(region, content)];
-  const key = keyReq(cell, content);
-  if (key) parts.push(key);
+  // The cell's own key and the key of the terrain it stands on (a cell on a river needs the key of water).
+  parts.push(...hexKeyReqs(content, hexKey(cell.hex[0], cell.hex[1])));
   const scouting = scoutSkill(content);
   parts.push(
     scouting === null
@@ -204,9 +206,11 @@ export function surveyReq(state: GameState, address: string, content: ContentDb)
   const subject = subjectOf(content, address);
   if (!subject) return null;
   if (subject.cell) return exploreReq(state, subject.cell, content);
-  return surveyLevel(state, subject, content) >= surveyMaxLevel(subject, content)
-    ? null
-    : graduateReq(content);
+  if (surveyLevel(state, subject, content) >= surveyMaxLevel(subject, content)) return null;
+  const keys = hexKeyReqs(content, hexKey(subject.hex.q, subject.hex.r));
+  return keys.length === 0
+    ? graduateReq(content)
+    : { t: 'all', of: [graduateReq(content), ...keys] };
 }
 
 /** Why a hex cannot be surveyed now for a cause that is not a requirement (a localization key), or null. */
@@ -422,7 +426,11 @@ export function travelBlocked(
   if (here && here.q === hex.q && here.r === hex.r) return 'error.alreadyThere';
   if (!isEnterable(content, hex) || !isSurveyed(state, content, hexKey(hex.q, hex.r)))
     return 'error.cellNotReachable';
-  return routeTo(state, content, hex, slot) === null ? 'error.cellNotReachable' : null;
+  if (routeTo(state, content, hex, slot) !== null) return null;
+  // No way with the keys the performer has: is there one with all of them?
+  return routeKeyCost(state, content, hex, slot)?.length
+    ? 'error.keyMissing'
+    : 'error.cellNotReachable';
 }
 
 /** Length of a walk to `cell` from where the player stands, modifiers included; at least 1 when no route is known. */

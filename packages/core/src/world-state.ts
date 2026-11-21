@@ -1,5 +1,5 @@
 import type { ContentDb } from '@shinobi/content';
-import { hexKey, hexesWithin, isPlayable } from './hex.ts';
+import { hexKey, hexKeyIds, hexesWithin, isPlayable } from './hex.ts';
 import { indexOf } from './lookup.ts';
 
 /**
@@ -49,12 +49,19 @@ export interface WorldState {
  * it reads as surveyed to level 1 whatever way it was marked; a cell keeps its own count (its
  * level is what finds its points of interest and pays Intel).
  */
-export function seedSurvey(world: WorldState, content: ContentDb, keys: Iterable<string>): void {
+export function seedSurvey(
+  world: WorldState,
+  content: ContentDb,
+  keys: Iterable<string>,
+  /** Marks the hexes that need a key too (the dev panel's «survey all»); a game never does: such a hex is surveyed by a performer who holds the key. */
+  withKeyed = false,
+): void {
   const index = indexOf(content);
   const first = content.balance.K.map.plainSurvey[0] ?? 0;
   for (const key of keys) {
     const hex = index.hexes.get(key);
     if (!isPlayable(hex)) continue;
+    if (!withKeyed && hexKeyIds(content, key).length > 0) continue;
     world.surveyed[key] = true;
     if (!index.cellByHex.has(key) && (world.explores[key] ?? 0) < first)
       world.explores[key] = first;

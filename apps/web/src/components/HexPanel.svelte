@@ -18,7 +18,7 @@
   import { game } from '../lib/store.ts';
   import { skillByActivity } from '../lib/vocab.ts';
   import { moneyName } from '../lib/vocab.ts';
-  import { keyIcon, keyNameKey, uniqueReq } from '../lib/world.ts';
+  import { keyIcon, keyNameKey, keyNeedKey, uniqueReq } from '../lib/world.ts';
   import Slot from '../lib/ext/Slot.svelte';
   import AutoSurveyButton from './AutoSurveyButton.svelte';
   import EntityLink from './EntityLink.svelte';
@@ -62,6 +62,10 @@
       paidBlocked: string | null;
       /** Whether the trip is free and at once: the performer stands on a found outpost and the target is one of its group. */
       free: boolean;
+      /** The keys (ids) that shut the short way: why the trip is refused, or what the route goes round. */
+      keys: string[];
+      /** Whether the route goes round water or another keyed hex. */
+      detour: boolean;
     };
     exploreSlot: number;
     /** The slot whose auto-survey is surveying this very hex now; -1 when none is. */
@@ -108,6 +112,8 @@
           price: plan.price,
           paidBlocked: plan.paidBlocked,
           free: plan.free,
+          keys: plan.keys,
+          detour: plan.detour,
         },
         exploreSlot,
         walkSlot: gs.slots.findIndex(
@@ -173,6 +179,9 @@
     return fog && info.surveyWhy === 'error.scoutLevelLow' ? 'map.why.fog' : info.surveyWhy;
   });
   const reasonGo = $derived(view?.travel.blocked ?? null);
+  /** The keys the hex needs that the performer lacks (a hex in fog says nothing). */
+  const lacking = $derived((info?.keys ?? []).filter((k) => !k.req.met));
+  const keyNames = (ids: string[]): string => ids.map((id) => t(keyNeedKey(id))).join(', ');
 
   /** What the next level of this hex gives, as one line. */
   const nextLine = $derived.by(() => {
@@ -267,6 +276,16 @@
           </span>
         {/if}
       </div>
+
+      {#each lacking as k (k.id)}
+        <section class="block" data-key-need={k.id}>
+          <p class="small">
+            <Icon name={keyIcon(k.id)} size={14} />
+            {t('map.hex.needsKey', { name: t(keyNeedKey(k.id)) })}
+          </p>
+          <ReqTree node={uniqueReq(k.req)} />
+        </section>
+      {/each}
 
       {#if fog}
         <p class="desc dim">{t('map.hex.fogDesc')}</p>
@@ -554,13 +573,19 @@
             {t(reasonSurvey)}
           </li>{/if}
         {#if reasonGo && !info.here}<li class="why" id="why-walk" data-why="walk">
-            {t(reasonGo)}
+            {reasonGo === 'error.keyMissing' && view.travel.keys.length > 0
+              ? t('map.noPathWithout', { name: keyNames(view.travel.keys) })
+              : t(reasonGo)}
           </li>{/if}
         {#if reasonPaid}<li class="why" id="why-paid" data-why="paid">
             {t(reasonPaid, { price: view.travel.price ?? 0 })}
           </li>{/if}
         {#if view.travel.hexes > 0 && !info.here}<li class="route-line" data-route-line>
             {t('map.route', { n: view.travel.hexes, time: formatDuration(view.travel.ms) })}
+            {#if view.travel.detour}
+              · <span data-detour
+                >{t('map.route.detour', { name: keyNames(view.travel.keys) })}</span
+              >{/if}
             {#if view.travel.free}
               · {t('map.route.free')}{/if}
           </li>{/if}

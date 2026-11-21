@@ -307,15 +307,8 @@
                     <path class="face" d="#52-78kory">
                   <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="6,19" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(536.9357503463519 570)">
                     <path class="face" d="#52-78kory">
-                  <g aria-label="Рівнини, розвіданий, рівень 0" aria-pressed="false" class="hex marked" data-hex="7,19" data-state="marked" data-ui="hex" role="button" tabindex="-1" transform="translate(571.5767664977294 570)">
-                    <path class="face" d="#52-78kory" style="--_fill: var(--terrain-plains);">
-                    <path class="glyph" d="#79-1pylrn4">
-                    <g aria-hidden="true" class="pips">
-                      <circle class="pip" cx="-10" cy="13" r="1.8">
-                      <circle class="pip" cx="-5" cy="13" r="1.8">
-                      <circle class="pip" cx="0" cy="13" r="1.8">
-                      <circle class="pip" cx="5" cy="13" r="1.8">
-                      <circle class="pip" cx="10" cy="13" r="1.8">
+                  <g aria-label="Гекс у тумані" aria-pressed="false" class="hex fog" data-hex="7,19" data-state="fog" data-ui="hex" role="button" tabindex="-1" transform="translate(571.5767664977294 570)">
+                    <path class="face" d="#52-78kory">
                   <g aria-label="Рівнини, розвіданий, рівень 0" aria-pressed="false" class="hex marked" data-hex="8,19" data-state="marked" data-ui="hex" role="button" tabindex="-1" transform="translate(606.217782649107 570)">
                     <path class="face" d="#52-78kory" style="--_fill: var(--terrain-plains);">
                     <path class="glyph" d="#79-1pylrn4">

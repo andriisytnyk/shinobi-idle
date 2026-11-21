@@ -325,7 +325,8 @@ export const MIGRATIONS: readonly Migration[] = [
     const marked = { ...seeded, explores: { ...seeded.explores } };
     for (const [id, n] of Object.entries(explores))
       if (typeof n === 'number' && index.cells.has(id)) marked.explores[id] = n;
-    seedSurvey(marked, content, keys);
+    // The save proves these hexes: what it proves is not taken back, a keyed hex included (it is walked only with its key).
+    seedSurvey(marked, content, keys, true);
     return {
       ...state,
       world: { ...world, surveyed: marked.surveyed, explores: { ...marked.explores } },

@@ -659,6 +659,11 @@ export const terrainSchema = z.strictObject({
   id: vocabId,
   token: z.string().optional(),
   blocked: z.boolean().optional(),
+  /**
+   * The key (`cellKeys`) a performer needs to enter, cross or survey a hex of this terrain (water
+   * needs the key of water). A cell on such a hex needs it too, besides its own key.
+   */
+  key: idOf('cellKey').optional(),
   /** The mark drawn on a hex of the terrain: an SVG path in units of the hex (about -12..12 across); none draws a bare hex. */
   glyph: z
     .string()
