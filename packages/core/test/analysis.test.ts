@@ -233,7 +233,7 @@ describe('coverage, hints and secrecy', () => {
     if (!wire) throw new Error('no bind tool');
     stock(state, { [wire.id]: 4 });
     run(state, { type: 'loadout.set', techniques: ['core:leaf_whirlwind'] });
-    run(state, { type: 'pouch.set', slot: 0, item: wire.id });
+    run(state, { type: 'pouch.set', slot: 1, item: wire.id });
     const b = analyze(state, marauder, quick);
     expect(b.coverage.find((c) => c.trait === 'evasive')?.by).toEqual([
       { kind: 'item', id: wire.id },

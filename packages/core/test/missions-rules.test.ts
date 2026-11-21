@@ -535,7 +535,7 @@ describe('A7: failures', () => {
     advance(state, (state.slots[0]?.data as { p: { ms: number } }).p.ms + 500, content);
     expect(state.combat).not.toBeNull();
     // Packed to the per-fight amount on the way into the fight.
-    expect(state.combat?.fight.pouch[0]).toEqual({ id: heal, n: 10 });
+    expect(state.combat?.fight.pouch[0]).toEqual({ id: heal, n: 4 });
     // Used up during the fight; nothing refills it until the next fight begins.
     if (state.combat) state.combat.fight.pouch[0] = { id: heal, n: 0 };
     advance(state, 5 * 60_000, content);

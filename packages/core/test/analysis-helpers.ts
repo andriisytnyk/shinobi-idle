@@ -9,7 +9,6 @@ import {
   type AnalysisTarget,
   type GameState,
 } from '../src/index.ts';
-import { K } from './fight-helpers.ts';
 import { setLevel } from './helpers.ts';
 import { wellStocked } from './prep-helpers.ts';
 import {

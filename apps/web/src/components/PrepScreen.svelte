@@ -372,11 +372,17 @@
                 {/each}
               </select>
             {/if}
-            <span class="note" data-pouch-amount>{t('prep.pouchPerFight', { n: formatInt(slot.perFight) })}</span>
+            <span class="note" data-pouch-amount
+              >{t('prep.pouchPerFight', { n: formatInt(slot.perFight) })}</span
+            >
             {#if slot.id !== ''}
-              <span class="note" data-pouch-stock>{t('prep.pouchBank', { n: formatInt(slot.stock) })}</span>
+              <span class="note" data-pouch-stock
+                >{t('prep.pouchBank', { n: formatInt(slot.stock) })}</span
+              >
             {/if}
-            {#if view.fighting && slot.id !== ''}<span class="note" data-pouch-now>{t('prep.pouchCarried', { n: formatInt(slot.n) })}</span>{/if}
+            {#if view.fighting && slot.id !== ''}<span class="note" data-pouch-now
+                >{t('prep.pouchCarried', { n: formatInt(slot.n) })}</span
+              >{/if}
           </li>
         {/each}
       </ul>
@@ -539,6 +545,13 @@
     align-items: center;
     gap: var(--space-2);
     min-height: var(--control-md);
+  }
+
+  .slot .kind {
+    flex: 1 0 100%;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--fg-dim);
   }
 
   .slot.empty {

@@ -34,7 +34,8 @@ const known = (v: number | Unknown): number | null => (typeof v === 'number' ? v
 export function forecastKeyOf(gs: GameState, target: PrepTarget, content: ContentDb): string {
   const level = knowledgeOfTarget(gs, target, content);
   if (!disclosure(level).verdict) return '';
-  const cap = (kind: string): number => content.pouchKinds.find((k) => k.id === kind)?.perFight ?? 0;
+  const cap = (kind: string): number =>
+    content.pouchKinds.find((k) => k.id === kind)?.perFight ?? 0;
   return JSON.stringify([
     target,
     level,

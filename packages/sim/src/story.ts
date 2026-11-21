@@ -230,7 +230,12 @@ export function playSlice(options: StoryOptions = {}): StoryRun {
       const def = content.items.find((i) => i.id === item);
       const slot = state.pouch.slots.findIndex((s, i) => {
         const kind = pouchKind(content, s.kind);
-        return def !== undefined && kind !== undefined && !used.has(i) && itemFitsKind(def, kind, content);
+        return (
+          def !== undefined &&
+          kind !== undefined &&
+          !used.has(i) &&
+          itemFitsKind(def, kind, content)
+        );
       });
       if (slot < 0) continue;
       used.add(slot);

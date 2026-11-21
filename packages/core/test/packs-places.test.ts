@@ -216,10 +216,10 @@ describe('the pouch of a player who loses a pack', () => {
     const state = modGenin();
     state.bank['testmod:elixir'] = 10;
     expect(
-      dispatch(state, { type: 'pouch.set', slot: 2, item: 'testmod:elixir' }, modContent, modRules)
+      dispatch(state, { type: 'pouch.set', slot: 3, item: 'testmod:elixir' }, modContent, modRules)
         .ok,
     ).toBe(true);
-    const packed = state.pouch.slots[2]?.n ?? 0;
+    const packed = state.pouch.slots[3]?.n ?? 0;
     expect(packed).toBeGreaterThan(0);
     expect((state.bank['testmod:elixir'] ?? 0) + packed).toBe(10);
     const core = deserialize(serialize(state), plainContent, plainRules);
@@ -230,7 +230,7 @@ describe('the pouch of a player who loses a pack', () => {
       (back.bank['testmod:elixir'] ?? 0) +
       back.pouch.slots.filter((s) => s.id === 'testmod:elixir').reduce((n, s) => n + s.n, 0);
     expect(units).toBe(10);
-    expect(back.pouch.slots[2]?.id).toBe('testmod:elixir');
+    expect(back.pouch.slots[3]?.id).toBe('testmod:elixir');
     void setSkill;
   });
 });

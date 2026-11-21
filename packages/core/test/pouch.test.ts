@@ -24,7 +24,7 @@ import { fighter, ids, run, startFight, startOperation, stock, unlock } from './
 
 const LEVEL = 34;
 /** Units a food slot takes into a fight (the per-fight amount of its kind). */
-const FOOD = 10;
+const FOOD = 4;
 
 /** A fight in which the AI uses `item` the first time it can, and otherwise waits. */
 function itemFight(
@@ -79,19 +79,21 @@ describe('stacks', () => {
     expect(state.pouch.slots.map((s) => s.kind)).toEqual([
       'core:pk_food',
       'core:pk_combat',
+      'core:pk_combat',
       'core:pk_cure',
     ]);
     state.player.rank = 'chunin';
     stock(state, { [ids.kunai]: 1, [ids.tag]: 1 });
     run(state, { type: 'pouch.set', slot: 1, item: ids.kunai });
     // The same item cannot sit in two slots, even of the same kind.
-    expect(dispatch(state, { type: 'pouch.set', slot: 3, item: ids.kunai }, content)).toEqual({
+    expect(dispatch(state, { type: 'pouch.set', slot: 2, item: ids.kunai }, content)).toEqual({
       ok: false,
       reason: 'error.itemInPouch',
     });
-    run(state, { type: 'pouch.set', slot: 3, item: ids.tag });
+    run(state, { type: 'pouch.set', slot: 4, item: ids.tag });
     expect(state.pouch.slots.map((s) => s.kind)).toEqual([
       'core:pk_food',
+      'core:pk_combat',
       'core:pk_combat',
       'core:pk_cure',
       'core:pk_combat',

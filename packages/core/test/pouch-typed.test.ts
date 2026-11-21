@@ -41,7 +41,7 @@ const CURE = perFight(content, 'core:pk_cure');
 
 describe('the kinds of slot', () => {
   it('have the per-fight amounts of the data', () => {
-    expect([FOOD, COMBAT, CURE]).toEqual([10, 4, 3]);
+    expect([FOOD, COMBAT, CURE]).toEqual([4, 4, 3]);
   });
 
   it('take only the items whose use the kind has', () => {
@@ -52,22 +52,22 @@ describe('the kinds of slot', () => {
     // Food and medicine in the food slot, tools in the combat slot, cures in the cure slot.
     expect(set(0, ids.heal).ok).toBe(true);
     expect(set(1, ids.kunai).ok).toBe(true);
-    expect(set(2, ids.antidote).ok).toBe(true);
+    expect(set(3, ids.antidote).ok).toBe(true);
     // Each item in a slot of another kind is refused, and the slot is left as it was.
     for (const [slot, item] of [
       [0, ids.kunai],
       [0, ids.antidote],
       [1, ids.heal],
       [1, ids.antidote],
-      [2, ids.heal],
-      [2, ids.kunai],
+      [3, ids.heal],
+      [3, ids.kunai],
     ] as const) {
       expect(set(slot, item), `${item} in slot ${slot}`).toEqual({
         ok: false,
         reason: 'error.wrongSlotKind',
       });
     }
-    expect(state.pouch.slots.map((s) => s.id)).toEqual([ids.heal, ids.kunai, ids.antidote]);
+    expect(state.pouch.slots.map((s) => s.id)).toEqual([ids.heal, ids.kunai, '', ids.antidote]);
   });
 });
 
@@ -77,8 +77,8 @@ describe('the amount per fight', () => {
     stock(state, { [ids.heal]: 240, [ids.kunai]: 50, [ids.antidote]: 9 });
     run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
     run(state, { type: 'pouch.set', slot: 1, item: ids.kunai });
-    run(state, { type: 'pouch.set', slot: 2, item: ids.antidote });
-    expect(state.pouch.slots.map((s) => s.n)).toEqual([FOOD, COMBAT, CURE]);
+    run(state, { type: 'pouch.set', slot: 3, item: ids.antidote });
+    expect(state.pouch.slots.map((s) => s.n)).toEqual([FOOD, COMBAT, 0, CURE]);
     expect(state.bank[ids.heal]).toBe(240 - FOOD);
     expect(state.bank[ids.kunai]).toBe(50 - COMBAT);
     expect(state.bank[ids.antidote]).toBe(9 - CURE);
@@ -188,7 +188,9 @@ describe('the pouch of a clone', () => {
     ensurePouch(state, content);
     stock(state, { [ids.heal]: 100 });
     run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
-    expect(dispatch(state, { type: 'clone.create', items: { [ids.heal]: 12 } }, content)).toEqual({
+    expect(
+      dispatch(state, { type: 'clone.create', items: { [ids.heal]: FOOD + 2 } }, content),
+    ).toEqual({
       ok: true,
     });
     const body = state.clones[1];
@@ -243,12 +245,13 @@ describe('saves', () => {
     expect(loaded.pouch.slots.map((s) => [s.kind, s.id, s.n])).toEqual([
       ['core:pk_food', ids.heal, 4],
       ['core:pk_combat', ids.kunai, 4],
+      ['core:pk_combat', ids.tag, 2],
       ['core:pk_cure', '', 0],
     ]);
     expect(loaded.pouch.medic).toBe(0);
-    // The second food, the second tool and the thing that is no pouch item are in the Bank again.
+    // The second food (the one food slot is taken) and the thing that is no pouch item are in the Bank again.
     expect(loaded.bank[ids.bigHeal]).toBe(3);
-    expect(loaded.bank[ids.tag]).toBe((bank[ids.tag] ?? 0) + 2);
+    expect(loaded.bank[ids.tag]).toBe(bank[ids.tag]);
     expect(loaded.bank['core:rice']).toBe((bank['core:rice'] ?? 0) + 6);
     expect(loaded.bank[ids.heal]).toBe(bank[ids.heal]);
   });
@@ -276,7 +279,7 @@ describe('saves', () => {
     const combat = raw.state.combat as { fight: { pouch: unknown[]; medic: number | null } };
     combat.fight.pouch = [
       { id: ids.kunai, n: 1 },
-      { id: ids.heal, n: 7 },
+      { id: ids.heal, n: 3 },
     ];
     combat.fight.medic = 1;
     const loaded = deserialize(JSON.stringify(raw), content);
@@ -284,13 +287,15 @@ describe('saves', () => {
       [ids.heal, FOOD],
       [ids.kunai, 2],
       ['', 0],
+      ['', 0],
     ]);
     expect(loaded.pouch.medic).toBe(0);
     expect(loaded.bank[ids.heal]).toBe((state.bank[ids.heal] ?? 0) + 40 - FOOD);
     // The fight in progress counts the slots in the new order, so the game goes on.
     expect(loaded.combat?.fight.pouch.map((s) => [s.id, s.n])).toEqual([
-      [ids.heal, 7],
+      [ids.heal, 3],
       [ids.kunai, 1],
+      ['', 0],
       ['', 0],
     ]);
     expect(loaded.combat?.fight.medic).toBe(0);
@@ -312,6 +317,7 @@ describe('a kind that a pack adds', () => {
     expect(pouchLayout(state, modContent)).toEqual([
       'core:pk_food',
       'core:pk_combat',
+      'core:pk_combat',
       'core:pk_cure',
       'testmod:pk_phials',
     ]);
@@ -320,12 +326,12 @@ describe('a kind that a pack adds', () => {
     state.bank[ids.kunai] = 5;
     const set = (slot: number, item: string) =>
       dispatch(state, { type: 'pouch.set', slot, item }, modContent, modRules);
-    expect(set(3, ids.kunai)).toEqual({ ok: false, reason: 'error.wrongSlotKind' });
-    expect(set(3, 'testmod:elixir').ok).toBe(true);
-    expect(state.pouch.slots[3]).toEqual({ kind: 'testmod:pk_phials', id: 'testmod:elixir', n: 2 });
+    expect(set(4, ids.kunai)).toEqual({ ok: false, reason: 'error.wrongSlotKind' });
+    expect(set(4, 'testmod:elixir').ok).toBe(true);
+    expect(state.pouch.slots[4]).toEqual({ kind: 'testmod:pk_phials', id: 'testmod:elixir', n: 2 });
     expect(state.bank['testmod:elixir']).toBe(8);
     // The save keeps the kind with the slot.
     const back = deserialize(serialize(state, 0), modContent, modRules);
-    expect(back.pouch.slots[3]).toEqual(state.pouch.slots[3]);
+    expect(back.pouch.slots[4]).toEqual(state.pouch.slots[4]);
   });
 });

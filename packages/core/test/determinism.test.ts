@@ -30,10 +30,10 @@ type Scenario = (state: GameState, at: number) => void;
 
 const scenarios: Record<string, Scenario> = {
   'a zone fight with tools from the pouch': (state, at) => {
-    stock(state, { [ids.heal]: 12, [ids.antidote]: 12, [ids.tag]: 12, [ids.medpouch]: 1 });
+    stock(state, { [ids.heal]: 12, [ids.kunai]: 12, [ids.tag]: 12, [ids.medpouch]: 1 });
     run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
     run(state, { type: 'pouch.set', slot: 1, item: ids.tag });
-    run(state, { type: 'pouch.set', slot: 2, item: ids.antidote });
+    run(state, { type: 'pouch.set', slot: 2, item: ids.kunai });
     run(state, { type: 'pouch.medic', slot: 0 });
     // A weak player in a pack zone: the tags and the pills are in constant use.
     for (const skill of ['tai', 'nin', 'katon', 'vit'] as const) setLevel(state, skill, 14);
@@ -317,7 +317,7 @@ describe('A12: saves', () => {
     const loaded = deserialize(JSON.stringify(raw), content);
     expect(loaded.v).toBe(STATE_VERSION);
     expect(loaded.wounds).toEqual({ stacks: 0, left: 0 });
-    expect(loaded.pouch.slots).toHaveLength(3);
+    expect(loaded.pouch.slots).toHaveLength(4);
     expect(loaded.bingo['core:bandit']?.seen).toBeGreaterThanOrEqual(1);
     expect(loaded.loadouts.auto).toBe(true);
     expect(loaded.loadouts.active.length).toBeGreaterThan(0);
@@ -350,7 +350,7 @@ describe('A12: saves', () => {
     expect(loaded.loadouts.active).toEqual(['core:great_fireball']);
     expect(loaded.loadouts.signature).toBeNull();
     expect(loaded.loadouts.saved.x?.techniques).toEqual([]);
-    expect(loaded.pouch.slots.map((s) => s.id)).toEqual(['', 'core:kunai', '']);
+    expect(loaded.pouch.slots.map((s) => s.id)).toEqual(['', 'core:kunai', '', '']);
     // A slot carries the per-fight amount of its kind; the rest goes back to the Bank, with what the wrong slot held.
     expect(loaded.pouch.slots[1]?.n).toBe(4);
     expect(loaded.bank['core:kunai']).toBe(95);
