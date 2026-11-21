@@ -20,7 +20,7 @@
               Дальність розвідки: 2 гекси
           <div class="auto-row">
             <span class="split plain" data-for="autosurvey" data-ui="start-split">
-              <button class="main ct-action" data-auto="" data-performer="0" data-start="true" type="button">
+              <button class="main ct-action wrap" data-auto="" data-performer="0" data-start="true" type="button">
                 Авторозвідка
         <div class="stage wide">
           <div class="map-wrap">

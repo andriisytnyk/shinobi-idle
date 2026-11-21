@@ -823,7 +823,8 @@
   /* Two columns where they fit, one where they do not: every label is shown in full. */
   .buttons {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    --_cell: 9rem;
+    grid-template-columns: repeat(auto-fit, minmax(var(--_cell), 1fr));
     gap: var(--space-3);
   }
 
