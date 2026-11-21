@@ -327,7 +327,7 @@
    "C": 4,
    "V": 2
   },
-  "missionXpShare": 0.85,
+  "missionXpShare": 0.3,
   "missionRateCap": {
    "D": 25,
    "C": 45,
