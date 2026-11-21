@@ -185,11 +185,13 @@ describe('A3: views follow the core without a reload', () => {
     expect(target.querySelector(`[data-herb="${MINT}"] [data-regrow]`)).toBeNull();
   });
 
-  it('the herb tile states the regrow rule in one sentence, with the numbers of the data', () => {
-    app = mount(HerbTile, { target, props: { info: info(MINT, 'gather') } });
+  it('the herb page states the regrow rule once, with the numbers of the data', () => {
+    app = mount(SkillPage, { target, context: coreContext(), props: { id: 'herb' } });
     flushSync();
     const K = content.balance.K.field;
-    const rule = text(target.querySelector(`[data-herb="${MINT}"] [data-regrow-rule]`));
+    expect(target.querySelectorAll('[data-regrow-rule]')).toHaveLength(1);
+    expect(target.querySelectorAll('[data-herb] [data-regrow-rule]')).toHaveLength(0);
+    const rule = text(target.querySelector('[data-regrow-rule]'));
     expect(rule).toContain(`по одній траві за ${K.regrowEachMs / 1000} с`);
     expect(rule).toContain(`відростає весь за ${K.regrowMs / 1000} с`);
     expect(rule).toContain('Кожен рівень Майстерності додає ще одну траву');
@@ -431,7 +433,7 @@ describe('the quantity field', () => {
     expect(game.state.currencies.ryo ?? 0).toBe(100 - Math.round(17 * 4 * 0.98));
   });
 
-/** One real keystroke: the browser has already put the character in the field, then fires input. */
+  /** One real keystroke: the browser has already put the character in the field, then fires input. */
   const key = (selector: string, text: string) => {
     const input = target.querySelector<HTMLInputElement>(selector);
     if (!input) throw new Error(`no ${selector}`);

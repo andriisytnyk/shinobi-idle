@@ -172,6 +172,7 @@
   "technique.source": "Звідки береться",
   "technique.requirements": "Вимоги",
   "technique.mastery": "Тренування й Майстерність",
+  "technique.notKnown": "Ще не знаєш цієї техніки",
   "technique.src.N": "Навчає наставник",
   "technique.src.S": "Сувій або бібліотека",
   "technique.src.O": "Дістається від боса чи ворога",

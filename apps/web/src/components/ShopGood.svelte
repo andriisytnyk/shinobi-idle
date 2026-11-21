@@ -72,7 +72,8 @@
 >
   <span class="ct-icon"><Icon entity={{ kind: 'item', id: item }} size={28} /></span>
   <span class="grow"><EntityLink kind="item" id={item} offered /></span>
-  <span class="ct-muted" data-price>{t('shop.price', { n: formatInt(price), currency: unit })}{discount > 0
+  <span class="ct-muted" data-price
+    >{t('shop.price', { n: formatInt(price), currency: unit })}{discount > 0
       ? ` (${t('shop.discount', { pct: formatInt(discount) })})`
       : ''}</span
   >

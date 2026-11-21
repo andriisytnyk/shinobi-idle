@@ -16,6 +16,7 @@
   import ModBreakdown from './ModBreakdown.svelte';
   import PinGoal from './PinGoal.svelte';
   import ReqTree from './ReqTree.svelte';
+  import TechniqueSource from './TechniqueSource.svelte';
   import SealStrip from './SealStrip.svelte';
   import TimeBar from './TimeBar.svelte';
   import Slot from '../lib/ext/Slot.svelte';
@@ -53,9 +54,12 @@
     const base = info.req;
     if (!base || !technique) return base;
     const rank = techniqueRankReq(technique.id, content);
-    if (!rank) return base;
-    const of = base.req.t === 'all' ? base.req.of : [base.req];
-    return game.read((gs) => evalReq(gs, { t: 'all', of: [...of, rank] }, content));
+    const all = base.req.t === 'all' ? base.req.of : [base.req];
+    // The technique is never its own requirement: the rows are what actually blocks it.
+    const of = all.filter((q) => !(q.t === 'technique' && q.id === technique.id));
+    if (rank) of.push(rank);
+    if (of.length === all.length && !rank) return base;
+    return game.read((gs) => evalReq(gs, { t: 'all', of }, content));
   });
   const stripSeals = $derived(technique?.sealSeq ?? []);
   const flash = $derived(
@@ -140,6 +144,7 @@
   {:else if lockReq}
     <div class="req">
       <p class="locked-label"><Icon name="lucide:lock" size={14} /> {t('tile.locked')}</p>
+      {#if technique && technique.src !== 'N'}<TechniqueSource id={technique.id} />{/if}
       <ReqTree node={lockReq} />
     </div>
   {/if}
@@ -210,8 +215,8 @@
   /* The numbers sit in even columns that reflow with the card's width; the mastery ring is the last cell. */
   .facts {
     display: grid;
-    --_fact-min: 6rem;
-    grid-template-columns: repeat(auto-fit, minmax(var(--_fact-min), 1fr));
+    --_fact-min: 7.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--_fact-min)), 1fr));
     align-items: center;
     gap: var(--space-1) var(--space-2);
     margin: 0;
@@ -229,7 +234,8 @@
 
   dd {
     margin: 0;
-    white-space: nowrap;
+    min-width: 0;
+    overflow-wrap: break-word;
     font-variant-numeric: tabular-nums;
   }
 

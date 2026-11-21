@@ -150,6 +150,40 @@ describe('A5: action tiles', () => {
     expect(body).toMatch(anchor({ kind: 'skill', id: 'katon' }));
   });
 
+  describe('a locked technique tile by source', () => {
+    const lockedTile = (src: string): string => {
+      const tech = content.techniques.find((x) => x.src === src && x.level > 1);
+      if (!tech) throw new Error(`no ${src} technique`);
+      const info = actionInfo(game.state, { kind: 'practice', id: tech.id }, content);
+      if (!info) throw new Error('no info');
+      expect(info.available).toBe(false);
+      return html(ActionTile, { info });
+    };
+
+    it('a mentor technique lists only what blocks it, never itself, no extra sentence', () => {
+      const body = lockedTile('N');
+      expect(body).toContain('Поки закрито');
+      expect(body).not.toContain('ще не відкрито');
+      expect(body).not.toContain('Навчає наставник');
+      expect(body).not.toContain('Ще не знаєш цієї техніки');
+    });
+
+    for (const src of ['S', 'O', 'Q']) {
+      it(`a ${src} technique says it is not known yet, says where to get it, no self row`, () => {
+        const body = lockedTile(src);
+        expect(body).toContain('Ще не знаєш цієї техніки');
+        expect(body).toContain(`data-technique-source="${src}"`);
+        expect(body).not.toContain('ще не відкрито');
+      });
+    }
+
+    it('the sheet of a mentor technique has no source sentence', () => {
+      const tech = content.techniques.find((x) => x.src === 'N');
+      if (!tech) throw new Error('no N technique');
+      expect(html(TechniqueSheet, { id: tech.id })).not.toContain('Навчає наставник');
+    });
+  });
+
   it('a running tile offers to stop', () => {
     const info = listSkillActions(game.state, 'tai', content)[0];
     if (!info) throw new Error('no tai action');
