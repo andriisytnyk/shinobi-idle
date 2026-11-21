@@ -1,5 +1,12 @@
 import type { ContentDb } from '@shinobi/content';
-import { currentHp, performerHpRegen, type GameState, type Rules } from '@shinobi/core';
+import {
+  asPerformer,
+  currentHp,
+  fightOf,
+  performerHpRegen,
+  type GameState,
+  type Rules,
+} from '@shinobi/core';
 import { formatHpRate, formatInt } from './format.ts';
 import { t } from './i18n.ts';
 
@@ -7,13 +14,19 @@ import { t } from './i18n.ts';
 export interface Vitals {
   hp: number;
   max: number;
-  /** Health per second out of a fight. */
+  /** Health per second now: out of a fight the whole rate, in a fight its share (`combat.hpRegenShare`). */
   regen: number;
 }
 
 export function vitalsOf(state: GameState, slot: number, content: ContentDb, rules: Rules): Vitals {
   const { hp, max } = currentHp(state, slot, content);
-  return { hp, max, regen: performerHpRegen(state, content, rules) };
+  // A clone's rate is read as the clone: its own modifiers (the character's tonics are not its).
+  const rate =
+    slot > 0
+      ? asPerformer(state, slot, () => performerHpRegen(state, content, rules))
+      : performerHpRegen(state, content, rules);
+  const fighting = fightOf(state, slot)?.phase === 'fight';
+  return { hp, max, regen: fighting ? rate * content.balance.K.combat.hpRegenShare : rate };
 }
 
 /** `34 / 120`: the health as a pair of whole numbers (a fraction of a point is not shown). */

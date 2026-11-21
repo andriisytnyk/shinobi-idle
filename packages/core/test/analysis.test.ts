@@ -41,8 +41,7 @@ describe('the session forecast against real play', () => {
   const cases: { c: Case; played: number; verdict: 'stable' | 'risky' | 'hopeless' }[] = [
     { c: zone(false), played: 2, verdict: 'stable' },
     { c: zone(true), played: 2, verdict: 'stable' },
-    // A boss is not farmed in a row any more: the health does not come back between fights, so the series collapses.
-    { c: boss(46), played: 8, verdict: 'hopeless' },
+    { c: boss(46), played: 8, verdict: 'risky' },
     { c: hideout, played: 3, verdict: 'risky' },
   ];
   for (const [i, { c, played: games, verdict }] of cases.entries()) {
@@ -112,7 +111,8 @@ describe('the session forecast against real play', () => {
       minSessions: 4,
     });
     expect(a.fresh.winRate).toBeGreaterThan(0.6);
-    expect(a.session?.winRate.median ?? 1).toBeLessThan(0.3);
+    // The wait for health after a defeat lifts a series of such fights, but a boss is still no farm (median under 40%).
+    expect(a.session?.winRate.median ?? 1).toBeLessThan(0.4);
     expect(a.session?.verdict).not.toBe('stable');
     expect('winsPerHour' in a).toBe(false);
     expect(a.fresh.winRateCi.hi - a.fresh.winRateCi.lo).toBeGreaterThan(0);

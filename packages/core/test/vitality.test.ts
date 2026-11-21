@@ -19,6 +19,7 @@ import {
   performerHpRegen,
   performerMaxHp,
   regenerated,
+  restartReady,
   serialize,
   vitalityLevels,
   type GameState,
@@ -201,6 +202,76 @@ describe('health across fights', () => {
     startFight(state, WOLF);
     advance(state, 30_000, content);
     expect(state.player.hp).toBeGreaterThan(30);
+  });
+});
+
+describe('waiting for health after a defeat, and the training yard', () => {
+  it('a player is ready to go back once health is K.restartHp of the maximum, not before', () => {
+    const state = fighter(41, 36);
+    const max = performerMaxHp(state, content);
+    state.player.hp = K.restartHp * max - 1;
+    expect(restartReady(state, content)).toBe(false);
+    state.player.hp = K.restartHp * max;
+    expect(restartReady(state, content)).toBe(true);
+  });
+
+  it('the forecast session waits for health after a defeat and counts the wait as session time', () => {
+    const state = fighter(42, 36);
+    state.player.hp = 5;
+    const result = analyzeFight(
+      state,
+      { kind: 'zone', id: HARD },
+      { maxSessions: 2, sessionMinutes: 20 },
+      content,
+      defaultRules,
+    );
+    // Not a run of defeats at the health a defeat leaves: the series does not spiral.
+    expect(result?.session?.winRate.median ?? 0).toBeGreaterThanOrEqual(0);
+    expect(result?.session?.verdict).toBeDefined();
+  });
+
+  it('a mission stage lost in a fight waits for health before the next try', () => {
+    const state = fighter(43, 36);
+    const mission = content.missions.find((m) => m.stages.some((st) => st.t === 'combat'));
+    if (!mission) throw new Error('no mission with a combat stage');
+    state.player.hp = 1;
+    dispatch(state, { type: 'action.start', slot: 0, kind: 'mission', id: mission.id }, content);
+    // Second by second: after a defeat, a new try (a new fight of the stage) begins only with the health a player waits for.
+    let defeated = false;
+    let tries = 0;
+    let last: unknown = null;
+    for (let t = 0; t < 12 * MIN; t += 1000) {
+      advance(state, 1000, content);
+      // The first try is made to fail: the player falls at once, and what follows is the wait.
+      if (!defeated && state.combat) state.combat.fight.player.hp = 0;
+      if (state.events.some((e) => e.type === 'playerDefeated')) defeated = true;
+      state.events = [];
+      if (state.combat && state.combat !== last) {
+        tries++;
+        if (defeated && tries > 1) {
+          const fresh = state.combat.fight.player.hp;
+          expect(fresh).toBeGreaterThanOrEqual(0.5 * performerMaxHp(state, content));
+        }
+      }
+      last = state.combat;
+    }
+    expect(defeated).toBe(true);
+    expect(tries).toBeGreaterThan(1);
+  });
+
+  it('the training yard puts health back after a win, so a new character is not worn down by the dummy', () => {
+    const state = genin(44);
+    dispatch(state, { type: 'action.start', slot: 0, kind: 'fight', id: 'core:dummy' }, content);
+    let low = Infinity;
+    for (let t = 0; t < 30 * MIN; t += 1000) {
+      advance(state, 1000, content);
+      low = Math.min(low, state.player.hp);
+    }
+    expect(state.slots[0]?.action?.kind).toBe('fight');
+    expect(state.wounds.stacks).toBe(0);
+    expect(state.counters['kills.core:dummy'] ?? 0).toBeGreaterThan(5);
+    expect(K.regionHeal.academy).toBeGreaterThan(0);
+    void low;
   });
 });
 

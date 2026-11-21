@@ -2189,10 +2189,12 @@
     ],
     "K.zoneHpRegen": 0,
     "K.hpRegen": [
-      0.03,
-      0.027
+      0.09,
+      0.02
     ],
     "K.defeatHp": 0.2,
+    "K.restartHp": 0.8,
+    "K.regionHeal.academy": 1,
     "K.opRegen": 0.25,
     "K.respawn": 3,
     "K.wound.stat": 0.05,
@@ -2398,7 +2400,7 @@
     "K.itemFx.sleep.chance": 0.5,
     "K.combat.xpTickMs": 1000,
     "K.combat.regenMs": 1000,
-    "K.combat.hpRegenShare": 0.1,
+    "K.combat.hpRegenShare": 0,
     "K.combat.hitEven": 0.5,
     "K.combat.fightCapMs": 240000,
     "K.combat.maxEnemies": 8,
@@ -7327,10 +7329,9 @@
       "squad.held": "0be35df67359",
       "squad.heldValue": "e4afe3800ae2",
       "squad.hp": "b0d8558593e3",
-      "squad.hpValue": "df47b26cb05c",
       "vitals.hp": "b0d8558593e3",
       "vitals.regen": "cce5678faadc",
-      "vitals.title": "cf3011880913",
+      "vitals.title": "8ec98f8a87d8",
       "report.hp": "116f739c6070",
       "squad.chakra": "c45dc149aa1a",
       "squad.chakraValue": "a07835650a31",
@@ -8099,6 +8100,8 @@
       "zoneHpRegen",
       "hpRegen",
       "defeatHp",
+      "restartHp",
+      "regionHeal",
       "opRegen",
       "respawn",
       "wound",
@@ -8481,6 +8484,9 @@
     "K.rest": [
       "s",
       "share"
+    ],
+    "K.regionHeal": [
+      "academy"
     ],
     "K.wound": [
       "stat",

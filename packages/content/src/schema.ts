@@ -1581,6 +1581,10 @@ export const balanceParamsSchema = z.object({
   hpRegen: pair,
   /** The share of the maximum health the character wakes with after a defeat. */
   defeatHp: z.number().min(0).max(1),
+  /** The share of the maximum health a player waits for before going back to a fight after a defeat (a forecast session, a mission stage). */
+  restartHp: z.number().min(0).max(1),
+  /** By region of the enemy: the share of the maximum health a won zone fight against it restores (the training yard of the Academy: a new character is not worn down by the dummy). */
+  regionHeal: z.record(z.string(), z.number().min(0).max(1)),
   opRegen: z.number(),
   respawn: z.number(),
   wound: z.object({
@@ -1705,7 +1709,7 @@ export const balanceParamsSchema = z.object({
   combat: z.object({
     xpTickMs: z.number().int(),
     regenMs: z.number().int(),
-    /** The share of the health regeneration (`hpRegen`) that works while a fight is on: the rest of it works between fights and out of them. */
+    /** The share of the health regeneration (`hpRegen`) that works while a fight is on; out of a fight the whole of it works. */
     hpRegenShare: z.number().min(0).max(1),
     hitEven: z.number(),
     fightCapMs: z.number().int(),

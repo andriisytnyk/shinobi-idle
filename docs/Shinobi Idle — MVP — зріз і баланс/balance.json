@@ -263,9 +263,13 @@
   ],
   "zoneHpRegen": 0,
   "hpRegen": [
-   0.03,
-   0.027
+   0.09,
+   0.02
   ],
+  "restartHp": 0.8,
+  "regionHeal": {
+   "academy": 1
+  },
   "defeatHp": 0.2,
   "opRegen": 0.25,
   "respawn": 3,

@@ -27,7 +27,7 @@ import { openWorld } from './prep-state.ts';
 const HOURS = 2;
 const STEP = 10_000;
 /** The share of the maximum health at which a player who has fallen goes back to the zone. */
-const REST_AT = 0.8;
+const REST_AT = content.balance.K.restartHp;
 /** Units of the level's food a player has in the Bank for the session: a few stacks of the pouch. */
 const BANK_STOCK = 240;
 // The thief is a mission enemy: no zone, fought only through its mission, so not here.
@@ -153,6 +153,6 @@ describe('two hours of continuous zone fighting', () => {
 /** Defeats allowed in two hours with food. */
 const MOST_DEFEATS = 2;
 /** The band of minutes in which a series without food ends in a defeat. */
-const BAND: [number, number] = [1, 40];
+const BAND: [number, number] = [1, 10];
 /** Enemies that a player of their level never loses to, even with no food (they barely hurt). */
 const NO_DEFEAT: string[] = [];

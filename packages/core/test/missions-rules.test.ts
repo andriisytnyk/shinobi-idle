@@ -452,6 +452,9 @@ describe('A7: failures', () => {
     expect(lost()).toBe(1);
     expect(state.wounds.stacks).toBeGreaterThan(0);
     expect(state.slots[0]?.data).toMatchObject({ s: 1, a: 1 });
+    // The player waits for health (K.restartHp) before the next try; the stage starts over once it is back.
+    expect(state.combat).toBeNull();
+    for (let i = 0; i < 40 * 60 && state.combat === null; i++) advance(state, 1000, content);
     expect(state.combat).not.toBeNull();
     // The scouting stage was passed once and never repeated.
     const stages = state.events.flatMap((e) => (e.type === 'missionStage' ? [e] : []));

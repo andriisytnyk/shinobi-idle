@@ -9,6 +9,7 @@ import type { TeamNatures } from './natures.ts';
 import { updateQuests } from './quests.ts';
 import type { VillageState } from './village-state.ts';
 import { ensurePouch } from './combat/pouch.ts';
+import { maxHpOf, type Levels } from './combat/numbers.ts';
 import { createWorld, type WorldState } from './world-state.ts';
 import { refreshUnlocks } from './unlocks.ts';
 
@@ -208,7 +209,7 @@ export function createState(seed: number, content: ContentDb): GameState {
       name: '',
       rank: content.playerRanks[0]?.id ?? '',
       natures: [],
-      hp: content.balance.K.hpBase + content.balance.K.hpPerVit,
+      hp: maxHpOf({} as Levels, content),
     },
     skills,
     mastery: {},

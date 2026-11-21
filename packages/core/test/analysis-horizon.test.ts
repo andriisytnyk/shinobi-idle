@@ -10,9 +10,9 @@ import { analyze, boss, build, inBand, play, rateOf, zone, type Case } from './a
 import type { Session } from '../src/index.ts';
 void content;
 
-/** The supplies: boss level 50 (a boss that is below that cannot be farmed without free healing: the health does not come back between fights) with a stock that runs out within the four hours played. */
+/** The supplies: boss levels 48 and 50 with a stock that runs out within the four hours played. */
 describe('the horizon of the supplies', () => {
-  for (const level of [50]) {
+  for (const level of [48, 50]) {
     it(
       `states the forecast for the time the stock lasts, and for after it, at level ${level}`,
       {

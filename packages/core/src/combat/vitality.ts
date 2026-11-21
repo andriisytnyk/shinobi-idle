@@ -73,6 +73,11 @@ export function currentHp(
   return { hp: Math.min(max, Math.max(0, stored ?? max)), max };
 }
 
+/** Whether the performer being computed has the health a player waits for before going back to a fight after a defeat (`K.restartHp` of the maximum). */
+export function restartReady(state: GameState, content: ContentDb): boolean {
+  return performerHp(state) >= content.balance.K.restartHp * performerMaxHp(state, content);
+}
+
 /** The health after `ms` of regeneration at `perSecond` HP per second, on whole millionths; never above `max`. */
 export function regenerated(hp: number, perSecond: number, ms: number, max: number): number {
   const units = Math.round(hp * HP_UNIT) + Math.round((perSecond * HP_UNIT) / MS_PER_SECOND) * ms;

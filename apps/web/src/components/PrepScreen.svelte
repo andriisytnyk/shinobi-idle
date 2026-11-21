@@ -1,6 +1,7 @@
 <script lang="ts">
   import { untrack } from 'svelte';
   import {
+    currentHp,
     evalReq,
     loadoutLimits,
     pouchSlotCount,
@@ -114,6 +115,9 @@
     result: null,
   });
 
+  /** The health buckets the forecast key distinguishes (tenths of the maximum). */
+  const HEALTH_BUCKETS = 10;
+
   /** What the forecast depends on: it is run again when the hand, the pouch, the Wounds or the knowledge change. */
   const forecastInputs = $derived(
     game.read((gs) => {
@@ -133,6 +137,8 @@
         ]),
         gs.pouch.medic,
         gs.wounds.stacks,
+        // Health in tenths of the maximum: the verdict follows it as it regenerates, without running again at every tick.
+        Math.floor((currentHp(gs, 0, content).hp / currentHp(gs, 0, content).max) * HEALTH_BUCKETS),
       ]);
     }),
   );

@@ -34,14 +34,6 @@ export interface FightSummary {
   };
 }
 
-/** What happens between two fights of a zone: a lump share of the maximum health, and the regeneration over the pause. */
-export interface BetweenFights {
-  share: number;
-  hpPerSecond: number;
-  /** The length of the pause between two fights, in seconds. */
-  seconds: number;
-}
-
 /** The seed of fight `i` of a run, drawn from its own stream so fights are independent. */
 function fightSeed(seed: number, i: number): number {
   return nextUint32(createStream(seed, `sim.${i}`));
@@ -72,9 +64,6 @@ export interface FightSim {
 /**
  * Runs `n` fights of the player against the enemy and aggregates them. Every fight has its own
  * seed derived from `seed`. Reads its arguments only; no game state, no shared mutable state.
- * With `between` the fights follow one another as in a zone: a won fight is followed by one that
- * starts with the health that is left plus what regenerates in the pause (`hpPerSecond` over `seconds`)
- * and a lump `share` of the maximum (0 in the data), a lost one by a fresh start from `snap`.
  */
 export function simulateFights(
   snap: PlayerSnapshot,
@@ -83,9 +72,8 @@ export function simulateFights(
   seed: number,
   content: ContentDb,
   rules: FightRules,
-  between?: BetweenFights,
 ): FightSummary {
-  const sim = fightSim(snap, encounter, n, seed, content, rules, between);
+  const sim = fightSim(snap, encounter, n, seed, content, rules);
   sim.step(n);
   return sim.summary();
 }
@@ -98,9 +86,7 @@ export function fightSim(
   seed: number,
   content: ContentDb,
   rules: FightRules,
-  between?: BetweenFights,
 ): FightSim {
-  let carried: number | undefined;
   const times: number[] = [];
   const items: Record<string, number> = {};
   const masteryWork: Record<string, number> = {};
@@ -121,8 +107,7 @@ export function fightSim(
   let played = 0;
   let simulatedMs = 0;
   const play = (i: number): void => {
-    const start = carried === undefined ? snap : { ...snap, hp: carried };
-    const fight = createFight(start, encounter, fightSeed(seed, i), content, rules);
+    const fight = createFight(snap, encounter, fightSeed(seed, i), content, rules);
     fight.log = null;
     const startHp = fight.player.hp;
     fightAdvance(fight, fight.cap + 1, content, rules);
@@ -148,16 +133,6 @@ export function fightSim(
         (won && fight.player.data.low === 1 ? 1 : 0) +
         t.wounds) /
       n;
-    // A zone fight that follows a win starts with the health left and a share more; any other starts fresh.
-    carried =
-      won && between !== undefined
-        ? Math.min(
-            fight.player.maxHp,
-            fight.player.hp +
-              between.share * fight.player.maxHp +
-              between.hpPerSecond * between.seconds,
-          )
-        : undefined;
     if (!won) return;
     times.push(fightTimeMs(fight));
     lost += startHp - fight.player.hp;

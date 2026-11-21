@@ -22,6 +22,7 @@ import {
   type GameState,
 } from '../src/index.ts';
 import { fighter, startFight } from './prep-state.ts';
+import { fullHp } from './helpers.ts';
 
 const K = content.balance.K;
 const TICK = K.tickMin * 60_000;
@@ -428,7 +429,11 @@ describe('determinism and split invariance', () => {
     const b = atTheGates(3, 20);
     for (const s of [a, b]) {
       startFight(s, RAID);
-      advance(s, 2 * 3_600_000, content);
+      // The defender is looked after (health back to the maximum every minute): the test is about determinism and the end of the raid.
+      for (let t = 0; t < 120; t++) {
+        fullHp(s);
+        advance(s, 60_000, content);
+      }
     }
     expect(serialize(a)).toBe(serialize(b));
     expect(info(a).phase).toBe('over');

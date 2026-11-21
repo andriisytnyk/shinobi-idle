@@ -372,10 +372,14 @@
     ],
     "zoneHpRegen": 0,
     "hpRegen": [
-      0.03,
-      0.027
+      0.09,
+      0.02
     ],
     "defeatHp": 0.2,
+    "restartHp": 0.8,
+    "regionHeal": {
+      "academy": 1
+    },
     "opRegen": 0.25,
     "respawn": 3,
     "wound": {
@@ -636,7 +640,7 @@
     "combat": {
       "xpTickMs": 1000,
       "regenMs": 1000,
-      "hpRegenShare": 0.1,
+      "hpRegenShare": 0,
       "hitEven": 0.5,
       "fightCapMs": 240000,
       "maxEnemies": 8,

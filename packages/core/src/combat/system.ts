@@ -421,7 +421,10 @@ function victory(
   woundsAfter(state, c, content, rules, false, key, clone);
   if (!c.run) {
     // Health carries over to the next fight (regeneration and food restore it); `zoneHpRegen` is a lump heal knob, 0 in the data.
-    player.hp = Math.min(player.maxHp, player.hp + K.zoneHpRegen * player.maxHp);
+    // A training enemy (by its region) also puts the health back: a new character is not worn down by the dummy.
+    const region = fallen !== undefined && 'region' in fallen ? fallen.region : '';
+    const heal = K.zoneHpRegen + (K.regionHeal[region] ?? 0);
+    player.hp = Math.min(player.maxHp, player.hp + heal * player.maxHp);
     setPerformerHp(state, player.hp, content);
     player.chakra = player.maxChakra;
     player.stamina = player.maxStamina;

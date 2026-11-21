@@ -39,7 +39,7 @@ export const BALANCE_EXT = {
   combat: {
     xpTickMs: 1000,
     regenMs: 1000,
-    hpRegenShare: 0.1,
+    hpRegenShare: 0,
     hitEven: 0.5,
     fightCapMs: 240000,
     maxEnemies: 8,
