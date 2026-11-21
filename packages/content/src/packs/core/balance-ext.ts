@@ -198,7 +198,7 @@ export const BALANCE_EXT = {
    */
   bossFx: {
     /** The leader of the wolves calls `count` wolves back every `everyMs` while he lives; a wolf has `hp` and `dmg` of an ordinary enemy of the leader's level. */
-    wolfPack: { count: 4, everyMs: 75000, hp: 0.12, dmg: 0.15, leaderHp: 1.15, leaderDmg: 1.15 },
+    wolfPack: { count: 4, everyMs: 75000, hp: 0.12, dmg: 0.15, leaderHp: 1.23, leaderDmg: 1.23 },
     /** The rival casts `techniques` techniques of the nature that beats the player's, one every `everyMs` (each hits for `mult` x his damage), and a signature every `sigEveryMs` for `sigMult` x. */
     rivalDuel: {
       techniques: 1,
@@ -207,8 +207,8 @@ export const BALANCE_EXT = {
       sigEveryMs: 16000,
       sigMult: 0.3,
       sigOpenMs: 2000,
-      hp: 0.96,
-      dmg: 0.96,
+      hp: 1.116,
+      dmg: 1.116,
     },
     rivalTournament: {
       techniques: 2,
@@ -217,17 +217,17 @@ export const BALANCE_EXT = {
       sigEveryMs: 16000,
       sigMult: 0.3,
       sigOpenMs: 2000,
-      hp: 1.15,
-      dmg: 1.15,
+      hp: 1.27,
+      dmg: 1.27,
       habituationMult: 2,
     },
-    drunkenEvasion: { maxMult: 2, hp: 1, dmg: 1 },
+    drunkenEvasion: { maxMult: 2, hp: 1.116, dmg: 1.116 },
     /** A heavy cast: `castMs` wind-up every `everyMs`, `damageMult` x damage, stuns the player for `stunMs` when it lands. */
-    heavyCast: { everyMs: 20000, castMs: 2500, damageMult: 2, stunMs: 500, hp: 1.0, dmg: 1.0 },
+    heavyCast: { everyMs: 20000, castMs: 2500, damageMult: 2, stunMs: 500, hp: 1.104, dmg: 1.104 },
     /** Two bodies: each has `hpEach` of the boss health and `dmgEach` of its damage; while both live the mist poisons the player for `mistMult` x the poison strength. */
-    twins: { count: 2, hpEach: 0.5, dmgEach: 0.5, mistMult: 1.6 },
-    mistRehide: { everyMs: 25000, hp: 0.97, dmg: 0.95 },
-    illusion: { everyMs: 8000, fleeAtHp: 0.3, hp: 1.22, dmg: 1.22 },
+    twins: { count: 2, hpEach: 0.593, dmgEach: 0.593, mistMult: 1.6 },
+    mistRehide: { everyMs: 25000, hp: 1.083, dmg: 1.06 },
+    illusion: { everyMs: 8000, fleeAtHp: 0.3, hp: 1.36, dmg: 1.36 },
   },
   /** Loadout: slots and distinct natures by rank (a student has no limit), and the number of saved loadouts. */
   loadout: {
