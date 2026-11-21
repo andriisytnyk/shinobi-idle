@@ -8,6 +8,8 @@ import {
   deserialize,
   dispatch,
   EXPLORE_KIND,
+  evalReq,
+  exploreReq,
   hexDistance,
   hexKey,
   regionOfHex,
@@ -17,7 +19,7 @@ import {
   updateQuests,
   type GameState,
 } from '../src/index.ts';
-import { genin, openWorld, teleport } from './helpers.ts';
+import { genin, openWorld, setLevel, teleport } from './helpers.ts';
 
 const K = content.balance.K;
 const FOREST = 'core:forest';
@@ -52,18 +54,17 @@ const fresh = (): GameState => {
 };
 
 describe('the surveyed counter', () => {
-  it('counts the hexes of a region that the survey of the start already brought to level 1', () => {
+  it('does not count the hexes the start of a game surveyed: a new game has every counter at 0', () => {
     const state = createState(1, content);
-    const expected = subjects.filter(
-      ({ subject, region }) =>
-        region !== null &&
+    const seeded = subjects.filter(
+      ({ subject }) =>
         !subject.cell &&
         (state.world.explores[subject.address] ?? 0) >= (K.map.plainSurvey[0] ?? 1),
     );
-    expect(expected.length).toBeGreaterThan(0);
-    let total = 0;
-    for (const region of content.regions) total += counterValue(state, surveyedKey(region.id));
-    expect(total).toBe(expected.length);
+    expect(seeded.length).toBeGreaterThan(0);
+    for (const region of content.regions) {
+      expect(counterValue(state, surveyedKey(region.id)), region.id).toBe(0);
+    }
   });
 
   it('counts a named cell reaching level 1 once, for its own region', () => {
@@ -102,14 +103,16 @@ describe('the surveyed counter', () => {
     expect(counterValue(state, surveyedKey(other?.id ?? ''))).toBe(foreign);
   });
 
-  it('is counted from the surveys when a save made before the counter is migrated', () => {
+  it('is counted from the surveys when a save made before the counter is migrated, without the start seed', () => {
     const state = fresh();
     const cell = content.cells.find((c) => c.region === FOREST && !state.world.explores[c.id]);
     if (!cell) throw new Error('no unexplored forest cell');
     surveyToLevelOne(state, cell.id);
+    const seed = createState(1, content).world.explores;
     const now = subjects.filter(
       ({ subject, region }) =>
         region === FOREST &&
+        seed[subject.address] !== state.world.explores[subject.address] &&
         (state.world.explores[subject.address] ?? 0) >=
           ((subject.cell ? K.cellExplores[0] : K.map.plainSurvey[0]) ?? 1),
     ).length;
@@ -118,8 +121,8 @@ describe('the surveyed counter', () => {
       v: number;
       state: Record<string, unknown> & { counters: Record<string, number> };
     };
-    // A save of version 21: one pinned goal, no surveyed counters.
-    parsed.v = 21;
+    // A save of version 22: one pinned goal, no surveyed counters.
+    parsed.v = 22;
     parsed.state.goal = null;
     delete parsed.state.goals;
     for (const key of Object.keys(parsed.state.counters)) {
@@ -127,26 +130,57 @@ describe('the surveyed counter', () => {
     }
     const loaded = deserialize(JSON.stringify(parsed), content);
     expect(counterValue(loaded, surveyedKey(FOREST))).toBe(now);
+    // An existing list of goals is kept by the migration.
+    parsed.state.goals = [{ kind: 'technique', id: 'core:great_fireball' }];
+    parsed.state.goal = { kind: 'technique', id: 'core:clone' };
+    expect(deserialize(JSON.stringify(parsed), content).goals).toEqual([
+      { kind: 'technique', id: 'core:great_fireball' },
+    ]);
   });
 
-  it('is what the exploration step of the mission board reads, counting what was surveyed before the step', () => {
+  describe('the exploration step of the mission board', () => {
     const quest = content.quests.find((q) => q.id === 'core:mission_board');
     const step = quest?.steps.find(
       (s) => s.objective.t === 'counter' && s.objective.counter === surveyedKey(FOREST),
     );
-    expect(step?.objective).toMatchObject({ t: 'counter', total: true });
-    const at = quest?.steps.indexOf(step as never) ?? -1;
-    const state = fresh();
-    // Cells of the forest surveyed before the chain gets to the step.
-    const cells = content.cells.filter((c) => c.region === FOREST).slice(0, 2);
-    for (const cell of cells) surveyToLevelOne(state, cell.id);
-    const had = counterValue(state, surveyedKey(FOREST));
-    state.quests['core:mission_board'] = { step: at, base: 0, done: false };
-    updateQuests(state, content);
     const objective = step?.objective;
-    if (objective?.t !== 'counter') throw new Error('not a counter');
-    // The step needs n in all, not n more than at its start.
-    const finished = state.quests['core:mission_board']?.step !== at;
-    expect(finished).toBe(had >= objective.n);
+    const at = quest && step ? quest.steps.indexOf(step) : -1;
+    const n = objective?.t === 'counter' ? objective.n : 0;
+    const progressOf = (state: GameState) => state.quests['core:mission_board'];
+
+    it('reads the counter and counts what was surveyed before the step', () => {
+      expect(objective).toMatchObject({ t: 'counter', total: true });
+      expect(n).toBeGreaterThan(0);
+    });
+
+    it('is not done when a fresh game reaches it: the start area does not count', () => {
+      const state = fresh();
+      progressOf(state);
+      state.quests['core:mission_board'] = { step: at, base: 0, done: false };
+      updateQuests(state, content);
+      expect(progressOf(state)?.step).toBe(at);
+      expect(counterValue(state, surveyedKey(FOREST))).toBe(0);
+    });
+
+    it('is done once n hexes of the region were surveyed, those surveyed before the step included', () => {
+      const state = fresh();
+      for (const skill of content.skills) setLevel(state, skill.id, 60);
+      // Cells of the forest that the player can survey now.
+      const mine = subjects.filter(({ subject, region }) => {
+        if (region !== FOREST || !subject.cell) return false;
+        const need = exploreReq(state, subject.cell, content);
+        return need !== null && evalReq(state, need, content).met;
+      });
+      expect(mine.length).toBeGreaterThanOrEqual(n);
+      for (const { subject } of mine.slice(0, n - 1)) surveyToLevelOne(state, subject.address);
+      state.quests['core:mission_board'] = { step: at, base: 0, done: false };
+      updateQuests(state, content);
+      expect(counterValue(state, surveyedKey(FOREST))).toBe(n - 1);
+      expect(progressOf(state)?.step).toBe(at);
+      const last = mine[n - 1];
+      if (!last) throw new Error('not enough cells');
+      surveyToLevelOne(state, last.subject.address);
+      expect(progressOf(state)?.step).not.toBe(at);
+    });
   });
 });

@@ -234,3 +234,36 @@ describe('the pouch of a player who loses a pack', () => {
     void setSkill;
   });
 });
+
+describe('a pinned goal of a pack that comes back', () => {
+  const mod = { kind: 'item', id: 'testmod:elixir' };
+  const own = (n: number) => ({ kind: 'technique', id: `core:t${n}` });
+
+  it('goes back where there is room, and never pushes out a goal pinned meanwhile', () => {
+    const dormant: Record<string, DormantPack> = {
+      testmod: { version: '1', rank: null, natures: [], data: { goals: { '0': mod } } },
+    };
+    const full = { goals: [own(1), own(2), own(3), own(4), own(5)] };
+    const back = restoreDormant(full, modContent, dormant);
+    expect(back.raw.goals).toEqual(full.goals);
+    // It stays dormant and comes back once there is room.
+    expect(dormant.testmod?.data.goals).toEqual({ '0': mod });
+    const room = restoreDormant({ goals: [own(1)] }, modContent, dormant);
+    expect(room.raw.goals).toEqual([mod, own(1)]);
+    expect(dormant.testmod).toBeUndefined();
+  });
+
+  it('is kept through a save with a full list', () => {
+    const state = modGenin();
+    state.goals = [{ kind: 'item', id: 'testmod:elixir' }];
+    const away = deserialize(serialize(state), plainContent, plainRules);
+    expect(away.goals).toEqual([]);
+    for (const tech of plainContent.techniques.slice(0, 5)) {
+      away.goals.push({ kind: 'technique', id: tech.id });
+    }
+    expect(away.goals).toHaveLength(5);
+    const back = deserialize(serialize(away), modContent, modRules);
+    expect(back.goals.map((g) => g.id)).toEqual(away.goals.map((g) => g.id));
+    expect(back.dormant.testmod?.data.goals).toBeDefined();
+  });
+});

@@ -1,5 +1,6 @@
 import type { ContentDb } from '@shinobi/content';
 import type { EntityRef } from './entity.ts';
+import { emit } from './events.ts';
 import type { GameState } from './state.ts';
 
 /**
@@ -16,6 +17,13 @@ export function isStoryGoal(ref: EntityRef, content: ContentDb): boolean {
 
 /** The same goal: same kind, same id. */
 export const sameGoal = (a: EntityRef, b: EntityRef): boolean => a.kind === b.kind && a.id === b.id;
+
+/** Pins the goal a reward gives. Tells the player when the list was full and the goal could not be pinned. */
+export function pinRewardGoal(state: GameState, ref: EntityRef): void {
+  if (state.goals.some((g) => sameGoal(g, ref))) return;
+  const type = pinGoal(state, ref) ? 'goalSet' : 'goalRefused';
+  emit(state, { type, kind: ref.kind, id: ref.id });
+}
 
 /** Pins a goal at the end of the list. Nothing happens when it is already pinned or the list is full; returns whether it was added. */
 export function pinGoal(state: GameState, ref: EntityRef): boolean {

@@ -32,7 +32,14 @@
   const unlocked = $derived(
     content.skills.filter((s) => s.unlockReq?.t === 'rank' && s.unlockReq.rank === reached),
   );
-  const goal = $derived(game.read((gs) => webRef(gs.goals[gs.goals.length - 1] ?? null)));
+  /** The goal the exam pinned: shown only if it is among the goals now (a full list refuses it). */
+  const goal = $derived(
+    game.read((gs) => {
+      const given = exam?.rewards.goal;
+      const pinned = given && gs.goals.find((g) => g.kind === given.kind && g.id === given.id);
+      return webRef(pinned ?? null);
+    }),
+  );
   /** The chakra paper test is the first thing a new genin does: until a nature is chosen the screen is offered. */
   const needsTest = $derived(fromAcademy && game.read((gs) => gs.player.natures.length === 0));
   const reward = $derived(exam?.rewards.items ?? []);

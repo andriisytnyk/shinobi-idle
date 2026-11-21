@@ -130,8 +130,8 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note">
-                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+              <p class="ct-note" data-regrow-rule="">
+                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="ct-actions">
               <span class="split plain" data-for="gather" data-ui="start-split">
                 <button class="main ct-action" data-performer="0" data-start="true" type="button">
@@ -191,8 +191,8 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note">
-                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+              <p class="ct-note" data-regrow-rule="">
+                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -284,8 +284,8 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note">
-                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+              <p class="ct-note" data-regrow-rule="">
+                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -377,8 +377,8 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note">
-                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+              <p class="ct-note" data-regrow-rule="">
+                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -447,7 +447,7 @@
                 <dd>
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
-                      22 373 дос./год
+                      22 372 дос./год
               <div data-ui="action-mastery">
                 <dt>
                   Майстерність
@@ -470,8 +470,8 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note">
-                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+              <p class="ct-note" data-regrow-rule="">
+                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -563,8 +563,8 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note">
-                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+              <p class="ct-note" data-regrow-rule="">
+                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -656,8 +656,8 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note">
-                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+              <p class="ct-note" data-regrow-rule="">
+                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -749,8 +749,8 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note">
-                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+              <p class="ct-note" data-regrow-rule="">
+                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -856,8 +856,8 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note">
-                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+              <p class="ct-note" data-regrow-rule="">
+                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -949,8 +949,8 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note">
-                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+              <p class="ct-note" data-regrow-rule="">
+                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -1071,8 +1071,8 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note">
-                Кущ дає 6 трав, потім відростає 5 с. Кожен рівень Майстерності додає до куща ще одну траву.
+              <p class="ct-note" data-regrow-rule="">
+                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">

@@ -41,6 +41,15 @@
   let message = $state('');
   let failed = $state(false);
 
+  // On a wide screen the open panel is a side column like the goal panel: the app leaves room for it
+  // (class `dev-open` on the app frame), so it does not cover the main column. On a phone it stays a sheet.
+  $effect(() => {
+    if (!open) return;
+    const frame = document.querySelector('.app');
+    frame?.classList.add('dev-open');
+    return () => frame?.classList.remove('dev-open');
+  });
+
   let skill = $state(skills[0]?.id ?? '');
   let skillLevel = $state(10);
   let customSpeed = $state(3);
@@ -603,7 +612,8 @@
     position: fixed;
     inset: 0 0 0 auto;
     z-index: calc(var(--z-toast) + 1);
-    width: min(var(--modal-width), 100%);
+    /* The width of the goal panel («Мета»). */
+    width: min(var(--meta-width), 100%);
     overflow-y: auto;
     padding: var(--space-3);
     border-left: var(--border-thin) dashed var(--danger);

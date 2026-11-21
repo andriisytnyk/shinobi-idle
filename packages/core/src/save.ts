@@ -1,4 +1,4 @@
-import { pinGoal } from './goal.ts';
+import { isStoryGoal, pinGoal } from './goal.ts';
 import type { ContentDb, NatureId, Req, SkillId } from '@shinobi/content';
 import { actionKindOf, rebalanceShares } from './actions.ts';
 import { COURSE_ID, COURSE_KIND } from './athletics.ts';
@@ -38,7 +38,7 @@ import {
   stashMissing,
 } from './pack-data.ts';
 import { bushSize } from './field.ts';
-import { cycleSeconds, MS_PER_HOUR, MS_PER_SECOND, poolCapacity } from './formulas.ts';
+import { MS_PER_HOUR, poolCapacity } from './formulas.ts';
 import { maxLevels, parseModRef } from './meditation.ts';
 import { indexOf } from './lookup.ts';
 import { teamFor } from './natures.ts';
@@ -427,8 +427,26 @@ export const MIGRATIONS: readonly Migration[] = [
     const loadouts = isRecord(state.loadouts) ? state.loadouts : {};
     return { ...state, loadouts: { ...loadouts, cloneRole: null } };
   },
-  // v21 -> v22: the pinned goal became a list of goals; the one goal is a list of one.
-  // It also counts the hexes already surveyed for the `surveyed.<region>` counters, which are new in v22.
+  // v21 -> v22: herb bushes keep the game time of their regrow clock (`at`) instead of the work kept on the regrow cycle
+  // (`carry`). A bush with herbs left starts its clock now; an empty one counts the pause it had already had.
+  (state, content) => {
+    const now = nonNegative(state.now);
+    const pause = content.balance.K.field.regrowMs;
+    const bushes = Object.fromEntries(
+      Object.entries(isRecord(state.bushes) ? state.bushes : {}).flatMap(([key, v]) => {
+        if (!isRecord(v)) return [];
+        const stock = nonNegative(v.stock);
+        const had = stock === 0 ? Math.min(nonNegative(v.carry) / SHARE_FULL, pause) : 0;
+        return [
+          [key, { stock, size: nonNegative(v.size), at: Math.max(0, Math.round(now - had)) }],
+        ];
+      }),
+    );
+    return { ...state, bushes };
+  },
+  // v22 -> v23: the pinned goal became a list of goals (an existing list is kept); the `surveyed.<region>` counters are new and
+  // are counted from the hexes the player surveyed: not the plain hexes of the start area that still hold the value the start
+  // seeded (an old save cannot tell those from a survey, and the start area is no work of the player).
   (state, content) => {
     const { goal, ...rest } = state;
     const counters = isRecord(rest.counters) ? rest.counters : {};
@@ -436,7 +454,7 @@ export const MIGRATIONS: readonly Migration[] = [
     const explores = isRecord(world.explores) ? world.explores : {};
     return {
       ...rest,
-      goals: isRecord(goal) ? [goal] : [],
+      goals: Array.isArray(rest.goals) ? rest.goals : isRecord(goal) ? [goal] : [],
       counters: { ...counters, ...surveyedCounts(explores, content) },
     };
   },
@@ -1112,14 +1130,9 @@ export function deserialize(
   // Region flags follow from rank and Scouting, so they are recomputed below, never trusted.
   for (const region of content.regions) delete state.flags[regionFlag(region.id)];
   if (isRecord(raw.stats)) state.stats.completed = Math.floor(nonNegative(raw.stats.completed));
-  // A fresh game starts with the surveyed counters of the start area; what the save kept wins.
-  const seeded = state.counters;
-  state.counters = {
-    ...seeded,
-    ...pick(raw.counters, (_key, v) =>
-      typeof v === 'number' && Number.isInteger(v) && v >= 0 ? v : undefined,
-    ),
-  };
+  state.counters = pick(raw.counters, (_key, v) =>
+    typeof v === 'number' && Number.isInteger(v) && v >= 0 ? v : undefined,
+  );
   state.quests = pick(raw.quests, (key, v) => {
     const quest = index.quests.get(key);
     if (!quest || !isRecord(v)) return undefined;
@@ -1167,16 +1180,11 @@ export function deserialize(
   });
   state.bushes = pick(raw.bushes, (key, v) => {
     if (!index.herbs.has(key) || !isRecord(v)) return undefined;
-    const K = content.balance.K;
     const size = Math.floor(nonNegative(v.size));
     if (size < 1 || size > bushSize(state, key, content, rules)) return undefined;
     const stock = Math.min(Math.floor(nonNegative(v.stock)), size);
-    // The carried progress of an empty bush is bounded by the herb's own cycle and its regrowing.
-    const herb = index.herbs.get(key);
-    const cycle = herb ? cycleSeconds('gather', herb, content) : K.gather;
-    const room = (K.field.regrowMs + cycle * MS_PER_SECOND) * SHARE_FULL;
-    const carry = stock === 0 ? Math.min(Math.floor(nonNegative(v.carry)), room) : 0;
-    return { stock, size, carry };
+    // The clock cannot be set in the future.
+    return { stock, size, at: Math.min(Math.floor(nonNegative(v.at)), state.now) };
   });
   state.world = sanitizeWorld(raw.world, content);
   const pending = isRecord(raw.missions) ? raw.missions.pending : undefined;
@@ -1191,10 +1199,11 @@ export function deserialize(
     ),
   };
   state.village = sanitizeVillage(raw.village, state, content);
-  // The pinned goals: well-formed, without repeats, at most the cap (a longer list is cut at the end).
+  // The pinned goals: well-formed, without repeats, not a chain of the main story (it is always shown), at most the cap.
   for (const goal of Array.isArray(raw.goals) ? raw.goals : []) {
     if (isRecord(goal) && typeof goal.kind === 'string' && typeof goal.id === 'string') {
-      pinGoal(state, { kind: goal.kind as EntityKind, id: goal.id });
+      const ref = { kind: goal.kind as EntityKind, id: goal.id };
+      if (!isStoryGoal(ref, content)) pinGoal(state, ref);
     }
   }
 

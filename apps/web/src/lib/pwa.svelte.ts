@@ -50,8 +50,19 @@ export const UPDATE_KEY = 'pwa.updateReady';
 const APPLY_TIMEOUT_MS = 10_000;
 const CHECK_EVERY_MS = 60 * 60 * 1000;
 
-/** Production only: the service worker is not registered under `pnpm dev` or Vitest. */
-const productionRegister: RegisterSw | null = import.meta.env.PROD
+/**
+ * What a build does with the service worker. Only the production build registers one (a new version
+ * is offered with a prompt, and the old version stays whole until the player applies it). Test builds
+ * (the developer panel is in them) and the dev server register none and remove any left by an earlier
+ * build of the same origin: they are rebuilt all the time, and a worker that waits would serve old
+ * styles to new scripts, which is worse than having no offline copy.
+ */
+export const serviceWorkerMode = (prod: boolean, devPanel: boolean): 'register' | 'remove' =>
+  prod && !devPanel ? 'register' : 'remove';
+
+const registers = serviceWorkerMode(import.meta.env.PROD, __DEV_PANEL__) === 'register';
+
+const productionRegister: RegisterSw | null = registers
   ? (hooks) => {
       // A placeholder until the virtual module has loaded; the real function replaces it.
       let apply: ((reload?: boolean) => Promise<void>) | null = null;
@@ -105,11 +116,7 @@ export function createPwa(deps: PwaDeps = {}) {
   const win = deps.win === undefined ? (typeof window === 'undefined' ? null : window) : deps.win;
   const register = deps.register === undefined ? productionRegister : deps.register;
   const cleanup =
-    deps.cleanup === undefined
-      ? import.meta.env.PROD
-        ? null
-        : removeServiceWorkers
-      : deps.cleanup;
+    deps.cleanup === undefined ? (registers ? null : removeServiceWorkers) : deps.cleanup;
   const ios = deps.isIos ?? detectIos(win);
 
   let offlineReady = $state(false);

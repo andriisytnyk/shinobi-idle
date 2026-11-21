@@ -11,7 +11,6 @@ import type { VillageState } from './village-state.ts';
 import { ensurePouch } from './combat/pouch.ts';
 import { createWorld, type WorldState } from './world-state.ts';
 import { refreshUnlocks } from './unlocks.ts';
-import { rebuildSurveyed } from './world.ts';
 
 /** A player rank id; the ranks and their order come from `content.playerRanks`. */
 export type Rank = string;
@@ -148,8 +147,8 @@ export interface GameState {
   fatigue: number;
   /** Running tonics by item id: the skill (or `allNatures`) they raise and the charges left. */
   buffs: Record<string, { skill: string; charges: number }>;
-  /** Herb bushes as the player left them, by herb id: herbs left, size, and regrow work kept. */
-  bushes: Record<string, { stock: number; size: number; carry: number }>;
+  /** Herb bushes by herb id: herbs left, size, and the game time of the regrow clock (see `Bush` in field.ts). */
+  bushes: Record<string, { stock: number; size: number; at: number }>;
   /** Training gear owned: tiers bought, by gear line id. */
   gear: Record<string, number>;
   /** Meditation: Insights and Enlightenments earned and the levels bought, by practice id. */
@@ -182,7 +181,7 @@ export interface GameState {
   events: GameEvent[];
 }
 
-export const STATE_VERSION = 22;
+export const STATE_VERSION = 23;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
@@ -234,7 +233,6 @@ export function createState(seed: number, content: ContentDb): GameState {
     missions: { pending: {} },
     events: [],
   };
-  rebuildSurveyed(state, content);
   ensurePouch(state, content);
   refreshUnlocks(state, content, true);
   updateQuests(state, content);

@@ -407,7 +407,7 @@ describe('saving', () => {
   });
 
   it('is on the version of the redesign', () => {
-    expect(createState(1, content).v).toBe(22);
+    expect(createState(1, content).v).toBe(23);
   });
 });
 
@@ -556,6 +556,8 @@ describe('a pack and the uniqueness of an action', () => {
     expect(rules.actionKinds.explore).not.toBe(defaultRules.actionKinds.explore);
     expect(rules.actionKinds.explore?.unique?.(HEX, content)).toBe(true);
     const state = cloner();
+    // The cell is three hexes from the start: the range at Scouting 30.
+    state.skills.scout!.xp = xpAt(30);
     expect(explore(state, 1, rules)).toEqual({ ok: true });
     expect(explore(state, 0, rules)).toEqual({ ok: false, reason: 'error.sameActionElsewhere' });
   });

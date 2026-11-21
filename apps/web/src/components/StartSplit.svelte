@@ -38,6 +38,8 @@
     describedBy?: string | undefined;
     /** Extra classes of the main button (the sites style it as `action` or `ct-action`). */
     cls?: string;
+    /** The label may wrap onto several lines instead of being cut with an ellipsis. */
+    wrap?: boolean;
   }
 
   let {
@@ -51,6 +53,7 @@
     mark,
     describedBy,
     cls = 'ct-action',
+    wrap = false,
   }: Props = $props();
 
   const content = game.content;
@@ -145,6 +148,7 @@
     type="button"
     class="main {cls}"
     class:stop={stopping}
+    class:wrap
     disabled={off}
     data-start
     {...mark ? { [`data-${mark}`]: '' } : {}}
@@ -231,6 +235,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  /* A label that must stay readable wraps; the row grows instead of cutting it. */
+  .main.wrap {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   .split:not(.plain) .main {

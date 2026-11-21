@@ -42,6 +42,7 @@ import { actionFloor, activitySkill, currencyOf, moneyOf } from './vocab.ts';
 import { evalReq, reqMet, skillLevel, type Req } from './requirements.ts';
 import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
+import { createWorld } from './world-state.ts';
 
 /** The action kind that surveys a hex; the action id is the address of the hex (a cell id, or its key). */
 export const EXPLORE_KIND = 'explore';
@@ -80,18 +81,19 @@ function countSurveyed(state: GameState, subject: Subject, content: ContentDb): 
 }
 
 /**
- * The surveyed counter of every region, counted from a table of surveys (address to surveys done):
- * for a game that starts with surveys it did not do (the start area) and for a save made before
- * the counters existed.
+ * The surveyed counter of every region, counted from a table of surveys (address to surveys done),
+ * for a save made before the counters existed. The plain hexes that still hold the value the start
+ * of a game seeded (`createWorld`) are not counted: they are no work of the player.
  */
 export function surveyedCounts(
   explores: Readonly<Record<string, unknown>>,
   content: ContentDb,
 ): Record<string, number> {
   const counts: Record<string, number> = {};
+  const seeded = createWorld(content).explores;
   for (const [address, done] of Object.entries(explores)) {
     const subject = subjectOf(content, address);
-    if (!subject || typeof done !== 'number') continue;
+    if (!subject || typeof done !== 'number' || seeded[address] === done) continue;
     const first = subject.cell ? levelForExplores(done, content) : plainLevelFor(done, content);
     const region = first >= 1 ? regionOfHex(content, subject) : null;
     if (region !== null) counts[surveyedKey(region)] = (counts[surveyedKey(region)] ?? 0) + 1;
@@ -99,10 +101,6 @@ export function surveyedCounts(
   return counts;
 }
 
-/** Sets the surveyed counters of a fresh state from the surveys it starts with. */
-export function rebuildSurveyed(state: GameState, content: ContentDb): void {
-  Object.assign(state.counters, surveyedCounts(state.world.explores, content));
-}
 /** Flag raised when a point of interest is found. */
 export const poiFlag = (poiId: string): string => `poi.${poiId}`;
 /** Flag counting the deposits found for a building of the village (+1 level each). */
@@ -630,13 +628,56 @@ export function autoPlan(state: GameState, content: ContentDb, slot = 0): AutoPl
   return plan;
 }
 
+const NO_SKIP: ReadonlySet<string> = new Set();
+
+/** The orders last read, by performer (see `autoOrder`). */
+const ordered = new WeakMap<
+  GameState,
+  Map<number, { content: ContentDb; stamp: string; limit: number; keys: string[] }>
+>();
+
+/**
+ * The hexes the auto-survey of a performer would take next, in the order of its rule, as hex keys:
+ * the first is what `autoPlan` chooses now, the next ones what it would choose if each in turn were
+ * done. It is a preview (surveying changes the land and the order may change with it), read-only and
+ * deterministic: the same state gives the same list. At most `limit` hexes.
+ */
+export function autoOrder(
+  state: GameState,
+  content: ContentDb,
+  slot: number,
+  limit: number,
+): string[] {
+  const stamp = planStamp(state, content, slot);
+  const memo = ordered.get(state)?.get(slot);
+  if (memo && memo.content === content && memo.stamp === stamp && memo.limit === limit)
+    return memo.keys;
+  const skip = new Set<string>();
+  const keys: string[] = [];
+  for (let i = 0; i < limit; i++) {
+    const plan = planFor(state, content, slot, skip);
+    if (!plan) break;
+    skip.add(plan.subject.address);
+    keys.push(hexKey(plan.subject.hex.q, plan.subject.hex.r));
+  }
+  const all = ordered.get(state) ?? new Map();
+  all.set(slot, { content, stamp, limit, keys });
+  ordered.set(state, all);
+  return keys;
+}
+
 /** Whether another performer is surveying the hex at `address` right now. */
 const surveyedByOther = (state: GameState, address: string, slot: number): boolean =>
   state.slots.some(
     (s, i) => i !== slot && s.action?.kind === EXPLORE_KIND && s.action.id === address,
   );
 
-function planFor(state: GameState, content: ContentDb, slot: number): AutoPlan | null {
+function planFor(
+  state: GameState,
+  content: ContentDb,
+  slot: number,
+  skip: ReadonlySet<string> = NO_SKIP,
+): AutoPlan | null {
   const here = positionHex(state, content, slot);
   if (!here) return null;
   const reach: Reach = reachFrom(state, content, here, slot);
@@ -671,7 +712,7 @@ function planFor(state: GameState, content: ContentDb, slot: number): AutoPlan |
   for (const a of seen) {
     const subject = subjectOf(content, addressOf(content, a));
     if (!subject || !surveyable(state, subject, content)) continue;
-    if (surveyedByOther(state, subject.address, slot)) continue;
+    if (skip.has(subject.address) || surveyedByOther(state, subject.address, slot)) continue;
     if (surveyAccess(state, content, a, reach, slot) !== 'ok') continue;
     const pick = {
       subject,
@@ -689,7 +730,7 @@ function planFor(state: GameState, content: ContentDb, slot: number): AutoPlan |
   for (const hex of indexOf(content).playableHexes) {
     const subject = subjectOf(content, hexKey(hex.q, hex.r));
     if (!subject || !surveyable(state, subject, content)) continue;
-    if (surveyedByOther(state, subject.address, slot)) continue;
+    if (skip.has(subject.address) || surveyedByOther(state, subject.address, slot)) continue;
     const cut = !isSurveyed(state, content, hexKey(hex.q, hex.r));
     for (const [spot, minutes] of reach.dist) {
       const at = parseHexKey(spot);
