@@ -2,6 +2,8 @@
   import { entityAttr } from '../lib/reveal.ts';
   import {
     actionInfo,
+    AUTOSURVEY_KIND,
+    autoPlan,
     cellInfo,
     dispelPreview,
     fightOf,
@@ -74,6 +76,10 @@
     xpPerHour: number | null;
     /** Time left of a walk, in ms. */
     walkLeft: number;
+    /** Time left of the survey (or of the step of the auto-survey) in progress, in ms; 0 when the action is none of these. */
+    surveyLeft: number;
+    /** The auto-survey is on its way to the next hex, not surveying one. */
+    autoStep: boolean;
     /** The stage, performer and failures of a mission in the slot. */
     mission: MissionNow | null;
     /** What a practised technique is doing right now. */
@@ -170,6 +176,14 @@
           mission: missionNow(state, index, game.content),
           practice,
           fight,
+          // What is left of the cycle in progress: the core's interval and the slot's progress, at the slot's share.
+          surveyLeft:
+            isExplore || slot.action.kind === AUTOSURVEY_KIND
+              ? Math.max(0, (intervalMs * SHARE_FULL - slot.progress) / Math.max(1, slot.share))
+              : 0,
+          autoStep:
+            slot.action.kind === AUTOSURVEY_KIND &&
+            (autoPlan(state, content, index)?.route.length ?? 0) > 0,
           // The time to arrival: the whole route, less what the step in progress has already taken.
           walkLeft: isWalk
             ? Math.max(
@@ -218,6 +232,7 @@
     row.fight !== null ||
     row.mission !== null ||
     row.walkLeft > 0 ||
+    row.surveyLeft > 0 ||
     (wait !== null && wait.slot === row.slot);
 
   /** The rows the bar draws: all of them, or with the panel beside it only those that have a detail. */
@@ -343,6 +358,13 @@
           {#if row.walkLeft > 0}
             <span class="wait" data-walk-left
               >{t('world.walkLeft', { time: formatDuration(row.walkLeft) })}</span
+            >
+          {/if}
+          {#if row.surveyLeft > 0}
+            <span class="wait" data-survey-left
+              >{t(row.autoStep ? 'map.stepLeft' : 'map.surveyLeft', {
+                time: formatDuration(row.surveyLeft),
+              })}</span
             >
           {/if}
           {#if wait && wait.slot === row.slot}

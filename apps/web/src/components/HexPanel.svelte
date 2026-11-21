@@ -1,5 +1,14 @@
 <script lang="ts">
-  import { cellInfo, hexInfo, travelPlan, type CellInfo, type HexInfo } from '@shinobi/core';
+  import {
+    AUTOSURVEY_KIND,
+    autoPlan,
+    cellInfo,
+    hexDistance,
+    hexInfo,
+    travelPlan,
+    type CellInfo,
+    type HexInfo,
+  } from '@shinobi/core';
   import { entityDesc } from '../lib/entities.ts';
   import { formatDuration, formatInt, formatXp } from '../lib/format.ts';
   import { autoState } from '../lib/hex-map.ts';
@@ -55,6 +64,8 @@
       free: boolean;
     };
     exploreSlot: number;
+    /** The slot whose auto-survey is surveying this very hex now; -1 when none is. */
+    autoSlot: number;
     walkSlot: number;
     timing: ReturnType<typeof slotTiming>;
     autoWhy: string | null;
@@ -80,9 +91,16 @@
       const exploreSlot = gs.slots.findIndex(
         (s) => s.action?.kind === 'explore' && s.action.id === info.address,
       );
+      const autoSlot = gs.slots.findIndex((s, i) => {
+        if (s.action?.kind !== AUTOSURVEY_KIND) return false;
+        const plan = autoPlan(gs, content, i);
+        return plan !== null && plan.route.length === 0 && plan.subject.address === info.address;
+      });
+      const surveySlot = exploreSlot >= 0 ? exploreSlot : autoSlot;
       return {
         info,
         cell,
+        autoSlot,
         travel: {
           blocked: plan.blocked,
           hexes: plan.hexes.length,
@@ -95,7 +113,7 @@
         walkSlot: gs.slots.findIndex(
           (s) => s.action?.kind === 'walk' && s.action.id === info.address,
         ),
-        timing: exploreSlot >= 0 ? slotTiming(gs, exploreSlot, info.surveyMs) : IDLE_TIMING,
+        timing: surveySlot >= 0 ? slotTiming(gs, surveySlot, info.surveyMs) : IDLE_TIMING,
         autoWhy: autoState(gs, content).why,
         // In fog nothing is said of levels or counts: they would tell a cell from a plain hex.
         nextAt:
@@ -108,6 +126,22 @@
   const cell = $derived(view?.cell ?? null);
   const fog = $derived(info !== null && !info.surveyed);
   const cellEntity = $derived(info?.cell ?? null);
+  /**
+   * A plain hex of the start zone (within `startRadius` of where the story begins) starts with the
+   * surveys of its first level: the rule of the world, said in the panel so that «6 з 18» is not a mystery.
+   */
+  const startZone = $derived.by(() => {
+    if (!info || info.cell || info.level < 1) return false;
+    const first = content.balance.K.map.plainSurvey[0] ?? 0;
+    if (info.explores !== first) return false;
+    const home =
+      content.cells.find((c) => c.id === content.regions[0]?.cells[0]) ?? content.cells[0];
+    return (
+      home !== undefined &&
+      hexDistance({ q: home.hex[0], r: home.hex[1] }, { q: info.q, r: info.r }) <=
+        content.balance.K.map.startRadius
+    );
+  });
   const regionOfCell = $derived(
     cellEntity ? (content.cells.find((c) => c.id === cellEntity)?.region ?? null) : null,
   );
@@ -391,8 +425,27 @@
             {/if}
           </dl>
         {/if}
-        {#if view.exploreSlot >= 0}<p class="small dim">{t('map.running.survey')}</p>{/if}
-        {#if view.timing.running}<TimeBar timing={view.timing} part="action-progress" />{/if}
+        {#if view.exploreSlot >= 0}<p class="small dim" data-surveying-now>
+            {t('map.running.survey')}
+          </p>{:else if view.autoSlot >= 0}<p class="small dim" data-surveying-now>
+            {t('map.running.auto')}
+          </p>{/if}
+        {#if view.timing.running}
+          <TimeBar
+            timing={view.timing}
+            part="action-progress"
+            size="md"
+            label={t('map.surveyProgress')}
+          />
+          <p class="small dim" data-survey-left>
+            {t('map.surveyLeft', {
+              time: formatDuration(view.timing.cycleMs * (1 - view.timing.fraction)),
+            })}
+          </p>
+        {/if}
+        {#if startZone}<p class="small dim" data-start-zone>
+            {t('map.startZone', { n: formatInt(info.explores) })}
+          </p>{/if}
         {#if view.walkSlot >= 0}<p class="small dim" data-walking>{t('map.running.walk')}</p>{/if}
       </section>
 
@@ -409,6 +462,8 @@
           </ul>
         </section>
       {/if}
+
+      <p class="small dim" data-auto-help>{t('map.auto.help')}</p>
 
       <Slot name="map.panel" ctx={{ hex: coord, cell: info.cell }} />
     </div>
@@ -432,6 +487,7 @@
             disabled={reasonSurvey !== null}
             describedBy={reasonSurvey ? 'why-explore' : undefined}
             mark="explore"
+            wrap
           />
         {/if}
         {#if view.walkSlot >= 0}
@@ -453,6 +509,7 @@
             describedBy={reasonGo ? 'why-walk' : undefined}
             run={travel('walk')}
             mark="travel-walk"
+            wrap
           />
           <StartSplit
             kind="travel-paid"
@@ -465,6 +522,7 @@
             describedBy={reasonPaid ? 'why-paid' : undefined}
             run={travel('paid')}
             mark="travel-paid"
+            wrap
           />
           {#if view.travel.free}
             <StartSplit
@@ -473,6 +531,7 @@
               label="map.act.free"
               run={travel('outpost')}
               mark="travel-free"
+              wrap
             />
           {/if}
         {/if}
@@ -761,9 +820,10 @@
     cursor: not-allowed;
   }
 
+  /* Two columns where they fit, one where they do not: every label is shown in full. */
   .buttons {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
     gap: var(--space-3);
   }
 

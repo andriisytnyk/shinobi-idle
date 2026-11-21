@@ -1,7 +1,9 @@
 import type { ContentDb } from '@shinobi/content';
 import {
   AUTOSURVEY_KIND,
+  autoOrder,
   autoPlan,
+  EXPLORE_KIND,
   evalReq,
   graduateReq,
   hexKey,
@@ -10,6 +12,7 @@ import {
   parseHexKey,
   positionHex,
   rangeNow,
+  subjectOf,
   travelPlan,
   type GameState,
   type HexInfo,
@@ -146,7 +149,14 @@ export interface MapView {
   /** The other performers (shadow clones) on the map, by action slot; each is a figure of its own. */
   figures: { slot: number; coord: string }[];
   range: number;
+  /** The hexes being surveyed right now, each with who surveys it: slot 0 is the character, a higher slot a clone. */
+  surveying: { coord: string; slot: number; auto: boolean }[];
+  /** The plan of the auto-survey: the hexes it takes next, in order (the first is the one it is on); empty when it does not run. */
+  autoOrder: string[];
 }
+
+/** How many hexes of the auto-survey plan the map numbers. */
+export const AUTO_ORDER_SHOWN = 8;
 
 /**
  * The playable hexes with what the player knows of each. The core view is read once per call (one
@@ -227,7 +237,34 @@ export function mapView(state: GameState, content: ContentDb, rules: Rules): Map
     bounds.x0 = bounds.y0 = -SIZE;
     bounds.x1 = bounds.y1 = SIZE;
   }
-  return { hexes, links, bounds, here, figures, range: rangeNow(state, content) };
+  const surveying: MapView['surveying'] = [];
+  let order: string[] = [];
+  state.slots.forEach((slot, i) => {
+    if (slot.action?.kind === EXPLORE_KIND) {
+      const at = subjectOf(content, slot.action.id)?.hex;
+      if (at) surveying.push({ coord: hexKey(at.q, at.r), slot: i, auto: false });
+    } else if (slot.action?.kind === AUTOSURVEY_KIND) {
+      const plan = autoPlan(state, content, i);
+      // Only a performer that stands in range surveys; on the way it walks.
+      if (plan && plan.route.length === 0)
+        surveying.push({
+          coord: hexKey(plan.subject.hex.q, plan.subject.hex.r),
+          slot: i,
+          auto: true,
+        });
+      if (order.length === 0) order = autoOrder(state, content, i, AUTO_ORDER_SHOWN);
+    }
+  });
+  return {
+    hexes,
+    links,
+    bounds,
+    here,
+    figures,
+    range: rangeNow(state, content),
+    surveying,
+    autoOrder: order,
+  };
 }
 
 /** The route and its time to the hex at `coord`, as the map draws it. */

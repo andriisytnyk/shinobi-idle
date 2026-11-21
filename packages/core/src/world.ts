@@ -578,13 +578,56 @@ export function autoPlan(state: GameState, content: ContentDb, slot = 0): AutoPl
   return plan;
 }
 
+const NO_SKIP: ReadonlySet<string> = new Set();
+
+/** The orders last read, by performer (see `autoOrder`). */
+const ordered = new WeakMap<
+  GameState,
+  Map<number, { content: ContentDb; stamp: string; limit: number; keys: string[] }>
+>();
+
+/**
+ * The hexes the auto-survey of a performer would take next, in the order of its rule, as hex keys:
+ * the first is what `autoPlan` chooses now, the next ones what it would choose if each in turn were
+ * done. It is a preview (surveying changes the land and the order may change with it), read-only and
+ * deterministic: the same state gives the same list. At most `limit` hexes.
+ */
+export function autoOrder(
+  state: GameState,
+  content: ContentDb,
+  slot: number,
+  limit: number,
+): string[] {
+  const stamp = planStamp(state, content, slot);
+  const memo = ordered.get(state)?.get(slot);
+  if (memo && memo.content === content && memo.stamp === stamp && memo.limit === limit)
+    return memo.keys;
+  const skip = new Set<string>();
+  const keys: string[] = [];
+  for (let i = 0; i < limit; i++) {
+    const plan = planFor(state, content, slot, skip);
+    if (!plan) break;
+    skip.add(plan.subject.address);
+    keys.push(hexKey(plan.subject.hex.q, plan.subject.hex.r));
+  }
+  const all = ordered.get(state) ?? new Map();
+  all.set(slot, { content, stamp, limit, keys });
+  ordered.set(state, all);
+  return keys;
+}
+
 /** Whether another performer is surveying the hex at `address` right now. */
 const surveyedByOther = (state: GameState, address: string, slot: number): boolean =>
   state.slots.some(
     (s, i) => i !== slot && s.action?.kind === EXPLORE_KIND && s.action.id === address,
   );
 
-function planFor(state: GameState, content: ContentDb, slot: number): AutoPlan | null {
+function planFor(
+  state: GameState,
+  content: ContentDb,
+  slot: number,
+  skip: ReadonlySet<string> = NO_SKIP,
+): AutoPlan | null {
   const here = positionHex(state, content, slot);
   if (!here) return null;
   const reach: Reach = reachFrom(state, content, here, slot);
@@ -619,7 +662,7 @@ function planFor(state: GameState, content: ContentDb, slot: number): AutoPlan |
   for (const a of seen) {
     const subject = subjectOf(content, addressOf(content, a));
     if (!subject || !surveyable(state, subject, content)) continue;
-    if (surveyedByOther(state, subject.address, slot)) continue;
+    if (skip.has(subject.address) || surveyedByOther(state, subject.address, slot)) continue;
     if (surveyAccess(state, content, a, reach, slot) !== 'ok') continue;
     const pick = {
       subject,
@@ -637,7 +680,7 @@ function planFor(state: GameState, content: ContentDb, slot: number): AutoPlan |
   for (const hex of indexOf(content).playableHexes) {
     const subject = subjectOf(content, hexKey(hex.q, hex.r));
     if (!subject || !surveyable(state, subject, content)) continue;
-    if (surveyedByOther(state, subject.address, slot)) continue;
+    if (skip.has(subject.address) || surveyedByOther(state, subject.address, slot)) continue;
     const cut = !isSurveyed(state, content, hexKey(hex.q, hex.r));
     for (const [spot, minutes] of reach.dist) {
       const at = parseHexKey(spot);
