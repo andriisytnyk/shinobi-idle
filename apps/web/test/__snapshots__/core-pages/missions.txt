@@ -39,15 +39,15 @@
                   D
                 <a class="entity-link" href="#/mission/core:cat">
                   Знайти кота
-              <span class="team" data-team="true">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Командна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:cat" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Командна місія" class="mark" data-team="true" data-ui="mission-kind" role="img" title="Командна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:cat" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Дружина даймьо
             <dl class="ct-facts">
@@ -80,26 +80,39 @@
                   <span>
                     Репутація: 1
             <div class="why" data-why="error.missionNeedsTeam" id="why-core:cat">
-              <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  <a class="entity-link" href="#/skill/ath">
-                    Атлетика
-                  <span class="detail">
-                    рів. 5
-                <span class="count">
-                  1/5
-                <span aria-hidden="true" class="bar">
-                  <span class="fill" style="width: 20%;">
+              <div class="reqs" data-rows="2" data-ui="req-summary">
+                <div class="group" data-met="false">
+                  <ul class="rows">
+                    <li>
+                      <div class="row met" data-met="true" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          Ранг: Генін
+                    <li>
+                    <li>
+                      <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/skill/ath">
+                            Атлетика
+                          <span class="detail">
+                            рів. 5
+                        <span class="count">
+                          1/5
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 20%;">
               <p class="ct-why" data-needs-team="">
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:cat" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:cat" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile card" data-entity="mission:core:weed" data-mission="core:weed" data-state="startable" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -107,15 +120,15 @@
                   D
                 <a class="entity-link" href="#/mission/core:weed">
                   Прополоти поле
-              <span class="team" data-team="false">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Сольна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:weed" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Сольна місія" class="mark" data-team="false" data-ui="mission-kind" role="img" title="Сольна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#41-6fdr79">
+                      <circle cx="12" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:weed" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Селяни околиць
             <dl class="ct-facts">
@@ -123,7 +136,7 @@
                 <dt>
                   Тривалість
                 <dd data-duration="" data-ms="133333.33333333334">
-                  2 хв
+                  2 хв 13 с
               <div>
                 <dt>
                   Без невдач
@@ -149,9 +162,17 @@
                     <a class="entity-link" href="#/item/core:rice">
                       Рис
                     ×6
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button class="main ct-action" data-performer="0" data-start="true" type="button">
-                Почати
+            <p class="ct-note trains" data-trains="">
+              <span>
+                Досвід:
+              <span data-trains-skill="herb" data-value="4406.399999999999">
+                <a class="entity-link" href="#/skill/herb">
+                  Травництво
+                4 406/год
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button class="main ct-action" data-performer="0" data-start="true" type="button">
+                  Почати
           <li class="ct-tile card" data-entity="mission:core:fire" data-mission="core:fire" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -159,15 +180,15 @@
                   D
                 <a class="entity-link" href="#/mission/core:fire">
                   Пожежа на рисовому складі
-              <span class="team" data-team="true">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Командна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:fire" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Командна місія" class="mark" data-team="true" data-ui="mission-kind" role="img" title="Командна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:fire" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Купці околиць
             <dl class="ct-facts">
@@ -208,26 +229,33 @@
                       Рис
                     ×6
             <div class="why" data-why="error.missionNeedsTeam" id="why-core:fire">
-              <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  <a class="entity-link" href="#/skill/ath">
-                    Атлетика
-                  <span class="detail">
-                    рів. 10
-                <span class="count">
-                  1/10
-                <span aria-hidden="true" class="bar">
-                  <span class="fill" style="width: 10%;">
+              <div class="reqs" data-rows="18" data-ui="req-summary">
+                <p class="head">
+                  <span data-req-count="">
+                    Вимоги: 1 з 4
+                  <button class="open" data-req-open="" type="button">
+                    Вимоги
+                <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                  <span class="mark">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <span class="label">
+                    <a class="entity-link" href="#/skill/ath">
+                      Атлетика
+                    <span class="detail">
+                      рів. 10
+                  <span class="count">
+                    1/10
+                  <span aria-hidden="true" class="bar">
+                    <span class="fill" style="width: 10%;">
               <p class="ct-why" data-needs-team="">
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:fire" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:fire" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile card" data-entity="mission:core:drought" data-mission="core:drought" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -235,15 +263,15 @@
                   D
                 <a class="entity-link" href="#/mission/core:drought">
                   Посуха на полях
-              <span class="team" data-team="false">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Сольна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:drought" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Сольна місія" class="mark" data-team="false" data-ui="mission-kind" role="img" title="Сольна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#41-6fdr79">
+                      <circle cx="12" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:drought" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Селяни околиць
             <dl class="ct-facts">
@@ -286,26 +314,35 @@
                       Спеції
                     ×2
             <div class="why" data-why="error.requirementsNotMet" id="why-core:drought">
-              <div class="row" data-entity="skill:suiton" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  <a class="entity-link" href="#/skill/suiton">
-                    Суйтон
-                  <span class="detail">
-                    рів. 20
-                  <span class="detail" data-nature-lacking="">
-                    потрібна ця природа чакри
-                <span class="count">
-                  1/20
-                <span aria-hidden="true" class="bar">
-                  <span class="fill" style="width: 5%;">
+              <div class="reqs" data-rows="10" data-ui="req-summary">
+                <p class="head">
+                  <span data-req-count="">
+                    Вимоги: 1 з 2
+                  <button class="open" data-req-open="" type="button">
+                    Вимоги
+                <p class="next" data-req-next="">
+                  Достатньо одного з 9 варіантів
+                <div class="row" data-entity="skill:suiton" data-met="false" data-ui="req-row">
+                  <span class="mark">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <span class="label">
+                    <a class="entity-link" href="#/skill/suiton">
+                      Суйтон
+                    <span class="detail">
+                      рів. 20
+                    <span class="detail" data-nature-lacking="">
+                      потрібна ця природа чакри
+                  <span class="count">
+                    1/20
+                  <span aria-hidden="true" class="bar">
+                    <span class="fill" style="width: 5%;">
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:drought" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:drought" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile card" data-entity="mission:core:courier" data-mission="core:courier" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -313,15 +350,15 @@
                   D
                 <a class="entity-link" href="#/mission/core:courier">
                   Термінова доставка
-              <span class="team" data-team="false">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Сольна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:courier" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Сольна місія" class="mark" data-team="false" data-ui="mission-kind" role="img" title="Сольна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#41-6fdr79">
+                      <circle cx="12" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:courier" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Гільдія купців
             <dl class="ct-facts">
@@ -348,24 +385,55 @@
                   <span>
                     Рьо: 50
             <div class="why" data-why="error.requirementsNotMet" id="why-core:courier">
-              <div class="row" data-entity="skill:nin" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  <a class="entity-link" href="#/skill/nin">
-                    Ніндзюцу
-                  <span class="detail">
-                    рів. 5
-                <span class="count">
-                  1/5
-                <span aria-hidden="true" class="bar">
-                  <span class="fill" style="width: 20%;">
+              <div class="reqs" data-rows="3" data-ui="req-summary">
+                <div class="group" data-met="false">
+                  <ul class="rows">
+                    <li>
+                      <div class="row met" data-met="true" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          Ранг: Генін
+                    <li>
+                      <div class="group" data-met="false">
+                        <p class="caption">
+                          Достатньо одного:
+                        <ul class="rows">
+                          <li>
+                            <div class="row" data-entity="skill:nin" data-met="false" data-ui="req-row">
+                              <span class="mark">
+                                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                                  <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                              <span class="label">
+                                <a class="entity-link" href="#/skill/nin">
+                                  Ніндзюцу
+                                <span class="detail">
+                                  рів. 5
+                              <span class="count">
+                                1/5
+                              <span aria-hidden="true" class="bar">
+                                <span class="fill" style="width: 20%;">
+                          <li>
+                            <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                              <span class="mark">
+                                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                                  <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                              <span class="label">
+                                <a class="entity-link" href="#/skill/ath">
+                                  Атлетика
+                                <span class="detail">
+                                  рів. 30
+                              <span class="count">
+                                1/30
+                              <span aria-hidden="true" class="bar">
+                                <span class="fill" style="width: 3.3333333333333335%;">
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:courier" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:courier" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile card" data-entity="mission:core:rockfall" data-mission="core:rockfall" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -373,15 +441,15 @@
                   D
                 <a class="entity-link" href="#/mission/core:rockfall">
                   Обвал на перевалі
-              <span class="team" data-team="false">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Сольна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:rockfall" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Сольна місія" class="mark" data-team="false" data-ui="mission-kind" role="img" title="Сольна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#41-6fdr79">
+                      <circle cx="12" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:rockfall" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Солевари
             <dl class="ct-facts">
@@ -416,26 +484,35 @@
                       Сіль
                     ×6
             <div class="why" data-why="error.requirementsNotMet" id="why-core:rockfall">
-              <div class="row" data-entity="skill:doton" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  <a class="entity-link" href="#/skill/doton">
-                    Дотон
-                  <span class="detail">
-                    рів. 30
-                  <span class="detail" data-nature-lacking="">
-                    потрібна ця природа чакри
-                <span class="count">
-                  1/30
-                <span aria-hidden="true" class="bar">
-                  <span class="fill" style="width: 3.3333333333333335%;">
+              <div class="reqs" data-rows="8" data-ui="req-summary">
+                <p class="head">
+                  <span data-req-count="">
+                    Вимоги: 1 з 2
+                  <button class="open" data-req-open="" type="button">
+                    Вимоги
+                <p class="next" data-req-next="">
+                  Достатньо одного з 7 варіантів
+                <div class="row" data-entity="skill:doton" data-met="false" data-ui="req-row">
+                  <span class="mark">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <span class="label">
+                    <a class="entity-link" href="#/skill/doton">
+                      Дотон
+                    <span class="detail">
+                      рів. 30
+                    <span class="detail" data-nature-lacking="">
+                      потрібна ця природа чакри
+                  <span class="count">
+                    1/30
+                  <span aria-hidden="true" class="bar">
+                    <span class="fill" style="width: 3.3333333333333335%;">
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:rockfall" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:rockfall" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile card" data-entity="mission:core:thief" data-mission="core:thief" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -443,15 +520,15 @@
                   D
                 <a class="entity-link" href="#/mission/core:thief">
                   Вистежити злодія
-              <span class="team" data-team="false">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Сольна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:thief" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Сольна місія" class="mark" data-team="false" data-ui="mission-kind" role="img" title="Сольна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#41-6fdr79">
+                      <circle cx="12" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:thief" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Містечко
             <dl class="ct-facts">
@@ -485,24 +562,37 @@
                     <a class="entity-link" href="#/item/core:note">
                       Відомості
             <div class="why" data-why="error.requirementsNotMet" id="why-core:thief">
-              <div class="row" data-entity="skill:scout" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  <a class="entity-link" href="#/skill/scout">
-                    Розвідка
-                  <span class="detail">
-                    рів. 20
-                <span class="count">
-                  1/20
-                <span aria-hidden="true" class="bar">
-                  <span class="fill" style="width: 5%;">
+              <div class="reqs" data-rows="2" data-ui="req-summary">
+                <div class="group" data-met="false">
+                  <ul class="rows">
+                    <li>
+                      <div class="row met" data-met="true" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          Ранг: Генін
+                    <li>
+                      <div class="row" data-entity="skill:scout" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/skill/scout">
+                            Розвідка
+                          <span class="detail">
+                            рів. 20
+                        <span class="count">
+                          1/20
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 5%;">
+                    <li>
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:thief" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:thief" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
       <section class="group" data-open="false" data-rank="C">
         <header class="group-head">
           <span aria-label="Ранг C" class="stamp" role="img" style="--stamp: var(--rank-c, var(--accent));">
@@ -533,15 +623,15 @@
                   C
                 <a class="entity-link" href="#/mission/core:caravan">
                   Супровід каравану
-              <span class="team" data-team="true">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Командна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:caravan" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Командна місія" class="mark" data-team="true" data-ui="mission-kind" role="img" title="Командна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:caravan" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Гільдія купців
             <dl class="ct-facts">
@@ -583,19 +673,53 @@
                     <span class="entity-link masked" data-masked="" title="Здобудь це">
                       ???
             <div class="why" data-why="error.missionNeedsTeam" id="why-core:caravan">
-              <div class="row" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  Дозвіл Хокаґе на місії рангу C
+              <div class="reqs" data-rows="3" data-ui="req-summary">
+                <div class="group" data-met="false">
+                  <ul class="rows">
+                    <li>
+                      <div class="row" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          Дозвіл Хокаґе на місії рангу C
+                    <li>
+                      <div class="row" data-entity="skill:scout" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/skill/scout">
+                            Розвідка
+                          <span class="detail">
+                            рів. 20
+                        <span class="count">
+                          1/20
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 5%;">
+                    <li>
+                    <li>
+                      <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/skill/tai">
+                            Тайдзюцу
+                          <span class="detail">
+                            рів. 25
+                        <span class="count">
+                          1/25
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 4%;">
               <p class="ct-why" data-needs-team="">
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:caravan" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:caravan" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile card closed" data-entity="mission:core:sealed" data-mission="core:sealed" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -603,15 +727,15 @@
                   C
                 <a class="entity-link" href="#/mission/core:sealed">
                   Запечатаний вантаж
-              <span class="team" data-team="false">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Сольна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:sealed" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Сольна місія" class="mark" data-team="false" data-ui="mission-kind" role="img" title="Сольна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#41-6fdr79">
+                      <circle cx="12" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:sealed" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Гільдія купців
             <dl class="ct-facts">
@@ -638,17 +762,51 @@
                   <span>
                     Рьо: 400
             <div class="why" data-why="error.requirementsNotMet" id="why-core:sealed">
-              <div class="row" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  Дозвіл Хокаґе на місії рангу C
+              <div class="reqs" data-rows="3" data-ui="req-summary">
+                <div class="group" data-met="false">
+                  <ul class="rows">
+                    <li>
+                      <div class="row" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          Дозвіл Хокаґе на місії рангу C
+                    <li>
+                      <div class="group" data-met="false">
+                        <p class="caption">
+                          Достатньо одного:
+                        <ul class="rows">
+                          <li>
+                            <div class="row" data-entity="technique:core:enclosing" data-met="false" data-ui="req-row">
+                              <span class="mark">
+                                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                                  <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                              <span class="label">
+                                <a class="entity-link" href="#/technique/core:enclosing">
+                                  Техніка запечатування
+                                <span class="detail">
+                                  ще не відкрито
+                    <li>
+                      <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/skill/ath">
+                            Атлетика
+                          <span class="detail">
+                            рів. 20
+                        <span class="count">
+                          1/20
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 5%;">
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:sealed" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:sealed" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile card closed" data-entity="mission:core:mail" data-mission="core:mail" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -656,15 +814,15 @@
                   C
                 <a class="entity-link" href="#/mission/core:mail">
                   Таємна пошта
-              <span class="team" data-team="false">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Сольна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:mail" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Сольна місія" class="mark" data-team="false" data-ui="mission-kind" role="img" title="Сольна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#41-6fdr79">
+                      <circle cx="12" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:mail" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Вежа Каґе
             <dl class="ct-facts">
@@ -697,17 +855,48 @@
                   <span>
                     Intel: 2
             <div class="why" data-why="error.requirementsNotMet" id="why-core:mail">
-              <div class="row" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  Дозвіл Хокаґе на місії рангу C
+              <div class="reqs" data-rows="3" data-ui="req-summary">
+                <div class="group" data-met="false">
+                  <ul class="rows">
+                    <li>
+                      <div class="group" data-met="false">
+                        <p class="caption">
+                          Потрібно все:
+                        <ul class="rows">
+                          <li>
+                            <div class="row" data-met="false" data-ui="req-row">
+                              <span class="mark">
+                                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                                  <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                              <span class="label">
+                                Дозвіл Хокаґе на місії рангу C
+                          <li>
+                            <div class="row" data-met="false" data-ui="req-row">
+                              <span class="mark">
+                                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                                  <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                              <span class="label">
+                                Звання «Довірений гінець» (180 Репутації)
+                    <li>
+                      <div class="row" data-entity="skill:ath" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/skill/ath">
+                            Атлетика
+                          <span class="detail">
+                            рів. 40
+                        <span class="count">
+                          1/40
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 2.5%;">
               <p class="ct-why">
                 Вимоги до цієї дії не виконано.
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:mail" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:mail" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile card closed" data-entity="mission:core:well" data-mission="core:well" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -715,15 +904,15 @@
                   C
                 <a class="entity-link" href="#/mission/core:well">
                   Отруєна криниця
-              <span class="team" data-team="true">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Командна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:well" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Командна місія" class="mark" data-team="true" data-ui="mission-kind" role="img" title="Командна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:well" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Містечко на Південних рівнинах
             <dl class="ct-facts">
@@ -764,19 +953,51 @@
                       Спеції
                     ×2
             <div class="why" data-why="error.missionNeedsTeam" id="why-core:well">
-              <div class="row" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  Дозвіл Хокаґе на місії рангу C
+              <div class="reqs" data-rows="3" data-ui="req-summary">
+                <div class="group" data-met="false">
+                  <ul class="rows">
+                    <li>
+                      <div class="row" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          Дозвіл Хокаґе на місії рангу C
+                    <li>
+                      <div class="row" data-entity="skill:scout" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/skill/scout">
+                            Розвідка
+                          <span class="detail">
+                            рів. 15
+                        <span class="count">
+                          1/15
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 6.666666666666667%;">
+                    <li>
+                      <div class="row" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <span class="entity-link masked" data-masked="" title="Здобудь це">
+                            ???
+                        <span class="count">
+                          0/5
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 0%;">
+                    <li>
               <p class="ct-why" data-needs-team="">
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:well" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:well" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile card closed" data-entity="mission:core:dig" data-mission="core:dig" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -784,15 +1005,15 @@
                   C
                 <a class="entity-link" href="#/mission/core:dig">
                   Охорона розкопок
-              <span class="team" data-team="true">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Командна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:dig" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Командна місія" class="mark" data-team="true" data-ui="mission-kind" role="img" title="Командна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:dig" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Храм Вогню
             <dl class="ct-facts">
@@ -834,19 +1055,26 @@
                     <span class="chance">
                       шанс 15%
             <div class="why" data-why="error.missionNeedsTeam" id="why-core:dig">
-              <div class="row" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  Дозвіл Хокаґе на місії рангу C
+              <div class="reqs" data-rows="9" data-ui="req-summary">
+                <p class="head">
+                  <span data-req-count="">
+                    Вимоги: 0 з 3
+                  <button class="open" data-req-open="" type="button">
+                    Вимоги
+                <div class="row" data-met="false" data-ui="req-row">
+                  <span class="mark">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <span class="label">
+                    Дозвіл Хокаґе на місії рангу C
               <p class="ct-why" data-needs-team="">
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:dig" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:dig" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
       <section class="group" data-open="true" data-rank="V">
         <header class="group-head">
           <span aria-label="Місії села" class="stamp" role="img" style="--stamp: var(--rank-v, var(--accent));">
@@ -864,15 +1092,15 @@
                   V
                 <a class="entity-link" href="#/mission/core:v_spar">
                   Спаринг в Академії
-              <span class="team" data-team="true">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Командна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:v_spar" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Командна місія" class="mark" data-team="true" data-ui="mission-kind" role="img" title="Командна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:v_spar" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <dl class="ct-facts">
@@ -907,26 +1135,38 @@
                   <a href="#/village">
                     Сила шинобі: +3
             <div class="why" data-why="error.missionNeedsTeam" id="why-core:v_spar">
-              <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  <a class="entity-link" href="#/skill/tai">
-                    Тайдзюцу
-                  <span class="detail">
-                    рів. 10
-                <span class="count">
-                  1/10
-                <span aria-hidden="true" class="bar">
-                  <span class="fill" style="width: 10%;">
+              <div class="reqs" data-rows="2" data-ui="req-summary">
+                <div class="group" data-met="false">
+                  <ul class="rows">
+                    <li>
+                      <div class="row met" data-met="true" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          Ранг: Генін
+                    <li>
+                      <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/skill/tai">
+                            Тайдзюцу
+                          <span class="detail">
+                            рів. 10
+                        <span class="count">
+                          1/10
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 10%;">
               <p class="ct-why" data-needs-team="">
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:v_spar" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:v_spar" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile card" data-entity="mission:core:v_walls" data-mission="core:v_walls" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -934,15 +1174,15 @@
                   V
                 <a class="entity-link" href="#/mission/core:v_walls">
                   Зведення стін
-              <span class="team" data-team="true">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Командна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:v_walls" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Командна місія" class="mark" data-team="true" data-ui="mission-kind" role="img" title="Командна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:v_walls" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <dl class="ct-facts">
@@ -977,22 +1217,39 @@
                   <a href="#/village">
                     Охорона: +3
             <div class="why" data-why="error.missionNeedsTeam" id="why-core:v_walls">
-              <div class="row" data-entity="technique:core:earth_style_wall" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  <a class="entity-link" href="#/technique/core:earth_style_wall">
-                    Стіна земляного стилю
-                  <span class="detail">
-                    ще не відкрито
+              <div class="reqs" data-rows="2" data-ui="req-summary">
+                <div class="group" data-met="false">
+                  <ul class="rows">
+                    <li>
+                      <div class="row met" data-met="true" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          Ранг: Генін
+                    <li>
+                      <div class="group" data-met="false">
+                        <p class="caption">
+                          Достатньо одного:
+                        <ul class="rows">
+                          <li>
+                            <div class="row" data-entity="technique:core:earth_style_wall" data-met="false" data-ui="req-row">
+                              <span class="mark">
+                                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                                  <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                              <span class="label">
+                                <a class="entity-link" href="#/technique/core:earth_style_wall">
+                                  Стіна земляного стилю
+                                <span class="detail">
+                                  ще не відкрито
               <p class="ct-why" data-needs-team="">
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:v_walls" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:v_walls" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile card" data-entity="mission:core:v_fence" data-mission="core:v_fence" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -1000,15 +1257,15 @@
                   V
                 <a class="entity-link" href="#/mission/core:v_fence">
                   Заряджені загородження
-              <span class="team" data-team="true">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Командна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:v_fence" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Командна місія" class="mark" data-team="true" data-ui="mission-kind" role="img" title="Командна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:v_fence" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <dl class="ct-facts">
@@ -1043,22 +1300,51 @@
                   <a href="#/village">
                     Охорона: +3
             <div class="why" data-why="error.missionNeedsTeam" id="why-core:v_fence">
-              <div class="row" data-entity="technique:core:four_pillar_bind" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  <a class="entity-link" href="#/technique/core:four_pillar_bind">
-                    Пута чотирьох стовпів
-                  <span class="detail">
-                    ще не відкрито
+              <div class="reqs" data-rows="3" data-ui="req-summary">
+                <div class="group" data-met="false">
+                  <ul class="rows">
+                    <li>
+                      <div class="row met" data-met="true" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          Ранг: Генін
+                    <li>
+                      <div class="group" data-met="false">
+                        <p class="caption">
+                          Достатньо одного:
+                        <ul class="rows">
+                          <li>
+                            <div class="row" data-entity="technique:core:four_pillar_bind" data-met="false" data-ui="req-row">
+                              <span class="mark">
+                                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                                  <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                              <span class="label">
+                                <a class="entity-link" href="#/technique/core:four_pillar_bind">
+                                  Пута чотирьох стовпів
+                                <span class="detail">
+                                  ще не відкрито
+                    <li>
+                      <div class="row" data-entity="item:core:wire" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/item/core:wire">
+                            Дріт
+                        <span class="count">
+                          0/10
+                        <span aria-hidden="true" class="bar">
+                          <span class="fill" style="width: 0%;">
               <p class="ct-why" data-needs-team="">
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:v_fence" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:v_fence" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile card" data-entity="mission:core:v_clear" data-mission="core:v_clear" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -1066,15 +1352,15 @@
                   V
                 <a class="entity-link" href="#/mission/core:v_clear">
                   Розчищення ділянок
-              <span class="team" data-team="true">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Командна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:v_clear" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Командна місія" class="mark" data-team="true" data-ui="mission-kind" role="img" title="Командна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:v_clear" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <dl class="ct-facts">
@@ -1109,22 +1395,54 @@
                   <a href="#/village">
                     Ділянки: +3
             <div class="why" data-why="error.missionNeedsTeam" id="why-core:v_clear">
-              <div class="row" data-entity="technique:core:running_fire" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  <a class="entity-link" href="#/technique/core:running_fire">
-                    Вогняна доріжка
-                  <span class="detail">
-                    ще не відкрито
+              <div class="reqs" data-rows="4" data-ui="req-summary">
+                <p class="head">
+                  <span data-req-count="">
+                    Вимоги: 1 з 2
+                  <button class="open" data-req-open="" type="button">
+                    Вимоги
+                <div class="group" data-met="false">
+                  <p class="caption">
+                    Достатньо одного:
+                  <ul class="rows">
+                    <li>
+                      <div class="row" data-entity="technique:core:running_fire" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/technique/core:running_fire">
+                            Вогняна доріжка
+                          <span class="detail">
+                            ще не відкрито
+                    <li>
+                      <div class="row" data-entity="technique:core:vacuum_wave" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/technique/core:vacuum_wave">
+                            Вакуумна хвиля
+                          <span class="detail">
+                            ще не відкрито
+                    <li>
+                      <div class="row" data-entity="technique:core:tearing_earth_turning_palm" data-met="false" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          <a class="entity-link" href="#/technique/core:tearing_earth_turning_palm">
+                            Долоня, що розриває землю
+                          <span class="detail">
+                            ще не відкрито
               <p class="ct-why" data-needs-team="">
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:v_clear" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:v_clear" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile card" data-entity="mission:core:v_water" data-mission="core:v_water" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -1132,15 +1450,15 @@
                   V
                 <a class="entity-link" href="#/mission/core:v_water">
                   Зрошення полів села
-              <span class="team" data-team="true">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Командна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:v_water" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Командна місія" class="mark" data-team="true" data-ui="mission-kind" role="img" title="Командна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:v_water" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <dl class="ct-facts">
@@ -1175,28 +1493,37 @@
                   <a href="#/village">
                     Зрошення: +3
             <div class="why" data-why="error.missionNeedsTeam" id="why-core:v_water">
-              <div class="row" data-entity="skill:suiton" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  <a class="entity-link" href="#/skill/suiton">
-                    Суйтон
-                  <span class="detail">
-                    рів. 20
-                  <span class="detail" data-nature-lacking="">
-                    потрібна ця природа чакри
-                <span class="count">
-                  1/20
-                <span aria-hidden="true" class="bar">
-                  <span class="fill" style="width: 5%;">
+              <div class="reqs" data-rows="9" data-ui="req-summary">
+                <p class="head">
+                  <span data-req-count="">
+                    Вимоги: 1 з 2
+                  <button class="open" data-req-open="" type="button">
+                    Вимоги
+                <p class="next" data-req-next="">
+                  Достатньо одного з 8 варіантів
+                <div class="row" data-entity="skill:suiton" data-met="false" data-ui="req-row">
+                  <span class="mark">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <span class="label">
+                    <a class="entity-link" href="#/skill/suiton">
+                      Суйтон
+                    <span class="detail">
+                      рів. 20
+                    <span class="detail" data-nature-lacking="">
+                      потрібна ця природа чакри
+                  <span class="count">
+                    1/20
+                  <span aria-hidden="true" class="bar">
+                    <span class="fill" style="width: 5%;">
               <p class="ct-why" data-needs-team="">
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:v_water" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:v_water" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile card" data-entity="mission:core:v_sanit" data-mission="core:v_sanit" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -1204,15 +1531,15 @@
                   V
                 <a class="entity-link" href="#/mission/core:v_sanit">
                   Санітарна варта
-              <span class="team" data-team="true">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Командна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:v_sanit" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Командна місія" class="mark" data-team="true" data-ui="mission-kind" role="img" title="Командна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:v_sanit" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <dl class="ct-facts">
@@ -1247,22 +1574,39 @@
                   <a href="#/village">
                     Здоров'я: +3
             <div class="why" data-why="error.missionNeedsTeam" id="why-core:v_sanit">
-              <div class="row" data-entity="technique:core:great_fireball" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  <a class="entity-link" href="#/technique/core:great_fireball">
-                    Техніка великої вогняної кулі
-                  <span class="detail">
-                    ще не відкрито
+              <div class="reqs" data-rows="2" data-ui="req-summary">
+                <div class="group" data-met="false">
+                  <ul class="rows">
+                    <li>
+                      <div class="row met" data-met="true" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          Ранг: Генін
+                    <li>
+                      <div class="group" data-met="false">
+                        <p class="caption">
+                          Достатньо одного:
+                        <ul class="rows">
+                          <li>
+                            <div class="row" data-entity="technique:core:great_fireball" data-met="false" data-ui="req-row">
+                              <span class="mark">
+                                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                                  <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                              <span class="label">
+                                <a class="entity-link" href="#/technique/core:great_fireball">
+                                  Техніка великої вогняної кулі
+                                <span class="detail">
+                                  ще не відкрито
               <p class="ct-why" data-needs-team="">
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:v_sanit" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:v_sanit" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile card" data-entity="mission:core:v_rubble" data-mission="core:v_rubble" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -1270,15 +1614,15 @@
                   V
                 <a class="entity-link" href="#/mission/core:v_rubble">
                   Розбір завалів
-              <span class="team" data-team="true">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Командна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:v_rubble" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Командна місія" class="mark" data-team="true" data-ui="mission-kind" role="img" title="Командна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:v_rubble" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <dl class="ct-facts">
@@ -1313,28 +1657,37 @@
                   <a href="#/village">
                     Кладка: +3
             <div class="why" data-why="error.missionNeedsTeam" id="why-core:v_rubble">
-              <div class="row" data-entity="skill:doton" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  <a class="entity-link" href="#/skill/doton">
-                    Дотон
-                  <span class="detail">
-                    рів. 30
-                  <span class="detail" data-nature-lacking="">
-                    потрібна ця природа чакри
-                <span class="count">
-                  1/30
-                <span aria-hidden="true" class="bar">
-                  <span class="fill" style="width: 3.3333333333333335%;">
+              <div class="reqs" data-rows="8" data-ui="req-summary">
+                <p class="head">
+                  <span data-req-count="">
+                    Вимоги: 1 з 2
+                  <button class="open" data-req-open="" type="button">
+                    Вимоги
+                <p class="next" data-req-next="">
+                  Достатньо одного з 7 варіантів
+                <div class="row" data-entity="skill:doton" data-met="false" data-ui="req-row">
+                  <span class="mark">
+                    <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                      <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                  <span class="label">
+                    <a class="entity-link" href="#/skill/doton">
+                      Дотон
+                    <span class="detail">
+                      рів. 30
+                    <span class="detail" data-nature-lacking="">
+                      потрібна ця природа чакри
+                  <span class="count">
+                    1/30
+                  <span aria-hidden="true" class="bar">
+                    <span class="fill" style="width: 3.3333333333333335%;">
               <p class="ct-why" data-needs-team="">
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:v_rubble" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:v_rubble" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile card" data-entity="mission:core:v_clones" data-mission="core:v_clones" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -1342,15 +1695,15 @@
                   V
                 <a class="entity-link" href="#/mission/core:v_clones">
                   Клони на будівництві
-              <span class="team" data-team="true">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Командна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:v_clones" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Командна місія" class="mark" data-team="true" data-ui="mission-kind" role="img" title="Командна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:v_clones" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <dl class="ct-facts">
@@ -1385,22 +1738,39 @@
                   <a href="#/village">
                     Робоча сила: +3
             <div class="why" data-why="error.missionNeedsTeam" id="why-core:v_clones">
-              <div class="row" data-entity="technique:core:shadow_clone" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  <a class="entity-link" href="#/technique/core:shadow_clone">
-                    Техніка тіньового клонування
-                  <span class="detail">
-                    ще не відкрито
+              <div class="reqs" data-rows="2" data-ui="req-summary">
+                <div class="group" data-met="false">
+                  <ul class="rows">
+                    <li>
+                      <div class="row met" data-met="true" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          Ранг: Генін
+                    <li>
+                      <div class="group" data-met="false">
+                        <p class="caption">
+                          Достатньо одного:
+                        <ul class="rows">
+                          <li>
+                            <div class="row" data-entity="technique:core:shadow_clone" data-met="false" data-ui="req-row">
+                              <span class="mark">
+                                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                                  <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                              <span class="label">
+                                <a class="entity-link" href="#/technique/core:shadow_clone">
+                                  Техніка тіньового клонування
+                                <span class="detail">
+                                  ще не відкрито
               <p class="ct-why" data-needs-team="">
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:v_clones" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:v_clones" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати
           <li class="ct-tile card" data-entity="mission:core:v_seal" data-mission="core:v_seal" data-state="blocked" data-ui="mission-card">
             <div class="ct-head">
               <h3 class="ct-name">
@@ -1408,15 +1778,15 @@
                   V
                 <a class="entity-link" href="#/mission/core:v_seal">
                   Запечатування запасів
-              <span class="team" data-team="true">
-                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                    <path d="#94-lwm9pk">
-                    <circle cx="9" cy="7" r="4">
-                Командна місія
-              <button aria-label="Закріпити як мету" class="pin always" data-entity="mission:core:v_seal" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-                <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                  <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              <div class="ct-corner corner">
+                <span aria-label="Командна місія" class="mark" data-team="true" data-ui="mission-kind" role="img" title="Командна місія">
+                  <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
+                    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                      <path d="#94-lwm9pk">
+                      <circle cx="9" cy="7" r="4">
+                <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="mission:core:v_seal" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
+                    <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <p class="ct-note client">
               Околиці Листя
             <dl class="ct-facts">
@@ -1451,19 +1821,36 @@
                   <a href="#/village">
                     Місткість: +3
             <div class="why" data-why="error.missionNeedsTeam" id="why-core:v_seal">
-              <div class="row" data-entity="technique:core:enclosing" data-met="false" data-ui="req-row">
-                <span class="mark">
-                  <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                    <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                <span class="label">
-                  <a class="entity-link" href="#/technique/core:enclosing">
-                    Техніка запечатування
-                  <span class="detail">
-                    ще не відкрито
+              <div class="reqs" data-rows="2" data-ui="req-summary">
+                <div class="group" data-met="false">
+                  <ul class="rows">
+                    <li>
+                      <div class="row met" data-met="true" data-ui="req-row">
+                        <span class="mark">
+                          <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                            <path d="#15-izve9w" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                        <span class="label">
+                          Ранг: Генін
+                    <li>
+                      <div class="group" data-met="false">
+                        <p class="caption">
+                          Достатньо одного:
+                        <ul class="rows">
+                          <li>
+                            <div class="row" data-entity="technique:core:enclosing" data-met="false" data-ui="req-row">
+                              <span class="mark">
+                                <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                                  <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+                              <span class="label">
+                                <a class="entity-link" href="#/technique/core:enclosing">
+                                  Техніка запечатування
+                                <span class="detail">
+                                  ще не відкрито
               <p class="ct-why" data-needs-team="">
                 Це командна місія, а команди в тебе ще немає: її дає вибір природи чакри.
                 <a href="#/nature">
                   Обрати природу
-            <span class="split plain" data-for="mission" data-ui="start-split">
-              <button aria-describedby="why-core:v_seal" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
-                Почати
+            <div class="ct-actions" data-ui="card-actions">
+              <span class="split plain" data-for="mission" data-ui="start-split">
+                <button aria-describedby="why-core:v_seal" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
+                  Почати

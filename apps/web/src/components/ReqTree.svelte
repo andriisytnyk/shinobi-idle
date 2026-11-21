@@ -1,6 +1,6 @@
 <script lang="ts">
   import { natureStatus, pointStatus, type ReqResult } from '@shinobi/core';
-  import { humanId, webRef } from '../lib/entities.ts';
+  import { entityName, humanId, webRef } from '../lib/entities.ts';
   import { currencyName, currencyOf, rankName } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
   import { formatInt } from '../lib/format.ts';
@@ -95,6 +95,21 @@
         })
       : false,
   );
+  /** A nature this character does not own and cannot take now: the row cannot be met for the time being. */
+  const natureImpossible = $derived(
+    (req.t === 'nature' || req.t === 'skill') && !node.met
+      ? game.read((gs) => {
+          const id = req.t === 'nature' ? req.nature : (req as { skill: string }).skill;
+          if (!game.content.natures.some((n) => n.id === id)) return null;
+          if (gs.player.natures.includes(id as never)) return null;
+          const status = natureStatus(gs, game.content);
+          if (status.canChoose && status.free.includes(id as never)) return null;
+          return id;
+        })
+      : null,
+  );
+  /** A group with no rows (a stage that is already open) prints nothing. */
+  const empty = $derived(isGroup && node.children.length === 0);
   const flagText = $derived(
     req.t === 'flag'
       ? hasKey(`req.flag.${req.id}`)
@@ -104,7 +119,9 @@
   );
 </script>
 
-{#if isGroup}
+{#if empty}
+  <!-- nothing to show -->
+{:else if isGroup}
   <div class="group" data-met={node.met}>
     {#if req.t === 'any' || depth > 0}
       <p class="caption">{t(req.t === 'any' ? 'req.any' : 'req.all')}</p>
@@ -119,7 +136,9 @@
   <div
     class="row"
     class:met={node.met}
+    class:impossible={natureImpossible !== null}
     data-met={node.met}
+    data-impossible={natureImpossible !== null ? '' : undefined}
     data-ui={part}
     data-entity={ref && shown ? `${ref.kind}:${ref.id}` : undefined}
   >
@@ -128,7 +147,12 @@
       {#if req.t === 'skill'}
         {#if ref}<EntityLink kind={ref.kind} id={ref.id} offered />{/if}
         <span class="detail">{t('req.level', { n: req.level })}</span>
-        {#if natureLacking}<span class="detail" data-nature-lacking>{t('req.needNature')}</span
+        {#if natureImpossible !== null}<span class="detail warn" data-nature-impossible
+            >{t('req.natureImpossible', {
+              nature: entityName({ kind: 'skill', id: natureImpossible }),
+            })}</span
+          >{:else if natureLacking}<span class="detail" data-nature-lacking
+            >{t('req.needNature')}</span
           >{/if}
       {:else if req.t === 'technique'}
         {#if ref}<EntityLink kind={ref.kind} id={ref.id} offered />{/if}
@@ -136,6 +160,11 @@
       {:else if req.t === 'nature'}
         <span class="detail">{t('req.nature')}</span>
         {#if ref}<EntityLink kind={ref.kind} id={ref.id} offered />{/if}
+        {#if natureImpossible !== null}<span class="detail warn" data-nature-impossible
+            >{t('req.natureImpossible', {
+              nature: entityName({ kind: 'skill', id: natureImpossible }),
+            })}</span
+          >{/if}
         {#if !node.met && natureChoosable}<a class="detail-link" href="#/nature"
             >{t('req.natureLink')}</a
           >{/if}
@@ -229,6 +258,11 @@
     margin-left: var(--space-1);
     color: var(--fg-dim);
     font-size: var(--text-xs);
+  }
+
+  .detail.warn {
+    color: var(--danger);
+    font-weight: 600;
   }
 
   .detail-link {

@@ -62,17 +62,33 @@
     return tree.met ? null : tree;
   }
 
-  function report(result: {
-    ok: boolean;
-    reason?: string;
-    params?: Record<string, string | number>;
-  }): void {
+  /** The price as the card shows it: the currency and the amount. */
+  const priceText = (cost: number): string =>
+    t('course.price', { n: formatInt(cost), currency: currencyName(moneyOf(content)) });
+
+  /** The text of a refusal; the one about ryo names the price of the obstacle. */
+  const pathReason = (reason: string): string =>
+    reason === 'error.notEnoughRyo' ? 'course.notEnoughRyo' : reason;
+  const blockedText = (reason: string, cost: number): string =>
+    t(pathReason(reason), { price: priceText(cost) });
+
+  function report(
+    result: {
+      ok: boolean;
+      reason?: string;
+      params?: Record<string, string | number>;
+    },
+    cost: number,
+  ): void {
     if (!result.ok && result.reason)
-      toasts.push({ key: result.reason, params: refusalParams(result) });
+      toasts.push({
+        key: pathReason(result.reason),
+        params: { price: priceText(cost), ...refusalParams(result) },
+      });
   }
 
-  const build = (slot: number, obstacle: string) =>
-    report(game.dispatch({ type: 'athletics.build', slot, obstacle }));
+  const build = (slot: number, option: ObstacleOption) =>
+    report(game.dispatch({ type: 'athletics.build', slot, obstacle: option.id }), option.cost);
 
   const label = (slot: CourseSlotInfo, option: ObstacleOption): string =>
     t(slot.built !== null && !option.built ? 'course.replace' : 'course.build');
@@ -193,13 +209,15 @@
                   type="button"
                   class="action"
                   disabled={option.blocked !== null}
-                  title={option.blocked && !missing ? t(option.blocked) : undefined}
-                  onclick={() => build(slot.slot, option.id)}
+                  title={option.blocked && !missing
+                    ? blockedText(option.blocked, option.cost)
+                    : undefined}
+                  onclick={() => build(slot.slot, option)}
                 >
                   {label(slot, option)}
                 </button>
                 {#if option.blocked === 'error.notEnoughRyo'}
-                  <p class="note">{t(option.blocked)}</p>
+                  <p class="note">{blockedText(option.blocked, option.cost)}</p>
                 {/if}
               {/if}
             </li>

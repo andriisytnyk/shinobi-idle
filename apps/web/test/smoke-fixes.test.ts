@@ -106,9 +106,28 @@ describe('a mission that asks for a nature the character lacks', () => {
     const state = player({ natures: ['katon'], base: 20, rankC: true });
     booted = await bootApp([coreUi], state, '#/missions');
     // A blocked card whose missing part is a nature the character does not own says so.
-    const hint = q('[data-mission][data-state="blocked"] [data-nature-lacking]');
+    // The card keeps a long list behind «Вимоги»: open every such list.
+    for (const b of [
+      ...(booted?.target.querySelectorAll<HTMLButtonElement>(
+        '[data-mission][data-state="blocked"] [data-req-open]',
+      ) ?? []),
+    ]) {
+      b.click();
+      flushSync();
+      break;
+    }
+    const hint =
+      document.querySelector(
+        '[data-ui="modal"] [data-nature-impossible], [data-ui="modal"] [data-nature-lacking]',
+      ) ??
+      q(
+        '[data-mission][data-state="blocked"] [data-nature-impossible], [data-mission][data-state="blocked"] [data-nature-lacking]',
+      );
     expect(hint, 'a blocked card with the nature hint').not.toBeNull();
-    expect(hint?.textContent).toBe(t('req.needNature'));
+    // A nature that can still be taken says «потрібна ця природа»; one that cannot be taken now says it is unavailable.
+    expect(hint?.textContent).toMatch(
+      new RegExp(`^(${t('req.needNature')}|недоступно: потрібна природа .+)$`),
+    );
     expect(hint?.closest('[data-ui="req-row"]')?.getAttribute('data-met')).toBe('false');
   });
 });

@@ -77,6 +77,7 @@
       id={ref.id}
       skill={info.skill}
       rank={technique?.rank ?? null}
+      size="sm"
       {flash}
     />
     <div class="main">
@@ -84,7 +85,6 @@
         <h3 class="name"><EntityLink kind={ref.kind} id={ref.id} /></h3>
         <span class="corner">
           <PerformerMarks kind={info.kind} id={info.id} />
-          <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
           {#if canPin(ref.kind, content)}<PinGoal
               kind={ref.kind}
               id={ref.id}
@@ -125,6 +125,9 @@
         />
       </dd>
     </div>
+    <div class="ring">
+      <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} size={36} />
+    </div>
   </dl>
 
   {#if info.available}
@@ -138,9 +141,6 @@
     <div class="req">
       <p class="locked-label"><Icon name="lucide:lock" size={14} /> {t('tile.locked')}</p>
       <ReqTree node={lockReq} />
-      {#if canPin(ref.kind, content)}
-        <p class="pin-caption"><PinGoal kind={ref.kind} id={ref.id} variant="link" /></p>
-      {/if}
     </div>
   {/if}
   <Slot name="action.tile" ctx={{ action: { kind: info.kind, id: info.id } }} />
@@ -150,8 +150,9 @@
   .tile {
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
-    padding: var(--space-3);
+    gap: var(--space-2);
+    min-width: 0;
+    padding: var(--space-2);
     border: var(--border-thin) solid var(--line);
     border-radius: var(--radius-md);
     background: var(--surface-raised);
@@ -165,8 +166,8 @@
   /* The emblem sits left of the title; the numbers go under both. */
   .top {
     display: flex;
-    align-items: center;
-    gap: var(--space-3);
+    align-items: flex-start;
+    gap: var(--space-2);
   }
 
   .main {
@@ -177,11 +178,12 @@
     min-width: 0;
   }
 
+  /* The title takes the free width and wraps only when it does not fit; the marks and the pin sit in a compact cluster in the corner. */
   .head {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    gap: var(--space-3);
+    gap: var(--space-2);
   }
 
   .corner {
@@ -189,14 +191,14 @@
     flex: none;
     align-items: center;
     gap: var(--space-1);
-  }
-
-  .pin-caption {
-    margin: var(--space-1) 0 0;
+    margin-left: auto;
   }
 
   .name {
+    flex: 1;
+    min-width: 0;
     margin: 0;
+    overflow-wrap: break-word;
     font-size: var(--text-sm);
     font-weight: 600;
   }
@@ -205,12 +207,19 @@
     color: var(--heading);
   }
 
+  /* The numbers sit in even columns that reflow with the card's width; the mastery ring is the last cell. */
   .facts {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    display: grid;
+    --_fact-min: 6rem;
+    grid-template-columns: repeat(auto-fit, minmax(var(--_fact-min), 1fr));
+    align-items: center;
     gap: var(--space-1) var(--space-2);
     margin: 0;
+  }
+
+  .ring {
+    display: flex;
+    justify-content: flex-start;
   }
 
   dt {
