@@ -53,6 +53,22 @@ function withRespawns(respawns: boolean, id = WOLF): ContentDb {
   };
 }
 
+/** The content with the wolf pack called back every `ms` ms. */
+function withRecall(ms: number, base: ContentDb = content): ContentDb {
+  const K = base.balance.K;
+  const row = (K.bossFx as Record<string, Record<string, number>>).wolfPack as Record<
+    string,
+    number
+  >;
+  return {
+    ...base,
+    balance: {
+      ...base.balance,
+      K: { ...K, bossFx: { ...K.bossFx, wolfPack: { ...row, everyMs: ms } } },
+    },
+  };
+}
+
 const snap = (priority?: keyof typeof PRIORITY): PlayerSnapshot => ({
   ...scripted(['core:leaf_whirlwind', 'core:front_lotus']),
   targetPriority: PRIORITY[priority ?? 'auto'],
@@ -120,14 +136,15 @@ describe('the data', () => {
 });
 
 describe('the automatic rule', () => {
-  it('leaves the helpers a leader calls back to come back, and aims at the leader first', () => {
+  it('kills the wolves first when the pack is called back rarely (the data of the first boss)', () => {
     const { fight, leader, pack } = wolfFight(content);
     expect(pack.length).toBeGreaterThan(0);
     const { target, view } = firstTarget(content);
     // The mechanic is known to the fight's player: the flag shows on the helpers.
     expect(view.enemies.filter((e) => e.respawns).map((e) => e.id)).toEqual(pack);
-    expect(target).toBe(leader);
+    expect(pack).toContain(target);
     expect(fight.enemies[0]?.id).toBe(leader);
+    expect(pack).toContain(firstToFall(content));
   });
 
   it('kills the helpers first when they do not come back', () => {
@@ -139,17 +156,18 @@ describe('the automatic rule', () => {
     expect(firstToFall(db)).not.toBe(leader);
   });
 
-  it('puts the leader first again when the helpers come back (the flag, from data)', () => {
-    const { leader } = wolfFight(withRespawns(true));
-    expect(firstTarget(withRespawns(true)).target).toBe(leader);
-    expect(firstToFall(withRespawns(true))).toBe(leader);
+  it('puts the leader first when the helpers come back almost at once (the interval, from data)', () => {
+    const db = withRecall(1000);
+    const { leader } = wolfFight(db);
+    expect(firstTarget(db).target).toBe(leader);
+    expect(firstToFall(db)).toBe(leader);
   });
 
   it('reads the flag from the data of any boss, not from an id: a mod boss with a pack', () => {
     const base = bossOf(content, WOLF);
     const mod: Boss = { ...base, id: 'testmod:boss_pack' };
     const db = (respawns: boolean): ContentDb => ({
-      ...content,
+      ...withRecall(1000),
       bosses: [
         ...content.bosses,
         {

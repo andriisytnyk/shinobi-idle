@@ -39,7 +39,7 @@ export const BALANCE_EXT = {
   combat: {
     xpTickMs: 1000,
     regenMs: 1000,
-    hpRegenShare: 0,
+    hpRegenShare: 1,
     hitEven: 0.5,
     fightCapMs: 240000,
     maxEnemies: 8,
@@ -198,7 +198,7 @@ export const BALANCE_EXT = {
    */
   bossFx: {
     /** The leader of the wolves calls `count` wolves back every `everyMs` while he lives; a wolf has `hp` and `dmg` of an ordinary enemy of the leader's level. */
-    wolfPack: { count: 4, everyMs: 20000, hp: 0.12, dmg: 0.05, leaderHp: 0.97, leaderDmg: 0.97 },
+    wolfPack: { count: 4, everyMs: 75000, hp: 0.12, dmg: 0.15, leaderHp: 1.15, leaderDmg: 1.15 },
     /** The rival casts `techniques` techniques of the nature that beats the player's, one every `everyMs` (each hits for `mult` x his damage), and a signature every `sigEveryMs` for `sigMult` x. */
     rivalDuel: {
       techniques: 1,

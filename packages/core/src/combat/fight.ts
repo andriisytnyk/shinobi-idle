@@ -1286,6 +1286,8 @@ function buildView(ctx: FightCtx, actor: Combatant): FightView {
   // The helpers a leader calls back while he lives are named by the data of the boss entry.
   const callsBack = content.bosses.find((b) => b.id === fight.encounter.id)?.special.companions;
   const callsBackHook = callsBack?.respawns === true ? callsBack.hook : undefined;
+  const bossFxRows = content.balance.K.bossFx as Record<string, Record<string, number> | undefined>;
+  const callsBackMs = callsBack ? (bossFxRows[callsBack.fx]?.everyMs ?? 0) : 0;
   const kindOf = (e: Combatant): string => `${e.entry}|${e.specials.join(',')}`;
   const watched = new Map<string, number>();
   for (const e of fight.enemies) if (e.last !== null) watched.set(kindOf(e), e.damage);
@@ -1331,6 +1333,7 @@ function buildView(ctx: FightCtx, actor: Combatant): FightView {
       hpShare: e.maxHp > 0 ? e.hp / e.maxHp : 0,
       cl: e.data[LEVEL_KEY] ?? 0,
       dps: cycleMs > 0 ? (perHit * secMs(1)) / cycleMs : 0,
+      respawnMs: callsBackMs,
       respawns: mechanicKnown && callsBackHook !== undefined && e.specials.includes(callsBackHook),
       nature: e.nature,
       effects: viewEffects(fight, e),

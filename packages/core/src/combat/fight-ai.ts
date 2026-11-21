@@ -223,13 +223,18 @@ function mostValuable(view: FightView): ViewEnemy | undefined {
   }
   const leaderUp = view.enemies.some((e) => e.leader);
   const called = view.enemies.reduce((sum, e) => sum + (e.respawns ? e.dps : 0), 0);
+  const timeToKill = (e: ViewEnemy): number => Math.max(1, Math.ceil(e.hp / blow)) * blowMs;
+  // The fight still to go: the time to take down the bodies that do not come back.
+  const horizon = Math.max(
+    1,
+    view.enemies.reduce((sum, e) => sum + (e.respawns ? 0 : timeToKill(e)), 0),
+  );
   let top: ViewEnemy | undefined;
   let topValue = -1;
   for (const e of view.enemies) {
-    const value =
-      leaderUp && e.respawns
-        ? 0
-        : (e.dps + (e.leader ? called : 0)) / (Math.max(1, Math.ceil(e.hp / blow)) * blowMs);
+    // A body that is called back while the leader lives is worth the relief its fall gives until it returns.
+    const relief = leaderUp && e.respawns ? Math.min(1, (e.respawnMs ?? 0) / horizon) : 1;
+    const value = (relief * (e.dps + (e.leader ? called : 0))) / timeToKill(e);
     if (value > topValue || (value === topValue && top !== undefined && e.hp < top.hp)) {
       top = e;
       topValue = value;

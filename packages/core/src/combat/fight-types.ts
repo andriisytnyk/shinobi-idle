@@ -502,6 +502,8 @@ export interface ViewEnemy {
   dps: number;
   /** The body is one the leader calls back while he lives (known once the player knows the mechanic), so killing it buys little. */
   respawns: boolean;
+  /** For such a body: the time, in ms, until the leader calls the helpers back (from the boss data). */
+  respawnMs?: number;
 }
 
 /** What the player AI sees when it must choose. Everything in it is a copy. */
