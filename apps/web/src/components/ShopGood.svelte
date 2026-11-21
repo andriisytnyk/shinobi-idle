@@ -40,6 +40,14 @@
   const total = $derived(
     game.read((gs) => shopTotal(gs, item, Math.max(1, qty), content, game.rules) ?? price * qty),
   );
+  /** The discount in whole percent that the shop modifiers (Market, rank) give on a big stack; 0 when none. */
+  const discount = $derived(
+    game.read((gs) => {
+      const probe = 10_000;
+      const paid = shopTotal(gs, item, probe, content, game.rules);
+      return paid === null ? 0 : Math.round((1 - paid / (price * probe)) * 100);
+    }),
+  );
   const block = $derived(req.met ? null : blockOf(req));
   const invalid = $derived(qty < 1);
   const poor = $derived(!invalid && ryo < total);
@@ -64,7 +72,10 @@
 >
   <span class="ct-icon"><Icon entity={{ kind: 'item', id: item }} size={28} /></span>
   <span class="grow"><EntityLink kind="item" id={item} offered /></span>
-  <span class="ct-muted" data-price>{t('shop.price', { n: formatInt(price), currency: unit })}</span
+  <span class="ct-muted" data-price
+    >{t('shop.price', { n: formatInt(price), currency: unit })}{discount > 0
+      ? ` (${t('shop.discount', { pct: formatInt(discount) })})`
+      : ''}</span
   >
   <span class="ct-muted" data-have>{t('shop.owned', { n: formatInt(owned) })}</span>
   <Stepper

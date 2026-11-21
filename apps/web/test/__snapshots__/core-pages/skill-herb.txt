@@ -16,6 +16,8 @@
       <section data-ui="entity-section">
         <h2>
           Дії
+        <p class="rule" data-regrow-rule="">
+          Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
         <ul class="tiles">
           <li class="ct-tile" data-action="core:mint" data-entity="item:core:mint" data-herb="core:mint" data-ui="action-tile">
             <div class="ct-top">
@@ -72,8 +74,6 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note" data-regrow-rule="">
-                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="ct-actions">
               <span class="split plain" data-for="gather" data-ui="start-split">
                 <button class="main ct-action" data-performer="0" data-start="true" type="button">
@@ -133,8 +133,6 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note" data-regrow-rule="">
-                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -226,8 +224,6 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note" data-regrow-rule="">
-                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -319,8 +315,6 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note" data-regrow-rule="">
-                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -412,8 +406,6 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note" data-regrow-rule="">
-                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -505,8 +497,6 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note" data-regrow-rule="">
-                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -598,8 +588,6 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note" data-regrow-rule="">
-                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -691,8 +679,6 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note" data-regrow-rule="">
-                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -798,8 +784,6 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note" data-regrow-rule="">
-                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -891,8 +875,6 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note" data-regrow-rule="">
-                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -1013,8 +995,6 @@
                   6/6
               <span aria-hidden="true" class="ct-bar">
                 <span class="ct-fill stock" style="width: 100%;">
-              <p class="ct-note" data-regrow-rule="">
-                Кущ відростає по одній траві за 10 с; якщо його зібрати повністю — відростає весь за 7 с. Кожен рівень Майстерності додає ще одну траву.
             <div class="req">
               <p class="ct-locked">
                 <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">

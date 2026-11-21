@@ -242,6 +242,8 @@ export interface PlayerKit {
   med: number;
   chakraRegen: number;
   staminaRegen: number;
+  /** Health regenerated per second in the fight (a fight saved before it existed has none). */
+  hpRegen: number;
   /** The parts of the player's evasion rating, with their sources (the rating itself is the player's `evasion`, wounds counted). */
   evasion: EvasionPart[];
   /**

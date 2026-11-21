@@ -39,7 +39,15 @@
       .filter(([, n]) => n > 0)
       .sort((a, b) => b[1] - a[1]);
   const maxDamage = (r: TargetReport): number => Math.max(1, ...Object.values(r.damage));
-  const usesRows = (r: TargetReport) => Object.entries(r.uses).sort((a, b) => b[1] - a[1]);
+  /** Only techniques: reports saved before the split also hold pouch items in `uses`. */
+  const usesRows = (r: TargetReport) =>
+    Object.entries(r.uses)
+      .filter(([id]) => techniqueIds.has(id))
+      .sort((a, b) => b[1] - a[1]);
+  const itemRows = (r: TargetReport) =>
+    Object.entries(r.items)
+      .filter(([, n]) => n > 0)
+      .sort((a, b) => b[1] - a[1]);
   const traitOf = (source: string): string | null =>
     source.startsWith('trait:') ? source.slice('trait:'.length) : null;
   const nameOfOp = (key: string) =>
@@ -111,6 +119,15 @@
           </ul>
         {/if}
 
+        {#if itemRows(r).length > 0}
+          <h4>{t('battle.items')}</h4>
+          <ul class="list" data-items>
+            {#each itemRows(r) as [id, n] (id)}
+              <li><EntityLink kind="item" {id} /> <span class="n">×{formatInt(n)}</span></li>
+            {/each}
+          </ul>
+        {/if}
+
         {#if damageRows(r).length > 0}
           <h4>{t('battle.damage')}</h4>
           <ul class="list" data-damage>
@@ -165,7 +182,7 @@
 
   .rows {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(var(--tile-min), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--tile-min)), 1fr));
     gap: var(--space-3);
     margin: 0;
     padding: 0;

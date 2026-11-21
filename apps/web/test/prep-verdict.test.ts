@@ -126,7 +126,7 @@ describe('F1-fix1: a target that is not open yet, and the page around the screen
     await booted.go('#/combat/report');
     expect(q('h1')?.textContent).toBe('Звіт бою');
     await booted.go('#/combat');
-    expect(q('h1')?.textContent).toBe('Тренувальний бій');
+    expect(q('h1')?.textContent).toBe('Бій');
   });
 });
 

@@ -130,7 +130,7 @@
   .mods {
     --_grid-template-columns: 15rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(var(--_grid-template-columns), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--_grid-template-columns)), 1fr));
     gap: var(--space-2);
   }
 

@@ -228,13 +228,14 @@ describe('a hook of another pack that fails', () => {
         .ok,
     ).toBe(true);
     const wounds = state.wounds.stacks;
-    expect(() => advance(state, 5 * 60_000, broken, rules)).not.toThrow();
+    // A minute: health carries over now, so a longer series of won fights would wear the character down to a Wound of its own.
+    expect(() => advance(state, 60_000, broken, rules)).not.toThrow();
     const voided = state.events.filter((e) => e.type === 'ruleDisabled');
     expect(voided.length).toBeGreaterThan(0);
     expect(voided[0]).toMatchObject({ pack: 'evil', rule: 'fightHook.evil:armor' });
     expect(state.wounds.stacks).toBe(wounds);
     const back = deserialize(serialize(state, 0), broken, rules);
-    expect(() => advance(back, 5 * 60_000, broken, rules)).not.toThrow();
+    expect(() => advance(back, 60_000, broken, rules)).not.toThrow();
     void startFight;
   });
 

@@ -18,12 +18,12 @@
   import PrepScreen from '../components/PrepScreen.svelte';
   import RaidPanel from '../components/RaidPanel.svelte';
   import StartSplit from '../components/StartSplit.svelte';
-  import ZoneWhere from '../components/ZoneWhere.svelte';
-  import { formatInt } from '../lib/format.ts';
+  import ZoneCard from '../components/ZoneCard.svelte';
   import { fightView } from '../lib/fight-view.svelte.ts';
   import { hasKey, t } from '../lib/i18n.ts';
   import { entityName } from '../lib/entities.ts';
   import type { PrepTarget } from '../lib/prep.ts';
+  import { revealLevel } from '../lib/reveal.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
 
@@ -48,10 +48,25 @@
         const kind = boss ? ('boss' as const) : ('enemy' as const);
         if (!hasKey(`${kind}.${z.enemy}.name`)) return [];
         const available = zoneAvailable(gs, z.id, content);
+        const cellId = zoneCellOf(z.id, content);
         const seen = boss
           ? z.unlock === null || evalReq(gs, z.unlock, content).met
-          : zoneCellOf(z.id, content) !== null && available;
-        return seen ? [{ id: z.id, enemy: z.enemy, kind, available }] : [];
+          : cellId !== null && (available || revealLevel({ kind, id: z.enemy }) !== 'hidden');
+        if (!seen) return [];
+        const entry =
+          content.enemies.find((e) => e.id === z.enemy) ??
+          content.bosses.find((b) => b.id === z.enemy);
+        return [
+          {
+            id: z.id,
+            enemy: z.enemy,
+            kind,
+            available,
+            cell: cellId,
+            cl: entry?.cl ?? 0,
+            hp: entry ? enemyStats(entry, content).maxHp : 0,
+          },
+        ];
       });
       const operations = content.operations
         .filter((o) => o.unlock === null || evalReq(gs, o.unlock, content).met)
@@ -75,6 +90,25 @@
     }),
   );
 
+  /** The enemy zones by region and cell, in the order of the map; bosses apart. */
+  const groups = $derived.by(() => {
+    const regions = content.regions.flatMap((region) => {
+      const cells = region.cells.flatMap((cellId) => {
+        const zones = listing.zones.filter((z) => z.kind === 'enemy' && z.cell === cellId);
+        return zones.length > 0 ? [{ id: cellId, zones }] : [];
+      });
+      return cells.length > 0
+        ? [{ id: region.id, cells, open: cells.some((c) => c.zones.some((z) => z.available)) }]
+        : [];
+    });
+    return { regions, bosses: listing.zones.filter((z) => z.kind === 'boss') };
+  });
+
+  /** The preparation shown in a sheet over the list. */
+  let sheet = $state.raw<PrepTarget | null>(null);
+  const openSheet = (kind: PrepTarget['kind'], id: string) => (sheet = { kind, id });
+  const closeSheet = () => (sheet = null);
+
   /** The performer whose fight is shown (the fight screen sets it), and the lines of that fight alone, worded for it. */
   const shownFight = $derived(fightView.shown(listing.fighters));
   const logEntries = () => game.combatLog.filter((e) => (e.event.slot ?? 0) === shownFight);
@@ -95,10 +129,19 @@
     }),
   );
 
+  /** Whether the fight shown is the training one (the Academy yard). */
+  const trainingShown = $derived(
+    game.read((gs: GameState) => {
+      if (!listing.fighting) return false;
+      const action = gs.slots[shownFight]?.action;
+      const zone = action?.kind === 'fight' ? content.zones.find((z) => z.id === action.id) : null;
+      return zone?.region === 'academy';
+    }),
+  );
+
   /** Whether a clone exists: the character's chakra pool is divided then. */
   const cloned = $derived(game.read((gs: GameState) => cloneCount(gs, content) > 0));
 
-  const prepareHref = (kind: PrepTarget['kind'], id: string) => `#/combat/prepare/${kind}/${id}`;
   const opName = (id: string) => (hasKey(`operation.${id}.name`) ? t(`operation.${id}.name`) : id);
 </script>
 
@@ -112,7 +155,9 @@
             ? 'combat.tab.report'
             : section === 'prepare'
               ? 'combat.prepare'
-              : 'combat.title',
+              : trainingShown
+                ? 'combat.titleTraining'
+                : 'combat.title',
       )}
   compact={listing.fighting}
 >
@@ -160,74 +205,102 @@
     {#if listing.fighting}<FightScreen />{/if}
     <Hint id="combat" />
     <RaidPanel compact />
-    <h2>{t('combat.enemies')}</h2>
-    {#if listing.yard.length === 0}
-      <p class="empty">{t('combat.empty')}</p>
-    {/if}
-    <ul class="cards">
-      {#each listing.yard as zone (zone.id)}
-        <li class="card" data-enemy={zone.enemy}>
-          <span class="icon"><Icon entity={{ kind: 'enemy', id: zone.enemy }} size={36} /></span>
-          <div class="info">
-            <p class="name"><EntityLink kind="enemy" id={zone.enemy} /></p>
-            <p class="meta">
-              {t('combat.level', { n: zone.cl })} · {t('combat.hp', { n: formatInt(zone.hp) })}
-            </p>
-          </div>
-          <div class="buttons">
-            <a class="prepare" href={prepareHref('zone', zone.id)}>{t('combat.prepare')}</a>
-            <StartSplit kind="fight" id={zone.id} label="combat.start" />
-          </div>
-        </li>
-      {/each}
-    </ul>
+    <section class="group" data-ui="zone-group" data-group="academy">
+      <h2>{t('combat.group.academy')}</h2>
+      {#if listing.yard.length === 0}
+        <p class="empty">{t('combat.empty')}</p>
+      {/if}
+      <ul class="ct-tiles">
+        {#each listing.yard as zone (zone.id)}
+          <ZoneCard
+            zone={{ ...zone, kind: 'enemy', available: true }}
+            startLabel="combat.start"
+            onPrepare={(id) => openSheet('zone', id)}
+          />
+        {/each}
+      </ul>
+    </section>
     <p class="idle">{t('combat.idle')}</p>
     {#if cloned}<p class="clone-note" data-clone-split>{t('combat.cloneSplit')}</p>{/if}
 
-    {#if listing.zones.length > 0}
-      <h2>{t('combat.zones')}</h2>
-      <ul class="cards" data-zones>
-        {#each listing.zones as zone (zone.id)}
-          <li class="card" data-zone={zone.id}>
-            <span class="icon"><Icon entity={{ kind: zone.kind, id: zone.enemy }} size={36} /></span
-            >
-            <div class="info">
-              <p class="name"><EntityLink kind={zone.kind} id={zone.enemy} /></p>
-              <ZoneWhere zone={zone.id} />
-              {#if !zone.available}<p class="why" id="why-zone-{zone.id}">
-                  {t('world.where.closed')}
-                </p>{/if}
-            </div>
-            <div class="buttons">
-              <a class="prepare" href={prepareHref('zone', zone.id)}>{t('combat.prepare')}</a>
-              <StartSplit
-                kind="fight"
-                id={zone.id}
-                label="combat.zoneStart"
-                disabled={!zone.available}
-                describedBy={zone.available ? undefined : `why-zone-${zone.id}`}
-              />
-            </div>
-          </li>
+    {#each groups.regions as region (region.id)}
+      <details class="group" open={region.open} data-ui="zone-group" data-group={region.id}>
+        <summary><h2><EntityLink kind="region" id={region.id} /></h2></summary>
+        {#each region.cells as cell (cell.id)}
+          <h3 class="cell"><EntityLink kind="cell" id={cell.id} /></h3>
+          <ul class="ct-tiles" data-zones>
+            {#each cell.zones as zone (zone.id)}
+              <ZoneCard {zone} onPrepare={(id) => openSheet('zone', id)} />
+            {/each}
+          </ul>
         {/each}
-      </ul>
+      </details>
+    {/each}
+
+    {#if groups.bosses.length > 0}
+      <section class="group" data-ui="zone-group" data-group="bosses">
+        <h2>{t('combat.group.bosses')}</h2>
+        <ul class="ct-tiles" data-zones>
+          {#each groups.bosses as zone (zone.id)}
+            <ZoneCard {zone} onPrepare={(id) => openSheet('zone', id)} />
+          {/each}
+        </ul>
+      </section>
     {/if}
 
     {#if listing.operations.length > 0}
-      <h2>{t('combat.operations')}</h2>
-      <ul class="cards" data-operations>
-        {#each listing.operations as op (op.id)}
-          <li class="card">
-            <span class="icon"><Icon name="lucide:swords" size={36} /></span>
-            <div class="info"><p class="name">{opName(op.id)}</p></div>
-            <div class="buttons">
-              <a class="prepare" href={prepareHref('operation', op.id)}>{t('combat.prepare')}</a>
-              <StartSplit kind="operation" id={op.id} label="combat.start" />
-            </div>
-          </li>
-        {/each}
-      </ul>
+      <section class="group" data-ui="zone-group" data-group="operations">
+        <h2>{t('combat.operations')}</h2>
+        <ul class="ct-tiles" data-operations>
+          {#each listing.operations as op (op.id)}
+            <li class="ct-tile" data-ui="zone-card" data-operation={op.id}>
+              <div class="ct-top">
+                <span class="ct-icon"><Icon name="lucide:swords" size={32} /></span>
+                <div class="ct-head"><h4 class="ct-name">{opName(op.id)}</h4></div>
+              </div>
+              <div class="ct-actions buttons">
+                <button
+                  type="button"
+                  class="ct-action stop prepare"
+                  data-prepare
+                  onclick={() => openSheet('operation', op.id)}>{t('combat.prepare')}</button
+                >
+                <StartSplit kind="operation" id={op.id} label="combat.start" />
+              </div>
+            </li>
+          {/each}
+        </ul>
+      </section>
     {/if}
+  {/if}
+
+  {#if sheet}
+    <div
+      class="sheet-backdrop"
+      data-ui="prep-sheet-backdrop"
+      role="presentation"
+      onclick={closeSheet}
+    ></div>
+    <div
+      class="sheet"
+      data-ui="prep-sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t('combat.prepare')}
+      tabindex="-1"
+      onkeydown={(e) => e.key === 'Escape' && closeSheet()}
+    >
+      <button
+        type="button"
+        class="sheet-close"
+        data-sheet-close
+        aria-label={t('modal.close')}
+        onclick={closeSheet}
+      >
+        <Icon name="lucide:x" size={18} />
+      </button>
+      <PrepScreen target={sheet} onStarted={closeSheet} onClose={closeSheet} />
+    </div>
   {/if}
 
   {#if section === 'fight' || (section === 'prepare' && listing.fighting)}
@@ -299,81 +372,27 @@
     font-size: var(--text-xs);
   }
 
-  .why {
-    margin: 0;
-    color: var(--fg-dim);
-    font-size: var(--text-xs);
-  }
-
-  .prepare {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: var(--control-md);
-    padding: var(--space-1) var(--space-4);
-    border: var(--border-thin) solid var(--accent);
-    border-radius: var(--radius-sm);
-    background: var(--accent);
-    color: var(--ink-900);
-    font: inherit;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-  }
-
-  .prepare {
-    background: transparent;
-    color: var(--accent);
-  }
-
-  .buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-  }
-
-  .cards {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .card {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
+  .group {
     margin-bottom: var(--space-2);
-    padding: var(--space-3);
-    border: var(--border-thin) solid var(--line);
-    border-radius: var(--radius-md);
-    background: var(--surface);
   }
 
-  .icon {
-    display: inline-flex;
-    color: var(--steel);
+  details.group > summary {
+    min-height: var(--control-md);
+    cursor: pointer;
+    list-style-position: inside;
   }
 
-  .info {
-    flex: 1;
-    min-width: 0;
+  details.group > summary h2 {
+    display: inline;
   }
 
-  .name {
-    margin: 0;
+  .cell {
+    margin: var(--space-3) 0 var(--space-2);
+    color: var(--fg-dim);
+    font-size: var(--text-sm);
     font-weight: 600;
   }
 
-  @media (max-width: 768px) {
-    .name :global(a),
-    h2 :global(a) {
-      display: inline-flex;
-      align-items: center;
-      min-height: var(--control-md);
-    }
-  }
-
-  .meta,
   .idle,
   .empty {
     margin: 0;
@@ -381,21 +400,50 @@
     font-size: var(--text-xs);
   }
 
-  .idle {
-    margin-top: var(--space-2);
+  .prepare {
+    display: inline-flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
   }
 
-  @media (max-width: 480px) {
-    .card {
-      flex-wrap: wrap;
-    }
+  .buttons {
+    flex-wrap: wrap;
+  }
 
-    .buttons {
-      width: 100%;
-    }
+  .sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    background: var(--scrim);
+  }
 
-    .buttons > * {
-      flex: 1;
-    }
+  .sheet {
+    position: fixed;
+    z-index: var(--z-modal);
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(100%, var(--modal-width));
+    padding: var(--space-4);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: var(--surface);
+    border-left: var(--border-thin) solid var(--line);
+  }
+
+  .sheet-close {
+    position: sticky;
+    top: 0;
+    float: right;
+    z-index: 1;
+    min-width: var(--control-md);
+    min-height: var(--control-md);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface-raised);
+    color: var(--fg);
+    cursor: pointer;
   }
 </style>

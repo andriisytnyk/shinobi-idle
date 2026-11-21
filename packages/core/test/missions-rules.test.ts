@@ -320,7 +320,7 @@ describe('A5: rewards', () => {
 // ---------- A6 ----------
 
 describe('A6: experience', () => {
-  it('pays 70% to 100% of the practice rate at the level of each stage, and prints the table', () => {
+  it('pays about 30% (K.missionXpShare, 25% to 40% with modifiers) of the practice rate at the level of each stage, and prints the table', () => {
     const rows: string[] = [];
     for (const m of BOARD) {
       const state = ableFor(m, [natureFor(m)], 1, 40);
@@ -360,8 +360,8 @@ describe('A6: experience', () => {
         shares.push(gained / hours / rate(Math.min(level, cap), content));
       }
       for (const share of shares) {
-        expect(share, m.id).toBeGreaterThanOrEqual(0.7);
-        expect(share, m.id).toBeLessThanOrEqual(1.0);
+        expect(share, m.id).toBeGreaterThanOrEqual(K.missionXpShare * 0.8);
+        expect(share, m.id).toBeLessThanOrEqual(K.missionXpShare * 1.3);
       }
       const mean = shares.reduce((a, b) => a + b, 0) / Math.max(1, shares.length);
       rows.push(
@@ -452,6 +452,9 @@ describe('A7: failures', () => {
     expect(lost()).toBe(1);
     expect(state.wounds.stacks).toBeGreaterThan(0);
     expect(state.slots[0]?.data).toMatchObject({ s: 1, a: 1 });
+    // The player waits for health (K.restartHp) before the next try; the stage starts over once it is back.
+    expect(state.combat).toBeNull();
+    for (let i = 0; i < 40 * 60 && state.combat === null; i++) advance(state, 1000, content);
     expect(state.combat).not.toBeNull();
     // The scouting stage was passed once and never repeated.
     const stages = state.events.flatMap((e) => (e.type === 'missionStage' ? [e] : []));

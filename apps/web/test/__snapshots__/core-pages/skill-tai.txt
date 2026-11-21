@@ -129,16 +129,6 @@
               <div class="group" data-met="false">
                 <ul class="rows">
                   <li>
-                    <div class="row" data-entity="technique:core:dynamic_entry" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:dynamic_entry">
-                          Динамічний вхід
-                        <span class="detail">
-                          ще не відкрито
-                  <li>
                     <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
                       <span class="mark">
                         <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -217,16 +207,6 @@
                 Поки закрито
               <div class="group" data-met="false">
                 <ul class="rows">
-                  <li>
-                    <div class="row" data-entity="technique:core:leaf_gale" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:leaf_gale">
-                          Листяний шквал
-                        <span class="detail">
-                          ще не відкрито
                   <li>
                     <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
                       <span class="mark">
@@ -307,16 +287,6 @@
               <div class="group" data-met="false">
                 <ul class="rows">
                   <li>
-                    <div class="row" data-entity="technique:core:gate_of_opening" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:gate_of_opening">
-                          Брама відкриття
-                        <span class="detail">
-                          ще не відкрито
-                  <li>
                     <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
                       <span class="mark">
                         <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -396,16 +366,6 @@
               <div class="group" data-met="false">
                 <ul class="rows">
                   <li>
-                    <div class="row" data-entity="technique:core:gate_of_healing" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:gate_of_healing">
-                          Брама зцілення
-                        <span class="detail">
-                          ще не відкрито
-                  <li>
                     <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
                       <span class="mark">
                         <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -482,18 +442,18 @@
                     <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
                     <path d="#24-1tb3nx8">
                 Поки закрито
+              <div class="source" data-technique-source="S">
+                <p class="lack">
+                  Ще не знаєш цієї техніки
+                <p class="how">
+                  Сувій або бібліотека
+                <ul class="links">
+                  <li>
+                    <a class="entity-link" href="#/building/core:library">
+                      Бібліотека
+                    (рівень 3)
               <div class="group" data-met="false">
                 <ul class="rows">
-                  <li>
-                    <div class="row" data-entity="technique:core:lion_combo" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:lion_combo">
-                          Левове комбо
-                        <span class="detail">
-                          ще не відкрито
                   <li>
                     <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
                       <span class="mark">
@@ -566,16 +526,6 @@
                 Поки закрито
               <div class="group" data-met="false">
                 <ul class="rows">
-                  <li>
-                    <div class="row" data-entity="technique:core:leaf_great_whirlwind" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:leaf_great_whirlwind">
-                          Листяний великий вихор
-                        <span class="detail">
-                          ще не відкрито
                   <li>
                     <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
                       <span class="mark">
@@ -653,18 +603,17 @@
                     <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
                     <path d="#24-1tb3nx8">
                 Поки закрито
+              <div class="source" data-technique-source="O">
+                <p class="lack">
+                  Ще не знаєш цієї техніки
+                <p class="how">
+                  Дістається від боса чи ворога
+                <ul class="links">
+                  <li>
+                    <span class="entity-link masked" data-masked="" title="Зустрінь у бою">
+                      ???
               <div class="group" data-met="false">
                 <ul class="rows">
-                  <li>
-                    <div class="row" data-entity="technique:core:drunken_fist" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:drunken_fist">
-                          П'яний кулак
-                        <span class="detail">
-                          ще не відкрито
                   <li>
                     <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
                       <span class="mark">
@@ -737,16 +686,6 @@
                 Поки закрито
               <div class="group" data-met="false">
                 <ul class="rows">
-                  <li>
-                    <div class="row" data-entity="technique:core:leaf_rising_wind" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:leaf_rising_wind">
-                          Листяний висхідний вітер
-                        <span class="detail">
-                          ще не відкрито
                   <li>
                     <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
                       <span class="mark">
@@ -826,16 +765,6 @@
                 Поки закрито
               <div class="group" data-met="false">
                 <ul class="rows">
-                  <li>
-                    <div class="row" data-entity="technique:core:front_lotus" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:front_lotus">
-                          Передній лотос
-                        <span class="detail">
-                          ще не відкрито
                   <li>
                     <div class="row" data-entity="skill:tai" data-met="false" data-ui="req-row">
                       <span class="mark">

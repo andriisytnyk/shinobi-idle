@@ -2,6 +2,7 @@ import type { ContentDb } from '@shinobi/content';
 import type { CloneDispelledEvent, GameEvent, RuleDisabledEvent } from './events.ts';
 import { skillEntry } from './vocab.ts';
 import { mergeReports, type TargetReport } from './combat/report.ts';
+import { currentHp } from './combat/vitality.ts';
 import { advance } from './engine.ts';
 import type { ActionStoppedEvent } from './events.ts';
 import { MS_PER_HOUR, masteryLevel } from './formulas.ts';
@@ -43,6 +44,8 @@ export interface OfflineSummary {
   itemsGained?: Record<string, number>;
   /** Currency that reached the Bank while away: the net gain per currency. Not saved. */
   currencyGained?: Record<string, number>;
+  /** The character's health when the time away began and when it ended, and the most it can be. */
+  hp?: { before: number; after: number; max: number };
   /** The battle report of the time away, by target. */
   reports: Record<string, TargetReport>;
 }
@@ -105,6 +108,7 @@ export function advanceOffline(
     Object.keys(state.mastery).map((key) => [key, masteryLevel(state, key, content)]),
   );
 
+  const hpBefore = currentHp(state, 0, content).hp;
   const bankBefore = { ...state.bank };
   const currenciesBefore = { ...state.currencies };
 
@@ -120,6 +124,8 @@ export function advanceOffline(
   state.report = before;
   mergeReports(state.report, reports, content);
 
+  const now = currentHp(state, 0, content);
+  const hpAfter = { after: now.hp, max: now.max };
   const summary: OfflineSummary = {
     requestedMs,
     simulatedMs,
@@ -134,6 +140,7 @@ export function advanceOffline(
     clonesDispelled: [],
     itemsGained: gainOf(bankBefore, state.bank),
     currencyGained: gainOf(currenciesBefore, state.currencies),
+    hp: { before: hpBefore, ...hpAfter },
     reports,
   };
   for (const e of away) {

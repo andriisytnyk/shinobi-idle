@@ -76,8 +76,8 @@
 
 .ct-facts {
   display: grid;
-  --_fact-min: 6rem;
-  grid-template-columns: repeat(auto-fit, minmax(var(--_fact-min), 1fr));
+  --_fact-min: 7.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--_fact-min)), 1fr));
   align-items: center;
   gap: var(--space-1) var(--space-2);
   margin: 0;
@@ -95,7 +95,8 @@
 
 .ct-facts dd {
   margin: 0;
-  white-space: nowrap;
+  min-width: 0;
+  overflow-wrap: break-word;
   font-variant-numeric: tabular-nums;
 }
 
