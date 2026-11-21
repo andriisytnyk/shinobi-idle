@@ -219,7 +219,7 @@
 
   .tiles {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(var(--tile-min), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--tile-min)), 1fr));
     gap: var(--space-3);
     margin: 0 0 var(--space-3);
     padding: 0;

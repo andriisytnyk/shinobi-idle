@@ -28,6 +28,11 @@
     text = String(next);
     value = next;
   };
+  /** Leaving the field (or Enter) puts a text that is not a whole number back into the range. */
+  const settle = () => {
+    if (value < 1) set(1);
+    else if (String(value) !== text) text = String(value);
+  };
   const current = () => (value >= 1 ? value : 0);
 </script>
 
@@ -47,8 +52,13 @@
     data-qty
     aria-label={label}
     aria-invalid={value < 1}
-    bind:value={text}
-    oninput={() => (value = parse(text))}
+    value={text}
+    oninput={(e) => {
+      // Read the field itself: the text and the amount must come from the same keystroke.
+      text = e.currentTarget.value;
+      value = parse(text);
+    }}
+    onblur={settle}
     onkeydown={(e) => {
       if (e.key === 'ArrowUp') {
         e.preventDefault();
@@ -57,6 +67,7 @@
         e.preventDefault();
         set(current() - 1);
       } else if (e.key === 'Enter') {
+        settle();
         onSubmit?.();
       }
     }}

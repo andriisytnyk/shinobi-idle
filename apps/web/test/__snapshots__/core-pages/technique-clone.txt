@@ -148,8 +148,6 @@
           <section data-ui="entity-section">
             <h2>
               Звідки береться
-            <p>
-              Навчає наставник
             <ul class="links">
               <li>
                 <a class="entity-link" href="#/building/core:academy">
@@ -456,16 +454,6 @@
               <div class="group" data-met="false">
                 <ul class="rows">
                   <li>
-                    <div class="row" data-entity="technique:core:body_flicker" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:body_flicker">
-                          Техніка мерехтіння тіла
-                        <span class="detail">
-                          ще не відкрито
-                  <li>
                     <div class="row" data-entity="skill:nin" data-met="false" data-ui="req-row">
                       <span class="mark">
                         <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -545,16 +533,6 @@
               <div class="group" data-met="false">
                 <ul class="rows">
                   <li>
-                    <div class="row" data-entity="technique:core:shadow_shuriken" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:shadow_shuriken">
-                          Техніка тіньового сюрікена
-                        <span class="detail">
-                          ще не відкрито
-                  <li>
                     <div class="row" data-entity="skill:nin" data-met="false" data-ui="req-row">
                       <span class="mark">
                         <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -631,18 +609,18 @@
                     <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
                     <path d="#24-1tb3nx8">
                 Поки закрито
+              <div class="source" data-technique-source="S">
+                <p class="lack">
+                  Ще не знаєш цієї техніки
+                <p class="how">
+                  Сувій або бібліотека
+                <ul class="links">
+                  <li>
+                    <a class="entity-link" href="#/building/core:library">
+                      Бібліотека
+                    (рівень 1)
               <div class="group" data-met="false">
                 <ul class="rows">
-                  <li>
-                    <div class="row" data-entity="technique:core:enclosing" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:enclosing">
-                          Техніка запечатування
-                        <span class="detail">
-                          ще не відкрито
                   <li>
                     <div class="row" data-entity="skill:nin" data-met="false" data-ui="req-row">
                       <span class="mark">
@@ -720,16 +698,6 @@
                 Поки закрито
               <div class="group" data-met="false">
                 <ul class="rows">
-                  <li>
-                    <div class="row" data-entity="technique:core:sensing" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:sensing">
-                          Сенсорна техніка
-                        <span class="detail">
-                          ще не відкрито
                   <li>
                     <div class="row" data-entity="skill:nin" data-met="false" data-ui="req-row">
                       <span class="mark">
@@ -810,16 +778,6 @@
               <div class="group" data-met="false">
                 <ul class="rows">
                   <li>
-                    <div class="row" data-entity="technique:core:rope_escape" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:rope_escape">
-                          Техніка звільнення від мотузок
-                        <span class="detail">
-                          ще не відкрито
-                  <li>
                     <div class="row" data-entity="skill:nin" data-met="false" data-ui="req-row">
                       <span class="mark">
                         <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -894,18 +852,18 @@
                     <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
                     <path d="#24-1tb3nx8">
                 Поки закрито
+              <div class="source" data-technique-source="S">
+                <p class="lack">
+                  Ще не знаєш цієї техніки
+                <p class="how">
+                  Сувій або бібліотека
+                <ul class="links">
+                  <li>
+                    <a class="entity-link" href="#/building/core:library">
+                      Бібліотека
+                    (рівень 2)
               <div class="group" data-met="false">
                 <ul class="rows">
-                  <li>
-                    <div class="row" data-entity="technique:core:temporary_paralysis" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:temporary_paralysis">
-                          Техніка тимчасового паралічу
-                        <span class="detail">
-                          ще не відкрито
                   <li>
                     <div class="row" data-entity="skill:nin" data-met="false" data-ui="req-row">
                       <span class="mark">
@@ -976,18 +934,17 @@
                     <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
                     <path d="#24-1tb3nx8">
                 Поки закрито
+              <div class="source" data-technique-source="O">
+                <p class="lack">
+                  Ще не знаєш цієї техніки
+                <p class="how">
+                  Дістається від боса чи ворога
+                <ul class="links">
+                  <li>
+                    <span class="entity-link masked" data-masked="" title="Зустрінь у бою">
+                      ???
               <div class="group" data-met="false">
                 <ul class="rows">
-                  <li>
-                    <div class="row" data-entity="technique:core:hidden_shadow_snake_hands" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:hidden_shadow_snake_hands">
-                          Приховані тіньові руки-змії
-                        <span class="detail">
-                          ще не відкрито
                   <li>
                     <div class="row" data-entity="skill:nin" data-met="false" data-ui="req-row">
                       <span class="mark">
@@ -1060,18 +1017,17 @@
                     <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
                     <path d="#24-1tb3nx8">
                 Поки закрито
+              <div class="source" data-technique-source="Q">
+                <p class="lack">
+                  Ще не знаєш цієї техніки
+                <p class="how">
+                  Нагорода за сюжетну лінію
+                <ul class="links">
+                  <li>
+                    <a class="entity-link" href="#/mission/core:courier">
+                      Термінова доставка
               <div class="group" data-met="false">
                 <ul class="rows">
-                  <li>
-                    <div class="row" data-entity="technique:core:chakra_halving_drill" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:chakra_halving_drill">
-                          Вправа: поділ чакри
-                        <span class="detail">
-                          ще не відкрито
                   <li>
                     <div class="row" data-entity="skill:nin" data-met="false" data-ui="req-row">
                       <span class="mark">
@@ -1147,18 +1103,20 @@
                     <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
                     <path d="#24-1tb3nx8">
                 Поки закрито
+              <div class="source" data-technique-source="Q">
+                <p class="lack">
+                  Ще не знаєш цієї техніки
+                <p class="how">
+                  Нагорода за сюжетну лінію
+                <ul class="links">
+                  <li>
+                    <a class="entity-link" href="#/mission/core:courier">
+                      Термінова доставка
+                  <li>
+                    <a class="entity-link" href="#/mission/core:v_clones">
+                      Клони на будівництві
               <div class="group" data-met="false">
                 <ul class="rows">
-                  <li>
-                    <div class="row" data-entity="technique:core:shadow_clone" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:shadow_clone">
-                          Техніка тіньового клонування
-                        <span class="detail">
-                          ще не відкрито
                   <li>
                     <div class="row" data-entity="skill:nin" data-met="false" data-ui="req-row">
                       <span class="mark">

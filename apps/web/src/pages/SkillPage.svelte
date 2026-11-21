@@ -19,6 +19,8 @@
   import Slot from '../lib/ext/Slot.svelte';
   import { entityDesc, entityName } from '../lib/entities.ts';
   import { hasKey, t } from '../lib/i18n.ts';
+  import { formatDuration } from '../lib/format.ts';
+  import { regrowEachMs, regrowMs } from '@shinobi/core';
   import { skillProgress } from '../lib/progress.ts';
   import { isNature, natureColor } from '../lib/vocab.ts';
   import { game } from '../lib/store.ts';
@@ -53,6 +55,17 @@
       const mult = nonNativeCastMult(progress?.level ?? 1, content);
       return { text: 'nature.skillForeign', pct: Math.round((mult - 1) * 100) };
     }),
+  );
+  /** The bush rule is the same for every herb: it is said once above the herb cards, not on each card. */
+  const regrowRule = $derived(
+    game.read((gs) =>
+      actions.some((a) => a.kind === 'gather')
+        ? {
+            each: formatDuration(regrowEachMs(gs, content, game.rules)),
+            time: formatDuration(regrowMs(gs, content, game.rules)),
+          }
+        : null,
+    ),
   );
   const gear = $derived(content.gear.filter((g) => g.skill === id));
   const actions = $derived(
@@ -117,6 +130,7 @@
     {:else if actions.length > 0}
       <section data-ui="entity-section">
         <h2>{t('skill.actions')}</h2>
+        {#if regrowRule}<p class="rule" data-regrow-rule>{t('herb.regrowNote', regrowRule)}</p>{/if}
         <ul class="tiles">
           {#each actions as info (info.kind + info.id)}
             {#if info.kind === 'gather'}
@@ -157,6 +171,7 @@
   .plate {
     --_border-left: 6px;
     display: flex;
+    flex-wrap: wrap;
     align-items: baseline;
     justify-content: space-between;
     gap: var(--space-4);
@@ -224,9 +239,15 @@
     margin-top: var(--space-1);
   }
 
+  .rule {
+    margin: 0 0 var(--space-2);
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
+  }
+
   .tiles {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(var(--tile-min), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--tile-min)), 1fr));
     gap: var(--space-3);
     margin: 0;
     padding: 0;

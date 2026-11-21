@@ -124,12 +124,15 @@
   .check,
   .sort {
     display: inline-flex;
+    flex-wrap: wrap;
+    max-width: 100%;
     align-items: center;
     gap: var(--space-2);
     min-height: var(--control-md);
   }
 
   select {
+    max-width: 100%;
     min-height: var(--control-sm);
     padding: var(--space-1) var(--space-2);
     border: var(--border-thin) solid var(--line);
