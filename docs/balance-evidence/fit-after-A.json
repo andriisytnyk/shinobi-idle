@@ -29,8 +29,8 @@
       "p90": 21.37
     },
     "hpLeft": {
-      "mean": 95.4,
-      "share": 0.9
+      "mean": 95.5,
+      "share": 0.901
     },
     "maxHp": 106,
     "damageShare": {
@@ -51,8 +51,8 @@
         "p90": 21.37
       },
       "hpLeft": {
-        "mean": 95.4,
-        "share": 0.9
+        "mean": 95.5,
+        "share": 0.901
       },
       "maxHp": 106,
       "damageShare": {
@@ -100,8 +100,8 @@
       "p90": 32.06
     },
     "hpLeft": {
-      "mean": 114.6,
-      "share": 0.831
+      "mean": 115,
+      "share": 0.833
     },
     "maxHp": 138,
     "damageShare": {
@@ -122,8 +122,8 @@
         "p90": 32.06
       },
       "hpLeft": {
-        "mean": 114.6,
-        "share": 0.831
+        "mean": 115,
+        "share": 0.833
       },
       "maxHp": 138,
       "damageShare": {
@@ -171,8 +171,8 @@
       "p90": 36.3
     },
     "hpLeft": {
-      "mean": 129.1,
-      "share": 0.797
+      "mean": 129.7,
+      "share": 0.8
     },
     "maxHp": 162,
     "damageShare": {
@@ -193,8 +193,8 @@
         "p90": 36.3
       },
       "hpLeft": {
-        "mean": 129.1,
-        "share": 0.797
+        "mean": 129.7,
+        "share": 0.8
       },
       "maxHp": 162,
       "damageShare": {
@@ -242,8 +242,8 @@
       "p90": 51.28
     },
     "hpLeft": {
-      "mean": 131.3,
-      "share": 0.772
+      "mean": 132.4,
+      "share": 0.779
     },
     "maxHp": 170,
     "damageShare": {
@@ -264,8 +264,8 @@
         "p90": 51.28
       },
       "hpLeft": {
-        "mean": 131.3,
-        "share": 0.772
+        "mean": 132.4,
+        "share": 0.779
       },
       "maxHp": 170,
       "damageShare": {
@@ -314,8 +314,8 @@
       "p90": 27.5
     },
     "hpLeft": {
-      "mean": 171.8,
-      "share": 0.886
+      "mean": 172.3,
+      "share": 0.888
     },
     "maxHp": 194,
     "damageShare": {
@@ -338,8 +338,8 @@
         "p90": 25.91
       },
       "hpLeft": {
-        "mean": 171.9,
-        "share": 0.886
+        "mean": 172.4,
+        "share": 0.889
       },
       "maxHp": 194,
       "damageShare": {
@@ -392,8 +392,8 @@
       "p90": 37.84
     },
     "hpLeft": {
-      "mean": 176.5,
-      "share": 0.84
+      "mean": 177.3,
+      "share": 0.844
     },
     "maxHp": 210,
     "damageShare": {
@@ -417,8 +417,8 @@
         "p90": 33.34
       },
       "hpLeft": {
-        "mean": 180.9,
-        "share": 0.862
+        "mean": 181.6,
+        "share": 0.865
       },
       "maxHp": 210,
       "damageShare": {
@@ -474,8 +474,8 @@
       "p90": 47.09
     },
     "hpLeft": {
-      "mean": 198.1,
-      "share": 0.793
+      "mean": 199.6,
+      "share": 0.799
     },
     "maxHp": 250,
     "damageShare": {
@@ -499,8 +499,8 @@
         "p90": 47.29
       },
       "hpLeft": {
-        "mean": 199.2,
-        "share": 0.797
+        "mean": 200.6,
+        "share": 0.803
       },
       "maxHp": 250,
       "damageShare": {
@@ -556,8 +556,8 @@
       "p90": 51.24
     },
     "hpLeft": {
-      "mean": 165.9,
-      "share": 0.761
+      "mean": 167.2,
+      "share": 0.767
     },
     "maxHp": 218,
     "damageShare": {
@@ -581,8 +581,8 @@
         "p90": 19.71
       },
       "hpLeft": {
-        "mean": 196.7,
-        "share": 0.902
+        "mean": 197.1,
+        "share": 0.904
       },
       "maxHp": 218,
       "damageShare": {
@@ -638,8 +638,8 @@
       "p90": 41.34
     },
     "hpLeft": {
-      "mean": 204.1,
-      "share": 0.843
+      "mean": 205.6,
+      "share": 0.85
     },
     "maxHp": 242,
     "damageShare": {
@@ -663,8 +663,8 @@
         "p90": 15.58
       },
       "hpLeft": {
-        "mean": 226.4,
-        "share": 0.936
+        "mean": 226.9,
+        "share": 0.937
       },
       "maxHp": 242,
       "damageShare": {
@@ -719,8 +719,8 @@
       "p90": 47.75
     },
     "hpLeft": {
-      "mean": 217,
-      "share": 0.77
+      "mean": 219,
+      "share": 0.777
     },
     "maxHp": 282,
     "damageShare": {
@@ -744,8 +744,8 @@
         "p90": 46.17
       },
       "hpLeft": {
-        "mean": 222.5,
-        "share": 0.789
+        "mean": 224.3,
+        "share": 0.795
       },
       "maxHp": 282,
       "damageShare": {
@@ -801,8 +801,8 @@
       "p90": 59.44
     },
     "hpLeft": {
-      "mean": 187.7,
-      "share": 0.706
+      "mean": 190,
+      "share": 0.714
     },
     "maxHp": 266,
     "damageShare": {
@@ -826,8 +826,8 @@
         "p90": 25.42
       },
       "hpLeft": {
-        "mean": 234.9,
-        "share": 0.883
+        "mean": 235.7,
+        "share": 0.886
       },
       "maxHp": 266,
       "damageShare": {
@@ -883,8 +883,8 @@
       "p90": 37.84
     },
     "hpLeft": {
-      "mean": 216.4,
-      "share": 0.767
+      "mean": 217.7,
+      "share": 0.772
     },
     "maxHp": 282,
     "damageShare": {
@@ -908,8 +908,8 @@
         "p90": 33.34
       },
       "hpLeft": {
-        "mean": 219.8,
-        "share": 0.779
+        "mean": 221.1,
+        "share": 0.784
       },
       "maxHp": 282,
       "damageShare": {
@@ -963,8 +963,8 @@
       "p90": 39.62
     },
     "hpLeft": {
-      "mean": 249.3,
-      "share": 0.794
+      "mean": 251,
+      "share": 0.799
     },
     "maxHp": 314,
     "damageShare": {
@@ -988,8 +988,8 @@
         "p90": 39.62
       },
       "hpLeft": {
-        "mean": 254.2,
-        "share": 0.81
+        "mean": 255.9,
+        "share": 0.815
       },
       "maxHp": 314,
       "damageShare": {
@@ -1043,8 +1043,8 @@
       "p90": 38.37
     },
     "hpLeft": {
-      "mean": 247,
-      "share": 0.829
+      "mean": 248.5,
+      "share": 0.834
     },
     "maxHp": 298,
     "damageShare": {
@@ -1068,8 +1068,8 @@
         "p90": 37.11
       },
       "hpLeft": {
-        "mean": 248.3,
-        "share": 0.833
+        "mean": 249.8,
+        "share": 0.838
       },
       "maxHp": 298,
       "damageShare": {
@@ -1123,8 +1123,8 @@
       "p90": 61.76
     },
     "hpLeft": {
-      "mean": 233.9,
-      "share": 0.709
+      "mean": 236.9,
+      "share": 0.718
     },
     "maxHp": 330,
     "damageShare": {
@@ -1148,8 +1148,8 @@
         "p90": 25.64
       },
       "hpLeft": {
-        "mean": 292,
-        "share": 0.885
+        "mean": 293.1,
+        "share": 0.888
       },
       "maxHp": 330,
       "damageShare": {
@@ -1205,8 +1205,8 @@
       "p90": 35.51
     },
     "hpLeft": {
-      "mean": 282.2,
-      "share": 0.816
+      "mean": 283.9,
+      "share": 0.821
     },
     "maxHp": 346,
     "damageShare": {
@@ -1230,8 +1230,8 @@
         "p90": 35.34
       },
       "hpLeft": {
-        "mean": 288.3,
-        "share": 0.833
+        "mean": 289.9,
+        "share": 0.838
       },
       "maxHp": 346,
       "damageShare": {
@@ -1285,8 +1285,8 @@
       "p90": 42.96
     },
     "hpLeft": {
-      "mean": 284,
-      "share": 0.785
+      "mean": 286.4,
+      "share": 0.791
     },
     "maxHp": 362,
     "damageShare": {
@@ -1309,8 +1309,8 @@
         "p90": 41.38
       },
       "hpLeft": {
-        "mean": 288.9,
-        "share": 0.798
+        "mean": 291.1,
+        "share": 0.804
       },
       "maxHp": 362,
       "damageShare": {
@@ -1365,8 +1365,8 @@
       "p90": 55.82
     },
     "hpLeft": {
-      "mean": 275.1,
-      "share": 0.777
+      "mean": 278.7,
+      "share": 0.787
     },
     "maxHp": 354,
     "damageShare": {
@@ -1390,8 +1390,8 @@
         "p90": 31.24
       },
       "hpLeft": {
-        "mean": 305.1,
-        "share": 0.862
+        "mean": 306.9,
+        "share": 0.867
       },
       "maxHp": 354,
       "damageShare": {
@@ -1448,8 +1448,8 @@
       "p90": 41.31
     },
     "hpLeft": {
-      "mean": 297.9,
-      "share": 0.788
+      "mean": 300.4,
+      "share": 0.795
     },
     "maxHp": 378,
     "damageShare": {
@@ -1473,8 +1473,8 @@
         "p90": 39.73
       },
       "hpLeft": {
-        "mean": 305.1,
-        "share": 0.807
+        "mean": 307.3,
+        "share": 0.813
       },
       "maxHp": 378,
       "damageShare": {
@@ -1530,8 +1530,8 @@
       "p90": 33.54
     },
     "hpLeft": {
-      "mean": 299.2,
-      "share": 0.792
+      "mean": 301,
+      "share": 0.796
     },
     "maxHp": 378,
     "damageShare": {
@@ -1555,8 +1555,8 @@
         "p90": 32.23
       },
       "hpLeft": {
-        "mean": 304.2,
-        "share": 0.805
+        "mean": 305.8,
+        "share": 0.809
       },
       "maxHp": 378,
       "damageShare": {
@@ -1610,8 +1610,8 @@
       "p90": 39.53
     },
     "hpLeft": {
-      "mean": 323,
-      "share": 0.82
+      "mean": 325.1,
+      "share": 0.825
     },
     "maxHp": 394,
     "damageShare": {
@@ -1635,8 +1635,8 @@
         "p90": 35.03
       },
       "hpLeft": {
-        "mean": 329.4,
-        "share": 0.836
+        "mean": 331.4,
+        "share": 0.841
       },
       "maxHp": 394,
       "damageShare": {
@@ -1690,8 +1690,8 @@
       "p90": 38.16
     },
     "hpLeft": {
-      "mean": 289.4,
-      "share": 0.765
+      "mean": 291.8,
+      "share": 0.772
     },
     "maxHp": 378,
     "damageShare": {
@@ -1715,8 +1715,8 @@
         "p90": 19.27
       },
       "hpLeft": {
-        "mean": 333,
-        "share": 0.881
+        "mean": 334,
+        "share": 0.884
       },
       "maxHp": 378,
       "damageShare": {
@@ -1771,8 +1771,8 @@
       "p90": 54.52
     },
     "hpLeft": {
-      "mean": 306.6,
-      "share": 0.763
+      "mean": 309.6,
+      "share": 0.77
     },
     "maxHp": 402,
     "damageShare": {
@@ -1796,8 +1796,8 @@
         "p90": 54.99
       },
       "hpLeft": {
-        "mean": 306.6,
-        "share": 0.763
+        "mean": 309.6,
+        "share": 0.77
       },
       "maxHp": 402,
       "damageShare": {
@@ -1854,8 +1854,8 @@
       "p90": 32.87
     },
     "hpLeft": {
-      "mean": 349.5,
-      "share": 0.852
+      "mean": 351.3,
+      "share": 0.857
     },
     "maxHp": 410,
     "damageShare": {
@@ -1880,8 +1880,8 @@
         "p90": 31.16
       },
       "hpLeft": {
-        "mean": 352.6,
-        "share": 0.86
+        "mean": 354.3,
+        "share": 0.864
       },
       "maxHp": 410,
       "damageShare": {
@@ -1923,56 +1923,56 @@
       "core:shadow_shuriken"
     ],
     "runs": 200,
-    "winRate": 0.08,
+    "winRate": 0.085,
     "outcomes": {
-      "victory": 16,
-      "defeat": 184,
+      "victory": 17,
+      "defeat": 183,
       "fled": 0,
       "timeout": 0
     },
     "timeSec": {
-      "mean": 121.45,
+      "mean": 122.81,
       "p10": 110.57,
-      "p90": 138.01
+      "p90": 142.85
     },
     "hpLeft": {
-      "mean": 20.2,
-      "share": 0.076
+      "mean": 25.9,
+      "share": 0.097
     },
     "maxHp": 266,
     "damageShare": {
       "basic": 0.314,
-      "core:running_fire": 0.274,
+      "core:running_fire": 0.273,
       "core:dynamic_entry": 0.16,
       "core:leaf_gale": 0.136,
       "core:shadow_shuriken": 0.116
     },
     "withPouch": {
-      "winRate": 0.2,
+      "winRate": 0.24,
       "outcomes": {
-        "victory": 40,
-        "defeat": 160,
+        "victory": 48,
+        "defeat": 152,
         "fled": 0,
         "timeout": 0
       },
       "timeSec": {
-        "mean": 120.69,
-        "p10": 102.52,
+        "mean": 121.51,
+        "p10": 102.84,
         "p90": 141.85
       },
       "hpLeft": {
-        "mean": 41.2,
-        "share": 0.155
+        "mean": 40.8,
+        "share": 0.153
       },
       "maxHp": 266,
       "damageShare": {
-        "core:tag": 0.254,
-        "basic": 0.203,
-        "core:running_fire": 0.163,
-        "core:dynamic_entry": 0.125,
-        "core:leaf_gale": 0.108,
+        "core:tag": 0.252,
+        "basic": 0.204,
+        "core:running_fire": 0.164,
+        "core:dynamic_entry": 0.126,
         "core:shadow_shuriken": 0.108,
-        "core:kunai": 0.039
+        "core:leaf_gale": 0.108,
+        "core:kunai": 0.038
       }
     },
     "model": {
@@ -1980,8 +1980,8 @@
       "hpLossShare": 1.284,
       "playerDps": 12.5
     },
-    "wins": 16,
-    "ratio": 1.623,
+    "wins": 17,
+    "ratio": 1.641,
     "flagged": true,
     "reasons": [
       "ratio",
@@ -2007,55 +2007,55 @@
       "core:shadow_shuriken"
     ],
     "runs": 200,
-    "winRate": 0.12,
+    "winRate": 0.14,
     "outcomes": {
-      "victory": 24,
-      "defeat": 176,
+      "victory": 28,
+      "defeat": 172,
       "fled": 0,
       "timeout": 0
     },
     "timeSec": {
-      "mean": 123.77,
-      "p10": 108.97,
+      "mean": 123.19,
+      "p10": 102.49,
       "p90": 143.57
     },
     "hpLeft": {
-      "mean": 33.7,
-      "share": 0.113
+      "mean": 36.8,
+      "share": 0.123
     },
     "maxHp": 298,
     "damageShare": {
-      "basic": 0.389,
-      "core:leaf_whirlwind": 0.168,
+      "basic": 0.39,
+      "core:leaf_whirlwind": 0.167,
       "core:leaf_gale": 0.161,
       "core:shadow_shuriken": 0.142,
-      "core:dynamic_entry": 0.14
+      "core:dynamic_entry": 0.139
     },
     "withPouch": {
-      "winRate": 0.13,
+      "winRate": 0.14,
       "outcomes": {
-        "victory": 26,
-        "defeat": 174,
+        "victory": 28,
+        "defeat": 172,
         "fled": 0,
         "timeout": 0
       },
       "timeSec": {
-        "mean": 118.99,
+        "mean": 118.83,
         "p10": 105.6,
         "p90": 137.1
       },
       "hpLeft": {
-        "mean": 48.1,
-        "share": 0.161
+        "mean": 52.5,
+        "share": 0.176
       },
       "maxHp": 298,
       "damageShare": {
-        "basic": 0.342,
-        "core:leaf_whirlwind": 0.163,
-        "core:leaf_gale": 0.159,
+        "basic": 0.343,
+        "core:leaf_whirlwind": 0.162,
+        "core:leaf_gale": 0.158,
         "core:dynamic_entry": 0.142,
         "core:shadow_shuriken": 0.139,
-        "core:kunai": 0.056
+        "core:kunai": 0.055
       }
     },
     "model": {
@@ -2063,8 +2063,8 @@
       "hpLossShare": 1.048,
       "playerDps": 13.57
     },
-    "wins": 24,
-    "ratio": 1.768,
+    "wins": 28,
+    "ratio": 1.76,
     "flagged": true,
     "reasons": [
       "ratio",
@@ -2102,9 +2102,9 @@
     "maxHp": 346,
     "damageShare": {
       "core:great_fireball": 0.308,
-      "basic": 0.286,
+      "basic": 0.287,
       "core:shadow_shuriken": 0.147,
-      "core:dynamic_entry": 0.136,
+      "core:dynamic_entry": 0.137,
       "core:leaf_gale": 0.122
     },
     "withPouch": {
@@ -2177,21 +2177,21 @@
       "core:shadow_shuriken": 0.126
     },
     "withPouch": {
-      "winRate": 0.01,
+      "winRate": 0.015,
       "outcomes": {
-        "victory": 2,
-        "defeat": 198,
+        "victory": 3,
+        "defeat": 197,
         "fled": 0,
         "timeout": 0
       },
       "timeSec": {
-        "mean": 131.26,
+        "mean": 136.66,
         "p10": 130.72,
-        "p90": 131.8
+        "p90": 147.47
       },
       "hpLeft": {
-        "mean": 16.8,
-        "share": 0.045
+        "mean": 19.8,
+        "share": 0.052
       },
       "maxHp": 378,
       "damageShare": {
@@ -2246,8 +2246,8 @@
     "hpLeft": null,
     "maxHp": 394,
     "damageShare": {
-      "basic": 0.329,
-      "core:great_fireball": 0.296,
+      "basic": 0.33,
+      "core:great_fireball": 0.295,
       "core:phoenix_sage_fire": 0.23,
       "core:dynamic_entry": 0.145
     },
@@ -2263,11 +2263,11 @@
       "hpLeft": null,
       "maxHp": 394,
       "damageShare": {
-        "core:great_fireball": 0.292,
-        "basic": 0.235,
-        "core:phoenix_sage_fire": 0.231,
+        "core:great_fireball": 0.291,
+        "basic": 0.239,
+        "core:phoenix_sage_fire": 0.23,
         "core:dynamic_entry": 0.143,
-        "core:kunai": 0.099
+        "core:kunai": 0.098
       }
     },
     "model": {
@@ -2316,8 +2316,8 @@
       "p90": 130.41
     },
     "hpLeft": {
-      "mean": 15.5,
-      "share": 0.038
+      "mean": 26.6,
+      "share": 0.065
     },
     "maxHp": 410,
     "damageShare": {
@@ -2341,8 +2341,8 @@
         "p90": 110.86
       },
       "hpLeft": {
-        "mean": 51.9,
-        "share": 0.127
+        "mean": 62.5,
+        "share": 0.153
       },
       "maxHp": 410,
       "damageShare": {
@@ -2400,8 +2400,8 @@
       "p90": 134.15
     },
     "hpLeft": {
-      "mean": 52.6,
-      "share": 0.119
+      "mean": 65.7,
+      "share": 0.149
     },
     "maxHp": 442,
     "damageShare": {
@@ -2426,8 +2426,8 @@
         "p90": 140.47
       },
       "hpLeft": {
-        "mean": 85.1,
-        "share": 0.192
+        "mean": 99.2,
+        "share": 0.224
       },
       "maxHp": 442,
       "damageShare": {
@@ -2486,44 +2486,44 @@
       "p90": 136.17
     },
     "hpLeft": {
-      "mean": 56.2,
-      "share": 0.132
+      "mean": 70.3,
+      "share": 0.165
     },
     "maxHp": 426,
     "damageShare": {
-      "basic": 0.347,
-      "core:great_fireball": 0.172,
-      "core:phoenix_sage_fire": 0.135,
+      "basic": 0.35,
+      "core:great_fireball": 0.17,
+      "core:phoenix_sage_fire": 0.134,
       "core:dynamic_entry": 0.127,
       "core:leaf_gale": 0.117,
-      "core:shadow_shuriken": 0.102
+      "core:shadow_shuriken": 0.101
     },
     "withPouch": {
-      "winRate": 0.005,
+      "winRate": 0.01,
       "outcomes": {
-        "victory": 1,
-        "defeat": 199,
+        "victory": 2,
+        "defeat": 198,
         "fled": 0,
         "timeout": 0
       },
       "timeSec": {
-        "mean": 138.35,
+        "mean": 143.96,
         "p10": 138.35,
-        "p90": 138.35
+        "p90": 149.56
       },
       "hpLeft": {
-        "mean": 35.6,
-        "share": 0.083
+        "mean": 26.2,
+        "share": 0.062
       },
       "maxHp": 426,
       "damageShare": {
-        "basic": 0.296,
-        "core:great_fireball": 0.167,
+        "basic": 0.301,
+        "core:great_fireball": 0.165,
         "core:dynamic_entry": 0.131,
-        "core:phoenix_sage_fire": 0.129,
+        "core:phoenix_sage_fire": 0.128,
         "core:leaf_gale": 0.122,
-        "core:shadow_shuriken": 0.099,
-        "core:kunai": 0.056
+        "core:shadow_shuriken": 0.098,
+        "core:kunai": 0.055
       }
     },
     "model": {
