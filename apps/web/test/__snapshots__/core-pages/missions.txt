@@ -165,10 +165,10 @@
             <p class="ct-note trains" data-trains="">
               <span>
                 Досвід:
-              <span data-trains-skill="herb" data-value="4406.399999999999">
+              <span data-trains-skill="herb" data-value="1555.2">
                 <a class="entity-link" href="#/skill/herb">
                   Травництво
-                4 406/год
+                1 555/год
             <div class="ct-actions" data-ui="card-actions">
               <span class="split plain" data-for="mission" data-ui="start-split">
                 <button class="main ct-action" data-performer="0" data-start="true" type="button">

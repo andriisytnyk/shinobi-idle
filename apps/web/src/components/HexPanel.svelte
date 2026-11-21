@@ -824,7 +824,7 @@
   .buttons {
     display: grid;
     --_cell: 9rem;
-    grid-template-columns: repeat(auto-fit, minmax(var(--_cell), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--_cell)), 1fr));
     gap: var(--space-3);
   }
 

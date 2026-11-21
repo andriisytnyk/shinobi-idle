@@ -71,6 +71,8 @@ const ALLOWED: Record<string, string> = {
   'components/HexPanel.svelte':
     'the cell and its points come from the hex view, which names them only once the hex is surveyed; a place is a hex fact, not an entity',
   'components/ZoneWhere.svelte': 'a zone is listed only when its cell is explored',
+  'components/ZoneCard.svelte':
+    'a card is a fight zone: listed only when its cell is explored or its enemy met; the enemy ids go through idAttr/entityAttr',
   'components/CoursePanel.svelte': 'obstacles: always shown',
   'components/Fighter.svelte': 'a flag of the fight (is the enemy aimed at), not an id',
   'components/ReqTree.svelte': 'the id is written only when the entity is shown (nameShown)',

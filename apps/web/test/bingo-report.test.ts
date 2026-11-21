@@ -12,6 +12,7 @@ import { render } from 'svelte/server';
 import { beforeEach, describe, expect, it } from 'vitest';
 import BattleReport from '../src/components/BattleReport.svelte';
 import BingoBook from '../src/components/BingoBook.svelte';
+import { clearMissingKeys, missingKeys } from '../src/lib/i18n.ts';
 import { game } from '../src/lib/store.ts';
 
 const html = <P extends Record<string, unknown>>(component: Component<P>, props: P): string =>
@@ -129,5 +130,33 @@ describe('F1: the battle report', () => {
     expect(out).toContain('data-damage');
     expect(out).toContain('data-combos');
     expect(out).toContain('Отримано шкоди: 321');
+  });
+
+  it('lists pouch items apart from techniques, by their Ukrainian names, never by a fallback of the id', () => {
+    const state = player();
+    const r = blankReport();
+    const heal = 'core:tsiliushcha_maz';
+    Object.assign(r, {
+      fights: 1,
+      wins: 1,
+      // A report saved before the split holds the item among the techniques.
+      uses: { 'core:great_fireball': 3, [heal]: 2 },
+      items: { [heal]: 2 },
+    });
+    state.report['core:zone_dummy'] = r;
+    game.replaceState(state);
+    state.bank[heal] = 1; // the player has had the item, so its name is shown
+    clearMissingKeys();
+    const out = html(BattleReport, {});
+    expect(out).toContain('data-items');
+    expect(out).toContain('Використані предмети');
+    expect(out).toContain('Цілюща мазь');
+    // The visible text (hrefs carry the id by design).
+    const text = out.replace(/<[^>]*>/g, ' ');
+    expect(text).not.toMatch(/Tsiliushcha/i);
+    expect(text).not.toContain('core:');
+    expect(missingKeys()).toEqual([]);
+    const techniques = out.slice(out.indexOf('data-uses'), out.indexOf('data-items'));
+    expect(techniques).not.toContain('Цілюща мазь');
   });
 });

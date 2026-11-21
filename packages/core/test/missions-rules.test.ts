@@ -320,7 +320,7 @@ describe('A5: rewards', () => {
 // ---------- A6 ----------
 
 describe('A6: experience', () => {
-  it('pays 70% to 100% of the practice rate at the level of each stage, and prints the table', () => {
+  it('pays about 30% (K.missionXpShare, 25% to 40% with modifiers) of the practice rate at the level of each stage, and prints the table', () => {
     const rows: string[] = [];
     for (const m of BOARD) {
       const state = ableFor(m, [natureFor(m)], 1, 40);
@@ -360,8 +360,8 @@ describe('A6: experience', () => {
         shares.push(gained / hours / rate(Math.min(level, cap), content));
       }
       for (const share of shares) {
-        expect(share, m.id).toBeGreaterThanOrEqual(0.7);
-        expect(share, m.id).toBeLessThanOrEqual(1.0);
+        expect(share, m.id).toBeGreaterThanOrEqual(K.missionXpShare * 0.8);
+        expect(share, m.id).toBeLessThanOrEqual(K.missionXpShare * 1.3);
       }
       const mean = shares.reduce((a, b) => a + b, 0) / Math.max(1, shares.length);
       rows.push(
