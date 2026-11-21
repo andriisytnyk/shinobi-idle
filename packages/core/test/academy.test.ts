@@ -326,7 +326,8 @@ describe('A8: saves', () => {
     expect(loaded.v).toBe(STATE_VERSION);
     expect(loaded.slots[0]?.action).toEqual({ kind: 'practice', id: 'core:leaf_whirlwind' });
     expect(loaded.skills.tai!.xp).toBe(state.skills.tai!.xp);
-    expect(loaded.counters).toEqual({});
+    // Only the surveys of the start area are counted (the counters did not exist in version 3).
+    expect(Object.keys(loaded.counters).every((k) => k.startsWith('surveyed.'))).toBe(true);
     expect(loaded.combat).toBeNull();
     expect(loaded.goals).toEqual([]);
     expect(loaded.quests[QUEST]).toEqual({ step: 0, base: 0, done: false });

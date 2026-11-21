@@ -102,7 +102,7 @@ describe('the surveyed counter', () => {
     expect(counterValue(state, surveyedKey(other?.id ?? ''))).toBe(foreign);
   });
 
-  it('is rebuilt from the surveys on load, so a save made before the counter counts them', () => {
+  it('is counted from the surveys when a save made before the counter is migrated', () => {
     const state = fresh();
     const cell = content.cells.find((c) => c.region === FOREST && !state.world.explores[c.id]);
     if (!cell) throw new Error('no unexplored forest cell');
@@ -114,7 +114,14 @@ describe('the surveyed counter', () => {
           ((subject.cell ? K.cellExplores[0] : K.map.plainSurvey[0]) ?? 1),
     ).length;
     expect(now).toBeGreaterThan(0);
-    const parsed = JSON.parse(serialize(state, 5)) as { state: { counters: Record<string, number> } };
+    const parsed = JSON.parse(serialize(state, 5)) as {
+      v: number;
+      state: Record<string, unknown> & { counters: Record<string, number> };
+    };
+    // A save of version 21: one pinned goal, no surveyed counters.
+    parsed.v = 21;
+    parsed.state.goal = null;
+    delete parsed.state.goals;
     for (const key of Object.keys(parsed.state.counters)) {
       if (key.startsWith(surveyedKey(''))) delete parsed.state.counters[key];
     }

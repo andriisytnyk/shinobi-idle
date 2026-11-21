@@ -305,6 +305,24 @@ describe('A5: goal panel', () => {
     expect(body).toMatch(/data-go|data-where-hint/);
   });
 
+  it('says what the exploration step counts: surveyed areas of the region, from before the step too', () => {
+    const state = fresh();
+    const board = content.quests.find((q) => q.id === 'core:mission_board');
+    const at =
+      board?.steps.findIndex(
+        (s) => s.objective.t === 'counter' && s.objective.counter === 'surveyed.core:forest',
+      ) ?? -1;
+    expect(at).toBeGreaterThan(-1);
+    state.quests['core:mission_board'] = { step: at, base: 0, done: false };
+    state.counters['surveyed.core:forest'] = 3;
+    game.replaceState(state);
+    const body = html(GoalPanel, { onClose: () => {} });
+    expect(body).toContain(ukLocale['quests.surveyed']);
+    expect(body).toMatch(anchor({ kind: 'region', id: 'core:forest' }));
+    // The three surveyed before the step count: no start-of-step baseline.
+    expect(body).toMatch(/3\s*\/\s*5/);
+  });
+
   it('drops a finished chain from the story list', () => {
     const done = fresh();
     for (const q of content.quests)

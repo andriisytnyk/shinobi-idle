@@ -15,7 +15,12 @@
   let { step }: Props = $props();
 </script>
 
-<section class="next" data-next-step data-quest={idAttr('quest', step.quest.id)} aria-label={t('next.title')}>
+<section
+  class="next"
+  data-next-step
+  data-quest={idAttr('quest', step.quest.id)}
+  aria-label={t('next.title')}
+>
   <div class="head">
     <p class="quest"><EntityLink kind="quest" id={step.quest.id} /></p>
     <PinGoal kind="quest" id={step.quest.id} always />

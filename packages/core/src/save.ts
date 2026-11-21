@@ -77,7 +77,7 @@ import {
   cellMaxExplores,
   levelForExplores,
   plainMaxExplores,
-  rebuildSurveyed,
+  surveyedCounts,
   subjectOf,
 } from './world.ts';
 import { createWorld, seedSurvey } from './world-state.ts';
@@ -428,9 +428,17 @@ export const MIGRATIONS: readonly Migration[] = [
     return { ...state, loadouts: { ...loadouts, cloneRole: null } };
   },
   // v21 -> v22: the pinned goal became a list of goals; the one goal is a list of one.
-  (state) => {
+  // It also counts the hexes already surveyed for the `surveyed.<region>` counters, which are new in v22.
+  (state, content) => {
     const { goal, ...rest } = state;
-    return { ...rest, goals: isRecord(goal) ? [goal] : [] };
+    const counters = isRecord(rest.counters) ? rest.counters : {};
+    const world = isRecord(rest.world) ? rest.world : {};
+    const explores = isRecord(world.explores) ? world.explores : {};
+    return {
+      ...rest,
+      goals: isRecord(goal) ? [goal] : [],
+      counters: { ...counters, ...surveyedCounts(explores, content) },
+    };
   },
 ];
 
@@ -1104,9 +1112,14 @@ export function deserialize(
   // Region flags follow from rank and Scouting, so they are recomputed below, never trusted.
   for (const region of content.regions) delete state.flags[regionFlag(region.id)];
   if (isRecord(raw.stats)) state.stats.completed = Math.floor(nonNegative(raw.stats.completed));
-  state.counters = pick(raw.counters, (_key, v) =>
-    typeof v === 'number' && Number.isInteger(v) && v >= 0 ? v : undefined,
-  );
+  // A fresh game starts with the surveyed counters of the start area; what the save kept wins.
+  const seeded = state.counters;
+  state.counters = {
+    ...seeded,
+    ...pick(raw.counters, (_key, v) =>
+      typeof v === 'number' && Number.isInteger(v) && v >= 0 ? v : undefined,
+    ),
+  };
   state.quests = pick(raw.quests, (key, v) => {
     const quest = index.quests.get(key);
     if (!quest || !isRecord(v)) return undefined;
@@ -1166,8 +1179,6 @@ export function deserialize(
     return { stock, size, carry };
   });
   state.world = sanitizeWorld(raw.world, content);
-  // The surveyed counters follow from the surveys, whatever the save kept.
-  rebuildSurveyed(state, content);
   const pending = isRecord(raw.missions) ? raw.missions.pending : undefined;
   state.missions = {
     pending: pick(pending, (key, n) =>

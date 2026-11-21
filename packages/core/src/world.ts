@@ -80,18 +80,28 @@ function countSurveyed(state: GameState, subject: Subject, content: ContentDb): 
 }
 
 /**
- * Sets the surveyed counters of every region from the surveys the state holds: for a save made
- * before the counters existed, and to keep the counters honest after a load.
+ * The surveyed counter of every region, counted from a table of surveys (address to surveys done):
+ * for a game that starts with surveys it did not do (the start area) and for a save made before
+ * the counters existed.
  */
-export function rebuildSurveyed(state: GameState, content: ContentDb): void {
-  for (const key of Object.keys(state.counters)) {
-    if (key.startsWith(surveyedKey(''))) delete state.counters[key];
-  }
-  for (const address of Object.keys(state.world.explores)) {
+export function surveyedCounts(
+  explores: Readonly<Record<string, unknown>>,
+  content: ContentDb,
+): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const [address, done] of Object.entries(explores)) {
     const subject = subjectOf(content, address);
-    if (!subject || surveyLevel(state, subject, content) < 1) continue;
-    countSurveyed(state, subject, content);
+    if (!subject || typeof done !== 'number') continue;
+    const first = subject.cell ? levelForExplores(done, content) : plainLevelFor(done, content);
+    const region = first >= 1 ? regionOfHex(content, subject) : null;
+    if (region !== null) counts[surveyedKey(region)] = (counts[surveyedKey(region)] ?? 0) + 1;
   }
+  return counts;
+}
+
+/** Sets the surveyed counters of a fresh state from the surveys it starts with. */
+export function rebuildSurveyed(state: GameState, content: ContentDb): void {
+  Object.assign(state.counters, surveyedCounts(state.world.explores, content));
 }
 /** Flag raised when a point of interest is found. */
 export const poiFlag = (poiId: string): string => `poi.${poiId}`;

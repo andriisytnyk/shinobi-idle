@@ -9,9 +9,6 @@
             <p class="quest">
               <a class="entity-link" href="#/quest/core:graduation">
                 Випуск
-            <button aria-label="Закріпити як мету" class="pin always" data-entity="quest:core:graduation" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
-              <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
-                <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
           <p class="text">
             Інструктор починає з тіла, а не з печаток: досягни Тайдзюцу 5 і Атлетики 5.
           <div class="objective">
