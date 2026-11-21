@@ -1360,7 +1360,7 @@
       "timeout": 0
     },
     "timeSec": {
-      "mean": 43.4,
+      "mean": 43.42,
       "p10": 32.63,
       "p90": 55.82
     },
@@ -1923,55 +1923,55 @@
       "core:shadow_shuriken"
     ],
     "runs": 200,
-    "winRate": 0.08,
+    "winRate": 0.085,
     "outcomes": {
-      "victory": 16,
-      "defeat": 184,
+      "victory": 17,
+      "defeat": 183,
       "fled": 0,
       "timeout": 0
     },
     "timeSec": {
-      "mean": 121.45,
+      "mean": 122.04,
       "p10": 110.57,
       "p90": 138.01
     },
     "hpLeft": {
-      "mean": 20.2,
-      "share": 0.076
+      "mean": 19,
+      "share": 0.071
     },
     "maxHp": 266,
     "damageShare": {
-      "basic": 0.314,
-      "core:running_fire": 0.274,
+      "basic": 0.315,
+      "core:running_fire": 0.273,
       "core:dynamic_entry": 0.16,
       "core:leaf_gale": 0.136,
       "core:shadow_shuriken": 0.116
     },
     "withPouch": {
-      "winRate": 0.2,
+      "winRate": 0.165,
       "outcomes": {
-        "victory": 40,
-        "defeat": 160,
+        "victory": 33,
+        "defeat": 167,
         "fled": 0,
         "timeout": 0
       },
       "timeSec": {
-        "mean": 120.69,
-        "p10": 102.52,
-        "p90": 141.85
+        "mean": 124.35,
+        "p10": 104.3,
+        "p90": 144.45
       },
       "hpLeft": {
-        "mean": 41.2,
-        "share": 0.155
+        "mean": 39.4,
+        "share": 0.148
       },
       "maxHp": 266,
       "damageShare": {
-        "core:tag": 0.254,
-        "basic": 0.203,
+        "core:tag": 0.244,
+        "basic": 0.21,
         "core:running_fire": 0.163,
-        "core:dynamic_entry": 0.125,
-        "core:leaf_gale": 0.108,
-        "core:shadow_shuriken": 0.108,
+        "core:dynamic_entry": 0.126,
+        "core:shadow_shuriken": 0.11,
+        "core:leaf_gale": 0.109,
         "core:kunai": 0.039
       }
     },
@@ -1980,8 +1980,8 @@
       "hpLossShare": 1.284,
       "playerDps": 12.5
     },
-    "wins": 16,
-    "ratio": 1.623,
+    "wins": 17,
+    "ratio": 1.631,
     "flagged": true,
     "reasons": [
       "ratio",
