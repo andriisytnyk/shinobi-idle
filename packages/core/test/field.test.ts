@@ -2,9 +2,9 @@
 import { content } from '@shinobi/content';
 import { describe, expect, it } from 'vitest';
 import {
+  bushNow,
   advance,
   createState,
-  cycleSeconds,
   deserialize,
   dispatch,
   getMod,
@@ -79,20 +79,27 @@ describe('gather', () => {
     ok(s, gather('core:lotus'));
   });
 
-  it('yields the bush stock, regrows for the pause, then yields again', () => {
+  it('yields the bush stock and what it regrows meanwhile, pauses while it regrows whole, then yields again', () => {
     const s = genin();
     ok(s, gather(MINT));
-    const size = K.field.stockBase + 1;
     const cycle = K.gather * 1000;
-    advance(s, cycle * size - 1, content, plainRules);
-    expect(s.bank[MINT]).toBe(size - 1);
+    // Mint: 6 herbs, a cycle of 2.5 s, one herb regrown per 10 s: the 7th herb empties the bush at 17.5 s.
+    expect(K.field.stockBase + 1).toBe(6);
+    advance(s, cycle * 7 - 1, content, plainRules);
+    expect(s.bank[MINT]).toBe(6);
     advance(s, 1, content, plainRules);
-    expect(s.bank[MINT]).toBe(size);
-    // The bush is empty: the next herb comes after the regrow pause and one more cycle.
-    advance(s, K.field.regrowMs + cycle - 1, content, plainRules);
-    expect(s.bank[MINT]).toBe(size);
+    expect(s.bank[MINT]).toBe(7);
+    expect(s.bushes[MINT]?.stock).toBe(0);
+    // The bush is empty: the pause comes first, then the whole bush is there, then a cycle takes one herb.
+    advance(s, K.field.regrowMs - 1, content, plainRules);
+    expect(bushNow(s, MINT, content, plainRules)).toMatchObject({ stock: 0, phase: 'regrow' });
     advance(s, 1, content, plainRules);
-    expect(s.bank[MINT]).toBe(size + 1);
+    expect(bushNow(s, MINT, content, plainRules)).toMatchObject({ stock: 6, phase: null });
+    expect(s.bank[MINT]).toBe(7);
+    advance(s, cycle - 1, content, plainRules);
+    expect(s.bank[MINT]).toBe(7);
+    advance(s, 1, content, plainRules);
+    expect(s.bank[MINT]).toBe(8);
   });
 
   for (const level of [1, 30]) {
@@ -120,8 +127,10 @@ describe('gather', () => {
     const size = K.field.stockBase + K.masteryCap;
     ok(s, gather(MINT));
     advance(s, HOUR, content, plainRules);
-    const perBush = K.gather * 1000 * size + K.field.regrowMs;
-    const expected = (HOUR / perBush) * size;
+    // A bush gathered steadily holds out size / (1 - cycle / regrowEachMs) herbs, then pauses.
+    const run = size / (1 - (K.gather * 1000) / K.field.regrowEachMs);
+    const perBush = K.gather * 1000 * run + K.field.regrowMs;
+    const expected = (HOUR / perBush) * run;
     expect(s.bank[MINT] ?? 0).toBeGreaterThan(expected * 0.99);
     expect(s.bank[MINT] ?? 0).toBeLessThan(expected * 1.01);
   });
@@ -132,7 +141,7 @@ describe('gather', () => {
     advance(s, 60_000, content, plainRules);
     expect(s.mastery[MINT]?.xp).toBeGreaterThan(0);
     expect(s.pools.herb!.xp).toBeGreaterThan(0);
-    expect(s.bushes[MINT]).toMatchObject({ size: expect.any(Number), carry: 0 });
+    expect(s.bushes[MINT]).toMatchObject({ size: expect.any(Number), at: expect.any(Number) });
   });
 
   it('is sped up by the sickle without changing the regrow pause', () => {
@@ -682,33 +691,22 @@ describe('A12: saving', () => {
       },
     };
     raw.state.bushes = {
-      [MINT]: { stock: 1e9, size: 1e9, carry: 5 },
-      'core:ghost': { stock: 1, size: 2, carry: 0 },
-      [NETTLE]: { stock: 0, size: 3, carry: 1e18 },
-      'core:hogweed': { stock: 9, size: 3, carry: 4 },
-      'core:shadowshroom': { stock: 0, size: 2, carry: 1e18 },
+      [MINT]: { stock: 1e9, size: 1e9, at: 5 },
+      'core:ghost': { stock: 1, size: 2, at: 0 },
+      [NETTLE]: { stock: 0, size: 3, at: 1e18 },
+      'core:hogweed': { stock: 9, size: 3, at: -4 },
+      'core:shadowshroom': { stock: 0, size: 2, at: 1e18 },
     };
     const state = deserialize(JSON.stringify(raw), content);
     expect(state.buffs).toEqual({ [CLEAR_MIND]: { skill: 'med', charges: 80 } });
     expect(state.gear).toEqual({ [SICKLE]: 2 });
     expect(state.slots[0]?.data).toBeNull();
     expect(state.slots[1]?.data).toEqual({ fine: [1, 'two', null] });
-    // The bound is the herb's own cycle plus its regrowing, not the base gather time.
-    const room = (herb: string): number =>
-      (K.field.regrowMs +
-        cycleSeconds(
-          'gather',
-          content.herbs.find((h) => h.id === herb)!,
-          content,
-        ) *
-          1000) *
-      1000;
-    expect(room('core:shadowshroom')).toBeGreaterThan(room(NETTLE));
-    expect(room(NETTLE)).toBeGreaterThan((K.field.regrowMs + K.gather * 1000) * 1000);
+    // The clock of a bush cannot be in the future; negative numbers count as 0.
     expect(state.bushes).toEqual({
-      [NETTLE]: { stock: 0, size: 3, carry: room(NETTLE) },
-      'core:shadowshroom': { stock: 0, size: 2, carry: room('core:shadowshroom') },
-      'core:hogweed': { stock: 3, size: 3, carry: 0 },
+      [NETTLE]: { stock: 0, size: 3, at: state.now },
+      'core:shadowshroom': { stock: 0, size: 2, at: state.now },
+      'core:hogweed': { stock: 3, size: 3, at: 0 },
     });
     ok(state, { type: 'action.stop', slot: 1 });
     ok(state, gather(MINT));

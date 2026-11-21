@@ -32,15 +32,14 @@
     ),
   );
   const running = $derived(slotIndex >= 0);
-  /** The running cycle; an empty bush's cycle also holds the regrow, which the tile's interval leaves out. */
-  const timing = $derived(
-    game.read((gs) =>
-      slotTiming(gs, slotIndex, info.intervalMs + (bush.empty ? bush.regrowMs : 0)),
-    ),
-  );
+  /** The running phase: the gathering cycle, or (an emptied bush) the regrow pause, which the core reports as `phaseMs`. */
+  const phaseMs = $derived(info.phaseMs ?? info.intervalMs);
+  const timing = $derived(game.read((gs) => slotTiming(gs, slotIndex, phaseMs)));
   const cycle = $derived(timing.fraction);
   const block = $derived(info.available ? null : blockOf(info.req));
   const stockFraction = $derived(bush.size > 0 ? bush.stock / bush.size : 0);
+  /** How far the next herb (or the whole bush) has regrown, from the core's own clock. */
+  const regrowFraction = $derived(bush.spanMs > 0 ? 1 - bush.leftMs / bush.spanMs : 1);
 </script>
 
 <li
@@ -106,21 +105,32 @@
     <span class="ct-bar" aria-hidden="true"
       ><span class="ct-fill stock" style:width="{stockFraction * 100}%"></span></span
     >
+    {#if bush.spanMs > 0}
+      <span class="ct-bar" aria-hidden="true" data-regrow-bar
+        ><span class="ct-fill regrow" style:width="{regrowFraction * 100}%"></span></span
+      >
+    {/if}
     {#if bush.empty}
-      <p class="ct-note" data-regrow>
+      <p class="ct-note" data-regrow data-phase="regrow">
         {#if running}
           {t('herb.regrowing', {
-            time: formatDuration(Math.max(0, (1 - cycle) * (info.intervalMs + bush.regrowMs))),
+            time: formatDuration(Math.max(0, (1 - cycle) * phaseMs)),
           })}
         {:else}
-          {t('herb.emptyIdle', { time: formatDuration(bush.regrowMs) })}
+          {t('herb.emptyIdle', { time: formatDuration(bush.leftMs) })}
         {/if}
       </p>
-    {:else}
-      <p class="ct-note">
-        {t('herb.regrowNote', { time: formatDuration(bush.regrowMs), size: bush.size })}
+    {:else if bush.leftMs > 0}
+      <p class="ct-note" data-next-herb>
+        {t('herb.nextHerb', { time: formatDuration(bush.leftMs) })}
       </p>
     {/if}
+    <p class="ct-note" data-regrow-rule>
+      {t('herb.regrowNote', {
+        each: formatDuration(bush.eachMs),
+        time: formatDuration(bush.regrowMs),
+      })}
+    </p>
   </div>
 
   {#if running}

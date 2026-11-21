@@ -1674,8 +1674,15 @@ export const balanceParamsSchema = z.object({
   }),
   academyCap: z.number().int(),
   academySlow: z.number(),
-  /** Herb bushes: stock is `stockBase` plus the herb's mastery level; an empty bush regrows for `regrowMs`. */
-  field: z.object({ stockBase: z.number().int(), regrowMs: z.number().int() }),
+  /**
+   * Herb bushes: stock is `stockBase` plus the herb's mastery level; a bush that is not empty regrows one herb
+   * every `regrowEachMs` (gathered or not); a bush gathered to 0 regrows whole after `regrowMs`.
+   */
+  field: z.object({
+    stockBase: z.number().int(),
+    regrowEachMs: z.number().int().positive(),
+    regrowMs: z.number().int(),
+  }),
   /** Crafting: mastery levels that open each tier, and the chance of a bonus unit per tier above the first. */
   craftRules: z.object({
     masteryTiers: z.array(z.number().int()).min(2),

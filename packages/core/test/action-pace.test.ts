@@ -103,9 +103,12 @@ describe('explicit cycle and XP per action', () => {
       const perHour = (w.xp * 3600) / w.cycle;
       expect(perHour / rate(w.level, content), w.id).toBeCloseTo(1, 3);
     }
-    const pause = K.field.regrowMs / 1000 / (K.field.stockBase + 1);
+    // A first-size bush gathered steadily holds out size / (1 - cycle / regrowEachMs) herbs, then pauses regrowMs.
     for (const h of content.herbs) {
-      const perHour = ((h.xp ?? 0) * 3600) / ((h.cycle ?? 1) + pause);
+      const cycle = h.cycle ?? 1;
+      const run = (K.field.stockBase + 1) / (1 - (cycle * 1000) / K.field.regrowEachMs);
+      const pause = K.field.regrowMs / 1000 / run;
+      const perHour = ((h.xp ?? 0) * 3600) / (cycle + pause);
       expect(perHour / rate(h.level, content), h.id).toBeCloseTo(1, 3);
     }
   });

@@ -596,7 +596,8 @@
     "academySlow": 0.25,
     "field": {
       "stockBase": 5,
-      "regrowMs": 5000
+      "regrowEachMs": 10000,
+      "regrowMs": 7000
     },
     "craftRules": {
       "masteryTiers": [

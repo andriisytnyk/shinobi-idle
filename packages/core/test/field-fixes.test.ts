@@ -27,14 +27,12 @@ const ok = (s: GameState, c: Command) => expect(dispatch(s, c, content)).toEqual
 describe('bush memory: stop and start does not skip the regrow', () => {
   const cycle = K.gather * 1000;
 
-  /** Stops and restarts at every depletion, landing exactly on the event so no work is lost. */
+  /** Stops and restarts every 5 s (two whole cycles): nothing half-done is lost, and the bush goes on regrowing meanwhile. */
   function restartingRun(herb: string, total: number): GameState {
     const s = genin();
     while (s.now < total) {
       ok(s, start('gather', herb));
-      const bush = s.bushes[herb];
-      const wait = bush && bush.stock > 0 ? bush.stock * cycle : K.field.regrowMs + cycle;
-      advance(s, Math.min(wait, total - s.now), content);
+      advance(s, Math.min(5000, total - s.now), content);
       ok(s, { type: 'action.stop', slot: 0 });
     }
     return s;
@@ -47,28 +45,39 @@ describe('bush memory: stop and start does not skip the regrow', () => {
     const cheat = restartingRun(MINT, HOUR);
     expect(cheat.now).toBe(HOUR);
     const herbs = (s: GameState) => s.bank[MINT] ?? 0;
-    expect(herbs(cheat) / herbs(honest)).toBeGreaterThan(0.995);
-    expect(herbs(cheat) / herbs(honest)).toBeLessThan(1.005);
-    expect(cheat.skills.herb!.xp / honest.skills.herb!.xp).toBeGreaterThan(0.995);
-    expect(cheat.skills.herb!.xp / honest.skills.herb!.xp).toBeLessThan(1.005);
+    expect(herbs(cheat)).toBeLessThanOrEqual(herbs(honest));
+    expect(cheat.skills.herb!.xp).toBeLessThanOrEqual(honest.skills.herb!.xp);
+    expect(herbs(cheat) / herbs(honest)).toBeGreaterThan(0.99);
   });
 
-  it('resumes an empty bush where it was left, and regrows only while gathering', () => {
+  it('keeps the regrow clock of an emptied bush while the hero is away: the pause is time, not work', () => {
     const s = genin();
     ok(s, start('gather', MINT));
-    const size = K.field.stockBase + 1;
-    advance(s, cycle * size + 2000, content);
+    // 7 herbs empty the first bush at 17.5 s (it regrows one herb per 10 s meanwhile).
+    advance(s, cycle * 7, content);
     expect(s.bushes[MINT]?.stock).toBe(0);
+    expect(s.bank[MINT]).toBe(7);
+    advance(s, 2000, content);
     ok(s, { type: 'action.stop', slot: 0 });
-    expect(s.bushes[MINT]?.carry).toBeGreaterThan(0);
-    // Time away does not regrow it.
+    // Away for a minute: the bush regrew whole by itself.
     advance(s, 60_000, content);
     ok(s, start('gather', MINT));
-    expect(s.slots[0]?.progress).toBe(s.bushes[MINT]?.carry);
-    advance(s, K.field.regrowMs + cycle - 2000 - 1, content);
-    expect(s.bank[MINT]).toBe(size);
-    advance(s, 1, content);
-    expect(s.bank[MINT]).toBe(size + 1);
+    expect(s.bushes[MINT]?.stock).toBe(K.field.stockBase + 1);
+    expect(s.slots[0]?.progress).toBe(0);
+    advance(s, cycle, content);
+    expect(s.bank[MINT]).toBe(8);
+    // Back within the pause: the time already spent counts.
+    const t = genin();
+    ok(t, start('gather', MINT));
+    advance(t, cycle * 7, content);
+    ok(t, { type: 'action.stop', slot: 0 });
+    advance(t, 3000, content);
+    ok(t, start('gather', MINT));
+    expect(t.slots[0]?.progress).toBe(3000 * 1000);
+    advance(t, K.field.regrowMs - 3000 + cycle - 1, content);
+    expect(t.bank[MINT]).toBe(7);
+    advance(t, 1, content);
+    expect(t.bank[MINT]).toBe(8);
   });
 
   it('keeps each herb its own bush when switching', () => {

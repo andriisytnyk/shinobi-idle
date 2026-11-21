@@ -1,10 +1,10 @@
 import type { ContentDb, Item, ShopEntry } from '@shinobi/content';
 import {
-  bushOf,
-  bushSize,
+  bushNow,
   craftBonusChance,
   craftTier,
   fieldworkSkill,
+  regrowEachMs,
   regrowMs,
   shopEntries,
   type GameState,
@@ -195,26 +195,34 @@ export function blockText(block: Block): string {
 export interface BushView {
   stock: number;
   size: number;
-  /** The bush is empty and has to regrow before the next herb. */
+  /** The bush was emptied and is regrowing whole: the regrow phase, which the gatherer waits out. */
   empty: boolean;
-  /** Time the regrow takes, in ms. */
+  /** Time the whole regrow of an emptied bush takes, in ms. */
   regrowMs: number;
+  /** Time one herb of a bush that still has some takes to regrow, in ms. */
+  eachMs: number;
+  /** Ms until the bush is whole (regrow phase) or has one herb more; 0 for a full bush. */
+  leftMs: number;
+  /** The length `leftMs` is counted in: `regrowMs` or `eachMs`; 0 for a full bush. */
+  spanMs: number;
 }
 
-/** The bush of a herb: the stock the player left, or a full one at today's size when it was never gathered. */
+/** The bush of a herb now (as of the game time): regrown herbs counted, a never gathered one full at today's size. */
 export function bushView(
   state: GameState,
   herb: string,
   content: ContentDb,
   rules: Rules,
 ): BushView {
-  const bush = bushOf(state, herb);
-  const size = bush?.size ?? bushSize(state, herb, content, rules);
+  const bush = bushNow(state, herb, content, rules);
   return {
-    stock: bush ? bush.stock : size,
-    size,
-    empty: bush?.stock === 0,
+    stock: bush.stock,
+    size: bush.size,
+    empty: bush.phase === 'regrow',
     regrowMs: regrowMs(state, content, rules),
+    eachMs: regrowEachMs(state, content, rules),
+    leftMs: bush.leftMs,
+    spanMs: bush.spanMs,
   };
 }
 

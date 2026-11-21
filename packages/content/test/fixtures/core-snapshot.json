@@ -288,17 +288,17 @@
       "core:plavannia_proty_techii": "1c307aa886a2"
     },
     "herbs": {
-      "core:mint": "6837392f5112",
-      "core:nettle": "2088adfd4d49",
-      "core:hogweed": "2fb7d63e77ee",
-      "core:bloodgrass": "3b82bf8b38ab",
-      "core:poppy": "a4271b8e67db",
-      "core:ironroot": "c74cb1cb1416",
-      "core:silvermoss": "a648c241f485",
-      "core:edelweiss": "d365c4f80ba2",
-      "core:fireflower": "4e76982752c6",
-      "core:lotus": "36ab9b619d1a",
-      "core:shadowshroom": "97b3fe227e0d"
+      "core:mint": "36ad20cda6ee",
+      "core:nettle": "953e6f044b87",
+      "core:hogweed": "c3b902ab75a9",
+      "core:bloodgrass": "e6aaa61caa3c",
+      "core:poppy": "a2dff9d0caf3",
+      "core:ironroot": "cb3f02fbef05",
+      "core:silvermoss": "bba5f8c5e66e",
+      "core:edelweiss": "96f9f30d9467",
+      "core:fireflower": "1afd8bccb885",
+      "core:lotus": "a19ba430c5d8",
+      "core:shadowshroom": "572e9b149beb"
     },
     "pools": {
       "core:pool_tai_10": "4fa84fac4d2a",
@@ -2372,7 +2372,8 @@
     "K.academyCap": 10,
     "K.academySlow": 0.25,
     "K.field.stockBase": 5,
-    "K.field.regrowMs": 5000,
+    "K.field.regrowEachMs": 10000,
+    "K.field.regrowMs": 7000,
     "K.craftRules.masteryTiers": [
       1,
       20,
@@ -6514,8 +6515,10 @@
       "reason.rank": "d3485b6288c2",
       "herb.bush": "a235efcbbe08",
       "herb.regrowing": "b4a12a90ebd7",
-      "herb.emptyIdle": "65d36af29181",
-      "herb.regrowNote": "b5a1453f9938",
+      "herb.emptyIdle": "1843f62f961e",
+      "herb.regrowPhase": "9e755b5ad543",
+      "herb.nextHerb": "4c354cb7ba62",
+      "herb.regrowNote": "7834b7d39c9e",
       "buff.title": "7808ed2e6c5e",
       "buff.charges": "36580a690a02",
       "gear.tiers": "77b8e2bc3dba",
@@ -7966,7 +7969,7 @@
     "interval.walk": "a9267976f157",
     "travel.price": "d61af9953e40",
     "bush.stock": "b1c0488ecc13",
-    "bush.regrow": "73e5d807096b",
+    "bush.regrow": "6860a9f1be22",
     "gather.double": "a36fc6419686",
     "craft.keep": "d06507ddecbb",
     "craft.keep.alch": "60df9ec6358c",
@@ -8594,6 +8597,7 @@
     ],
     "K.field": [
       "stockBase",
+      "regrowEachMs",
       "regrowMs"
     ],
     "K.craftRules": [
