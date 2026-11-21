@@ -12,7 +12,7 @@ void content;
 
 /** The supplies: boss levels 48 and 50 with a stock that runs out within the four hours played. */
 describe('the horizon of the supplies', () => {
-  for (const level of [48, 50]) {
+  for (const level of [48, 52]) {
     it(
       `states the forecast for the time the stock lasts, and for after it, at level ${level}`,
       {

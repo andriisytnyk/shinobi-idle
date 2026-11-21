@@ -263,6 +263,11 @@ export function chosenTarget(view: FightView): ViewEnemy | undefined {
 /** Attacks go to the body the player's target priority names; everything else is left to the engine's choice. */
 function aimed(view: FightView, decision: Decision): Decision {
   if (decision.type === 'wait' || decision.target !== undefined) return decision;
+  // An area technique strikes every body: it keeps its own rule and is aimed at no one (leader-first has always named the leader).
+  if (decision.type === 'technique' && view.priority !== 'leader') {
+    const used = view.techniques.find((r) => r.tech.id === decision.id);
+    if (used?.tech.hitsAll) return decision;
+  }
   const target = chosenTarget(view);
   return target ? { ...decision, target: target.id } : decision;
 }

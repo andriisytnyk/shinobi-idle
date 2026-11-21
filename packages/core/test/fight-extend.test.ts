@@ -332,11 +332,16 @@ describe('encounters', () => {
     if (!boss) throw new Error('no boss');
     const encounter = encounterFor(boss, content, ['test:special']);
     expect(encounter.spawns).toHaveLength(1);
-    expect(encounter.spawns[0]?.hpMult).toBeCloseTo(K.boss.hp, 9);
-    expect(encounter.spawns[0]?.dmgMult).toBeCloseTo(K.boss.dmg, 9);
+    const fx = (K.bossFx as unknown as Record<string, Record<string, number>>)
+      .drunkenEvasion as Record<string, number>;
+    expect(encounter.spawns[0]?.hpMult).toBeCloseTo(K.boss.hp * (fx.hp ?? 1), 9);
+    expect(encounter.spawns[0]?.dmgMult).toBeCloseTo(K.boss.dmg * (fx.dmg ?? 1), 9);
     expect(encounter.specials).toEqual(['test:special']);
     const fight = createFight(scripted([]), encounter, 1, content, rules);
-    expect(only(fight).maxHp).toBeCloseTo((K.eHp[0] + K.eHp[1] * boss.cl) * K.boss.hp, 6);
+    expect(only(fight).maxHp).toBeCloseTo(
+      (K.eHp[0] + K.eHp[1] * boss.cl) * K.boss.hp * (fx.hp ?? 1),
+      6,
+    );
     expect(only(fight).specials).toEqual(['test:special', 'special:evasionByMissingHp']);
   });
 
