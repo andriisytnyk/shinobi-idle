@@ -161,7 +161,9 @@ describe('the fight screen', () => {
     const state = fighter();
     fight(state, YARD.id);
     booted = await bootApp([coreUi], state, '#/combat');
-    expect(q('h1')?.textContent).toBe(ukLocale['combat.title'] ?? t('combat.title'));
+    expect(q('h1')?.textContent).toBe(
+      ukLocale['combat.titleTraining'] ?? t('combat.titleTraining'),
+    );
   });
 
   it('names the enemy in the heading of a zone fight', async () => {

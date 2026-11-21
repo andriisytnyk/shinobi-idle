@@ -207,7 +207,7 @@
 
   .entries {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(var(--tile-min), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--tile-min)), 1fr));
     gap: var(--space-3);
     margin: 0;
     padding: 0;

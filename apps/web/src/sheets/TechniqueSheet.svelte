@@ -262,7 +262,7 @@
 
     <section data-ui="entity-section">
       <h2>{t('technique.source')}</h2>
-      <p>{t(`technique.src.${tech.src}`)}</p>
+      {#if tech.src !== 'N'}<p>{t(`technique.src.${tech.src}`)}</p>{/if}
       <ul class="links">
         {#if relations.academy}<li><EntityLink kind="building" id={relations.academy} /></li>{/if}
         {#if relations.library}

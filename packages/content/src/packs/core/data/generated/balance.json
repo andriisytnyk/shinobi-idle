@@ -370,7 +370,16 @@
       8,
       0.4
     ],
-    "zoneHpRegen": 0.8,
+    "zoneHpRegen": 0,
+    "hpRegen": [
+      0.09,
+      0.02
+    ],
+    "defeatHp": 0.2,
+    "restartHp": 0.8,
+    "regionHeal": {
+      "academy": 1
+    },
     "opRegen": 0.25,
     "respawn": 3,
     "wound": {
@@ -436,7 +445,7 @@
       "C": 4,
       "V": 2
     },
-    "missionXpShare": 0.85,
+    "missionXpShare": 0.3,
     "missionRateCap": {
       "D": 25,
       "C": 45,
@@ -631,6 +640,7 @@
     "combat": {
       "xpTickMs": 1000,
       "regenMs": 1000,
+      "hpRegenShare": 0,
       "hitEven": 0.5,
       "fightCapMs": 240000,
       "maxEnemies": 8,

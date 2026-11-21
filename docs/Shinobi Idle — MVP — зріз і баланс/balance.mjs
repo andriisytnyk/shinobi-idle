@@ -66,7 +66,7 @@ export const K = {
   // --- бій: досвід за годину бою в зоні рівня Z, частки від rate(Z) ---
   combatXp: { style:0.70, vit:0.35 },
   // --- місії ---
-  ryoPerMin: { D:12, C:22, V:0, OP:0 }, repPerMission: { D:1, C:4, V:2 }, missionXpShare: 0.85, missionRateCap: { D:25, C:45, V:40 },
+  ryoPerMin: { D:12, C:22, V:0, OP:0 }, repPerMission: { D:1, C:4, V:2 }, missionXpShare: 0.3, missionRateCap: { D:25, C:45, V:40 },
   shinobiResPerMission: 3,
   // --- економіка ---
   scroll: { 1:250, 2:400, 3:900, 4:1600, 5:3500 }, gearTier: [300,1500,5000], obstacleBase: 150,

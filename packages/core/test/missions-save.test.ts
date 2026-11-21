@@ -129,9 +129,9 @@ describe('A11: saves', () => {
     // Keep the enemy alive past the end of the stage's time.
     for (let i = 0; i < 400 && (state.slots[0]?.data as { w: number }).w === 0; i++) {
       for (const e of state.combat?.fight.enemies ?? []) e.hp = e.maxHp = 1e12;
-      // The player does not fall: a lost fight would end the stage, and this test is about the one that never ends.
+      // The player does not fall (healed to the maximum every step; an inflated maximum would not survive a save, where health is held to the real one).
       const me = state.combat?.fight.player;
-      if (me) me.hp = me.maxHp = 1e12;
+      if (me) me.hp = me.maxHp;
       advance(state, 5000, content);
     }
     expect(state.slots[0]?.data).toMatchObject({ s: 1, w: 1, f: 1 });

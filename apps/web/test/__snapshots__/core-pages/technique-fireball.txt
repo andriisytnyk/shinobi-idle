@@ -214,8 +214,6 @@
           <section data-ui="entity-section">
             <h2>
               Звідки береться
-            <p>
-              Навчає наставник
             <ul class="links">
           <section data-missions="" data-ui="entity-section">
             <h2>
@@ -370,16 +368,6 @@
                         <a class="detail-link" href="#/nature">
                           Обрати природу
                   <li>
-                    <div class="row" data-entity="technique:core:nature_transformation_burn_a_leaf" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:nature_transformation_burn_a_leaf">
-                          Вправа: спалити листок
-                        <span class="detail">
-                          ще не відкрито
-                  <li>
                     <div class="row met" data-entity="skill:katon" data-met="true" data-ui="req-row">
                       <span class="mark">
                         <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -475,16 +463,6 @@
                           Катон
                         <a class="detail-link" href="#/nature">
                           Обрати природу
-                  <li>
-                    <div class="row" data-entity="technique:core:fire_breath_control_drill" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:fire_breath_control_drill">
-                          Вправа: полум'я з подиху
-                        <span class="detail">
-                          ще не відкрито
                   <li>
                     <div class="row" data-entity="skill:katon" data-met="false" data-ui="req-row">
                       <span class="mark">
@@ -583,16 +561,6 @@
                           Катон
                         <a class="detail-link" href="#/nature">
                           Обрати природу
-                  <li>
-                    <div class="row" data-entity="technique:core:running_fire" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:running_fire">
-                          Вогняна доріжка
-                        <span class="detail">
-                          ще не відкрито
                   <li>
                     <div class="row" data-entity="skill:katon" data-met="false" data-ui="req-row">
                       <span class="mark">
@@ -707,16 +675,6 @@
                         <a class="detail-link" href="#/nature">
                           Обрати природу
                   <li>
-                    <div class="row" data-entity="technique:core:great_fireball" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:great_fireball">
-                          Техніка великої вогняної кулі
-                        <span class="detail">
-                          ще не відкрито
-                  <li>
                     <div class="row" data-entity="skill:katon" data-met="false" data-ui="req-row">
                       <span class="mark">
                         <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -830,16 +788,6 @@
                         <a class="detail-link" href="#/nature">
                           Обрати природу
                   <li>
-                    <div class="row" data-entity="technique:core:phoenix_sage_fire" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:phoenix_sage_fire">
-                          Техніка вогню фенікса-мудреця
-                        <span class="detail">
-                          ще не відкрито
-                  <li>
                     <div class="row" data-entity="skill:katon" data-met="false" data-ui="req-row">
                       <span class="mark">
                         <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -932,6 +880,16 @@
                     <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
                     <path d="#24-1tb3nx8">
                 Поки закрито
+              <div class="source" data-technique-source="S">
+                <p class="lack">
+                  Ще не знаєш цієї техніки
+                <p class="how">
+                  Сувій або бібліотека
+                <ul class="links">
+                  <li>
+                    <a class="entity-link" href="#/building/core:library">
+                      Бібліотека
+                    (рівень 3)
               <div class="group" data-met="false">
                 <ul class="rows">
                   <li>
@@ -946,16 +904,6 @@
                           Катон
                         <a class="detail-link" href="#/nature">
                           Обрати природу
-                  <li>
-                    <div class="row" data-entity="technique:core:dragon_fire" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:dragon_fire">
-                          Техніка вогню дракона
-                        <span class="detail">
-                          ще не відкрито
                   <li>
                     <div class="row" data-entity="skill:katon" data-met="false" data-ui="req-row">
                       <span class="mark">
@@ -1051,6 +999,12 @@
                     <rect height="11" rx="2" ry="2" width="18" x="3" y="11">
                     <path d="#24-1tb3nx8">
                 Поки закрито
+              <div class="source" data-technique-source="S">
+                <p class="lack">
+                  Ще не знаєш цієї техніки
+                <p class="how">
+                  Сувій або бібліотека
+                <ul class="links">
               <div class="group" data-met="false">
                 <ul class="rows">
                   <li>
@@ -1065,16 +1019,6 @@
                           Катон
                         <a class="detail-link" href="#/nature">
                           Обрати природу
-                  <li>
-                    <div class="row" data-entity="technique:core:fire_dragon_flame_bullet" data-met="false" data-ui="req-row">
-                      <span class="mark">
-                        <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
-                          <path d="#8-twp5wy" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-                      <span class="label">
-                        <a class="entity-link" href="#/technique/core:fire_dragon_flame_bullet">
-                          Полум'яна куля вогняного дракона
-                        <span class="detail">
-                          ще не відкрито
                   <li>
                     <div class="row" data-entity="skill:katon" data-met="false" data-ui="req-row">
                       <span class="mark">

@@ -245,7 +245,11 @@ describe('what each tool does, and what it costs', () => {
     heal.fight.player.hp = 10;
     fightAdvance(heal.fight, workOf(1500), content, heal.r);
     const item = content.items.find((i) => i.id === ids.heal);
-    expect(heal.fight.player.hp).toBeCloseTo(10 + (item?.fx?.kind === 'heal' ? item.fx.hp : 0), 6);
+    // The pill, and the one regeneration step (a second of the fight) that falls inside the 1.5 s.
+    expect(heal.fight.player.hp).toBeCloseTo(
+      10 + (item?.fx?.kind === 'heal' ? item.fx.hp : 0) + heal.fight.kit.hpRegen,
+      6,
+    );
 
     const pill = itemFight(ids.chakraPill);
     pill.fight.player.chakra = 0;
