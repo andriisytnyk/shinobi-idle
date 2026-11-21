@@ -36,7 +36,10 @@ export function formatSeconds(ms: number): string {
   return t('format.seconds', { n: oneDecimal.format(ms / 1000) });
 }
 
-/** A span as hours, minutes and seconds, the two largest units, e.g. `2 год 5 хв`. */
+/**
+ * A span as hours, minutes and seconds, the two largest units, e.g. `2 год 5 хв` or `3 хв 30 с`:
+ * under an hour the seconds are kept, so a shown time is the time the span really takes.
+ */
 export function formatDuration(ms: number): string {
   const total = Math.max(0, Math.round(ms / 1000));
   const h = Math.floor(total / 3600);
@@ -46,6 +49,9 @@ export function formatDuration(ms: number): string {
     return m > 0
       ? `${t('format.hours', { n: h })} ${t('format.minutes', { n: m })}`
       : t('format.hours', { n: h });
-  if (m > 0) return t('format.minutes', { n: m });
+  if (m > 0)
+    return s > 0
+      ? `${t('format.minutes', { n: m })} ${t('format.seconds', { n: s })}`
+      : t('format.minutes', { n: m });
   return t('format.seconds', { n: s });
 }

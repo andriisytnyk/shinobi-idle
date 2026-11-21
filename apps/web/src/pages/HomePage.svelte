@@ -1,12 +1,13 @@
 <script lang="ts">
   import NextStepCard from '../components/NextStepCard.svelte';
+  import { greeting } from '../lib/greeting.ts';
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
 </script>
 
 <SimplePage title={t('home.title')}>
-  <p class="hello">{t('welcome.hello', { name: game.state.player.name })}</p>
+  <p class="hello">{greeting(game.state.player.name)}</p>
   <NextStepCard />
   <p class="hint">{t('home.hint')}</p>
 </SimplePage>
