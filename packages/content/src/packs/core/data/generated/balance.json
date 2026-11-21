@@ -830,19 +830,19 @@
       "range": [
         {
           "scout": 0,
+          "range": 1
+        },
+        {
+          "scout": 15,
           "range": 2
         },
         {
-          "scout": 10,
+          "scout": 30,
           "range": 3
         },
         {
-          "scout": 25,
+          "scout": 45,
           "range": 4
-        },
-        {
-          "scout": 40,
-          "range": 5
         }
       ],
       "outpostRange": 1,
