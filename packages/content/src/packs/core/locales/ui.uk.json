@@ -1410,6 +1410,7 @@
   "battle.defeatAt": "на {time} бою.",
   "battle.defeatLeft": "Лишалося чакри {chakra}%, витривалості {stamina}%.",
   "battle.techniques": "Використані техніки",
+  "battle.items": "Використані предмети",
   "battle.basic": "Звичайні удари",
   "battle.damage": "Шкода за джерелами",
   "battle.otherSource": "Інше",
