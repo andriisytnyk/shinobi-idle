@@ -251,7 +251,7 @@ describe('routes and anchors', () => {
     for (const row of rows) expect(row.getAttribute('data-entity')).toMatch(/^poi:.+/);
 
     const technique = content.techniques[0]?.id;
-    game.dispatch({ type: 'goal.set', ref: { kind: 'technique', id: technique ?? '' } });
+    game.dispatch({ type: 'goal.pin', ref: { kind: 'technique', id: technique ?? '' } });
     flushSync();
     await booted.go('#/skills');
     const goal = qa('[data-ui="goal-panel"] [data-ui="goal-row"]');

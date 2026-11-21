@@ -225,7 +225,7 @@ describe('A6: graduation', () => {
     }
     expect(Object.keys(state.known).length).toBeGreaterThan(4);
     expect(state.bank[SCROLL]).toBe(1);
-    expect(state.goal).toEqual({ kind: 'technique', id: 'core:shadow_clone' });
+    expect(state.goals).toEqual([{ kind: 'technique', id: 'core:shadow_clone' }]);
     const types = state.events.map((e) => e.type);
     expect(types).toEqual(
       expect.arrayContaining(['rankUp', 'itemGained', 'goalSet', 'actionStopped']),
@@ -328,7 +328,7 @@ describe('A8: saves', () => {
     expect(loaded.skills.tai!.xp).toBe(state.skills.tai!.xp);
     expect(loaded.counters).toEqual({});
     expect(loaded.combat).toBeNull();
-    expect(loaded.goal).toBeNull();
+    expect(loaded.goals).toEqual([]);
     expect(loaded.quests[QUEST]).toEqual({ step: 0, base: 0, done: false });
   });
 
@@ -372,11 +372,11 @@ describe('A8: saves', () => {
 
   it('keeps a graduate a graduate across save and load', () => {
     const state = genin(9);
-    state.goal = { kind: 'technique', id: 'core:shadow_clone' };
+    state.goals = [{ kind: 'technique', id: 'core:shadow_clone' }];
     state.bank[SCROLL] = 1;
     state.counters['kills.core:dummy'] = 12;
     const loaded = deserialize(serialize(state, 0), content);
-    expect(loaded.goal).toEqual(state.goal);
+    expect(loaded.goals).toEqual(state.goals);
     expect(loaded.bank[SCROLL]).toBe(1);
     expect(loaded.counters).toEqual(state.counters);
     expect(loaded.quests[QUEST]?.step).toBeGreaterThanOrEqual(0);

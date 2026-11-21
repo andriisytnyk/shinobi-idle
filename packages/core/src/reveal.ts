@@ -1,5 +1,6 @@
 import type { ContentDb, Region, RevealRule, RevealTerm } from '@shinobi/content';
 import { bingoLevel } from './combat/bingo.ts';
+import { defeatsKey, killsKey } from './counters.ts';
 import type { CommandResult } from './engine.ts';
 import type { EntityRef } from './entity.ts';
 import { indexOf, shopEntries } from './lookup.ts';
@@ -123,6 +124,12 @@ function catalogOf(content: ContentDb): Catalog {
     const entered = new Set<object>();
     const walk = (v: unknown, atRoot: boolean, field: string): void => {
       if (typeof v === 'string') {
+        // A kill counter (`kills.<enemy>`) names the enemy it counts.
+        const counted = [killsKey(''), defeatsKey('')].find((prefix) => v.startsWith(prefix));
+        const target = counted === undefined ? v : v.slice(counted.length);
+        if (counted !== undefined && kindsOf.has(target) && !found.has(target)) {
+          found.set(target, 'enemy');
+        }
         if (kindsOf.has(v) && !found.has(v) && (v !== skip || (kindsOf.get(v)?.length ?? 0) > 1)) {
           found.set(v, field);
         }

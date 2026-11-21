@@ -128,7 +128,7 @@ describe('one round trip per place', () => {
       ],
       medic: null,
     },
-    goal: { kind: 'item', id: ghost('item') },
+    goals: [{ kind: 'item', id: ghost('item') }],
   });
 
   it('empties every place of the pack and keeps the rest', () => {
@@ -151,7 +151,7 @@ describe('one round trip per place', () => {
     expect(out.bank).toEqual({ 'core:bun': 2 });
     expect((out.loadouts as Raw).active).toEqual(['core:a', 'core:b']);
     expect((out.pouch as { slots: unknown[] }).slots[1]).toEqual({ id: '', n: 0 });
-    expect(out.goal).toBeNull();
+    expect(out.goals).toEqual([]);
     expect((out.loadouts as Raw).signature).toBeNull();
     expect((out.loadouts as Raw).cloneRole).toBeNull();
   });
@@ -187,7 +187,7 @@ describe('one round trip per place', () => {
           skills: { tai: { xp: 999 }, 'ghost:s': { xp: 1 }, 'other:s': { xp: 5 } },
           bank: { 'core:bun': 999, 'ghost:item': 1 },
           course: { '1': 'core:obstacle', '3': 'ghost:o' },
-          goal: { '0': { kind: 'item', id: 'core:bun' } },
+          goals: { '0': { kind: 'item', id: 'core:bun' } },
           'loadouts.active': { '0': 'core:a', '1': 'ghost:x' },
           pouch: { '0': { id: 'core:bun', n: 50 } },
         },
@@ -197,7 +197,7 @@ describe('one round trip per place', () => {
       skills: { tai: { xp: 1 } },
       bank: { 'core:bun': 1 },
       course: {},
-      goal: null,
+      goals: [],
       loadouts: { active: [] },
       pouch: { slots: [{ id: '', n: 0 }] },
     };
@@ -205,7 +205,7 @@ describe('one round trip per place', () => {
     expect(back.skills).toEqual({ tai: { xp: 1 }, 'ghost:s': { xp: 1 } });
     expect(back.bank).toEqual({ 'core:bun': 1, 'ghost:item': 1 });
     expect(back.course).toEqual({ '3': 'ghost:o' });
-    expect(back.goal).toBeNull();
+    expect(back.goals).toEqual([]);
     expect((back.loadouts as Raw).active).toEqual(['ghost:x']);
     expect((back.pouch as { slots: unknown[] }).slots[0]).toEqual({ id: '', n: 0 });
   });

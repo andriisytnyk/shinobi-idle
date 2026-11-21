@@ -11,6 +11,7 @@ import type { VillageState } from './village-state.ts';
 import { ensurePouch } from './combat/pouch.ts';
 import { createWorld, type WorldState } from './world-state.ts';
 import { refreshUnlocks } from './unlocks.ts';
+import { rebuildSurveyed } from './world.ts';
 
 /** A player rank id; the ranks and their order come from `content.playerRanks`. */
 export type Rank = string;
@@ -161,8 +162,8 @@ export interface GameState {
   world: WorldState;
   /** The player's district: buildings, resources, treasury, construction. Null until the player is a Genin. */
   village: VillageState | null;
-  /** The pinned goal shown in the meta panel. */
-  goal: EntityRef | null;
+  /** The goals the player pinned for the meta panel, in pin order (at most `GOAL_CAP`). */
+  goals: EntityRef[];
   /** The techniques taken into a fight, the signature and the saved loadouts. */
   loadouts: LoadoutState;
   /** The pouch of tools and pills, and the slot the medic pouch uses on its own. */
@@ -181,7 +182,7 @@ export interface GameState {
   events: GameEvent[];
 }
 
-export const STATE_VERSION = 21;
+export const STATE_VERSION = 22;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
@@ -229,10 +230,11 @@ export function createState(seed: number, content: ContentDb): GameState {
     team: null,
     world: createWorld(content),
     village: null,
-    goal: null,
+    goals: [],
     missions: { pending: {} },
     events: [],
   };
+  rebuildSurveyed(state, content);
   ensurePouch(state, content);
   refreshUnlocks(state, content, true);
   updateQuests(state, content);

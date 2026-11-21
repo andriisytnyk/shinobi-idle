@@ -1,3 +1,4 @@
+import { pinGoal } from './goal.ts';
 import type { ContentDb, Exam } from '@shinobi/content';
 import type { ActionKind } from './actions.ts';
 import { addItem } from './bank.ts';
@@ -93,8 +94,7 @@ export const senseiTestKind: ActionKind = {
     }
     const goal = exam.rewards.goal;
     if (goal) {
-      state.goal = { kind: goal.kind, id: goal.id };
-      emit(state, { type: 'goalSet', kind: goal.kind, id: goal.id });
+      if (pinGoal(state, goal)) emit(state, { type: 'goalSet', kind: goal.kind, id: goal.id });
     }
     return 'stop';
   },

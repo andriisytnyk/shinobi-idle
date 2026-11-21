@@ -85,7 +85,7 @@
         <span class="corner">
           <PerformerMarks kind={info.kind} id={info.id} />
           <MasteryRing level={info.masteryLevel} progress={info.masteryProgress} />
-          {#if canPin(ref.kind)}<PinGoal
+          {#if canPin(ref.kind, content)}<PinGoal
               kind={ref.kind}
               id={ref.id}
               always={!info.available}
@@ -138,7 +138,7 @@
     <div class="req">
       <p class="locked-label"><Icon name="lucide:lock" size={14} /> {t('tile.locked')}</p>
       <ReqTree node={lockReq} />
-      {#if canPin(ref.kind)}
+      {#if canPin(ref.kind, content)}
         <p class="pin-caption"><PinGoal kind={ref.kind} id={ref.id} variant="link" /></p>
       {/if}
     </div>

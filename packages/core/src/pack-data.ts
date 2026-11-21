@@ -306,12 +306,15 @@ function stashPlace(raw: Raw, place: Place, loaded: ReadonlySet<string>, stash: 
       });
       return setAt(raw, path, { ...at, slots });
     }
-    case 'goal': {
-      const id = isRecord(at) ? at.id : undefined;
-      const away = awayPack(loaded, id);
-      if (away === undefined) return raw;
-      stash(away, path, '0', at);
-      return setAt(raw, path, null);
+    case 'goals': {
+      if (!Array.isArray(at)) return raw;
+      const kept: unknown[] = [];
+      at.forEach((goal: unknown, index) => {
+        const away = awayPack(loaded, isRecord(goal) ? goal.id : undefined);
+        if (away === undefined) kept.push(goal);
+        else stash(away, path, String(index), goal);
+      });
+      return setAt(raw, path, kept);
     }
   }
 }
@@ -441,11 +444,23 @@ function restorePlace(
       }
       return setAt(next, path, { ...(asRecord(getAt(next, path)) ?? pouch), slots });
     }
-    case 'goal': {
-      const goal = entries['0'];
-      return (at === null || at === undefined) && isRecord(goal) && mine(goal.id)
-        ? setAt(raw, path, goal)
-        : raw;
+    case 'goals': {
+      if (!Array.isArray(at)) return raw;
+      const list = [...at];
+      const back = Object.entries(entries)
+        .map(([index, goal]) => [Number(index), goal] as const)
+        .filter(
+          ([index, goal]) =>
+            Number.isInteger(index) && index >= 0 && isRecord(goal) && mine(goal.id),
+        )
+        .sort((x, y) => x[0] - y[0]);
+      for (const [index, goal] of back) {
+        const g = goal as Raw;
+        if (!list.some((x) => isRecord(x) && x.kind === g.kind && x.id === g.id)) {
+          list.splice(Math.min(index, list.length), 0, g);
+        }
+      }
+      return setAt(raw, path, list);
     }
   }
 }

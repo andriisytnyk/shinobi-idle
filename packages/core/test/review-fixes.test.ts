@@ -46,12 +46,12 @@ describe('the sensei test cannot be farmed', () => {
     dispatch(state, { type: 'exam.genin.start' }, content);
     advance(state, 300_000, content);
     expect(state.bank[SCROLL]).toBe(1);
-    state.goal = null;
+    state.goals = [];
     state.events = [];
     const kind = defaultRules.actionKinds['senseiTest'];
     kind?.complete(state, EXAM, content, defaultRules);
     expect(state.bank[SCROLL]).toBe(1);
-    expect(state.goal).toBeNull();
+    expect(state.goals).toEqual([]);
     expect(state.events).toEqual([]);
   });
 });

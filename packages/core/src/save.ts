@@ -1,3 +1,4 @@
+import { pinGoal } from './goal.ts';
 import type { ContentDb, NatureId, Req, SkillId } from '@shinobi/content';
 import { actionKindOf, rebalanceShares } from './actions.ts';
 import { COURSE_ID, COURSE_KIND } from './athletics.ts';
@@ -72,7 +73,13 @@ import { raidFlag } from './raid.ts';
 import { createVillage, type RaidRun, type VillageState } from './village-state.ts';
 import { isAcademyRank, isNature, packOfId, poolEntry, rankIndex, skillEntry } from './vocab.ts';
 import { hexKey, hexLine, isPlayable, removeFigure } from './hex.ts';
-import { cellMaxExplores, levelForExplores, plainMaxExplores, subjectOf } from './world.ts';
+import {
+  cellMaxExplores,
+  levelForExplores,
+  plainMaxExplores,
+  rebuildSurveyed,
+  subjectOf,
+} from './world.ts';
 import { createWorld, seedSurvey } from './world-state.ts';
 import { xpAt } from './xp.ts';
 
@@ -419,6 +426,11 @@ export const MIGRATIONS: readonly Migration[] = [
   (state) => {
     const loadouts = isRecord(state.loadouts) ? state.loadouts : {};
     return { ...state, loadouts: { ...loadouts, cloneRole: null } };
+  },
+  // v21 -> v22: the pinned goal became a list of goals; the one goal is a list of one.
+  (state) => {
+    const { goal, ...rest } = state;
+    return { ...rest, goals: isRecord(goal) ? [goal] : [] };
   },
 ];
 
@@ -1154,6 +1166,8 @@ export function deserialize(
     return { stock, size, carry };
   });
   state.world = sanitizeWorld(raw.world, content);
+  // The surveyed counters follow from the surveys, whatever the save kept.
+  rebuildSurveyed(state, content);
   const pending = isRecord(raw.missions) ? raw.missions.pending : undefined;
   state.missions = {
     pending: pick(pending, (key, n) =>
@@ -1166,11 +1180,12 @@ export function deserialize(
     ),
   };
   state.village = sanitizeVillage(raw.village, state, content);
-  const goal = raw.goal;
-  state.goal =
-    isRecord(goal) && typeof goal.kind === 'string' && typeof goal.id === 'string'
-      ? { kind: goal.kind as EntityKind, id: goal.id }
-      : null;
+  // The pinned goals: well-formed, without repeats, at most the cap (a longer list is cut at the end).
+  for (const goal of Array.isArray(raw.goals) ? raw.goals : []) {
+    if (isRecord(goal) && typeof goal.kind === 'string' && typeof goal.id === 'string') {
+      pinGoal(state, { kind: goal.kind as EntityKind, id: goal.id });
+    }
+  }
 
   refreshUnlocks(state, content, true);
   refreshRegions(state, content, true);

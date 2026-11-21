@@ -1,3 +1,4 @@
+import { pinGoal } from './goal.ts';
 import type { ContentDb, Quest, QuestRewards } from '@shinobi/content';
 import { addCurrency, addItem, removeCurrency } from './bank.ts';
 import { bump, counterValue } from './counters.ts';
@@ -96,8 +97,9 @@ function applyRewards(state: GameState, rewards: QuestRewards, content: ContentD
   }
   for (const flag of rewards.flags) state.flags[flag] = true;
   if (rewards.goal) {
-    state.goal = { kind: rewards.goal.kind, id: rewards.goal.id };
-    emit(state, { type: 'goalSet', kind: rewards.goal.kind, id: rewards.goal.id });
+    if (pinGoal(state, rewards.goal)) {
+      emit(state, { type: 'goalSet', kind: rewards.goal.kind, id: rewards.goal.id });
+    }
   }
   const rank = rewards.rank;
   if (rank && rankIndex(content, rank) > rankIndex(content, state.player.rank)) {
