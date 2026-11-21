@@ -84,9 +84,10 @@ describe('A9: bosses against a prepared player', () => {
       expect(r.full).toBeGreaterThanOrEqual(0.6);
     });
 
-    it(`${name}: four levels below wins less often than at the level, and under 50%`, () => {
+    it(`${name}: four levels below wins less often than at the level, and under 60%`, () => {
       expect(r.below).toBeLessThan(r.full);
-      expect(r.below).toBeLessThan(0.5);
+      // Health regenerates in a fight now (a share of the rate), which lifts the bosses a few points: the line is 60%.
+      expect(r.below).toBeLessThan(0.6);
     });
 
     if (r.boss.cl >= 32) {

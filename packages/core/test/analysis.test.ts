@@ -41,7 +41,8 @@ describe('the session forecast against real play', () => {
   const cases: { c: Case; played: number; verdict: 'stable' | 'risky' | 'hopeless' }[] = [
     { c: zone(false), played: 2, verdict: 'stable' },
     { c: zone(true), played: 2, verdict: 'stable' },
-    { c: boss(46), played: 8, verdict: 'risky' },
+    // A boss is not farmed in a row any more: the health does not come back between fights, so the series collapses.
+    { c: boss(46), played: 8, verdict: 'hopeless' },
     { c: hideout, played: 3, verdict: 'risky' },
   ];
   for (const [i, { c, played: games, verdict }] of cases.entries()) {

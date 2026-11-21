@@ -23,6 +23,7 @@ export const UI_ICON_NAMES = [
   'footprints',
   'gift',
   'hammer',
+  'heart',
   'hourglass',
   'info',
   'key-round',

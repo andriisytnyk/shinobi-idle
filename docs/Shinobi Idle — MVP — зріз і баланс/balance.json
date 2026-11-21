@@ -263,8 +263,8 @@
   ],
   "zoneHpRegen": 0,
   "hpRegen": [
-   0.06,
-   0.018
+   0.03,
+   0.027
   ],
   "defeatHp": 0.2,
   "opRegen": 0.25,

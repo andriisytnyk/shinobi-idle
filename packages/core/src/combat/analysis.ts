@@ -335,19 +335,9 @@ function runZone(
   content: ContentDb,
   rules: Rules,
 ): Batch {
-  const sim = fightSim(
-    snap,
-    encounter,
-    samples,
-    seed,
-    content,
-    rules,
-    {
-      share: content.balance.K.zoneHpRegen,
-      hpPerSecond: Math.max(0, hpRegenOf(snap.levels, content) + (snap.hpRegenBonus ?? 0)),
-      seconds: content.balance.K.respawn,
-    },
-  );
+  // Every sample is a fight of its own from the health the player has now: the first-fight figures are about the fight, and
+  // how health wears down over a series is the session forecast's business (it plays the game itself).
+  const sim = fightSim(snap, encounter, samples, seed, content, rules);
   return {
     simulatedMs: () => sim.simulatedMs,
     step: (plays) => sim.step(plays),

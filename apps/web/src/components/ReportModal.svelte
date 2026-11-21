@@ -28,6 +28,16 @@
     <p class="note">{t('report.capped', { time: formatDuration(report.simulatedMs) })}</p>
   {/if}
 
+  {#if report.hp}
+    <p data-report-hp>
+      {t('report.hp', {
+        before: formatInt(Math.floor(report.hp.before)),
+        after: formatInt(Math.floor(report.hp.after)),
+        max: formatInt(Math.round(report.hp.max)),
+      })}
+    </p>
+  {/if}
+
   {#if report.skills.length > 0}
     <h3>{t('report.skills')}</h3>
     <ul>

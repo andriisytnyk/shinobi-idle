@@ -8,6 +8,7 @@
   import { markerOf } from '../lib/nav.ts';
   import { nextStep } from '../lib/next-step.ts';
   import Icon from './Icon.svelte';
+  import { hpText, regenText, vitalsOf } from '../lib/vitals.ts';
 
   const content = game.content;
 
@@ -23,6 +24,7 @@
   let menuOpen = $state(false);
   const numbers = new Intl.NumberFormat('uk');
   const nature = $derived(game.read((gs) => natureStatus(gs, content)));
+  const vitals = $derived(game.read((gs) => vitalsOf(gs, 0, content, game.rules)));
   const natures = $derived(game.read((gs) => gs.player.natures));
   /** A nature is waiting to be chosen: the test, or an extra one. */
   const natureDue = $derived(nature.canChoose);
@@ -54,6 +56,15 @@
         <dd>{numbers.format(held(game.state, currency.id))}</dd>
       </div>
     {/each}
+    <div class="stat hp primary" data-ui="topbar-hp" title={t('vitals.title')}>
+      <dt>
+        <Icon name="lucide:heart" size={16} /><span class="label">{t('vitals.hp')}</span>
+      </dt>
+      <dd data-hp>
+        <span class="hp-value" data-hp-value>{hpText(vitals)}</span>
+        {#if regenText(vitals)}<span class="hp-regen" data-hp-regen>{regenText(vitals)}</span>{/if}
+      </dd>
+    </div>
     <div class="stat rank primary">
       <dt><Icon name="rank-3" size={16} /><span class="label">{t('topbar.rank')}</span></dt>
       <dd>
@@ -219,6 +230,11 @@
     border: var(--border-thick) solid var(--ink-900);
     border-radius: 50%;
     background: var(--accent);
+  }
+
+  .hp-regen {
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
   }
 
   .stat.save {

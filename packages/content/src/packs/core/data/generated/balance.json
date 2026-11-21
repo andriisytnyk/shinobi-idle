@@ -372,8 +372,8 @@
     ],
     "zoneHpRegen": 0,
     "hpRegen": [
-      0.06,
-      0.018
+      0.03,
+      0.027
     ],
     "defeatHp": 0.2,
     "opRegen": 0.25,
@@ -635,7 +635,7 @@
     "combat": {
       "xpTickMs": 1000,
       "regenMs": 1000,
-      "hpRegenShare": 0.25,
+      "hpRegenShare": 0.1,
       "hitEven": 0.5,
       "fightCapMs": 240000,
       "maxEnemies": 8,
