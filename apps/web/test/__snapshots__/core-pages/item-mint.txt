@@ -77,7 +77,7 @@
         <ul class="tiles">
           <li class="ct-tile" data-action="core:mint" data-entity="item:core:mint" data-herb="core:mint" data-highlighted="" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="clover" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="clover" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#342-1nbqtma" fill="currentColor">
               <div class="ct-head">
@@ -85,13 +85,7 @@
                   <a class="entity-link" href="#/item/core:mint">
                     Цілюща м'ята
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin" data-entity="item:core:mint" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin" data-entity="item:core:mint" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -121,6 +115,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="bush" data-bush="" data-empty="false">
               <p class="line">
                 <span>
@@ -137,7 +138,7 @@
                   Почати
           <li class="ct-tile" data-action="core:nettle" data-entity="item:core:nettle" data-herb="core:nettle" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="vine-leaf" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="vine-leaf" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#1611-1skmruf" fill="currentColor">
               <div class="ct-head">
@@ -145,13 +146,7 @@
                   <a class="entity-link" href="#/item/core:nettle">
                     Кропива
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:nettle" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="item:core:nettle" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -181,6 +176,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="bush" data-bush="" data-empty="false">
               <p class="line">
                 <span>
@@ -221,18 +223,15 @@
                         1/5
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 20%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="item:core:nettle" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <p class="ct-why" data-why="level" id="why-core:nettle">
+              Рівень замалий: потрібен 5.
             <div class="ct-actions">
               <span class="split plain" data-for="gather" data-ui="start-split">
                 <button aria-describedby="why-core:nettle" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
                   Почати
-            <p class="ct-why" data-why="level" id="why-core:nettle">
-              Рівень замалий: потрібен 5.
           <li class="ct-tile" data-action="core:hogweed" data-entity="item:core:hogweed" data-herb="core:hogweed" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="spoted-flower" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="spoted-flower" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#2793-6758lb" fill="currentColor">
               <div class="ct-head">
@@ -240,13 +239,7 @@
                   <a class="entity-link" href="#/item/core:hogweed">
                     Отруйний борщівник
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:hogweed" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="item:core:hogweed" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -276,6 +269,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="bush" data-bush="" data-empty="false">
               <p class="line">
                 <span>
@@ -316,18 +316,15 @@
                         1/10
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 10%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="item:core:hogweed" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <p class="ct-why" data-why="level" id="why-core:hogweed">
+              Рівень замалий: потрібен 10.
             <div class="ct-actions">
               <span class="split plain" data-for="gather" data-ui="start-split">
                 <button aria-describedby="why-core:hogweed" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
                   Почати
-            <p class="ct-why" data-why="level" id="why-core:hogweed">
-              Рівень замалий: потрібен 10.
           <li class="ct-tile" data-action="core:bloodgrass" data-entity="item:core:bloodgrass" data-herb="core:bloodgrass" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="vines" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="vines" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#2699-bf6zjk" fill="currentColor">
               <div class="ct-head">
@@ -335,13 +332,7 @@
                   <a class="entity-link" href="#/item/core:bloodgrass">
                     Кровотрав
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:bloodgrass" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="item:core:bloodgrass" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -371,6 +362,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="bush" data-bush="" data-empty="false">
               <p class="line">
                 <span>
@@ -411,18 +409,15 @@
                         1/15
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 6.666666666666667%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="item:core:bloodgrass" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <p class="ct-why" data-why="level" id="why-core:bloodgrass">
+              Рівень замалий: потрібен 15.
             <div class="ct-actions">
               <span class="split plain" data-for="gather" data-ui="start-split">
                 <button aria-describedby="why-core:bloodgrass" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
                   Почати
-            <p class="ct-why" data-why="level" id="why-core:bloodgrass">
-              Рівень замалий: потрібен 15.
           <li class="ct-tile" data-action="core:poppy" data-entity="item:core:poppy" data-herb="core:poppy" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="poppy" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="poppy" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#1475-1nold0k" fill="currentColor">
               <div class="ct-head">
@@ -430,13 +425,7 @@
                   <a class="entity-link" href="#/item/core:poppy">
                     Сонний мак
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:poppy" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="item:core:poppy" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -466,6 +455,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="bush" data-bush="" data-empty="false">
               <p class="line">
                 <span>
@@ -506,18 +502,15 @@
                         1/20
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 5%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="item:core:poppy" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <p class="ct-why" data-why="level" id="why-core:poppy">
+              Рівень замалий: потрібен 20.
             <div class="ct-actions">
               <span class="split plain" data-for="gather" data-ui="start-split">
                 <button aria-describedby="why-core:poppy" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
                   Почати
-            <p class="ct-why" data-why="level" id="why-core:poppy">
-              Рівень замалий: потрібен 20.
           <li class="ct-tile" data-action="core:ironroot" data-entity="item:core:ironroot" data-herb="core:ironroot" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="plant-roots" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="plant-roots" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#2567-1cdczec" fill="currentColor">
               <div class="ct-head">
@@ -525,13 +518,7 @@
                   <a class="entity-link" href="#/item/core:ironroot">
                     Залізний корінь
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:ironroot" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="item:core:ironroot" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -561,6 +548,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="bush" data-bush="" data-empty="false">
               <p class="line">
                 <span>
@@ -601,18 +595,15 @@
                         1/25
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 4%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="item:core:ironroot" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <p class="ct-why" data-why="level" id="why-core:ironroot">
+              Рівень замалий: потрібен 25.
             <div class="ct-actions">
               <span class="split plain" data-for="gather" data-ui="start-split">
                 <button aria-describedby="why-core:ironroot" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
                   Почати
-            <p class="ct-why" data-why="level" id="why-core:ironroot">
-              Рівень замалий: потрібен 25.
           <li class="ct-tile" data-action="core:silvermoss" data-entity="item:core:silvermoss" data-herb="core:silvermoss" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="solid-leaf" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="solid-leaf" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#341-n6fed8" fill="currentColor">
               <div class="ct-head">
@@ -620,13 +611,7 @@
                   <a class="entity-link" href="#/item/core:silvermoss">
                     Сріблястий мох
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:silvermoss" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="item:core:silvermoss" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -656,6 +641,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="bush" data-bush="" data-empty="false">
               <p class="line">
                 <span>
@@ -696,18 +688,15 @@
                         1/30
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 3.3333333333333335%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="item:core:silvermoss" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <p class="ct-why" data-why="level" id="why-core:silvermoss">
+              Рівень замалий: потрібен 30.
             <div class="ct-actions">
               <span class="split plain" data-for="gather" data-ui="start-split">
                 <button aria-describedby="why-core:silvermoss" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
                   Почати
-            <p class="ct-why" data-why="level" id="why-core:silvermoss">
-              Рівень замалий: потрібен 30.
           <li class="ct-tile" data-action="core:edelweiss" data-entity="item:core:edelweiss" data-herb="core:edelweiss" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="flower-star" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="flower-star" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#831-9ho3s9" fill="currentColor">
               <div class="ct-head">
@@ -715,13 +704,7 @@
                   <a class="entity-link" href="#/item/core:edelweiss">
                     Гірський едельвейс
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:edelweiss" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="item:core:edelweiss" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -751,6 +734,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="bush" data-bush="" data-empty="false">
               <p class="line">
                 <span>
@@ -805,18 +795,15 @@
                         1/35
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 2.857142857142857%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="item:core:edelweiss" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <p class="ct-why" data-why="level" id="why-core:edelweiss">
+              Рівень замалий: потрібен 15.
             <div class="ct-actions">
               <span class="split plain" data-for="gather" data-ui="start-split">
                 <button aria-describedby="why-core:edelweiss" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
                   Почати
-            <p class="ct-why" data-why="level" id="why-core:edelweiss">
-              Рівень замалий: потрібен 15.
           <li class="ct-tile" data-action="core:fireflower" data-entity="item:core:fireflower" data-herb="core:fireflower" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="fire-flower" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="fire-flower" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#1391-r7ivy4" fill="currentColor">
               <div class="ct-head">
@@ -824,13 +811,7 @@
                   <a class="entity-link" href="#/item/core:fireflower">
                     Вогняна квітка
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:fireflower" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="item:core:fireflower" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -860,6 +841,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="bush" data-bush="" data-empty="false">
               <p class="line">
                 <span>
@@ -900,18 +888,15 @@
                         1/40
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 2.5%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="item:core:fireflower" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <p class="ct-why" data-why="level" id="why-core:fireflower">
+              Рівень замалий: потрібен 40.
             <div class="ct-actions">
               <span class="split plain" data-for="gather" data-ui="start-split">
                 <button aria-describedby="why-core:fireflower" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
                   Почати
-            <p class="ct-why" data-why="level" id="why-core:fireflower">
-              Рівень замалий: потрібен 40.
           <li class="ct-tile" data-action="core:lotus" data-entity="item:core:lotus" data-herb="core:lotus" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="lotus" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="lotus" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#1476-v4t3xk" fill="currentColor">
               <div class="ct-head">
@@ -919,13 +904,7 @@
                   <a class="entity-link" href="#/item/core:lotus">
                     Водяний лотос
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:lotus" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="item:core:lotus" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -955,6 +934,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="bush" data-bush="" data-empty="false">
               <p class="line">
                 <span>
@@ -1024,18 +1010,15 @@
                         1/45
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 2.2222222222222223%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="item:core:lotus" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <p class="ct-why" data-why="level" id="why-core:lotus">
+              Рівень замалий: потрібен 30.
             <div class="ct-actions">
               <span class="split plain" data-for="gather" data-ui="start-split">
                 <button aria-describedby="why-core:lotus" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
                   Почати
-            <p class="ct-why" data-why="level" id="why-core:lotus">
-              Рівень замалий: потрібен 30.
           <li class="ct-tile" data-action="core:shadowshroom" data-entity="item:core:shadowshroom" data-herb="core:shadowshroom" data-ui="action-tile">
             <div class="ct-top">
-              <span class="emblem md" data-emblem-icon="spotted-mushroom" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+              <span class="emblem sm" data-emblem-icon="spotted-mushroom" data-emblem-kind="item" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
                 <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                   <path d="#2389-7ju6vx" fill="currentColor">
               <div class="ct-head">
@@ -1043,13 +1026,7 @@
                   <a class="entity-link" href="#/item/core:shadowshroom">
                     Тіньовий гриб
                 <span class="ct-corner">
-                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                    <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                      <circle class="track" cx="22" cy="22" r="18">
-                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                    <span class="level">
-                      1
-                  <button aria-label="Закріпити як мету" class="pin always" data-entity="item:core:shadowshroom" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
+                  <button aria-label="Закріпити як мету" aria-pressed="false" class="pin always" data-entity="item:core:shadowshroom" data-pinned="false" data-ui="pin-goal" title="Закріпити як мету" type="button">
                     <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                       <path d="#210-1cuvkl2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
             <dl class="ct-facts">
@@ -1079,6 +1056,13 @@
                   <span class="mod">
                     <button aria-expanded="false" class="figure" type="button">
                       4 147 дос./год
+              <div class="ct-ring">
+                <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                  <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                    <circle class="track" cx="22" cy="22" r="18">
+                    <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                  <span class="level">
+                    1
             <div class="bush" data-bush="" data-empty="false">
               <p class="line">
                 <span>
@@ -1119,15 +1103,12 @@
                         1/50
                       <span aria-hidden="true" class="bar">
                         <span class="fill" style="width: 2%;">
-              <p class="ct-pin-caption">
-                <button class="link" data-entity="item:core:shadowshroom" data-pinned="false" data-ui="pin-goal" type="button">
-                  Закріпити як мету
+            <p class="ct-why" data-why="level" id="why-core:shadowshroom">
+              Рівень замалий: потрібен 50.
             <div class="ct-actions">
               <span class="split plain" data-for="gather" data-ui="start-split">
                 <button aria-describedby="why-core:shadowshroom" class="main ct-action" data-performer="0" data-start="true" disabled="" type="button">
                   Почати
-            <p class="ct-why" data-why="level" id="why-core:shadowshroom">
-              Рівень замалий: потрібен 50.
       <section data-gear-section="" data-ui="entity-section">
         <h2>
           Тренувальне спорядження

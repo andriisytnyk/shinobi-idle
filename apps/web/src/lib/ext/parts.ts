@@ -91,6 +91,16 @@ export const UI_PARTS = [
   'map-mastery',
   /** A mission's card on the board; carries `data-entity="mission:<id>"`. */
   'mission-card',
+  /** The icon of a mission card or page that says solo or team; not a control. */
+  'mission-kind',
+  /** The stage, performer, time left and bar of a mission that runs, on its card. */
+  'mission-progress',
+  /** The progress bar of a running mission's card. */
+  'mission-bar',
+  /** The requirements of a card: the whole list, or a count with the «Вимоги» button. */
+  'req-summary',
+  /** The row that holds the start button at the bottom of a card. */
+  'card-actions',
   /** One stage of a mission on its page; `data-stage` is its index. */
   'mission-stage',
   /** One thing a mission pays: a currency, an item, a village resource. */

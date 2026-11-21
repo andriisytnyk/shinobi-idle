@@ -22,6 +22,8 @@ export interface Toast {
     items: { id: string; n: number }[];
     /** Skill XP, the skill an entity link. */
     xp?: { skill: string; amount: number } | null;
+    /** The skills a finished mission trained, with the expected XP of one run (about, not exact). */
+    xpList?: { skill: string; amount: number }[];
     /** Village resource units: `units` earned, `added` to the village, `lost` to a full store, `waiting` for a village that does not exist yet. */
     resource?: { slug: string; units: number; added: number; lost: number; waiting: number };
   };
