@@ -545,3 +545,16 @@ describe('saves', () => {
     }
   });
 });
+
+describe('placement', () => {
+  it('is a side column of the width of the goal panel, and leaves room for itself on a wide screen', async () => {
+    const { readFileSync } = await import('node:fs');
+    const panel = readFileSync('src/dev/DevPanel.svelte', 'utf8');
+    const app = readFileSync('src/App.svelte', 'utf8');
+    expect(panel).toMatch(/width: min\(var\(--meta-width\), 100%\)/);
+    expect(panel).toContain("classList.add('dev-open')");
+    expect(app).toMatch(
+      /\.app:global\(\.dev-open\)\s*\{\s*padding-inline-end: var\(--meta-width\)/,
+    );
+  });
+});

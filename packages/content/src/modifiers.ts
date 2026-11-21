@@ -135,7 +135,11 @@ export const CORE_MODIFIER_KEYS: Readonly<Table> = (() => {
     flat: true,
     wired: true,
   });
-  add('bush.regrow', 'Regrow time of an empty bush (-0.1 is 10% shorter)', { wired: true });
+  add(
+    'bush.regrow',
+    'Regrow time of a bush: one herb, and the whole of an empty one (-0.1 is 10% shorter)',
+    { wired: true },
+  );
   add('gather.double', 'Chance of a second herb from one gather', { wired: true });
   add('craft.keep', 'Chance that a craft keeps its ingredients, any skill', { wired: true });
   add('craft.keep.alch', 'Chance that an Alchemy craft keeps its ingredients', { wired: true });

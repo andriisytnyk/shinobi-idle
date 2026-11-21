@@ -171,7 +171,29 @@ describe('A3: views follow the core without a reload', () => {
     }
     expect(game.state.bushes[MINT]?.stock).toBe(0);
     flushSync();
-    expect(target.querySelector(`[data-herb="${MINT}"] [data-regrow]`)).not.toBeNull();
+    const phase = target.querySelector(`[data-herb="${MINT}"] [data-regrow]`);
+    expect(phase).not.toBeNull();
+    expect(phase?.getAttribute('data-phase')).toBe('regrow');
+    // The «Зараз» bar reads the same phase from the core: the regrow pause, not a gather.
+    expect(
+      game.read((gs) => actionInfo(gs, { kind: 'gather', id: MINT }, content, game.rules)?.phaseMs),
+    ).toBe(content.balance.K.field.regrowMs);
+    // The pause ends: the stock jumps to full, the phase text goes.
+    game.devAdvance(content.balance.K.field.regrowMs);
+    flushSync();
+    expect(stock()).toBe(`${size}/${size}`);
+    expect(target.querySelector(`[data-herb="${MINT}"] [data-regrow]`)).toBeNull();
+  });
+
+  it('the herb tile states the regrow rule in one sentence, with the numbers of the data', () => {
+    app = mount(HerbTile, { target, props: { info: info(MINT, 'gather') } });
+    flushSync();
+    const K = content.balance.K.field;
+    const rule = text(target.querySelector(`[data-herb="${MINT}"] [data-regrow-rule]`));
+    expect(rule).toContain(`по одній траві за ${K.regrowEachMs / 1000} с`);
+    expect(rule).toContain(`відростає весь за ${K.regrowMs / 1000} с`);
+    expect(rule).toContain('Кожен рівень Майстерності додає ще одну траву');
+    expect(target.querySelector('[data-regrow-bar]')).toBeNull(); // a full bush has nothing regrowing
   });
 });
 

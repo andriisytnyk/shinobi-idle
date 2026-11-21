@@ -225,6 +225,13 @@
     height: 100dvh;
   }
 
+  /* The developer panel (test builds) stands at the right edge with the width of the goal panel; the frame leaves room. */
+  @media (min-width: 769px) {
+    .app:global(.dev-open) {
+      padding-inline-end: var(--meta-width);
+    }
+  }
+
   .app.meta-open {
     grid-template-columns: var(--sidebar-width) minmax(0, 1fr) var(--meta-width);
     grid-template-areas:

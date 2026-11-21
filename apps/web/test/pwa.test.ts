@@ -6,6 +6,7 @@ import ToastHost from '../src/components/ToastHost.svelte';
 import {
   createPwa,
   removeServiceWorkers,
+  serviceWorkerMode,
   type PwaGame,
   type RegisterSw,
 } from '../src/lib/pwa.svelte.ts';
@@ -471,5 +472,14 @@ describe('removeServiceWorkers', () => {
   it('does nothing where service workers do not exist', async () => {
     const win = { navigator: {}, location: { reload: vi.fn() } } as unknown as Window;
     expect(await removeServiceWorkers(win, undefined)).toBe('none');
+  });
+});
+
+describe('the service worker by build', () => {
+  it('registers only in the production build; test builds and the dev server remove old workers', () => {
+    expect(serviceWorkerMode(true, false)).toBe('register');
+    expect(serviceWorkerMode(true, true)).toBe('remove');
+    expect(serviceWorkerMode(false, true)).toBe('remove');
+    expect(serviceWorkerMode(false, false)).toBe('remove');
   });
 });

@@ -14,13 +14,14 @@ import {
 } from './formulas.ts';
 import { builtObstacles, COURSE_KIND, courseSkill, lapBaseMs, lapXp } from './athletics.ts';
 import {
+  bushNow,
   bushOf,
-  bushSize,
   FIELDWORK_KIND,
   fieldworkSkill,
   gatherAverageSeconds,
+  gatherCycleMs,
+  gatherPauseMs,
   herbSkill,
-  regrowMs,
 } from './field.ts';
 import { getMod } from './mod.ts';
 import { nonNativeLevel } from './natures.ts';
@@ -71,6 +72,8 @@ export interface ActionInfo {
   baseMs: number;
   /** Length of one cycle at full speed in ms, modifiers included. */
   intervalMs: number;
+  /** Length of the phase the action is in now when that is not one cycle: the pause of an emptied herb bush (its regrow), ms; absent in a cycle. */
+  phaseMs?: number;
   /** Skill XP per hour at full speed, with modifiers and the Academy slowdown. */
   xpPerHour: number;
   /** Skill XP one completed cycle pays, with modifiers and the Academy slowdown; it does not change with mastery. */
@@ -202,15 +205,14 @@ function factsOf(
       const h = index.herbs.get(id);
       const skill = h ? herbSkill(content, h) : null;
       if (!h || skill === null) return null;
-      const bush = bushOf(state, id);
-      const size = bush?.size ?? bushSize(state, id, content, rules);
+      const size = bushNow(state, id, content, rules).size;
       return {
         skill,
         level: h.level,
         baseMs: ms(cycleSeconds('gather', h, content)),
         rewardXp: cycleXp('gather', h, content),
         masteryParts: [{ key: id, seconds: gatherAverageSeconds(h, size, content) }],
-        extraMs: regrowMs(state, content, rules) / size,
+        extraMs: gatherPauseMs(state, id, size, content, rules),
       };
     }
     case FIELDWORK_KIND: {
@@ -275,9 +277,11 @@ export function actionInfo(
 
   const K = content.balance.K;
   let intervalMs = kind.intervalMs(state, action.id, content, rules);
-  // An empty bush's regrow is counted in the average (extraMs), not in the steady cycle.
+  // The regrow of an emptied bush is a phase of its own, counted in the average (extraMs), not in the steady cycle.
+  let phaseMs: number | undefined;
   if (facts.extraMs !== undefined && bushOf(state, action.id)?.stock === 0) {
-    intervalMs -= regrowMs(state, content, rules);
+    phaseMs = intervalMs;
+    intervalMs = gatherCycleMs(state, action.id, content, rules);
   }
   // The cycle with the regrow pause of a bush (extraMs), which is part of what a gather costs on average.
   const cycleMs = intervalMs + (facts.extraMs ?? 0);
@@ -320,6 +324,7 @@ export function actionInfo(
     req: result.met ? null : result,
     baseMs,
     intervalMs,
+    ...(phaseMs !== undefined ? { phaseMs } : {}),
     xpPerHour,
     xpPerCycle,
     masteryPerHour,

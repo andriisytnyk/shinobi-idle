@@ -31,6 +31,7 @@
     disabled={data.why !== null}
     describedBy={data.why ? whyId : undefined}
     mark="auto"
+    wrap
   />
 {/if}
 
