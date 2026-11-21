@@ -5,6 +5,7 @@ import {
   combatantStatus,
   asPerformer,
   fightSlotIndex,
+  handStatus,
   SHARE_FULL,
   WORK_PER_MS,
   type Combatant,
@@ -89,7 +90,27 @@ export interface FighterView {
   last: LastView | null;
 }
 
+/** Why a technique of the hand is not being cast right now. */
+export type HandState =
+  'casting' | 'ready' | 'cooldown' | 'stamina' | 'chakra' | 'stance' | 'spent';
+
+/** One technique of the hand of the performer whose fight is shown, in hand order. */
+export interface HandView {
+  /** The id of the technique of the content. */
+  id: string;
+  state: HandState;
+  /** For `cooldown`: the time left, in ms of the fight clock; 0 otherwise. */
+  leftMs: number;
+  /** The whole cooldown, in ms; the bar drains from it. */
+  cooldownMs: number;
+  /** What it costs and of which pool. */
+  cost: number;
+  pool: 'chakra' | 'stamina';
+}
+
 export interface Scene {
+  /** The techniques of the hand with what each waits for. */
+  hand: HandView[];
   /** The slot that owns the fight. */
   slot: number;
   /** `fight`, or the pause before the next body (`respawn`) or an operation's first fight (`approach`). */
@@ -248,6 +269,35 @@ export function buildScene(
   return asPerformer(view, performer, () => sceneOf(view, content, rules));
 }
 
+/** The hand with the reason each technique waits: the cast under way first, then the cooldown, the stance, the pool. */
+function handOfScene(state: GameState, player: FighterView): HandView[] {
+  const combat = state.combat!;
+  const pendingMs = combat.work / WORK_PER_MS;
+  return handStatus(combat.fight, combat.fight.player).map((h) => {
+    const leftMs = Math.max(0, h.cooldownLeft / WORK_PER_MS - pendingMs);
+    const casting = player.action?.kind === 'technique' && player.action.id === h.id;
+    const state: HandState = casting
+      ? 'casting'
+      : leftMs > 0
+        ? 'cooldown'
+        : !h.stanceOk
+          ? 'stance'
+          : !h.affordable
+            ? h.pool
+            : !h.castable
+              ? 'spent'
+              : 'ready';
+    return {
+      id: h.id,
+      state,
+      leftMs: state === 'cooldown' ? leftMs : 0,
+      cooldownMs: h.cooldownMs,
+      cost: h.cost,
+      pool: h.pool,
+    };
+  });
+}
+
 function sceneOf(state: GameState, content: ContentDb, rules: Rules): Scene | null {
   const combat = state.combat;
   const slot = combat ? fightSlotIndex(state, combat.owner) : -1;
@@ -266,10 +316,12 @@ function sceneOf(state: GameState, content: ContentDb, rules: Rules): Scene | nu
   const allies = alliesOf(fight).map((a, i, all) =>
     fighterOf(state, a, i + 1, all.length, content, rules, share, nowMs),
   );
+  const player = fighterOf(state, fight.player, 1, 1, content, rules, share, nowMs);
   return {
     slot,
     phase: combat.phase,
-    player: fighterOf(state, fight.player, 1, 1, content, rules, share, nowMs),
+    player,
+    hand: handOfScene(state, player),
     allies,
     // The role the clones fight with is the one saved in the fight's kit, even if its pack is gone since (the row then names no role);
     // a fight that saved none was begun with the default role.

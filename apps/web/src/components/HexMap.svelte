@@ -72,6 +72,18 @@
     return `var(${token ?? `--terrain-${terrain}`})`;
   };
 
+  /** Who surveys each hex now, by hex key; the performer's mark is «Ти» for the character, «К1» for a clone. */
+  const surveyingAt = $derived(
+    new Map(
+      view.surveying.map((s) => [
+        s.coord,
+        { ...s, mark: s.slot === 0 ? t('squad.you') : t('map.mark.clone', { n: s.slot }) },
+      ]),
+    ),
+  );
+  /** The place of each hex in the plan of the auto-survey, counted from 1. */
+  const orderAt = $derived(new Map(view.autoOrder.map((c, i) => [c, i + 1])));
+
   const pipsOf = (h: MapHex): { filled: boolean }[] =>
     Array.from({ length: Math.min(h.info.maxLevel, 5) }, (_, i) => ({ filled: i < h.info.level }));
 
@@ -440,6 +452,27 @@
               {/each}
             </g>
           {/if}
+          {#if surveyingAt.get(h.coord)}
+            {@const who = surveyingAt.get(h.coord)}
+            <path d={HEX_PATH} class="surveying" data-surveying={who?.slot} aria-hidden="true" />
+            <g class="who" data-survey-mark aria-hidden="true" transform="translate(7 8)">
+              <rect x="-9" y="-6" width="18" height="11" rx="3" />
+              <text text-anchor="middle" y="2.5" font-size="7">{who?.mark}</text>
+            </g>
+          {/if}
+          {#if orderAt.get(h.coord)}
+            {@const n = orderAt.get(h.coord)}
+            <g
+              class="order"
+              class:current={n === 1}
+              data-auto-order={n}
+              aria-hidden="true"
+              transform="translate(-11 -9)"
+            >
+              <circle r="5.5" />
+              <text text-anchor="middle" y="2.4" font-size="7">{n}</text>
+            </g>
+          {/if}
           {#if s !== 'fog' && s !== 'reach'}
             <g class="pips" aria-hidden="true">
               {#each pipsOf(h) as pip, i (i)}
@@ -628,6 +661,55 @@
     stroke: var(--chakra);
     stroke-width: 3;
     stroke-dasharray: none;
+  }
+
+  /* The hex being surveyed: a ring that breathes, still when motion is reduced. */
+  .surveying {
+    fill: none;
+    stroke: var(--chakra);
+    stroke-width: 2.4;
+    pointer-events: none;
+    animation: survey-pulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes survey-pulse {
+    50% {
+      stroke-opacity: 0.35;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .surveying {
+      animation: none;
+    }
+  }
+
+  .who rect {
+    fill: var(--chakra);
+  }
+
+  .who text {
+    fill: var(--ink-900);
+    font-weight: 700;
+  }
+
+  .order circle {
+    fill: var(--surface-raised);
+    stroke: var(--accent);
+    stroke-width: 1.2;
+  }
+
+  .order.current circle {
+    fill: var(--accent);
+  }
+
+  .order text {
+    fill: var(--fg);
+    font-weight: 700;
+  }
+
+  .order.current text {
+    fill: var(--ink-900);
   }
 
   .glyph {

@@ -269,7 +269,12 @@ export function cycleOf(
   if (!action) return null;
   const info = actionInfo(state, action, content, rules);
   const kind = rules.actionKinds[action.kind];
-  return info?.intervalMs ?? kind?.intervalMs(state, action.id, content, rules, slot) ?? null;
+  return (
+    info?.phaseMs ??
+    info?.intervalMs ??
+    kind?.intervalMs(state, action.id, content, rules, slot) ??
+    null
+  );
 }
 
 export function timingOf(

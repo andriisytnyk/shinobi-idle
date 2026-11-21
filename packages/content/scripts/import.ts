@@ -379,15 +379,21 @@ const addItem = (item: Item, name: string, desc: string | undefined) => {
 const itemName = (id: string) => need(map.ITEMS[id], `item ${id} missing in map data`)[0];
 const itemDesc = (id: string) => need(map.ITEMS[id], `item ${id} missing in map data`)[2];
 
-/** A herb pays for its cycle and for its share of the regrow pause of a bush of the first size, so XP per hour is the pace of its level. */
+/**
+ * A herb pays for its cycle and for its share of the regrow pause of a bush of the first size, so XP per hour is the pace of its level.
+ * A bush gathered steadily holds out `size / (1 - cycle / regrowEachMs)` herbs (it regrows one per `regrowEachMs`) and then
+ * pauses `regrowMs` (the same formula as `gatherPauseShare` in core).
+ */
 const herbs: HerbBase[] = slice.herbs.map((h) => {
   const cycle = cycleAt('gather', h.level);
-  const { regrowMs, stockBase } = BALANCE_EXT.field;
+  const { regrowMs, regrowEachMs, stockBase } = BALANCE_EXT.field;
+  const run =
+    cycle * 1000 >= regrowEachMs ? Infinity : (stockBase + 1) / (1 - (cycle * 1000) / regrowEachMs);
   return {
     id: core(h.id),
     level: h.level,
     cycle,
-    xp: xpOfCycle(h.level, cycle + regrowMs / 1000 / (stockBase + 1)),
+    xp: xpOfCycle(h.level, cycle + regrowMs / 1000 / run),
   };
 });
 

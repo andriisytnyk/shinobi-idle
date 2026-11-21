@@ -377,7 +377,7 @@ export function playSlice(options: StoryOptions = {}): StoryRun {
     }
   });
 
-  // «Вовки Прикордонного лісу»
+  // «Вовки Північного лісу»
   chain('core:border_wolves', 6, () => {
     for (const cell of [
       'core:prykordonnyi_lis_okolytsia',

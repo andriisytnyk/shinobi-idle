@@ -47,7 +47,7 @@
             <dt>
               Дальність розвідки
             <dd data-scout-range="">
-              2 гекси
+              1 гекс
           <div>
             <dt>
               Поточна дія
@@ -91,7 +91,7 @@
           <ul class="tiles">
             <li class="tile locked" data-ui="action-tile">
               <div class="top">
-                <span class="emblem md" data-emblem-icon="ancient-columns" data-emblem-kind="fieldwork" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+                <span class="emblem sm" data-emblem-icon="ancient-columns" data-emblem-kind="fieldwork" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
                   <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                     <path d="#179-1stpbnq" fill="currentColor">
                 <div class="main">
@@ -100,12 +100,6 @@
                       <span class="entity-link masked" data-masked="" title="Виконай умови відкриття">
                         ???
                     <span class="corner">
-                      <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                        <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                          <circle class="track" cx="22" cy="22" r="18">
-                          <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                        <span class="level">
-                          1
               <dl class="facts">
                 <div>
                   <dt>
@@ -131,6 +125,13 @@
                     <span class="mod">
                       <button aria-expanded="false" class="figure" type="button">
                         4 147 дос./год
+                <div class="ring">
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                    <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
               <div class="req">
                 <p class="locked-label">
                   <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
@@ -173,7 +174,7 @@
                           <span class="fill" style="width: 10%;">
             <li class="tile locked" data-ui="action-tile">
               <div class="top">
-                <span class="emblem md" data-emblem-icon="stone-pile" data-emblem-kind="fieldwork" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
+                <span class="emblem sm" data-emblem-icon="stone-pile" data-emblem-kind="fieldwork" data-ui="action-emblem" style="--_tint: var(--group-field, var(--steel));">
                   <svg aria-hidden="true" class="icon" height="32" viewBox="0 0 512 512" width="32">
                     <path d="#1167-nm9kq2" fill="currentColor">
                 <div class="main">
@@ -182,12 +183,6 @@
                       <span class="entity-link masked" data-masked="" title="Виконай умови відкриття">
                         ???
                     <span class="corner">
-                      <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 44px; height: 44px;">
-                        <svg aria-hidden="true" height="44" viewBox="0 0 44 44" width="44">
-                          <circle class="track" cx="22" cy="22" r="18">
-                          <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
-                        <span class="level">
-                          1
               <dl class="facts">
                 <div>
                   <dt>
@@ -213,6 +208,13 @@
                     <span class="mod">
                       <button aria-expanded="false" class="figure" type="button">
                         4 147 дос./год
+                <div class="ring">
+                  <span aria-label="Майстерність 1, до наступного рівня 0%" class="ring" data-ui="mastery-ring" role="img" style="width: 36px; height: 36px;">
+                    <svg aria-hidden="true" height="36" viewBox="0 0 44 44" width="36">
+                      <circle class="track" cx="22" cy="22" r="18">
+                      <circle class="value" cx="22" cy="22" r="18" stroke-dasharray="0 113.09733552923255" transform="rotate(-90 22 22)">
+                    <span class="level">
+                      1
               <div class="req">
                 <p class="locked-label">
                   <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">

@@ -1,6 +1,14 @@
 // @vitest-environment happy-dom
 import { content, ukLocale } from '@shinobi/content';
-import { createState, xpAt, type GameState } from '@shinobi/core';
+import {
+  autoPlan,
+  createState,
+  hexesWithin,
+  hexInfo,
+  hexKey,
+  xpAt,
+  type GameState,
+} from '@shinobi/core';
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import Hint from '../src/components/Hint.svelte';
@@ -102,6 +110,8 @@ const click = (el: Element | null) => {
 
 describe('A3: the map follows the core', () => {
   it('a survey that finishes updates the hex', () => {
+    // The cell is three hexes from the start: the range at Scouting 30.
+    game.state.skills.scout!.xp = xpAt(30);
     show();
     expect(tile(PLAIN_CELL)?.getAttribute('data-state')).toBe('marked');
     expect(tile(PLAIN_CELL)?.querySelectorAll('.pip')).toHaveLength(
@@ -206,8 +216,8 @@ describe('the map page', () => {
 
   it('refuses to survey a hex behind fog until surveyed land reaches it', () => {
     const state = genin();
-    // Scouting 25 reaches four hexes; this hex lies four away with only fog round it.
-    state.skills.scout!.xp = xpAt(25);
+    // Scouting 45 reaches four hexes; this hex lies four away with only fog round it.
+    state.skills.scout!.xp = xpAt(45);
     game.replaceState(state);
     show();
     click(hexEl('10,13'));
@@ -361,6 +371,8 @@ describe('A5: a disabled control says why', () => {
   it('Scouting too low for the next level', () => {
     const state = genin();
     explored(state, PLAIN_CELL);
+    // Standing on the cell, so that it is in range and only the level is lacking.
+    state.world.location = PLAIN_CELL;
     game.replaceState(state);
     show({ cell: PLAIN_CELL, region: FOREST });
     expect(q('[data-explore]')?.hasAttribute('disabled')).toBe(true);
@@ -450,6 +462,83 @@ describe('the hex panel keeps its actions in view', () => {
     expect(panel?.querySelector(':scope > .head .close')).not.toBeNull();
     expect(panel?.querySelector(':scope > .actions [data-explore]')).not.toBeNull();
     expect(panel?.querySelector(':scope > .body [data-explore]')).toBeNull();
+  });
+
+  it('shows every action label in full and lets it wrap instead of cutting it with an ellipsis', () => {
+    show({ cell: PLAIN_CELL, region: FOREST });
+    const buttons = [...target.querySelectorAll<HTMLElement>('[data-actions] button.main')];
+    const labels = buttons.map((b) => b.textContent?.replace(/\s+/g, ' ').trim() ?? '');
+    for (const key of ['map.act.survey', 'map.act.walk', 'map.act.paid', 'map.act.auto'])
+      expect(labels.some((l) => l.startsWith(name(key)))).toBe(true);
+    expect(buttons.length).toBeGreaterThanOrEqual(4);
+    // The button's own style truncates (nowrap + ellipsis); `wrap` is what turns that off, and the
+    // layout (a grid that lets the cells be as wide as the panel) is checked in the browser.
+    for (const b of buttons) expect(b.classList.contains('wrap')).toBe(true);
+    expect(q('[data-route-line]')?.textContent).toContain(name('map.route').split('{')[0]!.trim());
+  });
+});
+
+describe('P4: what is being surveyed, and the order of the auto-survey', () => {
+  it('marks the hex being surveyed with the performer and shows its progress and time left', () => {
+    game.state.skills.scout!.xp = xpAt(30);
+    show();
+    expect(
+      game.dispatch({ type: 'action.start', slot: 0, kind: 'explore', id: PLAIN_CELL }).ok,
+    ).toBe(true);
+    game.devAdvance(1000);
+    flushSync();
+    const hex = tile(PLAIN_CELL);
+    expect(hex?.querySelector('.surveying')).not.toBeNull();
+    expect(hex?.querySelector('[data-survey-mark]')?.textContent?.trim()).toBe(name('squad.you'));
+    click(hex);
+    expect(q('[data-hex-panel] [role="progressbar"][aria-label]')).not.toBeNull();
+    expect(q('[data-hex-panel] [data-survey-left]')?.textContent).toContain(
+      name('map.surveyLeft').split('{')[0]!.trim(),
+    );
+    expect(q('[data-surveying-now]')).not.toBeNull();
+  });
+
+  it('numbers the next hexes of the auto-survey on the map and marks the current one', () => {
+    show();
+    expect(target.querySelector('[data-auto-order]')).toBeNull();
+    click(q('[data-map-status] [data-auto]'));
+    const marks = [...target.querySelectorAll<SVGElement>('[data-auto-order]')].sort(
+      (a, b) =>
+        Number(a.getAttribute('data-auto-order')) - Number(b.getAttribute('data-auto-order')),
+    );
+    expect(marks.length).toBeGreaterThan(1);
+    expect(marks.map((m) => m.getAttribute('data-auto-order'))).toEqual(
+      marks.map((_, i) => String(i + 1)),
+    );
+    expect(marks.filter((m) => m.classList.contains('current'))).toHaveLength(1);
+    expect(marks[0]?.classList.contains('current')).toBe(true);
+    // The hex of number 1 is the one the core's plan picks.
+    const first = marks[0]?.closest('[data-hex]')?.getAttribute('data-hex');
+    const plan = autoPlan(game.state, content);
+    expect(first).toBe(`${plan?.subject.hex.q},${plan?.subject.hex.r}`);
+  });
+
+  it('keeps the survey ring still when motion is reduced', async () => {
+    const { readFileSync } = await import('node:fs');
+    const css = readFileSync('src/components/HexMap.svelte', 'utf8');
+    expect(css).toMatch(
+      /prefers-reduced-motion: reduce\)\s*\{\s*\.surveying\s*\{\s*animation: none/,
+    );
+  });
+
+  it('says what the auto-survey does, and that a hex of the start zone begins surveyed', () => {
+    show();
+    const start = cellOf(content.regions[0]?.cells[0] ?? '').hex;
+    const plain = hexesWithin({ q: start[0], r: start[1] }, content.balance.K.map.startRadius)
+      .map((a) => hexKey(a.q, a.r))
+      .find((k) => {
+        const i = hexInfo(game.state, k, content, game.rules);
+        return i && !i.cell && i.level >= 1;
+      });
+    expect(plain).toBeDefined();
+    click(hexEl(plain ?? ''));
+    expect(q('[data-auto-help]')?.textContent).toBe(name('map.auto.help'));
+    expect(q('[data-start-zone]')).not.toBeNull();
   });
 });
 
