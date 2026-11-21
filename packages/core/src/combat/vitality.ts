@@ -7,7 +7,6 @@ import type { Rules } from '../rules.ts';
 import type { GameState } from '../state.ts';
 import type { System } from '../system.ts';
 import { woundFactor } from './fight.ts';
-import { holdsFight } from './system.ts';
 import { VITALITY_SKILL, hpRegenOf, maxHpOf, vitalityLevels, type Levels } from './numbers.ts';
 
 /*
@@ -62,7 +61,7 @@ export function currentHp(
 ): { hp: number; max: number } {
   const max = performerMaxHp(state, content);
   const fight = fightOf(state, slot);
-  if (fight?.phase === 'fight' && holdsFight(state, slot)) {
+  if (fight?.phase === 'fight') {
     return { hp: Math.min(max, Math.max(0, fight.fight.player.hp)), max };
   }
   const stored = slot > 0 ? state.clones[slot]?.hp : state.player.hp;
@@ -84,7 +83,7 @@ function regenOf(
 ): void {
   const fight = fightOf(state, slot);
   // The live number of a fight in progress is the fight's: it regenerates on the fight's own steps.
-  if (fight?.phase === 'fight' && holdsFight(state, slot)) return;
+  if (fight?.phase === 'fight') return;
   const max = performerMaxHp(state, content);
   const own = holder(state);
   if (own.hp >= max) {
