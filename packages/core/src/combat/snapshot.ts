@@ -10,6 +10,7 @@ import type { Levels, PlayerSnapshot } from './numbers.ts';
 import { bingoLevel, knowledgeOf } from './bingo.ts';
 import { effectiveLoadout } from './loadout.ts';
 import { medicTier } from './pouch.ts';
+import { performerHp, performerMaxHp } from './vitality.ts';
 
 /** Every skill level of the player. */
 export function levelsOf(state: GameState, content: ContentDb): Levels {
@@ -52,14 +53,17 @@ export function snapshotPlayer(
   entries: readonly string[] = [],
 ): PlayerSnapshot {
   const snapshot = planningSnapshot(state, content);
-  const [chakra, stamina, evasion] = computeMods(
+  const [chakra, stamina, evasion, regen] = computeMods(
     rules,
     state,
-    ['cost.chakra', 'cost.stamina', 'evasion'],
+    ['cost.chakra', 'cost.stamina', 'evasion', 'hp.regen'],
     content,
   );
   snapshot.costMod = { chakra: chakra?.total ?? 1, stamina: stamina?.total ?? 1 };
   snapshot.evasionMod = evasion?.total ?? 1;
+  // The performer's health carries over from its last fight; the regeneration modifier is flat HP per second.
+  snapshot.hp = Math.min(performerMaxHp(state, content), performerHp(state));
+  snapshot.hpRegenBonus = (regen?.total ?? 1) - 1;
   snapshot.knowledgeLevel = Object.fromEntries(
     entries.map((id) => [id, bingoLevel(state, id, content)]),
   );

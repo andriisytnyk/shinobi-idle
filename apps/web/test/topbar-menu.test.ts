@@ -21,13 +21,15 @@ afterEach(() => {
 });
 
 describe('F1-fix1: the top bar has one row on a phone, the rest behind a menu button', () => {
-  it('marks the first currency and the rank as the ones that stay, and has a menu button that unfolds the rest', async () => {
+  it('marks the first currency, the health and the rank as the ones that stay, and has a menu button that unfolds the rest', async () => {
     booted = await bootApp([coreUi]);
     const bar = booted.target.querySelector<HTMLElement>('header.topbar')!;
     const kept = [...bar.querySelectorAll('.stat.primary')];
-    expect(kept).toHaveLength(2);
+    expect(kept).toHaveLength(3);
     expect(kept[0]?.getAttribute('data-ui')).toBe('topbar-currency');
-    expect(kept[1]?.classList.contains('rank')).toBe(true);
+    // The health stays in the bar too: it is the number a player glances at between fights.
+    expect(kept[1]?.hasAttribute('data-topbar-hp')).toBe(true);
+    expect(kept[2]?.classList.contains('rank')).toBe(true);
     const button = bar.querySelector<HTMLButtonElement>('.menu-btn')!;
     expect(button.getAttribute('aria-expanded')).toBe('false');
     expect(button.getAttribute('aria-label')).toBe('Меню');

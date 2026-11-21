@@ -6,6 +6,7 @@
   import LoadErrorScreen from './components/LoadErrorScreen.svelte';
   import CloneCreate from './components/CloneCreate.svelte';
   import DispelDialog from './components/DispelDialog.svelte';
+  import { sidePanel } from './lib/side-panel.svelte.ts';
   import GoalPanel from './components/GoalPanel.svelte';
   import FinaleModal from './components/FinaleModal.svelte';
   import GraduationModal from './components/GraduationModal.svelte';
@@ -90,6 +91,16 @@
 
   // The meta panel starts open beside the page on wide screens and closed on phones, where it is an overlay.
   let metaOpen = $state(window.matchMedia('(min-width: 769px)').matches);
+  // One side panel at a time: the developer panel (test builds) replaces «Мета» while it is open.
+  const metaShown = $derived(metaOpen && !sidePanel.dev);
+  function toggleMeta(): void {
+    if (sidePanel.dev) {
+      sidePanel.dev = false;
+      metaOpen = true;
+    } else {
+      metaOpen = !metaOpen;
+    }
+  }
   // The squad is a side column on a wide screen and a strip of chips above the tab bar on a phone.
   let narrow = $state(window.matchMedia('(max-width: 768px)').matches);
   $effect(() => {
@@ -144,10 +155,15 @@
 {:else if !game.ready}
   <div class="boot" role="status">{t('app.loading')}</div>
 {:else}
-  <div class="app" class:meta-open={metaOpen} class:squad-on={squadOn && !narrow} bind:this={appEl}>
+  <div
+    class="app"
+    class:meta-open={metaShown}
+    class:squad-on={squadOn && !narrow}
+    bind:this={appEl}
+  >
     <div class="top" bind:this={topEl}>
       <ErrorBoundary area="top"
-        ><TopBar {metaOpen} onToggleMeta={() => (metaOpen = !metaOpen)} /></ErrorBoundary
+        ><TopBar metaOpen={metaShown} onToggleMeta={toggleMeta} /></ErrorBoundary
       >
     </div>
 
@@ -170,7 +186,7 @@
       <div class="squad"><ErrorBoundary area="squad"><SquadPanel /></ErrorBoundary></div>
     {/if}
 
-    {#if metaOpen}
+    {#if metaShown}
       <div class="meta">
         <ErrorBoundary area="goal"><GoalPanel onClose={() => (metaOpen = false)} /></ErrorBoundary>
       </div>

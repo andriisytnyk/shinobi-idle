@@ -33,3 +33,4 @@ export * from './stats.ts';
 export * from './system.ts';
 export * from './types.ts';
 export * from './units.ts';
+export * from './vitality.ts';

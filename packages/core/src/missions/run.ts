@@ -24,6 +24,7 @@ import { drainPendingResources } from '../village.ts';
 import { MISSION_KIND, newMissionCombat, releaseFight } from '../combat/system.ts';
 import { asPerformer } from '../performer.ts';
 import { refillPouch } from '../combat/pouch.ts';
+import { restartReady } from '../combat/vitality.ts';
 import { payOnStop } from '../combat/pending.ts';
 import type { TeamSupport } from '../combat/fight-types.ts';
 import { SELF, planStage, stageBaseMs, stageReq, teammates, type StagePlan } from './plan.ts';
@@ -540,6 +541,12 @@ export const missionKind: ActionKind = {
       // The stage waited for the fight to be free: begin it now if it is, else wait on.
       const entry = stage.t === 'combat' ? entryOf(content, stage.enemy) : undefined;
       if (!entry) return 'abort';
+      // A stage that waits for health (after a lost try) goes on waiting until the health a player waits for is back.
+      if (run.a > 0 && !restartReady(state, content)) {
+        const resting = state.slots[at];
+        if (resting) resting.progress = 0;
+        return 'step';
+      }
       // (A run saved while it waited for a free fight, before every performer had its own: it begins its fight now.)
       state.combat = newMissionCombat(
         state,
@@ -588,6 +595,13 @@ export const missionKind: ActionKind = {
       const again = { ...run, a: run.a + 1 };
       if (again.a >= content.balance.K.mission.maxDefeats) {
         return stopSlot(state, at, 'requirements', content, rules, TOO_HARD);
+      }
+      // The retry waits for health first (the wait is the stage's own `q` state, one tick at a time): at the health a defeat leaves, three quick tries would be three Wounds.
+      if (!restartReady(state, content)) {
+        store(state, at, { ...again, q: 1, f: 0, w: 0, st: '' });
+        const resting = state.slots[at];
+        if (resting) resting.progress = 0;
+        return;
       }
       if (!beginStage(state, at, mission, again, run.s, content, rules)) {
         stopSlot(state, at, 'requirements', content, rules, CANNOT_GO_ON);

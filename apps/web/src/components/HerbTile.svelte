@@ -127,12 +127,6 @@
         {t('herb.nextHerb', { time: formatDuration(bush.leftMs) })}
       </p>
     {/if}
-    <p class="ct-note" data-regrow-rule>
-      {t('herb.regrowNote', {
-        each: formatDuration(bush.eachMs),
-        time: formatDuration(bush.regrowMs),
-      })}
-    </p>
   </div>
 
   {#if running}

@@ -12,6 +12,7 @@ import { cloneSystem, fatigueProvider } from './clone-life.ts';
 import { fightKind, operationKind } from './combat/kind.ts';
 import { combatSystem } from './combat/system.ts';
 import { woundSystem } from './combat/wounds.ts';
+import { vitalitySystem } from './combat/vitality.ts';
 import { senseiTestKind } from './exam.ts';
 import { FIELDWORK_KIND, craftKind, fieldworkKind, gatherKind } from './field.ts';
 import { gearProvider } from './gear.ts';
@@ -67,6 +68,7 @@ export const defaultRules: Rules = {
     named('combat', combatSystem),
     named('clone', cloneSystem),
     named('wound', woundSystem),
+    named('vitality', vitalitySystem),
     named('village', villageSystem),
     named('quest', questSystem),
   ],

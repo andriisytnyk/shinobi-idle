@@ -2,6 +2,7 @@
   import { deserialize, levelCap, slotCount } from '@shinobi/core';
   import { fallbackText, hasKey, t } from '../lib/i18n.ts';
   import { formatDuration } from '../lib/format.ts';
+  import { sidePanel } from '../lib/side-panel.svelte.ts';
   import { squadUi } from '../lib/squad-ui.svelte.ts';
   import { game } from '../lib/store.ts';
   import { MAX_LIFE_MIN, cloneTechniques } from './clones.ts';
@@ -37,7 +38,9 @@
     return [...techniques, ...extra.map((id) => ({ id, name: fallbackText(`x.${id}`) }))];
   });
 
-  let open = $state(false);
+  // The open state lives in the side-panel store, so the app can swap «Мета» out while it is open.
+  const open = $derived(sidePanel.dev);
+  const setOpen = (v: boolean) => (sidePanel.dev = v);
   let message = $state('');
   let failed = $state(false);
 
@@ -176,7 +179,7 @@
   class="opener"
   data-dev-open
   hidden={squadUi.sheet}
-  onclick={() => (open = !open)}
+  onclick={() => setOpen(!open)}
 >
   {dt('dev.open')}
 </button>
@@ -185,7 +188,7 @@
   <aside class="panel" data-dev-panel aria-label={dt('dev.title')}>
     <header>
       <h2>{dt('dev.title')}</h2>
-      <button type="button" data-dev-close onclick={() => (open = false)}>{dt('dev.close')}</button>
+      <button type="button" data-dev-close onclick={() => setOpen(false)}>{dt('dev.close')}</button>
     </header>
     <p class="warn">{dt('dev.warn')}</p>
     <p class="status" class:bad={failed} role="status" data-dev-message>{message}</p>

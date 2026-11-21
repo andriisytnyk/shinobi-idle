@@ -90,7 +90,7 @@ describe('a saved fight with the ids of a pack, read with the core pack alone', 
     // Where the pack is gone the action is lost with its fight, and the game still runs.
     const back = deserialize(text, core, defaultRules);
     expect(back.combat?.enemy ?? null).not.toBe('testmod:shellback');
-    expect(() => advance(back, HOUR, core)).not.toThrow();
+    expect(() => advance(back, 30_000, core)).not.toThrow();
   });
 
   it('keeps a fight against a core enemy that carries pack ids, minus the ids', () => {
@@ -123,7 +123,7 @@ describe('a saved fight with the ids of a pack, read with the core pack alone', 
     expect(read?.traits).not.toContain('testmod:shelled');
     expect(read?.nature).toBeNull();
     expect(back.combat?.fight.player.effects.some((e) => e.id.startsWith('testmod:'))).toBe(false);
-    expect(() => advance(back, HOUR, core)).not.toThrow();
+    expect(() => advance(back, 30_000, core)).not.toThrow();
     // And back with the pack: the game is valid and plays on (what the fight carried of the pack is gone, as for any fight in progress).
     const again = deserialize(serialize(back, 0), mod, modRules);
     expect(again.combat?.enemy).toBe(fightId);

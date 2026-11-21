@@ -185,11 +185,13 @@ describe('A3: views follow the core without a reload', () => {
     expect(target.querySelector(`[data-herb="${MINT}"] [data-regrow]`)).toBeNull();
   });
 
-  it('the herb tile states the regrow rule in one sentence, with the numbers of the data', () => {
-    app = mount(HerbTile, { target, props: { info: info(MINT, 'gather') } });
+  it('the herb page states the regrow rule once, with the numbers of the data', () => {
+    app = mount(SkillPage, { target, context: coreContext(), props: { id: 'herb' } });
     flushSync();
     const K = content.balance.K.field;
-    const rule = text(target.querySelector(`[data-herb="${MINT}"] [data-regrow-rule]`));
+    expect(target.querySelectorAll('[data-regrow-rule]')).toHaveLength(1);
+    expect(target.querySelectorAll('[data-herb] [data-regrow-rule]')).toHaveLength(0);
+    const rule = text(target.querySelector('[data-regrow-rule]'));
     expect(rule).toContain(`по одній траві за ${K.regrowEachMs / 1000} с`);
     expect(rule).toContain(`відростає весь за ${K.regrowMs / 1000} с`);
     expect(rule).toContain('Кожен рівень Майстерності додає ще одну траву');
@@ -429,6 +431,61 @@ describe('the quantity field', () => {
     expect(game.state.bank[OIL]).toBe(17);
     // The Market's 2% comes off the whole stack: 68 ryo become 67.
     expect(game.state.currencies.ryo ?? 0).toBe(100 - Math.round(17 * 4 * 0.98));
+  });
+
+  /** One real keystroke: the browser has already put the character in the field, then fires input. */
+  const key = (selector: string, text: string) => {
+    const input = target.querySelector<HTMLInputElement>(selector);
+    if (!input) throw new Error(`no ${selector}`);
+    input.focus();
+    input.value = text;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    flushSync();
+  };
+
+  it('keeps digits typed one by one, edits with Backspace, survives a tick, clamps on blur', () => {
+    game.state.currencies.ryo = 1000;
+    app = mount(ShopPage, { target, props: {} });
+    flushSync();
+    const field = `${good} [data-qty]`;
+    const value = () => target.querySelector<HTMLInputElement>(field)?.value;
+    key(field, '12');
+    key(field, '125');
+    expect(value()).toBe('125');
+    key(field, '12'); // Backspace
+    key(field, '1');
+    key(field, '');
+    expect(value()).toBe('');
+    key(field, '2');
+    key(field, '25');
+    // A game tick while typing (state changes, the shop re-reads) does not reset the field.
+    game.state.currencies.ryo = 999;
+    flushSync();
+    expect(value()).toBe('25');
+    target
+      .querySelector<HTMLInputElement>(field)
+      ?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    flushSync();
+    expect(game.state.bank[OIL]).toBe(25);
+    // Emptied and left: back to 1.
+    key(field, '');
+    target.querySelector<HTMLInputElement>(field)?.dispatchEvent(new FocusEvent('blur'));
+    flushSync();
+    expect(value()).toBe('1');
+  });
+
+  it('shows the discount and the button total equals what is charged', () => {
+    game.state.currencies.ryo = 1000;
+    app = mount(ShopPage, { target, props: {} });
+    flushSync();
+    const text = target.querySelector(`${good} [data-price]`)?.textContent ?? '';
+    expect(text).toContain('знижка −2%');
+    for (const n of [1, 30, 31, 100]) {
+      key(`${good} [data-qty]`, String(n));
+      const label = target.querySelector(`[data-buy="${OIL}"]`)?.textContent ?? '';
+      const charged = Math.max(1, Math.round(4 * n * 0.98));
+      expect(label.replace(/[^0-9]/g, '')).toBe(String(charged));
+    }
   });
 
   it('arrow keys step the amount', () => {

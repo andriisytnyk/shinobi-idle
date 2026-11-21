@@ -1,6 +1,7 @@
 <script lang="ts">
   import { untrack } from 'svelte';
   import {
+    currentHp,
     evalReq,
     loadoutLimits,
     pouchSlotCount,
@@ -44,9 +45,12 @@
 
   interface Props {
     target: PrepTarget;
+    /** Shown in a sheet over the list: what to do after a fight started, and how to close (else the page navigates). */
+    onStarted?: () => void;
+    onClose?: () => void;
   }
 
-  let { target }: Props = $props();
+  let { target, onStarted, onClose }: Props = $props();
 
   const content = game.content;
 
@@ -116,6 +120,9 @@
     result: null,
   });
 
+  /** The health buckets the forecast key distinguishes (tenths of the maximum). */
+  const HEALTH_BUCKETS = 10;
+
   /** What the forecast depends on: it is run again when the hand, the pouch, the Wounds or the knowledge change. */
   const forecastInputs = $derived(
     game.read((gs) => {
@@ -136,6 +143,8 @@
         ]),
         gs.pouch.medic,
         gs.wounds.stacks,
+        // Health in tenths of the maximum: the verdict follows it as it regenerates, without running again at every tick.
+        Math.floor((currentHp(gs, 0, content).hp / currentHp(gs, 0, content).max) * HEALTH_BUCKETS),
       ]);
     }),
   );
@@ -219,7 +228,7 @@
   function start(): void {
     const r = game.dispatch(startCommand(target));
     say(r);
-    if (r.ok) navigate('#/combat');
+    if (r.ok) (onStarted ?? (() => navigate('#/combat')))();
   }
 
   const targetName = $derived(
@@ -454,7 +463,8 @@
     <button type="button" class="start" disabled={view.fighting} onclick={start}
       >{t('combat.start')}</button
     >
-    <a href="#/combat">{t('prep.back')}</a>
+    {#if onClose}<button type="button" class="back" onclick={onClose}>{t('prep.back')}</button
+      >{:else}<a href="#/combat">{t('prep.back')}</a>{/if}
   </div>
 
   <Slot name="prep.footer" ctx={{ target, level, hand, suggested: view.suggested.techniques }} />
