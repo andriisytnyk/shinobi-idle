@@ -347,7 +347,7 @@ export function reachFrom(state: GameState, content: ContentDb, from: Axial, slo
   const stamp = `${hexKey(from.q, from.r)}|${positionOf(state, slot)}|${worldStamp(state)}|${unmetKeys(state, content).join(',')}`;
   const memo = reaches.get(state)?.get(slot);
   if (memo && memo.content === content && memo.stamp === stamp) return memo.reach;
-  const reach = searchFrom(state, content, from, slot, false);
+  const reach = searchFrom(state, content, from, slot, null);
   const all = reaches.get(state) ?? new Map();
   all.set(slot, { content, stamp, reach });
   reaches.set(state, all);
@@ -361,7 +361,7 @@ const reaches = new WeakMap<
 >();
 
 /**
- * The search. A hex whose key the state lacks is not entered, unless `ignoreKeys` (a diagnosis of
+ * The search. A hex whose key the state lacks is not entered, unless a key is `granted` (a diagnosis of
  * what the keys cost). A performer that stands on such a hex (a save from before the keys) may walk
  * out: keyed hexes can be entered from the keyed hexes the way out began on, never from open ground.
  */
@@ -370,12 +370,12 @@ function searchFrom(
   content: ContentDb,
   from: Axial,
   slot: number,
-  ignoreKeys: boolean,
+  granted: ReadonlySet<string> | null,
 ): Reach {
   const graph = walkGraph(content);
   const known = surveyedKeys(state, content, slot);
   const start = hexKey(from.q, from.r);
-  const lacking = ignoreKeys ? new Set<string>() : new Set(unmetKeys(state, content));
+  const lacking = new Set(unmetKeys(state, content).filter((id) => !granted?.has(id)));
   const locked = (key: string): boolean =>
     lacking.size > 0 && hexKeyIds(content, key).some((id) => lacking.has(id));
   const chain = new Set<string>(locked(start) ? [start] : []);
@@ -465,10 +465,12 @@ export function routeTo(
 }
 
 /**
- * What the keys cost the route to `target`: the keys the cheapest route would need if no key were
- * needed, that the state lacks (empty when that route is open). Null when the target cannot be
- * reached even with every key. For the screens: the reason of a refusal, and the note that a route
- * goes round.
+ * What the keys cost the route to `target`, for the screens (the reason of a refusal, the note that
+ * a route goes round). When the performer can reach it now: the keys the cheapest route would need
+ * if no key were needed and that the performer lacks (empty when that route is open; non-empty when
+ * the route goes round). When it cannot: the keys without which no way exists (each one alone shuts
+ * every way), empty when the way is shut by fog or terrain, not by a key. Null when the target cannot
+ * be reached even with every key.
  */
 export function routeKeyCost(
   state: GameState,
@@ -478,11 +480,20 @@ export function routeKeyCost(
 ): string[] | null {
   const here = positionHex(state, content, slot);
   if (!here) return null;
-  const reach = searchFrom(state, content, here, slot, true);
-  const route = pathTo(content, reach, hexKey(target.q, target.r));
-  if (!route) return null;
+  const goal = hexKey(target.q, target.r);
+  const lacking = unmetKeys(state, content);
+  const all = new Set(lacking);
+  const free = pathTo(content, searchFrom(state, content, here, slot, all), goal);
+  if (!free) return null;
+  if (routeTo(state, content, target, slot) === null) {
+    // Shut: a key is necessary when, with every other key granted, the way is still shut.
+    return lacking.filter((id) => {
+      const others = new Set(lacking.filter((x) => x !== id));
+      return pathTo(content, searchFrom(state, content, here, slot, others), goal) === null;
+    });
+  }
   const out: string[] = [];
-  for (const key of route.hexes)
+  for (const key of free.hexes)
     for (const id of missingKeys(state, content, key)) if (!out.includes(id)) out.push(id);
   return out;
 }
