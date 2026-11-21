@@ -149,7 +149,9 @@ function keyedOf(content: ContentDb): Map<string, string[]> {
     const ids: string[] = [];
     const cellKey = index.cellByHex.get(key)?.key;
     if (cellKey) ids.push(cellKey);
-    const terrainKey = hex.terrain === undefined ? undefined : index.terrains.get(hex.terrain)?.key;
+    // A crossing (a ford, a bridge) is passed without the key of its terrain.
+    const terrainKey =
+      hex.terrain === undefined || hex.crossing ? undefined : index.terrains.get(hex.terrain)?.key;
     if (terrainKey && !ids.includes(terrainKey)) ids.push(terrainKey);
     if (ids.length > 0) map.set(key, ids);
   }
@@ -526,4 +528,15 @@ export function surveyAccess(
       return hexes.has(key) && walkable.dist.has(key);
     }) || linkedKeys(content, hexKey(target.q, target.r)).some((key) => walkable.dist.has(key));
   return touches ? 'ok' : 'cutOff';
+}
+
+/** A ford or a bridge. */
+export type Crossing = 'ford' | 'bridge';
+
+/** The crossing at the hex under `key`, when it is one over a terrain that asks a key (the crossing is what lets the hex be passed); else null. */
+export function crossingAt(content: ContentDb, key: string): Crossing | null {
+  const index = indexOf(content);
+  const hex = index.hexes.get(key);
+  if (!hex?.crossing || hex.terrain === undefined) return null;
+  return index.terrains.get(hex.terrain)?.key ? hex.crossing : null;
 }

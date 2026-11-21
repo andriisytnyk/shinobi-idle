@@ -97,6 +97,8 @@
 
   /** A surveyed hex the performer cannot enter, cross or survey for want of a key (water without the way to walk on it). */
   const shut = (h: MapHex): boolean => h.info.keys.some((k) => !k.req.met);
+  const BRIDGE = 'M-5 1Q0 -4 5 1M-5 3H5M-3 1V3M3 1V3';
+  const FORD = 'M-5 0H-3M-1 0H1M3 0H5M-4 3H-2M0 3H2M4 3H5';
   const LOCK = 'M-3 0V-2a3 3 0 0 1 6 0V0M-4 0H4V5H-4Z';
 
   const nameOf = (h: MapHex): string => {
@@ -111,7 +113,8 @@
   const label = (h: MapHex): string => {
     const s = stateOf(h);
     const state = s === 'fog' ? nameOf(h) : `${nameOf(h)}, ${t(`map.state.${s}`)}`;
-    return shut(h) ? `${state}, ${t('map.state.shut')}` : state;
+    const named = h.info.crossing ? `${state}, ${t(`map.crossing.${h.info.crossing}`)}` : state;
+    return shut(h) ? `${named}, ${t('map.state.shut')}` : named;
   };
 
   // ---------- the camera ----------
@@ -479,6 +482,15 @@
               <text text-anchor="middle" y="2.4" font-size="7">{n}</text>
             </g>
           {/if}
+          {#if h.info.crossing}
+            <path
+              d={h.info.crossing === 'bridge' ? BRIDGE : FORD}
+              class="crossing"
+              data-crossing={h.info.crossing}
+              aria-hidden="true"
+              transform="translate(-8 8) scale(0.9)"
+            />
+          {/if}
           {#if shut(h)}
             <path
               d={LOCK}
@@ -745,6 +757,14 @@
   /* A hex shut for want of a key: a dashed edge and a lock, so that it reads as «not yet». */
   .hex.shut .face {
     stroke-dasharray: 3 2;
+  }
+
+  .crossing {
+    fill: none;
+    stroke: var(--fg);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    pointer-events: none;
   }
 
   .lock {

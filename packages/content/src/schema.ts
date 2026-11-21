@@ -702,6 +702,8 @@ export const hexSchema = z.strictObject({
   r: z.number().int(),
   country: coreId.optional(),
   terrain: terrainId.optional(),
+  /** A ford or a bridge: a crossing is entered, crossed and surveyed without the key its terrain asks; the key of a cell on it still applies. */
+  crossing: z.enum(['ford', 'bridge']).optional(),
 });
 export type Hex = z.infer<typeof hexSchema>;
 

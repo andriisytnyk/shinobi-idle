@@ -30,6 +30,8 @@ import {
 } from './world.ts';
 import {
   hexKey,
+  crossingAt,
+  type Crossing,
   hexKeyIds,
   isSurveyed,
   unmetKeys,
@@ -251,6 +253,8 @@ export interface TravelPlan {
   keys: string[];
   /** Whether the route goes round: the short way is shut for want of a key, and a longer one is open. */
   detour: boolean;
+  /** The kinds of crossing (ford, bridge) the route uses over water, without repeats. */
+  crossings: Crossing[];
 }
 
 /** The route to the hex that `address` names with its length, for showing before the player goes. */
@@ -281,6 +285,7 @@ export function travelPlan(
     ms: hex && route ? (routeMs(state, content, rules, hex, slot) ?? 0) : 0,
     keys: keyCost,
     detour: route !== null && keyCost.length > 0,
+    crossings: route ? [...new Set(route.hexes.flatMap((k) => crossingAt(content, k) ?? []))] : [],
   };
 }
 
@@ -377,6 +382,8 @@ export interface HexInfo {
   surveyMs: number;
   /** The keys the hex needs (its cell's and its terrain's) with what each asks, once the hex is surveyed; empty for an open hex and in fog. A hex whose key is unmet cannot be entered, crossed or surveyed. */
   keys: { id: string; req: ReqResult }[];
+  /** A ford or a bridge over water, once the hex is surveyed: it is passed and surveyed without the key of water. */
+  crossing: Crossing | null;
 }
 
 /** The view of one hex of the grid, or null for a coordinate that is no hex. */
@@ -435,6 +442,7 @@ export function hexInfo(
     surveyWhy: why,
     surveyMs:
       subject && why === null ? exploreIntervalMs(state, content, rules, subject.address) : 0,
+    crossing: surveyed ? crossingAt(content, key) : null,
     keys: surveyed
       ? hexKeyIds(content, key).flatMap((id) => {
           const need = content.cellKeys[id];

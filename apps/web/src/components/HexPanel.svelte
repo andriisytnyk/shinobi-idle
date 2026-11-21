@@ -66,6 +66,8 @@
       keys: string[];
       /** Whether the route goes round water or another keyed hex. */
       detour: boolean;
+      /** The kinds of crossing (ford, bridge) the route uses. */
+      crossings: string[];
     };
     exploreSlot: number;
     /** The slot whose auto-survey is surveying this very hex now; -1 when none is. */
@@ -114,6 +116,7 @@
           free: plan.free,
           keys: plan.keys,
           detour: plan.detour,
+          crossings: plan.crossings,
         },
         exploreSlot,
         walkSlot: gs.slots.findIndex(
@@ -582,6 +585,10 @@
           </li>{/if}
         {#if view.travel.hexes > 0 && !info.here}<li class="route-line" data-route-line>
             {t('map.route', { n: view.travel.hexes, time: formatDuration(view.travel.ms) })}
+            {#if view.travel.crossings.length > 0}
+              · <span data-crossing
+                >{view.travel.crossings.map((c) => t(`map.route.via.${c}`)).join(', ')}</span
+              >{/if}
             {#if view.travel.detour}
               · <span data-detour
                 >{t('map.route.detour', { name: keyNames(view.travel.keys) })}</span

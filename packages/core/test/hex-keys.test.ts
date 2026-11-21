@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   advance,
   createState,
+  crossingAt,
   deserialize,
   dispatch,
   EXPLORE_KIND,
@@ -77,10 +78,11 @@ describe('keys in the data', () => {
     expect(content.terrains.filter((t) => t.key === undefined).length).toBeGreaterThan(3);
   });
 
-  it('needs the key of a cell and of its terrain: a cell on a river needs water too', () => {
+  it('needs the key of a cell and of its terrain; a crossing is exempt from the key of its terrain', () => {
     const ford = content.cells.find((c) => c.id === 'core:prykordonnyi_lis_brid')!;
     expect(ford.key).toBeNull();
-    expect(hexKeyIds(content, hexKey(ford.hex[0], ford.hex[1]))).toEqual(['water']);
+    expect(hexKeyIds(content, hexKey(ford.hex[0], ford.hex[1]))).toEqual([]);
+    expect(crossingAt(content, hexKey(ford.hex[0], ford.hex[1]))).toBe('ford');
     const rubble = content.cells.find((c) => c.id === MOLE_CELL)!;
     expect(hexKeyIds(content, hexKey(rubble.hex[0], rubble.hex[1]))).toEqual(['rubble']);
   });
@@ -243,5 +245,45 @@ describe('the start zone and old saves', () => {
     expect(state.world.location).toBe('core:okolytsi_sela');
     // Out of it, the hex is shut again: it cannot be entered without its key.
     expect(reason(state, walk(MOLE_CELL))).toBe('error.keyMissing');
+  });
+});
+
+describe('crossings', () => {
+  const FORD = 'core:prykordonnyi_lis_brid';
+
+  it('lets a ford be walked to and surveyed without the key', () => {
+    const state = genin();
+    surveyAll(state);
+    state.world.location = 'core:okolytsi_sela';
+    expect(reason(state, walk(FORD))).toBeNull();
+    expect(travelPlan(state, FORD, content).crossings).toEqual(['ford']);
+    expect(hexInfo(state, '12,14', content)?.crossing).toBe('ford');
+    // Survey: the ford in fog, with surveyed ground beside it.
+    const fresh = genin();
+    setLevel(fresh, 'scout', 99);
+    fresh.world.surveyed['11,14'] = true;
+    fresh.world.location = '11,14';
+    expect(
+      reason(fresh, { type: 'action.start', slot: 0, kind: EXPLORE_KIND, id: FORD }),
+    ).toBeNull();
+  });
+
+  it('lets a bridge be crossed, while the river beside it and the lake stay shut', () => {
+    const bridged = {
+      ...content,
+      hexes: content.hexes.map((h) =>
+        h.q === 14 && h.r === 12 ? { ...h, crossing: 'bridge' as const } : h,
+      ),
+    };
+    expect(crossingAt(bridged, '14,12')).toBe('bridge');
+    expect(hexKeyIds(bridged, '14,12')).toEqual([]);
+    expect(hexKeyIds(bridged, '13,12')).toEqual(['water']);
+    expect(hexKeyIds(bridged, '7,14')).toEqual(['water']);
+    const state = genin();
+    surveyAll(state);
+    state.world.location = '14,13';
+    expect(routeTo(state, bridged, { q: 14, r: 12 })).not.toBeNull();
+    expect(routeTo(state, bridged, { q: 13, r: 12 })).toBeNull();
+    expect(routeTo(state, content, { q: 14, r: 12 })).toBeNull();
   });
 });
