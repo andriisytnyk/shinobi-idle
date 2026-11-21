@@ -141,7 +141,7 @@
                     <g aria-hidden="true" class="pips">
                       <circle class="pip on" cx="-2.5" cy="13" r="1.8">
                       <circle class="pip" cx="2.5" cy="13" r="1.8">
-                  <g aria-label="Прикордонний ліс: околиця, розвіданий, рівень 0" aria-pressed="false" class="hex marked" data-hex="10,15" data-state="marked" data-ui="hex" role="button" tabindex="-1" transform="translate(606.217782649107 450)">
+                  <g aria-label="Північний ліс: околиця, розвіданий, рівень 0" aria-pressed="false" class="hex marked" data-hex="10,15" data-state="marked" data-ui="hex" role="button" tabindex="-1" transform="translate(606.217782649107 450)">
                     <path class="face" d="#52-78kory" style="--_fill: var(--terrain-road);">
                     <path class="glyph" d="#21-1j24myv">
                     <g aria-hidden="true" class="pips">
