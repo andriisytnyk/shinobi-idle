@@ -5,12 +5,16 @@ import {
   createState,
   dispatch,
   evalReq,
+  GOAL_CAP,
+  goalKinds,
   listSkillActions,
   type Req,
   rate,
   xpAt,
   type GameState,
 } from '@shinobi/core';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { render } from 'svelte/server';
 import type { Component } from 'svelte';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -20,7 +24,7 @@ import Hint from '../src/components/Hint.svelte';
 import NowBar from '../src/components/NowBar.svelte';
 import ReqTree from '../src/components/ReqTree.svelte';
 import SkillList from '../src/components/SkillList.svelte';
-import { techniqueGoal } from '../src/lib/goal.ts';
+import { canPin, techniqueGoal } from '../src/lib/goal.ts';
 import { hrefFor, parseHash, type EntityRef } from '../src/lib/route.ts';
 import { settings } from '../src/lib/settings.svelte.ts';
 import { game } from '../src/lib/store.ts';
@@ -254,7 +258,7 @@ describe('generic entity page', () => {
 describe('A5: goal panel', () => {
   it('renders the pinned goal as a tree of links', () => {
     expect(techniqueGoal('core:great_fireball', content)).not.toBeNull();
-    game.dispatch({ type: 'goal.set', ref: { kind: 'technique', id: 'core:great_fireball' } });
+    game.dispatch({ type: 'goal.pin', ref: { kind: 'technique', id: 'core:great_fireball' } });
     const body = html(GoalPanel, { onClose: () => {} });
     expect(body).toMatch(anchor({ kind: 'technique', id: 'core:great_fireball' }));
     expect(body).toMatch(anchor({ kind: 'skill', id: 'katon' }));
@@ -262,12 +266,130 @@ describe('A5: goal panel', () => {
     expect(body).toContain('data-hint="goalPanel"');
   });
 
-  it('suggests the current quest step, with a way to where it is done, when nothing is pinned', () => {
+  it('lists the current step of every active chain by default, with a way to where it is done', () => {
     const body = html(GoalPanel, { onClose: () => {} });
-    expect(body).toContain('data-suggestion="quest"');
+    expect(body).toContain('data-story');
     expect(body).toMatch(anchor({ kind: 'quest', id: 'core:graduation' }));
     expect(body).toMatch(anchor({ kind: 'skill', id: 'tai' }));
     expect(body).toMatch(/<a [^>]*href="#\/skill\/tai"[^>]*data-go/);
+  });
+
+  it('lists only the steps the player has reached, and no chain that has not started', () => {
+    const body = html(GoalPanel, { onClose: () => {} });
+    const chain = content.quests.find((q) => q.id === 'core:graduation');
+    const progress = game.state.quests['core:graduation'];
+    expect(chain && progress).toBeTruthy();
+    for (const [i, step] of (chain?.steps ?? []).entries()) {
+      if (i === progress?.step) expect(body).toContain(ukLocale[step.textKey]);
+      else expect(body).not.toContain(ukLocale[step.textKey]);
+    }
+    for (const q of content.quests) {
+      if (!game.state.quests[q.id]) expect(body).not.toContain(`data-quest="${q.id}"`);
+    }
+  });
+
+  it('names an enemy the step asks to defeat, links it and shows where to go or how to find the place', () => {
+    const state = fresh();
+    const board = content.quests.find((q) => q.id === 'core:mission_board');
+    const at =
+      board?.steps.findIndex(
+        (s) => s.objective.t === 'counter' && s.objective.counter === 'kills.core:arsonist',
+      ) ?? -1;
+    state.quests['core:mission_board'] = { step: at, base: 0, done: false };
+    game.replaceState(state);
+    const body = html(GoalPanel, { onClose: () => {} });
+    const arsonist = { kind: 'enemy', id: 'core:arsonist' } as const;
+    expect(body).toMatch(anchor(arsonist));
+    expect(body).not.toContain('Знешкодити:</span> ???');
+    // Either a way to the place, or the hint of how to find it when the place is still hidden.
+    expect(body).toMatch(/data-go|data-where-hint/);
+  });
+
+  it('says what the exploration step counts: surveyed areas of the region, from before the step too', () => {
+    const state = fresh();
+    const board = content.quests.find((q) => q.id === 'core:mission_board');
+    const at =
+      board?.steps.findIndex(
+        (s) => s.objective.t === 'counter' && s.objective.counter === 'surveyed.core:forest',
+      ) ?? -1;
+    expect(at).toBeGreaterThan(-1);
+    state.quests['core:mission_board'] = { step: at, base: 0, done: false };
+    state.counters['surveyed.core:forest'] = 3;
+    game.replaceState(state);
+    const body = html(GoalPanel, { onClose: () => {} });
+    expect(body).toContain(ukLocale['quests.surveyed']);
+    expect(body).toMatch(anchor({ kind: 'region', id: 'core:forest' }));
+    // The three surveyed before the step count: no start-of-step baseline.
+    expect(body).toMatch(/3\s*\/\s*5/);
+  });
+
+  it('drops a finished chain from the story list', () => {
+    const done = fresh();
+    for (const q of content.quests)
+      done.quests[q.id] = { step: q.steps.length, base: 0, done: true };
+    game.replaceState(done);
+    const body = html(GoalPanel, { onClose: () => {} });
+    expect(body).not.toContain('data-story');
+    expect(body).not.toContain('data-next-step');
+  });
+
+  it('the main story has no pin to press and is always first; a side chain can be pinned', () => {
+    const side = content.quests.find((q) => q.main !== true);
+    if (!side) throw new Error('no side chain');
+    const state = fresh();
+    state.quests[side.id] = { step: 0, base: 0, done: false };
+    game.replaceState(state);
+    const before = html(GoalPanel, { onClose: () => {} });
+    // The side chain is not shown until it is pinned; the main chain has no pin control.
+    expect(before).not.toContain(`data-quest="${side.id}"`);
+    expect(before).toMatch(/data-quest="core:graduation"/);
+    expect(before).not.toMatch(/data-entity="quest:core:graduation"/);
+    expect(game.dispatch({ type: 'goal.pin', ref: { kind: 'quest', id: side.id } }).ok).toBe(true);
+    const body = html(GoalPanel, { onClose: () => {} });
+    expect(body).toContain('data-pinned-goals');
+    expect(body.indexOf('data-quest="core:graduation"')).toBeLessThan(
+      body.indexOf(`data-quest="${side.id}"`),
+    );
+    expect(body).toContain('Відкріпити мету');
+  });
+
+  it('shows several pinned goals in pin order, each with its own unpin button', () => {
+    game.dispatch({ type: 'goal.pin', ref: { kind: 'technique', id: 'core:great_fireball' } });
+    game.dispatch({ type: 'goal.pin', ref: { kind: 'technique', id: 'core:clone' } });
+    const body = html(GoalPanel, { onClose: () => {} });
+    const first = body.indexOf('href="#/technique/core:great_fireball"');
+    const second = body.indexOf('href="#/technique/core:clone"');
+    expect(first).toBeGreaterThan(-1);
+    expect(second).toBeGreaterThan(first);
+    expect(count(body, 'data-unpin')).toBe(2);
+    game.dispatch({ type: 'goal.unpin', ref: { kind: 'technique', id: 'core:great_fireball' } });
+    const after = html(GoalPanel, { onClose: () => {} });
+    expect(after).not.toContain('href="#/technique/core:great_fireball"');
+    expect(count(after, 'data-unpin')).toBe(1);
+  });
+
+  it('says why a pin does nothing once the cap is reached, until one is unpinned', () => {
+    const refs = content.techniques.map((t) => ({ kind: 'technique', id: t.id }) as const);
+    for (const ref of refs) {
+      if (game.state.goals.length >= GOAL_CAP) break;
+      game.dispatch({ type: 'goal.pin', ref });
+    }
+    expect(game.state.goals).toHaveLength(GOAL_CAP);
+    const extra = refs.find((r) => !game.state.goals.some((g) => g.id === r.id));
+    expect(extra).toBeDefined();
+    expect(game.dispatch({ type: 'goal.pin', ref: extra as never })).toMatchObject({
+      ok: false,
+      reason: 'error.goalCap',
+    });
+    expect(ukLocale['meta.pinFull']).toContain('{n}');
+  });
+
+  it('takes the kinds that can be pinned from the core, not from a list of its own', () => {
+    expect(canPin('quest', content)).toBe(true);
+    expect(canPin('region', content)).toBe(false);
+    for (const kind of goalKinds(content)) expect(canPin(kind, content)).toBe(true);
+    const source = readFileSync(join(__dirname, '../src/lib/goal.ts'), 'utf8');
+    expect(source).not.toContain('PINNABLE');
   });
 
   it('suggests the nearest technique gated only by level once every chain is done', () => {

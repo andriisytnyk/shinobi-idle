@@ -145,6 +145,12 @@ export interface GoalSetEvent extends EventBase {
   kind: string;
   id: string;
 }
+/** A goal a reward would have pinned was not: the list of goals is full. */
+export interface GoalRefusedEvent extends EventBase {
+  type: 'goalRefused';
+  kind: string;
+  id: string;
+}
 
 /** A finished meditation cycle gave an Insight or an Enlightenment. */
 export interface MeditationGainEvent extends EventBase {
@@ -375,6 +381,7 @@ export type GameEvent =
   | ItemGainedEvent
   | ItemUsedEvent
   | GoalSetEvent
+  | GoalRefusedEvent
   | MeditationGainEvent
   | MeditationBoughtEvent
   | ObstacleBuiltEvent

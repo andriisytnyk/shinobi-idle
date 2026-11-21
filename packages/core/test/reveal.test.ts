@@ -337,22 +337,22 @@ describe('the command reveal.mark', () => {
   });
 });
 
-describe('goal.set and the reveal rule', () => {
+describe('goal.pin and the reveal rule', () => {
   it('refuses to pin an entity that is hidden, accepts one that is shown by name or more', () => {
     const state = createState(1, content);
     expect(
-      dispatch(state, { type: 'goal.set', ref: { kind: 'enemy', id: WOLF } }, content),
+      dispatch(state, { type: 'goal.pin', ref: { kind: 'enemy', id: WOLF } }, content),
     ).toEqual({
       ok: false,
       reason: 'error.invalidGoal',
     });
-    expect(state.goal).toBeNull();
+    expect(state.goals).toEqual([]);
     expect(
-      dispatch(state, { type: 'goal.set', ref: { kind: 'enemy', id: 'core:dummy' } }, content).ok,
+      dispatch(state, { type: 'goal.pin', ref: { kind: 'enemy', id: 'core:dummy' } }, content).ok,
     ).toBe(true);
     noteSighting(state, WOLF, content);
     expect(
-      dispatch(state, { type: 'goal.set', ref: { kind: 'enemy', id: WOLF } }, content).ok,
+      dispatch(state, { type: 'goal.pin', ref: { kind: 'enemy', id: WOLF } }, content).ok,
     ).toBe(true);
   });
 });
@@ -388,5 +388,33 @@ describe('a pack: its own rule over the default of its pack and its kind', () =>
     const plain = createState(1, content);
     plain.bank['core:kunai'] = 1;
     expect(level(plain, 'item', 'core:kunai')).toBe('full');
+  });
+});
+
+describe('an enemy a quest step asks to defeat', () => {
+  const isKills = (s: (typeof content.quests)[number]['steps'][number]): boolean =>
+    s.objective.t === 'counter' && s.objective.counter.startsWith('kills.');
+  /** Every kill step of the content, with the enemy it counts. */
+  const kills = content.quests.flatMap((q) =>
+    q.steps.flatMap((s, at) =>
+      isKills(s) && s.objective.t === 'counter'
+        ? [{ quest: q.id, at, enemy: s.objective.counter.slice('kills.'.length) }]
+        : [],
+    ),
+  );
+  const kindOf = (enemy: string): string =>
+    content.bosses.some((b) => b.id === enemy) ? 'boss' : 'enemy';
+
+  it('is named once the chain has reached that step, and not before', () => {
+    let hiddenBefore = 0;
+    for (const { quest, at, enemy } of kills) {
+      const state = createState(1, content);
+      state.quests[quest] = { step: 0, base: 0, done: false };
+      if (at > 0 && level(state, kindOf(enemy), enemy) === 'hidden') hiddenBefore++;
+      state.quests[quest] = { step: at, base: 0, done: false };
+      expect(level(state, kindOf(enemy), enemy), `${enemy} at step ${at}`).not.toBe('hidden');
+    }
+    // At least one enemy is hidden until its step: the rule is what shows it.
+    expect(hiddenBefore).toBeGreaterThan(0);
   });
 });

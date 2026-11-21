@@ -1,3 +1,4 @@
+import { isStoryGoal, pinGoal } from './goal.ts';
 import type { ContentDb, NatureId, Req, SkillId } from '@shinobi/content';
 import { actionKindOf, rebalanceShares } from './actions.ts';
 import { COURSE_ID, COURSE_KIND } from './athletics.ts';
@@ -73,7 +74,13 @@ import { raidFlag } from './raid.ts';
 import { createVillage, type RaidRun, type VillageState } from './village-state.ts';
 import { isAcademyRank, isNature, packOfId, poolEntry, rankIndex, skillEntry } from './vocab.ts';
 import { hexKey, hexLine, isPlayable, removeFigure } from './hex.ts';
-import { cellMaxExplores, levelForExplores, plainMaxExplores, subjectOf } from './world.ts';
+import {
+  cellMaxExplores,
+  levelForExplores,
+  plainMaxExplores,
+  surveyedCounts,
+  subjectOf,
+} from './world.ts';
 import { createWorld, seedSurvey } from './world-state.ts';
 import { xpAt } from './xp.ts';
 
@@ -438,7 +445,21 @@ export const MIGRATIONS: readonly Migration[] = [
     );
     return { ...state, bushes };
   },
-  // v22 -> v23: health became the performer's own state (it carries over between fights and regenerates). The
+  // v22 -> v23: the pinned goal became a list of goals (an existing list is kept); the `surveyed.<region>` counters are new and
+  // are counted from the hexes the player surveyed: not the plain hexes of the start area that still hold the value the start
+  // seeded (an old save cannot tell those from a survey, and the start area is no work of the player).
+  (state, content) => {
+    const { goal, ...rest } = state;
+    const counters = isRecord(rest.counters) ? rest.counters : {};
+    const world = isRecord(rest.world) ? rest.world : {};
+    const explores = isRecord(world.explores) ? world.explores : {};
+    return {
+      ...rest,
+      goals: Array.isArray(rest.goals) ? rest.goals : isRecord(goal) ? [goal] : [],
+      counters: { ...counters, ...surveyedCounts(explores, content) },
+    };
+  },
+  // v23 -> v24: health became the performer's own state (it carries over between fights and regenerates). The
   // fields are not written here: a save without `player.hp` or a clone's `hp` is read as full health, the maximum
   // of the character's Vitality and Wounds, which is what every performer had at the start of a fight before.
   (state) => state,
@@ -1185,11 +1206,13 @@ export function deserialize(
     ),
   };
   state.village = sanitizeVillage(raw.village, state, content);
-  const goal = raw.goal;
-  state.goal =
-    isRecord(goal) && typeof goal.kind === 'string' && typeof goal.id === 'string'
-      ? { kind: goal.kind as EntityKind, id: goal.id }
-      : null;
+  // The pinned goals: well-formed, without repeats, not a chain of the main story (it is always shown), at most the cap.
+  for (const goal of Array.isArray(raw.goals) ? raw.goals : []) {
+    if (isRecord(goal) && typeof goal.kind === 'string' && typeof goal.id === 'string') {
+      const ref = { kind: goal.kind as EntityKind, id: goal.id };
+      if (!isStoryGoal(ref, content)) pinGoal(state, ref);
+    }
+  }
 
   refreshUnlocks(state, content, true);
   refreshRegions(state, content, true);

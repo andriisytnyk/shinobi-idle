@@ -446,18 +446,18 @@ describe('the mission page', () => {
     ).not.toBeNull();
     (q('[data-mission="core:mail"] [data-ui="pin-goal"]') as HTMLButtonElement).click();
     flushSync();
-    expect(game.state.goal).toEqual({ kind: 'mission', id: 'core:mail' });
+    expect(game.state.goals).toEqual([{ kind: 'mission', id: 'core:mail' }]);
     expect(q('[data-mission="core:mail"] [data-ui="pin-goal"]')?.getAttribute('data-pinned')).toBe(
       'true',
     );
     booted.destroy();
-    game.dispatch({ type: 'goal.clear' });
+    game.dispatch({ type: 'goal.unpin', ref: { kind: 'mission', id: 'core:mail' } });
     booted = await bootApp([coreUi], player({ rankC: true }), '#/mission/core:mail');
     const pin = q('[data-ui="entity-page"] [data-ui="pin-goal"]') as HTMLButtonElement;
     expect(pin.getAttribute('data-entity')).toBe('mission:core:mail');
     pin.click();
     flushSync();
-    expect(game.state.goal).toEqual({ kind: 'mission', id: 'core:mail' });
+    expect(game.state.goals).toEqual([{ kind: 'mission', id: 'core:mail' }]);
     expect(pin.getAttribute('data-pinned')).toBe('true');
   });
 

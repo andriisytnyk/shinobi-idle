@@ -1,6 +1,7 @@
 import type { ContentDb } from '@shinobi/content';
 import { actionKindOf, rebalanceShares, stopSlot } from './actions.ts';
 import { growSlots } from './clone.ts';
+import { GOAL_CAP, GOAL_LISTS, isStoryGoal, pinGoal, sameGoal } from './goal.ts';
 import { createClone, dispelClone } from './clone-life.ts';
 import { STAND_KIND, asPerformer } from './performer.ts';
 import { startRefusal } from './start-check.ts';
@@ -87,8 +88,8 @@ export type Command =
   /** Spends Insights or Enlightenments of a practice on one level of its modifier (`insight.0` .. `enlight.2`). */
   | { type: 'meditation.buy'; practice: string; mod: string }
   /** Pins a goal for the meta panel; the entity must exist and be a kind that can be a goal. */
-  | { type: 'goal.set'; ref: EntityRef }
-  | { type: 'goal.clear' }
+  | { type: 'goal.pin'; ref: EntityRef }
+  | { type: 'goal.unpin'; ref: EntityRef }
   /** Names the player: 1 to 24 characters once trimmed. */
   | { type: 'player.setName'; name: string }
   /** Sets the loadout by hand (this switches the automatic loadout off). */
@@ -298,7 +299,7 @@ function goalExists(ref: EntityRef, content: ContentDb): boolean {
   if (typeof ref !== 'object' || ref === null || typeof ref.id !== 'string') return false;
   // The kinds that can be pinned are the kinds of the content that have a list to look the id up in.
   const list = content.entityKinds.find((k) => k.id === ref.kind)?.list;
-  if (list === null || list === undefined || !PINNABLE.has(list)) return false;
+  if (list === null || list === undefined || !GOAL_LISTS.has(list)) return false;
   const entities = (
     content as unknown as Record<string, readonly { id: string; board?: boolean }[]>
   )[list];
@@ -308,20 +309,6 @@ function goalExists(ref: EntityRef, content: ContentDb): boolean {
     entities.some((e) => e.id === ref.id && (list !== 'missions' || e.board === true))
   );
 }
-
-/** The lists of entities that a goal may point at. */
-const PINNABLE: ReadonlySet<string> = new Set([
-  'techniques',
-  'skills',
-  'items',
-  'enemies',
-  'quests',
-  'missions',
-  'recipes',
-  'exercises',
-  'practices',
-  'obstacles',
-]);
 
 /** Starts the sensei test of the exam that grants `rank`. */
 function startExam(
@@ -413,19 +400,27 @@ function apply(
       return buildObstacle(state, command.slot, command.obstacle, content, rules);
     case 'meditation.buy':
       return buyMeditationLevel(state, command.practice, command.mod, content);
-    case 'goal.set': {
+    case 'goal.pin': {
       if (!goalExists(command.ref, content)) return { ok: false, reason: 'error.invalidGoal' };
       // A typed id must not let the goal panel print what the player has not discovered.
       if (revealOf(state, command.ref, content, rules) === 'hidden') {
         return { ok: false, reason: 'error.invalidGoal' };
       }
-      state.goal = { kind: command.ref.kind, id: command.ref.id };
+      // Pinning what is already pinned (the story chain always is) changes nothing.
+      if (isStoryGoal(command.ref, content) || state.goals.some((g) => sameGoal(g, command.ref))) {
+        return { ok: true };
+      }
+      if (state.goals.length >= GOAL_CAP) {
+        return { ok: false, reason: 'error.goalCap', params: { n: GOAL_CAP } };
+      }
+      pinGoal(state, command.ref);
       emit(state, { type: 'goalSet', kind: command.ref.kind, id: command.ref.id });
       return { ok: true };
     }
-    case 'goal.clear':
-      state.goal = null;
+    case 'goal.unpin': {
+      state.goals = state.goals.filter((g) => !sameGoal(g, command.ref));
       return { ok: true };
+    }
     case 'player.setName': {
       const name = typeof command.name === 'string' ? command.name.trim() : '';
       // No control characters: a name is one line of plain text.

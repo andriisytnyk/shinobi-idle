@@ -727,17 +727,17 @@ describe('a mission as the pinned goal', () => {
     const state = ableFor(BOARD[0] as Mission);
     const board = BOARD[0] as Mission;
     expect(
-      dispatch(state, { type: 'goal.set', ref: { kind: 'mission', id: board.id } }, content),
+      dispatch(state, { type: 'goal.pin', ref: { kind: 'mission', id: board.id } }, content),
     ).toEqual({ ok: true });
-    expect(state.goal).toEqual({ kind: 'mission', id: board.id });
+    expect(state.goals).toEqual([{ kind: 'mission', id: board.id }]);
     const operation = content.missions.find((m) => !m.board);
     if (operation) {
       expect(
-        dispatch(state, { type: 'goal.set', ref: { kind: 'mission', id: operation.id } }, content),
+        dispatch(state, { type: 'goal.pin', ref: { kind: 'mission', id: operation.id } }, content),
       ).toEqual({ ok: false, reason: 'error.invalidGoal' });
     }
     expect(
-      dispatch(state, { type: 'goal.set', ref: { kind: 'mission', id: 'core:nope' } }, content),
+      dispatch(state, { type: 'goal.pin', ref: { kind: 'mission', id: 'core:nope' } }, content),
     ).toEqual({ ok: false, reason: 'error.invalidGoal' });
   });
 

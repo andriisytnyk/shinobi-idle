@@ -24,6 +24,7 @@ export * from './buffs.ts';
 export * from './field.ts';
 export * from './flags.ts';
 export * from './gear.ts';
+export { canBeGoal, GOAL_CAP, goalKinds, isStoryGoal, pinGoal, sameGoal } from './goal.ts';
 export * from './shop.ts';
 export * from './scrolls.ts';
 export * from './formulas.ts';

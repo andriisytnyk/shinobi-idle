@@ -282,16 +282,16 @@ describe('a save', () => {
     const loaded = deserialize(serialize(state, 0), content);
     expect(loaded.v).toBe(state.v);
     expect(loaded.player.hp).toBe(12.5);
-    // A save of version 22 has no health: it is full.
+    // A save of version 23 has no health: it is full.
     const raw = JSON.parse(serialize(state, 0)) as {
       v: number;
       state: { v: number; player: Record<string, unknown> };
     };
-    raw.v = 22;
-    raw.state.v = 22;
+    raw.v = 23;
+    raw.state.v = 23;
     delete raw.state.player.hp;
     const old = deserialize(JSON.stringify(raw), content);
-    expect(old.v).toBe(23);
+    expect(old.v).toBe(24);
     expect(old.player.hp).toBe(performerMaxHp(old, content));
   });
 

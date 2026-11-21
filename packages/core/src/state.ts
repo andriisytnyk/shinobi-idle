@@ -165,8 +165,8 @@ export interface GameState {
   world: WorldState;
   /** The player's district: buildings, resources, treasury, construction. Null until the player is a Genin. */
   village: VillageState | null;
-  /** The pinned goal shown in the meta panel. */
-  goal: EntityRef | null;
+  /** The goals the player pinned for the meta panel, in pin order (at most `GOAL_CAP`). */
+  goals: EntityRef[];
   /** The techniques taken into a fight, the signature and the saved loadouts. */
   loadouts: LoadoutState;
   /** The pouch of tools and pills, and the slot the medic pouch uses on its own. */
@@ -185,7 +185,7 @@ export interface GameState {
   events: GameEvent[];
 }
 
-export const STATE_VERSION = 23;
+export const STATE_VERSION = 24;
 
 /** A fresh game: every skill at 0 xp, one empty action slot, streams seeded from `seed`. */
 export function createState(seed: number, content: ContentDb): GameState {
@@ -239,7 +239,7 @@ export function createState(seed: number, content: ContentDb): GameState {
     team: null,
     world: createWorld(content),
     village: null,
-    goal: null,
+    goals: [],
     missions: { pending: {} },
     events: [],
   };
