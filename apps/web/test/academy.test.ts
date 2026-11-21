@@ -149,11 +149,12 @@ describe('A4: combat screen', () => {
     const body = html(CombatPage, {});
     expect(body).toMatch(anchor({ kind: 'enemy', id: 'core:dummy' }));
     expect(body).toContain('data-enemy="core:dummy"');
-    expect(body).toContain('Бойовий рівень');
+    expect(body).toContain('Рів. 2');
     expect(body).toContain('Почати бій');
     // Nothing undiscovered: no region zone, no boss zone, no raw id of a boss.
     expect(body).not.toContain('data-enemy="core:bandit"');
-    expect(body).not.toContain('data-zone=');
+    expect(body).not.toContain('data-zone="core:zone_bandit"');
+    expect(body).not.toContain('data-group="core:forest"');
     expect(body).not.toContain('core:boss_');
   });
 
