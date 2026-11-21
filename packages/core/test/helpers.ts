@@ -3,6 +3,7 @@ import {
   createState,
   defaultRules,
   gearProvider,
+  performerMaxHp,
   poiFlag,
   refreshRegions,
   syncVillage,
@@ -76,8 +77,15 @@ export function withNatures(state: GameState, ...natures: NatureId[]): GameState
   return state;
 }
 
+/** The character at full health (a level raised by hand does not heal: health is the character's state). */
+export function fullHp(state: GameState): void {
+  state.player.hp = performerMaxHp(state, content);
+}
+
 export function setLevel(state: GameState, skill: SkillId, level: number): void {
   state.skills[skill]!.xp = xpAt(level);
+  // A character set up by hand at a Vitality level is at full health, as a fresh start was before health carried over.
+  if (skill === 'vit') fullHp(state);
 }
 
 export function start(kind: string, id: string, slot = 0) {

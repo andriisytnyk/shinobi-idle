@@ -4,6 +4,7 @@ import {
   analyzeFight,
   defaultRules,
   dispatch,
+  restartReady,
   unlockBoss,
   type Analysis,
   type AnalysisTarget,
@@ -143,7 +144,11 @@ export function play(c: Case, seed: number, minutes: number): Played {
     }
     state.events = [];
     if (outAt === null && heal() === 0) outAt = t / 60_000;
-    if (!state.slots.some((s) => s.action?.kind === 'fight' || s.action?.kind === 'operation')) {
+    // After a defeat the player waits for health (K.restartHp) before going back, as the forecast's sessions do.
+    if (
+      !state.slots.some((s) => s.action?.kind === 'fight' || s.action?.kind === 'operation') &&
+      restartReady(state, content)
+    ) {
       start();
     }
   }

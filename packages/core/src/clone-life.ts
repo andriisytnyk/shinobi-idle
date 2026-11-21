@@ -4,6 +4,7 @@ import { addCurrency, addItem, removeItem } from './bank.ts';
 import { cloneTechniqueOf, growSlots, slotCount } from './clone.ts';
 import { playerMaxChakra } from './combat/stats.ts';
 import { refillPouch } from './combat/pouch.ts';
+import { performerMaxHp } from './combat/vitality.ts';
 import { followChakraPool, previewAllyEarnings } from './combat/system.ts';
 import type { CommandResult } from './engine.ts';
 import { emit } from './events.ts';
@@ -192,6 +193,7 @@ export function probeBody(state: GameState, content: ContentDb): CloneBody {
     pouch: { slots: state.pouch.slots.map((s) => ({ id: s.id, n: 0 })), medic: state.pouch.medic },
     xp: {},
     mastery: {},
+    hp: performerMaxHp(state, content),
     fight: null,
   };
 }
@@ -259,6 +261,7 @@ export function createClone(
     },
     xp: {},
     mastery: {},
+    hp: performerMaxHp(state, content),
     fight: null,
   };
   // Whatever slot state a clone slot had is gone: it holds the clone's stand now.

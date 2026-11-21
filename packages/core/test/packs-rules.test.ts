@@ -71,7 +71,7 @@ describe('addRule and wrapRule', () => {
     const rules = addRule(addRule(defaultRules, 'modifierProviders', provider), 'systems', noop);
     expect(rules.modifierProviders.at(-1)).toBe(provider);
     expect(rules.systems).toHaveLength(defaultRules.systems.length + 1);
-    expect(defaultRules.systems).toHaveLength(7);
+    expect(defaultRules.systems).toHaveLength(8);
     const kind = defaultRules.actionKinds.practice;
     if (!kind) throw new Error('practice');
     expect(addRule(defaultRules, 'actionKinds', 'x:kind', kind).actionKinds['x:kind']).toBe(kind);

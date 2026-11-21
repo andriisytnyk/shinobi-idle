@@ -63,6 +63,8 @@ export interface AnbuReport {
   dispelled?: CloneDispelledEvent[];
   /** Raids that arrived or ended while away. */
   raids: RaidAway[];
+  /** The health when the time away began and ended, when it changed by at least a point. */
+  hp?: { before: number; after: number; max: number };
   /** Items and currency that reached the Bank while away (the net gain). */
   gained?: { items: { id: string; n: number }[]; currencies: { id: string; n: number }[] };
 }
@@ -107,6 +109,9 @@ export function buildReport(summary: OfflineSummary): AnbuReport | null {
     dispelled: summary.clonesDispelled ?? [],
     raids: summary.raids ?? [],
     gained: { items, currencies },
+    ...(summary.hp && Math.abs(summary.hp.after - summary.hp.before) >= 1
+      ? { hp: summary.hp }
+      : {}),
   };
 }
 

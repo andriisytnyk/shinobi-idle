@@ -26,6 +26,11 @@ export function formatBonus(factor: number): string {
   return `${pct < 0 ? '−' : '+'}${text}%`;
 }
 
+/** Health per second: two decimals under a tenth (`0,06`), one above (`0,4`). */
+export function formatHpRate(n: number): string {
+  return (n < 0.1 ? twoDecimals : oneDecimal).format(n);
+}
+
 /** Seconds with one decimal, e.g. `4,5 с`. */
 export function formatSeconds(ms: number): string {
   return t('format.seconds', { n: oneDecimal.format(ms / 1000) });
