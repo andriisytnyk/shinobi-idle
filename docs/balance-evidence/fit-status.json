@@ -445,27 +445,27 @@
       "basic": true
     },
     "core:boss_wolf": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
     "core:boss_ren1": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
     "core:boss_fighter": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
     "core:boss_hunter": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     },
     "core:boss_twins": {
-      "time": false,
+      "time": true,
       "win": true,
       "basic": true
     },
@@ -480,7 +480,7 @@
       "basic": true
     },
     "core:boss_ren2": {
-      "time": true,
+      "time": false,
       "win": true,
       "basic": true
     }
