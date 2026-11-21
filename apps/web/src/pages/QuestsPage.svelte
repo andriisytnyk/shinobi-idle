@@ -3,10 +3,12 @@
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
   import JournalTabs from '../components/JournalTabs.svelte';
+  import PinGoal from '../components/PinGoal.svelte';
   import QuestObjective from '../components/QuestObjective.svelte';
   import { entityDesc } from '../lib/entities.ts';
   import { hasKey, t } from '../lib/i18n.ts';
-  import { stepStatus } from '../lib/next-step.ts';
+  import StepGo from '../components/StepGo.svelte';
+  import { objectiveTarget, stepStatus } from '../lib/next-step.ts';
   import { MASK } from '../lib/reveal.ts';
   import { game } from '../lib/store.ts';
   import SimplePage from './SimplePage.svelte';
@@ -29,6 +31,7 @@
         <span class="count"
           >{t('quests.steps', { done: progress?.step ?? 0, total: quest.steps.length })}</span
         >
+        <PinGoal kind="quest" id={quest.id} always />
       </p>
     {/if}
     {#if entityDesc({ kind: 'quest', id: quest.id })}
@@ -65,6 +68,9 @@
           {:else}
             <p class="text">{t(step.textKey)}</p>
             <div class="objective"><QuestObjective {quest} index={i} /></div>
+            {#if status === 'current'}<StepGo
+                target={objectiveTarget(game.state, step.objective, content)}
+              />{/if}
           {/if}
         </li>
       {/each}

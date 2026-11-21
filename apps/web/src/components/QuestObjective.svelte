@@ -11,6 +11,7 @@
     counterLabel,
     counterMission,
     counterProgress,
+    counterRegion,
     withoutRankRows,
   } from '../lib/next-step.ts';
   import { game } from '../lib/store.ts';
@@ -46,11 +47,7 @@
   const mission = $derived(objective?.t === 'counter' ? counterMission(objective.counter) : null);
   /** The region an `explored.<region>` counter counts cells of. */
   const label = $derived(objective?.t === 'counter' ? counterLabel(objective.counter) : null);
-  const region = $derived(
-    objective?.t === 'counter' && objective.counter.startsWith('explored.')
-      ? objective.counter.slice('explored.'.length)
-      : null,
-  );
+  const where = $derived(objective?.t === 'counter' ? counterRegion(objective.counter) : null);
   /** A payment objective: the currency, how much it costs and what the player holds. */
   const payment = $derived(
     game.read((gs) => {
@@ -85,8 +82,9 @@
     <span class="label">
       {#if objective?.t === 'counter' && objective.also?.length}
         <span class="detail">{t('quests.killsMany')}</span>
-      {:else if region}
-        <span class="detail">{t('quests.explored')}</span> <EntityLink kind="region" id={region} />
+      {:else if where}
+        <span class="detail">{t(where.surveyed ? 'quests.surveyed' : 'quests.explored')}</span>
+        <EntityLink kind="region" id={where.region} />
       {:else if enemy}
         <span class="detail">{t('quests.kill')}</span>
         <EntityLink

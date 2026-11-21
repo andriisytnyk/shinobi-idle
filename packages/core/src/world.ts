@@ -42,6 +42,7 @@ import { actionFloor, activitySkill, currencyOf, moneyOf } from './vocab.ts';
 import { evalReq, reqMet, skillLevel, type Req } from './requirements.ts';
 import type { Rules } from './rules.ts';
 import type { GameState } from './state.ts';
+import { createWorld } from './world-state.ts';
 
 /** The action kind that surveys a hex; the action id is the address of the hex (a cell id, or its key). */
 export const EXPLORE_KIND = 'explore';
@@ -54,6 +55,52 @@ export const AUTOSURVEY_ID = 'vision';
 
 /** Counter of the cells of a region explored to level 1 or more; quests count it from a step's start. */
 export const exploredKey = (regionId: string): string => `explored.${regionId}`;
+
+/** The counter of the hexes of a region surveyed to their first level: named cells and plain hexes alike, each counted once. */
+export const surveyedKey = (regionId: string): string => `surveyed.${regionId}`;
+
+/** The region a hex belongs to: that of its cell, or of the nearest cell for a hex that is none (the first on a tie). */
+export function regionOfHex(content: ContentDb, subject: Subject): string | null {
+  if (subject.cell) return subject.cell.region;
+  let best: Cell | null = null;
+  let bestDistance = Infinity;
+  for (const cell of content.cells) {
+    const d = hexDistance(subject.hex, { q: cell.hex[0], r: cell.hex[1] });
+    if (d < bestDistance) {
+      best = cell;
+      bestDistance = d;
+    }
+  }
+  return best?.region ?? null;
+}
+
+/** Counts a hex that has just been surveyed to its first level for its region. */
+function countSurveyed(state: GameState, subject: Subject, content: ContentDb): void {
+  const region = regionOfHex(content, subject);
+  if (region !== null) bump(state, surveyedKey(region));
+}
+
+/**
+ * The surveyed counter of every region, counted from a table of surveys (address to surveys done),
+ * for a save made before the counters existed. The plain hexes that still hold the value the start
+ * of a game seeded (`createWorld`) are not counted: they are no work of the player.
+ */
+export function surveyedCounts(
+  explores: Readonly<Record<string, unknown>>,
+  content: ContentDb,
+): Record<string, number> {
+  const counts: Record<string, number> = {};
+  const seeded = createWorld(content).explores;
+  for (const [address, done] of Object.entries(explores)) {
+    const subject = subjectOf(content, address);
+    if (!subject || typeof done !== 'number' || seeded[address] === done) continue;
+    const first = subject.cell ? levelForExplores(done, content) : plainLevelFor(done, content);
+    const region = first >= 1 ? regionOfHex(content, subject) : null;
+    if (region !== null) counts[surveyedKey(region)] = (counts[surveyedKey(region)] ?? 0) + 1;
+  }
+  return counts;
+}
+
 /** Flag raised when a point of interest is found. */
 export const poiFlag = (poiId: string): string => `poi.${poiId}`;
 /** Flag counting the deposits found for a building of the village (+1 level each). */
@@ -306,6 +353,8 @@ function exploreOnce(state: GameState, cell: Cell, content: ContentDb, rules: Ru
     if (intel !== null) addCurrency(state, intel, K.intel.perCellLevel);
     if (after === 1) {
       state.world.surveyed[hexKey(cell.hex[0], cell.hex[1])] = true;
+      const subject = subjectOf(content, cell.id);
+      if (subject) countSurveyed(state, subject, content);
       discover(state, cell);
     }
     emit(state, { type: 'cellLevelUp', cell: cell.id, level: after, max: after >= max });
@@ -324,6 +373,7 @@ function plainOnce(state: GameState, subject: Subject, content: ContentDb, rules
   state.world.explores[subject.address] = before + 1;
   const after = plainLevelFor(before + 1, content);
   if (after >= 1) state.world.surveyed[hexKey(subject.hex.q, subject.hex.r)] = true;
+  if (after >= 1 && level < 1) countSurveyed(state, subject, content);
   if (after > level)
     emit(state, { type: 'hexSurveyed', hex: subject.address, level: after, max: after >= max });
   return after >= max;

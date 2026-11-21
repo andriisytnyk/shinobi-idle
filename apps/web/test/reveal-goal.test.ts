@@ -20,7 +20,7 @@ const textsOf = ({ kind, id }: { kind: string; id: string }) => ({
 describe('goals and pins (R1)', () => {
   it('keeps the tree of a goal that is shown by name (what opens it is no spoiler)', () => {
     const state = freshState();
-    state.goal = { kind: 'mission', id: 'core:cat' };
+    state.goals = [{ kind: 'mission', id: 'core:cat' }];
     game.replaceState(state);
     const body = render(GoalPanel, { props: { onClose: () => {} }, context: coreContext() }).body;
     expect(body).not.toContain('data-goal-unrevealed');
@@ -40,7 +40,7 @@ describe('goals and pins (R1)', () => {
 
   it('prints a hidden pinned goal as «???» with its hint, never its name or tree', () => {
     const state = freshState();
-    state.goal = { kind: 'boss', id: 'core:boss_ren2' };
+    state.goals = [{ kind: 'boss', id: 'core:boss_ren2' }];
     game.replaceState(state);
     const body = render(GoalPanel, { props: { onClose: () => {} }, context: coreContext() }).body;
     expect(body).toContain('data-goal-unrevealed');

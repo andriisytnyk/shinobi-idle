@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { GOAL_CAP, isStoryGoal } from '@shinobi/core';
   import { t } from '../lib/i18n.ts';
   import { nameShown } from '../lib/reveal.ts';
   import { game } from '../lib/store.ts';
@@ -17,21 +18,29 @@
 
   let { kind, id, variant = 'icon', always = false }: Props = $props();
 
-  const pinned = $derived(game.read((gs) => gs.goal?.kind === kind && gs.goal.id === id));
+  const content = game.content;
+  const pinned = $derived(game.read((gs) => gs.goals.some((g) => g.kind === kind && g.id === id)));
+  /** The chain of the main story is always a goal: it has no pin to press. */
+  const story = $derived(isStoryGoal({ kind, id }, content));
+  /** With the cap reached the pin explains why it does nothing, until a goal is let go. */
+  const full = $derived(game.read((gs) => !pinned && gs.goals.length >= GOAL_CAP));
   /** A goal is never offered for an entity the player has not discovered. */
   const offered = $derived(nameShown({ kind, id }));
-  const label = $derived(t(pinned ? 'meta.unpin' : 'meta.pin'));
+  const label = $derived(
+    pinned ? t('meta.unpin') : full ? t('meta.pinFull', { n: GOAL_CAP }) : t('meta.pin'),
+  );
 
-  /** Pinning another entity replaces the goal; pinning the pinned one lets it go. */
+  /** Pinning adds a goal to the list; pressing the pin of a pinned one lets it go. */
   function toggle(): void {
+    if (full) return;
     const result = pinned
-      ? game.dispatch({ type: 'goal.clear' })
-      : game.dispatch({ type: 'goal.set', ref: { kind, id } });
+      ? game.dispatch({ type: 'goal.unpin', ref: { kind, id } })
+      : game.dispatch({ type: 'goal.pin', ref: { kind, id } });
     if (!result.ok) toasts.push({ key: result.reason, params: refusalParams(result) });
   }
 </script>
 
-{#if !offered}
+{#if !offered || story}
   <!-- hidden: nothing to pin yet -->
 {:else if variant === 'button'}
   <button
@@ -40,6 +49,7 @@
     data-ui="pin-goal"
     data-entity="{kind}:{id}"
     data-pinned={pinned}
+    disabled={full}
     onclick={toggle}
   >
     <Icon name="lucide:pin" size={16} />
@@ -52,6 +62,7 @@
     data-ui="pin-goal"
     data-entity="{kind}:{id}"
     data-pinned={pinned}
+    disabled={full}
     onclick={toggle}
   >
     {label}
@@ -60,13 +71,14 @@
   <button
     type="button"
     class="pin"
-    class:always={always || pinned}
+    class:always={always || pinned || full}
     data-ui="pin-goal"
     data-entity="{kind}:{id}"
     data-pinned={pinned}
     aria-label={label}
     aria-pressed={pinned}
     title={label}
+    disabled={full}
     onclick={toggle}
   >
     <Icon name="lucide:pin" size={16} />
@@ -152,6 +164,12 @@
   .text[data-pinned='true'] {
     background: var(--accent);
     color: var(--ink-900);
+  }
+
+  .pin:disabled,
+  .text:disabled,
+  .link:disabled {
+    cursor: not-allowed;
   }
 
   .link {
