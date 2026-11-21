@@ -176,7 +176,7 @@ describe('fog and the survey range', () => {
     const key = fogPlain(state, K.map.startRadius + 1);
     // Out of the range of 2? The hex is 3 away from the start: too far.
     expect(refusal(state, survey(key))).toBe('error.outOfRange');
-    setLevel(state, 'scout', 10);
+    setLevel(state, 'scout', 30);
     expect(surveyRange(state, content)).toBe(3);
     ok(state, survey(key));
     advance(state, 10 * MIN, content);
@@ -187,7 +187,7 @@ describe('fog and the survey range', () => {
   it('keeps a hex behind fog out of reach until surveyed ground touches it', () => {
     const state = genin();
     setLevel(state, 'scout', 99);
-    const far = fogPlain(state, 5);
+    const far = fogPlain(state, 4);
     const at = parseHexKey(far)!;
     expect(surveyAccess(state, content, at)).toBe('cutOff');
     expect(refusal(state, survey(far))).toBe('error.cutOff');
@@ -221,7 +221,7 @@ describe('fog and the survey range', () => {
 
   it('makes a hex passable when it reaches level 1, and not before', () => {
     const state = genin();
-    setLevel(state, 'scout', 10);
+    setLevel(state, 'scout', 30);
     const key = fogPlain(state, K.map.startRadius + 1);
     const need = K.map.plainSurvey[0]!;
     const each = Math.round(
@@ -281,7 +281,7 @@ describe('what the fog gives away', () => {
 
   it('keeps the list of hexes while nothing it shows changes, and makes it again when it does', () => {
     const state = genin();
-    setLevel(state, 'scout', 10);
+    setLevel(state, 'scout', 30);
     const first = listHexes(state, content, defaultRules, 0, 'playable');
     expect(first.every((i) => i.playable)).toBe(true);
     expect(first).toHaveLength(content.hexes.filter((h) => h.terrain).length);
@@ -337,7 +337,7 @@ describe('routes', () => {
 describe('surveying a plain hex', () => {
   it('trains Scouting, has two levels and stops by itself at the top', () => {
     const state = genin();
-    setLevel(state, 'scout', 10);
+    setLevel(state, 'scout', 30);
     const key = fogPlain(state, K.map.startRadius + 1);
     ok(state, survey(key));
     const levels = K.map.plainSurvey.length;

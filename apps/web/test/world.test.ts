@@ -110,6 +110,8 @@ const click = (el: Element | null) => {
 
 describe('A3: the map follows the core', () => {
   it('a survey that finishes updates the hex', () => {
+    // The cell is three hexes from the start: the range at Scouting 30.
+    game.state.skills.scout!.xp = xpAt(30);
     show();
     expect(tile(PLAIN_CELL)?.getAttribute('data-state')).toBe('marked');
     expect(tile(PLAIN_CELL)?.querySelectorAll('.pip')).toHaveLength(
@@ -214,8 +216,8 @@ describe('the map page', () => {
 
   it('refuses to survey a hex behind fog until surveyed land reaches it', () => {
     const state = genin();
-    // Scouting 25 reaches four hexes; this hex lies four away with only fog round it.
-    state.skills.scout!.xp = xpAt(25);
+    // Scouting 45 reaches four hexes; this hex lies four away with only fog round it.
+    state.skills.scout!.xp = xpAt(45);
     game.replaceState(state);
     show();
     click(hexEl('10,13'));
@@ -369,6 +371,8 @@ describe('A5: a disabled control says why', () => {
   it('Scouting too low for the next level', () => {
     const state = genin();
     explored(state, PLAIN_CELL);
+    // Standing on the cell, so that it is in range and only the level is lacking.
+    state.world.location = PLAIN_CELL;
     game.replaceState(state);
     show({ cell: PLAIN_CELL, region: FOREST });
     expect(q('[data-explore]')?.hasAttribute('disabled')).toBe(true);
@@ -476,6 +480,7 @@ describe('the hex panel keeps its actions in view', () => {
 
 describe('P4: what is being surveyed, and the order of the auto-survey', () => {
   it('marks the hex being surveyed with the performer and shows its progress and time left', () => {
+    game.state.skills.scout!.xp = xpAt(30);
     show();
     expect(
       game.dispatch({ type: 'action.start', slot: 0, kind: 'explore', id: PLAIN_CELL }).ok,
