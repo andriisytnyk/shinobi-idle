@@ -5,7 +5,6 @@ import { sharesOf, summonSpecOf } from './fight-allies.ts';
 import { cloneRoleOf, copiesHand, pickCloneHand } from './fight-roles.ts';
 import { targetPriorityOf } from './fight-priority.ts';
 import { chosenTarget } from './fight-ai.ts';
-import { MS_PER_SECOND } from '../formulas.ts';
 import { figure, need } from './need.ts';
 import { answersTraitData, balanceOf, beatenBy, fightData, type TraitMod } from './fight-data.ts';
 import {
@@ -1283,6 +1282,9 @@ function buildView(ctx: FightCtx, actor: Combatant): FightView {
   // The helpers a leader calls back while he lives are named by the data of the boss entry.
   const callsBack = content.bosses.find((b) => b.id === fight.encounter.id)?.special.companions;
   const callsBackHook = callsBack?.respawns === true ? callsBack.hook : undefined;
+  const kindOf = (e: Combatant): string => `${e.entry}|${e.specials.join(',')}`;
+  const watched = new Map<string, number>();
+  for (const e of fight.enemies) if (e.last !== null) watched.set(kindOf(e), e.damage);
   const enemies: ViewEnemy[] = living.map((e) => {
     const known = fight.knowledge[e.entry];
     const knownTraits = known ? e.traits.filter((t) => known.includes(t)) : [...e.traits];
@@ -1315,16 +1317,16 @@ function buildView(ctx: FightCtx, actor: Combatant): FightView {
         nextCastIn = info.inWork;
       }
     }
-    // Before an enemy has acted, its level is all the player has to go by; once it has swung, the player has seen what it does.
+    // The player has seen what a body of this kind does once one has swung; before that, its level is all there is to go by.
     const perHit =
-      e.last !== null ? e.damage : enemyStats({ cl: e.data[LEVEL_KEY] ?? 0 }, content).damage;
+      watched.get(kindOf(e)) ?? enemyStats({ cl: e.data[LEVEL_KEY] ?? 0 }, content).damage;
     const cycleMs = e.waitMs + e.strikeMs;
     return {
       id: e.id,
       hp: e.hp,
       hpShare: e.maxHp > 0 ? e.hp / e.maxHp : 0,
       cl: e.data[LEVEL_KEY] ?? 0,
-      dps: cycleMs > 0 ? (perHit * MS_PER_SECOND) / cycleMs : 0,
+      dps: cycleMs > 0 ? (perHit * secMs(1)) / cycleMs : 0,
       respawns: mechanicKnown && callsBackHook !== undefined && e.specials.includes(callsBackHook),
       nature: e.nature,
       effects: viewEffects(fight, e),

@@ -1,5 +1,5 @@
-import { MS_PER_SECOND } from '../formulas.ts';
 import type { AiRuleId } from '@shinobi/content';
+import { secMs } from './numbers.ts';
 import type {
   CombatAi,
   Decision,
@@ -209,7 +209,7 @@ const weakest = (list: readonly ViewEnemy[]): ViewEnemy | undefined =>
 function mostValuable(view: FightView): ViewEnemy | undefined {
   // One blow of the best single-target attack, and the time it takes; with no attack at hand, a blow of 1 a second.
   let blow = 1;
-  let blowMs = MS_PER_SECOND;
+  let blowMs = secMs(1);
   let rate = 0;
   for (const r of view.techniques) {
     if (!(r.expected > 0)) continue;
@@ -257,6 +257,7 @@ export function chosenTarget(view: FightView): ViewEnemy | undefined {
 
 /** Attacks go to the body the player's target priority names; everything else is left to the engine's choice. */
 function aimed(view: FightView, decision: Decision): Decision {
+  if (decision.type === 'wait' || decision.target !== undefined) return decision;
   // An area technique strikes every body: it keeps its own rule and has no one to be aimed at.
   if (decision.type === 'technique') {
     const used = view.techniques.find((r) => r.tech.id === decision.id);

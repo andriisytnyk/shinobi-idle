@@ -495,7 +495,7 @@ export interface ViewEnemy {
   cl: number;
   /**
    * What the player can tell of the damage this body deals to the player's side, per second: what its level
-   * promises before it has acted, and its blows as the player has watched them after; over its attack cycle.
+   * promises until a body of its kind has acted, and its blows as the player has watched them after; over its attack cycle.
    */
   dps: number;
   /** The body is one the leader calls back while he lives (known once the player knows the mechanic), so killing it buys little. */

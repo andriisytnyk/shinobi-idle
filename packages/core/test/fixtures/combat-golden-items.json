@@ -24583,7 +24583,7 @@
    ],
    [
     1,
-    102214,
+    105465,
     [
      [
       "3f9af6d09f14d5b9",
@@ -24666,7 +24666,7 @@
       ]
      ],
      [
-      "64b99f73fcefff7a",
+      "9d58e8f077822beb",
       [
        [],
        [],
@@ -24706,7 +24706,7 @@
       ]
      ],
      [
-      "0a3ed32c68bc48f9",
+      "3459be62cd66aa07",
       [
        [],
        [],
@@ -24726,7 +24726,7 @@
       ]
      ],
      [
-      "85d7a59f86ddb4ba",
+      "f015de838a97c195",
       [
        [],
        [],
@@ -24736,7 +24736,7 @@
       ]
      ],
      [
-      "5b34ce9e46f30d46",
+      "f4e259fcc3b27062",
       [
        [],
        [],
@@ -24756,7 +24756,7 @@
       ]
      ],
      [
-      "6eead8744d7ad471",
+      "179694e95a37c51c",
       [
        [],
        [],
@@ -24787,19 +24787,19 @@
      ]
     ],
     {
-     "core:running_fire": 255.32799999999992,
-     "core:tag": 234.546,
-     "core:leaf_whirlwind": 97.77489494949496,
-     "core:leaf_gale": 143.30328888888891,
-     "core:dynamic_entry": 151.6464707070709,
-     "core:double_suicide_decapitation": 12.506818181818183,
+     "core:running_fire": 254.7989999999999,
+     "core:tag": 214.72143434343434,
+     "core:leaf_whirlwind": 84.67921616161615,
+     "core:leaf_gale": 117.24814545454547,
+     "core:dynamic_entry": 149.10476767676772,
+     "core:double_suicide_decapitation": 20.65909090909091,
      "core:kunai": 72,
-     "core:shadow_shuriken": 63.86872727272726,
-     "basic": 131.005
+     "core:shadow_shuriken": 96.48254545454544,
+     "basic": 152.285
     },
     {
      "core:sonnyi_poroshok": 4,
-     "core:running_fire": 5,
+     "core:running_fire": 6,
      "core:tag": 4,
      "core:leaf_whirlwind": 10,
      "core:leaf_gale": 10,
@@ -24809,12 +24809,12 @@
      "core:kunai": 4
     },
     {
-     "burn": 16,
-     "interrupt": 29,
-     "bind": 2
+     "burn": 15,
+     "interrupt": 28,
+     "bind": 3
     },
     {},
-    95.64867999999997,
+    177.39735999999985,
     0,
     [
      4,
@@ -24828,8 +24828,8 @@
     ]
    ],
    [
-    1,
-    110811,
+    2,
+    87025,
     [
      [
       "40dd5c2a673223aa",
@@ -24912,7 +24912,7 @@
       ]
      ],
      [
-      "9472204271d0e8e8",
+      "3459be62cd66aa07",
       [
        [],
        [],
@@ -24932,7 +24932,7 @@
       ]
      ],
      [
-      "5bc5675d11b945d0",
+      "973508105fbaacd6",
       [
        [],
        [],
@@ -24942,7 +24942,7 @@
       ]
      ],
      [
-      "4e6b342f2ff5f8ea",
+      "3459be62cd66aa07",
       [
        [],
        [],
@@ -24952,7 +24952,7 @@
       ]
      ],
      [
-      "4e6b342f2ff5f8ea",
+      "7016e0201871218a",
       [
        [],
        [],
@@ -24972,7 +24972,7 @@
       ]
      ],
      [
-      "a335a848434975bd",
+      "25ada3d0b236115e",
       [
        [],
        [],
@@ -24982,7 +24982,7 @@
       ]
      ],
      [
-      "97dbb29b994703f7",
+      "86e7ca95be5e4b31",
       [
        [],
        [],
@@ -25002,7 +25002,7 @@
       ]
      ],
      [
-      "d335f67d483c1f43",
+      "3459be62cd66aa07",
       [
        [],
        [],
@@ -25033,34 +25033,32 @@
      ]
     ],
     {
-     "core:running_fire": 181.3879999999998,
-     "core:tag": 276.966,
-     "core:leaf_gale": 156.03169494949498,
-     "core:shadow_shuriken": 129.70354545454546,
+     "core:running_fire": 160.91599999999985,
+     "core:tag": 257.14143434343436,
+     "core:leaf_gale": 153.0739676767677,
+     "core:shadow_shuriken": 89.68799999999999,
      "core:kunai": 36,
-     "core:leaf_whirlwind": 89.56455555555556,
-     "core:dynamic_entry": 105.88386868686868,
-     "basic": 172.20971717171736,
-     "core:double_suicide_decapitation": 14.23181818181818
+     "core:leaf_whirlwind": 53.738733333333336,
+     "core:dynamic_entry": 127.44363636363634,
+     "basic": 127.68
     },
     {
      "core:sonnyi_poroshok": 4,
-     "core:running_fire": 6,
+     "core:running_fire": 5,
      "core:tag": 4,
-     "core:leaf_whirlwind": 11,
-     "core:leaf_gale": 11,
-     "core:dynamic_entry": 14,
-     "core:shadow_shuriken": 12,
-     "core:double_suicide_decapitation": 4,
+     "core:leaf_whirlwind": 8,
+     "core:leaf_gale": 8,
+     "core:dynamic_entry": 12,
+     "core:shadow_shuriken": 9,
+     "core:double_suicide_decapitation": 3,
      "core:kunai": 4
     },
     {
-     "burn": 12,
-     "interrupt": 32,
-     "bind": 2
+     "burn": 10,
+     "interrupt": 26
     },
     {},
-    236.9713699999999,
+    241.99999999999994,
     0,
     [
      4,
@@ -25321,7 +25319,7 @@
    ],
    [
     1,
-    118761,
+    105612,
     [
      [
       "f2419ecc17938215",
@@ -25404,7 +25402,7 @@
       ]
      ],
      [
-      "a025182d5332ac78",
+      "3cf479bed5be5754",
       [
        [],
        [],
@@ -25454,7 +25452,7 @@
       ]
      ],
      [
-      "a1f629fed0d6a1c8",
+      "cdeb90756201ee77",
       [
        [],
        [],
@@ -25464,7 +25462,7 @@
       ]
      ],
      [
-      "a3bf6019d64e557b",
+      "49c348140621d9f4",
       [
        [],
        [],
@@ -25484,7 +25482,17 @@
       ]
      ],
      [
-      "637b9d1cea27b93d",
+      "3459be62cd66aa07",
+      [
+       [],
+       [],
+       [],
+       [],
+       []
+      ]
+     ],
+     [
+      "f7e0ac26748f1f7c",
       [
        [],
        [],
@@ -25504,17 +25512,7 @@
       ]
      ],
      [
-      "3459be62cd66aa07",
-      [
-       [],
-       [],
-       [],
-       [],
-       []
-      ]
-     ],
-     [
-      "3459be62cd66aa07",
+      "721c5c29e7f6fb2f",
       [
        [],
        [],
@@ -25525,34 +25523,34 @@
      ]
     ],
     {
-     "core:running_fire": 169.17499999999987,
-     "core:tag": 276.966,
-     "core:leaf_whirlwind": 169.83053939393943,
-     "core:leaf_gale": 104.97078787878787,
-     "core:dynamic_entry": 136.43218585858585,
+     "core:running_fire": 126.2499999999999,
+     "core:tag": 257.14143434343436,
+     "core:leaf_whirlwind": 179.12911111111114,
+     "core:leaf_gale": 107.33255555555556,
+     "core:dynamic_entry": 154.34840404040406,
      "core:kunai": 54,
-     "core:shadow_shuriken": 111.43054545454544,
-     "basic": 119.89232323232324,
-     "core:double_suicide_decapitation": 19.28181818181818
+     "core:shadow_shuriken": 106.74447272727285,
+     "basic": 166.728,
+     "core:double_suicide_decapitation": 10.30522222222222
     },
     {
      "core:sonnyi_poroshok": 4,
      "core:running_fire": 6,
      "core:tag": 4,
-     "core:leaf_whirlwind": 12,
-     "core:leaf_gale": 11,
-     "core:dynamic_entry": 16,
-     "core:shadow_shuriken": 13,
+     "core:leaf_whirlwind": 10,
+     "core:leaf_gale": 10,
+     "core:dynamic_entry": 14,
+     "core:shadow_shuriken": 12,
      "core:double_suicide_decapitation": 4,
      "core:kunai": 4
     },
     {
-     "burn": 11,
-     "interrupt": 35,
-     "bind": 3
+     "burn": 8,
+     "interrupt": 36,
+     "bind": 2
     },
     {},
-    163.56268999999983,
+    77.64400999999992,
     0,
     [
      4,
@@ -25567,7 +25565,7 @@
    ],
    [
     1,
-    98153,
+    96630,
     [
      [
       "3f9af6d09f14d5b9",
@@ -25730,7 +25728,7 @@
       ]
      ],
      [
-      "2355598667afd068",
+      "5f20faa1f2e660c6",
       [
        [],
        [],
@@ -25740,7 +25738,7 @@
       ]
      ],
      [
-      "179694e95a37c51c",
+      "97dfd26c2372f4f5",
       [
        [],
        [],
@@ -25760,7 +25758,7 @@
       ]
      ],
      [
-      "0171d34ad8d171fb",
+      "1a1736fc68b0ef98",
       [
        [],
        [],
@@ -25771,21 +25769,21 @@
      ]
     ],
     {
-     "core:running_fire": 196.3439999999999,
+     "core:running_fire": 197.1519999999999,
      "core:tag": 234.546,
-     "core:leaf_whirlwind": 140.83205656565661,
-     "core:leaf_gale": 130.2757171717172,
-     "core:dynamic_entry": 104.85206262626286,
-     "core:shadow_shuriken": 123.66072727272726,
-     "core:double_suicide_decapitation": 28.46363636363636,
+     "core:leaf_whirlwind": 139.72425656565682,
+     "core:leaf_gale": 135.01614545454547,
+     "core:dynamic_entry": 120.36343434343434,
+     "core:shadow_shuriken": 134.53199999999998,
+     "core:double_suicide_decapitation": 26.371363636363633,
      "core:kunai": 72,
-     "basic": 131.005
+     "basic": 102.274
     },
     {
      "core:sonnyi_poroshok": 4,
      "core:running_fire": 5,
      "core:tag": 4,
-     "core:leaf_whirlwind": 10,
+     "core:leaf_whirlwind": 9,
      "core:leaf_gale": 9,
      "core:dynamic_entry": 13,
      "core:shadow_shuriken": 10,
@@ -25794,11 +25792,11 @@
     },
     {
      "burn": 12,
-     "interrupt": 32,
+     "interrupt": 33,
      "bind": 4
     },
     {},
-    156.61268999999984,
+    158.69768999999982,
     0,
     [
      4,

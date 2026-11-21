@@ -13650,24 +13650,24 @@
   "core:boss_wolf": [
    [
     2,
-    99265,
+    95289,
     {
-     "core:running_fire": 293.4579999999998,
+     "core:running_fire": 263.28199999999987,
      "core:leaf_whirlwind": 153.0739676767677,
-     "core:leaf_gale": 125.39037777777779,
-     "core:dynamic_entry": 144.4361212121212,
-     "core:shadow_shuriken": 74.74,
-     "core:double_suicide_decapitation": 16.986363636363635,
-     "basic": 234.08
+     "core:leaf_gale": 112.36280606060606,
+     "core:dynamic_entry": 133.10779797979797,
+     "core:shadow_shuriken": 63.86872727272727,
+     "core:double_suicide_decapitation": 22.036363636363635,
+     "basic": 255.36
     },
     {
-     "burn": 16,
-     "interrupt": 29,
-     "bind": 2
+     "burn": 12,
+     "interrupt": 26,
+     "bind": 3
     },
     {},
-    242.00000000000009,
-    6
+    242.0000000000001,
+    7
    ],
    [
     1,
@@ -14027,25 +14027,25 @@
     5
    ],
    [
-    1,
-    136633,
+    2,
+    94596,
     {
-     "core:running_fire": 303.64299999999974,
-     "core:dynamic_entry": 133.60010505050502,
-     "core:shadow_shuriken": 137.24981818181817,
-     "core:double_suicide_decapitation": 23.77930707070712,
-     "basic": 312.176,
-     "core:leaf_whirlwind": 127.7690383838384,
-     "core:leaf_gale": 123.76193131313133
+     "core:running_fire": 229.55274949494944,
+     "core:dynamic_entry": 94.87470707070706,
+     "core:shadow_shuriken": 89.68799999999999,
+     "core:double_suicide_decapitation": 22.036363636363635,
+     "basic": 319.19999999999993,
+     "core:leaf_whirlwind": 133.53261010101014,
+     "core:leaf_gale": 71.65164444444444
     },
     {
-     "burn": 16,
-     "interrupt": 35,
-     "bind": 4
+     "burn": 12,
+     "interrupt": 23,
+     "bind": 3
     },
     {},
-    224.59202999999977,
-    13
+    242.00000000000006,
+    6
    ],
    [
     2,
@@ -21005,9 +21005,9 @@
   ]
  },
  "sessions": {
-  "wolfmask lvl 12 katon": "ea7c6ffd86bb88fa40db6132",
-  "kiri_hunter lvl 30 futon": "60ed8858d8061b40f09fd2db",
-  "merc_pack lvl 20 raiton": "b3a8dd203098ffd5c86e305d"
+  "wolfmask lvl 12 katon": "95d9e2371d18754c684a3266",
+  "kiri_hunter lvl 30 futon": "9a38ca30c4d28b33ca72920d",
+  "merc_pack lvl 20 raiton": "ba1784aabaf8b3afa93e89d2"
  },
  "analyses": {
   "zone": "94f269936bea1e9e25dafb0c",
