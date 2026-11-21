@@ -22,8 +22,8 @@ export type PlaceRule =
   | 'saved'
   /** The pouch: a slot with an item of the pack is emptied; the units come back to the slot if it is free, else to the bank. */
   | 'pouch'
-  /** The pinned goal: cleared while the pack is away, restored if nothing else was pinned. */
-  | 'goal';
+  /** The pinned goals: the ones of the pack are cut while it is away and come back where the list has room. */
+  | 'goals';
 
 export interface Place {
   /** Dotted path from the state; it also names the field of the dormant bucket. */
@@ -64,7 +64,7 @@ export const PLACES: readonly Place[] = [
   { path: 'loadouts.cloneRole', rule: 'single' },
   { path: 'loadouts.saved', rule: 'saved' },
   { path: 'pouch', rule: 'pouch' },
-  { path: 'goal', rule: 'goal' },
+  { path: 'goals', rule: 'goals' },
 ];
 
 /** What the loader does with each branch of the state. */
@@ -112,7 +112,7 @@ export const STATE_IDS: Record<keyof GameState, StateIdRule> = {
   team: 'recomputed',
   world: 'places',
   village: 'places',
-  goal: 'place',
+  goals: 'place',
   loadouts: 'places',
   pouch: 'place',
   wounds: 'none',
