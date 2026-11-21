@@ -169,13 +169,13 @@ describe('health across fights', () => {
     expect(state.combat?.fight.player.hp).toBe(before);
   });
 
-  it('regenerates in a fight on the same rate as outside it', () => {
+  it('regenerates in a fight on the rate it has outside it, times the share the balance gives the fight', () => {
     const state = fighter(14, 36);
     // A fight the character does not lose in a short time: a long wait is not needed, the first step is.
     state.player.hp = 100;
     startFight(state, WOLF);
     expect(state.combat?.fight.kit.hpRegen).toBeCloseTo(
-      performerHpRegen(state, content, defaultRules),
+      performerHpRegen(state, content, defaultRules) * K.combat.hpRegenShare,
       9,
     );
   });
@@ -184,7 +184,8 @@ describe('health across fights', () => {
     const state = fighter(15, 36);
     state.player.hp = 1;
     startFight(state, HARD);
-    advance(state, 5 * MIN, content);
+    // Second by second, up to the defeat: the check is of the moment the character wakes, before regeneration goes on.
+    for (let t = 0; t < 5 * MIN && state.slots[0]?.action; t += 1000) advance(state, 1000, content);
     expect(state.slots[0]?.action).toBeNull();
     const max = performerMaxHp(state, content);
     // The share of the maximum (the Wound the defeat cost has already cut the maximum), then the regeneration since.
