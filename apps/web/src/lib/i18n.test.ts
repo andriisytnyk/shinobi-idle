@@ -28,11 +28,11 @@ describe('t', () => {
   it('reports a placeholder no parameter filled, once, and stays quiet when all are filled', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     clearUnfilledPlaceholders();
-    t('error.notEnoughRyo', { price: 'Рьо: 5' });
+    t('course.notEnoughRyo', { price: 'Рьо: 5' });
     expect(unfilledPlaceholders()).toEqual([]);
-    expect(t('error.notEnoughRyo')).toContain('{price}');
-    t('error.notEnoughRyo');
-    expect(unfilledPlaceholders()).toEqual(['error.notEnoughRyo: {price}']);
+    expect(t('course.notEnoughRyo')).toContain('{price}');
+    t('course.notEnoughRyo');
+    expect(unfilledPlaceholders()).toEqual(['course.notEnoughRyo: {price}']);
     expect(warn).toHaveBeenCalledTimes(1);
     warn.mockRestore();
     clearUnfilledPlaceholders();

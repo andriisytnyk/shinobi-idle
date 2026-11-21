@@ -67,8 +67,10 @@
     t('course.price', { n: formatInt(cost), currency: currencyName(moneyOf(content)) });
 
   /** The text of a refusal; the one about ryo names the price of the obstacle. */
+  const pathReason = (reason: string): string =>
+    reason === 'error.notEnoughRyo' ? 'course.notEnoughRyo' : reason;
   const blockedText = (reason: string, cost: number): string =>
-    t(reason, { price: priceText(cost) });
+    t(pathReason(reason), { price: priceText(cost) });
 
   function report(
     result: {
@@ -80,7 +82,7 @@
   ): void {
     if (!result.ok && result.reason)
       toasts.push({
-        key: result.reason,
+        key: pathReason(result.reason),
         params: { price: priceText(cost), ...refusalParams(result) },
       });
   }
