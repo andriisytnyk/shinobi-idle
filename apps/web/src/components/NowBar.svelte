@@ -84,6 +84,8 @@
     mission: MissionNow | null;
     /** What a practised technique is doing right now. */
     practice: { phase: PhaseName; seal: { id: string; glyph: string } | null } | null;
+    /** A herb bush that was emptied is regrowing: the bar shows that pause (the core's `phaseMs`), not a gather. */
+    regrow: boolean;
     /** What the player does in a fight: a key of the fight page and the technique being cast. */
     fight: { key: string; tech: string | null } | null;
     /** A clone's chakra: the share left and the time it lasts at what it does now. */
@@ -102,7 +104,9 @@
         // Fights and exams are not skill tiles, so their cycle comes straight from their kind.
         const kind = game.rules.actionKinds[slot.action.kind];
         const intervalMs =
-          info?.intervalMs ?? kind?.intervalMs(state, slot.action.id, content, game.rules);
+          info?.phaseMs ??
+          info?.intervalMs ??
+          kind?.intervalMs(state, slot.action.id, content, game.rules);
         if (intervalMs === undefined) return;
         const isExplore = slot.action.kind === 'explore';
         const isWalk = slot.action.kind === 'walk';
@@ -175,6 +179,7 @@
           xpPerHour,
           mission: missionNow(state, index, game.content),
           practice,
+          regrow: info?.phaseMs !== undefined,
           fight,
           // What is left of the cycle in progress: the core's interval and the slot's progress, at the slot's share.
           surveyLeft:
@@ -229,6 +234,7 @@
   /** Whether the row has a line of its own beyond what the squad panel shows. */
   const hasDetail = (row: Row): boolean =>
     row.practice !== null ||
+    row.regrow ||
     row.fight !== null ||
     row.mission !== null ||
     row.walkLeft > 0 ||
@@ -318,6 +324,8 @@
                   {t(PHASE_KEY[row.practice.phase])}
                 {/if}
               </span>
+            {:else if row.regrow}
+              <span class="phrase" data-now-phase="regrow">{t('herb.regrowPhase')}</span>
             {:else if row.fight}
               <span class="phrase" data-now-fight>
                 {#if row.fight.tech}<span class="fight-tech" data-now-fight-tech

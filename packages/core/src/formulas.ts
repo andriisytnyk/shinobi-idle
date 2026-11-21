@@ -104,6 +104,21 @@ export function cycleSeconds(kind: PacedKind, action: Paced, content: ContentDb)
 }
 
 /**
+ * Herbs a bush of `size` gives over a long session of steady gathering at `cycle` seconds per herb: it regrows one
+ * herb every `K.field.regrowEachMs` meanwhile, so it holds out `size / (1 - cycle / each)` herbs before it is empty.
+ * A cycle not shorter than the regrow never empties it (Infinity).
+ */
+export function gatherRunLength(cycle: number, size: number, content: ContentDb): number {
+  const ratio = (cycle * MS_PER_SECOND) / content.balance.K.field.regrowEachMs;
+  return ratio >= 1 ? Infinity : size / (1 - ratio);
+}
+
+/** Seconds of the empty-bush pause that fall on one herb over a long session: `K.field.regrowMs` shared by the run. */
+export function gatherPauseShare(cycle: number, size: number, content: ContentDb): number {
+  return content.balance.K.field.regrowMs / MS_PER_SECOND / gatherRunLength(cycle, size, content);
+}
+
+/**
  * Skill XP one completed cycle pays before modifiers: the explicit number of the action, else the
  * pace of its level times its cycle (a craft pays `K.craftXpMult` times that; a herb also its share of
  * the regrow pause of a first-size bush). It never depends on mastery.
@@ -111,12 +126,10 @@ export function cycleSeconds(kind: PacedKind, action: Paced, content: ContentDb)
 export function cycleXp(kind: PacedKind, action: Paced, content: ContentDb): number {
   if (action.xp !== undefined) return action.xp;
   const K = content.balance.K;
-  const pause = kind === 'gather' ? K.field.regrowMs / MS_PER_SECOND / (K.field.stockBase + 1) : 0;
+  const cycle = cycleSeconds(kind, action, content);
+  const pause = kind === 'gather' ? gatherPauseShare(cycle, K.field.stockBase + 1, content) : 0;
   const mult = kind === 'craft' ? K.craftXpMult : 1;
-  return (
-    (rate(action.level, content) * (cycleSeconds(kind, action, content) + pause) * mult) /
-    SECONDS_PER_HOUR
-  );
+  return (rate(action.level, content) * (cycle + pause) * mult) / SECONDS_PER_HOUR;
 }
 
 /** The practice cycle of a technique at mastery 1 of the player's own nature, in seconds: what its XP is set against. */

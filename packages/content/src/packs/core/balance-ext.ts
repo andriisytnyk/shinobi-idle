@@ -55,8 +55,11 @@ export const BALANCE_EXT = {
   bindEva: 0.3,
   /** Chance to resist an Illusionist's illusion per Meditation level (Медитація ÷ 200). */
   illusionResist: 0.005,
-  /** Herb bushes: stock is stockBase plus the herb's mastery level; an empty bush regrows for regrowMs. */
-  field: { stockBase: 5, regrowMs: 5000 },
+  /**
+   * Herb bushes: stock is stockBase plus the herb's mastery level; a bush that is not empty regrows one herb every
+   * regrowEachMs (longer than a gathering cycle, so steady gathering slowly empties it); an empty one regrows whole after regrowMs.
+   */
+  field: { stockBase: 5, regrowEachMs: 10000, regrowMs: 7000 },
   /** Crafting mastery tiers (mastery levels 1 / 20 / 50 / 90): each tier above the first adds this chance of one bonus unit. */
   craftRules: { masteryTiers: [1, 20, 50, 90], bonusPerTier: 0.25 },
   /** A tonic holds at most this many times the charges of one tonic. */

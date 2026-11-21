@@ -23,6 +23,7 @@ import {
   shopPrice,
   woundHealMs,
   woundIntervalMs,
+  regrowEachMs,
   regrowMs,
   techniqueNumbers,
   travelPrice,
@@ -239,9 +240,15 @@ describe('A4: each wired key changes its mechanic by exactly the modifier', () =
       expect(regrowMs(s, content, defaultRules)).toBe(K.field.regrowMs);
       reach(s, 'herb', 25);
       expect(regrowMs(s, content, defaultRules)).toBe(Math.round(K.field.regrowMs * 0.9));
-      s.bushes[MINT] = { stock: 0, size: 5, carry: 0 };
+      expect(regrowEachMs(s, content, defaultRules)).toBe(Math.round(K.field.regrowEachMs * 0.9));
+      // An emptied bush: the phase is the (shortened) pause alone; a bush with herbs left: a gathering cycle.
+      s.bushes[MINT] = { stock: 0, size: 5, at: 0 };
       expect(gatherKind.intervalMs(s, MINT, content, defaultRules)).toBe(
-        Math.round(K.gather * 1000) + Math.round(K.field.regrowMs * 0.9),
+        Math.round(K.field.regrowMs * 0.9),
+      );
+      s.bushes[MINT] = { stock: 2, size: 5, at: 0 };
+      expect(gatherKind.intervalMs(s, MINT, content, defaultRules)).toBe(
+        Math.round(K.gather * 1000),
       );
     },
     'gather.double': () => {
@@ -249,7 +256,10 @@ describe('A4: each wired key changes its mechanic by exactly the modifier', () =
       const s = genin();
       reach(s, 'herb', 50);
       const gathers = 20_000;
-      for (let i = 0; i < gathers; i++) gatherKind.complete(s, MINT, content, defaultRules);
+      for (let i = 0; i < gathers; i++) {
+        delete s.bushes[MINT]; // time does not pass here: every gather finds a full bush
+        gatherKind.complete(s, MINT, content, defaultRules);
+      }
       const herbs = s.bank[MINT] ?? 0;
       expect(herbs / gathers).toBeGreaterThan(1.05 - 0.01);
       expect(herbs / gathers).toBeLessThan(1.05 + 0.01);

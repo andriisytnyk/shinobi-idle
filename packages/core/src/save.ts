@@ -37,7 +37,7 @@ import {
   stashMissing,
 } from './pack-data.ts';
 import { bushSize } from './field.ts';
-import { cycleSeconds, MS_PER_HOUR, MS_PER_SECOND, poolCapacity } from './formulas.ts';
+import { MS_PER_HOUR, poolCapacity } from './formulas.ts';
 import { maxLevels, parseModRef } from './meditation.ts';
 import { indexOf } from './lookup.ts';
 import { teamFor } from './natures.ts';
@@ -419,6 +419,23 @@ export const MIGRATIONS: readonly Migration[] = [
   (state) => {
     const loadouts = isRecord(state.loadouts) ? state.loadouts : {};
     return { ...state, loadouts: { ...loadouts, cloneRole: null } };
+  },
+  // v21 -> v22: herb bushes keep the game time of their regrow clock (`at`) instead of the work kept on the regrow cycle
+  // (`carry`). A bush with herbs left starts its clock now; an empty one counts the pause it had already had.
+  (state, content) => {
+    const now = nonNegative(state.now);
+    const pause = content.balance.K.field.regrowMs;
+    const bushes = Object.fromEntries(
+      Object.entries(isRecord(state.bushes) ? state.bushes : {}).flatMap(([key, v]) => {
+        if (!isRecord(v)) return [];
+        const stock = nonNegative(v.stock);
+        const had = stock === 0 ? Math.min(nonNegative(v.carry) / SHARE_FULL, pause) : 0;
+        return [
+          [key, { stock, size: nonNegative(v.size), at: Math.max(0, Math.round(now - had)) }],
+        ];
+      }),
+    );
+    return { ...state, bushes };
   },
 ];
 
@@ -1142,16 +1159,11 @@ export function deserialize(
   });
   state.bushes = pick(raw.bushes, (key, v) => {
     if (!index.herbs.has(key) || !isRecord(v)) return undefined;
-    const K = content.balance.K;
     const size = Math.floor(nonNegative(v.size));
     if (size < 1 || size > bushSize(state, key, content, rules)) return undefined;
     const stock = Math.min(Math.floor(nonNegative(v.stock)), size);
-    // The carried progress of an empty bush is bounded by the herb's own cycle and its regrowing.
-    const herb = index.herbs.get(key);
-    const cycle = herb ? cycleSeconds('gather', herb, content) : K.gather;
-    const room = (K.field.regrowMs + cycle * MS_PER_SECOND) * SHARE_FULL;
-    const carry = stock === 0 ? Math.min(Math.floor(nonNegative(v.carry)), room) : 0;
-    return { stock, size, carry };
+    // The clock cannot be set in the future.
+    return { stock, size, at: Math.min(Math.floor(nonNegative(v.at)), state.now) };
   });
   state.world = sanitizeWorld(raw.world, content);
   const pending = isRecord(raw.missions) ? raw.missions.pending : undefined;

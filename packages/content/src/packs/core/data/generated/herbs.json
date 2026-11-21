@@ -3,66 +3,66 @@
     "id": "core:mint",
     "level": 1,
     "cycle": 2.5,
-    "xp": 4.8
+    "xp": 4.86
   },
   {
     "id": "core:nettle",
     "level": 5,
     "cycle": 2.9,
-    "xp": 7.314
+    "xp": 7.304
   },
   {
     "id": "core:hogweed",
     "level": 10,
     "cycle": 3.5,
-    "xp": 12.474
+    "xp": 12.258
   },
   {
     "id": "core:bloodgrass",
     "level": 15,
     "cycle": 4.1,
-    "xp": 20.866
+    "xp": 20.253
   },
   {
     "id": "core:poppy",
     "level": 20,
     "cycle": 4.6,
-    "xp": 33.766
+    "xp": 32.502
   },
   {
     "id": "core:ironroot",
     "level": 25,
     "cycle": 5.2,
-    "xp": 55.092
+    "xp": 52.596
   },
   {
     "id": "core:silvermoss",
     "level": 30,
     "cycle": 5.8,
-    "xp": 88.999
+    "xp": 84.392
   },
   {
     "id": "core:edelweiss",
     "level": 35,
     "cycle": 6.3,
-    "xp": 140.625
+    "xp": 132.707
   },
   {
     "id": "core:fireflower",
     "level": 40,
     "cycle": 6.9,
-    "xp": 224.004
+    "xp": 210.342
   },
   {
     "id": "core:lotus",
     "level": 45,
     "cycle": 7.4,
-    "xp": 350.416
+    "xp": 327.858
   },
   {
     "id": "core:shadowshroom",
     "level": 50,
     "cycle": 8,
-    "xp": 552.397
+    "xp": 514.875
   }
 ]
