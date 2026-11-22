@@ -58,9 +58,9 @@ describe('A11: the map is quick offline', () => {
         // All the land is surveyed: the walk is a plain search over the whole grid.
         for (const h of content.hexes) if (h.terrain) state.world.surveyed[hexKey(h.q, h.r)] = true;
         // The far end is the last cell that needs no key (a keyed one is not reachable on foot without it).
-        const far = content.cells.findLast(
-          (c) => hexKeyIds(content, hexKey(c.hex[0], c.hex[1])).length === 0,
-        );
+        const far = content.cells
+          .filter((c) => hexKeyIds(content, hexKey(c.hex[0], c.hex[1])).length === 0)
+          .pop();
         const ends = ['core:okolytsi_sela', far?.id ?? ''];
         let walked = 0;
         for (let leg = 0; walked < 12 * HOUR; leg++) {
