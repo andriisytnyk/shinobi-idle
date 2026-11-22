@@ -14,6 +14,7 @@ import {
   type CommandResult,
   type GameEvent,
   type GameState,
+  type PointFoundEvent,
   type Rules,
   serializeTelemetry,
 } from '@shinobi/core';
@@ -170,6 +171,8 @@ export function createGame(deps: GameDeps = {}) {
   let crash = $state.raw<CrashInfo | null>(null);
   let log = $state.raw<LogEntry[]>([]);
   let logId = 0;
+  /** Points of interest found by a survey that the player has not been told about in a dialog yet. */
+  let foundPoints = $state.raw<PointFoundEvent[]>([]);
   /** Set when the player has just graduated; the graduation modal clears it. */
   let graduation = $state(false);
   /** Set when the player has passed the exam that ends the story; the final screen clears it. */
@@ -308,6 +311,8 @@ export function createGame(deps: GameDeps = {}) {
         event.type === 'playerDefeated'
       ) {
         lines.push({ id: ++logId, event });
+      } else if (event.type === 'pointFound') {
+        foundPoints = [...foundPoints, event];
       } else if (event.type === 'rankUp' && content.exams.some((e) => e.rank === event.rank)) {
         // An exam that ends the story (the Chunin one ends the slice) has its own screen instead of the promotion dialog.
         if (content.exams.some((e) => e.rank === event.rank && e.finale === true)) finale = true;
@@ -463,6 +468,7 @@ export function createGame(deps: GameDeps = {}) {
     // The game that is given a state is the one that is played: the reveal rule reads from it.
     setRevealReader(reveal);
     log = [];
+    foundPoints = [];
     graduation = false;
     finale = false;
     signals = {};
@@ -559,6 +565,10 @@ export function createGame(deps: GameDeps = {}) {
     get signals(): Signals {
       return signals;
     },
+    /** The discovery dialog of the oldest point found and not yet shown; null when there is none. */
+    get foundPoint(): PointFoundEvent | null {
+      return foundPoints[0] ?? null;
+    },
     /** Whether the graduation modal is due. */
     get graduation(): boolean {
       return graduation;
@@ -649,6 +659,9 @@ export function createGame(deps: GameDeps = {}) {
     onEvent(fn: (event: GameEvent) => void): () => void {
       eventListeners.add(fn);
       return () => eventListeners.delete(fn);
+    },
+    dismissFoundPoint(): void {
+      foundPoints = foundPoints.slice(1);
     },
     dismissGraduation(): void {
       graduation = false;

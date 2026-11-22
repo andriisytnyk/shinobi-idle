@@ -3,7 +3,7 @@
     <article class="simple-page">
       <h1 class="compact">
         Мапа світу
-      <div class="world" data-world="" style="--sheet-max: 55dvh; --sheet-bottom: 768px;">
+      <div class="world" data-world="" style="--sheet-bottom: 768px;">
         <div class="strip" data-map-status="">
           <p class="where">
             <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
@@ -18,6 +18,20 @@
               <span aria-hidden="true" class="sep">
                 ·
               Дальність розвідки: 1 гекс
+          <div class="facts">
+            <span class="fact" data-intel-chip="">
+              <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 512 512" width="16">
+                <path d="#3653-17qd3ut" fill="currentColor">
+              Intel
+              <strong data-intel="">
+                0
+            <span class="fact" data-scout-current="">
+              <span class="dim">
+                Розвідка зараз не йде.
+            <button aria-controls="map-mastery-tiers" aria-expanded="false" class="chip" data-mastery-chip="" type="button">
+              <svg aria-hidden="true" class="icon" height="14" viewBox="0 0 24 24" width="14">
+                <path d="#260-1rmif5e" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
+              Мапа 0/118
           <div class="auto-row">
             <span class="split plain" data-for="autosurvey" data-ui="start-split">
               <button class="main ct-action wrap" data-auto="" data-performer="0" data-start="true" type="button">

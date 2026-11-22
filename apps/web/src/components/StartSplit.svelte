@@ -40,6 +40,8 @@
     cls?: string;
     /** The label may wrap onto several lines instead of being cut with an ellipsis. */
     wrap?: boolean;
+    /** The tooltip of the main button: why it is off. */
+    title?: string | undefined;
   }
 
   let {
@@ -54,6 +56,7 @@
     describedBy,
     cls = 'ct-action',
     wrap = false,
+    title,
   }: Props = $props();
 
   const content = game.content;
@@ -150,6 +153,7 @@
     class:stop={stopping}
     class:wrap
     disabled={off}
+    title={off ? title : undefined}
     data-start
     {...mark ? { [`data-${mark}`]: '' } : {}}
     data-performer={performer.n}

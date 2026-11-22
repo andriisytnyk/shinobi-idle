@@ -37,6 +37,7 @@ export const HINTS: readonly HintDef[] = [
   { id: 'crafting' },
   { id: 'shop' },
   { id: 'world' },
+  { id: 'mapPage' },
   { id: 'village' },
   { id: 'missions' },
   { id: 'missionPage' },

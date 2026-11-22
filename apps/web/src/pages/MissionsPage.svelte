@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { listSkillActions, locationHint, pointStatus } from '@shinobi/core';
+  import ActionTile from '../components/ActionTile.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
   import JournalTabs from '../components/JournalTabs.svelte';
@@ -7,7 +9,7 @@
   import ReqTree from '../components/ReqTree.svelte';
   import Slot from '../lib/ext/Slot.svelte';
   import { t } from '../lib/i18n.ts';
-  import { missionRankDesc, missionRankName } from '../lib/vocab.ts';
+  import { missionRankDesc, missionRankName, skillByActivity } from '../lib/vocab.ts';
   import { availableOf, followCommands, gatesOf, viewOf } from '../lib/mission-feed.svelte.ts';
   import {
     isMissionSort,
@@ -22,6 +24,29 @@
 
   const ONLY_KEY = 'core:missions.onlyAvailable';
   const SORT_KEY = 'core:missions.sort';
+  const TAB_KEY = 'core:missions.tab';
+
+  type Tab = 'board' | 'fieldwork';
+  const tab = $derived<Tab>(settings.ext(TAB_KEY) === 'fieldwork' ? 'fieldwork' : 'board');
+  const TABS: readonly Tab[] = ['board', 'fieldwork'];
+
+  const content = game.content;
+  /** The work that found points open (a ruin search, a deposit): locked with what it asks for until the point is found. */
+  /** For a work whose point is not found yet: the region to look in. The place id stays out of the page, so there is no link to the map. */
+  const lookRegions = (point: string): string[] | null =>
+    game.read((gs) => {
+      const place = content.places.find((p) => p.id === point);
+      if (!place || pointStatus(gs, content, place) === 'found') return null;
+      return locationHint(gs, content, { kind: 'place', id: point })?.regions ?? null;
+    });
+  const works = $derived(
+    game.read((gs) => {
+      const scout = skillByActivity(content, 'map');
+      return scout
+        ? listSkillActions(gs, scout, content, game.rules).filter((a) => a.kind === 'fieldwork')
+        : [];
+    }),
+  );
 
   // What a command changed shows at once, not at the next coarse step.
   $effect(() => followCommands());
@@ -55,64 +80,149 @@
   <Hint id="missions" />
   <Slot name="missions.header" />
 
-  <div class="bar" data-missions-bar>
-    <label class="check">
-      <input
-        type="checkbox"
-        data-only-available
-        checked={onlyAvailable}
-        onchange={(e) => settings.setExt(ONLY_KEY, e.currentTarget.checked)}
-      />
-      {t('missions.onlyAvailable')}
-    </label>
-    <label class="sort">
-      <span>{t('missions.sort')}</span>
-      <select
-        data-sort
-        value={sort}
-        onchange={(e) => settings.setExt(SORT_KEY, e.currentTarget.value)}
+  <div class="tabs" role="tablist" aria-label={t('missions.tabs')} data-missions-tabs>
+    {#each TABS as which (which)}
+      <button
+        type="button"
+        role="tab"
+        class:active={tab === which}
+        aria-selected={tab === which}
+        data-tab={which}
+        onclick={() => settings.setExt(TAB_KEY, which)}>{t(`missions.tab.${which}`)}</button
       >
-        {#each MISSION_SORTS as option (option)}
-          <option value={option}>{t(`missions.sort.${option}`)}</option>
-        {/each}
-      </select>
-    </label>
+    {/each}
   </div>
 
-  {#each shown as group (group.rank)}
-    {@const gate = gateOf(group.rank)}
-    {@const open = gate?.open ?? true}
-    {@const rankDesc = missionRankDesc(group.rank)}
-    <section class="group" data-rank={group.rank} data-open={open}>
-      <header class="group-head">
-        <MissionRankStamp rank={group.rank} />
-        <div class="titles">
-          <h2>
-            {missionRankName(group.rank)}
-          </h2>
-          {#if rankDesc}<p class="ct-note">{rankDesc}</p>{/if}
-        </div>
-      </header>
-      {#if !open && gate?.result}
-        <div class="gate" data-rank-gate>
-          <p class="ct-locked"><Icon name="lucide:lock" size={14} /> {t('missions.rankClosed')}</p>
-          <ReqTree node={gate.result} />
-        </div>
-      {/if}
-      {#if group.missions.length === 0}
-        <p class="ct-note" data-empty>{t('missions.groupEmpty')}</p>
+  {#if tab === 'fieldwork'}
+    <section class="works" data-fieldwork-tab data-ui="entity-section">
+      <p class="ct-note">{t('missions.fieldworkIntro')}</p>
+      {#if works.length === 0}
+        <p class="ct-note" data-empty>{t('missions.fieldworkEmpty')}</p>
       {:else}
-        <ul class="ct-tiles">
-          {#each group.missions as mission (mission.id)}
-            <MissionCard {mission} />
+        <div class="tiles">
+          {#each works as info (info.kind + info.id)}
+            {@const point = content.fieldworks.find((w) => w.id === info.id)?.point}
+            {@const regions = point ? lookRegions(point) : null}
+            <div class="work">
+              <ul class="one"><ActionTile {info} /></ul>
+              {#if regions && regions.length > 0}
+                <p class="look" data-work-look>
+                  {t('look.search')}
+                  <strong>{regions.map((r) => t(`region.${r}.name`)).join(', ')}</strong>
+                </p>
+              {/if}
+            </div>
           {/each}
-        </ul>
+        </div>
       {/if}
     </section>
-  {/each}
+  {:else}
+    <div class="bar" data-missions-bar>
+      <label class="check">
+        <input
+          type="checkbox"
+          data-only-available
+          checked={onlyAvailable}
+          onchange={(e) => settings.setExt(ONLY_KEY, e.currentTarget.checked)}
+        />
+        {t('missions.onlyAvailable')}
+      </label>
+      <label class="sort">
+        <span>{t('missions.sort')}</span>
+        <select
+          data-sort
+          value={sort}
+          onchange={(e) => settings.setExt(SORT_KEY, e.currentTarget.value)}
+        >
+          {#each MISSION_SORTS as option (option)}
+            <option value={option}>{t(`missions.sort.${option}`)}</option>
+          {/each}
+        </select>
+      </label>
+    </div>
+
+    {#each shown as group (group.rank)}
+      {@const gate = gateOf(group.rank)}
+      {@const open = gate?.open ?? true}
+      {@const rankDesc = missionRankDesc(group.rank)}
+      <section class="group" data-rank={group.rank} data-open={open}>
+        <header class="group-head">
+          <MissionRankStamp rank={group.rank} />
+          <div class="titles">
+            <h2>
+              {missionRankName(group.rank)}
+            </h2>
+            {#if rankDesc}<p class="ct-note">{rankDesc}</p>{/if}
+          </div>
+        </header>
+        {#if !open && gate?.result}
+          <div class="gate" data-rank-gate>
+            <p class="ct-locked">
+              <Icon name="lucide:lock" size={14} />
+              {t('missions.rankClosed')}
+            </p>
+            <ReqTree node={gate.result} />
+          </div>
+        {/if}
+        {#if group.missions.length === 0}
+          <p class="ct-note" data-empty>{t('missions.groupEmpty')}</p>
+        {:else}
+          <ul class="ct-tiles">
+            {#each group.missions as mission (mission.id)}
+              <MissionCard {mission} />
+            {/each}
+          </ul>
+        {/if}
+      </section>
+    {/each}
+  {/if}
 </SimplePage>
 
 <style>
+  .tabs {
+    display: flex;
+    gap: var(--space-2);
+    margin: var(--space-2) 0 var(--space-3);
+  }
+
+  .tabs button {
+    flex: 1;
+    min-height: var(--control-md);
+    padding: var(--space-1) var(--space-3);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--fg);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .tabs button.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .one {
+    display: grid;
+    margin: 0;
+    padding: 0;
+  }
+
+  .look {
+    margin: var(--space-1) 0 0;
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
+  }
+
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--tile-min)), 1fr));
+    gap: var(--space-3);
+    margin: var(--space-3) 0 0;
+    padding: 0;
+  }
+
   .bar {
     display: flex;
     flex-wrap: wrap;

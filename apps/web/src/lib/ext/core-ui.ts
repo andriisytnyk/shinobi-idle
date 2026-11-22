@@ -270,7 +270,12 @@ export const coreUi: UiPack = {
     });
 
     // What the skill page draws for each skill activity; an activity that is not listed gets the action tiles.
-    ui.addSkillPanel('map', { mount: { svelte: ScoutPanel }, place: 'replace' });
+    ui.addSkillPanel('map', {
+      mount: { svelte: ScoutPanel },
+      place: 'replace',
+      hint: 'mapPage',
+      compact: true,
+    });
     ui.addSkillPanel('course', { mount: { svelte: CoursePanel }, place: 'replace' });
     ui.addSkillPanel('insight', { mount: { svelte: MeditationPanel } });
     ui.addSkillPanel('patch', { hint: 'herbalism' });

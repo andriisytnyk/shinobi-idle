@@ -8,6 +8,11 @@
           Доручення
         <a aria-current="page" class="active" data-journal="missions" href="#/missions">
           Місії
+      <div aria-label="Розділи сторінки місій" class="tabs" data-missions-tabs="" role="tablist">
+        <button aria-selected="true" class="active" data-tab="board" role="tab" type="button">
+          Доручення
+        <button aria-selected="false" data-tab="fieldwork" role="tab" type="button">
+          Роботи на місцях
       <div class="bar" data-missions-bar="">
         <label class="check">
           <input data-only-available="" type="checkbox">

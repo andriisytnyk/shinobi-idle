@@ -72,6 +72,11 @@ function show(
 ): void {
   app = mount(WorldPage, { target, context: coreContext(), props: { focus } });
   flushSync();
+  // The full panel of a hex is behind «Деталі» of its card: these tests read it.
+  target
+    .querySelector('[data-hex-details]')
+    ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  flushSync();
 }
 
 const q = (selector: string) => target.querySelector<HTMLElement>(selector);
@@ -106,6 +111,13 @@ function stand(state: GameState, id: string): void {
 const click = (el: Element | null) => {
   el?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   flushSync();
+  // The full panel of a hex is behind «Деталі» of its card: these tests read it.
+  if (el?.getAttribute('data-ui') === 'hex' && !target.querySelector('[data-hex-details-body]')) {
+    target
+      .querySelector('[data-hex-details]')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    flushSync();
+  }
 };
 
 describe('A3: the map follows the core', () => {
@@ -466,7 +478,9 @@ describe('the hex panel keeps its actions in view', () => {
 
   it('shows every action label in full and lets it wrap instead of cutting it with an ellipsis', () => {
     show({ cell: PLAIN_CELL, region: FOREST });
-    const buttons = [...target.querySelectorAll<HTMLElement>('[data-actions] button.main')];
+    const buttons = [
+      ...target.querySelectorAll<HTMLElement>('[data-hex-panel] [data-actions] button.main'),
+    ];
     const labels = buttons.map((b) => b.textContent?.replace(/\s+/g, ' ').trim() ?? '');
     for (const key of ['map.act.survey', 'map.act.walk', 'map.act.paid', 'map.act.auto'])
       expect(labels.some((l) => l.startsWith(name(key)))).toBe(true);
@@ -474,7 +488,9 @@ describe('the hex panel keeps its actions in view', () => {
     // The button's own style truncates (nowrap + ellipsis); `wrap` is what turns that off, and the
     // layout (a grid that lets the cells be as wide as the panel) is checked in the browser.
     for (const b of buttons) expect(b.classList.contains('wrap')).toBe(true);
-    expect(q('[data-route-line]')?.textContent).toContain(name('map.route').split('{')[0]!.trim());
+    expect(q('[data-hex-panel] [data-route-line]')?.textContent).toContain(
+      name('map.route').split('{')[0]!.trim(),
+    );
   });
 });
 
@@ -606,14 +622,18 @@ describe('the Now bar shows where the player is', () => {
 });
 
 describe('the Scouting page', () => {
-  it('shows Intel, the current action and a link to the map', () => {
+  it('opens on the map with a compact status row and no list of facts', () => {
     const state = genin();
     state.currencies.intel = 7;
     game.replaceState(state);
     app = mount(SkillPage, { target, context: coreContext(), props: { id: 'scout' } });
     flushSync();
     expect(q('[data-intel]')?.textContent).toBe('7');
-    expect(q('[data-open-world]')?.getAttribute('href')).toBe('#/world');
+    expect(q('[data-ui="map"]')).not.toBeNull();
+    expect(q('[data-map-status]')).not.toBeNull();
+    expect(q('[data-open-world]')).toBeNull();
+    expect(q('[data-scout-works]')).toBeNull();
+    expect(q('.facts dt')).toBeNull();
     expect(q('[data-scout-current]')?.textContent).toContain(name('scout.idle'));
     // The gear line of maps and the exploration time breakdown are on the page.
     expect(q('[data-gear-section]')).not.toBeNull();

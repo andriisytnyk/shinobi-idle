@@ -246,6 +246,8 @@ describe('routes and anchors', () => {
     state.world.explores[cell.id] = content.balance.K.cellExplores[0] ?? 0;
     for (const poi of cell.pois) state.world.pois[poi.id] = true;
     booted = await bootApp([coreUi], state, `#/cell/${cell.id}`);
+    booted.target.querySelector<HTMLElement>('[data-hex-details]')?.click();
+    await new Promise((r) => setTimeout(r, 0));
     const rows = qa('[data-ui="poi-row"]');
     expect(rows.length).toBeGreaterThan(0);
     for (const row of rows) expect(row.getAttribute('data-entity')).toMatch(/^poi:.+/);

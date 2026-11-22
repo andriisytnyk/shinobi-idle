@@ -38,6 +38,8 @@
   const ref = $derived({ kind: 'skill', id } as const);
   /** The panel and hint that the activity of the skill has in the UI packs; none: the generic action tiles. */
   const panel = $derived(ui?.registry.skillPanel(skill?.activity ?? ''));
+  /** The panel comes first and the lore, the gear and the pool are folded into one «Деталі» block. */
+  const compact = $derived(panel?.compact === true && panel.place === 'replace');
   const desc = $derived(entityDesc(ref));
   const unlockKey = $derived(localeKey('skill', id, 'unlock'));
   const progress = $derived(game.read((gs) => (skill ? skillProgress(gs, skill.id) : null)));
@@ -105,8 +107,10 @@
     </header>
     <Slot name="skill.header" ctx={{ skill: skill.id }} />
 
-    {#if desc}<p class="lore">{desc}</p>{/if}
-    {#if hasKey(unlockKey)}<p class="unlock">{t(unlockKey)}</p>{/if}
+    {#if !compact}
+      {#if desc}<p class="lore">{desc}</p>{/if}
+      {#if hasKey(unlockKey)}<p class="unlock">{t(unlockKey)}</p>{/if}
+    {/if}
     {#if natureLine}
       <p class="nature-line" data-nature-line>
         {t(natureLine.text, { pct: natureLine.pct, end: content.balance.K.natures.penaltyEnd })}
@@ -151,16 +155,28 @@
       <PanelHost owner={panel.key} packId={panel.packId} mount={panel.mount} ctx={{ skill: id }} />
     {/if}
 
-    {#if gear.length > 0}
-      <section data-ui="entity-section" data-gear-section>
-        <h2>{t('skill.gear')}</h2>
-        {#each gear as line (line.id)}
-          <GearLine {line} compact />
-        {/each}
-      </section>
-    {/if}
+    {#snippet details()}
+      {#if gear.length > 0}
+        <section data-ui="entity-section" data-gear-section>
+          <h2>{t('skill.gear')}</h2>
+          {#each gear as line (line.id)}
+            <GearLine {line} compact />
+          {/each}
+        </section>
+      {/if}
 
-    <PoolBar skill={skill.id} />
+      <PoolBar skill={skill.id} />
+    {/snippet}
+    {#if compact}
+      <details class="details" data-skill-details>
+        <summary>{t('skill.details')}</summary>
+        {#if desc}<p class="lore">{desc}</p>{/if}
+        {#if hasKey(unlockKey)}<p class="unlock">{t(unlockKey)}</p>{/if}
+        {@render details()}
+      </details>
+    {:else}
+      {@render details()}
+    {/if}
     <Slot name="skill.footer" ctx={{ skill: skill.id }} />
   </article>
 {:else}
@@ -237,6 +253,22 @@
 
   .locked h2 {
     margin-top: var(--space-1);
+  }
+
+  .details {
+    margin-top: var(--space-3);
+    padding: var(--space-1) var(--space-3);
+    border: var(--border-thin) solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+  }
+
+  .details summary {
+    display: flex;
+    align-items: center;
+    min-height: var(--control-sm);
+    font-weight: 600;
+    cursor: pointer;
   }
 
   .rule {
