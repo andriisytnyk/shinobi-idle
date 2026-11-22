@@ -3,6 +3,7 @@
   import { t } from '../lib/i18n.ts';
   import { game } from '../lib/store.ts';
   import EntityLink from './EntityLink.svelte';
+  import WhereToLook from './WhereToLook.svelte';
 
   const content = game.content;
 
@@ -28,6 +29,7 @@
       {available ? t('world.where.open') : t('world.where.closed')}
     </span>
   </p>
+  {#if !available}<WhereToLook target={{ kind: 'zone', id: zone }} />{/if}
 {/if}
 
 <style>

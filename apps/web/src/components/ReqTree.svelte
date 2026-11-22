@@ -6,10 +6,11 @@
   import { formatInt } from '../lib/format.ts';
   import { hasKey, t } from '../lib/i18n.ts';
   import { nameShown } from '../lib/reveal.ts';
-  import { flagEntity } from '../lib/world.ts';
+  import { flagEntity, flagLookTarget } from '../lib/world.ts';
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ReqTree from './ReqTree.svelte';
+  import WhereToLook from './WhereToLook.svelte';
 
   interface Props {
     node: ReqResult;
@@ -108,6 +109,8 @@
         })
       : null,
   );
+  /** A point of interest or a named place still to be found: where on the map to look for it. */
+  const lookTarget = $derived(req.t === 'flag' && !node.met ? flagLookTarget(req.id) : null);
   /** A group with no rows (a stage that is already open) prints nothing. */
   const empty = $derived(isGroup && node.children.length === 0);
   const flagText = $derived(
@@ -196,6 +199,9 @@
         ><span class="fill" style:width="{fraction * 100}%"></span></span
       >
     {/if}
+    {#if lookTarget}
+      <div class="look"><WhereToLook target={lookTarget} /></div>
+    {/if}
   </div>
 {/if}
 
@@ -223,7 +229,8 @@
     grid-template-columns: auto 1fr auto;
     grid-template-areas:
       'mark label count'
-      '. bar bar';
+      '. bar bar'
+      '. look look';
     align-items: center;
     column-gap: var(--space-2);
     padding: var(--space-1) 0;
@@ -275,6 +282,10 @@
     grid-area: count;
     font-size: var(--text-xs);
     font-variant-numeric: tabular-nums;
+  }
+
+  .look {
+    grid-area: look;
   }
 
   .bar {

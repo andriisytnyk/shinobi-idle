@@ -107,6 +107,10 @@ export const BALANCE_EXT = {
     ],
     outpostRange: 1,
     startRadius: 2,
+    /** Where to look: the radius, in hexes, of the search area drawn around a thing a requirement asks to find (0: the exact hex). */
+    hintRadius: 2,
+    /** Where to look: a search area clipped to the target's region keeps at least this many hexes (else it is not clipped). */
+    hintMin: 4,
     plainSurvey: [6, 18],
     plainScout: 1,
     /** Walking pays Athletics at the pace of level 3 and Scouting at the pace of level 2, for the minutes of each hex. */

@@ -8,6 +8,7 @@
   import Icon from './Icon.svelte';
   import ModParts from './ModParts.svelte';
   import ReqTree from './ReqTree.svelte';
+  import WhereToLook from './WhereToLook.svelte';
 
   interface Props {
     missionId: string;
@@ -88,6 +89,12 @@
       <a class="to-combat" href="#/combat">{t('mission.stage.toCombat')}</a>
     {/if}
   </header>
+
+  {#if view.head.combat}
+    {#each view.head.refs as ref (`${ref.kind}:${ref.id}`)}
+      <WhereToLook target={{ kind: 'enemy', id: ref.id }} />
+    {/each}
+  {/if}
 
   {#if ways.length > 0}
     <ul class="alts" aria-label={t('mission.stage.ways')} data-alts>
