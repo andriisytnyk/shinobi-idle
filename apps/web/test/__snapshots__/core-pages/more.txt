@@ -4,7 +4,7 @@
       <h1>
         Ще
       <ul class="menu">
-        <li>
+        <li class="phone-only">
           <a data-more-bank="" href="#/bank">
             <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
               <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
@@ -14,7 +14,7 @@
               Банк
             <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
               <path d="#14-mnqmls" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-        <li>
+        <li class="phone-only">
           <a data-more-shop="" href="#/shop">
             <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
               <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
@@ -24,7 +24,7 @@
               Крамниця
             <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
               <path d="#14-mnqmls" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-        <li>
+        <li class="phone-only">
           <a data-more-village="" href="#/village">
             <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
               <path d="#125-1dlw44n" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">

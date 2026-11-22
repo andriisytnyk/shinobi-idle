@@ -34,10 +34,14 @@ describe('F1-fix1: the top bar has one row on a phone, the rest behind a menu bu
     expect(button.getAttribute('aria-expanded')).toBe('false');
     expect(button.getAttribute('aria-label')).toBe('Меню');
     expect(bar.classList.contains('open')).toBe(false);
-    // The things behind the button: the tools (the bank, the village, the shop) are in the panel it controls.
+    // The things behind the button: the tools are in the panel it controls. The bank, the village and
+    // the shop are not among them: the side menu (a wide screen) and «Ще» (a phone) lead there.
     const panel = bar.querySelector<HTMLElement>(`#${button.getAttribute('aria-controls')}`);
-    expect(panel?.querySelector('[data-bank-link]')).not.toBeNull();
-    expect(panel?.querySelector('[data-shop-link]')).not.toBeNull();
+    expect(panel?.querySelector('[data-more-bank], a[href="#/more"]')).not.toBeNull();
+    expect(panel?.querySelector('[data-bank-link]')).toBeNull();
+    expect(panel?.querySelector('[data-shop-link]')).toBeNull();
+    expect(panel?.querySelector('[data-village-link]')).toBeNull();
+    expect(panel?.querySelector('[data-topbar-dev-slot]')).not.toBeNull();
     button.click();
     flushSync();
     expect(button.getAttribute('aria-expanded')).toBe('true');

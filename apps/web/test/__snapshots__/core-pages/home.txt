@@ -72,25 +72,6 @@
         <select aria-label="Мова" disabled="">
           <option>
             Українська
-      <a class="meta-toggle shop-link" data-bank-link="" href="#/bank">
-        <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
-          <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-            <path d="#129-1i0q4rl">
-            <path d="#36-1xcqgks">
-        <span>
-          Банк
-      <a class="meta-toggle shop-link" data-village-link="" href="#/village">
-        <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
-          <path d="#125-1dlw44n" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-        <span>
-          Село
-      <a class="meta-toggle shop-link" data-shop-link="" href="#/shop">
-        <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
-          <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
-            <path d="#282-1ybrt6b">
-            <path d="#48-1o8urc2">
-        <span>
-          Крамниця
       <a class="meta-toggle more-link" href="#/more">
         <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
           <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
@@ -105,6 +86,7 @@
             <path d="#8-1fwukk9">
         <span>
           Мета
+      <span class="dev-slot" data-topbar-dev-slot="">
     <button aria-controls="topbar-menu" aria-expanded="false" aria-label="Меню" class="menu-btn" type="button">
       <svg aria-hidden="true" class="icon" height="18" viewBox="0 0 24 24" width="18">
         <path d="#23-15lkpf4" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">

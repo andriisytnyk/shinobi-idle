@@ -205,6 +205,9 @@ describe('the offline report', () => {
     document.body.append(host);
     const app = mount(ReportModal, { target: host, props: { report: report!, onClose: () => {} } });
     flushSync();
+    // The report is a normal dark dialog, not a paper scroll.
+    expect(document.body.querySelector('[data-ui="modal"]')).not.toBeNull();
+    expect(document.body.querySelector('.paper')).toBeNull();
     const item = document.body.querySelector('[data-report-item="core:mint"]');
     expect(item?.textContent).toContain('7');
     expect(item?.textContent).toContain(ukLocale['item.core:mint.name']);

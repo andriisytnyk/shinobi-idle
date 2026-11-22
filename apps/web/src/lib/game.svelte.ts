@@ -334,6 +334,10 @@ export function createGame(deps: GameDeps = {}) {
 
   /** One pass of the loop: move the game to the wall clock, through the offline path after a sleep. */
   function tick(): void {
+    // A hidden tab is not advanced: browsers throttle its timers to about one tick a minute, and every
+    // throttled tick would be its own short catch-up with its own report. The time stays in lastWall
+    // and is caught up once, as one offline stretch, when the tab is shown again.
+    if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
     const now = clock.now();
     const delta = Math.floor(now - lastWall);
     if (delta < 0) {
@@ -432,6 +436,7 @@ export function createGame(deps: GameDeps = {}) {
     );
     const onHide = () => {
       if (document.visibilityState === 'hidden') void save();
+      else tick();
     };
     const onPageHide = () => void save();
     document.addEventListener('visibilitychange', onHide);

@@ -115,18 +115,6 @@
         <option>{t('lang.uk')}</option>
       </select>
     </label>
-    <a class="meta-toggle shop-link" href="#/bank" data-bank-link>
-      <Icon name="lucide:package" size={18} />
-      <span>{t('nav.bank')}</span>
-    </a>
-    <a class="meta-toggle shop-link" href="#/village" data-village-link>
-      <Icon name="lucide:landmark" size={18} />
-      <span>{t('nav.village')}</span>
-    </a>
-    <a class="meta-toggle shop-link" href="#/shop" data-shop-link>
-      <Icon name="lucide:store" size={18} />
-      <span>{t('nav.shop')}</span>
-    </a>
     <a class="meta-toggle more-link" href="#/more">
       <Icon name="lucide:settings" size={18} />
       <span class="more-label">{t('nav.more')}</span>
@@ -141,6 +129,8 @@
       <Icon name="lucide:panel-right" size={18} />
       <span>{t('nav.meta')}</span>
     </button>
+    <!-- Test builds put the developer panel's button here. -->
+    <span class="dev-slot" data-topbar-dev-slot></span>
   </div>
   <button
     type="button"
@@ -276,8 +266,11 @@
     cursor: pointer;
   }
 
-  .more-link,
-  .shop-link {
+  .dev-slot {
+    display: contents;
+  }
+
+  .more-link {
     text-decoration: none;
   }
 
