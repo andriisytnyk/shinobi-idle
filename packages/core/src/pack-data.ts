@@ -303,7 +303,7 @@ function stashPlace(raw: Raw, place: Place, loaded: ReadonlySet<string>, stash: 
         const away = awayPack(loaded, id);
         if (away === undefined) return slot;
         stash(away, path, String(index), slot);
-        return { id: '', n: 0 };
+        return { ...(isRecord(slot) ? slot : {}), id: '', n: 0 };
       });
       return setAt(raw, path, { ...at, slots });
     }
@@ -432,7 +432,7 @@ function restorePlace(
         const free =
           at2 < slots.length && isRecord(have) && (have.id === '' || have.id === undefined);
         if (free) {
-          slots[at2] = { id: slot.id, n: slot.n };
+          slots[at2] = { ...(isRecord(have) ? have : {}), id: slot.id, n: slot.n };
         } else {
           // The slot is taken or gone: the units go back to the bank.
           const bank = asRecord(getAt(next, 'bank')) ?? {};

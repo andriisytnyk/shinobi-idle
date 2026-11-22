@@ -317,7 +317,7 @@ describe('A12: saves', () => {
     const loaded = deserialize(JSON.stringify(raw), content);
     expect(loaded.v).toBe(STATE_VERSION);
     expect(loaded.wounds).toEqual({ stacks: 0, left: 0 });
-    expect(loaded.pouch.slots).toHaveLength(3);
+    expect(loaded.pouch.slots).toHaveLength(4);
     expect(loaded.bingo['core:bandit']?.seen).toBeGreaterThanOrEqual(1);
     expect(loaded.loadouts.auto).toBe(true);
     expect(loaded.loadouts.active.length).toBeGreaterThan(0);
@@ -338,7 +338,11 @@ describe('A12: saves', () => {
       saved: { x: { techniques: ['core:nope'], signature: null } },
     };
     raw.state.pouch = {
-      slots: [{ id: 'core:rice', n: 99 }, { id: 'core:kunai', n: 99 }, 5],
+      slots: [
+        { kind: 'core:pk_food', id: 'core:rice', n: 99 },
+        { kind: 'core:pk_combat', id: 'core:kunai', n: 99 },
+        5,
+      ],
       medic: 7,
     };
     raw.state.wounds = { stacks: 99, left: 10 ** 12 };
@@ -346,8 +350,11 @@ describe('A12: saves', () => {
     expect(loaded.loadouts.active).toEqual(['core:great_fireball']);
     expect(loaded.loadouts.signature).toBeNull();
     expect(loaded.loadouts.saved.x?.techniques).toEqual([]);
-    expect(loaded.pouch.slots.map((s) => s.id)).toEqual(['', 'core:kunai', '']);
-    expect(loaded.pouch.slots[1]?.n).toBe(content.balance.K.pouchStack);
+    expect(loaded.pouch.slots.map((s) => s.id)).toEqual(['', 'core:kunai', '', '']);
+    // A slot carries the per-fight amount of its kind; the rest goes back to the Bank, with what the wrong slot held.
+    expect(loaded.pouch.slots[1]?.n).toBe(4);
+    expect(loaded.bank['core:kunai']).toBe(95);
+    expect(loaded.bank['core:rice']).toBe(99);
     expect(loaded.pouch.medic).toBeNull();
     expect(loaded.wounds.stacks).toBe(content.balance.K.wound.max);
     expect(loaded.wounds.left).toBeLessThanOrEqual(content.balance.K.wound.healMin * 60_000);

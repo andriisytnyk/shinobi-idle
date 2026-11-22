@@ -1,7 +1,7 @@
 /** Closure of the combat preparation data: the AI tiers, the loadout and pouch numbers, the medic pouch, the operations' clear flags. */
 import { describe, expect, it } from 'vitest';
 import { BALANCE_OVERRIDE, withOverrides } from '../src/packs/core/balance-ext.ts';
-import { AI_RULE_IDS, content, TRAIT_IDS } from '../src/index.ts';
+import { AI_RULE_IDS, content, POUCH_ALL_USES, TRAIT_IDS } from '../src/index.ts';
 
 const K = content.balance.K;
 
@@ -47,9 +47,21 @@ describe('the preparation numbers', () => {
     expect(K.signatureHabituation).toBeLessThan(1);
   });
 
-  it('gives the pouch 3 slots and one more with the vest, and the stack its cap', () => {
-    expect(K.pouch).toMatchObject({ slots: 3, vest: 1 });
-    expect(K.pouchStack).toBe(4);
+  it('has a kind of pouch slot per use, each with a per-fight amount, and the vest adds a slot', () => {
+    expect(K.pouch.vestRank).toBe('chunin');
+    expect(content.pouchKinds.map((k) => k.id)).toEqual([
+      'core:pk_food',
+      'core:pk_combat',
+      'core:pk_cure',
+    ]);
+    expect(content.pouchKinds.map((k) => k.perFight)).toEqual([4, 4, 3]);
+    expect(content.pouchKinds.map((k) => k.slots + (k.vest ?? 0))).toEqual([1, 3, 1]);
+    // Every use an item can have in a fight has a slot kind that takes it.
+    const uses = new Set(content.pouchKinds.flatMap((k) => k.uses));
+    for (const use of POUCH_ALL_USES) expect(uses.has(use), use).toBe(true);
+    for (const k of content.pouchKinds) {
+      expect(content.locales.uk[`pouchKind.${k.id}.name`], k.id).toBeTruthy();
+    }
   });
 
   it('keeps the Wound numbers of the balance tables', () => {

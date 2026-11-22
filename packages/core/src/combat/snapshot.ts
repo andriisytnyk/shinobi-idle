@@ -9,7 +9,7 @@ import type { GameState } from '../state.ts';
 import type { Levels, PlayerSnapshot } from './numbers.ts';
 import { bingoLevel, knowledgeOf } from './bingo.ts';
 import { effectiveLoadout } from './loadout.ts';
-import { medicTier } from './pouch.ts';
+import { medicTier, slotAmount } from './pouch.ts';
 import { performerHp, performerMaxHp } from './vitality.ts';
 
 /** Every skill level of the player. */
@@ -85,7 +85,11 @@ export function snapshotPlayer(
   if (state.loadouts.cloneRole !== null) snapshot.cloneRole = state.loadouts.cloneRole;
   if (state.loadouts.targetPriority !== null)
     snapshot.targetPriority = state.loadouts.targetPriority;
-  snapshot.pouch = state.pouch.slots.map((s) => ({ id: s.id, n: s.n }));
+  snapshot.pouch = state.pouch.slots.map((s) => ({
+    id: s.id,
+    n: s.n,
+    cap: slotAmount(content, s),
+  }));
   // The medic pouch works only while it is owned.
   snapshot.medic =
     state.pouch.medic !== null && medicTier(state, content) >= 1 ? state.pouch.medic : null;

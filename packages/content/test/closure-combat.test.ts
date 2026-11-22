@@ -376,7 +376,7 @@ describe('scrolls, parts and tools', () => {
       expect(K.goods, `${i.id}: buy key ${i.buy}`).toHaveProperty(i.buy ?? '');
     }
     for (const i of content.items.filter((x) => x.pouch)) expect(i.kind, i.id).toBe('tool');
-    expect(K.pouchStack).toBeGreaterThan(0);
+    for (const k of content.pouchKinds) expect(k.perFight, k.id).toBeGreaterThan(0);
   });
 
   it('registers every new id in the id registry', () => {

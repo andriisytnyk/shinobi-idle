@@ -656,7 +656,7 @@ function parseKnowledge(raw: unknown): Record<string, string[]> | null {
 }
 
 function parsePouch(raw: unknown, content: ContentDb): PouchSlot[] | null {
-  const most = content.balance.K.pouch.slots + content.balance.K.pouch.vest;
+  const most = content.pouchKinds.reduce((n, k) => n + k.slots + (k.vest ?? 0), 0);
   if (!Array.isArray(raw) || raw.length > most) return null;
   const items = new Set(content.items.map((i) => i.id));
   const slots: PouchSlot[] = [];

@@ -209,7 +209,7 @@ describe('one round trip per place', () => {
     expect(back.course).toEqual({ '3': 'ghost:o' });
     expect(back.goals).toEqual([]);
     expect((back.loadouts as Raw).active).toEqual(['ghost:x']);
-    expect((back.pouch as { slots: unknown[] }).slots[0]).toEqual({ id: '', n: 0 });
+    expect((back.pouch as { slots: unknown[] }).slots[0]).toMatchObject({ id: '', n: 0 });
   });
 });
 
@@ -218,10 +218,10 @@ describe('the pouch of a player who loses a pack', () => {
     const state = modGenin();
     state.bank['testmod:elixir'] = 10;
     expect(
-      dispatch(state, { type: 'pouch.set', slot: 0, item: 'testmod:elixir' }, modContent, modRules)
+      dispatch(state, { type: 'pouch.set', slot: 3, item: 'testmod:elixir' }, modContent, modRules)
         .ok,
     ).toBe(true);
-    const packed = state.pouch.slots[0]?.n ?? 0;
+    const packed = state.pouch.slots[3]?.n ?? 0;
     expect(packed).toBeGreaterThan(0);
     expect((state.bank['testmod:elixir'] ?? 0) + packed).toBe(10);
     const core = deserialize(serialize(state), plainContent, plainRules);
@@ -232,7 +232,7 @@ describe('the pouch of a player who loses a pack', () => {
       (back.bank['testmod:elixir'] ?? 0) +
       back.pouch.slots.filter((s) => s.id === 'testmod:elixir').reduce((n, s) => n + s.n, 0);
     expect(units).toBe(10);
-    expect(back.pouch.slots[0]?.id).toBe('testmod:elixir');
+    expect(back.pouch.slots[3]?.id).toBe('testmod:elixir');
     void setSkill;
   });
 });

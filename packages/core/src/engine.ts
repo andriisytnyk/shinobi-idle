@@ -16,7 +16,7 @@ import {
   setCloneRole,
   setTargetPriority,
 } from './combat/loadout.ts';
-import { setMedicSlot, setPouchSlot, usePouchSlot } from './combat/pouch.ts';
+import { setMedicSlot, setPouchAmount, setPouchSlot, usePouchSlot } from './combat/pouch.ts';
 import { buildObstacle } from './athletics.ts';
 import { studyEnemy } from './combat/bingo.ts';
 import { followChakraPool } from './combat/system.ts';
@@ -110,6 +110,7 @@ export type Command =
   | { type: 'loadout.prepare'; encounter: string }
   /** Puts an item (or nothing) in a pouch slot and packs it from the bank. */
   | { type: 'pouch.set'; slot: number; item: string | null }
+  | { type: 'pouch.amount'; slot: number; amount: number }
   /** Uses a healing or restoring slot by hand during a fight. */
   | { type: 'pouch.use'; slot: number }
   /** Chooses the slot the medic pouch uses on its own (null: none). */
@@ -451,6 +452,8 @@ function apply(
       return setTargetPriority(state, command.priority, content);
     case 'loadout.prepare':
       return prepareLoadout(state, command.encounter, content);
+    case 'pouch.amount':
+      return setPouchAmount(state, command.slot, command.amount, content);
     case 'pouch.set':
       return setPouchSlot(state, command.slot, command.item, content);
     case 'pouch.use':

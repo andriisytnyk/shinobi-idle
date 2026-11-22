@@ -44,7 +44,6 @@
    */
   const digest = $derived(
     api.read((gs) => {
-      const cap = api.content.balance.K.pouchStack;
       return JSON.stringify([
         ctx.target,
         ctx.hand,
@@ -57,7 +56,7 @@
         gs.loadouts.targetPriority,
         gs.pouch.slots.map((slot) => [
           slot.id,
-          slot.id === '' ? 0 : Math.min(cap, slot.n + (gs.bank[slot.id] ?? 0)),
+          slot.id === '' ? 0 : Math.min(slot.amount, slot.n + (gs.bank[slot.id] ?? 0)),
         ]),
         Object.keys(gs.skills).map((k) => api.core.skillLevel(gs, k, api.content)),
       ]);

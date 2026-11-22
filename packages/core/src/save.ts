@@ -11,7 +11,7 @@ import { parseReport } from './combat/report.ts';
 import { secMs } from './combat/numbers.ts';
 import { pouchUse } from './combat/fight-items.ts';
 import { loadoutLimits, syncLoadout } from './combat/loadout.ts';
-import { ensurePouch } from './combat/pouch.ts';
+import { ensurePouch, itemFitsKind, maxPouchSlots, pouchKind } from './combat/pouch.ts';
 import {
   FIGHT_KIND,
   OPERATION_KIND,
@@ -460,11 +460,95 @@ export const MIGRATIONS: readonly Migration[] = [
       counters: { ...counters, ...surveyedCounts(explores, content) },
     };
   },
-  // v23 -> v24: health became the performer's own state (it carries over between fights and regenerates). The
-  // fields are not written here: a save without `player.hp` or a clone's `hp` is read as full health, the maximum
-  // of the character's Vitality and Wounds, which is what every performer had at the start of a fight before.
+  // v23 -> v24: health became the performer's own state; no field is written (a save without `player.hp` or a clone's `hp` reads as full health).
   (state) => state,
+  // v24 -> v25: the pouch has typed slots (`content.pouchKinds`): every held item goes to the slot of the kind that takes it
+  // (the first with a place left), at most the kind's per-fight amount; what fits no kind, has no place left or is over the
+  // amount goes back to the Bank (a clone's: to its bag). A fight in progress carries its pouch counts in the new slot order.
+  (state, content) => {
+    const rank = isRecord(state.player) ? state.player.rank : undefined;
+    const bank: Record<string, unknown> = isRecord(state.bank) ? { ...state.bank } : {};
+    const mine = typePouch(state.pouch, state.combat, bank, rank, content);
+    const clones: Raw = {};
+    for (const [key, body] of Object.entries(isRecord(state.clones) ? state.clones : {})) {
+      if (!isRecord(body)) continue;
+      const bag: Record<string, unknown> = isRecord(body.bag) ? { ...body.bag } : {};
+      const theirs = typePouch(body.pouch, body.fight, bag, rank, content);
+      clones[key] = { ...body, pouch: theirs.pouch, bag, fight: theirs.fight };
+    }
+    return { ...state, bank, pouch: mine.pouch, clones, combat: mine.combat };
+  },
 ];
+
+/**
+ * The pouch of a save before the typed slots, put in the typed form, and the fight in progress (`fight`, or a combat with one)
+ * with its own pouch counts put in the same slot order. The slots are those the rank has (a student none, the vest's extra
+ * ones from its rank), in the order of `pouchLayout`; what does not fit goes into `bank` (the Bank or a clone's bag).
+ */
+function typePouch(
+  raw: unknown,
+  fight: unknown,
+  bank: Record<string, unknown>,
+  rank: unknown,
+  content: ContentDb,
+): { pouch: Raw; fight: unknown; combat: unknown } {
+  const items = new Map(content.items.map((i) => [i.id, i]));
+  const back = (id: string, n: number): void => {
+    if (n > 0) bank[id] = (typeof bank[id] === 'number' ? (bank[id] as number) : 0) + n;
+  };
+  // The kinds of the slots of the rank, as `pouchLayout` has them.
+  const known = typeof rank === 'string' && rankIndex(content, rank) >= 0;
+  const layout: string[] = [];
+  if (known && !isAcademyRank(content, rank)) {
+    for (const k of content.pouchKinds) for (let i = 0; i < k.slots; i++) layout.push(k.id);
+    if (rankIndex(content, rank) >= rankIndex(content, content.balance.K.pouch.vestRank))
+      for (const k of content.pouchKinds) for (let i = 0; i < (k.vest ?? 0); i++) layout.push(k.id);
+  }
+  const slots = layout.map((kind) => ({ kind, id: '', n: 0, amount: perFightOf(content, kind) }));
+  const held =
+    isRecord(fight) && isRecord(fight.fight) ? fight.fight : isRecord(fight) ? fight : null;
+  const carried = held && Array.isArray(held.pouch) ? held.pouch : [];
+  const counts = layout.map(() => ({ id: '', n: 0 }));
+  const old = isRecord(raw) && Array.isArray(raw.slots) ? raw.slots : [];
+  const medic = isRecord(raw) ? raw.medic : null;
+  let at: number | null = null;
+  old.forEach((s: unknown, i) => {
+    if (!isRecord(s) || typeof s.id !== 'string' || s.id === '') return;
+    const n = Math.floor(nonNegative(s.n));
+    const item = items.get(s.id);
+    const j = item
+      ? slots.findIndex((slot) => {
+          const kind = content.pouchKinds.find((k) => k.id === slot.kind);
+          return slot.id === '' && kind !== undefined && itemFitsKind(item, kind, content);
+        })
+      : -1;
+    const slot = slots[j];
+    if (!item || !slot) return back(s.id, n);
+    const keep = Math.min(perFightOf(content, slot.kind), n);
+    back(s.id, n - keep);
+    slot.id = s.id;
+    slot.n = keep;
+    const inFight = carried[i];
+    const inFightN =
+      isRecord(inFight) && inFight.id === s.id ? Math.floor(nonNegative(inFight.n)) : 0;
+    counts[j] = { id: s.id, n: Math.min(keep, inFightN) };
+    if (i === medic) at = j;
+  });
+  // A fight carries the same slots, with its own medic slot.
+  let carriedFight: unknown = fight;
+  if (held) {
+    const moved = {
+      ...held,
+      pouch: counts,
+      medic: held.medic === null || held.medic === undefined ? held.medic : at,
+    };
+    carriedFight = isRecord(fight) && isRecord(fight.fight) ? { ...fight, fight: moved } : moved;
+  }
+  return { pouch: { slots, medic: at }, fight: carriedFight, combat: carriedFight };
+}
+
+const perFightOf = (content: ContentDb, kind: string): number =>
+  content.pouchKinds.find((k) => k.id === kind)?.perFight ?? 0;
 
 /** Deepest nesting a slot's data may have. */
 const JSON_DEPTH = 6;
@@ -663,17 +747,18 @@ function sanitizeClones(raw: unknown, state: GameState, content: ContentDb): Gam
       const entry = { insight: count(m.insight), enlight: count(m.enlight) };
       return entry.insight > 0 || entry.enlight > 0 ? entry : undefined;
     });
+    const bag: Record<string, number> = pick(v.bag, (id, n) =>
+      index.itemIds.has(id) && typeof n === 'number' && Number.isInteger(n) && n > 0
+        ? Math.min(HELD_LIMIT, n)
+        : undefined,
+    );
     out[slot] = {
       life: Math.min(LIFE_FULL, Math.max(1, Math.floor(nonNegative(v.life)))),
       max: Math.min(1e9, nonNegative(v.max)),
       born: Math.min(state.now, Math.floor(nonNegative(v.born))),
-      bag: pick(v.bag, (id, n) =>
-        index.itemIds.has(id) && typeof n === 'number' && Number.isInteger(n) && n > 0
-          ? Math.min(HELD_LIMIT, n)
-          : undefined,
-      ),
+      bag,
       purse,
-      pouch: sanitizePouch(v.pouch, content),
+      pouch: sanitizePouch(v.pouch, content, bag),
       xp: pick(v.xp, (skill, n) => (index.skills.has(skill) && held(n) > 0 ? held(n) : undefined)),
       // A body without health (an older save) is at full health: the maximum is applied once the Wounds are read.
       hp: typeof v.hp === 'number' && Number.isFinite(v.hp) ? Math.max(0, v.hp) : Infinity,
@@ -777,23 +862,46 @@ function sanitizeLoadouts(raw: unknown, state: GameState, content: ContentDb): L
   return out;
 }
 
-/** A pouch read back: only items that can ride in it, at most a stack each. */
-function sanitizePouch(raw: unknown, content: ContentDb): PouchState {
+/**
+ * A pouch read back: a slot needs a kind the content knows, and holds only an item of that kind, at most the
+ * kind's per-fight amount. What a slot cannot keep (an item of the wrong kind, a slot beyond the most, the excess)
+ * goes into `bank`, the Bank of the state or the bag of the clone the pouch belongs to.
+ */
+function sanitizePouch(raw: unknown, content: ContentDb, bank: Record<string, number>): PouchState {
   const out: PouchState = { slots: [], medic: null };
   if (!isRecord(raw) || !Array.isArray(raw.slots)) return out;
   const index = indexOf(content);
-  const cap = content.balance.K.pouchStack;
-  const most = content.balance.K.pouch.slots + content.balance.K.pouch.vest;
-  for (const s of raw.slots.slice(0, most)) {
+  const most = maxPouchSlots(content);
+  const back = (id: string, n: number): void => {
+    if (n > 0) bank[id] = Math.min(HELD_LIMIT, (bank[id] ?? 0) + n);
+  };
+  let at: number | null = null;
+  raw.slots.forEach((s: unknown, i) => {
     const item = isRecord(s) && typeof s.id === 'string' ? index.items.get(s.id) : undefined;
     const n = isRecord(s) ? Math.floor(nonNegative(s.n)) : 0;
-    out.slots.push(
-      item && pouchUse(item) !== null ? { id: item.id, n: Math.min(cap, n) } : { id: '', n: 0 },
-    );
-  }
-  const medic = raw.medic;
-  if (typeof medic === 'number' && Number.isInteger(medic) && out.slots[medic]?.id)
-    out.medic = medic;
+    const kind = isRecord(s) && typeof s.kind === 'string' ? pouchKind(content, s.kind) : undefined;
+    // The amount the player set, kept within the kind's range (the kind's default when it is missing or not a whole number).
+    const asked = isRecord(s) ? s.amount : undefined;
+    const amount =
+      kind && typeof asked === 'number' && Number.isInteger(asked)
+        ? Math.min(kind.max, Math.max(1, asked))
+        : (kind?.perFight ?? 0);
+    if (!kind || out.slots.length >= most) {
+      if (item) back(item.id, n);
+      return;
+    }
+    if (i === raw.medic && item) at = out.slots.length;
+    if (item && pouchUse(item, content) !== null && itemFitsKind(item, kind, content)) {
+      const keep = Math.min(amount, n);
+      back(item.id, n - keep);
+      out.slots.push({ kind: kind.id, id: item.id, n: keep, amount });
+    } else {
+      if (item) back(item.id, n);
+      if (i === raw.medic) at = null;
+      out.slots.push({ kind: kind.id, id: '', n: 0, amount });
+    }
+  });
+  out.medic = at;
   return out;
 }
 
@@ -1066,7 +1174,7 @@ export function deserialize(
     index.techniques.has(key) || index.recipeIds.has(key) ? (true as const) : undefined,
   );
   state.loadouts = sanitizeLoadouts(raw.loadouts, state, content);
-  state.pouch = sanitizePouch(raw.pouch, content);
+  state.pouch = sanitizePouch(raw.pouch, content, state.bank);
   if (isRecord(raw.wounds)) {
     const stacks = Math.min(
       Math.floor(nonNegative(raw.wounds.stacks)),

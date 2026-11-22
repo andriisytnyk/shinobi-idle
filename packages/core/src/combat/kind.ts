@@ -10,7 +10,6 @@ import { earnXp, payOnStop } from './pending.ts';
 import { sharesOf } from './fight-allies.ts';
 import { alliesOf, heldOf } from './fight.ts';
 import { raidFlag } from '../raid.ts';
-import { ensurePouch, refillPouch } from './pouch.ts';
 import { newCombat, newOperation, releaseFight } from './system.ts';
 import { entryOf, fightTarget, zoneBlocked, zoneRequirement } from './zones.ts';
 
@@ -70,9 +69,6 @@ export const fightKind: ActionKind = {
   start(state, slot, id, content, rules) {
     const target = fightTarget(content, id);
     if (!target) return;
-    // The pouch is topped up from the bank on the way out.
-    ensurePouch(state, content);
-    refillPouch(state, content);
     state.combat = newCombat(state, target.enemy, content, rules, slot);
     // The first fight opens Vitality and Evasion, whose skills train only in combat.
     state.flags[FIRST_FIGHT_FLAG] = true;
@@ -87,8 +83,8 @@ export const fightKind: ActionKind = {
 };
 
 /**
- * An operation: the fights of its stages in order, with partial recovery between them and no
- * refill of the pouch. Finishing it raises its first-clear flag; a defeat or a stop resets the run.
+ * An operation: the fights of its stages in order, with partial recovery between them; the pouch is
+ * filled again before every stage, as before any fight. Finishing it raises its first-clear flag; a defeat or a stop resets the run.
  */
 export const operationKind: ActionKind = {
   has: (id, content) => indexOf(content).operations.has(id),
@@ -103,9 +99,6 @@ export const operationKind: ActionKind = {
   start(state, slot, id, content, rules) {
     const op = indexOf(content).operations.get(id);
     if (!op) return;
-    // The pouch is packed once, for the whole run.
-    ensurePouch(state, content);
-    refillPouch(state, content);
     state.combat = newOperation(state, op, content, rules, slot);
     state.flags[FIRST_FIGHT_FLAG] = true;
   },

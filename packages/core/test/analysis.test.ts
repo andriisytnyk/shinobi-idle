@@ -42,7 +42,8 @@ describe('the session forecast against real play', () => {
     { c: zone(false), played: 2, verdict: 'stable' },
     { c: zone(true), played: 2, verdict: 'stable' },
     { c: boss(46), played: 8, verdict: 'risky' },
-    { c: hideout, played: 3, verdict: 'risky' },
+    // Nine games, not three: with three the share inside the band is a coin flip of the seeds (1 of 3 or 2 of 3).
+    { c: hideout, played: 9, verdict: 'risky' },
   ];
   for (const [i, { c, played: games, verdict }] of cases.entries()) {
     it(`describes ${c.name}`, { timeout: 300_000 }, () => {
@@ -235,7 +236,7 @@ describe('coverage, hints and secrecy', () => {
     if (!wire) throw new Error('no bind tool');
     stock(state, { [wire.id]: 4 });
     run(state, { type: 'loadout.set', techniques: ['core:leaf_whirlwind'] });
-    run(state, { type: 'pouch.set', slot: 0, item: wire.id });
+    run(state, { type: 'pouch.set', slot: 1, item: wire.id });
     const b = analyze(state, marauder, quick);
     expect(b.coverage.find((c) => c.trait === 'evasive')?.by).toEqual([
       { kind: 'item', id: wire.id },

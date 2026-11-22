@@ -4,7 +4,6 @@
     currentHp,
     evalReq,
     loadoutLimits,
-    pouchSlotCount,
     rankIndex,
     startAnalysis,
     stepAnalysis,
@@ -54,6 +53,8 @@
 
   const content = game.content;
 
+  const kindName = (id: string): string =>
+    hasKey(`pouchKind.${id}.name`) ? t(`pouchKind.${id}.name`) : id;
   const first = $derived(entriesOf(target, content)[0]);
   const isBoss = $derived(content.bosses.some((b) => b.id === first));
 
@@ -93,9 +94,12 @@
           candidates: handCandidates(gs, content).map((tech) => tech.id),
           defence: defenceOf(gs, target, content, game.rules),
           passives: defenceTechniques(gs, content).map((tech) => tech.id),
-          pouch: gs.pouch.slots.map((s) => ({ ...s })),
-          pouchSlots: pouchSlotCount(gs, content),
-          choices: pouchChoices(gs, content),
+          pouch: gs.pouch.slots.map((s) => ({
+            ...s,
+            max: content.pouchKinds.find((k) => k.id === s.kind)?.max ?? 0,
+            stock: s.id === '' ? 0 : (gs.bank[s.id] ?? 0),
+            choices: pouchChoices(gs, content, s.kind),
+          })),
           medic: gs.pouch.medic,
           wounds: gs.wounds.stacks,
           fighting: gs.combat !== null,
@@ -126,7 +130,6 @@
   /** What the forecast depends on: it is run again when the hand, the pouch, the Wounds or the knowledge change. */
   const forecastInputs = $derived(
     game.read((gs) => {
-      const cap = content.balance.K.pouchStack;
       return JSON.stringify([
         target,
         knowledgeOfTarget(gs, target, content),
@@ -139,7 +142,7 @@
         // The pouch as the fight sees it: what the bank adds counts, the rest of the bank does not (it changes while the player gathers).
         gs.pouch.slots.map((s) => [
           s.id,
-          s.id === '' ? 0 : Math.min(cap, s.n + (gs.bank[s.id] ?? 0)),
+          s.id === '' ? 0 : Math.min(s.amount, s.n + (gs.bank[s.id] ?? 0)),
         ]),
         gs.pouch.medic,
         gs.wounds.stacks,
@@ -223,6 +226,19 @@
 
   function setPouch(slot: number, item: string): void {
     say(game.dispatch({ type: 'pouch.set', slot, item: item === '' ? null : item }));
+  }
+
+  /** The amount a slot takes into every fight: a number outside 1..max is cut to it; what is not a number leaves the amount as it was. */
+  function setAmount(slot: number, input: HTMLInputElement): void {
+    const row = view.pouch[slot];
+    const n = Math.floor(Number(input.value));
+    if (!row || input.value.trim() === '' || !Number.isFinite(n)) {
+      input.value = String(row?.amount ?? 1);
+      return;
+    }
+    const amount = Math.min(row.max, Math.max(1, n));
+    input.value = String(amount);
+    say(game.dispatch({ type: 'pouch.amount', slot, amount }));
   }
 
   function start(): void {
@@ -348,24 +364,27 @@
 
   <section class="block" data-prep-pouch>
     <h3>{t('prep.pouch')}</h3>
-    {#if view.pouchSlots === 0}
+    {#if view.pouch.length === 0}
       <p class="note">{t('prep.noPouch')}</p>
     {:else}
       <ul class="slots">
         {#each view.pouch as slot, i (i)}
-          <li class="slot" data-pouch-slot={i}>
+          <li class="slot" data-pouch-slot={i} data-pouch-kind={slot.kind}>
+            <span class="kind">{kindName(slot.kind)}</span>
             {#if view.fighting}
               {#if slot.id !== ''}<EntityLink kind="item" id={slot.id} /> ×{formatInt(
                   slot.n,
                 )}{:else}{t('prep.emptySlot')}{/if}
             {:else}
               <select
-                aria-label={t('prep.pouchSlot', { n: i + 1 })}
+                aria-label={t('prep.pouchPick', {
+                  kind: kindName(slot.kind),
+                })}
                 value={slot.id}
                 onchange={(e) => setPouch(i, e.currentTarget.value)}
               >
                 <option value="">{t('prep.emptySlot')}</option>
-                {#each view.choices as id (id)}
+                {#each slot.choices as id (id)}
                   <option
                     value={id}
                     disabled={id !== slot.id && view.pouch.some((s) => s.id === id)}
@@ -373,8 +392,36 @@
                   >
                 {/each}
               </select>
-              {#if slot.id !== ''}<span class="note">×{formatInt(slot.n)}</span>{/if}
             {/if}
+            {#if view.fighting}
+              <span class="note" data-pouch-amount
+                >{t('prep.pouchPerFight', { n: formatInt(slot.amount) })}</span
+              >
+            {:else}
+              <label class="amount">
+                <span class="note">{t('prep.pouchAmount')}</span>
+                <input
+                  type="number"
+                  inputmode="numeric"
+                  min="1"
+                  max={slot.max}
+                  step="1"
+                  data-pouch-amount
+                  aria-label={t('prep.pouchAmountFor', { kind: kindName(slot.kind) })}
+                  value={slot.amount}
+                  onchange={(e) => setAmount(i, e.currentTarget)}
+                />
+                <span class="note">{t('prep.pouchMax', { n: formatInt(slot.max) })}</span>
+              </label>
+            {/if}
+            {#if slot.id !== ''}
+              <span class="note" data-pouch-stock
+                >{t('prep.pouchBank', { n: formatInt(slot.stock) })}</span
+              >
+            {/if}
+            {#if view.fighting && slot.id !== ''}<span class="note" data-pouch-now
+                >{t('prep.pouchCarried', { n: formatInt(slot.n) })}</span
+              >{/if}
           </li>
         {/each}
       </ul>
@@ -536,6 +583,24 @@
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-2);
+    min-height: var(--control-md);
+  }
+
+  .slot .kind {
+    flex: 1 0 100%;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--fg-dim);
+  }
+
+  .slot .amount {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .slot .amount input {
+    width: calc(var(--space-8) * 1.5);
     min-height: var(--control-md);
   }
 

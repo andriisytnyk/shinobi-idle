@@ -172,12 +172,9 @@ describe('A11: speed with clones', () => {
     expect(ms).toBeLessThan(CAP);
   };
 
-  speedIt(
-    'plays 3 h of a fight with a standing clone beside it as fast as the fight alone',
-    () => {
-      beside('standing', 1.4);
-    },
-  );
+  speedIt('plays 3 h of a fight with a standing clone beside it as fast as the fight alone', () => {
+    beside('standing', 1.4);
+  });
 
   speedIt(
     'plays 3 h of a fight with a clone that practises beside it as fast as the fight alone',

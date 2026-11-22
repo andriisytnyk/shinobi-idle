@@ -87,6 +87,10 @@ function startFight(
   support: readonly TeamSupport[] = [],
 ): CombatState['fight'] {
   noteSighting(state, entry.id, content);
+  // Every fight begins with the pouch filled up to the per-fight amount of each slot from the Bank (or the clone's bag):
+  // after a win, a lost try, a stage of an operation or a mission, a boss. Nothing refills inside the fight.
+  ensurePouch(state, content);
+  refillPouch(state, content);
   // Health is the performer's own state (it carries over); the pools of the previous fight, when there is one, only add chakra and stamina.
   const snapshot = snapshotPlayer(
     state,
@@ -136,7 +140,7 @@ export function newCombat(
   return blank(entry, startFight(state, entry, content, rules), null, owner);
 }
 
-/** A fight of a mission's combat stage: full pools, the health the performer has, the current loadout and pouch (no refill), and the teammates' support. */
+/** A fight of a mission's combat stage: full pools, the health the performer has, the current loadout, the pouch filled for the fight, and the teammates' support. */
 export function newMissionCombat(
   state: GameState,
   entry: Enemy | Boss,
@@ -146,9 +150,6 @@ export function newMissionCombat(
   owner: number,
 ): CombatState {
   state.flags[FIRST_FIGHT_FLAG] = true;
-  // The pouch is topped up from the bank on the way into the fight, as for any fight.
-  ensurePouch(state, content);
-  refillPouch(state, content);
   const fight = startFight(state, entry, content, rules, undefined, support);
   // A mission has no combat tick: the bodies of the character's side earn by the clock at the rate a fight's tick pays.
   fight.allyXpRate = rate(entry.cl, content) / MS_PER_HOUR / WORK_PER_MS;
@@ -385,9 +386,9 @@ function cleared(state: GameState, op: Operation, content: ContentDb): void {
 
 /**
  * An enemy fell: count it, pay the Wounds, and let the player recover. In a zone the player
- * regains health, pools and the pouch before the same enemy comes again; in an operation only a
- * share, the pouch is not refilled and the next step's enemy comes. Returns true when the
- * operation is over.
+ * regains health and pools before the same enemy comes again; in an operation only a share and the
+ * next step's enemy comes. The pouch is filled before every fight, wherever it is fought (`startFight`).
+ * Returns true when the operation is over.
  */
 function victory(
   state: GameState,
@@ -428,7 +429,6 @@ function victory(
     setPerformerHp(state, player.hp, content);
     player.chakra = player.maxChakra;
     player.stamina = player.maxStamina;
-    refillPouch(state, content);
     // A pack of a raid at the village gates counts for the defence; the last one ends the raid and the fight with it.
     return raidPackFell(state, key, content);
   }

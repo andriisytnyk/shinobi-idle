@@ -338,7 +338,6 @@
     "dodgeStamina": 2,
     "ccCostPerLevel": 0.0015,
     "pillAction": 0.5,
-    "pouchStack": 4,
     "pillAt": 0.45,
     "food": [
       [
@@ -669,8 +668,6 @@
       "xpBonus": 0.1
     },
     "pouch": {
-      "slots": 3,
-      "vest": 1,
       "vestRank": "chunin"
     },
     "ai": {

@@ -1,5 +1,5 @@
 import { content } from '@shinobi/content';
-import { defaultRules, simulateFights } from '@shinobi/core';
+import { defaultRules, perFight, simulateFights } from '@shinobi/core';
 import { beforeAll, describe, expect, it } from 'vitest';
 import {
   allEntries,
@@ -115,7 +115,7 @@ describe('pnpm sim fight', () => {
 
   it('gives the meals of the balance model to a boss by default, and none to an ordinary enemy', () => {
     const food = modelFood(30, content);
-    expect(food?.n).toBe(content.balance.K.pouchStack);
+    expect(food?.n).toBe(perFight(content, 'core:pk_food'));
     const boss = content.bosses[0];
     if (!boss) throw new Error('no bosses in content');
     const row = fightRow(boss, { entries: [boss.id], runs: 3, seed: 1, comparePouch: false });

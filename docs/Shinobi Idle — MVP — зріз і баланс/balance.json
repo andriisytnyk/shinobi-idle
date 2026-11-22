@@ -229,7 +229,6 @@
   "dodgeStamina": 2,
   "ccCostPerLevel": 0.0015,
   "pillAction": 0.5,
-  "pouchStack": 4,
   "pillAt": 0.45,
   "food": [
    [

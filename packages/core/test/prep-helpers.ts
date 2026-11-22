@@ -27,12 +27,18 @@ export function healItemFor(c: number): string {
   return item.id;
 }
 
-/** Every item a prepared player might carry: four of the level's healing item and four of each tool. */
+/**
+ * What the prepared player of the balance tests has of each item: the most a slot can carry (the largest `max` of the
+ * pouch kinds), so the tests measure the strongest pouch the player can legally take. The maxes are the balance lever.
+ */
+export const PREPARED_STACK = Math.max(...content.pouchKinds.map((k) => k.max));
+
+/** Every item a prepared player might carry: `PREPARED_STACK` of the level's healing item and of each tool. */
 export function wellStocked(c: number): Record<string, number> {
-  const bank: Record<string, number> = { [healItemFor(c)]: K.pouchStack };
+  const bank: Record<string, number> = { [healItemFor(c)]: PREPARED_STACK };
   for (const i of content.items) {
     if (i.pouch === true || ['cleanse', 'dispel', 'bomb'].includes(i.fx?.kind ?? '')) {
-      bank[i.id] = K.pouchStack;
+      bank[i.id] = PREPARED_STACK;
     }
   }
   return bank;
@@ -101,7 +107,9 @@ export function playerFor(entry: Entry, nature: NatureId, opts: PlayerOptions): 
   }
   const target = planTarget(entry, everything, nature, content);
   // The chunin vest adds a pouch slot.
-  const slots = K.pouch.slots + (tier >= 2 ? K.pouch.vest : 0);
+  const slots = [...content.pouchKinds.flatMap((k) => Array<string>(k.slots).fill(k.id))];
+  if (tier >= 2)
+    slots.push(...content.pouchKinds.flatMap((k) => Array<string>(k.vest ?? 0).fill(k.id)));
   const plan = prepareFor(snap, limits, target, wellStocked(c), slots, null, content);
   snap.loadout = plan.techniques;
   if (opts.prep === 'prepared') {

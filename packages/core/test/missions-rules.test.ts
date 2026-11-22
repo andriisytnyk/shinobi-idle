@@ -528,21 +528,21 @@ describe('A7: failures', () => {
     });
   });
 
-  it('refills the pouch from the bank for a combat stage, at its start and after a win', () => {
+  it('fills the pouch from the bank for a combat stage, at its start, and not again when the stage is won', () => {
     const state = ableFor(mission('core:thief'));
     const heal = 'core:bulion_ramenu';
     state.bank[heal] = 40;
     expect(dispatch(state, { type: 'pouch.set', slot: 0, item: heal }, content).ok).toBe(true);
-    state.pouch.slots[0] = { id: heal, n: 1 };
+    state.pouch.slots[0] = { kind: 'core:pk_food', id: heal, n: 1, amount: 10 };
     startMission(state, 'core:thief');
     advance(state, (state.slots[0]?.data as { p: { ms: number } }).p.ms + 500, content);
     expect(state.combat).not.toBeNull();
-    // Packed to the stack on the way into the fight.
-    expect(state.combat?.fight.pouch[0]).toEqual({ id: heal, n: content.balance.K.pouchStack });
-    // Used up during the fight, and refilled when it is won.
+    // Packed to the per-fight amount on the way into the fight.
+    expect(state.combat?.fight.pouch[0]).toEqual({ id: heal, n: 4 });
+    // Used up during the fight; nothing refills it until the next fight begins.
     if (state.combat) state.combat.fight.pouch[0] = { id: heal, n: 0 };
     advance(state, 5 * 60_000, content);
-    expect(state.pouch.slots[0]?.n).toBe(content.balance.K.pouchStack);
+    expect(state.pouch.slots[0]?.n).toBe(0);
   });
 
   it('has a fight at hand in the combat stage, and drops it when the mission stops', () => {

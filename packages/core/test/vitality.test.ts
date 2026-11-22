@@ -10,6 +10,7 @@ import {
   advance,
   analyzeFight,
   createState,
+  STATE_VERSION,
   currentHp,
   defaultRules,
   deserialize,
@@ -291,7 +292,7 @@ describe('a save', () => {
     raw.state.v = 23;
     delete raw.state.player.hp;
     const old = deserialize(JSON.stringify(raw), content);
-    expect(old.v).toBe(24);
+    expect(old.v).toBe(STATE_VERSION);
     expect(old.player.hp).toBe(performerMaxHp(old, content));
   });
 

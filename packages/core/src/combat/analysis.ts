@@ -291,9 +291,10 @@ function snapshotFor(
     undefined,
     entries.map((e) => e.id),
   );
-  const cap = content.balance.K.pouchStack;
   snap.pouch = (snap.pouch ?? []).map((s) =>
-    s.id === '' ? { ...s } : { id: s.id, n: Math.min(cap, s.n + (state.bank[s.id] ?? 0)) },
+    s.id === ''
+      ? { ...s }
+      : { id: s.id, n: Math.min(s.cap ?? 0, s.n + (state.bank[s.id] ?? 0)), cap: s.cap ?? 0 },
   );
   if (opts.loadout) {
     const known = new Set(snap.known);
@@ -356,7 +357,25 @@ function runZone(
   };
 }
 
-/** Plays the operation `runs` times from the first step: pools carry over with the partial recovery, the pouch is not refilled, a lost fight ends the run. */
+/**
+ * Fills the slots of a pouch up to their per-fight amounts from what is left of the bank, as a fight start does.
+ * `caps` are the amounts by slot, `bank` the units left outside the pouch (it is spent).
+ */
+function refillSlots(
+  pouch: { id: string; n: number }[],
+  caps: readonly (number | undefined)[],
+  bank: Record<string, number>,
+): void {
+  pouch.forEach((slot, k) => {
+    if (slot.id === '') return;
+    const take = Math.min((caps[k] ?? 0) - slot.n, bank[slot.id] ?? 0);
+    if (take <= 0) return;
+    slot.n += take;
+    bank[slot.id] = (bank[slot.id] ?? 0) - take;
+  });
+}
+
+/** Plays the operation `runs` times from the first step: pools carry over with the partial recovery, the pouch is filled again before every fight from what the bank has left, a lost fight ends the run. */
 function runOperation(
   snap: PlayerSnapshot,
   op: Operation,
@@ -364,11 +383,16 @@ function runOperation(
   approach: number,
   runs: number,
   seed: number,
+  stock: Readonly<Record<string, number>>,
   content: ContentDb,
   rules: Rules,
 ): Batch {
   const K = content.balance.K;
   const steps = opSteps(op);
+  const caps = (snap.pouch ?? []).map((s) => s.cap);
+  // What the bank has outside the pouch: the stock of the pouch and the bank, less what the snapshot packed.
+  const outside: Record<string, number> = { ...stock };
+  for (const s of snap.pouch ?? []) if (s.id !== '') outside[s.id] = (outside[s.id] ?? 0) - s.n;
   const rng = createStream(seed, 'analysis.pick');
   const total: Figures = { runs, wins: 0, allMs: 0, winMs: 0, wounds: 0, items: {} };
   const respawn = secMs(K.respawn);
@@ -378,6 +402,7 @@ function runOperation(
   const play = (r: number): void => {
     let pools: { hp?: number; chakra?: number; stamina?: number } = {};
     let pouch = (snap.pouch ?? []).map((s) => ({ ...s }));
+    const bank = { ...outside };
     let wounds = snap.wounds ?? 0;
     let ms = 0;
     let won = true;
@@ -393,6 +418,8 @@ function runOperation(
         break;
       }
       const seedOf = nextUint32(createStream(seed, `analysis.${r}.${i}`));
+      // Every fight, every stage of the run too, begins with the slots filled up from the bank.
+      refillSlots(pouch, caps, bank);
       const fight: FightState = createFight(
         { ...snap, ...pools, pouch, wounds },
         encounter,
@@ -1096,7 +1123,17 @@ function step(job: AnalysisJob, found: Resolved, content: ContentDb, rules: Rule
       const n = Math.min(size, job.samples - f.done * size);
       const seed = nextUint32(createStream(job.seed, `fresh.${f.done}`));
       under.batch = found.op
-        ? runOperation(job.snap, found.op, job.encounters, job.approach, n, seed, content, rules)
+        ? runOperation(
+            job.snap,
+            found.op,
+            job.encounters,
+            job.approach,
+            n,
+            seed,
+            job.stock,
+            content,
+            rules,
+          )
         : runZone(
             job.snap,
             job.encounters[found.entries[0]?.id ?? ''] as Encounter,

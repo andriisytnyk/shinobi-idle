@@ -314,6 +314,11 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     at('cloneRoles', r.id);
     problem('default', `a second default clone role (the first is ${defaults[0]?.id ?? ''})`);
   }
+  for (const k of db.pouchKinds) {
+    at('pouchKinds', k.id);
+    if (k.slots + (k.vest ?? 0) < 1) problem('slots', 'a pouch kind with no slot at all');
+    if (k.max < k.perFight) problem('max', 'the most a slot may carry is below its default amount');
+  }
   // Exactly one target priority is the default: the fight falls back to it.
   const priorities = db.targetPriorities.filter((r) => r.default === true);
   if (db.targetPriorities.length > 0 && priorities.length === 0) {

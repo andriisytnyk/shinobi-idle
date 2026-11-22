@@ -7,6 +7,7 @@ import {
   evalReq,
   isSkillUnlocked,
   listSkillActions,
+  perFight,
   planPouch,
   pouchUse,
   skillLevel,
@@ -169,19 +170,22 @@ export function createFighterBot(): Bot {
       }
 
       // Shop and pouch: stock what the plan for the zone's enemy would carry.
-      const stack = content.balance.K.pouchStack;
+      // What the bot wants to own of an item: the per-fight amount of the kind of the slot that would carry it.
+      const kinds = state.pouch.slots.map((s) => s.kind);
+      const amount = (i: number): number => perFight(content, kinds[i] ?? '');
+      const most = Math.max(0, ...content.pouchKinds.map((k) => k.perFight));
       const target = best ? targetOf(state, best.entry.id, content) : null;
       const offered = content.shop.flatMap((s) => {
         const item = content.items.find((i) => i.id === s.item);
-        if (!item || pouchUse(item) === null) return [];
+        if (!item || pouchUse(item, content) === null) return [];
         return evalReq(state, s.req, content).met ? [item.id] : [];
       });
       const hypothetical = { ...state.bank };
-      for (const id of offered) hypothetical[id] = Math.max(hypothetical[id] ?? 0, stack);
+      for (const id of offered) hypothetical[id] = Math.max(hypothetical[id] ?? 0, most);
       const plan = planPouch(
         {
           bank: hypothetical,
-          slots: state.pouch.slots.length,
+          slots: kinds,
           traits: target?.traits ?? [],
           loadout: state.loadouts.active,
         },
@@ -190,10 +194,10 @@ export function createFighterBot(): Bot {
       let ryo = state.currencies[moneyOf(content)] ?? 0;
       const buys: Command[] = [];
       const bought = new Set<string>();
-      for (const { id } of plan) {
-        if (!offered.includes(id)) continue;
+      for (const [i, { id }] of plan.entries()) {
+        if (id === '' || !offered.includes(id)) continue;
         const held = state.pouch.slots.find((s) => s.id === id)?.n ?? 0;
-        const need = stack - held - (state.bank[id] ?? 0);
+        const need = amount(i) - held - (state.bank[id] ?? 0);
         const price =
           content.balance.K.goods[content.items.find((i) => i.id === id)?.buy ?? ''] ?? 0;
         const n = price > 0 ? Math.min(need, Math.floor(ryo / price)) : 0;
@@ -202,13 +206,12 @@ export function createFighterBot(): Bot {
         buys.push({ type: 'shop.buy', item: id, n });
         bought.add(id);
       }
-      const empty = state.pouch.slots.flatMap((s, i) => (s.id === '' ? [i] : []));
       const sets: Command[] = [];
-      for (const { id } of plan) {
+      for (const [slot, { id }] of plan.entries()) {
+        if (id === '' || state.pouch.slots[slot]?.id !== '') continue;
         if (state.pouch.slots.some((s) => s.id === id)) continue;
         if ((state.bank[id] ?? 0) < 1 && !bought.has(id)) continue;
-        const slot = empty.shift();
-        if (slot !== undefined) sets.push({ type: 'pouch.set', slot, item: id });
+        sets.push({ type: 'pouch.set', slot, item: id });
       }
 
       const same = action && running?.kind === action.kind && running.id === action.id;

@@ -10,9 +10,8 @@ import {
   type AnalysisTarget,
   type GameState,
 } from '../src/index.ts';
-import { K } from './fight-helpers.ts';
 import { setLevel } from './helpers.ts';
-import { wellStocked } from './prep-helpers.ts';
+import { PREPARED_STACK, wellStocked } from './prep-helpers.ts';
 import {
   fighter,
   ids,
@@ -71,7 +70,7 @@ export const hideout: Case = {
   name: 'the hideout operation',
   target: { kind: 'operation', id: 'core:op_hideout' },
   level: 50,
-  bank: Object.fromEntries(Object.keys(wellStocked(50)).map((id) => [id, 20 * K.pouchStack])),
+  bank: Object.fromEntries(Object.keys(wellStocked(50)).map((id) => [id, 20 * PREPARED_STACK])),
   knows: ['core:guard_pack', 'core:boss_twins', 'core:boss_mist'],
   prepare: (s) => {
     unlock(s, 'op.hideout.unlocked');
