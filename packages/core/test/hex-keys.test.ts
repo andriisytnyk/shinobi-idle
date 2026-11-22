@@ -268,6 +268,24 @@ describe('crossings', () => {
     ).toBeNull();
   });
 
+  it('leaves every cell that needs no key reachable from the village without the key of water (the story route crosses the river by the fords)', () => {
+    const state = genin();
+    surveyAll(state);
+    state.world.location = 'core:okolytsi_sela';
+    const shut = content.cells
+      .filter((c) => hexKeyIds(content, hexKey(c.hex[0], c.hex[1])).length === 0)
+      .filter((c) => routeTo(state, content, { q: c.hex[0], r: c.hex[1] }) === null)
+      .map((c) => c.id);
+    expect(shut).toEqual([]);
+    // The story cell of the valley lies behind the river, and the only way to it is the ford.
+    const valley = content.cells.find((c) => c.id === 'core:skhovok_pid_vodospadom');
+    expect(valley).toBeDefined();
+    expect(routeTo(state, content, { q: 13, r: 11 })).not.toBeNull();
+    // Crossings sit on river hexes, never in a lake.
+    for (const h of content.hexes.filter((x) => x.crossing))
+      expect(h.terrain, `${h.q},${h.r}`).toBe('river');
+  });
+
   it('lets a bridge be crossed, while the river beside it and the lake stay shut', () => {
     const bridged = {
       ...content,
