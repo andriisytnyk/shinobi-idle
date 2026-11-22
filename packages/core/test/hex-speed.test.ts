@@ -9,6 +9,7 @@ import {
   deserialize,
   dispatch,
   hexKey,
+  hexKeyIds,
   serialize,
   travelPlan,
   type GameState,
@@ -56,7 +57,11 @@ describe('A11: the map is quick offline', () => {
         const state = genin(1);
         // All the land is surveyed: the walk is a plain search over the whole grid.
         for (const h of content.hexes) if (h.terrain) state.world.surveyed[hexKey(h.q, h.r)] = true;
-        const ends = ['core:okolytsi_sela', content.cells[content.cells.length - 1]?.id ?? ''];
+        // The far end is the last cell that needs no key (a keyed one is not reachable on foot without it).
+        const far = content.cells
+          .filter((c) => hexKeyIds(content, hexKey(c.hex[0], c.hex[1])).length === 0)
+          .pop();
+        const ends = ['core:okolytsi_sela', far?.id ?? ''];
         let walked = 0;
         for (let leg = 0; walked < 12 * HOUR; leg++) {
           const to = ends[(leg + 1) % 2] ?? '';

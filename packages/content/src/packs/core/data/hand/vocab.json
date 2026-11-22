@@ -554,6 +554,7 @@
     {
       "id": "river",
       "token": "--terrain-river",
+      "key": "water",
       "glyph": "M-12 -4q4 -4 8 0t8 0t8 0M-12 4q4 -4 8 0t8 0t8 0",
       "finds": {
         "chance": 0.08,
@@ -590,6 +591,7 @@
     {
       "id": "lake",
       "token": "--terrain-lake",
+      "key": "water",
       "glyph": "M-10 0a10 6 0 1 0 20 0a10 6 0 1 0 -20 0M-5 0a5 3 0 1 0 10 0a5 3 0 1 0 -10 0",
       "finds": {
         "chance": 0.07,

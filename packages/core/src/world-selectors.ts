@@ -1,8 +1,8 @@
 import type { CellKey, ContentDb, Mod, Payout, PoiKind } from '@shinobi/content';
 import { MS_PER_HOUR } from './formulas.ts';
-import { indexOf } from './lookup.ts';
+import { graduateReq, indexOf } from './lookup.ts';
 import { getMod } from './mod.ts';
-import { evalReq, type ReqResult } from './requirements.ts';
+import { evalReq, reqMet, type ReqResult } from './requirements.ts';
 import { defaultRules, type Rules } from './rules.ts';
 import type { GameState } from './state.ts';
 import {
@@ -30,7 +30,13 @@ import {
 } from './world.ts';
 import {
   hexKey,
+  crossingAt,
+  type Crossing,
+  hexKeyIds,
   isSurveyed,
+  unmetKeys,
+  missingKeys,
+  routeKeyCost,
   positionHex,
   reachFrom,
   terrainMinutes,
@@ -165,7 +171,7 @@ export function cellInfo(
   if (!why && !requirementsMet) {
     why = !isRegionOpen(state, region, content)
       ? 'error.regionClosed'
-      : keyResult && !keyResult.met
+      : missingKeys(state, content, hexKey(cell.hex[0], cell.hex[1])).length > 0
         ? 'error.keyMissing'
         : 'error.scoutLevelLow';
   }
@@ -243,6 +249,12 @@ export interface TravelPlan {
   hexes: string[];
   /** Length of the whole route in ms at full speed, modifiers included; 0 when there is no route. */
   ms: number;
+  /** The keys (ids) the shortest way without keys would need that the performer lacks: why the trip is refused (`error.keyMissing`), or what the route goes round. Empty when no key is in the way. */
+  keys: string[];
+  /** Whether the route goes round: the short way is shut for want of a key, and a longer one is open. */
+  detour: boolean;
+  /** The kinds of crossing (ford, bridge) the route uses over water, without repeats. */
+  crossings: Crossing[];
 }
 
 /** The route to the hex that `address` names with its length, for showing before the player goes. */
@@ -259,6 +271,11 @@ export function travelPlan(
     : indexOf(content).hexes.get(address);
   const route = blocked === null && hex ? routeTo(state, content, hex, slot) : null;
   const price = blocked === null ? travelPrice(state, address, content, rules, slot) : null;
+  // What the keys cost: asked only when the performer lacks some key, and the target is a surveyed hex.
+  const keyCost =
+    hex && isSurveyed(state, content, hexKey(hex.q, hex.r)) && unmetKeys(state, content).length > 0
+      ? (routeKeyCost(state, content, hex, slot) ?? [])
+      : [];
   return {
     blocked,
     price,
@@ -266,6 +283,9 @@ export function travelPlan(
     free: jumpBlocked(state, address, 'outpost', content, rules, slot) === null,
     hexes: route?.hexes ?? [],
     ms: hex && route ? (routeMs(state, content, rules, hex, slot) ?? 0) : 0,
+    keys: keyCost,
+    detour: route !== null && keyCost.length > 0,
+    crossings: route ? [...new Set(route.hexes.flatMap((k) => crossingAt(content, k) ?? []))] : [],
   };
 }
 
@@ -360,6 +380,10 @@ export interface HexInfo {
   surveyWhy: string | null;
   /** Length of one survey and Scouting XP per hour at full speed, modifiers included; 0 when the hex cannot be surveyed. */
   surveyMs: number;
+  /** The keys the hex needs (its cell's and its terrain's) with what each asks, once the hex is surveyed; empty for an open hex and in fog. A hex whose key is unmet cannot be entered, crossed or surveyed. */
+  keys: { id: string; req: ReqResult }[];
+  /** A ford or a bridge over water, once the hex is surveyed: it is passed and surveyed without the key of water. */
+  crossing: Crossing | null;
 }
 
 /** The view of one hex of the grid, or null for a coordinate that is no hex. */
@@ -383,8 +407,12 @@ export function hexInfo(
     ? surveyBlocked(state, subject.address, content, reach, slot)
     : 'error.unknownCell';
   let why = blocked;
-  if (!why && req && !evalReq(state, req, content).met)
-    why = req.t === 'rank' ? 'error.surveyRank' : 'error.scoutLevelLow';
+  if (!why && req && !evalReq(state, req, content).met) {
+    // The key is named only on a hex the player has surveyed: in fog nothing says what the hex is.
+    if (!reqMet(state, graduateReq(content), content)) why = 'error.surveyRank';
+    else if (surveyed && missingKeys(state, content, key).length > 0) why = 'error.keyMissing';
+    else why = 'error.scoutLevelLow';
+  }
   return {
     key,
     q: hex.q,
@@ -414,6 +442,13 @@ export function hexInfo(
     surveyWhy: why,
     surveyMs:
       subject && why === null ? exploreIntervalMs(state, content, rules, subject.address) : 0,
+    crossing: surveyed ? crossingAt(content, key) : null,
+    keys: surveyed
+      ? hexKeyIds(content, key).flatMap((id) => {
+          const need = content.cellKeys[id];
+          return need ? [{ id, req: evalReq(state, need, content) }] : [];
+        })
+      : [],
   };
 }
 

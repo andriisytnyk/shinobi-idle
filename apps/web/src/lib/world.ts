@@ -19,6 +19,8 @@ const KEY_ICON: Readonly<Record<string, string>> = {
 };
 
 export const keyNameKey = (key: string): string => `world.key.${key}`;
+/** The name of what a key asks, as a performer would say it (the technique): «Ходіння по воді» for the key of water. */
+export const keyNeedKey = (key: string): string => `world.key.need.${key}`;
 export const poiKindKey = (kind: string): string => `world.poi.kind.${kind}`;
 
 /** Whether a route shows the map: the world page, or the page of a cell, a region or a point of interest. */
