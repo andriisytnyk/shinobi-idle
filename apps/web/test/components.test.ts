@@ -337,6 +337,9 @@ describe('A5: goal panel', () => {
     expect(body).not.toContain('Знешкодити:</span> ???');
     // Either a way to the place, or the hint of how to find it when the place is still hidden.
     expect(body).toMatch(/data-go|data-where-hint/);
+    // And the region to look in, with a link that opens the map on the search area.
+    expect(body).toContain('data-where-look="enemy"');
+    expect(body).toContain('href="#/world/look/enemy/core:arsonist"');
   });
 
   it('says what the exploration step counts: surveyed areas of the region, from before the step too', () => {

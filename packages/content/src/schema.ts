@@ -1885,6 +1885,7 @@ export const balanceParamsSchema = z.object({
    * hexes within this many steps of the first cell are surveyed in a new game. `plainSurvey`:
    * surveys that reach each level of a hex that is not a cell (the levels are its length).
    * `plainScout`: the pace level (as a region's `scout`) that XP of surveying such a hex follows.
+   * `hintRadius`: the radius (hexes) of the search area that says where to look for a thing a requirement asks to find; 0 is the exact hex. `hintMin`: the fewest hexes of that area a clip to the region may leave.
    */
   map: z.object({
     terrain: shapeOf(
@@ -1899,6 +1900,8 @@ export const balanceParamsSchema = z.object({
       .min(1),
     outpostRange: z.number().int().min(0),
     startRadius: z.number().int().min(0),
+    hintRadius: z.number().int().min(0),
+    hintMin: z.number().int().min(1),
     plainSurvey: z.array(z.number().int().min(1)).min(1),
     plainScout: z.number().int().min(1),
     /**

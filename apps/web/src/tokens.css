@@ -42,6 +42,7 @@
   --terrain-lake: #3b6f9e;
   --map-fog: #232731;
   --map-fog-line: #2f3440;
+  --map-look: var(--rank-s-gold);
   --map-sea: #171a21;
 
   /* Progress of a running cycle, 0..1; animated by lib/time-progress.ts, read by bars, the seal strip and the emblem flash */

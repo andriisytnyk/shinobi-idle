@@ -1,7 +1,8 @@
 import type { Poi } from '@shinobi/content';
-import type { ReqResult } from '@shinobi/core';
+import type { HintKind, HintTarget, ReqResult } from '@shinobi/core';
 import { entityRefsIn } from './entity-data.ts';
 import type { EntityRef, Route } from './route.ts';
+import { nameShown } from './reveal.ts';
 import { game } from './store.ts';
 
 /** The icon of a point of interest whose kind no UI pack has a renderer for. */
@@ -44,6 +45,23 @@ export function worldFocus(route: Route): { cell: string | null; region: string 
     return { cell: cell?.id ?? null, region: cell?.region ?? null };
   }
   return { cell: null, region: null };
+}
+
+/** What a «where to look» hint is asked for: the kinds `locationHint` of the core places on the map. */
+export const HINT_KINDS: readonly HintKind[] = ['enemy', 'zone', 'poi', 'cell', 'place'];
+
+export const isHintKind = (kind: string): kind is HintKind =>
+  (HINT_KINDS as readonly string[]).includes(kind);
+
+/** The map with the search area of a target highlighted: `#/world/look/<kind>/<id>`. */
+export const lookHref = (target: HintTarget): string =>
+  `#/world/look/${target.kind}/${encodeURIComponent(target.id).replace(/%3A/gi, ':')}`;
+
+/** The point of interest a requirement's map flag (`poi.<id>`) asks for, as a hint target; null for other flags. A thing the player has not discovered gets none: its id in the link would give it away. */
+export function flagLookTarget(flag: string): HintTarget | null {
+  if (!flag.startsWith('poi.')) return null;
+  const id = flag.slice('poi.'.length);
+  return nameShown({ kind: 'poi', id }) ? { kind: 'poi', id } : null;
 }
 
 /** The cell a point of interest lies in. */

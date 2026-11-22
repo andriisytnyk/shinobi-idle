@@ -18,6 +18,7 @@
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import ReqTree from './ReqTree.svelte';
+  import WhereToLook from './WhereToLook.svelte';
 
   const content = game.content;
 
@@ -106,6 +107,9 @@
     <span class="bar" aria-hidden="true"
       ><span class="fill" style:width="{fraction * 100}%"></span></span
     >
+    {#if enemy && !met}
+      <div class="look"><WhereToLook target={{ kind: 'enemy', id: enemy }} /></div>
+    {/if}
   </div>
 {:else if payment}
   <div class="row" class:met={payment.done} data-met={payment.done} data-pay>
@@ -134,7 +138,8 @@
     grid-template-columns: auto 1fr auto;
     grid-template-areas:
       'mark label count'
-      '. bar bar';
+      '. bar bar'
+      '. look look';
     align-items: center;
     column-gap: var(--space-2);
     padding: var(--space-1) 0;
@@ -202,6 +207,10 @@
     grid-area: count;
     font-size: var(--text-xs);
     font-variant-numeric: tabular-nums;
+  }
+
+  .look {
+    grid-area: look;
   }
 
   .bar {

@@ -53,6 +53,7 @@ export * from './village-selectors.ts';
 export * from './village-state.ts';
 export * from './hex.ts';
 export * from './hex-hooks.ts';
+export * from './hint.ts';
 export * from './world.ts';
 export * from './points.ts';
 export * from './finds.ts';

@@ -39,9 +39,21 @@
     sheet?: boolean;
     onSelect: (coord: string | null) => void;
     onHover?: (coord: string | null) => void;
+    /** The search area of «where to look»: the hexes to highlight; the map opens on `lookAt`. */
+    look?: ReadonlySet<string> | null;
+    lookAt?: string | null;
   }
 
-  let { view, selected, preview, sheet = false, onSelect, onHover }: Props = $props();
+  let {
+    view,
+    selected,
+    preview,
+    sheet = false,
+    onSelect,
+    onHover,
+    look = null,
+    lookAt = null,
+  }: Props = $props();
 
   const content = game.content;
 
@@ -165,6 +177,13 @@
         ? clamp(cameraAt(p, width / 2, height / 2, k))
         : clamp(cameraAt({ x: 0, y: 0 }, width / 2, height / 2, k));
     });
+  });
+
+  // A search area opens the map on itself, at a size a finger can hit.
+  $effect(() => {
+    const at = lookAt;
+    if (!at || width === 0 || height === 0) return;
+    untrack(() => focusOn(at, Math.max(zoomMin, START_HEX / (SIZE * Math.sqrt(3)))));
   });
 
   // A resize keeps the map in view.
@@ -425,6 +444,9 @@
           onpointerleave={(e) => e.pointerType === 'mouse' && onHover?.(null)}
         >
           <path d={HEX_PATH} class="face" style:--_fill={fillOf(h.terrain)} />
+          {#if look?.has(h.coord)}
+            <path d={HEX_PATH} class="look" data-look-hex aria-hidden="true" />
+          {/if}
           {#if mark}
             <path
               d={PLACE_MARKS[mark.role] ?? PLACE_FALLBACK}
@@ -840,6 +862,14 @@
   .pip.on {
     fill: var(--accent);
     stroke: var(--bg);
+  }
+
+  /* The search area of «where to look»: a gold wash with a solid edge, unlike the dashed route and reach. */
+  .look {
+    fill: color-mix(in srgb, var(--map-look) 30%, transparent);
+    stroke: var(--map-look);
+    stroke-width: 2.4;
+    pointer-events: none;
   }
 
   .route {

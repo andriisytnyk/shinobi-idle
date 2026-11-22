@@ -1,5 +1,14 @@
 <script lang="ts">
-  import { hexKey, hexOfAddress, isSurveyed, travelPlan } from '@shinobi/core';
+  import {
+    hexDistance,
+    hexKey,
+    hexOfAddress,
+    isSurveyed,
+    locationHint,
+    parseHexKey,
+    travelPlan,
+    type HintTarget,
+  } from '@shinobi/core';
   import { untrack } from 'svelte';
   import AutoSurveyButton from '../components/AutoSurveyButton.svelte';
   import HexMap from '../components/HexMap.svelte';
@@ -12,6 +21,7 @@
   import { MASK } from '../lib/reveal.ts';
   import { navigate } from '../lib/router.svelte.ts';
   import { game } from '../lib/store.ts';
+  import { isHintKind } from '../lib/world.ts';
   import SimplePage from './SimplePage.svelte';
 
   const content = game.content;
@@ -19,9 +29,39 @@
   interface Props {
     /** What the route asks the map to show: a cell with its panel, or a region. */
     focus?: { cell: string | null; region: string | null };
+    /** «Where to look» (`#/world/look/<kind>/<id>`): the thing whose search area the map highlights. */
+    look?: { kind: string; id: string } | null;
   }
 
-  let { focus = { cell: null, region: null } }: Props = $props();
+  let { focus = { cell: null, region: null }, look = null }: Props = $props();
+
+  /** The search area of the thing to look for: null on a normal visit of the map, or for a thing with no place. */
+  const hint = $derived(
+    look && isHintKind(look.kind)
+      ? game.read((gs) => locationHint(gs, content, look as HintTarget))
+      : null,
+  );
+  const lookSet = $derived(hint ? new Set(hint.hexes) : null);
+  /** The hex of the area nearest to its middle: the map opens on it. */
+  const lookAt = $derived.by(() => {
+    if (!hint || hint.hexes.length === 0) return null;
+    const points = hint.hexes.flatMap((k) => parseHexKey(k) ?? []);
+    const mid = {
+      q: points.reduce((s, p) => s + p.q, 0) / points.length,
+      r: points.reduce((s, p) => s + p.r, 0) / points.length,
+    };
+    let best = hint.hexes[0] ?? null;
+    let bestDistance = Infinity;
+    for (const key of hint.hexes) {
+      const p = parseHexKey(key);
+      const d = p ? hexDistance({ q: p.q, r: p.r }, { q: mid.q, r: mid.r }) : Infinity;
+      if (d < bestDistance) {
+        best = key;
+        bestDistance = d;
+      }
+    }
+    return best;
+  });
 
   const view = $derived(game.read((gs): MapView => mapView(gs, content, game.rules)));
   const byCoord = $derived(new Map(view.hexes.map((h) => [h.coord, h])));
@@ -161,6 +201,17 @@
       </div>
     </div>
 
+    {#if hint}
+      <p class="looking" data-looking={hint.exact ? 'exact' : 'area'}>
+        <span class="swatch look"></span>
+        <span
+          >{t(hint.exact ? 'look.map.found' : 'look.map.area')}
+          <strong>{hint.regions.map((r) => t(`region.${r}.name`)).join(', ')}</strong></span
+        >
+        <a class="clear" href="#/world" data-look-clear>{t('look.clear')}</a>
+      </p>
+    {/if}
+
     <div
       class="stage"
       class:wide
@@ -174,6 +225,8 @@
           {view}
           {selected}
           {preview}
+          look={lookSet}
+          {lookAt}
           {sheet}
           onSelect={select}
           onHover={(c) => (hovered = c)}
@@ -210,6 +263,7 @@
         <li><span class="swatch reach"></span>{t('map.legend.reach')}</li>
         <li><span class="swatch you"></span>{t('map.legend.you')}</li>
         <li><span class="swatch route"></span>{t('map.legend.route')}</li>
+        <li><span class="swatch look"></span>{t('map.legend.look')}</li>
         <li><Icon name="lucide:landmark" size={16} />{t('map.legend.place')}</li>
         <li><span class="swatch poi"></span>{t('map.legend.poi')}</li>
         <li><span class="swatch pips"></span>{t('map.legend.pips')}</li>
@@ -408,6 +462,24 @@
     border-top: var(--border-thick) dashed var(--accent);
     border-radius: 0;
     background: none;
+  }
+
+  .swatch.look {
+    border-color: var(--map-look);
+    background: color-mix(in srgb, var(--map-look) 30%, transparent);
+  }
+
+  .looking {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-3);
+  }
+
+  .looking .clear {
+    margin-inline-start: auto;
+    color: var(--accent);
   }
 
   .swatch.poi {
