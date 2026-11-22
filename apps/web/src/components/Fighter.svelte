@@ -114,6 +114,11 @@
         />{#if f.of > 1}&nbsp;<span class="nth">#{f.nth}</span>{/if}{/if}
     </h3>
     {#if !f.alive}<span class="down-tag">{t('fight.down')}</span>{/if}
+    {#if f.side === 'enemy' && f.alive && targeted}<span
+        class="aim"
+        data-ui="fight-aim"
+        title={t('fight.target.hint')}>◎ {t('fight.target.mark')}</span
+      >{/if}
     {@render pops()}
   </header>
 
@@ -307,6 +312,13 @@
   .down-tag {
     color: var(--fg-dim);
     font-size: var(--text-xs);
+  }
+
+  /* The small mark on the enemy the player's side aims at. */
+  .aim {
+    color: var(--accent);
+    font-size: var(--text-xs);
+    white-space: nowrap;
   }
 
   .statuses {

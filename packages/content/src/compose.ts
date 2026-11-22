@@ -72,6 +72,7 @@ export const ENTITY_LISTS = [
   'traits',
   'combos',
   'cloneRoles',
+  'targetPriorities',
 ] as const satisfies readonly EntityListKey[];
 
 const ENTITY_LIST_SET: ReadonlySet<string> = new Set(ENTITY_LISTS);
@@ -380,6 +381,7 @@ const DESCRIBED: Partial<Record<EntityListKey, string>> = {
   fieldworks: 'fieldwork',
   raids: 'raid',
   cloneRoles: 'cloneRole',
+  targetPriorities: 'targetPriority',
   renownRanks: 'renownRank',
 };
 

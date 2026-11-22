@@ -700,6 +700,7 @@ function sanitizeLoadouts(raw: unknown, state: GameState, content: ContentDb): L
     signature: null,
     basis: '',
     cloneRole: null,
+    targetPriority: null,
     saved: {},
   };
   if (!isRecord(raw)) return out;
@@ -747,6 +748,13 @@ function sanitizeLoadouts(raw: unknown, state: GameState, content: ContentDb): L
   out.cloneRole =
     typeof raw.cloneRole === 'string' && raw.cloneRole.length > 0 && raw.cloneRole.length <= 200
       ? raw.cloneRole
+      : null;
+  // The same for the target priority; a save from before it was added has none, and plays the default one.
+  out.targetPriority =
+    typeof raw.targetPriority === 'string' &&
+    raw.targetPriority.length > 0 &&
+    raw.targetPriority.length <= 200
+      ? raw.targetPriority
       : null;
   if (isRecord(raw.saved)) {
     for (const [name, entry] of Object.entries(raw.saved)) {

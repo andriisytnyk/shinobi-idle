@@ -3,6 +3,8 @@ import { createStream, nextFloatFrom } from '../rng.ts';
 import { addEffect, findEffect, isSuppressed, removeEffect, statOf } from './fight-effects.ts';
 import { sharesOf, summonSpecOf } from './fight-allies.ts';
 import { cloneRoleOf, copiesHand, pickCloneHand } from './fight-roles.ts';
+import { targetPriorityOf } from './fight-priority.ts';
+import { chosenTarget } from './fight-ai.ts';
 import { figure, need } from './need.ts';
 import { answersTraitData, balanceOf, beatenBy, fightData, type TraitMod } from './fight-data.ts';
 import {
@@ -384,6 +386,9 @@ function buildKit(snap: PlayerSnapshot, content: ContentDb): PlayerKit {
     if (role.threat !== 1) kit.cloneThreat = role.threat;
     if (role.default !== true) kit.cloneRole = role.id;
   }
+  // The target priority: the default one leaves the kit as it was, so a fight with it is saved byte for byte as before.
+  const priority = targetPriorityOf(content, snap.targetPriority);
+  if (priority && priority.default !== true) kit.targetPriority = priority.id;
   return kit;
 }
 
@@ -1173,6 +1178,20 @@ function viewOf(tech: KitTechnique): KitTechnique {
   return copy;
 }
 
+/**
+ * The enemy the player's side would attack next by the target priority of the fight (the id of the body), for a
+ * screen that marks it; null when none stands. Reads the fight, changes nothing.
+ */
+export function aimedEnemy(
+  fight: FightState,
+  content: ContentDb,
+  rules: FightRules,
+): string | null {
+  if (!alive(fight.player)) return null;
+  const view = buildView(makeCtx(fight, content, rules), fight.player);
+  return chosenTarget(view)?.id ?? view.enemies[0]?.id ?? null;
+}
+
 export function lowestHp(enemies: readonly Combatant[]): Combatant | undefined {
   let best: Combatant | undefined;
   for (const e of enemies) if (alive(e) && (!best || e.hp < best.hp)) best = e;
@@ -1264,6 +1283,14 @@ function buildView(ctx: FightCtx, actor: Combatant): FightView {
       interrupts: facts.interrupts,
     };
   });
+  // The helpers a leader calls back while he lives are named by the data of the boss entry.
+  const callsBack = content.bosses.find((b) => b.id === fight.encounter.id)?.special.companions;
+  const callsBackHook = callsBack?.respawns === true ? callsBack.hook : undefined;
+  const bossFxRows = content.balance.K.bossFx as Record<string, Record<string, number> | undefined>;
+  const callsBackMs = callsBack ? (bossFxRows[callsBack.fx]?.everyMs ?? 0) : 0;
+  const kindOf = (e: Combatant): string => `${e.entry}|${e.specials.join(',')}`;
+  const watched = new Map<string, number>();
+  for (const e of fight.enemies) if (e.last !== null) watched.set(kindOf(e), e.damage);
   const enemies: ViewEnemy[] = living.map((e) => {
     const known = fight.knowledge[e.entry];
     const knownTraits = known ? e.traits.filter((t) => known.includes(t)) : [...e.traits];
@@ -1296,10 +1323,18 @@ function buildView(ctx: FightCtx, actor: Combatant): FightView {
         nextCastIn = info.inWork;
       }
     }
+    // The player has seen what a body of this kind does once one has swung; before that, its level is all there is to go by.
+    const perHit =
+      watched.get(kindOf(e)) ?? enemyStats({ cl: e.data[LEVEL_KEY] ?? 0 }, content).damage;
+    const cycleMs = e.waitMs + e.strikeMs;
     return {
       id: e.id,
       hp: e.hp,
       hpShare: e.maxHp > 0 ? e.hp / e.maxHp : 0,
+      cl: e.data[LEVEL_KEY] ?? 0,
+      dps: cycleMs > 0 ? (perHit * secMs(1)) / cycleMs : 0,
+      respawnMs: callsBackMs,
+      respawns: mechanicKnown && callsBackHook !== undefined && e.specials.includes(callsBackHook),
       nature: e.nature,
       effects: viewEffects(fight, e),
       knownTraits,
@@ -1332,6 +1367,7 @@ function buildView(ctx: FightCtx, actor: Combatant): FightView {
     allies: sideBodies(fight).filter((b) => b !== actor && alive(b) && b.ally !== undefined).length,
     habituation: { ...fight.uses },
     ai: tier,
+    priority: targetPriorityOf(content, fight.kit.targetPriority)?.rule ?? 'auto',
     visibleTraits: content.ai.visibleTraits,
     vocab: fightData(content).ai,
     pouch: (own ? fight.pouch : []).flatMap((slot, i) => {

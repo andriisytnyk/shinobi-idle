@@ -314,6 +314,19 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
     at('cloneRoles', r.id);
     problem('default', `a second default clone role (the first is ${defaults[0]?.id ?? ''})`);
   }
+  // Exactly one target priority is the default: the fight falls back to it.
+  const priorities = db.targetPriorities.filter((r) => r.default === true);
+  if (db.targetPriorities.length > 0 && priorities.length === 0) {
+    at('targetPriorities', db.targetPriorities[0]?.id ?? '');
+    problem('default', 'no target priority is the default');
+  }
+  for (const r of priorities.slice(1)) {
+    at('targetPriorities', r.id);
+    problem(
+      'default',
+      `a second default target priority (the first is ${priorities[0]?.id ?? ''})`,
+    );
+  }
   for (const t of db.traits) {
     at('traits', t.id);
     ref('answer', t.answer, 'tags');

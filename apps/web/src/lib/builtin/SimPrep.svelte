@@ -54,6 +54,7 @@
         Object.keys(gs.known).filter((id) => gs.known[id]).length,
         gs.loadouts.active,
         gs.loadouts.cloneRole,
+        gs.loadouts.targetPriority,
         gs.pouch.slots.map((slot) => [
           slot.id,
           slot.id === '' ? 0 : Math.min(cap, slot.n + (gs.bank[slot.id] ?? 0)),

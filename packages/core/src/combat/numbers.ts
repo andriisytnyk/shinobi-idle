@@ -45,6 +45,8 @@ export interface PlayerSnapshot {
   chakraDivisor?: number;
   /** The role of the combat clones (`content.cloneRoles`); absent, or one the content does not have: the default role. */
   cloneRole?: string;
+  /** The target priority (`content.targetPriorities`); absent, or one the content does not have: the default one. */
+  targetPriority?: string;
 }
 
 /** The highest level of knowledge of an enemy: unknown, seen, defeated, studied. */
