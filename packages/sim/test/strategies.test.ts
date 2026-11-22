@@ -6,6 +6,8 @@ import {
   createState,
   defaultRules,
   entryOf,
+  refreshRegions,
+  xpAt,
   type GameState,
 } from '@shinobi/core';
 import { describe, expect, it } from 'vitest';
@@ -174,6 +176,29 @@ describe('the fight forecast of a bot', () => {
     expect(rate as number).toBeGreaterThanOrEqual(0);
     expect(rate as number).toBeLessThanOrEqual(1);
     expect(winRate(seen(), entry)).toBe(rate);
+  });
+});
+
+describe('the way to a cell in the fog', () => {
+  it('surveys a plain hex beside a cell whose only surveyed neighbour is a keyed hex the start leaves in the fog', async () => {
+    const { exploreCell } = await import('../src/strategies/toolkit.ts');
+    const state = createState(1, content);
+    state.player.rank = 'genin';
+    state.skills.scout!.xp = xpAt(10);
+    refreshRegions(state, content, true);
+    const tk: Toolkit = {
+      ctx: { state, content, rules: defaultRules },
+      mem: createMemory(),
+      triple: triples[0] ?? [],
+      fightsToTrain: true,
+    };
+    // The ruins of the border fortress (6,20) lie behind the Fortress hideout (7,19), which needs a key.
+    const plan = exploreCell(tk, 'core:ruiny_prykordonnoi_fortetsi');
+    expect(plan).not.toBeNull();
+    const first = JSON.stringify((plan ?? [])[0]);
+    // It never aims at the cell itself (in the fog, cut off) nor at the keyed hex.
+    expect(first).not.toContain('ruiny_prykordonnoi_fortetsi');
+    expect(first).not.toContain('7,19');
   });
 });
 

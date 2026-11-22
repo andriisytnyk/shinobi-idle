@@ -95,6 +95,12 @@
     return i.level >= 1 ? 'partial' : 'marked';
   };
 
+  /** A surveyed hex the performer cannot enter, cross or survey for want of a key (water without the way to walk on it). */
+  const shut = (h: MapHex): boolean => h.info.keys.some((k) => !k.req.met);
+  const BRIDGE = 'M-5 1Q0 -4 5 1M-5 3H5M-3 1V3M3 1V3';
+  const FORD = 'M-5 0H-3M-1 0H1M3 0H5M-4 3H-2M0 3H2M4 3H5';
+  const LOCK = 'M-3 0V-2a3 3 0 0 1 6 0V0M-4 0H4V5H-4Z';
+
   const nameOf = (h: MapHex): string => {
     const cell = h.info.cell ? entityName({ kind: 'cell', id: h.info.cell }) : null;
     if (cell && cell !== MASK) return cell;
@@ -106,7 +112,9 @@
   // A hex in fog is already "a hex in fog": the state is said only when it adds something.
   const label = (h: MapHex): string => {
     const s = stateOf(h);
-    return s === 'fog' ? nameOf(h) : `${nameOf(h)}, ${t(`map.state.${s}`)}`;
+    const state = s === 'fog' ? nameOf(h) : `${nameOf(h)}, ${t(`map.state.${s}`)}`;
+    const named = h.info.crossing ? `${state}, ${t(`map.crossing.${h.info.crossing}`)}` : state;
+    return shut(h) ? `${named}, ${t('map.state.shut')}` : named;
   };
 
   // ---------- the camera ----------
@@ -400,6 +408,7 @@
         {@const mark = h.places[0]}
         <g
           class="hex {s}"
+          class:shut={shut(h)}
           class:selected={selected === h.coord}
           data-ui="hex"
           data-hex={h.coord}
@@ -472,6 +481,24 @@
               <circle r="5.5" />
               <text text-anchor="middle" y="2.4" font-size="7">{n}</text>
             </g>
+          {/if}
+          {#if h.info.crossing}
+            <path
+              d={h.info.crossing === 'bridge' ? BRIDGE : FORD}
+              class="crossing"
+              data-crossing={h.info.crossing}
+              aria-hidden="true"
+              transform="translate(-8 8) scale(0.9)"
+            />
+          {/if}
+          {#if shut(h)}
+            <path
+              d={LOCK}
+              class="lock"
+              data-shut
+              aria-hidden="true"
+              transform="translate(8 8) scale(0.9)"
+            />
           {/if}
           {#if s !== 'fog' && s !== 'reach'}
             <g class="pips" aria-hidden="true">
@@ -725,6 +752,28 @@
   .glyph.solid {
     fill: var(--bg);
     opacity: 0.4;
+  }
+
+  /* A hex shut for want of a key: a dashed edge and a lock, so that it reads as «not yet». */
+  .hex.shut .face {
+    stroke-dasharray: 3 2;
+  }
+
+  .crossing {
+    fill: none;
+    stroke: var(--fg);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    pointer-events: none;
+  }
+
+  .lock {
+    fill: var(--bg);
+    stroke: var(--fg);
+    stroke-width: 1.2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    pointer-events: none;
   }
 
   .place {

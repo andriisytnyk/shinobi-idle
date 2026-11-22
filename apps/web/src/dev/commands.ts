@@ -234,7 +234,7 @@ function setRank(state: GameState, rank: string, content: ContentDb, onlyUp = fa
 
 function surveyAll(state: GameState, content: ContentDb): void {
   const keys = content.hexes.map((h) => hexKey(h.q, h.r));
-  seedSurvey(state.world, content, keys);
+  seedSurvey(state.world, content, keys, true);
   const top = content.balance.K.cellExplores.at(-1) ?? 0;
   for (const cell of content.cells)
     state.world.explores[cell.id] = Math.max(state.world.explores[cell.id] ?? 0, top);

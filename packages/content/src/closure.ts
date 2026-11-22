@@ -483,6 +483,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
   for (const x of db.terrains) {
     at('terrains', x.id);
     needNumber('map.terrain', `map.terrain.${x.id}`);
+    if (x.key !== undefined) ref('key', x.key, 'cellKeys');
     x.finds?.drops.forEach((d, n) => ref(`finds.drops[${n}].item`, d.item, 'items'));
   }
   for (const h of db.hexes) {

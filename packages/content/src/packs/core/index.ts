@@ -25,6 +25,7 @@ import handBossSpecials from './data/hand/boss-specials.json' with { type: 'json
 import handBuildings from './data/hand/buildings.json' with { type: 'json' };
 import handCellKeys from './data/hand/cell-keys.json' with { type: 'json' };
 import handCellPois from './data/hand/cell-pois.json' with { type: 'json' };
+import handHexCrossings from './data/hand/hex-crossings.json' with { type: 'json' };
 import handPlaceWorth from './data/hand/place-worth.json' with { type: 'json' };
 import handCombos from './data/hand/combos.json' with { type: 'json' };
 import handEnemyCombat from './data/hand/enemy-combat.json' with { type: 'json' };
@@ -169,7 +170,10 @@ const data: Record<string, unknown> = {
   team: handTeam,
   regions,
   cells: layerCells(z.array(cellBaseSchema).parse(cells), cellPoiMapSchema.parse(handCellPois)),
-  hexes,
+  hexes: hexes.map((h) => {
+    const crossing = (handHexCrossings as Record<string, 'ford' | 'bridge'>)[`${h.q},${h.r}`];
+    return crossing ? { ...h, crossing } : h;
+  }),
   countries,
   places: layerPlaces(places as never, placeWorthMapSchema.parse(handPlaceWorth)),
   cellKeys: handCellKeys,
