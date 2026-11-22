@@ -155,7 +155,9 @@ describe('several fights at once', () => {
 
   // The wall-clock budget of two long fights is in offline-clones.test.ts (`pnpm test:speed`): a time asserted here fails under load.
   it('plays 12 offline hours with two fights', () => {
-    const state = cloner(5);
+    // Level 38, not 36 (moved by B6, shorter cooldowns of ranks E and D, with the health that carries over between
+    // fights): at 36 the character is defeated about an hour in with every seed; at 38 it fights on.
+    const state = cloner(5, 38);
     startFight(state, WOLF, 0);
     startFight(state, WOLF, 1);
     advance(state, 12 * HOUR, content);
