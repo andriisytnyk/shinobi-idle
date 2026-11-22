@@ -38,6 +38,20 @@ export function perFight(content: ContentDb, kind: string): number {
   return pouchKind(content, kind)?.perFight ?? 0;
 }
 
+/** The most a slot of this kind can be set to carry into a fight (the default for a kind the content does not know: 0). */
+export function maxPerFight(content: ContentDb, kind: string): number {
+  return pouchKind(content, kind)?.max ?? 0;
+}
+
+/** Units this slot takes into every fight: the amount the player set, kept within 1 and the most of its kind. */
+export function slotAmount(content: ContentDb, slot: { kind: string; amount: number }): number {
+  const kind = pouchKind(content, slot.kind);
+  if (!kind) return 0;
+  return Number.isInteger(slot.amount)
+    ? Math.min(kind.max, Math.max(1, slot.amount))
+    : kind.perFight;
+}
+
 /** Whether an item can sit in a slot of the kind: its use in a fight is one the kind takes. */
 export function itemFitsKind(item: Item, kind: PouchKind, content: ContentDb): boolean {
   const use = pouchUse(item, content);
@@ -105,7 +119,7 @@ export function ensurePouch(state: GameState, content: ContentDb): void {
       used.add(from);
       at.set(from, next.length);
       next.push(held);
-    } else next.push({ kind, id: '', n: 0 });
+    } else next.push({ kind, id: '', n: 0, amount: perFight(content, kind) });
   }
   old.forEach((slot, i) => {
     if (!used.has(i) && slot.id !== '') addItem(state, slot.id, slot.n);
@@ -114,11 +128,11 @@ export function ensurePouch(state: GameState, content: ContentDb): void {
   p.medic = p.medic === null ? null : (at.get(p.medic) ?? null);
 }
 
-/** Fills every slot up to the per-fight amount of its kind, as far as the bank goes; what a smaller amount leaves over goes back. */
+/** Fills every slot up to its own per-fight amount, as far as the bank goes; what a smaller amount leaves over goes back. */
 export function refillPouch(state: GameState, content: ContentDb): void {
   for (const slot of state.pouch.slots) {
     if (slot.id === '') continue;
-    const cap = perFight(content, slot.kind);
+    const cap = slotAmount(content, slot);
     if (slot.n > cap) {
       addItem(state, slot.id, slot.n - cap);
       slot.n = cap;
@@ -140,7 +154,7 @@ export function syncPouch(state: GameState, fight: FightState): void {
   });
 }
 
-/** Puts `item` (or nothing) in a slot: what was there goes back to the bank, the per-fight amount is taken from the bank. */
+/** Puts `item` (or nothing) in a slot: what was there goes back to the bank, the slot's amount (the default of its kind for a new item) is taken from the bank. */
 export function setPouchSlot(
   state: GameState,
   slot: number,
@@ -167,9 +181,31 @@ export function setPouchSlot(
     }
   }
   if (held.id !== '') addItem(state, held.id, held.n);
+  // A new item starts at the default amount of the kind; the same item keeps the amount the player set.
+  if ((item ?? '') !== held.id) held.amount = perFight(content, held.kind);
   held.id = item ?? '';
   held.n = 0;
   if (item === null && state.pouch.medic === slot) state.pouch.medic = null;
+  refillPouch(state, content);
+  return { ok: true };
+}
+
+/** Sets how many units a slot takes into every fight (1 up to the most of its kind): the Bank gives or takes back the difference at once. */
+export function setPouchAmount(
+  state: GameState,
+  slot: number,
+  amount: number,
+  content: ContentDb,
+): CommandResult {
+  ensurePouch(state, content);
+  if (!Number.isInteger(slot)) return { ok: false, reason: 'error.invalidSlot' };
+  const held = state.pouch.slots[slot];
+  if (!held) return { ok: false, reason: 'error.invalidSlot' };
+  if (state.combat) return { ok: false, reason: 'error.fighting' };
+  if (!Number.isInteger(amount) || amount < 1 || amount > maxPerFight(content, held.kind)) {
+    return { ok: false, reason: 'error.invalidAmount' };
+  }
+  held.amount = amount;
   refillPouch(state, content);
   return { ok: true };
 }

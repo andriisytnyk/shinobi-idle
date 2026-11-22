@@ -1,5 +1,13 @@
 import type { AiRuleId } from '@shinobi/content';
-import type { CombatAi, Decision, FightView, ViewPouch, ViewTechnique } from './fight-types.ts';
+import { secMs } from './numbers.ts';
+import type {
+  CombatAi,
+  Decision,
+  FightView,
+  ViewEnemy,
+  ViewPouch,
+  ViewTechnique,
+} from './fight-types.ts';
 
 /*
  * The player AI. It reads only the view. The priority list, and how each rule behaves, come from
@@ -187,11 +195,81 @@ const RULES: Record<AiRuleId, Rule> = {
   basic,
 };
 
-/** Attacks go to the body the fight turns on, when there is one; everything else is left to the engine's choice. */
-function aimed(view: FightView, decision: Decision): Decision {
+/** The enemy with the least health; the first of them wins a tie. */
+const weakest = (list: readonly ViewEnemy[]): ViewEnemy | undefined =>
+  list.reduce<ViewEnemy | undefined>((top, e) => (!top || e.hp < top.hp ? e : top), undefined);
+
+/**
+ * The enemy whose fall takes the most damage per second off the player's side. For each living
+ * enemy the value is the damage per second it deals (what the player has seen of its hits, or what
+ * its level promises) over the time the player needs to kill it with the best attack at hand. Killing
+ * the leader also ends the damage of the helpers he keeps calling back, so that damage is his; those
+ * helpers themselves get no priority while he lives. A tie goes to the weaker body.
+ */
+function mostValuable(view: FightView): ViewEnemy | undefined {
+  // One blow of the best single-target attack, and the time it takes; with no attack at hand, a blow of 1 a second.
+  let blow = 1;
+  let blowMs = secMs(1);
+  let rate = 0;
+  for (const r of view.techniques) {
+    if (!(r.expected > 0)) continue;
+    const hit = r.expected / (r.tech.hitsAll ? Math.max(1, view.enemies.length) : 1);
+    const ms = Math.max(1, r.tech.castMs);
+    if (hit / ms > rate) {
+      rate = hit / ms;
+      blow = hit;
+      blowMs = ms;
+    }
+  }
+  const leaderUp = view.enemies.some((e) => e.leader);
+  const called = view.enemies.reduce((sum, e) => sum + (e.respawns ? e.dps : 0), 0);
+  const timeToKill = (e: ViewEnemy): number => Math.max(1, Math.ceil(e.hp / blow)) * blowMs;
+  // The fight still to go: the time to take down the bodies that do not come back.
+  const horizon = Math.max(
+    1,
+    view.enemies.reduce((sum, e) => sum + (e.respawns ? 0 : timeToKill(e)), 0),
+  );
+  let top: ViewEnemy | undefined;
+  let topValue = -1;
+  for (const e of view.enemies) {
+    // A body that is called back while the leader lives is worth the relief its fall gives until it returns.
+    const relief = leaderUp && e.respawns ? Math.min(1, (e.respawnMs ?? 0) / horizon) : 1;
+    const value = (relief * (e.dps + (e.leader ? called : 0))) / timeToKill(e);
+    if (value > topValue || (value === topValue && top !== undefined && e.hp < top.hp)) {
+      top = e;
+      topValue = value;
+    }
+  }
+  return top;
+}
+
+/** The body the target priority of the view names, or undefined to leave the choice to the engine. */
+export function chosenTarget(view: FightView): ViewEnemy | undefined {
+  if (view.enemies.length < 2 && view.priority !== 'leader') return undefined;
   const leader = view.enemies.find((e) => e.leader);
-  if (!leader || decision.type === 'wait' || decision.target !== undefined) return decision;
-  return { ...decision, target: leader.id };
+  const helpers = view.enemies.filter((e) => !e.leader);
+  switch (view.priority) {
+    case 'weakest':
+      return weakest(view.enemies);
+    case 'leader':
+      return leader;
+    case 'adds':
+      return leader && helpers.length > 0 ? weakest(helpers) : leader ? leader : mostValuable(view);
+    default:
+      return mostValuable(view);
+  }
+}
+
+/** Attacks go to the body the player's target priority names; everything else is left to the engine's choice. */
+function aimed(view: FightView, decision: Decision): Decision {
+  if (decision.type === 'wait' || decision.target !== undefined) return decision;
+  // An area technique strikes every body: it keeps its own rule and is aimed at no one (leader-first has always named the leader).
+  if (decision.type === 'technique' && view.priority !== 'leader') {
+    const used = view.techniques.find((r) => r.tech.id === decision.id);
+    if (used?.tech.hitsAll) return decision;
+  }
+  const target = chosenTarget(view);
+  return target ? { ...decision, target: target.id } : decision;
 }
 
 /** Runs the tier's rule list in order; the first rule with a decision wins, the basic attack is the last resort. */

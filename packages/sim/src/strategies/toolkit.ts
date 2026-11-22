@@ -16,6 +16,16 @@ import {
   examWrittenFlag,
   firstUnmetLeaf,
   hexDistance,
+  hexKey,
+  hexKeyIds,
+  isPlayable,
+  isSurveyed,
+  neighbours,
+  parseHexKey,
+  positionHex,
+  reachFrom,
+  surveyAccess,
+  surveyRange,
   zoneCellOf,
   learnReq,
   regionOpenReq,
@@ -475,6 +485,7 @@ export function exploreCell(tk: Toolkit, cellId: string): Plan {
   if (!info || info.nextLevelNeed === null) return null;
   if (info.explorable) return startIn(tk, 'explore', cellId);
   if (info.why === 'error.regionClosed' || info.keyReq?.met === false) return null;
+  if (info.why === 'error.cutOff') return surveyTowards(tk, cell);
   // Not in range: go to the reachable cell nearest to the target.
   const here = state.world.location;
   let best: { cell: Cell; d: number } | null = null;
@@ -488,6 +499,37 @@ export function exploreCell(tk: Toolkit, cellId: string): Plan {
   const nearest = info.reachable ? cell : best?.cell;
   if (!nearest) return null;
   return travelTo(tk, nearest.id);
+}
+
+/**
+ * A cell in the fog with no surveyed ground the performer can walk to beside it (a keyed hex that
+ * the start does not survey was the way in): surveys a plain hex next to it, walking to a hex
+ * within survey range of that one first. Null when there is none.
+ */
+function surveyTowards(tk: Toolkit, cell: Cell): Plan {
+  const { state, content } = tk.ctx;
+  const here = positionHex(state, content);
+  if (!here) return null;
+  const reach = reachFrom(state, content, here);
+  const range = surveyRange(state, content);
+  const target = { q: cell.hex[0], r: cell.hex[1] };
+  const hexes = new Map(content.hexes.map((h) => [hexKey(h.q, h.r), h]));
+  for (const n of neighbours(target)) {
+    const key = hexKey(n.q, n.r);
+    const hex = hexes.get(key);
+    if (!hex || !isPlayable(hex) || isSurveyed(state, content, key)) continue;
+    if (hexKeyIds(content, key).length > 0) continue;
+    if (surveyAccess(state, content, n, reach) === 'ok') return startIn(tk, 'explore', key);
+    // Stand on the nearest hex of the walkable ground that reaches it.
+    let stand: string | null = null;
+    for (const [at] of reach.dist) {
+      const p = parseHexKey(at);
+      if (p && hexDistance(p, n) <= range && (stand === null || at < stand)) stand = at;
+    }
+    if (stand && stand !== hexKey(here.q, here.r))
+      return [{ type: 'world.travel', cell: stand, mode: 'walk' }];
+  }
+  return null;
 }
 
 /** Goes to a cell: the paid trip when it is cheap, the walk otherwise. */

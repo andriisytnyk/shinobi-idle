@@ -60,6 +60,7 @@ import { refreshUnlocks } from './unlocks.ts';
 import { FATIGUE_UNIT } from './clone-life.ts';
 import { STAND_ID, STAND_KIND, asPerformer } from './performer.ts';
 import { playerMaxChakra } from './combat/stats.ts';
+import { performerMaxHp, setPerformerHp } from './combat/vitality.ts';
 import {
   villageBuildCost,
   civilCap,
@@ -332,7 +333,8 @@ export const MIGRATIONS: readonly Migration[] = [
     const marked = { ...seeded, explores: { ...seeded.explores } };
     for (const [id, n] of Object.entries(explores))
       if (typeof n === 'number' && index.cells.has(id)) marked.explores[id] = n;
-    seedSurvey(marked, content, keys);
+    // The save proves these hexes: what it proves is not taken back, a keyed hex included (it is walked only with its key).
+    seedSurvey(marked, content, keys, true);
     return {
       ...state,
       world: { ...world, surveyed: marked.surveyed, explores: { ...marked.explores } },
@@ -458,7 +460,9 @@ export const MIGRATIONS: readonly Migration[] = [
       counters: { ...counters, ...surveyedCounts(explores, content) },
     };
   },
-  // v23 -> v24: the pouch has typed slots (`content.pouchKinds`): every held item goes to the slot of the kind that takes it
+  // v23 -> v24: health became the performer's own state; no field is written (a save without `player.hp` or a clone's `hp` reads as full health).
+  (state) => state,
+  // v24 -> v25: the pouch has typed slots (`content.pouchKinds`): every held item goes to the slot of the kind that takes it
   // (the first with a place left), at most the kind's per-fight amount; what fits no kind, has no place left or is over the
   // amount goes back to the Bank (a clone's: to its bag). A fight in progress carries its pouch counts in the new slot order.
   (state, content) => {
@@ -500,7 +504,7 @@ function typePouch(
     if (rankIndex(content, rank) >= rankIndex(content, content.balance.K.pouch.vestRank))
       for (const k of content.pouchKinds) for (let i = 0; i < (k.vest ?? 0); i++) layout.push(k.id);
   }
-  const slots = layout.map((kind) => ({ kind, id: '', n: 0 }));
+  const slots = layout.map((kind) => ({ kind, id: '', n: 0, amount: perFightOf(content, kind) }));
   const held =
     isRecord(fight) && isRecord(fight.fight) ? fight.fight : isRecord(fight) ? fight : null;
   const carried = held && Array.isArray(held.pouch) ? held.pouch : [];
@@ -756,6 +760,8 @@ function sanitizeClones(raw: unknown, state: GameState, content: ContentDb): Gam
       purse,
       pouch: sanitizePouch(v.pouch, content, bag),
       xp: pick(v.xp, (skill, n) => (index.skills.has(skill) && held(n) > 0 ? held(n) : undefined)),
+      // A body without health (an older save) is at full health: the maximum is applied once the Wounds are read.
+      hp: typeof v.hp === 'number' && Number.isFinite(v.hp) ? Math.max(0, v.hp) : Infinity,
       mastery: pick(v.mastery, (mkey, m) => {
         if (!index.masteryKeys.has(mkey) || !isRecord(m) || !index.skills.has(String(m.skill)))
           return undefined;
@@ -779,6 +785,7 @@ function sanitizeLoadouts(raw: unknown, state: GameState, content: ContentDb): L
     signature: null,
     basis: '',
     cloneRole: null,
+    targetPriority: null,
     saved: {},
   };
   if (!isRecord(raw)) return out;
@@ -827,6 +834,13 @@ function sanitizeLoadouts(raw: unknown, state: GameState, content: ContentDb): L
     typeof raw.cloneRole === 'string' && raw.cloneRole.length > 0 && raw.cloneRole.length <= 200
       ? raw.cloneRole
       : null;
+  // The same for the target priority; a save from before it was added has none, and plays the default one.
+  out.targetPriority =
+    typeof raw.targetPriority === 'string' &&
+    raw.targetPriority.length > 0 &&
+    raw.targetPriority.length <= 200
+      ? raw.targetPriority
+      : null;
   if (isRecord(raw.saved)) {
     for (const [name, entry] of Object.entries(raw.saved)) {
       if (
@@ -866,19 +880,25 @@ function sanitizePouch(raw: unknown, content: ContentDb, bank: Record<string, nu
     const item = isRecord(s) && typeof s.id === 'string' ? index.items.get(s.id) : undefined;
     const n = isRecord(s) ? Math.floor(nonNegative(s.n)) : 0;
     const kind = isRecord(s) && typeof s.kind === 'string' ? pouchKind(content, s.kind) : undefined;
+    // The amount the player set, kept within the kind's range (the kind's default when it is missing or not a whole number).
+    const asked = isRecord(s) ? s.amount : undefined;
+    const amount =
+      kind && typeof asked === 'number' && Number.isInteger(asked)
+        ? Math.min(kind.max, Math.max(1, asked))
+        : (kind?.perFight ?? 0);
     if (!kind || out.slots.length >= most) {
       if (item) back(item.id, n);
       return;
     }
     if (i === raw.medic && item) at = out.slots.length;
     if (item && pouchUse(item, content) !== null && itemFitsKind(item, kind, content)) {
-      const keep = Math.min(kind.perFight, n);
+      const keep = Math.min(amount, n);
       back(item.id, n - keep);
-      out.slots.push({ kind: kind.id, id: item.id, n: keep });
+      out.slots.push({ kind: kind.id, id: item.id, n: keep, amount });
     } else {
       if (item) back(item.id, n);
       if (i === raw.medic) at = null;
-      out.slots.push({ kind: kind.id, id: '', n: 0 });
+      out.slots.push({ kind: kind.id, id: '', n: 0, amount });
     }
   });
   out.medic = at;
@@ -1352,6 +1372,14 @@ export function deserialize(
   for (const body of Object.values(state.clones)) {
     if (!(body.max > 0)) body.max = playerMaxChakra(state, content);
   }
+  // Health: a saved number within [0, maximum]; none (an older save, or doctored) is full health.
+  const fullHp = performerMaxHp(state, content);
+  const savedHp = isRecord(raw.player) ? raw.player.hp : undefined;
+  state.player.hp =
+    typeof savedHp === 'number' && Number.isFinite(savedHp)
+      ? Math.min(fullHp, Math.max(0, savedHp))
+      : fullHp;
+  for (const body of Object.values(state.clones)) body.hp = Math.min(fullHp, body.hp);
   // A figure belongs to a clone that works: one of a slot that is gone or idle is not on the map.
   for (const slot of Object.keys(state.world.figures ?? {}))
     if (!state.slots[Number(slot)]?.action) removeFigure(state, Number(slot));
@@ -1377,6 +1405,10 @@ export function deserialize(
       // A mission keeps its fight in the same place; the mission checks it against its run below.
       const stand = action.kind === MISSION_KIND ? { kind: FIGHT_KIND, id: action.id } : action;
       state.combat = sanitizeCombat(saved, stand, i, content);
+      // A fight in progress has the live health; the state is brought to it (a save of an older version kept none).
+      if (state.combat?.phase === 'fight') {
+        setPerformerHp(state, state.combat.fight.player.hp, content);
+      }
       if (state.combat) return;
       // A plain fight or an operation whose state is lost starts afresh (an operation from the step of its run).
       if (action.kind === FIGHT_KIND) {

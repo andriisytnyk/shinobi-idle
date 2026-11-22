@@ -37,6 +37,7 @@ import {
 import { CHAKRA_DIVISOR_KEY, secMs } from './numbers.ts';
 import { ensurePouch, refillPouch, syncPouch } from './pouch.ts';
 import { snapshotPlayer } from './snapshot.ts';
+import { keepPerformerHp, performerHp, setPerformerHp } from './vitality.ts';
 import type { CombatState, RunState } from './types.ts';
 import { WORK_PER_MS, workOf } from './units.ts';
 import { addWounds, shortenWounds } from './wounds.ts';
@@ -90,7 +91,14 @@ function startFight(
   // after a win, a lost try, a stage of an operation or a mission, a boss. Nothing refills inside the fight.
   ensurePouch(state, content);
   refillPouch(state, content);
-  const snapshot = snapshotPlayer(state, content, rules, pools, [entry.id]);
+  // Health is the performer's own state (it carries over); the pools of the previous fight, when there is one, only add chakra and stamina.
+  const snapshot = snapshotPlayer(
+    state,
+    content,
+    rules,
+    pools ? { ...pools, hp: performerHp(state) } : undefined,
+    [entry.id],
+  );
   // The fight gets its own seed from the game's combat stream and runs on a stream of its own.
   return createFight(
     snapshot,
@@ -121,7 +129,7 @@ function blank(
   };
 }
 
-/** A zone fight that has just begun: full health and pools. */
+/** A zone fight that has just begun: full pools and the health the performer has. */
 export function newCombat(
   state: GameState,
   entry: Enemy | Boss,
@@ -132,7 +140,7 @@ export function newCombat(
   return blank(entry, startFight(state, entry, content, rules), null, owner);
 }
 
-/** A fight of a mission's combat stage: full pools, the current loadout, the pouch filled for the fight, and the teammates' support. */
+/** A fight of a mission's combat stage: full pools, the health the performer has, the current loadout, the pouch filled for the fight, and the teammates' support. */
 export function newMissionCombat(
   state: GameState,
   entry: Enemy | Boss,
@@ -413,7 +421,12 @@ function victory(
   recordFight(state, key, c.fight, 'win', content, clone);
   woundsAfter(state, c, content, rules, false, key, clone);
   if (!c.run) {
-    player.hp = Math.min(player.maxHp, player.hp + K.zoneHpRegen * player.maxHp);
+    // Health carries over to the next fight (regeneration and food restore it); `zoneHpRegen` is a lump heal knob, 0 in the data.
+    // A training enemy (by its region) also puts the health back: a new character is not worn down by the dummy.
+    const region = fallen !== undefined && 'region' in fallen ? fallen.region : '';
+    const heal = K.zoneHpRegen + (K.regionHeal[region] ?? 0);
+    player.hp = Math.min(player.maxHp, player.hp + heal * player.maxHp);
+    setPerformerHp(state, player.hp, content);
     player.chakra = player.maxChakra;
     player.stamina = player.maxStamina;
     // A pack of a raid at the village gates counts for the defence; the last one ends the raid and the fight with it.
@@ -422,6 +435,7 @@ function victory(
   const op = indexOf(content).operations.get(c.run.op);
   if (!op) return true;
   recover(player, K[op.regen]);
+  setPerformerHp(state, player.hp, content);
   c.run.step++;
   const next = enemyOfStep(state, opSteps(op)[c.run.step]);
   if (next === null) {
@@ -459,6 +473,10 @@ function lose(
   recordFight(state, key, c.fight, 'loss', content, clone);
   stampDefeat(state, key);
   woundsAfter(state, c, content, rules, true, key, clone);
+  // The character does not go on at nothing: it wakes with a share of the maximum health.
+  const body = c.fight.player;
+  body.hp = Math.max(body.hp, content.balance.K.defeatHp * body.maxHp);
+  setPerformerHp(state, body.hp, content);
 }
 
 /**
@@ -551,10 +569,16 @@ function runFight(state: GameState, index: number, content: ContentDb, rules: Ru
             stamina: p.stamina,
           });
           c.paid = {};
+        } else {
+          // An approach: the fight was prepared before it, and the health has regenerated on the way.
+          const p = c.fight.player;
+          p.hp = Math.min(p.maxHp, performerHp(state));
         }
         c.phase = 'fight';
       }
       c.work = fightAdvance(c.fight, c.work, content, rules);
+      // The state keeps the health the fight has, so that whatever ends the fight leaves it where it is.
+      keepPerformerHp(state, c.fight.player.hp);
       settle(state, c, content, rules, clone);
       const key = reportKey(state, index);
       recordItems(state, key, syncAndCount(state, c));

@@ -1,11 +1,24 @@
 [
-  { "id": "core:pk_food", "uses": ["heal", "restore"], "perFight": 4, "slots": 1 },
+  {
+    "id": "core:pk_food",
+    "uses": ["heal", "restore"],
+    "perFight": 10,
+    "max": 30,
+    "slots": 1
+  },
   {
     "id": "core:pk_combat",
     "uses": ["bomb", "sweep", "snare", "venom", "throw", "sleep"],
     "perFight": 4,
+    "max": 12,
     "slots": 2,
     "vest": 1
   },
-  { "id": "core:pk_cure", "uses": ["cleanse", "dispel"], "perFight": 3, "slots": 1 }
+  {
+    "id": "core:pk_cure",
+    "uses": ["cleanse", "dispel"],
+    "perFight": 3,
+    "max": 9,
+    "slots": 1
+  }
 ]

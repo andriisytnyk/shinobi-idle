@@ -1,5 +1,6 @@
 import type { ContentDb } from '@shinobi/content';
 import {
+  aimedEnemy,
   alliesOf,
   cloneRoleOf,
   combatantStatus,
@@ -121,6 +122,8 @@ export interface Scene {
   /** The id of the role the clones of this fight were given: the one the fight was begun with (the default role when it names none). */
   cloneRole: string | null;
   enemies: FighterView[];
+  /** The id of the enemy the player's side attacks next by the target priority of the fight; null when none stands. */
+  aim: string | null;
   /** The fight clock, in ms, as the screen sees it. */
   nowMs: number;
 }
@@ -327,6 +330,7 @@ function sceneOf(state: GameState, content: ContentDb, rules: Rules): Scene | nu
     // a fight that saved none was begun with the default role.
     cloneRole: fight.kit.cloneRole ?? cloneRoleOf(content, undefined)?.id ?? null,
     enemies,
+    aim: aimedEnemy(fight, content, rules),
     nowMs,
   };
 }
@@ -366,7 +370,8 @@ function targetOfAction(scene: Scene, actor: FighterView): string {
 export function targetedKey(scene: Scene): string | null {
   const named = scene.player.action?.target;
   const aimed = named ? scene.enemies.find((e) => e.key === named && e.alive) : undefined;
-  return (aimed ?? scene.enemies.find((e) => e.alive) ?? scene.enemies[0])?.key ?? null;
+  const planned = scene.enemies.find((e) => e.key === scene.aim && e.alive);
+  return (aimed ?? planned ?? scene.enemies.find((e) => e.alive) ?? scene.enemies[0])?.key ?? null;
 }
 
 /**

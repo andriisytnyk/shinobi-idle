@@ -64,8 +64,6 @@ export interface FightSim {
 /**
  * Runs `n` fights of the player against the enemy and aggregates them. Every fight has its own
  * seed derived from `seed`. Reads its arguments only; no game state, no shared mutable state.
- * With `regen` the fights follow one another as in a zone: a won fight is followed by one that
- * starts with the health that is left plus that share of the maximum, a lost one by a fresh start.
  */
 export function simulateFights(
   snap: PlayerSnapshot,
@@ -74,9 +72,8 @@ export function simulateFights(
   seed: number,
   content: ContentDb,
   rules: FightRules,
-  regen?: number,
 ): FightSummary {
-  const sim = fightSim(snap, encounter, n, seed, content, rules, regen);
+  const sim = fightSim(snap, encounter, n, seed, content, rules);
   sim.step(n);
   return sim.summary();
 }
@@ -89,9 +86,7 @@ export function fightSim(
   seed: number,
   content: ContentDb,
   rules: FightRules,
-  regen?: number,
 ): FightSim {
-  let carried: number | undefined;
   const times: number[] = [];
   const items: Record<string, number> = {};
   const masteryWork: Record<string, number> = {};
@@ -112,8 +107,7 @@ export function fightSim(
   let played = 0;
   let simulatedMs = 0;
   const play = (i: number): void => {
-    const start = carried === undefined ? snap : { ...snap, hp: carried };
-    const fight = createFight(start, encounter, fightSeed(seed, i), content, rules);
+    const fight = createFight(snap, encounter, fightSeed(seed, i), content, rules);
     fight.log = null;
     const startHp = fight.player.hp;
     fightAdvance(fight, fight.cap + 1, content, rules);
@@ -139,11 +133,6 @@ export function fightSim(
         (won && fight.player.data.low === 1 ? 1 : 0) +
         t.wounds) /
       n;
-    // A zone fight that follows a win starts with the health left and a share more; any other starts fresh.
-    carried =
-      won && regen !== undefined
-        ? Math.min(fight.player.maxHp, fight.player.hp + regen * fight.player.maxHp)
-        : undefined;
     if (!won) return;
     times.push(fightTimeMs(fight));
     lost += startHp - fight.player.hp;

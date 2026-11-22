@@ -16,6 +16,7 @@ import {
   rate,
   teamFor,
   xpAt,
+  performerMaxHp,
   type GameState,
   type Rank,
   type Rules,
@@ -129,6 +130,8 @@ export function buildCharacter(content: ContentDb, o: CharacterOptions): GameSta
     if (isNature(content, skill.id) && !o.natures.includes(skill.id as NatureId)) continue;
     state.skills[skill.id] = { xp: xpAt(level) };
   }
+  // A measuring stick fights at full health, whatever the levels it was set to (health is the character's state and does not follow them).
+  state.player.hp = performerMaxHp(state, content);
   refreshUnlocks(state, content, true);
   grantShopBuildings(state, content);
   const mastery = Math.min(K.masteryCap, Math.max(1, o.mastery ?? TYPICAL_MASTERY));

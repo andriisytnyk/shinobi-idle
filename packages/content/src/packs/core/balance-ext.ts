@@ -1,10 +1,7 @@
 /**
  * Values that win over the documented ones until the documents are updated.
  */
-export const BALANCE_OVERRIDE: Partial<Record<string, number>> = {
-  /** HP regained between the fights of a zone: with no healing item at all, grinding an enemy of the player's level for two hours needs this much (see sustained.test.ts). */
-  zoneHpRegen: 0.8,
-};
+export const BALANCE_OVERRIDE: Partial<Record<string, number>> = {};
 
 /**
  * Puts the overrides over `base`. A key that `base` does not have is a typo, not a new
@@ -42,6 +39,7 @@ export const BALANCE_EXT = {
   combat: {
     xpTickMs: 1000,
     regenMs: 1000,
+    hpRegenShare: 1,
     hitEven: 0.5,
     fightCapMs: 240000,
     maxEnemies: 8,
@@ -200,7 +198,7 @@ export const BALANCE_EXT = {
    */
   bossFx: {
     /** The leader of the wolves calls `count` wolves back every `everyMs` while he lives; a wolf has `hp` and `dmg` of an ordinary enemy of the leader's level. */
-    wolfPack: { count: 4, everyMs: 20000, hp: 0.12, dmg: 0.05, leaderHp: 0.97, leaderDmg: 0.97 },
+    wolfPack: { count: 4, everyMs: 75000, hp: 0.12, dmg: 0.05, leaderHp: 1.25, leaderDmg: 1.25 },
     /** The rival casts `techniques` techniques of the nature that beats the player's, one every `everyMs` (each hits for `mult` x his damage), and a signature every `sigEveryMs` for `sigMult` x. */
     rivalDuel: {
       techniques: 1,
@@ -209,8 +207,8 @@ export const BALANCE_EXT = {
       sigEveryMs: 16000,
       sigMult: 0.3,
       sigOpenMs: 2000,
-      hp: 0.96,
-      dmg: 0.96,
+      hp: 1.15,
+      dmg: 1.15,
     },
     rivalTournament: {
       techniques: 2,
@@ -219,17 +217,17 @@ export const BALANCE_EXT = {
       sigEveryMs: 16000,
       sigMult: 0.3,
       sigOpenMs: 2000,
-      hp: 1.15,
-      dmg: 1.15,
+      hp: 1.2,
+      dmg: 1.2,
       habituationMult: 2,
     },
-    drunkenEvasion: { maxMult: 2, hp: 1, dmg: 1 },
+    drunkenEvasion: { maxMult: 2, hp: 1.06, dmg: 1.06 },
     /** A heavy cast: `castMs` wind-up every `everyMs`, `damageMult` x damage, stuns the player for `stunMs` when it lands. */
-    heavyCast: { everyMs: 20000, castMs: 2500, damageMult: 2, stunMs: 500, hp: 1.0, dmg: 1.0 },
+    heavyCast: { everyMs: 20000, castMs: 2500, damageMult: 2, stunMs: 500, hp: 1.1, dmg: 1.06 },
     /** Two bodies: each has `hpEach` of the boss health and `dmgEach` of its damage; while both live the mist poisons the player for `mistMult` x the poison strength. */
-    twins: { count: 2, hpEach: 0.5, dmgEach: 0.5, mistMult: 1.6 },
-    mistRehide: { everyMs: 25000, hp: 0.97, dmg: 0.95 },
-    illusion: { everyMs: 8000, fleeAtHp: 0.3, hp: 1.22, dmg: 1.22 },
+    twins: { count: 2, hpEach: 0.58, dmgEach: 0.58, mistMult: 1.6 },
+    mistRehide: { everyMs: 25000, hp: 1.07, dmg: 1.05 },
+    illusion: { everyMs: 8000, fleeAtHp: 0.3, hp: 1.4, dmg: 1.4 },
   },
   /** Loadout: slots and distinct natures by rank (a student has no limit), and the number of saved loadouts. */
   loadout: {

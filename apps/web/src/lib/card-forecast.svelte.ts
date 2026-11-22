@@ -34,8 +34,6 @@ const known = (v: number | Unknown): number | null => (typeof v === 'number' ? v
 export function forecastKeyOf(gs: GameState, target: PrepTarget, content: ContentDb): string {
   const level = knowledgeOfTarget(gs, target, content);
   if (!disclosure(level).verdict) return '';
-  const cap = (kind: string): number =>
-    content.pouchKinds.find((k) => k.id === kind)?.perFight ?? 0;
   return JSON.stringify([
     target,
     level,
@@ -46,7 +44,7 @@ export function forecastKeyOf(gs: GameState, target: PrepTarget, content: Conten
     gs.loadouts.cloneRole,
     gs.pouch.slots.map((s) => [
       s.id,
-      s.id === '' ? 0 : Math.min(cap(s.kind), s.n + (gs.bank[s.id] ?? 0)),
+      s.id === '' ? 0 : Math.min(s.amount, s.n + (gs.bank[s.id] ?? 0)),
     ]),
     gs.pouch.medic,
     gs.wounds.stacks,

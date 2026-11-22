@@ -74,7 +74,7 @@ const data = {
     },
   ],
   /** A kind of pouch slot of the pack: one more slot, for what cures (the elixir), two units into every fight. */
-  pouchKinds: [{ id: 'testmod:pk_phials', uses: ['cleanse'], perFight: 2, slots: 1 }],
+  pouchKinds: [{ id: 'testmod:pk_phials', uses: ['cleanse'], perFight: 2, max: 6, slots: 1 }],
   /** A tag that cracks a shell: the body takes more damage while the crack lasts and the trait stops. */
   tags: [
     {

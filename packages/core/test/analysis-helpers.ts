@@ -4,13 +4,14 @@ import {
   analyzeFight,
   defaultRules,
   dispatch,
+  restartReady,
   unlockBoss,
   type Analysis,
   type AnalysisTarget,
   type GameState,
 } from '../src/index.ts';
 import { setLevel } from './helpers.ts';
-import { wellStocked } from './prep-helpers.ts';
+import { PREPARED_STACK, wellStocked } from './prep-helpers.ts';
 import {
   fighter,
   ids,
@@ -84,6 +85,10 @@ export function build(c: Case, seed: number): GameState {
   for (const id of c.knows ?? []) know(state, id);
   stock(state, c.bank);
   c.prepare(state);
+  // The cases were set at four units a slot (see PREPARED_STACK); the data default of the healing slot is ten.
+  state.pouch.slots.forEach((_, slot) =>
+    dispatch(state, { type: 'pouch.amount', slot, amount: PREPARED_STACK }, content),
+  );
   if (c.shared) {
     state.slots.push({ action: null, progress: 0, share: 1000, data: null });
     const drill = content.exercises[0];
@@ -142,7 +147,11 @@ export function play(c: Case, seed: number, minutes: number): Played {
     }
     state.events = [];
     if (outAt === null && heal() === 0) outAt = t / 60_000;
-    if (!state.slots.some((s) => s.action?.kind === 'fight' || s.action?.kind === 'operation')) {
+    // After a defeat the player waits for health (K.restartHp) before going back, as the forecast's sessions do.
+    if (
+      !state.slots.some((s) => s.action?.kind === 'fight' || s.action?.kind === 'operation') &&
+      restartReady(state, content)
+    ) {
       start();
     }
   }

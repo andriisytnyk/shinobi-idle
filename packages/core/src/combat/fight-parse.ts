@@ -472,6 +472,7 @@ function parseKit(raw: unknown, content: ContentDb, v: Vocab): PlayerKit | null 
   if (!isRecord(raw) || !Array.isArray(raw.techniques)) return null;
   if (!nonNeg(raw.med) || !nonNeg(raw.chakraRegen) || !nonNeg(raw.staminaRegen)) return null;
   if (!nonNeg(raw.toolDamage)) return null;
+  if (raw.hpRegen !== undefined && !nonNeg(raw.hpRegen)) return null;
   const known = new Set(content.techniques.map((t) => t.id));
   if (!Array.isArray(raw.evasion)) return null;
   const evasion: EvasionPart[] = [];
@@ -499,16 +500,19 @@ function parseKit(raw: unknown, content: ContentDb, v: Vocab): PlayerKit | null 
   if (raw.cloneThreat !== undefined && !(isNum(raw.cloneThreat) && raw.cloneThreat > 0))
     return null;
   if (raw.cloneRole !== undefined && !isStr(raw.cloneRole)) return null;
+  if (raw.targetPriority !== undefined && !isStr(raw.targetPriority)) return null;
   return {
     techniques,
     toolDamage: raw.toolDamage,
     med: raw.med,
     chakraRegen: raw.chakraRegen,
     staminaRegen: raw.staminaRegen,
+    hpRegen: raw.hpRegen ?? 0,
     evasion,
     ...(cloneHand ? { cloneHand } : {}),
     ...(raw.cloneThreat !== undefined ? { cloneThreat: raw.cloneThreat as number } : {}),
     ...(raw.cloneRole !== undefined ? { cloneRole: raw.cloneRole as string } : {}),
+    ...(raw.targetPriority !== undefined ? { targetPriority: raw.targetPriority as string } : {}),
   };
 }
 

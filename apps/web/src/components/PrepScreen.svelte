@@ -1,6 +1,7 @@
 <script lang="ts">
   import { untrack } from 'svelte';
   import {
+    currentHp,
     evalReq,
     loadoutLimits,
     rankIndex,
@@ -36,6 +37,7 @@
   import { game } from '../lib/store.ts';
   import ActionEmblem from './ActionEmblem.svelte';
   import CloneRolePicker from './CloneRolePicker.svelte';
+  import TargetPriorityPicker from './TargetPriorityPicker.svelte';
   import EntityLink from './EntityLink.svelte';
   import NatureLink from './NatureLink.svelte';
   import ReqTree from './ReqTree.svelte';
@@ -67,6 +69,7 @@
         gs.loadouts.active,
         gs.loadouts.auto,
         gs.loadouts.cloneRole,
+        gs.loadouts.targetPriority,
         gs.pouch.slots,
         gs.pouch.medic,
         gs.wounds.stacks,
@@ -93,7 +96,7 @@
           passives: defenceTechniques(gs, content).map((tech) => tech.id),
           pouch: gs.pouch.slots.map((s) => ({
             ...s,
-            perFight: content.pouchKinds.find((k) => k.id === s.kind)?.perFight ?? 0,
+            max: content.pouchKinds.find((k) => k.id === s.kind)?.max ?? 0,
             stock: s.id === '' ? 0 : (gs.bank[s.id] ?? 0),
             choices: pouchChoices(gs, content, s.kind),
           })),
@@ -121,11 +124,12 @@
     result: null,
   });
 
+  /** The health buckets the forecast key distinguishes (tenths of the maximum). */
+  const HEALTH_BUCKETS = 10;
+
   /** What the forecast depends on: it is run again when the hand, the pouch, the Wounds or the knowledge change. */
   const forecastInputs = $derived(
     game.read((gs) => {
-      const cap = (kind: string): number =>
-        content.pouchKinds.find((k) => k.id === kind)?.perFight ?? 0;
       return JSON.stringify([
         target,
         knowledgeOfTarget(gs, target, content),
@@ -134,13 +138,16 @@
         gs.loadouts.active,
         gs.loadouts.auto,
         gs.loadouts.cloneRole,
+        gs.loadouts.targetPriority,
         // The pouch as the fight sees it: what the bank adds counts, the rest of the bank does not (it changes while the player gathers).
         gs.pouch.slots.map((s) => [
           s.id,
-          s.id === '' ? 0 : Math.min(cap(s.kind), s.n + (gs.bank[s.id] ?? 0)),
+          s.id === '' ? 0 : Math.min(s.amount, s.n + (gs.bank[s.id] ?? 0)),
         ]),
         gs.pouch.medic,
         gs.wounds.stacks,
+        // Health in tenths of the maximum: the verdict follows it as it regenerates, without running again at every tick.
+        Math.floor((currentHp(gs, 0, content).hp / currentHp(gs, 0, content).max) * HEALTH_BUCKETS),
       ]);
     }),
   );
@@ -221,6 +228,19 @@
     say(game.dispatch({ type: 'pouch.set', slot, item: item === '' ? null : item }));
   }
 
+  /** The amount a slot takes into every fight: a number outside 1..max is cut to it; what is not a number leaves the amount as it was. */
+  function setAmount(slot: number, input: HTMLInputElement): void {
+    const row = view.pouch[slot];
+    const n = Math.floor(Number(input.value));
+    if (!row || input.value.trim() === '' || !Number.isFinite(n)) {
+      input.value = String(row?.amount ?? 1);
+      return;
+    }
+    const amount = Math.min(row.max, Math.max(1, n));
+    input.value = String(amount);
+    say(game.dispatch({ type: 'pouch.amount', slot, amount }));
+  }
+
   function start(): void {
     const r = game.dispatch(startCommand(target));
     say(r);
@@ -297,6 +317,7 @@
   </section>
 
   <CloneRolePicker />
+  <TargetPriorityPicker />
 
   <section class="block" data-ui="prep-defence">
     <h3>{t('prep.defence')}</h3>
@@ -372,9 +393,27 @@
                 {/each}
               </select>
             {/if}
-            <span class="note" data-pouch-amount
-              >{t('prep.pouchPerFight', { n: formatInt(slot.perFight) })}</span
-            >
+            {#if view.fighting}
+              <span class="note" data-pouch-amount
+                >{t('prep.pouchPerFight', { n: formatInt(slot.amount) })}</span
+              >
+            {:else}
+              <label class="amount">
+                <span class="note">{t('prep.pouchAmount')}</span>
+                <input
+                  type="number"
+                  inputmode="numeric"
+                  min="1"
+                  max={slot.max}
+                  step="1"
+                  data-pouch-amount
+                  aria-label={t('prep.pouchAmountFor', { kind: kindName(slot.kind) })}
+                  value={slot.amount}
+                  onchange={(e) => setAmount(i, e.currentTarget)}
+                />
+                <span class="note">{t('prep.pouchMax', { n: formatInt(slot.max) })}</span>
+              </label>
+            {/if}
             {#if slot.id !== ''}
               <span class="note" data-pouch-stock
                 >{t('prep.pouchBank', { n: formatInt(slot.stock) })}</span
@@ -552,6 +591,17 @@
     font-size: var(--text-xs);
     font-weight: 600;
     color: var(--fg-dim);
+  }
+
+  .slot .amount {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .slot .amount input {
+    width: 4.5rem;
+    min-height: var(--control-md);
   }
 
   .slot.empty {

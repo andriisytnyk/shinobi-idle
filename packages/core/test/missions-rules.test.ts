@@ -452,6 +452,9 @@ describe('A7: failures', () => {
     expect(lost()).toBe(1);
     expect(state.wounds.stacks).toBeGreaterThan(0);
     expect(state.slots[0]?.data).toMatchObject({ s: 1, a: 1 });
+    // The player waits for health (K.restartHp) before the next try; the stage starts over once it is back.
+    expect(state.combat).toBeNull();
+    for (let i = 0; i < 40 * 60 && state.combat === null; i++) advance(state, 1000, content);
     expect(state.combat).not.toBeNull();
     // The scouting stage was passed once and never repeated.
     const stages = state.events.flatMap((e) => (e.type === 'missionStage' ? [e] : []));
@@ -530,12 +533,12 @@ describe('A7: failures', () => {
     const heal = 'core:bulion_ramenu';
     state.bank[heal] = 40;
     expect(dispatch(state, { type: 'pouch.set', slot: 0, item: heal }, content).ok).toBe(true);
-    state.pouch.slots[0] = { kind: 'core:pk_food', id: heal, n: 1 };
+    state.pouch.slots[0] = { kind: 'core:pk_food', id: heal, n: 1, amount: 10 };
     startMission(state, 'core:thief');
     advance(state, (state.slots[0]?.data as { p: { ms: number } }).p.ms + 500, content);
     expect(state.combat).not.toBeNull();
     // Packed to the per-fight amount on the way into the fight.
-    expect(state.combat?.fight.pouch[0]).toEqual({ id: heal, n: 4 });
+    expect(state.combat?.fight.pouch[0]).toEqual({ id: heal, n: 10 });
     // Used up during the fight; nothing refills it until the next fight begins.
     if (state.combat) state.combat.fight.pouch[0] = { id: heal, n: 0 };
     advance(state, 5 * 60_000, content);

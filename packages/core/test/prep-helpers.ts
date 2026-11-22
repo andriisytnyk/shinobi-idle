@@ -27,12 +27,19 @@ export function healItemFor(c: number): string {
   return item.id;
 }
 
-/** Every item a prepared player might carry: four of the level's healing item and four of each tool. */
+/**
+ * What the prepared player of the balance tests has of each item: four, as every pouch slot carried before the typed
+ * slots. The data default of the healing slot is now ten, which makes the bosses far easier (see the PR); these tests
+ * keep measuring the fights at the strength their bounds were set at.
+ */
+export const PREPARED_STACK = 4;
+
+/** Every item a prepared player might carry: `PREPARED_STACK` of the level's healing item and of each tool. */
 export function wellStocked(c: number): Record<string, number> {
-  const bank: Record<string, number> = { [healItemFor(c)]: 10 };
+  const bank: Record<string, number> = { [healItemFor(c)]: PREPARED_STACK };
   for (const i of content.items) {
     if (i.pouch === true || ['cleanse', 'dispel', 'bomb'].includes(i.fx?.kind ?? '')) {
-      bank[i.id] = 10;
+      bank[i.id] = PREPARED_STACK;
     }
   }
   return bank;

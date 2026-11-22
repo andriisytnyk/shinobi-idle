@@ -18,12 +18,14 @@ import {
   hexesWithin,
   hexInfo,
   hexKey,
+  hexKeyIds,
   hexLine,
   isSurveyed,
   listHexes,
   neighbours,
   parseHexKey,
   rangeNow,
+  routeKeyCost,
   routeTo,
   serialize,
   STATE_VERSION,
@@ -127,7 +129,8 @@ describe('the grid in the content', () => {
     const state = genin();
     surveyAll(state);
     for (const c of content.cells) {
-      expect(routeTo(state, content, { q: c.hex[0], r: c.hex[1] }), c.id).not.toBeNull();
+      // With every key (the diagnosis ignores them): keyed hexes are reached only by who holds the key.
+      expect(routeKeyCost(state, content, { q: c.hex[0], r: c.hex[1] }), c.id).not.toBeNull();
     }
   });
 
@@ -152,6 +155,11 @@ describe('fog and the survey range', () => {
       const key = hexKey(a.q, a.r);
       const hex = content.hexes.find((h) => h.q === a.q && h.r === a.r);
       if (!hex?.terrain) continue;
+      // A hex that needs a key is left in fog: it is surveyed by a performer who holds the key.
+      if (hexKeyIds(content, key).length > 0) {
+        expect(state.world.surveyed[key], key).toBeUndefined();
+        continue;
+      }
       expect(state.world.surveyed[key], key).toBe(true);
       const subject = subjectOf(content, key)!;
       if (subject.cell) expect(state.world.explores[subject.address]).toBeUndefined();
@@ -194,7 +202,11 @@ describe('fog and the survey range', () => {
     // Surveyed land that reaches a neighbour of it opens it.
     const next = neighbours(at).find((n) => {
       const hex = content.hexes.find((h) => h.q === n.q && h.r === n.r);
-      return hex?.terrain && hexDistance(n, START) <= K.map.startRadius + 3;
+      return (
+        hex?.terrain &&
+        hexDistance(n, START) <= K.map.startRadius + 3 &&
+        hexLine(START, n).every((h) => hexKeyIds(content, hexKey(h.q, h.r)).length === 0)
+      );
     })!;
     // A chain of surveyed hexes from the start to that neighbour.
     for (const h of hexLine(START, next)) state.world.surveyed[hexKey(h.q, h.r)] = true;
@@ -571,9 +583,9 @@ describe.each([
       if ((loaded.world.explores[cell.id] ?? 0) < (K.cellExplores[0] ?? 1)) continue;
       for (const poi of cell.pois) expect(loaded.world.pois[poi.id], poi.id).toBe(true);
     }
-    // A cell that was only marked keeps its level 0, and the player can walk from there to every cell of the region.
+    // A cell that was only marked keeps its level 0, and the way to every cell of the region is walkable (a cell behind a key only with the key).
     for (const c of content.cells.filter((x) => x.region === content.regions[0]!.id))
-      expect(routeTo(loaded, content, { q: c.hex[0], r: c.hex[1] }), c.id).not.toBeNull();
+      expect(routeKeyCost(loaded, content, { q: c.hex[0], r: c.hex[1] }), c.id).not.toBeNull();
     expect(serialize(deserialize(serialize(loaded), content))).toBe(serialize(loaded));
   });
 
@@ -583,7 +595,7 @@ describe.each([
     for (const [id, n] of Object.entries(before.state.world.explores))
       expect(loaded.world.explores[id], id).toBe(n);
     for (const c of content.cells)
-      expect(routeTo(loaded, content, { q: c.hex[0], r: c.hex[1] }), c.id).not.toBeNull();
+      expect(routeKeyCost(loaded, content, { q: c.hex[0], r: c.hex[1] }), c.id).not.toBeNull();
   });
 
   it('cleans a doctored world: foreign hexes, huge surveys, a position in the sea', () => {

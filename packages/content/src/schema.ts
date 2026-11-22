@@ -659,6 +659,11 @@ export const terrainSchema = z.strictObject({
   id: vocabId,
   token: z.string().optional(),
   blocked: z.boolean().optional(),
+  /**
+   * The key (`cellKeys`) a performer needs to enter, cross or survey a hex of this terrain (water
+   * needs the key of water). A cell on such a hex needs it too, besides its own key.
+   */
+  key: idOf('cellKey').optional(),
   /** The mark drawn on a hex of the terrain: an SVG path in units of the hex (about -12..12 across); none draws a bare hex. */
   glyph: z
     .string()
@@ -697,6 +702,8 @@ export const hexSchema = z.strictObject({
   r: z.number().int(),
   country: coreId.optional(),
   terrain: terrainId.optional(),
+  /** A ford or a bridge: a crossing is entered, crossed and surveyed without the key its terrain asks; the key of a cell on it still applies. */
+  crossing: z.enum(['ford', 'bridge']).optional(),
 });
 export type Hex = z.infer<typeof hexSchema>;
 
@@ -895,7 +902,14 @@ export const bossSpecialSchema = z.strictObject({
   hook: z.string().min(1),
   nature: z.literal('beatsPlayerFirst').optional(),
   adds: z.array(traitId).optional(),
-  companions: z.strictObject({ fx: z.string().min(1), hook: z.string().min(1) }).optional(),
+  companions: z
+    .strictObject({
+      fx: z.string().min(1),
+      hook: z.string().min(1),
+      /** The leader calls the companions back while he lives: the player's AI gives them no priority. */
+      respawns: z.boolean().optional(),
+    })
+    .optional(),
   bodies: z.boolean().optional(),
   fleeAt: z.string().min(1).optional(),
   /** The keys of `K.bossFx[fx]` the hook reads: the closure proves they exist, so the hook never falls back to a default. */
@@ -1378,7 +1392,7 @@ export const POUCH_ALL_USES = [
 
 /**
  * A kind of pouch slot: which uses of items it accepts, how many units of its item the character
- * takes into every fight (refilled from the Bank before each fight, never during one), and how many
+ * takes into every fight by default (`perFight`; the player sets it per slot up to `max`; refilled from the Bank before each fight, never during one), and how many
  * slots of the kind there are (`vest` more once the rank of the vest is reached). The name and the
  * one-line description are the locale keys `pouchKind.<id>.name` and `.desc`.
  */
@@ -1386,6 +1400,8 @@ export const pouchKindSchema = z.strictObject({
   id: coreId,
   uses: z.array(z.enum(POUCH_ALL_USES)).min(1),
   perFight: z.number().int().min(1).max(99),
+  /** The most the player can set a slot of the kind to carry into a fight (`perFight` is the default). */
+  max: z.number().int().min(1).max(99),
   slots: z.number().int().min(0).max(6),
   vest: z.number().int().min(0).max(6).optional(),
 });
@@ -1495,6 +1511,21 @@ export const cloneRoleSchema = z.strictObject({
   ]),
 });
 
+/**
+ * A setting of the target priority: which enemy the player's side attacks first. The player picks one
+ * (`state.loadouts.targetPriority`); a fight reads it when it begins. `rule` is the behaviour: `auto`
+ * the target that removes the most damage per second of fighting, `adds` the helpers before the
+ * leader, `leader` the leader before the helpers, `weakest` the enemy with the least health. The
+ * name and the one-line description are the locale keys `targetPriority.<id>.name` and `.desc`.
+ */
+export const TARGET_RULES = ['auto', 'adds', 'leader', 'weakest'] as const;
+export const targetPrioritySchema = z.strictObject({
+  id: coreId,
+  /** The setting a fight uses when none is chosen or the chosen one is gone; exactly one of the content has it. */
+  default: z.boolean().optional(),
+  rule: z.enum(TARGET_RULES),
+});
+
 // ---------- balance ----------
 
 const pair = z.tuple([z.number(), z.number()]);
@@ -1602,7 +1633,16 @@ export const balanceParamsSchema = z.object({
   pillAt: z.number(),
   food: z.array(pair),
   toolTag: pair,
+  /** The share of the maximum health a won zone fight gives back at once; 0: health carries over and only `hpRegen` restores it. */
   zoneHpRegen: z.number(),
+  /** Passive health regeneration per second: a base and a gain per Vitality level (plus the `hp.regen` modifier). */
+  hpRegen: pair,
+  /** The share of the maximum health the character wakes with after a defeat. */
+  defeatHp: z.number().min(0).max(1),
+  /** The share of the maximum health a player waits for before going back to a fight after a defeat (a forecast session, a mission stage). */
+  restartHp: z.number().min(0).max(1),
+  /** By region of the enemy: the share of the maximum health a won zone fight against it restores (the training yard of the Academy: a new character is not worn down by the dummy). */
+  regionHeal: z.record(z.string(), z.number().min(0).max(1)),
   opRegen: z.number(),
   respawn: z.number(),
   wound: z.object({
@@ -1727,6 +1767,8 @@ export const balanceParamsSchema = z.object({
   combat: z.object({
     xpTickMs: z.number().int(),
     regenMs: z.number().int(),
+    /** The share of the health regeneration (`hpRegen`) that works while a fight is on; out of a fight the whole of it works. */
+    hpRegenShare: z.number().min(0).max(1),
     hitEven: z.number(),
     fightCapMs: z.number().int(),
     maxEnemies: z.number().int(),
@@ -2009,6 +2051,7 @@ export const contentDbSchema = z.object({
   combos: z.array(comboSchema),
   cloneRoles: z.array(cloneRoleSchema),
   pouchKinds: z.array(pouchKindSchema),
+  targetPriorities: z.array(targetPrioritySchema),
   ai: aiSchema,
 });
 
@@ -2035,6 +2078,7 @@ export const generatedDbSchema = contentDbSchema
     combos: true,
     cloneRoles: true,
     pouchKinds: true,
+    targetPriorities: true,
     ai: true,
     team: true,
     skillGroups: true,
@@ -2138,6 +2182,8 @@ export type TraitEntity = z.infer<typeof traitSchema>;
 export type Combo = z.infer<typeof comboSchema>;
 export type CloneRole = z.infer<typeof cloneRoleSchema>;
 export type PouchKind = z.infer<typeof pouchKindSchema>;
+export type TargetPriority = z.infer<typeof targetPrioritySchema>;
+export type TargetRule = (typeof TARGET_RULES)[number];
 export type AiTier = z.infer<typeof aiTierSchema>;
 export type AiData = z.infer<typeof aiSchema>;
 export type AiRuleId = (typeof AI_RULE_IDS)[number];

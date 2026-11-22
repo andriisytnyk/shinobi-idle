@@ -317,6 +317,20 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
   for (const k of db.pouchKinds) {
     at('pouchKinds', k.id);
     if (k.slots + (k.vest ?? 0) < 1) problem('slots', 'a pouch kind with no slot at all');
+    if (k.max < k.perFight) problem('max', 'the most a slot may carry is below its default amount');
+  }
+  // Exactly one target priority is the default: the fight falls back to it.
+  const priorities = db.targetPriorities.filter((r) => r.default === true);
+  if (db.targetPriorities.length > 0 && priorities.length === 0) {
+    at('targetPriorities', db.targetPriorities[0]?.id ?? '');
+    problem('default', 'no target priority is the default');
+  }
+  for (const r of priorities.slice(1)) {
+    at('targetPriorities', r.id);
+    problem(
+      'default',
+      `a second default target priority (the first is ${priorities[0]?.id ?? ''})`,
+    );
   }
   for (const t of db.traits) {
     at('traits', t.id);
@@ -474,6 +488,7 @@ export function validateClosure(db: ContentDb, options: ClosureOptions): Closure
   for (const x of db.terrains) {
     at('terrains', x.id);
     needNumber('map.terrain', `map.terrain.${x.id}`);
+    if (x.key !== undefined) ref('key', x.key, 'cellKeys');
     x.finds?.drops.forEach((d, n) => ref(`finds.drops[${n}].item`, d.item, 'items'));
   }
   for (const h of db.hexes) {

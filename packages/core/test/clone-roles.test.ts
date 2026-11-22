@@ -338,7 +338,6 @@ describe('saves', () => {
     delete raw.state.loadouts.cloneRole;
     const loaded = deserialize(JSON.stringify(raw), content);
     expect(loaded.v).toBe(STATE_VERSION);
-    expect(STATE_VERSION).toBe(STATE_VERSION);
     expect(loaded.loadouts.cloneRole).toBeNull();
   });
 

@@ -68,12 +68,14 @@ export interface LoadoutState {
   basis: string;
   /** The role all the combat clones take in a fight (`content.cloneRoles`); null: the default role. */
   cloneRole: string | null;
+  /** The target priority of the fight (`content.targetPriorities`); null: the default one. */
+  targetPriority: string | null;
   saved: Record<string, { techniques: string[]; signature: string | null }>;
 }
 
-/** The pouch: one slot per kind of slot (`content.pouchKinds`) holding one item (an empty slot has an empty id) and the units of it carried now, and the slot the medic pouch uses. */
+/** The pouch: one slot per kind of slot (`content.pouchKinds`) holding one item (an empty slot has an empty id), the units of it carried now and the amount the player wants in every fight (`amount`, within the kind's range), and the slot the medic pouch uses. */
 export interface PouchState {
-  slots: { kind: string; id: string; n: number }[];
+  slots: { kind: string; id: string; n: number; amount: number }[];
   medic: number | null;
 }
 

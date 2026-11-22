@@ -16,6 +16,8 @@ export interface PlayerSnapshot {
   /** Ids of the techniques the player may use. */
   known: string[];
   natures: NatureId[];
+  /** The `hp.regen` modifiers' total in HP per second (gear, buildings, tonics); absent means none. */
+  hpRegenBonus?: number;
   /** Multipliers on technique cost, from items and village. */
   costMod: { chakra: number; stamina: number };
   /** Pools at the start of the fight; absent means full. */
@@ -43,6 +45,8 @@ export interface PlayerSnapshot {
   chakraDivisor?: number;
   /** The role of the combat clones (`content.cloneRoles`); absent, or one the content does not have: the default role. */
   cloneRole?: string;
+  /** The target priority (`content.targetPriorities`); absent, or one the content does not have: the default one. */
+  targetPriority?: string;
 }
 
 /** The highest level of knowledge of an enemy: unknown, seen, defeated, studied. */
@@ -85,6 +89,21 @@ export function hitChance(accuracy: number, evasion: number, content: ContentDb)
       ? (K.combat.hitEven * accuracy) / evasion
       : 1 - (K.combat.hitEven * evasion) / accuracy;
   return Math.min(K.hitMax, Math.max(K.hitMin, raw));
+}
+
+/**
+ * The levels the health formulas read: only Vitality counts. The skill is named by the shape of `Levels` the formulas
+ * already read (`levels.vit`), not by an id written here: the fight code keeps no id of a pack as a literal.
+ */
+export const vitalityLevels = (level: number): Levels => ({ vit: level }) as unknown as Levels;
+
+/** The skill whose level sets the health: the one `vitalityLevels` fills. */
+export const VITALITY_SKILL = Object.keys(vitalityLevels(0))[0] as SkillId;
+
+/** Health regenerated per second at these levels, before the `hp.regen` modifiers: the base and the Vitality gain. */
+export function hpRegenOf(levels: Levels, content: ContentDb): number {
+  const [base, perLevel] = content.balance.K.hpRegen;
+  return (base ?? 0) + (perLevel ?? 0) * (levels.vit ?? 1);
 }
 
 export function maxHpOf(levels: Levels, content: ContentDb): number {

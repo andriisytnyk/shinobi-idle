@@ -1,7 +1,7 @@
 import type { Cell, ContentDb, Hex } from '@shinobi/content';
 import { indexOf } from './lookup.ts';
 import { touchMods } from './modifiers.ts';
-import { skillLevel } from './requirements.ts';
+import { reqMet, skillLevel, type Req } from './requirements.ts';
 import type { GameState } from './state.ts';
 import { activitySkill } from './vocab.ts';
 
@@ -135,6 +135,54 @@ export function isEnterable(content: ContentDb, hex: Hex | null | undefined): bo
   if (!isPlayable(hex)) return false;
   return indexOf(content).terrains.get(hex.terrain)?.blocked !== true;
 }
+
+// ---------- keys ----------
+
+/** The ids of the keys each hex needs (its cell's key and its terrain's key), for the hexes that need any; built once per content. */
+const keyedHexes = new WeakMap<ContentDb, Map<string, string[]>>();
+function keyedOf(content: ContentDb): Map<string, string[]> {
+  let map = keyedHexes.get(content);
+  if (map) return map;
+  map = new Map();
+  const index = indexOf(content);
+  for (const [key, hex] of index.hexes) {
+    const ids: string[] = [];
+    const cellKey = index.cellByHex.get(key)?.key;
+    if (cellKey) ids.push(cellKey);
+    // A crossing (a ford, a bridge) is passed without the key of its terrain.
+    const terrainKey =
+      hex.terrain === undefined || hex.crossing ? undefined : index.terrains.get(hex.terrain)?.key;
+    if (terrainKey && !ids.includes(terrainKey)) ids.push(terrainKey);
+    if (ids.length > 0) map.set(key, ids);
+  }
+  keyedHexes.set(content, map);
+  return map;
+}
+
+/** The ids of the keys the hex under `key` needs: its cell's key and its terrain's key (data, so a pack's terrain can carry one). Empty for an open hex. */
+export const hexKeyIds = (content: ContentDb, key: string): readonly string[] =>
+  keyedOf(content).get(key) ?? [];
+
+/** The requirements of the keys the hex under `key` needs. */
+export const hexKeyReqs = (content: ContentDb, key: string): Req[] =>
+  hexKeyIds(content, key).flatMap((id) => content.cellKeys[id] ?? []);
+
+/** The ids of the keys the state lacks (knowledge is the character's; clones share it), in a fixed order. */
+export function unmetKeys(state: GameState, content: ContentDb): string[] {
+  const out: string[] = [];
+  for (const id of Object.keys(content.cellKeys).sort()) {
+    const req = content.cellKeys[id];
+    if (req && !reqMet(state, req, content)) out.push(id);
+  }
+  return out;
+}
+
+/** The keys the hex under `key` needs that the state lacks; empty when the hex is open to it. */
+export const missingKeys = (state: GameState, content: ContentDb, key: string): string[] =>
+  hexKeyIds(content, key).filter((id) => {
+    const req = content.cellKeys[id];
+    return req !== undefined && !reqMet(state, req, content);
+  });
 
 /**
  * The address where the performer of action slot `slot` stands. Slot 0 is the character
@@ -298,10 +346,10 @@ type HeapItem = [number, string];
  * ties go to the smaller key so that the result never depends on the order of the search.
  */
 export function reachFrom(state: GameState, content: ContentDb, from: Axial, slot = 0): Reach {
-  const stamp = `${hexKey(from.q, from.r)}|${positionOf(state, slot)}|${worldStamp(state)}`;
+  const stamp = `${hexKey(from.q, from.r)}|${positionOf(state, slot)}|${worldStamp(state)}|${unmetKeys(state, content).join(',')}`;
   const memo = reaches.get(state)?.get(slot);
   if (memo && memo.content === content && memo.stamp === stamp) return memo.reach;
-  const reach = searchFrom(state, content, from, slot);
+  const reach = searchFrom(state, content, from, slot, null);
   const all = reaches.get(state) ?? new Map();
   all.set(slot, { content, stamp, reach });
   reaches.set(state, all);
@@ -314,10 +362,25 @@ const reaches = new WeakMap<
   Map<number, { content: ContentDb; stamp: string; reach: Reach }>
 >();
 
-function searchFrom(state: GameState, content: ContentDb, from: Axial, slot: number): Reach {
+/**
+ * The search. A hex whose key the state lacks is not entered, unless a key is `granted` (a diagnosis of
+ * what the keys cost). A performer that stands on such a hex (a save from before the keys) may walk
+ * out: keyed hexes can be entered from the keyed hexes the way out began on, never from open ground.
+ */
+function searchFrom(
+  state: GameState,
+  content: ContentDb,
+  from: Axial,
+  slot: number,
+  granted: ReadonlySet<string> | null,
+): Reach {
   const graph = walkGraph(content);
   const known = surveyedKeys(state, content, slot);
   const start = hexKey(from.q, from.r);
+  const lacking = new Set(unmetKeys(state, content).filter((id) => !granted?.has(id)));
+  const locked = (key: string): boolean =>
+    lacking.size > 0 && hexKeyIds(content, key).some((id) => lacking.has(id));
+  const chain = new Set<string>(locked(start) ? [start] : []);
   const dist = new Map<string, number>([[start, 0]]);
   const prev = new Map<string, string>();
   const done = new Set<string>();
@@ -360,11 +423,14 @@ function searchFrom(state: GameState, content: ContentDb, from: Axial, slot: num
     done.add(key);
     for (const edge of graph.get(key) ?? []) {
       if (done.has(edge.key) || !known.has(edge.key)) continue;
+      const shut = locked(edge.key);
+      if (shut && !chain.has(key)) continue;
       const next = cost + edge.minutes;
       const old = dist.get(edge.key);
       if (old === undefined || next < old || (next === old && key < (prev.get(edge.key) ?? key))) {
         dist.set(edge.key, next);
         prev.set(edge.key, key);
+        if (shut) chain.add(edge.key);
         push([next, edge.key]);
       }
     }
@@ -400,6 +466,40 @@ export function routeTo(
   return pathTo(content, reachFrom(state, content, here, slot), hexKey(target.q, target.r));
 }
 
+/**
+ * What the keys cost the route to `target`, for the screens (the reason of a refusal, the note that
+ * a route goes round). When the performer can reach it now: the keys the cheapest route would need
+ * if no key were needed and that the performer lacks (empty when that route is open; non-empty when
+ * the route goes round). When it cannot: the keys without which no way exists (each one alone shuts
+ * every way), empty when the way is shut by fog or terrain, not by a key. Null when the target cannot
+ * be reached even with every key.
+ */
+export function routeKeyCost(
+  state: GameState,
+  content: ContentDb,
+  target: Axial,
+  slot = 0,
+): string[] | null {
+  const here = positionHex(state, content, slot);
+  if (!here) return null;
+  const goal = hexKey(target.q, target.r);
+  const lacking = unmetKeys(state, content);
+  const all = new Set(lacking);
+  const free = pathTo(content, searchFrom(state, content, here, slot, all), goal);
+  if (!free) return null;
+  if (routeTo(state, content, target, slot) === null) {
+    // Shut: a key is necessary when, with every other key granted, the way is still shut.
+    return lacking.filter((id) => {
+      const others = new Set(lacking.filter((x) => x !== id));
+      return pathTo(content, searchFrom(state, content, here, slot, others), goal) === null;
+    });
+  }
+  const out: string[] = [];
+  for (const key of free.hexes)
+    for (const id of missingKeys(state, content, key)) if (!out.includes(id)) out.push(id);
+  return out;
+}
+
 // ---------- what can be surveyed from here ----------
 
 /**
@@ -428,4 +528,15 @@ export function surveyAccess(
       return hexes.has(key) && walkable.dist.has(key);
     }) || linkedKeys(content, hexKey(target.q, target.r)).some((key) => walkable.dist.has(key));
   return touches ? 'ok' : 'cutOff';
+}
+
+/** A ford or a bridge. */
+export type Crossing = 'ford' | 'bridge';
+
+/** The crossing at the hex under `key`, when it is one over a terrain that asks a key (the crossing is what lets the hex be passed); else null. */
+export function crossingAt(content: ContentDb, key: string): Crossing | null {
+  const index = indexOf(content);
+  const hex = index.hexes.get(key);
+  if (!hex?.crossing || hex.terrain === undefined) return null;
+  return index.terrains.get(hex.terrain)?.key ? hex.crossing : null;
 }

@@ -14,8 +14,9 @@ import {
   setLoadout,
   setSignature,
   setCloneRole,
+  setTargetPriority,
 } from './combat/loadout.ts';
-import { setMedicSlot, setPouchSlot, usePouchSlot } from './combat/pouch.ts';
+import { setMedicSlot, setPouchAmount, setPouchSlot, usePouchSlot } from './combat/pouch.ts';
 import { buildObstacle } from './athletics.ts';
 import { studyEnemy } from './combat/bingo.ts';
 import { followChakraPool } from './combat/system.ts';
@@ -103,10 +104,13 @@ export type Command =
   | { type: 'loadout.signature'; technique: string | null }
   /** Chooses the role all the combat clones take in a fight (an id of `content.cloneRoles`; null: the default role). */
   | { type: 'loadout.cloneRole'; role: string | null }
+  /** Chooses which enemy the player's side attacks first (an id of `content.targetPriorities`; null: the default one). */
+  | { type: 'loadout.targetPriority'; priority: string | null }
   /** Builds the best loadout and pouch for a zone, enemy or boss id. */
   | { type: 'loadout.prepare'; encounter: string }
   /** Puts an item (or nothing) in a pouch slot and packs it from the bank. */
   | { type: 'pouch.set'; slot: number; item: string | null }
+  | { type: 'pouch.amount'; slot: number; amount: number }
   /** Uses a healing or restoring slot by hand during a fight. */
   | { type: 'pouch.use'; slot: number }
   /** Chooses the slot the medic pouch uses on its own (null: none). */
@@ -444,8 +448,12 @@ function apply(
       return setSignature(state, command.technique, content);
     case 'loadout.cloneRole':
       return setCloneRole(state, command.role, content);
+    case 'loadout.targetPriority':
+      return setTargetPriority(state, command.priority, content);
     case 'loadout.prepare':
       return prepareLoadout(state, command.encounter, content);
+    case 'pouch.amount':
+      return setPouchAmount(state, command.slot, command.amount, content);
     case 'pouch.set':
       return setPouchSlot(state, command.slot, command.item, content);
     case 'pouch.use':

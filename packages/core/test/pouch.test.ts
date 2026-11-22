@@ -17,6 +17,7 @@ import {
   type CombatAi,
   type FightState,
   type PlayerSnapshot,
+  perFight,
 } from '../src/index.ts';
 import { K, enemyAt, pacify, quiet, rules, scripted, sec, withAi, ctxOf } from './fight-helpers.ts';
 import { addEffect } from '../src/index.ts';
@@ -24,7 +25,7 @@ import { fighter, ids, run, startFight, startOperation, stock, unlock } from './
 
 const LEVEL = 34;
 /** Units a food slot takes into a fight (the per-fight amount of its kind). */
-const FOOD = 4;
+const FOOD = perFight(content, 'core:pk_food');
 
 /** A fight in which the AI uses `item` the first time it can, and otherwise waits. */
 function itemFight(
@@ -58,7 +59,12 @@ describe('stacks', () => {
     const state = fighter(1, 20);
     stock(state, { [ids.heal]: FOOD + 3 });
     run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
-    expect(state.pouch.slots[0]).toEqual({ kind: 'core:pk_food', id: ids.heal, n: FOOD });
+    expect(state.pouch.slots[0]).toEqual({
+      kind: 'core:pk_food',
+      id: ids.heal,
+      n: FOOD,
+      amount: FOOD,
+    });
     expect(state.bank[ids.heal]).toBe(3);
     // A slot of another kind does not take it, and a tool of nothing is no pouch item.
     expect(dispatch(state, { type: 'pouch.set', slot: 1, item: ids.heal }, content)).toEqual({
@@ -106,13 +112,13 @@ describe('refills', () => {
     const state = fighter(2, 40);
     stock(state, { [ids.heal]: 30 });
     run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
-    state.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 1 };
+    state.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 1, amount: FOOD };
     const bank = state.bank[ids.heal] ?? 0;
     expect(startFight(state, 'core:zone_dummy')).toEqual({ ok: true });
     // Starting the zone packed the pouch; spend most of it as a fight would.
     expect(state.pouch.slots[0]?.n).toBe(FOOD);
     expect(state.bank[ids.heal]).toBe(bank - (FOOD - 1));
-    state.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 0 };
+    state.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 0, amount: FOOD };
     advance(state, 90_000, content);
     expect(state.counters['kills.core:dummy'] ?? 0).toBeGreaterThan(0);
     expect(state.pouch.slots[0]?.n).toBeGreaterThan(0);
@@ -126,7 +132,7 @@ describe('refills', () => {
     expect(startOperation(state, 'core:op_hideout')).toEqual({ ok: true });
     expect(state.pouch.slots[0]?.n).toBe(FOOD);
     // Part of the pouch is spent: the running fight carries the count, and nothing refills it while the fight goes on.
-    state.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 2 };
+    state.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 2, amount: FOOD };
     if (state.combat) state.combat.fight.pouch[0] = { id: ids.heal, n: 2 };
     const bank = state.bank[ids.heal] ?? 0;
     const first = state.combat?.run?.step ?? -1;
@@ -271,7 +277,11 @@ describe('what each tool does, and what it costs', () => {
     heal.fight.player.hp = 10;
     fightAdvance(heal.fight, workOf(1500), content, heal.r);
     const item = content.items.find((i) => i.id === ids.heal);
-    expect(heal.fight.player.hp).toBeCloseTo(10 + (item?.fx?.kind === 'heal' ? item.fx.hp : 0), 6);
+    // The pill, and the one regeneration step (a second of the fight) that falls inside the 1.5 s.
+    expect(heal.fight.player.hp).toBeCloseTo(
+      10 + (item?.fx?.kind === 'heal' ? item.fx.hp : 0) + heal.fight.kit.hpRegen,
+      6,
+    );
 
     const pill = itemFight(ids.chakraPill);
     pill.fight.player.chakra = 0;

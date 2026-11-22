@@ -4,6 +4,7 @@
     "fx": "wolfPack",
     "hook": "special:packRespawn",
     "companions": {
+      "respawns": true,
       "fx": "wolfPack",
       "hook": "special:packMember"
     },

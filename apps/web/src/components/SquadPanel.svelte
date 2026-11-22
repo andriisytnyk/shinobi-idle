@@ -18,6 +18,7 @@
   import EntityLink from './EntityLink.svelte';
   import Icon from './Icon.svelte';
   import TimeBar from './TimeBar.svelte';
+  import { hpText, regenText, vitalsOf } from '../lib/vitals.ts';
 
   interface Props {
     /** A phone: a strip of chips, and a sheet with the rows behind a tap. */
@@ -35,6 +36,11 @@
   const timings = $derived(
     game.read((gs) =>
       Object.fromEntries(list.map((p) => [p.slot, timingOf(gs, p.slot, content, game.rules)])),
+    ),
+  );
+  const vitals = $derived(
+    game.read((gs) =>
+      Object.fromEntries(list.map((p) => [p.slot, vitalsOf(gs, p.slot, content, game.rules)])),
     ),
   );
   const canCreate = $derived(game.read((gs) => canCreateClone(gs, content)));
@@ -117,6 +123,16 @@
     {/if}
 
     <dl class="facts">
+      {#if vitals[p.slot]}
+        {@const v = vitals[p.slot]!}
+        <div data-squad-hp>
+          <dt>{t('squad.hp')}</dt>
+          <dd>
+            {hpText(v)}{#if regenText(v)}
+              <span class="regen">{regenText(v)}</span>{/if}
+          </dd>
+        </div>
+      {/if}
       {#if p.clone && p.lifeMs !== undefined}
         <div data-squad-life>
           <dt>{t('squad.life')}</dt>
@@ -413,6 +429,12 @@
   dd {
     margin: 0;
     font-weight: 600;
+  }
+
+  .regen {
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
+    font-weight: 400;
   }
 
   .life {

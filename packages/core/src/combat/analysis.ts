@@ -29,8 +29,9 @@ import { fightSim } from './fight-sim.ts';
 import type { Encounter, FightState } from './fight-types.ts';
 import { itemAnswers } from './fight-items.ts';
 import { answersTrait, planTarget } from './loadout.ts';
-import { secMs, type PlayerSnapshot } from './numbers.ts';
+import { hpRegenOf, secMs, type PlayerSnapshot } from './numbers.ts';
 import { snapshotPlayer } from './snapshot.ts';
+import { restartReady } from './vitality.ts';
 import { FIGHT_KIND, MISSION_KIND, OPERATION_KIND, isCombatKind } from './system.ts';
 import { STAND_ID, STAND_KIND } from '../performer.ts';
 import { approachMs, entryOf, fightTarget, opSteps } from './zones.ts';
@@ -336,15 +337,9 @@ function runZone(
   content: ContentDb,
   rules: Rules,
 ): Batch {
-  const sim = fightSim(
-    snap,
-    encounter,
-    samples,
-    seed,
-    content,
-    rules,
-    content.balance.K.zoneHpRegen,
-  );
+  // Every sample is a fight of its own from the health the player has now: the first-fight figures are about the fight, and
+  // how health wears down over a series is the session forecast's business (it plays the game itself).
+  const sim = fightSim(snap, encounter, samples, seed, content, rules);
   return {
     simulatedMs: () => sim.simulatedMs,
     step: (plays) => sim.step(plays),
@@ -401,6 +396,7 @@ function runOperation(
   const rng = createStream(seed, 'analysis.pick');
   const total: Figures = { runs, wins: 0, allMs: 0, winMs: 0, wounds: 0, items: {} };
   const respawn = secMs(K.respawn);
+  const regenPerSecond = Math.max(0, hpRegenOf(snap.levels, content) + (snap.hpRegenBonus ?? 0));
   let played = 0;
   let simulatedMs = 0;
   const play = (r: number): void => {
@@ -456,7 +452,8 @@ function runOperation(
       pouch = fight.pouch.map((s) => ({ ...s }));
       const p = fight.player;
       pools = {
-        hp: Math.min(p.maxHp, p.hp + K[op.regen] * p.maxHp),
+        // The share the operation gives back, and what regenerates in the pause before the next step.
+        hp: Math.min(p.maxHp, p.hp + K[op.regen] * p.maxHp + regenPerSecond * K.respawn),
         chakra: Math.min(p.maxChakra, p.chakra + K[op.regen] * p.maxChakra),
         stamina: Math.min(p.maxStamina, p.stamina + K[op.regen] * p.maxStamina),
       };
@@ -981,7 +978,8 @@ function openSession(
     rec.stackMax = Math.max(rec.stackMax, clone.wounds.stacks);
     t += MS_PER_SECOND;
     // A defeat (or a finished operation) ends the action; this forecast restarts it at once.
-    if (!clone.slots[at]?.action && !start()) over = true;
+    // The player waits for health (`K.restartHp`) before going back: regeneration runs meanwhile, and the wait is session time.
+    if (!clone.slots[at]?.action && restartReady(clone, content) && !start()) over = true;
   };
   const finish = (): void => {
     const r = clone.report[id];

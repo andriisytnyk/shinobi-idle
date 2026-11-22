@@ -72,6 +72,9 @@ const enemyView = (o: Partial<ViewEnemy> = {}): ViewEnemy => ({
   cast: null,
   nextCastIn: null,
   leader: false,
+  cl: 10,
+  dps: 5,
+  respawns: false,
   ...o,
 });
 function view(id: 'genin' | 'chunin', techs: KitTechnique[], enemies: ViewEnemy[]): FightView {
@@ -94,6 +97,7 @@ function view(id: 'genin' | 'chunin', techs: KitTechnique[], enemies: ViewEnemy[
     enemies,
     habituation: {},
     ai,
+    priority: 'auto',
     visibleTraits: content.ai.visibleTraits,
     vocab: aiVocab,
     pouch: [],

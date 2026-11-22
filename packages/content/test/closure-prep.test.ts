@@ -54,7 +54,7 @@ describe('the preparation numbers', () => {
       'core:pk_combat',
       'core:pk_cure',
     ]);
-    expect(content.pouchKinds.map((k) => k.perFight)).toEqual([4, 4, 3]);
+    expect(content.pouchKinds.map((k) => k.perFight)).toEqual([10, 4, 3]);
     expect(content.pouchKinds.map((k) => k.slots + (k.vest ?? 0))).toEqual([1, 3, 1]);
     // Every use an item can have in a fight has a slot kind that takes it.
     const uses = new Set(content.pouchKinds.flatMap((k) => k.uses));
@@ -93,12 +93,12 @@ describe('the preparation numbers', () => {
 
 describe('the balance overrides', () => {
   it('win over the imported value, and are the values the content carries', () => {
-    expect(Object.keys(BALANCE_OVERRIDE)).toEqual(['zoneHpRegen']);
+    expect(Object.keys(BALANCE_OVERRIDE)).toEqual([]);
     for (const [key, value] of Object.entries(BALANCE_OVERRIDE)) {
       expect((K as unknown as Record<string, unknown>)[key], key).toBe(value);
     }
     // The documented value is lower: the override is what makes the difference.
-    expect(withOverrides({ zoneHpRegen: 0.35 }, BALANCE_OVERRIDE).zoneHpRegen).toBe(0.8);
+    expect(withOverrides({ zoneHpRegen: 0.35 }, { zoneHpRegen: 0.8 }).zoneHpRegen).toBe(0.8);
   });
 
   it('fail for a key that is not a parameter, so a typo cannot shadow nothing', () => {

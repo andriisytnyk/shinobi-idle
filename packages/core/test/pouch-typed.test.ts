@@ -41,7 +41,7 @@ const CURE = perFight(content, 'core:pk_cure');
 
 describe('the kinds of slot', () => {
   it('have the per-fight amounts of the data', () => {
-    expect([FOOD, COMBAT, CURE]).toEqual([4, 4, 3]);
+    expect([FOOD, COMBAT, CURE]).toEqual([10, 4, 3]);
   });
 
   it('take only the items whose use the kind has', () => {
@@ -95,7 +95,7 @@ describe('the amount per fight', () => {
     expect(state.combat?.fight.pouch[0]).toEqual({ id: ids.heal, n: 3 });
     expect(state.bank[ids.heal]).toBeUndefined();
     // Once the bank gets more, the next fight takes it, up to the amount.
-    state.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 0 };
+    state.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 0, amount: 10 };
     stock(state, { [ids.heal]: 4 });
     refillPouch(state, content);
     expect(state.pouch.slots[0]?.n).toBe(4);
@@ -194,17 +194,22 @@ describe('the pouch of a clone', () => {
       ok: true,
     });
     const body = state.clones[1];
-    expect(body?.pouch.slots[0]).toEqual({ kind: 'core:pk_food', id: ids.heal, n: FOOD });
+    expect(body?.pouch.slots[0]).toEqual({
+      kind: 'core:pk_food',
+      id: ids.heal,
+      n: FOOD,
+      amount: 10,
+    });
     expect(body?.bag[ids.heal]).toBe(2);
     const bank = { ...state.bank };
     // The slot is spent; the next fight fills it from what is left in the bag.
-    if (body) body.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 0 };
+    if (body) body.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 0, amount: 10 };
     asPerformer(state, 1, () => refillPouch(state, content));
     expect(state.clones[1]?.pouch.slots[0]?.n).toBe(2);
     expect(state.clones[1]?.bag[ids.heal]).toBeUndefined();
     // With the bag empty there is nothing to take, and the Bank, however full, is not touched.
     if (state.clones[1])
-      state.clones[1].pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 0 };
+      state.clones[1].pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 0, amount: 10 };
     asPerformer(state, 1, () => refillPouch(state, content));
     expect(state.clones[1]?.pouch.slots[0]?.n).toBe(0);
     expect(state.bank).toEqual(bank);
@@ -212,10 +217,11 @@ describe('the pouch of a clone', () => {
 });
 
 describe('saves', () => {
-  /** A save of the version before the typed slots: slots with an item and a count, no kind. */
+  /** A save of the version before the typed slots (24 on dev; 23 runs the identity step of 24 first): slots with an item and a count, no kind. */
   function oldSave(
     slots: { id: string; n: number }[],
     medic: number | null,
+    from = 24,
   ): { text: string; bank: Record<string, number> } {
     const state = fighter(7, 36);
     stock(state, { [ids.heal]: 2, [ids.tag]: 1 });
@@ -223,11 +229,23 @@ describe('saves', () => {
       v: number;
       state: Record<string, unknown>;
     };
-    raw.v = 23;
-    raw.state.v = 23;
+    raw.v = from;
+    raw.state.v = from;
     raw.state.pouch = { slots, medic };
     return { text: JSON.stringify(raw), bank: { ...state.bank } };
   }
+
+  it('load from the version 23 too, and the slots start at the default amount of their kind', () => {
+    const { text } = oldSave([{ id: ids.heal, n: 4 }], null, 23);
+    const loaded = deserialize(text, content);
+    expect(loaded.v).toBe(STATE_VERSION);
+    expect(loaded.pouch.slots.map((s) => [s.kind, s.id, s.n, s.amount])).toEqual([
+      ['core:pk_food', ids.heal, 4, FOOD],
+      ['core:pk_combat', '', 0, COMBAT],
+      ['core:pk_combat', '', 0, COMBAT],
+      ['core:pk_cure', '', 0, CURE],
+    ]);
+  });
 
   it('move the old slots to the kinds that take their items; what fits no kind goes back to the Bank', () => {
     const { text, bank } = oldSave(
@@ -267,7 +285,7 @@ describe('saves', () => {
       state: Record<string, unknown>;
     };
     // The old pouch: the food in the first slot, two slots of tools before it would have moved the slot.
-    raw.v = 23;
+    raw.v = 24;
     raw.state.v = 23;
     raw.state.pouch = {
       slots: [
@@ -328,10 +346,138 @@ describe('a kind that a pack adds', () => {
       dispatch(state, { type: 'pouch.set', slot, item }, modContent, modRules);
     expect(set(4, ids.kunai)).toEqual({ ok: false, reason: 'error.wrongSlotKind' });
     expect(set(4, 'testmod:elixir').ok).toBe(true);
-    expect(state.pouch.slots[4]).toEqual({ kind: 'testmod:pk_phials', id: 'testmod:elixir', n: 2 });
+    expect(state.pouch.slots[4]).toEqual({
+      kind: 'testmod:pk_phials',
+      id: 'testmod:elixir',
+      n: 2,
+      amount: 2,
+    });
     expect(state.bank['testmod:elixir']).toBe(8);
     // The save keeps the kind with the slot.
     const back = deserialize(serialize(state, 0), modContent, modRules);
     expect(back.pouch.slots[4]).toEqual(state.pouch.slots[4]);
+  });
+});
+
+describe('the amount the player sets per slot', () => {
+  const most = (kind: string): number => content.pouchKinds.find((k) => k.id === kind)?.max ?? 0;
+
+  it('starts at the default of the kind, and changes by command within 1 and the most of the kind', () => {
+    const state = fighter(1, 36);
+    stock(state, { [ids.heal]: 100 });
+    expect(state.pouch.slots.map((s) => s.amount)).toEqual([FOOD, COMBAT, COMBAT, CURE]);
+    run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
+    expect(state.pouch.slots[0]?.n).toBe(FOOD);
+    run(state, { type: 'pouch.amount', slot: 0, amount: 25 });
+    expect(state.pouch.slots[0]).toMatchObject({ n: 25, amount: 25 });
+    expect(state.bank[ids.heal]).toBe(100 - 25);
+    // A smaller amount gives the difference back to the Bank at once.
+    run(state, { type: 'pouch.amount', slot: 0, amount: 6 });
+    expect(state.pouch.slots[0]).toMatchObject({ n: 6, amount: 6 });
+    expect(state.bank[ids.heal]).toBe(100 - 6);
+    for (const bad of [0, -1, 2.5, most('core:pk_food') + 1, Number.NaN]) {
+      expect(dispatch(state, { type: 'pouch.amount', slot: 0, amount: bad }, content)).toEqual({
+        ok: false,
+        reason: 'error.invalidAmount',
+      });
+    }
+    expect(dispatch(state, { type: 'pouch.amount', slot: 9, amount: 3 }, content)).toEqual({
+      ok: false,
+      reason: 'error.invalidSlot',
+    });
+    expect(state.pouch.slots[0]?.amount).toBe(6);
+  });
+
+  it('is refused in a fight, and a new item in the slot starts at the default again', () => {
+    const state = fighter(1, 36);
+    stock(state, { [ids.heal]: 100, [ids.bigHeal]: 100 });
+    run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
+    run(state, { type: 'pouch.amount', slot: 0, amount: 7 });
+    // The same item chosen again keeps the amount; another item starts at the default.
+    run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
+    expect(state.pouch.slots[0]?.amount).toBe(7);
+    run(state, { type: 'pouch.set', slot: 0, item: ids.bigHeal });
+    expect(state.pouch.slots[0]).toMatchObject({ id: ids.bigHeal, n: FOOD, amount: FOOD });
+    run(state, { type: 'pouch.amount', slot: 0, amount: 7 });
+    startFight(state, 'core:zone_dummy');
+    expect(dispatch(state, { type: 'pouch.amount', slot: 0, amount: 3 }, content)).toEqual({
+      ok: false,
+      reason: 'error.fighting',
+    });
+  });
+
+  it('is what every fight fills the slot to, in a zone and in every stage of an operation', () => {
+    const fightPouch = () => state.combat?.fight.pouch[0];
+    const state = fighter(3, 50);
+    unlock(state, 'op.hideout.unlocked');
+    stock(state, { [ids.heal]: 200 });
+    run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
+    run(state, { type: 'pouch.amount', slot: 0, amount: 6 });
+    expect(startFight(state, 'core:zone_dummy')).toEqual({ ok: true });
+    expect(state.combat?.fight.pouch[0]).toEqual({ id: ids.heal, n: 6 });
+    // Spent in the fight, the slot is filled to 6 again, not to the default, before the next one.
+    state.combat = null;
+    state.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 1, amount: 6 };
+    const bank = state.bank[ids.heal] ?? 0;
+    expect(startFight(state, 'core:zone_dummy')).toEqual({ ok: true });
+    expect(state.pouch.slots[0]?.n).toBe(6);
+    expect(state.bank[ids.heal]).toBe(bank - 5);
+    state.combat = null;
+    state.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 0, amount: 6 };
+    expect(startOperation(state, 'core:op_hideout')).toEqual({ ok: true });
+    expect(fightPouch()).toEqual({ id: ids.heal, n: 6 });
+  });
+
+  it('is kept by the save and by a clone, and read back within the range of the kind', () => {
+    const state = cloner();
+    ensurePouch(state, content);
+    stock(state, { [ids.heal]: 100 });
+    run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
+    run(state, { type: 'pouch.amount', slot: 0, amount: 8 });
+    expect(dispatch(state, { type: 'clone.create', items: { [ids.heal]: 20 } }, content).ok).toBe(
+      true,
+    );
+    expect(state.clones[1]?.pouch.slots[0]?.amount).toBe(8);
+    const back = deserialize(serialize(state, 0), content);
+    expect(back.pouch.slots[0]).toEqual(state.pouch.slots[0]);
+    expect(back.clones[1]?.pouch.slots[0]?.amount).toBe(8);
+    // A damaged amount falls back: out of range is clamped, not a number is the default of the kind.
+    const raw = JSON.parse(serialize(state, 0)) as {
+      state: { pouch: { slots: { amount: unknown }[] } };
+    };
+    const slots = raw.state.pouch.slots;
+    if (slots[0]) slots[0].amount = 500;
+    if (slots[1]) slots[1].amount = 'many';
+    if (slots[3]) slots[3].amount = 0;
+    const read = deserialize(JSON.stringify(raw), content);
+    expect(read.pouch.slots.map((s) => s.amount)).toEqual([
+      most('core:pk_food'),
+      COMBAT,
+      COMBAT,
+      1,
+    ]);
+    expect(read.pouch.slots[0]?.n).toBeLessThanOrEqual(most('core:pk_food'));
+  });
+
+  it('keeps a split of advance the same as a whole one', () => {
+    const make = () => {
+      const state = fighter(5, 40);
+      stock(state, { [ids.heal]: 300, [ids.kunai]: 80 });
+      run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
+      run(state, { type: 'pouch.amount', slot: 0, amount: 7 });
+      run(state, { type: 'pouch.set', slot: 1, item: ids.kunai });
+      run(state, { type: 'pouch.amount', slot: 1, amount: 2 });
+      dispatch(
+        state,
+        { type: 'action.start', slot: 0, kind: 'fight', id: 'core:zone_heavy' },
+        content,
+      );
+      return state;
+    };
+    const whole = make();
+    advance(whole, 600_000, content);
+    const split = make();
+    for (let i = 0; i < 60; i++) advance(split, 10_000, content);
+    expect(serialize(split, 0)).toBe(serialize(whole, 0));
   });
 });
