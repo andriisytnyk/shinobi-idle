@@ -52,8 +52,8 @@
     "castFloor": 0.4,
     "nonNativeCast": 0.3,
     "power": {
-      "E": 16,
-      "D": 16,
+      "E": 16.96,
+      "D": 16.96,
       "C": 25,
       "B": 40,
       "A": 63,
@@ -107,8 +107,8 @@
       }
     },
     "rankCd": {
-      "E": 0.9,
-      "D": 1,
+      "E": 0.55,
+      "D": 0.6,
       "C": 1.1,
       "B": 1.25,
       "A": 1.4,
@@ -207,9 +207,9 @@
         "count": 4,
         "everyMs": 75000,
         "hp": 0.12,
-        "dmg": 0.15,
-        "leaderHp": 1.23,
-        "leaderDmg": 1.23
+        "dmg": 0.05,
+        "leaderHp": 1.25,
+        "leaderDmg": 1.25
       },
       "rivalDuel": {
         "techniques": 1,
@@ -218,8 +218,8 @@
         "sigEveryMs": 16000,
         "sigMult": 0.3,
         "sigOpenMs": 2000,
-        "hp": 1.116,
-        "dmg": 1.116
+        "hp": 1.15,
+        "dmg": 1.15
       },
       "rivalTournament": {
         "techniques": 2,
@@ -228,39 +228,39 @@
         "sigEveryMs": 16000,
         "sigMult": 0.3,
         "sigOpenMs": 2000,
-        "hp": 1.27,
-        "dmg": 1.27,
+        "hp": 1.2,
+        "dmg": 1.2,
         "habituationMult": 2
       },
       "drunkenEvasion": {
         "maxMult": 2,
-        "hp": 1.116,
-        "dmg": 1.116
+        "hp": 1.06,
+        "dmg": 1.06
       },
       "heavyCast": {
         "everyMs": 20000,
         "castMs": 2500,
         "damageMult": 2,
         "stunMs": 500,
-        "hp": 1.104,
-        "dmg": 1.104
+        "hp": 1.1,
+        "dmg": 1.06
       },
       "twins": {
         "count": 2,
-        "hpEach": 0.593,
-        "dmgEach": 0.593,
+        "hpEach": 0.58,
+        "dmgEach": 0.58,
         "mistMult": 1.6
       },
       "mistRehide": {
         "everyMs": 25000,
-        "hp": 1.083,
-        "dmg": 1.06
+        "hp": 1.07,
+        "dmg": 1.05
       },
       "illusion": {
         "everyMs": 8000,
         "fleeAtHp": 0.3,
-        "hp": 1.36,
-        "dmg": 1.36
+        "hp": 1.4,
+        "dmg": 1.4
       }
     },
     "ryoDrop": [
@@ -332,8 +332,8 @@
       "share": 0.08
     },
     "basicDmg": [
-      7.84,
-      0.64
+      5.1,
+      0.719
     ],
     "dodgeStamina": 2,
     "ccCostPerLevel": 0.0015,
@@ -406,7 +406,7 @@
       4.3
     ],
     "boss": {
-      "hp": 3.6,
+      "hp": 3.3,
       "dmg": 1.49
     },
     "pack": {

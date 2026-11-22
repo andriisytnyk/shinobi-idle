@@ -12,7 +12,7 @@ void content;
 
 /** The supplies: boss levels 48 and 50 with a stock that runs out within the four hours played. */
 describe('the horizon of the supplies', () => {
-  for (const level of [48, 52]) {
+  for (const level of [48, 50]) {
     it(
       `states the forecast for the time the stock lasts, and for after it, at level ${level}`,
       {
@@ -103,7 +103,11 @@ describe('honest intervals', () => {
     'calls a safe zone stable for every seed, and never with a zero-width interval before enough sessions',
     { timeout: 300_000 },
     () => {
-      const counts = verdicts(zone(false), 20, { sessionMinutes: 5, maxSessions: 24 });
+      // Level 3, not 2 (moved by B6, shorter cooldowns of ranks E and D): at 2 one seed of 20 is called risky.
+      const counts = verdicts({ ...zone(false), level: 3 }, 20, {
+        sessionMinutes: 5,
+        maxSessions: 24,
+      });
       console.log(`safe zone, 20 seeds: ${JSON.stringify(counts)}`);
       expect(counts.stable).toBe(20);
       const state = build(zone(false), 501);

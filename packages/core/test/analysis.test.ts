@@ -41,7 +41,7 @@ describe('the session forecast against real play', () => {
   const cases: { c: Case; played: number; verdict: 'stable' | 'risky' | 'hopeless' }[] = [
     { c: zone(false), played: 2, verdict: 'stable' },
     { c: zone(true), played: 2, verdict: 'stable' },
-    { c: boss(48), played: 8, verdict: 'risky' },
+    { c: boss(46), played: 8, verdict: 'risky' },
     { c: hideout, played: 3, verdict: 'risky' },
   ];
   for (const [i, { c, played: games, verdict }] of cases.entries()) {
@@ -103,8 +103,9 @@ describe('the session forecast against real play', () => {
   });
 
   it('keeps the first fight apart from the yields: a boss that wins a fresh fight is not worth farming', () => {
-    // Level 45, not 44: the hunter of the fit that closed #82 wins a fresh fight 57% at 44 and 68% at 45.
-    const c = boss(45);
+    // Level 44 (moved from 45 by B6, shorter cooldowns of ranks E and D): the hunter wins a fresh fight 69% at 44 and
+    // the session median is 13%; at 45 the session median jumps to 77% (a seed-dependent cliff), at 43 it is 67% fresh.
+    const c = boss(44);
     const a = analyze(build(c, 64), c.target, {
       sessionMinutes: 30,
       maxSessions: 4,

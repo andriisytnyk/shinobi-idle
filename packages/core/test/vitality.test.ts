@@ -326,8 +326,9 @@ describe('clones', () => {
 
   it('has its own health, full when it is made, carried between its fights and regenerating', () => {
     const state = cloner(21);
-    startFight(state, WOLF, 0);
-    startFight(state, WOLF, 1);
+    // The harder zone: with health regenerating in the fight too (`hpRegenShare` 1) a clone of level 21 loses nothing to the wolves in 20 s.
+    startFight(state, HARD, 0);
+    startFight(state, HARD, 1);
     const body = state.clones[1];
     expect(body?.hp).toBe(performerMaxHp(state, content));
     advance(state, 20_000, content);

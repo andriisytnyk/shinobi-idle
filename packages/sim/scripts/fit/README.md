@@ -48,3 +48,9 @@ The AI tier thresholds (`ai.enemyTier`) and the rating formulas' structure are d
 - `OPT_ONLY=pwL,bd0,...` limits `opt.ts` to the named knobs (comma separated); `OPT_OUT=./name.json` writes the best knobs there instead of `opt-best.json`. The start knobs can be given as the fourth argument (JSON).
 - `regen.mjs '{"pw":1.1}'` applies knob multipliers on top of the numbers now in the docs, rebuilds `balance.json` and runs `pnpm content:import` (no need to touch `opt-best.json`).
 - After a pass that is kept: re-record the golden fixtures of `packages/core` (`UPDATE_GOLDEN=1` for `combat-golden` and `combat-golden-items`, `UPDATE_GOLDEN=expected` for `combat-dev-saves`, `DUMP=1` for `per-hit`, `RECORD_MISSIONS=1` for `missions-behaviour`), `scripts/snapshot.ts` of `packages/content`, the web page snapshots, `scripts/fit-record.ts` and `scripts/fit/table.ts`.
+
+## Added by the low-rank cooldowns change (B6)
+
+- `casts.ts` prints, for the first enemies, the mean fight time and the number of technique casts per won fight (yardsticks A and D): `pnpm --filter @shinobi/sim exec tsx scripts/fit/casts.ts` (`RCD=0.5` overrides `K.rankCd.D` for a quick look).
+- `apply.mjs` multiplies `rankCd` of E and D by `rcD`; after a pass that is kept, check the figures in `balance.mjs` (`rankCd`) by eye, because the regexp substitution was seen to apply a second factor to E when `rcD` is applied twice in a row.
+- A cliff to know: with `K.rankCd.D` below 0.6 the loadout planner prefers the Rank D projectiles to the Rank C ones (`planLoadout` scores damage per second), and `enemies.test.ts` and `loadout.test.ts` fail.
