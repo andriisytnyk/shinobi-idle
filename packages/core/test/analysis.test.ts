@@ -42,7 +42,7 @@ describe('the session forecast against real play', () => {
     { c: zone(false), played: 2, verdict: 'stable' },
     { c: zone(true), played: 2, verdict: 'stable' },
     { c: boss(46), played: 8, verdict: 'risky' },
-    // Nine games, not three: with three the share inside the band was a coin flip of the seeds (1 of 3 or 2 of 3).
+    // Nine games, not three: with three the share inside the band is a coin flip of the seeds (1 of 3 or 2 of 3).
     { c: hideout, played: 9, verdict: 'risky' },
   ];
   for (const [i, { c, played: games, verdict }] of cases.entries()) {

@@ -70,7 +70,7 @@ export const hideout: Case = {
   name: 'the hideout operation',
   target: { kind: 'operation', id: 'core:op_hideout' },
   level: 50,
-  bank: Object.fromEntries(Object.keys(wellStocked(50)).map((id) => [id, 200])),
+  bank: Object.fromEntries(Object.keys(wellStocked(50)).map((id) => [id, 20 * PREPARED_STACK])),
   knows: ['core:guard_pack', 'core:boss_twins', 'core:boss_mist'],
   prepare: (s) => {
     unlock(s, 'op.hideout.unlocked');
@@ -85,10 +85,6 @@ export function build(c: Case, seed: number): GameState {
   for (const id of c.knows ?? []) know(state, id);
   stock(state, c.bank);
   c.prepare(state);
-  // The cases were set at four units a slot (see PREPARED_STACK); the data default of the healing slot is ten.
-  state.pouch.slots.forEach((_, slot) =>
-    dispatch(state, { type: 'pouch.amount', slot, amount: PREPARED_STACK }, content),
-  );
   if (c.shared) {
     state.slots.push({ action: null, progress: 0, share: 1000, data: null });
     const drill = content.exercises[0];

@@ -54,7 +54,7 @@ describe('the preparation numbers', () => {
       'core:pk_combat',
       'core:pk_cure',
     ]);
-    expect(content.pouchKinds.map((k) => k.perFight)).toEqual([10, 4, 3]);
+    expect(content.pouchKinds.map((k) => k.perFight)).toEqual([4, 4, 3]);
     expect(content.pouchKinds.map((k) => k.slots + (k.vest ?? 0))).toEqual([1, 3, 1]);
     // Every use an item can have in a fight has a slot kind that takes it.
     const uses = new Set(content.pouchKinds.flatMap((k) => k.uses));

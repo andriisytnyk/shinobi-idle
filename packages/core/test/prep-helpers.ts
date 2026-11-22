@@ -28,11 +28,10 @@ export function healItemFor(c: number): string {
 }
 
 /**
- * What the prepared player of the balance tests has of each item: four, as every pouch slot carried before the typed
- * slots. The data default of the healing slot is now ten, which makes the bosses far easier (see the PR); these tests
- * keep measuring the fights at the strength their bounds were set at.
+ * What the prepared player of the balance tests has of each item: the most a slot can carry (the largest `max` of the
+ * pouch kinds), so the tests measure the strongest pouch the player can legally take. The maxes are the balance lever.
  */
-export const PREPARED_STACK = 4;
+export const PREPARED_STACK = Math.max(...content.pouchKinds.map((k) => k.max));
 
 /** Every item a prepared player might carry: `PREPARED_STACK` of the level's healing item and of each tool. */
 export function wellStocked(c: number): Record<string, number> {

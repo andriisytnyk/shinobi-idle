@@ -1915,9 +1915,9 @@
       "core:role_distract": "0881f23b9c30"
     },
     "pouchKinds": {
-      "core:pk_food": "50fbb28c7cb5",
-      "core:pk_combat": "3d26d236de23",
-      "core:pk_cure": "8e1e1d3b2ece"
+      "core:pk_food": "f36a3bc1a202",
+      "core:pk_combat": "05f17a4779a7",
+      "core:pk_cure": "b5897b82dcbb"
     },
     "targetPriorities": {
       "core:prio_auto": "9387b5244223",

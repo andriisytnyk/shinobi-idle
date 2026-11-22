@@ -41,7 +41,7 @@ const CURE = perFight(content, 'core:pk_cure');
 
 describe('the kinds of slot', () => {
   it('have the per-fight amounts of the data', () => {
-    expect([FOOD, COMBAT, CURE]).toEqual([10, 4, 3]);
+    expect([FOOD, COMBAT, CURE]).toEqual([4, 4, 3]);
   });
 
   it('take only the items whose use the kind has', () => {
@@ -95,7 +95,7 @@ describe('the amount per fight', () => {
     expect(state.combat?.fight.pouch[0]).toEqual({ id: ids.heal, n: 3 });
     expect(state.bank[ids.heal]).toBeUndefined();
     // Once the bank gets more, the next fight takes it, up to the amount.
-    state.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 0, amount: 10 };
+    state.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 0, amount: FOOD };
     stock(state, { [ids.heal]: 4 });
     refillPouch(state, content);
     expect(state.pouch.slots[0]?.n).toBe(4);
@@ -198,18 +198,18 @@ describe('the pouch of a clone', () => {
       kind: 'core:pk_food',
       id: ids.heal,
       n: FOOD,
-      amount: 10,
+      amount: FOOD,
     });
     expect(body?.bag[ids.heal]).toBe(2);
     const bank = { ...state.bank };
     // The slot is spent; the next fight fills it from what is left in the bag.
-    if (body) body.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 0, amount: 10 };
+    if (body) body.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 0, amount: FOOD };
     asPerformer(state, 1, () => refillPouch(state, content));
     expect(state.clones[1]?.pouch.slots[0]?.n).toBe(2);
     expect(state.clones[1]?.bag[ids.heal]).toBeUndefined();
     // With the bag empty there is nothing to take, and the Bank, however full, is not touched.
     if (state.clones[1])
-      state.clones[1].pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 0, amount: 10 };
+      state.clones[1].pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 0, amount: FOOD };
     asPerformer(state, 1, () => refillPouch(state, content));
     expect(state.clones[1]?.pouch.slots[0]?.n).toBe(0);
     expect(state.bank).toEqual(bank);
@@ -368,13 +368,13 @@ describe('the amount the player sets per slot', () => {
     expect(state.pouch.slots.map((s) => s.amount)).toEqual([FOOD, COMBAT, COMBAT, CURE]);
     run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
     expect(state.pouch.slots[0]?.n).toBe(FOOD);
-    run(state, { type: 'pouch.amount', slot: 0, amount: 25 });
-    expect(state.pouch.slots[0]).toMatchObject({ n: 25, amount: 25 });
-    expect(state.bank[ids.heal]).toBe(100 - 25);
+    run(state, { type: 'pouch.amount', slot: 0, amount: 3 });
+    expect(state.pouch.slots[0]).toMatchObject({ n: 3, amount: 3 });
+    expect(state.bank[ids.heal]).toBe(100 - 3);
     // A smaller amount gives the difference back to the Bank at once.
-    run(state, { type: 'pouch.amount', slot: 0, amount: 6 });
-    expect(state.pouch.slots[0]).toMatchObject({ n: 6, amount: 6 });
-    expect(state.bank[ids.heal]).toBe(100 - 6);
+    run(state, { type: 'pouch.amount', slot: 0, amount: 2 });
+    expect(state.pouch.slots[0]).toMatchObject({ n: 2, amount: 2 });
+    expect(state.bank[ids.heal]).toBe(100 - 2);
     for (const bad of [0, -1, 2.5, most('core:pk_food') + 1, Number.NaN]) {
       expect(dispatch(state, { type: 'pouch.amount', slot: 0, amount: bad }, content)).toEqual({
         ok: false,
@@ -385,20 +385,20 @@ describe('the amount the player sets per slot', () => {
       ok: false,
       reason: 'error.invalidSlot',
     });
-    expect(state.pouch.slots[0]?.amount).toBe(6);
+    expect(state.pouch.slots[0]?.amount).toBe(2);
   });
 
   it('is refused in a fight, and a new item in the slot starts at the default again', () => {
     const state = fighter(1, 36);
     stock(state, { [ids.heal]: 100, [ids.bigHeal]: 100 });
     run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
-    run(state, { type: 'pouch.amount', slot: 0, amount: 7 });
+    run(state, { type: 'pouch.amount', slot: 0, amount: 3 });
     // The same item chosen again keeps the amount; another item starts at the default.
     run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
-    expect(state.pouch.slots[0]?.amount).toBe(7);
+    expect(state.pouch.slots[0]?.amount).toBe(3);
     run(state, { type: 'pouch.set', slot: 0, item: ids.bigHeal });
     expect(state.pouch.slots[0]).toMatchObject({ id: ids.bigHeal, n: FOOD, amount: FOOD });
-    run(state, { type: 'pouch.amount', slot: 0, amount: 7 });
+    run(state, { type: 'pouch.amount', slot: 0, amount: 3 });
     startFight(state, 'core:zone_dummy');
     expect(dispatch(state, { type: 'pouch.amount', slot: 0, amount: 3 }, content)).toEqual({
       ok: false,
@@ -412,20 +412,20 @@ describe('the amount the player sets per slot', () => {
     unlock(state, 'op.hideout.unlocked');
     stock(state, { [ids.heal]: 200 });
     run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
-    run(state, { type: 'pouch.amount', slot: 0, amount: 6 });
+    run(state, { type: 'pouch.amount', slot: 0, amount: 2 });
     expect(startFight(state, 'core:zone_dummy')).toEqual({ ok: true });
-    expect(state.combat?.fight.pouch[0]).toEqual({ id: ids.heal, n: 6 });
-    // Spent in the fight, the slot is filled to 6 again, not to the default, before the next one.
+    expect(state.combat?.fight.pouch[0]).toEqual({ id: ids.heal, n: 2 });
+    // Spent in the fight, the slot is filled to 2 again, not to the default, before the next one.
     state.combat = null;
-    state.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 1, amount: 6 };
+    state.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 1, amount: 2 };
     const bank = state.bank[ids.heal] ?? 0;
     expect(startFight(state, 'core:zone_dummy')).toEqual({ ok: true });
-    expect(state.pouch.slots[0]?.n).toBe(6);
-    expect(state.bank[ids.heal]).toBe(bank - 5);
+    expect(state.pouch.slots[0]?.n).toBe(2);
+    expect(state.bank[ids.heal]).toBe(bank - 1);
     state.combat = null;
-    state.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 0, amount: 6 };
+    state.pouch.slots[0] = { kind: 'core:pk_food', id: ids.heal, n: 0, amount: 2 };
     expect(startOperation(state, 'core:op_hideout')).toEqual({ ok: true });
-    expect(fightPouch()).toEqual({ id: ids.heal, n: 6 });
+    expect(fightPouch()).toEqual({ id: ids.heal, n: 2 });
   });
 
   it('is kept by the save and by a clone, and read back within the range of the kind', () => {
@@ -433,14 +433,14 @@ describe('the amount the player sets per slot', () => {
     ensurePouch(state, content);
     stock(state, { [ids.heal]: 100 });
     run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
-    run(state, { type: 'pouch.amount', slot: 0, amount: 8 });
+    run(state, { type: 'pouch.amount', slot: 0, amount: 3 });
     expect(dispatch(state, { type: 'clone.create', items: { [ids.heal]: 20 } }, content).ok).toBe(
       true,
     );
-    expect(state.clones[1]?.pouch.slots[0]?.amount).toBe(8);
+    expect(state.clones[1]?.pouch.slots[0]?.amount).toBe(3);
     const back = deserialize(serialize(state, 0), content);
     expect(back.pouch.slots[0]).toEqual(state.pouch.slots[0]);
-    expect(back.clones[1]?.pouch.slots[0]?.amount).toBe(8);
+    expect(back.clones[1]?.pouch.slots[0]?.amount).toBe(3);
     // A damaged amount falls back: out of range is clamped, not a number is the default of the kind.
     const raw = JSON.parse(serialize(state, 0)) as {
       state: { pouch: { slots: { amount: unknown }[] } };
@@ -464,7 +464,7 @@ describe('the amount the player sets per slot', () => {
       const state = fighter(5, 40);
       stock(state, { [ids.heal]: 300, [ids.kunai]: 80 });
       run(state, { type: 'pouch.set', slot: 0, item: ids.heal });
-      run(state, { type: 'pouch.amount', slot: 0, amount: 7 });
+      run(state, { type: 'pouch.amount', slot: 0, amount: 3 });
       run(state, { type: 'pouch.set', slot: 1, item: ids.kunai });
       run(state, { type: 'pouch.amount', slot: 1, amount: 2 });
       dispatch(
