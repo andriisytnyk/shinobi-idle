@@ -8,6 +8,7 @@ import { masteryRef } from '../src/lib/entities.ts';
 import { MASK } from '../src/lib/reveal.ts';
 import { settings } from '../src/lib/settings.svelte.ts';
 import { game } from '../src/lib/store.ts';
+import MissionsPage from '../src/pages/MissionsPage.svelte';
 import WorldPage from '../src/pages/WorldPage.svelte';
 import { coreContext } from './helpers/core-registry.ts';
 
@@ -33,6 +34,7 @@ const q = (selector: string) => target.querySelector<HTMLElement>(selector);
 
 beforeEach(() => {
   settings.hints = false;
+  settings.setExt('core:missions.tab', 'board');
   target = document.createElement('div');
   document.body.append(target);
 });
@@ -43,16 +45,40 @@ afterEach(() => {
   target.remove();
 });
 
+const showMissions = (tab: 'board' | 'fieldwork' = 'fieldwork'): void => {
+  settings.setExt('core:missions.tab', tab);
+  app = mount(MissionsPage, { target, context: coreContext() });
+  flushSync();
+};
+
 const showScout = (): void => {
   app = mount(ScoutPanel, { target, context: coreContext(), props: { skill: 'scout' } });
   flushSync();
 };
 
-describe('the work that found points open, on the Scouting page', () => {
+describe('the Missions page has two tabs', () => {
+  it('opens on the board and switches to the field work, and remembers the choice', () => {
+    game.replaceState(genin());
+    showMissions('board');
+    const tabs = [...target.querySelectorAll<HTMLElement>('[data-missions-tabs] [role="tab"]')];
+    expect(tabs.map((x) => x.dataset.tab)).toEqual(['board', 'fieldwork']);
+    expect(tabs.map((x) => x.textContent?.trim())).toEqual([
+      name('missions.tab.board'),
+      name('missions.tab.fieldwork'),
+    ]);
+    expect(q('[data-rank]')).not.toBeNull();
+    expect(q('[data-fieldwork-tab]')).toBeNull();
+    tabs[1]?.click();
+    flushSync();
+    expect(q('[data-fieldwork-tab]')).not.toBeNull();
+    expect(q('[data-rank]')).toBeNull();
+    expect(settings.ext('core:missions.tab')).toBe('fieldwork');
+  });
+
   it('lists both works, locked and unnamed while their points are not found', () => {
     game.replaceState(genin());
-    showScout();
-    const tiles = [...target.querySelectorAll('[data-scout-works] [data-ui="action-tile"]')];
+    showMissions();
+    const tiles = [...target.querySelectorAll('[data-fieldwork-tab] [data-ui="action-tile"]')];
     expect(tiles).toHaveLength(2);
     for (const tile of tiles) {
       expect(tile.classList.contains('locked')).toBe(true);
@@ -64,20 +90,31 @@ describe('the work that found points open, on the Scouting page', () => {
     expect(target.textContent).not.toContain(name(`fieldwork.${SEARCH}.name`));
   });
 
-  it('opens the ruin search once the point is found and the level is there', () => {
+  it('opens the ruin search once the point is found and the level is there, and starts it', () => {
     const state = genin();
     state.skills.scout = { xp: xpAt(10) };
     state.world.pois[RUINS] = true;
     game.replaceState(state);
-    showScout();
+    showMissions();
     const tile = q(`[data-action="${SEARCH}"]`);
     expect(tile).not.toBeNull();
     expect(tile?.classList.contains('locked')).toBe(false);
     expect(tile?.textContent).toContain(name(`fieldwork.${SEARCH}.name`));
     // The deposit of Hell Valley is still locked, and still unnamed.
-    const other = q(`[data-action="${SULPHUR}"]`);
-    expect(other).toBeNull();
+    expect(q(`[data-action="${SULPHUR}"]`)).toBeNull();
     expect(target.textContent).not.toContain(name(`fieldwork.${SULPHUR}.name`));
+    tile?.querySelector<HTMLElement>('[data-ui="start-split"] [data-start]')?.click();
+    expect(game.state.slots[0]?.action).toEqual({ kind: 'fieldwork', id: SEARCH });
+  });
+
+  it('keeps the work off the Scouting page', () => {
+    const state = genin();
+    state.skills.scout = { xp: xpAt(10) };
+    state.world.pois[RUINS] = true;
+    game.replaceState(state);
+    showScout();
+    expect(q('[data-scout-works]')).toBeNull();
+    expect(q(`[data-action="${SEARCH}"]`)).toBeNull();
   });
 });
 
@@ -96,6 +133,8 @@ describe('the point on the map says what it opens', () => {
     q(`[data-ui="hex"][data-hex="${coord}"]`)?.dispatchEvent(
       new MouseEvent('click', { bubbles: true }),
     );
+    flushSync();
+    q('[data-hex-details]')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     flushSync();
   };
 

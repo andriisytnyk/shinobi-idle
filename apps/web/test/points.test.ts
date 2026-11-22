@@ -59,6 +59,13 @@ const q = (selector: string) => target.querySelector<HTMLElement>(selector);
 const click = (el: Element | null) => {
   el?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   flushSync();
+  // The full panel of a hex is behind «Деталі» of its card: these tests read it.
+  if (el?.getAttribute('data-ui') === 'hex' && !target.querySelector('[data-hex-details-body]')) {
+    target
+      .querySelector('[data-hex-details]')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    flushSync();
+  }
 };
 const select = (id: string) => click(q(`[data-ui="hex"][data-hex="${coordOf(id)}"]`));
 
@@ -212,6 +219,12 @@ describe('the rest of the interface', () => {
 
   it('the Scouting page shows the map mastery with its tiers', () => {
     app = mount(ScoutPanel, { target, context: coreContext(), props: { skill: 'scout' } });
+    flushSync();
+    // One compact chip; the tiers open from it.
+    expect(q('[data-ui="map-mastery"]')).toBeNull();
+    const chip = q('[data-mastery-chip]');
+    expect(chip?.textContent).toContain('/');
+    click(chip);
     flushSync();
     const block = q('[data-ui="map-mastery"]');
     expect(block).not.toBeNull();

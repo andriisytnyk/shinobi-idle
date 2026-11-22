@@ -134,6 +134,8 @@ describe('a panel that fails while it draws', () => {
     state.world.explores[cell.id] = game.content.balance.K.cellExplores[0] ?? 1;
     for (const p of cell.pois) state.world.pois[p.id] = true;
     booted = await bootApp([coreUi, bad], state, `#/cell/${cell.id}`);
+    booted.target.querySelector<HTMLElement>('[data-hex-details]')?.click();
+    await new Promise((r) => setTimeout(r, 0));
     expect(booted.target.querySelector('[data-poi-kind="outpost"]')).not.toBeNull();
     expect(booted.target.textContent).not.toContain('never drawn');
   });

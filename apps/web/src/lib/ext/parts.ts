@@ -79,7 +79,9 @@ export const UI_PARTS = [
   'hex',
   /** The player's token on the map. */
   'map-token',
-  /** The panel of the selected hex: beside the map, or a bottom sheet on a narrow screen. */
+  /** The small card of the selected hex over the map: a bottom sheet on a narrow screen. */
+  'hex-card',
+  /** The full panel of the selected hex, in the «Деталі» dialog. */
   'hex-panel',
   /** A point-of-interest row of the cell panel. */
   'poi-row',

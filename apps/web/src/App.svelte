@@ -13,6 +13,7 @@
   import HintHost from './components/HintHost.svelte';
   import MainNav from './components/MainNav.svelte';
   import NowBar from './components/NowBar.svelte';
+  import PointModal from './components/PointModal.svelte';
   import ReportModal from './components/ReportModal.svelte';
   import SquadPanel from './components/SquadPanel.svelte';
   import SquadWatch from './components/SquadWatch.svelte';
@@ -213,6 +214,16 @@
       <FinaleModal onClose={() => game.dismissFinale()} />
     {:else if game.graduation}
       <GraduationModal onClose={() => game.dismissGraduation()} />
+    {/if}
+    {#if game.foundPoint}
+      {@const found = game.foundPoint}
+      <PointModal
+        place={found.place}
+        reward={found.reward}
+        title={t('map.point.discovered')}
+        discovered
+        onClose={() => game.dismissFoundPoint()}
+      />
     {/if}
     {#if game.report}
       <ReportModal report={game.report} onClose={() => game.dismissReport()} />

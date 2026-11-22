@@ -13,7 +13,7 @@ describe('card grids hold at any column width', () => {
     'pages/SkillPage.svelte',
     'pages/FieldworkPage.svelte',
     'components/CoursePanel.svelte',
-    'components/ScoutPanel.svelte',
+    'pages/MissionsPage.svelte',
     'components/BingoBook.svelte',
     'components/BattleReport.svelte',
     'components/FightScreen.svelte',

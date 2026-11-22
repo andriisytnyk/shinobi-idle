@@ -227,6 +227,8 @@ describe('the app booted with core and testmod (T1)', () => {
     gs.world.explores[CELL] = game.content.balance.K.cellExplores[0] ?? 1;
     gs.world.pois[POI] = true;
     booted = await boot(`#/cell/${CELL}`, gs);
+    q('[data-hex-details]')?.click();
+    await new Promise((r) => setTimeout(r, 0));
     expect(q('[data-ui="hex"]')).not.toBeNull();
     expect(text('[data-hex-panel] [data-hex-title]')).toBe('Край тестового гаю');
     const row = q(`[data-poi="${POI}"]`);
@@ -326,6 +328,8 @@ describe('what a player sees with a mod (fix iteration)', () => {
     gs.world.explores[CELL] = game.content.balance.K.cellExplores[0] ?? 1;
     gs.world.pois['testmod:poi_grove_cache'] = true;
     booted = await boot(`#/cell/${CELL}`, gs);
+    q('[data-hex-details]')?.click();
+    await new Promise((r) => setTimeout(r, 0));
     const row = q('[data-poi="testmod:poi_grove_cache"]');
     expect(row?.textContent).toContain('Тестовий жетон: 3');
     expect(rawTexts()).toEqual([]);

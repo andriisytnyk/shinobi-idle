@@ -256,6 +256,8 @@ export interface SkillPanelSpec {
   place?: 'replace' | 'after';
   /** The one-time hint of the page (`hint.<id>`); default `skillPage`. */
   hint?: string;
+  /** The page shows the panel first and folds the lore, the gear and the pool into one «Деталі» block. */
+  compact?: boolean;
 }
 
 /**
