@@ -600,7 +600,7 @@
   }
 
   .slot .amount input {
-    width: 4.5rem;
+    width: calc(var(--space-8) * 1.5);
     min-height: var(--control-md);
   }
 
