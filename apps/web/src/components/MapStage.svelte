@@ -1,5 +1,14 @@
 <script lang="ts">
-  import { hexKey, hexOfAddress, isSurveyed, travelPlan } from '@shinobi/core';
+  import {
+    hexDistance,
+    hexKey,
+    hexOfAddress,
+    isSurveyed,
+    locationHint,
+    parseHexKey,
+    travelPlan,
+    type HintTarget,
+  } from '@shinobi/core';
   import { untrack } from 'svelte';
   import { actionRef, entityName } from '../lib/entities.ts';
   import { formatInt } from '../lib/format.ts';
@@ -9,6 +18,7 @@
   import { navigate } from '../lib/router.svelte.ts';
   import { game } from '../lib/store.ts';
   import { currencyOf, held } from '../lib/vocab.ts';
+  import { isHintKind } from '../lib/world.ts';
   import AutoSurveyButton from './AutoSurveyButton.svelte';
   import EntityLink from './EntityLink.svelte';
   import HexMap from './HexMap.svelte';
@@ -26,9 +36,39 @@
     focus?: { cell: string | null; region: string | null };
     /** The id of the one-time hint shown above the map; null when the page around the map shows its own. */
     hint?: string | null;
+    /** «Where to look» (`#/world/look/<kind>/<id>`): the thing whose search area the map highlights. */
+    look?: { kind: string; id: string } | null;
   }
 
-  let { focus = { cell: null, region: null }, hint = 'world' }: Props = $props();
+  let { focus = { cell: null, region: null }, hint = 'world', look = null }: Props = $props();
+
+  /** The search area of the thing to look for: null on a normal visit of the map, or for a thing with no place. */
+  const lookHint = $derived(
+    look && isHintKind(look.kind)
+      ? game.read((gs) => locationHint(gs, content, look as HintTarget))
+      : null,
+  );
+  const lookSet = $derived(lookHint ? new Set(lookHint.hexes) : null);
+  /** The hex of the area nearest to its middle: the map opens on it. */
+  const lookAt = $derived.by(() => {
+    if (!lookHint || lookHint.hexes.length === 0) return null;
+    const points = lookHint.hexes.flatMap((k) => parseHexKey(k) ?? []);
+    const mid = {
+      q: points.reduce((s, p) => s + p.q, 0) / points.length,
+      r: points.reduce((s, p) => s + p.r, 0) / points.length,
+    };
+    let best = lookHint.hexes[0] ?? null;
+    let bestDistance = Infinity;
+    for (const key of lookHint.hexes) {
+      const p = parseHexKey(key);
+      const d = p ? hexDistance({ q: p.q, r: p.r }, { q: mid.q, r: mid.r }) : Infinity;
+      if (d < bestDistance) {
+        best = key;
+        bestDistance = d;
+      }
+    }
+    return best;
+  });
 
   /** The currency exploring pays: the one with the role study. */
   const study = currencyOf(content, 'study') ?? '';
@@ -193,6 +233,17 @@
     </div>
   </div>
 
+  {#if lookHint}
+    <p class="looking" data-looking={lookHint.exact ? 'exact' : 'area'}>
+      <span class="swatch look"></span>
+      <span
+        >{t(lookHint.exact ? 'look.map.found' : 'look.map.area')}
+        <strong>{lookHint.regions.map((r) => t(`region.${r}.name`)).join(', ')}</strong></span
+      >
+      <a class="clear" href="#/world" data-look-clear>{t('look.clear')}</a>
+    </p>
+  {/if}
+
   <div
     class="stage"
     class:wide
@@ -206,6 +257,8 @@
         {view}
         {selected}
         {preview}
+        look={lookSet}
+        {lookAt}
         {sheet}
         onSelect={select}
         onHover={(c) => (hovered = c)}
@@ -248,6 +301,7 @@
       <li><span class="swatch reach"></span>{t('map.legend.reach')}</li>
       <li><span class="swatch you"></span>{t('map.legend.you')}</li>
       <li><span class="swatch route"></span>{t('map.legend.route')}</li>
+      <li><span class="swatch look"></span>{t('map.legend.look')}</li>
       <li><Icon name="lucide:landmark" size={16} />{t('map.legend.place')}</li>
       <li><span class="swatch poi"></span>{t('map.legend.poi')}</li>
       <li><span class="swatch pips"></span>{t('map.legend.pips')}</li>
@@ -473,6 +527,24 @@
     border-top: var(--border-thick) dashed var(--accent);
     border-radius: 0;
     background: none;
+  }
+
+  .swatch.look {
+    border-color: var(--map-look);
+    background: color-mix(in srgb, var(--map-look) 30%, transparent);
+  }
+
+  .looking {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-3);
+  }
+
+  .looking .clear {
+    margin-inline-start: auto;
+    color: var(--accent);
   }
 
   .swatch.poi {

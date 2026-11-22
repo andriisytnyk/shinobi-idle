@@ -52,6 +52,7 @@ const ROUTES = [
   '#/village',
   '#/village/*focus',
   '#/world',
+  '#/world/look/:kind/*id',
 ];
 
 /** The nav items that existed before, with the hash each opens. */

@@ -90,7 +90,18 @@ describe('the Missions page has two tabs', () => {
     expect(target.textContent).not.toContain(name(`fieldwork.${SEARCH}.name`));
   });
 
-  it('opens the ruin search once the point is found and the level is there, and starts it', () => {
+  it('says where to look for a point that is not found, without its id', () => {
+    game.replaceState(genin());
+    showMissions();
+    const lines = [...target.querySelectorAll('[data-work-look]')];
+    expect(lines).toHaveLength(2);
+    for (const line of lines) expect(line.textContent).toContain(name('look.search'));
+    expect(target.innerHTML).not.toContain('war_fort_ruins');
+    expect(target.innerHTML).not.toContain('hell_valley');
+    expect(target.querySelector('[data-work-look] a')).toBeNull();
+  });
+
+  it('opens the point is found and the level is there, and starts it', () => {
     const state = genin();
     state.skills.scout = { xp: xpAt(10) };
     state.world.pois[RUINS] = true;

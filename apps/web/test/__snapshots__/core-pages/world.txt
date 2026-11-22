@@ -450,6 +450,9 @@
               <span class="swatch route">
               Маршрут і його час
             <li>
+              <span class="swatch look">
+              Золота область: де шукати те, що просить вимога чи крок
+            <li>
               <svg aria-hidden="true" class="icon" height="16" viewBox="0 0 24 24" width="16">
                 <path d="#125-1dlw44n" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor">
               Назване місце

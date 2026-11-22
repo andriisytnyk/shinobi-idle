@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { listSkillActions } from '@shinobi/core';
+  import { listSkillActions, locationHint, pointStatus } from '@shinobi/core';
   import ActionTile from '../components/ActionTile.svelte';
   import Hint from '../components/Hint.svelte';
   import Icon from '../components/Icon.svelte';
@@ -32,6 +32,13 @@
 
   const content = game.content;
   /** The work that found points open (a ruin search, a deposit): locked with what it asks for until the point is found. */
+  /** For a work whose point is not found yet: the region to look in. The place id stays out of the page, so there is no link to the map. */
+  const lookRegions = (point: string): string[] | null =>
+    game.read((gs) => {
+      const place = content.places.find((p) => p.id === point);
+      if (!place || pointStatus(gs, content, place) === 'found') return null;
+      return locationHint(gs, content, { kind: 'place', id: point })?.regions ?? null;
+    });
   const works = $derived(
     game.read((gs) => {
       const scout = skillByActivity(content, 'map');
@@ -92,11 +99,21 @@
       {#if works.length === 0}
         <p class="ct-note" data-empty>{t('missions.fieldworkEmpty')}</p>
       {:else}
-        <ul class="tiles">
+        <div class="tiles">
           {#each works as info (info.kind + info.id)}
-            <ActionTile {info} />
+            {@const point = content.fieldworks.find((w) => w.id === info.id)?.point}
+            {@const regions = point ? lookRegions(point) : null}
+            <div class="work">
+              <ul class="one"><ActionTile {info} /></ul>
+              {#if regions && regions.length > 0}
+                <p class="look" data-work-look>
+                  {t('look.search')}
+                  <strong>{regions.map((r) => t(`region.${r}.name`)).join(', ')}</strong>
+                </p>
+              {/if}
+            </div>
           {/each}
-        </ul>
+        </div>
       {/if}
     </section>
   {:else}
@@ -184,6 +201,18 @@
     border-color: var(--accent);
     color: var(--accent);
     font-weight: 600;
+  }
+
+  .one {
+    display: grid;
+    margin: 0;
+    padding: 0;
+  }
+
+  .look {
+    margin: var(--space-1) 0 0;
+    color: var(--fg-dim);
+    font-size: var(--text-xs);
   }
 
   .tiles {

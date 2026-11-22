@@ -858,6 +858,8 @@
       ],
       "outpostRange": 1,
       "startRadius": 2,
+      "hintRadius": 2,
+      "hintMin": 4,
       "plainSurvey": [
         6,
         18

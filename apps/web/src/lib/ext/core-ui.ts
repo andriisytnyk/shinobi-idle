@@ -151,6 +151,17 @@ export const coreUi: UiPack = {
       nav: 'world',
       mount: { svelte: WorldPage },
     });
+    // The map with the search area of a thing to find («Шукай: …»); a normal visit of `#/world` shows none.
+    ui.addPage({
+      id: 'world.look',
+      route: '#/world/look/:kind/*id',
+      title: 'nav.world',
+      nav: 'world',
+      mount: {
+        svelte: WorldPage,
+        props: ({ params }) => ({ look: { kind: params.kind ?? '', id: params.id ?? '' } }),
+      },
+    });
     ui.addPage({
       id: 'nature',
       route: '#/nature',
