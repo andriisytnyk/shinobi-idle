@@ -18,21 +18,21 @@
 
 <SimplePage title={t('nav.more')}>
   <ul class="menu">
-    <li>
+    <li class="phone-only">
       <a href="#/bank" data-more-bank>
         <Icon name="lucide:package" size={18} />
         <span>{t('nav.bank')}</span>
         <Icon name="lucide:chevron-right" size={16} />
       </a>
     </li>
-    <li>
+    <li class="phone-only">
       <a href="#/shop" data-more-shop>
         <Icon name="lucide:store" size={18} />
         <span>{t('nav.shop')}</span>
         <Icon name="lucide:chevron-right" size={16} />
       </a>
     </li>
-    <li>
+    <li class="phone-only">
       <a href="#/village" data-more-village>
         <Icon name="lucide:landmark" size={18} />
         <span>{t('nav.village')}</span>
@@ -81,13 +81,18 @@
 
 <style>
   .menu {
+    display: grid;
+    gap: var(--space-2);
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  li + li {
-    margin-top: var(--space-2);
+  /* On a wide screen the side menu has these; on a phone only this page does. */
+  @media (min-width: 769px) {
+    .phone-only {
+      display: none;
+    }
   }
 
   a {

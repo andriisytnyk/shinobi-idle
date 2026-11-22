@@ -96,6 +96,50 @@ describe('game store', () => {
     expect(game.report).toBeNull();
   });
 
+  describe('a hidden tab', () => {
+    const setVisibility = (state: 'hidden' | 'visible') =>
+      vi.stubGlobal('document', { visibilityState: state });
+    afterEach(() => vi.unstubAllGlobals());
+
+    it('is not advanced by throttled ticks; one report covers the whole time away', () => {
+      const { game, advance } = setup();
+      startTai(game);
+      const xp = game.state.skills.tai!.xp;
+      const start = game.state.now;
+      setVisibility('hidden');
+      // A throttled timer: one tick a minute for ten minutes.
+      for (let i = 0; i < 10; i++) {
+        advance(60_000);
+        game.tick();
+      }
+      expect(game.report).toBeNull();
+      expect(game.state.skills.tai!.xp).toBe(xp);
+      setVisibility('visible');
+      game.tick();
+      expect(game.state.now - start).toBe(600_000);
+      expect(game.report?.requestedMs).toBe(600_000);
+      expect(game.report?.skills.find((s) => s.skill === 'tai')?.xp).toBeGreaterThan(0);
+    });
+
+    it('gives the same result as one offline stretch over the whole gap', () => {
+      const a = setup();
+      const b = setup();
+      startTai(a.game);
+      startTai(b.game);
+      setVisibility('hidden');
+      for (let i = 0; i < 10; i++) {
+        a.advance(60_000);
+        a.game.tick();
+      }
+      setVisibility('visible');
+      a.game.tick();
+      b.advance(600_000);
+      b.game.tick();
+      expect(serialize(a.game.state)).toBe(serialize(b.game.state));
+      expect(a.game.report).toEqual(b.game.report);
+    });
+  });
+
   it('applies a short gap silently', () => {
     const { game, advance } = setup();
     startTai(game);

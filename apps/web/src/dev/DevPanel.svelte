@@ -41,6 +41,20 @@
   // The open state lives in the side-panel store, so the app can swap «Мета» out while it is open.
   const open = $derived(sidePanel.dev);
   const setOpen = (v: boolean) => (sidePanel.dev = v);
+  /** The opener sits in the top bar next to «Мета» when the bar has a place for it; otherwise it floats. */
+  let opener: HTMLButtonElement | undefined = $state();
+  let inBar = $state(false);
+  $effect(() => {
+    const slot = document.querySelector('[data-topbar-dev-slot]');
+    if (!opener || !slot) return;
+    slot.append(opener);
+    inBar = true;
+    return () => {
+      inBar = false;
+      // eslint-disable-next-line svelte/no-dom-manipulating -- the button was moved out of its place; Svelte removes it on destroy
+      opener?.remove();
+    };
+  });
   let message = $state('');
   let failed = $state(false);
 
@@ -177,6 +191,8 @@
 <button
   type="button"
   class="opener"
+  class:in-bar={inBar}
+  bind:this={opener}
   data-dev-open
   hidden={squadUi.sheet}
   onclick={() => setOpen(!open)}
@@ -596,6 +612,18 @@
     font-size: var(--text-xs);
     font-weight: 600;
     cursor: pointer;
+  }
+
+  /* In the top bar the opener looks like its neighbours. */
+  .opener.in-bar {
+    position: static;
+    min-height: 0;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    background: var(--surface-raised);
+    font-size: inherit;
+    font-weight: 400;
+    opacity: 1;
   }
 
   /* On a phone the tab is a small one in the right corner above the bottom navigation, so it covers little of the page. */

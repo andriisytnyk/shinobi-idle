@@ -22,7 +22,7 @@
   const heads = $derived(game.read((gs) => hasSquad(gs, game.content)));
 </script>
 
-<Modal title={t('report.title')} paper {onClose}>
+<Modal title={t('report.title')} {onClose}>
   <p>{t('report.away', { time: formatDuration(report.requestedMs) })}</p>
   {#if report.capped}
     <p class="note">{t('report.capped', { time: formatDuration(report.simulatedMs) })}</p>
@@ -161,12 +161,5 @@
   ul {
     margin: 0;
     padding-left: var(--space-4);
-  }
-
-  /* Links on the paper take the ink colour, not the accent that suits the dark theme. */
-  :global(.paper) li :global(a) {
-    color: var(--paper-ink);
-    font-weight: 600;
-    text-decoration: underline;
   }
 </style>
